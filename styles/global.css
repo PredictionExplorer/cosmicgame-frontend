@@ -1,0 +1,46 @@
+@import url(/fonts/ClashDisplay/css/clash-display.css);
+@import url(/fonts/Inter/css/inter.css);
+
+a {
+  -webkit-text-decoration-color: white !important;
+  text-decoration-color: white !important;
+}
+
+@property --radius {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --border {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/* width */
+.cm-scroller::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+/* Track */
+.cm-scroller::-webkit-scrollbar-track {
+  border-radius: 200px;
+  background: #161B3C;
+}
+ 
+/* Handle */
+.cm-scroller::-webkit-scrollbar-thumb {
+  background: #15BFFD; 
+  border-radius: 200px;
+}
+
+/* Handle on hover */
+.cm-scroller::-webkit-scrollbar-thumb:hover {
+  background: #088dbe; 
+}
+
+.cm-scroller::-webkit-scrollbar-corner {
+  display: none;
+}
