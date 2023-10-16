@@ -4,6 +4,7 @@ import { InjectedConnector } from '@web3-react/injected-connector'
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 
 import { INFURA_KEY } from '../config/app'
+import { SEPOLIA_KEY } from '../config/app'
 import {
   ALL_SUPPORTED_CHAIN_IDS,
   DEFAULT_CHAIN_ID,
@@ -17,6 +18,7 @@ const NETWORK_URLS: { [key in SupportedChainId]: string } = {
   [SupportedChainId.ARBITRUM_RINKEBY]: `https://arbitrum-rinkeby.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.ARBITRUM_GOERLI]: `https://arbitrum-goerli.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.LOCAL_NETWORK]: 'http://170.187.142.12:11845',
+  [SupportedChainId.SEPOLIA]: `https://frosty-bold-pallet.arbitrum-sepolia.quiknode.pro/${SEPOLIA_KEY}/`,
 }
 
 export const network = new NetworkConnector({
