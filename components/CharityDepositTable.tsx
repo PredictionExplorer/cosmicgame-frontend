@@ -27,6 +27,7 @@ const DonationRow = ({ donation }) => {
       <TablePrimaryCell>
         {convertTimestampToDateTime(donation.TimeStamp)}
       </TablePrimaryCell>
+      <TablePrimaryCell align="center">{donation.RoundNum}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
           color="inherit"
@@ -54,13 +55,15 @@ export const CharityDepositTable = ({ list }) => {
       <TablePrimaryContainer>
         <Table>
           <colgroup>
-            <col width="25%" />
-            <col width="50%" />
+            <col width="20%" />
+            <col width="15%" />
+            <col width="40%" />
             <col width="25%" />
           </colgroup>
           <TablePrimaryHead>
             <TableRow>
               <TableCell>Datetime</TableCell>
+              <TableCell align="center">Round Num</TableCell>
               <TableCell align="center">Donor Address</TableCell>
               <TableCell align="right">Donation amount (ETH)</TableCell>
             </TableRow>
