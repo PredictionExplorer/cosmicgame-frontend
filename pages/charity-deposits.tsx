@@ -41,11 +41,11 @@ const CharityDeposits = () => {
           <Typography variant="h6">Loading...</Typography>
         ) : (
           <>
-            <Typography variant="h6" mb={2}>
+            <Typography variant="h6" mb={2} id="cosmicgame-deposits">
               Cosmic Game Deposits
             </Typography>
             <CharityDepositTable list={CGDeposits} />
-            <Typography variant="h6" mt={4} mb={2}>
+            <Typography variant="h6" mt={4} mb={2} id="voluntary-deposits">
               Voluntary Deposits
             </Typography>
             <CharityDepositTable list={voluntary} />
