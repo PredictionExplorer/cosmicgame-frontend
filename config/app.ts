@@ -1,3 +1,4 @@
+export const RPC_URL = "https://sepolia-rollup.arbitrum.io/rpc"
 export const INFURA_KEY = 'bbec1793df7a420a96239ce32e506c74'
 export const SEPOLIA_KEY = '9c62ffd139f699675fdd8a8e60d90f19efc75e6b'
 export const MARKET_ADDRESS = '0x47eF85Dfb775aCE0934fBa9EEd09D22e6eC0Cc08'
