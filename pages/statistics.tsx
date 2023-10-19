@@ -247,11 +247,11 @@ const Statistics = () => {
               />
               <StatisticsItem
                 title="Withdrawals from Charity Wallet"
-                value={data.NumWithdrawals}
+                value={data.MainStats.NumWithdrawals}
               />
               <StatisticsItem
                 title="Total amount withdrawn"
-                value={data.SumWithdrawals.toFixed(2)}
+                value={data.MainStats.SumWithdrawals.toFixed(2)}
               />
               <StatisticsItem
                 title="RandomWalk Tokens Used"
