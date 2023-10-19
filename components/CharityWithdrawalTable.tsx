@@ -25,13 +25,20 @@ const WithdrawalRow = ({ withdrawal }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(withdrawal.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${withdrawal.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(withdrawal.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`/user/${withdrawal.destinationAddr}`}
+          href={`/user/${withdrawal.DestinationAddr}`}
         >
           {withdrawal.DestinationAddr}
         </Link>

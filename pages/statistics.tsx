@@ -245,14 +245,18 @@ const Statistics = () => {
                   )
                 }
               />
-              <StatisticsItem
-                title="Withdrawals from Charity Wallet"
-                value={data.MainStats.NumWithdrawals}
-              />
-              <StatisticsItem
-                title="Total amount withdrawn"
-                value={data.MainStats.SumWithdrawals.toFixed(2)}
-              />
+              {data.MainStats.NumWithdrawals > 0 && (
+                <>
+                  <StatisticsItem
+                    title="Withdrawals from Charity Wallet"
+                    value={data.MainStats.NumWithdrawals}
+                  />
+                  <StatisticsItem
+                    title="Total amount withdrawn"
+                    value={`${data.MainStats.SumWithdrawals.toFixed(2)} ETH`}
+                  />
+                </>
+              )}
               <StatisticsItem
                 title="RandomWalk Tokens Used"
                 value={data.NumRwalkTokensUsed}
