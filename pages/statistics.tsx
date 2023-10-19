@@ -218,7 +218,7 @@ const Statistics = () => {
                     <Link
                       color="inherit"
                       fontSize="inherit"
-                      href="/charity-deposits#cosmicgame-deposits"
+                      href="/charity-deposits-cg"
                     >
                       {`${data.MainStats.SumCosmicGameDonationsEth.toFixed(
                         6
@@ -236,7 +236,7 @@ const Statistics = () => {
                     <Link
                       color="inherit"
                       fontSize="inherit"
-                      href="/charity-deposits#voluntary-deposits"
+                      href="/charity-deposits-voluntary"
                     >
                       {`${data.NumVoluntaryDonations} totalling ${data.SumVoluntaryDonationsEth} ETH`}
                     </Link>
@@ -244,6 +244,14 @@ const Statistics = () => {
                     `${data.NumVoluntaryDonations} totalling ${data.SumVoluntaryDonationsEth} ETH`
                   )
                 }
+              />
+              <StatisticsItem
+                title="Withdrawals from Charity Wallet"
+                value={data.NumWithdrawals}
+              />
+              <StatisticsItem
+                title="Total amount withdrawn"
+                value={data.SumWithdrawals.toFixed(2)}
               />
               <StatisticsItem
                 title="RandomWalk Tokens Used"

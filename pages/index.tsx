@@ -709,7 +709,6 @@ const NewHome = () => {
                 </Box>
               </>
             )}
-
             {account !== null && (
               <>
                 <Accordion>
