@@ -10,8 +10,6 @@ import {
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
-import { useActiveWeb3React } from "../hooks/web3";
-import { Network } from "@ethersproject/providers";
 
 export const ContractListItem = styled(ListItem)({
   justifyContent: "center",
@@ -44,8 +42,6 @@ const ContractItem = ({ name, value }) => {
 const Contracts = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [network, setNetwork] = useState<Network>();
-  const { library } = useActiveWeb3React();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,8 +49,6 @@ const Contracts = () => {
         setLoading(true);
         const newData = await api.get_dashboard_info();
         setData(newData);
-        const res = await library.getNetwork();
-        setNetwork(res);
         setLoading(false);
       } catch (err) {
         console.log(err);
