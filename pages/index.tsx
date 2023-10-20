@@ -692,7 +692,7 @@ const NewHome = () => {
                     </Box>
                   </>
                 ) : (
-                  <Typography variant="h5">Game hasn't started yet!</Typography>
+                  <Typography variant="h5">Start the game with your first bid!</Typography>
                 )}
 
                 <Typography mt="40px" mb={1}>
