@@ -1,19 +1,29 @@
 import { Contract } from '@ethersproject/contracts'
 import { useMemo } from 'react'
-import { ethers } from 'ethers'
-import { RPC_URL } from '../config/app'
+
+import { useActiveWeb3React } from './web3'
 
 export default function useContract<T extends Contract = Contract>(
   address: string,
   ABI: any,
 ): T | null {
+  const { library, account, chainId } = useActiveWeb3React()
+
   return useMemo(() => {
-    const jsonRpcProvider = new ethers.providers.JsonRpcProvider(RPC_URL)
-    try {
-        return new Contract(address, ABI, jsonRpcProvider)
-    } catch (error) {
-      console.error('Failed To Get Contract', error)
+    if (!address || !ABI || !library || !chainId) {
       return null
     }
-  }, [address, ABI]) as T
+
+    try {
+      if (account) {
+        return new Contract(address, ABI, library.getSigner(account))
+      } else {
+        return new Contract(address, ABI, library)
+      }
+    } catch (error) {
+      console.error('Failed To Get Contract', error)
+
+      return null
+    }
+  }, [address, ABI, library, account]) as T
 }

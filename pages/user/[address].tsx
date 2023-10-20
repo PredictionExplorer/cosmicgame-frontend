@@ -6,8 +6,9 @@ import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
 import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import WinningHistoryTable from "../../components/WinningHistoryTable";
-import useCosmicSignatureTokenContract from "../../hooks/useCosmicSignatureTokenContract";
-import { ethers } from "ethers";
+import { Contract, ethers } from "ethers";
+import { COSMIC_SIGNATURE_TOKEN_ADDRESS, RPC_URL } from "../../config/app";
+import COSMICTOKEN_ABI from "../../contracts/CosmicToken.json";
 
 const UserInfo = ({ address }) => {
   const [claimHistory, setClaimHistory] = useState(null);
@@ -15,7 +16,6 @@ const UserInfo = ({ address }) => {
   const [userInfo, setUserInfo] = useState(null);
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
-  const cosmicSignatureTokenContract = useCosmicSignatureTokenContract();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,6 +25,12 @@ const UserInfo = ({ address }) => {
       const { Bids, UserInfo } = await api.get_user_info(address);
       setBidHistory(Bids);
       setUserInfo(UserInfo);
+      const jsonRpcProvider = new ethers.providers.JsonRpcProvider(RPC_URL);
+      const cosmicSignatureTokenContract = new Contract(
+        COSMIC_SIGNATURE_TOKEN_ADDRESS,
+        COSMICTOKEN_ABI,
+        jsonRpcProvider.getSigner()
+      );
       const balance = await cosmicSignatureTokenContract.balanceOf(address);
       setBalance(Number(ethers.utils.formatEther(balance)));
 
