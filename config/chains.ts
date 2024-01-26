@@ -6,7 +6,7 @@ export enum SupportedChainId {
   SEPOLIA = 421614
 }
 
-export const DEFAULT_CHAIN_ID = SupportedChainId.SEPOLIA;
+export const DEFAULT_CHAIN_ID = SupportedChainId.LOCAL_NETWORK;
 
 export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   SupportedChainId.ARBITRUM_ONE,
