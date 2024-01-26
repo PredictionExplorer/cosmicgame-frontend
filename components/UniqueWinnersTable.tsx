@@ -26,14 +26,22 @@ const UniqueWinnersRow = ({ winner }) => {
       <TablePrimaryCell>
         <Link
           href={`/user/${winner.WinnerAddr}`}
-          style={{ color: "rgba(255, 255, 255, 0.68)", fontSize: 14 }}
+          style={{
+            color: "inherit",
+            fontSize: "inherit",
+            fontFamily: "monospace",
+          }}
         >
           {winner.WinnerAddr}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell>{winner.PrizesCount}</TablePrimaryCell>
-      <TablePrimaryCell>{winner.MaxWinAmountEth.toFixed(6)}</TablePrimaryCell>
-      <TablePrimaryCell>{winner.PrizesSum.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{winner.PrizesCount}</TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {winner.MaxWinAmountEth.toFixed(6)}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {winner.PrizesSum.toFixed(6)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -57,9 +65,9 @@ export const UniqueWinnersTable = ({ list }) => {
           <TablePrimaryHead>
             <TableRow>
               <TableCell>Winner Address</TableCell>
-              <TableCell>Prizes Taken</TableCell>
-              <TableCell>Max Prize</TableCell>
-              <TableCell>Prizes Sum (ETH)</TableCell>
+              <TableCell align="right">Prizes Taken</TableCell>
+              <TableCell align="right">Max Prize</TableCell>
+              <TableCell align="right">Prizes Sum (ETH)</TableCell>
             </TableRow>
           </TablePrimaryHead>
           <TableBody>

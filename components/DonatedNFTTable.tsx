@@ -47,18 +47,39 @@ const NFTRow = ({ nft, handleClaim }) => {
         <Tooltip title={nft.DonorAddr}>
           <Link
             href={`/user/${nft.DonorAddr}`}
-            style={{ color: "rgba(255, 255, 255, 0.68)", fontSize: "inherit" }}
+            style={{
+              color: "inherit",
+              fontSize: "inherit",
+              fontFamily: "monospace",
+            }}
+            target="_blank"
           >
             {shortenHex(nft.DonorAddr, 6)}
           </Link>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{nft.RoundNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
+          href={`/prize/${nft.RoundNum}`}
+          style={{
+            color: "inherit",
+            fontSize: "inherit",
+          }}
+          target="_blank"
+        >
+          {nft.RoundNum + 1}
+        </Link>
+      </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip title={nft.TokenAddr}>
           <Link
             href={`https://arbiscan.io/address/${nft.TokenAddr}`}
-            style={{ color: "rgba(255, 255, 255, 0.68)", fontSize: "inherit" }}
+            style={{
+              color: "inherit",
+              fontSize: "inherit",
+              fontFamily: "monospace",
+            }}
+            target="_blank"
           >
             {shortenHex(nft.TokenAddr, 6)}
           </Link>
@@ -83,6 +104,7 @@ const NFTRow = ({ nft, handleClaim }) => {
           <Button
             variant="contained"
             onClick={(e) => handleClaim(e, nft.Index)}
+            data-testid="Claim Button"
           >
             Claim
           </Button>
@@ -92,7 +114,7 @@ const NFTRow = ({ nft, handleClaim }) => {
   );
 };
 
-export const DonatedNFTTable = ({ list, handleClaim }) => {
+const DonatedNFTTable = ({ list, handleClaim }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -103,8 +125,8 @@ export const DonatedNFTTable = ({ list, handleClaim }) => {
       <TablePrimaryContainer>
         <Table>
           <colgroup>
-            <col width="15%" />
             <col width="20%" />
+            <col width="15%" />
             <col width="10%" />
             <col width="20%" />
             <col width="10%" />
@@ -118,7 +140,7 @@ export const DonatedNFTTable = ({ list, handleClaim }) => {
               <TableCell align="center">Round #</TableCell>
               <TableCell>Token Address</TableCell>
               <TableCell align="right">Token ID</TableCell>
-              <TableCell>Token Image</TableCell>
+              <TableCell align="center">Token Image</TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TablePrimaryHead>
@@ -143,3 +165,5 @@ export const DonatedNFTTable = ({ list, handleClaim }) => {
     </>
   );
 };
+
+export default DonatedNFTTable;

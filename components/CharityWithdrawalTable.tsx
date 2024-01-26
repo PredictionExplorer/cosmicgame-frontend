@@ -38,6 +38,7 @@ const WithdrawalRow = ({ withdrawal }) => {
         <Link
           color="inherit"
           fontSize="inherit"
+          fontFamily="monospace"
           href={`/user/${withdrawal.DestinationAddr}`}
         >
           {withdrawal.DestinationAddr}
@@ -50,7 +51,7 @@ const WithdrawalRow = ({ withdrawal }) => {
   );
 };
 
-export const CharityWithdrawalTable = ({ list }) => {
+const CharityWithdrawalTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -98,3 +99,5 @@ export const CharityWithdrawalTable = ({ list }) => {
     </>
   );
 };
+
+export default CharityWithdrawalTable;

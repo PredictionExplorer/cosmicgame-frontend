@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Grid, Link, Typography } from "@mui/material";
+import { Box, Grid, Link, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
@@ -7,30 +7,7 @@ import api from "../../services/api";
 import axios from "axios";
 import RandomWalkNFT from "../../components/RandomWalkNFT";
 import NFTImage from "../../components/NFTImage";
-import { shortenHex } from "../../utils";
-
-const convertTimestampToDateTime = (timestamp: any) => {
-  var date_ob = new Date(timestamp * 1000);
-  var year = date_ob.getFullYear();
-  var month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-  var date = ("0" + date_ob.getDate()).slice(-2);
-  var hours = ("0" + date_ob.getHours()).slice(-2);
-  var minutes = ("0" + date_ob.getMinutes()).slice(-2);
-  var seconds = ("0" + date_ob.getSeconds()).slice(-2);
-  var result =
-    year +
-    "-" +
-    month +
-    "-" +
-    date +
-    " " +
-    hours +
-    ":" +
-    minutes +
-    ":" +
-    seconds;
-  return result;
-};
+import { convertTimestampToDateTime, shortenHex } from "../../utils";
 
 const BidInfo = ({ bidId }) => {
   const [loading, setLoading] = useState(true);
@@ -68,10 +45,14 @@ const BidInfo = ({ bidId }) => {
               &nbsp;
               <Link
                 href={`https://arbiscan.io/tx/${bidInfo.TxHash}`}
-                style={{ color: "rgb(255, 255, 255)" }}
+                style={{ color: "inherit" }}
                 target="_blank"
               >
-                <Typography>{shortenHex(bidInfo.TxHash, 16)}</Typography>
+                <Tooltip title={bidInfo.TxHash}>
+                  <Typography sx={{ fontFamily: "monospace" }}>
+                    {shortenHex(bidInfo.TxHash, 16)}
+                  </Typography>
+                </Tooltip>
               </Link>
             </Box>
             <Box mb={1} display="flex" flexWrap="wrap">
@@ -84,7 +65,7 @@ const BidInfo = ({ bidId }) => {
                   color: "inherit",
                 }}
               >
-                <Typography>{bidInfo.RoundNum}</Typography>
+                <Typography>{bidInfo.RoundNum + 1}</Typography>
               </Link>
             </Box>
             <Box mb={1} display="flex" flexWrap="wrap">
@@ -101,13 +82,27 @@ const BidInfo = ({ bidId }) => {
                 href={`/user/${bidInfo.BidderAddr}`}
                 style={{ color: "rgb(255, 255, 255)" }}
               >
-                <Typography>{bidInfo.BidderAddr}</Typography>
+                <Typography fontFamily="monospace">
+                  {bidInfo.BidderAddr}
+                </Typography>
               </Link>
             </Box>
             <Box mb={1} display="flex" flexWrap="wrap">
               <Typography color="primary">Bid Price:</Typography>
               &nbsp;
-              <Typography>{bidInfo.BidPriceEth.toFixed(6)} ETH</Typography>
+              <Typography>
+                {bidInfo.BidType === 2
+                  ? `${
+                      bidInfo.NumCSTTokensEth && bidInfo.NumCSTTokensEth < 1
+                        ? bidInfo.NumCSTTokensEth?.toFixed(7)
+                        : bidInfo.NumCSTTokensEth?.toFixed(2)
+                    } CST`
+                  : `${
+                      bidInfo.BidPriceEth && bidInfo.BidPriceEth < 1
+                        ? bidInfo.BidPriceEth?.toFixed(7)
+                        : bidInfo.BidPriceEth?.toFixed(2)
+                    } ETH`}
+              </Typography>
             </Box>
             <Box mb={1} display="flex" flexWrap="wrap">
               <Typography color="primary">
@@ -115,6 +110,13 @@ const BidInfo = ({ bidId }) => {
               </Typography>
               &nbsp;
               <Typography>{bidInfo.RWalkNFTId < 0 ? "No" : "Yes"}</Typography>
+            </Box>
+            <Box mb={1} display="flex" flexWrap="wrap">
+              <Typography color="primary">
+                Was bid with Cosmic Signature Token:
+              </Typography>
+              &nbsp;
+              <Typography>{bidInfo.BidType === 2 ? "Yes" : "No"}</Typography>
             </Box>
             {bidInfo.RWalkNFTId >= 0 && (
               <Box mb={1} display="flex" flexWrap="wrap">
@@ -131,7 +133,9 @@ const BidInfo = ({ bidId }) => {
                       Donated NFT Contract Address (aka Token):
                     </Typography>
                     &nbsp;
-                    <Typography>{bidInfo.NFTDonationTokenAddr}</Typography>
+                    <Typography fontFamily="monospace">
+                      {bidInfo.NFTDonationTokenAddr}
+                    </Typography>
                   </Box>
                   <Box mb={1} display="flex" flexWrap="wrap">
                     <Typography color="primary">

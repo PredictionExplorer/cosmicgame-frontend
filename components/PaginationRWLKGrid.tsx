@@ -14,13 +14,21 @@ import RandomWalkNFT from "./RandomWalkNFT";
 const PaginationRWLKGrid = ({
   loading,
   data,
-  selectedToken = 0,
+  selectedToken = -1,
   setSelectedToken = null,
 }) => {
   const [collection, setCollection] = useState([]);
   const [perPage] = useState(6);
   const [curPage, setCurPage] = useState(1);
   const [searchId, setSearchId] = useState("");
+
+  const handleClick = (index) => {
+    if (index === selectedToken) {
+      setSelectedToken(-1);
+    } else {
+      setSelectedToken(index);
+    }
+  };
 
   useEffect(() => {
     const filtered = data.filter(
@@ -67,9 +75,7 @@ const PaginationRWLKGrid = ({
                   xs={6}
                   sm={6}
                   md={4}
-                  onClick={() => {
-                    setSelectedToken(index);
-                  }}
+                  onClick={() => handleClick(index)}
                 >
                   <RandomWalkNFT
                     tokenId={index}

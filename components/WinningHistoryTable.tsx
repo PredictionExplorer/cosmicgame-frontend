@@ -14,6 +14,7 @@ import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
+import LayersIcon from "@mui/icons-material/Layers";
 import TokenIcon from "@mui/icons-material/Token";
 import {
   TablePrimaryContainer,
@@ -22,20 +23,8 @@ import {
   TablePrimaryRow,
 } from "./styled";
 import Pagination from "@mui/material/Pagination";
-import { shortenHex } from "../utils";
+import { convertTimestampToDateTime, shortenHex } from "../utils";
 import axios from "axios";
-
-const convertTimestampToDateTime = (timestamp: any) => {
-  var date_ob = new Date(timestamp * 1000);
-  var year = date_ob.getFullYear();
-  var month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-  var date = ("0" + date_ob.getDate()).slice(-2);
-  var hours = ("0" + date_ob.getHours()).slice(-2);
-  var minutes = ("0" + date_ob.getMinutes()).slice(-2);
-  var seconds = ("0" + date_ob.getSeconds()).slice(-2);
-  var result = `${month}/${date}/${year} ${hours}:${minutes}:${seconds}`;
-  return result;
-};
 
 const HistoryRow = ({ history, showClaimedStatus }) => {
   const [tokenURI, setTokenURI] = useState(null);
@@ -74,10 +63,15 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
               <VolunteerActivismIcon />
               &nbsp;<span>Donated NFT</span>
             </>
-          ) : (
+          ) : history.RecordType === 3 ? (
             <>
               <EmojiEventsIcon />
               &nbsp;<span>Main Prize</span>
+            </>
+          ) : (
+            <>
+              <LayersIcon />
+              &nbsp;<span>Staking Deposit / Reward</span>
             </>
           )}
           &nbsp;
@@ -93,7 +87,18 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
       <TablePrimaryCell>
         {convertTimestampToDateTime(history.TimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
+          href={`/prize/${history.RoundNum}`}
+          sx={{
+            fontSize: "inherit",
+            color: "inherit",
+          }}
+          target="_blank"
+        >
+          {history.RoundNum + 1}
+        </Link>
+      </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {history.AmountEth.toFixed(4)}
       </TablePrimaryCell>
@@ -104,6 +109,7 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
             sx={{
               fontSize: "inherit",
               color: "inherit",
+              fontFamily: "monospace",
             }}
             target="_blank"
           >
@@ -154,9 +160,9 @@ const HistoryTable = ({
     <TablePrimaryContainer>
       <Table>
         <colgroup>
-          <col width="20%" />
+          <col width="21%" />
           <col width="16%" />
-          <col width="9%" />
+          <col width="8%" />
           <col width="15%" />
           <col width="15%" />
           <col width="15%" />

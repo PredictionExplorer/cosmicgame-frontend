@@ -30,7 +30,11 @@ const TransferHistoryRow = ({ record }) => {
       <TablePrimaryCell>
         <Link
           href={`/user/${record.FromAddr}`}
-          sx={{ color: "inherit", fontSize: "inherit" }}
+          sx={{
+            color: "inherit",
+            fontSize: "inherit",
+            fontFamily: "monospace",
+          }}
         >
           {record.FromAddr}
         </Link>
@@ -38,7 +42,11 @@ const TransferHistoryRow = ({ record }) => {
       <TablePrimaryCell>
         <Link
           href={`/user/${record.ToAddr}`}
-          sx={{ color: "inherit", fontSize: "inherit" }}
+          sx={{
+            color: "inherit",
+            fontSize: "inherit",
+            fontFamily: "monospace",
+          }}
         >
           {record.ToAddr}
         </Link>

@@ -13,7 +13,6 @@ import useCosmicGameContract from "../../hooks/useCosmicGameContract";
 import { useApiData } from "../../contexts/ApiDataContext";
 
 const PrizeInfo = ({ roundNum }) => {
-  const { account } = useActiveWeb3React();
   const cosmicGameContract = useCosmicGameContract();
   const { apiData: status } = useApiData();
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState([]);
@@ -33,10 +32,10 @@ const PrizeInfo = ({ roundNum }) => {
   };
   useEffect(() => {
     const fetchUnclaimedDonatedNFTs = async () => {
-      const nfts = await api.get_unclaimed_donated_nft_by_user(account);
+      const nfts = await api.get_donations_nft_unclaimed_by_round(roundNum);
       setDonatedNFTToClaim(nfts);
     };
-    if (status.NumDonatedNFTToClaim > 0) {
+    if (status?.NumDonatedNFTToClaim > 0) {
       fetchUnclaimedDonatedNFTs();
     }
   }, [status]);
@@ -63,17 +62,9 @@ const PrizeInfo = ({ roundNum }) => {
       </Head>
       <MainWrapper>
         <Box mb={4}>
-          <Link
-            href={`/prize/${roundNum}`}
-            sx={{
-              textDecorationColor: "#15BFFD !important",
-              textDecorationThickness: "3px",
-            }}
-          >
-            <Typography variant="h4" color="primary" component="span" mr={2}>
-              {`Round #${roundNum}`}
-            </Typography>
-          </Link>
+          <Typography variant="h4" color="primary" component="span" mr={2}>
+            {`Round #${roundNum + 1}`}
+          </Typography>
           <Typography variant="h4" component="span">
             Prize Information
           </Typography>
@@ -147,7 +138,7 @@ const PrizeInfo = ({ roundNum }) => {
               </Typography>
               &nbsp;
               <Typography component="span">
-                {prizeInfo.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)}
+                {prizeInfo.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH
               </Typography>
             </Box>
             <Box mb={1}>
@@ -184,7 +175,7 @@ const PrizeInfo = ({ roundNum }) => {
                 }}
               >
                 <Typography variant="h6">Donated NFTs</Typography>
-                {status.NumDonatedNFTToClaim > 0 && (
+                {donatedNFTToClaim.length > 0 && (
                   <Button
                     variant="contained"
                     onClick={handleAllDonatedNFTsClaim}

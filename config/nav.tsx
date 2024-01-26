@@ -1,6 +1,5 @@
-import { Badge } from "@mui/material";
 import { ReactNode } from "react";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import { Badge } from "@mui/material";
 
 type NavItem = {
   title: string | ReactNode;
@@ -13,25 +12,28 @@ const getNAVs = (status, account) => {
     { title: "Gallery", route: "/gallery" },
     { title: "Contracts", route: "/contracts" },
     { title: "Prizes", route: "/prize" },
+    {
+      title: "Rewards",
+      route: "",
+      children: [
+        { title: "Staking", route: "/staking" },
+        { title: "Marketing", route: "/marketing" },
+      ],
+    },
     { title: "Statistics", route: "/statistics" },
     { title: "FAQ", route: "/faq" },
   ];
-  if (account && status) {
+  if (
+    account &&
+    (status?.ETHRaffleToClaim > 0 || status?.NumDonatedNFTToClaim > 0)
+  ) {
     NAVS.push({
-      title:
-        status.ETHRaffleToClaim > 0 || status.NumDonatedNFTToClaim > 0 ? (
-          <Badge color="error" variant="dot">
-            <EmojiEventsIcon />
-          </Badge>
-        ) : (
-          <EmojiEventsIcon />
-        ),
-      route: "",
-      children: [
-        { title: "Pending to Claim", route: "/my-winnings" },
-        { title: "My Wallet", route: "/my-wallet" },
-        { title: "History of Winnings", route: "/winning-history" },
-      ],
+      title: (
+        <Badge variant="dot" color="error">
+          Claim
+        </Badge>
+      ),
+      route: "/my-winnings",
     });
   }
   return NAVS;

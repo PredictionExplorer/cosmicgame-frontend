@@ -26,7 +26,15 @@ const HistoryRow = ({ history }) => {
 
   return (
     <TablePrimaryRow
-      sx={{ cursor: "pointer" }}
+      sx={{
+        cursor: "pointer",
+        background:
+          history.BidType === 2
+            ? "rgba(0,128,128, 0.1)"
+            : history.BidType === 1
+            ? "rgba(128,128,128, 0.1)"
+            : "rgba(0,0,0, 0.1)",
+      }}
       onClick={() => {
         router.push(`/bid/${history.EvtLogId}`);
       }}
@@ -36,53 +44,70 @@ const HistoryRow = ({ history }) => {
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip title={history.BidderAddr}>
-          <Typography sx={{ fontSize: "inherit !important" }}>
+          <Typography
+            sx={{ fontSize: "inherit !important", fontFamily: "monospace" }}
+          >
             {shortenHex(history.BidderAddr, 6)}
           </Typography>
         </Tooltip>
       </TablePrimaryCell>
 
       <TablePrimaryCell>
-        {history.BidPriceEth && history.BidPriceEth < 1
-          ? history.BidPriceEth?.toFixed(7)
-          : history.BidPriceEth?.toFixed(2)}
-        Ξ
+        {history.BidType === 2
+          ? `${
+              history.NumCSTTokensEth && history.NumCSTTokensEth < 1
+                ? history.NumCSTTokensEth?.toFixed(7)
+                : history.NumCSTTokensEth?.toFixed(2)
+            } CST`
+          : `${
+              history.BidPriceEth && history.BidPriceEth < 1
+                ? history.BidPriceEth?.toFixed(7)
+                : history.BidPriceEth?.toFixed(2)
+            } Ξ`}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>
-      <TablePrimaryCell>
-        {history.RWalkNFTId < 0 ? "" : history.RWalkNFTId}
+      <TablePrimaryCell align="center">{history.RoundNum + 1}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {history.BidType === 2
+          ? "CST Bid"
+          : history.BidType === 1
+          ? "RWLK Token Bid"
+          : "ETH Bid"}
       </TablePrimaryCell>
       <TablePrimaryCell>
-        {history.NFTDonationTokenAddr ? (
-          <Tooltip title={history.NFTDonationTokenAddr}>
-            <Typography sx={{ fontSize: "inherit !important" }}>
-              {shortenHex(history.NFTDonationTokenAddr, 6)}
-            </Typography>
-          </Tooltip>
-        ) : (
-          ""
-        )}
-      </TablePrimaryCell>
-      <TablePrimaryCell>
-        {history.NFTDonationTokenId < 0 ? "" : history.NFTDonationTokenId}
+        {history.BidType === 1 &&
+          `Bid was made using RandomWalk Token(id = ${history.RWalkNFTId})`}
+        {!!history.NFTDonationTokenAddr &&
+          history.BidType === 2 &&
+          "Bid was made using Cosmic Signature Tokens"}
+        {!!history.NFTDonationTokenAddr &&
+          history.BidType === 0 &&
+          "Bid was made using ETH"}
+        {!!history.NFTDonationTokenAddr &&
+          ` and a token(${shortenHex(
+            history.NFTDonationTokenAddr,
+            6
+          )}) with ID ${history.NFTDonationTokenId} was donated`}
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Link
-          sx={{ textDecoration: "none", color: "rgba(255, 255, 255, 0.68)" }}
+          sx={{ textDecoration: "none", color: "inherit", fontSize: "inherit" }}
         >
-          <Typography
-            sx={{
-              maxWidth: "180px",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-              display: "inline-block",
-              textOverflow: "ellipsis",
-              lineHeight: 1,
-            }}
-            component="span"
-          >
-            {history.Message}
-          </Typography>
+          <Tooltip title={history.Message}>
+            <Typography
+              sx={{
+                fontSize: "inherit !important",
+                maxWidth: "180px",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                display: "inline-block",
+                textOverflow: "ellipsis",
+                lineHeight: 1,
+              }}
+              component="span"
+            >
+              {history.Message}
+            </Typography>
+          </Tooltip>
         </Link>
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -95,12 +120,11 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
       <Table>
         <colgroup>
           <col width="11%" />
-          <col width="16%" />
-          <col width="10%" />
-          <col width="10%" />
-          <col width="10%" />
-          <col width="15%" />
+          <col width="14%" />
+          <col width="11%" />
           <col width="9%" />
+          <col width="12%" />
+          <col width="24%" />
           <col width="19%" />
         </colgroup>
         <TablePrimaryHead>
@@ -109,9 +133,8 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
             <TableCell>Bidder</TableCell>
             <TableCell>Price</TableCell>
             <TableCell align="center">Round #</TableCell>
-            <TableCell>RWLK ID</TableCell>
-            <TableCell>Donated NFT Address</TableCell>
-            <TableCell>Donated NFT ID</TableCell>
+            <TableCell align="center">Bid Type</TableCell>
+            <TableCell>Bid Info</TableCell>
             <TableCell>Message</TableCell>
           </TableRow>
         </TablePrimaryHead>

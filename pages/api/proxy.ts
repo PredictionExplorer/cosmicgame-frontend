@@ -15,6 +15,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     // Send the response back to the client
     res.json(response.data);
   } catch (error) {
-    res.status(500).json({ error: 'Proxy request failed' });
+    res.status(500).json({ message: 'Proxy request failed', error });
   }
 };

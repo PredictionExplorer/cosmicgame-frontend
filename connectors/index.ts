@@ -3,8 +3,7 @@ import { SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 
-import { INFURA_KEY } from '../config/app'
-import { SEPOLIA_KEY } from '../config/app'
+import { INFURA_KEY, SEPOLIA_KEY } from '../config/app'
 import {
   ALL_SUPPORTED_CHAIN_IDS,
   DEFAULT_CHAIN_ID,

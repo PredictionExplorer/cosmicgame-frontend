@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-
 import {
   Toolbar,
   IconButton,
@@ -8,6 +7,9 @@ import {
   ListItem,
   Container,
   Link,
+  Typography,
+  Box,
+  Divider,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import getNAVs from "../config/nav";
@@ -18,6 +20,8 @@ import ListNavItem from "./ListNavItem";
 import ListItemButton from "./ListItemButton";
 import { useApiData } from "../contexts/ApiDataContext";
 import { useActiveWeb3React } from "../hooks/web3";
+import api from "../services/api";
+import { ethers } from "ethers";
 
 const Header = () => {
   const [state, setState] = useState({
@@ -25,8 +29,9 @@ const Header = () => {
     drawerOpen: false,
   });
   const { mobileView, drawerOpen } = state;
-  const { apiData: status } = useApiData();
+  const { apiData: status, setApiData } = useApiData();
   const { account } = useActiveWeb3React();
+  const [balance, setBalance] = useState({ CosmicToken: 0, ETH: 0 });
 
   useEffect(() => {
     const setResponsiveness = () => {
@@ -44,6 +49,27 @@ const Header = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const notify = await api.notify_red_box(account);
+      setApiData(notify);
+
+      const balance = await api.get_user_balance(account);
+      if (balance) {
+        setBalance({
+          CosmicToken: Number(
+            ethers.utils.formatEther(balance.CosmicTokenBalance)
+          ),
+          ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
+        });
+      }
+    };
+
+    if (account) {
+      fetchData();
+    }
+  }, [account]);
+
   const renderDesktop = () => {
     return (
       <Toolbar disableGutters>
@@ -53,7 +79,7 @@ const Header = () => {
         {getNAVs(status, account).map((nav, i) => (
           <ListNavItem key={i} nav={nav} />
         ))}
-        <ConnectWalletButton isMobileView={false} />
+        <ConnectWalletButton isMobileView={false} balance={balance} />
       </Toolbar>
     );
   };
@@ -83,7 +109,7 @@ const Header = () => {
         <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
           <DrawerList>
             <ListItem>
-              <ConnectWalletButton isMobileView />
+              <ConnectWalletButton isMobileView balance={balance} />
             </ListItem>
             {getNAVs(status, account).map((nav, i) => (
               <ListItemButton
@@ -92,6 +118,55 @@ const Header = () => {
                 sx={{ justifyContent: "center" }}
               />
             ))}
+            <ListItemButton
+              nav={{ title: "My Wallet", route: "/my-wallet" }}
+              sx={{ justifyContent: "center" }}
+            />
+            <ListItemButton
+              nav={{ title: "History of Winnings", route: "/winning-history" }}
+              sx={{ justifyContent: "center" }}
+            />
+            <Divider />
+            <ListItem sx={{ display: "block" }}>
+              <Typography sx={{ fontSize: 16 }}>BALANCE:</Typography>
+
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
+              >
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  sx={{ fontStyle: "italic", fontWeight: 600 }}
+                >
+                  ETH:
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  sx={{ fontStyle: "italic", fontWeight: 600 }}
+                >
+                  {balance.ETH.toFixed(2)}
+                </Typography>
+              </Box>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
+              >
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  sx={{ fontStyle: "italic", fontWeight: 600 }}
+                >
+                  CST:
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  sx={{ fontStyle: "italic", fontWeight: 600 }}
+                >
+                  {balance.CosmicToken.toFixed(2)}
+                </Typography>
+              </Box>
+            </ListItem>
           </DrawerList>
         </Drawer>
       </Toolbar>

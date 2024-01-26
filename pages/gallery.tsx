@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import Head from "next/head";
-
 import PaginationGrid from "../components/PaginationGrid";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";

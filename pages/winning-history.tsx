@@ -22,12 +22,12 @@ const WinningHistory = () => {
   return (
     <>
       <Head>
-        <title>History of Winnings | Cosmic Signature</title>
+        <title>History of My Winnings | Cosmic Signature</title>
         <meta name="description" content="" />
       </Head>
       <MainWrapper>
         <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          History of Winnings
+          History of My Winnings
         </Typography>
         {claimHistory === null ? (
           <Typography variant="h6">Loading...</Typography>

@@ -32,7 +32,11 @@ const WinnerRow = ({ winner, type }) => {
         <Tooltip title={winner.WinnerAddr}>
           <Link
             href={`/user/${winner.WinnerAddr}`}
-            style={{ color: "rgba(255, 255, 255, 0.68)", fontSize: 14 }}
+            style={{
+              color: "inherit",
+              fontSize: "inherit",
+              fontFamily: "monospace",
+            }}
           >
             {shortenHex(winner.WinnerAddr, 6)}
           </Link>
@@ -41,9 +45,9 @@ const WinnerRow = ({ winner, type }) => {
       <TablePrimaryCell align="center">
         <Link
           href={`/prize/${winner.RoundNum}`}
-          style={{ color: "rgba(255, 255, 255, 0.68)", fontSize: 14 }}
+          style={{ color: "inherit", fontSize: "inherit" }}
         >
-          {winner.RoundNum}
+          {winner.RoundNum + 1}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>{type}</TablePrimaryCell>
@@ -53,7 +57,7 @@ const WinnerRow = ({ winner, type }) => {
       <TablePrimaryCell align="center">
         <Link
           href={`/detail/${winner.TokenId}`}
-          style={{ color: "rgba(255, 255, 255, 0.68)", fontSize: 14 }}
+          style={{ color: "inherit", fontSize: "inherit" }}
         >
           {winner.TokenId}
         </Link>

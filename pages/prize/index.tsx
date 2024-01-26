@@ -23,7 +23,7 @@ const PrizeWinners = () => {
   return (
     <>
       <Head>
-        <title>Prize Winners | Cosmic Signature</title>
+        <title>Main Prize Winnings | Cosmic Signature</title>
         <meta name="description" content="" />
       </Head>
       <MainWrapper>
@@ -33,7 +33,7 @@ const PrizeWinners = () => {
           gutterBottom
           textAlign="center"
         >
-          Prize Winners
+          Main Prize Winnings
         </Typography>
         <Box mt={6}>
           <PrizeTable list={prizeClaims} loading={loading} />

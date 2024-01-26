@@ -10,30 +10,6 @@ export function shortenHex(hex: string, length = 4) {
   return "";
 }
 
-const ETHERSCAN_PREFIXES = {
-  1: '',
-  3: 'ropsten.',
-  4: 'rinkeby.',
-  5: 'goerli.',
-  42: 'kovan.',
-}
-
-export function formatEtherscanLink(
-  type: 'Account' | 'Transaction',
-  data: [number, string],
-) {
-  switch (type) {
-    case 'Account': {
-      const [chainId, address] = data
-      return `https://${ETHERSCAN_PREFIXES[chainId]}etherscan.io/address/${address}`
-    }
-    case 'Transaction': {
-      const [chainId, hash] = data
-      return `https://${ETHERSCAN_PREFIXES[chainId]}etherscan.io/tx/${hash}`
-    }
-  }
-}
-
 export const parseBalance = (
   value: BigNumberish,
   decimals = 18,
@@ -59,17 +35,18 @@ export const convertTimestampToDateTime = (timestamp: any) => {
     "Nov",
     "Dec",
   ];
-  let date_ob = new Date(timestamp * 1000);
-  let month = month_names[date_ob.getMonth()];
-  let date = ("0" + date_ob.getDate()).slice(-2);
-  let hours = ("0" + date_ob.getHours()).slice(-2);
-  let minutes = ("0" + date_ob.getMinutes()).slice(-2);
-  let result = month + " " + date + ", " + hours + ":" + minutes;
+  var date_ob = new Date(timestamp * 1000);
+  var year = date_ob.getFullYear();
+  var month = month_names[date_ob.getMonth()];
+  var date = ("0" + date_ob.getDate()).slice(-2);
+  var hours = ("0" + date_ob.getHours()).slice(-2);
+  var minutes = ("0" + date_ob.getMinutes()).slice(-2);
+  var result = `${month} ${date}, ${year} ${hours}:${minutes}`;
   return result;
 };
 
-export const calculateTimeDiff = (timestamp: any, current: any) => {
-  let seconds = current - timestamp;
+export const calculateTimeDiff = (timestamp: any) => {
+  let seconds = Math.floor(Date.now() / 1000) - timestamp;
   let minutes = Math.floor(seconds / 60);
   seconds = seconds % 60;
   let hours = Math.floor(minutes / 60);
@@ -88,4 +65,14 @@ export const calculateTimeDiff = (timestamp: any, current: any) => {
   }
   str += ("0" + seconds).slice(-2) + " Seconds";
   return str;
-}
+};
+
+export const formatEthValue = (value: number) => {
+  if (value < 10) return `${value.toFixed(4)} ETH`;
+  return `${value.toFixed(1)} ETH`;
+};
+
+export const formatCSTValue = (value: number) => {
+  if (value < 10) return `${value.toFixed(4)} CST`;
+  return `${value.toFixed(1)} CST`;
+};

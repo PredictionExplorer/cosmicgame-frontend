@@ -7,7 +7,7 @@ import NFTImage from "./NFTImage";
 
 const NFT = ({ nft }) => {
   const fileName = nft.TokenId.toString().padStart(6, "0");
-  const image = `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.png`;
+  const image = `https://cosmic-game.s3.us-east-2.amazonaws.com/${fileName}.png`;
 
   return (
     <StyledCard>
@@ -20,6 +20,16 @@ const NFT = ({ nft }) => {
         {nft && (
           <NFTInfoWrapper>
             <Typography variant="caption">{formatId(nft.TokenId)}</Typography>
+          </NFTInfoWrapper>
+        )}
+        {nft.TokenName !== "" && (
+          <NFTInfoWrapper sx={{ width: "calc(100% - 40px)" }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ color: "#FFFFFF", textAlign: "center" }}
+            >
+              {nft.TokenName}
+            </Typography>
           </NFTInfoWrapper>
         )}
       </CardActionArea>

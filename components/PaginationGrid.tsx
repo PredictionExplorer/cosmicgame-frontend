@@ -4,11 +4,10 @@ import { Grid, Box, Typography } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import { SearchBox, SearchField, SearchButton } from "./styled";
 import NFT from "./NFT";
+import api from "../services/api";
 
 const PaginationGrid = ({ data, loading }) => {
-  const [nftId, setNftId] = useState("");
-  const [searchNFT, setSearchNFT] = useState(null);
-  const [searchResult, setSearchResult] = useState(false);
+  const [searchKey, setSearchKey] = useState("");
   const [collection, setCollection] = useState([]);
   const [perPage] = useState(12);
   const [curPage, setCurPage] = useState(1);
@@ -21,44 +20,60 @@ const PaginationGrid = ({ data, loading }) => {
   };
 
   const handleSearchChange = async (e) => {
-    setNftId(e.target.value);
+    setSearchKey(e.target.value);
     if (!e.target.value) {
-      setSearchNFT(null);
-      setSearchResult(false);
+      setCollection(data);
     }
+  };
+
+  const handleSearchKeyPress = (e) => {
+    if (e.keyCode === 13 || e.which === 13) {
+      handleSearch();
+    }
+  };
+
+  const isNumeric = (value) => {
+    return /^\d+$/.test(value);
   };
 
   const handleSearch = async () => {
-    if (nftId === "") return;
-    const filtered = collection.filter((nft) => nft.TokenId === Number(nftId));
-    setSearchResult(true);
-    if (filtered.length) {
-      setSearchNFT(filtered[0]);
+    if (searchKey === "") return;
+    let filtered = [];
+    if (isNumeric(searchKey)) {
+      filtered = data.filter((nft) => nft.TokenId === Number(searchKey));
     } else {
-      setSearchNFT(null);
+      const res = await api.get_token_by_name(searchKey);
+      const filteredIds = res.map((o) => o.TokenId);
+      filtered = data.filter((nft) => filteredIds.includes(nft.TokenId));
     }
+    setCollection(filtered);
+    router.push({ pathname: router.pathname });
   };
-
-  useEffect(() => {
-    setCollection(data);
-  }, [data]);
 
   useEffect(() => {
     const page = parseInt(router.query["page"] as string) || 1;
     setCurPage(page);
   }, [router]);
 
+  useEffect(() => {
+    if (data.length > 0) {
+      setCollection(data);
+    }
+  }, [data]);
+
   return (
     <Box mt={4}>
       <SearchBox>
         <SearchField
           variant="filled"
-          placeholder="Enter NFT ID"
+          placeholder="Enter NFT ID or Name"
           color="secondary"
-          value={nftId}
+          value={searchKey}
           onChange={handleSearchChange}
+          onKeyPress={handleSearchKeyPress}
         />
         <SearchButton
+          type="submit"
           size="large"
           variant="contained"
           color="primary"
@@ -71,32 +86,26 @@ const PaginationGrid = ({ data, loading }) => {
         <Typography variant="h6" align="center">
           Loading...
         </Typography>
-      ) : data.length > 0 ? (
+      ) : (
         <>
           <Grid spacing={2} container>
-            {!!(nftId && searchResult) ? (
-              !searchNFT ? (
-                <Grid item>
-                  <Typography variant="h6" align="center">
-                    Nothing Found!
-                  </Typography>
-                </Grid>
-              ) : (
-                <Grid item xs={6} sm={4}>
-                  <NFT nft={searchNFT} />
-                </Grid>
-              )
+            {collection.length === 0 ? (
+              <Grid item>
+                <Typography variant="h6" align="center">
+                  Nothing Found!
+                </Typography>
+              </Grid>
             ) : (
               collection
                 .slice((curPage - 1) * perPage, curPage * perPage)
-                .map((nft, index) => (
-                  <Grid key={index} item xs={6} sm={6} md={4}>
+                .map((nft) => (
+                  <Grid key={nft.TokenId} item xs={6} sm={6} md={4}>
                     <NFT nft={nft} />
                   </Grid>
                 ))
             )}
           </Grid>
-          {!nftId && (
+          {collection.length > perPage && (
             <Box display="flex" justifyContent="center" mt={4}>
               <Pagination
                 color="primary"
@@ -110,10 +119,6 @@ const PaginationGrid = ({ data, loading }) => {
             </Box>
           )}
         </>
-      ) : (
-        <Typography variant="h6" align="center">
-          Nothing Found!
-        </Typography>
       )}
     </Box>
   );

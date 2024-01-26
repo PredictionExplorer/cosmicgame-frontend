@@ -21,7 +21,7 @@ import {
   TablePrimaryRow,
 } from "../components/styled";
 import { convertTimestampToDateTime } from "../utils";
-import { DonatedNFTTable } from "../components/DonatedNFTTable";
+import DonatedNFTTable from "../components/DonatedNFTTable";
 import { useActiveWeb3React } from "../hooks/web3";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
@@ -39,7 +39,7 @@ const MyWinningsRow = ({ winning }) => {
       <TablePrimaryCell>
         {convertTimestampToDateTime(winning.TimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{winning.RoundNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{winning.RoundNum + 1}</TablePrimaryCell>
       <TablePrimaryCell align="right">
         {winning.Amount.toFixed(4)}
       </TablePrimaryCell>
@@ -73,8 +73,8 @@ const MyWinnings = () => {
   const [curPage, setCurPage] = useState(1);
   const { apiData: status } = useApiData();
   const perPage = 5;
-  const [donatedNFTToClaim, setDonatedNFTToClaim] = useState([]);
-  const [raffleETHToClaim, setRaffleETHToClaim] = useState([]);
+  const [donatedNFTToClaim, setDonatedNFTToClaim] = useState(null);
+  const [raffleETHToClaim, setRaffleETHToClaim] = useState(null);
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
     raffleETH: false,
@@ -138,25 +138,24 @@ const MyWinnings = () => {
     }
   };
 
+  const fetchUnclaimedDonatedNFTs = async () => {
+    let nfts = await api.get_unclaimed_donated_nft_by_user(account);
+    nfts = nfts.sort((a, b) => a.TimeStamp - b.TimeStamp);
+    setDonatedNFTToClaim(nfts);
+  };
+  const fetchUnclaimedRaffleETHDeposits = async () => {
+    let deposits = await api.get_unclaimed_raffle_deposits_by_user(account);
+    deposits = deposits.sort((a, b) => b.TimeStamp - a.TimeStamp);
+    setRaffleETHToClaim(deposits);
+  };
   useEffect(() => {
-    const fetchUnclaimedDonatedNFTs = async () => {
-      let nfts = await api.get_unclaimed_donated_nft_by_user(account);
-      nfts = nfts.sort((a, b) => a.TimeStamp - b.TimeStamp);
-      setDonatedNFTToClaim(nfts);
-    };
-    const fetchUnclaimedRaffleETHDeposits = async () => {
-      let deposits = await api.get_unclaimed_raffle_deposits_by_user(account);
-      deposits = deposits.sort((a, b) => b.TimeStamp - a.TimeStamp);
-      setRaffleETHToClaim(deposits);
-    };
-    if (status.NumDonatedNFTToClaim > 0) {
+    if (status?.NumDonatedNFTToClaim > 0) {
       fetchUnclaimedDonatedNFTs();
     }
-    if (status.ETHRaffleToClaim > 0) {
+    if (status?.ETHRaffleToClaim > 0) {
       fetchUnclaimedRaffleETHDeposits();
     }
   }, [status]);
-
   return (
     <>
       <Head>
@@ -173,25 +172,12 @@ const MyWinnings = () => {
           Pending Winnings
         </Typography>
         <Box mt={6}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-            <Typography variant="h5">Claimable Raffle ETH</Typography>
-            {status.ETHRaffleToClaim > 0 && (
-              <Box>
-                <Typography component="span" mr={2}>
-                  Your claimable winnings are{" "}
-                  {`${status.ETHRaffleToClaim.toFixed(6)} ETH`}
-                </Typography>
-                <Button
-                  onClick={handleAllETHClaim}
-                  variant="contained"
-                  disabled={isClaiming.raffleETH}
-                >
-                  Claim All
-                </Button>
-              </Box>
-            )}
-          </Box>
-          {raffleETHToClaim.length > 0 ? (
+          <Typography variant="h5" mb={2}>
+            Claimable Raffle ETH
+          </Typography>
+          {raffleETHToClaim === null ? (
+            <Typography variant="h6">Loading...</Typography>
+          ) : raffleETHToClaim.length > 0 ? (
             <>
               <MyWinningsTable
                 list={raffleETHToClaim.slice(
@@ -199,7 +185,29 @@ const MyWinnings = () => {
                   curPage * perPage
                 )}
               />
-              <Box display="flex" justifyContent="center" mt={4}>
+              {status?.ETHRaffleToClaim > 0 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "end",
+                    alignItems: "center",
+                    mt: 2,
+                  }}
+                >
+                  <Typography mr={2}>
+                    Your claimable winnings are{" "}
+                    {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
+                  </Typography>
+                  <Button
+                    onClick={handleAllETHClaim}
+                    variant="contained"
+                    disabled={isClaiming.raffleETH}
+                  >
+                    Claim All
+                  </Button>
+                </Box>
+              )}
+              <Box display="flex" justifyContent="center" mt={2}>
                 <Pagination
                   color="primary"
                   page={curPage}
@@ -218,7 +226,7 @@ const MyWinnings = () => {
         <Box mt={6}>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
             <Typography variant="h5">Donated NFTs</Typography>
-            {donatedNFTToClaim.length > 0 && (
+            {donatedNFTToClaim?.length > 0 && (
               <Button
                 onClick={handleAllDonatedNFTsClaim}
                 variant="contained"
@@ -228,10 +236,14 @@ const MyWinnings = () => {
               </Button>
             )}
           </Box>
-          <DonatedNFTTable
-            list={donatedNFTToClaim}
-            handleClaim={handleDonatedNFTsClaim}
-          />
+          {donatedNFTToClaim === null ? (
+            <Typography variant="h6">Loading...</Typography>
+          ) : (
+            <DonatedNFTTable
+              list={donatedNFTToClaim}
+              handleClaim={handleDonatedNFTsClaim}
+            />
+          )}
         </Box>
         <Box mt={6}>
           <Button

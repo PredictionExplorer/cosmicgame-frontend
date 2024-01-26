@@ -38,6 +38,7 @@ const DonatedNFT = ({ nft }) => {
         <Typography
           variant="caption"
           style={{ textShadow: "0px 0px 8px #080B2A" }}
+          data-testid="NFTTokenId"
         >
           #{nft.NFTTokenId}
         </Typography>

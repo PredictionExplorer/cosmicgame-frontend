@@ -32,7 +32,7 @@ const NameHistoryRow = ({ record }) => {
   );
 };
 
-export const NameHistoryTable = ({ list }) => {
+const NameHistoryTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   return (
@@ -66,3 +66,5 @@ export const NameHistoryTable = ({ list }) => {
     </>
   );
 };
+
+export default NameHistoryTable;

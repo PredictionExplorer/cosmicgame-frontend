@@ -36,12 +36,14 @@ const PrizeRow = ({ prize }) => {
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip title={prize.WinnerAddr}>
-          <Typography sx={{ fontSize: "inherit !important" }}>
+          <Typography
+            sx={{ fontSize: "inherit !important", fontFamily: "monospace" }}
+          >
             {shortenHex(prize.WinnerAddr, 6)}
           </Typography>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{prize.PrizeNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{prize.PrizeNum + 1}</TablePrimaryCell>
       <TablePrimaryCell align="right">
         {prize.AmountEth.toFixed(4)} ETH
       </TablePrimaryCell>
@@ -75,12 +77,12 @@ export const PrizeTable = ({ list, loading }) => {
       <TablePrimaryContainer>
         <Table>
           <colgroup>
-            <col width="12%" />
+            <col width="16%" />
             <col width="15%" />
-            <col width="10%" />
+            <col width="9%" />
             <col width="12%" />
-            <col width="10%" />
-            <col width="12%" />
+            <col width="8%" />
+            <col width="13%" />
             <col width="15%" />
             <col width="12%" />
           </colgroup>

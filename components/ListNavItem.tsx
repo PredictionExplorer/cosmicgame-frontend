@@ -16,12 +16,25 @@ const ListNavItem = (props) => {
     <>
       <Box ml={3}>
         {props.nav.children ? (
-          <NavLink href="#" onClick={handleMenuOpen} display="flex" alignItems="center">
+          <NavLink
+            href="#"
+            onClick={handleMenuOpen}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              "&:hover": { textDecoration: "none" },
+            }}
+          >
             {props.nav.title}
             {anchorEl ? <ExpandLess /> : <ExpandMore />}
           </NavLink>
         ) : (
-          <NavLink href={props.nav.route}>{props.nav.title}</NavLink>
+          <NavLink
+            href={props.nav.route}
+            sx={{ "&:hover": { textDecoration: "none" } }}
+          >
+            {props.nav.title}
+          </NavLink>
         )}
       </Box>
       {props.nav.children && (
@@ -46,7 +59,12 @@ const ListNavItem = (props) => {
               style={{ minWidth: 166 }}
               onClick={handleMenuClose}
             >
-              <NavLink href={nav.route}>{nav.title}</NavLink>
+              <NavLink
+                href={nav.route}
+                sx={{ "&:hover": { textDecoration: "none" } }}
+              >
+                {nav.title}
+              </NavLink>
             </MenuItem>
           ))}
         </Menu>

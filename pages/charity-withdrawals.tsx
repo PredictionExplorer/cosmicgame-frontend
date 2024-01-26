@@ -3,7 +3,7 @@ import { Typography } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
-import { CharityWithdrawalTable } from "../components/CharityWithdrawalTable";
+import CharityWithdrawalTable from "../components/CharityWithdrawalTable";
 
 const CharityWithdrawals = () => {
   const [loading, setLoading] = useState(true);

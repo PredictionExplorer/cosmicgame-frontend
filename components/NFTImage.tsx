@@ -17,6 +17,7 @@ const NFTImage = (props) => {
     <StyledImage
       src={props.src || "/images/qmark.png"}
       onError={handleImageError}
+      alt="nft image"
     />
   );
 };

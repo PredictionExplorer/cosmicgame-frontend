@@ -1,0 +1,6 @@
+[
+  "function MARKETING_REWARD() view returns (uint256)",
+  "function MAX_MESSAGE_LENGTH() view returns (uint256)",
+  "function MILLION() view returns (uint256)",
+  "function TOKEN_REWARD() view returns (uint256)"
+]
