@@ -594,7 +594,7 @@ const NewHome = () => {
                   </Typography>
                   &nbsp;
                   <Typography variant="subtitle1" component="span">
-                    {cstBidPrice.toFixed(6)} ETH
+                    {cstBidPrice.toFixed(6)} CST
                   </Typography>
                 </Box>
                 <Box>
