@@ -521,10 +521,10 @@ class ApiService {
   public async get_cst_price() {
     try {
       const { data } = await axios.get(getAPIUrl("bid/cst_price"));
-      return data.CSTPrice;
+      return data;
     } catch (err) {
       console.log(err);
-      return 0;
+      return null;
     }
   }
 }

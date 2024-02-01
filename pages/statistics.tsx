@@ -20,8 +20,14 @@ import {
   ChartSeriesItem,
 } from "@progress/kendo-react-charts";
 import "@progress/kendo-theme-default/dist/all.css";
-import { convertTimestampToDateTime, formatCSTValue, formatEthValue } from "../utils";
+import {
+  convertTimestampToDateTime,
+  formatCSTValue,
+  formatEthValue,
+} from "../utils";
 import { UniqueStakersTable } from "../components/UniqueStakersTable";
+import { GlobalStakingActionsTable } from "../components/GlobalStakingActionsTable";
+import { GlobalStakedTokensTable } from "../components/GlobalStakedTokensTable";
 
 const StatisticsItem = ({ title, value }) => {
   return (
@@ -45,6 +51,8 @@ const Statistics = () => {
   const [nftDonations, setNftDonations] = useState([]);
   const [cstDistribution, setCSTDistribution] = useState([]);
   const [ctBalanceDistribution, setCTBalanceDistribution] = useState([]);
+  const [stakingActions, setStakingActions] = useState(null);
+  const [stakedTokens, setStakedTokens] = useState(null);
   const [loading, setLoading] = useState(true);
   const gridLayout =
     nftDonations.length > 16
@@ -76,6 +84,11 @@ const Statistics = () => {
       setCSTDistribution(distribution);
       const ctbDistribution = await api.get_ct_balances_distribution();
       setCTBalanceDistribution(ctbDistribution);
+      const actions = await api.get_staking_actions();
+      setStakingActions(actions);
+      const tokens = await api.get_staked_tokens();
+      setStakedTokens(tokens);
+
       setLoading(false);
     };
     fetchData();
@@ -348,6 +361,30 @@ const Statistics = () => {
                 title="Amount of Cosmic Signature tokens with assigned name"
                 value={data.MainStats.TotalNamedTokens}
               />
+              <StatisticsItem
+                title="Number of Active Stakers"
+                value={data.MainStats.StakeStatistics.NumActiveStakers}
+              />
+              <StatisticsItem
+                title="Number of Staking Rewards Deposits"
+                value={data.MainStats.StakeStatistics.NumDeposits}
+              />
+              <StatisticsItem
+                title="Total Staking Rewards"
+                value={`${data.MainStats.StakeStatistics.TotalRewardEth.toFixed(
+                  4
+                )} ETH`}
+              />
+              <StatisticsItem
+                title="Total Tokens Staked"
+                value={data.MainStats.StakeStatistics.TotalTokensStaked}
+              />
+              <StatisticsItem
+                title="Unclaimed Staking Rewards"
+                value={`${data.MainStats.StakeStatistics.UnclaimedRewardEth.toFixed(
+                  4
+                )} ETH`}
+              />
             </Box>
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
@@ -418,6 +455,26 @@ const Statistics = () => {
               <CTBalanceDistributionTable
                 list={ctBalanceDistribution.slice(0, 20)}
               />
+            </Box>
+            <Box>
+              <Typography variant="h6" mb={2} mt={8}>
+                Staking Actions
+              </Typography>
+              {stakingActions === null ? (
+                <Typography variant="h6">Loading...</Typography>
+              ) : (
+                <GlobalStakingActionsTable list={stakingActions} />
+              )}
+            </Box>
+            <Box>
+              <Typography variant="h6" mt={8} mb={2}>
+                Staked Tokens
+              </Typography>
+              {stakedTokens === null ? (
+                <Typography variant="h6">Loading...</Typography>
+              ) : (
+                <GlobalStakedTokensTable list={stakedTokens} />
+              )}
             </Box>
             <Box mt={4}>
               <Typography variant="h6" mb={2}>

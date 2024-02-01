@@ -175,7 +175,9 @@ const MyWinnings = () => {
           <Typography variant="h5" mb={2}>
             Claimable Raffle ETH
           </Typography>
-          {raffleETHToClaim === null ? (
+          {!status?.ETHRaffleToClaim ? (
+            <Typography variant="h6">No winnings yet.</Typography>
+          ) : status?.ETHRaffleToClaim > 0 && raffleETHToClaim === null ? (
             <Typography variant="h6">Loading...</Typography>
           ) : raffleETHToClaim.length > 0 ? (
             <>
@@ -236,13 +238,17 @@ const MyWinnings = () => {
               </Button>
             )}
           </Box>
-          {donatedNFTToClaim === null ? (
+          {!status?.NumDonatedNFTToClaim ? (
+            <Typography variant="h6">No NFTs yet.</Typography>
+          ) : status?.NumDonatedNFTToClaim > 0 && donatedNFTToClaim === null ? (
             <Typography variant="h6">Loading...</Typography>
           ) : (
-            <DonatedNFTTable
-              list={donatedNFTToClaim}
-              handleClaim={handleDonatedNFTsClaim}
-            />
+            donatedNFTToClaim !== null && (
+              <DonatedNFTTable
+                list={donatedNFTToClaim}
+                handleClaim={handleDonatedNFTsClaim}
+              />
+            )
           )}
         </Box>
         <Box mt={6}>

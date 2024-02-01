@@ -199,7 +199,7 @@ const WinningHistoryTable = ({ winningHistory, showClaimedStatus = false }) => {
   const perPage = 5;
   const [curPage, setCurrentPage] = useState(1);
   if (winningHistory.length === 0) {
-    return <Typography>No history yet.</Typography>;
+    return <Typography variant="h6">No history yet.</Typography>;
   }
   return (
     <Box mt={2}>
