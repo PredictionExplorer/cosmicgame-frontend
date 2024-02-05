@@ -184,8 +184,8 @@ export const CenterBox = styled(Box)(({ theme }) => ({
 
 export const CounterWrapper = styled(Box)({
   display: 'flex',
-  justifyContent: isMobile ? 'center' : 'start',
-  alignItems: 'center',
+  justifyContent: "space-between",
+  // alignItems: 'center',
 })
 
 export const CounterItemWrapper = styled(Box)(!isSafari ? {

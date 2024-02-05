@@ -66,7 +66,6 @@ export const calculateTimeDiff = (timestamp: any) => {
   if (minutes) {
     str += ("0" + minutes).slice(-2) + " Minutes ";
   }
-  str += ("0" + seconds).slice(-2) + " Seconds";
   return str;
 };
 
