@@ -518,419 +518,77 @@ const NewHome = () => {
         >
           <CircularProgress color="inherit" />
         </Backdrop>
-        <Grid container spacing={8}>
-          <Grid item xs={12} sm={12} md={6} lg={6}>
-            <StyledCard>
-              <CardActionArea
-                onClick={
-                  bannerTokenId
-                    ? () => router.push(`/detail/${bannerTokenId}`)
-                    : null
-                }
-              >
-                <NFTImage
-                  src={
-                    bannerTokenId === ""
-                      ? "/images/qmark.png"
-                      : `https://cosmic-game.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
-                  }
-                />
-              </CardActionArea>
-            </StyledCard>
-            <Typography color="primary" mt={4}>
-              Random sample of your possible NFT
-            </Typography>
+
+        {data?.LastBidderAddr !== constants.AddressZero ? (
+          <Grid container spacing={2} alignItems="center" mb={2}>
+            <Grid item sm={12} md={2}>
+              <Typography variant="h5">
+                Round #{data?.CurRoundNum + 1}
+              </Typography>
+            </Grid>
+            <Grid item sm={12} md={6}>
+              <Typography textAlign="center">finishes in</Typography>
+              {data?.LastBidderAddr !== constants.AddressZero &&
+                (prizeTime > Date.now() ? (
+                  <Countdown key={0} date={prizeTime} renderer={Counter} />
+                ) : (
+                  <Countdown key={1} date={Date.now()} renderer={Counter} />
+                ))}
+              {roundStarted !== "" && (
+                <Typography sx={{ fontSize: 12, textAlign: "center" }}>
+                  (Round started {roundStarted} ago)
+                </Typography>
+              )}
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={12} md={6} lg={6}>
-            {data?.LastBidderAddr !== constants.AddressZero ? (
+        ) : (
+          <>
+            {data?.PrizeAmountEth > 0 ? (
               <>
-                <Typography variant="h4" mr={1} component="span">
-                  Current Bid
+                <Typography variant="h4" mb={2}>
+                  Round #{data?.CurRoundNum} ended
                 </Typography>
-                <Typography variant="h5" component="span">
-                  (Round #{data?.CurRoundNum + 1})
-                </Typography>
-                {data?.LastBidderAddr !== constants.AddressZero &&
-                  (prizeTime > Date.now() ? (
-                    <Countdown key={0} date={prizeTime} renderer={Counter} />
-                  ) : (
-                    <Countdown key={1} date={Date.now()} renderer={Counter} />
-                  ))}
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    color="primary"
-                    component="span"
-                  >
-                    Bid Price:
-                  </Typography>
-                  &nbsp;
-                  <Typography variant="subtitle1" component="span">
-                    {data?.BidPriceEth.toFixed(6)} ETH
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    color="primary"
-                    component="span"
-                  >
-                    CST Bid Price:
-                  </Typography>
-                  &nbsp;
-                  <Typography variant="subtitle1" component="span">
-                    {cstBidData?.CSTPrice.toFixed(6)} CST
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    color="primary"
-                    component="span"
-                  >
-                    Elapsed Time:
-                  </Typography>
-                  &nbsp;
-                  <Typography variant="subtitle1" component="span">
-                    {calculateTimeDiff(cstBidData?.SecondsElapsed)}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    color="primary"
-                    component="span"
-                  >
-                    Auction Duration:
-                  </Typography>
-                  &nbsp;
-                  <Typography variant="subtitle1" component="span">
-                    {cstBidData?.AuctionDuration} Seconds
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    color="primary"
-                    component="span"
-                  >
-                    Reward:
-                  </Typography>
-                  &nbsp;
-                  <Typography variant="subtitle1" component="span">
-                    {data?.PrizeAmountEth.toFixed(4)} ETH
-                  </Typography>
-                </Box>
-                {roundStarted && (
-                  <Box>
-                    <Typography color="primary" component="span">
-                      Round Started:
-                    </Typography>
-                    &nbsp;
-                    <Typography component="span">{roundStarted} ago</Typography>
-                  </Box>
-                )}
-                <Box sx={{ mt: "24px" }}>
-                  <Typography color="primary">Last Bidder Address:</Typography>
-                  <Typography>
-                    {data?.LastBidderAddr === constants.AddressZero ? (
-                      "There is no bidder yet."
-                    ) : (
+                <Grid container spacing={2} mb={2}>
+                  <Grid item sm={12} md={2}>
+                    <Typography variant="subtitle1">Winner</Typography>
+                  </Grid>
+                  <Grid item sm={12} md={4}>
+                    <Typography variant="subtitle1" textAlign="center">
                       <Link
-                        href={`/user/${data?.LastBidderAddr}`}
+                        href={`/user/${prizeInfo?.WinnerAddr}`}
                         color="rgb(255, 255, 255)"
+                        fontSize="inherit"
                       >
-                        {data?.LastBidderAddr}
+                        {prizeInfo?.WinnerAddr}
                       </Link>
-                    )}
-                  </Typography>
-                </Box>
-                {!!(curBidList.length && curBidList[0].Message !== "") && (
-                  <Box sx={{ mb: "24px" }}>
-                    <Typography color="primary" component="span">
-                      Last Bidder Message:
                     </Typography>
-                    &nbsp;
-                    <Typography component="span">
-                      {curBidList[0].Message}
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} mb={2}>
+                  <Grid item sm={12} md={2}>
+                    <Typography variant="subtitle1">Previous Reward</Typography>
+                  </Grid>
+                  <Grid item sm={12} md={4}>
+                    <Typography variant="subtitle1">
+                      {data?.PrizeAmountEth.toFixed(4)} ETH
                     </Typography>
-                  </Box>
-                )}
+                  </Grid>
+                </Grid>
               </>
             ) : (
-              <>
-                {data?.PrizeAmountEth > 0 ? (
-                  <>
-                    <Typography variant="h4" mb={2}>
-                      Round #{data?.CurRoundNum} ended
-                    </Typography>
-                    <Box mb={1}>
-                      <Typography color="primary" component="span">
-                        Winner:
-                      </Typography>
-                      &nbsp;
-                      <Typography component="span">
-                        <Link
-                          href={`/user/${prizeInfo?.WinnerAddr}`}
-                          color="rgb(255, 255, 255)"
-                          fontSize="inherit"
-                        >
-                          {prizeInfo?.WinnerAddr}
-                        </Link>
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <Typography color="primary" component="span">
-                        Previous Round Reward:
-                      </Typography>
-                      &nbsp;
-                      <Typography component="span">
-                        {data?.PrizeAmountEth.toFixed(4)} ETH
-                      </Typography>
-                    </Box>
-                  </>
-                ) : (
-                  <Typography variant="h5">
-                    Start the game with your first bid!
-                  </Typography>
-                )}
+              <Typography variant="subtitle1">
+                Start the game with your first bid!
+              </Typography>
+            )}
 
-                <Typography mt="40px" mb={1}>
-                  Be the first to start a new round, place a bid.
-                </Typography>
-                <Box>
-                  <Typography color="primary" component="span">
-                    Bid Price:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    {data?.BidPriceEth.toFixed(6)} ETH
-                  </Typography>
-                </Box>
-              </>
-            )}
-            {account !== null && (
-              <>
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Advanced Options</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    {/* Random Walk NFT list */}
-                    <Box mb={4}>
-                      <Typography variant="h6">
-                        Random Walk NFT Gallery
-                      </Typography>
-                      <Typography variant="body2">
-                        If you own some RandomWalkNFTs and one of them is used
-                        when bidding, you can get a 50% discount!
-                      </Typography>
-                      <PaginationRWLKGrid
-                        loading={false}
-                        data={rwlknftIds}
-                        selectedToken={rwlkId}
-                        setSelectedToken={setRwlkId}
-                      />
-                    </Box>
-                    <Typography variant="body2">
-                      If you want to donate one of your NFTs while bidding, you
-                      can put the contract address, NFT id, and comment here.
-                    </Typography>
-                    <TextField
-                      placeholder="NFT contract address"
-                      size="small"
-                      fullWidth
-                      sx={{ marginTop: 2 }}
-                      onChange={(e) => setNftDonateAddress(e.target.value)}
-                    />
-                    <TextField
-                      placeholder="NFT number"
-                      size="small"
-                      fullWidth
-                      sx={{ marginTop: 2 }}
-                      onChange={(e) => setNftId(Number(e.target.value))}
-                    />
-                    <TextField
-                      placeholder="Message (280 characters)"
-                      size="small"
-                      multiline
-                      fullWidth
-                      rows={4}
-                      inputProps={{ maxLength: 280 }}
-                      sx={{ marginTop: 2 }}
-                      onChange={(e) => setMessage(e.target.value)}
-                    />
-                    <Box
-                      sx={{
-                        display: "flex",
-                        marginTop: 2,
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography
-                        whiteSpace="nowrap"
-                        color="rgba(255, 255, 255, 0.68)"
-                        mr={2}
-                      >
-                        Rise bid price by
-                      </Typography>
-                      <CustomTextField
-                        type="number"
-                        placeholder="Bid Price Plus"
-                        value={bidPricePlus}
-                        size="small"
-                        fullWidth
-                        InputProps={{
-                          inputComponent: StyledInput,
-                          endAdornment: (
-                            <InputAdornment position="end">%</InputAdornment>
-                          ),
-                          inputProps: { min: 0, max: 50 },
-                        }}
-                        onChange={(e) => {
-                          let value = Number(e.target.value);
-                          if (value <= 50) {
-                            setBidPricePlus(value);
-                          }
-                        }}
-                      />
-                      <Typography
-                        whiteSpace="nowrap"
-                        color="rgba(255, 255, 255, 0.68)"
-                        ml={2}
-                      >
-                        {(data?.BidPriceEth * (1 + bidPricePlus / 100)).toFixed(
-                          6
-                        )}{" "}
-                        ETH
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" mt={2}>
-                      The bid price is increased {bidPricePlus}% to prevent
-                      bidding collision.
-                    </Typography>
-                  </AccordionDetails>
-                </Accordion>
-                <Box mb={2} position="relative">
-                  <Grid container spacing={2} mt="25px">
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <Button
-                        variant="contained"
-                        size="large"
-                        endIcon={<ArrowForward />}
-                        onClick={onBid}
-                        fullWidth
-                        disabled={isBidding}
-                      >
-                        Bid {rwlkId !== -1 ? "with RandomWalk" : "Now"}
-                      </Button>
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6} lg={6}>
-                      <Button
-                        variant="outlined"
-                        size="large"
-                        endIcon={<ArrowForward />}
-                        onClick={onBidWithCST}
-                        fullWidth
-                        disabled={isBidding}
-                      >
-                        Bid with CST
-                      </Button>
-                    </Grid>
-                  </Grid>
-                  {!(
-                    prizeTime > Date.now() ||
-                    data?.LastBidderAddr === constants.AddressZero
-                  ) && (
-                    <Grid container columnSpacing={2} mt="20px">
-                      <Grid item xs={12} sm={12} md={12} lg={12}>
-                        <Button
-                          variant="outlined"
-                          size="large"
-                          onClick={onClaimPrize}
-                          fullWidth
-                          disabled={
-                            data?.LastBidderAddr !== account &&
-                            prizeTime > Date.now()
-                          }
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          Claim Prize
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            {prizeTime > Date.now() &&
-                              data?.LastBidderAddr !== account && (
-                                <>
-                                  available in &nbsp;
-                                  <Countdown date={prizeTime} />
-                                </>
-                              )}
-                            &nbsp;
-                            <ArrowForward sx={{ width: 22, height: 22 }} />
-                          </Box>
-                        </Button>
-                        {data?.LastBidderAddr !== account &&
-                          prizeTime > Date.now() && (
-                            <Typography
-                              variant="body2"
-                              fontStyle="italic"
-                              textAlign="right"
-                              color="primary"
-                            >
-                              Please wait until the last bidder claims the
-                              prize.
-                            </Typography>
-                          )}
-                      </Grid>
-                    </Grid>
-                  )}
-                </Box>
-              </>
-            )}
-            <Typography variant="body2">
-              When you bid, you will get 100 tokens as a reward. These tokens
-              allow you to participate in the DAO.
+            <Typography variant="subtitle1" mt="40px" mb={1}>
+              Be the first to start a new round, place a bid.
             </Typography>
-            <Box mt={2}>
-              <Typography variant="body2" color="primary" component="span">
-                *
-              </Typography>
-              <Typography variant="body2" component="span">
-                When you bid, you are also buying a raffle ticket.{" "}
-                {data?.NumRaffleEthWinners} raffle tickets will be chosen and
-                these people will win {data?.RafflePercentage}% of the pot each.
-                Also, {data?.NumRaffleNFTWinners} additional winners and{" "}
-                {data?.NumHolderNFTWinners} Random Walk NFT holders and{" "}
-                {data?.NumHolderNFTWinners} CosmicSignature token holders will
-                be chosen which will receive a Cosmic Signature NFT.
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
+          </>
+        )}
 
-        <Grid container spacing={2} alignItems="center" mb={2}>
-          <Grid item sm={12} md={3}>
-            <Typography variant="h5">Round #{data?.CurRoundNum + 1}</Typography>
-          </Grid>
-          <Grid item sm={12} md={6}>
-            <Typography textAlign="center">finishes in</Typography>
-            {data?.LastBidderAddr !== constants.AddressZero &&
-              (prizeTime > Date.now() ? (
-                <Countdown key={0} date={prizeTime} renderer={Counter} />
-              ) : (
-                <Countdown key={1} date={Date.now()} renderer={Counter} />
-              ))}
-            {roundStarted !== "" && (
-              <Typography sx={{ fontSize: 12, textAlign: "center" }}>
-                (Round started {roundStarted} ago)
-              </Typography>
-            )}
-          </Grid>
-        </Grid>
         <Grid container spacing={2} mb={2}>
-          <Grid item sm={12} md={3}>
+          <Grid item sm={12} md={2}>
             <Typography variant="subtitle1">Bid Price</Typography>
           </Grid>
           <Grid item sm={12} md={4}>
@@ -953,7 +611,7 @@ const NewHome = () => {
           </Grid>
         </Grid>
         <Grid container spacing={2} mb={2}>
-          <Grid item sm={12} md={3}>
+          <Grid item sm={12} md={2}>
             <Typography variant="subtitle1">Reward</Typography>
           </Grid>
           <Grid item sm={12} md={4}>
@@ -963,7 +621,7 @@ const NewHome = () => {
           </Grid>
         </Grid>
         <Grid container spacing={2} mb={2}>
-          <Grid item sm={12} md={3}>
+          <Grid item sm={12} md={2}>
             <Typography variant="subtitle1">Last Bidder</Typography>
           </Grid>
           <Grid item sm={12} md={4}>
@@ -974,6 +632,7 @@ const NewHome = () => {
                 <Link
                   href={`/user/${data?.LastBidderAddr}`}
                   color="rgb(255, 255, 255)"
+                  fontSize="inherit"
                 >
                   {data?.LastBidderAddr}
                 </Link>
@@ -985,8 +644,8 @@ const NewHome = () => {
         <RadioGroup
           row
           value={bidType}
-          name="radio-buttons-group"
           onChange={(_e, value) => setBidType(value)}
+          sx={{ mb: 2 }}
         >
           <FormControlLabel value="ETH" control={<Radio />} label="ETH" />
           <FormControlLabel
@@ -1002,24 +661,26 @@ const NewHome = () => {
         </RadioGroup>
         {bidType === "CST" && (
           <>
-            <Box>
-              <Typography variant="subtitle1" color="primary" component="span">
-                Elapsed Time:
-              </Typography>
-              &nbsp;
-              <Typography variant="subtitle1" component="span">
-                {calculateTimeDiff(cstBidData?.SecondsElapsed)}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="subtitle1" color="primary" component="span">
-                Auction Duration:
-              </Typography>
-              &nbsp;
-              <Typography variant="subtitle1" component="span">
-                {cstBidData?.AuctionDuration} Seconds
-              </Typography>
-            </Box>
+            <Grid container spacing={2} mb={2}>
+              <Grid item sm={12} md={2}>
+                <Typography variant="subtitle1">Elapsed Time</Typography>
+              </Grid>
+              <Grid item sm={12} md={4}>
+                <Typography variant="subtitle1">
+                  {calculateTimeDiff(cstBidData?.SecondsElapsed)}
+                </Typography>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2} mb={2}>
+              <Grid item sm={12} md={2}>
+                <Typography variant="subtitle1">Auction Duration</Typography>
+              </Grid>
+              <Grid item sm={12} md={4}>
+                <Typography variant="subtitle1">
+                  {cstBidData?.AuctionDuration} Seconds
+                </Typography>
+              </Grid>
+            </Grid>
           </>
         )}
         {account !== null && (
@@ -1120,17 +781,76 @@ const NewHome = () => {
                 </Typography>
               </AccordionDetails>
             </Accordion>
-            <Box mt={2} position="relative">
-              <Button
-                variant="contained"
-                size="large"
-                endIcon={<ArrowForward />}
-                onClick={onBid}
-                fullWidth
-                disabled={isBidding}
-              >
-                Bid now with {bidType}
-              </Button>
+            <Grid container spacing={2} my={2}>
+              <Grid item xs={12} md={6}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  endIcon={<ArrowForward />}
+                  onClick={bidType === "CST" ? onBidWithCST : onBid}
+                  fullWidth
+                  disabled={isBidding}
+                >
+                  Bid now with {bidType}
+                </Button>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={onClaimPrize}
+                  fullWidth
+                  disabled={
+                    data?.LastBidderAddr !== account && prizeTime > Date.now()
+                  }
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  Claim Prize
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    {prizeTime > Date.now() &&
+                      data?.LastBidderAddr !== account && (
+                        <>
+                          available in &nbsp;
+                          <Countdown date={prizeTime} />
+                        </>
+                      )}
+                    &nbsp;
+                    <ArrowForward sx={{ width: 22, height: 22 }} />
+                  </Box>
+                </Button>
+              </Grid>
+              {data?.LastBidderAddr !== account && prizeTime > Date.now() && (
+                <Typography
+                  variant="body2"
+                  fontStyle="italic"
+                  textAlign="right"
+                  color="primary"
+                >
+                  Please wait until the last bidder claims the prize.
+                </Typography>
+              )}
+            </Grid>
+
+            <Typography variant="body2">
+              When you bid, you will get 100 tokens as a reward. These tokens
+              allow you to participate in the DAO.
+            </Typography>
+            <Box mt={2}>
+              <Typography variant="body2" color="primary" component="span">
+                *
+              </Typography>
+              <Typography variant="body2" component="span">
+                When you bid, you are also buying a raffle ticket.{" "}
+                {data?.NumRaffleEthWinners} raffle tickets will be chosen and
+                these people will win {data?.RafflePercentage}% of the pot each.
+                Also, {data?.NumRaffleNFTWinners} additional winners and{" "}
+                {data?.NumHolderNFTWinners} Random Walk NFT holders and{" "}
+                {data?.NumHolderNFTWinners} CosmicSignature token holders will
+                be chosen which will receive a Cosmic Signature NFT.
+              </Typography>
             </Box>
           </>
         )}
@@ -1156,9 +876,6 @@ const NewHome = () => {
               />
             </ChartSeries>
           </Chart>
-          <Typography color="primary" mt={4}>
-            Distribution of Prize funds
-          </Typography>
         </Box>
         <Prize prizeAmount={data?.PrizeAmountEth || 0} />
 
