@@ -67,6 +67,7 @@ export const UnclaimedStakingRewardsTable = ({ list }) => {
         .claimReward(actionId, depositId)
         .then((tx) => tx.wait());
       console.log(res);
+      // How to get the ids of the staked tokens for this reward?
       // await stakingContract.stake(actionId).then((tx) => tx.wait());
     } catch (err) {
       console.error(err);
