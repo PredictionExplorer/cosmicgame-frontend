@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Box,
-  Button,
   Link,
   Pagination,
   Table,
@@ -17,9 +16,8 @@ import {
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
-import useStakingWalletContract from "../hooks/useStakingWalletContract";
 
-const GlobalStakedTokensRow = ({ row, handleStake, handleUnstake }) => {
+const GlobalStakedTokensRow = ({ row }) => {
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
   }
@@ -63,15 +61,6 @@ const GlobalStakedTokensRow = ({ row, handleStake, handleUnstake }) => {
 export const GlobalStakedTokensTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
-  const stakingContract = useStakingWalletContract();
-  const handleStake = async (tokenId) => {
-    const res = await stakingContract.stake(tokenId).then((tx) => tx.wait());
-    console.log(res);
-  };
-  const handleUnstake = async (tokenId) => {
-    const res = await stakingContract.unstake(tokenId).then((tx) => tx.wait());
-    console.log(res);
-  };
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
   }
@@ -97,12 +86,7 @@ export const GlobalStakedTokensTable = ({ list }) => {
             {list
               .slice((page - 1) * perPage, page * perPage)
               .map((row, index) => (
-                <GlobalStakedTokensRow
-                  key={index}
-                  row={row}
-                  handleStake={handleStake}
-                  handleUnstake={handleUnstake}
-                />
+                <GlobalStakedTokensRow key={index} row={row} />
               ))}
           </TableBody>
         </Table>

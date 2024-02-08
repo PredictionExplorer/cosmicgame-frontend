@@ -43,7 +43,7 @@ const UnclaimedStakingRewardsRow = ({ row, handleClaim }) => {
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Button size="small" onClick={handleClaim}>
-          Claim
+          Unstake & Claim
         </Button>
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -62,10 +62,12 @@ export const UnclaimedStakingRewardsTable = ({ list }) => {
         account,
         depositId
       );
+      await stakingContract.unstake(actionId).then((tx) => tx.wait());
       const res = await stakingContract
         .claimReward(actionId, depositId)
         .then((tx) => tx.wait());
       console.log(res);
+      // await stakingContract.stake(actionId).then((tx) => tx.wait());
     } catch (err) {
       console.error(err);
       alert(err.data.message);
@@ -103,10 +105,10 @@ export const UnclaimedStakingRewardsTable = ({ list }) => {
             <col width="15%" />
             <col width="10%" />
             <col width="18%" />
+            <col width="12%" />
+            <col width="12%" />
+            <col width="15%" />
             <col width="16%" />
-            <col width="17%" />
-            <col width="20%" />
-            <col width="2%" />
           </colgroup>
           <TablePrimaryHead>
             <TableRow>
