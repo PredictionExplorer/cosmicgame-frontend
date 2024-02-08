@@ -131,12 +131,14 @@ const NewHome = () => {
     { category: "Prize", value: data?.PrizePercentage },
     { category: "Raffle", value: data?.RafflePercentage },
     { category: "Charity", value: data?.CharityPercentage },
+    { category: "Staking", value: data?.StakignPercentage },
     {
       category: "Next round",
       value:
         100 -
         data?.CharityPercentage -
         data?.RafflePercentage -
+        data?.StakignPercentage -
         data?.PrizePercentage,
     },
   ];
