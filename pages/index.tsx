@@ -84,7 +84,7 @@ const bidParamsEncoding: ethers.utils.ParamType = {
 const NewHome = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
-  const [bidType, setBidType] = useState("ETH");
+  const [bidType, setBidType] = useState("");
   const [cstBidData, setCSTBidData] = useState({
     AuctionDuration: 0,
     CSTPrice: 0,
@@ -464,6 +464,9 @@ const NewHome = () => {
       const fileName = bannerId.toString().padStart(6, "0");
       setBannerTokenId(fileName);
     }
+    if (data?.LastBidderAddr === constants.AddressZero) {
+      setBidType("");
+    }
     const interval = setInterval(async () => {
       setRoundStarted(calculateTimeDiff(data?.TsRoundStart));
     }, 1000);
@@ -521,7 +524,7 @@ const NewHome = () => {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <Grid container spacing={20} mb={4}>
+        <Grid container spacing={8} mb={4}>
           <Grid item sm={12} md={6}>
             {data?.LastBidderAddr !== constants.AddressZero ? (
               <Grid container spacing={2} alignItems="center" mb={2}>
@@ -831,47 +834,53 @@ const NewHome = () => {
                   Bid now with {bidType}
                 </Button>
               </Grid>
-              <Grid item xs={12} md={6}>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={onClaimPrize}
-                  fullWidth
-                  disabled={
-                    data?.LastBidderAddr !== account && prizeTime > Date.now()
-                  }
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  Claim Prize
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    {prizeTime > Date.now() &&
-                      data?.LastBidderAddr !== account && (
-                        <>
-                          available in &nbsp;
-                          <Countdown date={prizeTime} />
-                        </>
-                      )}
-                    &nbsp;
-                    <ArrowForward sx={{ width: 22, height: 22 }} />
-                  </Box>
-                </Button>
-              </Grid>
-              {data?.LastBidderAddr !== account && prizeTime > Date.now() && (
-                <Typography
-                  variant="body2"
-                  fontStyle="italic"
-                  textAlign="right"
-                  color="primary"
-                >
-                  Please wait until the last bidder claims the prize.
-                </Typography>
+              {!(
+                prizeTime > Date.now() ||
+                data?.LastBidderAddr === constants.AddressZero
+              ) && (
+                <Grid item xs={12} md={6}>
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    onClick={onClaimPrize}
+                    fullWidth
+                    disabled={
+                      data?.LastBidderAddr !== account && prizeTime > Date.now()
+                    }
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    Claim Prize
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      {prizeTime > Date.now() &&
+                        data?.LastBidderAddr !== account && (
+                          <>
+                            available in &nbsp;
+                            <Countdown date={prizeTime} />
+                          </>
+                        )}
+                      &nbsp;
+                      <ArrowForward sx={{ width: 22, height: 22 }} />
+                    </Box>
+                  </Button>
+                  {data?.LastBidderAddr !== account && prizeTime > Date.now() && (
+                    <Typography
+                      variant="body2"
+                      fontStyle="italic"
+                      textAlign="right"
+                      color="primary"
+                      mt={2}
+                    >
+                      Please wait until the last bidder claims the prize.
+                    </Typography>
+                  )}
+                </Grid>
               )}
             </Grid>
 
-            <Typography variant="body2">
+            <Typography variant="body2" mt={4}>
               When you bid, you will get 100 tokens as a reward. These tokens
               allow you to participate in the DAO.
             </Typography>
