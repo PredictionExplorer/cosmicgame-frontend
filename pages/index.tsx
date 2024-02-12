@@ -699,6 +699,21 @@ const NewHome = () => {
             label="CST (Cosmic Signature Token)"
           />
         </RadioGroup>
+        {bidType === "RandomWalk" && (
+          <Box mb={4}>
+            <Typography variant="h6">Random Walk NFT Gallery</Typography>
+            <Typography variant="body2">
+              If you own some RandomWalkNFTs and one of them is used when
+              bidding, you can get a 50% discount!
+            </Typography>
+            <PaginationRWLKGrid
+              loading={false}
+              data={rwlknftIds}
+              selectedToken={rwlkId}
+              setSelectedToken={setRwlkId}
+            />
+          </Box>
+        )}
         {bidType === "CST" && (
           <>
             <Grid container spacing={2} mb={2}>
@@ -730,20 +745,6 @@ const NewHome = () => {
                 <Typography>Advanced Options</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {/* Random Walk NFT list */}
-                <Box mb={4}>
-                  <Typography variant="h6">Random Walk NFT Gallery</Typography>
-                  <Typography variant="body2">
-                    If you own some RandomWalkNFTs and one of them is used when
-                    bidding, you can get a 50% discount!
-                  </Typography>
-                  <PaginationRWLKGrid
-                    loading={false}
-                    data={rwlknftIds}
-                    selectedToken={rwlkId}
-                    setSelectedToken={setRwlkId}
-                  />
-                </Box>
                 <Typography variant="body2">
                   If you want to donate one of your NFTs while bidding, you can
                   put the contract address, NFT id, and comment here.
@@ -829,7 +830,7 @@ const NewHome = () => {
                   endIcon={<ArrowForward />}
                   onClick={bidType === "CST" ? onBidWithCST : onBid}
                   fullWidth
-                  disabled={isBidding}
+                  disabled={isBidding || bidType === ""}
                 >
                   Bid now with {bidType}
                 </Button>
