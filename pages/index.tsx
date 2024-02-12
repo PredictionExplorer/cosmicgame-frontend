@@ -628,7 +628,7 @@ const NewHome = () => {
                 </Box>
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={2}>
+            <Grid container spacing={2} mb={2} alignItems="center">
               <Grid item sm={12} md={4}>
                 <Typography variant="subtitle1">Rewards</Typography>
               </Grid>
@@ -636,7 +636,7 @@ const NewHome = () => {
                 <Typography>{data?.PrizeAmountEth.toFixed(4)} ETH</Typography>
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={2}>
+            <Grid container spacing={2} mb={2} alignItems="center">
               <Grid item sm={12} md={4}>
                 <Typography variant="subtitle1">Last Bidder</Typography>
               </Grid>
@@ -681,10 +681,14 @@ const NewHome = () => {
           </Grid>
         </Grid>
 
+        <Typography mb={1}>Make your bid with:</Typography>
         <RadioGroup
           row
           value={bidType}
-          onChange={(_e, value) => setBidType(value)}
+          onChange={(_e, value) => {
+            setRwlkId(-1);
+            setBidType(value);
+          }}
           sx={{ mb: 2 }}
         >
           <FormControlLabel value="ETH" control={<Radio />} label="ETH" />
@@ -700,7 +704,7 @@ const NewHome = () => {
           />
         </RadioGroup>
         {bidType === "RandomWalk" && (
-          <Box mb={4}>
+          <Box mb={4} ml={4}>
             <Typography variant="h6">Random Walk NFT Gallery</Typography>
             <Typography variant="body2">
               If you own some RandomWalkNFTs and one of them is used when
@@ -715,28 +719,26 @@ const NewHome = () => {
           </Box>
         )}
         {bidType === "CST" && (
-          <>
-            <Grid container spacing={2} mb={2}>
+          <Box ml={4}>
+            <Grid container spacing={2} mb={2} alignItems="center">
               <Grid item sm={12} md={2}>
                 <Typography variant="subtitle1">Elapsed Time</Typography>
               </Grid>
               <Grid item sm={12} md={4}>
-                <Typography variant="subtitle1">
+                <Typography>
                   {calculateTimeDiff(cstBidData?.SecondsElapsed)}
                 </Typography>
               </Grid>
             </Grid>
-            <Grid container spacing={2} mb={2}>
+            <Grid container spacing={2} mb={2} alignItems="center">
               <Grid item sm={12} md={2}>
                 <Typography variant="subtitle1">Auction Duration</Typography>
               </Grid>
               <Grid item sm={12} md={4}>
-                <Typography variant="subtitle1">
-                  {cstBidData?.AuctionDuration} Seconds
-                </Typography>
+                <Typography>{cstBidData?.AuctionDuration} Seconds</Typography>
               </Grid>
             </Grid>
-          </>
+          </Box>
         )}
         {account !== null && (
           <>
