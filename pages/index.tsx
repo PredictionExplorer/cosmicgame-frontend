@@ -61,7 +61,7 @@ import {
 import "@progress/kendo-theme-default/dist/all.css";
 import getErrorMessage from "../utils/alert";
 import NFTImage from "../components/NFTImage";
-import { calculateTimeDiff } from "../utils";
+import { calculateTimeDiff, formatSeconds } from "../utils";
 import WinningHistoryTable from "../components/WinningHistoryTable";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
@@ -680,68 +680,71 @@ const NewHome = () => {
             </Typography>
           </Grid>
         </Grid>
-
-        <Typography mb={1}>Make your bid with:</Typography>
-        <RadioGroup
-          row
-          value={bidType}
-          onChange={(_e, value) => {
-            setRwlkId(-1);
-            setBidType(value);
-          }}
-          sx={{ mb: 2 }}
-        >
-          <FormControlLabel value="ETH" control={<Radio />} label="ETH" />
-          <FormControlLabel
-            value="RandomWalk"
-            control={<Radio />}
-            label="RandomWalk"
-          />
-          <FormControlLabel
-            value="CST"
-            control={<Radio />}
-            label="CST (Cosmic Signature Token)"
-          />
-        </RadioGroup>
-        {bidType === "RandomWalk" && (
-          <Box mb={4} ml={4}>
-            <Typography variant="h6">Random Walk NFT Gallery</Typography>
-            <Typography variant="body2">
-              If you own some RandomWalkNFTs and one of them is used when
-              bidding, you can get a 50% discount!
-            </Typography>
-            <PaginationRWLKGrid
-              loading={false}
-              data={rwlknftIds}
-              selectedToken={rwlkId}
-              setSelectedToken={setRwlkId}
-            />
-          </Box>
-        )}
-        {bidType === "CST" && (
-          <Box ml={4}>
-            <Grid container spacing={2} mb={2} alignItems="center">
-              <Grid item sm={12} md={2}>
-                <Typography variant="subtitle1">Elapsed Time</Typography>
-              </Grid>
-              <Grid item sm={12} md={4}>
-                <Typography>
-                  {calculateTimeDiff(cstBidData?.SecondsElapsed)}
-                </Typography>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} mb={2} alignItems="center">
-              <Grid item sm={12} md={2}>
-                <Typography variant="subtitle1">Auction Duration</Typography>
-              </Grid>
-              <Grid item sm={12} md={4}>
-                <Typography>{cstBidData?.AuctionDuration} Seconds</Typography>
-              </Grid>
-            </Grid>
-          </Box>
-        )}
         {account !== null && (
           <>
+            <Typography mb={1}>Make your bid with:</Typography>
+            <RadioGroup
+              row
+              value={bidType}
+              onChange={(_e, value) => {
+                setRwlkId(-1);
+                setBidType(value);
+              }}
+              sx={{ mb: 2 }}
+            >
+              <FormControlLabel value="ETH" control={<Radio />} label="ETH" />
+              <FormControlLabel
+                value="RandomWalk"
+                control={<Radio />}
+                label="RandomWalk"
+              />
+              <FormControlLabel
+                value="CST"
+                control={<Radio />}
+                label="CST (Cosmic Signature Token)"
+              />
+            </RadioGroup>
+            {bidType === "RandomWalk" && (
+              <Box mb={4} ml={4}>
+                <Typography variant="h6">Random Walk NFT Gallery</Typography>
+                <Typography variant="body2">
+                  If you own some RandomWalkNFTs and one of them is used when
+                  bidding, you can get a 50% discount!
+                </Typography>
+                <PaginationRWLKGrid
+                  loading={false}
+                  data={rwlknftIds}
+                  selectedToken={rwlkId}
+                  setSelectedToken={setRwlkId}
+                />
+              </Box>
+            )}
+            {bidType === "CST" && (
+              <Box ml={4}>
+                <Grid container spacing={2} mb={2} alignItems="center">
+                  <Grid item sm={12} md={2}>
+                    <Typography variant="subtitle1">Elapsed Time</Typography>
+                  </Grid>
+                  <Grid item sm={12} md={4}>
+                    <Typography>
+                      {formatSeconds(cstBidData?.SecondsElapsed)}
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} mb={2} alignItems="center">
+                  <Grid item sm={12} md={2}>
+                    <Typography variant="subtitle1">
+                      Auction Duration
+                    </Typography>
+                  </Grid>
+                  <Grid item sm={12} md={4}>
+                    <Typography>
+                      {cstBidData?.AuctionDuration} Seconds
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Box>
+            )}
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Advanced Options</Typography>
@@ -827,7 +830,7 @@ const NewHome = () => {
             <Grid container spacing={2} my={2}>
               <Grid item xs={12} md={6}>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   size="large"
                   endIcon={<ArrowForward />}
                   onClick={bidType === "CST" ? onBidWithCST : onBid}
@@ -843,7 +846,7 @@ const NewHome = () => {
               ) && (
                 <Grid item xs={12} md={6}>
                   <Button
-                    variant="outlined"
+                    variant="contained"
                     size="large"
                     onClick={onClaimPrize}
                     fullWidth
@@ -882,7 +885,6 @@ const NewHome = () => {
                 </Grid>
               )}
             </Grid>
-
             <Typography variant="body2" mt={4}>
               When you bid, you will get 100 tokens as a reward. These tokens
               allow you to participate in the DAO.
