@@ -464,9 +464,6 @@ const NewHome = () => {
       const fileName = bannerId.toString().padStart(6, "0");
       setBannerTokenId(fileName);
     }
-    if (data?.LastBidderAddr === constants.AddressZero) {
-      setBidType("");
-    }
     const interval = setInterval(async () => {
       setRoundStarted(calculateTimeDiff(data?.TsRoundStart));
     }, 1000);
