@@ -834,7 +834,21 @@ const NewHome = () => {
                   fullWidth
                   disabled={isBidding || bidType === ""}
                 >
-                  Bid now with {bidType}
+                  {`Bid now with ${bidType} (${
+                    bidType === "ETH"
+                      ? `${
+                          data?.BidPriceEth > 0.1
+                            ? data?.BidPriceEth.toFixed(2)
+                            : data?.BidPriceEth.toFixed(5)
+                        } ETH`
+                      : bidType === "RandomWalk"
+                      ? `${
+                          data?.BidPriceEth > 0.2
+                            ? (data?.BidPriceEth / 2).toFixed(2)
+                            : (data?.BidPriceEth / 2).toFixed(5)
+                        } ETH`
+                      : `${cstBidData?.CSTPrice.toFixed(2)} CST`
+                  })`}
                 </Button>
               </Grid>
               {!(
