@@ -218,6 +218,10 @@ const Statistics = () => {
             <Typography variant="h5">Overall Statistics</Typography>
             <Box mt={4}>
               <StatisticsItem
+                title="CosmicGame contract balance"
+                value={formatEthValue(data.TotalPrizesPaidAmountEth)}
+              />
+              <StatisticsItem
                 title="Num Prizes Given"
                 value={
                   <Link href="/prize" color="inherit" fontSize="inherit">

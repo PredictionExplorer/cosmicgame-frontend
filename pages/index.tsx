@@ -521,7 +521,7 @@ const NewHome = () => {
           <CircularProgress color="inherit" />
         </Backdrop>
 
-        <Grid container spacing={8} mb={4}>
+        <Grid container spacing={16} mb={4}>
           <Grid item sm={12} md={6}>
             {data?.LastBidderAddr !== constants.AddressZero ? (
               <Grid container spacing={2} alignItems="center" mb={2}>
@@ -552,7 +552,7 @@ const NewHome = () => {
                     <Typography variant="h4" mb={2}>
                       Round #{data?.CurRoundNum} ended
                     </Typography>
-                    <Grid container spacing={2} mb={2}>
+                    <Grid container spacing={2} mb={2} alignItems="center">
                       <Grid item sm={12} md={4}>
                         <Typography variant="subtitle1">Winner</Typography>
                       </Grid>
@@ -568,7 +568,7 @@ const NewHome = () => {
                         </Typography>
                       </Grid>
                     </Grid>
-                    <Grid container spacing={2} mb={2}>
+                    <Grid container spacing={2} mb={2} alignItems="center">
                       <Grid item sm={12} md={4}>
                         <Typography variant="subtitle1">
                           Previous Reward
@@ -587,7 +587,7 @@ const NewHome = () => {
                   </Typography>
                 )}
 
-                <Typography variant="subtitle1" mt="40px" mb={1}>
+                <Typography variant="subtitle1" mt={2} mb={1}>
                   Be the first to start a new round, place a bid.
                 </Typography>
               </>
@@ -607,7 +607,13 @@ const NewHome = () => {
                   <Typography>Using Ether</Typography>
                   <Typography>{data?.BidPriceEth.toFixed(6)} ETH</Typography>
                 </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mb: 1,
+                  }}
+                >
                   <Typography>Using RandomWalk</Typography>
                   <Typography>
                     {(data?.BidPriceEth / 2).toFixed(6)} ETH
@@ -627,7 +633,7 @@ const NewHome = () => {
             </Grid>
             <Grid container spacing={2} mb={2} alignItems="center">
               <Grid item sm={12} md={4}>
-                <Typography variant="subtitle1">Rewards</Typography>
+                <Typography variant="subtitle1">Main Prize Reward</Typography>
               </Grid>
               <Grid item sm={12} md={8}>
                 <Typography>{data?.PrizeAmountEth.toFixed(4)} ETH</Typography>
@@ -635,10 +641,10 @@ const NewHome = () => {
             </Grid>
             <Grid container spacing={2} mb={2} alignItems="center">
               <Grid item sm={12} md={4}>
-                <Typography variant="subtitle1">Last Bidder</Typography>
+                <Typography variant="subtitle1">Last Bidder Address</Typography>
               </Grid>
               <Grid item sm={12} md={8}>
-                <Typography textAlign="center">
+                <Typography>
                   {data?.LastBidderAddr === constants.AddressZero ? (
                     "There is no bidder yet."
                   ) : (
@@ -653,6 +659,18 @@ const NewHome = () => {
                 </Typography>
               </Grid>
             </Grid>
+            {!!(curBidList.length && curBidList[0].Message !== "") && (
+              <Grid container spacing={2} mb={2} alignItems="center">
+                <Grid item sm={12} md={4}>
+                  <Typography variant="subtitle1">
+                    Last Bidder Message
+                  </Typography>
+                </Grid>
+                <Grid item sm={12} md={8}>
+                  <Typography>{curBidList[0].Message}</Typography>
+                </Grid>
+              </Grid>
+            )}
           </Grid>
           <Grid item sm={12} md={6}>
             <StyledCard>
@@ -735,9 +753,7 @@ const NewHome = () => {
                     </Typography>
                   </Grid>
                   <Grid item sm={12} md={4}>
-                    <Typography>
-                      {cstBidData?.AuctionDuration} Seconds
-                    </Typography>
+                    <Typography>{cstBidData?.AuctionDuration} Days</Typography>
                   </Grid>
                 </Grid>
               </Box>
@@ -916,7 +932,10 @@ const NewHome = () => {
             </Box>
           </>
         )}
-        <Box mt={4}>
+        <Box mt={6}>
+          <Typography color="primary" textAlign="center">
+            Distribution of funds on each round
+          </Typography>
           <Chart
             transitions={false}
             style={{ width: "100%", height: matches ? 300 : 200 }}
