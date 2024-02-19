@@ -39,7 +39,7 @@ const Counter = ({ days, hours, minutes, seconds }) => {
           </GradientText>
         </CounterItemWrapper>
         <Typography align="center" variant="subtitle1" fontSize={14}>
-          MINUTES
+          MIN
         </Typography>
       </CounterItem>
       <CounterItem>
@@ -49,7 +49,7 @@ const Counter = ({ days, hours, minutes, seconds }) => {
           </GradientText>
         </CounterItemWrapper>
         <Typography align="center" variant="subtitle1" fontSize={14}>
-          SECONDS
+          SEC
         </Typography>
       </CounterItem>
     </CounterWrapper>

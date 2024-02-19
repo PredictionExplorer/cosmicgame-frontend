@@ -848,23 +848,27 @@ const NewHome = () => {
                   endIcon={<ArrowForward />}
                   onClick={bidType === "CST" ? onBidWithCST : onBid}
                   fullWidth
-                  disabled={isBidding || bidType === ""}
+                  disabled={
+                    isBidding ||
+                    bidType === "" ||
+                    (bidType === "RandomWalk" && rwlkId === -1)
+                  }
                 >
-                  {`Bid now with ${bidType} (${
+                  {`Bid now with ${bidType} ${
                     bidType === "ETH"
-                      ? `${
+                      ? `(${
                           data?.BidPriceEth > 0.1
                             ? data?.BidPriceEth.toFixed(2)
                             : data?.BidPriceEth.toFixed(5)
-                        } ETH`
+                        } ETH)`
                       : bidType === "RandomWalk"
-                      ? `${
+                      ? ` token ${rwlkId} (${
                           data?.BidPriceEth > 0.2
                             ? (data?.BidPriceEth / 2).toFixed(2)
                             : (data?.BidPriceEth / 2).toFixed(5)
-                        } ETH`
-                      : `${cstBidData?.CSTPrice.toFixed(2)} CST`
-                  })`}
+                        } ETH)`
+                      : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
+                  }`}
                 </Button>
               </Grid>
               {!(

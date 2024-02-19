@@ -52,7 +52,7 @@ const HistoryRow = ({ history }) => {
         </Tooltip>
       </TablePrimaryCell>
 
-      <TablePrimaryCell>
+      <TablePrimaryCell align="right">
         {history.BidType === 2
           ? `${
               history.NumCSTTokensEth && history.NumCSTTokensEth < 1
@@ -63,7 +63,7 @@ const HistoryRow = ({ history }) => {
               history.BidPriceEth && history.BidPriceEth < 1
                 ? history.BidPriceEth?.toFixed(7)
                 : history.BidPriceEth?.toFixed(2)
-            } Ξ`}
+            } ETH`}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{history.RoundNum + 1}</TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -121,8 +121,8 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
         <colgroup>
           <col width="11%" />
           <col width="14%" />
-          <col width="11%" />
-          <col width="9%" />
+          <col width="13%" />
+          <col width="7%" />
           <col width="12%" />
           <col width="24%" />
           <col width="19%" />
@@ -131,8 +131,8 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
           <TableRow>
             <TableCell>Date</TableCell>
             <TableCell>Bidder</TableCell>
-            <TableCell>Price</TableCell>
-            <TableCell align="center">Round #</TableCell>
+            <TableCell align="center">Price</TableCell>
+            <TableCell align="center">Round</TableCell>
             <TableCell align="center">Bid Type</TableCell>
             <TableCell>Bid Info</TableCell>
             <TableCell>Message</TableCell>
