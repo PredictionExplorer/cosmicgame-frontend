@@ -215,6 +215,20 @@ const NewHome = () => {
     return true;
   };
 
+  const checkBalance = async (type, amount) => {
+    const balance = await api.get_user_balance(account);
+    if (balance) {
+      if (type === "ETH") {
+        return Number(ethers.utils.formatEther(balance.ETH_Balance)) >= amount;
+      } else if (type === "CST") {
+        return (
+          Number(ethers.utils.formatEther(balance.CosmicTokenBalance)) >= amount
+        );
+      }
+    }
+    return false;
+  };
+
   const onBid = async () => {
     let bidPrice, newBidPrice;
     setIsBidding(true);
@@ -223,6 +237,13 @@ const NewHome = () => {
       newBidPrice =
         parseFloat(ethers.utils.formatEther(bidPrice)) *
         (1 + bidPricePlus / 100);
+      if (rwlkId !== -1) {
+        newBidPrice /= 2;
+      }
+      if (!checkBalance("ETH", newBidPrice)) {
+        alert("Insufficient balance");
+        return;
+      }
       let receipt;
       if (!nftDonateAddress || nftId === -1) {
         let params = ethers.utils.defaultAbiCoder.encode(
@@ -320,6 +341,10 @@ const NewHome = () => {
   const onBidWithCST = async () => {
     setIsBidding(true);
     try {
+      if (!checkBalance("CST", cstBidData?.CSTPrice)) {
+        alert("Insufficient balance");
+        return;
+      }
       let receipt = await cosmicGameContract
         .bidWithCST(message)
         .then((tx) => tx.wait());
@@ -753,7 +778,9 @@ const NewHome = () => {
                     </Typography>
                   </Grid>
                   <Grid item sm={12} md={4}>
-                    <Typography>{cstBidData?.AuctionDuration} Days</Typography>
+                    <Typography>
+                      {formatSeconds(cstBidData?.AuctionDuration)}
+                    </Typography>
                   </Grid>
                 </Grid>
               </Box>
