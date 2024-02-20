@@ -63,6 +63,7 @@ import getErrorMessage from "../utils/alert";
 import NFTImage from "../components/NFTImage";
 import { calculateTimeDiff, formatSeconds } from "../utils";
 import WinningHistoryTable from "../components/WinningHistoryTable";
+import AlertDialog from "../components/AlertDialog";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -109,6 +110,11 @@ const NewHome = () => {
   const [roundStarted, setRoundStarted] = useState("");
   const [curPage, setCurrentPage] = useState(1);
   const [claimHistory, setClaimHistory] = useState(null);
+  const [alertDlg, setAlertDlg] = useState({
+    title: "",
+    content: "",
+    open: false,
+  });
   const perPage = 12;
   // const [blackVideo, setBlackVideo] = useState(null);
 
@@ -145,6 +151,10 @@ const NewHome = () => {
 
   const labelContent = (props) => {
     return `${props.dataItem.category}: ${props.dataItem.value}%`;
+  };
+
+  const setAlertOpen = (status) => {
+    setAlertDlg((prev) => ({ ...prev, open: status }));
   };
 
   const onClaimPrize = async () => {
@@ -216,15 +226,22 @@ const NewHome = () => {
   };
 
   const checkBalance = async (type, amount) => {
-    const balance = await api.get_user_balance(account);
-    if (balance) {
-      if (type === "ETH") {
-        return Number(ethers.utils.formatEther(balance.ETH_Balance)) >= amount;
-      } else if (type === "CST") {
-        return (
-          Number(ethers.utils.formatEther(balance.CosmicTokenBalance)) >= amount
-        );
+    try {
+      const balance = await api.get_user_balance(account);
+      if (balance) {
+        if (type === "ETH") {
+          return (
+            Number(ethers.utils.formatEther(balance.ETH_Balance)) >= amount
+          );
+        } else if (type === "CST") {
+          return (
+            Number(ethers.utils.formatEther(balance.CosmicTokenBalance)) >=
+            amount
+          );
+        }
       }
+    } catch (e) {
+      console.log(e);
     }
     return false;
   };
@@ -240,8 +257,14 @@ const NewHome = () => {
       if (rwlkId !== -1) {
         newBidPrice /= 2;
       }
-      if (!checkBalance("ETH", newBidPrice)) {
-        alert("Insufficient balance");
+      const enoughBalance = await checkBalance("ETH", newBidPrice);
+      if (!enoughBalance) {
+        setAlertDlg({
+          title: "Insufficient ETH balance",
+          content: "There isn't enough ETH in you wallet.",
+          open: true,
+        });
+        setIsBidding(false);
         return;
       }
       let receipt;
@@ -341,8 +364,14 @@ const NewHome = () => {
   const onBidWithCST = async () => {
     setIsBidding(true);
     try {
-      if (!checkBalance("CST", cstBidData?.CSTPrice)) {
-        alert("Insufficient balance");
+      const enoughBalance = await checkBalance("CST", cstBidData?.CSTPrice);
+      if (!enoughBalance) {
+        setAlertDlg({
+          title: "Insufficient CST balance",
+          content: "There isn't enough CosmicSignature Token in you wallet.",
+          open: true,
+        });
+        setIsBidding(false);
         return;
       }
       let receipt = await cosmicGameContract
@@ -894,7 +923,9 @@ const NewHome = () => {
                             ? (data?.BidPriceEth / 2).toFixed(2)
                             : (data?.BidPriceEth / 2).toFixed(5)
                         } ETH)`
-                      : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
+                      : bidType === "CST"
+                      ? `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
+                      : ""
                   }`}
                 </Button>
               </Grid>
@@ -1152,6 +1183,12 @@ const NewHome = () => {
           <FAQ />
         </Box>
       </Container>
+      <AlertDialog
+        title={alertDlg.title}
+        content={alertDlg.content}
+        open={alertDlg.open}
+        setOpen={setAlertOpen}
+      />
     </>
   );
 };
