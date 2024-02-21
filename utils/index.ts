@@ -58,13 +58,13 @@ export const formatSeconds = (seconds: any) => {
   hours = hours % 24;
   let str = "";
   if (days) {
-    str = ("0" + days).slice(-2) + " Days ";
+    str = days + " Days ";
   }
   if (hours || str) {
-    str += ("0" + hours).slice(-2) + " Hours ";
+    str += hours + " Hours ";
   }
   if (minutes) {
-    str += ("0" + minutes).slice(-2) + " Minutes ";
+    str += minutes + " Minutes ";
   }
   return str;
 };

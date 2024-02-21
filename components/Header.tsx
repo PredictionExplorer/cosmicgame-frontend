@@ -32,6 +32,7 @@ const Header = () => {
   const { apiData: status, setApiData } = useApiData();
   const { account } = useActiveWeb3React();
   const [balance, setBalance] = useState({ CosmicToken: 0, ETH: 0 });
+  const [stakedTokens, setStakedTokens] = useState(null);
 
   useEffect(() => {
     const setResponsiveness = () => {
@@ -63,6 +64,9 @@ const Header = () => {
           ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
         });
       }
+
+      const tokens = await api.get_staked_tokens();
+      setStakedTokens(tokens);
     };
 
     if (account) {
@@ -79,7 +83,7 @@ const Header = () => {
         {getNAVs(status, account).map((nav, i) => (
           <ListNavItem key={i} nav={nav} />
         ))}
-        <ConnectWalletButton isMobileView={false} balance={balance} />
+        <ConnectWalletButton isMobileView={false} balance={balance} stakedTokens={stakedTokens} />
       </Toolbar>
     );
   };
@@ -109,7 +113,7 @@ const Header = () => {
         <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
           <DrawerList>
             <ListItem>
-              <ConnectWalletButton isMobileView balance={balance} />
+              <ConnectWalletButton isMobileView balance={balance} stakedTokens={stakedTokens} />
             </ListItem>
             {getNAVs(status, account).map((nav, i) => (
               <ListItemButton
@@ -129,7 +133,6 @@ const Header = () => {
             <Divider />
             <ListItem sx={{ display: "block" }}>
               <Typography sx={{ fontSize: 16 }}>BALANCE:</Typography>
-
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
               >
@@ -166,6 +169,13 @@ const Header = () => {
                   {balance.CosmicToken.toFixed(2)}
                 </Typography>
               </Box>
+            </ListItem>
+            <Divider />
+            <ListItem sx={{justifyContent:'space-between'}}>
+              <Typography sx={{ fontSize: 16 }}>STAKED TOKENS:</Typography>
+              <Typography color="primary" sx={{ fontSize: 16 }}>
+                {stakedTokens?.length}
+              </Typography>
             </ListItem>
           </DrawerList>
         </Drawer>
