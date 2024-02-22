@@ -65,7 +65,7 @@ const Header = () => {
         });
       }
 
-      const tokens = await api.get_staked_tokens();
+      const tokens = await api.get_staked_tokens_by_user(account);
       setStakedTokens(tokens);
     };
 
@@ -83,7 +83,11 @@ const Header = () => {
         {getNAVs(status, account).map((nav, i) => (
           <ListNavItem key={i} nav={nav} />
         ))}
-        <ConnectWalletButton isMobileView={false} balance={balance} stakedTokens={stakedTokens} />
+        <ConnectWalletButton
+          isMobileView={false}
+          balance={balance}
+          stakedTokens={stakedTokens}
+        />
       </Toolbar>
     );
   };
@@ -113,7 +117,11 @@ const Header = () => {
         <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
           <DrawerList>
             <ListItem>
-              <ConnectWalletButton isMobileView balance={balance} stakedTokens={stakedTokens} />
+              <ConnectWalletButton
+                isMobileView
+                balance={balance}
+                stakedTokens={stakedTokens}
+              />
             </ListItem>
             {getNAVs(status, account).map((nav, i) => (
               <ListItemButton
@@ -171,7 +179,7 @@ const Header = () => {
               </Box>
             </ListItem>
             <Divider />
-            <ListItem sx={{justifyContent:'space-between'}}>
+            <ListItem sx={{ justifyContent: "space-between" }}>
               <Typography sx={{ fontSize: 16 }}>STAKED TOKENS:</Typography>
               <Typography color="primary" sx={{ fontSize: 16 }}>
                 {stakedTokens?.length}
