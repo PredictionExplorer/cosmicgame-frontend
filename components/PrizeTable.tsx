@@ -57,6 +57,9 @@ const PrizeRow = ({ prize }) => {
         {prize.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
+        {prize.StakingDepositAmountEth.toFixed(4)} ETH
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
         {prize.RoundStats.TotalRaffleNFTs}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -78,23 +81,25 @@ export const PrizeTable = ({ list, loading }) => {
         <Table>
           <colgroup>
             <col width="16%" />
-            <col width="15%" />
-            <col width="9%" />
+            <col width="14%" />
+            <col width="5%" />
             <col width="12%" />
-            <col width="8%" />
+            <col width="5%" />
+            <col width="10%" />
+            <col width="15%" />
             <col width="13%" />
-            <col width="15%" />
-            <col width="12%" />
+            <col width="10%" />
           </colgroup>
           <TablePrimaryHead>
             <TableRow>
               <TableCell>Datetime</TableCell>
               <TableCell>Winner</TableCell>
-              <TableCell align="center">Round #</TableCell>
+              <TableCell align="center">Round</TableCell>
               <TableCell align="right">Prize Amount</TableCell>
               <TableCell align="center">Bids</TableCell>
               <TableCell align="center">Donated NFTs</TableCell>
               <TableCell align="right">Raffle Deposits</TableCell>
+              <TableCell align="center">Staking Winnings</TableCell>
               <TableCell align="center">Raffle NFTs</TableCell>
             </TableRow>
           </TablePrimaryHead>

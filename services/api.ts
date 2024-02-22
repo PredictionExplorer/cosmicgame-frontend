@@ -527,6 +527,16 @@ class ApiService {
       return null;
     }
   }
+
+  public async get_staking_rewards_by_round(round: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`staking/rewards/by_round/${round}`));
+      return data.Winners;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
 }
 
 export default new ApiService();
