@@ -38,7 +38,7 @@ test("DonatedNFTTable with mock data", async () => {
   expect(
     screen.getByText(shortenHex(mockData[0].DonorAddr, 6))
   ).toBeInTheDocument();
-  expect(screen.getByText(mockData[0].RoundNum + 1)).toBeInTheDocument();
+  expect(screen.getByText(mockData[0].RoundNum)).toBeInTheDocument();
   expect(
     screen.getByText(shortenHex(mockData[0].TokenAddr, 6))
   ).toBeInTheDocument();

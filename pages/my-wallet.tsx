@@ -48,7 +48,7 @@ const MyWinningsRow = ({ winning }) => {
           }}
           target="_blank"
         >
-          {winning.RoundNum + 1}
+          {winning.RoundNum}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
@@ -140,7 +140,7 @@ const CSTRow = ({ nft }) => {
             href={`/prize/${nft.RoundNum}`}
             style={{ color: "inherit", fontSize: "inherit" }}
           >
-            Prize Winner (#{nft.RoundNum + 1})
+            Prize Winner (#{nft.RoundNum})
           </Link>
         ) : nft.RecordType === 4 ? (
           "Staking Deposit / Reward"

@@ -43,6 +43,6 @@ test("BiddingHistoryTable with mock data", () => {
   expect(
     screen.getByText(`${mockData[0].BidPriceEth.toFixed(7)}Ξ`)
   ).toBeInTheDocument();
-  expect(screen.getByText(mockData[0].RoundNum + 1)).toBeInTheDocument();
+  expect(screen.getByText(mockData[0].RoundNum)).toBeInTheDocument();
   expect(screen.getByText(mockData[0].Message)).toBeInTheDocument();
 });

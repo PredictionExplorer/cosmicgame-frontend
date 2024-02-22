@@ -39,7 +39,7 @@ const MyWinningsRow = ({ winning }) => {
       <TablePrimaryCell>
         {convertTimestampToDateTime(winning.TimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{winning.RoundNum + 1}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{winning.RoundNum}</TablePrimaryCell>
       <TablePrimaryCell align="right">
         {winning.Amount.toFixed(4)}
       </TablePrimaryCell>

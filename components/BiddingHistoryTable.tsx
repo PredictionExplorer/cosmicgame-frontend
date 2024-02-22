@@ -65,7 +65,7 @@ const HistoryRow = ({ history }) => {
                 : history.BidPriceEth?.toFixed(2)
             } ETH`}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{history.RoundNum + 1}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.BidType === 2
           ? "CST Bid"

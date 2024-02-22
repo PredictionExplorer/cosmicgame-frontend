@@ -47,7 +47,7 @@ const WinnerRow = ({ winner, type }) => {
           href={`/prize/${winner.RoundNum}`}
           style={{ color: "inherit", fontSize: "inherit" }}
         >
-          {winner.RoundNum + 1}
+          {winner.RoundNum}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>{type}</TablePrimaryCell>

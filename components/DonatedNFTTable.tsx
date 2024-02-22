@@ -67,7 +67,7 @@ const NFTRow = ({ nft, handleClaim }) => {
           }}
           target="_blank"
         >
-          {nft.RoundNum + 1}
+          {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>

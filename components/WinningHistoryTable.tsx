@@ -96,7 +96,7 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
           }}
           target="_blank"
         >
-          {history.RoundNum + 1}
+          {history.RoundNum}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">

@@ -66,7 +66,7 @@ const PrizeInfo = ({ roundNum }) => {
       <MainWrapper>
         <Box mb={4}>
           <Typography variant="h4" color="primary" component="span" mr={2}>
-            {`Round #${roundNum + 1}`}
+            {`Round #${roundNum}`}
           </Typography>
           <Typography variant="h4" component="span">
             Prize Information

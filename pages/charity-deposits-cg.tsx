@@ -37,7 +37,7 @@ const DonationRow = ({ donation }) => {
           {convertTimestampToDateTime(donation.TimeStamp)}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{donation.RoundNum + 1}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{donation.RoundNum}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
           color="inherit"

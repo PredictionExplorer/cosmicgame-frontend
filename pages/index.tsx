@@ -581,7 +581,7 @@ const NewHome = () => {
               <Grid container spacing={2} alignItems="center" mb={2}>
                 <Grid item sm={12} md={4}>
                   <Typography variant="h5">
-                    Round #{data?.CurRoundNum + 1}
+                    Round #{data?.CurRoundNum}
                   </Typography>
                 </Grid>
                 <Grid item sm={12} md={8}>
