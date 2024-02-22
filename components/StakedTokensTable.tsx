@@ -41,16 +41,7 @@ const StakedTokensRow = ({ row, handleUnstake }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${row.TokenInfo.RoundNum}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
-          target="_blank"
-        >
-          {row.TokenInfo.RoundNum}
-        </Link>
+        {row.TokenInfo.StakeActionId}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(row.UnstakeTimeStamp)}
@@ -89,7 +80,7 @@ export const StakedTokensTable = ({ list, handleUnstake }) => {
             <TableRow>
               <TableCell>Stake Datetime</TableCell>
               <TableCell align="center">Token ID</TableCell>
-              <TableCell align="center">Round</TableCell>
+              <TableCell align="center">Stake Action ID</TableCell>
               <TableCell align="center">Unstake Datetime</TableCell>
               <TableCell align="center"></TableCell>
             </TableRow>
