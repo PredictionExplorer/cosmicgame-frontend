@@ -630,7 +630,7 @@ const NewHome = () => {
                       </Grid>
                       <Grid item sm={12} md={8}>
                         <Typography>
-                          {data?.PrizeAmountEth.toFixed(4)} ETH
+                          {prizeInfo?.AmountEth.toFixed(4)} ETH
                         </Typography>
                       </Grid>
                     </Grid>
