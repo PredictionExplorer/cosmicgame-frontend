@@ -273,6 +273,7 @@ const UserInfo = ({ address }) => {
                   </Typography>
                   <UnclaimedStakingRewardsTable
                     list={unclaimedStakingRewards}
+                    owner={address}
                   />
                 </Box>
                 <Box>
