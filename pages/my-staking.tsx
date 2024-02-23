@@ -106,7 +106,10 @@ const MyStaking = () => {
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                 Unclaimed Staking Rewards
               </Typography>
-              <UnclaimedStakingRewardsTable list={unclaimedStakingRewards} />
+              <UnclaimedStakingRewardsTable
+                list={unclaimedStakingRewards}
+                owner={account}
+              />
             </Box>
             <Box>
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>

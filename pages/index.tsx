@@ -819,24 +819,28 @@ const NewHome = () => {
                 <Typography>Advanced Options</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <Typography variant="body2">
-                  If you want to donate one of your NFTs while bidding, you can
-                  put the contract address, NFT id, and comment here.
-                </Typography>
-                <TextField
-                  placeholder="NFT contract address"
-                  size="small"
-                  fullWidth
-                  sx={{ marginTop: 2 }}
-                  onChange={(e) => setNftDonateAddress(e.target.value)}
-                />
-                <TextField
-                  placeholder="NFT number"
-                  size="small"
-                  fullWidth
-                  sx={{ marginTop: 2 }}
-                  onChange={(e) => setNftId(Number(e.target.value))}
-                />
+                {bidType !== "CST" && (
+                  <>
+                    <Typography variant="body2">
+                      If you want to donate one of your NFTs while bidding, you
+                      can put the contract address, NFT id, and comment here.
+                    </Typography>
+                    <TextField
+                      placeholder="NFT contract address"
+                      size="small"
+                      fullWidth
+                      sx={{ marginTop: 2 }}
+                      onChange={(e) => setNftDonateAddress(e.target.value)}
+                    />
+                    <TextField
+                      placeholder="NFT number"
+                      size="small"
+                      fullWidth
+                      sx={{ marginTop: 2 }}
+                      onChange={(e) => setNftId(Number(e.target.value))}
+                    />
+                  </>
+                )}
                 <TextField
                   placeholder="Message (280 characters)"
                   size="small"

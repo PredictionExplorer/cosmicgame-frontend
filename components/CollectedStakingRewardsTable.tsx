@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Box,
+  Link,
   Pagination,
   Table,
   TableBody,
@@ -26,15 +27,26 @@ const CollectedStakingRewardsRow = ({ row }) => {
       <TablePrimaryCell>
         {convertTimestampToDateTime(row.TimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
-        {row.DepositAmountEth.toFixed(6)}
+      <TablePrimaryCell align="center">
+        <Link
+          href={`/prize/${row.RoundNum}`}
+          style={{ color: "inherit", fontSize: "inherit" }}
+        >
+          {row.RoundNum}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
-      <TablePrimaryCell align="right">
-        {row.AmountPerTokenEth.toFixed(6)}
+      <TablePrimaryCell align="center">
+        {row.TotalDepositAmountEth.toFixed(6)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{row.YourTokensStaked}</TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell align="center">
+        {row.YourAmountToClaimEth.toFixed(6)}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.YourTokensStaked}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.NumTokensCollected}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
         {row.YourCollectedAmountEth.toFixed(6)}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -52,23 +64,29 @@ export const CollectedStakingRewardsTable = ({ list }) => {
       <TablePrimaryContainer>
         <Table>
           <colgroup>
-            <col width="15%" />
             <col width="14%" />
-            <col width="18%" />
-            <col width="15%" />
-            <col width="17%" />
-            <col width="19%" />
+            <col width="8%" />
+            <col width="12%" />
+            <col width="12%" />
+            <col width="12%" />
+            <col width="12%" />
+            <col width="16%" />
+            <col width="14%" />
           </colgroup>
           <TablePrimaryHead>
             <TableRow>
               <TableCell>Datetime</TableCell>
-              <TableCell align="right">Deposit Amount</TableCell>
+              <TableCell align="center">Round</TableCell>
+              <TableCell align="center">Total Staked Tokens</TableCell>
+              <TableCell align="center">Total Deposited</TableCell>
+              <TableCell align="center">Reward on your stake</TableCell>
+              <TableCell align="center">Num tokens of your stake</TableCell>
               <TableCell align="center">
-                Total Staked Tokens by all the Users
+                Num tokens of your stake collected
               </TableCell>
-              <TableCell align="right">Reward Per Token</TableCell>
-              <TableCell align="right">Your Staked Tokens</TableCell>
-              <TableCell align="right">Your Collected Amount</TableCell>
+              <TableCell align="center">
+                Amount of your stake collected
+              </TableCell>
             </TableRow>
           </TablePrimaryHead>
           <TableBody>

@@ -11,11 +11,11 @@ const getNAVs = (status, account) => {
   let NAVS: NavItem[] = [
     { title: "Gallery", route: "/gallery" },
     { title: "Contracts", route: "/contracts" },
-    { title: "Prizes", route: "/prize" },
     {
-      title: "Rewards",
+      title: "Prizes & Rewards",
       route: "",
       children: [
+        { title: "Prizes", route: "/prize" },
         { title: "Staking", route: "/staking" },
         { title: "Marketing", route: "/marketing" },
       ],
