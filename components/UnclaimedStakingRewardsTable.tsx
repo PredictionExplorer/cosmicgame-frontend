@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -20,7 +20,12 @@ import useStakingWalletContract from "../hooks/useStakingWalletContract";
 import api from "../services/api";
 import { useActiveWeb3React } from "../hooks/web3";
 
-const UnclaimedStakingRewardsRow = ({ row, handleClaim, owner }) => {
+const UnclaimedStakingRewardsRow = ({
+  row,
+  handleClaim,
+  owner,
+  stakedTokens,
+}) => {
   const { account } = useActiveWeb3React();
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
@@ -45,7 +50,7 @@ const UnclaimedStakingRewardsRow = ({ row, handleClaim, owner }) => {
       {account === owner && (
         <TablePrimaryCell>
           <Button size="small" onClick={handleClaim}>
-            Unstake & Claim
+            {stakedTokens.length > 0 ? "Unstake & Claim" : "Claim"}
           </Button>
         </TablePrimaryCell>
       )}
@@ -58,6 +63,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner }) => {
   const stakingContract = useStakingWalletContract();
   const perPage = 5;
   const [page, setPage] = useState(1);
+  const [stakedTokens, setStakedTokens] = useState([]);
 
   const handleClaim = async (depositId: number) => {
     try {
@@ -98,6 +104,16 @@ export const UnclaimedStakingRewardsTable = ({ list, owner }) => {
     }
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const staked = await api.get_staked_tokens_by_user(account);
+      setStakedTokens(staked);
+    };
+    if (account) {
+      fetchData();
+    }
+  }, [account]);
+
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
@@ -135,6 +151,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner }) => {
                   row={row}
                   key={index}
                   owner={owner}
+                  stakedTokens={stakedTokens}
                   handleClaim={() => handleClaim(row.DepositId)}
                 />
               ))}
