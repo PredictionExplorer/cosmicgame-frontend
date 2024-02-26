@@ -475,16 +475,13 @@ class ApiService {
     }
   }
 
-  public async get_action_id_by_deposit_id(user_addr: string, deposit_id: number) {
+  public async get_action_ids_by_deposit_id(user_addr: string, deposit_id: number) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/rewards/action_ids_by_deposit/${user_addr}/${deposit_id}`));
-      if (data.ActionIds.length) {
-        return data.ActionIds[0].StakeActionId;
-      }
-      return -1;
+      return data.ActionIds;
     } catch (err) {
       console.log(err);
-      return -1;
+      return [];
     }
   }
 

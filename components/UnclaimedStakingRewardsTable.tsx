@@ -67,40 +67,21 @@ export const UnclaimedStakingRewardsTable = ({ list, owner }) => {
 
   const handleClaim = async (depositId: number) => {
     try {
-      const actionId = await api.get_action_id_by_deposit_id(
+      const response = await api.get_action_ids_by_deposit_id(
         account,
         depositId
       );
-      await stakingContract.unstake(actionId).then((tx) => tx.wait());
+      const actionIds = response.map((x) => x.StakeActionId);
+      await stakingContract.unstakeMany(actionIds).then((tx) => tx.wait());
       const res = await stakingContract
-        .claimReward(actionId, depositId)
-        .then((tx) => tx.wait());
-      console.log(res);
-      // How to get the ids of the staked tokens for this reward?
-      // await stakingContract.stake(actionId).then((tx) => tx.wait());
-    } catch (err) {
-      console.error(err);
-      alert(err.data.message);
-    }
-  };
-  const handleClaimAll = async () => {
-    const promiseArray = list.map(async (x) => {
-      const actionId = await api.get_action_id_by_deposit_id(
-        account,
-        x.DepositId
-      );
-      return actionId;
-    });
-    const actionIds = await Promise.all(promiseArray);
-    const depositIds = list.map((x) => x.DepositId);
-    try {
-      const res = await stakingContract
-        .claimManyRewards(actionIds, depositIds)
+        .claimManyRewards(
+          actionIds,
+          new Array(actionIds.length).fill(depositId)
+        )
         .then((tx) => tx.wait());
       console.log(res);
     } catch (err) {
       console.error(err);
-      alert(err.data.message);
     }
   };
 
@@ -168,13 +149,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner }) => {
             .toFixed(6)}
         </Typography>
       </Box>
-      {account === owner && (
-        <Box display="flex" justifyContent="end" mt={1}>
-          <Button size="small" onClick={handleClaimAll}>
-            Claim All
-          </Button>
-        </Box>
-      )}
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination
           color="primary"
