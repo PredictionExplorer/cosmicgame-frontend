@@ -43,7 +43,7 @@ const PrizeRow = ({ prize }) => {
           </Typography>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{prize.PrizeNum + 1}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{prize.PrizeNum}</TablePrimaryCell>
       <TablePrimaryCell align="right">
         {prize.AmountEth.toFixed(4)} ETH
       </TablePrimaryCell>
@@ -56,7 +56,7 @@ const PrizeRow = ({ prize }) => {
       <TablePrimaryCell align="right">
         {prize.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell align="right">
         {prize.StakingDepositAmountEth.toFixed(4)} ETH
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -82,8 +82,8 @@ export const PrizeTable = ({ list, loading }) => {
           <colgroup>
             <col width="16%" />
             <col width="14%" />
-            <col width="5%" />
-            <col width="12%" />
+            <col width="4%" />
+            <col width="13%" />
             <col width="5%" />
             <col width="10%" />
             <col width="15%" />
@@ -92,14 +92,14 @@ export const PrizeTable = ({ list, loading }) => {
           </colgroup>
           <TablePrimaryHead>
             <TableRow>
-              <TableCell>Datetime</TableCell>
-              <TableCell>Winner</TableCell>
+              <TableCell align="center">Datetime</TableCell>
+              <TableCell align="center">Winner</TableCell>
               <TableCell align="center">Round</TableCell>
               <TableCell align="right">Prize Amount</TableCell>
               <TableCell align="center">Bids</TableCell>
               <TableCell align="center">Donated NFTs</TableCell>
               <TableCell align="right">Raffle Deposits</TableCell>
-              <TableCell align="center">Staking Winnings</TableCell>
+              <TableCell align="right">Staking Winnings</TableCell>
               <TableCell align="center">Raffle NFTs</TableCell>
             </TableRow>
           </TablePrimaryHead>
