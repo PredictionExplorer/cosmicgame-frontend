@@ -31,6 +31,7 @@ const PrizeRow = ({ prize }) => {
         router.push(`/prize/${prize.PrizeNum}`);
       }}
     >
+      <TablePrimaryCell align="center">{prize.PrizeNum}</TablePrimaryCell>
       <TablePrimaryCell>
         {convertTimestampToDateTime(prize.TimeStamp)}
       </TablePrimaryCell>
@@ -43,7 +44,6 @@ const PrizeRow = ({ prize }) => {
           </Typography>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{prize.PrizeNum}</TablePrimaryCell>
       <TablePrimaryCell align="right">
         {prize.AmountEth.toFixed(4)} ETH
       </TablePrimaryCell>
@@ -80,9 +80,9 @@ export const PrizeTable = ({ list, loading }) => {
       <TablePrimaryContainer>
         <Table>
           <colgroup>
+            <col width="4%" />
             <col width="16%" />
             <col width="14%" />
-            <col width="4%" />
             <col width="13%" />
             <col width="5%" />
             <col width="10%" />
@@ -92,14 +92,14 @@ export const PrizeTable = ({ list, loading }) => {
           </colgroup>
           <TablePrimaryHead>
             <TableRow>
+              <TableCell align="center">Round</TableCell>
               <TableCell align="center">Datetime</TableCell>
               <TableCell align="center">Winner</TableCell>
-              <TableCell align="center">Round</TableCell>
               <TableCell align="right">Prize Amount</TableCell>
               <TableCell align="center">Bids</TableCell>
               <TableCell align="center">Donated NFTs</TableCell>
               <TableCell align="right">Raffle Deposits</TableCell>
-              <TableCell align="right">Staking Winnings</TableCell>
+              <TableCell align="right">Staking Deposit</TableCell>
               <TableCell align="center">Raffle NFTs</TableCell>
             </TableRow>
           </TablePrimaryHead>

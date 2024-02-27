@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
+  Checkbox,
   Link,
   Pagination,
   Table,
@@ -18,13 +19,25 @@ import {
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
 
-const CSTokensRow = ({ row, handleStake }) => {
+const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
   }
 
   return (
-    <TablePrimaryRow>
+    <TablePrimaryRow
+      hover
+      role="checkbox"
+      aria-checked={isItemSelected}
+      tabIndex={-1}
+      key={row.id}
+      selected={isItemSelected}
+      onClick={() => handleClick(row.TokenId)}
+      sx={{ cursor: "pointer" }}
+    >
+      <TablePrimaryCell padding="checkbox">
+        <Checkbox color="primary" checked={isItemSelected} />
+      </TablePrimaryCell>
       <TablePrimaryCell>
         {convertTimestampToDateTime(row.TimeStamp)}
       </TablePrimaryCell>
@@ -82,6 +95,35 @@ const CSTokensRow = ({ row, handleStake }) => {
 export const CSTokensTable = ({ list, handleStake }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState([]);
+  const isSelected = (id: number) => selected.indexOf(id) !== -1;
+  const handleClick = (id: number) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+  const onSelectAllClick = (e) => {
+    if (e.target.checked) {
+      const newSelected = list.map((n) => n.TokenId);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
+  };
+
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
   }
@@ -90,7 +132,8 @@ export const CSTokensTable = ({ list, handleStake }) => {
       <TablePrimaryContainer>
         <Table>
           <colgroup>
-            <col width="15%" />
+            <col width="1%" />
+            <col width="14%" />
             <col width="15%" />
             <col width="15%" />
             <col width="25%" />
@@ -98,6 +141,19 @@ export const CSTokensTable = ({ list, handleStake }) => {
           </colgroup>
           <TablePrimaryHead>
             <TableRow>
+              <TableCell padding="checkbox">
+                <Checkbox
+                  color="info"
+                  indeterminate={
+                    selected.length > 0 && selected.length < list.length
+                  }
+                  checked={list.length > 0 && selected.length === list.length}
+                  onChange={onSelectAllClick}
+                  inputProps={{
+                    "aria-label": "select all desserts",
+                  }}
+                />
+              </TableCell>
               <TableCell>Mint Datetime</TableCell>
               <TableCell align="center">Token ID</TableCell>
               <TableCell align="center">Round</TableCell>
@@ -113,6 +169,8 @@ export const CSTokensTable = ({ list, handleStake }) => {
                   key={index}
                   row={row}
                   handleStake={handleStake}
+                  isItemSelected={isSelected(row.TokenId)}
+                  handleClick={handleClick}
                 />
               ))}
           </TableBody>

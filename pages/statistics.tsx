@@ -28,9 +28,6 @@ import {
 import { UniqueStakersTable } from "../components/UniqueStakersTable";
 import { GlobalStakingActionsTable } from "../components/GlobalStakingActionsTable";
 import { GlobalStakedTokensTable } from "../components/GlobalStakedTokensTable";
-import { useActiveWeb3React } from "../hooks/web3";
-import { COSMICGAME_ADDRESS } from "../config/app";
-import { ethers } from "ethers";
 
 const StatisticsItem = ({ title, value }) => {
   return (
@@ -44,7 +41,6 @@ const StatisticsItem = ({ title, value }) => {
 };
 
 const Statistics = () => {
-  const { library } = useActiveWeb3React();
   const [curPage, setCurrentPage] = useState(1);
   const perPage = 12;
   const [data, setData] = useState(null);
@@ -58,7 +54,6 @@ const Statistics = () => {
   const [stakingActions, setStakingActions] = useState(null);
   const [stakedTokens, setStakedTokens] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [CTBalance, setCTBalance] = useState(0);
 
   const gridLayout =
     nftDonations.length > 16
@@ -70,10 +65,6 @@ const Statistics = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      if (library) {
-        let balance = await library.getBalance(COSMICGAME_ADDRESS);
-        setCTBalance(parseFloat(ethers.utils.formatEther(balance)));
-      }
       const data = await api.get_dashboard_info();
       setData(data);
       const bidHistory = await api.get_bid_list_by_round(
@@ -226,7 +217,7 @@ const Statistics = () => {
             <Box mt={4}>
               <StatisticsItem
                 title="CosmicGame contract balance"
-                value={`${CTBalance.toFixed(4)} ETH`}
+                value={`${data.CosmicGameBalanceEth.toFixed(4)} ETH`}
               />
               <StatisticsItem
                 title="Num Prizes Given"
