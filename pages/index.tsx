@@ -851,49 +851,53 @@ const NewHome = () => {
                   sx={{ marginTop: 2 }}
                   onChange={(e) => setMessage(e.target.value)}
                 />
-                <Box
-                  sx={{
-                    display: "flex",
-                    marginTop: 2,
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    whiteSpace="nowrap"
-                    color="rgba(255, 255, 255, 0.68)"
-                    mr={2}
-                  >
-                    Rise bid price by
-                  </Typography>
-                  <CustomTextField
-                    type="number"
-                    placeholder="Bid Price Plus"
-                    value={bidPricePlus}
-                    size="small"
-                    fullWidth
-                    InputProps={{
-                      inputComponent: StyledInput,
-                      endAdornment: (
-                        <InputAdornment position="end">%</InputAdornment>
-                      ),
-                      inputProps: { min: 0, max: 50 },
+                {bidType !== "CST" && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginTop: 2,
+                      alignItems: "center",
                     }}
-                    onChange={(e) => {
-                      let value = Number(e.target.value);
-                      if (value <= 50) {
-                        setBidPricePlus(value);
-                      }
-                    }}
-                  />
-                  <Typography
-                    whiteSpace="nowrap"
-                    color="rgba(255, 255, 255, 0.68)"
-                    ml={2}
                   >
-                    {(data?.BidPriceEth * (1 + bidPricePlus / 100)).toFixed(6)}{" "}
-                    ETH
-                  </Typography>
-                </Box>
+                    <Typography
+                      whiteSpace="nowrap"
+                      color="rgba(255, 255, 255, 0.68)"
+                      mr={2}
+                    >
+                      Rise bid price by
+                    </Typography>
+                    <CustomTextField
+                      type="number"
+                      placeholder="Bid Price Plus"
+                      value={bidPricePlus}
+                      size="small"
+                      fullWidth
+                      InputProps={{
+                        inputComponent: StyledInput,
+                        endAdornment: (
+                          <InputAdornment position="end">%</InputAdornment>
+                        ),
+                        inputProps: { min: 0, max: 50 },
+                      }}
+                      onChange={(e) => {
+                        let value = Number(e.target.value);
+                        if (value <= 50) {
+                          setBidPricePlus(value);
+                        }
+                      }}
+                    />
+                    <Typography
+                      whiteSpace="nowrap"
+                      color="rgba(255, 255, 255, 0.68)"
+                      ml={2}
+                    >
+                      {(data?.BidPriceEth * (1 + bidPricePlus / 100)).toFixed(
+                        6
+                      )}{" "}
+                      ETH
+                    </Typography>
+                  </Box>
+                )}
                 <Typography variant="body2" mt={2}>
                   The bid price is increased {bidPricePlus}% to prevent bidding
                   collision.
