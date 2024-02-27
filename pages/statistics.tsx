@@ -70,8 +70,10 @@ const Statistics = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      let balance = await library.getBalance(COSMICGAME_ADDRESS);
-      setCTBalance(parseFloat(ethers.utils.formatEther(balance)));
+      if (library) {
+        let balance = await library.getBalance(COSMICGAME_ADDRESS);
+        setCTBalance(parseFloat(ethers.utils.formatEther(balance)));
+      }
       const data = await api.get_dashboard_info();
       setData(data);
       const bidHistory = await api.get_bid_list_by_round(
@@ -143,10 +145,7 @@ const Statistics = () => {
           <>
             <Typography variant="h5">Current Round Statistics</Typography>
             <Box my={4}>
-              <StatisticsItem
-                title="Current Round"
-                value={data.CurRoundNum}
-              />
+              <StatisticsItem title="Current Round" value={data.CurRoundNum} />
               <StatisticsItem
                 title="Round Start Date"
                 value={
