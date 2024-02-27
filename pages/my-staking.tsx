@@ -46,6 +46,29 @@ const MyStaking = () => {
       }
     }
   };
+  
+  const handleStakeMany = async (tokenIds) => {
+    try {
+      const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
+        account,
+        STAKING_WALLET_ADDRESS
+      );
+      if (!isApprovedForAll) {
+        await cosmicSignatureContract
+          .setApprovalForAll(STAKING_WALLET_ADDRESS, true)
+          .then((tx) => tx.wait());
+      }
+      const res = await stakingContract.stakeMany(tokenIds).then((tx) => tx.wait());
+      console.log(res);
+      fetchData(account);
+    } catch (err) {
+      console.error(err);
+      if (err.data?.message) {
+        alert(err.data.message);
+      }
+    }
+  };
+
   const handleUnstake = async (actionId: number) => {
     try {
       const res = await stakingContract
@@ -127,7 +150,7 @@ const MyStaking = () => {
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                 Tokens Available for Staking
               </Typography>
-              <CSTokensTable list={CSTokens} handleStake={handleStake} />
+              <CSTokensTable list={CSTokens} handleStake={handleStake} handleStakeMany={handleStakeMany} />
             </Box>
             <Box>
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>

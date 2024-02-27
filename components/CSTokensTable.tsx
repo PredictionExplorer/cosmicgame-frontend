@@ -79,11 +79,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {!row.Staked && (
-          <Button
-            variant="text"
-            sx={{ mr: 1 }}
-            onClick={() => handleStake(row.TokenId)}
-          >
+          <Button variant="text" onClick={() => handleStake(row.TokenId)}>
             Stake
           </Button>
         )}
@@ -92,7 +88,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
   );
 };
 
-export const CSTokensTable = ({ list, handleStake }) => {
+export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
@@ -176,6 +172,13 @@ export const CSTokensTable = ({ list, handleStake }) => {
           </TableBody>
         </Table>
       </TablePrimaryContainer>
+      {selected.length > 0 && (
+        <Box display="flex" justifyContent="end" mt={2}>
+          <Button variant="text" onClick={() => handleStakeMany(selected)}>
+            Stake Many
+          </Button>
+        </Box>
+      )}
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination
           color="primary"
