@@ -27,9 +27,17 @@ const Staking = () => {
           color="primary"
           gutterBottom
           textAlign="center"
-          mb={6}
         >
           Staking Rewards
+        </Typography>
+        <Typography
+          variant="h5"
+          color="primary"
+          gutterBottom
+          textAlign="center"
+          mb={6}
+        >
+          (for all the stakers)
         </Typography>
         {stakingRewards === null ? (
           <Typography variant="h6">Loading...</Typography>

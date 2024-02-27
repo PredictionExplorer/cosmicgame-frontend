@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import {
   Box,
+  IconButton,
   Link,
   Pagination,
   Table,
   TableBody,
   TableCell,
   TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
+import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import {
   TablePrimaryCell,
   TablePrimaryContainer,
@@ -46,8 +49,15 @@ const GlobalStakingRewardsRow = ({ row }) => {
           {row.StakerAddr}
         </Link>
       </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Tooltip title="This reward is unclaimed, go to Pending Winnings page and claim it.">
+          <IconButton size="small" sx={{ fontSize: 16 }}>
+            <QuestionMarkIcon fontSize="inherit" color="error" />
+          </IconButton>
+        </Tooltip>
+      </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {row.AmountEth.toFixed(6)}
+        {row.YourAmountToClaimEth.toFixed(6)} ETH
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -67,13 +77,19 @@ export const GlobalStakingRewardsTable = ({ list }) => {
             <TableRow>
               <TableCell>Stake Datetime</TableCell>
               <TableCell align="center">Staker</TableCell>
-              <TableCell align="right">Amount</TableCell>
+              <TableCell align="center">Reward claimed</TableCell>
+              <TableCell align="right">Amount to claim</TableCell>
             </TableRow>
           </TablePrimaryHead>
           <TableBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <GlobalStakingRewardsRow row={row} key={row.RecordId} />
-            ))}
+            {list
+              .slice((page - 1) * perPage, page * perPage)
+              .map((row, index) => (
+                <GlobalStakingRewardsRow
+                  row={row}
+                  key={(page - 1) * perPage + index}
+                />
+              ))}
           </TableBody>
         </Table>
       </TablePrimaryContainer>
@@ -88,6 +104,10 @@ export const GlobalStakingRewardsTable = ({ list }) => {
           shape="rounded"
         />
       </Box>
+      <Typography mt={4}>
+        To participate in Staking go to "MY STAKING" (option available from the
+        Account menu)
+      </Typography>
     </>
   );
 };
