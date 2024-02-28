@@ -171,94 +171,105 @@ const MyWinnings = () => {
         >
           Pending Winnings
         </Typography>
-        <Box mt={6}>
-          <Typography variant="h5" mb={2}>
-            Claimable Raffle ETH
+        {!account ? (
+          <Typography variant="subtitle1" mt={4}>
+            Please login to Metamask to see your winnings.
           </Typography>
-          {!status?.ETHRaffleToClaim ? (
-            <Typography variant="h6">No winnings yet.</Typography>
-          ) : status?.ETHRaffleToClaim > 0 && raffleETHToClaim === null ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : raffleETHToClaim.length > 0 ? (
-            <>
-              <MyWinningsTable
-                list={raffleETHToClaim.slice(
-                  (curPage - 1) * perPage,
-                  curPage * perPage
-                )}
-              />
-              {status?.ETHRaffleToClaim > 0 && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "end",
-                    alignItems: "center",
-                    mt: 2,
-                  }}
-                >
-                  <Typography mr={2}>
-                    Your claimable winnings are{" "}
-                    {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
-                  </Typography>
+        ) : (
+          <>
+            <Box mt={6}>
+              <Typography variant="h5" mb={2}>
+                Claimable Raffle ETH
+              </Typography>
+              {!status?.ETHRaffleToClaim ? (
+                <Typography variant="h6">No winnings yet.</Typography>
+              ) : status?.ETHRaffleToClaim > 0 && raffleETHToClaim === null ? (
+                <Typography variant="h6">Loading...</Typography>
+              ) : raffleETHToClaim.length > 0 ? (
+                <>
+                  <MyWinningsTable
+                    list={raffleETHToClaim.slice(
+                      (curPage - 1) * perPage,
+                      curPage * perPage
+                    )}
+                  />
+                  {status?.ETHRaffleToClaim > 0 && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "end",
+                        alignItems: "center",
+                        mt: 2,
+                      }}
+                    >
+                      <Typography mr={2}>
+                        Your claimable winnings are{" "}
+                        {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
+                      </Typography>
+                      <Button
+                        onClick={handleAllETHClaim}
+                        variant="contained"
+                        disabled={isClaiming.raffleETH}
+                      >
+                        Claim All
+                      </Button>
+                    </Box>
+                  )}
+                  <Box display="flex" justifyContent="center" mt={2}>
+                    <Pagination
+                      color="primary"
+                      page={curPage}
+                      onChange={(_e, page) => setCurPage(page)}
+                      count={Math.ceil(raffleETHToClaim.length / perPage)}
+                      hideNextButton
+                      hidePrevButton
+                      shape="rounded"
+                    />
+                  </Box>
+                </>
+              ) : (
+                <Typography>No winnings yet.</Typography>
+              )}
+            </Box>
+            <Box mt={6}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+              >
+                <Typography variant="h5">Donated NFTs</Typography>
+                {donatedNFTToClaim?.length > 0 && (
                   <Button
-                    onClick={handleAllETHClaim}
+                    onClick={handleAllDonatedNFTsClaim}
                     variant="contained"
-                    disabled={isClaiming.raffleETH}
+                    disabled={isClaiming.donatedNFT}
                   >
                     Claim All
                   </Button>
-                </Box>
-              )}
-              <Box display="flex" justifyContent="center" mt={2}>
-                <Pagination
-                  color="primary"
-                  page={curPage}
-                  onChange={(_e, page) => setCurPage(page)}
-                  count={Math.ceil(raffleETHToClaim.length / perPage)}
-                  hideNextButton
-                  hidePrevButton
-                  shape="rounded"
-                />
+                )}
               </Box>
-            </>
-          ) : (
-            <Typography>No winnings yet.</Typography>
-          )}
-        </Box>
-        <Box mt={6}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-            <Typography variant="h5">Donated NFTs</Typography>
-            {donatedNFTToClaim?.length > 0 && (
+              {!status?.NumDonatedNFTToClaim ? (
+                <Typography variant="h6">No NFTs yet.</Typography>
+              ) : status?.NumDonatedNFTToClaim > 0 &&
+                donatedNFTToClaim === null ? (
+                <Typography variant="h6">Loading...</Typography>
+              ) : (
+                donatedNFTToClaim !== null && (
+                  <DonatedNFTTable
+                    list={donatedNFTToClaim}
+                    handleClaim={handleDonatedNFTsClaim}
+                  />
+                )
+              )}
+            </Box>
+            <Box mt={6}>
               <Button
-                onClick={handleAllDonatedNFTsClaim}
-                variant="contained"
-                disabled={isClaiming.donatedNFT}
+                variant="outlined"
+                onClick={() => router.push("/winning-history")}
               >
-                Claim All
+                Go to my winning history page.
               </Button>
-            )}
-          </Box>
-          {!status?.NumDonatedNFTToClaim ? (
-            <Typography variant="h6">No NFTs yet.</Typography>
-          ) : status?.NumDonatedNFTToClaim > 0 && donatedNFTToClaim === null ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : (
-            donatedNFTToClaim !== null && (
-              <DonatedNFTTable
-                list={donatedNFTToClaim}
-                handleClaim={handleDonatedNFTsClaim}
-              />
-            )
-          )}
-        </Box>
-        <Box mt={6}>
-          <Button
-            variant="outlined"
-            onClick={() => router.push("/winning-history")}
-          >
-            Go to my winning history page.
-          </Button>
-        </Box>
+            </Box>
+          </>
+        )}
       </MainWrapper>
     </>
   );

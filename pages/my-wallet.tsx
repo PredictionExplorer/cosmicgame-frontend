@@ -374,63 +374,78 @@ const MyWallet = () => {
         >
           My Wallet
         </Typography>
-        <Box mt={6}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-            <Typography variant="h5">Raffle ETH I Won</Typography>
-            {status?.ETHRaffleToClaim > 0 && (
-              <Box>
-                <Typography component="span" mr={2}>
-                  Your claimable winnings are{" "}
-                  {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
-                </Typography>
-                <Button
-                  onClick={handleAllETHClaim}
-                  variant="contained"
-                  disabled={isClaiming.raffleETH}
-                >
-                  Claim All
-                </Button>
-              </Box>
-            )}
-          </Box>
-          {raffleETHToClaim.loading ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : (
-            <MyWinningsTable list={raffleETHToClaim.data} />
-          )}
-        </Box>
-        <Box mt={6}>
-          <Typography variant="h5" mb={2}>
-            Cosmic Signature Tokens I Won
+        {!account ? (
+          <Typography variant="subtitle1">
+            Please login to Metamask to see your wallet.
           </Typography>
-          {CSTList.loading ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : (
-            <CSTTable list={CSTList.data} />
-          )}
-        </Box>
-        <Box mt={6}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-            <Typography variant="h5">Donated NFTs I Won</Typography>
-            {status?.NumDonatedNFTToClaim > 0 && (
-              <Button
-                onClick={handleAllDonatedNFTsClaim}
-                variant="contained"
-                disabled={isClaiming.donatedNFT}
+        ) : (
+          <>
+            <Box mt={6}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
               >
-                Claim All
-              </Button>
-            )}
-          </Box>
-          {unclaimedDonatedNFTs.loading || claimedDonatedNFTs.loading ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : (
-            <DonatedNFTTable
-              list={[...unclaimedDonatedNFTs.data, ...claimedDonatedNFTs.data]}
-              handleClaim={handleDonatedNFTsClaim}
-            />
-          )}
-        </Box>
+                <Typography variant="h5">Raffle ETH I Won</Typography>
+                {status?.ETHRaffleToClaim > 0 && (
+                  <Box>
+                    <Typography component="span" mr={2}>
+                      Your claimable winnings are{" "}
+                      {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
+                    </Typography>
+                    <Button
+                      onClick={handleAllETHClaim}
+                      variant="contained"
+                      disabled={isClaiming.raffleETH}
+                    >
+                      Claim All
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+              {raffleETHToClaim.loading ? (
+                <Typography variant="h6">Loading...</Typography>
+              ) : (
+                <MyWinningsTable list={raffleETHToClaim.data} />
+              )}
+            </Box>
+            <Box mt={6}>
+              <Typography variant="h5" mb={2}>
+                Cosmic Signature Tokens I Won
+              </Typography>
+              {CSTList.loading ? (
+                <Typography variant="h6">Loading...</Typography>
+              ) : (
+                <CSTTable list={CSTList.data} />
+              )}
+            </Box>
+            <Box mt={6}>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
+              >
+                <Typography variant="h5">Donated NFTs I Won</Typography>
+                {status?.NumDonatedNFTToClaim > 0 && (
+                  <Button
+                    onClick={handleAllDonatedNFTsClaim}
+                    variant="contained"
+                    disabled={isClaiming.donatedNFT}
+                  >
+                    Claim All
+                  </Button>
+                )}
+              </Box>
+              {unclaimedDonatedNFTs.loading || claimedDonatedNFTs.loading ? (
+                <Typography variant="h6">Loading...</Typography>
+              ) : (
+                <DonatedNFTTable
+                  list={[
+                    ...unclaimedDonatedNFTs.data,
+                    ...claimedDonatedNFTs.data,
+                  ]}
+                  handleClaim={handleDonatedNFTsClaim}
+                />
+              )}
+            </Box>
+          </>
+        )}
       </MainWrapper>
     </>
   );

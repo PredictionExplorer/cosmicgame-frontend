@@ -29,7 +29,11 @@ const WinningHistory = () => {
         <Typography variant="h4" color="primary" textAlign="center" mb={4}>
           History of My Winnings
         </Typography>
-        {claimHistory === null ? (
+        {!account ? (
+          <Typography variant="subtitle1">
+            Please login to Metamask to see your winnings.
+          </Typography>
+        ) : claimHistory === null ? (
           <Typography variant="h6">Loading...</Typography>
         ) : (
           <WinningHistoryTable
