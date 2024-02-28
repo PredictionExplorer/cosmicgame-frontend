@@ -12,6 +12,7 @@ import { UnclaimedStakingRewardsTable } from "../../components/UnclaimedStakingR
 import { CollectedStakingRewardsTable } from "../../components/CollectedStakingRewardsTable";
 import { StakingActionsTable } from "../../components/StakingActionsTable";
 import { MarketingRewardsTable } from "../../components/MarketingRewardsTable";
+import { useStakedToken } from "../../contexts/StakedTokenContext";
 
 const UserInfo = ({ address }) => {
   const [claimHistory, setClaimHistory] = useState(null);
@@ -24,38 +25,41 @@ const UserInfo = ({ address }) => {
   const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
   const [stakingActions, setStakingActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
+  const { fetchData: fetchStakedToken } = useStakedToken();
+
+  const fetchData = async (addr: string, reload: boolean = true) => {
+    setLoading(reload);
+    const history = await api.get_claim_history_by_user(addr);
+    setClaimHistory(history);
+    const { Bids, UserInfo } = await api.get_user_info(addr);
+    setBidHistory(Bids);
+    setUserInfo(UserInfo);
+    const balance = await api.get_user_balance(addr);
+    if (balance) {
+      setBalance({
+        CosmicToken: Number(
+          ethers.utils.formatEther(balance.CosmicTokenBalance)
+        ),
+        ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
+      });
+    }
+    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
+      addr
+    );
+    setUnclaimedStakingRewards(unclaimedStakingRewards);
+    const collectedStakingRewards = await api.get_collected_staking_rewards_by_user(
+      addr
+    );
+    setCollectedStakingRewards(collectedStakingRewards);
+    const stakingActions = await api.get_staking_actions_by_user(addr);
+    setStakingActions(stakingActions);
+    const marketingRewards = await api.get_marketing_rewards_by_user(addr);
+    setMarketingRewards(marketingRewards);
+    fetchStakedToken();
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchData = async (addr: string) => {
-      setLoading(true);
-      const history = await api.get_claim_history_by_user(addr);
-      setClaimHistory(history);
-      const { Bids, UserInfo } = await api.get_user_info(addr);
-      setBidHistory(Bids);
-      setUserInfo(UserInfo);
-      const balance = await api.get_user_balance(addr);
-      if (balance) {
-        setBalance({
-          CosmicToken: Number(
-            ethers.utils.formatEther(balance.CosmicTokenBalance)
-          ),
-          ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
-        });
-      }
-      const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
-        addr
-      );
-      setUnclaimedStakingRewards(unclaimedStakingRewards);
-      const collectedStakingRewards = await api.get_collected_staking_rewards_by_user(
-        addr
-      );
-      setCollectedStakingRewards(collectedStakingRewards);
-      const stakingActions = await api.get_staking_actions_by_user(addr);
-      setStakingActions(stakingActions);
-      const marketingRewards = await api.get_marketing_rewards_by_user(addr);
-      setMarketingRewards(marketingRewards);
-      setLoading(false);
-    };
     if (address) {
       if (address !== "Invalid Address") {
         fetchData(address);
@@ -274,6 +278,7 @@ const UserInfo = ({ address }) => {
                   <UnclaimedStakingRewardsTable
                     list={unclaimedStakingRewards}
                     owner={address}
+                    fetchData={fetchData}
                   />
                 </Box>
                 <Box>

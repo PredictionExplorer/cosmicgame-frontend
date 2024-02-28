@@ -12,6 +12,7 @@ import useStakingWalletContract from "../hooks/useStakingWalletContract";
 import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
 import { STAKING_WALLET_ADDRESS } from "../config/app";
 import { StakedTokensTable } from "../components/StakedTokensTable";
+import { useStakedToken } from "../contexts/StakedTokenContext";
 
 const MyStaking = () => {
   const { account } = useActiveWeb3React();
@@ -20,7 +21,7 @@ const MyStaking = () => {
   const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
   const [stakingActions, setStakingActions] = useState([]);
   const [CSTokens, setCSTokens] = useState([]);
-  const [stakedTokens, setStakedTokens] = useState([]);
+  const { data: stakedTokens, fetchData: fetchStakedToken } = useStakedToken();
 
   const stakingContract = useStakingWalletContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
@@ -41,13 +42,10 @@ const MyStaking = () => {
       fetchData(account);
     } catch (err) {
       console.error(err);
-      if (err.data?.message) {
-        alert(err.data.message);
-      }
     }
   };
 
-  const handleStakeMany = async (tokenIds) => {
+  const handleStakeMany = async (tokenIds: number[]) => {
     try {
       const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
         account,
@@ -65,9 +63,18 @@ const MyStaking = () => {
       fetchData(account);
     } catch (err) {
       console.error(err);
-      if (err.data?.message) {
-        alert(err.data.message);
-      }
+    }
+  };
+
+  const handleUnstakeMany = async (actionIds: number[]) => {
+    try {
+      const res = await stakingContract
+        .unstakeMany(actionIds)
+        .then((tx) => tx.wait());
+      console.log(res);
+      fetchData(account);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -80,13 +87,10 @@ const MyStaking = () => {
       fetchData(account);
     } catch (err) {
       console.error(err);
-      if (err.data?.message) {
-        alert(err.data.message);
-      }
     }
   };
-  const fetchData = async (addr: string) => {
-    setLoading(true);
+  const fetchData = async (addr: string, reload: boolean = true) => {
+    setLoading(reload);
     const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
       addr
     );
@@ -99,8 +103,7 @@ const MyStaking = () => {
     setStakingActions(stakingActions);
     const CSTokens = await api.get_cst_tokens_by_user(addr);
     setCSTokens(CSTokens);
-    const staked = await api.get_staked_tokens_by_user(addr);
-    setStakedTokens(staked);
+    fetchStakedToken();
     setLoading(false);
   };
   useEffect(() => {
@@ -138,6 +141,7 @@ const MyStaking = () => {
               <UnclaimedStakingRewardsTable
                 list={unclaimedStakingRewards}
                 owner={account}
+                fetchData={fetchData}
               />
             </Box>
             <Box>
@@ -169,6 +173,7 @@ const MyStaking = () => {
               <StakedTokensTable
                 list={stakedTokens}
                 handleUnstake={handleUnstake}
+                handleUnstakeMany={handleUnstakeMany}
               />
             </Box>
           </>

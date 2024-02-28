@@ -19,6 +19,7 @@ import { convertTimestampToDateTime } from "../utils";
 import useStakingWalletContract from "../hooks/useStakingWalletContract";
 import api from "../services/api";
 import { useActiveWeb3React } from "../hooks/web3";
+import { useStakedToken } from "../contexts/StakedTokenContext";
 
 const UnclaimedStakingRewardsRow = ({
   row,
@@ -58,12 +59,12 @@ const UnclaimedStakingRewardsRow = ({
   );
 };
 
-export const UnclaimedStakingRewardsTable = ({ list, owner }) => {
+export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const { account } = useActiveWeb3React();
   const stakingContract = useStakingWalletContract();
   const perPage = 5;
   const [page, setPage] = useState(1);
-  const [stakedTokens, setStakedTokens] = useState([]);
+  const { data: stakedTokens } = useStakedToken();
 
   const handleClaim = async (depositId: number) => {
     try {
@@ -80,20 +81,11 @@ export const UnclaimedStakingRewardsTable = ({ list, owner }) => {
         )
         .then((tx) => tx.wait());
       console.log(res);
+      fetchData(owner, false);
     } catch (err) {
       console.error(err);
     }
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const staked = await api.get_staked_tokens_by_user(account);
-      setStakedTokens(staked);
-    };
-    if (account) {
-      fetchData();
-    }
-  }, [account]);
 
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;

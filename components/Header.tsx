@@ -22,6 +22,7 @@ import { useApiData } from "../contexts/ApiDataContext";
 import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
 import { ethers } from "ethers";
+import { useStakedToken } from "../contexts/StakedTokenContext";
 
 const Header = () => {
   const [state, setState] = useState({
@@ -32,7 +33,7 @@ const Header = () => {
   const { apiData: status, setApiData } = useApiData();
   const { account } = useActiveWeb3React();
   const [balance, setBalance] = useState({ CosmicToken: 0, ETH: 0 });
-  const [stakedTokens, setStakedTokens] = useState(null);
+  const {data: stakedTokens} = useStakedToken();
 
   useEffect(() => {
     const setResponsiveness = () => {
@@ -64,9 +65,6 @@ const Header = () => {
           ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
         });
       }
-
-      const tokens = await api.get_staked_tokens_by_user(account);
-      setStakedTokens(tokens);
     };
 
     if (account) {

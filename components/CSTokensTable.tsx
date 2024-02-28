@@ -79,7 +79,13 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {!row.Staked && (
-          <Button variant="text" onClick={() => handleStake(row.TokenId)}>
+          <Button
+            variant="text"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleStake(row.TokenId);
+            }}
+          >
             Stake
           </Button>
         )}

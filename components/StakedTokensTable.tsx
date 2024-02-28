@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
+  Checkbox,
   Link,
   Pagination,
   Table,
@@ -18,13 +19,34 @@ import {
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
 
-const StakedTokensRow = ({ row, handleUnstake }) => {
+const StakedTokensRow = ({
+  row,
+  handleUnstake,
+  isItemSelected,
+  handleClick,
+}) => {
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
   }
 
   return (
-    <TablePrimaryRow>
+    <TablePrimaryRow
+      hover
+      role="checkbox"
+      aria-checked={isItemSelected}
+      tabIndex={-1}
+      key={row.id}
+      selected={isItemSelected}
+      onClick={() => handleClick(row.TokenInfo.StakeActionId)}
+      sx={{ cursor: "pointer" }}
+    >
+      <TablePrimaryCell padding="checkbox">
+        <Checkbox
+          color="primary"
+          checked={isItemSelected}
+          disabled={row.UnstakeTimeStamp * 1000 > new Date().getTime()}
+        />
+      </TablePrimaryCell>
       <TablePrimaryCell>
         {convertTimestampToDateTime(row.StakeTimeStamp)}
       </TablePrimaryCell>
@@ -50,7 +72,10 @@ const StakedTokensRow = ({ row, handleUnstake }) => {
         <Button
           variant="text"
           sx={{ mr: 1 }}
-          onClick={() => handleUnstake(row.TokenInfo.StakeActionId)}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleUnstake(row.TokenInfo.StakeActionId);
+          }}
         >
           Unstake
         </Button>
@@ -59,9 +84,44 @@ const StakedTokensRow = ({ row, handleUnstake }) => {
   );
 };
 
-export const StakedTokensTable = ({ list, handleUnstake }) => {
+export const StakedTokensTable = ({
+  list,
+  handleUnstake,
+  handleUnstakeMany,
+}) => {
   const perPage = 5;
+  const filtered = list.filter(
+    (x) => x.UnstakeTimeStamp * 1000 <= new Date().getTime()
+  );
   const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState([]);
+  const isSelected = (id: number) => selected.indexOf(id) !== -1;
+  const handleClick = (id: number) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+  const onSelectAllClick = (e) => {
+    if (e.target.checked) {
+      const newSelected = filtered.map((n) => n.TokenInfo.StakeActionId);
+      setSelected(newSelected);
+      return;
+    }
+    setSelected([]);
+  };
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
   }
@@ -70,7 +130,8 @@ export const StakedTokensTable = ({ list, handleUnstake }) => {
       <TablePrimaryContainer>
         <Table>
           <colgroup>
-            <col width="20%" />
+            <col width="1%" />
+            <col width="19%" />
             <col width="20%" />
             <col width="20%" />
             <col width="20%" />
@@ -78,11 +139,26 @@ export const StakedTokensTable = ({ list, handleUnstake }) => {
           </colgroup>
           <TablePrimaryHead>
             <TableRow>
+              <TableCell padding="checkbox">
+                <Checkbox
+                  color="info"
+                  indeterminate={
+                    selected.length > 0 && selected.length < filtered.length
+                  }
+                  checked={
+                    filtered.length > 0 && selected.length === filtered.length
+                  }
+                  onChange={onSelectAllClick}
+                  inputProps={{
+                    "aria-label": "select all desserts",
+                  }}
+                />
+              </TableCell>
               <TableCell>Stake Datetime</TableCell>
               <TableCell align="center">Token ID</TableCell>
               <TableCell align="center">Stake Action ID</TableCell>
               <TableCell align="center">Unstake Datetime</TableCell>
-              <TableCell align="center"></TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TablePrimaryHead>
           <TableBody>
@@ -93,11 +169,20 @@ export const StakedTokensTable = ({ list, handleUnstake }) => {
                   key={index}
                   row={row}
                   handleUnstake={handleUnstake}
+                  isItemSelected={isSelected(row.TokenInfo.StakeActionId)}
+                  handleClick={handleClick}
                 />
               ))}
           </TableBody>
         </Table>
-      </TablePrimaryContainer>
+      </TablePrimaryContainer>{" "}
+      {selected.length > 0 && (
+        <Box display="flex" justifyContent="end" mt={2}>
+          <Button variant="text" onClick={() => handleUnstakeMany(selected)}>
+            Unstake Many
+          </Button>
+        </Box>
+      )}
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination
           color="primary"
