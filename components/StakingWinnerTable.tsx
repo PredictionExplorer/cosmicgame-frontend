@@ -57,7 +57,7 @@ const StakingWinnerTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
-    return <Typography>No winners yet.</Typography>;
+    return <Typography>No rewards yet.</Typography>;
   }
   return (
     <>
@@ -74,7 +74,7 @@ const StakingWinnerTable = ({ list }) => {
               <TableCell>Datetime</TableCell>
               <TableCell>Staker</TableCell>
               <TableCell align="center">Number of NFTs</TableCell>
-              <TableCell align="right">Winning Amount (ETH)</TableCell>
+              <TableCell align="right">Reward Amount (ETH)</TableCell>
             </TableRow>
           </TablePrimaryHead>
           <TableBody>

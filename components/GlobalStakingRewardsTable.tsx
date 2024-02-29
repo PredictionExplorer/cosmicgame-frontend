@@ -50,11 +50,7 @@ const GlobalStakingRewardsRow = ({ row }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Tooltip title="This reward is unclaimed, go to Pending Winnings page and claim it.">
-          <IconButton size="small" sx={{ fontSize: 16 }}>
-            <QuestionMarkIcon fontSize="inherit" color="error" />
-          </IconButton>
-        </Tooltip>
+        {row.FullyClaimed ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {row.YourAmountToClaimEth.toFixed(6)} ETH
@@ -77,8 +73,8 @@ export const GlobalStakingRewardsTable = ({ list }) => {
             <TableRow>
               <TableCell>Stake Datetime</TableCell>
               <TableCell align="center">Staker</TableCell>
-              <TableCell align="center">Reward claimed</TableCell>
-              <TableCell align="right">Amount to claim</TableCell>
+              <TableCell align="center">Reward Claimed?</TableCell>
+              <TableCell align="right">Amount to Claim</TableCell>
             </TableRow>
           </TablePrimaryHead>
           <TableBody>

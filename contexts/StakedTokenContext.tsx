@@ -11,7 +11,6 @@ export const StakedTokenProvider = ({ children }) => {
   const fetchData = async () => {
     try {
       const tokens = await api.get_staked_tokens_by_user(account);
-      console.log(tokens);
       setData(tokens);
     } catch (error) {
       console.error("Error fetching data:", error);

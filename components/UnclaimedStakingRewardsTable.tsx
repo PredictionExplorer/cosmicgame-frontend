@@ -89,6 +89,30 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     }
   };
 
+  const handleClaimAll = async () => {
+    let actionIds = [],
+      depositIds = [];
+    for (const element of list) {
+      const depositId = element.DepositId;
+      const response = await api.get_action_ids_by_deposit_id(
+        account,
+        depositId
+      );
+      const ids = response.map((x) => x.StakeActionId);
+      actionIds = actionIds.concat(ids);
+      depositIds = depositIds.concat(new Array(ids.length).fill(depositId));
+    }
+    try {
+      const res = await stakingContract
+        .claimManyRewards(actionIds, depositIds)
+        .then((tx) => tx.wait());
+      console.log(res);
+      fetchData(owner, false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
@@ -143,6 +167,13 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
             .toFixed(6)}
         </Typography>
       </Box>
+      {stakedTokens.length === 0 && list.length > 0 && (
+        <Box display="flex" justifyContent="end" mt={1}>
+          <Button variant="text" onClick={handleClaimAll}>
+            Claim All
+          </Button>
+        </Box>
+      )}
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination
           color="primary"

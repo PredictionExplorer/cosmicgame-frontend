@@ -156,7 +156,7 @@ const CSTTable = ({ list }) => {
   const perPage = 5;
   const [curPage, setCurPage] = useState(1);
   if (list.length === 0) {
-    return <Typography>No winnings yet.</Typography>;
+    return <Typography>No tokens yet.</Typography>;
   }
 
   return (
@@ -409,7 +409,7 @@ const MyWallet = () => {
             </Box>
             <Box mt={6}>
               <Typography variant="h5" mb={2}>
-                Cosmic Signature Tokens I Won
+                Cosmic Signature Tokens I Own
               </Typography>
               {CSTList.loading ? (
                 <Typography variant="h6">Loading...</Typography>

@@ -186,7 +186,7 @@ const PrizeInfo = ({ roundNum }) => {
             </Box>
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
-                Staking Winners
+                Staking Rewards
               </Typography>
               <StakingWinnerTable list={stakingRewards} />
             </Box>

@@ -39,7 +39,13 @@ const MarketingRewards = () => {
           {loading ? (
             <Typography variant="h6">Loading...</Typography>
           ) : (
-            <GlobalMarketingRewardsTable list={marketingRewards} />
+            <>
+              <GlobalMarketingRewardsTable list={marketingRewards} />
+              <Typography mt={4}>
+                To earn marketing rewards by promoting our project online,
+                please contact our marketing team.
+              </Typography>
+            </>
           )}
         </Box>
       </MainWrapper>
