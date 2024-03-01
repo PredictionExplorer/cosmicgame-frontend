@@ -116,13 +116,11 @@ const NewHome = () => {
     open: false,
   });
   const perPage = 12;
-  // const [blackVideo, setBlackVideo] = useState(null);
 
   const { library, account } = useActiveWeb3React();
   const cosmicGameContract = useCosmicGameContract();
   const nftRWLKContract = useRWLKNFTContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
-  // const ref = useRef(null);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
 
@@ -424,12 +422,6 @@ const NewHome = () => {
     getData();
   }, [nftRWLKContract, account]);
 
-  // useEffect(() => {
-  //   if (blackVideo) {
-  //     ref.current.load();
-  //   }
-  // }, [blackVideo]);
-
   useEffect(() => {
     const fetchData = async () => {
       const newData = await api.get_dashboard_info();
@@ -453,7 +445,10 @@ const NewHome = () => {
 
     const fetchPrizeTime = async () => {
       const t = await api.get_prize_time();
-      setPrizeTime(t * 1000);
+      // setPrizeTime(t * 1000);
+      const current = await api.get_current_time();
+      const offset = current * 1000 - Date.now();
+      setPrizeTime(t * 1000 - offset);
     };
 
     const fetchPrizeInfo = async () => {
@@ -490,9 +485,6 @@ const NewHome = () => {
       fetchCSTBidData();
     }
 
-    // setBlackVideo(
-    //   `https://cosmic-game.s3.us-east-2.amazonaws.com/${fileName}.mp4`
-    // );
     // Fetch data every 12 seconds
     const interval = setInterval(() => {
       fetchData();
@@ -529,34 +521,6 @@ const NewHome = () => {
 
   return (
     <>
-      {/* {blackVideo && (
-        <div
-          style={{
-            position: "fixed",
-            top: 125,
-            bottom: 64,
-            left: 0,
-            right: 0,
-            zIndex: -1,
-          }}
-        >
-          <video
-            autoPlay
-            muted
-            playsInline
-            style={{
-              position: "absolute",
-              width: "100%",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
-            ref={ref}
-          >
-            <source src={blackVideo} type="video/mp4"></source>
-          </video>
-        </div>
-      )} */}
       <MainWrapper>
         <Snackbar
           anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
@@ -1201,12 +1165,3 @@ const NewHome = () => {
 };
 
 export default NewHome;
-
-/*
-ToDo list
-
-1. fix claim button error
-2. 
-
-
-*/

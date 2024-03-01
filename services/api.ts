@@ -295,6 +295,16 @@ class ApiService {
     }
   }
 
+  public async get_current_time() {
+    try {
+      const { data } = await axios.get(getAPIUrl("time/current"));
+      return data.CurrentTimeStamp;
+    } catch (err) {
+      console.log(err);
+      return 0;
+    }
+  }
+
   public async get_charity_cg_deposits() {
     try {
       const { data } = await axios.get(getAPIUrl("donations/charity/cg_deposits"));
