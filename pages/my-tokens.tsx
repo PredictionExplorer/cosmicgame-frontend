@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Box,
-  Button,
   Link,
   Pagination,
   Table,
@@ -21,11 +20,8 @@ import {
 } from "../components/styled";
 import { convertTimestampToDateTime } from "../utils";
 import { useActiveWeb3React } from "../hooks/web3";
-import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 import { useRouter } from "next/router";
 import { useApiData } from "../contexts/ApiDataContext";
-import useCosmicGameContract from "../hooks/useCosmicGameContract";
-import DonatedNFTTable from "../components/DonatedNFTTable";
 import Fireworks, { FireworksHandlers } from "@fireworks-js/react";
 import api from "../services/api";
 
@@ -58,7 +54,7 @@ const MyWinningsRow = ({ winning }) => {
   );
 };
 
-const MyWinningsTable = ({ list }) => {
+export const MyWinningsTable = ({ list }) => {
   const perPage = 5;
   const [curPage, setCurPage] = useState(1);
   if (list.length === 0) {
@@ -206,133 +202,33 @@ const MyWallet = () => {
   const ref = useRef<FireworksHandlers>(null);
   const { account } = useActiveWeb3React();
   const { apiData: status } = useApiData();
-  const [raffleETHToClaim, setRaffleETHToClaim] = useState({
-    data: [],
-    loading: false,
-  });
   const [CSTList, setCSTList] = useState({
     data: [],
     loading: false,
   });
-  const [claimedDonatedNFTs, setClaimedDonatedNFTs] = useState({
-    data: [],
-    loading: false,
-  });
-  const [unclaimedDonatedNFTs, setUnclaimedDonatedNFTs] = useState({
-    data: [],
-    loading: false,
-  });
-  const [isClaiming, setIsClaiming] = useState({
-    donatedNFT: false,
-    raffleETH: false,
-  });
   const [finishFireworks, setFinishFireworks] = useState(false);
-
-  const cosmicGameContract = useCosmicGameContract();
-  const raffleWalletContract = useRaffleWalletContract();
-
-  const handleAllETHClaim = async () => {
-    try {
-      setIsClaiming({
-        ...isClaiming,
-        raffleETH: true,
-      });
-      const res = await raffleWalletContract.withdraw();
-      console.log(res);
-      setTimeout(() => {
-        router.reload();
-      }, 4000);
-    } catch (err) {
-      console.log(err);
-      setIsClaiming({
-        ...isClaiming,
-        raffleETH: false,
-      });
-    }
-  };
-
-  const handleDonatedNFTsClaim = async (e, tokenID) => {
-    try {
-      e.target.disabled = true;
-      e.target.classList.add("Mui-disabled");
-      const res = await cosmicGameContract.claimDonatedNFT(tokenID);
-      console.log(res);
-      setTimeout(() => {
-        router.reload();
-      }, 4000);
-    } catch (err) {
-      console.log(err);
-      e.target.disabled = false;
-      e.target.classList.remove("Mui-disabled");
-    }
-  };
-
-  const handleAllDonatedNFTsClaim = async () => {
-    try {
-      setIsClaiming({
-        ...isClaiming,
-        donatedNFT: true,
-      });
-      const indexList = unclaimedDonatedNFTs.data.map((item) => item.Index);
-      const res = await cosmicGameContract.claimManyDonatedNFTs(indexList);
-      console.log(res);
-      setTimeout(() => {
-        router.reload();
-      }, 4000);
-    } catch (err) {
-      console.log(err);
-      setIsClaiming({
-        ...isClaiming,
-        donatedNFT: false,
-      });
-    }
-  };
 
   const handleFireworksClick = () => {
     ref.current.stop();
     setFinishFireworks(true);
   };
 
-  const fetchRaffleETHDeposits = async (updateStatus) => {
-    setRaffleETHToClaim((prev) => ({ ...prev, loading: updateStatus && true }));
-    let deposits = await api.get_raffle_deposits_by_user(account);
-    deposits = deposits.sort((a, b) => b.TimeStamp - a.TimeStamp);
-    setRaffleETHToClaim({ data: deposits, loading: false });
-  };
   const fetchCSTList = async (updateStatus) => {
     setCSTList((prev) => ({ ...prev, loading: updateStatus && true }));
     let cstList = await api.get_cst_list_by_user(account);
     setCSTList({ data: cstList, loading: false });
   };
-  const fetchDonatedNFTs = async (updateStatus) => {
-    setClaimedDonatedNFTs((prev) => ({
-      ...prev,
-      loading: updateStatus && true,
-    }));
-    const claimed = await api.get_claimed_donated_nft_by_user(account);
-    setClaimedDonatedNFTs({ data: claimed, loading: false });
-    setUnclaimedDonatedNFTs((prev) => ({
-      ...prev,
-      loading: updateStatus && true,
-    }));
-    const unclaimed = await api.get_unclaimed_donated_nft_by_user(account);
-    setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
-  };
   useEffect(() => {
-    fetchRaffleETHDeposits(false);
     fetchCSTList(false);
-    fetchDonatedNFTs(false);
   }, [status]);
   useEffect(() => {
-    fetchRaffleETHDeposits(true);
     fetchCSTList(true);
-    fetchDonatedNFTs(true);
   }, []);
 
   return (
     <>
       <Head>
-        <title>My Wallet | Cosmic Signature</title>
+        <title>My Tokens | Cosmic Signature</title>
         <meta name="description" content="" />
       </Head>
       <MainWrapper>
@@ -372,41 +268,14 @@ const MyWallet = () => {
           gutterBottom
           textAlign="center"
         >
-          My Wallet
+          My Cosmic Signature (ERC721) Tokens
         </Typography>
         {!account ? (
           <Typography variant="subtitle1">
-            Please login to Metamask to see your wallet.
+            Please login to Metamask to see your tokens.
           </Typography>
         ) : (
           <>
-            <Box mt={6}>
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
-              >
-                <Typography variant="h5">Raffle ETH I Won</Typography>
-                {status?.ETHRaffleToClaim > 0 && (
-                  <Box>
-                    <Typography component="span" mr={2}>
-                      Your claimable winnings are{" "}
-                      {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
-                    </Typography>
-                    <Button
-                      onClick={handleAllETHClaim}
-                      variant="contained"
-                      disabled={isClaiming.raffleETH}
-                    >
-                      Claim All
-                    </Button>
-                  </Box>
-                )}
-              </Box>
-              {raffleETHToClaim.loading ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <MyWinningsTable list={raffleETHToClaim.data} />
-              )}
-            </Box>
             <Box mt={6}>
               <Typography variant="h5" mb={2}>
                 Cosmic Signature Tokens I Own
@@ -415,33 +284,6 @@ const MyWallet = () => {
                 <Typography variant="h6">Loading...</Typography>
               ) : (
                 <CSTTable list={CSTList.data} />
-              )}
-            </Box>
-            <Box mt={6}>
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
-              >
-                <Typography variant="h5">Donated NFTs I Won</Typography>
-                {status?.NumDonatedNFTToClaim > 0 && (
-                  <Button
-                    onClick={handleAllDonatedNFTsClaim}
-                    variant="contained"
-                    disabled={isClaiming.donatedNFT}
-                  >
-                    Claim All
-                  </Button>
-                )}
-              </Box>
-              {unclaimedDonatedNFTs.loading || claimedDonatedNFTs.loading ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <DonatedNFTTable
-                  list={[
-                    ...unclaimedDonatedNFTs.data,
-                    ...claimedDonatedNFTs.data,
-                  ]}
-                  handleClaim={handleDonatedNFTsClaim}
-                />
               )}
             </Box>
           </>

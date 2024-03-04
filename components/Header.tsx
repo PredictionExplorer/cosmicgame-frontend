@@ -134,7 +134,7 @@ const Header = () => {
               />
             ))}
             <ListItemButton
-              nav={{ title: "My Wallet", route: "/my-wallet" }}
+              nav={{ title: "My Tokens", route: "/my-tokens" }}
               sx={{ justifyContent: "center" }}
             />
             <ListItemButton

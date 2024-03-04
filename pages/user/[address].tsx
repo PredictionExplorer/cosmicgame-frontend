@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Link, Typography } from "@mui/material";
+import { Box, Button, Link, Typography } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
@@ -13,8 +13,30 @@ import { CollectedStakingRewardsTable } from "../../components/CollectedStakingR
 import { StakingActionsTable } from "../../components/StakingActionsTable";
 import { MarketingRewardsTable } from "../../components/MarketingRewardsTable";
 import { useStakedToken } from "../../contexts/StakedTokenContext";
+import { useApiData } from "../../contexts/ApiDataContext";
+import { MyWinningsTable } from "../my-tokens";
+import useRaffleWalletContract from "../../hooks/useRaffleWalletContract";
+import { useRouter } from "next/router";
+import { useActiveWeb3React } from "../../hooks/web3";
+import useCosmicGameContract from "../../hooks/useCosmicGameContract";
+import DonatedNFTTable from "../../components/DonatedNFTTable";
 
 const UserInfo = ({ address }) => {
+  const router = useRouter();
+  const { account } = useActiveWeb3React();
+  const { apiData: status } = useApiData();
+  const [raffleETHToClaim, setRaffleETHToClaim] = useState({
+    data: [],
+    loading: false,
+  });
+  const [claimedDonatedNFTs, setClaimedDonatedNFTs] = useState({
+    data: [],
+    loading: false,
+  });
+  const [unclaimedDonatedNFTs, setUnclaimedDonatedNFTs] = useState({
+    data: [],
+    loading: false,
+  });
   const [claimHistory, setClaimHistory] = useState(null);
   const [bidHistory, setBidHistory] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
@@ -26,6 +48,13 @@ const UserInfo = ({ address }) => {
   const [stakingActions, setStakingActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
   const { fetchData: fetchStakedToken } = useStakedToken();
+  const [isClaiming, setIsClaiming] = useState({
+    donatedNFT: false,
+    raffleETH: false,
+  });
+
+  const raffleWalletContract = useRaffleWalletContract();
+  const cosmicGameContract = useCosmicGameContract();
 
   const fetchData = async (addr: string, reload: boolean = true) => {
     setLoading(reload);
@@ -58,11 +87,91 @@ const UserInfo = ({ address }) => {
     fetchStakedToken();
     setLoading(false);
   };
+  const fetchRaffleETHDeposits = async () => {
+    setRaffleETHToClaim((prev) => ({ ...prev, loading: true }));
+    let deposits = await api.get_raffle_deposits_by_user(address);
+    deposits = deposits.sort((a, b) => b.TimeStamp - a.TimeStamp);
+    setRaffleETHToClaim({ data: deposits, loading: false });
+  };
+
+  const fetchDonatedNFTs = async () => {
+    setClaimedDonatedNFTs((prev) => ({
+      ...prev,
+      loading: true,
+    }));
+    const claimed = await api.get_claimed_donated_nft_by_user(address);
+    setClaimedDonatedNFTs({ data: claimed, loading: false });
+    setUnclaimedDonatedNFTs((prev) => ({
+      ...prev,
+      loading: true,
+    }));
+    const unclaimed = await api.get_unclaimed_donated_nft_by_user(address);
+    setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
+  };
+
+  const handleAllETHClaim = async () => {
+    try {
+      setIsClaiming({
+        ...isClaiming,
+        raffleETH: true,
+      });
+      const res = await raffleWalletContract.withdraw();
+      console.log(res);
+      setTimeout(() => {
+        router.reload();
+      }, 4000);
+    } catch (err) {
+      console.log(err);
+      setIsClaiming({
+        ...isClaiming,
+        raffleETH: false,
+      });
+    }
+  };
+
+  const handleDonatedNFTsClaim = async (e, tokenID) => {
+    try {
+      e.target.disabled = true;
+      e.target.classList.add("Mui-disabled");
+      const res = await cosmicGameContract.claimDonatedNFT(tokenID);
+      console.log(res);
+      setTimeout(() => {
+        router.reload();
+      }, 4000);
+    } catch (err) {
+      console.log(err);
+      e.target.disabled = false;
+      e.target.classList.remove("Mui-disabled");
+    }
+  };
+
+  const handleAllDonatedNFTsClaim = async () => {
+    try {
+      setIsClaiming({
+        ...isClaiming,
+        donatedNFT: true,
+      });
+      const indexList = unclaimedDonatedNFTs.data.map((item) => item.Index);
+      const res = await cosmicGameContract.claimManyDonatedNFTs(indexList);
+      console.log(res);
+      setTimeout(() => {
+        router.reload();
+      }, 4000);
+    } catch (err) {
+      console.log(err);
+      setIsClaiming({
+        ...isClaiming,
+        donatedNFT: false,
+      });
+    }
+  };
 
   useEffect(() => {
     if (address) {
       if (address !== "Invalid Address") {
         fetchData(address);
+        fetchRaffleETHDeposits();
+        fetchDonatedNFTs();
       } else {
         setInvalidAddress(true);
       }
@@ -271,6 +380,39 @@ const UserInfo = ({ address }) => {
                     showClaimedStatus={true}
                   />
                 </Box>
+                <Box mt={8}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="h6" lineHeight={1}>
+                      Raffle ETH User Won
+                    </Typography>
+                    {status?.ETHRaffleToClaim > 0 && account === address && (
+                      <Box>
+                        <Typography component="span" mr={2}>
+                          Your claimable winnings are{" "}
+                          {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
+                        </Typography>
+                        <Button
+                          onClick={handleAllETHClaim}
+                          variant="contained"
+                          disabled={isClaiming.raffleETH}
+                        >
+                          Claim All
+                        </Button>
+                      </Box>
+                    )}
+                  </Box>
+                  {raffleETHToClaim.loading ? (
+                    <Typography variant="h6">Loading...</Typography>
+                  ) : (
+                    <MyWinningsTable list={raffleETHToClaim.data} />
+                  )}
+                </Box>
                 <Box>
                   <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                     Unclaimed Staking Rewards
@@ -303,6 +445,39 @@ const UserInfo = ({ address }) => {
                     <MarketingRewardsTable list={marketingRewards} />
                   </Box>
                 )}
+                <Box mt={8}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="h6">Donated NFTs User Won</Typography>
+                    {status?.NumDonatedNFTToClaim > 0 && account === address && (
+                      <Button
+                        onClick={handleAllDonatedNFTsClaim}
+                        variant="contained"
+                        disabled={isClaiming.donatedNFT}
+                      >
+                        Claim All
+                      </Button>
+                    )}
+                  </Box>
+                  {unclaimedDonatedNFTs.loading ||
+                  claimedDonatedNFTs.loading ? (
+                    <Typography variant="h6">Loading...</Typography>
+                  ) : (
+                    <DonatedNFTTable
+                      list={[
+                        ...unclaimedDonatedNFTs.data,
+                        ...claimedDonatedNFTs.data,
+                      ]}
+                      handleClaim={account === address ? handleDonatedNFTsClaim : null}
+                    />
+                  )}
+                </Box>
               </>
             )}
           </>

@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
-
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import { FooterWrapper } from "./styled";
 
 const Footer = () => (
@@ -54,9 +54,9 @@ const Footer = () => (
               <Typography
                 variant="body2"
                 color="textSecondary"
-                width={{xs: "100%", sm: "100%", md: "100%", lg: "auto"}}
+                width={{ xs: "100%", sm: "100%", md: "100%", lg: "auto" }}
                 textAlign="center"
-                marginRight={{xs: 0, sm: 0, md: 0, lg: 10}}
+                marginRight={{ xs: 0, sm: 0, md: 0, lg: 10 }}
                 lineHeight={4}
               >
                 Copyright © 2023 Cosmic Signature
@@ -80,6 +80,9 @@ const Footer = () => (
               </Link>
             </Box>
             <Box ml={{ xs: 0, sm: 0, md: 0, lg: 6 }}>
+              <IconButton href="/site-map">
+                <AccountTreeIcon sx={{ color: "#A9AAB5" }} />
+              </IconButton>
               <IconButton
                 href="https://twitter.com/CosmicSignatureNFT"
                 target="_blank"
