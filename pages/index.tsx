@@ -644,7 +644,13 @@ const NewHome = () => {
                   }}
                 >
                   <Typography>Using CST</Typography>
-                  <Typography>{cstBidData?.CSTPrice.toFixed(6)} CST</Typography>
+                  {cstBidData?.CSTPrice > 0 ? (
+                    <Typography>
+                      {cstBidData?.CSTPrice.toFixed(6)} CST
+                    </Typography>
+                  ) : (
+                    <Typography color="#ff0">FREE</Typography>
+                  )}
                 </Box>
               </Grid>
             </Grid>
@@ -753,20 +759,26 @@ const NewHome = () => {
             )}
             {bidType === "CST" && (
               <Box ml={4}>
-                <Grid container spacing={2} mb={2} alignItems="center">
-                  <Grid item sm={12} md={2}>
-                    <Typography variant="subtitle1">Elapsed Time</Typography>
+                {cstBidData?.SecondsElapsed > cstBidData?.AuctionDuration ? (
+                  <Typography variant="subtitle1">
+                    Auction ended, you can bid for free.
+                  </Typography>
+                ) : (
+                  <Grid container spacing={2} mb={2} alignItems="center">
+                    <Grid item sm={12} md={2}>
+                      <Typography variant="subtitle1">Elapsed Time:</Typography>
+                    </Grid>
+                    <Grid item sm={12} md={4}>
+                      <Typography>
+                        {formatSeconds(cstBidData?.SecondsElapsed)}
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item sm={12} md={4}>
-                    <Typography>
-                      {formatSeconds(cstBidData?.SecondsElapsed)}
-                    </Typography>
-                  </Grid>
-                </Grid>
+                )}
                 <Grid container spacing={2} mb={2} alignItems="center">
                   <Grid item sm={12} md={2}>
                     <Typography variant="subtitle1">
-                      Auction Duration
+                      Auction Duration:
                     </Typography>
                   </Grid>
                   <Grid item sm={12} md={4}>
@@ -895,7 +907,9 @@ const NewHome = () => {
                             : (data?.BidPriceEth / 2).toFixed(5)
                         } ETH)`
                       : bidType === "CST"
-                      ? `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
+                      ? cstBidData?.SecondsElapsed > cstBidData?.AuctionDuration
+                        ? "(FREE BID)"
+                        : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
                       : ""
                   }`}
                 </Button>

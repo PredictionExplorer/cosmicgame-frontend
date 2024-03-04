@@ -32,8 +32,12 @@ const Header = () => {
   const { mobileView, drawerOpen } = state;
   const { apiData: status, setApiData } = useApiData();
   const { account } = useActiveWeb3React();
-  const [balance, setBalance] = useState({ CosmicToken: 0, ETH: 0 });
-  const {data: stakedTokens} = useStakedToken();
+  const [balance, setBalance] = useState({
+    CosmicToken: 0,
+    ETH: 0,
+    CosmicSignature: 0,
+  });
+  const { data: stakedTokens } = useStakedToken();
 
   useEffect(() => {
     const setResponsiveness = () => {
@@ -55,14 +59,15 @@ const Header = () => {
     const fetchData = async () => {
       const notify = await api.notify_red_box(account);
       setApiData(notify);
-
       const balance = await api.get_user_balance(account);
+      const { UserInfo } = await api.get_user_info(account);
       if (balance) {
         setBalance({
           CosmicToken: Number(
             ethers.utils.formatEther(balance.CosmicTokenBalance)
           ),
           ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
+          CosmicSignature: UserInfo.TotalCSTokensWon,
         });
       }
     };
@@ -173,6 +178,24 @@ const Header = () => {
                   sx={{ fontStyle: "italic", fontWeight: 600 }}
                 >
                   {balance.CosmicToken.toFixed(2)}
+                </Typography>
+              </Box>
+              <Box
+                sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
+              >
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  sx={{ fontStyle: "italic", fontWeight: 600 }}
+                >
+                  CST (ERC721):
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="secondary"
+                  sx={{ fontStyle: "italic", fontWeight: 600 }}
+                >
+                  {balance.CosmicSignature} tokens
                 </Typography>
               </Box>
             </ListItem>

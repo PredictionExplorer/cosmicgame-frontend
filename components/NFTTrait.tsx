@@ -81,6 +81,8 @@ const NFTTrait = ({ tokenId }) => {
       });
       if (Number(txCount) === 0) {
         setOpenDialog(true);
+      } else {
+        handleTransfer();
       }
     } catch (err) {
       console.log(err);
@@ -445,7 +447,7 @@ const NFTTrait = ({ tokenId }) => {
                       onClick={handleClickTransfer}
                       endIcon={<ArrowForward />}
                       sx={{ ml: 1 }}
-                      disabled={!address}
+                      disabled={!address || address === account}
                     >
                       Transfer
                     </Button>

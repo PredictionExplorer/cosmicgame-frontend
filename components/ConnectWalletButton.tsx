@@ -135,6 +135,24 @@ const ConnectWalletButton = ({ isMobileView, balance, stakedTokens }) => {
                 {balance.CosmicToken.toFixed(2)}
               </Typography>
             </Box>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
+            >
+              <Typography
+                variant="body2"
+                color="secondary"
+                sx={{ fontStyle: "italic", fontWeight: 600 }}
+              >
+                CST (ERC721):
+              </Typography>
+              <Typography
+                variant="body2"
+                color="secondary"
+                sx={{ fontStyle: "italic", fontWeight: 600 }}
+              >
+                {balance.CosmicSignature} tokens
+              </Typography>
+            </Box>
           </MenuItem>
           <Divider />
           <MenuItem
