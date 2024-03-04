@@ -18,9 +18,19 @@ const FAQ = () => {
         "Each round begins with a 24-hour countdown and a low initial bid price of around 0.01 ETH. Every new bid increases the price by 1% and adds an hour to the clock. If you're the last person to bid when the timer runs out, you win the main prize.",
     },
     {
+      summary: "What type of bids are available?",
+      detail:
+        "It is possible to bid with ETH or Cosmic Signature Tokens (ERC20). You can also attach RandomWalk token to the bid and get 50% discount on bid price. Alternatively, you can bid using only ERC20 Cosmic Signature Tokens through the Dutch auction.",
+    },
+    {
       summary: "What is the main prize?",
       detail:
         "The main prize is a unique Cosmic Signature NFT, 25% of the ETH pot, and any donated NFTs from other projects.",
+    },
+    {
+      summary: "What are marketing rewards?",
+      detail:
+        "You can earn Cosmic Signature Tokens (ERC20) by promoting Cosmic Game website in your Twitter account. Marketing rewards are paid on every bid placed during the round. Contact the Marketing Team for more info.",
     },
     {
       summary: "What are Cosmic Tokens and the Cosmic DAO?",
@@ -28,9 +38,19 @@ const FAQ = () => {
         "Every bid also earns you Cosmic Tokens, which can be used to vote in the Cosmic DAO. The DAO helps decide which beneficiary receives 10% of the pot each round and may be used for other governance decisions in the future.",
     },
     {
+      summary: "What is Dutch Auction bidding?",
+      detail:
+        "When you bid with ETH you will earn 100 Cosmic Signature Tokens (ERC20). These tokens alone can be used to make another bid through the Dutch Auction. Dutch Auction is a special type of auction which lowers the bid price if nobody bids after certain amount of time, the more time passes, the lower the bid price gets. This feature allows you to save on bidding and continue playing the game.",
+    },
+    {
       summary: "How does the raffle work?",
       detail:
         "Each bid doubles as a raffle ticket. There are eight raffle winners each round — three winning a portion of the pot and five receiving a newly minted Cosmic Signature NFT.",
+    },
+    {
+      summary: "How does staking work?",
+      detail:
+        'After winning Cosmic Signature Tokens in Raffles you can stake them and continue earning income. Staking pays 10% of CosmicGame contract balance on each round, and this amount is distributed equally between the owners of all staked tokens. To stake tokens go to "MY STAKING" page (available from your account balance menu).',
     },
     {
       summary: "What is the connection with RandomWalkNFT?",
