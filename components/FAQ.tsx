@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import Image from "next/image";
-import { Box, Typography, AccordionSummary, Container } from "@mui/material";
+import { Box, Typography, AccordionSummary } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { FaqAccordion, FaqAccordionDetails, QuestionIcon } from "./styled";
@@ -20,7 +19,7 @@ const FAQ = () => {
     {
       summary: "What type of bids are available?",
       detail:
-        "It is possible to bid with ETH or Cosmic Signature Tokens (ERC20). You can also attach RandomWalk token to the bid and get 50% discount on bid price. Alternatively, you can bid using only ERC20 Cosmic Signature Tokens through the Dutch auction.",
+        "It is possible to bid with ETH or Cosmic Tokens (ERC20). You can also attach RandomWalk token to the bid and get 50% discount on bid price. Alternatively, you can bid using only ERC20 Cosmic Signature Tokens through the Dutch auction.",
     },
     {
       summary: "What is the main prize?",
@@ -30,7 +29,7 @@ const FAQ = () => {
     {
       summary: "What are marketing rewards?",
       detail:
-        "You can earn Cosmic Signature Tokens (ERC20) by promoting Cosmic Game website in your Twitter account. Marketing rewards are paid on every bid placed during the round. Contact the Marketing Team for more info.",
+        "You can earn Cosmic Tokens (ERC20) by promoting Cosmic Game website in your Twitter account. Marketing rewards are paid on every bid placed during the round. Contact the Marketing Team for more info.",
     },
     {
       summary: "What are Cosmic Tokens and the Cosmic DAO?",
@@ -40,7 +39,7 @@ const FAQ = () => {
     {
       summary: "What is Dutch Auction bidding?",
       detail:
-        "When you bid with ETH you will earn 100 Cosmic Signature Tokens (ERC20). These tokens alone can be used to make another bid through the Dutch Auction. Dutch Auction is a special type of auction which lowers the bid price if nobody bids after certain amount of time, the more time passes, the lower the bid price gets. This feature allows you to save on bidding and continue playing the game.",
+        "When you bid with ETH you will earn 100 Cosmic Tokens (ERC20). These tokens alone can be used to make another bid through the Dutch Auction. Dutch Auction is a special type of auction which lowers the bid price if nobody bids after certain amount of time, the more time passes, the lower the bid price gets. This feature allows you to save on bidding and continue playing the game.",
     },
     {
       summary: "How does the raffle work?",
