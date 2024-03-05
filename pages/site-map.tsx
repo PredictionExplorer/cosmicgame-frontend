@@ -31,16 +31,13 @@ const SiteMap = () => {
               </Link>
             </Typography>
             <Typography variant="subtitle1">
-              <Link
-                href="/#"
-                sx={{ fontSize: "inherit", color: "inherit" }}
-              >
+              <Link href="/#" sx={{ fontSize: "inherit", color: "inherit" }}>
                 Unclaimed assets
               </Link>
             </Typography>
             <Typography variant="subtitle1">
               <Link
-                href="/#"
+                href="/winning-history"
                 sx={{ fontSize: "inherit", color: "inherit" }}
               >
                 Transactional history
@@ -48,7 +45,7 @@ const SiteMap = () => {
             </Typography>
             <Typography variant="subtitle1">
               <Link
-                href="/#"
+                href="/my-staking"
                 sx={{ fontSize: "inherit", color: "inherit" }}
               >
                 Staking
@@ -59,7 +56,40 @@ const SiteMap = () => {
         <Box mt={4}>
           <Typography variant="h5">Overall system information</Typography>
           <Box ml={4}>
-            
+            <Typography variant="subtitle1">
+              <Link
+                href="/gallery"
+                sx={{ fontSize: "inherit", color: "inherit" }}
+              >
+                CosmicSignature gallery
+              </Link>
+            </Typography>
+            <Typography variant="subtitle1">
+              <Link href="/#" sx={{ fontSize: "inherit", color: "inherit" }}>
+                Rewards for all players
+              </Link>
+            </Typography>
+            <Typography variant="subtitle1">
+              <Link
+                href="/statistics"
+                sx={{ fontSize: "inherit", color: "inherit" }}
+              >
+                System Statistics
+              </Link>
+            </Typography>
+            <Typography variant="subtitle1">
+              <Link
+                href="/contracts"
+                sx={{ fontSize: "inherit", color: "inherit" }}
+              >
+                Contract Addresses
+              </Link>
+            </Typography>
+            <Typography variant="subtitle1">
+              <Link href="/faq" sx={{ fontSize: "inherit", color: "inherit" }}>
+                FAQ
+              </Link>
+            </Typography>
           </Box>
         </Box>
       </MainWrapper>
