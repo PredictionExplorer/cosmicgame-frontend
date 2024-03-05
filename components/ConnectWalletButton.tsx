@@ -125,7 +125,7 @@ const ConnectWalletButton = ({ isMobileView, balance, stakedTokens }) => {
                 color="secondary"
                 sx={{ fontStyle: "italic", fontWeight: 600 }}
               >
-                CST:
+                CT (ERC20):
               </Typography>
               <Typography
                 variant="body2"
