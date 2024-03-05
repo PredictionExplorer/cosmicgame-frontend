@@ -75,6 +75,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       const actionIds = response.map((x) => x.StakeActionId);
       if (stakedTokens.length > 0) {
         await stakingContract.unstakeMany(actionIds).then((tx) => tx.wait());
+        fetchData(owner, false);
       }
       const res = await stakingContract
         .claimManyRewards(

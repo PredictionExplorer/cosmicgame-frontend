@@ -28,6 +28,7 @@ import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 import router from "next/router";
 import { useApiData } from "../contexts/ApiDataContext";
 import api from "../services/api";
+import { UnclaimedStakingRewardsTable } from "../components/UnclaimedStakingRewardsTable";
 
 const MyWinningsRow = ({ winning }) => {
   if (!winning) {
@@ -75,6 +76,7 @@ const MyWinnings = () => {
   const perPage = 5;
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState(null);
   const [raffleETHToClaim, setRaffleETHToClaim] = useState(null);
+  const [unclaimedStakingRewards, setUnclaimedStakingRewards] = useState(null);
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
     raffleETH: false,
@@ -137,7 +139,12 @@ const MyWinnings = () => {
       });
     }
   };
-
+  const fetchUnclaimedStakingRewards = async () => {
+    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
+      account
+    );
+    setUnclaimedStakingRewards(unclaimedStakingRewards);
+  };
   const fetchUnclaimedDonatedNFTs = async () => {
     let nfts = await api.get_unclaimed_donated_nft_by_user(account);
     nfts = nfts.sort((a, b) => a.TimeStamp - b.TimeStamp);
@@ -149,6 +156,7 @@ const MyWinnings = () => {
     setRaffleETHToClaim(deposits);
   };
   useEffect(() => {
+    fetchUnclaimedStakingRewards();
     if (status?.NumDonatedNFTToClaim > 0) {
       fetchUnclaimedDonatedNFTs();
     }
@@ -231,7 +239,21 @@ const MyWinnings = () => {
                 <Typography>No winnings yet.</Typography>
               )}
             </Box>
-            <Box mt={6}>
+            <Box mt={8}>
+              <Typography variant="h5" mb={2}>
+                Unclaimed Staking Rewards
+              </Typography>
+              {unclaimedStakingRewards === null ? (
+                <Typography variant="h6">Loading...</Typography>
+              ) : (
+                <UnclaimedStakingRewardsTable
+                  list={unclaimedStakingRewards}
+                  owner={account}
+                  fetchData={fetchUnclaimedStakingRewards}
+                />
+              )}
+            </Box>
+            <Box mt={8}>
               <Box
                 sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
               >
