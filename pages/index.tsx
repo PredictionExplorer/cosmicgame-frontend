@@ -866,9 +866,11 @@ const NewHome = () => {
                       color="rgba(255, 255, 255, 0.68)"
                       ml={2}
                     >
-                      {(data?.BidPriceEth * (1 + bidPricePlus / 100)).toFixed(
-                        6
-                      )}{" "}
+                      {(
+                        data?.BidPriceEth *
+                        (1 + bidPricePlus / 100) *
+                        (bidType === "RandomWalk" ? 0.5 : 1)
+                      ).toFixed(6)}{" "}
                       ETH
                     </Typography>
                   </Box>
