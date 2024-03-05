@@ -24,7 +24,7 @@ const SiteMap = () => {
           <Box ml={4}>
             <Typography variant="subtitle1">
               <Link
-                href="/my-wallet"
+                href="/my-tokens"
                 sx={{ fontSize: "inherit", color: "inherit" }}
               >
                 My tokens
@@ -32,7 +32,7 @@ const SiteMap = () => {
             </Typography>
             <Typography variant="subtitle1">
               <Link
-                href="/my-wallet"
+                href="/#"
                 sx={{ fontSize: "inherit", color: "inherit" }}
               >
                 Unclaimed assets
@@ -40,7 +40,7 @@ const SiteMap = () => {
             </Typography>
             <Typography variant="subtitle1">
               <Link
-                href="/my-wallet"
+                href="/#"
                 sx={{ fontSize: "inherit", color: "inherit" }}
               >
                 Transactional history
@@ -48,7 +48,7 @@ const SiteMap = () => {
             </Typography>
             <Typography variant="subtitle1">
               <Link
-                href="/my-wallet"
+                href="/#"
                 sx={{ fontSize: "inherit", color: "inherit" }}
               >
                 Staking
