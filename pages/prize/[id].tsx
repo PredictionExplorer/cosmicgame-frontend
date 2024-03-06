@@ -11,6 +11,7 @@ import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import useCosmicGameContract from "../../hooks/useCosmicGameContract";
 import { useApiData } from "../../contexts/ApiDataContext";
 import StakingWinnerTable from "../../components/StakingWinnerTable";
+import DonatedNFTTable from "../../components/DonatedNFTTable";
 
 const PrizeInfo = ({ roundNum }) => {
   const cosmicGameContract = useCosmicGameContract();
@@ -209,21 +210,7 @@ const PrizeInfo = ({ roundNum }) => {
                   </Button>
                 )}
               </Box>
-              <Grid container spacing={2}>
-                {nftDonations.length ? (
-                  nftDonations.map((nft) => (
-                    <Grid key={nft.RecordId} item xs={12} sm={12} md={4} lg={4}>
-                      <DonatedNFT nft={nft} />
-                    </Grid>
-                  ))
-                ) : (
-                  <Grid item>
-                    <Typography>
-                      No ERC721 tokens were donated on this round
-                    </Typography>
-                  </Grid>
-                )}
-              </Grid>
+              <DonatedNFTTable list={nftDonations} handleClaim={null} />
             </Box>
           </Box>
         ) : (

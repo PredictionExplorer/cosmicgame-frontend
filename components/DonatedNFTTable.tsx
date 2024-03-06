@@ -120,7 +120,7 @@ const DonatedNFTTable = ({ list, handleClaim }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
-    return <Typography variant="h6">No NFTs yet.</Typography>;
+    return <Typography>No donated NFTs yet.</Typography>;
   }
   return (
     <>
