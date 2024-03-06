@@ -65,8 +65,27 @@ const SiteMap = () => {
               </Link>
             </Typography>
             <Typography variant="subtitle1">
-              <Link href="/#" sx={{ fontSize: "inherit", color: "inherit" }}>
-                Rewards for all players
+              <Link
+                href="/prize"
+                sx={{ fontSize: "inherit", color: "inherit" }}
+              >
+                Prizes
+              </Link>
+            </Typography>
+            <Typography variant="subtitle1">
+              <Link
+                href="/staking"
+                sx={{ fontSize: "inherit", color: "inherit" }}
+              >
+                Staking Rewards
+              </Link>
+            </Typography>
+            <Typography variant="subtitle1">
+              <Link
+                href="/marketing"
+                sx={{ fontSize: "inherit", color: "inherit" }}
+              >
+                Marketing Rewards
               </Link>
             </Typography>
             <Typography variant="subtitle1">
