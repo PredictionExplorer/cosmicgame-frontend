@@ -58,7 +58,7 @@ const HistoryRow = ({ history }) => {
               history.NumCSTTokensEth && history.NumCSTTokensEth < 1
                 ? history.NumCSTTokensEth?.toFixed(7)
                 : history.NumCSTTokensEth?.toFixed(2)
-            } CST`
+            } CT`
           : `${
               history.BidPriceEth && history.BidPriceEth < 1
                 ? history.BidPriceEth?.toFixed(7)
@@ -68,7 +68,7 @@ const HistoryRow = ({ history }) => {
       <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.BidType === 2
-          ? "CST Bid"
+          ? "CT Bid"
           : history.BidType === 1
           ? "RWLK Token Bid"
           : "ETH Bid"}
@@ -78,7 +78,7 @@ const HistoryRow = ({ history }) => {
           `Bid was made using RandomWalk Token(id = ${history.RWalkNFTId})`}
         {!!history.NFTDonationTokenAddr &&
           history.BidType === 2 &&
-          "Bid was made using Cosmic Signature Tokens"}
+          "Bid was made using Cosmic Tokens"}
         {!!history.NFTDonationTokenAddr &&
           history.BidType === 0 &&
           "Bid was made using ETH"}

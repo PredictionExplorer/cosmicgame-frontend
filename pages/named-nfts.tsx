@@ -92,7 +92,7 @@ const NamedNFTs = () => {
   return (
     <>
       <Head>
-        <title>Named CosmicSignature tokens | Cosmic Signature</title>
+        <title>Named Cosmic Signature Tokens | Cosmic Signature</title>
         <meta name="description" content="" />
       </Head>
       <MainWrapper>
@@ -102,7 +102,7 @@ const NamedNFTs = () => {
           gutterBottom
           textAlign="center"
         >
-          Named CosmicSignature tokens
+          Named Cosmic Signature Tokens
         </Typography>
         <Box mt={6}>
           {loading ? (

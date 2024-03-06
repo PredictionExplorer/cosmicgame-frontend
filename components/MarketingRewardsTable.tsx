@@ -34,9 +34,7 @@ const MarketingRewardsRow = ({ row }) => {
           {convertTimestampToDateTime(row.TimeStamp)}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell>
-        {row.AmountEth.toFixed(2)}
-      </TablePrimaryCell>
+      <TablePrimaryCell>{row.AmountEth.toFixed(2)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -54,7 +52,7 @@ export const MarketingRewardsTable = ({ list }) => {
           <TablePrimaryHead>
             <TableRow>
               <TableCell>Datetime</TableCell>
-              <TableCell>Amount (CST)</TableCell>
+              <TableCell>Amount (CT)</TableCell>
             </TableRow>
           </TablePrimaryHead>
           <TableBody>

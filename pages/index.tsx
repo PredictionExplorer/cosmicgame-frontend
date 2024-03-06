@@ -86,9 +86,9 @@ const NewHome = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [bidType, setBidType] = useState("");
-  const [cstBidData, setCSTBidData] = useState({
+  const [ctBidData, setCTBidData] = useState({
     AuctionDuration: 0,
-    CSTPrice: 0,
+    CTPrice: 0,
     SecondsElapsed: 0,
   });
   const [curBidList, setCurBidList] = useState([]);
@@ -231,7 +231,7 @@ const NewHome = () => {
           return (
             Number(ethers.utils.formatEther(balance.ETH_Balance)) >= amount
           );
-        } else if (type === "CST") {
+        } else if (type === "CT") {
           return (
             Number(ethers.utils.formatEther(balance.CosmicTokenBalance)) >=
             amount
@@ -359,14 +359,14 @@ const NewHome = () => {
     }
   };
 
-  const onBidWithCST = async () => {
+  const onBidWithCT = async () => {
     setIsBidding(true);
     try {
-      const enoughBalance = await checkBalance("CST", cstBidData?.CSTPrice);
+      const enoughBalance = await checkBalance("CT", ctBidData?.CTPrice);
       if (!enoughBalance) {
         setAlertDlg({
-          title: "Insufficient CST balance",
-          content: "There isn't enough CosmicSignature Token in you wallet.",
+          title: "Insufficient CT balance",
+          content: "There isn't enough Cosmic Token in you wallet.",
           open: true,
         });
         setIsBidding(false);
@@ -466,13 +466,13 @@ const NewHome = () => {
       const history = await api.get_claim_history();
       setClaimHistory(history);
     };
-    const fetchCSTBidData = async () => {
-      let cstData = await api.get_cst_price();
-      if (cstData) {
-        setCSTBidData({
-          AuctionDuration: parseInt(cstData.AuctionDuration),
-          CSTPrice: parseFloat(ethers.utils.formatEther(cstData.CSTPrice)),
-          SecondsElapsed: parseInt(cstData.SecondsElapsed),
+    const fetchCTBidData = async () => {
+      let ctData = await api.get_ct_price();
+      if (ctData) {
+        setCTBidData({
+          AuctionDuration: parseInt(ctData.AuctionDuration),
+          CTPrice: parseFloat(ethers.utils.formatEther(ctData.CTPrice)),
+          SecondsElapsed: parseInt(ctData.SecondsElapsed),
         });
       }
     };
@@ -482,7 +482,7 @@ const NewHome = () => {
     fetchPrizeTime();
     fetchClaimHistory();
     if (cosmicGameContract) {
-      fetchCSTBidData();
+      fetchCTBidData();
     }
 
     // Fetch data every 12 seconds
@@ -492,7 +492,7 @@ const NewHome = () => {
       fetchPrizeTime();
       fetchClaimHistory();
       if (cosmicGameContract) {
-        fetchCSTBidData();
+        fetchCTBidData();
       }
     }, 12000);
 
@@ -643,11 +643,9 @@ const NewHome = () => {
                     mb: 1,
                   }}
                 >
-                  <Typography>Using CST</Typography>
-                  {cstBidData?.CSTPrice > 0 ? (
-                    <Typography>
-                      {cstBidData?.CSTPrice.toFixed(6)} CST
-                    </Typography>
+                  <Typography>Using CT</Typography>
+                  {ctBidData?.CTPrice > 0 ? (
+                    <Typography>{ctBidData?.CTPrice.toFixed(6)} CT</Typography>
                   ) : (
                     <Typography color="#ff0">FREE</Typography>
                   )}
@@ -737,9 +735,9 @@ const NewHome = () => {
                 label="RandomWalk"
               />
               <FormControlLabel
-                value="CST"
+                value="CT"
                 control={<Radio />}
-                label="CST (Cosmic Signature Token)"
+                label="CT (Cosmic Token)"
               />
             </RadioGroup>
             {bidType === "RandomWalk" && (
@@ -757,9 +755,9 @@ const NewHome = () => {
                 />
               </Box>
             )}
-            {bidType === "CST" && (
+            {bidType === "CT" && (
               <Box ml={4}>
-                {cstBidData?.SecondsElapsed > cstBidData?.AuctionDuration ? (
+                {ctBidData?.SecondsElapsed > ctBidData?.AuctionDuration ? (
                   <Typography variant="subtitle1">
                     Auction ended, you can bid for free.
                   </Typography>
@@ -770,7 +768,7 @@ const NewHome = () => {
                     </Grid>
                     <Grid item sm={12} md={4}>
                       <Typography>
-                        {formatSeconds(cstBidData?.SecondsElapsed)}
+                        {formatSeconds(ctBidData?.SecondsElapsed)}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -783,7 +781,7 @@ const NewHome = () => {
                   </Grid>
                   <Grid item sm={12} md={4}>
                     <Typography>
-                      {formatSeconds(cstBidData?.AuctionDuration)}
+                      {formatSeconds(ctBidData?.AuctionDuration)}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -794,7 +792,7 @@ const NewHome = () => {
                 <Typography>Advanced Options</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {bidType !== "CST" && (
+                {bidType !== "CT" && (
                   <>
                     <Typography variant="body2">
                       If you want to donate one of your NFTs while bidding, you
@@ -826,7 +824,7 @@ const NewHome = () => {
                   sx={{ marginTop: 2 }}
                   onChange={(e) => setMessage(e.target.value)}
                 />
-                {bidType !== "CST" && (
+                {bidType !== "CT" && (
                   <Box
                     sx={{
                       display: "flex",
@@ -887,7 +885,7 @@ const NewHome = () => {
                   variant="outlined"
                   size="large"
                   endIcon={<ArrowForward />}
-                  onClick={bidType === "CST" ? onBidWithCST : onBid}
+                  onClick={bidType === "CT" ? onBidWithCT : onBid}
                   fullWidth
                   disabled={
                     isBidding ||
@@ -908,10 +906,10 @@ const NewHome = () => {
                             ? (data?.BidPriceEth / 2).toFixed(2)
                             : (data?.BidPriceEth / 2).toFixed(5)
                         } ETH)`
-                      : bidType === "CST"
-                      ? cstBidData?.SecondsElapsed > cstBidData?.AuctionDuration
+                      : bidType === "CT"
+                      ? ctBidData?.SecondsElapsed > ctBidData?.AuctionDuration
                         ? "(FREE BID)"
-                        : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
+                        : `(${ctBidData?.CTPrice.toFixed(2)} CT)`
                       : ""
                   }`}
                 </Button>
@@ -975,8 +973,8 @@ const NewHome = () => {
                 these people will win {data?.RafflePercentage}% of the pot each.
                 Also, {data?.NumRaffleNFTWinners} additional winners and{" "}
                 {data?.NumHolderNFTWinners} Random Walk NFT holders and{" "}
-                {data?.NumHolderNFTWinners} CosmicSignature token holders will
-                be chosen which will receive a Cosmic Signature NFT.
+                {data?.NumHolderNFTWinners} Cosmic Token holders will be chosen
+                which will receive a Cosmic Signature NFT.
               </Typography>
             </Box>
           </>

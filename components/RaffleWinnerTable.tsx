@@ -102,7 +102,7 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
                 <WinnerRow
                   key={winner.EvtLogId}
                   winner={winner}
-                  type={winner.Amount ? "ETH Deposit" : "CosmicSignature Token"}
+                  type={winner.Amount ? "ETH Deposit" : "Cosmic Signature Token"}
                 />
               ))}
           </TableBody>

@@ -19,7 +19,7 @@ const FAQ = () => {
     {
       summary: "What type of bids are available?",
       detail:
-        "It is possible to bid with ETH or Cosmic Tokens (ERC20). You can also attach RandomWalk token to the bid and get 50% discount on bid price. Alternatively, you can bid using only ERC20 Cosmic Signature Tokens through the Dutch auction.",
+        "It is possible to bid with ETH or Cosmic Tokens (ERC20). You can also attach RandomWalk token to the bid and get 50% discount on bid price. Alternatively, you can bid using only ERC20 Cosmic Tokens through the Dutch auction.",
     },
     {
       summary: "What is the main prize?",

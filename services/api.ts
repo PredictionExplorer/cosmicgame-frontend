@@ -525,7 +525,7 @@ class ApiService {
     }
   }
 
-  public async get_cst_price() {
+  public async get_ct_price() {
     try {
       const { data } = await axios.get(getAPIUrl("bid/cst_price"));
       return data;

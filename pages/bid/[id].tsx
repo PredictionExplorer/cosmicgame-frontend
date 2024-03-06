@@ -96,7 +96,7 @@ const BidInfo = ({ bidId }) => {
                       bidInfo.NumCSTTokensEth && bidInfo.NumCSTTokensEth < 1
                         ? bidInfo.NumCSTTokensEth?.toFixed(7)
                         : bidInfo.NumCSTTokensEth?.toFixed(2)
-                    } CST`
+                    } CT`
                   : `${
                       bidInfo.BidPriceEth && bidInfo.BidPriceEth < 1
                         ? bidInfo.BidPriceEth?.toFixed(7)
@@ -113,7 +113,7 @@ const BidInfo = ({ bidId }) => {
             </Box>
             <Box mb={1} display="flex" flexWrap="wrap">
               <Typography color="primary">
-                Was bid with Cosmic Signature Token:
+                Was bid with Cosmic Token:
               </Typography>
               &nbsp;
               <Typography>{bidInfo.BidType === 2 ? "Yes" : "No"}</Typography>

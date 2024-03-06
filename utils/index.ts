@@ -98,7 +98,7 @@ export const formatEthValue = (value: number) => {
   return `${value.toFixed(1)} ETH`;
 };
 
-export const formatCSTValue = (value: number) => {
-  if (value < 10) return `${value.toFixed(4)} CST`;
-  return `${value.toFixed(1)} CST`;
+export const formatCTValue = (value: number) => {
+  if (value < 10) return `${value.toFixed(4)} CT`;
+  return `${value.toFixed(1)} CT`;
 };

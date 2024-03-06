@@ -22,7 +22,7 @@ import {
 import "@progress/kendo-theme-default/dist/all.css";
 import {
   convertTimestampToDateTime,
-  formatCSTValue,
+  formatCTValue,
   formatEthValue,
 } from "../utils";
 import { UniqueStakersTable } from "../components/UniqueStakersTable";
@@ -228,7 +228,7 @@ const Statistics = () => {
                 }
               />
               <StatisticsItem
-                title="Total Cosmic Signature tokens minted"
+                title="Total Cosmic Signature Tokens minted"
                 value={
                   <Link href="/gallery" color="inherit" fontSize="inherit">
                     {data.MainStats.NumCSTokenMints}
@@ -244,12 +244,12 @@ const Statistics = () => {
                 value={formatEthValue(data.MainStats.TotalRaffleEthDeposits)}
               />
               <StatisticsItem
-                title="Total CST Consumed"
-                value={formatCSTValue(data.MainStats.TotalCSTConsumedEth)}
+                title="Total CT Consumed"
+                value={formatCTValue(data.MainStats.TotalCSTConsumedEth)}
               />
               <StatisticsItem
-                title="Total Reward Paid to Marketing Agents with CST"
-                value={formatCSTValue(data.MainStats.TotalMktRewardsEth)}
+                title="Total Reward Paid to Marketing Agents with CT"
+                value={formatCTValue(data.MainStats.TotalMktRewardsEth)}
               />
               <StatisticsItem
                 title="Number of Marketing Reward Transactions"
@@ -344,7 +344,7 @@ const Statistics = () => {
                 value={formatEthValue(data.CharityBalanceEth)}
               />
               <StatisticsItem
-                title="Number of Bids with CST"
+                title="Number of Bids with CT"
                 value={data.MainStats.NumBidsCST}
               />
               <StatisticsItem
@@ -360,7 +360,7 @@ const Statistics = () => {
                 value={data.NumDonatedNFTs}
               />
               <StatisticsItem
-                title="Amount of Cosmic Signature tokens with assigned name"
+                title="Amount of Cosmic Signature Tokens with assigned name"
                 value={data.MainStats.TotalNamedTokens}
               />
               <StatisticsItem

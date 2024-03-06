@@ -7,7 +7,7 @@ const Detail = ({ tokenId }) => {
   return (
     <>
       <Head>
-        <title>NFT #{tokenId} | CosmicSignature Token</title>
+        <title>NFT #{tokenId} | Cosmic Signature Token</title>
       </Head>
       <MainWrapper
         maxWidth={false}
