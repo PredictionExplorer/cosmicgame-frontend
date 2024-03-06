@@ -471,7 +471,7 @@ const NewHome = () => {
       if (ctData) {
         setCTBidData({
           AuctionDuration: parseInt(ctData.AuctionDuration),
-          CTPrice: parseFloat(ethers.utils.formatEther(ctData.CTPrice)),
+          CTPrice: parseFloat(ethers.utils.formatEther(ctData.CSTPrice)),
           SecondsElapsed: parseInt(ctData.SecondsElapsed),
         });
       }
