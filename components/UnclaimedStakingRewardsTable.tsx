@@ -78,7 +78,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         fetchData(owner, false);
       }
       const res = await stakingContract
-        .claimReward(
+        .claimManyRewards(
           actionIds,
           new Array(actionIds.length).fill(depositId)
         )
