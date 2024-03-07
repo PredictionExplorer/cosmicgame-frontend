@@ -219,7 +219,7 @@ const UserInfo = ({ address }) => {
                     </Typography>
                     &nbsp;
                     <Typography component="span">
-                      {balance.CosmicToken.toFixed(2)} CT
+                      {balance.CosmicToken.toFixed(2)} CST
                     </Typography>
                   </Box>
                 )}

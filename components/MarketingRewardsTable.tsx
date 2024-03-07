@@ -52,7 +52,7 @@ export const MarketingRewardsTable = ({ list }) => {
           <TablePrimaryHead>
             <TableRow>
               <TableCell>Datetime</TableCell>
-              <TableCell>Amount (CT)</TableCell>
+              <TableCell>Amount (CST)</TableCell>
             </TableRow>
           </TablePrimaryHead>
           <TableBody>

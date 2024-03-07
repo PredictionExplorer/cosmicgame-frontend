@@ -58,7 +58,7 @@ const HistoryRow = ({ history }) => {
               history.NumCSTTokensEth && history.NumCSTTokensEth < 1
                 ? history.NumCSTTokensEth?.toFixed(7)
                 : history.NumCSTTokensEth?.toFixed(2)
-            } CT`
+            } CST`
           : `${
               history.BidPriceEth && history.BidPriceEth < 1
                 ? history.BidPriceEth?.toFixed(7)
@@ -68,7 +68,7 @@ const HistoryRow = ({ history }) => {
       <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.BidType === 2
-          ? "CT Bid"
+          ? "CST Bid"
           : history.BidType === 1
           ? "RWLK Token Bid"
           : "ETH Bid"}

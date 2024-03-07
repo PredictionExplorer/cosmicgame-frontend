@@ -96,7 +96,7 @@ const BidInfo = ({ bidId }) => {
                       bidInfo.NumCSTTokensEth && bidInfo.NumCSTTokensEth < 1
                         ? bidInfo.NumCSTTokensEth?.toFixed(7)
                         : bidInfo.NumCSTTokensEth?.toFixed(2)
-                    } CT`
+                    } CST`
                   : `${
                       bidInfo.BidPriceEth && bidInfo.BidPriceEth < 1
                         ? bidInfo.BidPriceEth?.toFixed(7)

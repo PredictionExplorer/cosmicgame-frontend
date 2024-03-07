@@ -170,7 +170,7 @@ const Header = () => {
                   color="secondary"
                   sx={{ fontStyle: "italic", fontWeight: 600 }}
                 >
-                  CT (ERC20):
+                  CST (ERC20):
                 </Typography>
                 <Typography
                   variant="body2"
@@ -188,7 +188,7 @@ const Header = () => {
                   color="secondary"
                   sx={{ fontStyle: "italic", fontWeight: 600 }}
                 >
-                  CST (ERC721):
+                  CSS (ERC721):
                 </Typography>
                 <Typography
                   variant="body2"

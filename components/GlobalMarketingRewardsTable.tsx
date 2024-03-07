@@ -47,7 +47,7 @@ const GlobalMarketingRewardsRow = ({ row }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {row.AmountEth.toFixed(2)} CT
+        {row.AmountEth.toFixed(2)} CST
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
