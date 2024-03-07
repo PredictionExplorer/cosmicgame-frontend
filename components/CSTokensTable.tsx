@@ -125,6 +125,18 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
     }
     setSelected([]);
   };
+  const onStakeMany = async () => {
+    await handleStakeMany(selected);
+    setTimeout(() => {
+      setSelected([]);
+    }, 3000);
+  };
+  const onStake = async (id: number) => {
+    await handleStake(id);
+    setTimeout(() => {
+      setSelected([]);
+    }, 3000);
+  };
 
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
@@ -170,7 +182,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
                 <CSTokensRow
                   key={index}
                   row={row}
-                  handleStake={handleStake}
+                  handleStake={onStake}
                   isItemSelected={isSelected(row.TokenId)}
                   handleClick={handleClick}
                 />
@@ -180,7 +192,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
       </TablePrimaryContainer>
       {selected.length > 0 && (
         <Box display="flex" justifyContent="end" mt={2}>
-          <Button variant="text" onClick={() => handleStakeMany(selected)}>
+          <Button variant="text" onClick={onStakeMany}>
             Stake Many
           </Button>
         </Box>

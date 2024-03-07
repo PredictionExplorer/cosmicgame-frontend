@@ -38,7 +38,11 @@ const StakedTokensRow = ({
       key={row.id}
       selected={isItemSelected}
       onClick={() => handleClick(row.TokenInfo.StakeActionId)}
-      sx={{ cursor: "pointer" }}
+      sx={{
+        cursor: "pointer",
+        pointerEvents:
+          row.UnstakeTimeStamp * 1000 > new Date().getTime() ? "none" : "auto",
+      }}
     >
       <TablePrimaryCell padding="checkbox">
         <Checkbox
@@ -69,16 +73,18 @@ const StakedTokensRow = ({
         {convertTimestampToDateTime(row.UnstakeTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Button
-          variant="text"
-          sx={{ mr: 1 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleUnstake(row.TokenInfo.StakeActionId);
-          }}
-        >
-          Unstake
-        </Button>
+        {row.UnstakeTimeStamp * 1000 <= new Date().getTime() && (
+          <Button
+            variant="text"
+            sx={{ mr: 1 }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUnstake(row.TokenInfo.StakeActionId);
+            }}
+          >
+            Unstake
+          </Button>
+        )}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -121,6 +127,18 @@ export const StakedTokensTable = ({
       return;
     }
     setSelected([]);
+  };
+  const onUnstakeMany = async () => {
+    await handleUnstakeMany(selected);
+    setTimeout(() => {
+      setSelected([]);
+    }, 3000);
+  };
+  const onUnstake = async (id: number) => {
+    await handleUnstake(id);
+    setTimeout(() => {
+      setSelected([]);
+    }, 3000);
   };
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
@@ -168,7 +186,7 @@ export const StakedTokensTable = ({
                 <StakedTokensRow
                   key={index}
                   row={row}
-                  handleUnstake={handleUnstake}
+                  handleUnstake={onUnstake}
                   isItemSelected={isSelected(row.TokenInfo.StakeActionId)}
                   handleClick={handleClick}
                 />
@@ -178,7 +196,7 @@ export const StakedTokensTable = ({
       </TablePrimaryContainer>{" "}
       {selected.length > 0 && (
         <Box display="flex" justifyContent="end" mt={2}>
-          <Button variant="text" onClick={() => handleUnstakeMany(selected)}>
+          <Button variant="text" onClick={onUnstakeMany}>
             Unstake Many
           </Button>
         </Box>
