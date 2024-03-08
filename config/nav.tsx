@@ -29,7 +29,7 @@ const getNAVs = (status, account) => {
   ) {
     NAVS.push({
       title: (
-        <Badge variant="dot" color="error">
+        <Badge badgeContent="$" color="error">
           Claim
         </Badge>
       ),
