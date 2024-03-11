@@ -25,10 +25,6 @@ const UserInfo = ({ address }) => {
   const router = useRouter();
   const { account } = useActiveWeb3React();
   const { apiData: status } = useApiData();
-  const [raffleETHToClaim, setRaffleETHToClaim] = useState({
-    data: [],
-    loading: false,
-  });
   const [claimedDonatedNFTs, setClaimedDonatedNFTs] = useState({
     data: [],
     loading: false,
@@ -53,7 +49,6 @@ const UserInfo = ({ address }) => {
     raffleETH: false,
   });
 
-  const raffleWalletContract = useRaffleWalletContract();
   const cosmicGameContract = useCosmicGameContract();
 
   const fetchData = async (addr: string, reload: boolean = true) => {
@@ -87,12 +82,6 @@ const UserInfo = ({ address }) => {
     fetchStakedToken();
     setLoading(false);
   };
-  const fetchRaffleETHDeposits = async () => {
-    setRaffleETHToClaim((prev) => ({ ...prev, loading: true }));
-    let deposits = await api.get_raffle_deposits_by_user(address);
-    deposits = deposits.sort((a, b) => b.TimeStamp - a.TimeStamp);
-    setRaffleETHToClaim({ data: deposits, loading: false });
-  };
 
   const fetchDonatedNFTs = async () => {
     setClaimedDonatedNFTs((prev) => ({
@@ -107,26 +96,6 @@ const UserInfo = ({ address }) => {
     }));
     const unclaimed = await api.get_unclaimed_donated_nft_by_user(address);
     setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
-  };
-
-  const handleAllETHClaim = async () => {
-    try {
-      setIsClaiming({
-        ...isClaiming,
-        raffleETH: true,
-      });
-      const res = await raffleWalletContract.withdraw();
-      console.log(res);
-      setTimeout(() => {
-        router.reload();
-      }, 4000);
-    } catch (err) {
-      console.log(err);
-      setIsClaiming({
-        ...isClaiming,
-        raffleETH: false,
-      });
-    }
   };
 
   const handleDonatedNFTsClaim = async (e, tokenID) => {
@@ -170,7 +139,6 @@ const UserInfo = ({ address }) => {
     if (address) {
       if (address !== "Invalid Address") {
         fetchData(address);
-        fetchRaffleETHDeposits();
         fetchDonatedNFTs();
       } else {
         setInvalidAddress(true);
@@ -288,11 +256,16 @@ const UserInfo = ({ address }) => {
                   </Typography>
                   &nbsp;
                   <Typography component="span">
-                    {(
-                      userInfo.SumRaffleEthWinnings +
-                      userInfo.SumRaffleEthWithdrawal
-                    ).toFixed(6)}{" "}
-                    ETH
+                    <Link
+                      href={`/user/raffle-eth/${address}`}
+                      sx={{ color: "inherit", fontSize: "inherit" }}
+                    >
+                      {(
+                        userInfo.SumRaffleEthWinnings +
+                        userInfo.SumRaffleEthWithdrawal
+                      ).toFixed(6)}{" "}
+                      ETH
+                    </Link>
                   </Typography>
                 </Box>
                 <Box mb={1}>
@@ -380,39 +353,6 @@ const UserInfo = ({ address }) => {
                     showClaimedStatus={true}
                   />
                 </Box>
-                <Box mt={8}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="h6" lineHeight={1}>
-                      Raffle ETH User Won
-                    </Typography>
-                    {status?.ETHRaffleToClaim > 0 && account === address && (
-                      <Box>
-                        <Typography component="span" mr={2}>
-                          Your claimable winnings are{" "}
-                          {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
-                        </Typography>
-                        <Button
-                          onClick={handleAllETHClaim}
-                          variant="contained"
-                          disabled={isClaiming.raffleETH}
-                        >
-                          Claim All
-                        </Button>
-                      </Box>
-                    )}
-                  </Box>
-                  {raffleETHToClaim.loading ? (
-                    <Typography variant="h6">Loading...</Typography>
-                  ) : (
-                    <MyWinningsTable list={raffleETHToClaim.data} />
-                  )}
-                </Box>
                 <Box>
                   <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                     Unclaimed Staking Rewards
@@ -474,7 +414,9 @@ const UserInfo = ({ address }) => {
                         ...unclaimedDonatedNFTs.data,
                         ...claimedDonatedNFTs.data,
                       ]}
-                      handleClaim={account === address ? handleDonatedNFTsClaim : null}
+                      handleClaim={
+                        account === address ? handleDonatedNFTsClaim : null
+                      }
                     />
                   )}
                 </Box>
