@@ -1,6 +1,13 @@
 [
+  "function DEFAULT_AUCTION_LENGTH() view returns (uint256)",
+  "function DEFAULT_MIN_STAKE_PERIOD() view returns (uint256)",
+  "function ERR_STR_MODE_MAINTENANCE() view returns (string)",
+  "function ERR_STR_MODE_RUNTIME() view returns (string)",
   "function MARKETING_REWARD() view returns (uint256)",
   "function MAX_MESSAGE_LENGTH() view returns (uint256)",
   "function MILLION() view returns (uint256)",
+  "function MODE_MAINTENANCE() view returns (uint256)",
+  "function MODE_PREPARE_MAINTENANCE() view returns (uint256)",
+  "function MODE_RUNTIME() view returns (uint256)",
   "function TOKEN_REWARD() view returns (uint256)"
 ]

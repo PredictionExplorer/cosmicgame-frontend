@@ -54,7 +54,7 @@ const FAQ = () => {
     {
       summary: "What is the connection with RandomWalkNFT?",
       detail:
-        "If you're a RandomWalkNFT holder, you can bid for free in Cosmic Signature, adding an extra layer of excitement and opportunity to the game.",
+        "If you're a RandomWalkNFT holder, you can bid with 50% discount in Cosmic Game, this feature adds an extra layer of excitement and opportunity to the game.",
     },
     {
       summary: "How are the NFT images created?",

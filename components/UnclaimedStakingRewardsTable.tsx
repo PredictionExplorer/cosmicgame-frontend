@@ -48,7 +48,7 @@ const UnclaimedStakingRewardsRow = ({
       <TablePrimaryCell align="right">
         {row.YourClaimableAmountEth.toFixed(6)}
       </TablePrimaryCell>
-      {account === owner && (
+      {account === owner && row.TimeStamp * 1000 < Date.now() && (
         <TablePrimaryCell>
           <Button size="small" onClick={handleClaim}>
             {stakedTokens.length > 0 ? "Unstake & Claim" : "Claim"}

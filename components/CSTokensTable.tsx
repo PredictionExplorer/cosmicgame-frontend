@@ -139,7 +139,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   };
 
   if (list.length === 0) {
-    return <Typography>No tokens yet.</Typography>;
+    return <Typography>No available tokens.</Typography>;
   }
   return (
     <>

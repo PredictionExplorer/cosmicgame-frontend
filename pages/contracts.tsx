@@ -75,6 +75,10 @@ const Contracts = () => {
               <ContractItem name="Network" value="Arbitrum Sepolia" />
               <ContractItem name="Chain ID" value={421614} />
               <ContractItem
+                name="Business Logic Address"
+                value={data?.ContractAddrs.BusinessLogicAddr}
+              />
+              <ContractItem
                 name="CosmicGame Address"
                 value={data?.ContractAddrs.CosmicGameAddr}
               />

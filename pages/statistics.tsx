@@ -24,10 +24,12 @@ import {
   convertTimestampToDateTime,
   formatCSTValue,
   formatEthValue,
+  formatSeconds,
 } from "../utils";
 import { UniqueStakersTable } from "../components/UniqueStakersTable";
 import { GlobalStakingActionsTable } from "../components/GlobalStakingActionsTable";
 import { GlobalStakedTokensTable } from "../components/GlobalStakedTokensTable";
+import { ethers } from "ethers";
 
 const StatisticsItem = ({ title, value }) => {
   return (
@@ -54,6 +56,11 @@ const Statistics = () => {
   const [stakingActions, setStakingActions] = useState(null);
   const [stakedTokens, setStakedTokens] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [cstBidData, setCSTBidData] = useState({
+    AuctionDuration: 0,
+    CSTPrice: 0,
+    SecondsElapsed: 0,
+  });
 
   const gridLayout =
     nftDonations.length > 16
@@ -89,7 +96,14 @@ const Statistics = () => {
       setStakingActions(actions);
       const tokens = await api.get_staked_tokens();
       setStakedTokens(tokens);
-
+      let ctData = await api.get_ct_price();
+      if (ctData) {
+        setCSTBidData({
+          AuctionDuration: parseInt(ctData.AuctionDuration),
+          CSTPrice: parseFloat(ethers.utils.formatEther(ctData.CSTPrice)),
+          SecondsElapsed: parseInt(ctData.SecondsElapsed),
+        });
+      }
       setLoading(false);
     };
     fetchData();
@@ -148,6 +162,30 @@ const Statistics = () => {
               <StatisticsItem
                 title="Current Bid Price"
                 value={formatEthValue(data.BidPriceEth)}
+              />
+              <StatisticsItem
+                title="Current Bid Price using RandomWalk"
+                value={formatEthValue(data.BidPriceEth / 2)}
+              />
+              <StatisticsItem
+                title="Current Bid Price using CST"
+                value={
+                  cstBidData?.CSTPrice > 0 ? (
+                    <Typography>
+                      {formatCSTValue(cstBidData?.CSTPrice)}
+                    </Typography>
+                  ) : (
+                    <Typography color="#ff0">FREE</Typography>
+                  )
+                }
+              />
+              <StatisticsItem
+                title="Elapsed Time"
+                value={formatSeconds(cstBidData?.SecondsElapsed)}
+              />
+              <StatisticsItem
+                title="Auction Duration"
+                value={formatSeconds(cstBidData?.AuctionDuration)}
               />
               <StatisticsItem
                 title="Num Bids Since Round Start"

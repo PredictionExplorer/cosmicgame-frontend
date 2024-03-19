@@ -17,7 +17,7 @@ const NETWORK_URLS: { [key in SupportedChainId]: string } = {
   [SupportedChainId.ARBITRUM_RINKEBY]: `https://arbitrum-rinkeby.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.ARBITRUM_GOERLI]: `https://arbitrum-goerli.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.LOCAL_NETWORK]: 'http://170.187.142.12:11845',
-  [SupportedChainId.SEPOLIA]: `https://frosty-bold-pallet.arbitrum-sepolia.quiknode.pro/${SEPOLIA_KEY}/`,
+  [SupportedChainId.SEPOLIA]: `https://frosty-bold-pallet.arbitrum-sepolia.quiknode.pro/${SEPOLIA_KEY}`,
 }
 
 export const network = new NetworkConnector({

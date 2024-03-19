@@ -10,6 +10,8 @@ import {
   Typography,
   Box,
   Divider,
+  // Snackbar,
+  // Alert,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import getNAVs from "../config/nav";
@@ -23,6 +25,7 @@ import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
 import { ethers } from "ethers";
 import { useStakedToken } from "../contexts/StakedTokenContext";
+import { useSystemMode } from "../contexts/SystemModeContext";
 
 const Header = () => {
   const [state, setState] = useState({
@@ -38,6 +41,16 @@ const Header = () => {
     CosmicSignature: 0,
   });
   const { data: stakedTokens } = useStakedToken();
+  const { data: systemMode } = useSystemMode();
+  // const [notification, setNotification] = useState<{
+  //   text: string;
+  //   type: "success" | "info" | "warning" | "error";
+  //   visible: boolean;
+  // }>({
+  //   text: "",
+  //   type: "error",
+  //   visible: false,
+  // });
 
   useEffect(() => {
     const setResponsiveness = () => {
@@ -67,7 +80,7 @@ const Header = () => {
             ethers.utils.formatEther(balance.CosmicTokenBalance)
           ),
           ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
-          CosmicSignature: UserInfo.TotalCSTokensWon,
+          CosmicSignature: UserInfo?.TotalCSTokensWon,
         });
       }
     };
@@ -76,6 +89,24 @@ const Header = () => {
       fetchData();
     }
   }, [account]);
+
+  // useEffect(() => {
+  //   if (systemMode === 2) {
+  //     setNotification({
+  //       text:
+  //         "The system is entered in maintenance mode. You can't bid, donate or claim prize during the maintenance mode.",
+  //       type: "info",
+  //       visible: true,
+  //     });
+  //   } else if (systemMode === 1) {
+  //     setNotification({
+  //       text:
+  //         "The system is in prepare_maintenance mode. The system will enter maintenance mode immediately after claimPrize() is executed.",
+  //       type: "info",
+  //       visible: true,
+  //     });
+  //   }
+  // }, [systemMode]);
 
   const renderDesktop = () => {
     return (
@@ -214,7 +245,41 @@ const Header = () => {
 
   return (
     <AppBarWrapper position="fixed">
-      <Container>{mobileView ? renderMobile() : renderDesktop()}</Container>
+      <Container>
+        {/* <Snackbar
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          autoHideDuration={10000}
+          open={notification.visible}
+          onClose={() =>
+            setNotification((prev) => ({ ...prev, visible: false }))
+          }
+        >
+          <Alert severity={notification.type} variant="filled">
+            {notification.text}
+          </Alert>
+        </Snackbar> */}
+        {systemMode > 0 && (
+          <Typography
+            sx={{
+              position: "fixed",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "#f00",
+              color: "#fff",
+              px: 1,
+              borderBottomLeftRadius: 8,
+              borderBottomRightRadius: 8,
+            }}
+          >
+            {systemMode === 1
+              ? "Prepare Maintenance Mode"
+              : systemMode === 2
+              ? "Maintenance Mode"
+              : ""}
+          </Typography>
+        )}
+        {mobileView ? renderMobile() : renderDesktop()}
+      </Container>
     </AppBarWrapper>
   );
 };
