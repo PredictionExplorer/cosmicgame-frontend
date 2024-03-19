@@ -415,6 +415,16 @@ class ApiService {
     }
   }
 
+  public async get_staking_actions_info(actionId: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`staking/actions/info/${actionId}`));
+      return data.CombinedStakingRecordInfo;
+    } catch (err) {
+      console.log(err);
+      return { Stake: null, Unstake: null };
+    }
+  }
+
   public async get_collected_staking_rewards_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/rewards/collected/by_user/${address}/0/10000`));

@@ -28,6 +28,22 @@ const UnclaimedStakingRewardsRow = ({
   stakedTokens,
 }) => {
   const { account } = useActiveWeb3React();
+  const [unstakeTimeStamp, setUnstakeTimeStamp] = useState(0);
+
+  useEffect(() => {
+    const fetchInfo = async () => {
+      const response = await api.get_action_ids_by_deposit_id(
+        account,
+        row.DepositId
+      );
+      const actionIds = response.map((x) => x.StakeActionId);
+      if (actionIds > 0) {
+        const { Stake } = await api.get_staking_actions_info(actionIds[0]);
+        setUnstakeTimeStamp(Stake?.UnstakeTimeStamp);
+      }
+    };
+    fetchInfo();
+  }, []);
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
   }
@@ -48,13 +64,15 @@ const UnclaimedStakingRewardsRow = ({
       <TablePrimaryCell align="right">
         {row.YourClaimableAmountEth.toFixed(6)}
       </TablePrimaryCell>
-      {account === owner && row.TimeStamp * 1000 < Date.now() && (
-        <TablePrimaryCell>
-          <Button size="small" onClick={handleClaim}>
-            {stakedTokens.length > 0 ? "Unstake & Claim" : "Claim"}
-          </Button>
-        </TablePrimaryCell>
-      )}
+      {account === owner &&
+        unstakeTimeStamp &&
+        unstakeTimeStamp * 1000 < Date.now() && (
+          <TablePrimaryCell>
+            <Button size="small" onClick={handleClaim}>
+              {stakedTokens.length > 0 ? "Unstake & Claim" : "Claim"}
+            </Button>
+          </TablePrimaryCell>
+        )}
     </TablePrimaryRow>
   );
 };
@@ -175,6 +193,12 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
           </Button>
         </Box>
       )}
+      <Box display="flex" justifyContent="end" mt={1}>
+        <Typography>
+          You can claim your prizes in the case if the unstake date is beyond
+          the current date.
+        </Typography>
+      </Box>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination
           color="primary"
