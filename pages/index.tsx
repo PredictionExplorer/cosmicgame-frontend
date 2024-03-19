@@ -741,7 +741,7 @@ const NewHome = () => {
                 </Grid>
               </Grid>
             )}
-            {curBidList.length && winProbability && (
+            {curBidList.length > 0 && winProbability && (
               <Typography>
                 {winProbability.raffle}% chance you will win{" "}
                 {data?.RaffleAmountEth.toFixed(2)} ETH if you bid.{" "}

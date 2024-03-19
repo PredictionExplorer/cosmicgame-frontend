@@ -9,10 +9,12 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { GradientText, StyledCard2 } from "./styled";
+import { useTokenPrice } from "../hooks/useTokenPrice";
 
 const Prize = ({ prizeAmount }) => {
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
+  const ethPrice = useTokenPrice();
   return (
     <Box mt="130px">
       <Box
@@ -82,7 +84,7 @@ const Prize = ({ prizeAmount }) => {
                   : prizeAmount.toFixed(1)}{" "}
                 ETH
               </GradientText>
-              <Typography ml={1}>($100)</Typography>
+              <Typography color="primary" ml={1}>(${(ethPrice * prizeAmount).toFixed(2)})</Typography>
             </CardActionArea>
           </StyledCard2>
         </Grid>
