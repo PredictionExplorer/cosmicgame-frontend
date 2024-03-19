@@ -418,7 +418,6 @@ const NewHome = () => {
   };
 
   const playAudio = async () => {
-    console.log("play sounds");
     try {
       const audioElement = new Audio("/audio/notification.wav");
       await audioElement.play();
