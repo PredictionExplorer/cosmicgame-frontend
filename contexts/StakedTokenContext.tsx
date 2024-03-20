@@ -17,7 +17,9 @@ export const StakedTokenProvider = ({ children }) => {
     }
   };
   useEffect(() => {
-    fetchData();
+    if (account) {
+      fetchData();
+    }
   }, []);
 
   return (
