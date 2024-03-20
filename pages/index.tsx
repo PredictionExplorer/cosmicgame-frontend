@@ -386,15 +386,17 @@ const NewHome = () => {
   const onBidWithCST = async () => {
     setIsBidding(true);
     try {
-      const enoughBalance = await checkBalance("CST", cstBidData?.CSTPrice);
-      if (!enoughBalance) {
-        setAlertDlg({
-          title: "Insufficient CST balance",
-          content: "There isn't enough Cosmic Token in you wallet.",
-          open: true,
-        });
-        setIsBidding(false);
-        return;
+      if (cstBidData?.CSTPrice > 0) {
+        const enoughBalance = await checkBalance("CST", cstBidData?.CSTPrice);
+        if (!enoughBalance) {
+          setAlertDlg({
+            title: "Insufficient CST balance",
+            content: "There isn't enough Cosmic Token in you wallet.",
+            open: true,
+          });
+          setIsBidding(false);
+          return;
+        }
       }
       let receipt = await cosmicGameContract
         .bidWithCST(message)

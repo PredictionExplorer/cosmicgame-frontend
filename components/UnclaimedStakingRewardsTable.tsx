@@ -44,6 +44,7 @@ const UnclaimedStakingRewardsRow = ({
     };
     fetchInfo();
   }, []);
+
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
   }
@@ -65,7 +66,7 @@ const UnclaimedStakingRewardsRow = ({
         {row.YourClaimableAmountEth.toFixed(6)}
       </TablePrimaryCell>
       {account === owner &&
-        unstakeTimeStamp &&
+        unstakeTimeStamp > 0 &&
         unstakeTimeStamp * 1000 < Date.now() && (
           <TablePrimaryCell>
             <Button size="small" onClick={handleClaim}>
