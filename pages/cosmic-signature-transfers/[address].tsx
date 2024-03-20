@@ -63,7 +63,16 @@ const CosmicSignatureTransferRow = ({ row }) => {
           {row.ToAddr}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.TokenId}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`/detail/${row.TokenId}`}
+          target="__blank"
+        >
+          {row.TokenId}
+        </Link>
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
