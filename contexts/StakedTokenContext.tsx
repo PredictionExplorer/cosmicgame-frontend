@@ -10,16 +10,16 @@ export const StakedTokenProvider = ({ children }) => {
 
   const fetchData = async () => {
     try {
-      const tokens = await api.get_staked_tokens_by_user(account);
-      setData(tokens);
+      if (account) {
+        const tokens = await api.get_staked_tokens_by_user(account);
+        setData(tokens);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
   useEffect(() => {
-    if (account) {
-      fetchData();
-    }
+    fetchData();
   }, [account]);
 
   return (
