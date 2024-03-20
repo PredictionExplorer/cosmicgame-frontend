@@ -20,7 +20,7 @@ export const StakedTokenProvider = ({ children }) => {
     if (account) {
       fetchData();
     }
-  }, []);
+  }, [account]);
 
   return (
     <StakedTokenContext.Provider value={{ data, fetchData }}>
