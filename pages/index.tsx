@@ -259,8 +259,10 @@ const NewHome = () => {
       newBidPrice = bidPrice
         .mul(ethers.utils.parseEther((100 + bidPricePlus).toString()))
         .div(ethers.utils.parseEther("100"));
-      if (rwlkId !== -1) {
-        newBidPrice = newBidPrice.div(ethers.utils.parseEther("2"));
+      if (bidType === "RandomWalk") {
+        newBidPrice = newBidPrice
+          .mul(ethers.utils.parseEther("50"))
+          .div(ethers.utils.parseEther("100"));
       }
       const enoughBalance = await checkBalance("ETH", newBidPrice);
       if (!enoughBalance) {
@@ -279,9 +281,7 @@ const NewHome = () => {
           [{ msg: message, rwalk: rwlkId }]
         );
         receipt = await cosmicGameContract
-          .bid(params, {
-            value: newBidPrice,
-          })
+          .bid(params, { value: newBidPrice })
           .then((tx) => tx.wait());
         console.log(receipt);
         setTimeout(() => {
@@ -291,7 +291,7 @@ const NewHome = () => {
       }
     } catch (err) {
       if (err?.data?.message) {
-        const msg = err?.data?.message;
+        const msg = getErrorMessage(err?.data?.message);
         setNotification({
           visible: true,
           type: "error",
