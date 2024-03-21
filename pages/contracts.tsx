@@ -119,11 +119,11 @@ const Contracts = () => {
               <ContractItem name="Time Increase" value="0.01%" />
               <ContractItem
                 name="Prize Percentage"
-                value={`${data.PrizePercentage} %`}
+                value={`${data.PrizePercentage}%`}
               />
               <ContractItem
                 name="Raffle Percentage"
-                value={`${data.RafflePercentage} %`}
+                value={`${data.RafflePercentage}%`}
               />
               <ContractItem
                 name="NFT Holder Winners"
@@ -144,7 +144,7 @@ const Contracts = () => {
               <ContractItem name="Charity Address" value={data.CharityAddr} />
               <ContractItem
                 name="Charity Percentage"
-                value={`${data.CharityPercentage} %`}
+                value={`${data.CharityPercentage}%`}
               />
 
               <ContractItem
