@@ -52,7 +52,7 @@ const WinnerRow = ({ winner, type }) => {
       </TablePrimaryCell>
       <TablePrimaryCell>{type}</TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {winner.Amount ? `${winner.Amount.toFixed(4)}Ξ` : ""}
+        {winner.Amount ? `${winner.Amount.toFixed(4)} ETH` : ""}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link

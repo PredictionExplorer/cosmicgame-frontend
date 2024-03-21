@@ -16,6 +16,7 @@ import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import LayersIcon from "@mui/icons-material/Layers";
 import TokenIcon from "@mui/icons-material/Token";
+import { COSMIC_SIGNATURE_TOKEN_ADDRESS } from "../config/app";
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -103,19 +104,35 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
         {history.AmountEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <Tooltip title={history.TokenAddress}>
-          <Link
-            href={`https://arbiscan.io/address/${history.TokenAddress}`}
-            sx={{
-              fontSize: "inherit",
-              color: "inherit",
-              fontFamily: "monospace",
-            }}
-            target="_blank"
-          >
-            {shortenHex(history.TokenAddress.toString(), 6)}
-          </Link>
-        </Tooltip>
+        {history.RecordType === 1 ? (
+          <Tooltip title={COSMIC_SIGNATURE_TOKEN_ADDRESS}>
+            <Link
+              href={`https://arbiscan.io/address/${COSMIC_SIGNATURE_TOKEN_ADDRESS}`}
+              sx={{
+                fontSize: "inherit",
+                color: "inherit",
+                fontFamily: "monospace",
+              }}
+              target="_blank"
+            >
+              {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS.toString(), 6)}
+            </Link>
+          </Tooltip>
+        ) : (
+          <Tooltip title={history.TokenAddress}>
+            <Link
+              href={`https://arbiscan.io/address/${history.TokenAddress}`}
+              sx={{
+                fontSize: "inherit",
+                color: "inherit",
+                fontFamily: "monospace",
+              }}
+              target="_blank"
+            >
+              {shortenHex(history.TokenAddress.toString(), 6)}
+            </Link>
+          </Tooltip>
+        )}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {history.TokenId >= 0 &&
