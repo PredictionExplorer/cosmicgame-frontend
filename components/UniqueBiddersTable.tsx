@@ -36,7 +36,7 @@ const UniqueBiddersRow = ({ bidder }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">{bidder.NumBids}</TablePrimaryCell>
-      <TablePrimaryCell align="right" sx={{ fontFamily: "monospace" }}>
+      <TablePrimaryCell align="right">
         {bidder.MaxBidAmountEth.toFixed(6)}
       </TablePrimaryCell>
     </TablePrimaryRow>

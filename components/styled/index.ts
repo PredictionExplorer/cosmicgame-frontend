@@ -46,7 +46,8 @@ export const StyledCard = styled(Card)(!isSafari ? {
       background: "linear-gradient(-27.86deg, #15BFFD 9.96%, #9C37FD 100%)",
       opacity: 0.7,
       "--t": 1,
-      WebkitMask: "paint(rounded-shape)"
+      WebkitMask: "paint(rounded-shape)",
+      pointerEvents: 'none'
     }
   }
 } : {

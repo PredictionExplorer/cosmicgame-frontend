@@ -1,8 +1,7 @@
 import React from "react";
-import { Typography, CardActionArea } from "@mui/material";
+import { Typography, CardActionArea, Link } from "@mui/material";
 import { formatId } from "../utils";
 import { NFTSkeleton, NFTInfoWrapper, StyledCard } from "./styled";
-import router from "next/router";
 import NFTImage from "./NFTImage";
 
 const NFT = ({ nft }) => {
@@ -11,11 +10,13 @@ const NFT = ({ nft }) => {
 
   return (
     <StyledCard>
-      <CardActionArea onClick={() => router.push(`/detail/${nft.TokenId}`)}>
+      <CardActionArea>
         {!nft ? (
           <NFTSkeleton animation="wave" variant="rectangular" />
         ) : (
-          <NFTImage src={image} />
+          <Link href={`/detail/${nft.TokenId}`} sx={{ display: "block" }}>
+            <NFTImage src={image} />
+          </Link>
         )}
         {nft && (
           <NFTInfoWrapper>

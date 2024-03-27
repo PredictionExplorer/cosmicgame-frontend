@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
+  Link,
   Pagination,
   Table,
   TableBody,
@@ -40,7 +41,18 @@ const MyWinningsRow = ({ winning }) => {
       <TablePrimaryCell>
         {convertTimestampToDateTime(winning.TimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{winning.RoundNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
+          href={`/prize/${winning.RoundNum}`}
+          style={{
+            color: "inherit",
+            fontSize: "inherit",
+          }}
+          target="_blank"
+        >
+          {winning.RoundNum}
+        </Link>
+      </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {winning.Amount.toFixed(4)}
       </TablePrimaryCell>
@@ -190,7 +202,7 @@ const MyWinnings = () => {
                 Claimable Raffle ETH
               </Typography>
               {!status?.ETHRaffleToClaim ? (
-                <Typography variant="h6">No winnings yet.</Typography>
+                <Typography>No winnings yet.</Typography>
               ) : status?.ETHRaffleToClaim > 0 && raffleETHToClaim === null ? (
                 <Typography variant="h6">Loading...</Typography>
               ) : raffleETHToClaim.length > 0 ? (
@@ -269,7 +281,7 @@ const MyWinnings = () => {
                 )}
               </Box>
               {!status?.NumDonatedNFTToClaim ? (
-                <Typography variant="h6">No NFTs yet.</Typography>
+                <Typography>No NFTs yet.</Typography>
               ) : status?.NumDonatedNFTToClaim > 0 &&
                 donatedNFTToClaim === null ? (
                 <Typography variant="h6">Loading...</Typography>

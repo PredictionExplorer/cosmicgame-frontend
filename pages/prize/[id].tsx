@@ -5,7 +5,6 @@ import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
 import { convertTimestampToDateTime } from "../../utils";
-import DonatedNFT from "../../components/DonatedNFT";
 import RaffleWinnerTable from "../../components/RaffleWinnerTable";
 import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import useCosmicGameContract from "../../hooks/useCosmicGameContract";
@@ -160,7 +159,7 @@ const PrizeInfo = ({ roundNum }) => {
               </Typography>
               &nbsp;
               <Typography component="span">
-                {prizeInfo.StakingDepositAmountEth.toFixed(4)}
+                {prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH
               </Typography>
             </Box>
             <Box mb={1}>

@@ -48,7 +48,7 @@ const DonationRow = ({ donation }) => {
           {donation.DonorAddr}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right" sx={{ fontFamily: "monospace" }}>
+      <TablePrimaryCell align="right">
         {donation.AmountEth.toFixed(6)}
       </TablePrimaryCell>
     </TablePrimaryRow>

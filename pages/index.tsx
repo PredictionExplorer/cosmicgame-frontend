@@ -361,7 +361,7 @@ const NewHome = () => {
         );
         receipt = await cosmicGameContract
           .bidAndDonateNFT(params, nftDonateAddress, nftId, {
-            value: ethers.utils.parseEther(newBidPrice.toFixed(10)),
+            value: newBidPrice,
           })
           .then((tx) => tx.wait());
         console.log(receipt);
@@ -471,7 +471,6 @@ const NewHome = () => {
 
     const fetchPrizeTime = async () => {
       const t = await api.get_prize_time();
-      // setPrizeTime(t * 1000);
       const current = await api.get_current_time();
       const offset = current * 1000 - Date.now();
       setPrizeTime(t * 1000 - offset);
@@ -531,15 +530,17 @@ const NewHome = () => {
         const curRoundBids = Bids.filter(
           (bid) => bid.RoundNum === data.CurRoundNum
         );
+        const raffle =
+          (curRoundBids.length / curBidList.length) *
+          data?.NumRaffleEthWinners *
+          100;
+        const nft =
+          (curRoundBids.length / curBidList.length) *
+          data?.NumRaffleNFTWinners *
+          100;
         setWinProbability({
-          raffle:
-            (curRoundBids.length / curBidList.length) *
-            data?.NumRaffleEthWinners *
-            100,
-          nft:
-            (curRoundBids.length / curBidList.length) *
-            data?.NumRaffleNFTWinners *
-            100,
+          raffle: raffle > 100 ? 100 : raffle,
+          nft: nft > 100 ? 100 : nft,
         });
       }
     };
@@ -591,33 +592,43 @@ const NewHome = () => {
         <Grid container spacing={16} mb={4}>
           <Grid item sm={12} md={6}>
             {data?.TsRoundStart !== 0 ? (
-              <Grid container spacing={2} alignItems="center" mb={2}>
-                <Grid item sm={12} md={4}>
-                  <Typography variant="h5">
-                    Round #{data?.CurRoundNum}
-                  </Typography>
-                </Grid>
-                <Grid item sm={12} md={8}>
-                  <Typography textAlign="center">finishes in</Typography>
-                  {data?.LastBidderAddr !== constants.AddressZero &&
-                    (prizeTime > Date.now() ? (
-                      <Countdown key={0} date={prizeTime} renderer={Counter} />
-                    ) : (
-                      <Countdown key={1} date={Date.now()} renderer={Counter} />
-                    ))}
-                  {roundStarted !== "" && (
-                    <Typography sx={{ fontSize: 12, textAlign: "center" }}>
-                      (Round started {roundStarted} ago)
+              <>
+                <Grid container spacing={2} alignItems="center" mb={2}>
+                  <Grid item sm={12} md={4}>
+                    <Typography variant="h5">
+                      Round #{data?.CurRoundNum}
                     </Typography>
-                  )}
+                  </Grid>
+                  <Grid item sm={12} md={8}>
+                    <Typography textAlign="center">finishes in</Typography>
+                    {data?.LastBidderAddr !== constants.AddressZero &&
+                      (prizeTime > Date.now() ? (
+                        <Countdown
+                          key={0}
+                          date={prizeTime}
+                          renderer={Counter}
+                        />
+                      ) : (
+                        <Countdown
+                          key={1}
+                          date={Date.now()}
+                          renderer={Counter}
+                        />
+                      ))}
+                  </Grid>
                 </Grid>
-              </Grid>
+                {roundStarted !== "" && (
+                  <Typography sx={{ fontSize: 12, textAlign: "center", mb: 4 }}>
+                    (Round started {roundStarted} ago)
+                  </Typography>
+                )}
+              </>
             ) : (
               <>
                 {data?.CurRoundNum > 0 && data?.TsRoundStart === 0 ? (
                   <>
                     <Typography variant="h4" mb={2}>
-                      Round #{data?.CurRoundNum} ended
+                      Round {data?.CurRoundNum - 1} ended
                     </Typography>
                     <Grid container spacing={2} mb={2} alignItems="center">
                       <Grid item sm={12} md={4}>
@@ -653,7 +664,7 @@ const NewHome = () => {
                     Start the game with your first bid!
                   </Typography>
                 )}
-                <Typography variant="subtitle1" mt={2} mb={1}>
+                <Typography variant="subtitle1" mt={2} mb={2}>
                   Be the first to start a new round, place a bid.
                 </Typography>
               </>
@@ -745,29 +756,28 @@ const NewHome = () => {
             )}
             {curBidList.length > 0 && winProbability && (
               <Typography>
-                {winProbability.raffle}% chance you will win{" "}
+                {winProbability.raffle.toFixed(2)}% chance you will win{" "}
                 {data?.RaffleAmountEth.toFixed(2)} ETH if you bid.{" "}
-                {winProbability.nft}% chance you will win a Cosmic Signature NFT
-                if you bid.
+                {winProbability.nft.toFixed(2)}% chance you will win a Cosmic
+                Signature NFT if you bid.
               </Typography>
             )}
           </Grid>
           <Grid item sm={12} md={6}>
             <StyledCard>
-              <CardActionArea
-                onClick={
-                  bannerTokenId
-                    ? () => router.push(`/detail/${bannerTokenId}`)
-                    : null
-                }
-              >
-                <NFTImage
-                  src={
-                    bannerTokenId === ""
-                      ? "/images/qmark.png"
-                      : `https://cosmic-game.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
-                  }
-                />
+              <CardActionArea>
+                <Link
+                  href={bannerTokenId ? `/detail/${bannerTokenId}` : ""}
+                  sx={{ display: "block" }}
+                >
+                  <NFTImage
+                    src={
+                      bannerTokenId === ""
+                        ? "/images/qmark.png"
+                        : `https://cosmic-game.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
+                    }
+                  />
+                </Link>
               </CardActionArea>
             </StyledCard>
             <Typography color="primary" mt={4}>

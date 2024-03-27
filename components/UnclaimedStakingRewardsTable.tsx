@@ -65,15 +65,20 @@ const UnclaimedStakingRewardsRow = ({
       <TablePrimaryCell align="right">
         {row.YourClaimableAmountEth.toFixed(6)}
       </TablePrimaryCell>
-      {account === owner &&
-        unstakeTimeStamp > 0 &&
-        unstakeTimeStamp * 1000 < Date.now() && (
-          <TablePrimaryCell>
-            <Button size="small" onClick={handleClaim}>
-              {stakedTokens.length > 0 ? "Unstake & Claim" : "Claim"}
-            </Button>
-          </TablePrimaryCell>
-        )}
+
+      <TablePrimaryCell>
+        <Button
+          size="small"
+          onClick={handleClaim}
+          disabled={
+            account !== owner ||
+            unstakeTimeStamp <= 0 ||
+            unstakeTimeStamp * 1000 >= Date.now()
+          }
+        >
+          {stakedTokens.length > 0 ? "Unstake & Claim" : "Claim"}
+        </Button>
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };

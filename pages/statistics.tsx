@@ -170,13 +170,9 @@ const Statistics = () => {
               <StatisticsItem
                 title="Current Bid Price using CST"
                 value={
-                  cstBidData?.CSTPrice > 0 ? (
-                    <Typography>
-                      {formatCSTValue(cstBidData?.CSTPrice)}
-                    </Typography>
-                  ) : (
-                    <Typography color="#ff0">FREE</Typography>
-                  )
+                  cstBidData?.CSTPrice > 0
+                    ? formatCSTValue(cstBidData?.CSTPrice)
+                    : "FREE"
                 }
               />
               <StatisticsItem
@@ -481,7 +477,7 @@ const Statistics = () => {
                       labels={{
                         visible: true,
                         content: (props) => {
-                          return `${props.dataItem.category}: ${props.dataItem.value}`;
+                          return `${props.dataItem.category}: ${props.dataItem.value.toFixed(6)}`;
                         },
                         color: "white",
                         background: "none",
@@ -498,7 +494,7 @@ const Statistics = () => {
             </Box>
             <Box>
               <Typography variant="h6" mb={2} mt={8}>
-                Staking Actions
+                Stake / Unstake Actions
               </Typography>
               {stakingActions === null ? (
                 <Typography variant="h6">Loading...</Typography>

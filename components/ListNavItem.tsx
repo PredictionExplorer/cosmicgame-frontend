@@ -17,12 +17,12 @@ const ListNavItem = (props) => {
       <Box ml={3}>
         {props.nav.children ? (
           <NavLink
-            href="#"
             onClick={handleMenuOpen}
             sx={{
               display: "flex",
               alignItems: "center",
               "&:hover": { textDecoration: "none" },
+              cursor: "pointer",
             }}
           >
             {props.nav.title}
@@ -59,10 +59,7 @@ const ListNavItem = (props) => {
               style={{ minWidth: 166 }}
               onClick={handleMenuClose}
             >
-              <NavLink
-                href={nav.route}
-                sx={{ "&:hover": { textDecoration: "none" } }}
-              >
+              <NavLink href={nav.route} sx={{ width: "100%" }}>
                 {nav.title}
               </NavLink>
             </MenuItem>

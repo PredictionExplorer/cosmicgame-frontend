@@ -176,7 +176,7 @@ const UserInfo = ({ address }) => {
                     </Typography>
                     &nbsp;
                     <Typography component="span">
-                      {balance.ETH.toFixed(2)} ETH
+                      {balance.ETH.toFixed(6)} ETH
                     </Typography>
                   </Box>
                 )}
@@ -187,7 +187,7 @@ const UserInfo = ({ address }) => {
                     </Typography>
                     &nbsp;
                     <Typography component="span">
-                      {balance.CosmicToken.toFixed(2)} CST
+                      {balance.CosmicToken.toFixed(6)} CST
                     </Typography>
                   </Box>
                 )}
