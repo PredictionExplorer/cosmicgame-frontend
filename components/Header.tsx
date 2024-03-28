@@ -31,6 +31,7 @@ const Header = () => {
     mobileView: false,
     drawerOpen: false,
   });
+  const [navs, setNavs] = useState([]);
   const { mobileView, drawerOpen } = state;
   const { apiData: status, setApiData } = useApiData();
   const { account } = useActiveWeb3React();
@@ -79,13 +80,18 @@ const Header = () => {
     }
   }, [account]);
 
+  useEffect(() => {
+    const navs = getNAVs(status, account);
+    setNavs(navs);
+  }, [account, status]);
+
   const renderDesktop = () => {
     return (
       <Toolbar disableGutters>
         <Link href="/">
           <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
         </Link>
-        {getNAVs(status, account).map((nav, i) => (
+        {navs.map((nav, i) => (
           <ListNavItem key={i} nav={nav} />
         ))}
         <ConnectWalletButton
@@ -128,7 +134,7 @@ const Header = () => {
                 stakedTokens={stakedTokens}
               />
             </ListItem>
-            {getNAVs(status, account).map((nav, i) => (
+            {navs.map((nav, i) => (
               <ListItemButton
                 key={i}
                 nav={nav}
