@@ -84,7 +84,7 @@ const Prize = ({ prizeAmount }) => {
                   : prizeAmount.toFixed(1)}{" "}
                 ETH
               </GradientText>
-              <Typography color="primary" ml={1}>(${(ethPrice * prizeAmount).toFixed(2)})</Typography>
+              <Typography color="primary" ml={1}>({(ethPrice * prizeAmount).toFixed(2)} USD)</Typography>
             </CardActionArea>
           </StyledCard2>
         </Grid>

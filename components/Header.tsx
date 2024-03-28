@@ -10,6 +10,7 @@ import {
   Typography,
   Box,
   Divider,
+  Grid,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import getNAVs from "../config/nav";
@@ -217,24 +218,35 @@ const Header = () => {
     <AppBarWrapper position="fixed">
       <Container>
         {systemMode > 0 && (
-          <Typography
+          <Box
             sx={{
               position: "fixed",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              background: "#f00",
-              color: "#fff",
-              px: 1,
-              borderBottomLeftRadius: 8,
-              borderBottomRightRadius: 8,
+              top: mobileView ? "88px" : "96px",
+              left: 0,
+              right: 0,
+              background: "#F3D217",
+              color: "#000",
+              px: 4,
+              py: 1,
             }}
           >
-            {systemMode === 1
-              ? "Prepare Maintenance Mode"
-              : systemMode === 2
-              ? "Maintenance Mode"
-              : ""}
-          </Typography>
+            <Grid container>
+              <Grid item sm={12} md={8}>
+                <Typography variant="body1">
+                  {systemMode === 1
+                    ? "The system will enter maintenance mode as soon as prize claim transaction is executed. The administrator will make adjustments to the parameters of the system and after that you will be able to play again."
+                    : "The system is in maintenance mode. The administrator will make adjustments to the parameters of the system and after that you will be able to play again."}
+                </Typography>
+              </Grid>
+              <Grid item sm={12} md={4} sx={{ alignSelf: "center" }}>
+                <Typography variant="h5" textAlign="center">
+                  {systemMode === 1
+                    ? "MAINTENANCE PENDING"
+                    : "MAINTENANCE MODE"}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
         )}
         {mobileView ? renderMobile() : renderDesktop()}
       </Container>
