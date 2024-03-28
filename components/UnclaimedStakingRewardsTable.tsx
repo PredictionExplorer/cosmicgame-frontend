@@ -37,7 +37,7 @@ const UnclaimedStakingRewardsRow = ({
         row.DepositId
       );
       const actionIds = response.map((x) => x.StakeActionId);
-      if (actionIds > 0) {
+      if (actionIds.length > 0) {
         const { Stake } = await api.get_staking_actions_info(actionIds[0]);
         setUnstakeTimeStamp(Stake?.UnstakeTimeStamp);
       }
@@ -67,17 +67,17 @@ const UnclaimedStakingRewardsRow = ({
       </TablePrimaryCell>
 
       <TablePrimaryCell>
-        <Button
-          size="small"
-          onClick={handleClaim}
-          disabled={
-            account !== owner ||
-            unstakeTimeStamp <= 0 ||
-            unstakeTimeStamp * 1000 >= Date.now()
-          }
-        >
-          {stakedTokens.length > 0 ? "Unstake & Claim" : "Claim"}
-        </Button>
+        {account === owner && (
+          <Button
+            size="small"
+            onClick={handleClaim}
+            disabled={
+              unstakeTimeStamp <= 0 || unstakeTimeStamp * 1000 >= Date.now()
+            }
+          >
+            {stakedTokens.length > 0 ? "Unstake & Claim" : "Claim"}
+          </Button>
+        )}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
