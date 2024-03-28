@@ -719,7 +719,9 @@ const NewHome = () => {
                 <Typography variant="subtitle1">Main Prize Reward</Typography>
               </Grid>
               <Grid item sm={12} md={8}>
-                <Typography>{data?.PrizeAmountEth.toFixed(4)} ETH</Typography>
+                <GradientText variant="h6" sx={{ display: "inline" }}>
+                  {data?.PrizeAmountEth.toFixed(4)} ETH
+                </GradientText>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={2} alignItems="center">
