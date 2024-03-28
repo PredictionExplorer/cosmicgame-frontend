@@ -869,103 +869,107 @@ const NewHome = () => {
                     </Grid>
                   </Box>
                 )}
-                <Accordion>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>Advanced Options</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    {bidType !== "CST" && (
-                      <>
-                        <Typography variant="body2">
-                          If you want to donate one of your NFTs while bidding,
-                          you can put the contract address, NFT id, and comment
-                          here.
-                        </Typography>
-                        <TextField
-                          placeholder="NFT contract address"
-                          size="small"
-                          fullWidth
-                          sx={{ marginTop: 2 }}
-                          onChange={(e) => setNftDonateAddress(e.target.value)}
-                        />
-                        <TextField
-                          placeholder="NFT number"
-                          size="small"
-                          fullWidth
-                          sx={{ marginTop: 2 }}
-                          onChange={(e) => setNftId(Number(e.target.value))}
-                        />
-                      </>
-                    )}
-                    <TextField
-                      placeholder="Message (280 characters)"
-                      size="small"
-                      multiline
-                      fullWidth
-                      rows={4}
-                      inputProps={{ maxLength: 280 }}
-                      sx={{ marginTop: 2 }}
-                      onChange={(e) => setMessage(e.target.value)}
-                    />
-                    {bidType !== "CST" && (
-                      <>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            marginTop: 2,
-                            alignItems: "center",
-                          }}
-                        >
-                          <Typography
-                            whiteSpace="nowrap"
-                            color="rgba(255, 255, 255, 0.68)"
-                            mr={2}
-                          >
-                            Rise bid price by
+                {bidType !== "" && (
+                  <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography>Advanced Options</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {bidType !== "CST" && (
+                        <>
+                          <Typography variant="body2">
+                            If you want to donate one of your NFTs while
+                            bidding, you can put the contract address, NFT id,
+                            and comment here.
                           </Typography>
-                          <CustomTextField
-                            type="number"
-                            placeholder="Bid Price Plus"
-                            value={bidPricePlus}
+                          <TextField
+                            placeholder="NFT contract address"
                             size="small"
                             fullWidth
-                            InputProps={{
-                              inputComponent: StyledInput,
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                              inputProps: { min: 0, max: 50 },
-                            }}
-                            onChange={(e) => {
-                              let value = Number(e.target.value);
-                              if (value <= 50) {
-                                setBidPricePlus(value);
-                              }
-                            }}
+                            sx={{ marginTop: 2 }}
+                            onChange={(e) =>
+                              setNftDonateAddress(e.target.value)
+                            }
                           />
-                          <Typography
-                            whiteSpace="nowrap"
-                            color="rgba(255, 255, 255, 0.68)"
-                            ml={2}
+                          <TextField
+                            placeholder="NFT number"
+                            size="small"
+                            fullWidth
+                            sx={{ marginTop: 2 }}
+                            onChange={(e) => setNftId(Number(e.target.value))}
+                          />
+                        </>
+                      )}
+                      <TextField
+                        placeholder="Message (280 characters)"
+                        size="small"
+                        multiline
+                        fullWidth
+                        rows={4}
+                        inputProps={{ maxLength: 280 }}
+                        sx={{ marginTop: 2 }}
+                        onChange={(e) => setMessage(e.target.value)}
+                      />
+                      {bidType !== "CST" && (
+                        <>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              marginTop: 2,
+                              alignItems: "center",
+                            }}
                           >
-                            {(
-                              data?.BidPriceEth *
-                              (1 + bidPricePlus / 100) *
-                              (bidType === "RandomWalk" ? 0.5 : 1)
-                            ).toFixed(6)}{" "}
-                            ETH
+                            <Typography
+                              whiteSpace="nowrap"
+                              color="rgba(255, 255, 255, 0.68)"
+                              mr={2}
+                            >
+                              Rise bid price by
+                            </Typography>
+                            <CustomTextField
+                              type="number"
+                              placeholder="Bid Price Plus"
+                              value={bidPricePlus}
+                              size="small"
+                              fullWidth
+                              InputProps={{
+                                inputComponent: StyledInput,
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    %
+                                  </InputAdornment>
+                                ),
+                                inputProps: { min: 0, max: 50 },
+                              }}
+                              onChange={(e) => {
+                                let value = Number(e.target.value);
+                                if (value <= 50) {
+                                  setBidPricePlus(value);
+                                }
+                              }}
+                            />
+                            <Typography
+                              whiteSpace="nowrap"
+                              color="rgba(255, 255, 255, 0.68)"
+                              ml={2}
+                            >
+                              {(
+                                data?.BidPriceEth *
+                                (1 + bidPricePlus / 100) *
+                                (bidType === "RandomWalk" ? 0.5 : 1)
+                              ).toFixed(6)}{" "}
+                              ETH
+                            </Typography>
+                          </Box>
+                          <Typography variant="body2" mt={2}>
+                            The bid price is increased {bidPricePlus}% to
+                            prevent bidding collision.
                           </Typography>
-                        </Box>
-                        <Typography variant="body2" mt={2}>
-                          The bid price is increased {bidPricePlus}% to prevent
-                          bidding collision.
-                        </Typography>
-                      </>
-                    )}
-                  </AccordionDetails>
-                </Accordion>
+                        </>
+                      )}
+                    </AccordionDetails>
+                  </Accordion>
+                )}
               </Grid>
               <Grid item xs={12} md={6}>
                 <Button
