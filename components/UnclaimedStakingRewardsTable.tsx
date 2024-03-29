@@ -21,14 +21,13 @@ import api from "../services/api";
 import { useActiveWeb3React } from "../hooks/web3";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 
-const UnclaimedStakingRewardsRow = ({
-  row,
-  handleClaim,
-  owner,
-  stakedTokens,
-}) => {
+const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
   const { account } = useActiveWeb3React();
-  const [unstakeTimeStamp, setUnstakeTimeStamp] = useState(0);
+  const stakingContract = useStakingWalletContract();
+  const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
+  const [unclaimedActionIds, setUnclaimedActionIds] = useState([]);
+  const { data: stakedTokens } = useStakedToken();
+  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -36,14 +35,60 @@ const UnclaimedStakingRewardsRow = ({
         account,
         row.DepositId
       );
-      const actionIds = response.map((x) => x.StakeActionId);
-      if (actionIds.length > 0) {
-        const { Stake } = await api.get_staking_actions_info(actionIds[0]);
-        setUnstakeTimeStamp(Stake?.UnstakeTimeStamp);
-      }
+      let unstakeableActionIds = [],
+        unclaimableActionIds = [];
+      await Promise.all(
+        response.map(async (x) => {
+          try {
+            const { Stake } = await api.get_staking_actions_info(
+              x.StakeActionId
+            );
+            if (Stake) {
+              if (Stake.UnstakeTimeStamp < Date.now()) {
+                if (!x.Claimed) {
+                  unclaimableActionIds.push({
+                    DepositId: x.DepositId,
+                    StakeActionId: x.StakeActionId,
+                  });
+                }
+                if (stakedActionIds.includes(x.StakeActionId)) {
+                  unstakeableActionIds.push(x.StakeActionId);
+                }
+              }
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        })
+      );
+      setUnstakeableActionIds(unstakeableActionIds);
+      setUnclaimedActionIds(unclaimableActionIds);
     };
     fetchInfo();
   }, []);
+
+  const handleClaim = async () => {
+    try {
+      if (unstakeableActionIds.length > 0) {
+        await stakingContract
+          .unstakeMany(unstakeableActionIds)
+          .then((tx) => tx.wait());
+        fetchData(owner, false);
+      }
+      if (unclaimedActionIds.length > 0) {
+        const res = await stakingContract
+          .claimManyRewards(
+            unclaimedActionIds.map((x) => x.StakeActionId),
+            unclaimedActionIds.map((x) => x.DepositId)
+          )
+          .then((tx) => tx.wait());
+        console.log(res);
+        fetchData(owner, false);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
@@ -66,18 +111,18 @@ const UnclaimedStakingRewardsRow = ({
         {row.YourClaimableAmountEth.toFixed(6)}
       </TablePrimaryCell>
 
-      <TablePrimaryCell>
-        {account === owner && (
-          <Button
-            size="small"
-            onClick={handleClaim}
-            disabled={
-              unstakeTimeStamp <= 0 || unstakeTimeStamp * 1000 >= Date.now()
-            }
-          >
-            {stakedTokens.length > 0 ? "Unstake & Claim" : "Claim"}
-          </Button>
-        )}
+      <TablePrimaryCell align="center">
+        {account === owner &&
+          (unstakeableActionIds.length > 0 ||
+            unclaimedActionIds.length > 0) && (
+            <Button size="small" onClick={handleClaim}>
+              {(unstakeableActionIds.length === 0 &&
+                unclaimedActionIds.length === 0) ||
+              unstakeableActionIds.length > 0
+                ? "Unstake & Claim"
+                : "Claim"}
+            </Button>
+          )}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -90,30 +135,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const [page, setPage] = useState(1);
   const { data: stakedTokens } = useStakedToken();
 
-  const handleClaim = async (depositId: number) => {
-    try {
-      const response = await api.get_action_ids_by_deposit_id(
-        account,
-        depositId
-      );
-      const actionIds = response.map((x) => x.StakeActionId);
-      if (stakedTokens.length > 0) {
-        await stakingContract.unstakeMany(actionIds).then((tx) => tx.wait());
-        fetchData(owner, false);
-      }
-      const res = await stakingContract
-        .claimManyRewards(
-          actionIds,
-          new Array(actionIds.length).fill(depositId)
-        )
-        .then((tx) => tx.wait());
-      console.log(res);
-      fetchData(owner, false);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const handleClaimAll = async () => {
     let actionIds = [],
       depositIds = [];
@@ -123,7 +144,9 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         account,
         depositId
       );
-      const ids = response.map((x) => x.StakeActionId);
+      const ids = response
+        .filter((x) => !x.Claimed)
+        .map((x) => x.StakeActionId);
       actionIds = actionIds.concat(ids);
       depositIds = depositIds.concat(new Array(ids.length).fill(depositId));
     }
@@ -175,8 +198,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
                   row={row}
                   key={index}
                   owner={owner}
-                  stakedTokens={stakedTokens}
-                  handleClaim={() => handleClaim(row.DepositId)}
+                  fetchData={fetchData}
                 />
               ))}
           </TableBody>
