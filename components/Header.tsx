@@ -141,79 +141,102 @@ const Header = () => {
                 sx={{ justifyContent: "center" }}
               />
             ))}
-            <ListItemButton
-              nav={{ title: "My Tokens", route: "/my-tokens" }}
-              sx={{ justifyContent: "center" }}
-            />
-            <ListItemButton
-              nav={{ title: "History of Winnings", route: "/winning-history" }}
-              sx={{ justifyContent: "center" }}
-            />
-            <Divider />
-            <ListItem sx={{ display: "block" }}>
-              <Typography sx={{ fontSize: 16 }}>BALANCE:</Typography>
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
-              >
-                <Typography
-                  variant="body2"
-                  color="secondary"
-                  sx={{ fontStyle: "italic", fontWeight: 600 }}
-                >
-                  ETH:
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="secondary"
-                  sx={{ fontStyle: "italic", fontWeight: 600 }}
-                >
-                  {balance.ETH.toFixed(2)}
-                </Typography>
-              </Box>
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
-              >
-                <Typography
-                  variant="body2"
-                  color="secondary"
-                  sx={{ fontStyle: "italic", fontWeight: 600 }}
-                >
-                  CST (ERC20):
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="secondary"
-                  sx={{ fontStyle: "italic", fontWeight: 600 }}
-                >
-                  {balance.CosmicToken.toFixed(2)}
-                </Typography>
-              </Box>
-              <Box
-                sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
-              >
-                <Typography
-                  variant="body2"
-                  color="secondary"
-                  sx={{ fontStyle: "italic", fontWeight: 600 }}
-                >
-                  CSS (ERC721):
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="secondary"
-                  sx={{ fontStyle: "italic", fontWeight: 600 }}
-                >
-                  {balance.CosmicSignature} tokens
-                </Typography>
-              </Box>
-            </ListItem>
-            <Divider />
-            <ListItem sx={{ justifyContent: "space-between" }}>
-              <Typography sx={{ fontSize: 16 }}>STAKED TOKENS:</Typography>
-              <Typography color="primary" sx={{ fontSize: 16 }}>
-                {stakedTokens?.length}
-              </Typography>
-            </ListItem>
+            {account && (
+              <>
+                <ListItemButton
+                  nav={{ title: "My Tokens", route: "/my-tokens" }}
+                  sx={{ justifyContent: "center" }}
+                />
+                <ListItemButton
+                  nav={{ title: "My Staking", route: "/my-staking" }}
+                  sx={{ justifyContent: "center" }}
+                />
+                <ListItemButton
+                  nav={{
+                    title: "History of Winnings",
+                    route: "/winning-history",
+                  }}
+                  sx={{ justifyContent: "center" }}
+                />
+                <Divider />
+                <ListItem sx={{ display: "block" }}>
+                  <Typography sx={{ fontSize: 16 }}>BALANCE:</Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      color="secondary"
+                      sx={{ fontStyle: "italic", fontWeight: 600 }}
+                    >
+                      ETH:
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="secondary"
+                      sx={{ fontStyle: "italic", fontWeight: 600 }}
+                    >
+                      {balance.ETH.toFixed(2)}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      color="secondary"
+                      sx={{ fontStyle: "italic", fontWeight: 600 }}
+                    >
+                      CST (ERC20):
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="secondary"
+                      sx={{ fontStyle: "italic", fontWeight: 600 }}
+                    >
+                      {balance.CosmicToken.toFixed(2)}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      color="secondary"
+                      sx={{ fontStyle: "italic", fontWeight: 600 }}
+                    >
+                      CSS (ERC721):
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="secondary"
+                      sx={{ fontStyle: "italic", fontWeight: 600 }}
+                    >
+                      {balance.CosmicSignature} tokens
+                    </Typography>
+                  </Box>
+                </ListItem>
+                <Divider />
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <Typography sx={{ fontSize: 16 }}>STAKED TOKENS:</Typography>
+                  <Typography color="primary" sx={{ fontSize: 16 }}>
+                    {stakedTokens?.length}
+                  </Typography>
+                </ListItem>
+              </>
+            )}
           </DrawerList>
         </Drawer>
       </Toolbar>
