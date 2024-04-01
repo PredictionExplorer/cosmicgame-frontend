@@ -3,7 +3,6 @@ import {
   Typography,
   List,
   ListItem,
-  styled,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
@@ -57,7 +56,7 @@ const Contracts = () => {
   return (
     <>
       <Head>
-        <title>Withdraw | CosmicSignature NFT</title>
+        <title>Contracts | CosmicSignature NFT</title>
         <meta
           name="description"
           content="Programmatically generated CosmicSignature image and video NFTs. ETH spent on minting goes back to the minters."

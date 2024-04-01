@@ -14,8 +14,6 @@ import { StakingActionsTable } from "../../components/StakingActionsTable";
 import { MarketingRewardsTable } from "../../components/MarketingRewardsTable";
 import { useStakedToken } from "../../contexts/StakedTokenContext";
 import { useApiData } from "../../contexts/ApiDataContext";
-import { MyWinningsTable } from "../my-tokens";
-import useRaffleWalletContract from "../../hooks/useRaffleWalletContract";
 import { useRouter } from "next/router";
 import { useActiveWeb3React } from "../../hooks/web3";
 import useCosmicGameContract from "../../hooks/useCosmicGameContract";
@@ -167,6 +165,10 @@ const UserInfo = ({ address }) => {
             </Box>
             {loading ? (
               <Typography variant="h6">Loading...</Typography>
+            ) : userInfo === null ? (
+              <Typography variant="h6">
+                There is no user information yet.
+              </Typography>
             ) : (
               <>
                 {balance.ETH !== 0 && (

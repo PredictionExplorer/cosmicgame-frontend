@@ -125,12 +125,12 @@ const CharityCGDeposits = () => {
   return (
     <>
       <Head>
-        <title>Cosmic Game Deposits | Cosmic Signature</title>
+        <title>Cosmic Game Charity Deposits | Cosmic Signature</title>
         <meta name="description" content="" />
       </Head>
       <MainWrapper>
         <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          Cosmic Game Deposits
+          Cosmic Game Charity Deposits
         </Typography>
         {loading ? (
           <Typography variant="h6">Loading...</Typography>

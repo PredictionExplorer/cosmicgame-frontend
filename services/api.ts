@@ -201,7 +201,7 @@ class ApiService {
       return data;
     } catch (err) {
       console.log(err);
-      return { Bids: null, UserInfo: null };
+      return { Bids: [], UserInfo: null };
     }
   }
 

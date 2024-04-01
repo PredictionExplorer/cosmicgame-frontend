@@ -110,10 +110,9 @@ const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
       <TablePrimaryCell align="right">
         {row.YourClaimableAmountEth.toFixed(6)}
       </TablePrimaryCell>
-
-      <TablePrimaryCell align="center">
-        {account === owner &&
-          (unstakeableActionIds.length > 0 ||
+      {account === owner && (
+        <TablePrimaryCell align="center">
+          {(unstakeableActionIds.length > 0 ||
             unclaimedActionIds.length > 0) && (
             <Button size="small" onClick={handleClaim}>
               {(unstakeableActionIds.length === 0 &&
@@ -123,7 +122,8 @@ const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
                 : "Claim"}
             </Button>
           )}
-      </TablePrimaryCell>
+        </TablePrimaryCell>
+      )}
     </TablePrimaryRow>
   );
 };
@@ -214,7 +214,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
             .toFixed(6)}
         </Typography>
       </Box>
-      {stakedTokens.length === 0 && list.length > 0 && (
+      {account === owner && stakedTokens.length === 0 && list.length > 0 && (
         <Box display="flex" justifyContent="end" mt={1}>
           <Button variant="text" onClick={handleClaimAll}>
             Claim All
