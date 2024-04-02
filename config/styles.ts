@@ -31,6 +31,23 @@ const theme = createTheme({
     fontSize: 16,
   },
   components: {
+    MuiTable: {
+      styleOverrides: {
+        root: {
+          minWidth: '1000px'
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          [breakpoints.down('md')]: {
+            fontSize: 12,
+            fontWeight: 400,
+          },
+        }
+      }
+    },
     MuiInputBase: {
       styleOverrides: {
         root: {
@@ -64,7 +81,7 @@ const theme = createTheme({
         h4: {
           fontFamily: "ClashDisplay-Variable",
           fontWeight: 600,
-          fontSize: 40,
+          fontSize: 36,
           [breakpoints.up('md')]: {
             fontSize: 45,
           },
@@ -106,6 +123,12 @@ const theme = createTheme({
     },
     MuiButton: {
       styleOverrides: {
+        root: {
+          [breakpoints.down('md')]: {
+            fontSize: 13,
+            fontWeight: 400,
+          },
+        },
         outlined: !isSafari && {
           textTransform: "capitalize",
           position: "relative",

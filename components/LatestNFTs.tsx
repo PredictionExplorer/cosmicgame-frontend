@@ -27,9 +27,10 @@ const LatestNFTs = () => {
     };
     fetchData();
   }, []);
+
   return (
     <Box sx={{ backgroundColor: "#101441" }}>
-      <Container sx={{ padding: "80px 10px 150px" }}>
+      <Container sx={{ padding: matches ? "80px 10px 150px" : "80px 10px" }}>
         <Box
           display="flex"
           alignItems="center"

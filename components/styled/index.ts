@@ -169,7 +169,7 @@ export const MainWrapper = styled(Container)(({ theme }) => ({
   minHeight: 'calc(100vh - 100px)',
   [theme.breakpoints.down('sm')]: {
     paddingTop: theme.spacing(18),
-    paddingBottom: theme.spacing(18),
+    paddingBottom: theme.spacing(12),
   },
 }))
 
@@ -219,7 +219,6 @@ export const CounterItem = styled(Box)({
   width: isMobile ? '80%' : '20%',
   padding: '8px 0',
   boxSizing: 'border-box',
-  marginBottom: isMobile ? 24 : 0,
 })
 
 export const QuestionIcon = styled('img')({

@@ -16,7 +16,7 @@ const Prize = ({ prizeAmount }) => {
   const matches = useMediaQuery(theme.breakpoints.up("md"));
   const ethPrice = useTokenPrice();
   return (
-    <Box mt="130px">
+    <Box mt={matches ? "130px" : "60px"}>
       <Box
         display="flex"
         alignItems="center"

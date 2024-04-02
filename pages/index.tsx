@@ -64,6 +64,8 @@ import NFTImage from "../components/NFTImage";
 import { calculateTimeDiff, formatSeconds } from "../utils";
 import WinningHistoryTable from "../components/WinningHistoryTable";
 import AlertDialog from "../components/AlertDialog";
+import Lightbox from "react-awesome-lightbox";
+import "react-awesome-lightbox/build/style.css";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -116,6 +118,7 @@ const NewHome = () => {
   const [roundStarted, setRoundStarted] = useState("");
   const [curPage, setCurrentPage] = useState(1);
   const [claimHistory, setClaimHistory] = useState(null);
+  const [imageOpen, setImageOpen] = useState(false);
   const [alertDlg, setAlertDlg] = useState({
     title: "",
     content: "",
@@ -599,7 +602,7 @@ const NewHome = () => {
                       Round #{data?.CurRoundNum}
                     </Typography>
                   </Grid>
-                  <Grid item sm={12} md={8}>
+                  <Grid item sm={12} md={8} sx={{ width: "100%" }}>
                     <Typography textAlign="center">finishes in</Typography>
                     {data?.LastBidderAddr !== constants.AddressZero &&
                       (prizeTime > Date.now() ? (
@@ -765,31 +768,33 @@ const NewHome = () => {
               </Typography>
             )}
           </Grid>
-          <Grid item sm={12} md={6}>
-            <StyledCard>
-              <CardActionArea>
-                <Link
-                  href={bannerTokenId ? `/detail/${bannerTokenId}` : ""}
-                  sx={{ display: "block" }}
-                >
-                  <NFTImage
-                    src={
-                      bannerTokenId === ""
-                        ? "/images/qmark.png"
-                        : `https://cosmic-game.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
-                    }
-                  />
-                </Link>
-              </CardActionArea>
-            </StyledCard>
-            <Typography color="primary" mt={4}>
-              Random sample of your possible NFT
-            </Typography>
-          </Grid>
+          {matches && (
+            <Grid item sm={12} md={6}>
+              <StyledCard>
+                <CardActionArea>
+                  <Link
+                    href={bannerTokenId ? `/detail/${bannerTokenId}` : ""}
+                    sx={{ display: "block" }}
+                  >
+                    <NFTImage
+                      src={
+                        bannerTokenId === ""
+                          ? "/images/qmark.png"
+                          : `https://cosmic-game.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
+                      }
+                    />
+                  </Link>
+                </CardActionArea>
+              </StyledCard>
+              <Typography color="primary" mt={4}>
+                Random sample of your possible NFT
+              </Typography>
+            </Grid>
+          )}
         </Grid>
         {account !== null && (
           <>
-            <Grid container spacing={8}>
+            <Grid container spacing={matches ? 8 : 0}>
               <Grid item xs={12} md={6}>
                 <Typography mb={1}>Make your bid with:</Typography>
                 <RadioGroup
@@ -1062,6 +1067,17 @@ const NewHome = () => {
                       )}
                   </>
                 )}
+                {!matches && (
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    fullWidth
+                    sx={{ mt: 3 }}
+                    onClick={() => setImageOpen(true)}
+                  >
+                    Show Random Sample NFT
+                  </Button>
+                )}
               </Grid>
             </Grid>
             <Typography variant="body2" mt={4}>
@@ -1226,7 +1242,7 @@ const NewHome = () => {
             </Typography>
           )}
         </Box>
-        <Box mt="120px">
+        <Box mt={matches ? "120px" : "80px"}>
           <Box>
             <Typography variant="h6" component="span">
               CURRENT ROUND
@@ -1279,6 +1295,16 @@ const NewHome = () => {
         open={alertDlg.open}
         setOpen={setAlertOpen}
       />
+      {imageOpen && (
+        <Lightbox
+          image={
+            bannerTokenId === ""
+              ? "/images/qmark.png"
+              : `https://cosmic-game.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
+          }
+          onClose={() => setImageOpen(false)}
+        />
+      )}
     </>
   );
 };

@@ -143,6 +143,7 @@ const Header = () => {
             ))}
             {account && (
               <>
+                <Divider />
                 <ListItemButton
                   nav={{ title: "My Tokens", route: "/my-tokens" }}
                   sx={{ justifyContent: "center" }}
