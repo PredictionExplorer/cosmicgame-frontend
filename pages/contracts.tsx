@@ -5,32 +5,72 @@ import {
   ListItem,
   useTheme,
   useMediaQuery,
+  Box,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import api from "../services/api";
 
-const ContractItem = ({ name, value }) => {
+const ContractItem = ({ name, value, copyable = false }) => {
   const theme = useTheme();
   const md = useMediaQuery(theme.breakpoints.up("md"));
   const sm = useMediaQuery(theme.breakpoints.up("sm"));
+  const [notification, setNotification] = useState(false);
   return (
-    <ListItem>
-      <Typography
-        color="primary"
-        sx={{ mr: 2, width: md ? "350px" : sm ? "150px" : "100px" }}
-        variant={sm ? "subtitle1" : "body1"}
+    <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={6000}
+        open={notification}
+        onClose={() => setNotification(false)}
       >
-        {name}:
-      </Typography>
-      <Typography
-        fontFamily="monospace"
-        variant={sm ? "subtitle1" : "body1"}
-        sx={{ width: "42ch" }}
-      >
-        {value}
-      </Typography>
-    </ListItem>
+        <Alert severity="success" variant="filled">
+          Address copied!
+        </Alert>
+      </Snackbar>
+      <ListItem>
+        <Typography
+          color="primary"
+          sx={{
+            mr: 2,
+            minWidth: md ? "350px" : "150px",
+            maxWidth: md ? "350px" : "150px",
+          }}
+          variant={sm ? "subtitle1" : "body1"}
+        >
+          {name}:
+        </Typography>
+        {copyable ? (
+          <CopyToClipboard text={value}>
+            <Box
+              sx={{ display: "flex", cursor: "pointer", alignItems: "center" }}
+              onClick={() => setNotification(true)}
+            >
+              <Typography
+                fontFamily="monospace"
+                variant={sm ? "subtitle1" : "body1"}
+                sx={{ wordBreak: "break-all", mr: 1 }}
+              >
+                {value}
+              </Typography>
+              <ContentCopyIcon fontSize="inherit" />
+            </Box>
+          </CopyToClipboard>
+        ) : (
+          <Typography
+            fontFamily="monospace"
+            variant={sm ? "subtitle1" : "body1"}
+            sx={{ wordBreak: "break-all" }}
+          >
+            {value}
+          </Typography>
+        )}
+      </ListItem>
+    </>
   );
 };
 
@@ -76,42 +116,51 @@ const Contracts = () => {
               <ContractItem
                 name="Business Logic Address"
                 value={data?.ContractAddrs.BusinessLogicAddr}
+                copyable={true}
               />
               <ContractItem
                 name="CosmicGame Address"
                 value={data?.ContractAddrs.CosmicGameAddr}
+                copyable={true}
               />
               <ContractItem
                 name="CosmicToken Address"
                 value={data?.ContractAddrs.CosmicTokenAddr}
+                copyable={true}
               />
               <ContractItem
                 name="CosmicSignature Address"
                 value={data?.ContractAddrs.CosmicSignatureAddr}
+                copyable={true}
               />
               <ContractItem
                 name="CosmicDAO Address"
                 value={data?.ContractAddrs.CosmicDaoAddr}
+                copyable={true}
               />
               <ContractItem
                 name="Charity Wallet Address"
                 value={data?.ContractAddrs.CharityWalletAddr}
+                copyable={true}
               />
               <ContractItem
                 name="Marketing Wallet Address"
                 value={data?.ContractAddrs.MarketingWalletAddr}
+                copyable={true}
               />
               <ContractItem
                 name="Raffle Wallet Address"
                 value={data?.ContractAddrs.RaffleWalletAddr}
+                copyable={true}
               />
               <ContractItem
                 name="Staking Wallet Address"
                 value={data?.ContractAddrs.StakingWalletAddr}
+                copyable={true}
               />
             </List>
             <Typography variant="h6" mt={5} mb={3}>
-              Current configuration of the contracts.
+              Current configuration of the contracts
             </Typography>
             <List>
               <ContractItem name="Price Increase" value="1%" />
@@ -140,7 +189,11 @@ const Contracts = () => {
                 name="Raffle Holder NFT Winners"
                 value={data.NumHolderNFTWinners}
               />
-              <ContractItem name="Charity Address" value={data.CharityAddr} />
+              <ContractItem
+                name="Charity Address"
+                value={data.CharityAddr}
+                copyable={true}
+              />
               <ContractItem
                 name="Charity Percentage"
                 value={`${data.CharityPercentage}%`}
@@ -156,6 +209,7 @@ const Contracts = () => {
               <ContractItem
                 name="Random Walk contract address"
                 value={data?.ContractAddrs.RandomWalkAddr}
+                copyable={true}
               />
             </List>
           </>

@@ -31,6 +31,16 @@ const theme = createTheme({
     fontSize: 16,
   },
   components: {
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          [breakpoints.down('md')]: {
+            fontSize: 12,
+            fontWeight: 400,
+          },
+        }
+      }
+    },
     MuiTable: {
       styleOverrides: {
         root: {
