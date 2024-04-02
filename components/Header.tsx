@@ -11,6 +11,7 @@ import {
   Box,
   Divider,
   Grid,
+  Badge,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import getNAVs from "../config/nav";
@@ -122,7 +123,14 @@ const Header = () => {
           onClick={handleDrawerOpen}
           style={{ marginLeft: "auto" }}
         >
-          <MenuIcon />
+          {account &&
+          (status?.ETHRaffleToClaim > 0 || status?.NumDonatedNFTToClaim > 0) ? (
+            <Badge variant="dot" color="error">
+              <MenuIcon />
+            </Badge>
+          ) : (
+            <MenuIcon />
+          )}
         </IconButton>
 
         <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
