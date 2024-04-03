@@ -1,20 +1,15 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const CTBalanceDistributionRow = ({ row }) => {
   if (!row) {
@@ -35,7 +30,9 @@ const CTBalanceDistributionRow = ({ row }) => {
           {row.OwnerAddr}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{row.BalanceFloat.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {row.BalanceFloat.toFixed(6)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -49,23 +46,19 @@ const CTBalanceDistributionTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="50%" />
-            <col width="50%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Owner</TableCell>
-              <TableCell align="right">Balance</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Owner</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Balance</TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <CTBalanceDistributionRow row={row} key={row.OwnerAid} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

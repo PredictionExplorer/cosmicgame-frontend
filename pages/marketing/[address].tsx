@@ -43,7 +43,12 @@ const UserMarketingRewards = ({ address }) => {
               <Typography variant="h6" color="primary" component="span" mr={1}>
                 Marketing Rewards for User
               </Typography>
-              <Typography variant="h6" component="span" fontFamily="monospace">
+              <Typography
+                variant="h6"
+                component="span"
+                fontFamily="monospace"
+                sx={{ wordBreak: "break-all" }}
+              >
                 <Link
                   href={`/user/${address}`}
                   style={{

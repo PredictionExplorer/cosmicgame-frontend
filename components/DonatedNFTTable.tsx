@@ -4,22 +4,23 @@ import {
   Button,
   Link,
   Pagination,
-  Table,
   TableBody,
-  TableCell,
-  TableRow,
   Tooltip,
   Typography,
 } from "@mui/material";
 import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime, shortenHex } from "../utils";
 import axios from "axios";
 import NFTImage from "./NFTImage";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const NFTRow = ({ nft, handleClaim }) => {
   const [tokenURI, setTokenURI] = useState(null);
@@ -101,7 +102,7 @@ const NFTRow = ({ nft, handleClaim }) => {
       </TablePrimaryCell>
       {handleClaim && (
         <TablePrimaryCell>
-          {!nft.WinnerAddr && (
+          {!nft.WinnerAddr ? (
             <Button
               variant="contained"
               onClick={(e) => handleClaim(e, nft.Index)}
@@ -109,6 +110,8 @@ const NFTRow = ({ nft, handleClaim }) => {
             >
               Claim
             </Button>
+          ) : (
+            " "
           )}
         </TablePrimaryCell>
       )}
@@ -125,33 +128,30 @@ const DonatedNFTTable = ({ list, handleClaim }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="20%" />
-            <col width="15%" />
-            <col width="10%" />
-            <col width="20%" />
-            <col width="10%" />
-            <col width="25%" />
-            <col width="5%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Datetime</TableCell>
-              <TableCell>Donor Address</TableCell>
-              <TableCell align="center">Round #</TableCell>
-              <TableCell>Token Address</TableCell>
-              <TableCell align="right">Token ID</TableCell>
-              <TableCell align="center">Token Image</TableCell>
-              {handleClaim && <TableCell></TableCell>}
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Donor Address
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Round #</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Token Address
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Token ID
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
+              {handleClaim && <TablePrimaryHeadCell></TablePrimaryHeadCell>}
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((nft) => (
               <NFTRow nft={nft} key={nft.RecordId} handleClaim={handleClaim} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

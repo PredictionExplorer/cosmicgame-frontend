@@ -78,7 +78,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {!row.Staked && (
+        {!row.Staked ? (
           <Button
             variant="text"
             onClick={(e) => {
@@ -88,6 +88,8 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
           >
             Stake
           </Button>
+        ) : (
+          " "
         )}
       </TablePrimaryCell>
     </TablePrimaryRow>

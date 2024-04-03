@@ -1,21 +1,16 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const GlobalMarketingRewardsRow = ({ row }) => {
   if (!row) {
@@ -62,25 +57,20 @@ export const GlobalMarketingRewardsTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="30%" />
-            <col width="40%" />
-            <col width="30%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Datetime</TableCell>
-              <TableCell align="center">Marketer</TableCell>
-              <TableCell align="right">Amount</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Marketer</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <GlobalMarketingRewardsRow row={row} key={row.EvtLogId} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

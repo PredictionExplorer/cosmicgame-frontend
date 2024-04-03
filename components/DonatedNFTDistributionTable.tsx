@@ -10,11 +10,15 @@ import {
   Typography,
 } from "@mui/material";
 import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const DonatedNFTDistributionRow = ({ row }) => {
   if (!row) {
@@ -49,23 +53,23 @@ const DonatedNFTDistributionTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="50%" />
-            <col width="50%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Contract Address</TableCell>
-              <TableCell align="right">Number of NFTs</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">
+                Contract Address
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Number of NFTs
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <DonatedNFTDistributionRow row={row} key={row.ContractAddr} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

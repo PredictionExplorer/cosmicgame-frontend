@@ -206,7 +206,7 @@ const MyWinnings = () => {
               {!status?.ETHRaffleToClaim ? (
                 <Typography>No winnings yet.</Typography>
               ) : status?.ETHRaffleToClaim > 0 && raffleETHToClaim === null ? (
-                <Typography variant="h6">Loading...</Typography>
+                <Typography>Loading...</Typography>
               ) : raffleETHToClaim.length > 0 ? (
                 <>
                   <MyWinningsTable
@@ -257,8 +257,11 @@ const MyWinnings = () => {
               <Typography variant="h5" mb={2}>
                 Unclaimed Staking Rewards
               </Typography>
-              {unclaimedStakingRewards === null ? (
-                <Typography variant="h6">Loading...</Typography>
+              {status?.UnclaimedStakingReward === 0 ? (
+                <Typography>No rewards yet.</Typography>
+              ) : status?.UnclaimedStakingReward > 0 &&
+                unclaimedStakingRewards === null ? (
+                <Typography>Loading...</Typography>
               ) : (
                 <UnclaimedStakingRewardsTable
                   list={unclaimedStakingRewards}
@@ -286,7 +289,7 @@ const MyWinnings = () => {
                 <Typography>No NFTs yet.</Typography>
               ) : status?.NumDonatedNFTToClaim > 0 &&
                 donatedNFTToClaim === null ? (
-                <Typography variant="h6">Loading...</Typography>
+                <Typography>Loading...</Typography>
               ) : (
                 donatedNFTToClaim !== null && (
                   <DonatedNFTTable

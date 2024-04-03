@@ -1,21 +1,16 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const GlobalStakingActionsRow = ({ row }) => {
   if (!row) {
@@ -42,8 +37,9 @@ const GlobalStakingActionsRow = ({ row }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>
-        {row.ActionType === 0 &&
-          convertTimestampToDateTime(row.UnstakeTimeStamp)}
+        {row.ActionType === 0
+          ? convertTimestampToDateTime(row.UnstakeTimeStamp)
+          : " "}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -71,31 +67,27 @@ export const GlobalStakingActionsTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="17%" />
-            <col width="14%" />
-            <col width="14%" />
-            <col width="18%" />
-            <col width="20%" />
-            <col width="17%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Stake Datetime</TableCell>
-              <TableCell align="center">Action Type</TableCell>
-              <TableCell align="center">Token ID</TableCell>
-              <TableCell>Unstake Datetime</TableCell>
-              <TableCell align="center">Staker Address</TableCell>
-              <TableCell align="center">Number of NFTs</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">
+                Stake Datetime
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Unstake Datetime
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Staker Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <GlobalStakingActionsRow row={row} key={row.EvtLogId} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

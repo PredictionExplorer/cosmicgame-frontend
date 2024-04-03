@@ -1,21 +1,16 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const GlobalStakedTokensRow = ({ row }) => {
   if (!row) {
@@ -28,8 +23,9 @@ const GlobalStakedTokensRow = ({ row }) => {
         {convertTimestampToDateTime(row.StakeTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell>
-        {row.UnstakeTimeStamp !== 0 &&
-          convertTimestampToDateTime(row.UnstakeTimeStamp)}
+        {row.UnstakeTimeStamp !== 0
+          ? convertTimestampToDateTime(row.UnstakeTimeStamp)
+          : " "}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -67,20 +63,18 @@ export const GlobalStakedTokensTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="20%" />
-            <col width="20%" />
-            <col width="20%" />
-            <col width="40%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Stake Datetime</TableCell>
-              <TableCell>Unstake Datetime</TableCell>
-              <TableCell align="center">Token ID</TableCell>
-              <TableCell align="center">Staker Address</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">
+                Stake Datetime
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Unstake Datetime
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Staker Address</TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list
@@ -89,7 +83,7 @@ export const GlobalStakedTokensTable = ({ list }) => {
                 <GlobalStakedTokensRow key={index} row={row} />
               ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

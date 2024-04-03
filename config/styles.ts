@@ -41,16 +41,6 @@ const theme = createTheme({
         }
       }
     },
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          [breakpoints.down('md')]: {
-            fontSize: 12,
-            fontWeight: 400,
-          },
-        }
-      }
-    },
     MuiInputBase: {
       styleOverrides: {
         root: {

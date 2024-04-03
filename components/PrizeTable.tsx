@@ -1,22 +1,17 @@
 import React, { useState } from "react";
+import { Box, Pagination, TableBody, Tooltip, Typography } from "@mui/material";
 import {
-  Box,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../components/styled";
 import { convertTimestampToDateTime, shortenHex } from "../utils";
 import { useRouter } from "next/router";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const PrizeRow = ({ prize }) => {
   const router = useRouter();
@@ -78,26 +73,32 @@ export const PrizeTable = ({ list, loading }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell align="center">Round</TableCell>
-              <TableCell align="center">Datetime</TableCell>
-              <TableCell align="center">Winner</TableCell>
-              <TableCell align="right">Prize Amount</TableCell>
-              <TableCell align="center">Bids</TableCell>
-              <TableCell align="center">Donated NFTs</TableCell>
-              <TableCell align="right">Raffle Deposits</TableCell>
-              <TableCell align="right">Staking Deposit</TableCell>
-              <TableCell align="center">Raffle NFTs</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Prize Amount
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Bids</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Donated NFTs</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Raffle Deposits
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Staking Deposit
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Raffle NFTs</TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((prize) => (
               <PrizeRow prize={prize} key={prize.EvtLogId} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

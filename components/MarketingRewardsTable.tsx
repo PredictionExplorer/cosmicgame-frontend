@@ -1,21 +1,16 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const MarketingRewardsRow = ({ row }) => {
   if (!row) {
@@ -48,19 +43,21 @@ export const MarketingRewardsTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Datetime</TableCell>
-              <TableCell>Amount (CST)</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Amount (CST)
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <MarketingRewardsRow row={row} key={row.EvtLogId} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

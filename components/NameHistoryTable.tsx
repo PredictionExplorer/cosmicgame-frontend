@@ -1,19 +1,16 @@
 import React, { useState } from "react";
+import { Box, Pagination, TableBody } from "@mui/material";
 import {
-  Box,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const NameHistoryRow = ({ record }) => {
   if (!record) {
@@ -38,19 +35,21 @@ const NameHistoryTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>DateTime</TableCell>
-              <TableCell>Token Name</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Token Name
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((record) => (
               <NameHistoryRow record={record} key={record.EvtLogId} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

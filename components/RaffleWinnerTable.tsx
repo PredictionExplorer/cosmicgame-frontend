@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import {
-  Table,
-  TableRow,
   TableBody,
-  TableCell,
   Box,
   Pagination,
   Link,
@@ -15,8 +12,12 @@ import {
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
+  TablePrimary,
+  TablePrimaryHeadCell,
 } from "./styled";
 import { convertTimestampToDateTime, shortenHex } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const WinnerRow = ({ winner, type }) => {
   if (!winner) {
@@ -52,15 +53,19 @@ const WinnerRow = ({ winner, type }) => {
       </TablePrimaryCell>
       <TablePrimaryCell>{type}</TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {winner.Amount ? `${winner.Amount.toFixed(4)} ETH` : ""}
+        {winner.Amount ? `${winner.Amount.toFixed(4)} ETH` : " "}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/detail/${winner.TokenId}`}
-          style={{ color: "inherit", fontSize: "inherit" }}
-        >
-          {winner.TokenId}
-        </Link>
+        {winner.TokenId ? (
+          <Link
+            href={`/detail/${winner.TokenId}`}
+            style={{ color: "inherit", fontSize: "inherit" }}
+          >
+            {winner.TokenId}
+          </Link>
+        ) : (
+          " "
+        )}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -76,24 +81,20 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="15%" />
-            <col width="20%" />
-            <col width="15%" />
-            <col width="20%" />
-            <col width="15%" />
-            <col width="15%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Datetime</TableCell>
-              <TableCell>Winner</TableCell>
-              <TableCell align="center">Round #</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell align="right">Amount</TableCell>
-              <TableCell align="center">Token ID</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Winner</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                Round #
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Type</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                Token ID
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list
@@ -102,11 +103,13 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
                 <WinnerRow
                   key={winner.EvtLogId}
                   winner={winner}
-                  type={winner.Amount ? "ETH Deposit" : "Cosmic Signature Token"}
+                  type={
+                    winner.Amount ? "ETH Deposit" : "Cosmic Signature Token"
+                  }
                 />
               ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

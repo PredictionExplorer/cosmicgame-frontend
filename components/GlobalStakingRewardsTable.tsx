@@ -1,24 +1,16 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  IconButton,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const GlobalStakingRewardsRow = ({ row }) => {
   if (!row) {
@@ -68,14 +60,18 @@ export const GlobalStakingRewardsTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Stake Datetime</TableCell>
-              <TableCell align="center">Staker</TableCell>
-              <TableCell align="center">Reward Claimed?</TableCell>
-              <TableCell align="right">Amount to Claim</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">
+                Stake Datetime
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Staker</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Reward Claimed?</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Amount to Claim
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list
@@ -87,7 +83,7 @@ export const GlobalStakingRewardsTable = ({ list }) => {
                 />
               ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

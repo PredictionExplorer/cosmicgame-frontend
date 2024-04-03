@@ -107,8 +107,7 @@ const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
       </TablePrimaryCell>
       {account === owner && (
         <TablePrimaryCell align="center" sx={{ p: "4px 8px !important" }}>
-          {(unstakeableActionIds.length > 0 ||
-            unclaimedActionIds.length > 0) && (
+          {unstakeableActionIds.length > 0 || unclaimedActionIds.length > 0 ? (
             <Button size="small" onClick={handleClaim} sx={{ p: 0 }}>
               {(unstakeableActionIds.length === 0 &&
                 unclaimedActionIds.length === 0) ||
@@ -116,6 +115,8 @@ const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
                 ? "Unstake & Claim"
                 : "Claim"}
             </Button>
+          ) : (
+            " "
           )}
         </TablePrimaryCell>
       )}

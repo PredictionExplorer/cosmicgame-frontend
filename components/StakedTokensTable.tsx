@@ -155,7 +155,7 @@ export const StakedTokensTable = ({
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell padding="checkbox">
+              <TablePrimaryHeadCell padding="checkbox" align="left">
                 <Checkbox
                   color="info"
                   indeterminate={
