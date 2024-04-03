@@ -124,7 +124,9 @@ const Header = () => {
           style={{ marginLeft: "auto" }}
         >
           {account &&
-          (status?.ETHRaffleToClaim > 0 || status?.NumDonatedNFTToClaim > 0) ? (
+          (status?.ETHRaffleToClaim > 0 ||
+            status?.NumDonatedNFTToClaim > 0 ||
+            status?.UnclaimedStakingReward > 0) ? (
             <Badge variant="dot" color="error">
               <MenuIcon />
             </Badge>

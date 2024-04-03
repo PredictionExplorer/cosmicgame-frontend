@@ -60,6 +60,7 @@ a {
   .responsiveTable td .tdBefore {
     top: 0;
     left: 0 !important;
+    bottom: 0;
     background-color: #15BFFD;
     color: #fff;
     font-weight: 400 !important;

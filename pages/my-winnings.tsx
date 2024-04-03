@@ -168,7 +168,9 @@ const MyWinnings = () => {
     setRaffleETHToClaim(deposits);
   };
   useEffect(() => {
-    fetchUnclaimedStakingRewards();
+    if (status?.UnclaimedStakingReward > 0) {
+      fetchUnclaimedStakingRewards();
+    }
     if (status?.NumDonatedNFTToClaim > 0) {
       fetchUnclaimedDonatedNFTs();
     }

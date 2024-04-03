@@ -1,20 +1,15 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const UniqueBiddersRow = ({ bidder }) => {
   if (!bidder) {
@@ -35,7 +30,7 @@ const UniqueBiddersRow = ({ bidder }) => {
           {bidder.BidderAddr}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{bidder.NumBids}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{bidder.NumBids}</TablePrimaryCell>
       <TablePrimaryCell align="right">
         {bidder.MaxBidAmountEth.toFixed(6)}
       </TablePrimaryCell>
@@ -52,25 +47,24 @@ export const UniqueBiddersTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="60%" />
-            <col width="20%" />
-            <col width="20%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Bidder Address</TableCell>
-              <TableCell align="right">Num Bids</TableCell>
-              <TableCell align="right">Max Bid (ETH)</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">
+                Bidder Address
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Num Bids</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Max Bid (ETH)
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((bidder) => (
               <UniqueBiddersRow bidder={bidder} key={bidder.BidderAid} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

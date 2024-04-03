@@ -28,6 +28,7 @@ export const ApiDataProvider: React.FC<ApiDataContextProps> = ({
     ETHRaffleToClaim: 0,
     ETHRaffleToClaimWei: 0,
     NumDonatedNFTToClaim: 0,
+    UnclaimedStakingReward: 0,
   });
 
   return (

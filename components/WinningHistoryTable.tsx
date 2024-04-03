@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Box,
-  Table,
-  TableRow,
   TableBody,
-  TableCell,
   Typography,
   Link,
   Tooltip,
@@ -22,10 +19,14 @@ import {
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
+  TablePrimaryHeadCell,
+  TablePrimary,
 } from "./styled";
 import Pagination from "@mui/material/Pagination";
 import { convertTimestampToDateTime, shortenHex } from "../utils";
 import axios from "axios";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const HistoryRow = ({ history, showClaimedStatus }) => {
   const [tokenURI, setTokenURI] = useState(null);
@@ -104,7 +105,9 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
         {history.AmountEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {history.RecordType === 1 ? (
+        {history.RecordType === 0 ? (
+          " "
+        ) : history.RecordType === 1 ? (
           <Tooltip title={COSMIC_SIGNATURE_TOKEN_ADDRESS}>
             <Link
               href={`https://arbiscan.io/address/${COSMIC_SIGNATURE_TOKEN_ADDRESS}`}
@@ -135,8 +138,8 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {history.TokenId >= 0 &&
-          (history.RecordType === 1 || history.RecordType === 3 ? (
+        {history.TokenId >= 0 ? (
+          history.RecordType === 1 || history.RecordType === 3 ? (
             <Link
               href={`/detail/${history.TokenId}`}
               sx={{
@@ -158,10 +161,13 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
             >
               {history.TokenId}
             </Link>
-          ))}
+          )
+        ) : (
+          " "
+        )}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {history.WinnerIndex >= 0 && history.WinnerIndex}
+        {history.WinnerIndex >= 0 ? history.WinnerIndex : " "}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -175,26 +181,21 @@ const HistoryTable = ({
 }) => {
   return (
     <TablePrimaryContainer>
-      <Table>
-        <colgroup>
-          <col width="21%" />
-          <col width="16%" />
-          <col width="8%" />
-          <col width="15%" />
-          <col width="15%" />
-          <col width="15%" />
-          <col width="10%" />
-        </colgroup>
+      <TablePrimary>
         <TablePrimaryHead>
-          <TableRow>
-            <TableCell>Record Type</TableCell>
-            <TableCell>Datetime</TableCell>
-            <TableCell align="center">Round</TableCell>
-            <TableCell align="right">Amount (ETH)</TableCell>
-            <TableCell align="center">Token Address</TableCell>
-            <TableCell align="center">Token ID</TableCell>
-            <TableCell align="right">Position</TableCell>
-          </TableRow>
+          <Tr>
+            <TablePrimaryHeadCell align="left">
+              Record Type
+            </TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="right">
+              Amount (ETH)
+            </TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Token Address</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="right">Position</TablePrimaryHeadCell>
+          </Tr>
         </TablePrimaryHead>
         <TableBody>
           {winningHistory
@@ -207,7 +208,7 @@ const HistoryTable = ({
               />
             ))}
         </TableBody>
-      </Table>
+      </TablePrimary>
     </TablePrimaryContainer>
   );
 };

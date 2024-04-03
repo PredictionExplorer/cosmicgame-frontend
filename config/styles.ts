@@ -41,13 +41,6 @@ const theme = createTheme({
         }
       }
     },
-    MuiTable: {
-      styleOverrides: {
-        root: {
-          minWidth: '1000px'
-        }
-      }
-    },
     MuiTableCell: {
       styleOverrides: {
         root: {

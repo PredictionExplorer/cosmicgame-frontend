@@ -1,20 +1,15 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const UniqueStakersRow = ({ row }) => {
   if (!row) {
@@ -57,21 +52,27 @@ export const UniqueStakersTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Staker Address</TableCell>
-              <TableCell align="center">Num Stake Actions</TableCell>
-              <TableCell align="right">Total Reward (ETH)</TableCell>
-              <TableCell align="right">Unclaimed Reward (ETH)</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">
+                Staker Address
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Num Stake Actions</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Total Reward (ETH)
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Unclaimed Reward (ETH)
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <UniqueStakersRow row={row} key={row.StakerAid} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

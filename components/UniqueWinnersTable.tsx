@@ -1,20 +1,15 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const UniqueWinnersRow = ({ winner }) => {
   if (!winner) {
@@ -55,27 +50,29 @@ export const UniqueWinnersTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="55%" />
-            <col width="15%" />
-            <col width="15%" />
-            <col width="15%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Winner Address</TableCell>
-              <TableCell align="right">Prizes Taken</TableCell>
-              <TableCell align="right">Max Prize</TableCell>
-              <TableCell align="right">Prizes Sum (ETH)</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">
+                Winner Address
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Prizes Taken
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Max Prize
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Prizes Sum (ETH)
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((winner) => (
               <UniqueWinnersRow winner={winner} key={winner.WinnerAid} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination
