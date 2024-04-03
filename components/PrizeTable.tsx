@@ -79,17 +79,6 @@ export const PrizeTable = ({ list, loading }) => {
     <>
       <TablePrimaryContainer>
         <Table>
-          <colgroup>
-            <col width="4%" />
-            <col width="16%" />
-            <col width="14%" />
-            <col width="13%" />
-            <col width="5%" />
-            <col width="10%" />
-            <col width="15%" />
-            <col width="13%" />
-            <col width="10%" />
-          </colgroup>
           <TablePrimaryHead>
             <TableRow>
               <TableCell align="center">Round</TableCell>

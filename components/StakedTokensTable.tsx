@@ -29,10 +29,10 @@ const StakedTokensRow = ({
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
   }
-
+  console.log(row.UnstakeTimeStamp, Date.now() / 1000);
   return (
     <TablePrimaryRow
-      hover
+      hover="true"
       role="checkbox"
       aria-checked={isItemSelected}
       tabIndex={-1}
@@ -42,14 +42,14 @@ const StakedTokensRow = ({
       sx={{
         cursor: "pointer",
         pointerEvents:
-          row.UnstakeTimeStamp * 1000 > new Date().getTime() ? "none" : "auto",
+          row.UnstakeTimeStamp * 1000 > Date.now() ? "none" : "auto",
       }}
     >
       <TablePrimaryCell padding="checkbox">
         <Checkbox
           color="primary"
           checked={isItemSelected}
-          disabled={row.UnstakeTimeStamp * 1000 > new Date().getTime()}
+          disabled={row.UnstakeTimeStamp * 1000 > Date.now()}
         />
       </TablePrimaryCell>
       <TablePrimaryCell>
