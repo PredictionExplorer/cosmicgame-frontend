@@ -7573,6 +7573,11 @@ react-snap-carousel@^0.3.2:
   resolved "https://registry.yarnpkg.com/react-snap-carousel/-/react-snap-carousel-0.3.2.tgz#91bad605692cb41c88181cb6f1217e97c65ce875"
   integrity sha512-3o4pA+k/OhphCNWt3gVxddSzp98XQ3e9+JtVeU3js2cStfysBQDj45L1dhO0kSh4PBAnuhXB+gsQjDDzIVU10g==
 
+react-super-responsive-table@^5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/react-super-responsive-table/-/react-super-responsive-table-5.2.2.tgz#fc3f45b921fa60718b87077dafcba2c48350091d"
+  integrity sha512-LDsGq8X3TBn0AMv5gX/0wFeWoFMMmiZXNTD1kIMMWz3WflPMHUZOSHXXlG5EOO2u3WSNcVl7MLIk83maS/Xj0g==
+
 react-transition-group@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.2.tgz#8b59a56f09ced7b55cbd53c36768b922890d5470"

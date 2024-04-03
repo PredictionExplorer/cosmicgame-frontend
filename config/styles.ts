@@ -209,6 +209,12 @@ const theme = createTheme({
     },
     MuiPaginationItem: {
       styleOverrides: {
+        root: {
+          [breakpoints.down('md')]: {
+            fontSize: 12,
+            fontWeight: 400,
+          },
+        },
         rounded: !isSafari && {
           position: "relative",
           border: 0,

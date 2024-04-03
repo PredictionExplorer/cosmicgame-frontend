@@ -7,13 +7,13 @@ a {
 }
 
 @property --radius {
-  syntax: '<length>';
+  syntax: "<length>";
   inherits: true;
   initial-value: 0;
 }
 
 @property --border {
-  syntax: '<length>';
+  syntax: "<length>";
   inherits: true;
   initial-value: 0;
 }
@@ -27,20 +27,44 @@ a {
 /* Track */
 .cm-scroller::-webkit-scrollbar-track {
   border-radius: 200px;
-  background: #161B3C;
+  background: #161b3c;
 }
- 
+
 /* Handle */
 .cm-scroller::-webkit-scrollbar-thumb {
-  background: #15BFFD; 
+  background: #15bffd;
   border-radius: 200px;
 }
 
 /* Handle on hover */
 .cm-scroller::-webkit-scrollbar-thumb:hover {
-  background: #088dbe; 
+  background: #088dbe;
 }
 
 .cm-scroller::-webkit-scrollbar-corner {
   display: none;
+}
+
+@media screen and (max-width: 40em) {
+  .responsiveTable tbody tr {
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    padding: 0 !important;
+  }
+  .responsiveTable td.pivoted {
+    padding-top: 0;
+    padding-bottom: 0;
+    font-weight: 400;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .responsiveTable td .tdBefore {
+    top: 0;
+    left: 0 !important;
+    background-color: #15BFFD;
+    color: #fff;
+    font-weight: 400 !important;
+    padding-left: 16px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
 }

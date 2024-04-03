@@ -1,21 +1,17 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
 import { ZERO_ADDRESS } from "../config/misc";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const TransferHistoryRow = ({ record }) => {
   if (!record || record.FromAddr === ZERO_ADDRESS) {
@@ -61,20 +57,20 @@ export const TransferHistoryTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>DateTime</TableCell>
-              <TableCell>From</TableCell>
-              <TableCell>To</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">From</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">To</TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((record) => (
               <TransferHistoryRow record={record} key={record.EvtLogId} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

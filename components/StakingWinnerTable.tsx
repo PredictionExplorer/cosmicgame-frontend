@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 import {
-  Table,
-  TableRow,
   TableBody,
-  TableCell,
   Box,
   Pagination,
   Link,
   Typography,
   Tooltip,
-  Button,
 } from "@mui/material";
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
+  TablePrimaryHeadCell,
+  TablePrimary,
 } from "./styled";
 import { convertTimestampToDateTime, shortenHex } from "../utils";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const WinnerRow = ({ winner }) => {
   if (!winner) {
@@ -29,7 +29,7 @@ const WinnerRow = ({ winner }) => {
       <TablePrimaryCell>
         {convertTimestampToDateTime(winner.TimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell align="left">
         <Tooltip title={winner.StakerAddr}>
           <Link
             href={`/user/${winner.StakerAddr}`}
@@ -62,20 +62,16 @@ const StakingWinnerTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="25%" />
-            <col width="25%" />
-            <col width="25%" />
-            <col width="25%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Datetime</TableCell>
-              <TableCell>Staker</TableCell>
-              <TableCell align="center">Number of NFTs</TableCell>
-              <TableCell align="right">Reward Amount (ETH)</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Staker</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Reward Amount (ETH)
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list
@@ -84,7 +80,7 @@ const StakingWinnerTable = ({ list }) => {
                 <WinnerRow key={winner.StakerAddr} winner={winner} />
               ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

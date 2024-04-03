@@ -5,19 +5,20 @@ import {
   Checkbox,
   Link,
   Pagination,
-  Table,
   TableBody,
-  TableCell,
-  TableRow,
   Typography,
 } from "@mui/material";
 import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const StakedTokensRow = ({
   row,
@@ -146,18 +147,10 @@ export const StakedTokensTable = ({
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="1%" />
-            <col width="19%" />
-            <col width="20%" />
-            <col width="20%" />
-            <col width="20%" />
-            <col width="20%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell padding="checkbox">
+            <Tr>
+              <TablePrimaryHeadCell padding="checkbox">
                 <Checkbox
                   color="info"
                   indeterminate={
@@ -171,13 +164,15 @@ export const StakedTokensTable = ({
                     "aria-label": "select all desserts",
                   }}
                 />
-              </TableCell>
-              <TableCell>Stake Datetime</TableCell>
-              <TableCell align="center">Token ID</TableCell>
-              <TableCell align="center">Stake Action ID</TableCell>
-              <TableCell align="center">Unstake Datetime</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Stake Datetime
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Unstake Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell></TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list
@@ -192,8 +187,8 @@ export const StakedTokensTable = ({
                 />
               ))}
           </TableBody>
-        </Table>
-      </TablePrimaryContainer>{" "}
+        </TablePrimary>
+      </TablePrimaryContainer>
       {selected.length > 0 && (
         <Box display="flex" justifyContent="end" mt={2}>
           <Button variant="text" onClick={onUnstakeMany}>
