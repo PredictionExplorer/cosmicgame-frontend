@@ -1,23 +1,18 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Table,
-  TableRow,
-  TableBody,
-  Link,
-  TableCell,
-  Typography,
-  Tooltip,
-} from "@mui/material";
+import { Box, TableBody, Link, Typography, Tooltip } from "@mui/material";
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
   TablePrimaryHead,
   TablePrimaryRow,
+  TablePrimaryHeadCell,
+  TablePrimary,
 } from "./styled";
 import Pagination from "@mui/material/Pagination";
 import { shortenHex, convertTimestampToDateTime } from "../utils";
 import router from "next/router";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const HistoryRow = ({ history }) => {
   if (!history) {
@@ -86,7 +81,7 @@ const HistoryRow = ({ history }) => {
           ` and a token(${shortenHex(
             history.NFTDonationTokenAddr,
             6
-          )}) with ID ${history.NFTDonationTokenId} was donated`}
+          )}) with ID ${history.NFTDonationTokenId} was donated`}{" "}
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Link
@@ -117,26 +112,17 @@ const HistoryRow = ({ history }) => {
 const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
   return (
     <TablePrimaryContainer>
-      <Table>
-        <colgroup>
-          <col width="11%" />
-          <col width="14%" />
-          <col width="13%" />
-          <col width="7%" />
-          <col width="12%" />
-          <col width="24%" />
-          <col width="19%" />
-        </colgroup>
+      <TablePrimary>
         <TablePrimaryHead>
-          <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Bidder</TableCell>
-            <TableCell align="center">Price</TableCell>
-            <TableCell align="center">Round</TableCell>
-            <TableCell align="center">Bid Type</TableCell>
-            <TableCell>Bid Info</TableCell>
-            <TableCell>Message</TableCell>
-          </TableRow>
+          <Tr>
+            <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">Bidder</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">Price</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Bid Type</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">Bid Info</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
+          </Tr>
         </TablePrimaryHead>
         <TableBody>
           {biddingHistory
@@ -145,7 +131,7 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
               <HistoryRow history={history} key={i} />
             ))}
         </TableBody>
-      </Table>
+      </TablePrimary>
     </TablePrimaryContainer>
   );
 };

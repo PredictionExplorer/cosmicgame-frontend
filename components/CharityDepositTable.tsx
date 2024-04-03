@@ -1,21 +1,16 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const DonationRow = ({ donation }) => {
   if (!donation) {
@@ -25,13 +20,34 @@ const DonationRow = ({ donation }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(donation.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${donation.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(donation.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{donation.RoundNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {donation.RoundNum < 0 ? (
+          " "
+        ) : (
+          <Link
+            color="inherit"
+            fontSize="inherit"
+            href={`/prize/${donation.RoundNum}`}
+            target="__blank"
+          >
+            {donation.RoundNum}
+          </Link>
+        )}
+      </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
           color="inherit"
           fontSize="inherit"
+          fontFamily="monospace"
           href={`/user/${donation.DonorAddr}`}
         >
           {donation.DonorAddr}
@@ -53,20 +69,16 @@ export const CharityDepositTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="20%" />
-            <col width="15%" />
-            <col width="40%" />
-            <col width="25%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Datetime</TableCell>
-              <TableCell align="center">Round Num</TableCell>
-              <TableCell align="center">Donor Address</TableCell>
-              <TableCell align="right">Donation amount (ETH)</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Round Num</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Donor Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Donation amount (ETH)
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list
@@ -75,7 +87,7 @@ export const CharityDepositTable = ({ list }) => {
                 <DonationRow donation={donation} key={donation.EvtLogId} />
               ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

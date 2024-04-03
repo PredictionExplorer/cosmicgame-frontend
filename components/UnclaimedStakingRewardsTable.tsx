@@ -39,7 +39,7 @@ const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
               x.StakeActionId
             );
             if (Stake) {
-              if (Stake.UnstakeTimeStamp < Date.now()) {
+              if (Stake.UnstakeTimeStamp < Date.now() / 1000) {
                 if (!x.Claimed) {
                   unclaimableActionIds.push({
                     DepositId: x.DepositId,

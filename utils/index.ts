@@ -48,7 +48,7 @@ export const convertTimestampToDateTime = (timestamp: any) => {
 
 export const formatSeconds = (seconds: any) => {
   if (seconds <= 0) {
-    return "";
+    return " ";
   }
   let minutes = Math.floor(seconds / 60);
   seconds = seconds % 60;

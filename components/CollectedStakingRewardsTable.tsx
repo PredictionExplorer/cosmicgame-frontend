@@ -1,21 +1,16 @@
 import React, { useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const CollectedStakingRewardsRow = ({ row }) => {
   if (!row) {
@@ -62,32 +57,22 @@ export const CollectedStakingRewardsTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="14%" />
-            <col width="8%" />
-            <col width="12%" />
-            <col width="12%" />
-            <col width="12%" />
-            <col width="12%" />
-            <col width="16%" />
-            <col width="14%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Datetime</TableCell>
-              <TableCell align="center">Round</TableCell>
-              <TableCell align="center">Total Staked Tokens</TableCell>
-              <TableCell align="center">Total Deposited</TableCell>
-              <TableCell align="center">Reward on your stake</TableCell>
-              <TableCell align="center">Num tokens of your stake</TableCell>
-              <TableCell align="center">
-                Num tokens of your stake collected
-              </TableCell>
-              <TableCell align="center">
-                Amount of your stake collected
-              </TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Deposited</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Reward on Your Stake</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Staked Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                Collected Staked Tokens
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                Amount of Stake Collected
+              </TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list
@@ -96,7 +81,7 @@ export const CollectedStakingRewardsTable = ({ list }) => {
                 <CollectedStakingRewardsRow row={row} key={index} />
               ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="end" mt={1}>
         <Typography mr={1}>Total Rewards:</Typography>

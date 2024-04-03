@@ -5,19 +5,20 @@ import {
   Checkbox,
   Link,
   Pagination,
-  Table,
   TableBody,
-  TableCell,
-  TableRow,
   Typography,
 } from "@mui/material";
 import {
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
   if (!row) {
@@ -26,9 +27,8 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
 
   return (
     <TablePrimaryRow
-      hover
+      hover="true"
       role="checkbox"
-      aria-checked={isItemSelected}
       tabIndex={-1}
       key={row.id}
       selected={isItemSelected}
@@ -144,18 +144,10 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="1%" />
-            <col width="14%" />
-            <col width="15%" />
-            <col width="15%" />
-            <col width="25%" />
-            <col width="20%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell padding="checkbox">
+            <Tr>
+              <TablePrimaryHeadCell padding="checkbox" align="left">
                 <Checkbox
                   color="info"
                   indeterminate={
@@ -167,13 +159,15 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
                     "aria-label": "select all desserts",
                   }}
                 />
-              </TableCell>
-              <TableCell>Mint Datetime</TableCell>
-              <TableCell align="center">Token ID</TableCell>
-              <TableCell align="center">Round</TableCell>
-              <TableCell align="center">Winner Address</TableCell>
-              <TableCell align="center"></TableCell>
-            </TableRow>
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Mint Datetime
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell></TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list
@@ -188,7 +182,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
                 />
               ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       {selected.length > 0 && (
         <Box display="flex" justifyContent="end" mt={2}>
