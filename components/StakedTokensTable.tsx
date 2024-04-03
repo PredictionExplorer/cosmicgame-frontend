@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -21,6 +21,7 @@ import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const StakedTokensRow = ({
+  current,
   row,
   handleUnstake,
   isItemSelected,
@@ -29,7 +30,6 @@ const StakedTokensRow = ({
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
   }
-  console.log(row.UnstakeTimeStamp, Date.now() / 1000);
   return (
     <TablePrimaryRow
       hover="true"
@@ -41,15 +41,14 @@ const StakedTokensRow = ({
       onClick={() => handleClick(row.TokenInfo.StakeActionId)}
       sx={{
         cursor: "pointer",
-        pointerEvents:
-          row.UnstakeTimeStamp * 1000 > Date.now() ? "none" : "auto",
+        pointerEvents: row.UnstakeTimeStamp > current ? "none" : "auto",
       }}
     >
       <TablePrimaryCell padding="checkbox">
         <Checkbox
           color="primary"
           checked={isItemSelected}
-          disabled={row.UnstakeTimeStamp * 1000 > Date.now()}
+          disabled={row.UnstakeTimeStamp > current}
         />
       </TablePrimaryCell>
       <TablePrimaryCell>
@@ -74,7 +73,7 @@ const StakedTokensRow = ({
         {convertTimestampToDateTime(row.UnstakeTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.UnstakeTimeStamp * 1000 <= new Date().getTime() && (
+        {row.UnstakeTimeStamp <= current && (
           <Button
             variant="text"
             sx={{ mr: 1 }}
@@ -97,9 +96,8 @@ export const StakedTokensTable = ({
   handleUnstakeMany,
 }) => {
   const perPage = 5;
-  const filtered = list.filter(
-    (x) => x.UnstakeTimeStamp * 1000 <= new Date().getTime()
-  );
+  const [current, setCurrent] = useState(Infinity);
+  const filtered = list.filter((x) => x.UnstakeTimeStamp <= Date.now());
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
@@ -141,6 +139,13 @@ export const StakedTokensTable = ({
       setSelected([]);
     }, 3000);
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      setCurrent(Date.now() / 1000);
+    };
+    fetchData();
+  }, []);
+
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
   }
@@ -180,6 +185,7 @@ export const StakedTokensTable = ({
               .map((row, index) => (
                 <StakedTokensRow
                   key={index}
+                  current={current}
                   row={row}
                   handleUnstake={onUnstake}
                   isItemSelected={isSelected(row.TokenInfo.StakeActionId)}
