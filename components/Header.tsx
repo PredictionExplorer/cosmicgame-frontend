@@ -45,7 +45,7 @@ const Header = () => {
   const { data: systemMode } = useSystemMode();
   useEffect(() => {
     const setResponsiveness = () => {
-      return window.innerWidth < 992
+      return window.innerWidth < 1024
         ? setState((prevState) => ({ ...prevState, mobileView: true }))
         : setState((prevState) => ({ ...prevState, mobileView: false }));
     };

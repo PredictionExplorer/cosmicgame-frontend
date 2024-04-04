@@ -134,6 +134,7 @@ export const TablePrimaryRow = styled(Tr)({
 })
 
 export const NavLink = styled(StyledLink)({
+  fontSize: 16,
   textTransform: 'uppercase',
   textDecoration: 'none',
   ':hover': {

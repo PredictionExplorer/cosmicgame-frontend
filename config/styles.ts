@@ -58,9 +58,11 @@ const theme = createTheme({
           fontSize: 16,
         },
         body1: {
-          fontSize: 12,
+          fontSize: 14,
+          fontWeight: 300,
           [breakpoints.up('md')]: {
             fontSize: 16,
+            fontWeight: 400,
           },
         },
         h3: {
@@ -106,10 +108,14 @@ const theme = createTheme({
           fontSize: 14,
         },
         body2: {
-          fontSize: 12,
+          fontSize: 13,
           color: "rgba(255, 255, 255, 0.68)",
+          [breakpoints.up('sm')]: {
+            fontSize: 14,
+            fontWeight: 300,
+          },
           [breakpoints.up('md')]: {
-            fontSize: 13,
+            fontSize: 15,
           },
         }
       },

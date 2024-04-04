@@ -592,18 +592,24 @@ const NewHome = () => {
         >
           <CircularProgress color="inherit" />
         </Backdrop>
-        <Grid container spacing={16} mb={4}>
+        <Grid container spacing={{ lg: 16, md: 8, sm: 8, xs: 4 }} mb={4}>
           <Grid item sm={12} md={6}>
             {data?.TsRoundStart !== 0 ? (
               <>
                 <Grid container spacing={2} alignItems="center" mb={2}>
-                  <Grid item sm={12} md={4}>
+                  <Grid item xs={12} sm={4} md={4}>
                     <Typography variant="h5">
                       Round #{data?.CurRoundNum}
                     </Typography>
                   </Grid>
-                  <Grid item sm={12} md={8} sx={{ width: "100%" }}>
-                    <Typography textAlign="center">finishes in</Typography>
+                  <Grid item xs={12} sm={8} md={8} sx={{ width: "100%" }}>
+                    <Typography
+                      variant="subtitle1"
+                      textAlign="center"
+                      fontWeight={400}
+                    >
+                      Finishes In
+                    </Typography>
                     {data?.LastBidderAddr !== constants.AddressZero &&
                       (prizeTime > Date.now() ? (
                         <Countdown
@@ -621,7 +627,7 @@ const NewHome = () => {
                   </Grid>
                 </Grid>
                 {roundStarted !== "" && (
-                  <Typography sx={{ fontSize: 12, textAlign: "center", mb: 4 }}>
+                  <Typography sx={{ textAlign: "center", mb: 4 }}>
                     (Round started {roundStarted} ago)
                   </Typography>
                 )}
@@ -673,10 +679,10 @@ const NewHome = () => {
               </>
             )}
             <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} sm={12} md={4}>
+              <Grid item xs={12} sm={3} md={4}>
                 <Typography variant="subtitle1">Bid Price</Typography>
               </Grid>
-              <Grid item xs={12} sm={12} md={8}>
+              <Grid item xs={8} sm={5} md={8}>
                 <Box
                   sx={{
                     display: "flex",
@@ -718,20 +724,20 @@ const NewHome = () => {
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={2} alignItems="center">
-              <Grid item sm={12} md={4}>
+              <Grid item xs={12} sm={4} md={4}>
                 <Typography variant="subtitle1">Main Prize Reward</Typography>
               </Grid>
-              <Grid item sm={12} md={8}>
+              <Grid item xs={12} sm={8} md={8}>
                 <GradientText variant="h6" sx={{ display: "inline" }}>
                   {data?.PrizeAmountEth.toFixed(4)} ETH
                 </GradientText>
               </Grid>
             </Grid>
             <Grid container spacing={2} mb={2} alignItems="center">
-              <Grid item sm={12} md={4}>
+              <Grid item xs={12} sm={4} md={4}>
                 <Typography variant="subtitle1">Last Bidder Address</Typography>
               </Grid>
-              <Grid item sm={12} md={8}>
+              <Grid item xs={12} sm={8} md={8}>
                 <Typography>
                   {data?.LastBidderAddr === constants.AddressZero ? (
                     "There is no bidder yet."
@@ -740,6 +746,7 @@ const NewHome = () => {
                       href={`/user/${data?.LastBidderAddr}`}
                       color="rgb(255, 255, 255)"
                       fontSize="inherit"
+                      sx={{ wordBreak: "break-all" }}
                     >
                       {data?.LastBidderAddr}
                     </Link>
@@ -749,12 +756,12 @@ const NewHome = () => {
             </Grid>
             {!!(curBidList.length && curBidList[0].Message !== "") && (
               <Grid container spacing={2} mb={2} alignItems="center">
-                <Grid item sm={12} md={4}>
+                <Grid item xs={12} sm={4} md={4}>
                   <Typography variant="subtitle1">
                     Last Bidder Message
                   </Typography>
                 </Grid>
-                <Grid item sm={12} md={8}>
+                <Grid item xs={12} sm={8} md={8}>
                   <Typography>{curBidList[0].Message}</Typography>
                 </Grid>
               </Grid>
@@ -795,7 +802,7 @@ const NewHome = () => {
         {account !== null && (
           <>
             <Grid container spacing={matches ? 8 : 0}>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={8} md={6}>
                 <Typography mb={1}>Make your bid with:</Typography>
                 <RadioGroup
                   row
@@ -976,7 +983,7 @@ const NewHome = () => {
                   </Accordion>
                 )}
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} sm={4} md={6}>
                 <Button
                   variant="outlined"
                   size="large"
