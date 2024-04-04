@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -129,16 +129,15 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   };
   const onStakeMany = async () => {
     await handleStakeMany(selected);
-    setTimeout(() => {
-      setSelected([]);
-    }, 3000);
   };
   const onStake = async (id: number) => {
+    setSelected([id]);
     await handleStake(id);
-    setTimeout(() => {
-      setSelected([]);
-    }, 3000);
   };
+
+  useEffect(() => {
+    setSelected([]);
+  }, [list]);
 
   if (list.length === 0) {
     return <Typography>No available tokens.</Typography>;

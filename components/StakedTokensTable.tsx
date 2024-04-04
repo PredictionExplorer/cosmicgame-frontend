@@ -96,7 +96,7 @@ export const StakedTokensTable = ({
   handleUnstakeMany,
 }) => {
   const perPage = 5;
-  const [current, setCurrent] = useState(Infinity);
+  const current = Date.now() / 1000;
   const filtered = list.filter((x) => x.UnstakeTimeStamp <= Date.now());
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
@@ -129,22 +129,14 @@ export const StakedTokensTable = ({
   };
   const onUnstakeMany = async () => {
     await handleUnstakeMany(selected);
-    setTimeout(() => {
-      setSelected([]);
-    }, 3000);
   };
   const onUnstake = async (id: number) => {
+    setSelected([id]);
     await handleUnstake(id);
-    setTimeout(() => {
-      setSelected([]);
-    }, 3000);
   };
   useEffect(() => {
-    const fetchData = async () => {
-      setCurrent(Date.now() / 1000);
-    };
-    fetchData();
-  }, []);
+    setSelected([]);
+  }, [list]);
 
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
