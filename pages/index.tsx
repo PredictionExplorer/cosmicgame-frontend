@@ -673,10 +673,10 @@ const NewHome = () => {
               </>
             )}
             <Grid container spacing={2} mb={2}>
-              <Grid item sm={12} md={4}>
+              <Grid item xs={12} sm={12} md={4}>
                 <Typography variant="subtitle1">Bid Price</Typography>
               </Grid>
-              <Grid item sm={12} md={8}>
+              <Grid item xs={12} sm={12} md={8}>
                 <Box
                   sx={{
                     display: "flex",
