@@ -19,6 +19,7 @@ import {
 import { convertTimestampToDateTime } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import api from "../services/api";
 
 const StakedTokensRow = ({
   current,
@@ -96,7 +97,7 @@ export const StakedTokensTable = ({
   handleUnstakeMany,
 }) => {
   const perPage = 5;
-  const current = Date.now() / 1000;
+  const [current, setCurrent] = useState(Infinity);
   const filtered = list.filter((x) => x.UnstakeTimeStamp <= Date.now());
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
@@ -135,6 +136,11 @@ export const StakedTokensTable = ({
     await handleUnstake(id);
   };
   useEffect(() => {
+    const fetchData = async () => {
+      const current = await api.get_current_time();
+      setCurrent(current);
+    };
+    fetchData();
     setSelected([]);
   }, [list]);
 
