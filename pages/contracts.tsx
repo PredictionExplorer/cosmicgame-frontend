@@ -111,8 +111,8 @@ const Contracts = () => {
         ) : (
           <>
             <List sx={{ mt: 4 }}>
-              <ContractItem name="Network" value="Arbitrum Sepolia" />
-              <ContractItem name="Chain ID" value={421614} />
+              <ContractItem name="Network" value="Local Network" />
+              <ContractItem name="Chain ID" value={31337} />
               <ContractItem
                 name="Business Logic Address"
                 value={data?.ContractAddrs.BusinessLogicAddr}
