@@ -1309,6 +1309,7 @@ const NewHome = () => {
               ? "/images/qmark.png"
               : `https://cosmic-game.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
           }
+          title="This is a possible image of the NFT you are going to receive."
           onClose={() => setImageOpen(false)}
         />
       )}

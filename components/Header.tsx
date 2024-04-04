@@ -112,16 +112,13 @@ const Header = () => {
 
     return (
       <Toolbar>
-        <Link href="/">
-          <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
-        </Link>
         <IconButton
           aria-label="menu"
           aria-haspopup="true"
           edge="start"
           color="inherit"
           onClick={handleDrawerOpen}
-          style={{ marginLeft: "auto" }}
+          style={{ marginRight: "8px" }}
         >
           {account &&
           (status?.ETHRaffleToClaim > 0 ||
@@ -134,8 +131,11 @@ const Header = () => {
             <MenuIcon />
           )}
         </IconButton>
+        <Link href="/">
+          <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
+        </Link>
 
-        <Drawer anchor="right" open={drawerOpen} onClose={handleDrawerClose}>
+        <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerClose}>
           <DrawerList>
             <ListItem>
               <ConnectWalletButton
