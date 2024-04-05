@@ -242,7 +242,10 @@ const Header = () => {
                 <Divider />
                 <ListItem sx={{ justifyContent: "space-between" }}>
                   <Typography sx={{ fontSize: 16 }}>STAKED TOKENS:</Typography>
-                  <Typography color="primary" sx={{ fontSize: 16 }}>
+                  <Typography
+                    color="secondary"
+                    sx={{ fontSize: 16, fontWeight: 600 }}
+                  >
                     {stakedTokens?.length}
                   </Typography>
                 </ListItem>

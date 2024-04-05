@@ -16,50 +16,50 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 
+const fetchInfo = async (account, depositId, stakedActionIds) => {
+  const response = await api.get_action_ids_by_deposit_id(account, depositId);
+  let unstakeableActionIds = [],
+    claimableActionIds = [];
+  await Promise.all(
+    response.map(async (x) => {
+      try {
+        const { Stake } = await api.get_staking_actions_info(x.StakeActionId);
+        if (Stake) {
+          if (Stake.UnstakeTimeStamp < Date.now() / 1000) {
+            if (!x.Claimed) {
+              claimableActionIds.push({
+                DepositId: x.DepositId,
+                StakeActionId: x.StakeActionId,
+              });
+            }
+            if (stakedActionIds.includes(x.StakeActionId)) {
+              unstakeableActionIds.push(x.StakeActionId);
+            }
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })
+  );
+  return { unstakeableActionIds, claimableActionIds };
+};
+
 const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
   const { account } = useActiveWeb3React();
   const stakingContract = useStakingWalletContract();
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
-  const [unclaimedActionIds, setUnclaimedActionIds] = useState([]);
+  const [claimableActionIds, setClaimableActionIds] = useState([]);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
 
   useEffect(() => {
-    const fetchInfo = async () => {
-      const response = await api.get_action_ids_by_deposit_id(
-        account,
-        row.DepositId
-      );
-      let unstakeableActionIds = [],
-        unclaimableActionIds = [];
-      await Promise.all(
-        response.map(async (x) => {
-          try {
-            const { Stake } = await api.get_staking_actions_info(
-              x.StakeActionId
-            );
-            if (Stake) {
-              if (Stake.UnstakeTimeStamp < Date.now() / 1000) {
-                if (!x.Claimed) {
-                  unclaimableActionIds.push({
-                    DepositId: x.DepositId,
-                    StakeActionId: x.StakeActionId,
-                  });
-                }
-                if (stakedActionIds.includes(x.StakeActionId)) {
-                  unstakeableActionIds.push(x.StakeActionId);
-                }
-              }
-            }
-          } catch (error) {
-            console.log(error);
-          }
-        })
-      );
-      setUnstakeableActionIds(unstakeableActionIds);
-      setUnclaimedActionIds(unclaimableActionIds);
+    const fetchData = async () => {
+      const res = await fetchInfo(account, row.DepositId, stakedActionIds);
+      setUnstakeableActionIds(res.unstakeableActionIds);
+      setClaimableActionIds(res.claimableActionIds);
     };
-    fetchInfo();
+    fetchData();
   }, []);
 
   const handleClaim = async () => {
@@ -70,11 +70,11 @@ const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
           .then((tx) => tx.wait());
         fetchData(owner, false);
       }
-      if (unclaimedActionIds.length > 0) {
+      if (claimableActionIds.length > 0) {
         const res = await stakingContract
           .claimManyRewards(
-            unclaimedActionIds.map((x) => x.StakeActionId),
-            unclaimedActionIds.map((x) => x.DepositId)
+            claimableActionIds.map((x) => x.StakeActionId),
+            claimableActionIds.map((x) => x.DepositId)
           )
           .then((tx) => tx.wait());
         console.log(res);
@@ -107,10 +107,10 @@ const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
       </TablePrimaryCell>
       {account === owner && (
         <TablePrimaryCell align="center" sx={{ p: "4px 8px !important" }}>
-          {unstakeableActionIds.length > 0 || unclaimedActionIds.length > 0 ? (
+          {unstakeableActionIds.length > 0 || claimableActionIds.length > 0 ? (
             <Button size="small" onClick={handleClaim} sx={{ p: 0 }}>
               {(unstakeableActionIds.length === 0 &&
-                unclaimedActionIds.length === 0) ||
+                claimableActionIds.length === 0) ||
               unstakeableActionIds.length > 0
                 ? "Unstake & Claim"
                 : "Claim"}
@@ -130,6 +130,8 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const { data: stakedTokens } = useStakedToken();
+  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const [claimableActionIds, setClaimableActionIds] = useState([]);
 
   const handleClaimAll = async () => {
     let actionIds = [],
@@ -148,7 +150,10 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     }
     try {
       const res = await stakingContract
-        .claimManyRewards(actionIds, depositIds)
+        .claimManyRewards(
+          claimableActionIds.map((x) => x.StakeActionId),
+          claimableActionIds.map((x) => x.DepositId)
+        )
         .then((tx) => tx.wait());
       console.log(res);
       fetchData(owner, false);
@@ -156,6 +161,25 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let actionIds = [];
+      await Promise.all(
+        list.map(async (item) => {
+          const depositId = item.DepositId;
+          const { claimableActionIds: res } = await fetchInfo(
+            account,
+            depositId,
+            stakedActionIds
+          );
+          actionIds = actionIds.concat(res);
+        })
+      );
+      setClaimableActionIds(actionIds);
+    };
+    fetchData();
+  }, []);
 
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
@@ -209,7 +233,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
             .toFixed(6)}
         </Typography>
       </Box>
-      {account === owner && stakedTokens.length === 0 && list.length > 0 && (
+      {account === owner && claimableActionIds.length > 0 && (
         <Box display="flex" justifyContent="end" mt={1}>
           <Button variant="text" onClick={handleClaimAll}>
             Claim All

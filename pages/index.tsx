@@ -769,9 +769,9 @@ const NewHome = () => {
             {curBidList.length > 0 && winProbability && (
               <Typography>
                 {winProbability.raffle.toFixed(2)}% chance you will win{" "}
-                {data?.RaffleAmountEth.toFixed(2)} ETH if you bid.{" "}
+                {data?.RaffleAmountEth.toFixed(2)} ETH and{" "}
                 {winProbability.nft.toFixed(2)}% chance you will win a Cosmic
-                Signature NFT if you bid.
+                Signature NFT for now.
               </Typography>
             )}
           </Grid>
@@ -1108,7 +1108,7 @@ const NewHome = () => {
           </>
         )}
         <Box mt={6}>
-          <Typography color="primary" textAlign="center">
+          <Typography variant="subtitle1" color="primary" textAlign="center">
             Distribution of funds on each round
           </Typography>
           <Chart
