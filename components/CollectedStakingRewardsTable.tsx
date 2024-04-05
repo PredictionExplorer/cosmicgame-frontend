@@ -60,17 +60,17 @@ export const CollectedStakingRewardsTable = ({ list }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Stake Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Deposited</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Reward on Your Stake</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Your Stake Rewards</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staked Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
-                Collected Staked Tokens
+                Collected Tokens
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
-                Amount of Stake Collected
+                Collected Rewards
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

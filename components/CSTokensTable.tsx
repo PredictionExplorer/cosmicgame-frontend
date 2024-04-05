@@ -36,7 +36,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
       sx={{ cursor: "pointer" }}
     >
       <TablePrimaryCell padding="checkbox">
-        <Checkbox color="primary" checked={isItemSelected} />
+        <Checkbox color="primary" checked={isItemSelected} size="small" />
       </TablePrimaryCell>
       <TablePrimaryCell>
         {convertTimestampToDateTime(row.TimeStamp)}
@@ -80,7 +80,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
       <TablePrimaryCell align="center">
         {!row.Staked ? (
           <Button
-            variant="text"
+            size="small"
             onClick={(e) => {
               e.stopPropagation();
               handleStake(row.TokenId);
@@ -159,6 +159,8 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
                   inputProps={{
                     "aria-label": "select all desserts",
                   }}
+                  size="small"
+                  sx={{ display: { md: "block", sm: "block", xs: "none" } }}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">

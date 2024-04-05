@@ -50,6 +50,7 @@ const StakedTokensRow = ({
           color="primary"
           checked={isItemSelected}
           disabled={row.UnstakeTimeStamp > current}
+          size="small"
         />
       </TablePrimaryCell>
       <TablePrimaryCell>
@@ -76,7 +77,7 @@ const StakedTokensRow = ({
       <TablePrimaryCell align="center">
         {row.UnstakeTimeStamp <= current && (
           <Button
-            variant="text"
+            size="small"
             sx={{ mr: 1 }}
             onClick={(e) => {
               e.stopPropagation();
@@ -166,6 +167,8 @@ export const StakedTokensTable = ({
                   inputProps={{
                     "aria-label": "select all desserts",
                   }}
+                  size="small"
+                  sx={{ display: { md: "block", sm: "block" , xs: "none" } }}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">
