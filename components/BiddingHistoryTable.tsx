@@ -117,7 +117,7 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
           <Tr>
             <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Bidder</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Price</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="right">Price</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Bid Type</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Bid Info</TablePrimaryHeadCell>

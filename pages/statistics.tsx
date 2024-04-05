@@ -62,13 +62,6 @@ const Statistics = () => {
     SecondsElapsed: 0,
   });
 
-  const gridLayout =
-    nftDonations.length > 16
-      ? { xs: 6, sm: 3, md: 2, lg: 2 }
-      : nftDonations.length > 9
-      ? { xs: 6, sm: 4, md: 3, lg: 3 }
-      : { xs: 12, sm: 6, md: 4, lg: 4 };
-
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -477,7 +470,9 @@ const Statistics = () => {
                       labels={{
                         visible: true,
                         content: (props) => {
-                          return `${props.dataItem.category}: ${props.dataItem.value.toFixed(6)}`;
+                          return `${
+                            props.dataItem.category
+                          }: ${props.dataItem.value.toFixed(6)}`;
                         },
                         color: "white",
                         background: "none",
@@ -525,10 +520,10 @@ const Statistics = () => {
                         <Grid
                           item
                           key={nft.RecordId}
-                          xs={gridLayout.xs}
-                          sm={gridLayout.sm}
-                          md={gridLayout.md}
-                          lg={gridLayout.lg}
+                          xs={6}
+                          sm={4}
+                          md={3}
+                          lg={2}
                         >
                           <DonatedNFT nft={nft} />
                         </Grid>

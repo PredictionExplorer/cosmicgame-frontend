@@ -23,6 +23,7 @@ import api from "../services/api";
 
 const StakedTokensRow = ({
   current,
+  offset,
   row,
   handleUnstake,
   isItemSelected,
@@ -54,7 +55,7 @@ const StakedTokensRow = ({
         />
       </TablePrimaryCell>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(row.StakeTimeStamp)}
+        {convertTimestampToDateTime(row.StakeTimeStamp - offset)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -72,7 +73,7 @@ const StakedTokensRow = ({
         {row.TokenInfo.StakeActionId}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(row.UnstakeTimeStamp)}
+        {convertTimestampToDateTime(row.UnstakeTimeStamp - offset)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {row.UnstakeTimeStamp <= current && (
@@ -99,7 +100,8 @@ export const StakedTokensTable = ({
 }) => {
   const perPage = 5;
   const [current, setCurrent] = useState(Infinity);
-  const filtered = list.filter((x) => x.UnstakeTimeStamp <= Date.now());
+  const [offset, setOffset] = useState(0);
+  const filtered = list.filter((x) => x.UnstakeTimeStamp <= current);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
@@ -139,7 +141,10 @@ export const StakedTokensTable = ({
   useEffect(() => {
     const fetchData = async () => {
       const current = await api.get_current_time();
+      const offset = current - Date.now() / 1000;
+      console.log(offset);
       setCurrent(current);
+      setOffset(offset);
     };
     fetchData();
     setSelected([]);
@@ -168,7 +173,7 @@ export const StakedTokensTable = ({
                     "aria-label": "select all desserts",
                   }}
                   size="small"
-                  sx={{ display: { md: "block", sm: "block" , xs: "none" } }}
+                  sx={{ display: { md: "block", sm: "block", xs: "none" } }}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">
@@ -187,6 +192,7 @@ export const StakedTokensTable = ({
                 <StakedTokensRow
                   key={index}
                   current={current}
+                  offset={offset}
                   row={row}
                   handleUnstake={onUnstake}
                   isItemSelected={isSelected(row.TokenInfo.StakeActionId)}
