@@ -160,7 +160,13 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
                     "aria-label": "select all desserts",
                   }}
                   size="small"
-                  sx={{ display: { md: "block", sm: "block", xs: "none" } }}
+                  sx={{
+                    display: {
+                      md: "inline-flex",
+                      sm: "inline-flex",
+                      xs: "none",
+                    },
+                  }}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">

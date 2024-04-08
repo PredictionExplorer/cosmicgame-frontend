@@ -142,7 +142,6 @@ export const StakedTokensTable = ({
     const fetchData = async () => {
       const current = await api.get_current_time();
       const offset = current - Date.now() / 1000;
-      console.log(offset);
       setCurrent(current);
       setOffset(offset);
     };
@@ -173,7 +172,13 @@ export const StakedTokensTable = ({
                     "aria-label": "select all desserts",
                   }}
                   size="small"
-                  sx={{ display: { md: "block", sm: "block", xs: "none" } }}
+                  sx={{
+                    display: {
+                      md: "inline-flex",
+                      sm: "inline-flex",
+                      xs: "none",
+                    },
+                  }}
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">

@@ -132,6 +132,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
+  const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
 
   const handleClaimAll = async () => {
     let actionIds = [],
@@ -164,19 +165,21 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      let actionIds = [];
+      let cl_actionIds = [],
+        us_actionIds = [];
       await Promise.all(
         list.map(async (item) => {
           const depositId = item.DepositId;
-          const { claimableActionIds: res } = await fetchInfo(
-            account,
-            depositId,
-            stakedActionIds
-          );
-          actionIds = actionIds.concat(res);
+          const {
+            claimableActionIds: cl,
+            unstakeableActionIds: us,
+          } = await fetchInfo(account, depositId, stakedActionIds);
+          cl_actionIds = cl_actionIds.concat(cl);
+          us_actionIds = us_actionIds.concat(us);
         })
       );
-      setClaimableActionIds(actionIds);
+      setClaimableActionIds(cl_actionIds);
+      setUnstakeableActionIds(us_actionIds);
     };
     fetchData();
   }, []);
@@ -233,13 +236,15 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
             .toFixed(6)}
         </Typography>
       </Box>
-      {account === owner && claimableActionIds.length > 0 && (
-        <Box display="flex" justifyContent="end" mt={1}>
-          <Button variant="text" onClick={handleClaimAll}>
-            Claim All
-          </Button>
-        </Box>
-      )}
+      {account === owner &&
+        unstakableActionIds.length === 0 &&
+        claimableActionIds.length > 0 && (
+          <Box display="flex" justifyContent="end" mt={1}>
+            <Button variant="text" onClick={handleClaimAll}>
+              Claim All
+            </Button>
+          </Box>
+        )}
       <Box display="flex" justifyContent="end" mt={1}>
         <Typography>
           You can claim your prizes in the case if the unstake date is beyond
