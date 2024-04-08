@@ -151,7 +151,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
     await handleStake(id);
     setNotification({
       visible: true,
-      text: "The token was staked successfully!",
+      text: `You have successfully staked token ${id}!`,
       type: "success",
     });
   };

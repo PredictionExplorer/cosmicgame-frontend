@@ -84,7 +84,7 @@ const StakedTokensRow = ({
             sx={{ mr: 1 }}
             onClick={(e) => {
               e.stopPropagation();
-              handleUnstake(row.TokenInfo.StakeActionId);
+              handleUnstake(row.TokenInfo.StakeActionId, row.TokenInfo.TokenId);
             }}
           >
             Unstake
@@ -150,12 +150,12 @@ export const StakedTokensTable = ({
       type: "success",
     });
   };
-  const onUnstake = async (id: number) => {
-    setSelected([id]);
-    await handleUnstake(id);
+  const onUnstake = async (actionId: number, tokenId: number) => {
+    setSelected([actionId]);
+    await handleUnstake(actionId);
     setNotification({
       visible: true,
-      text: "The token was unstaked successfully!",
+      text: `You have successfully unstaked token ${tokenId}!`,
       type: "success",
     });
   };
