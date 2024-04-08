@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Box,
   Button,
   Checkbox,
   Link,
   Pagination,
+  Snackbar,
   TableBody,
   Typography,
 } from "@mui/material";
@@ -98,6 +100,15 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
 
 export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   const perPage = 5;
+  const [notification, setNotification] = useState<{
+    text: string;
+    type: "success" | "info" | "warning" | "error";
+    visible: boolean;
+  }>({
+    visible: false,
+    text: "",
+    type: "success",
+  });
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
@@ -129,10 +140,20 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   };
   const onStakeMany = async () => {
     await handleStakeMany(selected);
+    setNotification({
+      visible: true,
+      text: "The selected tokens were staked successfully!",
+      type: "success",
+    });
   };
   const onStake = async (id: number) => {
     setSelected([id]);
     await handleStake(id);
+    setNotification({
+      visible: true,
+      text: "The token was staked successfully!",
+      type: "success",
+    });
   };
 
   useEffect(() => {
@@ -144,6 +165,18 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   }
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        autoHideDuration={10000}
+        open={notification.visible}
+        onClose={() =>
+          setNotification({ text: "", type: "success", visible: false })
+        }
+      >
+        <Alert severity={notification.type} variant="filled">
+          {notification.text}
+        </Alert>
+      </Snackbar>
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>

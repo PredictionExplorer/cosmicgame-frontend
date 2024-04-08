@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Box,
   Button,
   Checkbox,
   Link,
   Pagination,
+  Snackbar,
   TableBody,
   Typography,
 } from "@mui/material";
@@ -99,6 +101,15 @@ export const StakedTokensTable = ({
   handleUnstakeMany,
 }) => {
   const perPage = 5;
+  const [notification, setNotification] = useState<{
+    text: string;
+    type: "success" | "info" | "warning" | "error";
+    visible: boolean;
+  }>({
+    visible: false,
+    text: "",
+    type: "success",
+  });
   const [current, setCurrent] = useState(Infinity);
   const [offset, setOffset] = useState(0);
   const filtered = list.filter((x) => x.UnstakeTimeStamp <= current);
@@ -133,10 +144,20 @@ export const StakedTokensTable = ({
   };
   const onUnstakeMany = async () => {
     await handleUnstakeMany(selected);
+    setNotification({
+      visible: true,
+      text: "The selected tokens were unstaked successfully!",
+      type: "success",
+    });
   };
   const onUnstake = async (id: number) => {
     setSelected([id]);
     await handleUnstake(id);
+    setNotification({
+      visible: true,
+      text: "The token was unstaked successfully!",
+      type: "success",
+    });
   };
   useEffect(() => {
     const fetchData = async () => {
@@ -154,6 +175,18 @@ export const StakedTokensTable = ({
   }
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        autoHideDuration={10000}
+        open={notification.visible}
+        onClose={() =>
+          setNotification({ text: "", type: "success", visible: false })
+        }
+      >
+        <Alert severity={notification.type} variant="filled">
+          {notification.text}
+        </Alert>
+      </Snackbar>
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>

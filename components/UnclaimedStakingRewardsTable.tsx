@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Pagination, TableBody, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  Pagination,
+  Snackbar,
+  TableBody,
+  Typography,
+} from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -45,7 +53,12 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
   return { unstakeableActionIds, claimableActionIds };
 };
 
-const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
+const UnclaimedStakingRewardsRow = ({
+  row,
+  owner,
+  fetchData,
+  setNotification,
+}) => {
   const { account } = useActiveWeb3React();
   const stakingContract = useStakingWalletContract();
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
@@ -69,6 +82,11 @@ const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
           .unstakeMany(unstakeableActionIds)
           .then((tx) => tx.wait());
         fetchData(owner, false);
+        setNotification({
+          visible: true,
+          text: "The tokens were unstaked successfully!",
+          type: "success",
+        });
       }
       if (claimableActionIds.length > 0) {
         const res = await stakingContract
@@ -79,6 +97,11 @@ const UnclaimedStakingRewardsRow = ({ row, owner, fetchData }) => {
           .then((tx) => tx.wait());
         console.log(res);
         fetchData(owner, false);
+        setNotification({
+          visible: true,
+          text: "The rewards were claimed successfully!",
+          type: "success",
+        });
       }
     } catch (err) {
       console.error(err);
@@ -133,7 +156,15 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
-
+  const [notification, setNotification] = useState<{
+    text: string;
+    type: "success" | "info" | "warning" | "error";
+    visible: boolean;
+  }>({
+    visible: false,
+    text: "",
+    type: "success",
+  });
   const handleClaimAll = async () => {
     let actionIds = [],
       depositIds = [];
@@ -158,6 +189,11 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         .then((tx) => tx.wait());
       console.log(res);
       fetchData(owner, false);
+      setNotification({
+        visible: true,
+        text: "All rewards were claimed successfully!",
+        type: "success",
+      });
     } catch (e) {
       console.error(e);
     }
@@ -189,6 +225,18 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   }
   return (
     <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        autoHideDuration={10000}
+        open={notification.visible}
+        onClose={() =>
+          setNotification({ text: "", type: "success", visible: false })
+        }
+      >
+        <Alert severity={notification.type} variant="filled">
+          {notification.text}
+        </Alert>
+      </Snackbar>
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>
@@ -221,6 +269,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
                   key={index}
                   owner={owner}
                   fetchData={fetchData}
+                  setNotification={setNotification}
                 />
               ))}
           </TableBody>
