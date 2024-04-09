@@ -160,7 +160,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const [page, setPage] = useState(1);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  const [offset, setOffset] = useState(0);
+  const [offset, setOffset] = useState(undefined);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
   const [notification, setNotification] = useState<{
@@ -207,7 +207,15 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const calculateOffset = async () => {
+      const current = await api.get_current_time();
+      const offset = current - Date.now() / 1000;
+      setOffset(offset);
+    };
+    calculateOffset();
+  }, []);
+  useEffect(() => {
+    const fetchActionIds = async () => {
       let cl_actionIds = [],
         us_actionIds = [];
       await Promise.all(
@@ -224,14 +232,12 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       setClaimableActionIds(cl_actionIds);
       setUnstakeableActionIds(us_actionIds);
     };
-    const calculateOffset = async () => {
-      const current = await api.get_current_time();
-      const offset = current - Date.now() / 1000;
-      setOffset(offset);
-    };
-    fetchData();
-    calculateOffset();
-  }, []);
+    if (offset !== undefined) {
+      fetchActionIds();
+    }
+  }, [offset]);
+
+  if (offset === undefined) return;
 
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
