@@ -24,7 +24,6 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import api from "../services/api";
 
 const StakedTokensRow = ({
-  current,
   offset,
   row,
   handleUnstake,
@@ -45,14 +44,15 @@ const StakedTokensRow = ({
       onClick={() => handleClick(row.TokenInfo.StakeActionId)}
       sx={{
         cursor: "pointer",
-        pointerEvents: row.UnstakeTimeStamp > current ? "none" : "auto",
+        pointerEvents:
+          row.UnstakeTimeStamp > Date.now() / 1000 + offset ? "none" : "auto",
       }}
     >
       <TablePrimaryCell padding="checkbox">
         <Checkbox
           color="primary"
           checked={isItemSelected}
-          disabled={row.UnstakeTimeStamp > current}
+          disabled={row.UnstakeTimeStamp > Date.now() / 1000 + offset}
           size="small"
         />
       </TablePrimaryCell>
@@ -78,7 +78,7 @@ const StakedTokensRow = ({
         {convertTimestampToDateTime(row.UnstakeTimeStamp - offset)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.UnstakeTimeStamp <= current && (
+        {row.UnstakeTimeStamp <= Date.now() / 1000 + offset && (
           <Button
             size="small"
             sx={{ mr: 1 }}
@@ -110,9 +110,10 @@ export const StakedTokensTable = ({
     text: "",
     type: "success",
   });
-  const [current, setCurrent] = useState(Infinity);
   const [offset, setOffset] = useState(0);
-  const filtered = list.filter((x) => x.UnstakeTimeStamp <= current);
+  const filtered = list.filter(
+    (x) => x.UnstakeTimeStamp <= Date.now() / 1000 + offset
+  );
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
@@ -163,7 +164,6 @@ export const StakedTokensTable = ({
     const fetchData = async () => {
       const current = await api.get_current_time();
       const offset = current - Date.now() / 1000;
-      setCurrent(current);
       setOffset(offset);
     };
     fetchData();
@@ -229,7 +229,6 @@ export const StakedTokensTable = ({
               .map((row, index) => (
                 <StakedTokensRow
                   key={index}
-                  current={current}
                   offset={offset}
                   row={row}
                   handleUnstake={onUnstake}

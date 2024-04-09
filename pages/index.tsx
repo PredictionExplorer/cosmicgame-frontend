@@ -767,7 +767,7 @@ const NewHome = () => {
               </Grid>
             )}
             {curBidList.length > 0 && winProbability && (
-              <Typography>
+              <Typography mt={4}>
                 {winProbability.raffle.toFixed(2)}% chance you will win{" "}
                 {data?.RaffleAmountEth.toFixed(2)} ETH and{" "}
                 {winProbability.nft.toFixed(2)}% chance you will win a Cosmic
@@ -815,18 +815,18 @@ const NewHome = () => {
                 >
                   <FormControlLabel
                     value="ETH"
-                    control={<Radio />}
+                    control={<Radio size="small" />}
                     label="ETH"
                   />
                   <FormControlLabel
                     value="RandomWalk"
-                    control={<Radio />}
+                    control={<Radio size="small" />}
                     label="RandomWalk"
                   />
                   <FormControlLabel
                     value="CST"
-                    control={<Radio />}
-                    label="CST (Cosmic Token)"
+                    control={<Radio size="small" />}
+                    label="CST(Cosmic Token)"
                   />
                 </RadioGroup>
                 {bidType === "RandomWalk" && (

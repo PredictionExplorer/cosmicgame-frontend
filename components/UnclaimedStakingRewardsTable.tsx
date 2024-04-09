@@ -24,7 +24,7 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 
-const fetchInfo = async (account, depositId, stakedActionIds) => {
+const fetchInfo = async (account, depositId, stakedActionIds, offset) => {
   const response = await api.get_action_ids_by_deposit_id(account, depositId);
   let unstakeableActionIds = [],
     claimableActionIds = [];
@@ -33,7 +33,7 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
       try {
         const { Stake } = await api.get_staking_actions_info(x.StakeActionId);
         if (Stake) {
-          if (Stake.UnstakeTimeStamp < Date.now() / 1000) {
+          if (Stake.UnstakeTimeStamp < Date.now() / 1000 + offset) {
             if (!x.Claimed) {
               claimableActionIds.push({
                 DepositId: x.DepositId,
@@ -58,6 +58,7 @@ const UnclaimedStakingRewardsRow = ({
   owner,
   fetchData,
   setNotification,
+  offset,
 }) => {
   const { account } = useActiveWeb3React();
   const stakingContract = useStakingWalletContract();
@@ -68,7 +69,12 @@ const UnclaimedStakingRewardsRow = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetchInfo(account, row.DepositId, stakedActionIds);
+      const res = await fetchInfo(
+        account,
+        row.DepositId,
+        stakedActionIds,
+        offset
+      );
       setUnstakeableActionIds(res.unstakeableActionIds);
       setClaimableActionIds(res.claimableActionIds);
     };
@@ -115,7 +121,7 @@ const UnclaimedStakingRewardsRow = ({
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(row.TimeStamp)}
+        {convertTimestampToDateTime(row.TimeStamp - offset)}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {row.DepositAmountEth.toFixed(6)}
@@ -154,6 +160,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const [page, setPage] = useState(1);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const [offset, setOffset] = useState(0);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
   const [notification, setNotification] = useState<{
@@ -209,7 +216,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
           const {
             claimableActionIds: cl,
             unstakeableActionIds: us,
-          } = await fetchInfo(account, depositId, stakedActionIds);
+          } = await fetchInfo(account, depositId, stakedActionIds, offset);
           cl_actionIds = cl_actionIds.concat(cl);
           us_actionIds = us_actionIds.concat(us);
         })
@@ -217,7 +224,13 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       setClaimableActionIds(cl_actionIds);
       setUnstakeableActionIds(us_actionIds);
     };
+    const calculateOffset = async () => {
+      const current = await api.get_current_time();
+      const offset = current - Date.now() / 1000;
+      setOffset(offset);
+    };
     fetchData();
+    calculateOffset();
   }, []);
 
   if (list.length === 0) {
@@ -270,6 +283,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
                   owner={owner}
                   fetchData={fetchData}
                   setNotification={setNotification}
+                  offset={offset}
                 />
               ))}
           </TableBody>

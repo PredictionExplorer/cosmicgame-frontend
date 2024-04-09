@@ -487,6 +487,7 @@ const Statistics = () => {
                 list={ctBalanceDistribution.slice(0, 20)}
               />
             </Box>
+            
             <Box>
               <Typography variant="h6" mb={2} mt={8}>
                 Stake / Unstake Actions

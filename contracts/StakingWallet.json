@@ -13,6 +13,7 @@
   "function deposit(uint256) payable",
   "function game() view returns (address)",
   "function modulo() view returns (uint256)",
+  "function minStakePeriod() view returns (uint256)",
   "function nft() view returns (address)",
   "function numETHDeposits() view returns (uint256)",
   "function numStakeActions() view returns (uint256)",
