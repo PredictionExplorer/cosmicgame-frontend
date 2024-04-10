@@ -258,7 +258,7 @@ const MyWinnings = () => {
             </Box>
             <Box mt={8}>
               <Typography variant="h5" mb={2}>
-                Unclaimed Staking Rewards
+                Earned Staking Rewards
               </Typography>
               {status?.UnclaimedStakingReward === 0 ? (
                 <Typography>No rewards yet.</Typography>

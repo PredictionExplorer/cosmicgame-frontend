@@ -141,7 +141,7 @@ const MyStaking = () => {
           <>
             <Box>
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                Unclaimed Staking Rewards
+                Earned Staking Rewards
               </Typography>
               <UnclaimedStakingRewardsTable
                 list={unclaimedStakingRewards}

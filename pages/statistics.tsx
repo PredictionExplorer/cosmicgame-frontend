@@ -409,7 +409,7 @@ const Statistics = () => {
                 value={data.MainStats.StakeStatistics.TotalTokensStaked}
               />
               <StatisticsItem
-                title="Unclaimed Staking Rewards"
+                title="Earned Staking Rewards"
                 value={`${data.MainStats.StakeStatistics.UnclaimedRewardEth.toFixed(
                   4
                 )} ETH`}
