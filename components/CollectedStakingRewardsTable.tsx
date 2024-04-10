@@ -25,83 +25,56 @@ import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
 
 const DetailRow = ({ row }) => {
-  const [open, setOpen] = useState(false);
   if (!row) {
     return <TablePrimaryRow />;
   }
 
   return (
-    <>
-      <TablePrimaryRow sx={{ borderBottom: 0 }}>
-        <TablePrimaryCell align="left">
-          {convertTimestampToDateTime(row.ClaimTimeStamp)}
-        </TablePrimaryCell>
-        <TablePrimaryCell align="center">
-          <Link
-            href={`/detail/${row.TokenId}`}
-            style={{ color: "inherit", fontSize: "inherit" }}
-          >
-            {row.TokenId}
-          </Link>
-        </TablePrimaryCell>
-        <TablePrimaryCell align="center">{row.StakeActionId}</TablePrimaryCell>
-        <TablePrimaryCell align="right">
-          {row.ClaimRewardAmountEth.toFixed(6)}
-        </TablePrimaryCell>
-      </TablePrimaryRow>
-      <TablePrimaryRow sx={{ borderTop: 0 }}>
-        <TablePrimaryCell sx={{ py: 0 }} colSpan={9}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                History
-              </Typography>
-            </Box>
-          </Collapse>
-        </TablePrimaryCell>
-      </TablePrimaryRow>
-    </>
+    <TablePrimaryRow sx={{ borderBottom: 0 }}>
+      <TablePrimaryCell align="left">
+        {convertTimestampToDateTime(row.ClaimTimeStamp)}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
+          href={`/detail/${row.TokenId}`}
+          style={{ color: "inherit", fontSize: "inherit" }}
+        >
+          {row.TokenId}
+        </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.StakeActionId}</TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {row.ClaimRewardAmountEth.toFixed(6)}
+      </TablePrimaryCell>
+    </TablePrimaryRow>
   );
 };
 
 const DetailTable = ({ list }) => {
-  const perPage = 5;
-  const [page, setPage] = useState(1);
   return (
-    <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <Tr>
-              <TablePrimaryHeadCell align="left">
-                Claim Datetime
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token Id</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Action Id</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Rewards</TablePrimaryHeadCell>
-            </Tr>
-          </TablePrimaryHead>
-          <TableBody>
-            {list
-              .slice((page - 1) * perPage, page * perPage)
-              .map((row, index) => (
-                <DetailRow row={row} key={index} />
-              ))}
-          </TableBody>
-        </TablePrimary>
-      </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={2} mb={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
-    </>
+    <TablePrimaryContainer>
+      <TablePrimary>
+        <TablePrimaryHead>
+          <Tr>
+            <TablePrimaryHeadCell align="left" sx={{ py: 1 }}>
+              Claim Datetime
+            </TablePrimaryHeadCell>
+            <TablePrimaryHeadCell sx={{ py: 1 }}>Token Id</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell sx={{ py: 1 }}>
+              Action Id
+            </TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="right" sx={{ py: 1 }}>
+              Reward
+            </TablePrimaryHeadCell>
+          </Tr>
+        </TablePrimaryHead>
+        <TableBody>
+          {list.map((row, index) => (
+            <DetailRow row={row} key={index} />
+          ))}
+        </TableBody>
+      </TablePrimary>
+    </TablePrimaryContainer>
   );
 };
 
@@ -168,7 +141,7 @@ const CollectedStakingRewardsRow = ({ row }) => {
       <TablePrimaryRow sx={{ borderTop: 0 }}>
         <TablePrimaryCell sx={{ py: 0 }} colSpan={9}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
+            <Box sx={{ margin: 1, marginBottom: 4 }}>
               <Typography variant="subtitle1" gutterBottom component="div">
                 Detail
               </Typography>
@@ -207,8 +180,8 @@ export const CollectedStakingRewardsTable = ({ list }) => {
           <TableBody>
             {list
               .slice((page - 1) * perPage, page * perPage)
-              .map((row, index) => (
-                <CollectedStakingRewardsRow row={row} key={index} />
+              .map((row) => (
+                <CollectedStakingRewardsRow row={row} key={row.EvtLogId} />
               ))}
           </TableBody>
         </TablePrimary>
