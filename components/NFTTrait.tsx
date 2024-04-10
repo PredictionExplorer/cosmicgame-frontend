@@ -44,8 +44,8 @@ import api from "../services/api";
 
 const NFTTrait = ({ tokenId }) => {
   const fileName = tokenId.toString().padStart(6, "0");
-  const image = `https://cosmic-game.s3.us-east-2.amazonaws.com/${fileName}.png`;
-  const video = `https://cosmic-game.s3.us-east-2.amazonaws.com/${fileName}.mp4`;
+  const image = `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.png`;
+  const video = `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.mp4`;
   const [open, setOpen] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
   const [videoPath, setVideoPath] = useState(null);

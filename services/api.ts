@@ -435,6 +435,16 @@ class ApiService {
     }
   }
 
+  public async get_action_ids_by_deposit_with_claim_info(address: string, depositId: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`staking/rewards/action_ids_by_deposit_with_claim_info/${address}/${depositId}`));
+      return data.ActionIdsWithClaimInfo;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
   public async get_staking_actions_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/actions/by_user/${address}/0/10000`));

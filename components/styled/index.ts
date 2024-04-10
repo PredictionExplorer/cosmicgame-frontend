@@ -107,6 +107,7 @@ export const TablePrimaryHead = styled(Thead)({
 })
 
 export const TablePrimaryHeadCell = styled(Th)(({ theme }) => ({
+  color: '#fff',
   fontWeight: 400,
   lineHeight: 1.43,
   borderBottom: "1px solid rgba(81, 81, 81, 1)",
