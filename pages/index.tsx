@@ -174,9 +174,23 @@ const NewHome = () => {
         : BigNumber.from(2000000);
       await cosmicGameContract.claimPrize({ gasLimit }).then((tx) => tx.wait());
       const balance = await cosmicSignatureContract.totalSupply();
-      const token_id = balance.toNumber() - 1;
-      const seed = await cosmicSignatureContract.seeds(token_id);
-      await api.create(token_id, seed);
+      let token_id = balance.toNumber() - 1;
+      const count =
+        data?.NumRaffleNFTWinners + data?.NumHolderNFTWinners * 2 + 1;
+      await Promise.all(
+        Array(count)
+          .fill(1)
+          .map(async (_value, index) => {
+            try {
+              const seed = await cosmicSignatureContract.seeds(
+                token_id - index
+              );
+              await api.create(token_id - index, seed);
+            } catch (error) {
+              console.log(error);
+            }
+          })
+      );
       router.push({
         pathname: "/my-tokens",
         query: {
