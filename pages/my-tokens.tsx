@@ -110,6 +110,15 @@ const CSTRow = ({ nft }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
+          href={`/detail/${nft.TokenId}`}
+          style={{ color: "inherit", fontSize: "inherit" }}
+        >
+          {nft.TokenId}
+        </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">{nft.TokenName || " "}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
           href={`/user/${nft.WinnerAddr}`}
           style={{
             color: "inherit",
@@ -118,14 +127,6 @@ const CSTRow = ({ nft }) => {
           }}
         >
           {nft.WinnerAddr}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        <Link
-          href={`/detail/${nft.TokenId}`}
-          style={{ color: "inherit", fontSize: "inherit" }}
-        >
-          {nft.TokenId}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
@@ -147,7 +148,7 @@ const CSTRow = ({ nft }) => {
 };
 
 const CSTTable = ({ list }) => {
-  const perPage = 5;
+  const perPage = 10;
   const [curPage, setCurPage] = useState(1);
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
@@ -160,8 +161,9 @@ const CSTTable = ({ list }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Prize Type
               </TablePrimaryHeadCell>
@@ -271,7 +273,7 @@ const MyWallet = () => {
         ) : (
           <>
             <Box mt={6}>
-              <Typography variant="h5" mb={2}>
+              <Typography variant="h6" mb={2}>
                 Cosmic Signature Tokens I Own
               </Typography>
               {CSTList.loading ? (
