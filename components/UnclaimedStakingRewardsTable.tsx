@@ -24,7 +24,7 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 
-const fetchInfo = async (account, depositId, stakedActionIds, offset) => {
+const fetchInfo = async (account, depositId, stakedActionIds) => {
   const response = await api.get_action_ids_by_deposit_id(account, depositId);
   let unstakeableActionIds = [],
     claimableActionIds = [],
@@ -32,18 +32,15 @@ const fetchInfo = async (account, depositId, stakedActionIds, offset) => {
   await Promise.all(
     response.map(async (x) => {
       try {
-        const { Stake } = await api.get_staking_actions_info(x.StakeActionId);
-        if (Stake) {
-          if (Stake.UnstakeTimeStamp < Date.now() / 1000 + offset) {
-            if (!x.Claimed) {
-              claimableActionIds.push({
-                DepositId: x.DepositId,
-                StakeActionId: x.StakeActionId,
-              });
-            }
-            if (stakedActionIds.includes(x.StakeActionId)) {
-              unstakeableActionIds.push(x.StakeActionId);
-            }
+        if (x.UnstakeEligibleTimeStamp < x.CurChainTimeStamp) {
+          if (!x.Claimed) {
+            claimableActionIds.push({
+              DepositId: x.DepositId,
+              StakeActionId: x.StakeActionId,
+            });
+          }
+          if (stakedActionIds.includes(x.StakeActionId)) {
+            unstakeableActionIds.push(x.StakeActionId);
           }
         }
       } catch (error) {
@@ -51,7 +48,11 @@ const fetchInfo = async (account, depositId, stakedActionIds, offset) => {
       }
     })
   );
-  return { unstakeableActionIds, claimableActionIds, claimableAmount };
+  return {
+    unstakeableActionIds,
+    claimableActionIds,
+    claimableAmount,
+  };
 };
 
 const UnclaimedStakingRewardsRow = ({
@@ -71,12 +72,7 @@ const UnclaimedStakingRewardsRow = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetchInfo(
-        account,
-        row.DepositId,
-        stakedActionIds,
-        offset
-      );
+      const res = await fetchInfo(account, row.DepositId, stakedActionIds);
       setUnstakeableActionIds(res.unstakeableActionIds);
       setClaimableActionIds(res.claimableActionIds);
       setClaimableAmount(res.claimableAmount);
@@ -118,7 +114,7 @@ const UnclaimedStakingRewardsRow = ({
   };
 
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
@@ -220,9 +216,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       const offset = current - Date.now() / 1000;
       setOffset(offset);
     };
-    calculateOffset();
-  }, []);
-  useEffect(() => {
     const fetchActionIds = async () => {
       let cl_actionIds = [],
         us_actionIds = [];
@@ -232,7 +225,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
           const {
             claimableActionIds: cl,
             unstakeableActionIds: us,
-          } = await fetchInfo(account, depositId, stakedActionIds, offset);
+          } = await fetchInfo(account, depositId, stakedActionIds);
           cl_actionIds = cl_actionIds.concat(cl);
           us_actionIds = us_actionIds.concat(us);
         })
@@ -240,10 +233,9 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       setClaimableActionIds(cl_actionIds);
       setUnstakeableActionIds(us_actionIds);
     };
-    if (offset !== undefined) {
-      fetchActionIds();
-    }
-  }, [offset]);
+    fetchActionIds();
+    calculateOffset();
+  }, []);
 
   if (offset === undefined) return;
 
