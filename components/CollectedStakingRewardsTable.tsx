@@ -167,7 +167,9 @@ export const CollectedStakingRewardsTable = ({ list }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell />
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left" sx={{ minWidth: "165px" }}>
+                Datetime
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Deposited</TablePrimaryHeadCell>
@@ -178,11 +180,9 @@ export const CollectedStakingRewardsTable = ({ list }) => {
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list
-              .slice((page - 1) * perPage, page * perPage)
-              .map((row) => (
-                <CollectedStakingRewardsRow row={row} key={row.EvtLogId} />
-              ))}
+            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
+              <CollectedStakingRewardsRow row={row} key={row.EvtLogId} />
+            ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>

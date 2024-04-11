@@ -27,7 +27,8 @@ import { Tr } from "react-super-responsive-table";
 const fetchInfo = async (account, depositId, stakedActionIds, offset) => {
   const response = await api.get_action_ids_by_deposit_id(account, depositId);
   let unstakeableActionIds = [],
-    claimableActionIds = [];
+    claimableActionIds = [],
+    claimableAmount = 0;
   await Promise.all(
     response.map(async (x) => {
       try {
@@ -50,7 +51,7 @@ const fetchInfo = async (account, depositId, stakedActionIds, offset) => {
       }
     })
   );
-  return { unstakeableActionIds, claimableActionIds };
+  return { unstakeableActionIds, claimableActionIds, claimableAmount };
 };
 
 const UnclaimedStakingRewardsRow = ({
@@ -64,6 +65,7 @@ const UnclaimedStakingRewardsRow = ({
   const stakingContract = useStakingWalletContract();
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
+  const [claimableAmount, setClaimableAmount] = useState(0);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
 
@@ -77,6 +79,7 @@ const UnclaimedStakingRewardsRow = ({
       );
       setUnstakeableActionIds(res.unstakeableActionIds);
       setClaimableActionIds(res.claimableActionIds);
+      setClaimableAmount(res.claimableAmount);
     };
     fetchData();
   }, []);
@@ -137,12 +140,17 @@ const UnclaimedStakingRewardsRow = ({
       {account === owner && (
         <TablePrimaryCell align="center" sx={{ p: "4px 8px !important" }}>
           {unstakeableActionIds.length > 0 || claimableActionIds.length > 0 ? (
-            <Button size="small" onClick={handleClaim}>
+            <Button
+              size="small"
+              onClick={handleClaim}
+              sx={{ minWidth: "140px" }}
+            >
               {(unstakeableActionIds.length === 0 &&
                 claimableActionIds.length === 0) ||
               unstakeableActionIds.length > 0
                 ? "Unstake & Claim"
-                : "Claim"}
+                : "Claim"}{" "}
+              {claimableAmount.toFixed(2)} ETH
             </Button>
           ) : (
             " "
@@ -260,7 +268,9 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left" sx={{ minWidth: "165px" }}>
+                Datetime
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Deposit Amount
               </TablePrimaryHeadCell>
