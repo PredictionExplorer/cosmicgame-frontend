@@ -3,22 +3,23 @@ import {
   Box,
   Link,
   Pagination,
-  Table,
   TableBody,
-  TableCell,
-  TableRow,
   Typography,
 } from "@mui/material";
 import Head from "next/head";
 import {
   MainWrapper,
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../components/styled";
 import { convertTimestampToDateTime } from "../utils";
 import api from "../services/api";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { Tr } from "react-super-responsive-table";
 
 const UsedRwlkNftRow = ({ nft }) => {
   if (!nft) {
@@ -57,27 +58,21 @@ const UsedRwlkNftRow = ({ nft }) => {
 const UsedRwlkNftsTable = ({ list }) => {
   return (
     <TablePrimaryContainer>
-      <Table>
-        <colgroup>
-          <col width="15%" />
-          <col width="55%" />
-          <col width="15%" />
-          <col width="15%" />
-        </colgroup>
+      <TablePrimary>
         <TablePrimaryHead>
-          <TableRow>
-            <TableCell>DateTime</TableCell>
-            <TableCell align="center">Bidder Address</TableCell>
-            <TableCell align="center">Round</TableCell>
-            <TableCell align="center">Token Id</TableCell>
-          </TableRow>
+          <Tr>
+            <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Bidder Address</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Token Id</TablePrimaryHeadCell>
+          </Tr>
         </TablePrimaryHead>
         <TableBody>
           {list.map((nft, i) => (
             <UsedRwlkNftRow key={i} nft={nft} />
           ))}
         </TableBody>
-      </Table>
+      </TablePrimary>
     </TablePrimaryContainer>
   );
 };

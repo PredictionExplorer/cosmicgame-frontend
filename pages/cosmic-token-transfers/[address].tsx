@@ -12,15 +12,19 @@ import {
 import Head from "next/head";
 import {
   MainWrapper,
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../../components/styled";
 import api from "../../services/api";
 import { convertTimestampToDateTime } from "../../utils";
 import { ethers } from "ethers";
 import { GetServerSidePropsContext } from "next";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const CosmicTokenTransferRow = ({ row }) => {
   if (!row) {
@@ -79,27 +83,21 @@ export const CosmicTokenTransfersTable = ({ list }) => {
   return (
     <>
       <TablePrimaryContainer>
-        <Table>
-          <colgroup>
-            <col width="15%" />
-            <col width="35%" />
-            <col width="35%" />
-            <col width="15%" />
-          </colgroup>
+        <TablePrimary>
           <TablePrimaryHead>
-            <TableRow>
-              <TableCell>Datetime</TableCell>
-              <TableCell align="center">From</TableCell>
-              <TableCell align="center">To</TableCell>
-              <TableCell align="center">Value (ETH)</TableCell>
-            </TableRow>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>From</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>To</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Value (ETH)</TablePrimaryHeadCell>
+            </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <CosmicTokenTransferRow row={row} key={row.EvtLogId} />
             ))}
           </TableBody>
-        </Table>
+        </TablePrimary>
       </TablePrimaryContainer>
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination

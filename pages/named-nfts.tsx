@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Link,
-  Pagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import Head from "next/head";
 import {
   MainWrapper,
+  TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
   TablePrimaryHead,
+  TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../components/styled";
 import { convertTimestampToDateTime } from "../utils";
 import api from "../services/api";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const NamedNFTRow = ({ nft }) => {
   if (!nft) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
   return (
     <TablePrimaryRow>
@@ -45,25 +40,20 @@ const NamedNFTRow = ({ nft }) => {
 const NamedNFTsTable = ({ list }) => {
   return (
     <TablePrimaryContainer>
-      <Table>
-        <colgroup>
-          <col width="15%" />
-          <col width="35%" />
-          <col width="50%" />
-        </colgroup>
+      <TablePrimary>
         <TablePrimaryHead>
-          <TableRow>
-            <TableCell>DateTime</TableCell>
-            <TableCell align="center">Token Id</TableCell>
-            <TableCell>Token Name</TableCell>
-          </TableRow>
+          <Tr>
+            <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Token Id</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">Token Name</TablePrimaryHeadCell>
+          </Tr>
         </TablePrimaryHead>
         <TableBody>
           {list.map((nft, i) => (
             <NamedNFTRow key={i} nft={nft} />
           ))}
         </TableBody>
-      </Table>
+      </TablePrimary>
     </TablePrimaryContainer>
   );
 };
