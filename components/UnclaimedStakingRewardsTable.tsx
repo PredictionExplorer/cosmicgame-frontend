@@ -38,6 +38,7 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
               DepositId: x.DepositId,
               StakeActionId: x.StakeActionId,
             });
+            claimableAmount += x.AmountEth;
           }
           if (stakedActionIds.includes(x.StakeActionId)) {
             unstakeableActionIds.push(x.StakeActionId);
@@ -82,34 +83,45 @@ const UnclaimedStakingRewardsRow = ({
 
   const handleClaim = async () => {
     try {
-      if (unstakeableActionIds.length > 0) {
-        await stakingContract
-          .unstakeMany(unstakeableActionIds)
-          .then((tx) => tx.wait());
-        fetchData(owner, false);
-        setNotification({
-          visible: true,
-          text: "The tokens were unstaked successfully!",
-          type: "success",
-        });
-      }
-      if (claimableActionIds.length > 0) {
-        const res = await stakingContract
-          .claimManyRewards(
-            claimableActionIds.map((x) => x.StakeActionId),
-            claimableActionIds.map((x) => x.DepositId)
-          )
-          .then((tx) => tx.wait());
-        console.log(res);
-        fetchData(owner, false);
-        setNotification({
-          visible: true,
-          text: "The rewards were claimed successfully!",
-          type: "success",
-        });
-      }
-    } catch (err) {
-      console.error(err);
+      const res = await stakingContract
+        .unstakeClaimRestakeMany(
+          unstakeableActionIds,
+          [],
+          claimableActionIds.map((x) => x.StakeActionId),
+          claimableActionIds.map((x) => x.DepositId)
+        )
+        .then((tx) => tx.wait());
+      console.log(res);
+      fetchData(owner, false);
+      setNotification({
+        visible: true,
+        text: "The tokens were unstaked and claimed successfully!",
+        type: "success",
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleUnstakeClaimRestake = async () => {
+    try {
+      const res = await stakingContract
+        .unstakeClaimRestakeMany(
+          unstakeableActionIds,
+          claimableActionIds.map((x) => x.StakeActionId),
+          claimableActionIds.map((x) => x.StakeActionId),
+          claimableActionIds.map((x) => x.DepositId)
+        )
+        .then((tx) => tx.wait());
+      console.log(res);
+      fetchData(owner, false);
+      setNotification({
+        visible: true,
+        text: "The tokens were unstaked, claimed and restaked successfully!",
+        type: "success",
+      });
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -136,18 +148,29 @@ const UnclaimedStakingRewardsRow = ({
       {account === owner && (
         <TablePrimaryCell align="center" sx={{ p: "4px 8px !important" }}>
           {unstakeableActionIds.length > 0 || claimableActionIds.length > 0 ? (
-            <Button
-              size="small"
-              onClick={handleClaim}
-              sx={{ minWidth: "140px" }}
-            >
-              {(unstakeableActionIds.length === 0 &&
-                claimableActionIds.length === 0) ||
-              unstakeableActionIds.length > 0
-                ? "Unstake & Claim"
-                : "Claim"}{" "}
-              {claimableAmount.toFixed(2)} ETH
-            </Button>
+            <>
+              <Button
+                size="small"
+                onClick={handleClaim}
+                sx={{ minWidth: "140px" }}
+              >
+                {(unstakeableActionIds.length === 0 &&
+                  claimableActionIds.length === 0) ||
+                unstakeableActionIds.length > 0
+                  ? "Unstake & Claim"
+                  : "Claim"}{" "}
+                {claimableAmount.toFixed(6)} ETH
+              </Button>
+              <Button
+                size="small"
+                onClick={handleUnstakeClaimRestake}
+                sx={{ minWidth: "140px", mt: 1 }}
+              >
+                {`Unstake & Claim (${claimableAmount.toFixed(
+                  6
+                )} ETH) & Restake`}
+              </Button>
+            </>
           ) : (
             " "
           )}
