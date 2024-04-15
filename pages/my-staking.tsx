@@ -96,25 +96,20 @@ const MyStaking = () => {
   };
   const fetchData = async (addr: string, reload: boolean = true) => {
     setLoading(reload);
-    setTimeout(
-      async () => {
-        const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
-          addr
-        );
-        setUnclaimedStakingRewards(unclaimedStakingRewards);
-        const collectedStakingRewards = await api.get_collected_staking_rewards_by_user(
-          addr
-        );
-        setCollectedStakingRewards(collectedStakingRewards);
-        const stakingActions = await api.get_staking_actions_by_user(addr);
-        setStakingActions(stakingActions);
-        const CSTokens = await api.get_cst_tokens_by_user(addr);
-        setCSTokens(CSTokens);
-        fetchStakedToken();
-        setLoading(false);
-      },
-      reload ? 0 : 3000
+    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
+      addr
     );
+    setUnclaimedStakingRewards(unclaimedStakingRewards);
+    const collectedStakingRewards = await api.get_collected_staking_rewards_by_user(
+      addr
+    );
+    setCollectedStakingRewards(collectedStakingRewards);
+    const stakingActions = await api.get_staking_actions_by_user(addr);
+    setStakingActions(stakingActions);
+    const CSTokens = await api.get_cst_tokens_by_user(addr);
+    setCSTokens(CSTokens);
+    fetchStakedToken();
+    setLoading(false);
   };
   useEffect(() => {
     if (account) {

@@ -71,16 +71,16 @@ const UnclaimedStakingRewardsRow = ({
   const [claimableAmount, setClaimableAmount] = useState(0);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  const router = useRouter();
 
+  const fetchRowData = async () => {
+    const res = await fetchInfo(account, row.DepositId, stakedActionIds);
+    setUnstakeableActionIds(res.unstakeableActionIds);
+    setClaimableActionIds(res.claimableActionIds);
+    setClaimableAmount(res.claimableAmount);
+    return res;
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetchInfo(account, row.DepositId, stakedActionIds);
-      setUnstakeableActionIds(res.unstakeableActionIds);
-      setClaimableActionIds(res.claimableActionIds);
-      setClaimableAmount(res.claimableAmount);
-    };
-    fetchData();
+    fetchRowData();
   }, []);
 
   const handleClaim = async () => {
@@ -102,7 +102,11 @@ const UnclaimedStakingRewardsRow = ({
       });
     } catch (e) {
       if (e.code === -32603) {
-        router.reload();
+        fetchData(owner, false);
+        const rowData = await fetchRowData();
+        if (rowData.claimableActionIds.length > 0) {
+          handleClaim();
+        }
       } else {
         console.error(e);
       }
