@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Box, CardActionArea, Link, Typography } from "@mui/material";
 import Head from "next/head";
-import { MainWrapper, StyledCard } from "../../components/styled";
+import { MainWrapper, StyledCard } from "../../../components/styled";
 import { GetServerSidePropsContext } from "next";
-import api from "../../services/api";
-import { convertTimestampToDateTime } from "../../utils";
-import NFTImage from "../../components/NFTImage";
+import api from "../../../services/api";
+import { convertTimestampToDateTime } from "../../../utils";
+import NFTImage from "../../../components/NFTImage";
 
-const StakingActionDetail = ({ actionId }) => {
+const StakingActionDetail = ({ actionId, actionType }) => {
   const [actionInfo, setActionInfo] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -16,15 +16,15 @@ const StakingActionDetail = ({ actionId }) => {
       try {
         setLoading(true);
         const info = await api.get_staking_actions_info(actionId);
-        if (!info.Unstake?.EvtLogId) {
-          setActionInfo({ ...info.Stake, ActionType: 0 });
+        if (!actionType) {
+          setActionInfo(info.Stake);
         } else {
-          setActionInfo({ ...info.Unstake, ActionType: 1 });
+          setActionInfo(info.Unstake);
         }
         setLoading(false);
       } catch (e) {
-        console.error(e);
         setLoading(false);
+        console.error(e);
       }
     };
     fetchData();
@@ -55,7 +55,7 @@ const StakingActionDetail = ({ actionId }) => {
               </Typography>
               &nbsp;
               <Typography component="span">
-                {actionInfo.ActionType === 1 ? "Unstake" : "Stake"}
+                {actionType === 1 ? "Unstake" : "Stake"}
               </Typography>
             </Box>
             <Box mb={1}>
@@ -67,7 +67,7 @@ const StakingActionDetail = ({ actionId }) => {
                 {convertTimestampToDateTime(actionInfo.TimeStamp)}
               </Typography>
             </Box>
-            {actionInfo.ActionType === 0 && (
+            {actionType === 0 && (
               <Box mb={1}>
                 <Typography color="primary" component="span">
                   Unstake Datetime:
@@ -138,9 +138,13 @@ const StakingActionDetail = ({ actionId }) => {
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const type = context.params!.actionType;
   const id = context.params!.actionId;
   const actionId = Array.isArray(id) ? id[0] : id;
-  return { props: { actionId: parseInt(actionId) } };
+  const actionType = Array.isArray(type) ? type[0] : type;
+  return {
+    props: { actionId: parseInt(actionId), actionType: parseInt(actionType) },
+  };
 }
 
 export default StakingActionDetail;

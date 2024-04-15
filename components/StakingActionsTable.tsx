@@ -23,7 +23,7 @@ const StakingActionsRow = ({ row }) => {
     <TablePrimaryRow
       sx={{ cursor: "pointer" }}
       onClick={() => {
-        router.push(`/staking-action/${row.ActionId}`);
+        router.push(`/staking-action/${row.ActionId}/${row.ActionType}`);
       }}
     >
       <TablePrimaryCell>
