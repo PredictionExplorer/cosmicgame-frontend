@@ -1,0 +1,146 @@
+import React, { useEffect, useState } from "react";
+import { Box, CardActionArea, Link, Typography } from "@mui/material";
+import Head from "next/head";
+import { MainWrapper, StyledCard } from "../../components/styled";
+import { GetServerSidePropsContext } from "next";
+import api from "../../services/api";
+import { convertTimestampToDateTime } from "../../utils";
+import NFTImage from "../../components/NFTImage";
+
+const StakingActionDetail = ({ actionId }) => {
+  const [actionInfo, setActionInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const info = await api.get_staking_actions_info(actionId);
+        if (!info.Unstake?.EvtLogId) {
+          setActionInfo({ ...info.Stake, ActionType: 0 });
+        } else {
+          setActionInfo({ ...info.Unstake, ActionType: 1 });
+        }
+        setLoading(false);
+      } catch (e) {
+        console.error(e);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  return (
+    <>
+      <Head>
+        <title>Staking Action Detail | Cosmic Signature</title>
+        <meta name="description" content="" />
+      </Head>
+      <MainWrapper>
+        <Box mb={4}>
+          <Typography variant="h4" color="primary" component="span" mr={2}>
+            {`Staking Action Id=${actionId}`}
+          </Typography>
+          <Typography variant="h4" component="span">
+            Information
+          </Typography>
+        </Box>
+        {loading ? (
+          <Typography variant="h6">Loading...</Typography>
+        ) : (
+          <Box>
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                Action Type:
+              </Typography>
+              &nbsp;
+              <Typography component="span">
+                {actionInfo.ActionType === 1 ? "Unstake" : "Stake"}
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                Stake Datetime:
+              </Typography>
+              &nbsp;
+              <Typography component="span">
+                {convertTimestampToDateTime(actionInfo.TimeStamp)}
+              </Typography>
+            </Box>
+            {actionInfo.ActionType === 0 && (
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Unstake Datetime:
+                </Typography>
+                &nbsp;
+                <Typography component="span">
+                  {convertTimestampToDateTime(actionInfo.UnstakeTimeStamp)}
+                </Typography>
+              </Box>
+            )}
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                Staker Address:
+              </Typography>
+              &nbsp;
+              <Link
+                href={`/user/${actionInfo.StakerAddr}`}
+                style={{ color: "inherit", wordBreak: "break-all" }}
+              >
+                <Typography component="span">
+                  {actionInfo.StakerAddr}
+                </Typography>
+              </Link>
+            </Box>
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                Number of Staked Tokens:
+              </Typography>
+              &nbsp;
+              <Typography component="span">
+                {actionInfo.NumStakedNFTs}
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                {actionInfo.ActionType === 0 ? "Staked" : "Unstaked"} Token Id:
+              </Typography>
+              &nbsp;
+              <Link
+                href={`/detail/${actionInfo.TokenId}`}
+                style={{ color: "inherit" }}
+              >
+                <Typography component="span">{actionInfo.TokenId}</Typography>
+              </Link>
+            </Box>
+            <Box sx={{ maxWidth: "400px", mt: 4, mb: 1 }}>
+              <StyledCard>
+                <CardActionArea>
+                  <Link
+                    href={`/detail/${actionInfo.TokenId}`}
+                    sx={{ display: "block" }}
+                  >
+                    <NFTImage
+                      src={`https://cosmic-game2.s3.us-east-2.amazonaws.com/${actionInfo.TokenId.toString().padStart(
+                        6,
+                        "0"
+                      )}.png`}
+                    />
+                  </Link>
+                </CardActionArea>
+              </StyledCard>
+            </Box>
+          </Box>
+        )}
+      </MainWrapper>
+    </>
+  );
+};
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const id = context.params!.actionId;
+  const actionId = Array.isArray(id) ? id[0] : id;
+  return { props: { actionId: parseInt(actionId) } };
+}
+
+export default StakingActionDetail;

@@ -11,14 +11,21 @@ import {
 import { Tbody, Tr } from "react-super-responsive-table";
 import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { useRouter } from "next/router";
 
 const StakingActionsRow = ({ row }) => {
+  const router = useRouter();
   if (!row) {
     return <TablePrimaryRow></TablePrimaryRow>;
   }
 
   return (
-    <TablePrimaryRow>
+    <TablePrimaryRow
+      sx={{ cursor: "pointer" }}
+      onClick={() => {
+        router.push(`/staking-action/${row.ActionId}`);
+      }}
+    >
       <TablePrimaryCell>
         {convertTimestampToDateTime(row.TimeStamp)}
       </TablePrimaryCell>
