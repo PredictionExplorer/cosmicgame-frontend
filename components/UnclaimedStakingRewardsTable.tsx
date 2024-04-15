@@ -23,6 +23,7 @@ import { useActiveWeb3React } from "../hooks/web3";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import { useRouter } from "next/router";
 
 const fetchInfo = async (account, depositId, stakedActionIds) => {
   const response = await api.get_action_ids_by_deposit_id(account, depositId);
@@ -70,6 +71,7 @@ const UnclaimedStakingRewardsRow = ({
   const [claimableAmount, setClaimableAmount] = useState(0);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,6 +102,9 @@ const UnclaimedStakingRewardsRow = ({
       });
     } catch (e) {
       console.error(e);
+      if (e.code === -32603) {
+        router.reload();
+      }
     }
   };
 
