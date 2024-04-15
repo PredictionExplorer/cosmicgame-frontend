@@ -101,9 +101,10 @@ const UnclaimedStakingRewardsRow = ({
         type: "success",
       });
     } catch (e) {
-      console.error(e);
       if (e.code === -32603) {
         router.reload();
+      } else {
+        console.error(e);
       }
     }
   };
