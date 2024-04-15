@@ -144,21 +144,25 @@ export const StakedTokensTable = ({
     setSelected([]);
   };
   const onUnstakeMany = async () => {
-    await handleUnstakeMany(selected);
-    setNotification({
-      visible: true,
-      text: "The selected tokens were unstaked successfully!",
-      type: "success",
-    });
+    const res = await handleUnstakeMany(selected);
+    if (!res.code) {
+      setNotification({
+        visible: true,
+        text: "The selected tokens were unstaked successfully!",
+        type: "success",
+      });
+    }
   };
   const onUnstake = async (actionId: number, tokenId: number) => {
     setSelected([actionId]);
-    await handleUnstake(actionId);
-    setNotification({
-      visible: true,
-      text: `You have successfully unstaked token ${tokenId}!`,
-      type: "success",
-    });
+    const res = await handleUnstake(actionId);
+    if (!res.code) {
+      setNotification({
+        visible: true,
+        text: `You have successfully unstaked token ${tokenId}!`,
+        type: "success",
+      });
+    }
   };
   useEffect(() => {
     const fetchData = async () => {
@@ -239,7 +243,7 @@ export const StakedTokensTable = ({
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      {selected.length > 0 && (
+      {selected.length > 1 && (
         <Box display="flex" justifyContent="end" mt={2}>
           <Button variant="text" onClick={onUnstakeMany}>
             Unstake Many

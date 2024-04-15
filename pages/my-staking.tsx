@@ -40,8 +40,10 @@ const MyStaking = () => {
       const res = await stakingContract.stake(tokenId).then((tx) => tx.wait());
       console.log(res);
       fetchData(account, false);
+      return res;
     } catch (err) {
       console.error(err);
+      return err;
     }
   };
 
@@ -59,10 +61,11 @@ const MyStaking = () => {
       const res = await stakingContract
         .stakeMany(tokenIds)
         .then((tx) => tx.wait());
-      console.log(res);
       fetchData(account, false);
+      return res;
     } catch (err) {
       console.error(err);
+      return err;
     }
   };
 
@@ -71,10 +74,11 @@ const MyStaking = () => {
       const res = await stakingContract
         .unstakeMany(actionIds)
         .then((tx) => tx.wait());
-      console.log(res);
       fetchData(account, false);
+      return res;
     } catch (err) {
       console.error(err);
+      return err;
     }
   };
 
@@ -83,10 +87,11 @@ const MyStaking = () => {
       const res = await stakingContract
         .unstake(actionId)
         .then((tx) => tx.wait());
-      console.log(res);
       fetchData(account, false);
+      return res;
     } catch (err) {
       console.error(err);
+      return err;
     }
   };
   const fetchData = async (addr: string, reload: boolean = true) => {

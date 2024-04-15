@@ -139,21 +139,25 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
     setSelected([]);
   };
   const onStakeMany = async () => {
-    await handleStakeMany(selected);
-    setNotification({
-      visible: true,
-      text: "The selected tokens were staked successfully!",
-      type: "success",
-    });
+    const res = await handleStakeMany(selected);
+    if (!res.code) {
+      setNotification({
+        visible: true,
+        text: "The selected tokens were staked successfully!",
+        type: "success",
+      });
+    }
   };
   const onStake = async (id: number) => {
     setSelected([id]);
-    await handleStake(id);
-    setNotification({
-      visible: true,
-      text: `You have successfully staked token ${id}!`,
-      type: "success",
-    });
+    const res = await handleStake(id);
+    if (!res.code) {
+      setNotification({
+        visible: true,
+        text: `You have successfully staked token ${id}!`,
+        type: "success",
+      });
+    }
   };
 
   useEffect(() => {
@@ -226,7 +230,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      {selected.length > 0 && (
+      {selected.length > 1 && (
         <Box display="flex" justifyContent="end" mt={2}>
           <Button variant="text" onClick={onStakeMany}>
             Stake Many
