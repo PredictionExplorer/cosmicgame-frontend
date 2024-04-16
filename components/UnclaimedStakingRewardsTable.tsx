@@ -131,7 +131,15 @@ const UnclaimedStakingRewardsRow = ({
         type: "success",
       });
     } catch (e) {
-      console.error(e);
+      if (e.code === -32603) {
+        fetchData(owner, false);
+        const rowData = await fetchRowData();
+        if (rowData.claimableActionIds.length > 0) {
+          handleClaim();
+        }
+      } else {
+        console.error(e);
+      }
     }
   };
 
@@ -268,7 +276,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     };
     fetchActionIds();
     calculateOffset();
-  }, []);
+  }, [list]);
 
   if (offset === undefined) return;
 
@@ -317,10 +325,10 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
           <TableBody>
             {list
               .slice((page - 1) * perPage, page * perPage)
-              .map((row, index) => (
+              .map((row) => (
                 <UnclaimedStakingRewardsRow
                   row={row}
-                  key={index}
+                  key={row.EvtLogId}
                   owner={owner}
                   fetchData={fetchData}
                   setNotification={setNotification}
