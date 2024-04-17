@@ -12,6 +12,7 @@ import {
   Skeleton,
   AccordionDetails,
   Typography,
+  MenuItem,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { isMobile, isSafari } from 'react-device-detect'
@@ -439,3 +440,7 @@ export const StyledInput = styled('input')({
   }
 })
 
+export const PrimaryMenuItem = styled(MenuItem)({
+  fontSize: 'inherit',
+  minHeight: '32px'
+})

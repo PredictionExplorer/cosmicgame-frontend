@@ -29,7 +29,12 @@ import "react-modal-video/css/modal-video.min.css";
 import NFTVideo from "./NFTVideo";
 import { useActiveWeb3React } from "../hooks/web3";
 import { convertTimestampToDateTime, formatId } from "../utils";
-import { StyledCard, SectionWrapper, NFTInfoWrapper } from "./styled";
+import {
+  StyledCard,
+  SectionWrapper,
+  NFTInfoWrapper,
+  PrimaryMenuItem,
+} from "./styled";
 import {
   ArrowBack,
   ArrowForward,
@@ -301,13 +306,19 @@ const NFTTrait = ({ tokenId }) => {
                     onClose={handleMenuClose}
                   >
                     <CopyToClipboard text={video}>
-                      <MenuItem onClick={handleMenuClose}>Video</MenuItem>
+                      <PrimaryMenuItem onClick={handleMenuClose}>
+                        <Typography>Video</Typography>
+                      </PrimaryMenuItem>
                     </CopyToClipboard>
                     <CopyToClipboard text={image}>
-                      <MenuItem onClick={handleMenuClose}>Image</MenuItem>
+                      <PrimaryMenuItem onClick={handleMenuClose}>
+                        <Typography>Image</Typography>
+                      </PrimaryMenuItem>
                     </CopyToClipboard>
                     <CopyToClipboard text={window.location.href}>
-                      <MenuItem onClick={handleMenuClose}>Detail Page</MenuItem>
+                      <PrimaryMenuItem onClick={handleMenuClose}>
+                        <Typography>Detail Page</Typography>
+                      </PrimaryMenuItem>
                     </CopyToClipboard>
                   </Menu>
                 </Grid>
