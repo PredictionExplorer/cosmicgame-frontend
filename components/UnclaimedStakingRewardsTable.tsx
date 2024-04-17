@@ -77,7 +77,7 @@ const UnclaimedStakingRewardsRow = ({
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [actionIds, setActionIds] = useState([]);
-  const [claimableAmount, setClaimableAmount] = useState(0);
+  // const [claimableAmount, setClaimableAmount] = useState(0);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -87,7 +87,7 @@ const UnclaimedStakingRewardsRow = ({
     const res = await fetchInfo(account, row.DepositId, stakedActionIds);
     setUnstakeableActionIds(res.unstakeableActionIds);
     setClaimableActionIds(res.claimableActionIds);
-    setClaimableAmount(res.claimableAmount);
+    // setClaimableAmount(res.claimableAmount);
     setActionIds(res.actionIds);
     return res;
   };
@@ -95,21 +95,21 @@ const UnclaimedStakingRewardsRow = ({
     fetchRowData();
   }, []);
 
-  const _handleUnstakeClaimRestake = async (
+  const handleUnstakeClaimRestake = async (
     type,
     unstakeActions,
-    stakeActions,
+    restakeActions,
     claimActions,
-    restakeActions
+    claimDeposits
   ) => {
     try {
       handleMenuClose();
       const res = await stakingContract
         .unstakeClaimRestakeMany(
           unstakeActions,
-          stakeActions,
+          restakeActions,
           claimActions,
-          restakeActions
+          claimDeposits
         )
         .then((tx) => tx.wait());
       console.log(res);
@@ -124,12 +124,12 @@ const UnclaimedStakingRewardsRow = ({
         fetchData(owner, false);
         const rowData = await fetchRowData();
         if (rowData.claimableActionIds.length > 0) {
-          _handleUnstakeClaimRestake(
+          handleUnstakeClaimRestake(
             type,
             unstakeActions,
-            stakeActions,
+            restakeActions,
             claimActions,
-            restakeActions
+            claimDeposits
           );
         }
       } else {
@@ -177,7 +177,7 @@ const UnclaimedStakingRewardsRow = ({
                     size="small"
                     sx={{ textTransform: "none" }}
                     onClick={() =>
-                      _handleUnstakeClaimRestake(
+                      handleUnstakeClaimRestake(
                         `${unstakeableActionIds.length > 0 &&
                           "unstaked & "}claimed`,
                         unstakeableActionIds,
@@ -211,7 +211,7 @@ const UnclaimedStakingRewardsRow = ({
                     {unstakeableActionIds.length > 0 && (
                       <PrimaryMenuItem
                         onClick={() =>
-                          _handleUnstakeClaimRestake(
+                          handleUnstakeClaimRestake(
                             "unstaked",
                             unstakeableActionIds,
                             [],
@@ -231,7 +231,7 @@ const UnclaimedStakingRewardsRow = ({
                   </PrimaryMenuItem> */}
                     <PrimaryMenuItem
                       onClick={() =>
-                        _handleUnstakeClaimRestake(
+                        handleUnstakeClaimRestake(
                           `${unstakeableActionIds.length > 0 &&
                             "unstaked & "}claimed and restaked`,
                           unstakeableActionIds,
@@ -254,7 +254,7 @@ const UnclaimedStakingRewardsRow = ({
                     size="small"
                     sx={{ textTransform: "none" }}
                     onClick={() =>
-                      _handleUnstakeClaimRestake(
+                      handleUnstakeClaimRestake(
                         `${unstakeableActionIds.length > 0 &&
                           "unstaked & "}claimed`,
                         unstakeableActionIds,
@@ -287,7 +287,7 @@ const UnclaimedStakingRewardsRow = ({
                     {unstakeableActionIds.length > 0 && (
                       <PrimaryMenuItem
                         onClick={() =>
-                          _handleUnstakeClaimRestake(
+                          handleUnstakeClaimRestake(
                             "unstaked",
                             unstakeableActionIds,
                             [],
@@ -307,7 +307,7 @@ const UnclaimedStakingRewardsRow = ({
                   </PrimaryMenuItem> */}
                     <PrimaryMenuItem
                       onClick={() =>
-                        _handleUnstakeClaimRestake(
+                        handleUnstakeClaimRestake(
                           `${unstakeableActionIds.length > 0 &&
                             "unstaked & "}claimed and restaked`,
                           unstakeableActionIds,
@@ -347,6 +347,7 @@ const UnclaimedStakingRewardsRow = ({
         open={openDlg}
         setOpen={setOpenDlg}
         tokens={actionIds}
+        handleUnstakeClaimRestake={handleUnstakeClaimRestake}
       />
     </>
   );

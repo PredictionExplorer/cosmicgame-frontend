@@ -44,23 +44,6 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     }
     return false;
   };
-  const isChecked = (field) => {
-    if (field === "unstake") {
-      if (stakedActionIds.includes(row.StakeActionId)) {
-        return false;
-      }
-      return true;
-    }
-    return false;
-  };
-
-  useEffect(() => {
-    setStakeState({
-      ...stakeState,
-      unstake: stakeState.unstake || isChecked("unstake"),
-    });
-  }, []);
-
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -83,6 +66,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
           disabled={isDisabled("unstake")}
           onChange={(e) =>
             setStakeState({
+              ...stakeState,
               unstake: e.target.checked,
               claim: stakeState.claim && e.target.checked,
               restake: stakeState.restake && e.target.checked,
@@ -121,21 +105,17 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
 };
 
 interface stakeStateInterface {
+  TokenId: number;
+  DepositId: number;
+  StakeActionId: number;
   unstake: boolean;
   claim: boolean;
   restake: boolean;
 }
 
-const TokensTable = ({ list }) => {
+const TokensTable = ({ list, stakeState, setStakeState }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
-  const [stakeState, setStakeState] = useState<stakeStateInterface[]>(
-    new Array(list.length).fill({
-      unstake: false,
-      claim: false,
-      restake: false,
-    })
-  );
   const updateStakeState = (index, param) => {
     const newArray = [...stakeState];
     newArray[index] = param;
@@ -188,15 +168,46 @@ const TokensTable = ({ list }) => {
         />
       </Box>
       <Box mt={2}>
-        <Button size="small" onClick={handleUnstakeAll}>Unstake All</Button>
+        <Button size="small" onClick={handleUnstakeAll}>
+          Unstake All
+        </Button>
       </Box>
     </>
   );
 };
 
-export default function AdvancedClaimDialog({ tokens, open, setOpen }) {
+export default function AdvancedClaimDialog({
+  tokens,
+  open,
+  setOpen,
+  handleUnstakeClaimRestake,
+}) {
+  const { data: stakedTokens } = useStakedToken();
+  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const [stakeState, setStakeState] = useState<stakeStateInterface[]>(
+    tokens.map((x) => ({
+      TokenId: x.TokenId,
+      StakeActionId: x.StakeActionId,
+      DepositId: x.DepositId,
+      unstake: !stakedActionIds.includes(x.StakeActionId),
+      claim: false,
+      restake: false,
+    }))
+  );
   const handleClose = () => {
     setOpen(false);
+  };
+  const handleSendTransaction = async () => {
+    handleClose();
+    handleUnstakeClaimRestake(
+      "unstaked, claimed and restaked",
+      stakeState
+        .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
+        .map((X) => X.StakeActionId),
+      stakeState.filter((x) => x.restake).map((X) => X.StakeActionId),
+      stakeState.filter((x) => x.claim).map((X) => X.StakeActionId),
+      stakeState.filter((x) => x.claim).map((X) => X.DepositId)
+    );
   };
 
   return (
@@ -213,10 +224,14 @@ export default function AdvancedClaimDialog({ tokens, open, setOpen }) {
           Advanced Transaction Build
         </DialogTitle>
         <DialogContent>
-          <TokensTable list={tokens} />
+          <TokensTable
+            list={tokens}
+            stakeState={stakeState}
+            setStakeState={setStakeState}
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Send Transaction</Button>
+          <Button onClick={handleSendTransaction}>Send Transaction</Button>
         </DialogActions>
       </Dialog>
     </>
