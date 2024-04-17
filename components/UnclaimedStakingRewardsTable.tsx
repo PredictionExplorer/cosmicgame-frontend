@@ -59,7 +59,9 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
     unstakeableActionIds,
     claimableActionIds,
     claimableAmount,
-    actionIds: response.filter((x) => !x.Claimed),
+    actionIds: response.filter(
+      (x) => x.UnstakeEligibleTimeStamp < x.CurChainTimeStamp && !x.Claimed
+    ),
   };
 };
 

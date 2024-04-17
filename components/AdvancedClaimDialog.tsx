@@ -30,8 +30,11 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     if (row.UnstakeEligibleTimeStamp > row.CurChainTimeStamp) {
       return true;
     }
-    if (field === "unstake" && stakedActionIds.includes(row.StakeActionId)) {
-      return false;
+    if (field === "unstake") {
+      if (stakedActionIds.includes(row.StakeActionId)) {
+        return false;
+      }
+      return true;
     }
     if (field === "claim" && !stakeState.unstake) {
       return true;
@@ -39,6 +42,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     if (field === "restake" && !stakeState.unstake) {
       return true;
     }
+    return false;
   };
   const isChecked = (field) => {
     if (field === "unstake") {
@@ -137,6 +141,10 @@ const TokensTable = ({ list }) => {
     newArray[index] = param;
     setStakeState(newArray);
   };
+  const handleUnstakeAll = () => {
+    const newArray = stakeState.map((x) => ({ ...x, unstake: true }));
+    setStakeState(newArray);
+  };
   if (list.length === 0) {
     return <Typography>No deposits yet.</Typography>;
   }
@@ -178,6 +186,9 @@ const TokensTable = ({ list }) => {
           hidePrevButton
           shape="rounded"
         />
+      </Box>
+      <Box mt={2}>
+        <Button size="small" onClick={handleUnstakeAll}>Unstake All</Button>
       </Box>
     </>
   );
