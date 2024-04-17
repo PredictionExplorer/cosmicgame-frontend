@@ -65,6 +65,15 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
   };
 };
 
+interface stakeStateInterface {
+  TokenId: number;
+  DepositId: number;
+  StakeActionId: number;
+  unstake: boolean;
+  claim: boolean;
+  restake: boolean;
+}
+
 const UnclaimedStakingRewardsRow = ({
   row,
   owner,
@@ -76,19 +85,24 @@ const UnclaimedStakingRewardsRow = ({
   const stakingContract = useStakingWalletContract();
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
-  const [actionIds, setActionIds] = useState([]);
   // const [claimableAmount, setClaimableAmount] = useState(0);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDlg, setOpenDlg] = useState(false);
+  const [stakeState, setStakeState] = useState<stakeStateInterface[]>();
 
   const fetchRowData = async () => {
     const res = await fetchInfo(account, row.DepositId, stakedActionIds);
     setUnstakeableActionIds(res.unstakeableActionIds);
     setClaimableActionIds(res.claimableActionIds);
     // setClaimableAmount(res.claimableAmount);
-    setActionIds(res.actionIds);
+    setStakeState(res.actionIds.map((x) => ({
+      ...x,
+      unstake: !stakedActionIds.includes(x.StakeActionId),
+      claim: false,
+      restake: false,
+    })));
     return res;
   };
   useEffect(() => {
@@ -250,26 +264,32 @@ const UnclaimedStakingRewardsRow = ({
                 </>
               ) : (
                 <>
-                  <Button
-                    size="small"
-                    sx={{ textTransform: "none" }}
-                    onClick={() =>
-                      handleUnstakeClaimRestake(
-                        `${unstakeableActionIds.length > 0 &&
-                          "unstaked & "}claimed`,
-                        unstakeableActionIds,
-                        [],
-                        claimableActionIds.map((x) => x.StakeActionId),
-                        claimableActionIds.map((x) => x.DepositId)
-                      )
-                    }
-                  >
-                    {`${unstakeableActionIds.length > 0 &&
-                      "Unstake &"} Claim All`}
-                  </Button>
-                  <IconButton size="small" onClick={handleMenuOpen}>
-                    <MoreHorizIcon fontSize="small" />
-                  </IconButton>
+                  <Box sx={{ display: "flex" }}>
+                    <Button
+                      size="small"
+                      sx={{
+                        textTransform: "none",
+                        whiteSpace: "nowrap",
+                        mr: 1,
+                      }}
+                      onClick={() =>
+                        handleUnstakeClaimRestake(
+                          `${unstakeableActionIds.length > 0 &&
+                            "unstaked & "}claimed`,
+                          unstakeableActionIds,
+                          [],
+                          claimableActionIds.map((x) => x.StakeActionId),
+                          claimableActionIds.map((x) => x.DepositId)
+                        )
+                      }
+                    >
+                      {`${unstakeableActionIds.length > 0 &&
+                        "Unstake &"} Claim All`}
+                    </Button>
+                    <IconButton size="small" onClick={handleMenuOpen}>
+                      <MoreHorizIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
                   <Menu
                     elevation={0}
                     anchorOrigin={{
@@ -346,7 +366,8 @@ const UnclaimedStakingRewardsRow = ({
       <AdvancedClaimDialog
         open={openDlg}
         setOpen={setOpenDlg}
-        tokens={actionIds}
+        stakeState={stakeState}
+        setStakeState={setStakeState}
         handleUnstakeClaimRestake={handleUnstakeClaimRestake}
       />
     </>

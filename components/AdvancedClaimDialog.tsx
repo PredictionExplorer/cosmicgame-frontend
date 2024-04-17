@@ -20,7 +20,7 @@ import {
   TablePrimaryRow,
 } from "./styled";
 import { Tr } from "react-super-responsive-table";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 
 const TokenRow = ({ row, stakeState, setStakeState }) => {
@@ -104,16 +104,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
   );
 };
 
-interface stakeStateInterface {
-  TokenId: number;
-  DepositId: number;
-  StakeActionId: number;
-  unstake: boolean;
-  claim: boolean;
-  restake: boolean;
-}
-
-const TokensTable = ({ list, stakeState, setStakeState }) => {
+const TokensTable = ({ stakeState, setStakeState }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const updateStakeState = (index, param) => {
@@ -125,9 +116,6 @@ const TokensTable = ({ list, stakeState, setStakeState }) => {
     const newArray = stakeState.map((x) => ({ ...x, unstake: true }));
     setStakeState(newArray);
   };
-  if (list.length === 0) {
-    return <Typography>No deposits yet.</Typography>;
-  }
   return (
     <>
       <TablePrimaryContainer>
@@ -141,7 +129,7 @@ const TokensTable = ({ list, stakeState, setStakeState }) => {
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list
+            {stakeState
               .slice((page - 1) * perPage, page * perPage)
               .map((row, index) => (
                 <TokenRow
@@ -161,7 +149,7 @@ const TokensTable = ({ list, stakeState, setStakeState }) => {
           color="primary"
           page={page}
           onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
+          count={Math.ceil(stakeState.length / perPage)}
           hideNextButton
           hidePrevButton
           shape="rounded"
@@ -177,28 +165,22 @@ const TokensTable = ({ list, stakeState, setStakeState }) => {
 };
 
 export default function AdvancedClaimDialog({
-  tokens,
+  stakeState,
+  setStakeState,
   open,
   setOpen,
   handleUnstakeClaimRestake,
 }) {
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  const [stakeState, setStakeState] = useState<stakeStateInterface[]>(
-    tokens.map((x) => ({
-      TokenId: x.TokenId,
-      StakeActionId: x.StakeActionId,
-      DepositId: x.DepositId,
-      unstake: !stakedActionIds.includes(x.StakeActionId),
-      claim: false,
-      restake: false,
-    }))
-  );
   const handleClose = () => {
     setOpen(false);
   };
   const handleSendTransaction = async () => {
     handleClose();
+    console.log(stakeState
+      .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
+      .map((X) => X.StakeActionId));
     handleUnstakeClaimRestake(
       "unstaked, claimed and restaked",
       stakeState
@@ -224,11 +206,7 @@ export default function AdvancedClaimDialog({
           Advanced Transaction Build
         </DialogTitle>
         <DialogContent>
-          <TokensTable
-            list={tokens}
-            stakeState={stakeState}
-            setStakeState={setStakeState}
-          />
+          <TokensTable stakeState={stakeState} setStakeState={setStakeState} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleSendTransaction}>Send Transaction</Button>
