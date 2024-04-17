@@ -41,14 +41,20 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     }
   };
   const isChecked = (field) => {
-    if (field === "unstake" && stakedActionIds.includes(row.StakeActionId)) {
-      return false;
+    if (field === "unstake") {
+      if (stakedActionIds.includes(row.StakeActionId)) {
+        return false;
+      }
+      return true;
     }
     return false;
   };
 
   useEffect(() => {
-    setStakeState({ ...stakeState, unstake: isChecked("unstake") });
+    setStakeState({
+      ...stakeState,
+      unstake: stakeState.unstake || isChecked("unstake"),
+    });
   }, []);
 
   if (!row) {
@@ -126,10 +132,8 @@ const TokensTable = ({ list }) => {
       restake: false,
     })
   );
-
   const updateStakeState = (index, param) => {
     const newArray = [...stakeState];
-    console.log(newArray, param);
     newArray[index] = param;
     setStakeState(newArray);
   };
