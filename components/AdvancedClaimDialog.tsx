@@ -178,17 +178,14 @@ export default function AdvancedClaimDialog({
   };
   const handleSendTransaction = async () => {
     handleClose();
-    console.log(stakeState
-      .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
-      .map((X) => X.StakeActionId));
     handleUnstakeClaimRestake(
       "unstaked, claimed and restaked",
       stakeState
         .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
         .map((X) => X.StakeActionId),
-      stakeState.filter((x) => x.restake).map((X) => X.StakeActionId),
-      stakeState.filter((x) => x.claim).map((X) => X.StakeActionId),
-      stakeState.filter((x) => x.claim).map((X) => X.DepositId)
+      stakeState.filter((x) => x.restake).map((x) => x.StakeActionId),
+      stakeState.filter((x) => x.claim).map((x) => x.StakeActionId),
+      stakeState.filter((x) => x.claim).map((x) => x.DepositId)
     );
   };
 
