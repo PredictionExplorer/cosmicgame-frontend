@@ -90,7 +90,7 @@ const UnclaimedStakingRewardsRow = ({
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDlg, setOpenDlg] = useState(false);
-  const [stakeState, setStakeState] = useState<stakeStateInterface[]>();
+  const [stakeState, setStakeState] = useState<stakeStateInterface[]>([]);
 
   const fetchRowData = async () => {
     const res = await fetchInfo(account, row.DepositId, stakedActionIds);
