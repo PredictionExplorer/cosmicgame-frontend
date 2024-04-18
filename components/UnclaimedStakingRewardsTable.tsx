@@ -97,12 +97,14 @@ const UnclaimedStakingRewardsRow = ({
     setUnstakeableActionIds(res.unstakeableActionIds);
     setClaimableActionIds(res.claimableActionIds);
     // setClaimableAmount(res.claimableAmount);
-    setStakeState(res.actionIds.map((x) => ({
-      ...x,
-      unstake: !stakedActionIds.includes(x.StakeActionId),
-      claim: false,
-      restake: false,
-    })));
+    setStakeState(
+      res.actionIds.map((x) => ({
+        ...x,
+        unstake: !stakedActionIds.includes(x.StakeActionId),
+        claim: false,
+        restake: false,
+      }))
+    );
     return res;
   };
   useEffect(() => {
@@ -256,8 +258,9 @@ const UnclaimedStakingRewardsRow = ({
                       }
                     >
                       <Typography>
-                        {`${unstakeableActionIds.length > 0 &&
-                          "Unstake &"} Claim & Restake`}
+                        {`${
+                          unstakeableActionIds.length > 0 ? "Unstake &" : ""
+                        } Claim & Restake`}
                       </Typography>
                     </PrimaryMenuItem>
                   </Menu>
@@ -283,8 +286,9 @@ const UnclaimedStakingRewardsRow = ({
                         )
                       }
                     >
-                      {`${unstakeableActionIds.length > 0 &&
-                        "Unstake &"} Claim All`}
+                      {`${
+                        unstakeableActionIds.length > 0 ? "Unstake &" : ""
+                      } Claim All`}
                     </Button>
                     <IconButton size="small" onClick={handleMenuOpen}>
                       <MoreHorizIcon fontSize="small" />
@@ -338,8 +342,9 @@ const UnclaimedStakingRewardsRow = ({
                       }
                     >
                       <Typography>
-                        {`${unstakeableActionIds.length > 0 &&
-                          "Unstake &"} Claim & Restake All`}
+                        {`${
+                          unstakeableActionIds.length > 0 ? "Unstake &" : ""
+                        } Claim & Restake All`}
                       </Typography>
                     </PrimaryMenuItem>
                     <PrimaryMenuItem
