@@ -26,6 +26,7 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 const TokenRow = ({ row, stakeState, setStakeState }) => {
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const isDisabled = (field) => {
     if (row.UnstakeEligibleTimeStamp > row.CurChainTimeStamp) {
       return true;
@@ -39,8 +40,10 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     if (field === "claim" && !stakeState.unstake) {
       return true;
     }
-    if (field === "restake" && !stakeState.unstake) {
-      return true;
+    if (field === "restake") {
+      if (!stakeState.unstake || stakedTokenIds.includes(row.TokenId)) {
+        return true;
+      }
     }
     return false;
   };
@@ -188,6 +191,25 @@ export default function AdvancedClaimDialog({
       stakeState.filter((x) => x.claim).map((x) => x.DepositId)
     );
   };
+  const canSendTransaction = () => {
+    const unstakeActionIds = stakeState
+      .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
+      .map((X) => X.StakeActionId);
+    const claimActionIds = stakeState
+      .filter((x) => x.claim)
+      .map((x) => x.StakeActionId);
+    const restakeActionIds = stakeState
+      .filter((x) => x.restake)
+      .map((x) => x.StakeActionId);
+    if (
+      unstakeActionIds.length === 0 &&
+      claimActionIds.length === 0 &&
+      restakeActionIds.length === 0
+    ) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <>
@@ -206,7 +228,12 @@ export default function AdvancedClaimDialog({
           <TokensTable stakeState={stakeState} setStakeState={setStakeState} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleSendTransaction}>Send Transaction</Button>
+          <Button
+            disabled={canSendTransaction()}
+            onClick={handleSendTransaction}
+          >
+            Send Transaction
+          </Button>
         </DialogActions>
       </Dialog>
     </>

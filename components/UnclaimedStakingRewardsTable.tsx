@@ -129,6 +129,9 @@ const UnclaimedStakingRewardsRow = ({
         )
         .then((tx) => tx.wait());
       console.log(res);
+      setTimeout(() => {
+        fetchRowData();
+      }, 1000);
       fetchData(owner, false);
       setNotification({
         visible: true,
