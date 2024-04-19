@@ -89,9 +89,10 @@ const UnclaimedStakingRewardsRow = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDlg, setOpenDlg] = useState(false);
   const [stakeState, setStakeState] = useState<stakeStateInterface[]>([]);
+  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
 
   const fetchRowData = async () => {
-    const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
     const res = await fetchInfo(account, row.DepositId, stakedActionIds);
     setUnstakeableActionIds(res.unstakeableActionIds);
     setClaimableActionIds(res.claimableActionIds);
@@ -238,7 +239,13 @@ const UnclaimedStakingRewardsRow = ({
                           `${unstakeableActionIds.length > 0 &&
                             "unstaked & "}claimed and restaked`,
                           unstakeableActionIds,
-                          claimableActionIds.map((x) => x.StakeActionId),
+                          stakeState
+                            .filter(
+                              (x) =>
+                                stakedActionIds.includes(x.StakeActionId) ||
+                                !stakedTokenIds.includes(x.TokenId)
+                            )
+                            .map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
                         )
@@ -322,7 +329,13 @@ const UnclaimedStakingRewardsRow = ({
                           `${unstakeableActionIds.length > 0 &&
                             "unstaked & "}claimed and restaked`,
                           unstakeableActionIds,
-                          claimableActionIds.map((x) => x.StakeActionId),
+                          stakeState
+                            .filter(
+                              (x) =>
+                                stakedActionIds.includes(x.StakeActionId) ||
+                                !stakedTokenIds.includes(x.TokenId)
+                            )
+                            .map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
                         )
@@ -458,9 +471,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         autoHideDuration={10000}
         open={notification.visible}
-        onClose={() =>
-          setNotification({ text: "", type: "success", visible: false })
-        }
+        onClose={() => setNotification((prev) => ({ ...prev, visible: false }))}
       >
         <Alert severity={notification.type} variant="filled">
           {notification.text}
