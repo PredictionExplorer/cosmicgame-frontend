@@ -9,7 +9,6 @@ import {
   Link,
   Pagination,
   TableBody,
-  Typography,
 } from "@mui/material";
 import {
   TablePrimary,
@@ -107,10 +106,10 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
 };
 
 const TokensTable = ({ stakeState, setStakeState }) => {
-  const { data: stakedTokens } = useStakedToken();
-  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const perPage = 5;
   const [page, setPage] = useState(1);
+  const { data: stakedTokens } = useStakedToken();
+  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const [isAllSelected, setAllSelected] = useState({
     unstake: true,
     claim: true,
@@ -124,7 +123,7 @@ const TokensTable = ({ stakeState, setStakeState }) => {
   const handleSelectUnstakeAll = () => {
     const newArray = stakeState.map((x) => ({
       ...x,
-      unstake: isAllSelected.unstake,
+      unstake: !stakedTokenIds.includes(x.TokenId) || isAllSelected.unstake,
       claim: x.claim && isAllSelected.unstake,
       restake: x.restake && isAllSelected.unstake,
     }));
@@ -219,7 +218,7 @@ export default function AdvancedClaimDialog({
   handleUnstakeClaimRestake,
 }) {
   const { data: stakedTokens } = useStakedToken();
-  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const handleClose = () => {
     setOpen(false);
   };
@@ -228,8 +227,8 @@ export default function AdvancedClaimDialog({
     handleUnstakeClaimRestake(
       "unstaked, claimed and restaked",
       stakeState
-        .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
-        .map((X) => X.StakeActionId),
+        .filter((x) => x.unstake && stakedTokenIds.includes(x.TokenId))
+        .map((x) => x.StakeActionId),
       stakeState.filter((x) => x.restake).map((x) => x.StakeActionId),
       stakeState.filter((x) => x.claim).map((x) => x.StakeActionId),
       stakeState.filter((x) => x.claim).map((x) => x.DepositId)
@@ -237,7 +236,7 @@ export default function AdvancedClaimDialog({
   };
   const canSendTransaction = () => {
     const unstakeActionIds = stakeState
-      .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
+      .filter((x) => x.unstake && stakedTokenIds.includes(x.TokenId))
       .map((X) => X.StakeActionId);
     const claimActionIds = stakeState
       .filter((x) => x.claim)
