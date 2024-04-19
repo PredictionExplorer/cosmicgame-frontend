@@ -25,7 +25,6 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 const TokenRow = ({ row, stakeState, setStakeState }) => {
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const isDisabled = (field) => {
     if (row.UnstakeEligibleTimeStamp > row.CurChainTimeStamp) {
       return true;
@@ -40,7 +39,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
       return true;
     }
     if (field === "restake") {
-      if (!stakeState.unstake || stakedTokenIds.includes(row.TokenId)) {
+      if (!stakeState.unstake) {
         return true;
       }
     }
@@ -150,10 +149,7 @@ const TokensTable = ({ stakeState, setStakeState }) => {
   const handleSelectRestakeAll = () => {
     const newArray = stakeState.map((x) => ({
       ...x,
-      restake:
-        isAllSelected.restake &&
-        x.unstake &&
-        !stakedTokenIds.includes(x.TokenId),
+      restake: isAllSelected.restake && x.unstake,
     }));
     setStakeState(newArray);
     setAllSelected({

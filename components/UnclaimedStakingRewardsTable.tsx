@@ -29,7 +29,7 @@ import { Tr } from "react-super-responsive-table";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AdvancedClaimDialog from "./AdvancedClaimDialog";
 
-const fetchInfo = async (account, depositId, stakedActionIds) => {
+const fetchInfo = async (account, depositId, stakedTokenIds) => {
   const response = await api.get_action_ids_by_deposit_id(account, depositId);
   let unstakeableActionIds = [],
     claimableActionIds = [],
@@ -45,7 +45,7 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
             });
             claimableAmount += x.AmountEth;
           }
-          if (stakedActionIds.includes(x.StakeActionId)) {
+          if (stakedTokenIds.includes(x.TokenId) && !x.Claimed) {
             unstakeableActionIds.push(x.StakeActionId);
           }
         }
@@ -85,22 +85,22 @@ const UnclaimedStakingRewardsRow = ({
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   // const [claimableAmount, setClaimableAmount] = useState(0);
-  const { data: stakedTokens, fetchData: fetchStakedTokens } = useStakedToken();
+  const { data: stakedTokens } = useStakedToken();
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDlg, setOpenDlg] = useState(false);
   const [stakeState, setStakeState] = useState<stakeStateInterface[]>([]);
 
   const fetchRowData = async () => {
+    const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
     const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
-    const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakedActionId);
-    const res = await fetchInfo(account, row.DepositId, stakedActionIds);
+    const res = await fetchInfo(account, row.DepositId, stakedTokenIds);
     setUnstakeableActionIds(res.unstakeableActionIds);
     setClaimableActionIds(res.claimableActionIds);
     // setClaimableAmount(res.claimableAmount);
     setStakeState(
       res.actionIds.map((x) => ({
         ...x,
-        unstake: stakedActionIds.includes(x.StakedActionId),
+        unstake: !stakedActionIds.includes(x.StakeActionId),
         claim: false,
         restake: false,
       }))
@@ -389,7 +389,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const { data: stakedTokens } = useStakedToken();
-  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakedActionId);
+  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const [offset, setOffset] = useState(undefined);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
@@ -451,7 +451,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
           const {
             claimableActionIds: cl,
             unstakeableActionIds: us,
-          } = await fetchInfo(account, depositId, stakedActionIds);
+          } = await fetchInfo(account, depositId, stakedTokenIds);
           cl_actionIds = cl_actionIds.concat(cl);
           us_actionIds = us_actionIds.concat(us);
         })
