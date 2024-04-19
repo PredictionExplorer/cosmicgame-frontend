@@ -24,13 +24,14 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 
 const TokenRow = ({ row, stakeState, setStakeState }) => {
   const { data: stakedTokens } = useStakedToken();
+  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const isDisabled = (field) => {
     if (row.UnstakeEligibleTimeStamp > row.CurChainTimeStamp) {
       return true;
     }
     if (field === "unstake") {
-      if (stakedTokenIds.includes(row.TokenId)) {
+      if (stakedActionIds.includes(row.StakeActionId)) {
         return false;
       }
       return true;
@@ -39,7 +40,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
       return true;
     }
     if (field === "restake") {
-      if (!stakeState.unstake) {
+      if (!stakeState.unstake || stakedTokenIds.includes(row.TokenId)) {
         return true;
       }
     }
@@ -109,6 +110,7 @@ const TokensTable = ({ stakeState, setStakeState }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const { data: stakedTokens } = useStakedToken();
+  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const [isAllSelected, setAllSelected] = useState({
     unstake: true,
@@ -123,7 +125,8 @@ const TokensTable = ({ stakeState, setStakeState }) => {
   const handleSelectUnstakeAll = () => {
     const newArray = stakeState.map((x) => ({
       ...x,
-      unstake: !stakedTokenIds.includes(x.TokenId) || isAllSelected.unstake,
+      unstake:
+        !stakedActionIds.includes(x.StakeActionId) || isAllSelected.unstake,
       claim: x.claim && isAllSelected.unstake,
       restake: x.restake && isAllSelected.unstake,
     }));
@@ -147,7 +150,10 @@ const TokensTable = ({ stakeState, setStakeState }) => {
   const handleSelectRestakeAll = () => {
     const newArray = stakeState.map((x) => ({
       ...x,
-      restake: isAllSelected.restake && x.unstake,
+      restake:
+        isAllSelected.restake &&
+        x.unstake &&
+        !stakedTokenIds.includes(x.TokenId),
     }));
     setStakeState(newArray);
     setAllSelected({

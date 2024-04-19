@@ -100,7 +100,7 @@ const UnclaimedStakingRewardsRow = ({
     setStakeState(
       res.actionIds.map((x) => ({
         ...x,
-        unstake: !stakedTokenIds.includes(x.TokenId),
+        unstake: stakedActionIds.includes(x.StakedActionId),
         claim: false,
         restake: false,
       }))
