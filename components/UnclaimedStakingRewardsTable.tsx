@@ -29,7 +29,7 @@ import { Tr } from "react-super-responsive-table";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AdvancedClaimDialog from "./AdvancedClaimDialog";
 
-const fetchInfo = async (account, depositId, stakedTokenIds) => {
+const fetchInfo = async (account, depositId, stakedActionIds) => {
   const response = await api.get_action_ids_by_deposit_id(account, depositId);
   let unstakeableActionIds = [],
     claimableActionIds = [],
@@ -45,7 +45,7 @@ const fetchInfo = async (account, depositId, stakedTokenIds) => {
             });
             claimableAmount += x.AmountEth;
           }
-          if (stakedTokenIds.includes(x.TokenId)) {
+          if (stakedActionIds.includes(x.StakeActionId)) {
             unstakeableActionIds.push(x.StakeActionId);
           }
         }
@@ -92,7 +92,8 @@ const UnclaimedStakingRewardsRow = ({
 
   const fetchRowData = async () => {
     const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
-    const res = await fetchInfo(account, row.DepositId, stakedTokenIds);
+    const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakedActionId);
+    const res = await fetchInfo(account, row.DepositId, stakedActionIds);
     setUnstakeableActionIds(res.unstakeableActionIds);
     setClaimableActionIds(res.claimableActionIds);
     // setClaimableAmount(res.claimableAmount);
@@ -388,7 +389,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const { data: stakedTokens } = useStakedToken();
-  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
+  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakedActionId);
   const [offset, setOffset] = useState(undefined);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
@@ -450,7 +451,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
           const {
             claimableActionIds: cl,
             unstakeableActionIds: us,
-          } = await fetchInfo(account, depositId, stakedTokenIds);
+          } = await fetchInfo(account, depositId, stakedActionIds);
           cl_actionIds = cl_actionIds.concat(cl);
           us_actionIds = us_actionIds.concat(us);
         })
