@@ -138,23 +138,7 @@ const UnclaimedStakingRewardsRow = ({
         type: "success",
       });
     } catch (e) {
-      if (e.code === -32603) {
-        setTimeout(() => {
-          fetchData(owner, false);
-        }, 1000);
-        const rowData = await fetchRowData();
-        if (rowData.claimableActionIds.length > 0) {
-          handleUnstakeClaimRestake(
-            type,
-            unstakeActions,
-            restakeActions,
-            claimActions,
-            claimDeposits
-          );
-        }
-      } else {
-        console.error(e);
-      }
+      console.error(e);
     }
   };
 

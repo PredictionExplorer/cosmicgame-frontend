@@ -110,7 +110,6 @@ const TokensTable = ({ stakeState, setStakeState }) => {
   const [page, setPage] = useState(1);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const [isAllSelected, setAllSelected] = useState({
     unstake: true,
     claim: true,
