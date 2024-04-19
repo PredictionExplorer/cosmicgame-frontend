@@ -128,7 +128,9 @@ const UnclaimedStakingRewardsRow = ({
         )
         .then((tx) => tx.wait());
       console.log(res);
-      fetchData(owner, false);
+      setTimeout(() => {
+        fetchData(owner, false);
+      }, 1000);
       setNotification({
         visible: true,
         text: `The tokens were ${type} successfully!`,
@@ -136,7 +138,9 @@ const UnclaimedStakingRewardsRow = ({
       });
     } catch (e) {
       if (e.code === -32603) {
-        fetchData(owner, false);
+        setTimeout(() => {
+          fetchData(owner, false);
+        }, 1000);
         const rowData = await fetchRowData();
         if (rowData.claimableActionIds.length > 0) {
           handleUnstakeClaimRestake(
