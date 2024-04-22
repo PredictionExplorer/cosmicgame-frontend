@@ -388,7 +388,11 @@ const Statistics = () => {
               />
               <StatisticsItem
                 title="Amount of Cosmic Signature Tokens with assigned name"
-                value={data.MainStats.TotalNamedTokens}
+                value={
+                  <Link color="inherit" fontSize="inherit" href="/named-nfts">
+                    {data.MainStats.TotalNamedTokens}
+                  </Link>
+                }
               />
               <StatisticsItem
                 title="Number of Active Stakers"
@@ -487,7 +491,7 @@ const Statistics = () => {
                 list={ctBalanceDistribution.slice(0, 20)}
               />
             </Box>
-            
+
             <Box>
               <Typography variant="h6" mb={2} mt={8}>
                 Stake / Unstake Actions

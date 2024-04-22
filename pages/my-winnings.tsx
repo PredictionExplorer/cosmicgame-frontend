@@ -55,7 +55,7 @@ const MyWinningsRow = ({ winning }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {winning.Amount.toFixed(4)}
+        {winning.Amount.toFixed(7)}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );

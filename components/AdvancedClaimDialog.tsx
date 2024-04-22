@@ -42,6 +42,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     if (field === "restake") {
       if (
         !stakeState.unstake ||
+        !stakeState.claim ||
         (!stakedActionIds.includes(row.StakeActionId) &&
           stakedTokenIds.includes(row.TokenId))
       ) {
@@ -89,6 +90,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
             setStakeState({
               ...stakeState,
               claim: e.target.checked,
+              restake: stakeState.restake && e.target.checked,
             })
           }
         />
@@ -144,6 +146,7 @@ const TokensTable = ({ stakeState, setStakeState }) => {
     const newArray = stakeState.map((x) => ({
       ...x,
       claim: isAllSelected.claim && x.unstake,
+      restake: isAllSelected.claim && x.restake,
     }));
     setStakeState(newArray);
     setAllSelected({
@@ -156,11 +159,10 @@ const TokensTable = ({ stakeState, setStakeState }) => {
       ...x,
       restake:
         isAllSelected.restake &&
-        !(
-          !x.unstake ||
-          (!stakedActionIds.includes(x.StakeActionId) &&
-            stakedTokenIds.includes(x.TokenId))
-        ),
+        x.unstake &&
+        x.claim &&
+        (stakedActionIds.includes(x.StakeActionId) ||
+          !stakedTokenIds.includes(x.TokenId)),
     }));
     setStakeState(newArray);
     setAllSelected({
