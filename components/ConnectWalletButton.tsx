@@ -78,6 +78,7 @@ const ConnectWalletButton = ({ isMobileView, balance, stakedTokens }) => {
           keepMounted
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
+          sx={{ zIndex: 10003 }}
         >
           <MenuItem style={{ minWidth: 166 }} onClick={handleMenuClose}>
             <NavLink href="/my-tokens" sx={{ width: "100%" }}>
