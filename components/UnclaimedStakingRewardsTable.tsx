@@ -412,7 +412,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       });
     } catch (e) {
       if (e.code === -32603) {
-        await fetchData(owner, false);
+        fetchData(owner, false);
         const msg = getErrorMessage(e?.data?.message);
         setNotification({
           visible: true,
