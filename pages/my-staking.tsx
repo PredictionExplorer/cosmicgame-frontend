@@ -39,7 +39,9 @@ const MyStaking = () => {
       }
       const res = await stakingContract.stake(tokenId).then((tx) => tx.wait());
       console.log(res);
-      fetchData(account, false);
+      setTimeout(() => {
+        fetchData(account, false);
+      }, 2000);
       return res;
     } catch (err) {
       console.error(err);
@@ -61,7 +63,9 @@ const MyStaking = () => {
       const res = await stakingContract
         .stakeMany(tokenIds)
         .then((tx) => tx.wait());
-      fetchData(account, false);
+      setTimeout(() => {
+        fetchData(account, false);
+      }, 2000);
       return res;
     } catch (err) {
       console.error(err);
@@ -74,7 +78,9 @@ const MyStaking = () => {
       const res = await stakingContract
         .unstakeMany(actionIds)
         .then((tx) => tx.wait());
-      fetchData(account, false);
+      setTimeout(() => {
+        fetchData(account, false);
+      }, 2000);
       return res;
     } catch (err) {
       console.error(err);
@@ -87,7 +93,10 @@ const MyStaking = () => {
       const res = await stakingContract
         .unstake(actionId)
         .then((tx) => tx.wait());
-      fetchData(account, false);
+
+      setTimeout(() => {
+        fetchData(account, false);
+      }, 2000);
       return res;
     } catch (err) {
       console.error(err);

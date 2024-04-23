@@ -162,6 +162,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
 
   useEffect(() => {
     setSelected([]);
+    setPage(1);
   }, [list]);
 
   if (list.length === 0) {

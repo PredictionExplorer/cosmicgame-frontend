@@ -172,6 +172,7 @@ export const StakedTokensTable = ({
     };
     fetchData();
     setSelected([]);
+    setPage(1);
   }, [list]);
 
   if (list.length === 0) {

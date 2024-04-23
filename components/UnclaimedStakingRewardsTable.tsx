@@ -162,27 +162,34 @@ const UnclaimedStakingRewardsRow = ({
             {claimableActionIds.length > 0 ? (
               row.YourTokensStaked === 1 ? (
                 <>
-                  <Button
-                    size="small"
-                    sx={{ textTransform: "none" }}
-                    onClick={() =>
-                      handleUnstakeClaimRestake(
-                        `${unstakeableActionIds.length > 0 &&
-                          "unstaked & "}claimed`,
-                        unstakeableActionIds,
-                        [],
-                        claimableActionIds.map((x) => x.StakeActionId),
-                        claimableActionIds.map((x) => x.DepositId)
-                      )
-                    }
-                  >
-                    {unstakeableActionIds.length > 0
-                      ? "Unstake & Claim"
-                      : "Claim"}
-                  </Button>
-                  <IconButton size="small">
-                    <MoreHorizIcon fontSize="small" />
-                  </IconButton>
+                  <Box sx={{ display: "flex" }}>
+                    <Button
+                      size="small"
+                      sx={{
+                        textTransform: "none",
+                        whiteSpace: "nowrap",
+                        mr: 1,
+                      }}
+                      onClick={() =>
+                        handleUnstakeClaimRestake(
+                          `${
+                            unstakeableActionIds.length > 0 ? "unstaked & " : ""
+                          }claimed`,
+                          unstakeableActionIds,
+                          [],
+                          claimableActionIds.map((x) => x.StakeActionId),
+                          claimableActionIds.map((x) => x.DepositId)
+                        )
+                      }
+                    >
+                      {unstakeableActionIds.length > 0
+                        ? "Unstake & Claim"
+                        : "Claim"}
+                    </Button>
+                    <IconButton size="small" onClick={handleMenuOpen}>
+                      <MoreHorizIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
                   <Menu
                     elevation={0}
                     anchorOrigin={{
@@ -199,15 +206,16 @@ const UnclaimedStakingRewardsRow = ({
                   >
                     {unstakeableActionIds.length > 0 && (
                       <PrimaryMenuItem
-                        onClick={() =>
+                        onClick={() => {
+                          handleMenuClose();
                           handleUnstakeClaimRestake(
                             "unstaked",
                             unstakeableActionIds,
                             [],
                             [],
                             []
-                          )
-                        }
+                          );
+                        }}
                       >
                         <Typography>Unstake Only</Typography>
                       </PrimaryMenuItem>
@@ -219,10 +227,12 @@ const UnclaimedStakingRewardsRow = ({
                     </Typography>
                   </PrimaryMenuItem> */}
                     <PrimaryMenuItem
-                      onClick={() =>
+                      onClick={() => {
+                        handleMenuClose();
                         handleUnstakeClaimRestake(
-                          `${unstakeableActionIds.length > 0 &&
-                            "unstaked & "}claimed and restaked`,
+                          `${
+                            unstakeableActionIds.length > 0 ? "unstaked & " : ""
+                          }claimed and restaked`,
                           unstakeableActionIds,
                           stakeState
                             .filter(
@@ -233,8 +243,8 @@ const UnclaimedStakingRewardsRow = ({
                             .map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
-                        )
-                      }
+                        );
+                      }}
                     >
                       <Typography>
                         {`${
@@ -256,8 +266,9 @@ const UnclaimedStakingRewardsRow = ({
                       }}
                       onClick={() =>
                         handleUnstakeClaimRestake(
-                          `${unstakeableActionIds.length > 0 &&
-                            "unstaked & "}claimed`,
+                          `${
+                            unstakeableActionIds.length > 0 ? "unstaked & " : ""
+                          }claimed`,
                           unstakeableActionIds,
                           [],
                           claimableActionIds.map((x) => x.StakeActionId),
@@ -289,15 +300,16 @@ const UnclaimedStakingRewardsRow = ({
                   >
                     {unstakeableActionIds.length > 0 && (
                       <PrimaryMenuItem
-                        onClick={() =>
+                        onClick={() => {
+                          handleMenuClose();
                           handleUnstakeClaimRestake(
                             "unstaked",
                             unstakeableActionIds,
                             [],
                             [],
                             []
-                          )
-                        }
+                          );
+                        }}
                       >
                         <Typography>Unstake Only</Typography>
                       </PrimaryMenuItem>
@@ -309,10 +321,12 @@ const UnclaimedStakingRewardsRow = ({
                     </Typography>
                   </PrimaryMenuItem> */}
                     <PrimaryMenuItem
-                      onClick={() =>
+                      onClick={() => {
+                        handleMenuClose();
                         handleUnstakeClaimRestake(
-                          `${unstakeableActionIds.length > 0 &&
-                            "unstaked & "}claimed and restaked`,
+                          `${
+                            unstakeableActionIds.length > 0 ? "unstaked & " : ""
+                          }claimed and restaked`,
                           unstakeableActionIds,
                           stakeState
                             .filter(
@@ -323,8 +337,8 @@ const UnclaimedStakingRewardsRow = ({
                             .map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
-                        )
-                      }
+                        );
+                      }}
                     >
                       <Typography>
                         {`${
@@ -404,7 +418,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       console.log(res);
       setTimeout(() => {
         fetchData(owner, false);
-      }, 1000);
+      }, 2000);
       setNotification({
         visible: true,
         text: `The tokens were ${type} successfully!`,
@@ -448,7 +462,9 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         )
         .then((tx) => tx.wait());
       console.log(res);
-      fetchData(owner, false);
+      setTimeout(() => {
+        fetchData(owner, false);
+      }, 2000);
       setNotification({
         visible: true,
         text: "All rewards were claimed successfully!",
@@ -484,7 +500,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     };
     fetchActionIds();
     calculateOffset();
-  }, [list]);
+  }, [list, stakedTokens]);
 
   if (offset === undefined) return;
 
