@@ -28,6 +28,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AdvancedClaimDialog from "./AdvancedClaimDialog";
+import getErrorMessage from "../utils/alert";
 
 const fetchInfo = async (account, depositId, stakedActionIds) => {
   const response = await api.get_action_ids_by_deposit_id(account, depositId);
@@ -76,12 +77,10 @@ interface stakeStateInterface {
 const UnclaimedStakingRewardsRow = ({
   row,
   owner,
-  fetchData,
-  setNotification,
   offset,
+  handleUnstakeClaimRestake,
 }) => {
   const { account } = useActiveWeb3React();
-  const stakingContract = useStakingWalletContract();
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   // const [claimableAmount, setClaimableAmount] = useState(0);
@@ -111,42 +110,28 @@ const UnclaimedStakingRewardsRow = ({
     fetchRowData();
   }, [stakedTokens]);
 
-  const handleUnstakeClaimRestake = async (
+  const handleMenuOpen = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleUnstakeClaimRestakeWrapper = (
     type,
     unstakeActions,
     restakeActions,
     claimActions,
     claimDeposits
   ) => {
-    try {
-      handleMenuClose();
-      const res = await stakingContract
-        .unstakeClaimRestakeMany(
-          unstakeActions,
-          restakeActions,
-          claimActions,
-          claimDeposits
-        )
-        .then((tx) => tx.wait());
-      console.log(res);
-      setTimeout(() => {
-        fetchData(owner, false);
-      }, 1000);
-      setNotification({
-        visible: true,
-        text: `The tokens were ${type} successfully!`,
-        type: "success",
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handleMenuOpen = (e) => {
-    setAnchorEl(e.currentTarget);
-  };
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+    handleMenuClose();
+    handleUnstakeClaimRestake(
+      type,
+      unstakeActions,
+      restakeActions,
+      claimActions,
+      claimDeposits
+    );
   };
 
   if (!row) {
@@ -373,7 +358,7 @@ const UnclaimedStakingRewardsRow = ({
         setOpen={setOpenDlg}
         stakeState={stakeState}
         setStakeState={setStakeState}
-        handleUnstakeClaimRestake={handleUnstakeClaimRestake}
+        handleUnstakeClaimRestake={handleUnstakeClaimRestakeWrapper}
       />
     </>
   );
@@ -399,6 +384,47 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     text: "",
     type: "success",
   });
+
+  const handleUnstakeClaimRestake = async (
+    type,
+    unstakeActions,
+    restakeActions,
+    claimActions,
+    claimDeposits
+  ) => {
+    try {
+      const res = await stakingContract
+        .unstakeClaimRestakeMany(
+          unstakeActions,
+          restakeActions,
+          claimActions,
+          claimDeposits
+        )
+        .then((tx) => tx.wait());
+      console.log(res);
+      setTimeout(() => {
+        fetchData(owner, false);
+      }, 1000);
+      setNotification({
+        visible: true,
+        text: `The tokens were ${type} successfully!`,
+        type: "success",
+      });
+    } catch (e) {
+      if (e.code === -32603) {
+        await fetchData(owner, false);
+        const msg = getErrorMessage(e?.data?.message);
+        setNotification({
+          visible: true,
+          text: `${msg}. Please try again.`,
+          type: "error",
+        });
+      } else {
+        console.error(e);
+      }
+    }
+  };
+
   const handleClaimAll = async () => {
     let actionIds = [],
       depositIds = [];
@@ -465,6 +491,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
+
   return (
     <>
       <Snackbar
@@ -508,8 +535,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
                 row={row}
                 key={row.EvtLogId}
                 owner={owner}
-                fetchData={fetchData}
-                setNotification={setNotification}
+                handleUnstakeClaimRestake={handleUnstakeClaimRestake}
                 offset={offset}
               />
             ))}
