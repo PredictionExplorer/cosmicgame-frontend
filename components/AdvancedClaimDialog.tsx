@@ -19,10 +19,12 @@ import {
   TablePrimaryRow,
 } from "./styled";
 import { Tr } from "react-super-responsive-table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStakedToken } from "../contexts/StakedTokenContext";
+import api from "../services/api";
 
 const TokenRow = ({ row, stakeState, setStakeState }) => {
+  const [namesHistory, setNamesHistory] = useState([]);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
@@ -51,24 +53,35 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     }
     return false;
   };
+  useEffect(() => {
+    const fetchNamesHistory = async () => {
+      const names = await api.get_name_history(row.TokenId);
+      setNamesHistory(names);
+    };
+    fetchNamesHistory();
+  }, []);
   if (!row) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>
+      <TablePrimaryCell align="center">
         <Link
           href={`/detail/${row.TokenId}`}
           target="_blank"
-          sx={{ color: "inherit" }}
+          sx={{ color: "inherit", fontSize: "inherit" }}
         >
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
+        {namesHistory.length > 0 ? namesHistory[namesHistory.length - 1] : " "}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
         <Checkbox
           size="small"
+          sx={{ p: 0 }}
           checked={stakeState.unstake}
           disabled={isDisabled("unstake")}
           onChange={(e) =>
@@ -84,6 +97,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
       <TablePrimaryCell align="center">
         <Checkbox
           size="small"
+          sx={{ p: 0 }}
           checked={stakeState.claim}
           disabled={isDisabled("claim")}
           onChange={(e) =>
@@ -98,6 +112,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
       <TablePrimaryCell align="center">
         <Checkbox
           size="small"
+          sx={{ p: 0 }}
           checked={stakeState.restake}
           disabled={isDisabled("restake")}
           onChange={(e) =>
@@ -203,7 +218,10 @@ const TokensTable = ({ stakeState, setStakeState }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell />
+              <TablePrimaryHeadCell>Token Id</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell style={{ maxWidth: "100px" }}>
+                Token Name
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Unstake</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Claim</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Restake</TablePrimaryHeadCell>
@@ -240,7 +258,7 @@ const TokensTable = ({ stakeState, setStakeState }) => {
         <Button
           size="small"
           onClick={handleSelectUnstakeAll}
-          sx={{ mr: 1 }}
+          sx={{ textTransform: "none", mr: 1 }}
           disabled={isDisabled("unstake")}
         >
           Unstake All
@@ -248,7 +266,7 @@ const TokensTable = ({ stakeState, setStakeState }) => {
         <Button
           size="small"
           onClick={handleSelectClaimAll}
-          sx={{ mr: 1 }}
+          sx={{ textTransform: "none", mr: 1 }}
           disabled={isDisabled("claim")}
         >
           Claim All
@@ -257,6 +275,7 @@ const TokensTable = ({ stakeState, setStakeState }) => {
           size="small"
           onClick={handleSelectRestakeAll}
           disabled={isDisabled("restake")}
+          sx={{ textTransform: "none" }}
         >
           Restake All
         </Button>
@@ -330,6 +349,7 @@ export default function AdvancedClaimDialog({
           <Button
             disabled={canSendTransaction()}
             onClick={handleSendTransaction}
+            sx={{ textTransform: "none" }}
           >
             Send Transaction
           </Button>
