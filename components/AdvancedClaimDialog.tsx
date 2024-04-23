@@ -140,6 +140,8 @@ const TokensTable = ({ stakeState, setStakeState }) => {
     setAllSelected({
       ...isAllSelected,
       unstake: !isAllSelected.unstake,
+      claim: !isAllSelected.unstake || isAllSelected.claim,
+      restake: !isAllSelected.unstake || isAllSelected.restake,
     });
   };
   const handleSelectClaimAll = () => {
@@ -152,6 +154,8 @@ const TokensTable = ({ stakeState, setStakeState }) => {
     setAllSelected({
       ...isAllSelected,
       claim: !isAllSelected.claim,
+      restake:
+        !isAllSelected.unstake || !isAllSelected.claim || isAllSelected.restake,
     });
   };
   const handleSelectRestakeAll = () => {
@@ -169,6 +173,28 @@ const TokensTable = ({ stakeState, setStakeState }) => {
       ...isAllSelected,
       restake: !isAllSelected.restake,
     });
+  };
+  const isDisabled = (type) => {
+    if (type === "unstake") {
+      const filtered = stakeState.filter((x) =>
+        stakedActionIds.includes(x.StakeActionId)
+      );
+      return filtered.length === 0;
+    }
+    if (type === "claim") {
+      const filtered = stakeState.filter((x) => x.unstake);
+      return filtered.length === 0;
+    }
+    if (type === "restake") {
+      const filtered = stakeState.filter(
+        (x) =>
+          x.unstake &&
+          x.claim &&
+          (stakedActionIds.includes(x.StakeActionId) ||
+            !stakedTokenIds.includes(x.TokenId))
+      );
+      return filtered.length === 0;
+    }
   };
 
   return (
@@ -211,13 +237,27 @@ const TokensTable = ({ stakeState, setStakeState }) => {
         />
       </Box>
       <Box mt={2}>
-        <Button size="small" onClick={handleSelectUnstakeAll} sx={{ mr: 1 }}>
+        <Button
+          size="small"
+          onClick={handleSelectUnstakeAll}
+          sx={{ mr: 1 }}
+          disabled={isDisabled("unstake")}
+        >
           Unstake All
         </Button>
-        <Button size="small" onClick={handleSelectClaimAll} sx={{ mr: 1 }}>
+        <Button
+          size="small"
+          onClick={handleSelectClaimAll}
+          sx={{ mr: 1 }}
+          disabled={isDisabled("claim")}
+        >
           Claim All
         </Button>
-        <Button size="small" onClick={handleSelectRestakeAll}>
+        <Button
+          size="small"
+          onClick={handleSelectRestakeAll}
+          disabled={isDisabled("restake")}
+        >
           Restake All
         </Button>
       </Box>
