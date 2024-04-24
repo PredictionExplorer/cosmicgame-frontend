@@ -444,6 +444,9 @@ const NewHome = () => {
       console.error("Error requesting sound permission:", error);
     }
   };
+  const handleNotificationClose = () => {
+    setNotification({ ...notification, visible: false });
+  };
 
   useEffect(() => {
     const getData = async () => {
@@ -592,11 +595,13 @@ const NewHome = () => {
           anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           autoHideDuration={10000}
           open={notification.visible}
-          onClose={() =>
-            setNotification((prev) => ({ ...prev, visible: false }))
-          }
+          onClose={handleNotificationClose}
         >
-          <Alert severity={notification.type} variant="filled">
+          <Alert
+            severity={notification.type}
+            variant="filled"
+            onClose={handleNotificationClose}
+          >
             {notification.text}
           </Alert>
         </Snackbar>

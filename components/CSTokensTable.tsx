@@ -159,6 +159,9 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
       });
     }
   };
+  const handleClose = () => {
+    setNotification({ ...notification, visible: false });
+  };
 
   useEffect(() => {
     setSelected([]);
@@ -174,11 +177,13 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         autoHideDuration={10000}
         open={notification.visible}
-        onClose={() =>
-          setNotification({ text: "", type: "success", visible: false })
-        }
+        onClose={handleClose}
       >
-        <Alert severity={notification.type} variant="filled">
+        <Alert
+          severity={notification.type}
+          variant="filled"
+          onClose={handleClose}
+        >
           {notification.text}
         </Alert>
       </Snackbar>

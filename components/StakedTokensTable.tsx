@@ -164,6 +164,9 @@ export const StakedTokensTable = ({
       });
     }
   };
+  const handleNotificationClose = () => {
+    setNotification({ ...notification, visible: false });
+  };
   useEffect(() => {
     const fetchData = async () => {
       const current = await api.get_current_time();
@@ -184,11 +187,13 @@ export const StakedTokensTable = ({
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         autoHideDuration={10000}
         open={notification.visible}
-        onClose={() =>
-          setNotification({ text: "", type: "success", visible: false })
-        }
+        onClose={handleNotificationClose}
       >
-        <Alert severity={notification.type} variant="filled">
+        <Alert
+          severity={notification.type}
+          variant="filled"
+          onClose={handleNotificationClose}
+        >
           {notification.text}
         </Alert>
       </Snackbar>

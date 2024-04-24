@@ -28,7 +28,11 @@ const ContractItem = ({ name, value, copyable = false }) => {
         open={notification}
         onClose={() => setNotification(false)}
       >
-        <Alert severity="success" variant="filled">
+        <Alert
+          severity="success"
+          variant="filled"
+          onClose={() => setNotification(false)}
+        >
           Address copied!
         </Alert>
       </Snackbar>

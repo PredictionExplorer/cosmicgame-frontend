@@ -19,6 +19,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
+import CloseIcon from "@mui/icons-material/Close";
 import { convertTimestampToDateTime } from "../utils";
 import useStakingWalletContract from "../hooks/useStakingWalletContract";
 import api from "../services/api";
@@ -474,6 +475,9 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       console.error(e);
     }
   };
+  const handleNotificationClose = () => {
+    setNotification({ ...notification, visible: false });
+  };
 
   useEffect(() => {
     const calculateOffset = async () => {
@@ -514,9 +518,13 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         autoHideDuration={10000}
         open={notification.visible}
-        onClose={() => setNotification((prev) => ({ ...prev, visible: false }))}
+        onClose={handleNotificationClose}
       >
-        <Alert severity={notification.type} variant="filled">
+        <Alert
+          severity={notification.type}
+          variant="filled"
+          onClose={handleNotificationClose}
+        >
           {notification.text}
         </Alert>
       </Snackbar>

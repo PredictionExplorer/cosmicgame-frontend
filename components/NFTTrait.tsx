@@ -10,7 +10,6 @@ import {
   Link,
   Container,
   Menu,
-  MenuItem,
   Snackbar,
   Alert,
   Dialog,
@@ -221,6 +220,9 @@ const NFTTrait = ({ tokenId }) => {
       console.log(e);
     }
   };
+  const handleNotificationClose = () => {
+    setNotification({ ...notification, visible: false });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -252,11 +254,13 @@ const NFTTrait = ({ tokenId }) => {
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
           autoHideDuration={10000}
           open={notification.visible}
-          onClose={() =>
-            setNotification({ text: "", type: "success", visible: false })
-          }
+          onClose={handleNotificationClose}
         >
-          <Alert severity={notification.type} variant="filled">
+          <Alert
+            severity={notification.type}
+            variant="filled"
+            onClose={handleNotificationClose}
+          >
             {notification.text}
           </Alert>
         </Snackbar>
