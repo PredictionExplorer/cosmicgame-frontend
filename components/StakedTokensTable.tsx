@@ -22,6 +22,7 @@ import { convertTimestampToDateTime } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import api from "../services/api";
+import NFTImage from "./NFTImage";
 
 const StakedTokensRow = ({
   offset,
@@ -30,8 +31,15 @@ const StakedTokensRow = ({
   isItemSelected,
   handleClick,
 }) => {
+  const getTokenImageURL = () => {
+    const fileName = row.TokenInfo.TokenId.toString().padStart(6, "0");
+    if (row.StakedIsRandomWalk) {
+      return `https://randomwalknft.s3.us-east-2.amazonaws.com/${fileName}_black_thumb.jpg`;
+    }
+    return `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.png`;
+  };
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
   return (
     <TablePrimaryRow
@@ -56,8 +64,8 @@ const StakedTokensRow = ({
           size="small"
         />
       </TablePrimaryCell>
-      <TablePrimaryCell>
-        {convertTimestampToDateTime(row.StakeTimeStamp - offset)}
+      <TablePrimaryCell sx={{width: '120px'}}>
+        <NFTImage src={getTokenImageURL()} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -72,7 +80,25 @@ const StakedTokensRow = ({
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
+        {row.StakedIsRandomWalk ? "True" : "False"}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
+          href={`/prize/${row.TokenInfo.RoundNum}`}
+          sx={{
+            color: "inherit",
+            fontSize: "inherit",
+          }}
+          target="_blank"
+        >
+          {row.TokenInfo.RoundNum}
+        </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
         {row.TokenInfo.StakeActionId}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {convertTimestampToDateTime(row.StakeTimeStamp - offset)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(row.UnstakeTimeStamp - offset)}
@@ -100,6 +126,7 @@ export const StakedTokensTable = ({
   handleUnstake,
   handleUnstakeMany,
 }) => {
+  console.log(list);
   const perPage = 5;
   const [notification, setNotification] = useState<{
     text: string;
@@ -224,11 +251,12 @@ export const StakedTokensTable = ({
                   }}
                 />
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">
-                Stake Datetime
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Is RandomWalk NFT?</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Stake Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Unstake Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell></TablePrimaryHeadCell>
             </Tr>

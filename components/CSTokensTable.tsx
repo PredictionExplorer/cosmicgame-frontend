@@ -139,7 +139,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
     setSelected([]);
   };
   const onStakeMany = async () => {
-    const res = await handleStakeMany(selected);
+    const res = await handleStakeMany(selected, new Array(selected.length).fill(false));
     if (!res.code) {
       setNotification({
         visible: true,
@@ -150,7 +150,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   };
   const onStake = async (id: number) => {
     setSelected([id]);
-    const res = await handleStake(id);
+    const res = await handleStake(id, false);
     if (!res.code) {
       setNotification({
         visible: true,

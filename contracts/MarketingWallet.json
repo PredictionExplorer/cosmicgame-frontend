@@ -1,10 +1,12 @@
 [
   "constructor(address)",
+  "event CosmicTokenAddressChanged(address)",
   "event OwnershipTransferred(address indexed,address indexed)",
   "event RewardSentEvent(address indexed,uint256)",
   "function owner() view returns (address)",
   "function renounceOwnership()",
   "function send(uint256,address)",
+  "function setTokenContract(address)",
   "function token() view returns (address)",
   "function transferOwnership(address)"
 ]

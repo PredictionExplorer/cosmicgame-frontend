@@ -26,30 +26,7 @@ const MyStaking = () => {
   const stakingContract = useStakingWalletContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
 
-  const handleStake = async (tokenId: number) => {
-    try {
-      const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
-        account,
-        STAKING_WALLET_ADDRESS
-      );
-      if (!isApprovedForAll) {
-        await cosmicSignatureContract
-          .setApprovalForAll(STAKING_WALLET_ADDRESS, true)
-          .then((tx) => tx.wait());
-      }
-      const res = await stakingContract.stake(tokenId).then((tx) => tx.wait());
-      console.log(res);
-      setTimeout(() => {
-        fetchData(account, false);
-      }, 2000);
-      return res;
-    } catch (err) {
-      console.error(err);
-      return err;
-    }
-  };
-
-  const handleStakeMany = async (tokenIds: number[]) => {
+  const handleStake = async (tokenId: number, isRwalk: boolean) => {
     try {
       const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
         account,
@@ -61,7 +38,32 @@ const MyStaking = () => {
           .then((tx) => tx.wait());
       }
       const res = await stakingContract
-        .stakeMany(tokenIds)
+        .stake(tokenId, isRwalk)
+        .then((tx) => tx.wait());
+      console.log(res);
+      setTimeout(() => {
+        fetchData(account, false);
+      }, 2000);
+      return res;
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
+  };
+
+  const handleStakeMany = async (tokenIds: number[], isRwalks: boolean[]) => {
+    try {
+      const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
+        account,
+        STAKING_WALLET_ADDRESS
+      );
+      if (!isApprovedForAll) {
+        await cosmicSignatureContract
+          .setApprovalForAll(STAKING_WALLET_ADDRESS, true)
+          .then((tx) => tx.wait());
+      }
+      const res = await stakingContract
+        .stakeMany(tokenIds, isRwalks)
         .then((tx) => tx.wait());
       setTimeout(() => {
         fetchData(account, false);

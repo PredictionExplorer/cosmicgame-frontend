@@ -447,6 +447,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     type,
     unstakeActions,
     restakeActions,
+    isRWalks,
     claimActions,
     claimDeposits
   ) => {
@@ -455,6 +456,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         .unstakeClaimRestakeMany(
           unstakeActions,
           restakeActions,
+          isRWalks,
           claimActions,
           claimDeposits
         )
@@ -575,7 +577,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left" sx={{ minWidth: "165px" }}>
+              <TablePrimaryHeadCell align="left" sx={{ minWidth: "185px" }}>
                 Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">

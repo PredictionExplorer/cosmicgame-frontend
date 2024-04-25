@@ -57,12 +57,13 @@ a {
     padding-top: 8px;
     padding-bottom: 8px;
     font-size: 11px;
+    width: 100%;
   }
   .responsiveTable td .tdBefore {
     top: 0;
     left: 0 !important;
     bottom: 0;
-    background-color: #15BFFD;
+    background-color: #15bffd;
     color: #fff;
     font-weight: 400 !important;
     padding: 8px;
