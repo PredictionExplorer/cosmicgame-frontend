@@ -125,9 +125,9 @@ export const TablePrimaryCell = styled(Td)(({ theme }) => ({
   lineHeight: 1.43,
   borderBottom: 0,
   padding: "16px",
-  fontSize: 14,
+  fontSize: 16,
   [theme.breakpoints.down('sm')]: {
-    fontSize: 12,
+    fontSize: 14,
   }
 }))
 

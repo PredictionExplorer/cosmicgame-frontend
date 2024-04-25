@@ -8,6 +8,7 @@ import {
   Pagination,
   Snackbar,
   TableBody,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -19,8 +20,8 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import CloseIcon from "@mui/icons-material/Close";
-import { convertTimestampToDateTime } from "../utils";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { convertTimestampToDateTime, formatSeconds } from "../utils";
 import useStakingWalletContract from "../hooks/useStakingWalletContract";
 import api from "../services/api";
 import { useActiveWeb3React } from "../hooks/web3";
@@ -35,7 +36,7 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
   const response = await api.get_action_ids_by_deposit_id(account, depositId);
   let unstakeableActionIds = [],
     claimableActionIds = [],
-    claimableAmount = 0;
+    claimableAmounts = {};
   await Promise.all(
     response.map(async (x) => {
       try {
@@ -45,10 +46,27 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
               DepositId: x.DepositId,
               StakeActionId: x.StakeActionId,
             });
-            claimableAmount += x.AmountEth;
           }
           if (stakedActionIds.includes(x.StakeActionId)) {
             unstakeableActionIds.push(x.StakeActionId);
+          }
+        }
+        if (!x.Claimed) {
+          const diff = x.UnstakeEligibleTimeStamp - x.CurChainTimeStamp;
+          // have to remove if Nick want to show the rewards that can claim right away
+          if (diff > 0) {
+            if (!claimableAmounts[diff]) {
+              const filtered = Object.keys(claimableAmounts).filter(
+                (x) => Math.abs(parseInt(x) - diff) < 60
+              );
+              if (filtered.length > 0) {
+                claimableAmounts[filtered[0]] += x.AmountEth;
+              } else {
+                claimableAmounts[diff] = x.AmountEth;
+              }
+            } else {
+              claimableAmounts[diff] += x.AmountEth;
+            }
           }
         }
       } catch (error) {
@@ -59,7 +77,7 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
   return {
     unstakeableActionIds,
     claimableActionIds,
-    claimableAmount,
+    claimableAmounts,
     actionIds: response.filter(
       (x) => x.UnstakeEligibleTimeStamp < x.CurChainTimeStamp && !x.Claimed
     ),
@@ -84,7 +102,7 @@ const UnclaimedStakingRewardsRow = ({
   const { account } = useActiveWeb3React();
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
-  // const [claimableAmount, setClaimableAmount] = useState(0);
+  const [claimableAmounts, setClaimableAmounts] = useState({});
   const { data: stakedTokens } = useStakedToken();
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDlg, setOpenDlg] = useState(false);
@@ -96,7 +114,7 @@ const UnclaimedStakingRewardsRow = ({
     const res = await fetchInfo(account, row.DepositId, stakedActionIds);
     setUnstakeableActionIds(res.unstakeableActionIds);
     setClaimableActionIds(res.claimableActionIds);
-    // setClaimableAmount(res.claimableAmount);
+    setClaimableAmounts(res.claimableAmounts);
     setStakeState(
       res.actionIds.map((x) => ({
         ...x,
@@ -107,9 +125,6 @@ const UnclaimedStakingRewardsRow = ({
     );
     return res;
   };
-  useEffect(() => {
-    fetchRowData();
-  }, [stakedTokens]);
 
   const handleMenuOpen = (e) => {
     setAnchorEl(e.currentTarget);
@@ -117,6 +132,10 @@ const UnclaimedStakingRewardsRow = ({
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    fetchRowData();
+  }, [stakedTokens]);
 
   const handleUnstakeClaimRestakeWrapper = (
     type,
@@ -157,6 +176,30 @@ const UnclaimedStakingRewardsRow = ({
         </TablePrimaryCell>
         <TablePrimaryCell align="right">
           {row.YourClaimableAmountEth.toFixed(6)}
+          {Object.keys(claimableAmounts).length > 0 && (
+            <Typography sx={{ display: "inline-block", lineHeight: 1, ml: 1 }}>
+              <Tooltip
+                title={
+                  <Typography>
+                    You can claim the reward for&nbsp;
+                    {Object.keys(claimableAmounts).map(
+                      (key, index, arr) =>
+                        `${claimableAmounts[key].toFixed(
+                          6
+                        )} ETH in ${formatSeconds(parseInt(key))}${
+                          index !== arr.length - 1 ? ", " : ""
+                        }`
+                    )}
+                  </Typography>
+                }
+              >
+                <ErrorOutlineIcon
+                  fontSize="inherit"
+                  sx={{ display: "block" }}
+                />
+              </Tooltip>
+            </Typography>
+          )}
         </TablePrimaryCell>
         {account === owner && (
           <TablePrimaryCell align="center">
