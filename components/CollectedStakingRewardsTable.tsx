@@ -43,6 +43,9 @@ const DetailRow = ({ row }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{row.StakeActionId}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.IsRandomWalk ? "True" : "False"}
+      </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {row.ClaimRewardAmountEth.toFixed(6)}
       </TablePrimaryCell>
@@ -62,6 +65,9 @@ const DetailTable = ({ list }) => {
             <TablePrimaryHeadCell sx={{ py: 1 }}>Token Id</TablePrimaryHeadCell>
             <TablePrimaryHeadCell sx={{ py: 1 }}>
               Action Id
+            </TablePrimaryHeadCell>
+            <TablePrimaryHeadCell sx={{ py: 1 }}>
+              Is RandomWalk NFT?
             </TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="right" sx={{ py: 1 }}>
               Reward

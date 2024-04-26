@@ -64,7 +64,7 @@ const StakedTokensRow = ({
           size="small"
         />
       </TablePrimaryCell>
-      <TablePrimaryCell sx={{width: '120px'}}>
+      <TablePrimaryCell sx={{ width: "120px" }}>
         <NFTImage src={getTokenImageURL()} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -126,7 +126,6 @@ export const StakedTokensTable = ({
   handleUnstake,
   handleUnstakeMany,
 }) => {
-  console.log(list);
   const perPage = 5;
   const [notification, setNotification] = useState<{
     text: string;
@@ -258,7 +257,7 @@ export const StakedTokensTable = ({
               <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Unstake Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell></TablePrimaryHeadCell>
+              <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
           <TableBody>
