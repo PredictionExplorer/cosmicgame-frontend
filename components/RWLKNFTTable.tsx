@@ -22,7 +22,7 @@ import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 
-const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
+const RWLKNFTRow = ({ row, handleStake, isItemSelected, handleClick }) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -43,62 +43,23 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
       <TablePrimaryCell>
         {convertTimestampToDateTime(row.TimeStamp)}
       </TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.TokenId}</TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/detail/${row.TokenId}`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
+        <Button
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleStake(row.TokenId);
           }}
-          target="_blank"
         >
-          {row.TokenId}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${row.RoundNum}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
-          target="_blank"
-        >
-          {row.RoundNum}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        <Link
-          href={`/user/${row.WinnerAddr}`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
-          target="_blank"
-        >
-          {row.WinnerAddr}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {!row.Staked ? (
-          <Button
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleStake(row.TokenId);
-            }}
-          >
-            Stake
-          </Button>
-        ) : (
-          " "
-        )}
+          Stake
+        </Button>
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
+export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
   const perPage = 5;
   const [notification, setNotification] = useState<{
     text: string;
@@ -139,7 +100,10 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
     setSelected([]);
   };
   const onStakeMany = async () => {
-    const res = await handleStakeMany(selected, new Array(selected.length).fill(false));
+    const res = await handleStakeMany(
+      selected,
+      new Array(selected.length).fill(true)
+    );
     if (!res.code) {
       setNotification({
         visible: true,
@@ -150,7 +114,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   };
   const onStake = async (id: number) => {
     setSelected([id]);
-    const res = await handleStake(id, false);
+    const res = await handleStake(id, true);
     if (!res.code) {
       setNotification({
         visible: true,
@@ -216,8 +180,6 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
                 Mint Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
@@ -225,7 +187,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
             {list
               .slice((page - 1) * perPage, page * perPage)
               .map((row, index) => (
-                <CSTokensRow
+                <RWLKNFTRow
                   key={index}
                   row={row}
                   handleStake={onStake}

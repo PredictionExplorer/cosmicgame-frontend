@@ -79,6 +79,9 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
         {namesHistory.length > 0 ? namesHistory[namesHistory.length - 1] : " "}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
+        {row.IsRandomWalk ? "True" : "False"}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
         <Checkbox
           size="small"
           sx={{ p: 0 }}
@@ -222,6 +225,7 @@ const TokensTable = ({ stakeState, setStakeState }) => {
               <TablePrimaryHeadCell style={{ maxWidth: "100px" }}>
                 Token Name
               </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Is RandomWalk NFT?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Unstake</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Claim</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Restake</TablePrimaryHeadCell>
@@ -305,6 +309,7 @@ export default function AdvancedClaimDialog({
         .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
         .map((x) => x.StakeActionId),
       stakeState.filter((x) => x.restake).map((x) => x.StakeActionId),
+      stakeState.filter((x) => x.restake).map((x) => x.IsRandomWalk),
       stakeState.filter((x) => x.claim).map((x) => x.StakeActionId),
       stakeState.filter((x) => x.claim).map((x) => x.DepositId)
     );

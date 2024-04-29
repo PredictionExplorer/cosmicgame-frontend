@@ -85,6 +85,7 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
 };
 
 interface stakeStateInterface {
+  IsRandomWalk: boolean;
   TokenId: number;
   DepositId: number;
   StakeActionId: number;
@@ -141,6 +142,7 @@ const UnclaimedStakingRewardsRow = ({
     type,
     unstakeActions,
     restakeActions,
+    isRWalks,
     claimActions,
     claimDeposits
   ) => {
@@ -149,6 +151,7 @@ const UnclaimedStakingRewardsRow = ({
       type,
       unstakeActions,
       restakeActions,
+      isRWalks,
       claimActions,
       claimDeposits
     );
@@ -221,6 +224,7 @@ const UnclaimedStakingRewardsRow = ({
                           }claimed`,
                           unstakeableActionIds,
                           [],
+                          [],
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
                         )
@@ -257,6 +261,7 @@ const UnclaimedStakingRewardsRow = ({
                             unstakeableActionIds,
                             [],
                             [],
+                            [],
                             []
                           );
                         }}
@@ -285,6 +290,13 @@ const UnclaimedStakingRewardsRow = ({
                                 !stakedTokenIds.includes(x.TokenId)
                             )
                             .map((x) => x.StakeActionId),
+                          stakeState
+                            .filter(
+                              (x) =>
+                                stakedActionIds.includes(x.StakeActionId) ||
+                                !stakedTokenIds.includes(x.TokenId)
+                            )
+                            .map((x) => x.IsRandomWalk),
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
                         );
@@ -314,6 +326,7 @@ const UnclaimedStakingRewardsRow = ({
                             unstakeableActionIds.length > 0 ? "unstaked & " : ""
                           }claimed`,
                           unstakeableActionIds,
+                          [],
                           [],
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
@@ -351,6 +364,7 @@ const UnclaimedStakingRewardsRow = ({
                             unstakeableActionIds,
                             [],
                             [],
+                            [],
                             []
                           );
                         }}
@@ -379,6 +393,13 @@ const UnclaimedStakingRewardsRow = ({
                                 !stakedTokenIds.includes(x.TokenId)
                             )
                             .map((x) => x.StakeActionId),
+                          stakeState
+                            .filter(
+                              (x) =>
+                                stakedActionIds.includes(x.StakeActionId) ||
+                                !stakedTokenIds.includes(x.TokenId)
+                            )
+                            .map((x) => x.IsRandomWalk),
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
                         );

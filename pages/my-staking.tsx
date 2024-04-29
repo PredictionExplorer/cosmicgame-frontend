@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import { useActiveWeb3React } from "../hooks/web3";
@@ -13,6 +13,29 @@ import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
 import { STAKING_WALLET_ADDRESS } from "../config/app";
 import { StakedTokensTable } from "../components/StakedTokensTable";
 import { useStakedToken } from "../contexts/StakedTokenContext";
+import { RWLKNFTTable } from "../components/RWLKNFTTable";
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 const MyStaking = () => {
   const { account } = useActiveWeb3React();
@@ -21,6 +44,7 @@ const MyStaking = () => {
   const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
   const [stakingActions, setStakingActions] = useState([]);
   const [CSTokens, setCSTokens] = useState([]);
+  const [stakingTable, setStakingTable] = useState(0);
   const { data: stakedTokens, fetchData: fetchStakedToken } = useStakedToken();
 
   const stakingContract = useStakingWalletContract();
@@ -105,6 +129,11 @@ const MyStaking = () => {
       return err;
     }
   };
+
+  const handleTabChange = (_event, newValue) => {
+    setStakingTable(newValue);
+  };
+
   const fetchData = async (addr: string, reload: boolean = true) => {
     setLoading(reload);
     const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
@@ -176,11 +205,26 @@ const MyStaking = () => {
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                 Tokens Available for Staking
               </Typography>
-              <CSTokensTable
-                list={CSTokens}
-                handleStake={handleStake}
-                handleStakeMany={handleStakeMany}
-              />
+              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <Tabs value={stakingTable} onChange={handleTabChange}>
+                  <Tab label="CosmicSignature Token" />
+                  <Tab label="RandomWalk Token" />
+                </Tabs>
+              </Box>
+              <CustomTabPanel value={stakingTable} index={0}>
+                <CSTokensTable
+                  list={CSTokens}
+                  handleStake={handleStake}
+                  handleStakeMany={handleStakeMany}
+                />
+              </CustomTabPanel>
+              <CustomTabPanel value={stakingTable} index={1}>
+                <RWLKNFTTable
+                  list={CSTokens}
+                  handleStake={handleStake}
+                  handleStakeMany={handleStakeMany}
+                />
+              </CustomTabPanel>
             </Box>
             <Box>
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
