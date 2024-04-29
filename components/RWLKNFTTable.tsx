@@ -18,38 +18,50 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
+import { useActiveWeb3React } from "../hooks/web3";
+import { useStakedToken } from "../contexts/StakedTokenContext";
+import api from "../services/api";
 
-const RWLKNFTRow = ({ row, handleStake, isItemSelected, handleClick }) => {
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
-
+const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
+  const [tokenInfo, setTokenInfo] = useState(null);
+  useEffect(() => {
+    const fetchTokenData = async () => {
+      const res = await api.get_info(tokenId);
+      setTokenInfo(res);
+    };
+    fetchTokenData();
+  }, []);
   return (
     <TablePrimaryRow
       hover="true"
       role="checkbox"
       tabIndex={-1}
-      key={row.id}
+      key={tokenId}
       selected={isItemSelected}
-      onClick={() => handleClick(row.TokenId)}
+      onClick={() => handleClick(tokenId)}
       sx={{ cursor: "pointer" }}
     >
       <TablePrimaryCell padding="checkbox">
         <Checkbox color="primary" checked={isItemSelected} size="small" />
       </TablePrimaryCell>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(row.TimeStamp)}
+        <Link
+          href={`/user/${tokenInfo?.CurOwnerAddr}`}
+          sx={{ color: "inherit", fontSize: "inherit" }}
+        >
+          {tokenInfo?.CurOwnerAddr}
+        </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.TokenId}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{tokenId}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Button
           size="small"
           onClick={(e) => {
             e.stopPropagation();
-            handleStake(row.TokenId);
+            handleStake(tokenId);
           }}
         >
           Stake
@@ -61,6 +73,9 @@ const RWLKNFTRow = ({ row, handleStake, isItemSelected, handleClick }) => {
 
 export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
   const perPage = 5;
+  const { account } = useActiveWeb3React();
+  const nftContract = useRWLKNFTContract();
+  const { data: stakedTokens } = useStakedToken();
   const [notification, setNotification] = useState<{
     text: string;
     type: "success" | "info" | "warning" | "error";
@@ -177,7 +192,7 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
                 />
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">
-                Mint Datetime
+                Owner Address
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell />
@@ -186,12 +201,12 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
           <TableBody>
             {list
               .slice((page - 1) * perPage, page * perPage)
-              .map((row, index) => (
+              .map((tokenId, index) => (
                 <RWLKNFTRow
                   key={index}
-                  row={row}
+                  tokenId={tokenId}
                   handleStake={onStake}
-                  isItemSelected={isSelected(row.TokenId)}
+                  isItemSelected={isSelected(tokenId)}
                   handleClick={handleClick}
                 />
               ))}

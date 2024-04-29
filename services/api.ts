@@ -218,7 +218,7 @@ class ApiService {
   public async get_info(token_id: number | string) {
     try {
       const { data } = await axios.get(baseUrl + "token_info/" + token_id);
-      return data;
+      return data.TokenInfo;
     } catch (err) {
       console.log(err);
       return null;

@@ -23,10 +23,12 @@ const PaginationRWLKGrid = ({
   const [searchId, setSearchId] = useState("");
 
   const handleClick = (index) => {
-    if (index === selectedToken) {
-      setSelectedToken(-1);
-    } else {
-      setSelectedToken(index);
+    if (setSelectedToken) {
+      if (index === selectedToken) {
+        setSelectedToken(-1);
+      } else {
+        setSelectedToken(index);
+      }
     }
   };
 

@@ -14,6 +14,7 @@ import { STAKING_WALLET_ADDRESS } from "../config/app";
 import { StakedTokensTable } from "../components/StakedTokensTable";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import { RWLKNFTTable } from "../components/RWLKNFTTable";
+import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -39,11 +40,13 @@ function CustomTabPanel(props: TabPanelProps) {
 
 const MyStaking = () => {
   const { account } = useActiveWeb3React();
+  const nftContract = useRWLKNFTContract();
   const [loading, setLoading] = useState(false);
   const [unclaimedStakingRewards, setUnclaimedStakingRewards] = useState([]);
   const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
   const [stakingActions, setStakingActions] = useState([]);
   const [CSTokens, setCSTokens] = useState([]);
+  const [rwlkTokens, setRwlkTokens] = useState([]);
   const [stakingTable, setStakingTable] = useState(0);
   const { data: stakedTokens, fetchData: fetchStakedToken } = useStakedToken();
 
@@ -149,6 +152,17 @@ const MyStaking = () => {
     const CSTokens = await api.get_cst_tokens_by_user(addr);
     setCSTokens(CSTokens);
     fetchStakedToken();
+
+    const rwlkStaked = stakedTokens
+      .filter((x) => x.IsRandomWalk)
+      .map((x) => x.TokenInfo.TokenId);
+    const tokens = await nftContract.walletOfOwner(account);
+    const nftIds = tokens
+      .map((t) => t.toNumber())
+      .reverse()
+      .filter((x) => !rwlkStaked.includes(x));
+    setRwlkTokens(nftIds);
+
     setLoading(false);
   };
   useEffect(() => {
@@ -220,7 +234,7 @@ const MyStaking = () => {
               </CustomTabPanel>
               <CustomTabPanel value={stakingTable} index={1}>
                 <RWLKNFTTable
-                  list={CSTokens}
+                  list={rwlkTokens}
                   handleStake={handleStake}
                   handleStakeMany={handleStakeMany}
                 />
