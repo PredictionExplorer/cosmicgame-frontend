@@ -69,7 +69,11 @@ const StakedTokensRow = ({
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/detail/${row.TokenInfo.TokenId}`}
+          href={
+            row.StakedIsRandomWalk
+              ? `https://randomwalknft.com/detail/${row.TokenInfo.TokenId}`
+              : `/detail/${row.TokenInfo.TokenId}`
+          }
           sx={{
             color: "inherit",
             fontSize: "inherit",
@@ -262,6 +266,7 @@ export const StakedTokensTable = ({
           </TablePrimaryHead>
           <TableBody>
             {list
+              .sort((a, b) => a.StakeTimeStamp - b.StakeTimeStamp)
               .slice((page - 1) * perPage, page * perPage)
               .map((row, index) => (
                 <StakedTokensRow
