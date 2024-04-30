@@ -84,7 +84,7 @@ const StakedTokensRow = ({
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.StakedIsRandomWalk ? "True" : "False"}
+        {row.StakedIsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link

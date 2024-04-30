@@ -79,7 +79,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
         {namesHistory.length > 0 ? namesHistory[namesHistory.length - 1] : " "}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.IsRandomWalk ? "True" : "False"}
+        {row.IsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Checkbox

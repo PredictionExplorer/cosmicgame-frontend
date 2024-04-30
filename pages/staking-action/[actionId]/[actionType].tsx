@@ -80,6 +80,15 @@ const StakingActionDetail = ({ actionId, actionType }) => {
             )}
             <Box mb={1}>
               <Typography color="primary" component="span">
+                Is RandomWalk Token?
+              </Typography>
+              &nbsp;
+              <Typography component="span">
+                {actionInfo.IsRandomWalk ? "Yes" : "No"}
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography color="primary" component="span">
                 Staker Address:
               </Typography>
               &nbsp;
@@ -117,14 +126,25 @@ const StakingActionDetail = ({ actionId, actionType }) => {
               <StyledCard>
                 <CardActionArea>
                   <Link
-                    href={`/detail/${actionInfo.TokenId}`}
+                    href={
+                      actionInfo.IsRandomWalk
+                        ? `https://randomwalknft.com/detail/${actionInfo.TokenId}`
+                        : `/detail/${actionInfo.TokenId}`
+                    }
                     sx={{ display: "block" }}
                   >
                     <NFTImage
-                      src={`https://cosmic-game2.s3.us-east-2.amazonaws.com/${actionInfo.TokenId.toString().padStart(
-                        6,
-                        "0"
-                      )}.png`}
+                      src={
+                        actionInfo.IsRandomWalk
+                          ? `https://randomwalknft.s3.us-east-2.amazonaws.com/${actionInfo.TokenId.toString().padStart(
+                              6,
+                              "0"
+                            )}_black_thumb.jpg`
+                          : `https://cosmic-game2.s3.us-east-2.amazonaws.com/${actionInfo.TokenId.toString().padStart(
+                              6,
+                              "0"
+                            )}.png`
+                      }
                     />
                   </Link>
                 </CardActionArea>

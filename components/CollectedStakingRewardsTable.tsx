@@ -44,7 +44,7 @@ const DetailRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{row.StakeActionId}</TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.IsRandomWalk ? "True" : "False"}
+        {row.IsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {row.ClaimRewardAmountEth.toFixed(6)}

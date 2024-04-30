@@ -44,7 +44,7 @@ const StakingActionsRow = ({ row }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.IsRandomWalk ? "True" : "False"}
+        {row.IsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell>
         {row.ActionType === 0
