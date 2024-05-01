@@ -20,9 +20,6 @@ import {
 } from "./styled";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
-import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
-import { useActiveWeb3React } from "../hooks/web3";
-import { useStakedToken } from "../contexts/StakedTokenContext";
 import api from "../services/api";
 
 const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
@@ -73,9 +70,6 @@ const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
 
 export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
   const perPage = 5;
-  const { account } = useActiveWeb3React();
-  const nftContract = useRWLKNFTContract();
-  const { data: stakedTokens } = useStakedToken();
   const [notification, setNotification] = useState<{
     text: string;
     type: "success" | "info" | "warning" | "error";
@@ -108,8 +102,7 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
   };
   const onSelectAllClick = (e) => {
     if (e.target.checked) {
-      const newSelected = list.map((n) => n.TokenId);
-      setSelected(newSelected);
+      setSelected(list);
       return;
     }
     setSelected([]);

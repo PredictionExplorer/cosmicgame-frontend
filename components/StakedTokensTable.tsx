@@ -87,18 +87,6 @@ const StakedTokensRow = ({
         {row.StakedIsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${row.TokenInfo.RoundNum}`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
-          target="_blank"
-        >
-          {row.TokenInfo.RoundNum}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
         {row.TokenInfo.StakeActionId}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -257,7 +245,6 @@ export const StakedTokensTable = ({
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Is RandomWalk NFT?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Unstake Datetime</TablePrimaryHeadCell>

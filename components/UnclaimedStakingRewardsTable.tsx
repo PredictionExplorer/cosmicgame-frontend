@@ -142,7 +142,6 @@ const UnclaimedStakingRewardsRow = ({
     type,
     unstakeActions,
     restakeActions,
-    isRWalks,
     claimActions,
     claimDeposits
   ) => {
@@ -151,7 +150,6 @@ const UnclaimedStakingRewardsRow = ({
       type,
       unstakeActions,
       restakeActions,
-      isRWalks,
       claimActions,
       claimDeposits
     );
@@ -224,7 +222,6 @@ const UnclaimedStakingRewardsRow = ({
                           }claimed`,
                           unstakeableActionIds,
                           [],
-                          [],
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
                         )
@@ -261,7 +258,6 @@ const UnclaimedStakingRewardsRow = ({
                             unstakeableActionIds,
                             [],
                             [],
-                            [],
                             []
                           );
                         }}
@@ -290,13 +286,6 @@ const UnclaimedStakingRewardsRow = ({
                                 !stakedTokenIds.includes(x.TokenId)
                             )
                             .map((x) => x.StakeActionId),
-                          stakeState
-                            .filter(
-                              (x) =>
-                                stakedActionIds.includes(x.StakeActionId) ||
-                                !stakedTokenIds.includes(x.TokenId)
-                            )
-                            .map((x) => x.IsRandomWalk),
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
                         );
@@ -326,7 +315,6 @@ const UnclaimedStakingRewardsRow = ({
                             unstakeableActionIds.length > 0 ? "unstaked & " : ""
                           }claimed`,
                           unstakeableActionIds,
-                          [],
                           [],
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
@@ -364,7 +352,6 @@ const UnclaimedStakingRewardsRow = ({
                             unstakeableActionIds,
                             [],
                             [],
-                            [],
                             []
                           );
                         }}
@@ -393,13 +380,6 @@ const UnclaimedStakingRewardsRow = ({
                                 !stakedTokenIds.includes(x.TokenId)
                             )
                             .map((x) => x.StakeActionId),
-                          stakeState
-                            .filter(
-                              (x) =>
-                                stakedActionIds.includes(x.StakeActionId) ||
-                                !stakedTokenIds.includes(x.TokenId)
-                            )
-                            .map((x) => x.IsRandomWalk),
                           claimableActionIds.map((x) => x.StakeActionId),
                           claimableActionIds.map((x) => x.DepositId)
                         );
@@ -468,7 +448,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     type,
     unstakeActions,
     restakeActions,
-    isRWalks,
     claimActions,
     claimDeposits
   ) => {
@@ -477,7 +456,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         .unstakeClaimRestakeMany(
           unstakeActions,
           restakeActions,
-          isRWalks,
           claimActions,
           claimDeposits
         )

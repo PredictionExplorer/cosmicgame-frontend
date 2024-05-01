@@ -49,7 +49,7 @@
   "function tokenIndicesRWalk(uint256) view returns (uint256)",
   "function transferOwnership(address)",
   "function unstake(uint256)",
-  "function unstakeClaimRestake(uint256,bool,uint256)",
-  "function unstakeClaimRestakeMany(uint256[],uint256[],bool[],uint256[],uint256[])",
+  "function unstakeClaimRestake(uint256,uint256)",
+  "function unstakeClaimRestakeMany(uint256[],uint256[],uint256[],uint256[])",
   "function unstakeMany(uint256[])"
 ]
