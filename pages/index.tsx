@@ -115,6 +115,7 @@ const NewHome = () => {
   });
   const [bannerTokenId, setBannerTokenId] = useState("");
   const [rwlknftIds, setRwlknftIds] = useState([]);
+  const [offset, setOffset] = useState(0);
   const [roundStarted, setRoundStarted] = useState("");
   const [curPage, setCurrentPage] = useState(1);
   const [claimHistory, setClaimHistory] = useState(null);
@@ -469,6 +470,12 @@ const NewHome = () => {
   }, [nftRWLKContract, account]);
 
   useEffect(() => {
+    const calculateTimeOffset = async () => {
+      const current = await api.get_current_time();
+      const offset = current * 1000 - Date.now();
+      setOffset(offset);
+    };
+
     const fetchData = async () => {
       const newData = await api.get_dashboard_info();
       const round = newData.CurRoundNum;
@@ -491,8 +498,6 @@ const NewHome = () => {
 
     const fetchPrizeTime = async () => {
       const t = await api.get_prize_time();
-      const current = await api.get_current_time();
-      const offset = current * 1000 - Date.now();
       setPrizeTime(t * 1000 - offset);
     };
 
@@ -522,6 +527,7 @@ const NewHome = () => {
       }
     };
 
+    calculateTimeOffset();
     fetchData();
     fetchPrizeInfo();
     fetchPrizeTime();
@@ -580,7 +586,7 @@ const NewHome = () => {
       }
     }
     const interval = setInterval(async () => {
-      setRoundStarted(calculateTimeDiff(data?.TsRoundStart));
+      setRoundStarted(calculateTimeDiff(data?.TsRoundStart - offset / 1000));
     }, 1000);
 
     return () => {
@@ -615,41 +621,46 @@ const NewHome = () => {
           <Grid item sm={12} md={6}>
             {data?.TsRoundStart !== 0 ? (
               <>
-                <Grid container spacing={2} alignItems="center" mb={2}>
+                <Grid container spacing={2} alignItems="center" mb={4}>
                   <Grid item xs={12} sm={4} md={4}>
                     <Typography variant="h5">
                       Round #{data?.CurRoundNum}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={8} md={8} sx={{ width: "100%" }}>
-                    <Typography
-                      variant="subtitle1"
-                      textAlign="center"
-                      fontWeight={400}
-                    >
-                      Finishes In
-                    </Typography>
                     {data?.LastBidderAddr !== constants.AddressZero &&
                       (prizeTime > Date.now() ? (
-                        <Countdown
-                          key={0}
-                          date={prizeTime}
-                          renderer={Counter}
-                        />
+                        <>
+                          <Typography
+                            variant="subtitle1"
+                            textAlign="center"
+                            fontWeight={400}
+                          >
+                            Finishes In
+                          </Typography>
+                          <Countdown
+                            key={0}
+                            date={prizeTime}
+                            renderer={Counter}
+                          />
+                        </>
                       ) : (
-                        <Countdown
-                          key={1}
-                          date={Date.now()}
-                          renderer={Counter}
-                        />
+                        <>
+                          <Typography variant="h5" color="primary">
+                            Bids exhausted!
+                          </Typography>
+                          <Typography variant="subtitle2" color="primary">
+                            Waiting for the winner to claim the prize.
+                          </Typography>
+                        </>
                       ))}
+                    {roundStarted !== "" && (
+                      <Typography sx={{ mt: 1 }}>
+                        (Round started {roundStarted} ago)
+                      </Typography>
+                    )}
                   </Grid>
                 </Grid>
-                {roundStarted !== "" && (
-                  <Typography sx={{ textAlign: "center", mb: 4 }}>
-                    (Round started {roundStarted} ago)
-                  </Typography>
-                )}
               </>
             ) : (
               <>
