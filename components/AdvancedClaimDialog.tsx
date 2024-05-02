@@ -68,7 +68,11 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     <TablePrimaryRow>
       <TablePrimaryCell align="center">
         <Link
-          href={`/detail/${row.TokenId}`}
+          href={
+            row.IsRandomWalk
+              ? `https://randomwalknft.com/detail/${row.TokenId}`
+              : `/detail/${row.TokenId}`
+          }
           target="_blank"
           sx={{ color: "inherit", fontSize: "inherit" }}
         >

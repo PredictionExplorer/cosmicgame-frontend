@@ -36,7 +36,11 @@ const DetailRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/detail/${row.TokenId}`}
+          href={
+            row.IsRandomWalk
+              ? `https://randomwalknft.com/detail/${row.TokenId}`
+              : `/detail/${row.TokenId}`
+          }
           style={{ color: "inherit", fontSize: "inherit" }}
         >
           {row.TokenId}
