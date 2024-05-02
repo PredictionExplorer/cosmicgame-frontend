@@ -313,7 +313,6 @@ export default function AdvancedClaimDialog({
         .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
         .map((x) => x.StakeActionId),
       stakeState.filter((x) => x.restake).map((x) => x.StakeActionId),
-      stakeState.filter((x) => x.restake).map((x) => x.IsRandomWalk),
       stakeState.filter((x) => x.claim).map((x) => x.StakeActionId),
       stakeState.filter((x) => x.claim).map((x) => x.DepositId)
     );
