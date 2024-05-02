@@ -56,7 +56,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
   useEffect(() => {
     const fetchNamesHistory = async () => {
       const names = await api.get_name_history(row.TokenId);
-      setNamesHistory(names);
+      setNamesHistory(names.map((x) => x.TokenName));
     };
     fetchNamesHistory();
   }, []);
