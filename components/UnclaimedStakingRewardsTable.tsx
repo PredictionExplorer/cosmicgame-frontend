@@ -265,12 +265,6 @@ const UnclaimedStakingRewardsRow = ({
                         <Typography>Unstake Only</Typography>
                       </PrimaryMenuItem>
                     )}
-                    {/* <PrimaryMenuItem onClick={handleMenuClose}>
-                    <Typography>
-                      {`${unstakeableActionIds.length > 0 &&
-                        "Unstake &"} Claim`}
-                    </Typography>
-                  </PrimaryMenuItem> */}
                     <PrimaryMenuItem
                       onClick={() => {
                         handleMenuClose();
@@ -359,12 +353,6 @@ const UnclaimedStakingRewardsRow = ({
                         <Typography>Unstake Only</Typography>
                       </PrimaryMenuItem>
                     )}
-                    {/* <PrimaryMenuItem onClick={handleMenuClose}>
-                    <Typography>
-                      {`${unstakeableActionIds.length > 0 &&
-                        "Unstake &"} Claim All`}
-                    </Typography>
-                  </PrimaryMenuItem> */}
                     <PrimaryMenuItem
                       onClick={() => {
                         handleMenuClose();
@@ -430,7 +418,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const [page, setPage] = useState(1);
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  // const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const [offset, setOffset] = useState(undefined);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
@@ -484,24 +471,12 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     }
   };
 
-  const handleClaimAll = async () => {
-    let actionIds = [],
-      depositIds = [];
-    for (const element of list) {
-      const depositId = element.DepositId;
-      const response = await api.get_action_ids_by_deposit_id(
-        account,
-        depositId
-      );
-      const ids = response
-        .filter((x) => !x.Claimed)
-        .map((x) => x.StakeActionId);
-      actionIds = actionIds.concat(ids);
-      depositIds = depositIds.concat(new Array(ids.length).fill(depositId));
-    }
+  const handleUnstakeClaimAll = async () => {
     try {
       const res = await stakingContract
-        .claimManyRewards(
+        .unstakeClaimRestakeMany(
+          unstakableActionIds,
+          [],
           claimableActionIds.map((x) => x.StakeActionId),
           claimableActionIds.map((x) => x.DepositId)
         )
@@ -620,15 +595,15 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
             .toFixed(6)}
         </Typography>
       </Box>
-      {account === owner &&
-        unstakableActionIds.length === 0 &&
-        claimableActionIds.length > 0 && (
-          <Box display="flex" justifyContent="end" mt={1}>
-            <Button variant="text" onClick={handleClaimAll}>
-              Claim All
-            </Button>
-          </Box>
-        )}
+      {account === owner && claimableActionIds.length > 0 && (
+        <Box display="flex" justifyContent="end" mt={1}>
+          <Button variant="contained" onClick={handleUnstakeClaimAll}>
+            {unstakableActionIds.length > 0
+              ? "Unstake & Claim All"
+              : "Claim All"}
+          </Button>
+        </Box>
+      )}
       <Box display="flex" justifyContent="end" mt={1}>
         <Typography>
           You can claim your prizes in the case if the unstake date is beyond
