@@ -619,190 +619,200 @@ const NewHome = () => {
         </Backdrop>
         <Grid container spacing={{ lg: 16, md: 8, sm: 8, xs: 4 }} mb={4}>
           <Grid item sm={12} md={6}>
-            {data?.TsRoundStart !== 0 ? (
+            {!loading && (
               <>
-                <Grid container spacing={2} alignItems="center" mb={4}>
-                  <Grid item xs={12} sm={4} md={4}>
-                    <Typography variant="h5">
-                      Round #{data?.CurRoundNum}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={8} md={8} sx={{ width: "100%" }}>
-                    {data?.LastBidderAddr !== constants.AddressZero &&
-                      (prizeTime > Date.now() ? (
-                        <>
-                          <Typography
-                            variant="subtitle1"
-                            textAlign="center"
-                            fontWeight={400}
-                          >
-                            Finishes In
-                          </Typography>
-                          <Countdown
-                            key={0}
-                            date={prizeTime}
-                            renderer={Counter}
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <Typography variant="h5" color="primary">
-                            Bids exhausted!
-                          </Typography>
-                          <Typography variant="subtitle2" color="primary">
-                            Waiting for the winner to claim the prize.
-                          </Typography>
-                        </>
-                      ))}
-                    {roundStarted !== "" && (
-                      <Typography sx={{ mt: 1 }}>
-                        (Round started {roundStarted} ago)
-                      </Typography>
-                    )}
-                  </Grid>
-                </Grid>
-              </>
-            ) : (
-              <>
-                {data?.CurRoundNum > 0 && data?.TsRoundStart === 0 ? (
+                {data?.TsRoundStart !== 0 ? (
                   <>
-                    <Typography variant="h4" mb={2}>
-                      Round {data?.CurRoundNum - 1} ended
-                    </Typography>
-                    <Grid container spacing={2} mb={2} alignItems="center">
-                      <Grid item sm={12} md={4}>
-                        <Typography variant="subtitle1">Winner</Typography>
-                      </Grid>
-                      <Grid item sm={12} md={8}>
-                        <Typography textAlign="center">
-                          <Link
-                            href={`/user/${prizeInfo?.WinnerAddr}`}
-                            color="rgb(255, 255, 255)"
-                            fontSize="inherit"
-                          >
-                            {prizeInfo?.WinnerAddr}
-                          </Link>
+                    <Grid container spacing={2} alignItems="center" mb={4}>
+                      <Grid item xs={12} sm={4} md={4}>
+                        <Typography variant="h5">
+                          Round #{data?.CurRoundNum}
                         </Typography>
                       </Grid>
-                    </Grid>
-                    <Grid container spacing={2} mb={2} alignItems="center">
-                      <Grid item sm={12} md={4}>
-                        <Typography variant="subtitle1">
-                          Previous Reward
-                        </Typography>
-                      </Grid>
-                      <Grid item sm={12} md={8}>
-                        <Typography>
-                          {prizeInfo?.AmountEth.toFixed(4)} ETH
-                        </Typography>
+                      <Grid item xs={12} sm={8} md={8} sx={{ width: "100%" }}>
+                        {data?.LastBidderAddr !== constants.AddressZero &&
+                          (prizeTime > Date.now() ? (
+                            <>
+                              <Typography
+                                variant="subtitle1"
+                                textAlign="center"
+                                fontWeight={400}
+                              >
+                                Finishes In
+                              </Typography>
+                              <Countdown
+                                key={0}
+                                date={prizeTime}
+                                renderer={Counter}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <Typography variant="h5" color="primary">
+                                Bids exhausted!
+                              </Typography>
+                              <Typography variant="subtitle2" color="primary">
+                                Waiting for the winner to claim the prize.
+                              </Typography>
+                            </>
+                          ))}
+                        {roundStarted !== "" && (
+                          <Typography sx={{ mt: 1 }}>
+                            (Round started {roundStarted} ago)
+                          </Typography>
+                        )}
                       </Grid>
                     </Grid>
                   </>
                 ) : (
-                  <Typography variant="subtitle1">
-                    Start the game with your first bid!
+                  <>
+                    {data?.CurRoundNum > 0 && data?.TsRoundStart === 0 ? (
+                      <>
+                        <Typography variant="h4" mb={2}>
+                          Round {data?.CurRoundNum - 1} ended
+                        </Typography>
+                        <Grid container spacing={2} mb={2} alignItems="center">
+                          <Grid item sm={12} md={4}>
+                            <Typography variant="subtitle1">Winner</Typography>
+                          </Grid>
+                          <Grid item sm={12} md={8}>
+                            <Typography textAlign="center">
+                              <Link
+                                href={`/user/${prizeInfo?.WinnerAddr}`}
+                                color="rgb(255, 255, 255)"
+                                fontSize="inherit"
+                              >
+                                {prizeInfo?.WinnerAddr}
+                              </Link>
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        <Grid container spacing={2} mb={2} alignItems="center">
+                          <Grid item sm={12} md={4}>
+                            <Typography variant="subtitle1">
+                              Previous Reward
+                            </Typography>
+                          </Grid>
+                          <Grid item sm={12} md={8}>
+                            <Typography>
+                              {prizeInfo?.AmountEth.toFixed(4)} ETH
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </>
+                    ) : (
+                      <Typography variant="subtitle1">
+                        Start the game with your first bid!
+                      </Typography>
+                    )}
+                    <Typography variant="subtitle1" mt={2} mb={2}>
+                      Be the first to start a new round, place a bid.
+                    </Typography>
+                  </>
+                )}
+                <Grid container spacing={2} mb={2}>
+                  <Grid item xs={12} sm={3} md={4}>
+                    <Typography variant="subtitle1">Bid Price</Typography>
+                  </Grid>
+                  <Grid item xs={8} sm={5} md={8}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
+                      <Typography>Using Ether</Typography>
+                      <Typography>
+                        {data?.BidPriceEth.toFixed(6)} ETH
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
+                      <Typography>Using RandomWalk</Typography>
+                      <Typography>
+                        {(data?.BidPriceEth / 2).toFixed(6)} ETH
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        mb: 1,
+                      }}
+                    >
+                      <Typography>Using CST</Typography>
+                      {cstBidData?.CSTPrice > 0 ? (
+                        <Typography>
+                          {cstBidData?.CSTPrice.toFixed(6)} CST
+                        </Typography>
+                      ) : (
+                        <Typography color="#ff0">FREE</Typography>
+                      )}
+                    </Box>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} mb={2} alignItems="center">
+                  <Grid item xs={12} sm={4} md={4}>
+                    <Typography variant="subtitle1">
+                      Main Prize Reward
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={8}>
+                    <GradientText variant="h6" sx={{ display: "inline" }}>
+                      {data?.PrizeAmountEth.toFixed(4)} ETH
+                    </GradientText>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} mb={2} alignItems="center">
+                  <Grid item xs={12} sm={4} md={4}>
+                    <Typography variant="subtitle1">
+                      Last Bidder Address
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={8}>
+                    <Typography>
+                      {data?.LastBidderAddr === constants.AddressZero ? (
+                        "There is no bidder yet."
+                      ) : (
+                        <Link
+                          href={`/user/${data?.LastBidderAddr}`}
+                          color="rgb(255, 255, 255)"
+                          fontSize="inherit"
+                          sx={{ wordBreak: "break-all" }}
+                        >
+                          {data?.LastBidderAddr}
+                        </Link>
+                      )}
+                    </Typography>
+                  </Grid>
+                </Grid>
+                {!!(curBidList.length && curBidList[0].Message !== "") && (
+                  <Grid container spacing={2} mb={2} alignItems="center">
+                    <Grid item xs={12} sm={4} md={4}>
+                      <Typography variant="subtitle1">
+                        Last Bidder Message
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={8} md={8}>
+                      <Typography>{curBidList[0].Message}</Typography>
+                    </Grid>
+                  </Grid>
+                )}
+                {curBidList.length > 0 && winProbability && (
+                  <Typography mt={4}>
+                    {winProbability.raffle.toFixed(2)}% chance you will win{" "}
+                    {data?.RaffleAmountEth.toFixed(2)} ETH and{" "}
+                    {winProbability.nft.toFixed(2)}% chance you will win a
+                    Cosmic Signature NFT for now.
                   </Typography>
                 )}
-                <Typography variant="subtitle1" mt={2} mb={2}>
-                  Be the first to start a new round, place a bid.
-                </Typography>
               </>
-            )}
-            <Grid container spacing={2} mb={2}>
-              <Grid item xs={12} sm={3} md={4}>
-                <Typography variant="subtitle1">Bid Price</Typography>
-              </Grid>
-              <Grid item xs={8} sm={5} md={8}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 1,
-                  }}
-                >
-                  <Typography>Using Ether</Typography>
-                  <Typography>{data?.BidPriceEth.toFixed(6)} ETH</Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 1,
-                  }}
-                >
-                  <Typography>Using RandomWalk</Typography>
-                  <Typography>
-                    {(data?.BidPriceEth / 2).toFixed(6)} ETH
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 1,
-                  }}
-                >
-                  <Typography>Using CST</Typography>
-                  {cstBidData?.CSTPrice > 0 ? (
-                    <Typography>
-                      {cstBidData?.CSTPrice.toFixed(6)} CST
-                    </Typography>
-                  ) : (
-                    <Typography color="#ff0">FREE</Typography>
-                  )}
-                </Box>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} mb={2} alignItems="center">
-              <Grid item xs={12} sm={4} md={4}>
-                <Typography variant="subtitle1">Main Prize Reward</Typography>
-              </Grid>
-              <Grid item xs={12} sm={8} md={8}>
-                <GradientText variant="h6" sx={{ display: "inline" }}>
-                  {data?.PrizeAmountEth.toFixed(4)} ETH
-                </GradientText>
-              </Grid>
-            </Grid>
-            <Grid container spacing={2} mb={2} alignItems="center">
-              <Grid item xs={12} sm={4} md={4}>
-                <Typography variant="subtitle1">Last Bidder Address</Typography>
-              </Grid>
-              <Grid item xs={12} sm={8} md={8}>
-                <Typography>
-                  {data?.LastBidderAddr === constants.AddressZero ? (
-                    "There is no bidder yet."
-                  ) : (
-                    <Link
-                      href={`/user/${data?.LastBidderAddr}`}
-                      color="rgb(255, 255, 255)"
-                      fontSize="inherit"
-                      sx={{ wordBreak: "break-all" }}
-                    >
-                      {data?.LastBidderAddr}
-                    </Link>
-                  )}
-                </Typography>
-              </Grid>
-            </Grid>
-            {!!(curBidList.length && curBidList[0].Message !== "") && (
-              <Grid container spacing={2} mb={2} alignItems="center">
-                <Grid item xs={12} sm={4} md={4}>
-                  <Typography variant="subtitle1">
-                    Last Bidder Message
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={8} md={8}>
-                  <Typography>{curBidList[0].Message}</Typography>
-                </Grid>
-              </Grid>
-            )}
-            {curBidList.length > 0 && winProbability && (
-              <Typography mt={4}>
-                {winProbability.raffle.toFixed(2)}% chance you will win{" "}
-                {data?.RaffleAmountEth.toFixed(2)} ETH and{" "}
-                {winProbability.nft.toFixed(2)}% chance you will win a Cosmic
-                Signature NFT for now.
-              </Typography>
             )}
           </Grid>
           {matches && (
