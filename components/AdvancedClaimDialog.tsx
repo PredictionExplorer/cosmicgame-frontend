@@ -86,20 +86,22 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
         {row.IsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Checkbox
-          size="small"
-          sx={{ p: 0 }}
-          checked={stakeState.unstake}
-          disabled={isDisabled("unstake")}
-          onChange={(e) =>
-            setStakeState({
-              ...stakeState,
-              unstake: e.target.checked,
-              claim: stakeState.claim && e.target.checked,
-              restake: stakeState.restake && e.target.checked,
-            })
-          }
-        />
+        {!isDisabled("unstake") && (
+          <Checkbox
+            size="small"
+            sx={{ p: 0 }}
+            checked={stakeState.unstake}
+            disabled={isDisabled("unstake")}
+            onChange={(e) =>
+              setStakeState({
+                ...stakeState,
+                unstake: e.target.checked,
+                claim: stakeState.claim && e.target.checked,
+                restake: stakeState.restake && e.target.checked,
+              })
+            }
+          />
+        )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Checkbox
@@ -301,7 +303,6 @@ export default function AdvancedClaimDialog({
 }) {
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  // const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const handleClose = () => {
     setOpen(false);
   };
