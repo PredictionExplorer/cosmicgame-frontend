@@ -264,32 +264,34 @@ const TokensTable = ({ stakeState, setStakeState }) => {
           shape="rounded"
         />
       </Box>
-      <Box mt={2}>
-        <Button
-          size="small"
-          onClick={handleSelectUnstakeAll}
-          sx={{ textTransform: "none", mr: 1 }}
-          disabled={isDisabled("unstake")}
-        >
-          Unstake All
-        </Button>
-        <Button
-          size="small"
-          onClick={handleSelectClaimAll}
-          sx={{ textTransform: "none", mr: 1 }}
-          disabled={isDisabled("claim")}
-        >
-          Claim All
-        </Button>
-        <Button
-          size="small"
-          onClick={handleSelectRestakeAll}
-          disabled={isDisabled("restake")}
-          sx={{ textTransform: "none" }}
-        >
-          Restake All
-        </Button>
-      </Box>
+      {stakeState.length > 1 && (
+        <Box mt={2}>
+          <Button
+            size="small"
+            onClick={handleSelectUnstakeAll}
+            sx={{ textTransform: "none", mr: 1 }}
+            disabled={isDisabled("unstake")}
+          >
+            Unstake All
+          </Button>
+          <Button
+            size="small"
+            onClick={handleSelectClaimAll}
+            sx={{ textTransform: "none", mr: 1 }}
+            disabled={isDisabled("claim")}
+          >
+            Claim All
+          </Button>
+          <Button
+            size="small"
+            onClick={handleSelectRestakeAll}
+            disabled={isDisabled("restake")}
+            sx={{ textTransform: "none" }}
+          >
+            Restake All
+          </Button>
+        </Box>
+      )}
     </>
   );
 };
