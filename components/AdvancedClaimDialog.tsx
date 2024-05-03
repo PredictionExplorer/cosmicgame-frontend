@@ -6,10 +6,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Link,
   Pagination,
   TableBody,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -353,6 +355,18 @@ export default function AdvancedClaimDialog({
         <DialogTitle id="alert-dialog-title">
           Advanced Transaction Build
         </DialogTitle>
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: "absolute",
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
         <DialogContent>
           <TokensTable stakeState={stakeState} setStakeState={setStakeState} />
         </DialogContent>
