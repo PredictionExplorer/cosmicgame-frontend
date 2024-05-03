@@ -26,6 +26,7 @@ import api from "../services/api";
 import { ethers } from "ethers";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import { useSystemMode } from "../contexts/SystemModeContext";
+import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 
 const Header = () => {
   const [state, setState] = useState({
@@ -40,9 +41,12 @@ const Header = () => {
     CosmicToken: 0,
     ETH: 0,
     CosmicSignature: 0,
+    RWLK: 0,
   });
   const { data: stakedTokens } = useStakedToken();
   const { data: systemMode } = useSystemMode();
+  const nftContract = useRWLKNFTContract();
+
   useEffect(() => {
     const setResponsiveness = () => {
       return window.innerWidth < 1024
@@ -65,6 +69,7 @@ const Header = () => {
       setApiData(notify);
       const balance = await api.get_user_balance(account);
       const { UserInfo } = await api.get_user_info(account);
+      const rwlkTokens = await nftContract.walletOfOwner(account);
       if (balance) {
         setBalance({
           CosmicToken: Number(
@@ -72,6 +77,7 @@ const Header = () => {
           ),
           ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
           CosmicSignature: UserInfo?.TotalCSTokensWon,
+          RWLK: rwlkTokens.length,
         });
       }
     };
@@ -236,6 +242,28 @@ const Header = () => {
                       sx={{ fontStyle: "italic", fontWeight: 600 }}
                     >
                       {balance.CosmicSignature} tokens
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      color="secondary"
+                      sx={{ fontStyle: "italic", fontWeight: 600 }}
+                    >
+                      RWLK (ERC721):
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="secondary"
+                      sx={{ fontStyle: "italic", fontWeight: 600 }}
+                    >
+                      {balance.RWLK} tokens
                     </Typography>
                   </Box>
                 </ListItem>
