@@ -170,6 +170,7 @@ const UnclaimedStakingRewardsRow = ({
         <TablePrimaryCell>
           {convertTimestampToDateTime(row.TimeStamp - offset)}
         </TablePrimaryCell>
+        <TablePrimaryCell align="center">{row.DepositId}</TablePrimaryCell>
         <TablePrimaryCell align="right">
           {row.DepositAmountEth.toFixed(6)}
         </TablePrimaryCell>
@@ -559,6 +560,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
               <TablePrimaryHeadCell align="left" sx={{ minWidth: "185px" }}>
                 Datetime
               </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Deposit Amount
               </TablePrimaryHeadCell>
