@@ -82,13 +82,13 @@ export const calculateTimeDiff = (timestamp: any) => {
   hours = hours % 24;
   let str = "";
   if (days) {
-    str = ("0" + days).slice(-2) + " Days ";
+    str = days + (days === 1 ? " Day " : " Days ");
   }
   if (hours || str) {
-    str += ("0" + hours).slice(-2) + " Hours ";
+    str += hours + (hours === 1 ? " Hour " : " Hours ");
   }
   if (minutes) {
-    str += ("0" + minutes).slice(-2) + " Minutes ";
+    str += minutes + (minutes === 1 ? " Minute " : " Minutes ");
   }
   return str;
 };

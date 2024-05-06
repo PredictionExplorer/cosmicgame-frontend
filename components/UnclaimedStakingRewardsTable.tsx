@@ -595,21 +595,25 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
             .toFixed(6)}
         </Typography>
       </Box>
-      {account === owner && claimableActionIds.length > 0 && (
-        <Box display="flex" justifyContent="end" mt={1}>
-          <Button variant="contained" onClick={handleUnstakeClaimAll}>
-            {unstakableActionIds.length > 0
-              ? "Unstake & Claim All"
-              : "Claim All"}
-          </Button>
-        </Box>
-      )}
       <Box display="flex" justifyContent="end" mt={1}>
         <Typography>
           You can claim your prizes in the case if the unstake date is beyond
           the current date.
         </Typography>
       </Box>
+      {account === owner && list.length > 0 && (
+        <Box display="flex" justifyContent="end" mt={1}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={handleUnstakeClaimAll}
+          >
+            {unstakableActionIds.length > 0
+              ? "Unstake & Claim All"
+              : "Claim All"}
+          </Button>
+        </Box>
+      )}
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination
           color="primary"

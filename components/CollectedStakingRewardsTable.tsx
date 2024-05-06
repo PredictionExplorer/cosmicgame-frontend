@@ -112,13 +112,17 @@ const CollectedStakingRewardsRow = ({ row }) => {
     <>
       <TablePrimaryRow sx={{ borderBottom: 0 }}>
         <TablePrimaryCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+          {list.length > 1 ? (
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          ) : (
+            " "
+          )}
         </TablePrimaryCell>
         <TablePrimaryCell>
           {convertTimestampToDateTime(row.TimeStamp)}
@@ -148,18 +152,20 @@ const CollectedStakingRewardsRow = ({ row }) => {
           {row.YourCollectedAmountEth.toFixed(6)}
         </TablePrimaryCell>
       </TablePrimaryRow>
-      <TablePrimaryRow sx={{ borderTop: 0 }}>
-        <TablePrimaryCell sx={{ py: 0 }} colSpan={9}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1, marginBottom: 4 }}>
-              <Typography variant="subtitle1" gutterBottom component="div">
-                Detail
-              </Typography>
-              <DetailTable list={list} />
-            </Box>
-          </Collapse>
-        </TablePrimaryCell>
-      </TablePrimaryRow>
+      {list.length > 1 && (
+        <TablePrimaryRow sx={{ borderTop: 0 }}>
+          <TablePrimaryCell sx={{ py: 0 }} colSpan={9}>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <Box sx={{ margin: 1, marginBottom: 4 }}>
+                <Typography variant="subtitle1" gutterBottom component="div">
+                  Detail
+                </Typography>
+                <DetailTable list={list} />
+              </Box>
+            </Collapse>
+          </TablePrimaryCell>
+        </TablePrimaryRow>
+      )}
     </>
   );
 };

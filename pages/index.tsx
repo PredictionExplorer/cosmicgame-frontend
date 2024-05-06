@@ -498,7 +498,9 @@ const NewHome = () => {
 
     const fetchPrizeTime = async () => {
       const t = await api.get_prize_time();
-      setPrizeTime(t * 1000 - offset);
+      const current = await api.get_current_time();
+      const diff = current * 1000 - Date.now();
+      setPrizeTime(t * 1000 - diff);
     };
 
     const fetchPrizeInfo = async () => {
