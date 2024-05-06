@@ -52,20 +52,18 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
           }
         }
         if (!x.Claimed) {
-          const diff = x.UnstakeEligibleTimeStamp - x.CurChainTimeStamp;
-          // have to remove if Nick want to show the rewards that can claim right away
-          if (diff > 0) {
-            if (!claimableAmounts[diff]) {
+          if (x.TimeStampDiff > 0) {
+            if (!claimableAmounts[x.TimeStampDiff]) {
               const filtered = Object.keys(claimableAmounts).filter(
-                (x) => Math.abs(parseInt(x) - diff) < 60
+                (element) => Math.abs(parseInt(element) - x.TimeStampDiff) < 60
               );
               if (filtered.length > 0) {
                 claimableAmounts[filtered[0]] += x.AmountEth;
               } else {
-                claimableAmounts[diff] = x.AmountEth;
+                claimableAmounts[x.TimeStampDiff] = x.AmountEth;
               }
             } else {
-              claimableAmounts[diff] += x.AmountEth;
+              claimableAmounts[x.TimeStampDiff] += x.AmountEth;
             }
           }
         }
@@ -124,7 +122,6 @@ const UnclaimedStakingRewardsRow = ({
         restake: false,
       }))
     );
-    return res;
   };
 
   const handleMenuOpen = (e) => {
@@ -136,6 +133,14 @@ const UnclaimedStakingRewardsRow = ({
 
   useEffect(() => {
     fetchRowData();
+    const interval = setInterval(() => {
+      fetchRowData();
+    }, 30000);
+
+    // Clean up the interval when the component is unmounted
+    return () => {
+      clearInterval(interval);
+    };
   }, [stakedTokens]);
 
   const handleUnstakeClaimRestakeWrapper = (
