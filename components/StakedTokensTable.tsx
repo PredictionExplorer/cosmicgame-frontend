@@ -31,6 +31,7 @@ const StakedTokensRow = ({
   isItemSelected,
   handleClick,
 }) => {
+  const [tokenName, setTokenName] = useState("");
   const getTokenImageURL = () => {
     const fileName = row.TokenInfo.TokenId.toString().padStart(6, "0");
     if (row.StakedIsRandomWalk) {
@@ -38,6 +39,20 @@ const StakedTokensRow = ({
     }
     return `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.png`;
   };
+  useEffect(() => {
+    const getTokenName = async () => {
+      if (row.StakedIsRandomWalk) {
+        const res = await api.get_info(row.TokenInfo.TokenId);
+        setTokenName(res.CurName);
+      } else {
+        const names = await api.get_name_history(row.TokenInfo.TokenId);
+        if (names.length > 0) {
+          setTokenName(names[names.length - 1].TokenName);
+        }
+      }
+    };
+    getTokenName();
+  }, []);
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -66,6 +81,9 @@ const StakedTokensRow = ({
       </TablePrimaryCell>
       <TablePrimaryCell sx={{ width: "120px" }}>
         <NFTImage src={getTokenImageURL()} />
+        <Typography variant="caption" mt={1}>
+          {tokenName}
+        </Typography>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
