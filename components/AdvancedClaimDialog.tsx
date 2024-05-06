@@ -26,7 +26,7 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 import api from "../services/api";
 
 const TokenRow = ({ row, stakeState, setStakeState }) => {
-  const [namesHistory, setNamesHistory] = useState([]);
+  const [tokenName, setTokenName] = useState("");
   const { data: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
@@ -56,11 +56,18 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     return false;
   };
   useEffect(() => {
-    const fetchNamesHistory = async () => {
-      const names = await api.get_name_history(row.TokenId);
-      setNamesHistory(names.map((x) => x.TokenName));
+    const getTokenName = async () => {
+      if (row.IsRandomWalk) {
+        const res = await api.get_info(row.TokenId);
+        setTokenName(res.CurName);
+      } else {
+        const names = await api.get_name_history(row.TokenId);
+        if (names.length > 0) {
+          setTokenName(names[names.length - 1].TokenName);
+        }
+      }
     };
-    fetchNamesHistory();
+    getTokenName();
   }, []);
   if (!row) {
     return <TablePrimaryRow />;
@@ -82,7 +89,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {namesHistory.length > 0 ? namesHistory[namesHistory.length - 1] : " "}
+        {tokenName === "" ? " " : tokenName}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {row.IsRandomWalk ? "Yes" : "No"}
