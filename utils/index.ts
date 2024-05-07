@@ -50,10 +50,7 @@ export const formatSeconds = (seconds: any) => {
   if (seconds <= 0) {
     return " ";
   }
-  if (seconds <= 60) {
-    return "1 Minute";
-  }
-  let minutes = Math.floor(seconds / 60);
+  let minutes = Math.ceil(seconds / 60);
   seconds = seconds % 60;
   let hours = Math.floor(minutes / 60);
   minutes = minutes % 60;
