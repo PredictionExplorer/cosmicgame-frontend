@@ -183,29 +183,31 @@ const UnclaimedStakingRewardsRow = ({
         </TablePrimaryCell>
         <TablePrimaryCell align="right">
           {row.YourClaimableAmountEth.toFixed(6)}
+        </TablePrimaryCell>
+        <TablePrimaryCell align="right">
+          {claimableActionIds.length}
+        </TablePrimaryCell>
+        <TablePrimaryCell align="right">
+          {row.YourTokensStaked - claimableActionIds.length}
           {Object.keys(claimableAmounts).length > 0 && (
-            <Typography sx={{ display: "inline-block", lineHeight: 1, ml: 1 }}>
-              <Tooltip
-                title={
-                  <Typography>
-                    You can claim the reward for&nbsp;
-                    {Object.keys(claimableAmounts).map(
-                      (key, index, arr) =>
-                        `${claimableAmounts[key].toFixed(
-                          6
-                        )} ETH in ${formatSeconds(parseInt(key))}${
-                          index !== arr.length - 1 ? ", " : ""
-                        }`
-                    )}
-                  </Typography>
-                }
-              >
-                <ErrorOutlineIcon
-                  fontSize="inherit"
-                  sx={{ display: "block" }}
-                />
-              </Tooltip>
-            </Typography>
+            <Tooltip
+              title={
+                <Typography>
+                  You can claim the reward for&nbsp;
+                  {Object.keys(claimableAmounts).map(
+                    (key, index, arr) =>
+                      `${claimableAmounts[key].toFixed(
+                        6
+                      )} ETH in ${formatSeconds(parseInt(key))}${
+                        index !== arr.length - 1 ? ", " : ""
+                      }`
+                  )}
+                </Typography>
+              }
+              sx={{ ml: 1 }}
+            >
+              <ErrorOutlineIcon fontSize="inherit" />
+            </Tooltip>
           )}
         </TablePrimaryCell>
         {account === owner && (
@@ -573,6 +575,12 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Your Claimable Amount
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Claimable Tokens
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Wait Period Tokens
               </TablePrimaryHeadCell>
               {account === owner && (
                 <TablePrimaryHeadCell> </TablePrimaryHeadCell>
