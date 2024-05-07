@@ -95,7 +95,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
         {row.IsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {!isDisabled("unstake") && (
+        {!isDisabled("unstake") ? (
           <Checkbox
             size="small"
             sx={{ p: 0 }}
@@ -110,6 +110,8 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
               })
             }
           />
+        ) : (
+          " "
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
