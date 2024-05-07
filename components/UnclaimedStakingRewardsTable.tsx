@@ -527,6 +527,9 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         })
       );
       setClaimableActionIds(cl_actionIds);
+      us_actionIds = us_actionIds.filter((item, index) => {
+        return index === us_actionIds.findIndex((o) => o === item);
+      });
       setUnstakeableActionIds(us_actionIds);
     };
     fetchActionIds();
