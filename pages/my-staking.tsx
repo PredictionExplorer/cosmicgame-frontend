@@ -221,8 +221,8 @@ const MyStaking = () => {
               </Typography>
               <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                 <Tabs value={stakingTable} onChange={handleTabChange}>
-                  <Tab label="CosmicSignature Token" />
-                  <Tab label="RandomWalk Token" />
+                  <Tab label={<Typography>CosmicSignature Token</Typography>} />
+                  <Tab label={<Typography>RandomWalk Token</Typography>} />
                 </Tabs>
               </Box>
               <CustomTabPanel value={stakingTable} index={0}>

@@ -5,11 +5,14 @@ import {
   Button,
   Checkbox,
   Link,
+  Menu,
+  MenuItem,
   Pagination,
   Snackbar,
   TableBody,
   Typography,
 } from "@mui/material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -100,6 +103,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
 
 export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   const perPage = 5;
+  const [anchorEl, setAnchorEl] = useState(null);
   const [notification, setNotification] = useState<{
     text: string;
     type: "success" | "info" | "warning" | "error";
@@ -130,16 +134,27 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
     }
     setSelected(newSelected);
   };
-  const onSelectAllClick = (e) => {
-    if (e.target.checked) {
-      const newSelected = list.map((n) => n.TokenId);
-      setSelected(newSelected);
-      return;
-    }
+  const onSelectAllClick = () => {
+    const newSelected = list.map((n) => n.TokenId);
+    setSelected(newSelected);
+    setAnchorEl(null);
+  };
+  const onSelectCurPgClick = () => {
+    const newSelected = list
+      .slice((page - 1) * perPage, page * perPage)
+      .map((n) => n.TokenId);
+    setSelected(newSelected);
+    setAnchorEl(null);
+  };
+  const onSelectNoneClick = () => {
     setSelected([]);
+    setAnchorEl(null);
   };
   const onStakeMany = async () => {
-    const res = await handleStakeMany(selected, new Array(selected.length).fill(false));
+    const res = await handleStakeMany(
+      selected,
+      new Array(selected.length).fill(false)
+    );
     if (!res.code) {
       setNotification({
         visible: true,
@@ -192,25 +207,62 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell padding="checkbox" align="left">
-                <Checkbox
-                  color="info"
-                  indeterminate={
-                    selected.length > 0 && selected.length < list.length
-                  }
-                  checked={list.length > 0 && selected.length === list.length}
-                  onChange={onSelectAllClick}
-                  inputProps={{
-                    "aria-label": "select all desserts",
-                  }}
-                  size="small"
+                <Box
                   sx={{
                     display: {
-                      md: "inline-flex",
-                      sm: "inline-flex",
+                      md: "flex",
+                      sm: "flex",
                       xs: "none",
                     },
+                    alignItems: "center",
+                    cursor: "pointer",
                   }}
-                />
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                >
+                  <Checkbox
+                    color="info"
+                    size="small"
+                    indeterminate={
+                      selected.length > 0 && selected.length < list.length
+                    }
+                    checked={list.length > 0 && selected.length === list.length}
+                  />
+                  {anchorEl ? <ExpandLess /> : <ExpandMore />}
+                </Box>
+                <Menu
+                  elevation={0}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={() => setAnchorEl(null)}
+                >
+                  <MenuItem
+                    style={{ minWidth: 166 }}
+                    onClick={onSelectAllClick}
+                  >
+                    <Typography>Select All</Typography>
+                  </MenuItem>
+                  <MenuItem
+                    style={{ minWidth: 166 }}
+                    onClick={onSelectCurPgClick}
+                  >
+                    <Typography>Select Current Page</Typography>
+                  </MenuItem>
+                  <MenuItem
+                    style={{ minWidth: 166 }}
+                    onClick={onSelectNoneClick}
+                  >
+                    <Typography>Select None</Typography>
+                  </MenuItem>
+                </Menu>
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">
                 Mint Datetime
