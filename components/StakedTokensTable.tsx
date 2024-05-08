@@ -5,11 +5,14 @@ import {
   Button,
   Checkbox,
   Link,
+  Menu,
+  MenuItem,
   Pagination,
   Snackbar,
   TableBody,
   Typography,
 } from "@mui/material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -151,6 +154,7 @@ export const StakedTokensTable = ({
     (x) => x.UnstakeTimeStamp <= Date.now() / 1000 + offset
   );
   const [page, setPage] = useState(1);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [selected, setSelected] = useState([]);
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
   const handleClick = (id: number) => {
@@ -171,13 +175,21 @@ export const StakedTokensTable = ({
     }
     setSelected(newSelected);
   };
-  const onSelectAllClick = (e) => {
-    if (e.target.checked) {
-      const newSelected = filtered.map((n) => n.TokenInfo.StakeActionId);
-      setSelected(newSelected);
-      return;
-    }
+  const onSelectAllClick = () => {
+    const newSelected = filtered.map((n) => n.TokenInfo.StakeActionId);
+    setSelected(newSelected);
+    setAnchorEl(null);
+  };
+  const onSelectCurPgClick = () => {
+    const newSelected = filtered
+      .slice((page - 1) * perPage, page * perPage)
+      .map((n) => n.TokenInfo.StakeActionId);
+    setSelected(newSelected);
+    setAnchorEl(null);
+  };
+  const onSelectNoneClick = () => {
     setSelected([]);
+    setAnchorEl(null);
   };
   const onUnstakeMany = async () => {
     const res = await handleUnstakeMany(selected);
@@ -238,27 +250,62 @@ export const StakedTokensTable = ({
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell padding="checkbox" align="left">
-                <Checkbox
-                  color="info"
-                  indeterminate={
-                    selected.length > 0 && selected.length < filtered.length
-                  }
-                  checked={
-                    filtered.length > 0 && selected.length === filtered.length
-                  }
-                  onChange={onSelectAllClick}
-                  inputProps={{
-                    "aria-label": "select all desserts",
-                  }}
-                  size="small"
+                <Box
                   sx={{
                     display: {
-                      md: "inline-flex",
-                      sm: "inline-flex",
+                      md: "flex",
+                      sm: "flex",
                       xs: "none",
                     },
+                    alignItems: "center",
+                    cursor: "pointer",
                   }}
-                />
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                >
+                  <Checkbox
+                    color="info"
+                    size="small"
+                    indeterminate={
+                      selected.length > 0 && selected.length < list.length
+                    }
+                    checked={list.length > 0 && selected.length === list.length}
+                  />
+                  {anchorEl ? <ExpandLess /> : <ExpandMore />}
+                </Box>
+                <Menu
+                  elevation={0}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={() => setAnchorEl(null)}
+                >
+                  <MenuItem
+                    style={{ minWidth: 166 }}
+                    onClick={onSelectAllClick}
+                  >
+                    <Typography>Select All</Typography>
+                  </MenuItem>
+                  <MenuItem
+                    style={{ minWidth: 166 }}
+                    onClick={onSelectCurPgClick}
+                  >
+                    <Typography>Select Current Page</Typography>
+                  </MenuItem>
+                  <MenuItem
+                    style={{ minWidth: 166 }}
+                    onClick={onSelectNoneClick}
+                  >
+                    <Typography>Select None</Typography>
+                  </MenuItem>
+                </Menu>
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>

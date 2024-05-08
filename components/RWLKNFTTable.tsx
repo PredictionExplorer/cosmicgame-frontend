@@ -5,11 +5,14 @@ import {
   Button,
   Checkbox,
   Link,
+  Menu,
+  MenuItem,
   Pagination,
   Snackbar,
   TableBody,
   Typography,
 } from "@mui/material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -70,6 +73,7 @@ const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
 
 export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
   const perPage = 5;
+  const [anchorEl, setAnchorEl] = useState(null);
   const [notification, setNotification] = useState<{
     text: string;
     type: "success" | "info" | "warning" | "error";
@@ -100,12 +104,18 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
     }
     setSelected(newSelected);
   };
-  const onSelectAllClick = (e) => {
-    if (e.target.checked) {
-      setSelected(list);
-      return;
-    }
+  const onSelectAllClick = () => {
+    setSelected(list);
+    setAnchorEl(null);
+  };
+  const onSelectCurPgClick = () => {
+    const newSelected = list.slice((page - 1) * perPage, page * perPage);
+    setSelected(newSelected);
+    setAnchorEl(null);
+  };
+  const onSelectNoneClick = () => {
     setSelected([]);
+    setAnchorEl(null);
   };
   const onStakeMany = async () => {
     const res = await handleStakeMany(
@@ -164,25 +174,62 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell padding="checkbox" align="left">
-                <Checkbox
-                  color="info"
-                  indeterminate={
-                    selected.length > 0 && selected.length < list.length
-                  }
-                  checked={list.length > 0 && selected.length === list.length}
-                  onChange={onSelectAllClick}
-                  inputProps={{
-                    "aria-label": "select all desserts",
-                  }}
-                  size="small"
+                <Box
                   sx={{
                     display: {
-                      md: "inline-flex",
-                      sm: "inline-flex",
+                      md: "flex",
+                      sm: "flex",
                       xs: "none",
                     },
+                    alignItems: "center",
+                    cursor: "pointer",
                   }}
-                />
+                  onClick={(e) => setAnchorEl(e.currentTarget)}
+                >
+                  <Checkbox
+                    color="info"
+                    size="small"
+                    indeterminate={
+                      selected.length > 0 && selected.length < list.length
+                    }
+                    checked={list.length > 0 && selected.length === list.length}
+                  />
+                  {anchorEl ? <ExpandLess /> : <ExpandMore />}
+                </Box>
+                <Menu
+                  elevation={0}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={() => setAnchorEl(null)}
+                >
+                  <MenuItem
+                    style={{ minWidth: 166 }}
+                    onClick={onSelectAllClick}
+                  >
+                    <Typography>Select All</Typography>
+                  </MenuItem>
+                  <MenuItem
+                    style={{ minWidth: 166 }}
+                    onClick={onSelectCurPgClick}
+                  >
+                    <Typography>Select Current Page</Typography>
+                  </MenuItem>
+                  <MenuItem
+                    style={{ minWidth: 166 }}
+                    onClick={onSelectNoneClick}
+                  >
+                    <Typography>Select None</Typography>
+                  </MenuItem>
+                </Menu>
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">
                 Owner Address
