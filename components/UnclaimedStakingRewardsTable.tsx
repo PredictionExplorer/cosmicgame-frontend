@@ -10,6 +10,8 @@ import {
   TableBody,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   PrimaryMenuItem,
@@ -109,6 +111,9 @@ const UnclaimedStakingRewardsRow = ({
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
 
+  const theme = useTheme();
+  const sm = useMediaQuery(theme.breakpoints.up("sm"));
+
   const fetchRowData = async () => {
     const res = await fetchInfo(account, row.DepositId, stakedActionIds);
     setUnstakeableActionIds(res.unstakeableActionIds);
@@ -188,27 +193,35 @@ const UnclaimedStakingRewardsRow = ({
           {claimableActionIds.length}
         </TablePrimaryCell>
         <TablePrimaryCell align="right">
-          {row.YourTokensStaked - claimableActionIds.length}
-          {Object.keys(claimableAmounts).length > 0 && (
-            <Tooltip
-              title={
-                <Typography>
-                  You can claim the reward for&nbsp;
-                  {Object.keys(claimableAmounts).map(
-                    (key, index, arr) =>
-                      `${claimableAmounts[key].toFixed(
-                        6
-                      )} ETH in ${formatSeconds(parseInt(key))}${
-                        index !== arr.length - 1 ? ", " : ""
-                      }`
-                  )}
-                </Typography>
-              }
-              sx={{ ml: 1 }}
-            >
-              <ErrorOutlineIcon fontSize="inherit" />
-            </Tooltip>
-          )}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: sm ? "end" : "start",
+            }}
+          >
+            {row.YourTokensStaked - claimableActionIds.length}
+            {Object.keys(claimableAmounts).length > 0 && (
+              <Tooltip
+                title={
+                  <Typography>
+                    You can claim the reward for&nbsp;
+                    {Object.keys(claimableAmounts).map(
+                      (key, index, arr) =>
+                        `${claimableAmounts[key].toFixed(
+                          6
+                        )} ETH in ${formatSeconds(parseInt(key))}${
+                          index !== arr.length - 1 ? ", " : ""
+                        }`
+                    )}
+                  </Typography>
+                }
+                sx={{ ml: 1 }}
+              >
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Tooltip>
+            )}
+          </Box>
         </TablePrimaryCell>
         {account === owner && (
           <TablePrimaryCell align="center">
