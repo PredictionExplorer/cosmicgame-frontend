@@ -112,11 +112,15 @@ const StakingActionDetail = ({ actionId, actionType }) => {
             </Box>
             <Box mb={1}>
               <Typography color="primary" component="span">
-                {actionInfo.ActionType === 0 ? "Staked" : "Unstaked"} Token Id:
+                {actionType === 0 ? "Staked" : "Unstaked"} Token Id:
               </Typography>
               &nbsp;
               <Link
-                href={`/detail/${actionInfo.TokenId}`}
+                href={
+                  actionInfo.IsRandomWalk
+                    ? `https://randomwalknft.com/detail/${actionInfo.TokenId}`
+                    : `/detail/${actionInfo.TokenId}`
+                }
                 style={{ color: "inherit" }}
               >
                 <Typography component="span">{actionInfo.TokenId}</Typography>
