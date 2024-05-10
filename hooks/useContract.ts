@@ -1,5 +1,5 @@
 import { Contract } from '@ethersproject/contracts'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useActiveWeb3React } from './web3'
 
@@ -8,9 +8,17 @@ export default function useContract<T extends Contract = Contract>(
   ABI: any,
 ): T | null {
   const { library, account, chainId } = useActiveWeb3React()
+  const [byteCode, setByteCode] = useState("");
+  useEffect(() => {
+    const getByteCode = async (address) => {
+      const code = await library.getCode(address);
+      setByteCode(code);
+    }
+    getByteCode(address);
+  }, [address]);
 
   return useMemo(() => {
-    if (!address || !ABI || !library || !chainId) {
+    if (!address || !ABI || !library || !chainId || byteCode.length <= 2) {
       return null
     }
 
@@ -25,5 +33,5 @@ export default function useContract<T extends Contract = Contract>(
 
       return null
     }
-  }, [address, ABI, library, account]) as T
+  }, [address, ABI, library, account, byteCode]) as T
 }

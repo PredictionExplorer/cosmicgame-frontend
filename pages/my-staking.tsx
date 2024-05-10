@@ -156,12 +156,14 @@ const MyStaking = () => {
     const rwlkStaked = stakedTokens
       .filter((x) => x.IsRandomWalk)
       .map((x) => x.TokenInfo.TokenId);
-    const tokens = await nftContract.walletOfOwner(account);
-    const nftIds = tokens
-      .map((t) => t.toNumber())
-      .reverse()
-      .filter((x) => !rwlkStaked.includes(x));
-    setRwlkTokens(nftIds);
+    if (nftContract) {
+      const tokens = await nftContract.walletOfOwner(account);
+      const nftIds = tokens
+        .map((t) => t.toNumber())
+        .reverse()
+        .filter((x) => !rwlkStaked.includes(x));
+      setRwlkTokens(nftIds);
+    }
 
     setLoading(false);
   };
