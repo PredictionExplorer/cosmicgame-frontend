@@ -19,7 +19,10 @@ const StakingActionDetail = ({ actionId, actionType }) => {
         if (!actionType) {
           setActionInfo(info.Stake);
         } else {
-          setActionInfo(info.Unstake);
+          setActionInfo({
+            ...info.Unstake,
+            IsRandomWalk: info.Stake.IsRandomWalk,
+          });
         }
         setLoading(false);
       } catch (e) {
