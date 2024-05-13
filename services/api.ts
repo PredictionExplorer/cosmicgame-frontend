@@ -564,6 +564,36 @@ class ApiService {
       return [];
     }
   }
+
+  public async get_system_events() {
+    try {
+      const { data } = await axios.get(getAPIUrl(`system/admin_events/0/10000`));
+      return data.AdminEvents;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_system_modelist() {
+    try {
+      const { data } = await axios.get(getAPIUrl(`system/modelist/0/10000`));
+      return data.SystemModeChanges;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_charity_donations() {
+    try {
+      const { data } = await axios.get(getAPIUrl("donations/eth"));
+      return data.CharityDonations;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
 }
 
 export default new ApiService();
