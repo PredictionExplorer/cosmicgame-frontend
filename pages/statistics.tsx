@@ -384,7 +384,15 @@ const Statistics = () => {
               />
               <StatisticsItem
                 title="Number of Donated NFTs"
-                value={data.NumDonatedNFTs}
+                value={
+                  <Link
+                    color="inherit"
+                    fontSize="inherit"
+                    href="/nft-donations"
+                  >
+                    {data.NumDonatedNFTs}
+                  </Link>
+                }
               />
               <StatisticsItem
                 title="Amount of Cosmic Signature Tokens with assigned name"
