@@ -70,7 +70,6 @@ const Header = () => {
       const balance = await api.get_user_balance(account);
       const { UserInfo } = await api.get_user_info(account);
       if (nftContract) {
-        console.log(nftContract);
         const rwlkTokens = await nftContract.walletOfOwner(account);
         if (balance) {
           setBalance({

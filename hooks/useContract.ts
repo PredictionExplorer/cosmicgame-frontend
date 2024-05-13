@@ -14,8 +14,10 @@ export default function useContract<T extends Contract = Contract>(
       const code = await library.getCode(address);
       setByteCode(code);
     }
-    getByteCode(address);
-  }, [address]);
+    if (library) {
+      getByteCode(address);
+    }
+  }, [address, library]);
 
   return useMemo(() => {
     if (!address || !ABI || !library || !chainId || byteCode.length <= 2) {
