@@ -216,14 +216,14 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Number of Prizes taken:
+                    Number of Prizes Taken:
                   </Typography>
                   &nbsp;
                   <Typography component="span">{userInfo.NumPrizes}</Typography>
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Maximum amount gained (in prize winnings):
+                    Maximum Amount Gained (in prize winnings):
                   </Typography>
                   &nbsp;
                   <Typography component="span">
@@ -232,7 +232,7 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Amount of winnings in ETH raffles:
+                    Amount of Winnings in ETH raffles:
                   </Typography>
                   &nbsp;
                   <Typography component="span">
@@ -241,7 +241,7 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Amount withdrawn from ETH raffles:
+                    Amount Withdrawn from ETH raffles:
                   </Typography>
                   &nbsp;
                   <Typography component="span">
@@ -250,7 +250,7 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Unclaimed donated NFTs:
+                    Unclaimed Donated NFTs:
                   </Typography>
                   &nbsp;
                   <Typography component="span">
@@ -259,7 +259,7 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Total ETH won in raffles:
+                    Total ETH Won in raffles:
                   </Typography>
                   &nbsp;
                   <Typography component="span">
@@ -277,7 +277,7 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Number of (ETH) raffles participated in:
+                    Number of (ETH) raffles Participated in:
                   </Typography>
                   &nbsp;
                   <Typography component="span">
@@ -286,7 +286,7 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Number of Raffle NFTs won:
+                    Number of Raffle NFTs Won:
                   </Typography>
                   &nbsp;
                   <Typography component="span">
@@ -295,7 +295,7 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Total Staked Tokens at this moment:
+                    Total Staked Tokens:
                   </Typography>
                   &nbsp;
                   <Typography component="span">

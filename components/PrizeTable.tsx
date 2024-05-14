@@ -16,7 +16,7 @@ import { Tr } from "react-super-responsive-table";
 const PrizeRow = ({ prize }) => {
   const router = useRouter();
   if (!prize) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
@@ -62,7 +62,7 @@ const PrizeRow = ({ prize }) => {
 };
 
 export const PrizeTable = ({ list, loading }) => {
-  const perPage = 5;
+  const perPage = 10;
   const [page, setPage] = useState(1);
   if (loading) {
     return <Typography variant="h6">Loading...</Typography>;
