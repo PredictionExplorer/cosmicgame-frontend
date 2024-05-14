@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Link,
+  Pagination,
+  TableBody,
+  Typography,
+} from "@mui/material";
 import Head from "next/head";
 import { GetServerSidePropsContext } from "next";
 import { ethers } from "ethers";
@@ -8,8 +15,89 @@ import { useActiveWeb3React } from "../../../hooks/web3";
 import { useApiData } from "../../../contexts/ApiDataContext";
 import useRaffleWalletContract from "../../../hooks/useRaffleWalletContract";
 import api from "../../../services/api";
-import { MainWrapper } from "../../../components/styled";
-import { MyWinningsTable } from "../../my-tokens";
+import {
+  MainWrapper,
+  TablePrimary,
+  TablePrimaryCell,
+  TablePrimaryContainer,
+  TablePrimaryHead,
+  TablePrimaryHeadCell,
+  TablePrimaryRow,
+} from "../../../components/styled";
+import { Tr } from "react-super-responsive-table";
+import { convertTimestampToDateTime } from "../../../utils";
+
+const MyWinningsRow = ({ winning }) => {
+  if (!winning) {
+    return <TablePrimaryRow />;
+  }
+
+  return (
+    <TablePrimaryRow>
+      <TablePrimaryCell>
+        {convertTimestampToDateTime(winning.TimeStamp)}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
+          href={`/prize/${winning.RoundNum}`}
+          style={{
+            color: "inherit",
+            fontSize: "inherit",
+          }}
+          target="_blank"
+        >
+          {winning.RoundNum}
+        </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {winning.Amount.toFixed(4)}
+      </TablePrimaryCell>
+    </TablePrimaryRow>
+  );
+};
+
+const MyWinningsTable = ({ list }) => {
+  const perPage = 5;
+  const [curPage, setCurPage] = useState(1);
+  if (list.length === 0) {
+    return <Typography>No Raffle ETH yet.</Typography>;
+  }
+  return (
+    <>
+      <TablePrimaryContainer>
+        <TablePrimary>
+          <TablePrimaryHead>
+            <Tr>
+              <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Amount (ETH)
+              </TablePrimaryHeadCell>
+            </Tr>
+          </TablePrimaryHead>
+          <TableBody>
+            {list
+              .slice((curPage - 1) * perPage, curPage * perPage)
+              .map((winning) => (
+                <MyWinningsRow key={winning.EvtLogId} winning={winning} />
+              ))}
+          </TableBody>
+        </TablePrimary>
+      </TablePrimaryContainer>
+      <Box display="flex" justifyContent="center" mt={4}>
+        <Pagination
+          color="primary"
+          page={curPage}
+          onChange={(_e, page) => setCurPage(page)}
+          count={Math.ceil(list.length / perPage)}
+          hideNextButton
+          hidePrevButton
+          shape="rounded"
+        />
+      </Box>
+    </>
+  );
+};
 
 const UserRaffleETH = ({ address }) => {
   const router = useRouter();
