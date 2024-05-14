@@ -119,6 +119,14 @@ const CSTRow = ({ nft }) => {
       <TablePrimaryCell align="center">{nft.TokenName || " "}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
+          href={`/prize/${nft.RoundNum}`}
+          style={{ color: "inherit", fontSize: "inherit" }}
+        >
+          {nft.RoundNum}
+        </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
           href={`/user/${nft.WinnerAddr}`}
           style={{
             color: "inherit",
@@ -128,6 +136,9 @@ const CSTRow = ({ nft }) => {
         >
           {nft.WinnerAddr}
         </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {nft.Staked ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {nft.RecordType === 3 ? (
@@ -163,7 +174,9 @@ const CSTTable = ({ list }) => {
               <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Staked</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Prize Type
               </TablePrimaryHeadCell>
