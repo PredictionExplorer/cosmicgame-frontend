@@ -556,7 +556,7 @@ const Statistics = () => {
                 </>
               ) : (
                 <Typography mt={2}>
-                  No ERC721 tokens were donated on this round
+                  No ERC721 tokens were donated on this round.
                 </Typography>
               )}
             </Box>

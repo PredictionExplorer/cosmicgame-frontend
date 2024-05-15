@@ -1075,7 +1075,8 @@ const NewHome = () => {
                 </Button>
                 {!(
                   prizeTime > Date.now() ||
-                  data?.LastBidderAddr === constants.AddressZero
+                  data?.LastBidderAddr === constants.AddressZero ||
+                  loading
                 ) && (
                   <>
                     <Button
@@ -1287,7 +1288,7 @@ const NewHome = () => {
             </>
           ) : (
             <Typography mt={2}>
-              No ERC721 tokens were donated on this round
+              No ERC721 tokens were donated on this round.
             </Typography>
           )}
         </Box>

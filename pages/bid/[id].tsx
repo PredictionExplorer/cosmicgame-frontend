@@ -41,18 +41,28 @@ const BidInfo = ({ bidId }) => {
         ) : (
           <>
             <Box mb={1} display="flex" flexWrap="wrap">
-              <Typography color="primary">Transaction Hash:</Typography>
+              <Typography color="primary">Bid Datetime:</Typography>
               &nbsp;
               <Link
                 href={`https://arbiscan.io/tx/${bidInfo.TxHash}`}
                 style={{ color: "inherit" }}
                 target="_blank"
               >
-                <Tooltip title={bidInfo.TxHash}>
-                  <Typography sx={{ fontFamily: "monospace" }}>
-                    {shortenHex(bidInfo.TxHash, 16)}
-                  </Typography>
-                </Tooltip>
+                <Typography>
+                  {convertTimestampToDateTime(bidInfo.TimeStamp)}
+                </Typography>
+              </Link>
+            </Box>
+            <Box mb={1} display="flex" flexWrap="wrap">
+              <Typography color="primary">Bidder Address:</Typography>
+              &nbsp;
+              <Link
+                href={`/user/${bidInfo.BidderAddr}`}
+                style={{ color: "rgb(255, 255, 255)" }}
+              >
+                <Typography fontFamily="monospace">
+                  {bidInfo.BidderAddr}
+                </Typography>
               </Link>
             </Box>
             <Box mb={1} display="flex" flexWrap="wrap">
@@ -66,25 +76,6 @@ const BidInfo = ({ bidId }) => {
                 }}
               >
                 <Typography>{bidInfo.RoundNum}</Typography>
-              </Link>
-            </Box>
-            <Box mb={1} display="flex" flexWrap="wrap">
-              <Typography color="primary">Bid Datetime:</Typography>
-              &nbsp;
-              <Typography>
-                {convertTimestampToDateTime(bidInfo.TimeStamp)}
-              </Typography>
-            </Box>
-            <Box mb={1} display="flex" flexWrap="wrap">
-              <Typography color="primary">Bidder Address:</Typography>
-              &nbsp;
-              <Link
-                href={`/user/${bidInfo.BidderAddr}`}
-                style={{ color: "rgb(255, 255, 255)" }}
-              >
-                <Typography fontFamily="monospace">
-                  {bidInfo.BidderAddr}
-                </Typography>
               </Link>
             </Box>
             <Box mb={1} display="flex" flexWrap="wrap">
