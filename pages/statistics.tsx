@@ -329,7 +329,11 @@ const Statistics = () => {
                       fontSize="inherit"
                       href="/charity-deposits-voluntary"
                     >
-                      {`${data.NumVoluntaryDonations} totalling ${data.SumVoluntaryDonationsEth} ETH`}
+                      {`${
+                        data.NumVoluntaryDonations
+                      } totalling ${data.SumVoluntaryDonationsEth.toFixed(
+                        4
+                      )} ETH`}
                     </Link>
                   }
                 />

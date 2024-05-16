@@ -42,13 +42,23 @@ const DetailRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
+          href={`/staking-action/${row.StakeActionId}/0`}
+          style={{ color: "inherit", fontSize: "inherit" }}
+        >
+          {row.StakeActionId}
+        </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
           href={`/detail/${row.TokenId}`}
           style={{ color: "inherit", fontSize: "inherit" }}
         >
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.StakeActionId}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.IsRandomWalk ? "Yes" : "No"}
+      </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {row.Claimed ? "Yes" : "No"}
       </TablePrimaryCell>
@@ -60,34 +70,56 @@ const DetailRow = ({ row }) => {
 };
 
 const DetailTable = ({ list }) => {
+  const perPage = 5;
+  const [page, setPage] = useState(1);
   return (
-    <TablePrimaryContainer>
-      <TablePrimary>
-        <TablePrimaryHead>
-          <Tr>
-            <TablePrimaryHeadCell align="left" sx={{ py: 1 }}>
-              Stake Datetime
-            </TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left" sx={{ py: 1 }}>
-              Unstake Datetime
-            </TablePrimaryHeadCell>
-            <TablePrimaryHeadCell sx={{ py: 1 }}>Token Id</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell sx={{ py: 1 }}>
-              Action Id
-            </TablePrimaryHeadCell>
-            <TablePrimaryHeadCell sx={{ py: 1 }}>Claimed?</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right" sx={{ py: 1 }}>
-              Reward
-            </TablePrimaryHeadCell>
-          </Tr>
-        </TablePrimaryHead>
-        <TableBody>
-          {list.map((row, index) => (
-            <DetailRow row={row} key={index} />
-          ))}
-        </TableBody>
-      </TablePrimary>
-    </TablePrimaryContainer>
+    <>
+      <TablePrimaryContainer>
+        <TablePrimary>
+          <TablePrimaryHead>
+            <Tr>
+              <TablePrimaryHeadCell align="left" sx={{ py: 1 }}>
+                Stake Datetime
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left" sx={{ py: 1 }}>
+                Unstake Datetime
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell sx={{ py: 1 }}>
+                Action Id
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell sx={{ py: 1 }}>
+                Token Id
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell sx={{ py: 1 }}>
+                Is RandomWalk NFT?
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell sx={{ py: 1 }}>
+                Claimed?
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right" sx={{ py: 1 }}>
+                Reward
+              </TablePrimaryHeadCell>
+            </Tr>
+          </TablePrimaryHead>
+          <TableBody>
+            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
+              <DetailRow row={row} key={row.RecordId} />
+            ))}
+          </TableBody>
+        </TablePrimary>
+      </TablePrimaryContainer>
+      <Box display="flex" justifyContent="center" mt={4}>
+        <Pagination
+          color="primary"
+          page={page}
+          onChange={(_e, page) => setPage(page)}
+          count={Math.ceil(list.length / perPage)}
+          hideNextButton
+          hidePrevButton
+          shape="rounded"
+        />
+      </Box>
+    </>
   );
 };
 

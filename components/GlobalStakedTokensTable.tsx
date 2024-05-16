@@ -14,7 +14,7 @@ import { Tr } from "react-super-responsive-table";
 
 const GlobalStakedTokensRow = ({ row }) => {
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
@@ -29,6 +29,17 @@ const GlobalStakedTokensRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
+          href={`/staking-action/${row.StakeActionId}/0`}
+          sx={{
+            color: "inherit",
+            fontSize: "inherit",
+          }}
+        >
+          {row.StakeActionId}
+        </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
           href={`/detail/${row.TokenInfo.TokenId}`}
           sx={{
             color: "inherit",
@@ -37,6 +48,9 @@ const GlobalStakedTokensRow = ({ row }) => {
         >
           {row.TokenInfo.TokenId}
         </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.StakedIsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -72,16 +86,16 @@ export const GlobalStakedTokensTable = ({ list }) => {
               <TablePrimaryHeadCell align="left">
                 Unstake Datetime
               </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Is RandomWalk NFT?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staker Address</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list
-              .slice((page - 1) * perPage, page * perPage)
-              .map((row, index) => (
-                <GlobalStakedTokensRow key={index} row={row} />
-              ))}
+            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
+              <GlobalStakedTokensRow key={row.StakeEvtLogId} row={row} />
+            ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
