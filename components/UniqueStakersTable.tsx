@@ -13,7 +13,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const UniqueStakersRow = ({ row }) => {
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
@@ -30,6 +30,10 @@ const UniqueStakersRow = ({ row }) => {
           {row.StakerAddr}
         </Link>
       </TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.NumStakeActions}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.NumUnstakeActions}
+      </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {row.TotalTokensStaked}
       </TablePrimaryCell>
@@ -44,6 +48,7 @@ const UniqueStakersRow = ({ row }) => {
 };
 
 export const UniqueStakersTable = ({ list }) => {
+  console.log(list);
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -59,6 +64,8 @@ export const UniqueStakersTable = ({ list }) => {
                 Staker Address
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Num Stake Actions</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Num Unstake Actions</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Total Reward (ETH)
               </TablePrimaryHeadCell>

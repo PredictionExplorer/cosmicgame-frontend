@@ -13,7 +13,7 @@ import { Tr } from "react-super-responsive-table";
 
 const UniqueWinnersRow = ({ winner }) => {
   if (!winner) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
@@ -45,7 +45,7 @@ export const UniqueWinnersTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
-    return <Typography>No bidders yet.</Typography>;
+    return <Typography>No winners yet.</Typography>;
   }
   return (
     <>
@@ -60,7 +60,7 @@ export const UniqueWinnersTable = ({ list }) => {
                 Prizes Taken
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
-                Max Prize
+                Max Prize (ETH)
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Prizes Sum (ETH)
