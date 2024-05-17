@@ -39,7 +39,7 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
   }, [history]);
 
   if (!history) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
   return (
     <TablePrimaryRow
@@ -217,7 +217,7 @@ const WinningHistoryTable = ({ winningHistory, showClaimedStatus = false }) => {
   const perPage = 5;
   const [curPage, setCurrentPage] = useState(1);
   if (winningHistory.length === 0) {
-    return <Typography variant="h6">No history yet.</Typography>;
+    return <Typography>No history yet.</Typography>;
   }
   return (
     <Box mt={2}>

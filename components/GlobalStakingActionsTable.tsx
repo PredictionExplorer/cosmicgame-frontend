@@ -70,7 +70,6 @@ const GlobalStakingActionsRow = ({ row }) => {
 };
 
 export const GlobalStakingActionsTable = ({ list }) => {
-  console.log(list);
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {

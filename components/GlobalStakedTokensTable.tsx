@@ -40,7 +40,11 @@ const GlobalStakedTokensRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/detail/${row.TokenInfo.TokenId}`}
+          href={
+            row.StakedIsRandomWalk
+              ? `https://randomwalknft.com/detail/${row.TokenInfo.TokenId}`
+              : `/detail/${row.TokenInfo.TokenId}`
+          }
           sx={{
             color: "inherit",
             fontSize: "inherit",
@@ -54,14 +58,14 @@ const GlobalStakedTokensRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/user/${row.TokenInfo.CurOwnerAddr}`}
+          href={`/user/${row.UserAddr}`}
           sx={{
             color: "inherit",
             fontSize: "inherit",
             fontFamily: "monospace",
           }}
         >
-          {row.TokenInfo.CurOwnerAddr}
+          {row.UserAddr}
         </Link>
       </TablePrimaryCell>
     </TablePrimaryRow>
