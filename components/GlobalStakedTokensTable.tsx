@@ -29,7 +29,7 @@ const GlobalStakedTokensRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/staking-action/${row.StakeActionId}/0`}
+          href={`/staking-action/${row.StakeActionId}`}
           sx={{
             color: "inherit",
             fontSize: "inherit",

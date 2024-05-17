@@ -46,7 +46,14 @@ const DetailRow = ({ row }) => {
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.StakeActionId}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
+          href={`/staking-action/${row.StakeActionId}`}
+          style={{ color: "inherit", fontSize: "inherit" }}
+        >
+          {row.StakeActionId}
+        </Link>
+      </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {row.IsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>

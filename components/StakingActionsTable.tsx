@@ -16,14 +16,14 @@ import { useRouter } from "next/router";
 const StakingActionsRow = ({ row }) => {
   const router = useRouter();
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow
       sx={{ cursor: "pointer" }}
       onClick={() => {
-        router.push(`/staking-action/${row.ActionId}/${row.ActionType}`);
+        router.push(`/staking-action/${row.ActionId}`);
       }}
     >
       <TablePrimaryCell>
