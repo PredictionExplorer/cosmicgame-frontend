@@ -48,7 +48,6 @@ const UniqueStakersRow = ({ row }) => {
 };
 
 export const UniqueStakersTable = ({ list }) => {
-  console.log(list);
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {

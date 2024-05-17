@@ -13,7 +13,7 @@ import { Tr } from "react-super-responsive-table";
 
 const CTBalanceDistributionRow = ({ row }) => {
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
@@ -49,8 +49,8 @@ const CTBalanceDistributionTable = ({ list }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Owner</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Balance</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Owner Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Balance (CST)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>

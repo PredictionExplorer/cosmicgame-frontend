@@ -8,7 +8,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
+import { convertTimestampToDateTime, shortenHex } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { useRouter } from "next/router";
@@ -34,14 +34,18 @@ const GlobalStakingActionsRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/detail/${row.TokenId}`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
+          href={
+            row.IsRandomWalk
+              ? `https://randomwalknft.com/detail/${row.TokenId}`
+              : `/detail/${row.TokenId}`
+          }
+          style={{ color: "inherit", fontSize: "inherit" }}
         >
           {row.TokenId}
         </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.IsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell>
         {row.ActionType === 0
@@ -57,7 +61,7 @@ const GlobalStakingActionsRow = ({ row }) => {
             fontFamily: "monospace",
           }}
         >
-          {row.StakerAddr}
+          {shortenHex(row.StakerAddr, 6)}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
@@ -66,6 +70,7 @@ const GlobalStakingActionsRow = ({ row }) => {
 };
 
 export const GlobalStakingActionsTable = ({ list }) => {
+  console.log(list);
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -82,6 +87,7 @@ export const GlobalStakingActionsTable = ({ list }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Is RandomWalk NFT?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">
                 Unstake Datetime
               </TablePrimaryHeadCell>

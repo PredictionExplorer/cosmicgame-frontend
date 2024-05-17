@@ -13,7 +13,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const CSTokenDistributionRow = ({ row }) => {
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
@@ -47,9 +47,11 @@ const CSTokenDistributionTable = ({ list }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Owner</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Owner Address
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
-                Amount of tokens owned
+                Number of Tokens Owned
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
