@@ -16,7 +16,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const HistoryRow = ({ history }) => {
   if (!history) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

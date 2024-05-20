@@ -565,9 +565,9 @@ class ApiService {
     }
   }
 
-  public async get_system_events() {
+  public async get_system_events(start: number, end: number) {
     try {
-      const { data } = await axios.get(getAPIUrl(`system/admin_events/0/10000`));
+      const { data } = await axios.get(getAPIUrl(`system/admin_events/${start}/${end}`));
       return data.AdminEvents;
     } catch (err) {
       console.log(err);

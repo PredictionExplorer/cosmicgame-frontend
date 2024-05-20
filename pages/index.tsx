@@ -518,6 +518,7 @@ const NewHome = () => {
       const history = await api.get_claim_history();
       setClaimHistory(history);
     };
+
     const fetchCSTBidData = async () => {
       let ctData = await api.get_ct_price();
       if (ctData) {

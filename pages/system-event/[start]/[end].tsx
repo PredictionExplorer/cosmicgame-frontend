@@ -9,23 +9,24 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../../components/styled";
-import api from "../../services/api";
-import { convertTimestampToDateTime } from "../../utils";
-import { ethers } from "ethers";
+} from "../../../components/styled";
+import api from "../../../services/api";
+import { convertTimestampToDateTime } from "../../../utils";
 import { GetServerSidePropsContext } from "next";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { ADMIN_EVENTS } from "../../../config/misc";
 
-const CosmicSignatureTransferRow = ({ row }) => {
+const AdminEventsRow = ({ row }) => {
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow
       sx={row.TransferType > 0 && { background: "rgba(255, 255, 255, 0.06)" }}
     >
+      <TablePrimaryCell>{ADMIN_EVENTS[row.RecordType]}</TablePrimaryCell>
       <TablePrimaryCell>
         <Link
           color="inherit"
@@ -37,46 +38,23 @@ const CosmicSignatureTransferRow = ({ row }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          fontFamily="monospace"
-          href={`/user/${row.FromAddr}`}
-          target="__blank"
-        >
-          {row.FromAddr}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          fontFamily="monospace"
-          href={`/user/${row.ToAddr}`}
-          target="__blank"
-        >
-          {row.ToAddr}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          href={`/detail/${row.TokenId}`}
-          target="__blank"
-        >
-          {row.TokenId}
-        </Link>
+        {row.RecordType === 0 ? (
+          "Undefined"
+        ) : row.RecordType < 8 || row.RecordType > 15 ? (
+          row.IntegerValue
+        ) : (
+          <Typography fontFamily="monospace">{row.AddressValue}</Typography>
+        )}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-const CosmicTokenTransfersTable = ({ list }) => {
+const AdminEventsTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
-    return <Typography variant="h6">No transfers yet.</Typography>;
+    return <Typography variant="h6">No events yet.</Typography>;
   }
   return (
     <>
@@ -84,15 +62,14 @@ const CosmicTokenTransfersTable = ({ list }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
+              <TablePrimaryHeadCell align="left">Event</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>From</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>To</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>New Value</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <CosmicSignatureTransferRow row={row} key={row.EvtLogId} />
+              <AdminEventsRow row={row} key={row.EvtLogId} />
             ))}
           </TableBody>
         </TablePrimary>
@@ -112,16 +89,16 @@ const CosmicTokenTransfersTable = ({ list }) => {
   );
 };
 
-const CosmicSignatureTransfers = ({ address }) => {
+const AdminEvent = ({ start, end }) => {
   const [loading, setLoading] = useState(true);
-  const [cosmicSignatureTransfers, setCosmicSignatureTransfers] = useState([]);
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
     const fetchTransfers = async () => {
       try {
         setLoading(true);
-        const transfers = await api.get_cst_transfers(address);
-        setCosmicSignatureTransfers(transfers);
+        const sys_events = await api.get_system_events(start, end);
+        setEvents(sys_events);
         setLoading(false);
       } catch (err) {
         console.log(err);
@@ -134,17 +111,17 @@ const CosmicSignatureTransfers = ({ address }) => {
   return (
     <>
       <Head>
-        <title>Cosmic Signature Transfers | Cosmic Signature</title>
+        <title>Admin Events | Cosmic Signature</title>
         <meta name="description" content="" />
       </Head>
       <MainWrapper>
         <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          Cosmic Signature Transfers
+          Admin Events
         </Typography>
         {loading ? (
           <Typography variant="h6">Loading...</Typography>
         ) : (
-          <CosmicTokenTransfersTable list={cosmicSignatureTransfers} />
+          <AdminEventsTable list={events} />
         )}
       </MainWrapper>
     </>
@@ -152,14 +129,11 @@ const CosmicSignatureTransfers = ({ address }) => {
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const params = context.params!.address;
-  let address = Array.isArray(params) ? params[0] : params;
-  if (ethers.utils.isAddress(address.toLowerCase())) {
-    address = ethers.utils.getAddress(address.toLowerCase());
-  } else {
-    address = "Invalid Address";
-  }
-  return { props: { address } };
+  let start = context.params!.start;
+  let end = context.params!.end;
+  start = Array.isArray(start) ? start[0] : start;
+  end = Array.isArray(end) ? end[0] : end;
+  return { props: { start, end } };
 }
 
-export default CosmicSignatureTransfers;
+export default AdminEvent;

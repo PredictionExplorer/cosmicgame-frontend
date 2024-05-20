@@ -30,6 +30,7 @@ import { UniqueStakersTable } from "../components/UniqueStakersTable";
 import { GlobalStakingActionsTable } from "../components/GlobalStakingActionsTable";
 import { GlobalStakedTokensTable } from "../components/GlobalStakedTokensTable";
 import { ethers } from "ethers";
+import { SystemModesTable } from "../components/SystemModesTable";
 
 const StatisticsItem = ({ title, value }) => {
   return (
@@ -55,6 +56,7 @@ const Statistics = () => {
   const [ctBalanceDistribution, setCTBalanceDistribution] = useState([]);
   const [stakingActions, setStakingActions] = useState(null);
   const [stakedTokens, setStakedTokens] = useState(null);
+  const [systemModeChanges, setSystemModeChanges] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cstBidData, setCSTBidData] = useState({
     AuctionDuration: 0,
@@ -89,6 +91,8 @@ const Statistics = () => {
       setStakingActions(actions);
       const tokens = await api.get_staked_tokens();
       setStakedTokens(tokens);
+      const sysChanges = await api.get_system_modelist();
+      setSystemModeChanges(sysChanges);
       let ctData = await api.get_ct_price();
       if (ctData) {
         setCSTBidData({
@@ -561,6 +565,16 @@ const Statistics = () => {
                 <Typography mt={2}>
                   No ERC721 tokens were donated on this round.
                 </Typography>
+              )}
+            </Box>
+            <Box>
+              <Typography variant="h6" mb={2} mt={8}>
+                System Mode Changes
+              </Typography>
+              {systemModeChanges === null ? (
+                <Typography variant="h6">Loading...</Typography>
+              ) : (
+                <SystemModesTable list={systemModeChanges} />
               )}
             </Box>
           </>
