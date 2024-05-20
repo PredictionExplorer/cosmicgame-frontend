@@ -26,7 +26,7 @@ const AdminEventsRow = ({ row }) => {
     <TablePrimaryRow
       sx={row.TransferType > 0 && { background: "rgba(255, 255, 255, 0.06)" }}
     >
-      <TablePrimaryCell>{ADMIN_EVENTS[row.RecordType]}</TablePrimaryCell>
+      <TablePrimaryCell>{ADMIN_EVENTS[row.RecordType].name}</TablePrimaryCell>
       <TablePrimaryCell>
         <Link
           color="inherit"
