@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
+import { Box, Link, Pagination, TableBody, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";
 import {
   MainWrapper,
@@ -10,6 +10,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../../../components/styled";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import api from "../../../services/api";
 import { convertTimestampToDateTime } from "../../../utils";
 import { GetServerSidePropsContext } from "next";
@@ -26,7 +27,17 @@ const AdminEventsRow = ({ row }) => {
     <TablePrimaryRow
       sx={row.TransferType > 0 && { background: "rgba(255, 255, 255, 0.06)" }}
     >
-      <TablePrimaryCell>{ADMIN_EVENTS[row.RecordType].name}</TablePrimaryCell>
+      <TablePrimaryCell>
+        {ADMIN_EVENTS[row.RecordType].name}
+        <Tooltip
+          title={
+            <Typography>{ADMIN_EVENTS[row.RecordType].description}</Typography>
+          }
+          sx={{ ml: 1 }}
+        >
+          <ErrorOutlineIcon fontSize="inherit" />
+        </Tooltip>
+      </TablePrimaryCell>
       <TablePrimaryCell>
         <Link
           color="inherit"
