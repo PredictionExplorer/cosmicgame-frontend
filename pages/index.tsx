@@ -478,16 +478,16 @@ const NewHome = () => {
 
     const fetchData = async () => {
       const newData = await api.get_dashboard_info();
-      const round = newData.CurRoundNum;
+      const round = newData?.CurRoundNum;
       const newBidData = await api.get_bid_list_by_round(round, "desc");
       setCurBidList(newBidData);
       const nftData = await api.get_donations_nft_by_round(round);
       setDonatedNFTs(nftData);
       setData((prevData) => {
         if (
-          account !== newData.LastBidderAddr &&
+          account !== newData?.LastBidderAddr &&
           prevData &&
-          prevData.CurNumBids < newData.CurNumBids
+          prevData.CurNumBids < newData?.CurNumBids
         ) {
           playAudio();
         }

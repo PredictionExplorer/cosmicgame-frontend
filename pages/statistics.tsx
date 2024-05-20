@@ -70,7 +70,7 @@ const Statistics = () => {
       const data = await api.get_dashboard_info();
       setData(data);
       const bidHistory = await api.get_bid_list_by_round(
-        data.CurRoundNum,
+        data?.CurRoundNum,
         "desc"
       );
       setBidHistory(bidHistory);
@@ -141,7 +141,7 @@ const Statistics = () => {
         <meta name="description" content="" />
       </Head>
       <MainWrapper>
-        {loading ? (
+        {loading || !data ? (
           <Typography variant="h6">Loading...</Typography>
         ) : (
           <>
