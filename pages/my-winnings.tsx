@@ -34,13 +34,20 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const MyWinningsRow = ({ winning }) => {
   if (!winning) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(winning.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${winning.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(winning.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -75,8 +82,8 @@ const MyWinningsTable = ({ list }) => {
           </Tr>
         </TablePrimaryHead>
         <TableBody>
-          {list.map((winning, i) => (
-            <MyWinningsRow key={i} winning={winning} />
+          {list.map((winning) => (
+            <MyWinningsRow key={winning.EvtLogId} winning={winning} />
           ))}
         </TableBody>
       </TablePrimary>

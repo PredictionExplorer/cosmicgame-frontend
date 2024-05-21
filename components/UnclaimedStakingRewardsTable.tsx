@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   IconButton,
+  Link,
   Menu,
   Pagination,
   Snackbar,
@@ -173,7 +174,14 @@ const UnclaimedStakingRewardsRow = ({
     <>
       <TablePrimaryRow>
         <TablePrimaryCell>
-          {convertTimestampToDateTime(row.TimeStamp - offset)}
+          <Link
+            color="inherit"
+            fontSize="inherit"
+            href={`https://arbiscan.io/tx/${row.TxHash}`}
+            target="__blank"
+          >
+            {convertTimestampToDateTime(row.TimeStamp - offset)}
+          </Link>
         </TablePrimaryCell>
         <TablePrimaryCell align="center">{row.DepositId}</TablePrimaryCell>
         <TablePrimaryCell align="right">
@@ -433,6 +441,7 @@ const UnclaimedStakingRewardsRow = ({
 };
 
 export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
+  console.log(list);
   const { account } = useActiveWeb3React();
   const stakingContract = useStakingWalletContract();
   const perPage = 5;
