@@ -21,7 +21,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const WinnerRow = ({ winner }) => {
   if (!winner) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

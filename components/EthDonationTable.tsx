@@ -14,7 +14,7 @@ import { convertTimestampToDateTime } from "../utils";
 
 const EthDonationRow = ({ row }) => {
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

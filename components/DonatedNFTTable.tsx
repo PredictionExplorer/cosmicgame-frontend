@@ -36,7 +36,7 @@ const NFTRow = ({ nft, handleClaim }) => {
   }, []);
 
   if (!nft) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

@@ -19,7 +19,7 @@ import { Tr } from "react-super-responsive-table";
 
 const CosmicSignatureTransferRow = ({ row }) => {
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

@@ -14,7 +14,7 @@ import { Tr } from "react-super-responsive-table";
 
 const GlobalMarketingRewardsRow = ({ row }) => {
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

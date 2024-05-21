@@ -14,7 +14,7 @@ import { Tr } from "react-super-responsive-table";
 
 const NameHistoryRow = ({ record }) => {
   if (!record) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

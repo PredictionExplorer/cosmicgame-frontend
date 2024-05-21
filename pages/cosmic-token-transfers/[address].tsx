@@ -19,7 +19,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const CosmicTokenTransferRow = ({ row }) => {
   if (!row) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

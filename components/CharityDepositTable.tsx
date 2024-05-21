@@ -14,7 +14,7 @@ import { Tr } from "react-super-responsive-table";
 
 const DonationRow = ({ donation }) => {
   if (!donation) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

@@ -23,7 +23,7 @@ import { Tr } from "react-super-responsive-table";
 
 const UsedRwlkNftRow = ({ nft }) => {
   if (!nft) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
   return (
     <TablePrimaryRow>

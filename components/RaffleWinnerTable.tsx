@@ -21,7 +21,7 @@ import { Tr } from "react-super-responsive-table";
 
 const WinnerRow = ({ winner, type }) => {
   if (!winner) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (

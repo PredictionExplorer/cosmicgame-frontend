@@ -20,7 +20,7 @@ import { Tr } from "react-super-responsive-table";
 
 const WithdrawalRow = ({ withdrawal }) => {
   if (!withdrawal) {
-    return <TablePrimaryRow></TablePrimaryRow>;
+    return <TablePrimaryRow />;
   }
 
   return (
