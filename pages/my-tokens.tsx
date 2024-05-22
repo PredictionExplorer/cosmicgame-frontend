@@ -94,7 +94,6 @@ const CSTRow = ({ nft }) => {
 };
 
 const CSTTable = ({ list }) => {
-  console.log(list);
   const perPage = 10;
   const [curPage, setCurPage] = useState(1);
   if (list.length === 0) {
