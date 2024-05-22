@@ -67,16 +67,16 @@ const Header = () => {
     const fetchData = async () => {
       const notify = await api.notify_red_box(account);
       setApiData(notify);
-      const balance = await api.get_user_balance(account);
+      const user_balance = await api.get_user_balance(account);
       const { UserInfo } = await api.get_user_info(account);
       if (nftContract) {
         const rwlkTokens = await nftContract.walletOfOwner(account);
-        if (balance) {
+        if (user_balance) {
           setBalance({
             CosmicToken: Number(
-              ethers.utils.formatEther(balance.CosmicTokenBalance)
+              ethers.utils.formatEther(user_balance.CosmicTokenBalance)
             ),
-            ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
+            ETH: Number(ethers.utils.formatEther(user_balance.ETH_Balance)),
             CosmicSignature: UserInfo?.TotalCSTokensWon,
             RWLK: rwlkTokens.length,
           });
@@ -87,7 +87,7 @@ const Header = () => {
     if (account) {
       fetchData();
     }
-  }, [account]);
+  }, [account, nftContract]);
 
   useEffect(() => {
     const navs = getNAVs(status, account);
@@ -103,11 +103,13 @@ const Header = () => {
         {navs.map((nav, i) => (
           <ListNavItem key={i} nav={nav} />
         ))}
-        <ConnectWalletButton
-          isMobileView={false}
-          balance={balance}
-          stakedTokens={stakedTokens}
-        />
+        {
+          <ConnectWalletButton
+            isMobileView={false}
+            balance={balance}
+            stakedTokens={stakedTokens}
+          />
+        }
       </Toolbar>
     );
   };

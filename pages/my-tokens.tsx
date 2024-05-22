@@ -87,6 +87,7 @@ const CSTRow = ({ nft }) => {
 };
 
 const CSTTable = ({ list }) => {
+  console.log(list);
   const perPage = 10;
   const [curPage, setCurPage] = useState(1);
   if (list.length === 0) {
@@ -104,7 +105,7 @@ const CSTTable = ({ list }) => {
               <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Staked</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Staked?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Prize Type
               </TablePrimaryHeadCell>
