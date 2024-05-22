@@ -109,13 +109,19 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {history.AmountEth.toFixed(4)}
+        {history.RecordType === 1 ? " " : history.AmountEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.RecordType === 0 ? (
           " "
         ) : history.RecordType === 1 ? (
-          <Tooltip title={COSMIC_SIGNATURE_TOKEN_ADDRESS}>
+          <Tooltip
+            title={
+              <Typography fontFamily="monospace">
+                {COSMIC_SIGNATURE_TOKEN_ADDRESS}
+              </Typography>
+            }
+          >
             <Link
               href={`https://arbiscan.io/address/${COSMIC_SIGNATURE_TOKEN_ADDRESS}`}
               sx={{
@@ -128,8 +134,14 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
               {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS.toString(), 6)}
             </Link>
           </Tooltip>
-        ) : (
-          <Tooltip title={history.TokenAddress}>
+        ) : history.TokenAddress !== "" ? (
+          <Tooltip
+            title={
+              <Typography fontFamily="monospace">
+                {history.TokenAddress}
+              </Typography>
+            }
+          >
             <Link
               href={`https://arbiscan.io/address/${history.TokenAddress}`}
               sx={{
@@ -142,6 +154,8 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
               {shortenHex(history.TokenAddress.toString(), 6)}
             </Link>
           </Tooltip>
+        ) : (
+          " "
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
