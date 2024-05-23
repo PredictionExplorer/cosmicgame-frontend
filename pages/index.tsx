@@ -454,19 +454,20 @@ const NewHome = () => {
       try {
         const bidList = await api.get_bid_list();
         const biddedRWLKIds = bidList.map((bid) => bid.RWalkNFTId);
-        if (nftRWLKContract && account) {
-          const tokens = await nftRWLKContract.walletOfOwner(account);
-          const nftIds = tokens
-            .map((t) => t.toNumber())
-            .filter((t) => !biddedRWLKIds.includes(t))
-            .reverse();
-          setRwlknftIds(nftIds);
-        }
+        const tokens = await nftRWLKContract.walletOfOwner(account);
+        const nftIds = tokens
+          .map((t) => t.toNumber())
+          .filter((t) => !biddedRWLKIds.includes(t))
+          .reverse();
+        setRwlknftIds(nftIds);
       } catch (e) {
         console.log(e);
       }
     };
-    getData();
+
+    if (nftRWLKContract && account) {
+      getData();
+    }
   }, [nftRWLKContract, account]);
 
   useEffect(() => {

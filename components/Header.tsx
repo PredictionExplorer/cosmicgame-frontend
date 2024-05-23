@@ -72,19 +72,17 @@ const Header = () => {
         setApiData(notify);
         const user_balance = await api.get_user_balance(account);
         const { UserInfo } = await api.get_user_info(account);
-        if (nftContract) {
-          const rwlkTokens = await nftContract.walletOfOwner(account);
-          if (user_balance) {
-            setBalance({
-              CosmicToken: Number(
-                ethers.utils.formatEther(user_balance.CosmicTokenBalance)
-              ),
-              ETH: Number(ethers.utils.formatEther(user_balance.ETH_Balance)),
-              CosmicSignature: UserInfo?.TotalCSTokensWon,
-              RWLK: rwlkTokens.length,
-            });
-            setLoading(false);
-          }
+        const rwlkTokens = await nftContract.walletOfOwner(account);
+        if (user_balance) {
+          setBalance({
+            CosmicToken: Number(
+              ethers.utils.formatEther(user_balance.CosmicTokenBalance)
+            ),
+            ETH: Number(ethers.utils.formatEther(user_balance.ETH_Balance)),
+            CosmicSignature: UserInfo?.TotalCSTokensWon,
+            RWLK: rwlkTokens.length,
+          });
+          setLoading(false);
         }
       } catch (e) {
         console.log(e);
@@ -92,7 +90,7 @@ const Header = () => {
       }
     };
 
-    if (account) {
+    if (account && nftContract) {
       fetchData();
     }
   }, [account, nftContract]);

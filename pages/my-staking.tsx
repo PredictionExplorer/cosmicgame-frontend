@@ -49,7 +49,6 @@ const MyStaking = () => {
   const [rwlkTokens, setRwlkTokens] = useState([]);
   const [stakingTable, setStakingTable] = useState(0);
   const { data: stakedTokens, fetchData: fetchStakedToken } = useStakedToken();
-
   const stakingContract = useStakingWalletContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
 
@@ -152,26 +151,24 @@ const MyStaking = () => {
     const CSTokens = await api.get_cst_tokens_by_user(addr);
     setCSTokens(CSTokens);
     fetchStakedToken();
-
     const rwlkStaked = stakedTokens
       .filter((x) => x.IsRandomWalk)
       .map((x) => x.TokenInfo.TokenId);
-    if (nftContract) {
-      const tokens = await nftContract.walletOfOwner(account);
-      const nftIds = tokens
-        .map((t) => t.toNumber())
-        .reverse()
-        .filter((x) => !rwlkStaked.includes(x));
-      setRwlkTokens(nftIds);
-    }
-
+    const tokens = await nftContract.walletOfOwner(account);
+    const nftIds = tokens
+      .map((t) => t.toNumber())
+      .reverse()
+      .filter((x) => !rwlkStaked.includes(x));
+    setRwlkTokens(nftIds);
     setLoading(false);
   };
+
   useEffect(() => {
-    if (account) {
+    if (account && nftContract) {
       fetchData(account);
     }
-  }, [account]);
+  }, [account, nftContract]);
+
   return (
     <>
       <Head>
