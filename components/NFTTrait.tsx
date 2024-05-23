@@ -130,8 +130,6 @@ const NFTTrait = ({ tokenId }) => {
     }
   };
   const handleSetTokenName = async () => {
-    console.log(tokenName);
-    console.log(tokenName.length);
     try {
       await nftContract
         .setTokenName(tokenId, tokenName)
@@ -366,7 +364,14 @@ const NFTTrait = ({ tokenId }) => {
                 </Typography>
                 &nbsp;
                 <Typography component="span">
-                  {convertTimestampToDateTime(nft.TimeStamp)}
+                  <Link
+                    color="inherit"
+                    fontSize="inherit"
+                    href={`https://arbiscan.io/tx/${nft.TxHash}`}
+                    target="__blank"
+                  >
+                    {convertTimestampToDateTime(nft.TimeStamp)}
+                  </Link>
                 </Typography>
               </Box>
             )}

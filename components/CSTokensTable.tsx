@@ -44,7 +44,14 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
         <Checkbox color="primary" checked={isItemSelected} size="small" />
       </TablePrimaryCell>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(row.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${row.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(row.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -58,6 +65,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.TokenName || " "}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
           href={`/prize/${row.RoundNum}`}
@@ -268,6 +276,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
                 Mint Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell />

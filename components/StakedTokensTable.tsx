@@ -108,7 +108,16 @@ const StakedTokensRow = ({
         {row.StakedIsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.TokenInfo.StakeActionId}
+        <Link
+          href={`/staking-action/${row.TokenInfo.StakeActionId}`}
+          sx={{
+            color: "inherit",
+            fontSize: "inherit",
+          }}
+          target="_blank"
+        >
+          {row.TokenInfo.StakeActionId}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(row.StakeTimeStamp - offset)}
@@ -322,7 +331,7 @@ export const StakedTokensTable = ({
               .slice((page - 1) * perPage, page * perPage)
               .map((row, index) => (
                 <StakedTokensRow
-                  key={index}
+                  key={(page - 1) * perPage + index}
                   offset={offset}
                   row={row}
                   handleUnstake={onUnstake}
