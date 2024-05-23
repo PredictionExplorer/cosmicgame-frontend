@@ -441,7 +441,6 @@ const UnclaimedStakingRewardsRow = ({
 };
 
 export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
-  console.log(list);
   const { account } = useActiveWeb3React();
   const stakingContract = useStakingWalletContract();
   const perPage = 5;

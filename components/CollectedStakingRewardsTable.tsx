@@ -138,7 +138,7 @@ const CollectedStakingRewardsRow = ({ row }) => {
     <>
       <TablePrimaryRow sx={{ borderBottom: 0 }}>
         <TablePrimaryCell>
-          {list.length > 1 ? (
+          {list.length > 1 && (
             <IconButton
               aria-label="expand row"
               size="small"
@@ -146,12 +146,17 @@ const CollectedStakingRewardsRow = ({ row }) => {
             >
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
-          ) : (
-            " "
           )}
         </TablePrimaryCell>
         <TablePrimaryCell>
-          {convertTimestampToDateTime(row.TimeStamp)}
+          <Link
+            color="inherit"
+            fontSize="inherit"
+            href={`https://arbiscan.io/tx/${row.TxHash}`}
+            target="__blank"
+          >
+            {convertTimestampToDateTime(row.TimeStamp)}
+          </Link>
         </TablePrimaryCell>
         <TablePrimaryCell align="center">
           <Link
@@ -177,6 +182,9 @@ const CollectedStakingRewardsRow = ({ row }) => {
         </TablePrimaryCell>
         <TablePrimaryCell align="center">
           {row.YourCollectedAmountEth.toFixed(6)}
+        </TablePrimaryCell>
+        <TablePrimaryCell align="center">
+          {row.FullyClaimed ? "Yes" : "No"}
         </TablePrimaryCell>
       </TablePrimaryRow>
       {list.length > 1 && (
@@ -221,6 +229,7 @@ export const CollectedStakingRewardsTable = ({ list }) => {
               <TablePrimaryHeadCell>Staked Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Collected Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Collected Rewards</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Fully Claimed?</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
