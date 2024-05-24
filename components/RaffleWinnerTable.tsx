@@ -27,7 +27,14 @@ const WinnerRow = ({ winner, type }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(winner.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${winner.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(winner.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip title={winner.WinnerAddr}>
@@ -97,17 +104,13 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list
-              .slice((page - 1) * perPage, page * perPage)
-              .map((winner, i) => (
-                <WinnerRow
-                  key={winner.EvtLogId}
-                  winner={winner}
-                  type={
-                    winner.Amount ? "ETH Deposit" : "Cosmic Signature Token"
-                  }
-                />
-              ))}
+            {list.slice((page - 1) * perPage, page * perPage).map((winner) => (
+              <WinnerRow
+                key={winner.EvtLogId}
+                winner={winner}
+                type={winner.Amount ? "ETH Deposit" : "Cosmic Signature Token"}
+              />
+            ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>

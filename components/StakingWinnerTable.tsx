@@ -27,7 +27,14 @@ const WinnerRow = ({ winner }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(winner.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${winner.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(winner.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="left">
         <Tooltip title={winner.StakerAddr}>

@@ -82,7 +82,14 @@ const PrizeInfo = ({ roundNum }) => {
               </Typography>
               &nbsp;
               <Typography component="span">
-                {convertTimestampToDateTime(prizeInfo.TimeStamp)}
+                <Link
+                  color="inherit"
+                  fontSize="inherit"
+                  href={`https://arbiscan.io/tx/${prizeInfo.TxHash}`}
+                  target="__blank"
+                >
+                  {convertTimestampToDateTime(prizeInfo.TimeStamp)}
+                </Link>
               </Typography>
             </Box>
             <Box mb={1}>

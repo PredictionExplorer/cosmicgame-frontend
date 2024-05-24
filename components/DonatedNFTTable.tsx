@@ -42,7 +42,14 @@ const NFTRow = ({ nft, handleClaim }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(nft.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${nft.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(nft.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip title={nft.DonorAddr}>
