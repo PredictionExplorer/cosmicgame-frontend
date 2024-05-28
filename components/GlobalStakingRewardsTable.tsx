@@ -129,7 +129,7 @@ const GlobalStakingRewardsRow = ({ row }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await api.get_action_ids_by_deposit_id(
+      const response = await api.get_cst_action_ids_by_deposit_id(
         row.StakerAddr,
         row.DepositId
       );

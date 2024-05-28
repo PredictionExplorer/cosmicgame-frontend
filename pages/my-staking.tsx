@@ -8,11 +8,15 @@ import { UnclaimedStakingRewardsTable } from "../components/UnclaimedStakingRewa
 import { CollectedStakingRewardsTable } from "../components/CollectedStakingRewardsTable";
 import { StakingActionsTable } from "../components/StakingActionsTable";
 import { CSTokensTable } from "../components/CSTokensTable";
-import useStakingWalletContract from "../hooks/useStakingWalletContract";
+import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
+import useStakingWalletRWLKContract from "../hooks/useStakingWalletRWLKContract";
 import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
-import { STAKING_WALLET_ADDRESS } from "../config/app";
+import {
+  STAKING_WALLET_CST_ADDRESS,
+  STAKING_WALLET_RWLK_ADDRESS,
+} from "../config/app";
 import { StakedTokensTable } from "../components/StakedTokensTable";
-import { useStakedToken } from "../contexts/StakedTokenContext";
+import { useStakedCSToken } from "../contexts/StakedCSTokenContext";
 import { RWLKNFTTable } from "../components/RWLKNFTTable";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 
@@ -33,7 +37,7 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -42,17 +46,68 @@ const MyStaking = () => {
   const { account } = useActiveWeb3React();
   const nftContract = useRWLKNFTContract();
   const [loading, setLoading] = useState(false);
-  const [unclaimedStakingRewards, setUnclaimedStakingRewards] = useState([]);
-  const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
-  const [stakingActions, setStakingActions] = useState([]);
+  const [unclaimedCSTStakingRewards, setUnclaimedCSTStakingRewards] = useState(
+    []
+  );
+  const [
+    unclaimedRWLKStakingRewards,
+    setUnclaimedRWLKStakingRewards,
+  ] = useState([]);
+  const [collectedCSTStakingRewards, setCollectedCSTStakingRewards] = useState(
+    []
+  );
+  const [
+    collectedRWLKStakingRewards,
+    setCollectedRWLKStakingRewards,
+  ] = useState([]);
+  const [stakingCSTActions, setStakingCSTActions] = useState([]);
   const [CSTokens, setCSTokens] = useState([]);
   const [rwlkTokens, setRwlkTokens] = useState([]);
   const [stakingTable, setStakingTable] = useState(0);
-  const { data: stakedTokens, fetchData: fetchStakedToken } = useStakedToken();
-  const stakingContract = useStakingWalletContract();
+  const {
+    data: stakedCSTokens,
+    fetchData: fetchStakedCSTokens,
+  } = useStakedCSToken();
+  const cstStakingContract = useStakingWalletCSTContract();
+  const rwlkStakingContract = useStakingWalletRWLKContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
 
   const handleStake = async (tokenId: number, isRwalk: boolean) => {
+    const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
+    const STAKING_WALLET_ADDRESS = isRwalk
+      ? STAKING_WALLET_RWLK_ADDRESS
+      : STAKING_WALLET_CST_ADDRESS;
+    try {
+      const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
+        account,
+        STAKING_WALLET_ADDRESS
+      );
+      if (!isApprovedForAll) {
+        await cosmicSignatureContract
+          .setApprovalForAll(STAKING_WALLET_ADDRESS, true)
+          .then((tx) => tx.wait());
+      }
+      const res = await stakingContract.stake(tokenId).then((tx) => tx.wait());
+      console.log(res);
+      setTimeout(() => {
+        if (isRwalk) {
+          fetchRWLKData(account, false);
+        } else {
+          fetchCSTData(account, false);
+        }
+      }, 2000);
+      return res;
+    } catch (err) {
+      console.error(err);
+      return err;
+    }
+  };
+
+  const handleStakeMany = async (tokenIds: number[], isRwalk: boolean) => {
+    const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
+    const STAKING_WALLET_ADDRESS = isRwalk
+      ? STAKING_WALLET_RWLK_ADDRESS
+      : STAKING_WALLET_CST_ADDRESS;
     try {
       const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
         account,
@@ -64,11 +119,15 @@ const MyStaking = () => {
           .then((tx) => tx.wait());
       }
       const res = await stakingContract
-        .stake(tokenId, isRwalk)
+        .stakeMany(tokenIds)
         .then((tx) => tx.wait());
       console.log(res);
       setTimeout(() => {
-        fetchData(account, false);
+        if (isRwalk) {
+          fetchRWLKData(account, false);
+        } else {
+          fetchCSTData(account, false);
+        }
       }, 2000);
       return res;
     } catch (err) {
@@ -77,37 +136,19 @@ const MyStaking = () => {
     }
   };
 
-  const handleStakeMany = async (tokenIds: number[], isRwalks: boolean[]) => {
-    try {
-      const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
-        account,
-        STAKING_WALLET_ADDRESS
-      );
-      if (!isApprovedForAll) {
-        await cosmicSignatureContract
-          .setApprovalForAll(STAKING_WALLET_ADDRESS, true)
-          .then((tx) => tx.wait());
-      }
-      const res = await stakingContract
-        .stakeMany(tokenIds, isRwalks)
-        .then((tx) => tx.wait());
-      setTimeout(() => {
-        fetchData(account, false);
-      }, 2000);
-      return res;
-    } catch (err) {
-      console.error(err);
-      return err;
-    }
-  };
-
-  const handleUnstakeMany = async (actionIds: number[]) => {
+  const handleUnstakeMany = async (actionIds: number[], isRwalk: boolean) => {
+    const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
     try {
       const res = await stakingContract
         .unstakeMany(actionIds)
         .then((tx) => tx.wait());
+      console.log(res);
       setTimeout(() => {
-        fetchData(account, false);
+        if (isRwalk) {
+          fetchRWLKData(account, false);
+        } else {
+          fetchCSTData(account, false);
+        }
       }, 2000);
       return res;
     } catch (err) {
@@ -116,14 +157,19 @@ const MyStaking = () => {
     }
   };
 
-  const handleUnstake = async (actionId: number) => {
+  const handleUnstake = async (actionId: number, isRwalk: boolean) => {
+    const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
     try {
       const res = await stakingContract
         .unstake(actionId)
         .then((tx) => tx.wait());
-
+      console.log(res);
       setTimeout(() => {
-        fetchData(account, false);
+        if (isRwalk) {
+          fetchRWLKData(account, false);
+        } else {
+          fetchCSTData(account, false);
+        }
       }, 2000);
       return res;
     } catch (err) {
@@ -136,36 +182,54 @@ const MyStaking = () => {
     setStakingTable(newValue);
   };
 
-  const fetchData = async (addr: string, reload: boolean = true) => {
+  const fetchCSTData = async (addr: string, reload: boolean = true) => {
     setLoading(reload);
-    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
+    const unclaimedStakingRewards = await api.get_unclaimed_staking_cst_rewards_by_user(
       addr
     );
-    setUnclaimedStakingRewards(unclaimedStakingRewards);
-    const collectedStakingRewards = await api.get_collected_staking_rewards_by_user(
+    setUnclaimedCSTStakingRewards(unclaimedStakingRewards);
+    const collectedStakingRewards = await api.get_collected_staking_cst_rewards_by_user(
       addr
     );
-    setCollectedStakingRewards(collectedStakingRewards);
-    const stakingActions = await api.get_staking_actions_by_user(addr);
-    setStakingActions(stakingActions);
+    setCollectedCSTStakingRewards(collectedStakingRewards);
+    const stakingActions = await api.get_staking_cst_actions_by_user(addr);
+    setStakingCSTActions(stakingActions);
     const CSTokens = await api.get_cst_tokens_by_user(addr);
     setCSTokens(CSTokens);
-    fetchStakedToken();
-    const rwlkStaked = stakedTokens
-      .filter((x) => x.IsRandomWalk)
-      .map((x) => x.TokenInfo.TokenId);
-    const tokens = await nftContract.walletOfOwner(account);
-    const nftIds = tokens
-      .map((t) => t.toNumber())
-      .reverse()
-      .filter((x) => !rwlkStaked.includes(x));
-    setRwlkTokens(nftIds);
+    fetchStakedCSTokens();
+    setLoading(false);
+  };
+
+  const fetchRWLKData = async (addr: string, reload: boolean = true) => {
+    setLoading(reload);
+    const unclaimedStakingRewards = await api.get_unclaimed_staking_cst_rewards_by_user(
+      addr
+    );
+    setUnclaimedCSTStakingRewards(unclaimedStakingRewards);
+    const collectedStakingRewards = await api.get_collected_staking_cst_rewards_by_user(
+      addr
+    );
+    setCollectedCSTStakingRewards(collectedStakingRewards);
+    const stakingActions = await api.get_staking_cst_actions_by_user(addr);
+    setStakingCSTActions(stakingActions);
+    const CSTokens = await api.get_cst_tokens_by_user(addr);
+    setCSTokens(CSTokens);
+    // fetchStakedToken();
+    // const rwlkStaked = stakedTokens
+    //   .filter((x) => x.IsRandomWalk)
+    //   .map((x) => x.TokenInfo.TokenId);
+    // const tokens = await nftContract.walletOfOwner(account);
+    // const nftIds = tokens
+    //   .map((t) => t.toNumber())
+    //   .reverse()
+    //   .filter((x) => !rwlkStaked.includes(x));
+    // setRwlkTokens(nftIds);
     setLoading(false);
   };
 
   useEffect(() => {
     if (account && nftContract) {
-      fetchData(account);
+      fetchCSTData(account);
     }
   }, [account, nftContract]);
 
@@ -192,63 +256,103 @@ const MyStaking = () => {
           <Typography variant="h6">Loading...</Typography>
         ) : (
           <>
-            <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                Earned Staking Rewards
-              </Typography>
-              <UnclaimedStakingRewardsTable
-                list={unclaimedStakingRewards}
-                owner={account}
-                fetchData={fetchData}
-              />
+            <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
+              <Tabs value={stakingTable} onChange={handleTabChange}>
+                <Tab label={<Typography>CosmicSignature Token</Typography>} />
+                <Tab label={<Typography>RandomWalk Token</Typography>} />
+              </Tabs>
             </Box>
-            <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                Collected Staking Rewards
-              </Typography>
-              <CollectedStakingRewardsTable list={collectedStakingRewards} />
-            </Box>
-            <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                Stake / Unstake Actions
-              </Typography>
-              <StakingActionsTable list={stakingActions} />
-            </Box>
-            <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                Tokens Available for Staking
-              </Typography>
-              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <Tabs value={stakingTable} onChange={handleTabChange}>
-                  <Tab label={<Typography>CosmicSignature Token</Typography>} />
-                  <Tab label={<Typography>RandomWalk Token</Typography>} />
-                </Tabs>
+            <CustomTabPanel value={stakingTable} index={0}>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mb={2}>
+                  Earned Staking Rewards
+                </Typography>
+                <UnclaimedStakingRewardsTable
+                  list={unclaimedCSTStakingRewards}
+                  owner={account}
+                  fetchData={fetchCSTData}
+                />
               </Box>
-              <CustomTabPanel value={stakingTable} index={0}>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  Collected Staking Rewards
+                </Typography>
+                <CollectedStakingRewardsTable
+                  list={collectedCSTStakingRewards}
+                />
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  Stake / Unstake Actions
+                </Typography>
+                <StakingActionsTable list={stakingCSTActions} />
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  Tokens Available for Staking
+                </Typography>
                 <CSTokensTable
                   list={CSTokens}
                   handleStake={handleStake}
                   handleStakeMany={handleStakeMany}
                 />
-              </CustomTabPanel>
-              <CustomTabPanel value={stakingTable} index={1}>
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  Staked Tokens
+                </Typography>
+                <StakedTokensTable
+                  list={stakedCSTokens}
+                  handleUnstake={handleUnstake}
+                  handleUnstakeMany={handleUnstakeMany}
+                  IsRwalk={false}
+                />
+              </Box>
+            </CustomTabPanel>
+            <CustomTabPanel value={stakingTable} index={1}>
+              {/* <Box>
+                <Typography variant="h6" lineHeight={1} mb={2}>
+                  Earned Staking Rewards
+                </Typography>
+                <UnclaimedStakingRewardsTable
+                  list={unclaimedStakingRewards}
+                  owner={account}
+                  fetchData={fetchData}
+                />
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  Collected Staking Rewards
+                </Typography>
+                <CollectedStakingRewardsTable list={collectedStakingRewards} />
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  Stake / Unstake Actions
+                </Typography>
+                <StakingActionsTable list={stakingActions} />
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  Tokens Available for Staking
+                </Typography>
                 <RWLKNFTTable
                   list={rwlkTokens}
                   handleStake={handleStake}
                   handleStakeMany={handleStakeMany}
                 />
-              </CustomTabPanel>
-            </Box>
-            <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                Staked Tokens
-              </Typography>
-              <StakedTokensTable
-                list={stakedTokens}
-                handleUnstake={handleUnstake}
-                handleUnstakeMany={handleUnstakeMany}
-              />
-            </Box>
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  Staked Tokens
+                </Typography>
+                <StakedTokensTable
+                  list={stakedTokens}
+                  handleUnstake={handleUnstake}
+                  handleUnstakeMany={handleUnstakeMany}
+                />
+              </Box> */}
+            </CustomTabPanel>
           </>
         )}
       </MainWrapper>

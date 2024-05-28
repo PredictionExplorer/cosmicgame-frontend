@@ -105,9 +105,6 @@ const StakedTokensRow = ({
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.StakedIsRandomWalk ? "Yes" : "No"}
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
         <Link
           href={`/staking-action/${row.TokenInfo.StakeActionId}`}
           sx={{
@@ -147,6 +144,7 @@ export const StakedTokensTable = ({
   list,
   handleUnstake,
   handleUnstakeMany,
+  IsRwalk,
 }) => {
   const perPage = 5;
   const [notification, setNotification] = useState<{
@@ -201,7 +199,7 @@ export const StakedTokensTable = ({
     setAnchorEl(null);
   };
   const onUnstakeMany = async () => {
-    const res = await handleUnstakeMany(selected);
+    const res = await handleUnstakeMany(selected, IsRwalk);
     if (!res.code) {
       setNotification({
         visible: true,
@@ -212,7 +210,7 @@ export const StakedTokensTable = ({
   };
   const onUnstake = async (actionId: number, tokenId: number) => {
     setSelected([actionId]);
-    const res = await handleUnstake(actionId);
+    const res = await handleUnstake(actionId, IsRwalk);
     if (!res.code) {
       setNotification({
         visible: true,
@@ -318,7 +316,6 @@ export const StakedTokensTable = ({
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Is RandomWalk NFT?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Unstake Datetime</TablePrimaryHeadCell>

@@ -159,10 +159,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
     setAnchorEl(null);
   };
   const onStakeMany = async () => {
-    const res = await handleStakeMany(
-      selected,
-      new Array(selected.length).fill(false)
-    );
+    const res = await handleStakeMany(selected, false);
     if (!res.code) {
       setNotification({
         visible: true,

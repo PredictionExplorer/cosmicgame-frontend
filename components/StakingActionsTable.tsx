@@ -47,9 +47,6 @@ const StakingActionsRow = ({ row }) => {
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {row.IsRandomWalk ? "Yes" : "No"}
-      </TablePrimaryCell>
       <TablePrimaryCell>
         {row.ActionType === 0
           ? convertTimestampToDateTime(row.UnstakeTimeStamp)
@@ -77,7 +74,6 @@ export const StakingActionsTable = ({ list }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Is RandomWalk NFT?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">
                 Unstake Datetime
               </TablePrimaryHeadCell>

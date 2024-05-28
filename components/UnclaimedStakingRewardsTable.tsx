@@ -25,10 +25,10 @@ import {
 } from "./styled";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { convertTimestampToDateTime, formatSeconds } from "../utils";
-import useStakingWalletContract from "../hooks/useStakingWalletContract";
+import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
 import api from "../services/api";
 import { useActiveWeb3React } from "../hooks/web3";
-import { useStakedToken } from "../contexts/StakedTokenContext";
+import { useStakedCSToken } from "../contexts/StakedCSTokenContext";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -36,7 +36,7 @@ import AdvancedClaimDialog from "./AdvancedClaimDialog";
 import getErrorMessage from "../utils/alert";
 
 const fetchInfo = async (account, depositId, stakedActionIds) => {
-  const response = await api.get_action_ids_by_deposit_id(account, depositId);
+  const response = await api.get_cst_action_ids_by_deposit_id(account, depositId);
   let unstakeableActionIds = [],
     claimableActionIds = [],
     claimableAmounts = {};
@@ -86,7 +86,6 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
 };
 
 interface stakeStateInterface {
-  IsRandomWalk: boolean;
   TokenId: number;
   DepositId: number;
   StakeActionId: number;
@@ -105,7 +104,7 @@ const UnclaimedStakingRewardsRow = ({
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [claimableAmounts, setClaimableAmounts] = useState({});
-  const { data: stakedTokens } = useStakedToken();
+  const { data: stakedTokens } = useStakedCSToken();
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDlg, setOpenDlg] = useState(false);
   const [stakeState, setStakeState] = useState<stakeStateInterface[]>([]);
@@ -442,11 +441,11 @@ const UnclaimedStakingRewardsRow = ({
 
 export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const { account } = useActiveWeb3React();
-  const stakingContract = useStakingWalletContract();
+  const stakingContract = useStakingWalletCSTContract();
   const perPage = 5;
   const [page, setPage] = useState(1);
-  const { data: stakedTokens } = useStakedToken();
-  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const { data: stakedCSTokens } = useStakedCSToken();
+  const stakedActionIds = stakedCSTokens.map((x) => x.TokenInfo.StakeActionId);
   const [offset, setOffset] = useState(undefined);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
@@ -523,6 +522,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       console.error(e);
     }
   };
+
   const handleNotificationClose = () => {
     setNotification({ ...notification, visible: false });
   };
@@ -555,7 +555,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     };
     fetchActionIds();
     calculateOffset();
-  }, [list, stakedTokens]);
+  }, [list, stakedCSTokens]);
 
   if (offset === undefined) return;
 

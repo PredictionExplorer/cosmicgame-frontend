@@ -27,7 +27,7 @@ import * as ga from '../utils/analytics'
 import { ApiDataProvider } from '../contexts/ApiDataContext'
 import ApiDataFetcher from '../contexts/ApiDataFetcher'
 import { CookiesProvider } from 'react-cookie'
-import { StakedTokenProvider } from '../contexts/StakedTokenContext'
+import { StakedCSTokenProvider } from '../contexts/StakedCSTokenContext'
 import { SystemModeProvider } from '../contexts/SystemModeContext'
 
 // Client-side cache, shared for the whole session of the user in the browser.
@@ -109,7 +109,7 @@ function MyApp(props: MyAppProps) {
               <CssBaseline />
               <Web3ReactManager>
               <CookiesProvider>
-                <StakedTokenProvider>
+                <StakedCSTokenProvider>
                   <SystemModeProvider>
                     <ApiDataProvider>
                       <Header />
@@ -118,7 +118,7 @@ function MyApp(props: MyAppProps) {
                       <ApiDataFetcher interval={30000} />
                     </ApiDataProvider>
                   </SystemModeProvider>
-                </StakedTokenProvider>
+                </StakedCSTokenProvider>
               </CookiesProvider>
               </Web3ReactManager>
             </ThemeProvider>

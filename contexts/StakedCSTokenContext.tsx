@@ -2,16 +2,16 @@ import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
 import { useActiveWeb3React } from "../hooks/web3";
 
-const StakedTokenContext = createContext(undefined);
+const StakedCSTokenContext = createContext(undefined);
 
-export const StakedTokenProvider = ({ children }) => {
+export const StakedCSTokenProvider = ({ children }) => {
   const [data, setData] = useState([]);
   const { account } = useActiveWeb3React();
 
   const fetchData = async () => {
     try {
       if (account) {
-        const tokens = await api.get_staked_tokens_by_user(account);
+        const tokens = await api.get_staked_cst_tokens_by_user(account);
         setData(tokens);
       }
     } catch (error) {
@@ -23,10 +23,10 @@ export const StakedTokenProvider = ({ children }) => {
   }, [account]);
 
   return (
-    <StakedTokenContext.Provider value={{ data, fetchData }}>
+    <StakedCSTokenContext.Provider value={{ data, fetchData }}>
       {children}
-    </StakedTokenContext.Provider>
+    </StakedCSTokenContext.Provider>
   );
 };
 
-export const useStakedToken = () => useContext(StakedTokenContext);
+export const useStakedCSToken = () => useContext(StakedCSTokenContext);
