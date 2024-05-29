@@ -19,7 +19,7 @@ const ConnectWalletButton = ({
   isMobileView,
   loading,
   balance,
-  stakedTokens,
+  stakedTokenCount,
 }) => {
   const { account, activate } = useActiveWeb3React();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -206,7 +206,7 @@ const ConnectWalletButton = ({
           >
             <Typography sx={{ fontSize: "inherit" }}>STAKED TOKENS:</Typography>
             <Typography color="primary" sx={{ fontSize: "inherit" }}>
-              {stakedTokens?.length}
+              {stakedTokenCount}
             </Typography>
           </MenuItem>
         </Menu>

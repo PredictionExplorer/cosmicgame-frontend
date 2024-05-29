@@ -22,12 +22,12 @@ import {
 } from "./styled";
 import { Tr } from "react-super-responsive-table";
 import { useEffect, useState } from "react";
-import { useStakedCSToken } from "../contexts/StakedCSTokenContext";
+import { useStakedToken } from "../contexts/StakedTokenContext";
 import api from "../services/api";
 
 const TokenRow = ({ row, stakeState, setStakeState }) => {
   const [tokenName, setTokenName] = useState("");
-  const { data: stakedTokens } = useStakedCSToken();
+  const { cstokens: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const isDisabled = (field) => {
@@ -147,7 +147,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
 const TokensTable = ({ stakeState, setStakeState }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
-  const { data: stakedTokens } = useStakedCSToken();
+  const { cstokens: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const [isAllSelected, setAllSelected] = useState({
@@ -310,7 +310,7 @@ export default function AdvancedClaimDialog({
   setOpen,
   handleUnstakeClaimRestake,
 }) {
-  const { data: stakedTokens } = useStakedCSToken();
+  const { cstokens: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const handleClose = () => {
     setOpen(false);

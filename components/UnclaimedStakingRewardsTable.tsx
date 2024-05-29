@@ -28,7 +28,7 @@ import { convertTimestampToDateTime, formatSeconds } from "../utils";
 import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
 import api from "../services/api";
 import { useActiveWeb3React } from "../hooks/web3";
-import { useStakedCSToken } from "../contexts/StakedCSTokenContext";
+import { useStakedToken } from "../contexts/StakedTokenContext";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -36,14 +36,18 @@ import AdvancedClaimDialog from "./AdvancedClaimDialog";
 import getErrorMessage from "../utils/alert";
 
 const fetchInfo = async (account, depositId, stakedActionIds) => {
-  const response = await api.get_cst_action_ids_by_deposit_id(account, depositId);
   let unstakeableActionIds = [],
     claimableActionIds = [],
     claimableAmounts = {};
+  const response = await api.get_cst_action_ids_by_deposit_id(
+    account,
+    depositId
+  );
+  const current = await api.get_current_time();
   await Promise.all(
     response.map(async (x) => {
       try {
-        if (x.UnstakeEligibleTimeStamp < x.CurChainTimeStamp) {
+        if (x.UnstakeEligibleTimeStamp < current) {
           if (!x.Claimed) {
             claimableActionIds.push({
               DepositId: x.DepositId,
@@ -80,7 +84,7 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
     claimableActionIds,
     claimableAmounts,
     actionIds: response.filter(
-      (x) => x.UnstakeEligibleTimeStamp < x.CurChainTimeStamp && !x.Claimed
+      (x) => x.UnstakeEligibleTimeStamp < current && !x.Claimed
     ),
   };
 };
@@ -104,10 +108,10 @@ const UnclaimedStakingRewardsRow = ({
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [claimableAmounts, setClaimableAmounts] = useState({});
-  const { data: stakedTokens } = useStakedCSToken();
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDlg, setOpenDlg] = useState(false);
   const [stakeState, setStakeState] = useState<stakeStateInterface[]>([]);
+  const { cstokens: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
 
@@ -444,8 +448,8 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const stakingContract = useStakingWalletCSTContract();
   const perPage = 5;
   const [page, setPage] = useState(1);
-  const { data: stakedCSTokens } = useStakedCSToken();
-  const stakedActionIds = stakedCSTokens.map((x) => x.TokenInfo.StakeActionId);
+  const { cstokens: stakedTokens } = useStakedToken();
+  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const [offset, setOffset] = useState(undefined);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
@@ -555,7 +559,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     };
     fetchActionIds();
     calculateOffset();
-  }, [list, stakedCSTokens]);
+  }, [list, stakedTokens]);
 
   if (offset === undefined) return;
 

@@ -33,18 +33,19 @@ const StakedTokensRow = ({
   handleUnstake,
   isItemSelected,
   handleClick,
+  IsRwalk,
 }) => {
   const [tokenName, setTokenName] = useState("");
   const getTokenImageURL = () => {
     const fileName = row.TokenInfo.TokenId.toString().padStart(6, "0");
-    if (row.StakedIsRandomWalk) {
+    if (IsRwalk) {
       return `https://randomwalknft.s3.us-east-2.amazonaws.com/${fileName}_black_thumb.jpg`;
     }
     return `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.png`;
   };
   useEffect(() => {
     const getTokenName = async () => {
-      if (row.StakedIsRandomWalk) {
+      if (IsRwalk) {
         const res = await api.get_info(row.TokenInfo.TokenId);
         setTokenName(res.CurName);
       } else {
@@ -91,7 +92,7 @@ const StakedTokensRow = ({
       <TablePrimaryCell align="center">
         <Link
           href={
-            row.StakedIsRandomWalk
+            IsRwalk
               ? `https://randomwalknft.com/detail/${row.TokenInfo.TokenId}`
               : `/detail/${row.TokenInfo.TokenId}`
           }
@@ -334,6 +335,7 @@ export const StakedTokensTable = ({
                   handleUnstake={onUnstake}
                   isItemSelected={isSelected(row.TokenInfo.StakeActionId)}
                   handleClick={handleClick}
+                  IsRwalk={IsRwalk}
                 />
               ))}
           </TableBody>

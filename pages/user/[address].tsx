@@ -12,7 +12,7 @@ import { UnclaimedStakingRewardsTable } from "../../components/UnclaimedStakingR
 import { CollectedStakingRewardsTable } from "../../components/CollectedStakingRewardsTable";
 import { StakingActionsTable } from "../../components/StakingActionsTable";
 import { MarketingRewardsTable } from "../../components/MarketingRewardsTable";
-import { useStakedCSToken } from "../../contexts/StakedCSTokenContext";
+import { useStakedToken } from "../../contexts/StakedTokenContext";
 import { useApiData } from "../../contexts/ApiDataContext";
 import { useRouter } from "next/router";
 import { useActiveWeb3React } from "../../hooks/web3";
@@ -41,7 +41,7 @@ const UserInfo = ({ address }) => {
   const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
   const [stakingActions, setStakingActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
-  const { fetchData: fetchStakedToken } = useStakedCSToken();
+  const { fetchData: fetchStakedToken } = useStakedToken();
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
     raffleETH: false,

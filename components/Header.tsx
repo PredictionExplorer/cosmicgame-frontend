@@ -24,7 +24,7 @@ import { useApiData } from "../contexts/ApiDataContext";
 import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
 import { ethers } from "ethers";
-import { useStakedCSToken } from "../contexts/StakedCSTokenContext";
+import { useStakedToken } from "../contexts/StakedTokenContext";
 import { useSystemMode } from "../contexts/SystemModeContext";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 
@@ -44,7 +44,10 @@ const Header = () => {
     CosmicSignature: 0,
     RWLK: 0,
   });
-  const { data: stakedCSTokens } = useStakedCSToken();
+  const {
+    cstokens: stakedCSTokens,
+    rwlktokens: stakedRWLKTokens,
+  } = useStakedToken();
   const { data: systemMode } = useSystemMode();
   const nftContract = useRWLKNFTContract();
 
@@ -114,7 +117,7 @@ const Header = () => {
             isMobileView={false}
             loading={loading}
             balance={balance}
-            stakedTokens={stakedCSTokens}
+            stakedTokenCount={stakedCSTokens?.length + stakedRWLKTokens?.length}
           />
         }
       </Toolbar>
@@ -159,7 +162,9 @@ const Header = () => {
                 isMobileView
                 balance={balance}
                 loading={loading}
-                stakedTokens={stakedCSTokens}
+                stakedTokenCount={
+                  stakedCSTokens?.length + stakedRWLKTokens?.length
+                }
               />
             </ListItem>
             {navs.map((nav, i) => (
@@ -292,7 +297,7 @@ const Header = () => {
                     color="secondary"
                     sx={{ fontSize: 16, fontWeight: 600 }}
                   >
-                    {stakedCSTokens?.length}
+                    {stakedCSTokens?.length + stakedRWLKTokens?.length}
                   </Typography>
                 </ListItem>
               </>

@@ -488,7 +488,7 @@ class ApiService {
   public async get_staking_rwalk_actions_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/rwalk/actions/by_user/${address}/0/10000`));
-      return data.StakingRWALKActions;
+      return data.UserStakingActionsRWalk;
     } catch (err) {
       console.log(err);
       return [];
@@ -538,7 +538,7 @@ class ApiService {
   public async get_staked_cst_tokens() {
     try {
       const { data } = await axios.get(getAPIUrl("staking/cst/staked_tokens"));
-      return data.StakedTokens;
+      return data.StakedTokensCST;
     } catch (err) {
       console.log(err);
       return [];
@@ -548,7 +548,7 @@ class ApiService {
   public async get_staked_rwalk_tokens() {
     try {
       const { data } = await axios.get(getAPIUrl("staking/rwalk/staked_tokens"));
-      return data.StakedTokens;
+      return data.StakedTokensRWalk;
     } catch (err) {
       console.log(err);
       return [];
@@ -569,7 +569,7 @@ class ApiService {
   public async get_staked_rwalk_tokens_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`user/staked/rwalk/${address}`));
-      return data.StakedTokensRWALK;
+      return data.StakedTokensRWalk;
     } catch (err) {
       console.log(err);
       return [];
@@ -579,16 +579,6 @@ class ApiService {
   public async get_cst_action_ids_by_deposit_id(user_addr: string, deposit_id: number) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/action_ids_by_deposit/${user_addr}/${deposit_id}`));
-      return data.ActionIds;
-    } catch (err) {
-      console.log(err);
-      return [];
-    }
-  }
-
-  public async get_rwalk_action_ids_by_deposit_id(user_addr: string, deposit_id: number) {
-    try {
-      const { data } = await axios.get(getAPIUrl(`staking/rwalkrewards/action_ids_by_deposit/${user_addr}/${deposit_id}`));
       return data.ActionIds;
     } catch (err) {
       console.log(err);
