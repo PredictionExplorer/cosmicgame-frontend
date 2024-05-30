@@ -162,7 +162,7 @@ const MyWinnings = () => {
     }
   };
   const fetchUnclaimedStakingRewards = async () => {
-    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
+    const unclaimedStakingRewards = await api.get_unclaimed_staking_cst_rewards_by_user(
       account
     );
     setUnclaimedStakingRewards(unclaimedStakingRewards);

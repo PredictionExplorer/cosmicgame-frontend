@@ -12,7 +12,7 @@ import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 
-const GlobalStakedTokensRow = ({ row }) => {
+const GlobalStakedTokensRow = ({ row, IsRWLK }) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -41,8 +41,8 @@ const GlobalStakedTokensRow = ({ row }) => {
       <TablePrimaryCell align="center">
         <Link
           href={
-            row.StakedIsRandomWalk
-              ? `https://randomwalknft.com/detail/${row.TokenInfo.TokenId}`
+            IsRWLK
+              ? `https://randomwalknft.com/detail/${row.StakedTokenId}`
               : `/detail/${row.TokenInfo.TokenId}`
           }
           sx={{
@@ -50,11 +50,8 @@ const GlobalStakedTokensRow = ({ row }) => {
             fontSize: "inherit",
           }}
         >
-          {row.TokenInfo.TokenId}
+          {IsRWLK ? row.StakedTokenId : row.TokenInfo.TokenId}
         </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {row.StakedIsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -72,7 +69,7 @@ const GlobalStakedTokensRow = ({ row }) => {
   );
 };
 
-export const GlobalStakedTokensTable = ({ list }) => {
+export const GlobalStakedTokensTable = ({ list, IsRWLK }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -92,13 +89,16 @@ export const GlobalStakedTokensTable = ({ list }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Is RandomWalk NFT?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staker Address</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <GlobalStakedTokensRow key={row.StakeEvtLogId} row={row} />
+              <GlobalStakedTokensRow
+                key={row.StakeEvtLogId}
+                row={row}
+                IsRWLK={IsRWLK}
+              />
             ))}
           </TableBody>
         </TablePrimary>

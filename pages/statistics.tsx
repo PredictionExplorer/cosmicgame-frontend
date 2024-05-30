@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Box, Grid, Link, Pagination, Typography } from "@mui/material";
+import {
+  Box,
+  Grid,
+  Link,
+  Pagination,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
@@ -26,11 +34,35 @@ import {
   formatEthValue,
   formatSeconds,
 } from "../utils";
-import { UniqueStakersTable } from "../components/UniqueStakersTable";
+import { UniqueStakersCSTTable } from "../components/UniqueStakersCSTTable";
 import { GlobalStakingActionsTable } from "../components/GlobalStakingActionsTable";
 import { GlobalStakedTokensTable } from "../components/GlobalStakedTokensTable";
 import { ethers } from "ethers";
 import { SystemModesTable } from "../components/SystemModesTable";
+import { UniqueStakersRWLKTable } from "../components/UniqueStakersRWLKTable";
+// import { UniqueStakersBothTable } from "../components/UniqueStakersBothTable";
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 const StatisticsItem = ({ title, value }) => {
   return (
@@ -50,12 +82,16 @@ const Statistics = () => {
   const [bidHistory, setBidHistory] = useState([]);
   const [uniqueBidders, setUniqueBidders] = useState([]);
   const [uniqueWinners, setUniqueWinners] = useState([]);
-  const [uniqueStakers, setUniqueStakers] = useState([]);
+  // const [uniqueStakers, setUniqueStakers] = useState([]);
+  const [uniqueCSTStakers, setUniqueCSTStakers] = useState([]);
+  const [uniqueRWLKStakers, setUniqueRWLKStakers] = useState([]);
   const [nftDonations, setNftDonations] = useState([]);
   const [cstDistribution, setCSTDistribution] = useState([]);
   const [ctBalanceDistribution, setCTBalanceDistribution] = useState([]);
-  const [stakingActions, setStakingActions] = useState(null);
-  const [stakedTokens, setStakedTokens] = useState(null);
+  const [stakingCSTActions, setStakingCSTActions] = useState(null);
+  const [stakingRWLKActions, setStakingRWLKActions] = useState(null);
+  const [stakedCSTokens, setStakedCSTokens] = useState(null);
+  const [stakedRWLKTokens, setStakedRWLKTokens] = useState(null);
   const [systemModeChanges, setSystemModeChanges] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cstBidData, setCSTBidData] = useState({
@@ -63,6 +99,11 @@ const Statistics = () => {
     CSTPrice: 0,
     SecondsElapsed: 0,
   });
+  const [stakingType, setStakingType] = useState(0);
+
+  const handleTabChange = (_event, newValue) => {
+    setStakingType(newValue);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,18 +120,26 @@ const Statistics = () => {
       setUniqueBidders(uniqueBidders);
       const uniqueWinners = await api.get_unique_winners();
       setUniqueWinners(uniqueWinners);
-      const uniqueStakers = await api.get_unique_stakers();
-      setUniqueStakers(uniqueStakers);
+      // const uniqueStakers = await api.get_unique_stakers();
+      // setUniqueStakers(uniqueStakers);
+      let uniqueStakers = await api.get_unique_cst_stakers();
+      setUniqueCSTStakers(uniqueStakers);
+      uniqueStakers = await api.get_unique_rwalk_stakers();
+      setUniqueRWLKStakers(uniqueStakers);
       const nftDonations = await api.get_donations_nft_list();
       setNftDonations(nftDonations);
       const distribution = await api.get_cst_distribution();
       setCSTDistribution(distribution);
       const ctbDistribution = await api.get_ct_balances_distribution();
       setCTBalanceDistribution(ctbDistribution);
-      const actions = await api.get_staking_actions();
-      setStakingActions(actions);
-      const tokens = await api.get_staked_tokens();
-      setStakedTokens(tokens);
+      let actions = await api.get_staking_cst_actions();
+      setStakingCSTActions(actions);
+      actions = await api.get_staking_rwalk_actions();
+      setStakingRWLKActions(actions);
+      let tokens = await api.get_staked_cst_tokens();
+      setStakedCSTokens(tokens);
+      tokens = await api.get_staked_rwalk_tokens();
+      setStakedRWLKTokens(tokens);
       const sysChanges = await api.get_system_modelist();
       setSystemModeChanges(sysChanges);
       let ctData = await api.get_ct_price();
@@ -410,7 +459,7 @@ const Statistics = () => {
                   </Link>
                 }
               />
-              <StatisticsItem
+              {/* <StatisticsItem
                 title="Number of Active Stakers"
                 value={data.MainStats.StakeStatistics.NumActiveStakers}
               />
@@ -433,7 +482,7 @@ const Statistics = () => {
                 value={`${data.MainStats.StakeStatistics.UnclaimedRewardEth.toFixed(
                   4
                 )} ETH`}
-              />
+              /> */}
             </Box>
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
@@ -447,12 +496,12 @@ const Statistics = () => {
               </Typography>
               <UniqueWinnersTable list={uniqueWinners} />
             </Box>
-            <Box mt={4}>
+            {/* <Box mt={4}>
               <Typography variant="h6" mb={2}>
                 Unique Stakers
               </Typography>
-              <UniqueStakersTable list={uniqueStakers} />
-            </Box>
+              <UniqueStakersBothTable list={uniqueStakers} />
+            </Box> */}
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
                 Donated Token Distribution per Contract Address
@@ -507,26 +556,81 @@ const Statistics = () => {
                 list={ctBalanceDistribution.slice(0, 20)}
               />
             </Box>
-            <Box>
-              <Typography variant="h6" mb={2} mt={8}>
-                Stake / Unstake Actions
-              </Typography>
-              {stakingActions === null ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <GlobalStakingActionsTable list={stakingActions} />
-              )}
+
+            <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
+              <Tabs value={stakingType} onChange={handleTabChange}>
+                <Tab label={<Typography>CosmicSignature Token</Typography>} />
+                <Tab label={<Typography>RandomWalk Token</Typography>} />
+              </Tabs>
             </Box>
-            <Box>
-              <Typography variant="h6" mt={8} mb={2}>
-                Staked Tokens
-              </Typography>
-              {stakedTokens === null ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <GlobalStakedTokensTable list={stakedTokens} />
-              )}
-            </Box>
+            <CustomTabPanel value={stakingType} index={0}>
+              <Box>
+                <Typography variant="h6" mb={2}>
+                  Stake / Unstake Actions
+                </Typography>
+                {stakingCSTActions === null ? (
+                  <Typography variant="h6">Loading...</Typography>
+                ) : (
+                  <GlobalStakingActionsTable
+                    list={stakingCSTActions}
+                    IsRWLK={false}
+                  />
+                )}
+              </Box>
+              <Box mt={4}>
+                <Typography variant="h6" mb={2}>
+                  Staked Tokens
+                </Typography>
+                {stakedCSTokens === null ? (
+                  <Typography variant="h6">Loading...</Typography>
+                ) : (
+                  <GlobalStakedTokensTable
+                    list={stakedCSTokens}
+                    IsRWLK={false}
+                  />
+                )}
+              </Box>
+              <Box mt={4}>
+                <Typography variant="h6" mb={2}>
+                  Unique Stakers
+                </Typography>
+                <UniqueStakersCSTTable list={uniqueCSTStakers} />
+              </Box>
+            </CustomTabPanel>
+            <CustomTabPanel value={stakingType} index={1}>
+              <Box>
+                <Typography variant="h6" mb={2}>
+                  Stake / Unstake Actions
+                </Typography>
+                {stakingRWLKActions === null ? (
+                  <Typography variant="h6">Loading...</Typography>
+                ) : (
+                  <GlobalStakingActionsTable
+                    list={stakingRWLKActions}
+                    IsRWLK={true}
+                  />
+                )}
+              </Box>
+              <Box mt={4}>
+                <Typography variant="h6" mb={2}>
+                  Staked Tokens
+                </Typography>
+                {stakedRWLKTokens === null ? (
+                  <Typography variant="h6">Loading...</Typography>
+                ) : (
+                  <GlobalStakedTokensTable
+                    list={stakedRWLKTokens}
+                    IsRWLK={true}
+                  />
+                )}
+              </Box>
+              <Box mt={4}>
+                <Typography variant="h6" mb={2}>
+                  Unique Stakers
+                </Typography>
+                <UniqueStakersRWLKTable list={uniqueRWLKStakers} />
+              </Box>
+            </CustomTabPanel>
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
                 Donated NFTs

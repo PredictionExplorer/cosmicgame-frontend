@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
+import {
+  Box,
+  Link,
+  Pagination,
+  TableBody,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -13,7 +20,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { useRouter } from "next/router";
 
-const GlobalStakingActionsRow = ({ row }) => {
+const GlobalStakingActionsRow = ({ row, IsRWLK }) => {
   const router = useRouter();
   if (!row) {
     return <TablePrimaryRow />;
@@ -35,7 +42,7 @@ const GlobalStakingActionsRow = ({ row }) => {
       <TablePrimaryCell align="center">
         <Link
           href={
-            row.IsRandomWalk
+            IsRWLK
               ? `https://randomwalknft.com/detail/${row.TokenId}`
               : `/detail/${row.TokenId}`
           }
@@ -44,32 +51,31 @@ const GlobalStakingActionsRow = ({ row }) => {
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {row.IsRandomWalk ? "Yes" : "No"}
-      </TablePrimaryCell>
       <TablePrimaryCell>
         {row.ActionType === 0
           ? convertTimestampToDateTime(row.UnstakeTimeStamp)
           : " "}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/user/${row.StakerAddr}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {shortenHex(row.StakerAddr, 6)}
-        </Link>
+        <Tooltip title={row.StakerAddr}>
+          <Link
+            href={`/user/${row.StakerAddr}`}
+            style={{
+              color: "inherit",
+              fontSize: "inherit",
+              fontFamily: "monospace",
+            }}
+          >
+            {shortenHex(row.StakerAddr, 6)}
+          </Link>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-export const GlobalStakingActionsTable = ({ list }) => {
+export const GlobalStakingActionsTable = ({ list, IsRWLK }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -86,7 +92,6 @@ export const GlobalStakingActionsTable = ({ list }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Is RandomWalk NFT?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">
                 Unstake Datetime
               </TablePrimaryHeadCell>
@@ -96,7 +101,11 @@ export const GlobalStakingActionsTable = ({ list }) => {
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <GlobalStakingActionsRow row={row} key={row.EvtLogId} />
+              <GlobalStakingActionsRow
+                row={row}
+                IsRWLK={IsRWLK}
+                key={row.EvtLogId}
+              />
             ))}
           </TableBody>
         </TablePrimary>

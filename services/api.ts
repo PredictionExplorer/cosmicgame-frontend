@@ -498,7 +498,7 @@ class ApiService {
   public async get_staking_cst_actions() {
     try {
       const { data } = await axios.get(getAPIUrl("staking/cst/actions/global/0/10000"));
-      return data.StakingActions;
+      return data.StakingCSTActions;
     } catch (err) {
       console.log(err);
       return [];
@@ -508,7 +508,7 @@ class ApiService {
   public async get_staking_rwalk_actions() {
     try {
       const { data } = await axios.get(getAPIUrl("staking/rwalk/actions/global/0/10000"));
-      return data.StakingActions;
+      return data.GlobalStakingActionsRWalk;
     } catch (err) {
       console.log(err);
       return [];
@@ -608,8 +608,28 @@ class ApiService {
 
   public async get_unique_stakers() {
     try {
-      const { data } = await axios.get(getAPIUrl("user/unique_stakers"));
-      return data.UniqueStakers;
+      const { data } = await axios.get(getAPIUrl("user/unique_stakers_both"));
+      return data.UniqueStakersBoth;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_unique_cst_stakers() {
+    try {
+      const { data } = await axios.get(getAPIUrl("user/unique_stakers_cst"));
+      return data.UniqueStakersCST;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_unique_rwalk_stakers() {
+    try {
+      const { data } = await axios.get(getAPIUrl("user/unique_stakers_rwalk"));
+      return data.UniqueStakersRWalk;
     } catch (err) {
       console.log(err);
       return [];

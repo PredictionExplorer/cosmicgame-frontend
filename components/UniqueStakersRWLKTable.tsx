@@ -11,7 +11,7 @@ import {
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
-const UniqueStakersRow = ({ row }) => {
+const UniqueStakersRWLKRow = ({ row }) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -37,17 +37,14 @@ const UniqueStakersRow = ({ row }) => {
       <TablePrimaryCell align="center">
         {row.TotalTokensStaked}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
-        {row.TotalRewardEth.toFixed(6)}
-      </TablePrimaryCell>
-      <TablePrimaryCell align="right">
-        {row.UnclaimedRewardEth.toFixed(6)}
+      <TablePrimaryCell align="center">
+        {row.TotalTokensMinted}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-export const UniqueStakersTable = ({ list }) => {
+export const UniqueStakersRWLKTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -65,17 +62,12 @@ export const UniqueStakersTable = ({ list }) => {
               <TablePrimaryHeadCell>Num Stake Actions</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Num Unstake Actions</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Total Reward (ETH)
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Unclaimed Reward (ETH)
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Minted Tokens</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <UniqueStakersRow row={row} key={row.StakerAid} />
+              <UniqueStakersRWLKRow row={row} key={row.StakerAid} />
             ))}
           </TableBody>
         </TablePrimary>
