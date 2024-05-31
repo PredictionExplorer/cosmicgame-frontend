@@ -37,7 +37,7 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -174,11 +174,11 @@ const MyStaking = () => {
 
   const fetchCSTData = async (addr: string, reload: boolean = true) => {
     setLoading(reload);
-    const unclaimedStakingRewards = await api.get_unclaimed_staking_cst_rewards_by_user(
+    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
       addr
     );
     setUnclaimedStakingRewards(unclaimedStakingRewards);
-    const collectedStakingRewards = await api.get_collected_staking_cst_rewards_by_user(
+    const collectedStakingRewards = await api.get_collected_staking_rewards_by_user(
       addr
     );
     setCollectedStakingRewards(collectedStakingRewards);

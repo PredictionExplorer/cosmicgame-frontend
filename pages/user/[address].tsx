@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Link, Typography } from "@mui/material";
+import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
@@ -18,6 +18,28 @@ import { useRouter } from "next/router";
 import { useActiveWeb3React } from "../../hooks/web3";
 import useCosmicGameContract from "../../hooks/useCosmicGameContract";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 const UserInfo = ({ address }) => {
   const router = useRouter();
@@ -39,13 +61,15 @@ const UserInfo = ({ address }) => {
   const [invalidAddress, setInvalidAddress] = useState(false);
   const [unclaimedStakingRewards, setUnclaimedStakingRewards] = useState([]);
   const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
-  const [stakingActions, setStakingActions] = useState([]);
+  const [stakingCSTActions, setStakingCSTActions] = useState([]);
+  const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
     raffleETH: false,
   });
+  const [stakingTable, setStakingTable] = useState(0);
 
   const cosmicGameContract = useCosmicGameContract();
 
@@ -73,8 +97,10 @@ const UserInfo = ({ address }) => {
       addr
     );
     setCollectedStakingRewards(collectedStakingRewards);
-    const stakingActions = await api.get_staking_actions_by_user(addr);
-    setStakingActions(stakingActions);
+    let stakingActions = await api.get_staking_cst_actions_by_user(addr);
+    setStakingCSTActions(stakingActions);
+    stakingActions = await api.get_staking_rwalk_actions_by_user(addr);
+    setStakingRWLKActions(stakingActions);
     const marketingRewards = await api.get_marketing_rewards_by_user(addr);
     setMarketingRewards(marketingRewards);
     fetchStakedToken();
@@ -131,6 +157,10 @@ const UserInfo = ({ address }) => {
         donatedNFT: false,
       });
     }
+  };
+
+  const handleTabChange = (_event, newValue) => {
+    setStakingTable(newValue);
   };
 
   useEffect(() => {
@@ -379,10 +409,29 @@ const UserInfo = ({ address }) => {
                   />
                 </Box>
                 <Box>
-                  <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  <Typography variant="h6" lineHeight={1} mt={4}>
                     Stake / Unstake Actions
                   </Typography>
-                  <StakingActionsTable list={stakingActions} />
+                  <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                    <Tabs value={stakingTable} onChange={handleTabChange}>
+                      <Tab
+                        label={<Typography>CosmicSignature Token</Typography>}
+                      />
+                      <Tab label={<Typography>RandomWalk Token</Typography>} />
+                    </Tabs>
+                  </Box>
+                  <CustomTabPanel value={stakingTable} index={0}>
+                    <StakingActionsTable
+                      list={stakingCSTActions}
+                      IsRwalk={false}
+                    />
+                  </CustomTabPanel>
+                  <CustomTabPanel value={stakingTable} index={1}>
+                    <StakingActionsTable
+                      list={stakingRWLKActions}
+                      IsRwalk={true}
+                    />
+                  </CustomTabPanel>
                 </Box>
                 {marketingRewards.length > 0 && (
                   <Box>

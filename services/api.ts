@@ -405,19 +405,9 @@ class ApiService {
     }
   }
 
-  public async get_unclaimed_staking_cst_rewards_by_user(address: string) {
+  public async get_unclaimed_staking_rewards_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/to_claim/by_user/${address}`));
-      return data.UnclaimedEthDeposits;
-    } catch (err) {
-      console.log(err);
-      return [];
-    }
-  }
-
-  public async get_unclaimed_staking_rwalk_rewards_by_user(address: string) {
-    try {
-      const { data } = await axios.get(getAPIUrl(`staking/rwalk/rewards/to_claim/by_user/${address}`));
       return data.UnclaimedEthDeposits;
     } catch (err) {
       console.log(err);
@@ -435,7 +425,7 @@ class ApiService {
     }
   }
 
-  public async get_collected_staking_cst_rewards_by_user(address: string) {
+  public async get_collected_staking_rewards_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/0/10000`));
       return data.CollectedStakingCSTRewards;
@@ -445,29 +435,9 @@ class ApiService {
     }
   }
 
-  public async get_collected_staking_rwalk_rewards_by_user(address: string) {
-    try {
-      const { data } = await axios.get(getAPIUrl(`staking/rwalk/rewards/collected/by_user/${address}/0/10000`));
-      return data.CollectedStakingRWALKRewards;
-    } catch (err) {
-      console.log(err);
-      return [];
-    }
-  }
-
   public async get_cst_action_ids_by_deposit_with_claim_info(address: string, depositId: number) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/action_ids_by_deposit_with_claim_info/${address}/${depositId}`));
-      return data.ActionIdsWithClaimInfo;
-    } catch (err) {
-      console.log(err);
-      return [];
-    }
-  }
-
-  public async get_rwalk_action_ids_by_deposit_with_claim_info(address: string, depositId: number) {
-    try {
-      const { data } = await axios.get(getAPIUrl(`staking/rwalk/rewards/action_ids_by_deposit_with_claim_info/${address}/${depositId}`));
       return data.ActionIdsWithClaimInfo;
     } catch (err) {
       console.log(err);
