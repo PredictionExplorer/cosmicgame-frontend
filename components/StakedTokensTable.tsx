@@ -107,7 +107,9 @@ const StakedTokensRow = ({
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/staking-action/${row.TokenInfo.StakeActionId}`}
+          href={`/staking-action/${IsRwalk ? 1 : 0}/${
+            row.TokenInfo.StakeActionId
+          }`}
           sx={{
             color: "inherit",
             fontSize: "inherit",

@@ -29,7 +29,7 @@ const GlobalStakedTokensRow = ({ row, IsRWLK }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/staking-action/${row.StakeActionId}`}
+          href={`/staking-action/${IsRWLK ? 1 : 0}/${row.StakeActionId}`}
           sx={{
             color: "inherit",
             fontSize: "inherit",

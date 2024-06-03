@@ -415,9 +415,19 @@ class ApiService {
     }
   }
 
-  public async get_staking_actions_info(actionId: number) {
+  public async get_staking_cst_actions_info(actionId: number) {
     try {
-      const { data } = await axios.get(getAPIUrl(`staking/actions/info/${actionId}`));
+      const { data } = await axios.get(getAPIUrl(`staking/cst/actions/info/${actionId}`));
+      return data.CombinedStakingRecordInfo;
+    } catch (err) {
+      console.log(err);
+      return { Stake: null, Unstake: null };
+    }
+  }
+
+  public async get_staking_rwalk_actions_info(actionId: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`staking/rwalk/actions/info/${actionId}`));
       return data.CombinedStakingRecordInfo;
     } catch (err) {
       console.log(err);

@@ -30,7 +30,7 @@ const GlobalStakingActionsRow = ({ row, IsRWLK }) => {
     <TablePrimaryRow
       sx={{ cursor: "pointer" }}
       onClick={() => {
-        router.push(`/staking-action/${row.ActionId}`);
+        router.push(`/staking-action/${IsRWLK ? 1 : 0}/${row.ActionId}`);
       }}
     >
       <TablePrimaryCell>

@@ -51,7 +51,7 @@ const DetailRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/staking-action/${row.StakeActionId}`}
+          href={`/staking-action/0/${row.StakeActionId}`}
           style={{ color: "inherit", fontSize: "inherit" }}
         >
           {row.StakeActionId}
