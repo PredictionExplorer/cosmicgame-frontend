@@ -587,7 +587,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left" sx={{ minWidth: "185px" }}>
+              <TablePrimaryHeadCell align="left" sx={{ minWidth: "150px" }}>
                 Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
