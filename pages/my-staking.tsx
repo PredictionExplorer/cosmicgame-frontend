@@ -233,22 +233,6 @@ const MyStaking = () => {
           <Typography variant="h6">Loading...</Typography>
         ) : (
           <>
-            <Box>
-              <Typography variant="h6" lineHeight={1} mb={2}>
-                Earned Staking Rewards
-              </Typography>
-              <UnclaimedStakingRewardsTable
-                list={unclaimedStakingRewards}
-                owner={account}
-                fetchData={fetchRWLKData}
-              />
-            </Box>
-            <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                Collected Staking Rewards
-              </Typography>
-              <CollectedStakingRewardsTable list={collectedStakingRewards} />
-            </Box>
             <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={stakingTable} onChange={handleTabChange}>
                 <Tab label={<Typography>CosmicSignature Token</Typography>} />
@@ -258,6 +242,22 @@ const MyStaking = () => {
             <CustomTabPanel value={stakingTable} index={0}>
               <Box>
                 <Typography variant="h6" lineHeight={1} mb={2}>
+                  Earned Staking Rewards
+                </Typography>
+                <UnclaimedStakingRewardsTable
+                  list={unclaimedStakingRewards}
+                  owner={account}
+                  fetchData={fetchRWLKData}
+                />
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  Collected Staking Rewards
+                </Typography>
+                <CollectedStakingRewardsTable list={collectedStakingRewards} />
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                   Stake / Unstake Actions
                 </Typography>
                 <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
