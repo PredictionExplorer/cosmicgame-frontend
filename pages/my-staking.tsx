@@ -194,7 +194,7 @@ const MyStaking = () => {
     const stakingActions = await api.get_staking_rwalk_actions_by_user(addr);
     setStakingRWLKActions(stakingActions);
     fetchStakedTokens();
-    const rwlkStaked = stakedRWLKTokens.map((x) => x.TokenInfo.TokenId);
+    const rwlkStaked = stakedRWLKTokens.map((x) => x.StakedTokenId);
     const tokens = await nftContract.walletOfOwner(account);
     const nftIds = tokens
       .map((t) => t.toNumber())

@@ -310,8 +310,8 @@ export default function AdvancedClaimDialog({
   setOpen,
   handleUnstakeClaimRestake,
 }) {
-  const { cstokens: stakedTokens } = useStakedToken();
-  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const { cstokens: stakedCSTTokens } = useStakedToken();
+  const stakedActionIds = stakedCSTTokens.map((x) => x.TokenInfo.StakeActionId);
   const handleClose = () => {
     setOpen(false);
   };

@@ -37,7 +37,9 @@ const StakedTokensRow = ({
 }) => {
   const [tokenName, setTokenName] = useState("");
   const getTokenImageURL = () => {
-    const fileName = row.TokenInfo.TokenId.toString().padStart(6, "0");
+    const fileName = (IsRwalk ? row.StakedTokenId : row.TokenInfo.TokenId)
+      .toString()
+      .padStart(6, "0");
     if (IsRwalk) {
       return `https://randomwalknft.s3.us-east-2.amazonaws.com/${fileName}_black_thumb.jpg`;
     }
@@ -46,7 +48,7 @@ const StakedTokensRow = ({
   useEffect(() => {
     const getTokenName = async () => {
       if (IsRwalk) {
-        const res = await api.get_info(row.TokenInfo.TokenId);
+        const res = await api.get_info(row.StakedTokenId);
         setTokenName(res.CurName);
       } else {
         const names = await api.get_name_history(row.TokenInfo.TokenId);
@@ -68,7 +70,9 @@ const StakedTokensRow = ({
       tabIndex={-1}
       key={row.id}
       selected={isItemSelected}
-      onClick={() => handleClick(row.TokenInfo.StakeActionId)}
+      onClick={() =>
+        handleClick(IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId)
+      }
       sx={{
         cursor: "pointer",
         pointerEvents:
@@ -93,7 +97,7 @@ const StakedTokensRow = ({
         <Link
           href={
             IsRwalk
-              ? `https://randomwalknft.com/detail/${row.TokenInfo.TokenId}`
+              ? `https://randomwalknft.com/detail/${row.StakedTokenId}`
               : `/detail/${row.TokenInfo.TokenId}`
           }
           sx={{
@@ -102,13 +106,13 @@ const StakedTokensRow = ({
           }}
           target="_blank"
         >
-          {row.TokenInfo.TokenId}
+          {IsRwalk ? row.StakedTokenId : row.TokenInfo.TokenId}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
           href={`/staking-action/${IsRwalk ? 1 : 0}/${
-            row.TokenInfo.StakeActionId
+            IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
           }`}
           sx={{
             color: "inherit",
@@ -116,7 +120,7 @@ const StakedTokensRow = ({
           }}
           target="_blank"
         >
-          {row.TokenInfo.StakeActionId}
+          {IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -132,7 +136,10 @@ const StakedTokensRow = ({
             sx={{ mr: 1 }}
             onClick={(e) => {
               e.stopPropagation();
-              handleUnstake(row.TokenInfo.StakeActionId, row.TokenInfo.TokenId);
+              handleUnstake(
+                IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId,
+                IsRwalk ? row.StakedTokenId : row.TokenInfo.TokenId
+              );
             }}
           >
             Unstake
@@ -186,14 +193,16 @@ export const StakedTokensTable = ({
     setSelected(newSelected);
   };
   const onSelectAllClick = () => {
-    const newSelected = filtered.map((n) => n.TokenInfo.StakeActionId);
+    const newSelected = filtered.map((n) =>
+      IsRwalk ? n.StakeActionId : n.TokenInfo.StakeActionId
+    );
     setSelected(newSelected);
     setAnchorEl(null);
   };
   const onSelectCurPgClick = () => {
     const newSelected = filtered
       .slice((page - 1) * perPage, page * perPage)
-      .map((n) => n.TokenInfo.StakeActionId);
+      .map((n) => (IsRwalk ? n.StakeActionId : n.TokenInfo.StakeActionId));
     setSelected(newSelected);
     setAnchorEl(null);
   };
@@ -335,7 +344,9 @@ export const StakedTokensTable = ({
                   offset={offset}
                   row={row}
                   handleUnstake={onUnstake}
-                  isItemSelected={isSelected(row.TokenInfo.StakeActionId)}
+                  isItemSelected={isSelected(
+                    IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
+                  )}
                   handleClick={handleClick}
                   IsRwalk={IsRwalk}
                 />
