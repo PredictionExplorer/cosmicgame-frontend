@@ -31,14 +31,10 @@ const DetailRow = ({ row }) => {
   return (
     <TablePrimaryRow sx={{ borderBottom: 0 }}>
       <TablePrimaryCell align="left">
-        {convertTimestampToDateTime(
-          row.StakeActionTimeStamp + row.TimeStampDiff
-        )}
+        {convertTimestampToDateTime(row.StakeActionTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="left">
-        {convertTimestampToDateTime(
-          row.UnstakeEligibleTimeStamp + row.TimeStampDiff
-        )}
+        {convertTimestampToDateTime(row.UnstakeEligibleTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -55,9 +51,6 @@ const DetailRow = ({ row }) => {
         >
           {row.TokenId}
         </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {row.IsRandomWalk ? "Yes" : "No"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {row.Claimed ? "Yes" : "No"}
@@ -89,9 +82,6 @@ const DetailTable = ({ list }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell sx={{ py: 1 }}>
                 Token Id
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell sx={{ py: 1 }}>
-                Is RandomWalk NFT?
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell sx={{ py: 1 }}>
                 Claimed?
@@ -145,7 +135,7 @@ const GlobalStakingRewardsRow = ({ row }) => {
   return (
     <>
       <TablePrimaryRow sx={{ borderBottom: 0 }}>
-        <TablePrimaryCell>
+        <TablePrimaryCell sx={{ p: 0 }}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -187,6 +177,7 @@ const GlobalStakingRewardsRow = ({ row }) => {
             {row.RoundNum}
           </Link>
         </TablePrimaryCell>
+        <TablePrimaryCell align="center">{row.DepositId}</TablePrimaryCell>
         <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
         <TablePrimaryCell align="center">
           {row.TotalDepositAmountEth.toFixed(6)}
@@ -205,7 +196,7 @@ const GlobalStakingRewardsRow = ({ row }) => {
         </TablePrimaryCell>
       </TablePrimaryRow>
       <TablePrimaryRow sx={{ borderTop: 0 }}>
-        <TablePrimaryCell sx={{ py: 0 }} colSpan={10}>
+        <TablePrimaryCell sx={{ py: 0 }} colSpan={11}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1, marginBottom: 4 }}>
               <Typography variant="subtitle1" gutterBottom component="div">
@@ -221,7 +212,7 @@ const GlobalStakingRewardsRow = ({ row }) => {
 };
 
 export const GlobalStakingRewardsTable = ({ list }) => {
-  const perPage = 10;
+  const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
@@ -232,15 +223,14 @@ export const GlobalStakingRewardsTable = ({ list }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell />
-              <TablePrimaryHeadCell align="left" sx={{ minWidth: "165px" }}>
+              <TablePrimaryHeadCell sx={{ p: 0 }} />
+              <TablePrimaryHeadCell align="left">
                 Stake Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staker</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell sx={{ minWidth: "120px" }}>
-                Total Staked Tokens
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Deposited</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staked Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Fully Claimed?</TablePrimaryHeadCell>

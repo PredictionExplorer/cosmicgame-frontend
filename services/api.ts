@@ -576,10 +576,10 @@ class ApiService {
     }
   }
 
-  public async get_staking_rewards() {
+  public async get_staking_cst_rewards() {
     try {
-      const { data } = await axios.get(getAPIUrl("staking/rewards/global/0/10000"));
-      return data.StakingRewards;
+      const { data } = await axios.get(getAPIUrl("staking/cst/rewards/global/0/10000"));
+      return data.StakingCSTRewards;
     } catch (err) {
       console.log(err);
       return [];
