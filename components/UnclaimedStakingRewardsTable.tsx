@@ -644,7 +644,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
           the current date.
         </Typography>
       </Box>
-      {account === owner && list.length > 0 && (
+      {account === owner && claimableActionIds.length > 0 && (
         <Box display="flex" justifyContent="end" mt={1}>
           <Button
             variant="contained"

@@ -177,7 +177,7 @@ const NewHome = () => {
       const balance = await cosmicSignatureContract.totalSupply();
       let token_id = balance.toNumber() - 1;
       const count =
-        data?.NumRaffleNFTWinners + data?.NumHolderNFTWinners * 2 + 1;
+        data?.numRaffleNFTWinnersBidding + data?.NumHolderNFTWinners * 2 + 1;
       await Promise.all(
         Array(count)
           .fill(1)
@@ -1191,8 +1191,8 @@ const NewHome = () => {
           >
             you are also buying a raffle ticket. When the round ends, there
             are&nbsp;
-            {data?.NumRaffleEthWinners +
-              data?.NumRaffleNFTWinners +
+            {data?.numRaffleETHWinnersBidding +
+              data?.numRaffleNFTWinnersBidding +
               data?.NumHolderNFTWinners * 2}
             &nbsp;raffle winners:
           </Typography>

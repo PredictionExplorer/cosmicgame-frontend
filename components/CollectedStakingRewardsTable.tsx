@@ -213,7 +213,7 @@ export const CollectedStakingRewardsTable = ({ list }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell />
-              <TablePrimaryHeadCell align="left" sx={{ minWidth: "185px" }}>
+              <TablePrimaryHeadCell align="left" sx={{ minWidth: "145px" }}>
                 Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
@@ -235,8 +236,50 @@ const MyStaking = () => {
           <>
             <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={stakingTable} onChange={handleTabChange}>
-                <Tab label={<Typography>CosmicSignature Token</Typography>} />
-                <Tab label={<Typography>RandomWalk Token</Typography>} />
+                <Tab
+                  label={
+                    <Box sx={{ display: "flex" }}>
+                      <Image
+                        src={"/images/CosmicSignatureNFT.png"}
+                        width={60}
+                        height={60}
+                        alt="cosmic signature nft"
+                      />
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          whiteSpace: "nowrap",
+                          textTransform: "none",
+                          ml: 2,
+                        }}
+                      >
+                        CST Staking
+                      </Typography>
+                    </Box>
+                  }
+                />
+                <Tab
+                  label={
+                    <Box sx={{ display: "flex" }}>
+                      <Image
+                        src={"/images/rwalk.jpg"}
+                        width={94}
+                        height={60}
+                        alt="RandomWalk nft"
+                      />
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          whiteSpace: "nowrap",
+                          textTransform: "none",
+                          ml: 2,
+                        }}
+                      >
+                        Rwalk Staking
+                      </Typography>
+                    </Box>
+                  }
+                />
               </Tabs>
             </Box>
             <CustomTabPanel value={stakingTable} index={0}>
@@ -247,7 +290,7 @@ const MyStaking = () => {
                 <UnclaimedStakingRewardsTable
                   list={unclaimedStakingRewards}
                   owner={account}
-                  fetchData={fetchRWLKData}
+                  fetchData={fetchCSTData}
                 />
               </Box>
               <Box>
