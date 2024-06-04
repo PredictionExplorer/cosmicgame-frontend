@@ -242,7 +242,11 @@ const MyStaking = () => {
         ) : (
           <>
             <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
-              <Tabs value={stakingTable} onChange={handleTabChange}>
+              <Tabs
+                variant="fullWidth"
+                value={stakingTable}
+                onChange={handleTabChange}
+              >
                 <Tab
                   label={
                     <Box sx={{ display: "flex" }}>
