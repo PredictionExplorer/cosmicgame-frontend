@@ -73,7 +73,7 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
           ) : (
             <>
               <LayersIcon />
-              &nbsp;<span>Staking Deposit / Reward</span>
+              &nbsp;<span>RWalk Staking Raffle Token</span>
             </>
           )}
           &nbsp;

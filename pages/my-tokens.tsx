@@ -84,7 +84,7 @@ const CSTRow = ({ nft }) => {
             Prize Winner (#{nft.RoundNum})
           </Link>
         ) : nft.RecordType === 4 ? (
-          "Staking Deposit / Reward"
+          "RWalk Staking Raffle Token"
         ) : (
           "Raffle Winner"
         )}

@@ -117,7 +117,10 @@ const Header = () => {
             isMobileView={false}
             loading={loading}
             balance={balance}
-            stakedTokenCount={stakedCSTokens?.length + stakedRWLKTokens?.length}
+            stakedTokenCount={{
+              cst: stakedCSTokens?.length,
+              rwalk: stakedRWLKTokens?.length,
+            }}
           />
         }
       </Toolbar>
@@ -162,9 +165,10 @@ const Header = () => {
                 isMobileView
                 balance={balance}
                 loading={loading}
-                stakedTokenCount={
-                  stakedCSTokens?.length + stakedRWLKTokens?.length
-                }
+                stakedTokenCount={{
+                  cst: stakedCSTokens?.length,
+                  rwalk: stakedRWLKTokens?.length,
+                }}
               />
             </ListItem>
             {navs.map((nav, i) => (
@@ -292,12 +296,21 @@ const Header = () => {
                 </ListItem>
                 <Divider />
                 <ListItem sx={{ justifyContent: "space-between" }}>
-                  <Typography sx={{ fontSize: 16 }}>STAKED TOKENS:</Typography>
+                  <Typography sx={{ fontSize: 16 }}>STAKED CST:</Typography>
                   <Typography
                     color="secondary"
                     sx={{ fontSize: 16, fontWeight: 600 }}
                   >
-                    {stakedCSTokens?.length + stakedRWLKTokens?.length}
+                    {stakedCSTokens?.length}
+                  </Typography>
+                </ListItem>
+                <ListItem sx={{ justifyContent: "space-between" }}>
+                  <Typography sx={{ fontSize: 16 }}>STAKED RWALK:</Typography>
+                  <Typography
+                    color="secondary"
+                    sx={{ fontSize: 16, fontWeight: 600 }}
+                  >
+                    {stakedRWLKTokens?.length}
                   </Typography>
                 </ListItem>
               </>

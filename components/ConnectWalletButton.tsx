@@ -204,9 +204,17 @@ const ConnectWalletButton = ({
           <MenuItem
             style={{ pointerEvents: "none", justifyContent: "space-between" }}
           >
-            <Typography sx={{ fontSize: "inherit" }}>STAKED TOKENS:</Typography>
+            <Typography sx={{ fontSize: "inherit" }}>STAKED CST:</Typography>
             <Typography color="primary" sx={{ fontSize: "inherit" }}>
-              {stakedTokenCount}
+              {stakedTokenCount.cst}
+            </Typography>
+          </MenuItem>
+          <MenuItem
+            style={{ pointerEvents: "none", justifyContent: "space-between" }}
+          >
+            <Typography sx={{ fontSize: "inherit" }}>STAKED RWALK:</Typography>
+            <Typography color="primary" sx={{ fontSize: "inherit" }}>
+              {stakedTokenCount.rwalk}
             </Typography>
           </MenuItem>
         </Menu>
