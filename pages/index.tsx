@@ -1195,7 +1195,7 @@ const NewHome = () => {
           >
             you are also buying a raffle ticket. When the round ends, there
             are&nbsp;
-            {data?.NumRaffleETHWinnersBidding +
+            {data?.NumRaffleEthWinnersBidding +
               data?.NumRaffleNFTWinnersBidding}
             &nbsp;raffle winners:
           </Typography>
