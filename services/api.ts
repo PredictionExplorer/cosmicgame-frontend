@@ -665,6 +665,16 @@ class ApiService {
       return [];
     }
   }
+
+  public async get_staking_rwalk_mints_by_user(address: string) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`staking/rwalk/mints/by_user/${address}`));
+      return data.RWalkStakingRewardMints;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
 }
 
 export default new ApiService();

@@ -20,6 +20,7 @@ import { StakedTokensTable } from "../components/StakedTokensTable";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import { RWLKNFTTable } from "../components/RWLKNFTTable";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
+import { RWalkStakingRewardMintsTable } from "../components/RWalkStakingRewardMintsTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -53,6 +54,7 @@ const MyStaking = () => {
   const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
   const [CSTokens, setCSTokens] = useState([]);
   const [rwlkTokens, setRwlkTokens] = useState([]);
+  const [rwlkMints, setRwlkMints] = useState([]);
   const [stakingTable, setStakingTable] = useState(0);
   const {
     cstokens: stakedCSTokens,
@@ -194,6 +196,8 @@ const MyStaking = () => {
   const fetchRWLKData = async (addr: string) => {
     const stakingActions = await api.get_staking_rwalk_actions_by_user(addr);
     setStakingRWLKActions(stakingActions);
+    const mints = await api.get_staking_rwalk_mints_by_user(addr);
+    setRwlkMints(mints);
     fetchStakedTokens();
     const rwlkStaked = stakedRWLKTokens.map((x) => x.StakedTokenId);
     const tokens = await nftContract.walletOfOwner(account);
@@ -330,6 +334,12 @@ const MyStaking = () => {
             <CustomTabPanel value={stakingTable} index={1}>
               <Box>
                 <Typography variant="h6" lineHeight={1} mb={2}>
+                  RWalk Token Staking Reward Mints
+                </Typography>
+                <RWalkStakingRewardMintsTable list={rwlkMints} />
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                   Stake / Unstake Actions
                 </Typography>
                 <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
