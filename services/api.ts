@@ -675,6 +675,16 @@ class ApiService {
       return [];
     }
   }
+
+  public async get_staking_cst_mints_by_user(address: string) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`staking/cst/mints/by_user/${address}`));
+      return data.CSTStakingRewardMints;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
 }
 
 export default new ApiService();

@@ -20,7 +20,7 @@ import { StakedTokensTable } from "../components/StakedTokensTable";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import { RWLKNFTTable } from "../components/RWLKNFTTable";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
-import { RWalkStakingRewardMintsTable } from "../components/RWalkStakingRewardMintsTable";
+import { StakingRewardMintsTable } from "../components/StakingRewardMintsTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -55,6 +55,7 @@ const MyStaking = () => {
   const [CSTokens, setCSTokens] = useState([]);
   const [rwlkTokens, setRwlkTokens] = useState([]);
   const [rwlkMints, setRwlkMints] = useState([]);
+  const [cstMints, setCSTMints] = useState([]);
   const [stakingTable, setStakingTable] = useState(0);
   const {
     cstokens: stakedCSTokens,
@@ -189,6 +190,8 @@ const MyStaking = () => {
     setStakingCSTActions(stakingActions);
     const CSTokens = await api.get_cst_tokens_by_user(addr);
     setCSTokens(CSTokens);
+    const mints = await api.get_staking_cst_mints_by_user(addr);
+    setCSTMints(mints);
     fetchStakedTokens();
     setLoading(false);
   };
@@ -305,6 +308,12 @@ const MyStaking = () => {
               </Box>
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                  CST Staking Reward Mints
+                </Typography>
+                <StakingRewardMintsTable list={cstMints} IsRwalk={false} />
+              </Box>
+              <Box>
+                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                   Stake / Unstake Actions
                 </Typography>
                 <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
@@ -336,7 +345,7 @@ const MyStaking = () => {
                 <Typography variant="h6" lineHeight={1} mb={2}>
                   RWalk Token Staking Reward Mints
                 </Typography>
-                <RWalkStakingRewardMintsTable list={rwlkMints} />
+                <StakingRewardMintsTable list={rwlkMints} IsRwalk={true} />
               </Box>
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>

@@ -12,7 +12,7 @@ import { Tbody, Tr } from "react-super-responsive-table";
 import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
-const RWalkStakingRewardMintsRow = ({ row }) => {
+const StakingRewardMintsRow = ({ row, IsRwalk }) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -51,7 +51,11 @@ const RWalkStakingRewardMintsRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`https://randomwalknft.com/detail/${row.TokenId}`}
+          href={
+            IsRwalk
+              ? `https://randomwalknft.com/detail/${row.TokenId}`
+              : `/detail/${row.TokenId}`
+          }
           style={{ color: "inherit", fontSize: "inherit" }}
         >
           {row.TokenId}
@@ -61,7 +65,7 @@ const RWalkStakingRewardMintsRow = ({ row }) => {
   );
 };
 
-export const RWalkStakingRewardMintsTable = ({ list }) => {
+export const StakingRewardMintsTable = ({ list, IsRwalk }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -81,7 +85,11 @@ export const RWalkStakingRewardMintsTable = ({ list }) => {
           </TablePrimaryHead>
           <Tbody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <RWalkStakingRewardMintsRow row={row} key={row.EvtLogId} />
+              <StakingRewardMintsRow
+                row={row}
+                key={row.EvtLogId}
+                IsRwalk={IsRwalk}
+              />
             ))}
           </Tbody>
         </TablePrimary>
