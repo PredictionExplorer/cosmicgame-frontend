@@ -59,7 +59,7 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -440,6 +440,22 @@ const Statistics = () => {
                 value={data.MainStats.NumUniqueWinners}
               />
               <StatisticsItem
+                title="Number of Raffle Eth Bidding Winners"
+                value={data.NumRaffleEthWinnersBidding}
+              />
+              <StatisticsItem
+                title="Number of Raffle NFT Bidding Winners"
+                value={data.NumRaffleNFTWinnersBidding}
+              />
+              <StatisticsItem
+                title="Number of Raffle NFT CST Staking Winners"
+                value={data.NumRaffleNFTWinnersStakingCST}
+              />
+              <StatisticsItem
+                title="Number of Raffle NFT RWalk Staking Winners"
+                value={data.NumRaffleNFTWinnersStakingRWalk}
+              />
+              <StatisticsItem
                 title="Number of Donated NFTs"
                 value={
                   <Link
@@ -452,12 +468,24 @@ const Statistics = () => {
                 }
               />
               <StatisticsItem
+                title="Number of Direct Donations"
+                value={data.MainStats.NumDirectDonations}
+              />
+              <StatisticsItem
                 title="Amount of Cosmic Signature Tokens with assigned name"
                 value={
                   <Link color="inherit" fontSize="inherit" href="/named-nfts">
                     {data.MainStats.TotalNamedTokens}
                   </Link>
                 }
+              />
+              <StatisticsItem
+                title="Number of Unique CST Stakers"
+                value={data.MainStats.NumUniqueStakersCST}
+              />
+              <StatisticsItem
+                title="Number of Unique RWalk Stakers"
+                value={data.MainStats.NumUniqueStakersRWalk}
               />
               {/* <StatisticsItem
                 title="Number of Active Stakers"
