@@ -264,7 +264,7 @@ const MyStaking = () => {
                           ml: 2,
                         }}
                       >
-                        CST Staking
+                        Cosmic Signature Staking
                       </Typography>
                     </Box>
                   }
@@ -286,7 +286,7 @@ const MyStaking = () => {
                           ml: 2,
                         }}
                       >
-                        Rwalk Staking
+                        Random Walk Staking
                       </Typography>
                     </Box>
                   }
@@ -306,13 +306,13 @@ const MyStaking = () => {
               </Box>
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Collected Staking Rewards
+                  Collected Staking Deposits
                 </Typography>
                 <CollectedStakingRewardsTable list={collectedStakingRewards} />
               </Box>
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  CST Staking Reward Mints
+                  Reward Tokens
                 </Typography>
                 <StakingRewardMintsTable list={cstMints} IsRwalk={false} />
               </Box>
@@ -347,7 +347,7 @@ const MyStaking = () => {
             <CustomTabPanel value={stakingTable} index={1}>
               <Box>
                 <Typography variant="h6" lineHeight={1} mb={2}>
-                  RWalk Token Staking Reward Mints
+                  Reward Tokens
                 </Typography>
                 <StakingRewardMintsTable list={rwlkMints} IsRwalk={true} />
               </Box>

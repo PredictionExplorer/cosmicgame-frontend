@@ -29,6 +29,7 @@ import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const HistoryRow = ({ history, showClaimedStatus }) => {
+  console.log(history);
   const [tokenURI, setTokenURI] = useState(null);
   useEffect(() => {
     const fetchTokenURI = async () => {
@@ -73,7 +74,7 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
           ) : (
             <>
               <LayersIcon />
-              &nbsp;<span>RWalk Staking Raffle Token</span>
+              &nbsp;<span>Random Walk Staking Raffle Token</span>
             </>
           )}
           &nbsp;
@@ -163,6 +164,17 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
           history.RecordType === 1 || history.RecordType === 3 ? (
             <Link
               href={`/detail/${history.TokenId}`}
+              sx={{
+                fontSize: "inherit",
+                color: "inherit",
+              }}
+              target="_blank"
+            >
+              {history.TokenId}
+            </Link>
+          ) : history.RecordType === 5 ? (
+            <Link
+              href={`https://randomwalknft.com/detail/${history.TokenId}`}
               sx={{
                 fontSize: "inherit",
                 color: "inherit",

@@ -1,7 +1,7 @@
 /** @type {import('next-sitemap').IConfig} */
 
 module.exports = {
-  siteUrl: "https://www.randomwalknft.com/",
+  siteUrl: "https://www.cosmicsignature.com/",
   changefreq: "daily",
   priority: 0.7,
   sitemapSize: 5000,

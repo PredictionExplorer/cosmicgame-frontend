@@ -452,7 +452,7 @@ const Statistics = () => {
                 value={data.NumRaffleNFTWinnersStakingCST}
               />
               <StatisticsItem
-                title="Number of Raffle NFT RWalk Staking Winners"
+                title="Number of Raffle NFT Random Walk Staking Winners"
                 value={data.NumRaffleNFTWinnersStakingRWalk}
               />
               <StatisticsItem
@@ -484,7 +484,7 @@ const Statistics = () => {
                 value={data.MainStats.NumUniqueStakersCST}
               />
               <StatisticsItem
-                title="Number of Unique RWalk Stakers"
+                title="Number of Unique Random Walk Stakers"
                 value={data.MainStats.NumUniqueStakersRWalk}
               />
               {/* <StatisticsItem
