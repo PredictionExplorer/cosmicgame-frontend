@@ -16,7 +16,6 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
       try {
         setLoading(true);
         const info = await api.get_staking_cst_actions_info(actionId);
-        console.log(info);
         setActionInfo(info);
         setLoading(false);
       } catch (e) {
@@ -36,7 +35,9 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
       <MainWrapper>
         <Box mb={4}>
           <Typography variant="h4" color="primary" component="span" mr={2}>
-            {`Staking Action Id=${actionId}`}
+            {`Staking Action for ${
+              IsRwalk ? "RandomWalk" : "Cosmic Signature"
+            } Token`}
           </Typography>
           <Typography variant="h4" component="span">
             Information
@@ -78,12 +79,10 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Is RandomWalk Token?
+                    Action Id:
                   </Typography>
                   &nbsp;
-                  <Typography component="span">
-                    {IsRwalk ? "Yes" : "No"}
-                  </Typography>
+                  <Typography component="span">{actionId}</Typography>
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">

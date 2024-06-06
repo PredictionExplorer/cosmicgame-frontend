@@ -71,11 +71,23 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
               <EmojiEventsIcon />
               &nbsp;<span>Main Prize</span>
             </>
-          ) : (
+          ) : history.RecordType === 4 ? (
+            <>
+              <EmojiEventsIcon />
+              &nbsp;<span>Cosmic Signature Staking ETH Deposit</span>
+            </>
+          ) : history.RecordType === 5 ? (
             <>
               <LayersIcon />
               &nbsp;<span>Random Walk Staking Raffle Token</span>
             </>
+          ) : history.RecordType === 6 ? (
+            <>
+              <LayersIcon />
+              &nbsp;<span>Cosmic Signature Staking Raffle Token</span>
+            </>
+          ) : (
+            " "
           )}
           &nbsp;
           {!history.Claimed && showClaimedStatus && (
@@ -110,7 +122,11 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {history.RecordType === 1 ? " " : history.AmountEth.toFixed(4)}
+        {history.RecordType === 1 ||
+        history.RecordType === 5 ||
+        history.RecordType === 6
+          ? "N/A"
+          : history.AmountEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.RecordType === 0 ? (
@@ -172,7 +188,7 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
             >
               {history.TokenId}
             </Link>
-          ) : history.RecordType === 5 ? (
+          ) : history.RecordType === 5 || history.RecordType === 6 ? (
             <Link
               href={`https://randomwalknft.com/detail/${history.TokenId}`}
               sx={{
