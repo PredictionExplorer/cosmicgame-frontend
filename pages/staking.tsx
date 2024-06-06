@@ -28,7 +28,7 @@ const Staking = () => {
           gutterBottom
           textAlign="center"
         >
-          Staking Rewards
+          Staking Rewards for staking Cosmic Signature Token
         </Typography>
         <Typography
           variant="h5"

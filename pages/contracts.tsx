@@ -123,22 +123,22 @@ const Contracts = () => {
                 copyable={true}
               />
               <ContractItem
-                name="CosmicGame Address"
+                name="Cosmic Game Address"
                 value={data?.ContractAddrs.CosmicGameAddr}
                 copyable={true}
               />
               <ContractItem
-                name="CosmicToken Address"
+                name="Cosmic Token Address"
                 value={data?.ContractAddrs.CosmicTokenAddr}
                 copyable={true}
               />
               <ContractItem
-                name="CosmicSignature Address"
+                name="Cosmic Signature Address"
                 value={data?.ContractAddrs.CosmicSignatureAddr}
                 copyable={true}
               />
               <ContractItem
-                name="CosmicDAO Address"
+                name="Cosmic DAO Address"
                 value={data?.ContractAddrs.CosmicDaoAddr}
                 copyable={true}
               />
@@ -158,8 +158,13 @@ const Contracts = () => {
                 copyable={true}
               />
               <ContractItem
-                name="Staking Wallet Address"
-                value={data?.ContractAddrs.StakingWalletAddr}
+                name="Cosmic Signature Staking Wallet Address"
+                value={data?.ContractAddrs.StakingWalletCSTAddr}
+                copyable={true}
+              />
+              <ContractItem
+                name="Random Walk Staking Wallet Address"
+                value={data?.ContractAddrs.StakingWalletRWalkAddr}
                 copyable={true}
               />
             </List>
@@ -178,20 +183,20 @@ const Contracts = () => {
                 value={`${data.RafflePercentage}%`}
               />
               <ContractItem
-                name="NFT Holder Winners"
-                value={data.NumHolderNFTWinners}
+                name="Raffle ETH Winners for Bidding"
+                value={data.NumRaffleEthWinnersBidding}
               />
               <ContractItem
-                name="Raffle ETH Winners"
-                value={data.NumRaffleEthWinners}
+                name="Raffle NFT Winners for Bidding"
+                value={data.NumRaffleNFTWinnersBidding}
               />
               <ContractItem
-                name="Raffle NFT Winners"
-                value={data.NumRaffleNFTWinners}
+                name="Raffle NFT Winners for Staking CST"
+                value={data.NumRaffleNFTWinnersStakingCST}
               />
               <ContractItem
-                name="Raffle Holder NFT Winners"
-                value={data.NumHolderNFTWinners}
+                name="Raffle NFT Winners for Staking Random Walk"
+                value={data.NumRaffleNFTWinnersStakingRWalk}
               />
               <ContractItem
                 name="Charity Address"

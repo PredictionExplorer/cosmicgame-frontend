@@ -314,7 +314,7 @@ const MyStaking = () => {
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                   Reward Tokens
                 </Typography>
-                <StakingRewardMintsTable list={cstMints} IsRwalk={false} />
+                <StakingRewardMintsTable list={cstMints} />
               </Box>
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
@@ -349,7 +349,7 @@ const MyStaking = () => {
                 <Typography variant="h6" lineHeight={1} mb={2}>
                   Reward Tokens
                 </Typography>
-                <StakingRewardMintsTable list={rwlkMints} IsRwalk={true} />
+                <StakingRewardMintsTable list={rwlkMints} />
               </Box>
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
