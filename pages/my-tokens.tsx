@@ -1,12 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Alert,
-  Box,
-  Link,
-  Pagination,
-  TableBody,
-  Typography,
-} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
 import Head from "next/head";
 import {
   MainWrapper,
@@ -19,9 +12,7 @@ import {
 } from "../components/styled";
 import { convertTimestampToDateTime } from "../utils";
 import { useActiveWeb3React } from "../hooks/web3";
-import { useRouter } from "next/router";
 import { useApiData } from "../contexts/ApiDataContext";
-import Fireworks, { FireworksHandlers } from "@fireworks-js/react";
 import api from "../services/api";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
@@ -142,21 +133,12 @@ const CSTTable = ({ list }) => {
 };
 
 const MyWallet = () => {
-  const router = useRouter();
-  const ref = useRef<FireworksHandlers>(null);
   const { account } = useActiveWeb3React();
   const { apiData: status } = useApiData();
   const [CSTList, setCSTList] = useState({
     data: [],
     loading: false,
   });
-  const [finishFireworks, setFinishFireworks] = useState(false);
-
-  const handleFireworksClick = () => {
-    ref.current.stop();
-    setFinishFireworks(true);
-  };
-
   const fetchCSTList = async (updateStatus) => {
     setCSTList((prev) => ({ ...prev, loading: updateStatus && true }));
     let cstList = await api.get_cst_list_by_user(account);
@@ -176,36 +158,6 @@ const MyWallet = () => {
         <meta name="description" content="" />
       </Head>
       <MainWrapper>
-        {router.query && router.query.message && (
-          <>
-            <Box px={8} mb={8} sx={{ zIndex: 10002, position: "relative" }}>
-              <Alert
-                variant="filled"
-                severity="success"
-                sx={{ boxShadow: "3px 3px 4px 1px #ffffff7f" }}
-              >
-                {router.query.message === "success"
-                  ? "Congratulations! You claimed the prize successfully."
-                  : ""}
-              </Alert>
-            </Box>
-            {!finishFireworks && (
-              <Fireworks
-                ref={ref}
-                options={{ opacity: 0.5 }}
-                style={{
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  position: "fixed",
-                  zIndex: 10000,
-                }}
-                onClick={handleFireworksClick}
-              />
-            )}
-          </>
-        )}
         <Typography
           variant="h4"
           color="primary"

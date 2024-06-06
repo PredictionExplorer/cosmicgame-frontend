@@ -196,8 +196,9 @@ const NewHome = () => {
           })
       );
       router.push({
-        pathname: "/my-tokens",
+        pathname: "/prize-claimed",
         query: {
+          round: data?.CurRoundNum,
           message: "success",
         },
       });
