@@ -50,7 +50,7 @@ const PrizeInfo = ({ roundNum }) => {
       setPrizeInfo(prizeInfo);
       const bidHistory = await api.get_bid_list_by_round(roundNum, "desc");
       setBidHistory(bidHistory);
-      const stakingRewards = await api.get_staking_rewards_by_round(roundNum);
+      const stakingRewards = await api.get_staking_cst_rewards_by_round(roundNum);
       setStakingRewards(stakingRewards);
       setLoading(false);
     };

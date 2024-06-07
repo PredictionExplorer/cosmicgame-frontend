@@ -64,7 +64,12 @@ const StakingWinnerTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
-    return <Typography>No rewards yet.</Typography>;
+    return (
+      <Typography>
+        There were no staked tokens at the time round ended, the deposit amount
+        was sent to charity address.
+      </Typography>
+    );
   }
   return (
     <>

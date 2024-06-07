@@ -124,10 +124,10 @@ const StakedTokensRow = ({
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(row.StakeTimeStamp - offset)}
+        {convertTimestampToDateTime(row.StakeTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(row.UnstakeTimeStamp - offset)}
+        {convertTimestampToDateTime(row.UnstakeTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {row.UnstakeTimeStamp <= Date.now() / 1000 + offset && (

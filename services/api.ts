@@ -626,10 +626,10 @@ class ApiService {
     }
   }
 
-  public async get_staking_rewards_by_round(round: number) {
+  public async get_staking_cst_rewards_by_round(round: number) {
     try {
-      const { data } = await axios.get(getAPIUrl(`staking/rewards/by_round/${round}`));
-      return data.Winners;
+      const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/by_round/${round}`));
+      return data.Rewards;
     } catch (err) {
       console.log(err);
       return [];
