@@ -206,7 +206,7 @@ const MyStaking = () => {
     const tokens = await nftContract.walletOfOwner(account);
     const nftIds = tokens
       .map((t) => t.toNumber())
-      .reverse()
+      .sort()
       .filter((x) => !rwlkStaked.includes(x));
     setRwlkTokens(nftIds);
   };

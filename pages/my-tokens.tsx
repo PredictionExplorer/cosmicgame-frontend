@@ -10,20 +10,28 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../components/styled";
-import { convertTimestampToDateTime } from "../utils";
+import { convertTimestampToDateTime, shortenHex } from "../utils";
 import { useActiveWeb3React } from "../hooks/web3";
 import { useApiData } from "../contexts/ApiDataContext";
 import api from "../services/api";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import NFTImage from "../components/NFTImage";
 
 const CSTRow = ({ nft }) => {
+  const getTokenImageURL = () => {
+    const fileName = nft.TokenId.toString().padStart(6, "0");
+    return `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.png`;
+  };
   if (!nft) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
+      <TablePrimaryCell sx={{ width: "120px" }}>
+        <NFTImage src={getTokenImageURL()} />
+      </TablePrimaryCell>
       <TablePrimaryCell>
         <Link
           color="inherit"
@@ -60,7 +68,7 @@ const CSTRow = ({ nft }) => {
             fontFamily: "monospace",
           }}
         >
-          {nft.WinnerAddr}
+          {shortenHex(nft.WinnerAddr, 6)}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -85,7 +93,7 @@ const CSTRow = ({ nft }) => {
 };
 
 const CSTTable = ({ list }) => {
-  const perPage = 10;
+  const perPage = 5;
   const [curPage, setCurPage] = useState(1);
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
@@ -97,6 +105,7 @@ const CSTTable = ({ list }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
+              <TablePrimaryHeadCell />
               <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
