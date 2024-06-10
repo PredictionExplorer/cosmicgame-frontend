@@ -19,7 +19,7 @@ import { convertTimestampToDateTime, shortenHex } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 
-const WinnerRow = ({ winner, type }) => {
+const WinnerRow = ({ winner }) => {
   if (!winner) {
     return <TablePrimaryRow />;
   }
@@ -58,7 +58,15 @@ const WinnerRow = ({ winner, type }) => {
           {winner.RoundNum}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell>{type}</TablePrimaryCell>
+      <TablePrimaryCell>
+        {winner.Amount
+          ? "ETH Deposit"
+          : winner.IsStaker && winner.IsRwalk
+          ? "Random Walk Staking Raffle Token"
+          : winner.IsStaker && !winner.IsRwalk
+          ? "Cosmic Signature Staking Raffle Token"
+          : "Cosmic Signature Token"}
+      </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {winner.Amount ? `${winner.Amount.toFixed(4)} ETH` : " "}
       </TablePrimaryCell>
@@ -81,6 +89,7 @@ const WinnerRow = ({ winner, type }) => {
 const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
   const perPage = 5;
   const list = [...RaffleETHDeposits, ...RaffleNFTWinners];
+  console.log(list);
   const [page, setPage] = useState(1);
   if (list.length === 0) {
     return <Typography>No winners yet.</Typography>;
@@ -105,11 +114,7 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((winner) => (
-              <WinnerRow
-                key={winner.EvtLogId}
-                winner={winner}
-                type={winner.Amount ? "ETH Deposit" : "Cosmic Signature Token"}
-              />
+              <WinnerRow key={winner.EvtLogId} winner={winner} />
             ))}
           </TableBody>
         </TablePrimary>

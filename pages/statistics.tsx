@@ -540,13 +540,13 @@ const Statistics = () => {
             </Box>
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
-                Cosmic Signature Token Distribution
+                Cosmic Signature Token (ERC721) Distribution
               </Typography>
               <CSTokenDistributionTable list={cstDistribution} />
             </Box>
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
-                Cosmic Token Balance Distribution
+                Cosmic Token (ERC20) Balance Distribution
               </Typography>
               {ctBalanceDistribution.length > 0 && (
                 <Chart
