@@ -29,7 +29,6 @@ import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
 const HistoryRow = ({ history, showClaimedStatus }) => {
-  console.log(history);
   const [tokenURI, setTokenURI] = useState(null);
   useEffect(() => {
     const fetchTokenURI = async () => {

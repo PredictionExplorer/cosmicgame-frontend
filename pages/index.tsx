@@ -566,7 +566,7 @@ const NewHome = () => {
         );
         const raffle =
           (curRoundBids.length / curBidList.length) *
-          data?.NumRaffleETHWinnersBidding *
+          data?.NumRaffleEthWinnersBidding *
           100;
         const nft =
           (curRoundBids.length / curBidList.length) *
