@@ -52,6 +52,11 @@ const FAQ = () => {
         'After winning Cosmic Signature Tokens in Raffles you can stake them and continue earning income. Staking pays 10% of CosmicGame contract balance on each round, and this amount is distributed equally between the owners of all staked tokens. To stake tokens go to "MY STAKING" page (available from your account balance menu).',
     },
     {
+      summary: "What types of Staking are available?",
+      detail:
+        'We have two types of staking: RandomWalk staking and CosmicSignature (ERC721) staking. RandomWalk staking only allows you to participate in each round to win a raffle NFT (CosmicSignature ERC721). CosmicSignature staking allows you to earn ETH and also earn raffle NFTs on each round. The contract variables that control the number of winners for each type of staking are "NumRaffleNFTWinnersStakingCST" and "NumRaffleNFTWinnersStakingRWalk", which can be modified by the community of players.',
+    },
+    {
       summary: "What is the connection with RandomWalkNFT?",
       detail:
         "If you're a RandomWalkNFT holder, you can bid with 50% discount in Cosmic Game, this feature adds an extra layer of excitement and opportunity to the game.",
@@ -84,12 +89,12 @@ const FAQ = () => {
     {
       summary: "Can I participate if I don't own any NFTs?",
       detail:
-        "Yes, anyone can participate in the Cosmic Signature game by placing a bid. You do not need to own an NFT to bid, but owning a RandomWalkNFT allows you to place a bid for free.",
+        "Yes, anyone can participate in the Cosmic Signature game by placing a bid. You do not need to own an NFT to bid, but owning a RandomWalkNFT gives you 50% discount on bid price.",
     },
     {
       summary: "How can other NFT projects donate their NFTs to the game?",
       detail:
-        "Projects interested in donating their NFTs to the Cosmic Signature pot can get in touch with us through our website. Their NFTs will be displayed on the Cosmic Signature page for the duration of the round, providing visibility and marketing for their project.",
+        'Projects interested in donating their NFTs to the Cosmic Signature pot can use "Advanced options" in the bid pane. Just provide the contract address and tokenId and hit the Bid button. Donated token will change ownership to CosmicGame contract and will be given to the main prize winner after round ends. This is a good opportunity to provide visibility and marketing for your project.',
     },
     {
       summary: "How many Cosmic Signature NFTs are minted each round?",

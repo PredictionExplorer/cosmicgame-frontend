@@ -93,9 +93,12 @@ const PrizeClaimed = () => {
                   {prizeInfo.TokenId}
                 </Link>
               </Typography>
-              <Typography variant="subtitle1">
-                {prizeInfo.RoundStats.TotalDonatedNFTs} donated tokens (ERC721)
-              </Typography>
+              {!!prizeInfo.RoundStats.TotalDonatedNFTs && (
+                <Typography variant="subtitle1">
+                  {prizeInfo.RoundStats.TotalDonatedNFTs} donated tokens
+                  (ERC721)
+                </Typography>
+              )}
             </Box>
             <Typography variant="subtitle2" mt={4}>
               There also could be random rewards from raffles, to check your
