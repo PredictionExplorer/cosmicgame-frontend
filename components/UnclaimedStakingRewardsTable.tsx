@@ -110,6 +110,7 @@ const UnclaimedStakingRewardsRow = ({
   owner,
   offset,
   handleUnstakeClaimRestake,
+  showWaitingTokensColumn,
 }) => {
   const { account } = useActiveWeb3React();
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
@@ -212,7 +213,7 @@ const UnclaimedStakingRewardsRow = ({
         <TablePrimaryCell align="right">
           {claimableActionIds.length}
         </TablePrimaryCell>
-        {stakedTokens.length > 0 && (
+        {showWaitingTokensColumn && (
           <TablePrimaryCell align="right">
             <Box
               sx={{
@@ -464,6 +465,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const [offset, setOffset] = useState(undefined);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
+  const [waitingActionIds, setWaitingActionIds] = useState([]);
   const [notification, setNotification] = useState<{
     text: string;
     type: "success" | "info" | "warning" | "error";
@@ -550,16 +552,19 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     };
     const fetchActionIds = async () => {
       let cl_actionIds = [],
-        us_actionIds = [];
+        us_actionIds = [],
+        wa_actionIds = [];
       await Promise.all(
         list.map(async (item) => {
           const depositId = item.DepositId;
           const {
             claimableActionIds: cl,
             unstakeableActionIds: us,
+            waitingActionIds: wa,
           } = await fetchInfo(account, depositId, stakedActionIds);
           cl_actionIds = cl_actionIds.concat(cl);
           us_actionIds = us_actionIds.concat(us);
+          wa_actionIds = wa_actionIds.concat(wa);
         })
       );
       setClaimableActionIds(cl_actionIds);
@@ -567,6 +572,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         return index === us_actionIds.findIndex((o) => o === item);
       });
       setUnstakeableActionIds(us_actionIds);
+      setWaitingActionIds(wa_actionIds);
     };
     fetchActionIds();
     calculateOffset();
@@ -618,7 +624,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
               <TablePrimaryHeadCell align="right">
                 Claimable Tokens
               </TablePrimaryHeadCell>
-              {stakedTokens.length > 0 && (
+              {waitingActionIds.length > 0 && (
                 <TablePrimaryHeadCell align="right">
                   Wait Period Tokens
                 </TablePrimaryHeadCell>
@@ -636,6 +642,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
                 owner={owner}
                 handleUnstakeClaimRestake={handleUnstakeClaimRestake}
                 offset={offset}
+                showWaitingTokensColumn={waitingActionIds.length > 0}
               />
             ))}
           </TableBody>
