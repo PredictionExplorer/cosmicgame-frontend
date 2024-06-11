@@ -536,7 +536,7 @@ const UserInfo = ({ address }) => {
                       &nbsp;
                       <Typography component="span">
                         {
-                          userInfo.StakingStatistics.CSTStakingInfo
+                          userInfo.StakingStatistics.RWalkStakingInfo
                             .TotalTokensMinted
                         }
                       </Typography>
@@ -548,7 +548,7 @@ const UserInfo = ({ address }) => {
                       &nbsp;
                       <Typography component="span">
                         {
-                          userInfo.StakingStatistics.CSTStakingInfo
+                          userInfo.StakingStatistics.RWalkStakingInfo
                             .TotalTokensStaked
                         }
                       </Typography>
