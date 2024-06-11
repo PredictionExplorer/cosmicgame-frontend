@@ -80,7 +80,6 @@ const UserInfo = ({ address }) => {
     const { Bids, UserInfo } = await api.get_user_info(addr);
     setBidHistory(Bids);
     setUserInfo(UserInfo);
-    console.log(Bids, UserInfo);
     const balance = await api.get_user_balance(addr);
     if (balance) {
       setBalance({
@@ -238,11 +237,29 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
+                    Number of Cosmic Signature Transfers:
+                  </Typography>
+                  &nbsp;
+                  <Typography component="span">
+                    {userInfo.CosmicSignatureNumTransfers}
+                  </Typography>
+                </Box>
+                <Box mb={1}>
+                  <Typography color="primary" component="span">
+                    Number of Cosmic Token Transfers:
+                  </Typography>
+                  &nbsp;
+                  <Typography component="span">
+                    {userInfo.CosmicTokenNumTransfers}
+                  </Typography>
+                </Box>
+                <Box mb={1}>
+                  <Typography color="primary" component="span">
                     Maximum Bid Amount:
                   </Typography>
                   &nbsp;
                   <Typography component="span">
-                    {userInfo.MaxBidAmount.toFixed(6)} ETH
+                    {formatEthValue(userInfo.MaxBidAmount)}
                   </Typography>
                 </Box>
                 <Box mb={1}>
@@ -322,6 +339,24 @@ const UserInfo = ({ address }) => {
                   &nbsp;
                   <Typography component="span">
                     {userInfo.RaffleNFTWon}
+                  </Typography>
+                </Box>
+                <Box mb={1}>
+                  <Typography color="primary" component="span">
+                    Number of Raffle NFTs Claimed:
+                  </Typography>
+                  &nbsp;
+                  <Typography component="span">
+                    {userInfo.RaffleNFTClaimed}
+                  </Typography>
+                </Box>
+                <Box mb={1}>
+                  <Typography color="primary" component="span">
+                    Number of Cosmic Signature Tokens Won:
+                  </Typography>
+                  &nbsp;
+                  <Typography component="span">
+                    {userInfo.TotalCSTokensWon}
                   </Typography>
                 </Box>
                 <Typography mt={3}>
