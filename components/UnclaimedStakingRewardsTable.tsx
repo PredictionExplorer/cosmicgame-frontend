@@ -38,7 +38,8 @@ import getErrorMessage from "../utils/alert";
 const fetchInfo = async (account, depositId, stakedActionIds) => {
   let unstakeableActionIds = [],
     claimableActionIds = [],
-    claimableAmounts = {};
+    claimableAmounts = {},
+    waitingActionIds = [];
   const response = await api.get_cst_action_ids_by_deposit_id(
     account,
     depositId
@@ -57,6 +58,11 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
           if (stakedActionIds.includes(x.StakeActionId)) {
             unstakeableActionIds.push(x.StakeActionId);
           }
+        } else {
+          waitingActionIds.push({
+            DepositId: x.DepositId,
+            StakeActionId: x.StakeActionId,
+          });
         }
         if (!x.Claimed) {
           if (x.TimeStampDiff > 0) {
@@ -83,6 +89,7 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
     unstakeableActionIds,
     claimableActionIds,
     claimableAmounts,
+    waitingActionIds,
     actionIds: response.filter(
       (x) => x.UnstakeEligibleTimeStamp < current && !x.Claimed
     ),
@@ -107,6 +114,7 @@ const UnclaimedStakingRewardsRow = ({
   const { account } = useActiveWeb3React();
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
+  const [waitingActionIds, setWaitingActionIds] = useState([]);
   const [claimableAmounts, setClaimableAmounts] = useState({});
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDlg, setOpenDlg] = useState(false);
@@ -123,6 +131,7 @@ const UnclaimedStakingRewardsRow = ({
     setUnstakeableActionIds(res.unstakeableActionIds);
     setClaimableActionIds(res.claimableActionIds);
     setClaimableAmounts(res.claimableAmounts);
+    setWaitingActionIds(res.waitingActionIds);
     setStakeState(
       res.actionIds.map((x) => ({
         ...x,
@@ -203,37 +212,39 @@ const UnclaimedStakingRewardsRow = ({
         <TablePrimaryCell align="right">
           {claimableActionIds.length}
         </TablePrimaryCell>
-        <TablePrimaryCell align="right">
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: sm ? "end" : "start",
-            }}
-          >
-            {row.YourTokensStaked - claimableActionIds.length}
-            {Object.keys(claimableAmounts).length > 0 && (
-              <Tooltip
-                title={
-                  <Typography>
-                    You can claim the reward for&nbsp;
-                    {Object.keys(claimableAmounts).map(
-                      (key, index, arr) =>
-                        `${claimableAmounts[key].toFixed(
-                          6
-                        )} ETH in ${formatSeconds(parseInt(key))}${
-                          index !== arr.length - 1 ? ", " : ""
-                        }`
-                    )}
-                  </Typography>
-                }
-                sx={{ ml: 1 }}
-              >
-                <ErrorOutlineIcon fontSize="inherit" />
-              </Tooltip>
-            )}
-          </Box>
-        </TablePrimaryCell>
+        {stakedTokens.length > 0 && (
+          <TablePrimaryCell align="right">
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: sm ? "end" : "start",
+              }}
+            >
+              {waitingActionIds.length}
+              {Object.keys(claimableAmounts).length > 0 && (
+                <Tooltip
+                  title={
+                    <Typography>
+                      You can claim the reward for&nbsp;
+                      {Object.keys(claimableAmounts).map(
+                        (key, index, arr) =>
+                          `${claimableAmounts[key].toFixed(
+                            6
+                          )} ETH in ${formatSeconds(parseInt(key))}${
+                            index !== arr.length - 1 ? ", " : ""
+                          }`
+                      )}
+                    </Typography>
+                  }
+                  sx={{ ml: 1 }}
+                >
+                  <ErrorOutlineIcon fontSize="inherit" />
+                </Tooltip>
+              )}
+            </Box>
+          </TablePrimaryCell>
+        )}
         {account === owner && (
           <TablePrimaryCell align="center">
             {claimableActionIds.length > 0 ? (
@@ -607,9 +618,11 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
               <TablePrimaryHeadCell align="right">
                 Claimable Tokens
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Wait Period Tokens
-              </TablePrimaryHeadCell>
+              {stakedTokens.length > 0 && (
+                <TablePrimaryHeadCell align="right">
+                  Wait Period Tokens
+                </TablePrimaryHeadCell>
+              )}
               {account === owner && (
                 <TablePrimaryHeadCell> </TablePrimaryHeadCell>
               )}
