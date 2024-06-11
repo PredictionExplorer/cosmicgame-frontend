@@ -80,6 +80,7 @@ const UserInfo = ({ address }) => {
     const { Bids, UserInfo } = await api.get_user_info(addr);
     setBidHistory(Bids);
     setUserInfo(UserInfo);
+    console.log(Bids, UserInfo);
     const balance = await api.get_user_balance(addr);
     if (balance) {
       setBalance({
@@ -323,45 +324,7 @@ const UserInfo = ({ address }) => {
                     {userInfo.RaffleNFTWon}
                   </Typography>
                 </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Total Staked Tokens:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    {userInfo.StakingStatistics.TotalTokensStaked}
-                  </Typography>
-                </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Total Number of Stake Actions:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    {userInfo.StakingStatistics.TotalNumStakeActions}
-                  </Typography>
-                </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Total Reward:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    {formatEthValue(userInfo.StakingStatistics.TotalRewardEth)}
-                  </Typography>
-                </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Unclaimed Reward:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    {formatEthValue(
-                      userInfo.StakingStatistics.UnclaimedRewardEth
-                    )}
-                  </Typography>
-                </Box>
-                <Typography mt={1}>
+                <Typography mt={3}>
                   This account has {userInfo.CosmicTokenNumTransfers}{" "}
                   CosmicToken (ERC20), click{" "}
                   <Link href={`/cosmic-token-transfers/${address}`}>here</Link>{" "}
@@ -375,6 +338,200 @@ const UserInfo = ({ address }) => {
                   </Link>{" "}
                   to see all the transfers made by this account.
                 </Typography>
+                <Box>
+                  <Typography variant="h6" lineHeight={1} mt={4}>
+                    Staking Statistics
+                  </Typography>
+                  <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                    <Tabs value={stakingTable} onChange={handleTabChange}>
+                      <Tab
+                        label={<Typography>CosmicSignature Token</Typography>}
+                      />
+                      <Tab label={<Typography>RandomWalk Token</Typography>} />
+                    </Tabs>
+                  </Box>
+                  <CustomTabPanel value={stakingTable} index={0}>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Number of Active Stakers:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.CSTStakingInfo
+                            .NumActiveStakers
+                        }
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Number of Deposits:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {userInfo.StakingStatistics.CSTStakingInfo.NumDeposits}
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Total Number of Stake Actions:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.CSTStakingInfo
+                            .TotalNumStakeActions
+                        }
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Total Number of Unstake Actions:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.CSTStakingInfo
+                            .TotalNumUnstakeActions
+                        }
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Total Rewards:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {formatEthValue(
+                          userInfo.StakingStatistics.CSTStakingInfo
+                            .TotalRewardEth
+                        )}
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Unclaimed Rewards:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {formatEthValue(
+                          userInfo.StakingStatistics.CSTStakingInfo
+                            .UnclaimedRewardEth
+                        )}
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Total Tokens Minted:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.CSTStakingInfo
+                            .TotalTokensMinted
+                        }
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Total Tokens Staked:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.CSTStakingInfo
+                            .TotalTokensStaked
+                        }
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="subtitle1"
+                      lineHeight={1}
+                      mt={4}
+                      mb={2}
+                    >
+                      Stake / Unstake Actions
+                    </Typography>
+                    <StakingActionsTable
+                      list={stakingCSTActions}
+                      IsRwalk={false}
+                    />
+                  </CustomTabPanel>
+                  <CustomTabPanel value={stakingTable} index={1}>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Number of Active Stakers:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.RWalkStakingInfo
+                            .NumActiveStakers
+                        }
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Total Number of Stake Actions:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.RWalkStakingInfo
+                            .TotalNumStakeActions
+                        }
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Total Number of Unstake Actions:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.RWalkStakingInfo
+                            .TotalNumUnstakeActions
+                        }
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Total Tokens Minted:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.CSTStakingInfo
+                            .TotalTokensMinted
+                        }
+                      </Typography>
+                    </Box>
+                    <Box mb={1}>
+                      <Typography color="primary" component="span">
+                        Total Tokens Staked:
+                      </Typography>
+                      &nbsp;
+                      <Typography component="span">
+                        {
+                          userInfo.StakingStatistics.CSTStakingInfo
+                            .TotalTokensStaked
+                        }
+                      </Typography>
+                    </Box>
+                    <Typography
+                      variant="subtitle1"
+                      lineHeight={1}
+                      mt={4}
+                      mb={2}
+                    >
+                      Stake / Unstake Actions
+                    </Typography>
+                    <StakingActionsTable
+                      list={stakingRWLKActions}
+                      IsRwalk={true}
+                    />
+                  </CustomTabPanel>
+                </Box>
                 <Box mt={6}>
                   <Typography variant="h6" lineHeight={1}>
                     Bid History
@@ -407,31 +564,6 @@ const UserInfo = ({ address }) => {
                   <CollectedStakingRewardsTable
                     list={collectedStakingRewards}
                   />
-                </Box>
-                <Box>
-                  <Typography variant="h6" lineHeight={1} mt={4}>
-                    Stake / Unstake Actions
-                  </Typography>
-                  <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                    <Tabs value={stakingTable} onChange={handleTabChange}>
-                      <Tab
-                        label={<Typography>CosmicSignature Token</Typography>}
-                      />
-                      <Tab label={<Typography>RandomWalk Token</Typography>} />
-                    </Tabs>
-                  </Box>
-                  <CustomTabPanel value={stakingTable} index={0}>
-                    <StakingActionsTable
-                      list={stakingCSTActions}
-                      IsRwalk={false}
-                    />
-                  </CustomTabPanel>
-                  <CustomTabPanel value={stakingTable} index={1}>
-                    <StakingActionsTable
-                      list={stakingRWLKActions}
-                      IsRwalk={true}
-                    />
-                  </CustomTabPanel>
                 </Box>
                 {marketingRewards.length > 0 && (
                   <Box>
