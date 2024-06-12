@@ -249,7 +249,7 @@ const UnclaimedStakingRewardsRow = ({
         {account === owner && (
           <TablePrimaryCell align="center">
             {claimableActionIds.length > 0 ? (
-              row.YourTokensStaked === 1 ? (
+              claimableActionIds.length === 1 ? (
                 <>
                   <Box sx={{ display: "flex" }}>
                     <Button
