@@ -94,13 +94,17 @@ const NFTRow = ({ nft, handleClaim }) => {
         </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        <Link
-          href={tokenURI?.external_url}
-          target="_blank"
-          sx={{ fontSize: "inherit", color: "inherit" }}
-        >
-          {nft.NFTTokenId || nft.TokenId}
-        </Link>
+        {tokenURI?.external_url ? (
+          <Link
+            href={tokenURI?.external_url}
+            target="_blank"
+            sx={{ fontSize: "inherit", color: "inherit" }}
+          >
+            {nft.NFTTokenId || nft.TokenId}
+          </Link>
+        ) : (
+          nft.NFTTokenId || nft.TokenId
+        )}
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Link href={tokenURI?.external_url} target="_blank">
