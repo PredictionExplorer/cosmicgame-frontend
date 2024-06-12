@@ -195,13 +195,15 @@ const NewHome = () => {
             }
           })
       );
-      router.push({
-        pathname: "/prize-claimed",
-        query: {
-          round: data?.CurRoundNum,
-          message: "success",
-        },
-      });
+      setTimeout(() => {
+        router.push({
+          pathname: "/prize-claimed",
+          query: {
+            round: data?.CurRoundNum,
+            message: "success",
+          },
+        });
+      }, 1000);
     } catch (err) {
       console.log(err);
       setNotification({
