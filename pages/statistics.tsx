@@ -40,6 +40,7 @@ import { GlobalStakedTokensTable } from "../components/GlobalStakedTokensTable";
 import { ethers } from "ethers";
 import { SystemModesTable } from "../components/SystemModesTable";
 import { UniqueStakersRWLKTable } from "../components/UniqueStakersRWLKTable";
+import { MARKETING_WALLET_ADDRESS } from "../config/app";
 // import { UniqueStakersBothTable } from "../components/UniqueStakersBothTable";
 
 interface TabPanelProps {
@@ -559,7 +560,10 @@ const Statistics = () => {
                     <ChartSeriesItem
                       type="pie"
                       data={ctBalanceDistribution.map((value) => ({
-                        category: value.OwnerAddr,
+                        category:
+                          value.OwnerAddr === MARKETING_WALLET_ADDRESS
+                            ? "MarketingWallet Contract"
+                            : value.OwnerAddr,
                         value: value.BalanceFloat,
                       }))}
                       field="value"
@@ -569,7 +573,7 @@ const Statistics = () => {
                         content: (props) => {
                           return `${
                             props.dataItem.category
-                          }: ${props.dataItem.value.toFixed(6)}`;
+                          }: ${props.dataItem.value.toFixed(4)}`;
                         },
                         color: "white",
                         background: "none",
@@ -587,13 +591,19 @@ const Statistics = () => {
 
             <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={stakingType} onChange={handleTabChange}>
-                <Tab label={<Typography>CosmicSignature Token</Typography>} />
-                <Tab label={<Typography>RandomWalk Token</Typography>} />
+                <Tab
+                  label={
+                    <Typography variant="h6">CosmicSignature Token</Typography>
+                  }
+                />
+                <Tab
+                  label={<Typography variant="h6">RandomWalk Token</Typography>}
+                />
               </Tabs>
             </Box>
             <CustomTabPanel value={stakingType} index={0}>
               <Box>
-                <Typography variant="h6" mb={2}>
+                <Typography variant="subtitle1" mb={2}>
                   Stake / Unstake Actions
                 </Typography>
                 {stakingCSTActions === null ? (
@@ -606,7 +616,7 @@ const Statistics = () => {
                 )}
               </Box>
               <Box mt={4}>
-                <Typography variant="h6" mb={2}>
+                <Typography variant="subtitle1" mb={2}>
                   Staked Tokens
                 </Typography>
                 {stakedCSTokens === null ? (
@@ -619,7 +629,7 @@ const Statistics = () => {
                 )}
               </Box>
               <Box mt={4}>
-                <Typography variant="h6" mb={2}>
+                <Typography variant="subtitle1" mb={2}>
                   Unique Stakers
                 </Typography>
                 <UniqueStakersCSTTable list={uniqueCSTStakers} />
@@ -627,7 +637,7 @@ const Statistics = () => {
             </CustomTabPanel>
             <CustomTabPanel value={stakingType} index={1}>
               <Box>
-                <Typography variant="h6" mb={2}>
+                <Typography variant="subtitle1" mb={2}>
                   Stake / Unstake Actions
                 </Typography>
                 {stakingRWLKActions === null ? (
@@ -640,7 +650,7 @@ const Statistics = () => {
                 )}
               </Box>
               <Box mt={4}>
-                <Typography variant="h6" mb={2}>
+                <Typography variant="subtitle1" mb={2}>
                   Staked Tokens
                 </Typography>
                 {stakedRWLKTokens === null ? (
@@ -653,7 +663,7 @@ const Statistics = () => {
                 )}
               </Box>
               <Box mt={4}>
-                <Typography variant="h6" mb={2}>
+                <Typography variant="subtitle1" mb={2}>
                   Unique Stakers
                 </Typography>
                 <UniqueStakersRWLKTable list={uniqueRWLKStakers} />

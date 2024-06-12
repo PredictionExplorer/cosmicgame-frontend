@@ -312,7 +312,7 @@ const MyStaking = () => {
               </Box>
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Reward Tokens
+                  Staking Reward Tokens
                 </Typography>
                 <StakingRewardMintsTable list={cstMints} />
               </Box>
@@ -347,7 +347,7 @@ const MyStaking = () => {
             <CustomTabPanel value={stakingTable} index={1}>
               <Box>
                 <Typography variant="h6" lineHeight={1} mb={2}>
-                  Reward Tokens
+                  Staking Reward Tokens
                 </Typography>
                 <StakingRewardMintsTable list={rwlkMints} />
               </Box>

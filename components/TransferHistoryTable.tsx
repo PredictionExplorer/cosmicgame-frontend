@@ -12,6 +12,10 @@ import { convertTimestampToDateTime } from "../utils";
 import { ZERO_ADDRESS } from "../config/misc";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import {
+  STAKING_WALLET_CST_ADDRESS,
+  STAKING_WALLET_RWLK_ADDRESS,
+} from "../config/app";
 
 const TransferHistoryRow = ({ record }) => {
   if (!record || record.FromAddr === ZERO_ADDRESS) {
@@ -32,7 +36,11 @@ const TransferHistoryRow = ({ record }) => {
             fontFamily: "monospace",
           }}
         >
-          {record.FromAddr}
+          {record.FromAddr === STAKING_WALLET_CST_ADDRESS
+            ? "StakingWallet CST"
+            : record.FromAddr === STAKING_WALLET_RWLK_ADDRESS
+            ? "StakingWallet RandomWalk"
+            : record.FromAddr}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>
@@ -44,7 +52,11 @@ const TransferHistoryRow = ({ record }) => {
             fontFamily: "monospace",
           }}
         >
-          {record.ToAddr}
+          {record.ToAddr === STAKING_WALLET_CST_ADDRESS
+            ? "StakingWallet CST"
+            : record.ToAddr === STAKING_WALLET_RWLK_ADDRESS
+            ? "StakingWallet RandomWalk"
+            : record.ToAddr}
         </Link>
       </TablePrimaryCell>
     </TablePrimaryRow>
