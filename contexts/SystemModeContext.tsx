@@ -22,7 +22,7 @@ export const SystemModeProvider = ({ children }) => {
     const intervalId = setInterval(fetchData, 12000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [cosmicGameContract]);
 
   return (
     <SystemModeContext.Provider value={{ data, fetchData }}>
