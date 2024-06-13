@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Grid, Link, Typography } from "@mui/material";
+import { Box, Button, Link, Typography } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
@@ -47,7 +47,6 @@ const PrizeInfo = ({ roundNum }) => {
       const nftDonations = await api.get_donations_nft_by_round(roundNum);
       setNftDonations(nftDonations);
       const prizeInfo = await api.get_prize_info(roundNum);
-      console.log(prizeInfo);
       setPrizeInfo(prizeInfo);
       const bidHistory = await api.get_bid_list_by_round(roundNum, "desc");
       setBidHistory(bidHistory);

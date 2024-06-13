@@ -488,30 +488,6 @@ const Statistics = () => {
                 title="Number of Unique Random Walk Stakers"
                 value={data.MainStats.NumUniqueStakersRWalk}
               />
-              {/* <StatisticsItem
-                title="Number of Active Stakers"
-                value={data.MainStats.StakeStatistics.NumActiveStakers}
-              />
-              <StatisticsItem
-                title="Number of Staking Rewards Deposits"
-                value={data.MainStats.StakeStatistics.NumDeposits}
-              />
-              <StatisticsItem
-                title="Total Staking Rewards"
-                value={`${data.MainStats.StakeStatistics.TotalRewardEth.toFixed(
-                  4
-                )} ETH`}
-              />
-              <StatisticsItem
-                title="Total Tokens Staked"
-                value={data.MainStats.StakeStatistics.TotalTokensStaked}
-              />
-              <StatisticsItem
-                title="Earned Staking Rewards"
-                value={`${data.MainStats.StakeStatistics.UnclaimedRewardEth.toFixed(
-                  4
-                )} ETH`}
-              /> */}
             </Box>
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
@@ -588,7 +564,6 @@ const Statistics = () => {
                 list={ctBalanceDistribution.slice(0, 20)}
               />
             </Box>
-
             <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={stakingType} onChange={handleTabChange}>
                 <Tab

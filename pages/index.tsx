@@ -1084,6 +1084,7 @@ const NewHome = () => {
                 {!(
                   prizeTime > Date.now() ||
                   data?.LastBidderAddr === constants.AddressZero ||
+                  data?.LastBidderAddr !== account ||
                   loading
                 ) && (
                   <>
@@ -1092,10 +1093,6 @@ const NewHome = () => {
                       size="large"
                       onClick={onClaimPrize}
                       fullWidth
-                      disabled={
-                        data?.LastBidderAddr !== account &&
-                        prizeTime > Date.now()
-                      }
                       sx={{ mt: 3 }}
                     >
                       Claim Prize
