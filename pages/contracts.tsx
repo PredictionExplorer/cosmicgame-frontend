@@ -14,6 +14,8 @@ import { MainWrapper } from "../components/styled";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import api from "../services/api";
+import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
+import useStakingWalletRWLKContract from "../hooks/useStakingWalletRWLKContract";
 
 const ContractItem = ({ name, value, copyable = false }) => {
   const theme = useTheme();
@@ -81,6 +83,10 @@ const ContractItem = ({ name, value, copyable = false }) => {
 const Contracts = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [minStakeCSTPeriod, setMinStakeCSTPeriod] = useState(0);
+  const [minStakeRWalkPeriod, setMinStakeRWalkPeriod] = useState(0);
+  const stakingWalletCSTContract = useStakingWalletCSTContract();
+  const stakingWalletRWalkContract = useStakingWalletRWLKContract();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,6 +102,18 @@ const Contracts = () => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let minStakePeriod = await stakingWalletCSTContract.minStakePeriod();
+      setMinStakeCSTPeriod(Number(minStakePeriod));
+      minStakePeriod = await stakingWalletRWalkContract.minStakePeriod();
+      setMinStakeRWalkPeriod(Number(minStakePeriod));
+    };
+    if (stakingWalletCSTContract && stakingWalletRWalkContract) {
+      fetchData();
+    }
+  }, [stakingWalletCSTContract, stakingWalletRWalkContract]);
 
   return (
     <>
@@ -118,11 +136,6 @@ const Contracts = () => {
               <ContractItem name="Network" value="Local Network" />
               <ContractItem name="Chain ID" value={31337} />
               <ContractItem
-                name="Business Logic Address"
-                value={data?.ContractAddrs.BusinessLogicAddr}
-                copyable={true}
-              />
-              <ContractItem
                 name="Cosmic Game Address"
                 value={data?.ContractAddrs.CosmicGameAddr}
                 copyable={true}
@@ -135,6 +148,11 @@ const Contracts = () => {
               <ContractItem
                 name="Cosmic Signature Address"
                 value={data?.ContractAddrs.CosmicSignatureAddr}
+                copyable={true}
+              />
+              <ContractItem
+                name="Business Logic Address"
+                value={data?.ContractAddrs.BusinessLogicAddr}
                 copyable={true}
               />
               <ContractItem
@@ -183,6 +201,10 @@ const Contracts = () => {
                 value={`${data.RafflePercentage}%`}
               />
               <ContractItem
+                name="Staking Percentage"
+                value={`${data.StakignPercentage}%`}
+              />
+              <ContractItem
                 name="Raffle ETH Winners for Bidding"
                 value={data.NumRaffleEthWinnersBidding}
               />
@@ -219,6 +241,14 @@ const Contracts = () => {
                 name="Random Walk contract address"
                 value={data?.ContractAddrs.RandomWalkAddr}
                 copyable={true}
+              />
+              <ContractItem
+                name="Minimal Stake Period for Cosmic Signature"
+                value={minStakeCSTPeriod}
+              />
+              <ContractItem
+                name="Minimal Stake Period for RandomWalk"
+                value={minStakeRWalkPeriod}
               />
             </List>
           </>
