@@ -97,6 +97,7 @@ const NewHome = () => {
   const [winProbability, setWinProbability] = useState(null);
   const [donatedNFTs, setDonatedNFTs] = useState([]);
   const [prizeTime, setPrizeTime] = useState(0);
+  const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
   const [prizeInfo, setPrizeInfo] = useState(null);
   const [message, setMessage] = useState("");
   const [nftDonateAddress, setNftDonateAddress] = useState("");
@@ -607,6 +608,16 @@ const NewHome = () => {
     };
   }, [data]);
 
+  useEffect(() => {
+    const fetchTimeoutClaimPrize = async () => {
+      const timeout = await cosmicGameContract.timeoutClaimPrize();
+      setTimeoutClaimPrize(Number(timeout));
+    };
+    if (cosmicGameContract) {
+      fetchTimeoutClaimPrize();
+    }
+  }, [cosmicGameContract]);
+
   return (
     <>
       <MainWrapper>
@@ -976,7 +987,14 @@ const NewHome = () => {
                         onChange={(e) => setMessage(e.target.value)}
                       />
                       {bidType !== "CST" && (
-                        <Box sx={{ border: "1px solid #444", borderRadius: 1, p: 2, mt: 2 }}>
+                        <Box
+                          sx={{
+                            border: "1px solid #444",
+                            borderRadius: 1,
+                            p: 2,
+                            mt: 2,
+                          }}
+                        >
                           <Typography variant="subtitle2">
                             Bid price collision prevention
                           </Typography>
@@ -1098,17 +1116,19 @@ const NewHome = () => {
                       fullWidth
                       disabled={
                         data?.LastBidderAddr !== account &&
-                        prizeTime > Date.now()
+                        prizeTime + timeoutClaimPrize * 1000 > Date.now()
                       }
                       sx={{ mt: 3 }}
                     >
                       Claim Prize
                       <Box sx={{ display: "flex", alignItems: "center" }}>
-                        {prizeTime > Date.now() &&
+                        {prizeTime + timeoutClaimPrize * 1000 > Date.now() &&
                           data?.LastBidderAddr !== account && (
                             <>
                               &nbsp;available in &nbsp;
-                              <Countdown date={prizeTime} />
+                              <Countdown
+                                date={prizeTime + timeoutClaimPrize * 1000}
+                              />
                             </>
                           )}
                         &nbsp;
@@ -1116,7 +1136,7 @@ const NewHome = () => {
                       </Box>
                     </Button>
                     {data?.LastBidderAddr !== account &&
-                      prizeTime > Date.now() && (
+                      prizeTime + timeoutClaimPrize * 1000 > Date.now() && (
                         <Typography
                           variant="body2"
                           fontStyle="italic"
