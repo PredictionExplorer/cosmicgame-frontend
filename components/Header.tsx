@@ -146,7 +146,8 @@ const Header = () => {
           {account &&
           (status?.ETHRaffleToClaim > 0 ||
             status?.NumDonatedNFTToClaim > 0 ||
-            status?.UnclaimedStakingReward > 0) ? (
+            (status?.UnclaimedStakingReward > 0 &&
+              status?.claimableActionIds.length > 0)) ? (
             <Badge variant="dot" color="error">
               <MenuIcon />
             </Badge>

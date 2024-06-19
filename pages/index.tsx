@@ -1106,7 +1106,9 @@ const NewHome = () => {
                   }`}
                 </Button>
                 {!(
-                  data?.LastBidderAddr === constants.AddressZero || loading
+                  prizeTime > Date.now() ||
+                  data?.LastBidderAddr === constants.AddressZero ||
+                  loading
                 ) && (
                   <>
                     <Button
