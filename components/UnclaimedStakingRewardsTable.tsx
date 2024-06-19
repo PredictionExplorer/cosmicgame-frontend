@@ -128,7 +128,7 @@ const UnclaimedStakingRewardsRow = ({
   const sm = useMediaQuery(theme.breakpoints.up("sm"));
 
   const fetchRowData = async () => {
-    const res = await fetchInfo(account, row.DepositId, stakedActionIds);
+    const res = await fetchInfo(owner, row.DepositId, stakedActionIds);
     setUnstakeableActionIds(res.unstakeableActionIds);
     setClaimableActionIds(res.claimableActionIds);
     setClaimableAmounts(res.claimableAmounts);
@@ -561,7 +561,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
             claimableActionIds: cl,
             unstakeableActionIds: us,
             waitingActionIds: wa,
-          } = await fetchInfo(account, depositId, stakedActionIds);
+          } = await fetchInfo(owner, depositId, stakedActionIds);
           cl_actionIds = cl_actionIds.concat(cl);
           us_actionIds = us_actionIds.concat(us);
           wa_actionIds = wa_actionIds.concat(wa);
@@ -616,10 +616,10 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
                 Reward Per Token
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
-                Your Staked Tokens
+                Staked Tokens
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
-                Your Claimable Amount
+                Claimable Amount
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Claimable Tokens

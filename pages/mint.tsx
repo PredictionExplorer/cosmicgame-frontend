@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { Typography, Box, Button } from "@mui/material";
+import { Typography, Box, Button, Link } from "@mui/material";
 import "react-slideshow-image/dist/styles.css";
 import Head from "next/head";
 import { MainWrapper, CenterBox } from "../components/styled";
@@ -20,7 +20,6 @@ const Mint = () => {
     if (nftContract) {
       try {
         const mintPrice = await nftContract.getMintPrice();
-        console.log(parseFloat(ethers.utils.formatEther(mintPrice)));
         const newPrice = parseFloat(ethers.utils.formatEther(mintPrice)) * 1.01;
 
         const receipt = await nftContract
@@ -33,11 +32,11 @@ const Mint = () => {
         if (data && data.message) {
           alert(data.message);
         } else {
-          alert("There's an error");
+          console.log(err);
         }
       }
     } else {
-      alert("Please connect your wallet on Arbitrum network");
+      console.log("Please connect your wallet on Arbitrum network");
     }
   };
 
@@ -48,8 +47,9 @@ const Mint = () => {
         (parseFloat(parseBalance(mintPrice)) * 1.01 + 0.008).toFixed(4)
       );
     };
-
-    getData();
+    if (nftContract) {
+      getData();
+    }
   }, [nftContract]);
 
   useEffect(() => {
@@ -57,7 +57,10 @@ const Mint = () => {
       try {
         setLoading(true);
         const tokens = await nftContract.walletOfOwner(account);
-        const nftIds = tokens.map((t) => t.toNumber()).reverse();
+        const nftIds = tokens
+          .map((t) => t.toNumber())
+          .sort()
+          .reverse();
         setNftIds(nftIds);
         setLoading(false);
       } catch (err) {
@@ -66,7 +69,7 @@ const Mint = () => {
       }
     };
 
-    if (account) {
+    if (account && nftContract) {
       getTokens();
     }
   }, [nftContract, account]);
@@ -136,7 +139,19 @@ const Mint = () => {
             NFTS
           </Typography>
         </Box>
-        <PaginationRWLKGrid loading={loading} data={nftIds} />
+        {nftIds.length > 0 && (
+          <Box mt={2}>
+            {nftIds.map((tokenId) => (
+              <Link
+                key={tokenId}
+                href={`/?randomwalk=true&tokenId=${tokenId}`}
+                sx={{ mr: 2, color: "inherit" }}
+              >
+                <Typography variant="subtitle1" component="span">{tokenId}</Typography>
+              </Link>
+            ))}
+          </Box>
+        )}
       </MainWrapper>
     </>
   );
