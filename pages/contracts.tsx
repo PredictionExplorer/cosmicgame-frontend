@@ -16,12 +16,15 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import api from "../services/api";
 import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
 import useStakingWalletRWLKContract from "../hooks/useStakingWalletRWLKContract";
+import useCosmicGameContract from "../hooks/useCosmicGameContract";
+import { formatSeconds } from "../utils";
 
 const ContractItem = ({ name, value, copyable = false }) => {
   const theme = useTheme();
   const md = useMediaQuery(theme.breakpoints.up("md"));
   const sm = useMediaQuery(theme.breakpoints.up("sm"));
   const [notification, setNotification] = useState(false);
+
   return (
     <>
       <Snackbar
@@ -85,8 +88,12 @@ const Contracts = () => {
   const [loading, setLoading] = useState(true);
   const [minStakeCSTPeriod, setMinStakeCSTPeriod] = useState(0);
   const [minStakeRWalkPeriod, setMinStakeRWalkPeriod] = useState(0);
+  const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
+  const [initialSecondsUntilPrize, setInitialSecondsUntilPrize] = useState(0);
+  const [auctionLength, setAuctionLength] = useState(0);
   const stakingWalletCSTContract = useStakingWalletCSTContract();
   const stakingWalletRWalkContract = useStakingWalletRWLKContract();
+  const cosmicGameContract = useCosmicGameContract();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,11 +116,25 @@ const Contracts = () => {
       setMinStakeCSTPeriod(Number(minStakePeriod));
       minStakePeriod = await stakingWalletRWalkContract.minStakePeriod();
       setMinStakeRWalkPeriod(Number(minStakePeriod));
+      const timeout = await cosmicGameContract.timeoutClaimPrize();
+      setTimeoutClaimPrize(Number(timeout));
+      const initialSeconds = await cosmicGameContract.initialSecondsUntilPrize();
+      setInitialSecondsUntilPrize(Number(initialSeconds));
+      const auctionLength = await cosmicGameContract.RoundStartCSTAuctionLength();
+      setAuctionLength(Number(auctionLength));
     };
-    if (stakingWalletCSTContract && stakingWalletRWalkContract) {
+    if (
+      stakingWalletCSTContract &&
+      stakingWalletRWalkContract &&
+      cosmicGameContract
+    ) {
       fetchData();
     }
-  }, [stakingWalletCSTContract, stakingWalletRWalkContract]);
+  }, [
+    stakingWalletCSTContract,
+    stakingWalletRWalkContract,
+    cosmicGameContract,
+  ]);
 
   return (
     <>
@@ -234,9 +255,19 @@ const Contracts = () => {
                 name="Amount of CosmicTokens earned per bid"
                 value={100}
               />
-              <ContractItem name="Timeout to claim prize" value="1 Day" />
+              <ContractItem
+                name="Auction Duration"
+                value={formatSeconds(auctionLength)}
+              />
+              <ContractItem
+                name="Timeout to claim prize"
+                value={formatSeconds(timeoutClaimPrize)}
+              />
               <ContractItem name="Maximum message length" value={280} />
-              <ContractItem name="Initial increment first bid" value="1 Day" />
+              <ContractItem
+                name="Initial increment first bid"
+                value={formatSeconds(initialSecondsUntilPrize)}
+              />
               <ContractItem
                 name="Random Walk contract address"
                 value={data?.ContractAddrs.RandomWalkAddr}

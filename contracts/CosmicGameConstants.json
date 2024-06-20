@@ -1,6 +1,5 @@
 [
   "function DEFAULT_AUCTION_LENGTH() view returns (uint256)",
-  "function DEFAULT_MIN_STAKE_PERIOD() view returns (uint32)",
   "function ERR_STR_MODE_MAINTENANCE() view returns (string)",
   "function ERR_STR_MODE_RUNTIME() view returns (string)",
   "function MARKETING_REWARD() view returns (uint256)",
