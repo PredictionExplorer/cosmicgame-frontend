@@ -21,6 +21,9 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 import { RWLKNFTTable } from "../components/RWLKNFTTable";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 import { StakingRewardMintsTable } from "../components/StakingRewardMintsTable";
+import useCosmicGameContract from "../hooks/useCosmicGameContract";
+import { formatSeconds } from "../utils";
+import { ethers } from "ethers";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -48,6 +51,7 @@ const MyStaking = () => {
   const { account } = useActiveWeb3React();
   const nftContract = useRWLKNFTContract();
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
   const [unclaimedStakingRewards, setUnclaimedStakingRewards] = useState([]);
   const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
   const [stakingCSTActions, setStakingCSTActions] = useState([]);
@@ -56,6 +60,8 @@ const MyStaking = () => {
   const [rwlkTokens, setRwlkTokens] = useState([]);
   const [rwlkMints, setRwlkMints] = useState([]);
   const [cstMints, setCSTMints] = useState([]);
+  const [stakingPeriod, setStakingPeriod] = useState(0);
+  const [rewardPerCST, setRewardPerCST] = useState(0);
   const [stakingTable, setStakingTable] = useState(0);
   const {
     cstokens: stakedCSTokens,
@@ -65,6 +71,7 @@ const MyStaking = () => {
   const cstStakingContract = useStakingWalletCSTContract();
   const rwlkStakingContract = useStakingWalletRWLKContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
+  const cosmicGameContract = useCosmicGameContract();
 
   const handleStake = async (tokenId: number, isRwalk: boolean) => {
     const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
@@ -176,6 +183,19 @@ const MyStaking = () => {
     setStakingTable(newValue);
   };
 
+  const fetchData = async () => {
+    const data = await api.get_dashboard_info();
+    setData(data);
+    const activationTime = await cosmicGameContract.activationTime();
+    const timestamp = await api.get_current_time();
+    setStakingPeriod(timestamp - Number(activationTime));
+    const stakingAmount = await cosmicGameContract.stakingAmount();
+    setRewardPerCST(
+      Number(ethers.utils.formatEther(stakingAmount)) /
+        data?.MainStats.StakeStatisticsCST.TotalTokensStaked
+    );
+  };
+
   const fetchCSTData = async (addr: string, reload: boolean = true) => {
     setLoading(reload);
     const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
@@ -212,11 +232,12 @@ const MyStaking = () => {
   };
 
   useEffect(() => {
-    if (account && nftContract) {
+    if (account && nftContract && cosmicGameContract) {
       fetchCSTData(account);
       fetchRWLKData(account);
+      fetchData();
     }
-  }, [account, nftContract]);
+  }, [account, nftContract, cosmicGameContract]);
 
   return (
     <>
@@ -230,6 +251,7 @@ const MyStaking = () => {
           color="primary"
           gutterBottom
           textAlign="center"
+          mb={8}
         >
           My Staking
         </Typography>
@@ -241,6 +263,38 @@ const MyStaking = () => {
           <Typography variant="h6">Loading...</Typography>
         ) : (
           <>
+            <Box sx={{ display: "flex" }}>
+              <Typography variant="subtitle1" mr={1}>
+                Staking period:
+              </Typography>
+              <Typography variant="subtitle1">
+                {formatSeconds(stakingPeriod)}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex" }}>
+              <Typography variant="subtitle1" mr={1}>
+                Number of staked CST tokens:
+              </Typography>
+              <Typography variant="subtitle1">
+                {data?.MainStats.StakeStatisticsCST.TotalTokensStaked}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex" }}>
+              <Typography variant="subtitle1" mr={1}>
+                Number of staked RandomWalk tokens:
+              </Typography>
+              <Typography variant="subtitle1">
+                {data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex" }}>
+              <Typography variant="subtitle1" mr={1}>
+                Reward (as of now) for staking 1 CST token:
+              </Typography>
+              <Typography variant="subtitle1">
+                {rewardPerCST.toFixed(6)}
+              </Typography>
+            </Box>
             <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
               <Tabs
                 variant="fullWidth"
