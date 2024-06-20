@@ -273,14 +273,6 @@ const Contracts = () => {
                 value={data?.ContractAddrs.RandomWalkAddr}
                 copyable={true}
               />
-              <ContractItem
-                name="Minimal Stake Period for Cosmic Signature"
-                value={minStakeCSTPeriod}
-              />
-              <ContractItem
-                name="Minimal Stake Period for RandomWalk"
-                value={minStakeRWalkPeriod}
-              />
             </List>
           </>
         )}
