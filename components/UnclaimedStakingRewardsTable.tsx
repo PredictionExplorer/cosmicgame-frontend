@@ -171,21 +171,6 @@ const UnclaimedStakingRewardsRow = ({
   }, [stakedTokens]);
 
   useEffect(() => {
-    const stakingInfo = row.stakingInfo;
-    if (stakingInfo) {
-      setUnstakeableActionIds(stakingInfo.unstakeableActionIds);
-      setClaimableActionIds(stakingInfo.claimableActionIds);
-      setClaimableAmounts(stakingInfo.claimableAmounts);
-      setWaitingActionIds(stakingInfo.waitingActionIds);
-      setStakeState(
-        stakingInfo.actionIds.map((x) => ({
-          ...x,
-          unstake: !stakedActionIds.includes(x.StakeActionId),
-          claim: false,
-          restake: false,
-        }))
-      );
-    }
     const interval = setInterval(() => {
       fetchRowData();
     }, 30000);
@@ -578,7 +563,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
           cl_actionIds = cl_actionIds.concat(res.claimableActionIds);
           us_actionIds = us_actionIds.concat(res.unstakeableActionIds);
           wa_actionIds = wa_actionIds.concat(res.waitingActionIds);
-          item.stakingInfo = res;
         })
       );
       setClaimableActionIds(cl_actionIds);
