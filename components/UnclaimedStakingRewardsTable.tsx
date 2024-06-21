@@ -172,18 +172,20 @@ const UnclaimedStakingRewardsRow = ({
 
   useEffect(() => {
     const stakingInfo = row.stakingInfo;
-    setUnstakeableActionIds(stakingInfo.unstakeableActionIds);
-    setClaimableActionIds(stakingInfo.claimableActionIds);
-    setClaimableAmounts(stakingInfo.claimableAmounts);
-    setWaitingActionIds(stakingInfo.waitingActionIds);
-    setStakeState(
-      stakingInfo.actionIds.map((x) => ({
-        ...x,
-        unstake: !stakedActionIds.includes(x.StakeActionId),
-        claim: false,
-        restake: false,
-      }))
-    );
+    if (stakingInfo) {
+      setUnstakeableActionIds(stakingInfo.unstakeableActionIds);
+      setClaimableActionIds(stakingInfo.claimableActionIds);
+      setClaimableAmounts(stakingInfo.claimableAmounts);
+      setWaitingActionIds(stakingInfo.waitingActionIds);
+      setStakeState(
+        stakingInfo.actionIds.map((x) => ({
+          ...x,
+          unstake: !stakedActionIds.includes(x.StakeActionId),
+          claim: false,
+          restake: false,
+        }))
+      );
+    }
     const interval = setInterval(() => {
       fetchRowData();
     }, 30000);
@@ -472,7 +474,6 @@ const UnclaimedStakingRewardsRow = ({
 
 export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const perPage = 5;
-  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const { cstokens: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
@@ -570,7 +571,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       let cl_actionIds = [],
         us_actionIds = [],
         wa_actionIds = [];
-      setLoading(true);
       await Promise.all(
         list.map(async (item) => {
           const depositId = item.DepositId;
@@ -587,7 +587,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       });
       setUnstakeableActionIds(us_actionIds);
       setWaitingActionIds(wa_actionIds);
-      setLoading(false);
     };
     fetchActionIds();
     calculateOffset();
@@ -597,10 +596,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
 
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
-  }
-
-  if (loading) {
-    return <Typography>Loading...</Typography>;
   }
 
   return (

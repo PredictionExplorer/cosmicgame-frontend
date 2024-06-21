@@ -92,7 +92,7 @@ const CSTRow = ({ nft }) => {
   );
 };
 
-const CSTTable = ({ list }) => {
+export const CSTTable = ({ list }) => {
   const perPage = 5;
   const [curPage, setCurPage] = useState(1);
   if (list.length === 0) {
@@ -150,7 +150,7 @@ const MyWallet = () => {
   });
   const fetchCSTList = async (updateStatus) => {
     setCSTList((prev) => ({ ...prev, loading: updateStatus && true }));
-    let cstList = await api.get_cst_list_by_user(account);
+    let cstList = await api.get_cst_tokens_by_user(account);
     setCSTList({ data: cstList, loading: false });
   };
   useEffect(() => {

@@ -175,16 +175,6 @@ class ApiService {
     }
   }
 
-  public async get_cst_list_by_user(address: string) {
-    try {
-      const { data } = await axios.get(getAPIUrl(`cst/list_by_user/${address}/0/1000000`));
-      return data.UserTokens;
-    } catch (err) {
-      console.log(err);
-      return [];
-    }
-  }
-
   public async get_cst_info(tokenId: number) {
     try {
       const { data } = await axios.get(getAPIUrl(`cst/info/${tokenId}`));

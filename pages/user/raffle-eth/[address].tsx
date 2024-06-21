@@ -25,6 +25,7 @@ import {
   TablePrimaryRow,
 } from "../../../components/styled";
 import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { convertTimestampToDateTime } from "../../../utils";
 
 const MyWinningsRow = ({ winning }) => {

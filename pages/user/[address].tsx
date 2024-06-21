@@ -18,6 +18,7 @@ import { useRouter } from "next/router";
 import { useActiveWeb3React } from "../../hooks/web3";
 import useCosmicGameContract from "../../hooks/useCosmicGameContract";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
+import { CSTTable } from "../my-tokens";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -64,6 +65,7 @@ const UserInfo = ({ address }) => {
   const [stakingCSTActions, setStakingCSTActions] = useState([]);
   const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
+  const [cstList, setCSTList] = useState([]);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
@@ -103,6 +105,8 @@ const UserInfo = ({ address }) => {
     setStakingRWLKActions(stakingActions);
     const marketingRewards = await api.get_marketing_rewards_by_user(addr);
     setMarketingRewards(marketingRewards);
+    const cstList = await api.get_cst_tokens_by_user(account);
+    setCSTList(cstList);
     fetchStakedToken();
     setLoading(false);
   };
@@ -572,6 +576,12 @@ const UserInfo = ({ address }) => {
                     Bid History
                   </Typography>
                   <BiddingHistoryTable biddingHistory={bidHistory} />
+                </Box>
+                <Box>
+                  <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                    Cosmic Signature Tokens User Own
+                  </Typography>
+                  <CSTTable list={cstList} />
                 </Box>
                 <Box>
                   <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
