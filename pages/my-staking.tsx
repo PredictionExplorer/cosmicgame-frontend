@@ -50,7 +50,7 @@ function CustomTabPanel(props: TabPanelProps) {
 const MyStaking = () => {
   const { account } = useActiveWeb3React();
   const nftContract = useRWLKNFTContract();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [unclaimedStakingRewards, setUnclaimedStakingRewards] = useState([]);
   const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
