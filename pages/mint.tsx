@@ -7,11 +7,9 @@ import { MainWrapper, CenterBox } from "../components/styled";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 import { parseBalance } from "../utils";
 import { useActiveWeb3React } from "../hooks/web3";
-import PaginationRWLKGrid from "../components/PaginationRWLKGrid";
 
 const Mint = () => {
   const [mintPrice, setMintPrice] = useState("0");
-  const [loading, setLoading] = useState(true);
   const [nftIds, setNftIds] = useState([]);
   const { account } = useActiveWeb3React();
   const nftContract = useRWLKNFTContract();
@@ -55,17 +53,14 @@ const Mint = () => {
   useEffect(() => {
     const getTokens = async () => {
       try {
-        setLoading(true);
         const tokens = await nftContract.walletOfOwner(account);
         const nftIds = tokens
           .map((t) => t.toNumber())
           .sort()
           .reverse();
         setNftIds(nftIds);
-        setLoading(false);
       } catch (err) {
         console.log(err);
-        setLoading(false);
       }
     };
 
@@ -147,7 +142,9 @@ const Mint = () => {
                 href={`/?randomwalk=true&tokenId=${tokenId}`}
                 sx={{ mr: 2, color: "inherit" }}
               >
-                <Typography variant="subtitle1" component="span">{tokenId}</Typography>
+                <Typography variant="subtitle1" component="span">
+                  {tokenId}
+                </Typography>
               </Link>
             ))}
           </Box>

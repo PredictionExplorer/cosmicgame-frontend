@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Box, Button, TextField, Link } from "@mui/material";
+import {
+  Typography,
+  Box,
+  Button,
+  TextField,
+  Link,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import "react-slideshow-image/dist/styles.css";
 import Head from "next/head";
 import { MainWrapper, CenterBox } from "../components/styled";
@@ -74,16 +82,19 @@ const MintArcBlocks = () => {
           </Typography>
         </CenterBox>
         <Box display="flex" my={8}>
-          <TextField
-            variant="filled"
-            type="number"
-            defaultValue={1}
-            color="secondary"
-            placeholder="Enter count here"
-            size="small"
-            inputProps={{ min: 1 }}
-            onChange={(e) => setCount(parseInt(e.target.value))}
-          />
+          <Select
+            value={count}
+            onChange={(e) => setCount(Number(e.target.value))}
+            sx={{ minWidth: "100px" }}
+          >
+            <MenuItem value={1}>1</MenuItem>
+            <MenuItem value={2}>2</MenuItem>
+            <MenuItem value={3}>3</MenuItem>
+            <MenuItem value={4}>4</MenuItem>
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={10}>10</MenuItem>
+            <MenuItem value={15}>15</MenuItem>
+          </Select>
           <Button
             variant="contained"
             onClick={handleMint}
@@ -94,13 +105,19 @@ const MintArcBlocks = () => {
           </Button>
         </Box>
         <Box sx={{ display: "flex" }}>
-          <Typography mr={1}>Current Token ID: </Typography>
-          <Typography>{curTokenId}</Typography>
+          <Typography variant="subtitle1" mr={1}>
+            Current Token ID:{" "}
+          </Typography>
+          <Typography variant="subtitle1">{curTokenId}</Typography>
         </Box>
         {mintedTokens.length > 0 && (
           <Box mt={2}>
             {mintedTokens.map((tokenId) => (
-              <Link key={tokenId} sx={{ mr: 2, color: "inherit" }}>
+              <Link
+                key={tokenId}
+                href={`/?donation=true&tokenId=${tokenId}`}
+                sx={{ mr: 2, color: "inherit" }}
+              >
                 <Typography variant="subtitle1" component="span">
                   {tokenId}
                 </Typography>

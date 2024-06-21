@@ -38,7 +38,7 @@ import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { BigNumber, Contract, constants, ethers } from "ethers";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 import { useActiveWeb3React } from "../hooks/web3";
-import { COSMICGAME_ADDRESS } from "../config/app";
+import { ART_BLOCKS_ADDRESS, COSMICGAME_ADDRESS } from "../config/app";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FAQ from "../components/FAQ";
 import { ArrowForward } from "@mui/icons-material";
@@ -66,6 +66,7 @@ import WinningHistoryTable from "../components/WinningHistoryTable";
 import AlertDialog from "../components/AlertDialog";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
+import { useRouter } from "next/router";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -85,6 +86,7 @@ const bidParamsEncoding: ethers.utils.ParamType = {
 };
 
 const NewHome = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [bidType, setBidType] = useState("");
@@ -101,7 +103,7 @@ const NewHome = () => {
   const [prizeInfo, setPrizeInfo] = useState(null);
   const [message, setMessage] = useState("");
   const [nftDonateAddress, setNftDonateAddress] = useState("");
-  const [nftId, setNftId] = useState(-1);
+  const [nftId, setNftId] = useState("");
   const [rwlkId, setRwlkId] = useState(-1);
   const [bidPricePlus, setBidPricePlus] = useState(2);
   const [isBidding, setIsBidding] = useState(false);
@@ -121,6 +123,7 @@ const NewHome = () => {
   const [curPage, setCurrentPage] = useState(1);
   const [claimHistory, setClaimHistory] = useState(null);
   const [imageOpen, setImageOpen] = useState(false);
+  const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const [alertDlg, setAlertDlg] = useState({
     title: "",
     content: "",
@@ -303,7 +306,7 @@ const NewHome = () => {
         return;
       }
       let receipt;
-      if (!nftDonateAddress || nftId === -1) {
+      if (!nftDonateAddress || !nftId) {
         let params = ethers.utils.defaultAbiCoder.encode(
           [bidParamsEncoding],
           [{ msg: message, rwalk: rwlkId }]
@@ -344,7 +347,8 @@ const NewHome = () => {
     }
 
     let receipt;
-    if (nftDonateAddress && nftId !== -1) {
+    if (nftDonateAddress && nftId) {
+      const nftIdNum = Number(nftId);
       const nftDonateContract = new Contract(
         nftDonateAddress,
         NFT_ABI,
@@ -365,7 +369,7 @@ const NewHome = () => {
       }
 
       // owner of
-      const isOwner = await checkTokenOwnership(nftDonateAddress, nftId);
+      const isOwner = await checkTokenOwnership(nftDonateAddress, nftIdNum);
       if (!isOwner) {
         setIsBidding(false);
         return;
@@ -373,7 +377,7 @@ const NewHome = () => {
 
       try {
         // setApprovalForAll
-        const approvedBy = await nftDonateContract.getApproved(nftId);
+        const approvedBy = await nftDonateContract.getApproved(nftIdNum);
         const isApprovedForAll = await nftDonateContract.isApprovedForAll(
           account,
           COSMICGAME_ADDRESS
@@ -388,7 +392,7 @@ const NewHome = () => {
           [{ msg: message, rwalk: rwlkId }]
         );
         receipt = await cosmicGameContract
-          .bidAndDonateNFT(params, nftDonateAddress, nftId, {
+          .bidAndDonateNFT(params, nftDonateAddress, nftIdNum, {
             value: newBidPrice,
           })
           .then((tx) => tx.wait());
@@ -481,6 +485,22 @@ const NewHome = () => {
   }, [nftRWLKContract, account]);
 
   useEffect(() => {
+    if (router.query) {
+      if (router.query.randomwalk) {
+        setRwlkId(Number(router.query.tokenId));
+        setBidType("RandomWalk");
+      }
+      if (router.query.donation) {
+        setNftDonateAddress(ART_BLOCKS_ADDRESS);
+        const tokenId = Array.isArray(router.query.tokenId)
+          ? router.query.tokenId[0]
+          : router.query.tokenId;
+        setNftId(tokenId);
+        setBidType("ETH");
+        setAdvancedExpanded(true);
+      }
+    }
+
     const calculateTimeOffset = async () => {
       const current = await api.get_current_time();
       const offset = current * 1000 - Date.now();
@@ -946,7 +966,12 @@ const NewHome = () => {
                   </Box>
                 )}
                 {bidType !== "" && (
-                  <Accordion>
+                  <Accordion
+                    expanded={advancedExpanded}
+                    onChange={(_event, isExpanded) =>
+                      setAdvancedExpanded(isExpanded)
+                    }
+                  >
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography>Advanced Options</Typography>
                     </AccordionSummary>
@@ -961,6 +986,7 @@ const NewHome = () => {
                           <TextField
                             placeholder="NFT contract address"
                             size="small"
+                            value={nftDonateAddress}
                             fullWidth
                             sx={{ marginTop: 2 }}
                             onChange={(e) =>
@@ -969,10 +995,12 @@ const NewHome = () => {
                           />
                           <TextField
                             placeholder="NFT number"
+                            type="number"
+                            value={nftId}
                             size="small"
                             fullWidth
                             sx={{ marginTop: 2 }}
-                            onChange={(e) => setNftId(Number(e.target.value))}
+                            onChange={(e) => setNftId(e.target.value)}
                           />
                         </>
                       )}
