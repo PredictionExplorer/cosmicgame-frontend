@@ -205,6 +205,16 @@ class ApiService {
     }
   }
 
+  public async get_raffle_nft_winnings_by_user(address: string) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`user/raffle_nft_winnings/${address}`));
+      return data.UserRaffleNFTWinnings;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
   public async get_info(token_id: number | string) {
     try {
       const { data } = await axios.get(baseUrl + "token_info/" + token_id);

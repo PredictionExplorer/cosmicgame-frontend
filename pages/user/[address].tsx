@@ -342,7 +342,12 @@ const UserInfo = ({ address }) => {
                   </Typography>
                   &nbsp;
                   <Typography component="span">
-                    {userInfo.RaffleNFTWon}
+                    <Link
+                      href={`/user/raffle-nft/${address}`}
+                      sx={{ color: "inherit", fontSize: "inherit" }}
+                    >
+                      {userInfo.RaffleNFTWon}
+                    </Link>
                   </Typography>
                 </Box>
                 <Box mb={1}>
