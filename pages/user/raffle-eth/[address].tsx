@@ -10,7 +10,6 @@ import {
 import Head from "next/head";
 import { GetServerSidePropsContext } from "next";
 import { ethers } from "ethers";
-import { useRouter } from "next/router";
 import { useActiveWeb3React } from "../../../hooks/web3";
 import { useApiData } from "../../../contexts/ApiDataContext";
 import useRaffleWalletContract from "../../../hooks/useRaffleWalletContract";
@@ -101,23 +100,18 @@ const MyWinningsTable = ({ list }) => {
 };
 
 const UserRaffleETH = ({ address }) => {
-  const router = useRouter();
   const { account } = useActiveWeb3React();
-  const { apiData: status } = useApiData();
+  const { apiData: status, fetchData: fetchStatusData } = useApiData();
   const [raffleETHToClaim, setRaffleETHToClaim] = useState({
     data: [],
     loading: false,
   });
   const [invalidAddress, setInvalidAddress] = useState(false);
-  const [isClaiming, setIsClaiming] = useState({
-    donatedNFT: false,
-    raffleETH: false,
-  });
-
+  const [isClaiming, setIsClaiming] = useState(false);
   const raffleWalletContract = useRaffleWalletContract();
 
-  const fetchRaffleETHDeposits = async () => {
-    setRaffleETHToClaim((prev) => ({ ...prev, loading: true }));
+  const fetchRaffleETHDeposits = async (reload = true) => {
+    setRaffleETHToClaim((prev) => ({ ...prev, loading: reload }));
     let deposits = await api.get_raffle_deposits_by_user(address);
     deposits = deposits.sort((a, b) => b.TimeStamp - a.TimeStamp);
     setRaffleETHToClaim({ data: deposits, loading: false });
@@ -125,21 +119,17 @@ const UserRaffleETH = ({ address }) => {
 
   const handleAllETHClaim = async () => {
     try {
-      setIsClaiming({
-        ...isClaiming,
-        raffleETH: true,
-      });
+      setIsClaiming(true);
       const res = await raffleWalletContract.withdraw();
       console.log(res);
       setTimeout(() => {
-        router.reload();
-      }, 4000);
+        fetchStatusData();
+        fetchRaffleETHDeposits(false);
+        setIsClaiming(false);
+      }, 2000);
     } catch (err) {
       console.log(err);
-      setIsClaiming({
-        ...isClaiming,
-        raffleETH: false,
-      });
+      setIsClaiming(false);
     }
   };
 
@@ -192,7 +182,7 @@ const UserRaffleETH = ({ address }) => {
                     <Button
                       onClick={handleAllETHClaim}
                       variant="contained"
-                      disabled={isClaiming.raffleETH}
+                      disabled={isClaiming}
                     >
                       Claim All
                     </Button>
