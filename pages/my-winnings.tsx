@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import {
   Box,
   Button,
@@ -8,9 +7,7 @@ import {
   TableBody,
   Typography,
 } from "@mui/material";
-
 import Head from "next/head";
-
 import {
   MainWrapper,
   TablePrimary,
@@ -94,7 +91,7 @@ const MyWinningsTable = ({ list }) => {
 const MyWinnings = () => {
   const { account } = useActiveWeb3React();
   const [curPage, setCurPage] = useState(1);
-  const { apiData: status } = useApiData();
+  const { apiData: status, fetchData: fetchStatusData } = useApiData();
   const perPage = 5;
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState(null);
   const [raffleETHToClaim, setRaffleETHToClaim] = useState(null);
@@ -116,8 +113,8 @@ const MyWinnings = () => {
       const res = await raffleWalletContract.withdraw();
       console.log(res);
       setTimeout(() => {
-        router.reload();
-      }, 4000);
+        fetchStatusData();
+      }, 3000);
     } catch (err) {
       console.log(err);
       setIsClaiming({
@@ -133,8 +130,8 @@ const MyWinnings = () => {
       const res = await cosmicGameContract.claimDonatedNFT(tokenID);
       console.log(res);
       setTimeout(() => {
-        router.reload();
-      }, 4000);
+        fetchStatusData();
+      }, 3000);
     } catch (err) {
       console.log(err);
       e.target.disabled = false;
@@ -151,8 +148,8 @@ const MyWinnings = () => {
       const res = await cosmicGameContract.claimManyDonatedNFTs(indexList);
       console.log(res);
       setTimeout(() => {
-        router.reload();
-      }, 4000);
+        fetchStatusData();
+      }, 3000);
     } catch (err) {
       console.log(err);
       setIsClaiming({
@@ -178,15 +175,9 @@ const MyWinnings = () => {
     setRaffleETHToClaim(deposits);
   };
   useEffect(() => {
-    if (status?.UnclaimedStakingReward > 0) {
-      fetchUnclaimedStakingRewards();
-    }
-    if (status?.NumDonatedNFTToClaim > 0) {
-      fetchUnclaimedDonatedNFTs();
-    }
-    if (status?.ETHRaffleToClaim > 0) {
-      fetchUnclaimedRaffleETHDeposits();
-    }
+    fetchUnclaimedStakingRewards();
+    fetchUnclaimedDonatedNFTs();
+    fetchUnclaimedRaffleETHDeposits();
   }, [status]);
   return (
     <>
@@ -213,11 +204,11 @@ const MyWinnings = () => {
               <Typography variant="h5" mb={2}>
                 Claimable Raffle ETH
               </Typography>
-              {!status?.ETHRaffleToClaim ? (
+              {raffleETHToClaim !== null && raffleETHToClaim.length === 0 ? (
                 <Typography>No winnings yet.</Typography>
-              ) : status?.ETHRaffleToClaim > 0 && raffleETHToClaim === null ? (
+              ) : raffleETHToClaim === null ? (
                 <Typography>Loading...</Typography>
-              ) : raffleETHToClaim.length > 0 ? (
+              ) : (
                 <>
                   <MyWinningsTable
                     list={raffleETHToClaim.slice(
@@ -259,18 +250,16 @@ const MyWinnings = () => {
                     />
                   </Box>
                 </>
-              ) : (
-                <Typography>No winnings yet.</Typography>
               )}
             </Box>
             <Box mt={8}>
               <Typography variant="h5" mb={2}>
                 Earned Staking Rewards
               </Typography>
-              {status?.UnclaimedStakingReward === 0 ? (
+              {unclaimedStakingRewards !== null &&
+              unclaimedStakingRewards.length === 0 ? (
                 <Typography>No rewards yet.</Typography>
-              ) : status?.UnclaimedStakingReward > 0 &&
-                unclaimedStakingRewards === null ? (
+              ) : unclaimedStakingRewards === null ? (
                 <Typography>Loading...</Typography>
               ) : (
                 <UnclaimedStakingRewardsTable
@@ -285,7 +274,7 @@ const MyWinnings = () => {
                 sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
               >
                 <Typography variant="h5">Donated NFTs</Typography>
-                {donatedNFTToClaim?.length > 0 && (
+                {status?.NumDonatedNFTToClaim > 0 && (
                   <Button
                     onClick={handleAllDonatedNFTsClaim}
                     variant="contained"
@@ -295,18 +284,15 @@ const MyWinnings = () => {
                   </Button>
                 )}
               </Box>
-              {!status?.NumDonatedNFTToClaim ? (
+              {donatedNFTToClaim !== null && donatedNFTToClaim.length === 0 ? (
                 <Typography>No NFTs yet.</Typography>
-              ) : status?.NumDonatedNFTToClaim > 0 &&
-                donatedNFTToClaim === null ? (
+              ) : donatedNFTToClaim === null ? (
                 <Typography>Loading...</Typography>
               ) : (
-                donatedNFTToClaim !== null && (
-                  <DonatedNFTTable
-                    list={donatedNFTToClaim}
-                    handleClaim={handleDonatedNFTsClaim}
-                  />
-                )
+                <DonatedNFTTable
+                  list={donatedNFTToClaim}
+                  handleClaim={handleDonatedNFTsClaim}
+                />
               )}
             </Box>
             <Box mt={6}>

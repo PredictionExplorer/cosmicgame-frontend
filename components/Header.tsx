@@ -35,7 +35,7 @@ const Header = () => {
   });
   const [navs, setNavs] = useState([]);
   const { mobileView, drawerOpen } = state;
-  const { apiData: status, setApiData } = useApiData();
+  const { apiData: status } = useApiData();
   const { account } = useActiveWeb3React();
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState({
@@ -71,8 +71,6 @@ const Header = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const notify = await api.notify_red_box(account);
-        setApiData(notify);
         const user_balance = await api.get_user_balance(account);
         const { UserInfo } = await api.get_user_info(account);
         const rwlkTokens = await nftContract.walletOfOwner(account);
