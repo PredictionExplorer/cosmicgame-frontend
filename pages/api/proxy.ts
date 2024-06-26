@@ -1,7 +1,11 @@
 // pages/api/proxy.js
 import axios from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
-
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+}
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { url } = req.query;

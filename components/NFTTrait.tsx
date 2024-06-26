@@ -116,8 +116,11 @@ const NFTTrait = ({ tokenId }) => {
       await nftContract
         .transferFrom(account, address, tokenId)
         .then((tx) => tx.wait());
-
-      router.reload();
+      setTimeout(() => {
+        fetchCSTInfo();
+        fetchTransferHistory();
+        setAddress("");
+      }, 3000);
     } catch (err) {
       console.log(err);
       if (err.code !== 4001) {
