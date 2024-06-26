@@ -257,7 +257,7 @@ class ApiService {
 
   public async get_transfer_history(token_id: number) {
     try {
-      const { data } = await axios.get(getAPIUrl(`cst/transfers/${token_id}/0/10000`));
+      const { data } = await axios.get(getAPIUrl(`cst/transfers/${token_id}/0/1000000`));
       return data.TokenTransfers;
     } catch (err) {
       console.log(err);
@@ -267,7 +267,7 @@ class ApiService {
 
   public async get_claim_history() {
     try {
-      const { data } = await axios.get(getAPIUrl("prize/claim_history/0/100000"));
+      const { data } = await axios.get(getAPIUrl("prize/claim_history/0/1000000"));
       return data.GlobalClaimHistory;
     } catch (err) {
       console.log(err);
@@ -277,7 +277,7 @@ class ApiService {
 
   public async get_claim_history_by_user(address: string) {
     try {
-      const { data } = await axios.get(getAPIUrl(`user/claim_history/${address}/0/100000`));
+      const { data } = await axios.get(getAPIUrl(`user/claim_history/${address}/0/1000000`));
       return data.ClaimHistory;
     } catch (err) {
       console.log(err);
@@ -377,7 +377,7 @@ class ApiService {
 
   public async get_ct_transfers(address: string) {
     try {
-      const { data } = await axios.get(getAPIUrl(`user/cosmictoken/transfers/${address}/0/1000`));
+      const { data } = await axios.get(getAPIUrl(`user/cosmictoken/transfers/${address}/0/1000000`));
       return data.CosmicTokenTransfers;
     } catch (err) {
       console.log(err);
@@ -387,7 +387,7 @@ class ApiService {
 
   public async get_cst_transfers(address: string) {
     try {
-      const { data } = await axios.get(getAPIUrl(`user/cosmicsignature/transfers/${address}/0/1000`));
+      const { data } = await axios.get(getAPIUrl(`user/cosmicsignature/transfers/${address}/0/1000000`));
       return data.CosmicSignatureTransfers;
     } catch (err) {
       console.log(err);
@@ -437,7 +437,7 @@ class ApiService {
 
   public async get_collected_staking_rewards_by_user(address: string) {
     try {
-      const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/0/10000`));
+      const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/0/1000000`));
       return data.CollectedStakingCSTRewards;
     } catch (err) {
       console.log(err);
@@ -457,7 +457,7 @@ class ApiService {
 
   public async get_staking_cst_actions_by_user(address: string) {
     try {
-      const { data } = await axios.get(getAPIUrl(`staking/cst/actions/by_user/${address}/0/10000`));
+      const { data } = await axios.get(getAPIUrl(`staking/cst/actions/by_user/${address}/0/1000000`));
       return data.StakingCSTActions;
     } catch (err) {
       console.log(err);
@@ -467,7 +467,7 @@ class ApiService {
 
   public async get_staking_rwalk_actions_by_user(address: string) {
     try {
-      const { data } = await axios.get(getAPIUrl(`staking/rwalk/actions/by_user/${address}/0/10000`));
+      const { data } = await axios.get(getAPIUrl(`staking/rwalk/actions/by_user/${address}/0/1000000`));
       return data.UserStakingActionsRWalk;
     } catch (err) {
       console.log(err);
@@ -477,7 +477,7 @@ class ApiService {
 
   public async get_staking_cst_actions() {
     try {
-      const { data } = await axios.get(getAPIUrl("staking/cst/actions/global/0/10000"));
+      const { data } = await axios.get(getAPIUrl("staking/cst/actions/global/0/1000000"));
       return data.StakingCSTActions;
     } catch (err) {
       console.log(err);
@@ -487,7 +487,7 @@ class ApiService {
 
   public async get_staking_rwalk_actions() {
     try {
-      const { data } = await axios.get(getAPIUrl("staking/rwalk/actions/global/0/10000"));
+      const { data } = await axios.get(getAPIUrl("staking/rwalk/actions/global/0/1000000"));
       return data.GlobalStakingActionsRWalk;
     } catch (err) {
       console.log(err);
@@ -497,7 +497,7 @@ class ApiService {
 
   public async get_marketing_rewards() {
     try {
-      const { data } = await axios.get(getAPIUrl("marketing/rewards/global/0/10000"));
+      const { data } = await axios.get(getAPIUrl("marketing/rewards/global/0/1000000"));
       return data.MarketingRewards;
     } catch (err) {
       console.log(err);
@@ -507,7 +507,7 @@ class ApiService {
 
   public async get_marketing_rewards_by_user(address: string) {
     try {
-      const { data } = await axios.get(getAPIUrl(`marketing/rewards/by_user/${address}/0/10000`));
+      const { data } = await axios.get(getAPIUrl(`marketing/rewards/by_user/${address}/0/1000000`));
       return data.UserMarketingRewards;
     } catch (err) {
       console.log(err);
@@ -568,7 +568,7 @@ class ApiService {
 
   public async get_cst_tokens_by_user(address: string) {
     try {
-      const { data } = await axios.get(getAPIUrl(`cst/list_by_user/${address}/0/10000`));
+      const { data } = await axios.get(getAPIUrl(`cst/list_by_user/${address}/0/1000000`));
       return data.UserTokens;
     } catch (err) {
       console.log(err);
@@ -578,7 +578,7 @@ class ApiService {
 
   public async get_staking_cst_rewards() {
     try {
-      const { data } = await axios.get(getAPIUrl("staking/cst/rewards/global/0/10000"));
+      const { data } = await axios.get(getAPIUrl("staking/cst/rewards/global/0/1000000"));
       return data.StakingCSTRewards;
     } catch (err) {
       console.log(err);
@@ -648,7 +648,7 @@ class ApiService {
 
   public async get_system_modelist() {
     try {
-      const { data } = await axios.get(getAPIUrl(`system/modelist/0/10000`));
+      const { data } = await axios.get(getAPIUrl(`system/modelist/0/1000000`));
       return data.SystemModeChanges;
     } catch (err) {
       console.log(err);

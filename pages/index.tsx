@@ -47,7 +47,6 @@ import PaginationRWLKGrid from "../components/PaginationRWLKGrid";
 import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
 import Prize from "../components/Prize";
 import LatestNFTs from "../components/LatestNFTs";
-import router from "next/router";
 import Countdown from "react-countdown";
 import Counter from "../components/Counter";
 import DonatedNFT from "../components/DonatedNFT";
@@ -844,7 +843,9 @@ const NewHome = () => {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={8} md={8}>
-                      <Typography>{curBidList[0].Message}</Typography>
+                      <Typography sx={{ wordWrap: "break-word" }}>
+                        {curBidList[0].Message}
+                      </Typography>
                     </Grid>
                   </Grid>
                 )}
