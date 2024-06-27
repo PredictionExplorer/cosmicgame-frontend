@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Link,
-  Pagination,
-  TableBody,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Button, Link, TableBody, Tooltip, Typography } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -21,6 +13,7 @@ import axios from "axios";
 import NFTImage from "./NFTImage";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { CustomPagination } from "./CustomPagination";
 
 const NFTRow = ({ nft, handleClaim }) => {
   const [tokenURI, setTokenURI] = useState(null);
@@ -164,17 +157,12 @@ const DonatedNFTTable = ({ list, handleClaim }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

@@ -19,15 +19,15 @@ class ApiService {
     }
   }
 
-  public async get_bid_list() {
-    try {
-      const { data } = await axios.get(getAPIUrl("bid/list/0/1000000"));
-      return data.Bids;
-    } catch (err) {
-      console.log(err);
-      return [];
-    }
-  }
+  // public async get_bid_list() {
+  //   try {
+  //     const { data } = await axios.get(getAPIUrl("bid/list/0/1000000"));
+  //     return data.Bids;
+  //   } catch (err) {
+  //     console.log(err);
+  //     return [];
+  //   }
+  // }
 
   public async get_bid_list_by_round(round: number, sortDir: string) {
     try {

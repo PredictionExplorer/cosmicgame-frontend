@@ -7,7 +7,6 @@ import {
   Link,
   Menu,
   MenuItem,
-  Pagination,
   Snackbar,
   TableBody,
   Typography,
@@ -24,6 +23,7 @@ import {
 import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import { CustomPagination } from "./CustomPagination";
 
 const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
   if (!row) {
@@ -301,17 +301,12 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
           </Button>
         </Box>
       )}
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Pagination, TableBody, Tooltip, Typography } from "@mui/material";
+import { TableBody, Tooltip, Typography } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -12,6 +12,7 @@ import { convertTimestampToDateTime, shortenHex } from "../utils";
 import { useRouter } from "next/router";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import { CustomPagination } from "./CustomPagination";
 
 const PrizeRow = ({ prize }) => {
   const router = useRouter();
@@ -100,17 +101,12 @@ export const PrizeTable = ({ list, loading }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

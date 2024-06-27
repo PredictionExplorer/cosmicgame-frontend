@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Grid,
-  Link,
-  Pagination,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
+import { Box, Grid, Link, Tab, Tabs, Typography } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
@@ -41,6 +33,7 @@ import { ethers } from "ethers";
 import { SystemModesTable } from "../components/SystemModesTable";
 import { UniqueStakersRWLKTable } from "../components/UniqueStakersRWLKTable";
 import { MARKETING_WALLET_ADDRESS } from "../config/app";
+import { CustomPagination } from "../components/CustomPagination";
 // import { UniqueStakersBothTable } from "../components/UniqueStakersBothTable";
 
 interface TabPanelProps {
@@ -691,17 +684,12 @@ const Statistics = () => {
                         </Grid>
                       ))}
                   </Grid>
-                  <Box display="flex" justifyContent="center" mt={4}>
-                    <Pagination
-                      color="primary"
-                      page={curPage}
-                      onChange={(e, page) => setCurrentPage(page)}
-                      count={Math.ceil(nftDonations.length / perPage)}
-                      hideNextButton
-                      hidePrevButton
-                      shape="rounded"
-                    />
-                  </Box>
+                  <CustomPagination
+                    page={curPage}
+                    setPage={setCurrentPage}
+                    totalLength={nftDonations.length}
+                    perPage={perPage}
+                  />
                 </>
               ) : (
                 <Typography mt={2}>

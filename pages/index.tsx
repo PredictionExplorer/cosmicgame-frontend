@@ -16,7 +16,6 @@ import {
   Snackbar,
   Alert,
   InputAdornment,
-  Pagination,
   Link,
   Backdrop,
   CircularProgress,
@@ -66,6 +65,7 @@ import AlertDialog from "../components/AlertDialog";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import { useRouter } from "next/router";
+import { CustomPagination } from "../components/CustomPagination";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -315,7 +315,8 @@ const NewHome = () => {
           .then((tx) => tx.wait());
         console.log(receipt);
         setTimeout(() => {
-          router.reload();
+          fetchDataCollection();
+          setIsBidding(false);
         }, 3000);
         return;
       }
@@ -397,8 +398,9 @@ const NewHome = () => {
           .then((tx) => tx.wait());
         console.log(receipt);
         setTimeout(() => {
-          router.reload();
-        }, 4000);
+          fetchDataCollection();
+          setIsBidding(false);
+        }, 3000);
       } catch (err) {
         if (err?.data?.message) {
           const msg = getErrorMessage(err?.data?.message);
@@ -434,7 +436,8 @@ const NewHome = () => {
         .then((tx) => tx.wait());
       console.log(receipt);
       setTimeout(() => {
-        router.reload();
+        fetchDataCollection();
+        setIsBidding(false);
       }, 3000);
     } catch (err) {
       if (err?.data?.message) {
@@ -458,28 +461,94 @@ const NewHome = () => {
       console.error("Error requesting sound permission:", error);
     }
   };
+
   const handleNotificationClose = () => {
     setNotification({ ...notification, visible: false });
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const bidList = await api.get_bid_list();
-        const biddedRWLKIds = bidList.map((bid) => bid.RWalkNFTId);
+  const getRwlkNFTIds = async () => {
+    try {
+      if (nftRWLKContract && account) {
+        const used_rwalk = await api.get_used_rwlk_nfts();
+        const biddedRWLKIds = used_rwalk.map((x) => x.RWalkTokenId);
         const tokens = await nftRWLKContract.walletOfOwner(account);
         const nftIds = tokens
           .map((t) => t.toNumber())
           .filter((t) => !biddedRWLKIds.includes(t))
           .reverse();
         setRwlknftIds(nftIds);
-      } catch (e) {
-        console.log(e);
       }
-    };
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
+  const fetchData = async () => {
+    const newData = await api.get_dashboard_info();
+    const round = newData?.CurRoundNum;
+    const newBidData = await api.get_bid_list_by_round(round, "desc");
+    setCurBidList(newBidData);
+    const nftData = await api.get_donations_nft_by_round(round);
+    setDonatedNFTs(nftData);
+    setData((prevData) => {
+      if (
+        account !== newData?.LastBidderAddr &&
+        prevData &&
+        prevData.CurNumBids < newData?.CurNumBids
+      ) {
+        playAudio();
+      }
+      return newData;
+    });
+    setLoading(false);
+  };
+
+  const fetchPrizeTime = async () => {
+    const t = await api.get_prize_time();
+    const current = await api.get_current_time();
+    const diff = current * 1000 - Date.now();
+    setPrizeTime(t * 1000 - diff);
+  };
+
+  const fetchPrizeInfo = async () => {
+    const prizeList = await api.get_prize_list();
+    let prizeInfo;
+    if (prizeList.length) {
+      prizeInfo = await api.get_prize_info(prizeList.length - 1);
+    } else {
+      prizeInfo = null;
+    }
+    setPrizeInfo(prizeInfo);
+  };
+
+  const fetchClaimHistory = async () => {
+    const history = await api.get_claim_history();
+    setClaimHistory(history);
+  };
+
+  const fetchCSTBidData = async () => {
+    let ctData = await api.get_ct_price();
+    if (ctData) {
+      setCSTBidData({
+        AuctionDuration: parseInt(ctData.AuctionDuration),
+        CSTPrice: parseFloat(ethers.utils.formatEther(ctData.CSTPrice)),
+        SecondsElapsed: parseInt(ctData.SecondsElapsed),
+      });
+    }
+  };
+
+  const fetchDataCollection = () => {
+    getRwlkNFTIds();
+    fetchData();
+    fetchPrizeInfo();
+    fetchPrizeTime();
+    fetchClaimHistory();
+    fetchCSTBidData();
+  };
+
+  useEffect(() => {
     if (nftRWLKContract && account) {
-      getData();
+      getRwlkNFTIds();
     }
   }, [nftRWLKContract, account]);
 
@@ -505,76 +574,11 @@ const NewHome = () => {
       const offset = current * 1000 - Date.now();
       setOffset(offset);
     };
-
-    const fetchData = async () => {
-      const newData = await api.get_dashboard_info();
-      const round = newData?.CurRoundNum;
-      const newBidData = await api.get_bid_list_by_round(round, "desc");
-      setCurBidList(newBidData);
-      const nftData = await api.get_donations_nft_by_round(round);
-      setDonatedNFTs(nftData);
-      setData((prevData) => {
-        if (
-          account !== newData?.LastBidderAddr &&
-          prevData &&
-          prevData.CurNumBids < newData?.CurNumBids
-        ) {
-          playAudio();
-        }
-        return newData;
-      });
-      setLoading(false);
-    };
-
-    const fetchPrizeTime = async () => {
-      const t = await api.get_prize_time();
-      const current = await api.get_current_time();
-      const diff = current * 1000 - Date.now();
-      setPrizeTime(t * 1000 - diff);
-    };
-
-    const fetchPrizeInfo = async () => {
-      const prizeList = await api.get_prize_list();
-      let prizeInfo;
-      if (prizeList.length) {
-        prizeInfo = await api.get_prize_info(prizeList.length - 1);
-      } else {
-        prizeInfo = null;
-      }
-      setPrizeInfo(prizeInfo);
-    };
-
-    const fetchClaimHistory = async () => {
-      const history = await api.get_claim_history();
-      setClaimHistory(history);
-    };
-
-    const fetchCSTBidData = async () => {
-      let ctData = await api.get_ct_price();
-      if (ctData) {
-        setCSTBidData({
-          AuctionDuration: parseInt(ctData.AuctionDuration),
-          CSTPrice: parseFloat(ethers.utils.formatEther(ctData.CSTPrice)),
-          SecondsElapsed: parseInt(ctData.SecondsElapsed),
-        });
-      }
-    };
-
     calculateTimeOffset();
-    fetchData();
-    fetchPrizeInfo();
-    fetchPrizeTime();
-    fetchClaimHistory();
-    fetchCSTBidData();
+    fetchDataCollection();
 
     // Fetch data every 12 seconds
-    const interval = setInterval(() => {
-      fetchData();
-      fetchPrizeInfo();
-      fetchPrizeTime();
-      fetchClaimHistory();
-      fetchCSTBidData();
-    }, 12000);
+    const interval = setInterval(fetchDataCollection, 12000);
 
     // Clean up the interval when the component is unmounted
     return () => {
@@ -1339,17 +1343,12 @@ const NewHome = () => {
                   </Grid>
                 ))}
               </Grid>
-              <Box display="flex" justifyContent="center" mt={4}>
-                <Pagination
-                  color="primary"
-                  page={curPage}
-                  onChange={(e, page) => setCurrentPage(page)}
-                  count={Math.ceil(donatedNFTs.length / perPage)}
-                  hideNextButton
-                  hidePrevButton
-                  shape="rounded"
-                />
-              </Box>
+              <CustomPagination
+                page={curPage}
+                setPage={setCurrentPage}
+                totalLength={donatedNFTs.length}
+                perPage={perPage}
+              />
             </>
           ) : (
             <Typography mt={2}>
@@ -1426,3 +1425,8 @@ const NewHome = () => {
 };
 
 export default NewHome;
+
+// Todo:
+// long list pagination with page number
+// get_bid_list_by_round: implement pagination
+// get_user_info: remove bid field

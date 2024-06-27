@@ -6,7 +6,6 @@ import {
   IconButton,
   Link,
   Menu,
-  Pagination,
   Snackbar,
   TableBody,
   Tooltip,
@@ -34,6 +33,7 @@ import { Tr } from "react-super-responsive-table";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AdvancedClaimDialog from "./AdvancedClaimDialog";
 import getErrorMessage from "../utils/alert";
+import { CustomPagination } from "./CustomPagination";
 
 const fetchInfo = async (account, depositId, stakedActionIds) => {
   let unstakeableActionIds = [],
@@ -675,17 +675,12 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
           </Button>
         </Box>
       )}
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

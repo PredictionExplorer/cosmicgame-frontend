@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Link,
-  Pagination,
-  TableBody,
-  Typography,
-} from "@mui/material";
+import { Link, TableBody, Typography } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -17,6 +11,7 @@ import {
 import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import { CustomPagination } from "./CustomPagination";
 
 const WithdrawalRow = ({ withdrawal }) => {
   if (!withdrawal) {
@@ -83,17 +78,12 @@ const CharityWithdrawalTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Pagination, TableBody } from "@mui/material";
+import { TableBody } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -11,6 +11,7 @@ import {
 import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import { CustomPagination } from "./CustomPagination";
 
 const NameHistoryRow = ({ record }) => {
   if (!record) {
@@ -51,17 +52,12 @@ const NameHistoryTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

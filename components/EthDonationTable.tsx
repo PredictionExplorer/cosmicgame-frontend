@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
+import { Link, TableBody, Typography } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -11,6 +11,7 @@ import {
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { convertTimestampToDateTime } from "../utils";
+import { CustomPagination } from "./CustomPagination";
 
 const EthDonationRow = ({ row }) => {
   if (!row) {
@@ -73,17 +74,12 @@ const EthDonationTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

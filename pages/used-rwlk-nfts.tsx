@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Link,
-  Pagination,
-  TableBody,
-  Typography,
-} from "@mui/material";
+import { Box, Link, TableBody, Typography } from "@mui/material";
 import Head from "next/head";
 import {
   MainWrapper,
@@ -20,6 +14,7 @@ import { convertTimestampToDateTime } from "../utils";
 import api from "../services/api";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import { CustomPagination } from "../components/CustomPagination";
 
 const UsedRwlkNftRow = ({ nft }) => {
   if (!nft) {
@@ -121,17 +116,12 @@ const UsedRwlkNfts = () => {
               <UsedRwlkNftsTable
                 list={list.slice((curPage - 1) * perPage, curPage * perPage)}
               />
-              <Box display="flex" justifyContent="center" mt={4}>
-                <Pagination
-                  color="primary"
-                  page={curPage}
-                  onChange={(_e, page) => setCurPage(page)}
-                  count={Math.ceil(list.length / perPage)}
-                  hideNextButton
-                  hidePrevButton
-                  shape="rounded"
-                />
-              </Box>
+              <CustomPagination
+                page={curPage}
+                setPage={setCurPage}
+                totalLength={list.length}
+                perPage={perPage}
+              />
             </>
           ) : (
             <Typography variant="h6">No NFTs yet.</Typography>

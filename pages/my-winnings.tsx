@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Link,
-  Pagination,
-  TableBody,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Link, TableBody, Typography } from "@mui/material";
 import Head from "next/head";
 import {
   MainWrapper,
@@ -28,6 +21,7 @@ import api from "../services/api";
 import { UnclaimedStakingRewardsTable } from "../components/UnclaimedStakingRewardsTable";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { CustomPagination } from "../components/CustomPagination";
 
 const MyWinningsRow = ({ winning }) => {
   if (!winning) {
@@ -238,17 +232,12 @@ const MyWinnings = () => {
                       </Button>
                     </Box>
                   )}
-                  <Box display="flex" justifyContent="center" mt={2}>
-                    <Pagination
-                      color="primary"
-                      page={curPage}
-                      onChange={(_e, page) => setCurPage(page)}
-                      count={Math.ceil(raffleETHToClaim.length / perPage)}
-                      hideNextButton
-                      hidePrevButton
-                      shape="rounded"
-                    />
-                  </Box>
+                  <CustomPagination
+                    page={curPage}
+                    setPage={setCurPage}
+                    totalLength={raffleETHToClaim.length}
+                    perPage={perPage}
+                  />
                 </>
               )}
             </Box>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
+import { Link, TableBody, Typography } from "@mui/material";
 import Head from "next/head";
 import {
   MainWrapper,
@@ -16,6 +16,7 @@ import { ethers } from "ethers";
 import { GetServerSidePropsContext } from "next";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { CustomPagination } from "../../components/CustomPagination";
 
 const CosmicTokenTransferRow = ({ row }) => {
   if (!row) {
@@ -90,17 +91,12 @@ const CosmicTokenTransfersTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

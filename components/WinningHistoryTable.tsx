@@ -22,11 +22,11 @@ import {
   TablePrimaryHeadCell,
   TablePrimary,
 } from "./styled";
-import Pagination from "@mui/material/Pagination";
 import { convertTimestampToDateTime, shortenHex } from "../utils";
 import axios from "axios";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { CustomPagination } from "./CustomPagination";
 
 const HistoryRow = ({ history, showClaimedStatus }) => {
   const [tokenURI, setTokenURI] = useState(null);
@@ -275,17 +275,12 @@ const WinningHistoryTable = ({ winningHistory, showClaimedStatus = false }) => {
         perPage={perPage}
         curPage={curPage}
       />
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={curPage}
-          onChange={(e, page) => setCurrentPage(page)}
-          count={Math.ceil(winningHistory.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={curPage}
+        setPage={setCurrentPage}
+        totalLength={winningHistory.length}
+        perPage={perPage}
+      />
     </Box>
   );
 };

@@ -8,7 +8,6 @@ import {
   DialogTitle,
   IconButton,
   Link,
-  Pagination,
   TableBody,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -24,6 +23,7 @@ import { Tr } from "react-super-responsive-table";
 import { useEffect, useState } from "react";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import api from "../services/api";
+import { CustomPagination } from "./CustomPagination";
 
 const TokenRow = ({ row, stakeState, setStakeState }) => {
   const [tokenName, setTokenName] = useState("");
@@ -260,17 +260,12 @@ const TokensTable = ({ stakeState, setStakeState }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(stakeState.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={stakeState.length}
+        perPage={perPage}
+      />
       {stakeState.length > 1 && (
         <Box mt={2}>
           <Button

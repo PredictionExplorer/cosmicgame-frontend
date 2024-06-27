@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Link, Pagination, TableBody, Tooltip, Typography } from "@mui/material";
+import { Link, TableBody, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";
 import {
   MainWrapper,
@@ -17,6 +17,7 @@ import { GetServerSidePropsContext } from "next";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { ADMIN_EVENTS } from "../../../config/misc";
+import { CustomPagination } from "../../../components/CustomPagination";
 
 const AdminEventsRow = ({ row }) => {
   if (!row) {
@@ -85,17 +86,12 @@ const AdminEventsTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

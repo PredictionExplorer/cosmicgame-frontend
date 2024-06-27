@@ -4,7 +4,6 @@ import {
   Collapse,
   IconButton,
   Link,
-  Pagination,
   TableBody,
   Typography,
 } from "@mui/material";
@@ -23,6 +22,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
+import { CustomPagination } from "./CustomPagination";
 
 const DetailRow = ({ row }) => {
   if (!row) {
@@ -94,17 +94,12 @@ const DetailTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };
@@ -244,17 +239,12 @@ export const CollectedStakingRewardsTable = ({ list }) => {
             .toFixed(6)}
         </Typography>
       </Box>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

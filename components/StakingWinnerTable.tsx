@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  TableBody,
-  Box,
-  Pagination,
-  Link,
-  Typography,
-  Tooltip,
-} from "@mui/material";
+import { TableBody, Link, Typography, Tooltip } from "@mui/material";
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -18,6 +11,7 @@ import {
 import { convertTimestampToDateTime, shortenHex } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { CustomPagination } from "./CustomPagination";
 
 const WinnerRow = ({ winner }) => {
   if (!winner) {
@@ -94,17 +88,12 @@ const StakingWinnerTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

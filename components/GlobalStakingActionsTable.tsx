@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Link,
-  Pagination,
-  TableBody,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Link, TableBody, Tooltip, Typography } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -19,6 +12,7 @@ import { convertTimestampToDateTime, shortenHex } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { useRouter } from "next/router";
+import { CustomPagination } from "./CustomPagination";
 
 const GlobalStakingActionsRow = ({ row, IsRWLK }) => {
   const router = useRouter();
@@ -110,17 +104,12 @@ export const GlobalStakingActionsTable = ({ list, IsRWLK }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(_e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

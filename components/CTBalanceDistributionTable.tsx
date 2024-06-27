@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Link, Pagination, TableBody, Typography } from "@mui/material";
+import { Link, TableBody, Typography } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -10,6 +10,7 @@ import {
 } from "./styled";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import { CustomPagination } from "./CustomPagination";
 
 const CTBalanceDistributionRow = ({ row }) => {
   if (!row) {
@@ -49,8 +50,12 @@ const CTBalanceDistributionTable = ({ list }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Owner Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Balance (CST)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Owner Address
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Balance (CST)
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
@@ -60,17 +65,12 @@ const CTBalanceDistributionTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };

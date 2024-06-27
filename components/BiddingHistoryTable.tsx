@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Box, TableBody, Link, Typography, Tooltip } from "@mui/material";
+import {
+  Box,
+  TableBody,
+  Link,
+  Typography,
+  Tooltip,
+} from "@mui/material";
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -8,11 +14,11 @@ import {
   TablePrimaryHeadCell,
   TablePrimary,
 } from "./styled";
-import Pagination from "@mui/material/Pagination";
 import { shortenHex, convertTimestampToDateTime } from "../utils";
 import router from "next/router";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { CustomPagination } from "./CustomPagination";
 
 const HistoryRow = ({ history }) => {
   if (!history) {
@@ -149,17 +155,12 @@ const BiddingHistoryTable = ({ biddingHistory }) => {
             perPage={perPage}
             curPage={curPage}
           />
-          <Box display="flex" justifyContent="center" mt={4}>
-            <Pagination
-              color="primary"
-              page={curPage}
-              onChange={(e, page) => setCurrentPage(page)}
-              count={Math.ceil(biddingHistory.length / perPage)}
-              hideNextButton
-              hidePrevButton
-              shape="rounded"
-            />
-          </Box>
+          <CustomPagination
+            page={curPage}
+            setPage={setCurrentPage}
+            totalLength={biddingHistory.length}
+            perPage={perPage}
+          />
         </>
       ) : (
         <Typography>No bid history yet.</Typography>

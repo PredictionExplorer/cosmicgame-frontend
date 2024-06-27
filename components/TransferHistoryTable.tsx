@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Link, Pagination, TableBody } from "@mui/material";
+import { Link, TableBody } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -16,6 +16,7 @@ import {
   STAKING_WALLET_CST_ADDRESS,
   STAKING_WALLET_RWLK_ADDRESS,
 } from "../config/app";
+import { CustomPagination } from "./CustomPagination";
 
 const TransferHistoryRow = ({ record }) => {
   if (!record || record.FromAddr === ZERO_ADDRESS) {
@@ -84,17 +85,12 @@ export const TransferHistoryTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <Box display="flex" justifyContent="center" mt={4}>
-        <Pagination
-          color="primary"
-          page={page}
-          onChange={(e, page) => setPage(page)}
-          count={Math.ceil(list.length / perPage)}
-          hideNextButton
-          hidePrevButton
-          shape="rounded"
-        />
-      </Box>
+      <CustomPagination
+        page={page}
+        setPage={setPage}
+        totalLength={list.length}
+        perPage={perPage}
+      />
     </>
   );
 };
