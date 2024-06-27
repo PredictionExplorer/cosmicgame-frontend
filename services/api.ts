@@ -21,7 +21,7 @@ class ApiService {
 
   public async get_bid_list() {
     try {
-      const { data } = await axios.get(getAPIUrl("bid/list/0/1000000"));
+      const { data } = await axios.get(getAPIUrl("bid/list/0/1000"));
       return data.Bids;
     } catch (err) {
       console.log(err);
