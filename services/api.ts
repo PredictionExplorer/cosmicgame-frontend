@@ -32,7 +32,7 @@ class ApiService {
   public async get_bid_list_by_round(round: number, sortDir: string) {
     try {
       const dir = sortDir === 'asc' ? 0 : 1;
-      const { data } = await axios.get(getAPIUrl(`bid/list_by_round/${round}/${dir}/0/1000000`));
+      const { data } = await axios.get(getAPIUrl(`bid/list_by_round/${round}/${dir}/0/1000`));
       return data.BidsByRound;
     } catch (err) {
       console.log(err);
