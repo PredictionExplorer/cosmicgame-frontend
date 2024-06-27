@@ -1427,6 +1427,5 @@ const NewHome = () => {
 export default NewHome;
 
 // Todo:
-// long list pagination with page number
 // get_bid_list_by_round: implement pagination
 // get_user_info: remove bid field

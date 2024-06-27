@@ -4,7 +4,7 @@ export const CustomPagination = ({ page, setPage, totalLength, perPage }) => {
   return (
     <Box
       display="flex"
-      justifyContent="end"
+      justifyContent={Math.ceil(totalLength / perPage) >= 30 ? "end" : "center"}
       alignItems="center"
       flexWrap="wrap"
       mt={2}
