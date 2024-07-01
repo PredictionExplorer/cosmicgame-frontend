@@ -400,6 +400,8 @@ const NewHome = () => {
         setTimeout(() => {
           fetchDataCollection();
           setMessage("");
+          setNftId("");
+          setNftDonateAddress("");
           setIsBidding(false);
         }, 3000);
       } catch (err) {
