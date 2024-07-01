@@ -6,8 +6,6 @@ import {
   useTheme,
   useMediaQuery,
   Box,
-  Alert,
-  Snackbar,
 } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
@@ -18,29 +16,16 @@ import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
 import useStakingWalletRWLKContract from "../hooks/useStakingWalletRWLKContract";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { formatSeconds } from "../utils";
+import { useNotification } from "../contexts/NotificationContext";
 
 const ContractItem = ({ name, value, copyable = false }) => {
   const theme = useTheme();
   const md = useMediaQuery(theme.breakpoints.up("md"));
   const sm = useMediaQuery(theme.breakpoints.up("sm"));
-  const [notification, setNotification] = useState(false);
+  const { setNotification } = useNotification();
 
   return (
     <>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        autoHideDuration={6000}
-        open={notification}
-        onClose={() => setNotification(false)}
-      >
-        <Alert
-          severity="success"
-          variant="filled"
-          onClose={() => setNotification(false)}
-        >
-          Address copied!
-        </Alert>
-      </Snackbar>
       <ListItem>
         <Typography
           color="primary"
@@ -57,7 +42,13 @@ const ContractItem = ({ name, value, copyable = false }) => {
           <CopyToClipboard text={value}>
             <Box
               sx={{ display: "flex", cursor: "pointer", alignItems: "center" }}
-              onClick={() => setNotification(true)}
+              onClick={() =>
+                setNotification({
+                  text: "Address copied!",
+                  type: "success",
+                  visible: true,
+                })
+              }
             >
               <Typography
                 fontFamily="monospace"

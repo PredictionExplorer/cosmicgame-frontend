@@ -22,6 +22,8 @@ import { UnclaimedStakingRewardsTable } from "../components/UnclaimedStakingRewa
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "../components/CustomPagination";
+import getErrorMessage from "../utils/alert";
+import { useNotification } from "../contexts/NotificationContext";
 
 const MyWinningsRow = ({ winning }) => {
   if (!winning) {
@@ -94,6 +96,7 @@ const MyWinnings = () => {
     donatedNFT: false,
     raffleETH: false,
   });
+  const { setNotification } = useNotification();
 
   const cosmicGameContract = useCosmicGameContract();
   const raffleWalletContract = useRaffleWalletContract();
@@ -111,6 +114,10 @@ const MyWinnings = () => {
       }, 3000);
     } catch (err) {
       console.log(err);
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       setIsClaiming({
         ...isClaiming,
         raffleETH: false,
@@ -128,6 +135,10 @@ const MyWinnings = () => {
       }, 3000);
     } catch (err) {
       console.log(err);
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       e.target.disabled = false;
       e.target.classList.remove("Mui-disabled");
     }
@@ -146,6 +157,10 @@ const MyWinnings = () => {
       }, 3000);
     } catch (err) {
       console.log(err);
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       setIsClaiming({
         ...isClaiming,
         donatedNFT: false,

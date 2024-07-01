@@ -29,6 +29,7 @@ import ApiDataFetcher from '../contexts/ApiDataFetcher'
 import { CookiesProvider } from 'react-cookie'
 import { StakedTokenProvider } from '../contexts/StakedTokenContext'
 import { SystemModeProvider } from '../contexts/SystemModeContext'
+import { NotificationProvider } from '../contexts/NotificationContext'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -112,10 +113,12 @@ function MyApp(props: MyAppProps) {
                 <StakedTokenProvider>
                   <SystemModeProvider>
                     <ApiDataProvider>
-                      <Header />
-                      <Component {...pageProps} />
-                      <Footer />
-                      <ApiDataFetcher interval={30000} />
+                      <NotificationProvider>
+                        <Header />
+                        <Component {...pageProps} />
+                        <Footer />
+                        <ApiDataFetcher interval={30000} />
+                      </NotificationProvider>
                     </ApiDataProvider>
                   </SystemModeProvider>
                 </StakedTokenProvider>

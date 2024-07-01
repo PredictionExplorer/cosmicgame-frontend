@@ -18,6 +18,8 @@ import { useActiveWeb3React } from "../../hooks/web3";
 import useCosmicGameContract from "../../hooks/useCosmicGameContract";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
 import { CSTTable } from "../my-tokens";
+import getErrorMessage from "../../utils/alert";
+import { useNotification } from "../../contexts/NotificationContext";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -67,6 +69,7 @@ const UserInfo = ({ address }) => {
   const [stakingTable, setStakingTable] = useState(0);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
+  const { setNotification } = useNotification();
 
   const cosmicGameContract = useCosmicGameContract();
 
@@ -135,6 +138,10 @@ const UserInfo = ({ address }) => {
       }, 3000);
     } catch (err) {
       console.log(err);
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       e.target.disabled = false;
       e.target.classList.remove("Mui-disabled");
     }
@@ -153,6 +160,10 @@ const UserInfo = ({ address }) => {
       }, 3000);
     } catch (err) {
       console.log(err);
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       setIsClaiming(false);
     }
   };

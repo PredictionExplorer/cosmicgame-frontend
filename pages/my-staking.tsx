@@ -24,6 +24,8 @@ import { StakingRewardMintsTable } from "../components/StakingRewardMintsTable";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { formatSeconds } from "../utils";
 import { ethers } from "ethers";
+import getErrorMessage from "../utils/alert";
+import { useNotification } from "../contexts/NotificationContext";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -72,6 +74,7 @@ const MyStaking = () => {
   const rwlkStakingContract = useStakingWalletRWLKContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
   const cosmicGameContract = useCosmicGameContract();
+  const { setNotification } = useNotification();
 
   const handleStake = async (tokenId: number, isRwalk: boolean) => {
     const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
@@ -90,6 +93,13 @@ const MyStaking = () => {
       }
       const res = await stakingContract.stake(tokenId).then((tx) => tx.wait());
       console.log(res);
+      if (!res.code) {
+        setNotification({
+          visible: true,
+          text: `You have successfully staked token ${tokenId}!`,
+          type: "success",
+        });
+      }
       setTimeout(() => {
         if (isRwalk) {
           fetchRWLKData(account);
@@ -99,6 +109,10 @@ const MyStaking = () => {
       }, 2000);
       return res;
     } catch (err) {
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       console.error(err);
       return err;
     }
@@ -123,6 +137,13 @@ const MyStaking = () => {
         .stakeMany(tokenIds)
         .then((tx) => tx.wait());
       console.log(res);
+      if (!res.code) {
+        setNotification({
+          visible: true,
+          text: "The selected tokens were staked successfully!",
+          type: "success",
+        });
+      }
       setTimeout(() => {
         if (isRwalk) {
           fetchRWLKData(account);
@@ -132,6 +153,10 @@ const MyStaking = () => {
       }, 2000);
       return res;
     } catch (err) {
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       console.error(err);
       return err;
     }
@@ -144,6 +169,13 @@ const MyStaking = () => {
         .unstakeMany(actionIds)
         .then((tx) => tx.wait());
       console.log(res);
+      if (!res.code) {
+        setNotification({
+          visible: true,
+          text: "The selected tokens were unstaked successfully!",
+          type: "success",
+        });
+      }
       setTimeout(() => {
         if (isRwalk) {
           fetchRWLKData(account);
@@ -153,6 +185,10 @@ const MyStaking = () => {
       }, 2000);
       return res;
     } catch (err) {
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       console.error(err);
       return err;
     }
@@ -165,6 +201,13 @@ const MyStaking = () => {
         .unstake(actionId)
         .then((tx) => tx.wait());
       console.log(res);
+      if (!res.code) {
+        setNotification({
+          visible: true,
+          text: `You have successfully unstaked token!`,
+          type: "success",
+        });
+      }
       setTimeout(() => {
         if (isRwalk) {
           fetchRWLKData(account);
@@ -174,6 +217,10 @@ const MyStaking = () => {
       }, 2000);
       return res;
     } catch (err) {
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       console.error(err);
       return err;
     }

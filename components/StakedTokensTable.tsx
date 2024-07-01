@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
   Link,
   Menu,
   MenuItem,
-  Snackbar,
   TableBody,
   Typography,
 } from "@mui/material";
@@ -137,8 +135,7 @@ const StakedTokensRow = ({
             onClick={(e) => {
               e.stopPropagation();
               handleUnstake(
-                IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId,
-                IsRwalk ? row.StakedTokenId : row.TokenInfo.TokenId
+                IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
               );
             }}
           >
@@ -157,15 +154,6 @@ export const StakedTokensTable = ({
   IsRwalk,
 }) => {
   const perPage = 5;
-  const [notification, setNotification] = useState<{
-    text: string;
-    type: "success" | "info" | "warning" | "error";
-    visible: boolean;
-  }>({
-    visible: false,
-    text: "",
-    type: "success",
-  });
   const [offset, setOffset] = useState(0);
   const filtered = list.filter(
     (x) => x.UnstakeTimeStamp <= Date.now() / 1000 + offset
@@ -211,28 +199,11 @@ export const StakedTokensTable = ({
     setAnchorEl(null);
   };
   const onUnstakeMany = async () => {
-    const res = await handleUnstakeMany(selected, IsRwalk);
-    if (!res.code) {
-      setNotification({
-        visible: true,
-        text: "The selected tokens were unstaked successfully!",
-        type: "success",
-      });
-    }
+    await handleUnstakeMany(selected, IsRwalk);
   };
-  const onUnstake = async (actionId: number, tokenId: number) => {
+  const onUnstake = async (actionId: number) => {
     setSelected([actionId]);
-    const res = await handleUnstake(actionId, IsRwalk);
-    if (!res.code) {
-      setNotification({
-        visible: true,
-        text: `You have successfully unstaked token ${tokenId}!`,
-        type: "success",
-      });
-    }
-  };
-  const handleNotificationClose = () => {
-    setNotification({ ...notification, visible: false });
+    await handleUnstake(actionId, IsRwalk);
   };
   useEffect(() => {
     const fetchData = async () => {
@@ -250,20 +221,6 @@ export const StakedTokensTable = ({
   }
   return (
     <>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        autoHideDuration={10000}
-        open={notification.visible}
-        onClose={handleNotificationClose}
-      >
-        <Alert
-          severity={notification.type}
-          variant="filled"
-          onClose={handleNotificationClose}
-        >
-          {notification.text}
-        </Alert>
-      </Snackbar>
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>

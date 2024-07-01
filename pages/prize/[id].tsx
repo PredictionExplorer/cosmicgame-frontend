@@ -11,6 +11,8 @@ import useCosmicGameContract from "../../hooks/useCosmicGameContract";
 import { useApiData } from "../../contexts/ApiDataContext";
 import StakingWinnerTable from "../../components/StakingWinnerTable";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
+import getErrorMessage from "../../utils/alert";
+import { useNotification } from "../../contexts/NotificationContext";
 
 const PrizeInfo = ({ roundNum }) => {
   const cosmicGameContract = useCosmicGameContract();
@@ -21,6 +23,7 @@ const PrizeInfo = ({ roundNum }) => {
   const [prizeInfo, setPrizeInfo] = useState(null);
   const [stakingRewards, setStakingRewards] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { setNotification } = useNotification();
 
   const handleAllDonatedNFTsClaim = async () => {
     try {
@@ -28,6 +31,10 @@ const PrizeInfo = ({ roundNum }) => {
       const res = await cosmicGameContract.claimManyDonatedNFTs(indexList);
       console.log(res);
     } catch (err) {
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       console.log(err);
     }
   };

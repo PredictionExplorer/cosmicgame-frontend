@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
   Link,
   Menu,
   MenuItem,
-  Snackbar,
   TableBody,
   Typography,
 } from "@mui/material";
@@ -74,15 +72,6 @@ const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
 export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
   const perPage = 5;
   const [anchorEl, setAnchorEl] = useState(null);
-  const [notification, setNotification] = useState<{
-    text: string;
-    type: "success" | "info" | "warning" | "error";
-    visible: boolean;
-  }>({
-    visible: false,
-    text: "",
-    type: "success",
-  });
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
@@ -118,33 +107,12 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
     setAnchorEl(null);
   };
   const onStakeMany = async () => {
-    const res = await handleStakeMany(
-      selected,
-      new Array(selected.length).fill(true)
-    );
-    if (!res.code) {
-      setNotification({
-        visible: true,
-        text: "The selected tokens were staked successfully!",
-        type: "success",
-      });
-    }
+    await handleStakeMany(selected, new Array(selected.length).fill(true));
   };
   const onStake = async (id: number) => {
     setSelected([id]);
-    const res = await handleStake(id, true);
-    if (!res.code) {
-      setNotification({
-        visible: true,
-        text: `You have successfully staked token ${id}!`,
-        type: "success",
-      });
-    }
+    await handleStake(id, true);
   };
-  const handleClose = () => {
-    setNotification({ ...notification, visible: false });
-  };
-
   useEffect(() => {
     setSelected([]);
     setPage(1);
@@ -155,20 +123,6 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
   }
   return (
     <>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        autoHideDuration={10000}
-        open={notification.visible}
-        onClose={handleClose}
-      >
-        <Alert
-          severity={notification.type}
-          variant="filled"
-          onClose={handleClose}
-        >
-          {notification.text}
-        </Alert>
-      </Snackbar>
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>

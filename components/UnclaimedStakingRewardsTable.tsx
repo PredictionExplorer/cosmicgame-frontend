@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   Box,
   Button,
   IconButton,
   Link,
   Menu,
-  Snackbar,
   TableBody,
   Tooltip,
   Typography,
@@ -34,6 +32,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AdvancedClaimDialog from "./AdvancedClaimDialog";
 import getErrorMessage from "../utils/alert";
 import { CustomPagination } from "./CustomPagination";
+import { useNotification } from "../contexts/NotificationContext";
 
 const fetchInfo = async (account, depositId, stakedActionIds) => {
   let unstakeableActionIds = [],
@@ -466,17 +465,9 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
   const [waitingActionIds, setWaitingActionIds] = useState([]);
-  const [notification, setNotification] = useState<{
-    text: string;
-    type: "success" | "info" | "warning" | "error";
-    visible: boolean;
-  }>({
-    visible: false,
-    text: "",
-    type: "success",
-  });
   const { account } = useActiveWeb3React();
   const stakingContract = useStakingWalletCSTContract();
+  const { setNotification } = useNotification();
 
   const handleUnstakeClaimRestake = async (
     type,
@@ -509,7 +500,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         const msg = getErrorMessage(e?.data?.message);
         setNotification({
           visible: true,
-          text: `${msg}. Please try again.`,
+          text: msg,
           type: "error",
         });
       } else {
@@ -538,12 +529,16 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         type: "success",
       });
     } catch (e) {
+      if (e?.data?.message) {
+        const msg = getErrorMessage(e?.data?.message);
+        setNotification({
+          visible: true,
+          text: msg,
+          type: "error",
+        });
+      }
       console.error(e);
     }
-  };
-
-  const handleNotificationClose = () => {
-    setNotification({ ...notification, visible: false });
   };
 
   useEffect(() => {
@@ -584,20 +579,6 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
 
   return (
     <>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-        autoHideDuration={10000}
-        open={notification.visible}
-        onClose={handleNotificationClose}
-      >
-        <Alert
-          severity={notification.type}
-          variant="filled"
-          onClose={handleNotificationClose}
-        >
-          {notification.text}
-        </Alert>
-      </Snackbar>
       <TablePrimaryContainer>
         <TablePrimary>
           <TablePrimaryHead>

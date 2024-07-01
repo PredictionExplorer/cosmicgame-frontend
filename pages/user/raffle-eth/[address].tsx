@@ -20,6 +20,8 @@ import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { convertTimestampToDateTime } from "../../../utils";
 import { CustomPagination } from "../../../components/CustomPagination";
+import getErrorMessage from "../../../utils/alert";
+import { useNotification } from "../../../contexts/NotificationContext";
 
 const MyWinningsRow = ({ winning }) => {
   if (!winning) {
@@ -98,6 +100,7 @@ const UserRaffleETH = ({ address }) => {
   const [invalidAddress, setInvalidAddress] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const raffleWalletContract = useRaffleWalletContract();
+  const { setNotification } = useNotification();
 
   const fetchRaffleETHDeposits = async (reload = true) => {
     setRaffleETHToClaim((prev) => ({ ...prev, loading: reload }));
@@ -118,6 +121,10 @@ const UserRaffleETH = ({ address }) => {
       }, 2000);
     } catch (err) {
       console.log(err);
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       setIsClaiming(false);
     }
   };

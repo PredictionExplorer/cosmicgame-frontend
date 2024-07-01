@@ -1,5 +1,5 @@
 export default function getErrorMessage(message) {
-  const regex = /'(.*?)'/; // Matches anything between single quotes
+  const regex = /"([^"]*)"/;
 
   const matches = message.match(regex);
   if (matches) {

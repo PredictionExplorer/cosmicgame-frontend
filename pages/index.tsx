@@ -13,8 +13,6 @@ import {
   Grid,
   useTheme,
   useMediaQuery,
-  Snackbar,
-  Alert,
   InputAdornment,
   Link,
   Backdrop,
@@ -66,6 +64,7 @@ import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
 import { useRouter } from "next/router";
 import { CustomPagination } from "../components/CustomPagination";
+import { useNotification } from "../contexts/NotificationContext";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -106,15 +105,6 @@ const NewHome = () => {
   const [rwlkId, setRwlkId] = useState(-1);
   const [bidPricePlus, setBidPricePlus] = useState(2);
   const [isBidding, setIsBidding] = useState(false);
-  const [notification, setNotification] = useState<{
-    text: string;
-    type: "success" | "info" | "warning" | "error";
-    visible: boolean;
-  }>({
-    text: "",
-    type: "error",
-    visible: false,
-  });
   const [bannerTokenId, setBannerTokenId] = useState("");
   const [rwlknftIds, setRwlknftIds] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -134,6 +124,7 @@ const NewHome = () => {
   const cosmicGameContract = useCosmicGameContract();
   const nftRWLKContract = useRWLKNFTContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
+  const { setNotification } = useNotification();
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
@@ -193,8 +184,16 @@ const NewHome = () => {
                 token_id - index
               );
               await api.create(token_id - index, seed);
-            } catch (error) {
-              console.log(error);
+            } catch (err) {
+              if (err?.data?.message) {
+                const msg = err?.data?.message;
+                setNotification({
+                  visible: true,
+                  type: "error",
+                  text: msg,
+                });
+              }
+              console.log(err);
             }
           })
       );
@@ -462,10 +461,6 @@ const NewHome = () => {
     }
   };
 
-  const handleNotificationClose = () => {
-    setNotification({ ...notification, visible: false });
-  };
-
   const getRwlkNFTIds = async () => {
     try {
       if (nftRWLKContract && account) {
@@ -644,20 +639,6 @@ const NewHome = () => {
   return (
     <>
       <MainWrapper>
-        <Snackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-          autoHideDuration={10000}
-          open={notification.visible}
-          onClose={handleNotificationClose}
-        >
-          <Alert
-            severity={notification.type}
-            variant="filled"
-            onClose={handleNotificationClose}
-          >
-            {notification.text}
-          </Alert>
-        </Snackbar>
         <Backdrop
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={loading}
@@ -1245,7 +1226,6 @@ const NewHome = () => {
           </Chart>
         </Box>
         <Prize prizeAmount={data?.PrizeAmountEth || 0} />
-
         <Box margin="100px 0">
           <Typography variant="h4" textAlign="center">
             Every time you bid
@@ -1427,5 +1407,14 @@ const NewHome = () => {
 export default NewHome;
 
 // Todo:
+// update contract revet message
+// fix staking-action page
+// fix CollectedStakingRewardsTable with account address
+// fix user-detail page with account address
+// system mode changes on statistics page
+// add tooltip to /staking page table
+// optimize statistics loading speed
+// update statistics page with new data
+//
 // get_bid_list_by_round: implement pagination
 // get_user_info: remove bid field
