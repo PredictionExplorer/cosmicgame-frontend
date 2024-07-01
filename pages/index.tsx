@@ -315,6 +315,7 @@ const NewHome = () => {
         console.log(receipt);
         setTimeout(() => {
           fetchDataCollection();
+          setMessage("");
           setIsBidding(false);
         }, 3000);
         return;
@@ -398,6 +399,7 @@ const NewHome = () => {
         console.log(receipt);
         setTimeout(() => {
           fetchDataCollection();
+          setMessage("");
           setIsBidding(false);
         }, 3000);
       } catch (err) {
@@ -436,6 +438,7 @@ const NewHome = () => {
       console.log(receipt);
       setTimeout(() => {
         fetchDataCollection();
+        setMessage("");
         setIsBidding(false);
       }, 3000);
     } catch (err) {
@@ -992,6 +995,7 @@ const NewHome = () => {
                       )}
                       <TextField
                         placeholder="Message (280 characters)"
+                        value={message}
                         size="small"
                         multiline
                         fullWidth
@@ -1407,7 +1411,6 @@ const NewHome = () => {
 export default NewHome;
 
 // Todo:
-// update contract revet message
 // fix staking-action page
 // fix CollectedStakingRewardsTable with account address
 // fix user-detail page with account address
@@ -1415,6 +1418,7 @@ export default NewHome;
 // add tooltip to /staking page table
 // optimize statistics loading speed
 // update statistics page with new data
+// add notification message
 //
 // get_bid_list_by_round: implement pagination
 // get_user_info: remove bid field
