@@ -103,7 +103,7 @@ const UserInfo = ({ address }) => {
     setStakingRWLKActions(stakingActions);
     const marketingRewards = await api.get_marketing_rewards_by_user(addr);
     setMarketingRewards(marketingRewards);
-    const cstList = await api.get_cst_tokens_by_user(account);
+    const cstList = await api.get_cst_tokens_by_user(addr);
     setCSTList(cstList);
     fetchStakedToken();
     fetchStatusData();

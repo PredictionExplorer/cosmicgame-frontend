@@ -1413,11 +1413,10 @@ const NewHome = () => {
 export default NewHome;
 
 // Todo:
-// fix CollectedStakingRewardsTable with account address
 // fix user-detail page with account address
-// system mode changes on statistics page
 // add tooltip to /staking page table
 // optimize statistics loading speed
+// system mode changes on statistics page
 // update statistics page with new data
 // add notification message
 //
