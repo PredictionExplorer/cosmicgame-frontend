@@ -618,6 +618,7 @@ const UserInfo = ({ address }) => {
                   </Typography>
                   <CollectedStakingRewardsTable
                     list={collectedStakingRewards}
+                    owner={address}
                   />
                 </Box>
                 {marketingRewards.length > 0 && (

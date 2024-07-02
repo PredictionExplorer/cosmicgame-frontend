@@ -409,7 +409,10 @@ const MyStaking = () => {
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                   Collected Staking Deposits
                 </Typography>
-                <CollectedStakingRewardsTable list={collectedStakingRewards} />
+                <CollectedStakingRewardsTable
+                  list={collectedStakingRewards}
+                  owner={account}
+                />
               </Box>
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>

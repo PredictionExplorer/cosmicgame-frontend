@@ -34,13 +34,10 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
       </Head>
       <MainWrapper>
         <Box mb={4}>
-          <Typography variant="h4" color="primary" component="span" mr={2}>
+          <Typography variant="h5" color="primary" component="span" mr={2}>
             {`Staking Action for ${
               IsRwalk ? "RandomWalk" : "Cosmic Signature"
             } Token`}
-          </Typography>
-          <Typography variant="h4" component="span">
-            Information
           </Typography>
         </Box>
         {loading ? (

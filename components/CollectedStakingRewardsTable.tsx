@@ -104,15 +104,14 @@ const DetailTable = ({ list }) => {
   );
 };
 
-const CollectedStakingRewardsRow = ({ row }) => {
+const CollectedStakingRewardsRow = ({ row, owner }) => {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState([]);
-  const { account } = useActiveWeb3React();
 
   useEffect(() => {
     const fetchData = async () => {
       const res = await api.get_cst_action_ids_by_deposit_with_claim_info(
-        account,
+        owner,
         row.DepositId
       );
       setList(res);
@@ -195,7 +194,7 @@ const CollectedStakingRewardsRow = ({ row }) => {
   );
 };
 
-export const CollectedStakingRewardsTable = ({ list }) => {
+export const CollectedStakingRewardsTable = ({ list, owner }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -224,7 +223,11 @@ export const CollectedStakingRewardsTable = ({ list }) => {
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <CollectedStakingRewardsRow row={row} key={row.EvtLogId} />
+              <CollectedStakingRewardsRow
+                row={row}
+                owner={owner}
+                key={row.EvtLogId}
+              />
             ))}
           </TableBody>
         </TablePrimary>
