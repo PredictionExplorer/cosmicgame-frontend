@@ -5,6 +5,7 @@ import {
   IconButton,
   Link,
   TableBody,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -150,16 +151,18 @@ const GlobalStakingRewardsRow = ({ row }) => {
           </Link>
         </TablePrimaryCell>
         <TablePrimaryCell align="center">
-          <Link
-            href={`/user/${row.StakerAddr}`}
-            style={{
-              color: "inherit",
-              fontSize: "inherit",
-              fontFamily: "monospace",
-            }}
-          >
-            {shortenHex(row.StakerAddr)}
-          </Link>
+          <Tooltip title={row.StakerAddr}>
+            <Link
+              href={`/user/${row.StakerAddr}`}
+              style={{
+                color: "inherit",
+                fontSize: "inherit",
+                fontFamily: "monospace",
+              }}
+            >
+              {shortenHex(row.StakerAddr)}
+            </Link>
+          </Tooltip>
         </TablePrimaryCell>
         <TablePrimaryCell align="center">
           <Link

@@ -67,7 +67,7 @@ const CosmicTokenTransferRow = ({ row }) => {
 };
 
 const CosmicTokenTransfersTable = ({ list }) => {
-  const perPage = 5;
+  const perPage = 10;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
     return <Typography variant="h6">No transfers yet.</Typography>;

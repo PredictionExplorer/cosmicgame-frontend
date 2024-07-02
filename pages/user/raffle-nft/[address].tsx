@@ -3,7 +3,6 @@ import { Box, Link, TableBody, Tooltip, Typography } from "@mui/material";
 import Head from "next/head";
 import { GetServerSidePropsContext } from "next";
 import { ethers } from "ethers";
-import { useActiveWeb3React } from "../../../hooks/web3";
 import api from "../../../services/api";
 import {
   MainWrapper,
@@ -85,7 +84,7 @@ const NFTWinningsRow = ({ row }) => {
 };
 
 const NFTWinningsTable = ({ list }) => {
-  const perPage = 5;
+  const perPage = 10;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
     return <Typography>No NFT winnings yet.</Typography>;
@@ -105,7 +104,7 @@ const NFTWinningsTable = ({ list }) => {
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((row, i) => (
+            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
               <NFTWinningsRow key={row.EvtLogId} row={row} />
             ))}
           </TableBody>
@@ -120,8 +119,7 @@ const NFTWinningsTable = ({ list }) => {
     </>
   );
 };
-const UserRaffleETH = ({ address }) => {
-  const { account } = useActiveWeb3React();
+const UserRaffleNFT = ({ address }) => {
   const [raffleNfts, setRaffleNfts] = useState({
     data: [],
     loading: false,
@@ -130,7 +128,7 @@ const UserRaffleETH = ({ address }) => {
 
   const fetchRaffleETHDeposits = async () => {
     setRaffleNfts((prev) => ({ ...prev, loading: true }));
-    let winnings = await api.get_raffle_nft_winnings_by_user(account);
+    let winnings = await api.get_raffle_nft_winnings_by_user(address);
     winnings = winnings.sort((a, b) => b.TimeStamp - a.TimeStamp);
     setRaffleNfts({ data: winnings, loading: false });
   };
@@ -148,7 +146,7 @@ const UserRaffleETH = ({ address }) => {
   return (
     <>
       <Head>
-        <title>Raffle ETH User Won | Cosmic Signature</title>
+        <title>Raffle NFT User Won | Cosmic Signature</title>
         <meta name="description" content="" />
       </Head>
       <MainWrapper>
@@ -192,4 +190,4 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return { props: { address } };
 }
 
-export default UserRaffleETH;
+export default UserRaffleNFT;
