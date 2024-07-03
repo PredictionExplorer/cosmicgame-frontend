@@ -138,7 +138,10 @@ const NewHome = () => {
 
   const series = [
     { category: "Prize", value: data?.PrizePercentage },
-    { category: "Raffle", value: data?.RafflePercentage },
+    {
+      category: "Raffle",
+      value: data?.RafflePercentage * data?.NumRaffleEthWinnersBidding,
+    },
     { category: "Charity", value: data?.CharityPercentage },
     { category: "Staking", value: data?.StakignPercentage },
     {
@@ -146,7 +149,7 @@ const NewHome = () => {
       value:
         100 -
         data?.CharityPercentage -
-        data?.RafflePercentage -
+        data?.RafflePercentage * data?.NumRaffleEthWinnersBidding -
         data?.StakignPercentage -
         data?.PrizePercentage,
     },
@@ -1413,8 +1416,11 @@ const NewHome = () => {
 export default NewHome;
 
 // Todo:
+// fix contract page error
 // add my-statistics page
+// add donate button, donor list, add eth-donate list to user detail
 // update site-map and show link
+// add link to user-detail for marketing reward for user
 
 // optimize statistics loading speed
 // file naming scheme to seed from token id
@@ -1425,5 +1431,3 @@ export default NewHome;
 // get_bid_list_by_round: implement pagination
 // get_user_info: remove bid field
 // complete admin page
-
-

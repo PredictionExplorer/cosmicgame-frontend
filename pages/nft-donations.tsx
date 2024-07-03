@@ -29,7 +29,7 @@ const NFTDonations = () => {
           textAlign="center"
           mb={4}
         >
-          Direct (ETH) Donations
+          NFT Donations
         </Typography>
         {nftDonations === null ? (
           <Typography variant="h6">Loading...</Typography>
