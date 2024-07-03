@@ -1194,13 +1194,12 @@ const NewHome = () => {
               </Typography>
               <Typography variant="body2" component="span">
                 When you bid, you are also buying a raffle ticket.{" "}
-                {data?.NumRaffleETHWinnersBidding} raffle tickets will be chosen
-                and these people will win {data?.RafflePercentage}% of the pot
-                each. Also, {data?.NumRaffleNFTWinnersBidding} additional
-                winners and {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk
-                NFT stakers and {data?.NumRaffleNFTWinnersStakingCST} Cosmic
-                Token stakers will be chosen which will receive a Cosmic
-                Signature NFT.
+                {data?.NumRaffleEthWinnersBidding} raffle tickets will be chosen
+                and these people will win {data?.RafflePercentage}% of the pot.
+                Also, {data?.NumRaffleNFTWinnersBidding} additional winners and{" "}
+                {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers
+                and {data?.NumRaffleNFTWinnersStakingCST} Cosmic Token stakers
+                will be chosen which will receive a Cosmic Signature NFT.
               </Typography>
             </Box>
           </>
