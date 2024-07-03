@@ -138,10 +138,7 @@ const NewHome = () => {
 
   const series = [
     { category: "Prize", value: data?.PrizePercentage },
-    {
-      category: "Raffle",
-      value: data?.RafflePercentage * data?.NumRaffleEthWinnersBidding,
-    },
+    { category: "Raffle", value: data?.RafflePercentage },
     { category: "Charity", value: data?.CharityPercentage },
     { category: "Staking", value: data?.StakignPercentage },
     {
@@ -149,7 +146,7 @@ const NewHome = () => {
       value:
         100 -
         data?.CharityPercentage -
-        data?.RafflePercentage * data?.NumRaffleEthWinnersBidding -
+        data?.RafflePercentage -
         data?.StakignPercentage -
         data?.PrizePercentage,
     },
