@@ -1202,6 +1202,18 @@ const NewHome = () => {
                 will be chosen which will receive a Cosmic Signature NFT.
               </Typography>
             </Box>
+            <Typography variant="body2" mt={2}>
+              When this round ends, Ethereum Protocol Guild (
+              <Link
+                href="https://protocol-guild.readthedocs.io"
+                target="_blank"
+                sx={{ color: "inherit" }}
+              >
+                https://protocol-guild.readthedocs.io
+              </Link>
+              ) will receive 10% of the prize pool (at least{" "}
+              {(data?.PrizeAmountEth / 10).toFixed(4)} ETH)
+            </Typography>
           </>
         )}
         <Box mt={6}>
