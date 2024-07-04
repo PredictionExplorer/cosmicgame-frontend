@@ -12,8 +12,6 @@ import { MainWrapper } from "../components/styled";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import api from "../services/api";
-import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
-import useStakingWalletRWLKContract from "../hooks/useStakingWalletRWLKContract";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { formatSeconds } from "../utils";
 import { useNotification } from "../contexts/NotificationContext";
@@ -77,13 +75,9 @@ const ContractItem = ({ name, value, copyable = false }) => {
 const Contracts = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [minStakeCSTPeriod, setMinStakeCSTPeriod] = useState(0);
-  const [minStakeRWalkPeriod, setMinStakeRWalkPeriod] = useState(0);
   const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
   const [initialSecondsUntilPrize, setInitialSecondsUntilPrize] = useState(0);
   const [auctionLength, setAuctionLength] = useState(0);
-  const stakingWalletCSTContract = useStakingWalletCSTContract();
-  const stakingWalletRWalkContract = useStakingWalletRWLKContract();
   const cosmicGameContract = useCosmicGameContract();
 
   useEffect(() => {
@@ -103,10 +97,6 @@ const Contracts = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      let minStakePeriod = await stakingWalletCSTContract.minStakePeriod();
-      setMinStakeCSTPeriod(Number(minStakePeriod));
-      minStakePeriod = await stakingWalletRWalkContract.minStakePeriod();
-      setMinStakeRWalkPeriod(Number(minStakePeriod));
       const timeout = await cosmicGameContract.timeoutClaimPrize();
       setTimeoutClaimPrize(Number(timeout));
       const initialSeconds = await cosmicGameContract.initialSecondsUntilPrize();
@@ -114,18 +104,10 @@ const Contracts = () => {
       const auctionLength = await cosmicGameContract.RoundStartCSTAuctionLength();
       setAuctionLength(Number(auctionLength));
     };
-    if (
-      stakingWalletCSTContract &&
-      stakingWalletRWalkContract &&
-      cosmicGameContract
-    ) {
+    if (cosmicGameContract) {
       fetchData();
     }
-  }, [
-    stakingWalletCSTContract,
-    stakingWalletRWalkContract,
-    cosmicGameContract,
-  ]);
+  }, [cosmicGameContract]);
 
   return (
     <>
