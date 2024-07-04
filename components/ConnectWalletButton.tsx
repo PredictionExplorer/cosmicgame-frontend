@@ -86,6 +86,11 @@ const ConnectWalletButton = ({
           sx={{ zIndex: 10003 }}
         >
           <MenuItem style={{ minWidth: 166 }} onClick={handleMenuClose}>
+            <NavLink href="/my-statistics" sx={{ width: "100%" }}>
+              MY STATISTICS
+            </NavLink>
+          </MenuItem>
+          <MenuItem style={{ minWidth: 166 }} onClick={handleMenuClose}>
             <NavLink href="/my-tokens" sx={{ width: "100%" }}>
               MY TOKENS
             </NavLink>

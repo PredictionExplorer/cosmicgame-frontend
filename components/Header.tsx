@@ -181,6 +181,10 @@ const Header = () => {
               <>
                 <Divider />
                 <ListItemButton
+                  nav={{ title: "My Statistics", route: "/my-statistics" }}
+                  sx={{ justifyContent: "center" }}
+                />
+                <ListItemButton
                   nav={{ title: "My Tokens", route: "/my-tokens" }}
                   sx={{ justifyContent: "center" }}
                 />
