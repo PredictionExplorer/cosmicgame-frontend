@@ -156,26 +156,28 @@ const Contracts = () => {
                 value={data?.ContractAddrs.CosmicGameAddr}
                 copyable={true}
               />
-              <Box sx={{ display: "flex", p: 2 }}>
-                <Box sx={{ display: "flex", alignItems: "center", mr: 4 }}>
-                  <TextField
-                    placeholder="Donation amount"
-                    type="number"
-                    value={donateAmount}
-                    size="small"
-                    sx={{ mr: 1 }}
-                    onChange={(e) => setDonateAmount(e.target.value)}
-                  />
-                  <Typography>ETH</Typography>
+              {!!cosmicGameContract && (
+                <Box sx={{ display: "flex", p: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", mr: 4 }}>
+                    <TextField
+                      placeholder="Donation amount"
+                      type="number"
+                      value={donateAmount}
+                      size="small"
+                      sx={{ mr: 1 }}
+                      onChange={(e) => setDonateAmount(e.target.value)}
+                    />
+                    <Typography>ETH</Typography>
+                  </Box>
+                  <Button
+                    variant="contained"
+                    disabled={donateAmount === "0" || donateAmount === ""}
+                    onClick={handleDonate}
+                  >
+                    Donate
+                  </Button>
                 </Box>
-                <Button
-                  variant="contained"
-                  disabled={donateAmount === "0" || donateAmount === ""}
-                  onClick={handleDonate}
-                >
-                  Donate
-                </Button>
-              </Box>
+              )}
               <ContractItem
                 name="Cosmic Token Address"
                 value={data?.ContractAddrs.CosmicTokenAddr}
