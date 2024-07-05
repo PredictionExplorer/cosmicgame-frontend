@@ -153,7 +153,10 @@ const NewHome = () => {
   ];
 
   const labelContent = (props) => {
-    return `${props.dataItem.category}: ${props.dataItem.value}%`;
+    return `${props.dataItem.category}: ${props.dataItem.value}% (${(
+      (props.dataItem.value * data?.CosmicGameBalanceEth) /
+      100
+    ).toFixed(4)} ETH)`;
   };
 
   const setAlertOpen = (status) => {
@@ -587,6 +590,25 @@ const NewHome = () => {
   }, []);
 
   useEffect(() => {
+    const factorial = (n) => {
+      if (n === 0 || n === 1) return 1;
+      let result = 1;
+      for (let i = 2; i <= n; i++) {
+        result *= i;
+      }
+      return result;
+    };
+    const combination = (n, k) => {
+      return factorial(n) / (factorial(k) * factorial(n - k));
+    };
+    const probabilityOfSelection = (totalBids, chosenBids, yourBids) => {
+      const totalWays = combination(totalBids, chosenBids);
+      const excludeYourBidsWays = combination(totalBids - yourBids, chosenBids);
+      const includeYourBidsWays = totalWays - excludeYourBidsWays;
+      const probability = includeYourBidsWays / totalWays;
+      return probability;
+    };
+
     const calculateProbability = async () => {
       const { Bids } = await api.get_user_info(account);
       if (Bids) {
@@ -594,16 +616,20 @@ const NewHome = () => {
           (bid) => bid.RoundNum === data.CurRoundNum
         );
         const raffle =
-          (curRoundBids.length / curBidList.length) *
-          data?.NumRaffleEthWinnersBidding *
-          100;
+          probabilityOfSelection(
+            curBidList.length,
+            data?.NumRaffleEthWinnersBidding,
+            curRoundBids.length
+          ) * 100;
         const nft =
-          (curRoundBids.length / curBidList.length) *
-          data?.NumRaffleNFTWinnersBidding *
-          100;
+          probabilityOfSelection(
+            curBidList.length,
+            data?.NumRaffleNFTWinnersBidding,
+            curRoundBids.length
+          ) * 100;
         setWinProbability({
-          raffle: raffle > 100 ? 100 : raffle,
-          nft: nft > 100 ? 100 : nft,
+          raffle: raffle,
+          nft: nft,
         });
       }
     };
@@ -840,12 +866,21 @@ const NewHome = () => {
                   </Grid>
                 )}
                 {curBidList.length > 0 && winProbability && (
-                  <Typography mt={4}>
-                    {winProbability.raffle.toFixed(2)}% chance you will win{" "}
-                    {data?.RaffleAmountEth.toFixed(2)} ETH and{" "}
-                    {winProbability.nft.toFixed(2)}% chance you will win a
-                    Cosmic Signature NFT for now.
-                  </Typography>
+                  <>
+                    <Typography mt={4}>
+                      {data?.LastBidderAddr === account
+                        ? `You have 100% chance of winning the main prize (${data?.PrizeAmountEth.toFixed(
+                            4
+                          )}ETH).`
+                        : "You're not the last bidder, so you can't win the main prize."}
+                    </Typography>
+                    <Typography>
+                      You have {winProbability.raffle.toFixed(2)}% chance of
+                      winning the raffle {data?.RaffleAmountEth.toFixed(4)} ETH,
+                      and {winProbability.nft.toFixed(2)}% chance of winning a
+                      Cosmic Signature Token for now.
+                    </Typography>
+                  </>
                 )}
               </>
             )}
@@ -1212,7 +1247,7 @@ const NewHome = () => {
                 https://protocol-guild.readthedocs.io
               </Link>
               ) will receive 10% of the prize pool (at least{" "}
-              {(data?.PrizeAmountEth / 10).toFixed(4)} ETH)
+              {(data?.CosmicGameBalanceEth / 10).toFixed(4)} ETH)
             </Typography>
           </>
         )}
@@ -1224,7 +1259,7 @@ const NewHome = () => {
             transitions={false}
             style={{ width: "100%", height: matches ? 300 : 200 }}
           >
-            <ChartLegend position="bottom" labels={{ color: "white" }} />
+            <ChartLegend visible={false} />
             <ChartArea background="transparent" />
             <ChartSeries>
               <ChartSeriesItem
@@ -1243,7 +1278,7 @@ const NewHome = () => {
           </Chart>
         </Box>
         <Prize prizeAmount={data?.PrizeAmountEth || 0} />
-        <Box margin="100px 0">
+        <Box margin="50px 0">
           <Typography variant="h4" textAlign="center">
             Every time you bid
           </Typography>
@@ -1258,7 +1293,7 @@ const NewHome = () => {
               data?.NumRaffleNFTWinnersBidding}
             &nbsp;raffle winners:
           </Typography>
-          <Box textAlign="center" marginBottom="56px">
+          <Box textAlign="center" mb={6}>
             <Image
               src={"/images/divider.svg"}
               width={93}
@@ -1268,18 +1303,15 @@ const NewHome = () => {
           </Box>
           <Grid container spacing={4}>
             <Grid item xs={12} sm={12} md={6} lg={6}>
-              <GradientBorder sx={{ padding: "50px" }}>
-                <Typography
-                  sx={{ fontSize: "26px !important" }}
-                  textAlign="center"
-                >
+              <GradientBorder sx={{ p: 2 }}>
+                <Typography variant="subtitle1" textAlign="center">
                   {data?.NumRaffleEthWinnersBidding} will receive
                 </Typography>
-                <GradientText variant="h3" textAlign="center">
-                  {data?.RaffleAmountEth.toFixed(2)} ETH
+                <GradientText variant="h4" textAlign="center">
+                  {data?.RaffleAmountEth.toFixed(4)} ETH
                 </GradientText>
                 <Typography
-                  sx={{ fontSize: "22px !important" }}
+                  variant="subtitle1"
                   color="rgba(255, 255, 255, 0.68)"
                   textAlign="center"
                 >
@@ -1288,21 +1320,18 @@ const NewHome = () => {
               </GradientBorder>
             </Grid>
             <Grid item xs={12} sm={12} md={6} lg={6}>
-              <GradientBorder sx={{ padding: "50px" }}>
-                <Typography
-                  sx={{ fontSize: "26px !important" }}
-                  textAlign="center"
-                >
+              <GradientBorder sx={{ p: 2 }}>
+                <Typography variant="subtitle1" textAlign="center">
                   {data?.NumRaffleNFTWinnersBidding +
                     data?.NumRaffleNFTWinnersStakingCST +
                     data?.NumRaffleNFTWinnersStakingRWalk}{" "}
                   will receive
                 </Typography>
-                <GradientText variant="h3" textAlign="center">
+                <GradientText variant="h4" textAlign="center">
                   1 Cosmic NFT
                 </GradientText>
                 <Typography
-                  sx={{ fontSize: "22px !important" }}
+                  variant="subtitle1"
                   color="rgba(255, 255, 255, 0.68)"
                   textAlign="center"
                 >
@@ -1312,7 +1341,7 @@ const NewHome = () => {
             </Grid>
           </Grid>
         </Box>
-        <Box marginTop="80px">
+        <Box marginTop={10}>
           <Box>
             <Typography variant="h6" component="span">
               DONATED
@@ -1353,7 +1382,7 @@ const NewHome = () => {
             </Typography>
           )}
         </Box>
-        <Box mt={matches ? "120px" : "80px"}>
+        <Box mt={10}>
           <Box>
             <Typography variant="h6" component="span">
               CURRENT ROUND
@@ -1424,6 +1453,13 @@ const NewHome = () => {
 export default NewHome;
 
 // Todo:
+// how-to-play page, hide contract option from header
+// show previous round winner, history of winnings
+
+
+// donation receiver address on contract page
+// CST balance update
+// add donate button to contract page
 // fix contract page error
 // add my-statistics page
 // add donate button, donor list, add eth-donate list to user detail

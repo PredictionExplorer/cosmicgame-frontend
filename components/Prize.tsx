@@ -16,7 +16,7 @@ const Prize = ({ prizeAmount }) => {
   const matches = useMediaQuery(theme.breakpoints.up("md"));
   const ethPrice = useTokenPrice();
   return (
-    <Box mt={matches ? "130px" : "60px"}>
+    <Box mt={matches ? "80px" : "50px"}>
       <Box
         display="flex"
         alignItems="center"
@@ -38,7 +38,7 @@ const Prize = ({ prizeAmount }) => {
           will Receive
         </Typography>
       </Box>
-      <Box textAlign="center" marginBottom="56px">
+      <Box textAlign="center" mb={6}>
         <Image
           src={"/images/divider.svg"}
           width={93}
@@ -84,7 +84,9 @@ const Prize = ({ prizeAmount }) => {
                   : prizeAmount.toFixed(1)}{" "}
                 ETH
               </GradientText>
-              <Typography color="primary" ml={1}>({(ethPrice * prizeAmount).toFixed(2)} USD)</Typography>
+              <Typography color="primary" ml={1}>
+                ({(ethPrice * prizeAmount).toFixed(2)} USD)
+              </Typography>
             </CardActionArea>
           </StyledCard2>
         </Grid>
