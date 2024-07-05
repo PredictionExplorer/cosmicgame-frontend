@@ -876,9 +876,12 @@ const NewHome = () => {
                     </Typography>
                     <Typography>
                       You have {winProbability.raffle.toFixed(2)}% chance of
-                      winning the raffle {data?.RaffleAmountEth.toFixed(4)} ETH,
-                      and {winProbability.nft.toFixed(2)}% chance of winning a
-                      Cosmic Signature Token for now.
+                      winning the raffle{" "}
+                      {(
+                        data?.RaffleAmountEth / data?.NumRaffleEthWinnersBidding
+                      ).toFixed(4)}{" "}
+                      ETH, and {winProbability.nft.toFixed(2)}% chance of
+                      winning a Cosmic Signature Token for now.
                     </Typography>
                   </>
                 )}
@@ -1308,7 +1311,10 @@ const NewHome = () => {
                   {data?.NumRaffleEthWinnersBidding} will receive
                 </Typography>
                 <GradientText variant="h4" textAlign="center">
-                  {data?.RaffleAmountEth.toFixed(4)} ETH
+                  {(
+                    data?.RaffleAmountEth / data?.NumRaffleEthWinnersBidding
+                  ).toFixed(4)}{" "}
+                  ETH
                 </GradientText>
                 <Typography
                   variant="subtitle1"
@@ -1455,7 +1461,6 @@ export default NewHome;
 // Todo:
 // how-to-play page, hide contract option from header
 // show previous round winner, history of winnings
-
 
 // donation receiver address on contract page
 // CST balance update
