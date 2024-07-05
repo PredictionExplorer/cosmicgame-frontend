@@ -6,6 +6,8 @@ import {
   useTheme,
   useMediaQuery,
   Box,
+  Button,
+  TextField,
 } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
@@ -15,6 +17,7 @@ import api from "../services/api";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { formatSeconds } from "../utils";
 import { useNotification } from "../contexts/NotificationContext";
+import { ethers } from "ethers";
 
 const ContractItem = ({ name, value, copyable = false }) => {
   const theme = useTheme();
@@ -76,9 +79,28 @@ const Contracts = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
+  const [donateAmount, setDonateAmount] = useState("");
   const [initialSecondsUntilPrize, setInitialSecondsUntilPrize] = useState(0);
   const [auctionLength, setAuctionLength] = useState(0);
   const cosmicGameContract = useCosmicGameContract();
+  const { setNotification } = useNotification();
+
+  const handleDonate = async () => {
+    try {
+      const res = await cosmicGameContract.donate({
+        value: ethers.utils.parseEther(donateAmount),
+      });
+      console.log(res);
+      setNotification({
+        text: `${donateAmount} ETH was donated successfully!`,
+        type: "success",
+        visible: true,
+      });
+      setDonateAmount("");
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -134,6 +156,26 @@ const Contracts = () => {
                 value={data?.ContractAddrs.CosmicGameAddr}
                 copyable={true}
               />
+              <Box sx={{ display: "flex", p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mr: 4 }}>
+                  <TextField
+                    placeholder="Donation amount"
+                    type="number"
+                    value={donateAmount}
+                    size="small"
+                    sx={{ mr: 1 }}
+                    onChange={(e) => setDonateAmount(e.target.value)}
+                  />
+                  <Typography>ETH</Typography>
+                </Box>
+                <Button
+                  variant="contained"
+                  disabled={donateAmount === "0" || donateAmount === ""}
+                  onClick={handleDonate}
+                >
+                  Donate
+                </Button>
+              </Box>
               <ContractItem
                 name="Cosmic Token Address"
                 value={data?.ContractAddrs.CosmicTokenAddr}
