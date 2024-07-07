@@ -599,6 +599,7 @@ const NewHome = () => {
       return result;
     };
     const combination = (n, k) => {
+      if (k > n) return 0;
       return factorial(n) / (factorial(k) * factorial(n - k));
     };
     const probabilityOfSelection = (totalBids, chosenBids, yourBids) => {
