@@ -1229,7 +1229,7 @@ const NewHome = () => {
                 and these people will win {data?.RafflePercentage}% of the pot.
                 Also, {data?.NumRaffleNFTWinnersBidding} additional winners and{" "}
                 {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers
-                and {data?.NumRaffleNFTWinnersStakingCST} Cosmic Token stakers
+                {/* and {data?.NumRaffleNFTWinnersStakingCST} Cosmic Token stakers */}
                 will be chosen which will receive a Cosmic Signature NFT.
               </Typography>
             </Box>
@@ -1322,7 +1322,7 @@ const NewHome = () => {
               <GradientBorder sx={{ p: 2 }}>
                 <Typography variant="subtitle1" textAlign="center">
                   {data?.NumRaffleNFTWinnersBidding +
-                    data?.NumRaffleNFTWinnersStakingCST +
+                    // data?.NumRaffleNFTWinnersStakingCST +
                     data?.NumRaffleNFTWinnersStakingRWalk}{" "}
                   will receive
                 </Typography>

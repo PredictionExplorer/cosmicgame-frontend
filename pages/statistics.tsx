@@ -441,10 +441,10 @@ const Statistics = () => {
                 title="Number of Raffle NFT Bidding Winners"
                 value={data.NumRaffleNFTWinnersBidding}
               />
-              <StatisticsItem
+              {/* <StatisticsItem
                 title="Number of Raffle NFT CST Staking Winners"
                 value={data.NumRaffleNFTWinnersStakingCST}
-              />
+              /> */}
               <StatisticsItem
                 title="Number of Raffle NFT Random Walk Staking Winners"
                 value={data.NumRaffleNFTWinnersStakingRWalk}

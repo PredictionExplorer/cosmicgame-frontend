@@ -250,10 +250,10 @@ const Contracts = () => {
                 name="Raffle NFT Winners for Bidding"
                 value={data.NumRaffleNFTWinnersBidding}
               />
-              <ContractItem
+              {/* <ContractItem
                 name="Raffle NFT Winners for Staking CST"
                 value={data.NumRaffleNFTWinnersStakingCST}
-              />
+              /> */}
               <ContractItem
                 name="Raffle NFT Winners for Staking Random Walk"
                 value={data.NumRaffleNFTWinnersStakingRWalk}

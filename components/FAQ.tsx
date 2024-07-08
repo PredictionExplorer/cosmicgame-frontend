@@ -51,11 +51,11 @@ const FAQ = () => {
       detail:
         'After winning Cosmic Signature Tokens in Raffles you can stake them and continue earning income. Staking pays 10% of CosmicGame contract balance on each round, and this amount is distributed equally between the owners of all staked tokens. To stake tokens go to "MY STAKING" page (available from your account balance menu).',
     },
-    {
-      summary: "What types of Staking are available?",
-      detail:
-        'We have two types of staking: RandomWalk staking and CosmicSignature (ERC721) staking. RandomWalk staking only allows you to participate in each round to win a raffle NFT (CosmicSignature ERC721). CosmicSignature staking allows you to earn ETH and also earn raffle NFTs on each round. The contract variables that control the number of winners for each type of staking are "NumRaffleNFTWinnersStakingCST" and "NumRaffleNFTWinnersStakingRWalk", which can be modified by the community of players.',
-    },
+    // {
+    //   summary: "What types of Staking are available?",
+    //   detail:
+    //     'We have two types of staking: RandomWalk staking and CosmicSignature (ERC721) staking. RandomWalk staking only allows you to participate in each round to win a raffle NFT (CosmicSignature ERC721). CosmicSignature staking allows you to earn ETH and also earn raffle NFTs on each round. The contract variables that control the number of winners for each type of staking are "NumRaffleNFTWinnersStakingCST" and "NumRaffleNFTWinnersStakingRWalk", which can be modified by the community of players.',
+    // },
     {
       summary: "What is the connection with RandomWalkNFT?",
       detail:
