@@ -109,6 +109,19 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
+        <Tooltip title={history.WinnerAddr}>
+          <Link
+            color="inherit"
+            fontSize="inherit"
+            fontFamily="monospace"
+            href={`/user/${history.WinnerAddr}`}
+            target="__blank"
+          >
+            {shortenHex(history.WinnerAddr, 6)}
+          </Link>
+        </Tooltip>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
         <Link
           href={`/prize/${history.RoundNum}`}
           sx={{
@@ -236,6 +249,7 @@ const HistoryTable = ({
               Record Type
             </TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="right">
               Amount (ETH)
