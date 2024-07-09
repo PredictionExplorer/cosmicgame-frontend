@@ -21,6 +21,7 @@ import { ethers } from "ethers";
 import useContractNoSigner from "../hooks/useContractNoSigner";
 import CHARITY_WALLET_ABI from "../contracts/CharityWallet.json";
 import { CHARITY_WALLET_ADDRESS } from "../config/app";
+import { useActiveWeb3React } from "../hooks/web3";
 
 const ContractItem = ({ name, value, copyable = false }) => {
   const theme = useTheme();
@@ -89,6 +90,7 @@ const Contracts = () => {
     CHARITY_WALLET_ADDRESS,
     CHARITY_WALLET_ABI
   );
+  const { account } = useActiveWeb3React();
 
   const handleDonate = async () => {
     try {
@@ -157,7 +159,7 @@ const Contracts = () => {
                 value={data?.ContractAddrs.CosmicGameAddr}
                 copyable={true}
               />
-              {!!cosmicGameContract && (
+              {!!account && (
                 <Box sx={{ display: "flex", p: 2 }}>
                   <Box sx={{ display: "flex", alignItems: "center", mr: 4 }}>
                     <TextField
