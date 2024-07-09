@@ -1449,13 +1449,8 @@ export default NewHome;
 // how-to-play page, hide contract option from header
 // show previous round winner, history of winnings
 
-// NumRaffleNFTWinnersStakingCST field disappeared
-
-// donation receiver address on contract page
 // CST balance update
 // add donate button to contract page
-// fix contract page error
-// add my-statistics page
 // add donate button, donor list, add eth-donate list to user detail
 // update site-map and show link
 // add link to user-detail for marketing reward for user

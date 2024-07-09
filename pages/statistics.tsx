@@ -462,8 +462,16 @@ const Statistics = () => {
                 }
               />
               <StatisticsItem
-                title="Number of Direct Donations"
-                value={data.MainStats.NumDirectDonations}
+                title="Number of Direct ETH Donors"
+                value={
+                  <Link color="inherit" fontSize="inherit" href="/donations">
+                    {data.MainStats.NumDirectDonations}
+                  </Link>
+                }
+              />
+              <StatisticsItem
+                title="Amount of Direct ETH Donations"
+                value={`${data.MainStats.DirectDonationsEth.toFixed(2)} ETH`}
               />
               <StatisticsItem
                 title="Amount of Cosmic Signature Tokens with assigned name"
@@ -481,30 +489,6 @@ const Statistics = () => {
                 title="Number of Unique Random Walk Stakers"
                 value={data.MainStats.NumUniqueStakersRWalk}
               />
-              {/* <StatisticsItem
-                title="Number of Active Stakers"
-                value={data.MainStats.StakeStatistics.NumActiveStakers}
-              />
-              <StatisticsItem
-                title="Number of Staking Rewards Deposits"
-                value={data.MainStats.StakeStatistics.NumDeposits}
-              />
-              <StatisticsItem
-                title="Total Staking Rewards"
-                value={`${data.MainStats.StakeStatistics.TotalRewardEth.toFixed(
-                  4
-                )} ETH`}
-              />
-              <StatisticsItem
-                title="Total Tokens Staked"
-                value={data.MainStats.StakeStatistics.TotalTokensStaked}
-              />
-              <StatisticsItem
-                title="Earned Staking Rewards"
-                value={`${data.MainStats.StakeStatistics.UnclaimedRewardEth.toFixed(
-                  4
-                )} ETH`}
-              /> */}
             </Box>
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
@@ -595,8 +579,36 @@ const Statistics = () => {
               </Tabs>
             </Box>
             <CustomTabPanel value={stakingType} index={0}>
+              <StatisticsItem
+                title="Number of Active Stakers"
+                value={data.MainStats.StakeStatisticsCST.NumActiveStakers}
+              />
+              <StatisticsItem
+                title="Number of Staking Rewards Deposits"
+                value={data.MainStats.StakeStatisticsCST.NumDeposits}
+              />
+              <StatisticsItem
+                title="Total Staking Rewards"
+                value={`${data.MainStats.StakeStatisticsCST.TotalRewardEth.toFixed(
+                  4
+                )} ETH`}
+              />
+              <StatisticsItem
+                title="Total Tokens Minted"
+                value={data.MainStats.StakeStatisticsCST.TotalTokensMinted}
+              />
+              <StatisticsItem
+                title="Total Tokens Staked"
+                value={data.MainStats.StakeStatisticsCST.TotalTokensStaked}
+              />
+              <StatisticsItem
+                title="Unclaimed Staking Rewards"
+                value={`${data.MainStats.StakeStatisticsCST.UnclaimedRewardEth.toFixed(
+                  4
+                )} ETH`}
+              />
               <Box>
-                <Typography variant="subtitle1" mb={2}>
+                <Typography variant="subtitle1" mt={2} mb={2}>
                   Stake / Unstake Actions
                 </Typography>
                 {stakingCSTActions === null ? (
@@ -629,8 +641,20 @@ const Statistics = () => {
               </Box>
             </CustomTabPanel>
             <CustomTabPanel value={stakingType} index={1}>
+              <StatisticsItem
+                title="Number of Active Stakers"
+                value={data.MainStats.StakeStatisticsRWalk.NumActiveStakers}
+              />
+              <StatisticsItem
+                title="Total Tokens Minted"
+                value={data.MainStats.StakeStatisticsRWalk.TotalTokensMinted}
+              />
+              <StatisticsItem
+                title="Total Tokens Staked"
+                value={data.MainStats.StakeStatisticsRWalk.TotalTokensStaked}
+              />
               <Box>
-                <Typography variant="subtitle1" mb={2}>
+                <Typography variant="subtitle1" mt={2} mb={2}>
                   Stake / Unstake Actions
                 </Typography>
                 {stakingRWLKActions === null ? (
