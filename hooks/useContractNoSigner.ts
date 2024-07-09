@@ -1,14 +1,11 @@
 import { Contract } from '@ethersproject/contracts'
 import { useEffect, useMemo, useState } from 'react'
-
 import { getNetworkLibrary } from '../connectors';
-import { useActiveWeb3React } from './web3';
 
-export default function useContract<T extends Contract = Contract>(
+export default function useContractNoSigner<T extends Contract = Contract>(
   address: string,
   ABI: any,
 ): T | null {
-  const { account } = useActiveWeb3React();
   const library = getNetworkLibrary();
   const [byteCode, setByteCode] = useState("");
   useEffect(() => {
@@ -27,15 +24,11 @@ export default function useContract<T extends Contract = Contract>(
     }
 
     try {
-      if (account) {
-        return new Contract(address, ABI, library.getSigner(account))
-      } else {
-        return new Contract(address, ABI, library)
-      }
+      return new Contract(address, ABI, library)
     } catch (error) {
       console.error('Failed To Get Contract', error)
 
       return null
     }
-  }, [address, ABI, library, account, byteCode]) as T
+  }, [address, ABI, library, byteCode]) as T
 }

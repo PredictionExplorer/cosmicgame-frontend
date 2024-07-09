@@ -18,6 +18,9 @@ import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { formatSeconds } from "../utils";
 import { useNotification } from "../contexts/NotificationContext";
 import { ethers } from "ethers";
+import useContractNoSigner from "../hooks/useContractNoSigner";
+import CHARITY_WALLET_ABI from "../contracts/CharityWallet.json";
+import { CHARITY_WALLET_ADDRESS } from "../config/app";
 
 const ContractItem = ({ name, value, copyable = false }) => {
   const theme = useTheme();
@@ -78,12 +81,14 @@ const ContractItem = ({ name, value, copyable = false }) => {
 const Contracts = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
   const [donateAmount, setDonateAmount] = useState("");
-  const [initialSecondsUntilPrize, setInitialSecondsUntilPrize] = useState(0);
-  const [auctionLength, setAuctionLength] = useState(0);
-  const cosmicGameContract = useCosmicGameContract();
   const { setNotification } = useNotification();
+  const [charityAddress, setCharityAddress] = useState("");
+  const cosmicGameContract = useCosmicGameContract();
+  const charityWalletContract = useContractNoSigner(
+    CHARITY_WALLET_ADDRESS,
+    CHARITY_WALLET_ABI
+  );
 
   const handleDonate = async () => {
     try {
@@ -119,17 +124,13 @@ const Contracts = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const timeout = await cosmicGameContract.timeoutClaimPrize();
-      setTimeoutClaimPrize(Number(timeout));
-      const initialSeconds = await cosmicGameContract.initialSecondsUntilPrize();
-      setInitialSecondsUntilPrize(Number(initialSeconds));
-      const auctionLength = await cosmicGameContract.RoundStartCSTAuctionLength();
-      setAuctionLength(Number(auctionLength));
+      const addr = await charityWalletContract.charityAddress();
+      setCharityAddress(addr);
     };
-    if (cosmicGameContract) {
+    if (charityWalletContract) {
       fetchData();
     }
-  }, [cosmicGameContract]);
+  }, [charityWalletContract]);
 
   return (
     <>
@@ -260,7 +261,7 @@ const Contracts = () => {
               />
               <ContractItem
                 name="Charity Address"
-                value={data.CharityAddr}
+                value={charityAddress}
                 copyable={true}
               />
               <ContractItem
@@ -274,16 +275,16 @@ const Contracts = () => {
               />
               <ContractItem
                 name="Auction Duration"
-                value={formatSeconds(auctionLength)}
+                value={formatSeconds(data?.RoundStartCSTAuctionLength)}
               />
               <ContractItem
                 name="Timeout to claim prize"
-                value={formatSeconds(timeoutClaimPrize)}
+                value={formatSeconds(data?.TimeoutClaimPrize)}
               />
               <ContractItem name="Maximum message length" value={280} />
               <ContractItem
                 name="Initial increment first bid"
-                value={formatSeconds(initialSecondsUntilPrize)}
+                value={formatSeconds(data?.InitialSecondsUntilPrize)}
               />
               <ContractItem
                 name="Random Walk contract address"
