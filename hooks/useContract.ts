@@ -1,15 +1,13 @@
 import { Contract } from '@ethersproject/contracts'
 import { useEffect, useMemo, useState } from 'react'
 
-import { getNetworkLibrary } from '../connectors';
-import { useActiveWeb3React } from './web3';
+import { useActiveWeb3React } from './web3'
 
 export default function useContract<T extends Contract = Contract>(
   address: string,
   ABI: any,
 ): T | null {
-  const { account } = useActiveWeb3React();
-  const library = getNetworkLibrary();
+  const { library, account, chainId } = useActiveWeb3React()
   const [byteCode, setByteCode] = useState("");
   useEffect(() => {
     const getByteCode = async (address) => {
@@ -22,7 +20,7 @@ export default function useContract<T extends Contract = Contract>(
   }, [address, library]);
 
   return useMemo(() => {
-    if (!address || !ABI || !library || byteCode.length <= 2) {
+    if (!address || !ABI || !library || !chainId || byteCode.length <= 2) {
       return null
     }
 

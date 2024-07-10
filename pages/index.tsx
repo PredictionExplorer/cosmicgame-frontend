@@ -1450,7 +1450,6 @@ export default NewHome;
 // show previous round winner, history of winnings
 
 // CST balance update
-// add donate button to contract page
 // add donate button, donor list, add eth-donate list to user detail
 // update site-map and show link
 // add link to user-detail for marketing reward for user
