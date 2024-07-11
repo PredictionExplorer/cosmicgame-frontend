@@ -12,13 +12,6 @@ import Countdown from "react-countdown";
 import DonatedNFTDistributionTable from "../components/DonatedNFTDistributionTable";
 import CSTokenDistributionTable from "../components/CSTokenDistributionTable";
 import CTBalanceDistributionTable from "../components/CTBalanceDistributionTable";
-import {
-  Chart,
-  ChartArea,
-  ChartLegend,
-  ChartSeries,
-  ChartSeriesItem,
-} from "@progress/kendo-react-charts";
 import "@progress/kendo-theme-default/dist/all.css";
 import {
   convertTimestampToDateTime,
@@ -32,8 +25,8 @@ import { GlobalStakedTokensTable } from "../components/GlobalStakedTokensTable";
 import { ethers } from "ethers";
 import { SystemModesTable } from "../components/SystemModesTable";
 import { UniqueStakersRWLKTable } from "../components/UniqueStakersRWLKTable";
-import { MARKETING_WALLET_ADDRESS } from "../config/app";
 import { CustomPagination } from "../components/CustomPagination";
+import { CTBalanceDistributionChart } from "../components/CTBalanceDistributionChart";
 // import { UniqueStakersBothTable } from "../components/UniqueStakersBothTable";
 
 interface TabPanelProps {
@@ -522,43 +515,12 @@ const Statistics = () => {
               </Typography>
               <CSTokenDistributionTable list={cstDistribution} />
             </Box>
+
             <Box mt={4}>
               <Typography variant="h6" mb={2}>
                 Cosmic Token (ERC20) Balance Distribution
               </Typography>
-              {ctBalanceDistribution.length > 0 && (
-                <Chart
-                  transitions={false}
-                  style={{ width: "100%", height: 500 }}
-                >
-                  <ChartLegend visible={false} />
-                  <ChartArea background="transparent" />
-                  <ChartSeries>
-                    <ChartSeriesItem
-                      type="pie"
-                      data={ctBalanceDistribution.map((value) => ({
-                        category:
-                          value.OwnerAddr === MARKETING_WALLET_ADDRESS
-                            ? "MarketingWallet Contract"
-                            : value.OwnerAddr,
-                        value: value.BalanceFloat,
-                      }))}
-                      field="value"
-                      categoryField="category"
-                      labels={{
-                        visible: true,
-                        content: (props) => {
-                          return `${
-                            props.dataItem.category
-                          }: ${props.dataItem.value.toFixed(4)}`;
-                        },
-                        color: "white",
-                        background: "none",
-                      }}
-                    />
-                  </ChartSeries>
-                </Chart>
-              )}
+              <CTBalanceDistributionChart list={ctBalanceDistribution} />
             </Box>
             <Box mt={4}>
               <CTBalanceDistributionTable

@@ -1286,7 +1286,9 @@ const NewHome = () => {
             you are also buying a raffle ticket. When the round ends, there
             are&nbsp;
             {data?.NumRaffleEthWinnersBidding +
-              data?.NumRaffleNFTWinnersBidding}
+              data?.NumRaffleNFTWinnersBidding +
+              // data?.NumRaffleNFTWinnersStakingCST +
+              data?.NumRaffleNFTWinnersStakingRWalk}
             &nbsp;raffle winners:
           </Typography>
           <Box textAlign="center" mb={6}>
@@ -1448,8 +1450,6 @@ export default NewHome;
 // Todo:
 // mobile responsiveness
 // table, styledcard, wallet connect, text break
-
-
 
 // how-to-play page, hide contract option from header
 // show previous round winner, history of winnings
