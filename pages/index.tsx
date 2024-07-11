@@ -1446,6 +1446,11 @@ const NewHome = () => {
 export default NewHome;
 
 // Todo:
+// mobile responsiveness
+// table, styledcard, wallet connect, text break
+
+
+
 // how-to-play page, hide contract option from header
 // show previous round winner, history of winnings
 

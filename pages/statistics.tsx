@@ -60,11 +60,11 @@ function CustomTabPanel(props: TabPanelProps) {
 
 const StatisticsItem = ({ title, value }) => {
   return (
-    <Box display="flex" flexWrap="wrap" my={1}>
-      <Typography color="primary" width={{ md: "400px", xs: "250px" }} mr={2}>
+    <Box display="flex" my={1}>
+      <Typography color="primary" width={{ md: "400px", xs: "200px" }} mr={2}>
         {title}
       </Typography>
-      <Typography>{value}</Typography>
+      <Typography sx={{ flex: 1, wordBreak: "break-all" }}>{value}</Typography>
     </Box>
   );
 };
@@ -238,12 +238,12 @@ const Statistics = () => {
               <Box display="flex" flexWrap="wrap" my={1}>
                 <Typography
                   color="primary"
-                  width={{ md: "400px", xs: "250px" }}
+                  width={{ md: "400px", xs: "200px" }}
                   mr={2}
                 >
                   Prize Claim Date
                 </Typography>
-                <Box>
+                <Box sx={{ flex: 1 }}>
                   <Typography>
                     {convertTimestampToDateTime(data.PrizeClaimTs)}
                   </Typography>

@@ -12,6 +12,7 @@ import { Tbody, Tr } from "react-super-responsive-table";
 import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
+import { AddressLink } from "./AddressLink";
 
 const StakingRewardMintsRow = ({ row }) => {
   if (!row) {
@@ -31,16 +32,7 @@ const StakingRewardMintsRow = ({ row }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/user/${row.WinnerAddr}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {row.WinnerAddr}
-        </Link>
+        <AddressLink address={row.WinnerAddr} url={`/user/${row.WinnerAddr}`} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link

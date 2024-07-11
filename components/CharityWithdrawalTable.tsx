@@ -12,6 +12,7 @@ import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
+import { AddressLink } from "./AddressLink";
 
 const WithdrawalRow = ({ withdrawal }) => {
   if (!withdrawal) {
@@ -31,14 +32,10 @@ const WithdrawalRow = ({ withdrawal }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          fontFamily="monospace"
-          href={`/user/${withdrawal.DestinationAddr}`}
-        >
-          {withdrawal.DestinationAddr}
-        </Link>
+        <AddressLink
+          address={withdrawal.DestinationAddr}
+          url={`/user/${withdrawal.DestinationAddr}`}
+        />
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {withdrawal.AmountEth.toFixed(6)}

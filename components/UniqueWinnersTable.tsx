@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, TableBody, Typography } from "@mui/material";
+import { TableBody, Typography } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -11,6 +11,7 @@ import {
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
+import { AddressLink } from "./AddressLink";
 
 const UniqueWinnersRow = ({ winner }) => {
   if (!winner) {
@@ -20,16 +21,10 @@ const UniqueWinnersRow = ({ winner }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <Link
-          href={`/user/${winner.WinnerAddr}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {winner.WinnerAddr}
-        </Link>
+        <AddressLink
+          address={winner.WinnerAddr}
+          url={`/user/${winner.WinnerAddr}`}
+        />
       </TablePrimaryCell>
       <TablePrimaryCell align="right">{winner.PrizesCount}</TablePrimaryCell>
       <TablePrimaryCell align="right">

@@ -15,7 +15,7 @@ import {
   MenuItem,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { isMobile, isSafari } from 'react-device-detect'
+import { isMobile } from 'react-device-detect'
 import { Table, Thead, Tr, Th, Td } from 'react-super-responsive-table'
 
 
@@ -24,7 +24,7 @@ export const StyledLink = styled(Link)({
   textDecoration: 'underline',
 })
 
-export const StyledCard = styled(Card)(!isSafari ? {
+export const StyledCard = styled(Card)(!isMobile ? {
   position: "relative",
   background: "transparent",
   boxShadow: "none",
@@ -60,7 +60,7 @@ export const StyledCard = styled(Card)(!isSafari ? {
   }
 })
 
-export const StyledCard2 = styled(Card)(!isSafari ? {
+export const StyledCard2 = styled(Card)(!isMobile ? {
   position: "relative",
   background: "transparent",
   boxShadow: "none",
@@ -210,7 +210,7 @@ export const CounterWrapper = styled(Box)({
   // alignItems: 'center',
 })
 
-export const CounterItemWrapper = styled(Box)(!isSafari ? {
+export const CounterItemWrapper = styled(Box)(!isMobile ? {
   position: "relative",
   width: "75px",
   padding: "6px 16px",
@@ -284,7 +284,7 @@ export const FaqAccordionDetails = styled(AccordionDetails)({
   padding: "0 40px 12px"
 })
 
-export const NFTImageWrapper = styled(Box)(!isSafari ? {
+export const NFTImageWrapper = styled(Box)(!isMobile ? {
   position: "relative",
   border: 0,
   "--border": "1px",
@@ -373,7 +373,7 @@ export const GradientText = styled(Typography)({
   WebkitTextFillColor: "transparent"
 })
 
-export const GradientBorder = styled(Box)(!isSafari ? {
+export const GradientBorder = styled(Box)(!isMobile ? {
   position: "relative",
   border: 0,
   "--border": "1px",
@@ -396,7 +396,7 @@ export const GradientBorder = styled(Box)(!isSafari ? {
   overflow: "hidden"
 })
 
-export const CodeWrapper = styled(Box)(!isSafari ? {
+export const CodeWrapper = styled(Box)(!isMobile ? {
   position: "relative",
   border: 0,
   "--border": "1px",

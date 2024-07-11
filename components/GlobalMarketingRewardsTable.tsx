@@ -12,6 +12,7 @@ import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
+import { AddressLink } from "./AddressLink";
 
 const GlobalMarketingRewardsRow = ({ row }) => {
   if (!row) {
@@ -31,16 +32,10 @@ const GlobalMarketingRewardsRow = ({ row }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/marketing/${row.MarketerAddr}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {row.MarketerAddr}
-        </Link>
+        <AddressLink
+          address={row.MarketerAddr}
+          url={`/marketing/${row.MarketerAddr}`}
+        />
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {row.AmountEth.toFixed(2)} CST

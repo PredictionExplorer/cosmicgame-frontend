@@ -19,15 +19,45 @@ class ApiService {
     }
   }
 
-  // public async get_bid_list() {
-  //   try {
-  //     const { data } = await axios.get(getAPIUrl("bid/list/0/1000000"));
-  //     return data.Bids;
-  //   } catch (err) {
-  //     console.log(err);
-  //     return [];
-  //   }
-  // }
+  public async get_banned_bids() {
+    try {
+      const { data } = await axios.get(baseUrl + "get_banned_bids");
+      return data;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async ban_bid(bid_id: number, user_addr: string) {
+    try {
+      const { data } = await axios.post(baseUrl + "ban_bid", { bid_id, user_addr });
+      return data;
+    } catch (err) {
+      console.log(err);
+      return -1;
+    }
+  }
+
+  public async unban_bid(bid_id: number) {
+    try {
+      const { data } = await axios.post(baseUrl + "unban_bid", { bid_id });
+      return data;
+    } catch (err) {
+      console.log(err);
+      return -1;
+    }
+  }
+
+  public async get_bid_list() {
+    try {
+      const { data } = await axios.get(getAPIUrl("bid/list/0/1000000"));
+      return data.Bids;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
 
   public async get_bid_list_by_round(round: number, sortDir: string) {
     try {

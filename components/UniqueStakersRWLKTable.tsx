@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, TableBody, Typography } from "@mui/material";
+import { TableBody, Typography } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -11,6 +11,7 @@ import {
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
+import { AddressLink } from "./AddressLink";
 
 const UniqueStakersRWLKRow = ({ row }) => {
   if (!row) {
@@ -20,16 +21,7 @@ const UniqueStakersRWLKRow = ({ row }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <Link
-          href={`/user/${row.StakerAddr}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {row.StakerAddr}
-        </Link>
+        <AddressLink address={row.StakerAddr} url={`/user/${row.StakerAddr}`} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{row.NumStakeActions}</TablePrimaryCell>
       <TablePrimaryCell align="center">

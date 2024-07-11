@@ -8,9 +8,9 @@ import {
   Typography,
 } from "@mui/material";
 import Head from "next/head";
-import { MainWrapper } from "../components/styled";
+import { MainWrapper } from "../../components/styled";
 import { useEffect, useState } from "react";
-import api from "../services/api";
+import api from "../../services/api";
 
 const Contracts = () => {
   const [data, setData] = useState(null);

@@ -4,10 +4,10 @@ import { Box, Paper, Typography, Link, styled } from "@mui/material";
 import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import FAQ from "../components/FAQ";
-import { isSafari } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 
 const StyledPaper = styled(Paper)(
-  !isSafari && {
+  !isMobile && {
     position: "relative",
     padding: "20px 120px",
     border: 0,

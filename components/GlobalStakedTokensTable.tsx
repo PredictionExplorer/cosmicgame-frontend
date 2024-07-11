@@ -12,6 +12,7 @@ import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
+import { AddressLink } from "./AddressLink";
 
 const GlobalStakedTokensRow = ({ row, IsRWLK }) => {
   if (!row) {
@@ -55,16 +56,7 @@ const GlobalStakedTokensRow = ({ row, IsRWLK }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/user/${row.UserAddr}`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {row.UserAddr}
-        </Link>
+        <AddressLink address={row.UserAddr} url={`/user/${row.UserAddr}`} />
       </TablePrimaryCell>
     </TablePrimaryRow>
   );

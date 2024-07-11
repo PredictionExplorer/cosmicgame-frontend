@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, TableBody } from "@mui/material";
+import { Link, TableBody, Tooltip } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -8,7 +8,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
+import { convertTimestampToDateTime, shortenHex } from "../utils";
 import { ZERO_ADDRESS } from "../config/misc";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
@@ -29,36 +29,40 @@ const TransferHistoryRow = ({ record }) => {
         {convertTimestampToDateTime(record.TimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <Link
-          href={`/user/${record.FromAddr}`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {record.FromAddr === STAKING_WALLET_CST_ADDRESS
-            ? "StakingWallet CST"
-            : record.FromAddr === STAKING_WALLET_RWLK_ADDRESS
-            ? "StakingWallet RandomWalk"
-            : record.FromAddr}
-        </Link>
+        <Tooltip title={record.FromAddr}>
+          <Link
+            href={`/user/${record.FromAddr}`}
+            sx={{
+              color: "inherit",
+              fontSize: "inherit",
+              fontFamily: "monospace",
+            }}
+          >
+            {record.FromAddr === STAKING_WALLET_CST_ADDRESS
+              ? "StakingWallet CST"
+              : record.FromAddr === STAKING_WALLET_RWLK_ADDRESS
+              ? "StakingWallet RandomWalk"
+              : shortenHex(record.FromAddr, 6)}
+          </Link>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <Link
-          href={`/user/${record.ToAddr}`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {record.ToAddr === STAKING_WALLET_CST_ADDRESS
-            ? "StakingWallet CST"
-            : record.ToAddr === STAKING_WALLET_RWLK_ADDRESS
-            ? "StakingWallet RandomWalk"
-            : record.ToAddr}
-        </Link>
+        <Tooltip title={record.ToAddr}>
+          <Link
+            href={`/user/${record.ToAddr}`}
+            sx={{
+              color: "inherit",
+              fontSize: "inherit",
+              fontFamily: "monospace",
+            }}
+          >
+            {record.ToAddr === STAKING_WALLET_CST_ADDRESS
+              ? "StakingWallet CST"
+              : record.ToAddr === STAKING_WALLET_RWLK_ADDRESS
+              ? "StakingWallet RandomWalk"
+              : shortenHex(record.ToAddr, 6)}
+          </Link>
+        </Tooltip>
       </TablePrimaryCell>
     </TablePrimaryRow>
   );

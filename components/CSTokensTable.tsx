@@ -22,6 +22,7 @@ import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
+import { AddressLink } from "./AddressLink";
 
 const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
   if (!row) {
@@ -77,16 +78,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/user/${row.WinnerAddr}`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
-          target="_blank"
-        >
-          {row.WinnerAddr}
-        </Link>
+        <AddressLink address={row.WinnerAddr} url={`/user/${row.WinnerAddr}`} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {!row.Staked ? (

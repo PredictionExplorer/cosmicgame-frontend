@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Typography,
-  Box,
-  Button,
-  TextField,
-  Link,
-  Select,
-  MenuItem,
-} from "@mui/material";
+import { Typography, Box, Button, Link, Select, MenuItem } from "@mui/material";
 import "react-slideshow-image/dist/styles.css";
 import Head from "next/head";
 import { MainWrapper, CenterBox } from "../components/styled";

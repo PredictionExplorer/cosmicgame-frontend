@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Link,
   Menu,
   MenuItem,
   TableBody,
@@ -22,6 +21,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import api from "../services/api";
 import { CustomPagination } from "./CustomPagination";
+import { AddressLink } from "./AddressLink";
 
 const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
   const [tokenInfo, setTokenInfo] = useState(null);
@@ -46,12 +46,10 @@ const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
         <Checkbox color="primary" checked={isItemSelected} size="small" />
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <Link
-          href={`/user/${tokenInfo?.CurOwnerAddr}`}
-          sx={{ color: "inherit", fontSize: "inherit" }}
-        >
-          {tokenInfo?.CurOwnerAddr}
-        </Link>
+        <AddressLink
+          address={tokenInfo?.CurOwnerAddr}
+          url={`/user/${tokenInfo?.CurOwnerAddr}`}
+        />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{tokenId}</TablePrimaryCell>
       <TablePrimaryCell align="center">

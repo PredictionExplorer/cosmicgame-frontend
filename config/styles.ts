@@ -1,6 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 import createBreakpoints from "@mui/system/createTheme/createBreakpoints";
-import { isSafari } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 
 const breakpoints = createBreakpoints({})
 
@@ -128,7 +128,7 @@ const theme = createTheme({
             fontWeight: 400,
           },
         },
-        outlined: !isSafari && {
+        outlined: !isMobile && {
           textTransform: "capitalize",
           position: "relative",
           paddingLeft: "24px",
@@ -166,7 +166,7 @@ const theme = createTheme({
           background: "rgba(255, 255, 255, 0.02)",
           borderRadius: 0
         },
-        contained: !isSafari && {
+        contained: !isMobile && {
           textTransform: "capitalize",
           position: "relative",
           color: "#FFFFFF",
@@ -204,7 +204,7 @@ const theme = createTheme({
             fontWeight: 400,
           },
         },
-        rounded: !isSafari && {
+        rounded: !isMobile && {
           position: "relative",
           border: 0,
           backgroundColor: "#1B2262",

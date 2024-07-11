@@ -12,6 +12,7 @@ import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
+import { AddressLink } from "./AddressLink";
 
 const DonationRow = ({ donation }) => {
   if (!donation) {
@@ -45,14 +46,10 @@ const DonationRow = ({ donation }) => {
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          fontFamily="monospace"
-          href={`/user/${donation.DonorAddr}`}
-        >
-          {donation.DonorAddr}
-        </Link>
+        <AddressLink
+          address={donation.DonorAddr}
+          url={`/user/${donation.DonorAddr}`}
+        />
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {donation.AmountEth.toFixed(6)}
