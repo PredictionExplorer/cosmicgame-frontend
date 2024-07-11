@@ -56,15 +56,17 @@ const RaffleHolderTable = ({ list }) => {
         }
       });
 
-      return Object.entries(result).map(([bidderAddr, data]) => ({
-        userAddr: bidderAddr,
-        count: data.count,
-        roundNum: data.roundNum,
-      }));
+      return Object.entries(result)
+        .map(([bidderAddr, data]) => ({
+          userAddr: bidderAddr,
+          count: data.count,
+          roundNum: data.roundNum,
+        }))
+        .sort((a, b) => b.count - a.count);
     };
     const holders = groupAndCountByBidderAddr(list);
     setHolderList(holders);
-  }, []);
+  }, [list]);
 
   if (list.length === 0) {
     return <Typography>No holders yet.</Typography>;
