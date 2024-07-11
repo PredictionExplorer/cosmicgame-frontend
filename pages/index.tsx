@@ -64,6 +64,7 @@ import "react-awesome-lightbox/build/style.css";
 import { useRouter } from "next/router";
 import { CustomPagination } from "../components/CustomPagination";
 import { useNotification } from "../contexts/NotificationContext";
+import RaffleHolderTable from "../components/RaffleHolderTable";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -1398,6 +1399,12 @@ const NewHome = () => {
             </Typography>
           </Box>
           <BiddingHistory biddingHistory={curBidList} />
+        </Box>
+        <Box mt={10}>
+            <Typography variant="h6">
+              TOP RAFFLE TICKETS HOLDERS
+            </Typography>
+          <RaffleHolderTable list={curBidList} />
         </Box>
       </MainWrapper>
 
