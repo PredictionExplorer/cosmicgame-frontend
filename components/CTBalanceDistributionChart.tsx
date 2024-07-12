@@ -14,8 +14,9 @@ import { shortenHex } from "../utils";
 import { useEffect, useState } from "react";
 
 export const CTBalanceDistributionChart = ({ list }) => {
-  const limit = 5;
+  const limit = 9;
   const [newList, setNewList] = useState([]);
+  const [maxValue, setMaxValue] = useState(0);
   useEffect(() => {
     if (list.length > limit) {
       const otherValue = list
@@ -29,8 +30,12 @@ export const CTBalanceDistributionChart = ({ list }) => {
         ...list.slice(0, limit),
         { OwnerAddr: "Other", BalanceFloat: otherValue },
       ]);
+      setMaxValue(
+        list[0].BalanceFloat > otherValue ? list[0].BalanceFloat : otherValue
+      );
     } else {
       setNewList(list);
+      setMaxValue(list[0].BalanceFloat);
     }
   }, []);
   return (
@@ -43,10 +48,7 @@ export const CTBalanceDistributionChart = ({ list }) => {
             <ChartCategoryAxisItem color="white" />
           </ChartCategoryAxis>
           <ChartValueAxis>
-            <ChartValueAxisItem
-              visible={false}
-              max={newList[0].BalanceFloat * 1.4}
-            />
+            <ChartValueAxisItem visible={false} max={maxValue * 1.4} />
           </ChartValueAxis>
           <ChartSeries>
             <ChartSeriesItem
