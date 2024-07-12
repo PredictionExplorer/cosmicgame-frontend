@@ -14,6 +14,7 @@ import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
 import api from "../services/api";
+import { isMobile } from "react-device-detect";
 
 const HistoryRow = ({ history, isBanned }) => {
   if (!history) {
@@ -70,19 +71,21 @@ const HistoryRow = ({ history, isBanned }) => {
           : "ETH Bid"}
       </TablePrimaryCell>
       <TablePrimaryCell>
-        {history.BidType === 1 &&
-          `Bid was made using RandomWalk Token(id = ${history.RWalkNFTId})`}
-        {!!history.NFTDonationTokenAddr &&
-          history.BidType === 2 &&
-          "Bid was made using Cosmic Tokens"}
-        {!!history.NFTDonationTokenAddr &&
-          history.BidType === 0 &&
-          "Bid was made using ETH"}
-        {!!history.NFTDonationTokenAddr &&
-          ` and a token(${shortenHex(
-            history.NFTDonationTokenAddr,
-            6
-          )}) with ID ${history.NFTDonationTokenId} was donated`}{" "}
+        <Typography sx={{ wordBreak: "break-all" }}>
+          {history.BidType === 1 &&
+            `Bid was made using RandomWalk Token(id = ${history.RWalkNFTId})`}
+          {!!history.NFTDonationTokenAddr &&
+            history.BidType === 2 &&
+            "Bid was made using Cosmic Tokens"}
+          {!!history.NFTDonationTokenAddr &&
+            history.BidType === 0 &&
+            "Bid was made using ETH"}
+          {!!history.NFTDonationTokenAddr &&
+            ` and a token(${shortenHex(
+              history.NFTDonationTokenAddr,
+              6
+            )}) with ID ${history.NFTDonationTokenId} was donated`}{" "}
+        </Typography>
       </TablePrimaryCell>
       <TablePrimaryCell>
         {!isBanned && (
@@ -119,6 +122,17 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
   return (
     <TablePrimaryContainer>
       <TablePrimary>
+        {!isMobile && (
+          <colgroup>
+            <col width="16%" />
+            <col width="17%" />
+            <col width="15%" />
+            <col width="8%" />
+            <col width="9%" />
+            <col width="15%" />
+            <col width="20%" />
+          </colgroup>
+        )}
         <TablePrimaryHead>
           <Tr>
             <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>

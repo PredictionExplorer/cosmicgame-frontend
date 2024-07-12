@@ -18,6 +18,7 @@ import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import NFTImage from "../components/NFTImage";
 import { CustomPagination } from "../components/CustomPagination";
+import { isMobile } from "react-device-detect";
 
 const CSTRow = ({ nft }) => {
   const getTokenImageURL = () => {
@@ -104,6 +105,18 @@ export const CSTTable = ({ list }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="11%" />
+              <col width="16%" />
+              <col width="10%" />
+              <col width="12%" />
+              <col width="8%" />
+              <col width="17%" />
+              <col width="9%" />
+              <col width="17%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell />

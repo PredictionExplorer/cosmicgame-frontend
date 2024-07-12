@@ -27,8 +27,10 @@ import axios from "axios";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
+import { isMobile } from "react-device-detect";
 
 const HistoryRow = ({ history, showClaimedStatus }) => {
+  console.log(history);
   const [tokenURI, setTokenURI] = useState(null);
   useEffect(() => {
     const fetchTokenURI = async () => {
@@ -243,6 +245,18 @@ const HistoryTable = ({
   return (
     <TablePrimaryContainer>
       <TablePrimary>
+        {!isMobile && (
+          <colgroup>
+            <col width="21%" />
+            <col width="13%" />
+            <col width="17%" />
+            <col width="7%" />
+            <col width="8%" />
+            <col width="17%" />
+            <col width="9%" />
+            <col width="9%" />
+          </colgroup>
+        )}
         <TablePrimaryHead>
           <Tr>
             <TablePrimaryHeadCell align="left">

@@ -23,6 +23,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
+import { isMobile } from "react-device-detect";
 
 const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
   if (!row) {
@@ -158,6 +159,17 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="2%" />
+              <col width="30%" />
+              <col width="15%" />
+              <col width="20%" />
+              <col width="5%" />
+              <col width="20%" />
+              <col width="3%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell padding="checkbox" align="left">

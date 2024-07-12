@@ -13,6 +13,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { useRouter } from "next/router";
 import { CustomPagination } from "./CustomPagination";
+import { isMobile } from "react-device-detect";
 
 const GlobalStakingActionsRow = ({ row, IsRWLK }) => {
   const router = useRouter();
@@ -79,6 +80,16 @@ export const GlobalStakingActionsTable = ({ list, IsRWLK }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="20%" />
+              <col width="15%" />
+              <col width="10%" />
+              <col width="20%" />
+              <col width="15%" />
+              <col width="15%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">

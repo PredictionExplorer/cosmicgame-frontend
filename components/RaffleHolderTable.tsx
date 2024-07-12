@@ -12,6 +12,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
+import { isMobile } from "react-device-detect";
 
 const HolderRow = ({ holder }) => {
   if (!holder) {
@@ -75,6 +76,13 @@ const RaffleHolderTable = ({ list }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="30%" />
+              <col width="35%" />
+              <col width="30%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Holder</TablePrimaryHeadCell>

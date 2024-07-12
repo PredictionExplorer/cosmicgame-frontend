@@ -13,6 +13,7 @@ import { convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { useRouter } from "next/router";
 import { CustomPagination } from "./CustomPagination";
+import { isMobile } from "react-device-detect";
 
 const StakingActionsRow = ({ row, IsRwalk }) => {
   const router = useRouter();
@@ -68,6 +69,15 @@ export const StakingActionsTable = ({ list, IsRwalk }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="20%" />
+              <col width="20%" />
+              <col width="15%" />
+              <col width="20%" />
+              <col width="20%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">

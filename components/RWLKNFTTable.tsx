@@ -22,6 +22,7 @@ import { Tr } from "react-super-responsive-table";
 import api from "../services/api";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
+import { isMobile } from "react-device-detect";
 
 const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
   const [tokenInfo, setTokenInfo] = useState(null);
@@ -123,6 +124,14 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="5%" />
+              <col width="50%" />
+              <col width="30%" />
+              <col width="10%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell padding="checkbox" align="left">
