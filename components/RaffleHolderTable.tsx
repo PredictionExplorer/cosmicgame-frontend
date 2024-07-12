@@ -18,7 +18,6 @@ const HolderRow = ({ holder }) => {
   if (!holder) {
     return <TablePrimaryRow />;
   }
-
   return (
     <TablePrimaryRow>
       <TablePrimaryCell align="left">
@@ -35,7 +34,10 @@ const HolderRow = ({ holder }) => {
           {holder.roundNum}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{holder.count * 8}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{holder.count}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {holder.probability.toFixed(2)}%
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -62,6 +64,7 @@ const RaffleHolderTable = ({ list }) => {
           userAddr: bidderAddr,
           count: data.count,
           roundNum: data.roundNum,
+          probability: data.count / list.length,
         }))
         .sort((a, b) => b.count - a.count);
     };
@@ -78,9 +81,10 @@ const RaffleHolderTable = ({ list }) => {
         <TablePrimary>
           {!isMobile && (
             <colgroup>
-              <col width="30%" />
-              <col width="35%" />
-              <col width="30%" />
+              <col width="25%" />
+              <col width="25%" />
+              <col width="25%" />
+              <col width="25%" />
             </colgroup>
           )}
           <TablePrimaryHead>
@@ -91,6 +95,9 @@ const RaffleHolderTable = ({ list }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
                 Number of Raffle Tickets
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                Probability of Winning
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

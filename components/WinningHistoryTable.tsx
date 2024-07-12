@@ -30,7 +30,6 @@ import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
 
 const HistoryRow = ({ history, showClaimedStatus }) => {
-  console.log(history);
   const [tokenURI, setTokenURI] = useState(null);
   useEffect(() => {
     const fetchTokenURI = async () => {
