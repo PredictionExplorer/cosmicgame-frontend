@@ -68,8 +68,8 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    const fetchData = async (loading = true) => {
+      setLoading(loading);
       try {
         const user_balance = await api.get_user_balance(account);
         const { UserInfo } = await api.get_user_info(account);
@@ -91,9 +91,16 @@ const Header = () => {
       }
     };
 
+    let interval;
     if (account && nftContract) {
       fetchData();
+      interval = setInterval(() => {
+        fetchData(false);
+      }, 30000);
     }
+    return () => {
+      clearInterval(interval);
+    };
   }, [account, nftContract]);
 
   useEffect(() => {
