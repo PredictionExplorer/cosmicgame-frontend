@@ -13,6 +13,7 @@ import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 import { isMobile } from "react-device-detect";
+import { useActiveWeb3React } from "../hooks/web3";
 
 const HolderRow = ({ holder }) => {
   if (!holder) {
@@ -38,34 +39,45 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const [holderList, setHolderList] = useState(null);
+  const { account } = useActiveWeb3React();
 
   useEffect(() => {
     const groupAndCountByBidderAddr = (events) => {
-      const result: { [key: string]: { count: number } } = {};
+      const result: { [key: string]: number } = {};
 
       events.forEach((event) => {
         if (result[event.BidderAddr]) {
-          result[event.BidderAddr].count++;
+          result[event.BidderAddr]++;
         } else {
-          result[event.BidderAddr] = { count: 1 };
+          result[event.BidderAddr] = 1;
         }
       });
 
-      return Object.entries(result)
+      const sortedResults = Object.entries(result)
         .map(([bidderAddr, data]) => ({
           userAddr: bidderAddr,
-          count: data.count,
+          count: data,
           probability:
-            1 -
-            Math.pow((list.length - data.count) / list.length, numRaffleWinner),
+            1 - Math.pow((list.length - data) / list.length, numRaffleWinner),
         }))
         .sort((a, b) => b.count - a.count);
+
+      const userIndex = sortedResults.findIndex(
+        (item) => item.userAddr === account
+      );
+
+      if (userIndex !== -1) {
+        const userItem = sortedResults.splice(userIndex, 1)[0];
+        sortedResults.unshift(userItem);
+      }
+
+      return sortedResults;
     };
     if (numRaffleWinner) {
       const holders = groupAndCountByBidderAddr(list);
       setHolderList(holders);
     }
-  }, [list, numRaffleWinner]);
+  }, [list, numRaffleWinner, account]);
 
   if (list.length === 0) {
     return <Typography>No holders yet.</Typography>;
