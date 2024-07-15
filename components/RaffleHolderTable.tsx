@@ -42,10 +42,10 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
   const { account } = useActiveWeb3React();
 
   useEffect(() => {
-    const groupAndCountByBidderAddr = (events) => {
+    const groupAndCountByBidderAddr = () => {
       const result: { [key: string]: number } = {};
 
-      events.forEach((event) => {
+      list.forEach((event) => {
         if (result[event.BidderAddr]) {
           result[event.BidderAddr]++;
         } else {
@@ -74,7 +74,7 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
       return sortedResults;
     };
     if (numRaffleWinner) {
-      const holders = groupAndCountByBidderAddr(list);
+      const holders = groupAndCountByBidderAddr();
       setHolderList(holders);
     }
   }, [list, numRaffleWinner, account]);

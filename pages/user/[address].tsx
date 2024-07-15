@@ -67,6 +67,7 @@ const UserInfo = ({ address }) => {
   const [cstList, setCSTList] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [stakingTable, setStakingTable] = useState(0);
+  const [raffleProbability, setRaffleProbability] = useState(0);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -125,6 +126,26 @@ const UserInfo = ({ address }) => {
     setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
   };
 
+  const calculateProbability = async () => {
+    let count = 0;
+    const newData = await api.get_dashboard_info();
+    const round = newData?.CurRoundNum;
+    const bidList = await api.get_bid_list_by_round(round, "desc");
+    bidList.forEach((bid) => {
+      if (bid.BidderAddr === address) {
+        count++;
+      }
+    });
+    const probability =
+      1 -
+      Math.pow(
+        (bidList.length - count) / bidList.length,
+        newData?.NumRaffleEthWinnersBidding +
+          newData?.NumRaffleNFTWinnersBidding
+      );
+    setRaffleProbability(probability);
+  };
+
   const handleDonatedNFTsClaim = async (e, tokenID) => {
     try {
       e.target.disabled = true;
@@ -177,6 +198,7 @@ const UserInfo = ({ address }) => {
       if (address !== "Invalid Address") {
         fetchData(address);
         fetchDonatedNFTs();
+        calculateProbability();
       } else {
         setInvalidAddress(true);
       }
@@ -371,6 +393,15 @@ const UserInfo = ({ address }) => {
                   &nbsp;
                   <Typography component="span">
                     {userInfo.TotalCSTokensWon}
+                  </Typography>
+                </Box>
+                <Box mb={1}>
+                  <Typography color="primary" component="span">
+                    Probability of Winning Raffle:
+                  </Typography>
+                  &nbsp;
+                  <Typography component="span">
+                    {(raffleProbability * 100).toFixed(2)}%
                   </Typography>
                 </Box>
                 <Typography mt={3}>

@@ -87,7 +87,7 @@ const NewHome = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
-  const [bidType, setBidType] = useState("");
+  const [bidType, setBidType] = useState("ETH");
   const [cstBidData, setCSTBidData] = useState({
     AuctionDuration: 0,
     CSTPrice: 0,
