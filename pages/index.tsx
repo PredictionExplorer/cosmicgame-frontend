@@ -65,7 +65,6 @@ import { useRouter } from "next/router";
 import { CustomPagination } from "../components/CustomPagination";
 import { useNotification } from "../contexts/NotificationContext";
 import RaffleHolderTable from "../components/RaffleHolderTable";
-import { UniqueBiddersTable } from "../components/UniqueBiddersTable";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -97,7 +96,6 @@ const NewHome = () => {
   const [curBidList, setCurBidList] = useState([]);
   const [winProbability, setWinProbability] = useState(null);
   const [donatedNFTs, setDonatedNFTs] = useState([]);
-  const [uniqueBidders, setUniqueBidders] = useState(null);
   const [prizeTime, setPrizeTime] = useState(0);
   const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
   const [prizeInfo, setPrizeInfo] = useState(null);
@@ -488,9 +486,6 @@ const NewHome = () => {
     setCurBidList(newBidData);
     const nftData = await api.get_donations_nft_by_round(round);
     setDonatedNFTs(nftData);
-    let uniqueBidders = await api.get_unique_bidders();
-    uniqueBidders = uniqueBidders.sort((a, b) => b.NumBids - a.NumBids);
-    setUniqueBidders(uniqueBidders);
     setData((prevData) => {
       if (
         account !== newData?.LastBidderAddr &&
@@ -588,23 +583,9 @@ const NewHome = () => {
   }, []);
 
   useEffect(() => {
-    const factorial = (n) => {
-      if (n === 0 || n === 1) return 1;
-      let result = 1;
-      for (let i = 2; i <= n; i++) {
-        result *= i;
-      }
-      return result;
-    };
-    const combination = (n, k) => {
-      if (k > n) return 0;
-      return factorial(n) / (factorial(k) * factorial(n - k));
-    };
     const probabilityOfSelection = (totalBids, chosenBids, yourBids) => {
-      const totalWays = combination(totalBids, chosenBids);
-      const excludeYourBidsWays = combination(totalBids - yourBids, chosenBids);
-      const includeYourBidsWays = totalWays - excludeYourBidsWays;
-      const probability = includeYourBidsWays / totalWays;
+      const probability =
+        1 - Math.pow((totalBids - yourBids) / totalBids, chosenBids);
       return probability;
     };
 
@@ -1292,9 +1273,7 @@ const NewHome = () => {
             you are also buying a raffle ticket. When the round ends, there
             are&nbsp;
             {data?.NumRaffleEthWinnersBidding +
-              data?.NumRaffleNFTWinnersBidding +
-              // data?.NumRaffleNFTWinnersStakingCST +
-              data?.NumRaffleNFTWinnersStakingRWalk}
+              data?.NumRaffleNFTWinnersBidding}
             &nbsp;raffle winners:
           </Typography>
           <Box textAlign="center" mb={6}>
@@ -1329,10 +1308,7 @@ const NewHome = () => {
             <Grid item xs={12} sm={12} md={6} lg={6}>
               <GradientBorder sx={{ p: 2 }}>
                 <Typography variant="subtitle1" textAlign="center">
-                  {data?.NumRaffleNFTWinnersBidding +
-                    // data?.NumRaffleNFTWinnersStakingCST +
-                    data?.NumRaffleNFTWinnersStakingRWalk}{" "}
-                  will receive
+                  {data?.NumRaffleNFTWinnersBidding} will receive
                 </Typography>
                 <GradientText variant="h4" textAlign="center">
                   1 Cosmic NFT
@@ -1407,7 +1383,13 @@ const NewHome = () => {
         </Box>
         <Box mt={10}>
           <Typography variant="h6">TOP RAFFLE TICKETS HOLDERS</Typography>
-          <RaffleHolderTable list={curBidList} />
+          <RaffleHolderTable
+            list={curBidList}
+            numRaffleWinner={
+              data?.NumRaffleEthWinnersBidding +
+              data?.NumRaffleNFTWinnersBidding
+            }
+          />
         </Box>
       </MainWrapper>
 
@@ -1415,16 +1397,6 @@ const NewHome = () => {
 
       <Container>
         <Box mt="60px">
-          <Typography variant="h4" textAlign="center" mb={6}>
-            Unique Bidders
-          </Typography>
-          {uniqueBidders === null ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : (
-            <UniqueBiddersTable list={uniqueBidders} />
-          )}
-        </Box>
-        <Box mt="80px">
           <Typography variant="h4" textAlign="center" mb={6}>
             History of Winnings
           </Typography>
