@@ -16,11 +16,18 @@ import { isMobile } from "react-device-detect";
 import { useActiveWeb3React } from "../hooks/web3";
 
 const HolderRow = ({ holder }) => {
+  const { account } = useActiveWeb3React();
   if (!holder) {
     return <TablePrimaryRow />;
   }
   return (
-    <TablePrimaryRow>
+    <TablePrimaryRow
+      sx={
+        account === holder.userAddr && {
+          backgroundColor: "rgba(255, 255, 255, 0.06)",
+        }
+      }
+    >
       <TablePrimaryCell align="left">
         <AddressLink
           address={holder.userAddr}

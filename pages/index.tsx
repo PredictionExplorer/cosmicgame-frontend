@@ -1215,7 +1215,7 @@ const NewHome = () => {
                 {data?.NumRaffleEthWinnersBidding} raffle tickets will be chosen
                 and these people will win {data?.RafflePercentage}% of the pot.
                 Also, {data?.NumRaffleNFTWinnersBidding} additional winners and{" "}
-                {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers
+                {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers{" "}
                 {/* and {data?.NumRaffleNFTWinnersStakingCST} Cosmic Token stakers */}
                 will be chosen which will receive a Cosmic Signature NFT.
               </Typography>
@@ -1273,7 +1273,8 @@ const NewHome = () => {
             you are also buying a raffle ticket. When the round ends, there
             are&nbsp;
             {data?.NumRaffleEthWinnersBidding +
-              data?.NumRaffleNFTWinnersBidding}
+              data?.NumRaffleNFTWinnersBidding +
+              data?.NumRaffleNFTWinnersStakingRWalk}
             &nbsp;raffle winners:
           </Typography>
           <Box textAlign="center" mb={6}>
@@ -1308,7 +1309,9 @@ const NewHome = () => {
             <Grid item xs={12} sm={12} md={6} lg={6}>
               <GradientBorder sx={{ p: 2 }}>
                 <Typography variant="subtitle1" textAlign="center">
-                  {data?.NumRaffleNFTWinnersBidding} will receive
+                  {data?.NumRaffleNFTWinnersBidding +
+                    data?.NumRaffleNFTWinnersStakingRWalk}{" "}
+                  will receive
                 </Typography>
                 <GradientText variant="h4" textAlign="center">
                   1 Cosmic NFT

@@ -73,21 +73,23 @@ const MyStaking = () => {
   const cstStakingContract = useStakingWalletCSTContract();
   const rwlkStakingContract = useStakingWalletRWLKContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
+  const rwalkContract = useRWLKNFTContract();
   const cosmicGameContract = useCosmicGameContract();
   const { setNotification } = useNotification();
 
   const handleStake = async (tokenId: number, isRwalk: boolean) => {
+    const contract = isRwalk ? rwalkContract : cosmicSignatureContract;
     const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
     const STAKING_WALLET_ADDRESS = isRwalk
       ? STAKING_WALLET_RWLK_ADDRESS
       : STAKING_WALLET_CST_ADDRESS;
     try {
-      const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
+      const isApprovedForAll = await contract.isApprovedForAll(
         account,
         STAKING_WALLET_ADDRESS
       );
       if (!isApprovedForAll) {
-        await cosmicSignatureContract
+        await contract
           .setApprovalForAll(STAKING_WALLET_ADDRESS, true)
           .then((tx) => tx.wait());
       }
@@ -119,17 +121,18 @@ const MyStaking = () => {
   };
 
   const handleStakeMany = async (tokenIds: number[], isRwalk: boolean) => {
+    const contract = isRwalk ? rwalkContract : cosmicSignatureContract;
     const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
     const STAKING_WALLET_ADDRESS = isRwalk
       ? STAKING_WALLET_RWLK_ADDRESS
       : STAKING_WALLET_CST_ADDRESS;
     try {
-      const isApprovedForAll = await cosmicSignatureContract.isApprovedForAll(
+      const isApprovedForAll = await contract.isApprovedForAll(
         account,
         STAKING_WALLET_ADDRESS
       );
       if (!isApprovedForAll) {
-        await cosmicSignatureContract
+        await contract
           .setApprovalForAll(STAKING_WALLET_ADDRESS, true)
           .then((tx) => tx.wait());
       }
