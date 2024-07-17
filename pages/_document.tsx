@@ -2,6 +2,7 @@ import * as React from "react";
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import createEmotionServer from "@emotion/server/create-instance";
 import createEmotionCache from "../cache/createEmotionCache";
+import { GA_TRACKING_ID } from "../utils/analytics";
 export default class MyDocument extends Document {
   render() {
     return (
@@ -17,7 +18,7 @@ export default class MyDocument extends Document {
           />
           <script
             async
-            src={`https://www.googletagmanager.com/gtag/js?id=G-02Z940Z27T`}
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
           />
           <script
             dangerouslySetInnerHTML={{
@@ -25,7 +26,7 @@ export default class MyDocument extends Document {
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
-                  gtag('config', 'G-02Z940Z27T', {
+                  gtag('config', '${GA_TRACKING_ID}', {
                   page_path: window.location.pathname,
                   });
               `,

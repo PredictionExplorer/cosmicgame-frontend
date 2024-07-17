@@ -72,8 +72,19 @@ const HistoryRow = ({ history, isBanned }) => {
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Typography sx={{ wordBreak: "break-all" }}>
-          {history.BidType === 1 &&
-            `Bid was made using RandomWalk Token(id = ${history.RWalkNFTId})`}
+          {history.BidType === 1 && (
+            <>
+              {`Bid was made using RandomWalk Token(id = ${history.RWalkNFTId})`}
+              <img
+                src={`https://randomwalknft.s3.us-east-2.amazonaws.com/${history.RWalkNFTId.toString().padStart(
+                  6,
+                  "0"
+                )}_black_thumb.jpg`}
+                width="32px"
+                style={{ verticalAlign: "middle" }}
+              />
+            </>
+          )}
           {!!history.NFTDonationTokenAddr &&
             history.BidType === 2 &&
             "Bid was made using Cosmic Tokens"}

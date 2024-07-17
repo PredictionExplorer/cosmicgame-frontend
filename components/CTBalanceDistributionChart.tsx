@@ -28,7 +28,10 @@ export const CTBalanceDistributionChart = ({ list }) => {
         );
       setNewList([
         ...list.slice(0, limit),
-        { OwnerAddr: "Other", BalanceFloat: otherValue },
+        {
+          OwnerAddr: "Others",
+          BalanceFloat: otherValue / (list.length - limit),
+        },
       ]);
       setMaxValue(
         list[0].BalanceFloat > otherValue ? list[0].BalanceFloat : otherValue
@@ -57,8 +60,8 @@ export const CTBalanceDistributionChart = ({ list }) => {
                 category:
                   value.OwnerAddr === MARKETING_WALLET_ADDRESS
                     ? "Marketing Wallet"
-                    : value.OwnerAddr === "Other"
-                    ? "Other"
+                    : value.OwnerAddr === "Others"
+                    ? "Others"
                     : shortenHex(value.OwnerAddr, 6),
                 value: value.BalanceFloat,
               }))}

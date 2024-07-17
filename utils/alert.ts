@@ -8,7 +8,7 @@ export default function getErrorMessage(message) {
   } else {
     let arr = message.split(":");
     if (arr.length > 1) {
-      return arr[1];
+      return arr.slice(1).join(":");
     }
   }
   return '';
