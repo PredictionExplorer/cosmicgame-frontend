@@ -179,8 +179,7 @@ const NewHome = () => {
               try {
                 const t = token_id - index;
                 const seed = await cosmicSignatureContract.seeds(t);
-                console.log(prize?.TokenId);
-                await api.create(t, seed, true);
+                await api.create(t, seed, prize?.TokenId === t);
               } catch (err) {
                 if (err?.data?.message) {
                   const msg = err?.data?.message;
