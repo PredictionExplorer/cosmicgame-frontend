@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Box, Grid, Link, Tooltip, Typography } from "@mui/material";
-import Head from "next/head";
+import { Box, Grid, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
 import axios from "axios";
 import RandomWalkNFT from "../../components/RandomWalkNFT";
 import NFTImage from "../../components/NFTImage";
-import { convertTimestampToDateTime, shortenHex } from "../../utils";
+import { convertTimestampToDateTime } from "../../utils";
 
 const BidInfo = ({ bidId }) => {
   const [loading, setLoading] = useState(true);
@@ -28,10 +27,6 @@ const BidInfo = ({ bidId }) => {
   }, []);
   return (
     <>
-      <Head>
-        <title>Bid Information | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography variant="h4" color="primary" mb={4}>
           Bid Information
@@ -202,7 +197,20 @@ const BidInfo = ({ bidId }) => {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const params = context.params!.id;
   const id = Array.isArray(params) ? params[0] : params;
-  return { props: { bidId: parseInt(id) } };
+  const title = "Bid Information | Cosmic Signature";
+  const description = `Bid Information for Bid Id=${id}`;
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData, bidId: parseInt(id) } };
 }
 
 export default BidInfo;

@@ -9,7 +9,6 @@ import {
   Button,
   TextField,
 } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -22,6 +21,7 @@ import useContractNoSigner from "../hooks/useContractNoSigner";
 import CHARITY_WALLET_ABI from "../contracts/CharityWallet.json";
 import { CHARITY_WALLET_ADDRESS } from "../config/app";
 import { useActiveWeb3React } from "../hooks/web3";
+import { GetServerSideProps } from "next";
 
 const ContractItem = ({ name, value, copyable = false }) => {
   const theme = useTheme();
@@ -136,13 +136,6 @@ const Contracts = () => {
 
   return (
     <>
-      <Head>
-        <title>Contracts | CosmicSignature NFT</title>
-        <meta
-          name="description"
-          content="Programmatically generated CosmicSignature image and video NFTs. ETH spent on minting goes back to the minters."
-        />
-      </Head>
       <MainWrapper>
         <Typography variant="h4" color="primary" align="center">
           Contract Addresses
@@ -299,6 +292,24 @@ const Contracts = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Contracts | Cosmic Signature";
+  const description =
+    "Get detailed information on Cosmic Signature's smart contracts, including addresses, default initial values, and more.";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default Contracts;

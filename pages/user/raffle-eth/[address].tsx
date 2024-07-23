@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Link, TableBody, Typography } from "@mui/material";
-import Head from "next/head";
 import { GetServerSidePropsContext } from "next";
 import { ethers } from "ethers";
 import { useActiveWeb3React } from "../../../hooks/web3";
@@ -141,10 +140,6 @@ const UserRaffleETH = ({ address }) => {
 
   return (
     <>
-      <Head>
-        <title>Raffle ETH User Won | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         {invalidAddress ? (
           <Typography variant="h6">Invalid Address</Typography>
@@ -206,7 +201,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   } else {
     address = "Invalid Address";
   }
-  return { props: { address } };
+  const title = `Raffle ETH User(${address}) Won | Cosmic Signature`;
+  const description = `Raffle ETH User(${address}) Won`;
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return {
+    props: { title, description, openGraphData, address },
+  };
 }
 
 export default UserRaffleETH;

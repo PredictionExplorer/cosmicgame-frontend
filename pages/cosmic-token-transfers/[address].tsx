@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, TableBody, Typography } from "@mui/material";
-import Head from "next/head";
 import {
   MainWrapper,
   TablePrimary,
@@ -122,10 +121,6 @@ const CosmicTokenTransfers = ({ address }) => {
 
   return (
     <>
-      <Head>
-        <title>Cosmic Token Transfers | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography variant="h4" color="primary" textAlign="center" mb={4}>
           Cosmic Token Transfers
@@ -148,7 +143,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   } else {
     address = "Invalid Address";
   }
-  return { props: { address } };
+  const title = `Cosmic Token Transfer History for ${address} | Cosmic Signature`;
+  const description = `Cosmic Token Transfer History for ${address}`;
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData, address } };
 }
 
 export default CosmicTokenTransfers;

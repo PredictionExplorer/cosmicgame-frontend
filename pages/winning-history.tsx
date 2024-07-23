@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import { useActiveWeb3React } from "../hooks/web3";
 import WinningHistoryTable from "../components/WinningHistoryTable";
 import api from "../services/api";
+import { GetServerSideProps } from "next";
 
 const WinningHistory = () => {
   const { account } = useActiveWeb3React();
@@ -21,10 +21,6 @@ const WinningHistory = () => {
 
   return (
     <>
-      <Head>
-        <title>History of My Winnings | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography variant="h4" color="primary" textAlign="center" mb={4}>
           History of My Winnings
@@ -44,6 +40,23 @@ const WinningHistory = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "History of My Winnings | Cosmic Signature";
+  const description = "History of My Winnings";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default WinningHistory;

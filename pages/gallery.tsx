@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
-import Head from "next/head";
 import PaginationGrid from "../components/PaginationGrid";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
+import { GetServerSideProps } from "next";
 
 const Gallery = () => {
   const [loading, setLoading] = useState(true);
@@ -21,10 +21,6 @@ const Gallery = () => {
 
   return (
     <>
-      <Head>
-        <title>Gallery | Cosmic Signature NFT</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Box
           display="flex"
@@ -45,6 +41,24 @@ const Gallery = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Gallery | Cosmic Signature";
+  const description =
+    "Explore the Cosmic Signature NFT Gallery and discover a unique collection of digital art. Immerse yourself in vibrant, one-of-a-kind NFTs, each telling a cosmic story. Start your journey into the digital universe today!";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default Gallery;

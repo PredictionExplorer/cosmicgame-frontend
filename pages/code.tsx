@@ -1,10 +1,10 @@
 import React from "react";
 import { Box, Typography, Grid } from "@mui/material";
-import Head from "next/head";
 import CodeMirror from "@uiw/react-codemirror";
 import { createTheme } from "@uiw/codemirror-themes";
 
 import { CodeWrapper, MainWrapper, StyledLink } from "../components/styled";
+import { GetServerSideProps } from "next";
 
 const myTheme = createTheme({
   theme: "light",
@@ -17,13 +17,6 @@ const myTheme = createTheme({
 
 const CodeViewer = () => (
   <>
-    <Head>
-      <title>Code | CosmicSignature NFT</title>
-      <meta
-        name="description"
-        content="Programmatically generated CosmicSignature image and video NFTs. ETH spent on minting goes back to the minters."
-      />
-    </Head>
     <MainWrapper>
       <Grid container spacing={4}>
         <Grid item xs={12} sm={12} md={6}>
@@ -601,5 +594,22 @@ fn main() {
     </MainWrapper>
   </>
 );
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Code | Cosmic Signature";
+  const description = "Code";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
+};
 
 export default CodeViewer;

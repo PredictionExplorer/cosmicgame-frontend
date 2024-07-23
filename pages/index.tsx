@@ -37,7 +37,6 @@ import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 import { useActiveWeb3React } from "../hooks/web3";
 import { ART_BLOCKS_ADDRESS, COSMICGAME_ADDRESS } from "../config/app";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import FAQ from "../components/FAQ";
 import { ArrowForward } from "@mui/icons-material";
 import NFT_ABI from "../contracts/RandomWalkNFT.json";
 import PaginationRWLKGrid from "../components/PaginationRWLKGrid";
@@ -65,6 +64,7 @@ import { useRouter } from "next/router";
 import { CustomPagination } from "../components/CustomPagination";
 import { useNotification } from "../contexts/NotificationContext";
 import RaffleHolderTable from "../components/RaffleHolderTable";
+import { GetServerSideProps } from "next";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -169,29 +169,31 @@ const NewHome = () => {
         data?.NumRaffleNFTWinnersBidding +
         data?.NumRaffleNFTWinnersStakingRWalk +
         1;
-      await Promise.all(
-        Array(count)
-          .fill(1)
-          .map(async (_value, index) => {
-            try {
-              const seed = await cosmicSignatureContract.seeds(
-                token_id - index
-              );
-              await api.create(token_id - index, seed);
-            } catch (err) {
-              if (err?.data?.message) {
-                const msg = err?.data?.message;
-                setNotification({
-                  visible: true,
-                  type: "error",
-                  text: msg,
-                });
+
+      setTimeout(async () => {
+        const prize = await fetchPrizeInfo();
+        await Promise.all(
+          Array(count)
+            .fill(1)
+            .map(async (_value, index) => {
+              try {
+                const t = token_id - index;
+                const seed = await cosmicSignatureContract.seeds(t);
+                console.log(prize?.TokenId);
+                await api.create(t, seed, true);
+              } catch (err) {
+                if (err?.data?.message) {
+                  const msg = err?.data?.message;
+                  setNotification({
+                    visible: true,
+                    type: "error",
+                    text: msg,
+                  });
+                }
+                console.log(err);
               }
-              console.log(err);
-            }
-          })
-      );
-      setTimeout(() => {
+            })
+        );
         router.push({
           pathname: "/prize-claimed",
           query: {
@@ -515,6 +517,7 @@ const NewHome = () => {
       prizeInfo = null;
     }
     setPrizeInfo(prizeInfo);
+    return prizeInfo;
   };
 
   const fetchClaimHistory = async () => {
@@ -1260,6 +1263,78 @@ const NewHome = () => {
             </ChartSeries>
           </Chart>
         </Box>
+        <Box mt={10}>
+          <Typography variant="h6">TOP RAFFLE TICKETS HOLDERS</Typography>
+          <RaffleHolderTable
+            list={curBidList}
+            numRaffleWinner={
+              data?.NumRaffleEthWinnersBidding +
+              data?.NumRaffleNFTWinnersBidding
+            }
+          />
+        </Box>
+        <Box marginTop={10}>
+          <Box>
+            <Typography variant="h6" component="span">
+              DONATED
+            </Typography>
+            <Typography variant="h6" color="primary" component="span" mx={1}>
+              ERC721 TOKENS
+            </Typography>
+            <Typography variant="h6" component="span">
+              FOR CURRENT ROUND
+            </Typography>
+          </Box>
+          {donatedNFTs.length > 0 ? (
+            <>
+              <Grid container spacing={2} mt={2}>
+                {donatedNFTs.map((nft) => (
+                  <Grid
+                    item
+                    key={nft.RecordId}
+                    xs={gridLayout.xs}
+                    sm={gridLayout.sm}
+                    md={gridLayout.md}
+                    lg={gridLayout.lg}
+                  >
+                    <DonatedNFT nft={nft} />
+                  </Grid>
+                ))}
+              </Grid>
+              <CustomPagination
+                page={curPage}
+                setPage={setCurrentPage}
+                totalLength={donatedNFTs.length}
+                perPage={perPage}
+              />
+            </>
+          ) : (
+            <Typography mt={2}>
+              No ERC721 tokens were donated on this round.
+            </Typography>
+          )}
+        </Box>
+        <Box mt={10}>
+          <Box>
+            <Typography variant="h6" component="span">
+              CURRENT ROUND
+            </Typography>
+            <Typography
+              variant="h6"
+              component="span"
+              color="primary"
+              sx={{ ml: 1 }}
+            >
+              BID HISTORY
+            </Typography>
+          </Box>
+          <BiddingHistory biddingHistory={curBidList} />
+        </Box>
+      </MainWrapper>
+
+      <LatestNFTs />
+
+      <Container>
         <Prize prizeAmount={data?.PrizeAmountEth || 0} />
         <Box margin="50px 0">
           <Typography variant="h4" textAlign="center">
@@ -1327,79 +1402,7 @@ const NewHome = () => {
             </Grid>
           </Grid>
         </Box>
-        <Box marginTop={10}>
-          <Box>
-            <Typography variant="h6" component="span">
-              DONATED
-            </Typography>
-            <Typography variant="h6" color="primary" component="span" mx={1}>
-              ERC721 TOKENS
-            </Typography>
-            <Typography variant="h6" component="span">
-              FOR CURRENT ROUND
-            </Typography>
-          </Box>
-          {donatedNFTs.length > 0 ? (
-            <>
-              <Grid container spacing={2} mt={2}>
-                {donatedNFTs.map((nft) => (
-                  <Grid
-                    item
-                    key={nft.RecordId}
-                    xs={gridLayout.xs}
-                    sm={gridLayout.sm}
-                    md={gridLayout.md}
-                    lg={gridLayout.lg}
-                  >
-                    <DonatedNFT nft={nft} />
-                  </Grid>
-                ))}
-              </Grid>
-              <CustomPagination
-                page={curPage}
-                setPage={setCurrentPage}
-                totalLength={donatedNFTs.length}
-                perPage={perPage}
-              />
-            </>
-          ) : (
-            <Typography mt={2}>
-              No ERC721 tokens were donated on this round.
-            </Typography>
-          )}
-        </Box>
-        <Box mt={10}>
-          <Box>
-            <Typography variant="h6" component="span">
-              CURRENT ROUND
-            </Typography>
-            <Typography
-              variant="h6"
-              component="span"
-              color="primary"
-              sx={{ ml: 1 }}
-            >
-              BID HISTORY
-            </Typography>
-          </Box>
-          <BiddingHistory biddingHistory={curBidList} />
-        </Box>
-        <Box mt={10}>
-          <Typography variant="h6">TOP RAFFLE TICKETS HOLDERS</Typography>
-          <RaffleHolderTable
-            list={curBidList}
-            numRaffleWinner={
-              data?.NumRaffleEthWinnersBidding +
-              data?.NumRaffleNFTWinnersBidding
-            }
-          />
-        </Box>
-      </MainWrapper>
-
-      <LatestNFTs />
-
-      <Container>
-        <Box mt="60px">
+        <Box margin="100px 0">
           <Typography variant="h4" textAlign="center" mb={6}>
             History of Winnings
           </Typography>
@@ -1408,21 +1411,6 @@ const NewHome = () => {
           ) : (
             <WinningHistoryTable winningHistory={claimHistory} />
           )}
-        </Box>
-
-        <Box sx={{ padding: "90px 0 80px" }}>
-          <Typography variant="h4" textAlign="center">
-            FAQ&#39;S
-          </Typography>
-          <Box textAlign="center" marginBottom="56px">
-            <Image
-              src={"/images/divider.svg"}
-              width={93}
-              height={3}
-              alt="divider"
-            />
-          </Box>
-          <FAQ />
         </Box>
       </Container>
       {imageOpen && (
@@ -1438,6 +1426,26 @@ const NewHome = () => {
       )}
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Cosmic Signature";
+  const data = await api.get_dashboard_info();
+  const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${data?.PrizeAmountEth.toFixed(
+    4
+  )}ETH prizes and Cosmic Signature NFTs.`;
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default NewHome;

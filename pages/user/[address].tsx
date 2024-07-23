@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
@@ -207,10 +206,6 @@ const UserInfo = ({ address }) => {
 
   return (
     <>
-      <Head>
-        <title>User Info | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         {invalidAddress ? (
           <Typography variant="h6">Invalid Address</Typography>
@@ -713,7 +708,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   } else {
     address = "Invalid Address";
   }
-  return { props: { address } };
+  const title = `Information for User ${address} | Cosmic Signature`;
+  const description = `Information for User ${address}`;
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return {
+    props: { title, description, openGraphData, address },
+  };
 }
 
 export default UserInfo;

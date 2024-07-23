@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import Fireworks, { FireworksHandlers } from "@fireworks-js/react";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import api from "../services/api";
+import { GetServerSideProps } from "next";
 
 const PrizeClaimed = () => {
   const router = useRouter();
@@ -42,10 +43,6 @@ const PrizeClaimed = () => {
 
   return (
     <>
-      <Head>
-        <title>My Tokens | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         {loading ? (
           <Typography variant="h6">Loading...</Typography>
@@ -117,6 +114,23 @@ const PrizeClaimed = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Claimed Prize Rewards | Cosmic Signature";
+  const description = "Claimed Prize Rewards";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default PrizeClaimed;

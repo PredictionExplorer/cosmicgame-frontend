@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Link, TableBody, Typography } from "@mui/material";
-import Head from "next/head";
 import {
   MainWrapper,
   TablePrimary,
@@ -24,6 +23,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "../components/CustomPagination";
 import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
+import { GetServerSideProps } from "next";
 
 const MyWinningsRow = ({ winning }) => {
   if (!winning) {
@@ -190,10 +190,6 @@ const MyWinnings = () => {
   }, [status]);
   return (
     <>
-      <Head>
-        <title>Pending Winnings | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography
           variant="h4"
@@ -312,6 +308,23 @@ const MyWinnings = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Pending Winnings | Cosmic Signature";
+  const description = "Pending Winnings";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default MyWinnings;

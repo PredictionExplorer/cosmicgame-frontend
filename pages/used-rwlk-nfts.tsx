@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Link, TableBody, Typography } from "@mui/material";
-import Head from "next/head";
 import {
   MainWrapper,
   TablePrimary,
@@ -15,6 +14,7 @@ import api from "../services/api";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "../components/CustomPagination";
+import { GetServerSideProps } from "next";
 
 const UsedRwlkNftRow = ({ nft }) => {
   if (!nft) {
@@ -95,10 +95,6 @@ const UsedRwlkNfts = () => {
 
   return (
     <>
-      <Head>
-        <title>Used RandomWalk NFTs | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography
           variant="h4"
@@ -130,6 +126,23 @@ const UsedRwlkNfts = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Used RandomWalk NFTs for Bid | Cosmic Signature";
+  const description = "Used RandomWalk NFTs for Bid";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default UsedRwlkNfts;

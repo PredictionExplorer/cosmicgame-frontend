@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../../components/styled";
 import api from "../../services/api";
 import { GlobalMarketingRewardsTable } from "../../components/GlobalMarketingRewardsTable";
+import { GetServerSideProps } from "next";
 
 const MarketingRewards = () => {
   const [marketingRewards, setMarketingRewards] = useState([]);
@@ -21,10 +21,6 @@ const MarketingRewards = () => {
 
   return (
     <>
-      <Head>
-        <title>Marketing Rewards | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography
           variant="h4"
@@ -50,6 +46,23 @@ const MarketingRewards = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Marketing Rewards | Cosmic Signature";
+  const description = "Marketing Rewards";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default MarketingRewards;

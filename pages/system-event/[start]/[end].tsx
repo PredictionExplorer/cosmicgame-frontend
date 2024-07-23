@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, TableBody, Tooltip, Typography } from "@mui/material";
-import Head from "next/head";
 import {
   MainWrapper,
   TablePrimary,
@@ -117,10 +116,6 @@ const AdminEvent = ({ start, end }) => {
 
   return (
     <>
-      <Head>
-        <title>Admin Events | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography variant="h4" color="primary" textAlign="center" mb={4}>
           Admin Events
@@ -140,7 +135,28 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   let end = context.params!.end;
   start = Array.isArray(start) ? start[0] : start;
   end = Array.isArray(end) ? end[0] : end;
-  return { props: { start, end } };
+  const title = `Admin Events | Cosmic Signature`;
+  const description = `Admin Events`;
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return {
+    props: {
+      title,
+      description,
+      openGraphData,
+      start,
+      end,
+    },
+  };
 }
 
 export default AdminEvent;

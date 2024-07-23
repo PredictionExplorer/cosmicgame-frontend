@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Link, TableBody, Typography } from "@mui/material";
-import Head from "next/head";
 import {
   MainWrapper,
   TablePrimary,
@@ -19,6 +18,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import NFTImage from "../components/NFTImage";
 import { CustomPagination } from "../components/CustomPagination";
 import { isMobile } from "react-device-detect";
+import { GetServerSideProps } from "next";
 
 const CSTRow = ({ nft }) => {
   const getTokenImageURL = () => {
@@ -171,10 +171,6 @@ const MyWallet = () => {
 
   return (
     <>
-      <Head>
-        <title>My Tokens | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography
           variant="h4"
@@ -205,6 +201,24 @@ const MyWallet = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "My Tokens | Cosmic Signature";
+  const description =
+    "Manage your digital assets on the My Tokens page at Cosmic Signature. View your token balance, transaction history, and ownership details. Keep track of your NFTs and tokens effortlessly.";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default MyWallet;

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
 import BiddingHistoryTable from "../components/BiddingHistoryTable";
@@ -19,6 +18,7 @@ import DonatedNFTTable from "../components/DonatedNFTTable";
 import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
 import { CSTTable } from "./my-tokens";
+import { GetServerSideProps } from "next";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -179,10 +179,6 @@ const MyStatistics = () => {
 
   return (
     <>
-      <Head>
-        <title>My Statistics | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <>
           <Typography variant="h4" color="primary" mb={4}>
@@ -637,6 +633,24 @@ const MyStatistics = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "My Statistics | Cosmic Signature";
+  const description =
+    "Track your performance with Cosmic Signature's My Statistics page. View detailed bid history, stake status, rewards, and more. Stay informed and optimize your participation in our blockchain ecosystem.";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default MyStatistics;

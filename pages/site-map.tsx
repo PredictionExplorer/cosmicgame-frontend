@@ -1,14 +1,10 @@
 import { Box, Link, Typography } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../components/styled";
+import { GetServerSideProps } from "next";
 
 const SiteMap = () => {
   return (
     <>
-      <Head>
-        <title>Site Map | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography
           variant="h4"
@@ -114,6 +110,23 @@ const SiteMap = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Site Map | Cosmic Signature";
+  const description = "Site Map";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default SiteMap;

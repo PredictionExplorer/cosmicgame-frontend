@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, CardActionArea, Grid, Link, Typography } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper, StyledCard } from "../../../components/styled";
 import { GetServerSidePropsContext } from "next";
 import api from "../../../services/api";
@@ -28,10 +27,6 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
 
   return (
     <>
-      <Head>
-        <title>Staking Action Detail | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Box mb={4}>
           <Typography variant="h5" color="primary" component="span" mr={2}>
@@ -200,8 +195,31 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const actionId = Array.isArray(id) ? id[0] : id;
   const rwalk = context.params!.IsRwalk;
   const IsRwalk = Array.isArray(rwalk) ? rwalk[0] : rwalk;
+  const title = `Detail for ${
+    IsRwalk ? "RandomWalk NFT" : "Cosmic Signature Token"
+  } Staking Action Id = ${actionId} | Cosmic Signature`;
+  const description = `Detail for ${
+    IsRwalk ? "RandomWalk NFT" : "Cosmic Signature Token"
+  } Staking Action Id = ${actionId}`;
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
   return {
-    props: { actionId: parseInt(actionId), IsRwalk: parseInt(IsRwalk) },
+    props: {
+      title,
+      description,
+      openGraphData,
+      actionId: parseInt(actionId),
+      IsRwalk: parseInt(IsRwalk),
+    },
   };
 }
 

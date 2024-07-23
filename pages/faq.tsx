@@ -1,13 +1,13 @@
 import React from "react";
 import Image from "next/image";
 import { Box, Paper, Typography, Link, styled } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import FAQ from "../components/FAQ";
-import { isMobile } from "react-device-detect";
+import { isFirefox, isMobile } from "react-device-detect";
+import { GetServerSideProps } from "next";
 
 const StyledPaper = styled(Paper)(
-  !isMobile && {
+  !(isMobile || isFirefox) && {
     position: "relative",
     padding: "20px 120px",
     border: 0,
@@ -25,10 +25,6 @@ const StyledPaper = styled(Paper)(
 const FAQPage = () => {
   return (
     <>
-      <Head>
-        <title>FAQ | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography
           variant="h4"
@@ -40,7 +36,7 @@ const FAQPage = () => {
         </Typography>
         <Box mt={4}>
           <FAQ />
-          <StyledPaper sx={{display: "flex", alignItems: "center"}}>
+          <StyledPaper sx={{ display: "flex", alignItems: "center" }}>
             <Box>
               <Typography variant="h4">Have a question?</Typography>
               <Box marginBottom="16px">
@@ -89,6 +85,23 @@ const FAQPage = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "FAQ | Cosmic Signature";
+  const description = "Frequenly Asked Questions (FAQ)";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default FAQPage;

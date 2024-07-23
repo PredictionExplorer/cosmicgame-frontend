@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Box, Tab, Tabs, Typography } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
@@ -26,6 +25,7 @@ import { formatSeconds } from "../utils";
 import { ethers } from "ethers";
 import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
+import { GetServerSideProps } from "next";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -291,10 +291,6 @@ const MyStaking = () => {
 
   return (
     <>
-      <Head>
-        <title>My Staking | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Typography
           variant="h4"
@@ -491,6 +487,24 @@ const MyStaking = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "My Staking | Cosmic Signature";
+  const description =
+    "Manage your staking with Cosmic Signature. View your staking status, rewards, and history. Maximize your earnings and participate in the growth of our blockchain ecosystem with ease.";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default MyStaking;

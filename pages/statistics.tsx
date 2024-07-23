@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Grid, Link, Tab, Tabs, Typography } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
 import BiddingHistoryTable from "../components/BiddingHistoryTable";
@@ -27,6 +26,7 @@ import { SystemModesTable } from "../components/SystemModesTable";
 import { UniqueStakersRWLKTable } from "../components/UniqueStakersRWLKTable";
 import { CustomPagination } from "../components/CustomPagination";
 import { CTBalanceDistributionChart } from "../components/CTBalanceDistributionChart";
+import { GetServerSideProps } from "next";
 // import { UniqueStakersBothTable } from "../components/UniqueStakersBothTable";
 
 interface TabPanelProps {
@@ -172,10 +172,6 @@ const Statistics = () => {
 
   return (
     <>
-      <Head>
-        <title>Statistics | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         {loading || !data ? (
           <Typography variant="h6">Loading...</Typography>
@@ -698,6 +694,24 @@ const Statistics = () => {
       </MainWrapper>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const title = "Statistics | Cosmic Signature";
+  const description =
+    "Explore comprehensive statistics on Cosmic Signature. Access data on market trends, token performance, user activity, and more. Stay informed with real-time insights into our blockchain ecosystem.";
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return { props: { title, description, openGraphData } };
 };
 
 export default Statistics;

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Link, Typography } from "@mui/material";
-import Head from "next/head";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
@@ -68,10 +67,6 @@ const PrizeInfo = ({ roundNum }) => {
 
   return (
     <>
-      <Head>
-        <title>Prize Info | Cosmic Signature</title>
-        <meta name="description" content="" />
-      </Head>
       <MainWrapper>
         <Box mb={4}>
           <Typography variant="h4" color="primary" component="span" mr={2}>
@@ -257,7 +252,22 @@ const PrizeInfo = ({ roundNum }) => {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = context.params!.id;
   const roundNum = Array.isArray(id) ? id[0] : id;
-  return { props: { roundNum: parseInt(roundNum) } };
+  const title = `Prize Information for Round ${roundNum} | Cosmic Signature`;
+  const description = `Prize Information for Round ${roundNum}`;
+  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+
+  const openGraphData = [
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+  ];
+
+  return {
+    props: { title, description, openGraphData, roundNum: parseInt(roundNum) },
+  };
 }
 
 export default PrizeInfo;

@@ -19,7 +19,6 @@ export const parseBalance = (
 export const formatId = (id: number | string) => {
   return `#${id.toString().padStart(6, '0')}`
 }
-
 export const convertTimestampToDateTime = (timestamp: any) => {
   let month_names = [
     "Jan",
@@ -44,7 +43,6 @@ export const convertTimestampToDateTime = (timestamp: any) => {
   var result = `${month} ${date}, ${year} ${hours}:${minutes}`;
   return result;
 };
-
 
 export const formatSeconds = (seconds: any) => {
   if (seconds <= 0) {
