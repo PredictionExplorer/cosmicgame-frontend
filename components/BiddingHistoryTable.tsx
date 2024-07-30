@@ -16,7 +16,7 @@ import { CustomPagination } from "./CustomPagination";
 import api from "../services/api";
 import { isMobile } from "react-device-detect";
 
-const HistoryRow = ({ history, isBanned }) => {
+const HistoryRow = ({ history, isBanned, showRound }) => {
   if (!history) {
     return <TablePrimaryRow />;
   }
@@ -48,7 +48,6 @@ const HistoryRow = ({ history, isBanned }) => {
           </Typography>
         </Tooltip>
       </TablePrimaryCell>
-
       <TablePrimaryCell align="right">
         {history.BidType === 2
           ? `${
@@ -62,7 +61,9 @@ const HistoryRow = ({ history, isBanned }) => {
                 : history.BidPriceEth?.toFixed(2)
             } ETH`}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>
+      {showRound && (
+        <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>
+      )}
       <TablePrimaryCell align="center">
         {history.BidType === 2
           ? "CST Bid"
@@ -121,7 +122,7 @@ const HistoryRow = ({ history, isBanned }) => {
   );
 };
 
-const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
+const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }) => {
   const [bannedList, setBannedList] = useState([]);
   const getBannedList = async () => {
     const bids = await api.get_banned_bids();
@@ -138,7 +139,7 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
             <col width="16%" />
             <col width="17%" />
             <col width="15%" />
-            <col width="8%" />
+            {showRound && <col width="8%" />}
             <col width="9%" />
             <col width="15%" />
             <col width="20%" />
@@ -149,7 +150,7 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
             <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Bidder</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="right">Price</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+            {showRound && <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>}
             <TablePrimaryHeadCell>Bid Type</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Bid Info</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
@@ -163,6 +164,7 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
                 history={history}
                 key={history.EvtLogId}
                 isBanned={bannedList.includes(history.EvtLogId)}
+                showRound={showRound}
               />
             ))}
         </TableBody>
@@ -171,7 +173,7 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
   );
 };
 
-const BiddingHistoryTable = ({ biddingHistory }) => {
+const BiddingHistoryTable = ({ biddingHistory, showRound = true }) => {
   const perPage = 5;
   const [curPage, setCurrentPage] = useState(1);
 
@@ -183,6 +185,7 @@ const BiddingHistoryTable = ({ biddingHistory }) => {
             biddingHistory={biddingHistory}
             perPage={perPage}
             curPage={curPage}
+            showRound={showRound}
           />
           <CustomPagination
             page={curPage}

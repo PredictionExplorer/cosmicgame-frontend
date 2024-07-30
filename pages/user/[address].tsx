@@ -44,6 +44,7 @@ function CustomTabPanel(props: TabPanelProps) {
 
 const UserInfo = ({ address }) => {
   const { account } = useActiveWeb3React();
+  const [data, setData] = useState(null);
   const [claimedDonatedNFTs, setClaimedDonatedNFTs] = useState({
     data: [],
     loading: false,
@@ -128,6 +129,7 @@ const UserInfo = ({ address }) => {
   const calculateProbability = async () => {
     let count = 0;
     const newData = await api.get_dashboard_info();
+    setData(newData);
     const round = newData?.CurRoundNum;
     const bidList = await api.get_bid_list_by_round(round, "desc");
     bidList.forEach((bid) => {
@@ -390,15 +392,17 @@ const UserInfo = ({ address }) => {
                     {userInfo.TotalCSTokensWon}
                   </Typography>
                 </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Probability of Winning Raffle:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    {(raffleProbability * 100).toFixed(2)}%
-                  </Typography>
-                </Box>
+                {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
+                  <Box mb={1}>
+                    <Typography color="primary" component="span">
+                      Probability of Winning Raffle:
+                    </Typography>
+                    &nbsp;
+                    <Typography component="span">
+                      {(raffleProbability * 100).toFixed(2)}%
+                    </Typography>
+                  </Box>
+                )}
                 <Typography mt={3}>
                   This account has {userInfo.CosmicTokenNumTransfers}{" "}
                   CosmicToken (ERC20) transfers, click{" "}

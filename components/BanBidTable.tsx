@@ -23,30 +23,57 @@ import { AddressLink } from "./AddressLink";
 import api from "../services/api";
 import { useActiveWeb3React } from "../hooks/web3";
 import { useNotification } from "../contexts/NotificationContext";
+import getErrorMessage from "../utils/alert";
 
 const HistoryRow = ({ history, isBanned, updateBannedList }) => {
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
   const handleBan = async () => {
-    const res = await api.ban_bid(history.EvtLogId, account);
-    console.log(res);
-    updateBannedList();
-    setNotification({
-      visible: true,
-      type: "success",
-      text: "Bid was banned successfully!",
-    });
+    try {
+      const res = await api.ban_bid(history.EvtLogId, account);
+      console.log(res);
+      updateBannedList();
+      setNotification({
+        visible: true,
+        type: "success",
+        text: "Bid was banned successfully!",
+      });
+    } catch (e) {
+      if (e?.data?.message) {
+        const msg = getErrorMessage(e?.data?.message);
+        setNotification({
+          visible: true,
+          text: msg,
+          type: "error",
+        });
+      }
+      console.error(e);
+    }
   };
+
   const handleUnban = async () => {
-    const res = await api.unban_bid(history.EvtLogId);
-    console.log(res);
-    updateBannedList();
-    setNotification({
-      visible: true,
-      type: "success",
-      text: "Bid was unbanned successfully!",
-    });
+    try {
+      const res = await api.unban_bid(history.EvtLogId);
+      console.log(res);
+      updateBannedList();
+      setNotification({
+        visible: true,
+        type: "success",
+        text: "Bid was unbanned successfully!",
+      });
+    } catch (e) {
+      if (e?.data?.message) {
+        const msg = getErrorMessage(e?.data?.message);
+        setNotification({
+          visible: true,
+          text: msg,
+          type: "error",
+        });
+      }
+      console.error(e);
+    }
   };
+
   if (!history) {
     return <TablePrimaryRow />;
   }
@@ -168,7 +195,7 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }) => {
 };
 
 const BanBidTable = ({ biddingHistory }) => {
-  const perPage = 5;
+  const perPage = 200;
   const [curPage, setCurrentPage] = useState(1);
 
   return (

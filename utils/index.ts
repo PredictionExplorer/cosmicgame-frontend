@@ -86,7 +86,7 @@ export const calculateTimeDiff = (timestamp: any) => {
     str += hours + (hours === 1 ? " Hour " : " Hours ");
   }
   if (minutes) {
-    str += minutes + (minutes === 1 ? " Minute " : " Minutes ");
+    str += minutes + (minutes === 1 ? " Minute" : " Minutes");
   }
   return str;
 };

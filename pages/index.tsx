@@ -109,6 +109,7 @@ const NewHome = () => {
   const [rwlknftIds, setRwlknftIds] = useState([]);
   const [offset, setOffset] = useState(0);
   const [roundStarted, setRoundStarted] = useState("");
+  const [lastBidderElapsed, setLastBidderElapsed] = useState("");
   const [curPage, setCurrentPage] = useState(1);
   const [claimHistory, setClaimHistory] = useState(null);
   const [imageOpen, setImageOpen] = useState(false);
@@ -544,6 +545,38 @@ const NewHome = () => {
     fetchCSTBidData();
   };
 
+  const requestNotificationPermission = () => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          console.log("Notification permission granted.");
+        }
+      });
+    }
+  };
+
+  const sendNotification = (title, options) => {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification(title, options);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      if (prizeTime && now >= prizeTime - 5 * 60 * 1000) {
+        sendNotification("Bid Now or Miss Out!", {
+          body:
+            "Time is running out! You have 5 minutes to place your bids and win amazing prizes.",
+        });
+        clearInterval(interval); // Stop the interval once the notification is sent
+      }
+    });
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
   useEffect(() => {
     if (nftRWLKContract && account) {
       getRwlkNFTIds();
@@ -551,6 +584,7 @@ const NewHome = () => {
   }, [nftRWLKContract, account]);
 
   useEffect(() => {
+    requestNotificationPermission();
     if (router.query) {
       if (router.query.randomwalk) {
         setRwlkId(Number(router.query.tokenId));
@@ -630,8 +664,12 @@ const NewHome = () => {
         setBannerTokenId(fileName);
       }
     }
-    const interval = setInterval(async () => {
+    const interval = setInterval(() => {
       setRoundStarted(calculateTimeDiff(data?.TsRoundStart - offset / 1000));
+      if (curBidList.length) {
+        const lastBidTime = curBidList[0].TimeStamp;
+        setLastBidderElapsed(calculateTimeDiff(lastBidTime - offset / 1000));
+      }
     }, 1000);
 
     return () => {
@@ -699,7 +737,7 @@ const NewHome = () => {
                           ))}
                         {roundStarted !== "" && (
                           <Typography sx={{ mt: 1 }}>
-                            (Round started {roundStarted} ago)
+                            (Started {roundStarted} ago.)
                           </Typography>
                         )}
                       </Grid>
@@ -765,7 +803,7 @@ const NewHome = () => {
                     >
                       <Typography>Using Ether</Typography>
                       <Typography>
-                        {data?.BidPriceEth.toFixed(6)} ETH
+                        {data?.BidPriceEth.toFixed(2)} ETH
                       </Typography>
                     </Box>
                     <Box
@@ -777,7 +815,7 @@ const NewHome = () => {
                     >
                       <Typography>Using RandomWalk</Typography>
                       <Typography>
-                        {(data?.BidPriceEth / 2).toFixed(6)} ETH
+                        {(data?.BidPriceEth / 2).toFixed(2)} ETH
                       </Typography>
                     </Box>
                     <Box
@@ -790,7 +828,7 @@ const NewHome = () => {
                       <Typography>Using CST</Typography>
                       {cstBidData?.CSTPrice > 0 ? (
                         <Typography>
-                          {cstBidData?.CSTPrice.toFixed(6)} CST
+                          {cstBidData?.CSTPrice.toFixed(2)} CST
                         </Typography>
                       ) : (
                         <Typography color="#ff0">FREE</Typography>
@@ -821,14 +859,19 @@ const NewHome = () => {
                       {data?.LastBidderAddr === constants.AddressZero ? (
                         "There is no bidder yet."
                       ) : (
-                        <Link
-                          href={`/user/${data?.LastBidderAddr}`}
-                          color="rgb(255, 255, 255)"
-                          fontSize="inherit"
-                          sx={{ wordBreak: "break-all" }}
-                        >
-                          {data?.LastBidderAddr}
-                        </Link>
+                        <>
+                          <Link
+                            href={`/user/${data?.LastBidderAddr}`}
+                            color="rgb(255, 255, 255)"
+                            fontSize="inherit"
+                            sx={{ wordBreak: "break-all" }}
+                          >
+                            {data?.LastBidderAddr}
+                          </Link>{" "}
+                          {lastBidderElapsed !== "" && (
+                            <>({lastBidderElapsed} Elapsed)</>
+                          )}
+                        </>
                       )}
                     </Typography>
                   </Grid>
@@ -841,7 +884,9 @@ const NewHome = () => {
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={8} md={8}>
-                      <Typography sx={{ wordWrap: "break-word" }}>
+                      <Typography
+                        sx={{ wordWrap: "break-word", color: "#ff0" }}
+                      >
                         {curBidList[0].Message}
                       </Typography>
                     </Grid>
@@ -854,7 +899,7 @@ const NewHome = () => {
                         ? `You have 100.00% chance of winning the main prize (${data?.PrizeAmountEth.toFixed(
                             4
                           )}ETH).`
-                        : "You're not the last bidder, so you can't win the main prize."}
+                        : "You're not the last bidder, so you can win the main prize in 24 hours if the last bidder doesn't take it."}
                     </Typography>
                     <Typography>
                       You have {winProbability.raffle.toFixed(2)}% chance of
@@ -1098,53 +1143,57 @@ const NewHome = () => {
                 )}
               </Grid>
               <Grid item xs={12} sm={4} md={6}>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  endIcon={<ArrowForward />}
-                  onClick={bidType === "CST" ? onBidWithCST : onBid}
-                  fullWidth
-                  disabled={
-                    isBidding ||
-                    (bidType === "RandomWalk" && rwlkId === -1) ||
-                    bidType === ""
-                  }
-                  sx={{ mt: 3 }}
-                >
-                  {`Bid now with ${bidType} ${
-                    bidType === "ETH"
-                      ? `(${
-                          data?.BidPriceEth * (1 + bidPricePlus / 100) > 0.1
-                            ? (
-                                data?.BidPriceEth *
-                                (1 + bidPricePlus / 100)
-                              ).toFixed(2)
-                            : (
-                                data?.BidPriceEth *
-                                (1 + bidPricePlus / 100)
-                              ).toFixed(5)
-                        } ETH)`
-                      : bidType === "RandomWalk" && rwlkId !== -1
-                      ? ` token ${rwlkId} (${
-                          data?.BidPriceEth * (1 + bidPricePlus / 100) > 0.2
-                            ? (
-                                data?.BidPriceEth *
-                                (1 + bidPricePlus / 100) *
-                                0.5
-                              ).toFixed(2)
-                            : (
-                                data?.BidPriceEth *
-                                (1 + bidPricePlus / 100) *
-                                0.5
-                              ).toFixed(5)
-                        } ETH)`
-                      : bidType === "CST"
-                      ? cstBidData?.SecondsElapsed > cstBidData?.AuctionDuration
-                        ? "(FREE BID)"
-                        : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
-                      : ""
-                  }`}
-                </Button>
+                {(prizeTime > Date.now() || data?.LastBidderAddr !== account) &&
+                  !loading && (
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      endIcon={<ArrowForward />}
+                      onClick={bidType === "CST" ? onBidWithCST : onBid}
+                      fullWidth
+                      disabled={
+                        isBidding ||
+                        (bidType === "RandomWalk" && rwlkId === -1) ||
+                        bidType === ""
+                      }
+                      sx={{ mt: 3 }}
+                    >
+                      {`Bid now with ${bidType} ${
+                        bidType === "ETH"
+                          ? `(${
+                              data?.BidPriceEth * (1 + bidPricePlus / 100) > 0.1
+                                ? (
+                                    data?.BidPriceEth *
+                                    (1 + bidPricePlus / 100)
+                                  ).toFixed(2)
+                                : (
+                                    data?.BidPriceEth *
+                                    (1 + bidPricePlus / 100)
+                                  ).toFixed(5)
+                            } ETH)`
+                          : bidType === "RandomWalk" && rwlkId !== -1
+                          ? ` token ${rwlkId} (${
+                              data?.BidPriceEth * (1 + bidPricePlus / 100) > 0.2
+                                ? (
+                                    data?.BidPriceEth *
+                                    (1 + bidPricePlus / 100) *
+                                    0.5
+                                  ).toFixed(2)
+                                : (
+                                    data?.BidPriceEth *
+                                    (1 + bidPricePlus / 100) *
+                                    0.5
+                                  ).toFixed(5)
+                            } ETH)`
+                          : bidType === "CST"
+                          ? cstBidData?.SecondsElapsed >
+                            cstBidData?.AuctionDuration
+                            ? "(FREE BID)"
+                            : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
+                          : ""
+                      }`}
+                    </Button>
+                  )}
                 {!(
                   prizeTime > Date.now() ||
                   data?.LastBidderAddr === constants.AddressZero ||
@@ -1316,7 +1365,7 @@ const NewHome = () => {
         <Box mt={10}>
           <Box>
             <Typography variant="h6" component="span">
-              CURRENT ROUND
+              CURRENT ROUND BID HISTORY
             </Typography>
             <Typography
               variant="h6"
@@ -1324,10 +1373,10 @@ const NewHome = () => {
               color="primary"
               sx={{ ml: 1 }}
             >
-              BID HISTORY
+              ROUND {data?.CurRoundNum}
             </Typography>
           </Box>
-          <BiddingHistory biddingHistory={curBidList} />
+          <BiddingHistory biddingHistory={curBidList} showRound={false} />
         </Box>
       </MainWrapper>
 
@@ -1465,7 +1514,6 @@ export default NewHome;
 // file naming scheme to seed from token id
 // system mode changes on statistics page
 // update statistics page with new data
-// add notification message
 //
 // get_bid_list_by_round: implement pagination
 // get_user_info: remove bid field

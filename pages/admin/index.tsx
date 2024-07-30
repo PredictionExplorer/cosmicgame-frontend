@@ -10,11 +10,13 @@ const Admin = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const bidList = await api.get_bid_list();
+      let bidList = await api.get_bid_list();
+      bidList = bidList.filter((x) => x.Message !== "");
       setBidList(bidList);
     };
     fetchData();
   }, []);
+
   return (
     <>
       <Head>

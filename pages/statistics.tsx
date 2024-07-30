@@ -263,7 +263,7 @@ const Statistics = () => {
             <Box my={4}>
               <Box display="flex" alignItems="center" flexWrap="wrap">
                 <Typography variant="h6" component="span">
-                  CURRENT ROUND
+                  CURRENT ROUND BID HISTORY
                 </Typography>
                 <Typography
                   variant="h6"
@@ -271,10 +271,10 @@ const Statistics = () => {
                   color="primary"
                   sx={{ ml: 1.5 }}
                 >
-                  BID HISTORY
+                  ROUND {data.CurRoundNum}
                 </Typography>
               </Box>
-              <BiddingHistoryTable biddingHistory={bidHistory} />
+              <BiddingHistoryTable biddingHistory={bidHistory} showRound={false} />
             </Box>
             <Typography variant="h5">Overall Statistics</Typography>
             <Box mt={4}>
