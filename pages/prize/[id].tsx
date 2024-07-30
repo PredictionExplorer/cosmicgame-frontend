@@ -23,7 +23,6 @@ const PrizeInfo = ({ roundNum }) => {
   const [stakingRewards, setStakingRewards] = useState([]);
   const [loading, setLoading] = useState(true);
   const { setNotification } = useNotification();
-
   const handleAllDonatedNFTsClaim = async () => {
     try {
       const indexList = donatedNFTToClaim.map((item) => item.Index);
@@ -135,6 +134,42 @@ const PrizeInfo = ({ roundNum }) => {
               &nbsp;
               <Typography component="span">
                 {prizeInfo.CharityAmountETH.toFixed(4)} ETH
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                Endurance Winner Address:
+              </Typography>
+              &nbsp;
+              <Typography component="span">
+                {prizeInfo.EnduranceWinnerAddr}
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                Endurance Token Id:
+              </Typography>
+              &nbsp;
+              <Typography component="span">
+                {prizeInfo.EnduranceTokenId}
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                Ultimate Bidder Address:
+              </Typography>
+              &nbsp;
+              <Typography component="span">
+                {prizeInfo.TopBidderWinnerAddr}
+              </Typography>
+            </Box>
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                Ultimate Bidder Token Id:
+              </Typography>
+              &nbsp;
+              <Typography component="span">
+                {prizeInfo.TopBidderTokenId}
               </Typography>
             </Box>
             <Box mb={1}>
