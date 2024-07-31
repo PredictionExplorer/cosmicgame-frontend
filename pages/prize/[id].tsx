@@ -138,7 +138,7 @@ const PrizeInfo = ({ roundNum }) => {
             </Box>
             <Box mb={1}>
               <Typography color="primary" component="span">
-                Endurance Winner Address:
+                Endurance Champion Prize Winner Address:
               </Typography>
               &nbsp;
               <Typography component="span">
@@ -147,31 +147,53 @@ const PrizeInfo = ({ roundNum }) => {
             </Box>
             <Box mb={1}>
               <Typography color="primary" component="span">
-                Endurance Token Id:
+                Endurance Champion Prize Winner (CST):
               </Typography>
               &nbsp;
               <Typography component="span">
-                {prizeInfo.EnduranceTokenId}
+                {prizeInfo.EnduranceERC721TokenId}
               </Typography>
             </Box>
             <Box mb={1}>
               <Typography color="primary" component="span">
-                Ultimate Bidder Address:
+                Endurance Champion Prize Winner (ERC20):
               </Typography>
               &nbsp;
               <Typography component="span">
-                {prizeInfo.TopBidderWinnerAddr}
+                {prizeInfo.EnduranceERC20AmountEth}
               </Typography>
             </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Ultimate Bidder Token Id:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.TopBidderTokenId}
-              </Typography>
-            </Box>
+            {prizeInfo.StellarWinnerAddr !== "" && (
+              <>
+                <Box mb={1}>
+                  <Typography color="primary" component="span">
+                    Stellar Spender Prize Winner Address:
+                  </Typography>
+                  &nbsp;
+                  <Typography component="span">
+                    {prizeInfo.StellarWinnerAddr}
+                  </Typography>
+                </Box>
+                <Box mb={1}>
+                  <Typography color="primary" component="span">
+                    Stellar Spender Prize Winner (CST):
+                  </Typography>
+                  &nbsp;
+                  <Typography component="span">
+                    {prizeInfo.StellarERC721TokenId}
+                  </Typography>
+                </Box>
+                <Box mb={1}>
+                  <Typography color="primary" component="span">
+                    Stellar Spender Prize Winner (ERC20):
+                  </Typography>
+                  &nbsp;
+                  <Typography component="span">
+                    {prizeInfo.StellarERC20AmountEth}
+                  </Typography>
+                </Box>
+              </>
+            )}
             <Box mb={1}>
               <Typography color="primary" component="span">
                 Total Bids:

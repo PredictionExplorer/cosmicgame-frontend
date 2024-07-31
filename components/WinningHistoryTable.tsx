@@ -89,12 +89,22 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
           ) : history.RecordType === 7 ? (
             <>
               <EmojiEventsIcon />
-              &nbsp;<span>Ultimate Bidder Prize</span>
+              &nbsp;<span>Endurance Champion NFT Winner</span>
             </>
           ) : history.RecordType === 8 ? (
             <>
               <EmojiEventsIcon />
-              &nbsp;<span>Endurance Champion Prize</span>
+              &nbsp;<span>Stellar Spender NFT Winner</span>
+            </>
+          ) : history.RecordType === 9 ? (
+            <>
+              <EmojiEventsIcon />
+              &nbsp;<span>Endurance Champion ERC20 winner</span>
+            </>
+          ) : history.RecordType === 10 ? (
+            <>
+              <EmojiEventsIcon />
+              &nbsp;<span>Stellar Spender ERC20 Winner</span>
             </>
           ) : (
             " "
