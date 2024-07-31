@@ -686,10 +686,40 @@ class ApiService {
     }
   }
 
-  public async get_charity_donations() {
+  public async get_donations() {
     try {
-      const { data } = await axios.get(getAPIUrl("donations/eth"));
-      return data.CharityDonations;
+      const { data } = await axios.get(getAPIUrl("donations/eth/simple/list/0/1000000"));
+      return data.DirectCGDonations;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_donations_by_round(round: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`donations/eth/simple/by_round/${round}`));
+      return data.DirectCGDonations;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_donations_with_info() {
+    try {
+      const { data } = await axios.get(getAPIUrl("donations/eth/with_info/list/0/1000000"));
+      return data.DirectCGDonations;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_donations_with_info_by_round(round: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`donations/eth/with_info/by_round/${round}`));
+      return data.DirectCGDonations;
     } catch (err) {
       console.log(err);
       return [];
