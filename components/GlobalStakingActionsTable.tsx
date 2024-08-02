@@ -46,11 +46,6 @@ const GlobalStakingActionsRow = ({ row, IsRWLK }) => {
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell>
-        {row.ActionType === 0
-          ? convertTimestampToDateTime(row.UnstakeTimeStamp)
-          : " "}
-      </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Tooltip title={row.StakerAddr}>
           <Link
@@ -82,11 +77,10 @@ export const GlobalStakingActionsTable = ({ list, IsRWLK }) => {
         <TablePrimary>
           {!isMobile && (
             <colgroup>
-              <col width="20%" />
+              <col width="25%" />
               <col width="15%" />
-              <col width="10%" />
-              <col width="20%" />
               <col width="15%" />
+              <col width="25%" />
               <col width="15%" />
             </colgroup>
           )}
@@ -97,9 +91,6 @@ export const GlobalStakingActionsTable = ({ list, IsRWLK }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">
-                Unstake Datetime
-              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staker Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
             </Tr>

@@ -1,4 +1,6 @@
 [
+  "error FundTransferFailed(string,uint256,address)",
+  "error ZeroAddress(string)",
   "event CharityUpdatedEvent(address indexed)",
   "event DonationReceivedEvent(address indexed,uint256)",
   "event DonationSentEvent(address indexed,uint256)",

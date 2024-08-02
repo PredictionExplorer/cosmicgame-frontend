@@ -130,17 +130,6 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
                   </Box>
                   <Box mb={1}>
                     <Typography color="primary" component="span">
-                      Unstake Eligible Datetime:
-                    </Typography>
-                    &nbsp;
-                    <Typography component="span">
-                      {convertTimestampToDateTime(
-                        actionInfo.Stake.UnstakeTimeStamp
-                      )}
-                    </Typography>
-                  </Box>
-                  <Box mb={1}>
-                    <Typography color="primary" component="span">
                       Number of Staked Tokens:
                     </Typography>
                     &nbsp;

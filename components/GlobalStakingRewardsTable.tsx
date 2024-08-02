@@ -34,9 +34,6 @@ const DetailRow = ({ row }) => {
       <TablePrimaryCell align="left">
         {convertTimestampToDateTime(row.StakeActionTimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="left">
-        {convertTimestampToDateTime(row.UnstakeEligibleTimeStamp)}
-      </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
           href={`/staking-action/${row.StakeActionId}`}
@@ -74,9 +71,6 @@ const DetailTable = ({ list }) => {
             <Tr>
               <TablePrimaryHeadCell align="left" sx={{ py: 1 }}>
                 Stake Datetime
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left" sx={{ py: 1 }}>
-                Unstake Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell sx={{ py: 1 }}>
                 Action Id

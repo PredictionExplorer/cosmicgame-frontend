@@ -29,11 +29,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
   const [tokenName, setTokenName] = useState("");
   const { cstokens: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const isDisabled = (field) => {
-    if (row.UnstakeEligibleTimeStamp > row.CurChainTimeStamp) {
-      return true;
-    }
     if (field === "unstake") {
       if (stakedActionIds.includes(row.StakeActionId)) {
         return false;
@@ -42,16 +38,6 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
     }
     if (field === "claim" && !stakeState.unstake) {
       return true;
-    }
-    if (field === "restake") {
-      if (
-        !stakeState.unstake ||
-        !stakeState.claim ||
-        (!stakedActionIds.includes(row.StakeActionId) &&
-          stakedTokenIds.includes(row.TokenId))
-      ) {
-        return true;
-      }
     }
     return false;
   };
@@ -103,7 +89,6 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
                 ...stakeState,
                 unstake: e.target.checked,
                 claim: stakeState.claim && e.target.checked,
-                restake: stakeState.restake && e.target.checked,
               })
             }
           />
@@ -121,21 +106,6 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
             setStakeState({
               ...stakeState,
               claim: e.target.checked,
-              restake: stakeState.restake && e.target.checked,
-            })
-          }
-        />
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        <Checkbox
-          size="small"
-          sx={{ p: 0 }}
-          checked={stakeState.restake}
-          disabled={isDisabled("restake")}
-          onChange={(e) =>
-            setStakeState({
-              ...stakeState,
-              restake: e.target.checked,
             })
           }
         />
@@ -153,7 +123,6 @@ const TokensTable = ({ stakeState, setStakeState }) => {
   const [isAllSelected, setAllSelected] = useState({
     unstake: true,
     claim: true,
-    restake: true,
   });
   const updateStakeState = (index, param) => {
     const newArray = [...stakeState];
@@ -166,44 +135,23 @@ const TokensTable = ({ stakeState, setStakeState }) => {
       unstake:
         !stakedActionIds.includes(x.StakeActionId) || isAllSelected.unstake,
       claim: x.claim && isAllSelected.unstake,
-      restake: x.restake && isAllSelected.unstake,
     }));
     setStakeState(newArray);
     setAllSelected({
       ...isAllSelected,
       unstake: !isAllSelected.unstake,
       claim: !isAllSelected.unstake || isAllSelected.claim,
-      restake: !isAllSelected.unstake || isAllSelected.restake,
     });
   };
   const handleSelectClaimAll = () => {
     const newArray = stakeState.map((x) => ({
       ...x,
       claim: isAllSelected.claim && x.unstake,
-      restake: isAllSelected.claim && x.restake,
     }));
     setStakeState(newArray);
     setAllSelected({
       ...isAllSelected,
       claim: !isAllSelected.claim,
-      restake:
-        !isAllSelected.unstake || !isAllSelected.claim || isAllSelected.restake,
-    });
-  };
-  const handleSelectRestakeAll = () => {
-    const newArray = stakeState.map((x) => ({
-      ...x,
-      restake:
-        isAllSelected.restake &&
-        x.unstake &&
-        x.claim &&
-        (stakedActionIds.includes(x.StakeActionId) ||
-          !stakedTokenIds.includes(x.TokenId)),
-    }));
-    setStakeState(newArray);
-    setAllSelected({
-      ...isAllSelected,
-      restake: !isAllSelected.restake,
     });
   };
   const isDisabled = (type) => {
@@ -215,16 +163,6 @@ const TokensTable = ({ stakeState, setStakeState }) => {
     }
     if (type === "claim") {
       const filtered = stakeState.filter((x) => x.unstake);
-      return filtered.length === 0;
-    }
-    if (type === "restake") {
-      const filtered = stakeState.filter(
-        (x) =>
-          x.unstake &&
-          x.claim &&
-          (stakedActionIds.includes(x.StakeActionId) ||
-            !stakedTokenIds.includes(x.TokenId))
-      );
       return filtered.length === 0;
     }
   };
@@ -241,7 +179,6 @@ const TokensTable = ({ stakeState, setStakeState }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Unstake</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Claim</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Restake</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
@@ -284,14 +221,6 @@ const TokensTable = ({ stakeState, setStakeState }) => {
           >
             Claim All
           </Button>
-          <Button
-            size="small"
-            onClick={handleSelectRestakeAll}
-            disabled={isDisabled("restake")}
-            sx={{ textTransform: "none" }}
-          >
-            Restake All
-          </Button>
         </Box>
       )}
     </>
@@ -303,7 +232,7 @@ export default function AdvancedClaimDialog({
   setStakeState,
   open,
   setOpen,
-  handleUnstakeClaimRestake,
+  handleUnstakeClaim,
 }) {
   const { cstokens: stakedCSTTokens } = useStakedToken();
   const stakedActionIds = stakedCSTTokens.map((x) => x.TokenInfo.StakeActionId);
@@ -312,12 +241,11 @@ export default function AdvancedClaimDialog({
   };
   const handleSendTransaction = async () => {
     handleClose();
-    handleUnstakeClaimRestake(
-      "unstaked, claimed and restaked",
+    handleUnstakeClaim(
+      "unstaked, claimed",
       stakeState
         .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
         .map((x) => x.StakeActionId),
-      stakeState.filter((x) => x.restake).map((x) => x.StakeActionId),
       stakeState.filter((x) => x.claim).map((x) => x.StakeActionId),
       stakeState.filter((x) => x.claim).map((x) => x.DepositId)
     );
@@ -329,14 +257,7 @@ export default function AdvancedClaimDialog({
     const claimActionIds = stakeState
       .filter((x) => x.claim)
       .map((x) => x.StakeActionId);
-    const restakeActionIds = stakeState
-      .filter((x) => x.restake)
-      .map((x) => x.StakeActionId);
-    if (
-      unstakeActionIds.length === 0 &&
-      claimActionIds.length === 0 &&
-      restakeActionIds.length === 0
-    ) {
+    if (unstakeActionIds.length === 0 && claimActionIds.length === 0) {
       return true;
     }
     return false;

@@ -70,6 +70,7 @@
   "function enduranceChampionDuration() view returns (uint256)",
   "function erc20RewardMultiplier() view returns (uint256)",
   "function extraStorage(uint256) view returns (uint256)",
+  "function finalizeTesting()",
   "function getBidPrice() view returns (uint256)",
   "function getDonationInfoRecord(uint256) view returns (tuple(address,uint256,string))",
   "function initialBidAmountFraction() view returns (uint256)",

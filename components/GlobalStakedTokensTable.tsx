@@ -24,11 +24,6 @@ const GlobalStakedTokensRow = ({ row, IsRWLK }) => {
       <TablePrimaryCell>
         {convertTimestampToDateTime(row.StakeTimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell>
-        {row.UnstakeTimeStamp !== 0
-          ? convertTimestampToDateTime(row.UnstakeTimeStamp)
-          : " "}
-      </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
           href={`/staking-action/${IsRWLK ? 1 : 0}/${row.StakeActionId}`}
@@ -76,9 +71,6 @@ export const GlobalStakedTokensTable = ({ list, IsRWLK }) => {
             <Tr>
               <TablePrimaryHeadCell align="left">
                 Stake Datetime
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">
-                Unstake Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>

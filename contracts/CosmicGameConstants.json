@@ -1,7 +1,9 @@
 [
   "function DEFAULT_AUCTION_LENGTH() view returns (uint256)",
+  "function ERC20_REWARD_MULTIPLIER() view returns (uint256)",
   "function ERR_STR_MODE_MAINTENANCE() view returns (string)",
   "function ERR_STR_MODE_RUNTIME() view returns (string)",
+  "function FIRST_ROUND_BID_PRICE() view returns (uint256)",
   "function MARKETING_REWARD() view returns (uint256)",
   "function MAX_MESSAGE_LENGTH() view returns (uint256)",
   "function MILLION() view returns (uint256)",

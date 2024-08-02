@@ -1,5 +1,9 @@
 [
   "constructor(address)",
+  "error NoMintPrivileges(string,address)",
+  "error OwnershipError(string,uint256)",
+  "error TokenNameLength(string,uint256)",
+  "error ZeroAddress(string)",
   "event Approval(address indexed,address indexed,uint256 indexed)",
   "event ApprovalForAll(address indexed,address indexed,bool)",
   "event BaseURIEvent(string)",

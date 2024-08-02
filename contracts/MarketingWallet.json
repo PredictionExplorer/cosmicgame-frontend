@@ -1,5 +1,7 @@
 [
   "constructor(address)",
+  "error ERC20TransferFailed(string,address,uint256)",
+  "error ZeroAddress(string)",
   "event CosmicTokenAddressChanged(address)",
   "event OwnershipTransferred(address indexed,address indexed)",
   "event RewardSentEvent(address indexed,uint256)",

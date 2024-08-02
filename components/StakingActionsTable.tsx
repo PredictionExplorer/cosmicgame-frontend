@@ -49,11 +49,6 @@ const StakingActionsRow = ({ row, IsRwalk }) => {
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell>
-        {row.ActionType === 0
-          ? convertTimestampToDateTime(row.UnstakeTimeStamp)
-          : " "}
-      </TablePrimaryCell>
       <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -71,11 +66,10 @@ export const StakingActionsTable = ({ list, IsRwalk }) => {
         <TablePrimary>
           {!isMobile && (
             <colgroup>
-              <col width="20%" />
-              <col width="20%" />
-              <col width="15%" />
-              <col width="20%" />
-              <col width="20%" />
+              <col width="25%" />
+              <col width="25%" />
+              <col width="25%" />
+              <col width="25%" />
             </colgroup>
           )}
           <TablePrimaryHead>
@@ -85,9 +79,6 @@ export const StakingActionsTable = ({ list, IsRwalk }) => {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">
-                Unstake Datetime
-              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

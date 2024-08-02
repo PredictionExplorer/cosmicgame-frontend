@@ -26,7 +26,6 @@ import NFTImage from "./NFTImage";
 import { CustomPagination } from "./CustomPagination";
 
 const StakedTokensRow = ({
-  offset,
   row,
   handleUnstake,
   isItemSelected,
@@ -71,19 +70,10 @@ const StakedTokensRow = ({
       onClick={() =>
         handleClick(IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId)
       }
-      sx={{
-        cursor: "pointer",
-        pointerEvents:
-          row.UnstakeTimeStamp > Date.now() / 1000 + offset ? "none" : "auto",
-      }}
+      sx={{ cursor: "pointer" }}
     >
       <TablePrimaryCell padding="checkbox">
-        <Checkbox
-          color="primary"
-          checked={isItemSelected}
-          disabled={row.UnstakeTimeStamp > Date.now() / 1000 + offset}
-          size="small"
-        />
+        <Checkbox color="primary" checked={isItemSelected} size="small" />
       </TablePrimaryCell>
       <TablePrimaryCell sx={{ width: "120px" }}>
         <NFTImage src={getTokenImageURL()} />
@@ -125,23 +115,18 @@ const StakedTokensRow = ({
         {convertTimestampToDateTime(row.StakeTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(row.UnstakeTimeStamp)}
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {row.UnstakeTimeStamp <= Date.now() / 1000 + offset && (
-          <Button
-            size="small"
-            sx={{ mr: 1 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleUnstake(
-                IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
-              );
-            }}
-          >
-            Unstake
-          </Button>
-        )}
+        <Button
+          size="small"
+          sx={{ mr: 1 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleUnstake(
+              IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
+            );
+          }}
+        >
+          Unstake
+        </Button>
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -154,10 +139,6 @@ export const StakedTokensTable = ({
   IsRwalk,
 }) => {
   const perPage = 5;
-  const [offset, setOffset] = useState(0);
-  const filtered = list.filter(
-    (x) => x.UnstakeTimeStamp <= Date.now() / 1000 + offset
-  );
   const [page, setPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selected, setSelected] = useState([]);
@@ -165,7 +146,6 @@ export const StakedTokensTable = ({
   const handleClick = (id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
-
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, id);
     } else if (selectedIndex === 0) {
@@ -181,14 +161,14 @@ export const StakedTokensTable = ({
     setSelected(newSelected);
   };
   const onSelectAllClick = () => {
-    const newSelected = filtered.map((n) =>
+    const newSelected = list.map((n) =>
       IsRwalk ? n.StakeActionId : n.TokenInfo.StakeActionId
     );
     setSelected(newSelected);
     setAnchorEl(null);
   };
   const onSelectCurPgClick = () => {
-    const newSelected = filtered
+    const newSelected = list
       .slice((page - 1) * perPage, page * perPage)
       .map((n) => (IsRwalk ? n.StakeActionId : n.TokenInfo.StakeActionId));
     setSelected(newSelected);
@@ -206,12 +186,6 @@ export const StakedTokensTable = ({
     await handleUnstake(actionId, IsRwalk);
   };
   useEffect(() => {
-    const fetchData = async () => {
-      const current = await api.get_current_time();
-      const offset = current - Date.now() / 1000;
-      setOffset(offset);
-    };
-    fetchData();
     setSelected([]);
     setPage(1);
   }, [list]);
@@ -287,7 +261,6 @@ export const StakedTokensTable = ({
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Unstake Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
@@ -298,7 +271,6 @@ export const StakedTokensTable = ({
               .map((row, index) => (
                 <StakedTokensRow
                   key={(page - 1) * perPage + index}
-                  offset={offset}
                   row={row}
                   handleUnstake={onUnstake}
                   isItemSelected={isSelected(

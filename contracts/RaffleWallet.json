@@ -1,5 +1,10 @@
 [
   "constructor(address)",
+  "error DepositFromUnauthorizedSender(string,address)",
+  "error FundTransferFailed(string,uint256,address)",
+  "error NonZeroValueRequired(string)",
+  "error ZeroAddress(string)",
+  "error ZeroBalance(string)",
   "event OwnershipTransferred(address indexed,address indexed)",
   "event RaffleDepositEvent(address indexed,uint256)",
   "event RaffleWithdrawalEvent(address indexed,uint256)",

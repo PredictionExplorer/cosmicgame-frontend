@@ -40,8 +40,6 @@ export const ApiDataProvider: React.FC<ApiDataContextProps> = ({
     NumDonatedNFTToClaim: 0,
     UnclaimedStakingReward: 0,
     unstakeableActionIds: [],
-    waitingActionIds: [],
-    claimableActionIds: [],
   });
   const { cstokens: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
@@ -54,49 +52,22 @@ export const ApiDataProvider: React.FC<ApiDataContextProps> = ({
 
   const fetchInfo = async (depositId, stakedActionIds) => {
     let unstakeableActionIds = [],
-      claimableActionIds = [],
-      claimableAmounts = {},
-      waitingActionIds = [];
+      claimableActionIds = [];
     const response = await api.get_cst_action_ids_by_deposit_id(
       account,
       depositId
     );
-    const current = await api.get_current_time();
     await Promise.all(
       response.map(async (x) => {
         try {
-          if (x.UnstakeEligibleTimeStamp < current) {
-            if (!x.Claimed) {
-              claimableActionIds.push({
-                DepositId: x.DepositId,
-                StakeActionId: x.StakeActionId,
-              });
-            }
-            if (stakedActionIds.includes(x.StakeActionId)) {
-              unstakeableActionIds.push(x.StakeActionId);
-            }
-          } else {
-            waitingActionIds.push({
+          if (!x.Claimed) {
+            claimableActionIds.push({
               DepositId: x.DepositId,
               StakeActionId: x.StakeActionId,
             });
           }
-          if (!x.Claimed) {
-            if (x.TimeStampDiff > 0) {
-              if (!claimableAmounts[x.TimeStampDiff]) {
-                const filtered = Object.keys(claimableAmounts).filter(
-                  (element) =>
-                    Math.abs(parseInt(element) - x.TimeStampDiff) < 60
-                );
-                if (filtered.length > 0) {
-                  claimableAmounts[filtered[0]] += x.AmountEth;
-                } else {
-                  claimableAmounts[x.TimeStampDiff] = x.AmountEth;
-                }
-              } else {
-                claimableAmounts[x.TimeStampDiff] += x.AmountEth;
-              }
-            }
+          if (stakedActionIds.includes(x.StakeActionId)) {
+            unstakeableActionIds.push(x.StakeActionId);
           }
         } catch (error) {
           console.log(error);
@@ -106,29 +77,21 @@ export const ApiDataProvider: React.FC<ApiDataContextProps> = ({
     return {
       unstakeableActionIds,
       claimableActionIds,
-      claimableAmounts,
-      waitingActionIds,
-      actionIds: response.filter(
-        (x) => x.UnstakeEligibleTimeStamp < current && !x.Claimed
-      ),
     };
   };
 
   const fetchActionIds = async (list) => {
     let cl_actionIds = [],
-      us_actionIds = [],
-      wa_actionIds = [];
+      us_actionIds = [];
     await Promise.all(
       list.map(async (item) => {
         const depositId = item.DepositId;
         const {
           claimableActionIds: cl,
           unstakeableActionIds: us,
-          waitingActionIds: wa,
         } = await fetchInfo(depositId, stakedActionIds);
         cl_actionIds = cl_actionIds.concat(cl);
         us_actionIds = us_actionIds.concat(us);
-        wa_actionIds = wa_actionIds.concat(wa);
       })
     );
     us_actionIds = us_actionIds.filter((item, index) => {
@@ -137,7 +100,6 @@ export const ApiDataProvider: React.FC<ApiDataContextProps> = ({
 
     return {
       unstakeableActionIds: us_actionIds,
-      waitingActionIds: wa_actionIds,
       claimableActionIds: cl_actionIds,
     };
   };
@@ -157,7 +119,6 @@ export const ApiDataProvider: React.FC<ApiDataContextProps> = ({
         setApiData({
           ...newData,
           unstakeableActionIds: [],
-          waitingActionIds: [],
           claimableActionIds: [],
         });
       }
