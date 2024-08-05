@@ -325,14 +325,16 @@ const MyStaking = () => {
                 {data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked}
               </Typography>
             </Box>
-            <Box sx={{ display: "flex" }}>
-              <Typography variant="subtitle1" mr={1}>
-                Reward (as of now) for staking 1 CST token:
-              </Typography>
-              <Typography variant="subtitle1">
-                {rewardPerCST.toFixed(6)}
-              </Typography>
-            </Box>
+            {data?.MainStats.StakeStatisticsCST.TotalTokensStaked > 0 && (
+              <Box sx={{ display: "flex" }}>
+                <Typography variant="subtitle1" mr={1}>
+                  Reward (as of now) for staking 1 CST token:
+                </Typography>
+                <Typography variant="subtitle1">
+                  {rewardPerCST.toFixed(6)}
+                </Typography>
+              </Box>
+            )}
             <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
               <Tabs
                 variant="fullWidth"
