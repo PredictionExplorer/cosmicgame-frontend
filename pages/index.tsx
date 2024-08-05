@@ -564,14 +564,17 @@ const NewHome = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
-      if (prizeTime && now >= prizeTime - 5 * 60 * 1000) {
+      if (prizeTime && now >= prizeTime - 5 * 60 * 1000 && now <= prizeTime) {
         sendNotification("Bid Now or Miss Out!", {
           body:
             "Time is running out! You have 5 minutes to place your bids and win amazing prizes.",
         });
         clearInterval(interval); // Stop the interval once the notification is sent
       }
-    });
+      if (now > prizeTime) {
+        clearInterval(interval);
+      }
+    }, 1000);
     return () => {
       clearInterval(interval);
     };
@@ -1021,7 +1024,18 @@ const NewHome = () => {
                     </Grid>
                   </Box>
                 )}
-                {bidType !== "" && (
+                <TextField
+                  placeholder="Message (280 characters, optional)"
+                  value={message}
+                  size="small"
+                  multiline
+                  fullWidth
+                  rows={4}
+                  inputProps={{ maxLength: 280 }}
+                  sx={{ marginBottom: 2 }}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                {bidType !== "CST" && (
                   <Accordion
                     expanded={advancedExpanded}
                     onChange={(_event, isExpanded) =>
@@ -1032,112 +1046,93 @@ const NewHome = () => {
                       <Typography>Advanced Options</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                      {bidType !== "CST" && (
-                        <>
-                          <Typography variant="body2">
-                            If you want to donate one of your NFTs while
-                            bidding, you can put the contract address, NFT id,
-                            and comment here.
-                          </Typography>
-                          <TextField
-                            placeholder="NFT contract address"
-                            size="small"
-                            value={nftDonateAddress}
-                            fullWidth
-                            sx={{ marginTop: 2 }}
-                            onChange={(e) =>
-                              setNftDonateAddress(e.target.value)
-                            }
-                          />
-                          <TextField
-                            placeholder="NFT number"
-                            type="number"
-                            value={nftId}
-                            size="small"
-                            fullWidth
-                            sx={{ marginTop: 2 }}
-                            onChange={(e) => setNftId(e.target.value)}
-                          />
-                        </>
-                      )}
+                      <Typography variant="body2">
+                        If you want to donate one of your NFTs while bidding,
+                        you can put the contract address, NFT id, and comment
+                        here.
+                      </Typography>
                       <TextField
-                        placeholder="Message (280 characters)"
-                        value={message}
+                        placeholder="NFT contract address"
                         size="small"
-                        multiline
+                        value={nftDonateAddress}
                         fullWidth
-                        rows={4}
-                        inputProps={{ maxLength: 280 }}
                         sx={{ marginTop: 2 }}
-                        onChange={(e) => setMessage(e.target.value)}
+                        onChange={(e) => setNftDonateAddress(e.target.value)}
                       />
-                      {bidType !== "CST" && (
+                      <TextField
+                        placeholder="NFT number"
+                        type="number"
+                        value={nftId}
+                        size="small"
+                        fullWidth
+                        sx={{ marginTop: 2 }}
+                        onChange={(e) => setNftId(e.target.value)}
+                      />
+                      <Box
+                        sx={{
+                          border: "1px solid #444",
+                          borderRadius: 1,
+                          p: 2,
+                          mt: 2,
+                        }}
+                      >
+                        <Typography variant="subtitle2">
+                          Bid price collision prevention
+                        </Typography>
                         <Box
                           sx={{
-                            border: "1px solid #444",
-                            borderRadius: 1,
-                            p: 2,
-                            mt: 2,
+                            display: "flex",
+                            marginTop: 2,
+                            alignItems: "center",
                           }}
                         >
-                          <Typography variant="subtitle2">
-                            Bid price collision prevention
-                          </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              marginTop: 2,
-                              alignItems: "center",
-                            }}
+                          <Typography
+                            whiteSpace="nowrap"
+                            color="rgba(255, 255, 255, 0.68)"
+                            mr={2}
                           >
-                            <Typography
-                              whiteSpace="nowrap"
-                              color="rgba(255, 255, 255, 0.68)"
-                              mr={2}
-                            >
-                              Rise bid price by
-                            </Typography>
-                            <CustomTextField
-                              type="number"
-                              placeholder="Bid Price Plus"
-                              value={bidPricePlus}
-                              size="small"
-                              fullWidth
-                              InputProps={{
-                                inputComponent: StyledInput,
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    %
-                                  </InputAdornment>
-                                ),
-                                inputProps: { min: 0, max: 50 },
-                              }}
-                              onChange={(e) => {
-                                let value = Number(e.target.value);
-                                if (value <= 50) {
-                                  setBidPricePlus(value);
-                                }
-                              }}
-                            />
-                            <Typography
-                              whiteSpace="nowrap"
-                              color="rgba(255, 255, 255, 0.68)"
-                              ml={2}
-                            >
-                              {(
-                                data?.BidPriceEth *
-                                (1 + bidPricePlus / 100) *
-                                (bidType === "RandomWalk" ? 0.5 : 1)
-                              ).toFixed(6)}{" "}
-                              ETH
-                            </Typography>
-                          </Box>
-                          <Typography variant="body2" mt={2}>
-                            The bid price is bumped {bidPricePlus}% to prevent
-                            bidding collision.
+                            Rise bid price by
+                          </Typography>
+                          <CustomTextField
+                            type="number"
+                            placeholder="Bid Price Plus"
+                            value={bidPricePlus}
+                            size="small"
+                            fullWidth
+                            InputProps={{
+                              inputComponent: StyledInput,
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  %
+                                </InputAdornment>
+                              ),
+                              inputProps: { min: 0, max: 50 },
+                            }}
+                            onChange={(e) => {
+                              let value = Number(e.target.value);
+                              if (value <= 50) {
+                                setBidPricePlus(value);
+                              }
+                            }}
+                          />
+                          <Typography
+                            whiteSpace="nowrap"
+                            color="rgba(255, 255, 255, 0.68)"
+                            ml={2}
+                          >
+                            {(
+                              data?.BidPriceEth *
+                              (1 + bidPricePlus / 100) *
+                              (bidType === "RandomWalk" ? 0.5 : 1)
+                            ).toFixed(6)}{" "}
+                            ETH
                           </Typography>
                         </Box>
-                      )}
+                        <Typography variant="body2" mt={2}>
+                          The bid price is bumped {bidPricePlus}% to prevent
+                          bidding collision.
+                        </Typography>
+                      </Box>
                     </AccordionDetails>
                   </Accordion>
                 )}
