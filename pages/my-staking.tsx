@@ -277,7 +277,12 @@ const MyStaking = () => {
     const nftIds = tokens
       .map((t) => t.toNumber())
       .sort()
-      .filter((x) => !rwlkStaked.includes(x));
+      .filter((x) => {
+        if (rwlkStaked.includes(x)) return false;
+        return !stakingActions.some(
+          (action) => action.ActionType !== 1 && action.TokenId === x
+        );
+      });
     setRwlkTokens(nftIds);
   };
 
