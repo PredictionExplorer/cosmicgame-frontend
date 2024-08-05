@@ -21,7 +21,6 @@ import { RWLKNFTTable } from "../components/RWLKNFTTable";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 import { StakingRewardMintsTable } from "../components/StakingRewardMintsTable";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
-import { formatSeconds } from "../utils";
 import { ethers } from "ethers";
 import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
@@ -62,7 +61,6 @@ const MyStaking = () => {
   const [rwlkTokens, setRwlkTokens] = useState([]);
   const [rwlkMints, setRwlkMints] = useState([]);
   const [cstMints, setCSTMints] = useState([]);
-  const [stakingPeriod, setStakingPeriod] = useState(0);
   const [rewardPerCST, setRewardPerCST] = useState(0);
   const [stakingTable, setStakingTable] = useState(0);
   const {
@@ -236,9 +234,6 @@ const MyStaking = () => {
   const fetchData = async () => {
     const data = await api.get_dashboard_info();
     setData(data);
-    const activationTime = await cosmicGameContract.activationTime();
-    const timestamp = await api.get_current_time();
-    setStakingPeriod(timestamp - Number(activationTime));
     const stakingAmount = await cosmicGameContract.stakingAmount();
     setRewardPerCST(
       Number(ethers.utils.formatEther(stakingAmount)) /
@@ -314,14 +309,6 @@ const MyStaking = () => {
           <Typography variant="h6">Loading...</Typography>
         ) : (
           <>
-            <Box sx={{ display: "flex" }}>
-              <Typography variant="subtitle1" mr={1}>
-                Staking period:
-              </Typography>
-              <Typography variant="subtitle1">
-                {formatSeconds(stakingPeriod)}
-              </Typography>
-            </Box>
             <Box sx={{ display: "flex" }}>
               <Typography variant="subtitle1" mr={1}>
                 Number of staked CST tokens:
