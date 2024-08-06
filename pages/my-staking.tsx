@@ -254,7 +254,7 @@ const MyStaking = () => {
     const stakingActions = await api.get_staking_cst_actions_by_user(addr);
     setStakingCSTActions(stakingActions);
     const CSTokens = await api.get_cst_tokens_by_user(addr);
-    setCSTokens(CSTokens);
+    setCSTokens(CSTokens.filter((x) => !x.WasUnstaked));
     const mints = await api.get_staking_cst_mints_by_user(addr);
     setCSTMints(mints);
     fetchStakedTokens();

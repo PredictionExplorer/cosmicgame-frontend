@@ -241,18 +241,15 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list
-              .filter((x) => !x.WasUnstaked)
-              .slice((page - 1) * perPage, page * perPage)
-              .map((row) => (
-                <CSTokensRow
-                  key={row.EvtLogId}
-                  row={row}
-                  handleStake={onStake}
-                  isItemSelected={isSelected(row.TokenId)}
-                  handleClick={handleClick}
-                />
-              ))}
+            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
+              <CSTokensRow
+                key={row.EvtLogId}
+                row={row}
+                handleStake={onStake}
+                isItemSelected={isSelected(row.TokenId)}
+                handleClick={handleClick}
+              />
+            ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
