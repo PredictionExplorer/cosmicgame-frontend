@@ -306,7 +306,7 @@ const Header = () => {
                 </ListItem>
                 <Divider />
                 <ListItem sx={{ justifyContent: "space-between" }}>
-                  <Typography sx={{ fontSize: 16 }}>STAKED CST:</Typography>
+                  <Typography sx={{ fontSize: 16 }}>STAKED CST NFT:</Typography>
                   <Typography
                     color="secondary"
                     sx={{ fontSize: 16, fontWeight: 600 }}

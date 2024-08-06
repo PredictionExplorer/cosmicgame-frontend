@@ -209,7 +209,9 @@ const ConnectWalletButton = ({
           <MenuItem
             style={{ pointerEvents: "none", justifyContent: "space-between" }}
           >
-            <Typography sx={{ fontSize: "inherit" }}>STAKED CST:</Typography>
+            <Typography sx={{ fontSize: "inherit" }}>
+              STAKED CST NFT:
+            </Typography>
             <Typography color="primary" sx={{ fontSize: "inherit" }}>
               {stakedTokenCount.cst}
             </Typography>
