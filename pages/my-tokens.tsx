@@ -76,6 +76,9 @@ const CSTRow = ({ nft }) => {
       <TablePrimaryCell align="center">
         {nft.Staked ? "Yes" : "No"}
       </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {nft.WasUnstaked ? "Yes" : "No"}
+      </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {nft.RecordType === 3 ? (
           <Link
@@ -107,14 +110,15 @@ export const CSTTable = ({ list }) => {
         <TablePrimary>
           {!isMobile && (
             <colgroup>
-              <col width="11%" />
-              <col width="16%" />
               <col width="10%" />
-              <col width="12%" />
-              <col width="8%" />
-              <col width="17%" />
+              <col width="15%" />
               <col width="9%" />
-              <col width="17%" />
+              <col width="10%" />
+              <col width="8%" />
+              <col width="16%" />
+              <col width="8%" />
+              <col width="8%" />
+              <col width="16%" />
             </colgroup>
           )}
           <TablePrimaryHead>
@@ -125,7 +129,8 @@ export const CSTTable = ({ list }) => {
               <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Staked?</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Currently Staked?</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Staked Once?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Prize Type
               </TablePrimaryHeadCell>
