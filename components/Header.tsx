@@ -315,7 +315,9 @@ const Header = () => {
                   </Typography>
                 </ListItem>
                 <ListItem sx={{ justifyContent: "space-between" }}>
-                  <Typography sx={{ fontSize: 16 }}>STAKED RWALK:</Typography>
+                  <Typography sx={{ fontSize: 16 }}>
+                    STAKED RWALK NFT:
+                  </Typography>
                   <Typography
                     color="secondary"
                     sx={{ fontSize: 16, fontWeight: 600 }}

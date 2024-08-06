@@ -219,7 +219,9 @@ const ConnectWalletButton = ({
           <MenuItem
             style={{ pointerEvents: "none", justifyContent: "space-between" }}
           >
-            <Typography sx={{ fontSize: "inherit" }}>STAKED RWALK:</Typography>
+            <Typography sx={{ fontSize: "inherit" }}>
+              STAKED RWALK NFT:
+            </Typography>
             <Typography color="primary" sx={{ fontSize: "inherit" }}>
               {stakedTokenCount.rwalk}
             </Typography>
