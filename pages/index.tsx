@@ -604,7 +604,7 @@ const NewHome = () => {
       }
       if (router.query.referred_by && router.query.who) {
         setMessage(
-          `@${router.query.referred_by} referred @${router.query.who}!`
+          `@${router.query.referred_by} referred @${router.query.who}`
         );
       }
     }
