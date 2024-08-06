@@ -311,7 +311,7 @@ const MyStaking = () => {
           <>
             <Box sx={{ display: "flex" }}>
               <Typography variant="subtitle1" mr={1}>
-                Number of staked CST tokens:
+                Number of globally staked CST tokens:
               </Typography>
               <Typography variant="subtitle1">
                 {data?.MainStats.StakeStatisticsCST.TotalTokensStaked}
@@ -319,7 +319,7 @@ const MyStaking = () => {
             </Box>
             <Box sx={{ display: "flex" }}>
               <Typography variant="subtitle1" mr={1}>
-                Number of staked RandomWalk tokens:
+                Number of globally staked RandomWalk tokens:
               </Typography>
               <Typography variant="subtitle1">
                 {data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked}

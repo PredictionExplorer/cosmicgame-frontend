@@ -107,7 +107,7 @@ const ConnectWalletButton = ({
           </MenuItem>
           <Divider />
           <MenuItem
-            style={{ minWidth: 166, pointerEvents: "none", display: "block" }}
+            style={{ minWidth: 240, pointerEvents: "none", display: "block" }}
           >
             <Typography sx={{ fontSize: "inherit" }}>BALANCE:</Typography>
             {loading ? (
