@@ -465,8 +465,7 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       </Box>
       <Box display="flex" justifyContent="end" mt={1}>
         <Typography>
-          You can claim your prizes in the case if the unstake date is beyond
-          the current date.
+          If you unstake a token, that token can never be staked again!
         </Typography>
       </Box>
       {account === owner && claimableActionIds.length > 0 && (
