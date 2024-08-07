@@ -606,7 +606,9 @@ const NewHome = () => {
         setAdvancedExpanded(true);
       }
       if (router.query.referred_by) {
-        setMessage(`Referred by @${router.query.referred_by}`);
+        setMessage(
+          `Referred by @${router.query.referred_by}\nWhat is your Twitter handle? (It must have a blue checkmark)\nAnd you must follow additional instructions to be eligible. Check Twitter.`
+        );
       }
     }
 
