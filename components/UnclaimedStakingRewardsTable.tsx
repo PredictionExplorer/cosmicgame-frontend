@@ -76,7 +76,6 @@ const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
   const [stakeState, setStakeState] = useState<stakeStateInterface[]>([]);
   const { cstokens: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
 
   const fetchRowData = async () => {
     const res = await fetchInfo(owner, row.DepositId, stakedActionIds);
@@ -184,9 +183,11 @@ const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
                         ? "Unstake & Claim"
                         : "Claim"}
                     </Button>
-                    <IconButton size="small" onClick={handleMenuOpen}>
-                      <MoreHorizIcon fontSize="small" />
-                    </IconButton>
+                    {unstakeableActionIds.length > 0 && (
+                      <IconButton size="small" onClick={handleMenuOpen}>
+                        <MoreHorizIcon fontSize="small" />
+                      </IconButton>
+                    )}
                   </Box>
                   <Menu
                     elevation={0}
