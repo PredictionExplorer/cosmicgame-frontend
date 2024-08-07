@@ -142,25 +142,37 @@ const PrizeInfo = ({ roundNum }) => {
               </Typography>
               &nbsp;
               <Typography component="span">
-                {prizeInfo.EnduranceWinnerAddr}
+                <Link
+                  href={`/user/${prizeInfo.EnduranceWinnerAddr}`}
+                  color="inherit"
+                  fontSize="inherit"
+                >
+                  {prizeInfo.EnduranceWinnerAddr}
+                </Link>
               </Typography>
             </Box>
             <Box mb={1}>
               <Typography color="primary" component="span">
-                Endurance Champion Prize Winner (CST):
+                Endurance Champion rewarded with CST NFT TokenID:
               </Typography>
               &nbsp;
               <Typography component="span">
-                {prizeInfo.EnduranceERC721TokenId}
+                <Link
+                  href={`/detail/${prizeInfo.EnduranceERC721TokenId}`}
+                  color="inherit"
+                  fontSize="inherit"
+                >
+                  {prizeInfo.EnduranceERC721TokenId}
+                </Link>
               </Typography>
             </Box>
             <Box mb={1}>
               <Typography color="primary" component="span">
-                Endurance Champion Prize Winner (ERC20):
+                Endurance Champion rewarded with CST (ERC20):
               </Typography>
               &nbsp;
               <Typography component="span">
-                {prizeInfo.EnduranceERC20AmountEth}
+                {prizeInfo.EnduranceERC20AmountEth} CST
               </Typography>
             </Box>
             {prizeInfo.StellarWinnerAddr !== "" && (
@@ -171,25 +183,37 @@ const PrizeInfo = ({ roundNum }) => {
                   </Typography>
                   &nbsp;
                   <Typography component="span">
-                    {prizeInfo.StellarWinnerAddr}
+                    <Link
+                      href={`/user/${prizeInfo.StellarWinnerAddr}`}
+                      color="inherit"
+                      fontSize="inherit"
+                    >
+                      {prizeInfo.StellarWinnerAddr}
+                    </Link>
                   </Typography>
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Stellar Spender Prize Winner (CST):
+                    Stellar Spender rewarded with CST NFT Token ID:
                   </Typography>
                   &nbsp;
                   <Typography component="span">
-                    {prizeInfo.StellarERC721TokenId}
+                    <Link
+                      href={`/detail/${prizeInfo.StellarERC721TokenId}`}
+                      color="inherit"
+                      fontSize="inherit"
+                    >
+                      {prizeInfo.StellarERC721TokenId}
+                    </Link>
                   </Typography>
                 </Box>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Stellar Spender Prize Winner (ERC20):
+                    Stellar Spender rewarded with CST (ERC20):
                   </Typography>
                   &nbsp;
                   <Typography component="span">
-                    {prizeInfo.StellarERC20AmountEth}
+                    {prizeInfo.StellarERC20AmountEth} CST
                   </Typography>
                 </Box>
               </>
