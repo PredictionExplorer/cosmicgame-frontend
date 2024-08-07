@@ -605,10 +605,8 @@ const NewHome = () => {
         setBidType("ETH");
         setAdvancedExpanded(true);
       }
-      if (router.query.referred_by && router.query.who) {
-        setMessage(
-          `@${router.query.referred_by} referred @${router.query.who}`
-        );
+      if (router.query.referred_by) {
+        setMessage(`Referred by @${router.query.referred_by}`);
       }
     }
 
