@@ -780,6 +780,42 @@ const NewHome = () => {
                         <Grid container spacing={2} mb={2} alignItems="center">
                           <Grid item sm={12} md={4}>
                             <Typography variant="subtitle1">
+                              Endurance Champion Address
+                            </Typography>
+                          </Grid>
+                          <Grid item sm={12} md={8}>
+                            <Typography>
+                              <Link
+                                href={`/user/${prizeInfo?.EnduranceWinnerAddr}`}
+                                color="rgb(255, 255, 255)"
+                                fontSize="inherit"
+                              >
+                                {prizeInfo?.EnduranceWinnerAddr}
+                              </Link>
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        <Grid container spacing={2} mb={2} alignItems="center">
+                          <Grid item sm={12} md={4}>
+                            <Typography variant="subtitle1">
+                              Stellar Spender Address
+                            </Typography>
+                          </Grid>
+                          <Grid item sm={12} md={8}>
+                            <Typography>
+                              <Link
+                                href={`/user/${prizeInfo?.StellarWinnerAddr}`}
+                                color="rgb(255, 255, 255)"
+                                fontSize="inherit"
+                              >
+                                {prizeInfo?.StellarWinnerAddr}
+                              </Link>
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                        <Grid container spacing={2} mb={2} alignItems="center">
+                          <Grid item sm={12} md={4}>
+                            <Typography variant="subtitle1">
                               Previous Reward
                             </Typography>
                           </Grid>
@@ -944,58 +980,11 @@ const NewHome = () => {
                   </Link>
                 </CardActionArea>
               </StyledCard>
-              <Typography variant="subtitle1" color="primary" mt={4} mb={2}>
-                Special Prizes
-              </Typography>
-              {data?.CurRoundNum > 0 && data?.TsRoundStart === 0 ? (
+              {data?.TsRoundStart !== 0 && (
                 <>
-                  <Grid container spacing={2} mb={2} alignItems="center">
-                    <Grid item xs={12} sm={4} md={4}>
-                      <Typography>Endurance Champion</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={8} md={8}>
-                      <Typography>
-                        <Link
-                          href={`/user/${prizeInfo?.EnduranceWinnerAddr}`}
-                          color="rgb(255, 255, 255)"
-                          fontSize="inherit"
-                          sx={{ wordBreak: "break-all" }}
-                        >
-                          {prizeInfo?.EnduranceWinnerAddr}
-                        </Link>
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={2} mb={2} alignItems="center">
-                    <Grid item xs={12} sm={4} md={4}>
-                      <Typography>Stellar Spender Address</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={8} md={8}>
-                      <Typography>
-                        <Link
-                          href={`/user/${prizeInfo?.StellarWinnerAddr}`}
-                          color="rgb(255, 255, 255)"
-                          fontSize="inherit"
-                          sx={{ wordBreak: "break-all" }}
-                        >
-                          {prizeInfo?.StellarWinnerAddr}
-                        </Link>
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={2} mb={2} alignItems="center">
-                    <Grid item xs={12} sm={4} md={4}>
-                      <Typography>Stellar Spender Amount</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={8} md={8}>
-                      <Typography>
-                        {prizeInfo?.StellarERC20AmountEth.toFixed(4)} ETH
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </>
-              ) : (
-                <>
+                  <Typography variant="subtitle1" color="primary" mt={4} mb={2}>
+                    Potential winners of Special Prizes
+                  </Typography>
                   <Grid container spacing={2} mb={2} alignItems="center">
                     <Grid item xs={12} sm={4} md={4}>
                       <Typography>Endurance Champion</Typography>
