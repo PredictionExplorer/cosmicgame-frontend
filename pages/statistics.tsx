@@ -247,16 +247,20 @@ const Statistics = () => {
               <StatisticsItem
                 title="Last Bidder"
                 value={
-                  <Link
-                    sx={{
-                      color: "inherit",
-                      fontSize: "inherit",
-                      fontFamily: "monospace",
-                    }}
-                    href={`/user/${data.LastBidderAddr}`}
-                  >
-                    {data.LastBidderAddr}
-                  </Link>
+                  data.LastBidderAddr === ZERO_ADDRESS ? (
+                    "Round isn't started yet."
+                  ) : (
+                    <Link
+                      sx={{
+                        color: "inherit",
+                        fontSize: "inherit",
+                        fontFamily: "monospace",
+                      }}
+                      href={`/user/${data.LastBidderAddr}`}
+                    >
+                      {data.LastBidderAddr}
+                    </Link>
+                  )
                 }
               />
             </Box>
@@ -274,7 +278,10 @@ const Statistics = () => {
                   ROUND {data.CurRoundNum}
                 </Typography>
               </Box>
-              <BiddingHistoryTable biddingHistory={bidHistory} showRound={false} />
+              <BiddingHistoryTable
+                biddingHistory={bidHistory}
+                showRound={false}
+              />
             </Box>
             <Typography variant="h5">Overall Statistics</Typography>
             <Box mt={4}>
