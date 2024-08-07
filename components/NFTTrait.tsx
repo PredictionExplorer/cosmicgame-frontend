@@ -435,7 +435,7 @@ const NFTTrait = ({ tokenId }) => {
             )}
             {!nft.Staked && !nft.WasUnstaked ? (
               <Typography sx={{ color: "#0f0" }}>
-                The token is eligiable for staking.
+                The token is eligible for staking.
               </Typography>
             ) : (
               <Typography sx={{ color: "#f00" }}>
