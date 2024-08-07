@@ -45,6 +45,7 @@ export const convertTimestampToDateTime = (timestamp: any) => {
 };
 
 export const formatSeconds = (seconds: any) => {
+  console.log(seconds);
   if (seconds <= 0) {
     return " ";
   }
@@ -62,7 +63,7 @@ export const formatSeconds = (seconds: any) => {
     str += hours + (hours === 1 ? " Hour " : " Hours ");
   }
   if (minutes) {
-    str += minutes + (minutes === 1 ? " Minute " : " Minutes ");
+    str += minutes + (minutes === 1 ? " Minute" : " Minutes");
   }
   return str;
 };

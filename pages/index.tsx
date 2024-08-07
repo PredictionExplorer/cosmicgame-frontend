@@ -94,6 +94,7 @@ const NewHome = () => {
     SecondsElapsed: 0,
   });
   const [curBidList, setCurBidList] = useState([]);
+  const [specialWinners, setSpecialWinners] = useState(null);
   const [winProbability, setWinProbability] = useState(null);
   const [donatedNFTs, setDonatedNFTs] = useState([]);
   const [prizeTime, setPrizeTime] = useState(0);
@@ -488,6 +489,8 @@ const NewHome = () => {
     setCurBidList(newBidData);
     const nftData = await api.get_donations_nft_by_round(round);
     setDonatedNFTs(nftData);
+    const specials = await api.get_current_special_winners();
+    setSpecialWinners(specials);
     setData((prevData) => {
       if (
         account !== newData?.LastBidderAddr &&
@@ -854,6 +857,66 @@ const NewHome = () => {
                     <GradientText variant="h6" sx={{ display: "inline" }}>
                       {data?.PrizeAmountEth.toFixed(4)} ETH
                     </GradientText>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} mb={2} alignItems="center">
+                  <Grid item xs={12} sm={4} md={4}>
+                    <Typography variant="subtitle1">
+                      Endurance Champion
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={8}>
+                    <Typography>
+                      <Link
+                        href={`/user/${specialWinners?.EnduranceChampionAddress}`}
+                        color="rgb(255, 255, 255)"
+                        fontSize="inherit"
+                        sx={{ wordBreak: "break-all" }}
+                      >
+                        {specialWinners?.EnduranceChampionAddress}
+                      </Link>
+                      {specialWinners?.EnduranceChampionDuration -
+                        (Date.now() + offset) / 1000 >
+                        0 && (
+                        <>
+                          {` (Lasted ${formatSeconds(
+                            specialWinners?.EnduranceChampionDuration -
+                              (Date.now() + offset) / 1000
+                          )})`}
+                        </>
+                      )}
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} mb={2} alignItems="center">
+                  <Grid item xs={12} sm={4} md={4}>
+                    <Typography variant="subtitle1">
+                      Stellar Spender Address
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={8}>
+                    <Typography>
+                      <Link
+                        href={`/user/${specialWinners?.StellarSpenderAddress}`}
+                        color="rgb(255, 255, 255)"
+                        fontSize="inherit"
+                        sx={{ wordBreak: "break-all" }}
+                      >
+                        {specialWinners?.StellarSpenderAddress}
+                      </Link>
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} mb={2} alignItems="center">
+                  <Grid item xs={12} sm={4} md={4}>
+                    <Typography variant="subtitle1">
+                      Stellar Spender Amount
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={8}>
+                    <Typography>
+                      {specialWinners?.StellarSpenderAmountEth.toFixed(4)} ETH
+                    </Typography>
                   </Grid>
                 </Grid>
                 <Grid container spacing={2} mb={2} alignItems="center">

@@ -745,6 +745,16 @@ class ApiService {
       return [];
     }
   }
+
+  public async get_current_special_winners() {
+    try {
+      const { data } = await axios.get(getAPIUrl("bid/current_special_winners"));
+      return data;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
 }
 
 export default new ApiService();
