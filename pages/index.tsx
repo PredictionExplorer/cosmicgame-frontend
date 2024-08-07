@@ -862,66 +862,6 @@ const NewHome = () => {
                 <Grid container spacing={2} mb={2} alignItems="center">
                   <Grid item xs={12} sm={4} md={4}>
                     <Typography variant="subtitle1">
-                      Endurance Champion
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={8} md={8}>
-                    <Typography>
-                      <Link
-                        href={`/user/${specialWinners?.EnduranceChampionAddress}`}
-                        color="rgb(255, 255, 255)"
-                        fontSize="inherit"
-                        sx={{ wordBreak: "break-all" }}
-                      >
-                        {specialWinners?.EnduranceChampionAddress}
-                      </Link>
-                      {specialWinners?.EnduranceChampionDuration -
-                        (Date.now() + offset) / 1000 >
-                        0 && (
-                        <>
-                          {` (Lasted ${formatSeconds(
-                            specialWinners?.EnduranceChampionDuration -
-                              (Date.now() + offset) / 1000
-                          )})`}
-                        </>
-                      )}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2} mb={2} alignItems="center">
-                  <Grid item xs={12} sm={4} md={4}>
-                    <Typography variant="subtitle1">
-                      Stellar Spender Address
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={8} md={8}>
-                    <Typography>
-                      <Link
-                        href={`/user/${specialWinners?.StellarSpenderAddress}`}
-                        color="rgb(255, 255, 255)"
-                        fontSize="inherit"
-                        sx={{ wordBreak: "break-all" }}
-                      >
-                        {specialWinners?.StellarSpenderAddress}
-                      </Link>
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2} mb={2} alignItems="center">
-                  <Grid item xs={12} sm={4} md={4}>
-                    <Typography variant="subtitle1">
-                      Stellar Spender Amount
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={8} md={8}>
-                    <Typography>
-                      {specialWinners?.StellarSpenderAmountEth.toFixed(4)} ETH
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2} mb={2} alignItems="center">
-                  <Grid item xs={12} sm={4} md={4}>
-                    <Typography variant="subtitle1">
                       Last Bidder Address
                     </Typography>
                   </Grid>
@@ -1004,9 +944,60 @@ const NewHome = () => {
                   </Link>
                 </CardActionArea>
               </StyledCard>
-              <Typography color="primary" mt={4}>
-                Random sample of your possible NFT
+              <Typography variant="subtitle1" color="primary" mt={4} mb={2}>
+                Special Prizes
               </Typography>
+              <Grid container spacing={2} mb={2} alignItems="center">
+                <Grid item xs={12} sm={4} md={4}>
+                  <Typography>Endurance Champion</Typography>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <Typography>
+                    <Link
+                      href={`/user/${specialWinners?.EnduranceChampionAddress}`}
+                      color="rgb(255, 255, 255)"
+                      fontSize="inherit"
+                      sx={{ wordBreak: "break-all" }}
+                    >
+                      {specialWinners?.EnduranceChampionAddress}
+                    </Link>
+                    {specialWinners?.EnduranceChampionDuration > 0 && (
+                      <>
+                        {` (Lasted ${formatSeconds(
+                          specialWinners?.EnduranceChampionDuration
+                        )})`}
+                      </>
+                    )}
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2} alignItems="center">
+                <Grid item xs={12} sm={4} md={4}>
+                  <Typography>Stellar Spender Address</Typography>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <Typography>
+                    <Link
+                      href={`/user/${specialWinners?.StellarSpenderAddress}`}
+                      color="rgb(255, 255, 255)"
+                      fontSize="inherit"
+                      sx={{ wordBreak: "break-all" }}
+                    >
+                      {specialWinners?.StellarSpenderAddress}
+                    </Link>
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2} mb={2} alignItems="center">
+                <Grid item xs={12} sm={4} md={4}>
+                  <Typography>Stellar Spender Amount</Typography>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <Typography>
+                    {specialWinners?.StellarSpenderAmountEth.toFixed(4)} ETH
+                  </Typography>
+                </Grid>
+              </Grid>
             </Grid>
           )}
         </Grid>
