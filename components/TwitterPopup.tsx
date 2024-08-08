@@ -17,8 +17,9 @@ export default function TwitterPopup({ open, setOpen, setTwitterHandle }) {
   const handleConfirm = () => {
     if (handle.startsWith("@")) {
       setTwitterHandle(handle.slice(1));
+    } else {
+      setTwitterHandle(handle);
     }
-    setTwitterHandle(handle);
     handleClose();
   };
 
