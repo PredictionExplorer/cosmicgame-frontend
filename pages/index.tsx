@@ -959,6 +959,39 @@ const NewHome = () => {
                     </Typography>
                   </>
                 )}
+
+                <Typography variant="body2" mt={4}>
+                  When you bid, you will get 100 tokens as a reward. These
+                  tokens allow you to participate in the DAO.
+                </Typography>
+                <Box mt={2}>
+                  <Typography variant="body2" color="primary" component="span">
+                    *
+                  </Typography>
+                  <Typography variant="body2" component="span">
+                    When you bid, you are also buying a raffle ticket.{" "}
+                    {data?.NumRaffleEthWinnersBidding} raffle tickets will be
+                    chosen and these people will win {data?.RafflePercentage}%
+                    of the pot. Also, {data?.NumRaffleNFTWinnersBidding}{" "}
+                    additional winners and{" "}
+                    {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT
+                    stakers{" "}
+                    {/* and {data?.NumRaffleNFTWinnersStakingCST} Cosmic Token stakers */}
+                    will be chosen which will receive a Cosmic Signature NFT.
+                  </Typography>
+                </Box>
+                <Typography variant="body2" mt={2}>
+                  When this round ends, Ethereum Protocol Guild (
+                  <Link
+                    href="https://protocol-guild.readthedocs.io"
+                    target="_blank"
+                    sx={{ color: "inherit" }}
+                  >
+                    https://protocol-guild.readthedocs.io
+                  </Link>
+                  ) will receive 10% of the prize pool (at least{" "}
+                  {(data?.CosmicGameBalanceEth / 10).toFixed(4)} ETH)
+                </Typography>
               </>
             )}
           </Grid>
@@ -1347,36 +1380,6 @@ const NewHome = () => {
                 )}
               </Grid>
             </Grid>
-            <Typography variant="body2" mt={4}>
-              When you bid, you will get 100 tokens as a reward. These tokens
-              allow you to participate in the DAO.
-            </Typography>
-            <Box mt={2}>
-              <Typography variant="body2" color="primary" component="span">
-                *
-              </Typography>
-              <Typography variant="body2" component="span">
-                When you bid, you are also buying a raffle ticket.{" "}
-                {data?.NumRaffleEthWinnersBidding} raffle tickets will be chosen
-                and these people will win {data?.RafflePercentage}% of the pot.
-                Also, {data?.NumRaffleNFTWinnersBidding} additional winners and{" "}
-                {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers{" "}
-                {/* and {data?.NumRaffleNFTWinnersStakingCST} Cosmic Token stakers */}
-                will be chosen which will receive a Cosmic Signature NFT.
-              </Typography>
-            </Box>
-            <Typography variant="body2" mt={2}>
-              When this round ends, Ethereum Protocol Guild (
-              <Link
-                href="https://protocol-guild.readthedocs.io"
-                target="_blank"
-                sx={{ color: "inherit" }}
-              >
-                https://protocol-guild.readthedocs.io
-              </Link>
-              ) will receive 10% of the prize pool (at least{" "}
-              {(data?.CosmicGameBalanceEth / 10).toFixed(4)} ETH)
-            </Typography>
           </>
         )}
         <Box mt={6}>
