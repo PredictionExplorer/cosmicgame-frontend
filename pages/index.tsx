@@ -65,6 +65,7 @@ import { CustomPagination } from "../components/CustomPagination";
 import { useNotification } from "../contexts/NotificationContext";
 import RaffleHolderTable from "../components/RaffleHolderTable";
 import { GetServerSideProps } from "next";
+import TwitterPopup from "../components/TwitterPopup";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -115,6 +116,9 @@ const NewHome = () => {
   const [claimHistory, setClaimHistory] = useState(null);
   const [imageOpen, setImageOpen] = useState(false);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
+  const [twitterPopupOpen, setTwitterPopupOpen] = useState(false);
+  const [twitterHandle, setTwitterHandle] = useState("");
+
   const perPage = 12;
 
   const { library, account } = useActiveWeb3React();
@@ -606,9 +610,7 @@ const NewHome = () => {
         setAdvancedExpanded(true);
       }
       if (router.query.referred_by) {
-        setMessage(
-          `Referred by @${router.query.referred_by}\nWhat is your Twitter handle? (It must have a blue checkmark)\nAnd you must follow additional instructions to be eligible. Check Twitter.`
-        );
+        setTwitterPopupOpen(true);
       }
     }
 
@@ -628,6 +630,12 @@ const NewHome = () => {
       clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    if (twitterHandle) {
+      setMessage(`@${twitterHandle} referred by @${router.query.referred_by}.`);
+    }
+  }, [twitterHandle]);
 
   useEffect(() => {
     const probabilityOfSelection = (totalBids, chosenBids, yourBids) => {
@@ -1588,6 +1596,11 @@ const NewHome = () => {
           onClose={() => setImageOpen(false)}
         />
       )}
+      <TwitterPopup
+        open={twitterPopupOpen}
+        setOpen={setTwitterPopupOpen}
+        setTwitterHandle={setTwitterHandle}
+      />
     </>
   );
 };
