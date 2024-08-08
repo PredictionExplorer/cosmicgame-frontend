@@ -185,6 +185,11 @@ const Contracts = () => {
                 copyable={true}
               />
               <ContractItem
+                name="RandomWalk Address"
+                value={data?.ContractAddrs.RandomWalkAddr}
+                copyable={true}
+              />
+              <ContractItem
                 name="Business Logic Address"
                 value={data?.ContractAddrs.BusinessLogicAddr}
                 copyable={true}
