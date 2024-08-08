@@ -959,429 +959,416 @@ const NewHome = () => {
                     </Typography>
                   </>
                 )}
-
-                <Typography variant="body2" mt={4}>
-                  When you bid, you will get 100 tokens as a reward. These
-                  tokens allow you to participate in the DAO.
-                </Typography>
-                <Box mt={2}>
-                  <Typography variant="body2" color="primary" component="span">
-                    *
-                  </Typography>
-                  <Typography variant="body2" component="span">
-                    When you bid, you are also buying a raffle ticket.{" "}
-                    {data?.NumRaffleEthWinnersBidding} raffle tickets will be
-                    chosen and these people will win {data?.RafflePercentage}%
-                    of the pot. Also, {data?.NumRaffleNFTWinnersBidding}{" "}
-                    additional winners and{" "}
-                    {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT
-                    stakers{" "}
-                    {/* and {data?.NumRaffleNFTWinnersStakingCST} Cosmic Token stakers */}
-                    will be chosen which will receive a Cosmic Signature NFT.
-                  </Typography>
-                </Box>
-                <Typography variant="body2" mt={2}>
-                  When this round ends, Ethereum Protocol Guild (
-                  <Link
-                    href="https://protocol-guild.readthedocs.io"
-                    target="_blank"
-                    sx={{ color: "inherit" }}
-                  >
-                    https://protocol-guild.readthedocs.io
-                  </Link>
-                  ) will receive 10% of the prize pool (at least{" "}
-                  {(data?.CosmicGameBalanceEth / 10).toFixed(4)} ETH)
-                </Typography>
+                {account !== null && (
+                  <>
+                    <Typography mb={1} mt={4}>
+                      Make your bid with:
+                    </Typography>
+                    <RadioGroup
+                      row
+                      value={bidType}
+                      onChange={(_e, value) => {
+                        setRwlkId(-1);
+                        setBidType(value);
+                      }}
+                      sx={{ mb: 2 }}
+                    >
+                      <FormControlLabel
+                        value="ETH"
+                        control={<Radio size="small" />}
+                        label="ETH"
+                      />
+                      <FormControlLabel
+                        value="RandomWalk"
+                        control={<Radio size="small" />}
+                        label="RandomWalk"
+                      />
+                      <FormControlLabel
+                        value="CST"
+                        control={<Radio size="small" />}
+                        label="CST(Cosmic Token)"
+                      />
+                    </RadioGroup>
+                    {bidType === "RandomWalk" && (
+                      <Box mb={4} mx={2}>
+                        <Typography variant="h6">
+                          Random Walk NFT Gallery
+                        </Typography>
+                        <Typography variant="body2">
+                          If you own some RandomWalkNFTs and one of them is used
+                          when bidding, you can get a 50% discount!
+                        </Typography>
+                        <PaginationRWLKGrid
+                          loading={false}
+                          data={rwlknftIds}
+                          selectedToken={rwlkId}
+                          setSelectedToken={setRwlkId}
+                        />
+                      </Box>
+                    )}
+                    {bidType === "CST" && (
+                      <Box ml={2}>
+                        {cstBidData?.SecondsElapsed >
+                        cstBidData?.AuctionDuration ? (
+                          <Typography variant="subtitle1">
+                            Auction ended, you can bid for free.
+                          </Typography>
+                        ) : (
+                          <Grid
+                            container
+                            spacing={2}
+                            mb={2}
+                            alignItems="center"
+                          >
+                            <Grid item sm={12} md={5}>
+                              <Typography variant="subtitle1">
+                                Elapsed Time:
+                              </Typography>
+                            </Grid>
+                            <Grid item sm={12} md={7}>
+                              <Typography>
+                                {formatSeconds(cstBidData?.SecondsElapsed)}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        )}
+                        <Grid container spacing={2} mb={2} alignItems="center">
+                          <Grid item sm={12} md={5}>
+                            <Typography variant="subtitle1">
+                              Auction Duration:
+                            </Typography>
+                          </Grid>
+                          <Grid item sm={12} md={7}>
+                            <Typography>
+                              {formatSeconds(cstBidData?.AuctionDuration)}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    )}
+                    <TextField
+                      placeholder="Message (280 characters, optional)"
+                      value={message}
+                      size="small"
+                      multiline
+                      fullWidth
+                      rows={4}
+                      inputProps={{ maxLength: 280 }}
+                      sx={{ marginBottom: 2 }}
+                      onChange={(e) => setMessage(e.target.value)}
+                    />
+                    {bidType !== "CST" && (
+                      <Accordion
+                        expanded={advancedExpanded}
+                        onChange={(_event, isExpanded) =>
+                          setAdvancedExpanded(isExpanded)
+                        }
+                      >
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography>Advanced Options</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Typography variant="body2">
+                            If you want to donate one of your NFTs while
+                            bidding, you can put the contract address, NFT id,
+                            and comment here.
+                          </Typography>
+                          <TextField
+                            placeholder="NFT contract address"
+                            size="small"
+                            value={nftDonateAddress}
+                            fullWidth
+                            sx={{ marginTop: 2 }}
+                            onChange={(e) =>
+                              setNftDonateAddress(e.target.value)
+                            }
+                          />
+                          <TextField
+                            placeholder="NFT number"
+                            type="number"
+                            value={nftId}
+                            size="small"
+                            fullWidth
+                            sx={{ marginTop: 2 }}
+                            onChange={(e) => setNftId(e.target.value)}
+                          />
+                          <Box
+                            sx={{
+                              border: "1px solid #444",
+                              borderRadius: 1,
+                              p: 2,
+                              mt: 2,
+                            }}
+                          >
+                            <Typography variant="subtitle2">
+                              Bid price collision prevention
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                marginTop: 2,
+                                alignItems: "center",
+                              }}
+                            >
+                              <Typography
+                                whiteSpace="nowrap"
+                                color="rgba(255, 255, 255, 0.68)"
+                                mr={2}
+                              >
+                                Rise bid price by
+                              </Typography>
+                              <CustomTextField
+                                type="number"
+                                placeholder="Bid Price Plus"
+                                value={bidPricePlus}
+                                size="small"
+                                fullWidth
+                                InputProps={{
+                                  inputComponent: StyledInput,
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      %
+                                    </InputAdornment>
+                                  ),
+                                  inputProps: { min: 0, max: 50 },
+                                }}
+                                onChange={(e) => {
+                                  let value = Number(e.target.value);
+                                  if (value <= 50) {
+                                    setBidPricePlus(value);
+                                  }
+                                }}
+                              />
+                              <Typography
+                                whiteSpace="nowrap"
+                                color="rgba(255, 255, 255, 0.68)"
+                                ml={2}
+                              >
+                                {(
+                                  data?.BidPriceEth *
+                                  (1 + bidPricePlus / 100) *
+                                  (bidType === "RandomWalk" ? 0.5 : 1)
+                                ).toFixed(6)}{" "}
+                                ETH
+                              </Typography>
+                            </Box>
+                            <Typography variant="body2" mt={2}>
+                              The bid price is bumped {bidPricePlus}% to prevent
+                              bidding collision.
+                            </Typography>
+                          </Box>
+                        </AccordionDetails>
+                      </Accordion>
+                    )}
+                  </>
+                )}
               </>
             )}
           </Grid>
-          {matches && (
-            <Grid item sm={12} md={6}>
-              <StyledCard>
-                <CardActionArea>
-                  <Link
-                    href={bannerTokenId ? `/detail/${bannerTokenId}` : ""}
-                    sx={{ display: "block" }}
-                  >
-                    <NFTImage
-                      src={
-                        bannerTokenId === ""
-                          ? "/images/qmark.png"
-                          : `https://cosmic-game2.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
-                      }
-                    />
-                  </Link>
-                </CardActionArea>
-              </StyledCard>
-              {data?.TsRoundStart !== 0 && (
-                <>
-                  <Typography variant="subtitle1" color="primary" mt={4} mb={2}>
-                    Potential winners of Special Prizes
-                  </Typography>
-                  <Grid container spacing={2} mb={2} alignItems="center">
-                    <Grid item xs={12} sm={4} md={4}>
-                      <Typography>Endurance Champion</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={8} md={8}>
-                      <Typography>
-                        <Link
-                          href={`/user/${specialWinners?.EnduranceChampionAddress}`}
-                          color="rgb(255, 255, 255)"
-                          fontSize="inherit"
-                          sx={{ wordBreak: "break-all" }}
-                        >
-                          {specialWinners?.EnduranceChampionAddress}
-                        </Link>
-                        {specialWinners?.EnduranceChampionDuration > 0 && (
-                          <>
-                            {` (Lasted ${formatSeconds(
-                              specialWinners?.EnduranceChampionDuration
-                            )})`}
-                          </>
-                        )}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={2} mb={2} alignItems="center">
-                    <Grid item xs={12} sm={4} md={4}>
-                      <Typography>Stellar Spender Address</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={8} md={8}>
-                      <Typography>
-                        <Link
-                          href={`/user/${specialWinners?.StellarSpenderAddress}`}
-                          color="rgb(255, 255, 255)"
-                          fontSize="inherit"
-                          sx={{ wordBreak: "break-all" }}
-                        >
-                          {specialWinners?.StellarSpenderAddress}
-                        </Link>
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                  <Grid container spacing={2} mb={2} alignItems="center">
-                    <Grid item xs={12} sm={4} md={4}>
-                      <Typography>Stellar Spender Amount</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={8} md={8}>
-                      <Typography>
-                        {specialWinners?.StellarSpenderAmountEth.toFixed(4)} ETH
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </>
-              )}
-            </Grid>
-          )}
-        </Grid>
-        {account !== null && (
-          <>
-            <Grid container spacing={matches ? 8 : 0}>
-              <Grid item xs={12} sm={8} md={6}>
-                <Typography mb={1}>Make your bid with:</Typography>
-                <RadioGroup
-                  row
-                  value={bidType}
-                  onChange={(_e, value) => {
-                    setRwlkId(-1);
-                    setBidType(value);
-                  }}
-                  sx={{ mb: 2 }}
-                >
-                  <FormControlLabel
-                    value="ETH"
-                    control={<Radio size="small" />}
-                    label="ETH"
-                  />
-                  <FormControlLabel
-                    value="RandomWalk"
-                    control={<Radio size="small" />}
-                    label="RandomWalk"
-                  />
-                  <FormControlLabel
-                    value="CST"
-                    control={<Radio size="small" />}
-                    label="CST(Cosmic Token)"
-                  />
-                </RadioGroup>
-                {bidType === "RandomWalk" && (
-                  <Box mb={4} mx={2}>
-                    <Typography variant="h6">
-                      Random Walk NFT Gallery
-                    </Typography>
-                    <Typography variant="body2">
-                      If you own some RandomWalkNFTs and one of them is used
-                      when bidding, you can get a 50% discount!
-                    </Typography>
-                    <PaginationRWLKGrid
-                      loading={false}
-                      data={rwlknftIds}
-                      selectedToken={rwlkId}
-                      setSelectedToken={setRwlkId}
-                    />
-                  </Box>
-                )}
-                {bidType === "CST" && (
-                  <Box ml={2}>
-                    {cstBidData?.SecondsElapsed >
-                    cstBidData?.AuctionDuration ? (
-                      <Typography variant="subtitle1">
-                        Auction ended, you can bid for free.
-                      </Typography>
-                    ) : (
-                      <Grid container spacing={2} mb={2} alignItems="center">
-                        <Grid item sm={12} md={5}>
-                          <Typography variant="subtitle1">
-                            Elapsed Time:
-                          </Typography>
-                        </Grid>
-                        <Grid item sm={12} md={7}>
-                          <Typography>
-                            {formatSeconds(cstBidData?.SecondsElapsed)}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    )}
-                    <Grid container spacing={2} mb={2} alignItems="center">
-                      <Grid item sm={12} md={5}>
-                        <Typography variant="subtitle1">
-                          Auction Duration:
-                        </Typography>
-                      </Grid>
-                      <Grid item sm={12} md={7}>
-                        <Typography>
-                          {formatSeconds(cstBidData?.AuctionDuration)}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                )}
-                <TextField
-                  placeholder="Message (280 characters, optional)"
-                  value={message}
-                  size="small"
-                  multiline
-                  fullWidth
-                  rows={4}
-                  inputProps={{ maxLength: 280 }}
-                  sx={{ marginBottom: 2 }}
-                  onChange={(e) => setMessage(e.target.value)}
-                />
-                {bidType !== "CST" && (
-                  <Accordion
-                    expanded={advancedExpanded}
-                    onChange={(_event, isExpanded) =>
-                      setAdvancedExpanded(isExpanded)
-                    }
-                  >
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography>Advanced Options</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography variant="body2">
-                        If you want to donate one of your NFTs while bidding,
-                        you can put the contract address, NFT id, and comment
-                        here.
-                      </Typography>
-                      <TextField
-                        placeholder="NFT contract address"
-                        size="small"
-                        value={nftDonateAddress}
-                        fullWidth
-                        sx={{ marginTop: 2 }}
-                        onChange={(e) => setNftDonateAddress(e.target.value)}
-                      />
-                      <TextField
-                        placeholder="NFT number"
-                        type="number"
-                        value={nftId}
-                        size="small"
-                        fullWidth
-                        sx={{ marginTop: 2 }}
-                        onChange={(e) => setNftId(e.target.value)}
-                      />
-                      <Box
-                        sx={{
-                          border: "1px solid #444",
-                          borderRadius: 1,
-                          p: 2,
-                          mt: 2,
-                        }}
-                      >
-                        <Typography variant="subtitle2">
-                          Bid price collision prevention
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            marginTop: 2,
-                            alignItems: "center",
-                          }}
-                        >
-                          <Typography
-                            whiteSpace="nowrap"
-                            color="rgba(255, 255, 255, 0.68)"
-                            mr={2}
-                          >
-                            Rise bid price by
-                          </Typography>
-                          <CustomTextField
-                            type="number"
-                            placeholder="Bid Price Plus"
-                            value={bidPricePlus}
-                            size="small"
-                            fullWidth
-                            InputProps={{
-                              inputComponent: StyledInput,
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  %
-                                </InputAdornment>
-                              ),
-                              inputProps: { min: 0, max: 50 },
-                            }}
-                            onChange={(e) => {
-                              let value = Number(e.target.value);
-                              if (value <= 50) {
-                                setBidPricePlus(value);
-                              }
-                            }}
-                          />
-                          <Typography
-                            whiteSpace="nowrap"
-                            color="rgba(255, 255, 255, 0.68)"
-                            ml={2}
-                          >
-                            {(
-                              data?.BidPriceEth *
-                              (1 + bidPricePlus / 100) *
-                              (bidType === "RandomWalk" ? 0.5 : 1)
-                            ).toFixed(6)}{" "}
-                            ETH
-                          </Typography>
-                        </Box>
-                        <Typography variant="body2" mt={2}>
-                          The bid price is bumped {bidPricePlus}% to prevent
-                          bidding collision.
-                        </Typography>
-                      </Box>
-                    </AccordionDetails>
-                  </Accordion>
-                )}
-              </Grid>
-              <Grid item xs={12} sm={4} md={6}>
-                {(prizeTime > Date.now() || data?.LastBidderAddr !== account) &&
-                  !loading && (
-                    <Button
-                      variant="outlined"
-                      size="large"
-                      endIcon={<ArrowForward />}
-                      onClick={bidType === "CST" ? onBidWithCST : onBid}
-                      fullWidth
-                      disabled={
-                        isBidding ||
-                        (bidType === "RandomWalk" && rwlkId === -1) ||
-                        bidType === ""
-                      }
-                      sx={{ mt: 3 }}
+          <Grid item sm={12} md={6}>
+            {matches && (
+              <>
+                <StyledCard>
+                  <CardActionArea>
+                    <Link
+                      href={bannerTokenId ? `/detail/${bannerTokenId}` : ""}
+                      sx={{ display: "block" }}
                     >
-                      {`Bid now with ${bidType} ${
-                        bidType === "ETH"
-                          ? `(${
-                              data?.BidPriceEth * (1 + bidPricePlus / 100) > 0.1
-                                ? (
-                                    data?.BidPriceEth *
-                                    (1 + bidPricePlus / 100)
-                                  ).toFixed(2)
-                                : (
-                                    data?.BidPriceEth *
-                                    (1 + bidPricePlus / 100)
-                                  ).toFixed(5)
-                            } ETH)`
-                          : bidType === "RandomWalk" && rwlkId !== -1
-                          ? ` token ${rwlkId} (${
-                              data?.BidPriceEth * (1 + bidPricePlus / 100) > 0.2
-                                ? (
-                                    data?.BidPriceEth *
-                                    (1 + bidPricePlus / 100) *
-                                    0.5
-                                  ).toFixed(2)
-                                : (
-                                    data?.BidPriceEth *
-                                    (1 + bidPricePlus / 100) *
-                                    0.5
-                                  ).toFixed(5)
-                            } ETH)`
-                          : bidType === "CST"
-                          ? cstBidData?.SecondsElapsed >
-                            cstBidData?.AuctionDuration
-                            ? "(FREE BID)"
-                            : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
-                          : ""
-                      }`}
-                    </Button>
-                  )}
-                {!(
-                  prizeTime > Date.now() ||
-                  data?.LastBidderAddr === constants.AddressZero ||
-                  loading
-                ) && (
+                      <NFTImage
+                        src={
+                          bannerTokenId === ""
+                            ? "/images/qmark.png"
+                            : `https://cosmic-game2.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
+                        }
+                      />
+                    </Link>
+                  </CardActionArea>
+                </StyledCard>
+                {data?.TsRoundStart !== 0 && (
                   <>
-                    <Button
-                      variant="contained"
-                      size="large"
-                      onClick={onClaimPrize}
-                      fullWidth
-                      disabled={
-                        data?.LastBidderAddr !== account &&
-                        prizeTime + timeoutClaimPrize * 1000 > Date.now()
-                      }
-                      sx={{ mt: 3 }}
+                    <Typography
+                      variant="subtitle1"
+                      color="primary"
+                      mt={4}
+                      mb={2}
                     >
-                      Claim Prize
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        {prizeTime + timeoutClaimPrize * 1000 > Date.now() &&
-                          data?.LastBidderAddr !== account && (
+                      Potential winners of Special Prizes
+                    </Typography>
+                    <Grid container spacing={2} mb={2} alignItems="center">
+                      <Grid item xs={12} sm={4} md={4}>
+                        <Typography>Endurance Champion</Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={8} md={8}>
+                        <Typography>
+                          <Link
+                            href={`/user/${specialWinners?.EnduranceChampionAddress}`}
+                            color="rgb(255, 255, 255)"
+                            fontSize="inherit"
+                            sx={{ wordBreak: "break-all" }}
+                          >
+                            {specialWinners?.EnduranceChampionAddress}
+                          </Link>
+                          {specialWinners?.EnduranceChampionDuration > 0 && (
                             <>
-                              &nbsp;available in &nbsp;
-                              <Countdown
-                                date={prizeTime + timeoutClaimPrize * 1000}
-                              />
+                              {` (Lasted ${formatSeconds(
+                                specialWinners?.EnduranceChampionDuration
+                              )})`}
                             </>
                           )}
-                        &nbsp;
-                        <ArrowForward sx={{ width: 22, height: 22 }} />
-                      </Box>
-                    </Button>
-                    {data?.LastBidderAddr !== account &&
-                      prizeTime + timeoutClaimPrize * 1000 > Date.now() && (
-                        <Typography
-                          variant="body2"
-                          fontStyle="italic"
-                          textAlign="right"
-                          color="primary"
-                          mt={2}
-                        >
-                          Please wait until the last bidder claims the prize.
                         </Typography>
-                      )}
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2} mb={2} alignItems="center">
+                      <Grid item xs={12} sm={4} md={4}>
+                        <Typography>Stellar Spender Address</Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={8} md={8}>
+                        <Typography>
+                          <Link
+                            href={`/user/${specialWinners?.StellarSpenderAddress}`}
+                            color="rgb(255, 255, 255)"
+                            fontSize="inherit"
+                            sx={{ wordBreak: "break-all" }}
+                          >
+                            {specialWinners?.StellarSpenderAddress}
+                          </Link>
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={2} mb={2} alignItems="center">
+                      <Grid item xs={12} sm={4} md={4}>
+                        <Typography>Stellar Spender Amount</Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={8} md={8}>
+                        <Typography>
+                          {specialWinners?.StellarSpenderAmountEth.toFixed(4)}{" "}
+                          ETH
+                        </Typography>
+                      </Grid>
+                    </Grid>
                   </>
                 )}
-                {!matches && (
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    fullWidth
-                    sx={{ mt: 3 }}
-                    onClick={() => setImageOpen(true)}
-                  >
-                    Show Random Sample NFT
-                  </Button>
+                {account !== null && (
+                  <>
+                    {(prizeTime > Date.now() ||
+                      data?.LastBidderAddr !== account) &&
+                      !loading && (
+                        <Button
+                          variant="outlined"
+                          size="large"
+                          endIcon={<ArrowForward />}
+                          onClick={bidType === "CST" ? onBidWithCST : onBid}
+                          fullWidth
+                          disabled={
+                            isBidding ||
+                            (bidType === "RandomWalk" && rwlkId === -1) ||
+                            bidType === ""
+                          }
+                          sx={{ mt: 3 }}
+                        >
+                          {`Bid now with ${bidType} ${
+                            bidType === "ETH"
+                              ? `(${
+                                  data?.BidPriceEth * (1 + bidPricePlus / 100) >
+                                  0.1
+                                    ? (
+                                        data?.BidPriceEth *
+                                        (1 + bidPricePlus / 100)
+                                      ).toFixed(2)
+                                    : (
+                                        data?.BidPriceEth *
+                                        (1 + bidPricePlus / 100)
+                                      ).toFixed(5)
+                                } ETH)`
+                              : bidType === "RandomWalk" && rwlkId !== -1
+                              ? ` token ${rwlkId} (${
+                                  data?.BidPriceEth * (1 + bidPricePlus / 100) >
+                                  0.2
+                                    ? (
+                                        data?.BidPriceEth *
+                                        (1 + bidPricePlus / 100) *
+                                        0.5
+                                      ).toFixed(2)
+                                    : (
+                                        data?.BidPriceEth *
+                                        (1 + bidPricePlus / 100) *
+                                        0.5
+                                      ).toFixed(5)
+                                } ETH)`
+                              : bidType === "CST"
+                              ? cstBidData?.SecondsElapsed >
+                                cstBidData?.AuctionDuration
+                                ? "(FREE BID)"
+                                : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
+                              : ""
+                          }`}
+                        </Button>
+                      )}
+                    {!(
+                      prizeTime > Date.now() ||
+                      data?.LastBidderAddr === constants.AddressZero ||
+                      loading
+                    ) && (
+                      <>
+                        <Button
+                          variant="contained"
+                          size="large"
+                          onClick={onClaimPrize}
+                          fullWidth
+                          disabled={
+                            data?.LastBidderAddr !== account &&
+                            prizeTime + timeoutClaimPrize * 1000 > Date.now()
+                          }
+                          sx={{ mt: 3 }}
+                        >
+                          Claim Prize
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            {prizeTime + timeoutClaimPrize * 1000 >
+                              Date.now() &&
+                              data?.LastBidderAddr !== account && (
+                                <>
+                                  &nbsp;available in &nbsp;
+                                  <Countdown
+                                    date={prizeTime + timeoutClaimPrize * 1000}
+                                  />
+                                </>
+                              )}
+                            &nbsp;
+                            <ArrowForward sx={{ width: 22, height: 22 }} />
+                          </Box>
+                        </Button>
+                        {data?.LastBidderAddr !== account &&
+                          prizeTime + timeoutClaimPrize * 1000 > Date.now() && (
+                            <Typography
+                              variant="body2"
+                              fontStyle="italic"
+                              textAlign="right"
+                              color="primary"
+                              mt={2}
+                            >
+                              Please wait until the last bidder claims the
+                              prize.
+                            </Typography>
+                          )}
+                      </>
+                    )}
+                    {!matches && (
+                      <Button
+                        variant="outlined"
+                        size="large"
+                        fullWidth
+                        sx={{ mt: 3 }}
+                        onClick={() => setImageOpen(true)}
+                      >
+                        Show Random Sample NFT
+                      </Button>
+                    )}
+                  </>
                 )}
-              </Grid>
-            </Grid>
-          </>
-        )}
+              </>
+            )}
+          </Grid>
+        </Grid>
         <Box mt={6}>
           <Typography variant="subtitle1" color="primary" textAlign="center">
             Distribution of funds on each round
