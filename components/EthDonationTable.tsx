@@ -13,6 +13,7 @@ import { Tr } from "react-super-responsive-table";
 import { convertTimestampToDateTime } from "../utils";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
+import router from "next/router";
 
 const EthDonationRow = ({ row }) => {
   if (!row) {
@@ -20,7 +21,14 @@ const EthDonationRow = ({ row }) => {
   }
 
   return (
-    <TablePrimaryRow>
+    <TablePrimaryRow
+      sx={{
+        cursor: "pointer",
+      }}
+      onClick={() => {
+        router.push(`/eth-donation/${row.EvtLogId}`);
+      }}
+    >
       <TablePrimaryCell>
         <Link
           color="inherit"
@@ -29,6 +37,16 @@ const EthDonationRow = ({ row }) => {
           target="__blank"
         >
           {convertTimestampToDateTime(row.TimeStamp)}
+        </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`/prize/${row.RoundNum}`}
+          target="__blank"
+        >
+          {row.RoundNum}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -54,6 +72,7 @@ const EthDonationTable = ({ list }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Donor</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Amount (ETH)

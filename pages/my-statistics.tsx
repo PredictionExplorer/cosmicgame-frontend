@@ -353,13 +353,13 @@ const MyStatistics = () => {
               <Typography mt={3}>
                 This account has {userInfo.CosmicTokenNumTransfers} CosmicToken
                 (ERC20), click{" "}
-                <Link href={`/cosmic-token-transfers/${account}`}>here</Link> to
+                <Link href={`/cosmic-token-transfer/${account}`}>here</Link> to
                 see all the transfers made by this account.
               </Typography>
               <Typography mt={1}>
                 This account has {userInfo.CosmicSignatureNumTransfers}{" "}
                 CosmicSignature (ERC721), click{" "}
-                <Link href={`/cosmic-signature-transfers/${account}`}>
+                <Link href={`/cosmic-signature-transfer/${account}`}>
                   here
                 </Link>{" "}
                 to see all the transfers made by this account.

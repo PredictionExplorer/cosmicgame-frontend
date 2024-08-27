@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Grid, Box, Typography } from "@mui/material";
+import { Grid, Box, Typography, CardActionArea, Link } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
-import { SearchBox, SearchField, SearchButton } from "./styled";
+import {
+  SearchBox,
+  SearchField,
+  SearchButton,
+  StyledCard,
+  NFTInfoWrapper,
+} from "./styled";
 import NFT from "./NFT";
 import api from "../services/api";
+import NFTImage from "./NFTImage";
 
 const PaginationGrid = ({ data, loading }) => {
   const [searchKey, setSearchKey] = useState("");
@@ -90,10 +97,26 @@ const PaginationGrid = ({ data, loading }) => {
         <>
           <Grid spacing={2} container>
             {collection.length === 0 ? (
-              <Grid item>
-                <Typography variant="h6" align="center">
-                  Nothing Found!
-                </Typography>
+              <Grid item xs={6} sm={6} md={4}>
+                <StyledCard>
+                  <CardActionArea>
+                    <Link href="/detail/sample" sx={{ display: "block" }}>
+                      <NFTImage
+                        src={
+                          "https://cosmic-game2.s3.us-east-2.amazonaws.com/sample.png"
+                        }
+                      />
+                    </Link>
+                    <NFTInfoWrapper sx={{ width: "calc(100% - 40px)" }}>
+                      <Typography
+                        variant="subtitle1"
+                        sx={{ color: "#FFFFFF", textAlign: "center" }}
+                      >
+                        Sample NFT
+                      </Typography>
+                    </NFTInfoWrapper>
+                  </CardActionArea>
+                </StyledCard>
               </Grid>
             ) : (
               collection

@@ -66,7 +66,7 @@ const Statistics = () => {
   const [curPage, setCurrentPage] = useState(1);
   const perPage = 12;
   const [data, setData] = useState(null);
-  const [bidHistory, setBidHistory] = useState([]);
+  const [currentRoundBidHistory, setCurrentRoundBidHistory] = useState([]);
   const [uniqueBidders, setUniqueBidders] = useState([]);
   const [uniqueWinners, setUniqueWinners] = useState([]);
   // const [uniqueStakers, setUniqueStakers] = useState([]);
@@ -97,11 +97,11 @@ const Statistics = () => {
       setLoading(true);
       const data = await api.get_dashboard_info();
       setData(data);
-      const bidHistory = await api.get_bid_list_by_round(
+      const curBidHistory = await api.get_bid_list_by_round(
         data?.CurRoundNum,
         "desc"
       );
-      setBidHistory(bidHistory);
+      setCurrentRoundBidHistory(curBidHistory);
       let uniqueBidders = await api.get_unique_bidders();
       uniqueBidders = uniqueBidders.sort((a, b) => b.NumBids - a.NumBids);
       setUniqueBidders(uniqueBidders);
@@ -129,6 +129,9 @@ const Statistics = () => {
       setStakedRWLKTokens(tokens);
       const sysChanges = await api.get_system_modelist();
       setSystemModeChanges(sysChanges);
+      setLoading(false);
+    };
+    const fetchCSTBidData = async () => {
       let ctData = await api.get_ct_price();
       if (ctData) {
         setCSTBidData({
@@ -137,32 +140,31 @@ const Statistics = () => {
           SecondsElapsed: parseInt(ctData.SecondsElapsed),
         });
       }
-      setLoading(false);
     };
     fetchData();
+    fetchCSTBidData();
+
+    const interval = setInterval(() => {
+      fetchCSTBidData();
+    }, 5000);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const renderer = ({ days, hours, minutes, seconds }) => {
     let result = "";
-    if (days > 1) {
-      result = `${days} days `;
-    } else if (days === 1) {
-      result = `${days} day `;
+    if (days) {
+      result = `${days}d `;
     }
-    if (hours > 1) {
-      result += `${hours} hours `;
-    } else if (hours === 1 || (hours === 0 && result !== "")) {
-      result += `${hours} hour `;
+    if (hours || result) {
+      result += `${hours}h `;
     }
-    if (minutes > 1) {
-      result += `${minutes} minutes `;
-    } else if (minutes === 1 || (minutes === 0 && result !== "")) {
-      result += `${minutes} minute `;
+    if (minutes || result) {
+      result += `${minutes}m `;
     }
-    if (seconds > 1) {
-      result += `${seconds} seconds`;
-    } else if (seconds === 1 || (seconds === 0 && result !== "")) {
-      result += `${seconds} second`;
+    if (seconds || result) {
+      result += `${seconds}s`;
     }
     if (result !== "") {
       result += " left";
@@ -233,14 +235,20 @@ const Statistics = () => {
                   Prize Claim Date
                 </Typography>
                 <Box sx={{ flex: 1 }}>
-                  <Typography>
-                    {convertTimestampToDateTime(data.PrizeClaimTs)}
-                  </Typography>
-                  {data.PrizeClaimTs > Date.now() / 1000 && (
-                    <Countdown
-                      date={data.PrizeClaimTs * 1000}
-                      renderer={renderer}
-                    />
+                  {data.PrizeClaimTs === 0 ? (
+                    <Typography>{"Round isn't started yet."}</Typography>
+                  ) : (
+                    <>
+                      <Typography>
+                        {convertTimestampToDateTime(data.PrizeClaimTs)}
+                      </Typography>
+                      {data.PrizeClaimTs > Date.now() / 1000 && (
+                        <Countdown
+                          date={data.PrizeClaimTs * 1000}
+                          renderer={renderer}
+                        />
+                      )}
+                    </>
                   )}
                 </Box>
               </Box>
@@ -279,7 +287,7 @@ const Statistics = () => {
                 </Typography>
               </Box>
               <BiddingHistoryTable
-                biddingHistory={bidHistory}
+                biddingHistory={currentRoundBidHistory}
                 showRound={false}
               />
             </Box>
@@ -429,7 +437,7 @@ const Statistics = () => {
                 title="Number of Unique Winners"
                 value={data.MainStats.NumUniqueWinners}
               />
-              <StatisticsItem
+              {/* <StatisticsItem
                 title="Number of Raffle Eth Bidding Winners"
                 value={data.NumRaffleEthWinnersBidding}
               />
@@ -437,14 +445,14 @@ const Statistics = () => {
                 title="Number of Raffle NFT Bidding Winners"
                 value={data.NumRaffleNFTWinnersBidding}
               />
-              {/* <StatisticsItem
+              <StatisticsItem
                 title="Number of Raffle NFT CST Staking Winners"
                 value={data.NumRaffleNFTWinnersStakingCST}
-              /> */}
+              />
               <StatisticsItem
                 title="Number of Raffle NFT Random Walk Staking Winners"
                 value={data.NumRaffleNFTWinnersStakingRWalk}
-              />
+              /> */}
               <StatisticsItem
                 title="Number of Donated NFTs"
                 value={
@@ -460,7 +468,7 @@ const Statistics = () => {
               <StatisticsItem
                 title="Number of Direct ETH Donors"
                 value={
-                  <Link color="inherit" fontSize="inherit" href="/donations">
+                  <Link color="inherit" fontSize="inherit" href="/eth-donation">
                     {data.MainStats.NumDirectDonations}
                   </Link>
                 }
@@ -530,7 +538,6 @@ const Statistics = () => {
                 list={ctBalanceDistribution.slice(0, 20)}
               />
             </Box>
-
             <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={stakingType} onChange={handleTabChange}>
                 <Tab

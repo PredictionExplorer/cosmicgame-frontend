@@ -36,7 +36,7 @@ export const CTBalanceDistributionChart = ({ list }) => {
       setMaxValue(
         list[0].BalanceFloat > otherValue ? list[0].BalanceFloat : otherValue
       );
-    } else {
+    } else if (list.length > 0) {
       setNewList(list);
       setMaxValue(list[0].BalanceFloat);
     }

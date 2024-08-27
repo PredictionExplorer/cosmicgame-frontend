@@ -15,39 +15,35 @@ import { AddressLink } from "./AddressLink";
 import { isMobile } from "react-device-detect";
 import { useActiveWeb3React } from "../hooks/web3";
 
-const HolderRow = ({ holder }) => {
+const ETHSpentRow = ({ row }) => {
   const { account } = useActiveWeb3React();
-  if (!holder) {
+  if (!row) {
     return <TablePrimaryRow />;
   }
   return (
     <TablePrimaryRow
       sx={
-        account === holder.userAddr && {
+        account === row.bidderAddr && {
           backgroundColor: "rgba(255, 255, 255, 0.06)",
         }
       }
     >
       <TablePrimaryCell align="left">
-        <AddressLink
-          address={holder.userAddr}
-          url={`/user/${holder.userAddr}`}
-        />
+        <AddressLink address={row.bidderAddr} url={`/user/${row.bidderAddr}`} />
         &nbsp;
-        {account === holder.userAddr && "(You)"}
+        {account === row.bidderAddr && "(You)"}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{holder.count}</TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {(holder.probability * 100).toFixed(2)}%
+        {row.amount.toFixed(4)} ETH
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-const RaffleHolderTable = ({ list, numRaffleWinner }) => {
+const ETHSpentTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
-  const [holderList, setHolderList] = useState(null);
+  const [spenderList, setSpenderList] = useState(null);
   const { account } = useActiveWeb3React();
 
   useEffect(() => {
@@ -56,23 +52,21 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
 
       list.forEach((event) => {
         if (result[event.BidderAddr]) {
-          result[event.BidderAddr]++;
+          result[event.BidderAddr] += event.BidPriceEth;
         } else {
-          result[event.BidderAddr] = 1;
+          result[event.BidderAddr] = event.BidPriceEth;
         }
       });
 
       const sortedResults = Object.entries(result)
         .map(([bidderAddr, data]) => ({
-          userAddr: bidderAddr,
-          count: data,
-          probability:
-            1 - Math.pow((list.length - data) / list.length, numRaffleWinner),
+          bidderAddr,
+          amount: data,
         }))
-        .sort((a, b) => b.count - a.count);
+        .sort((a, b) => b.amount - a.amount);
 
       const userIndex = sortedResults.findIndex(
-        (item) => item.userAddr === account
+        (item) => item.bidderAddr === account
       );
 
       if (userIndex !== -1) {
@@ -82,18 +76,16 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
 
       return sortedResults;
     };
-    if (numRaffleWinner) {
-      const holders = groupAndCountByBidderAddr();
-      setHolderList(holders);
-    }
-  }, [list, numRaffleWinner, account]);
+    const spender = groupAndCountByBidderAddr();
+    setSpenderList(spender);
+  }, [list, account]);
 
   if (list.length === 0) {
-    return <Typography>No holders yet.</Typography>;
+    return <Typography>No spenders yet.</Typography>;
   }
   return (
     <>
-      {holderList === null ? (
+      {spenderList === null ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
         <>
@@ -101,29 +93,25 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
             <TablePrimary>
               {!isMobile && (
                 <colgroup>
-                  <col width="40%" />
-                  <col width="30%" />
-                  <col width="30%" />
+                  <col width="50%" />
+                  <col width="50%" />
                 </colgroup>
               )}
               <TablePrimaryHead>
                 <Tr>
                   <TablePrimaryHeadCell align="left">
-                    Holder
+                    User Address
                   </TablePrimaryHeadCell>
                   <TablePrimaryHeadCell align="center">
-                    Number of Raffle Tickets
-                  </TablePrimaryHeadCell>
-                  <TablePrimaryHeadCell align="center">
-                    Probability of Winning
+                    Spent Amount ETH
                   </TablePrimaryHeadCell>
                 </Tr>
               </TablePrimaryHead>
               <TableBody>
-                {holderList
+                {spenderList
                   .slice((page - 1) * perPage, page * perPage)
-                  .map((holder) => (
-                    <HolderRow key={holder.userAddr} holder={holder} />
+                  .map((row) => (
+                    <ETHSpentRow key={row.bidderAddr} row={row} />
                   ))}
               </TableBody>
             </TablePrimary>
@@ -131,7 +119,7 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
           <CustomPagination
             page={page}
             setPage={setPage}
-            totalLength={holderList.length}
+            totalLength={spenderList.length}
             perPage={perPage}
           />
         </>
@@ -140,4 +128,4 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
   );
 };
 
-export default RaffleHolderTable;
+export default ETHSpentTable;

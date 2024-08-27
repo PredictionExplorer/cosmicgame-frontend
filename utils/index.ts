@@ -1,5 +1,12 @@
 import type { BigNumberish } from '@ethersproject/bignumber'
 import { formatUnits } from '@ethersproject/units'
+import axios from "axios";
+
+const proxyUrl = "/api/proxy?url=";
+
+const getAPIUrl = (url: string) => {
+  return `${proxyUrl}${encodeURIComponent(url)}`;
+};
 
 export function shortenHex(hex: string, length = 4) {
   if (hex) {
@@ -45,60 +52,98 @@ export const convertTimestampToDateTime = (timestamp: any) => {
 };
 
 export const formatSeconds = (seconds: any) => {
-  console.log(seconds);
-  if (seconds <= 0) {
+  if (seconds < 0) {
     return " ";
   }
-  let minutes = Math.ceil(seconds / 60);
-  seconds = seconds % 60;
+  let minutes = Math.floor(seconds / 60);
+  seconds = Math.floor(seconds % 60);
   let hours = Math.floor(minutes / 60);
   minutes = minutes % 60;
   let days = Math.floor(hours / 24);
   hours = hours % 24;
   let str = "";
   if (days) {
-    str = days + (days === 1 ? " Day " : " Days ");
+    str = days + 'd ';
   }
-  if (hours || str) {
-    str += hours + (hours === 1 ? " Hour " : " Hours ");
+  if (hours || (str && (minutes || seconds))) {
+    str += hours + 'h ';
   }
-  if (minutes) {
-    str += minutes + (minutes === 1 ? " Minute" : " Minutes");
+  if (minutes || (str && seconds)) {
+    str += minutes + 'm ';
   }
-  return str;
+  if (seconds) {
+    str += seconds + 's';
+  }
+  return str === "" ? "0s" : str;
 };
 
 export const calculateTimeDiff = (timestamp: any) => {
   let seconds = Math.floor(Date.now() / 1000) - timestamp;
-  if (seconds <= 0) {
+  if (seconds < 0) {
     return "";
   }
   let minutes = Math.floor(seconds / 60);
-  seconds = seconds % 60;
+  seconds = Math.floor(seconds % 60);
   let hours = Math.floor(minutes / 60);
   minutes = minutes % 60;
   let days = Math.floor(hours / 24);
   hours = hours % 24;
   let str = "";
   if (days) {
-    str = days + (days === 1 ? " Day " : " Days ");
+    str = days + 'd ';
   }
-  if (hours || str) {
-    str += hours + (hours === 1 ? " Hour " : " Hours ");
+  if (hours || (str && (minutes || seconds))) {
+    str += hours + 'h ';
   }
-  if (minutes) {
-    str += minutes + (minutes === 1 ? " Minute" : " Minutes");
+  if (minutes || (str && seconds)) {
+    str += minutes + 'm ';
   }
-  return str;
+  if (seconds) {
+    str += seconds + 's';
+  }
+  return str === "" ? "0s" : str;
 };
 
 export const formatEthValue = (value: number) => {
-  if (!value) return '';
+  if (!value) return '0 ETH';
   if (value < 10) return `${value.toFixed(4)} ETH`;
-  return `${value.toFixed(1)} ETH`;
+  return `${value.toFixed(2)} ETH`;
 };
 
 export const formatCSTValue = (value: number) => {
+  if (!value) return '0 ETH';
   if (value < 10) return `${value.toFixed(4)} CST`;
-  return `${value.toFixed(1)} CST`;
+  return `${value.toFixed(2)} CST`;
 };
+
+export async function getMetadata(url: string) {
+  try {
+    const { data: html } = await axios.get(getAPIUrl(url));
+
+    // Extract title using a regex
+    const titleMatch = html.match(/<title>(.*?)<\/title>/);
+    const title = titleMatch ? titleMatch[1] : '';
+
+    // Extract description using a regex
+    const descriptionMatch = html.match(/<meta\s+name=["']description["']\s+content=["'](.*?)["']/i);
+    const description = descriptionMatch ? descriptionMatch[1] : '';
+
+    // Extract keywords using a regex
+    const keywordsMatch = html.match(/<meta\s+name=["']keywords["']\s+content=["'](.*?)["']/i);
+    const keywords = keywordsMatch ? keywordsMatch[1] : '';
+
+    // Extract image using a regex for og:image
+    const imageMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["'](.*?)["']/i);
+    const image = imageMatch ? imageMatch[1] : '';
+
+    return {
+      title,
+      description,
+      keywords,
+      image,
+    };
+  } catch (error) {
+    console.error('Error fetching metadata:', error);
+    return null;
+  }
+}
