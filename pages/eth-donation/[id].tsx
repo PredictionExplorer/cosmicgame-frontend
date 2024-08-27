@@ -14,7 +14,7 @@ const EthDonationDetail = ({ id }) => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const info = await api.get_bid_info(id);
+      const info = await api.get_donations_with_info_by_id(id);
       setDonationInfo(info);
       if (info?.DataJson) {
         const jsonData = JSON.parse(info.DataJson);
@@ -86,45 +86,55 @@ const EthDonationDetail = ({ id }) => {
               &nbsp;
               <Typography>{donationInfo.AmountEth.toFixed(2)} ETH</Typography>
             </Box>
-            <Box mb={1} display="flex" flexWrap="wrap">
-              <Typography color="primary">Title:</Typography>
-              &nbsp;
-              <Typography>{dataJson?.title}</Typography>
-            </Box>
-            <Box mb={1} display="flex" flexWrap="wrap">
-              <Typography color="primary">Message:</Typography>
-              &nbsp;
-              <Typography>{dataJson?.message}</Typography>
-            </Box>
-            <Box mb={1} display="flex" flexWrap="wrap">
-              <Typography color="primary">URL:</Typography>
-              &nbsp;
-              <Typography>
-                <Link
-                  sx={{ color: "inherit", fontSize: "inherit" }}
-                  href={dataJson?.url}
-                  target="_blank"
-                >
-                  {dataJson?.url}
-                </Link>
-              </Typography>
-            </Box>
-            <Box mb={1} display="flex" flexWrap="wrap">
-              <Typography color="primary">Meta Description:</Typography>
-              &nbsp;
-              <Typography>{metaData?.description}</Typography>
-            </Box>
-            <Box mb={1} display="flex" flexWrap="wrap">
-              <Typography color="primary">Meta Keywords:</Typography>
-              &nbsp;
-              <Typography>{metaData?.Keywords}</Typography>
-            </Box>
-            <Box>
-              <Typography color="primary" mb={1}>
-                Meta Image:
-              </Typography>
-              <img src={metaData?.image} width="100%" alt="meta image" />
-            </Box>
+            {dataJson && (
+              <>
+                <Box mb={1} display="flex" flexWrap="wrap">
+                  <Typography color="primary">Title:</Typography>
+                  &nbsp;
+                  <Typography>{dataJson?.title}</Typography>
+                </Box>
+                <Box mb={1} display="flex" flexWrap="wrap">
+                  <Typography color="primary">Message:</Typography>
+                  &nbsp;
+                  <Typography>{dataJson?.message}</Typography>
+                </Box>
+                <Box mb={1} display="flex" flexWrap="wrap">
+                  <Typography color="primary">URL:</Typography>
+                  &nbsp;
+                  <Typography>
+                    <Link
+                      sx={{ color: "inherit", fontSize: "inherit" }}
+                      href={dataJson?.url}
+                      target="_blank"
+                    >
+                      {dataJson?.url}
+                    </Link>
+                  </Typography>
+                </Box>
+              </>
+            )}
+            {!!metaData?.description && (
+              <Box mb={1} display="flex" flexWrap="wrap">
+                <Typography color="primary">Meta Description:</Typography>
+                &nbsp;
+                <Typography>{metaData?.description}</Typography>
+              </Box>
+            )}
+            {!!metaData?.Keywords && (
+              <Box mb={1} display="flex" flexWrap="wrap">
+                <Typography color="primary">Meta Keywords:</Typography>
+                &nbsp;
+                <Typography>{metaData?.Keywords}</Typography>
+              </Box>
+            )}
+            {!!metaData?.image && (
+              <Box>
+                <Typography color="primary" mb={1}>
+                  Meta Image:
+                </Typography>
+                <img src={metaData?.image} width="100%" alt="meta image" />
+              </Box>
+            )}
           </>
         )}
       </MainWrapper>

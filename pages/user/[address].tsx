@@ -19,6 +19,7 @@ import DonatedNFTTable from "../../components/DonatedNFTTable";
 import { CSTTable } from "../my-tokens";
 import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
+import EthDonationTable from "../../components/EthDonationTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -64,6 +65,7 @@ const UserInfo = ({ address }) => {
   const [stakingCSTActions, setStakingCSTActions] = useState([]);
   const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
+  const [ethDonations, setEthDonations] = useState([]);
   const [cstList, setCSTList] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [stakingTable, setStakingTable] = useState(0);
@@ -106,6 +108,8 @@ const UserInfo = ({ address }) => {
     setMarketingRewards(marketingRewards);
     const cstList = await api.get_cst_tokens_by_user(addr);
     setCSTList(cstList);
+    const donations = await api.get_donations_by_user(addr);
+    setEthDonations(donations);
     fetchStakedToken();
     fetchStatusData();
     setLoading(false);
@@ -618,6 +622,12 @@ const UserInfo = ({ address }) => {
                     Bid History
                   </Typography>
                   <BiddingHistoryTable biddingHistory={bidHistory} />
+                </Box>
+                <Box>
+                  <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                    Donation History
+                  </Typography>
+                  <EthDonationTable list={ethDonations} />
                 </Box>
                 <Box>
                   <Typography variant="h6" lineHeight={1} mt={8} mb={2}>

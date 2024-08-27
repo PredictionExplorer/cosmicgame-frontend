@@ -22,12 +22,18 @@ const EthDonationRow = ({ row }) => {
 
   return (
     <TablePrimaryRow
-      sx={{
-        cursor: "pointer",
-      }}
-      onClick={() => {
-        router.push(`/eth-donation/${row.EvtLogId}`);
-      }}
+      sx={
+        row.RecordType > 0 && {
+          cursor: "pointer",
+        }
+      }
+      onClick={
+        row.RecordType > 0
+          ? () => {
+              router.push(`/eth-donation/${row.CGRecordId}`);
+            }
+          : null
+      }
     >
       <TablePrimaryCell>
         <Link
@@ -38,6 +44,9 @@ const EthDonationRow = ({ row }) => {
         >
           {convertTimestampToDateTime(row.TimeStamp)}
         </Link>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.RecordType ? "Donation with info" : "Simple donation"}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -72,6 +81,7 @@ const EthDonationTable = ({ list }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Type</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Donor</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">

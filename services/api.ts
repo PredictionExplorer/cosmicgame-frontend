@@ -726,6 +726,26 @@ class ApiService {
     }
   }
 
+  public async get_donations_by_user(address: string) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`donations/eth/by_user/${address}`));
+      return data.CombinedDonationRecords;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_donations_with_info_by_id(id: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`donations/eth/with_info/info/${id}`));
+      return data.ETHDonation;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
   public async get_staking_rwalk_mints_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/rwalk/mints/by_user/${address}`));
