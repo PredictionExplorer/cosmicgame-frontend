@@ -30,7 +30,7 @@ import {
   StyledInput,
 } from "../components/styled";
 import BiddingHistory from "../components/BiddingHistoryTable";
-import api from "../services/api";
+import api, { cosmicGameBaseUrl } from "../services/api";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { BigNumber, Contract, constants, ethers } from "ethers";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
@@ -70,6 +70,7 @@ import TwitterShareButton from "../components/TwitterShareButton";
 import ETHSpentTable from "../components/ETHSpentTable";
 import EnduranceChampionsTable from "../components/EnduranceChampionsTable";
 import EthDonationTable from "../components/EthDonationTable";
+import axios from "axios";
 
 const bidParamsEncoding: ethers.utils.ParamType = {
   type: "tuple(string,int256)",
@@ -744,17 +745,22 @@ const NewHome = () => {
   }, [data, account, curBidList]);
 
   useEffect(() => {
+    const fetchCSTInfo = async (bannerId) => {
+      const res = await api.get_cst_info(bannerId);
+      const fileName = `0x${res.TokenInfo.Seed}`;
+      setBannerTokenId(fileName);
+    };
     if (data && bannerTokenId === "") {
       if (data?.MainStats.NumCSTokenMints > 0) {
         let bannerId = Math.floor(
           Math.random() * data?.MainStats.NumCSTokenMints
         );
-        const fileName = bannerId.toString().padStart(6, "0");
-        setBannerTokenId(fileName);
+        fetchCSTInfo(bannerId);
       } else if (data?.MainStats.NumCSTokenMints === 0) {
         setBannerTokenId("sample");
       }
     }
+
     const interval = setInterval(() => {
       setRoundStarted(calculateTimeDiff(data?.TsRoundStart - offset / 1000));
       if (curBidList.length) {
@@ -1732,7 +1738,7 @@ const NewHome = () => {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Cosmic Signature";
-  const data = await api.get_dashboard_info();
+  const { data } = await axios.get(cosmicGameBaseUrl + "statistics/dashboard");
   const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${data?.PrizeAmountEth.toFixed(
     4
   )}ETH prizes and Cosmic Signature NFTs.`;

@@ -34,13 +34,13 @@ const StakedTokensRow = ({
 }) => {
   const [tokenName, setTokenName] = useState("");
   const getTokenImageURL = () => {
-    const fileName = (IsRwalk ? row.StakedTokenId : row.TokenInfo.TokenId)
+    const fileName = (IsRwalk ? row.StakedTokenId : row.TokenInfo.Seed)
       .toString()
       .padStart(6, "0");
     if (IsRwalk) {
       return `https://randomwalknft.s3.us-east-2.amazonaws.com/${fileName}_black_thumb.jpg`;
     }
-    return `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.png`;
+    return `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${fileName}.png`;
   };
   useEffect(() => {
     const getTokenName = async () => {

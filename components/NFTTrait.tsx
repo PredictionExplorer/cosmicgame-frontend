@@ -46,9 +46,8 @@ import api from "../services/api";
 import { useNotification } from "../contexts/NotificationContext";
 
 const NFTTrait = ({ tokenId }) => {
-  const fileName = tokenId.toString().padStart(6, "0");
-  const image = `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.png`;
-  const video = `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.mp4`;
+  const [image, setImage] = useState("/images/qmark.png");
+  const [video, setVideo] = useState("");
   const [open, setOpen] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
   const [videoPath, setVideoPath] = useState(null);
@@ -224,6 +223,12 @@ const NFTTrait = ({ tokenId }) => {
       const res = await api.get_cst_info(tokenId);
       setNft(res.TokenInfo);
       setPrizeInfo(res.PrizeInfo);
+      setImage(
+        `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${res.TokenInfo.Seed}.png`
+      );
+      setVideo(
+        `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${res.TokenInfo.Seed}.mp4`
+      );
     } catch (e) {
       console.log(e);
     }
