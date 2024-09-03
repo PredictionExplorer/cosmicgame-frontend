@@ -130,17 +130,21 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Tooltip title={history.WinnerAddr}>
-          <Link
-            color="inherit"
-            fontSize="inherit"
-            fontFamily="monospace"
-            href={`/user/${history.WinnerAddr}`}
-            target="__blank"
-          >
-            {shortenHex(history.WinnerAddr, 6)}
-          </Link>
-        </Tooltip>
+        {history.WinnerAddr === "" ? (
+          " "
+        ) : (
+          <Tooltip title={history.WinnerAddr}>
+            <Link
+              color="inherit"
+              fontSize="inherit"
+              fontFamily="monospace"
+              href={`/user/${history.WinnerAddr}`}
+              target="__blank"
+            >
+              {shortenHex(history.WinnerAddr, 6)}
+            </Link>
+          </Tooltip>
+        )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
@@ -181,7 +185,7 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
               }}
               target="_blank"
             >
-              {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS.toString(), 6)}
+              {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS, 6)}
             </Link>
           </Tooltip>
         ) : history.TokenAddress !== "" ? (
@@ -201,7 +205,7 @@ const HistoryRow = ({ history, showClaimedStatus }) => {
               }}
               target="_blank"
             >
-              {shortenHex(history.TokenAddress.toString(), 6)}
+              {shortenHex(history.TokenAddress, 6)}
             </Link>
           </Tooltip>
         ) : (

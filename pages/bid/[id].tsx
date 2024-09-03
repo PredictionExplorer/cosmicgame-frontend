@@ -17,7 +17,7 @@ const BidInfo = ({ bidId }) => {
       setLoading(true);
       const bidInfo = await api.get_bid_info(bidId);
       setBidInfo(bidInfo);
-      if (bidInfo.NFTTokenURI) {
+      if (bidInfo?.NFTTokenURI) {
         const { data } = await axios.get(bidInfo.NFTTokenURI);
         setTokenURI(data);
       }
@@ -79,14 +79,14 @@ const BidInfo = ({ bidId }) => {
               <Typography>
                 {bidInfo.BidType === 2
                   ? `${
-                      bidInfo.NumCSTTokensEth && bidInfo.NumCSTTokensEth < 1
-                        ? bidInfo.NumCSTTokensEth?.toFixed(7)
-                        : bidInfo.NumCSTTokensEth?.toFixed(2)
+                      bidInfo.NumCSTTokensEth > 0 && bidInfo.NumCSTTokensEth < 1
+                        ? bidInfo.NumCSTTokensEth.toFixed(7)
+                        : bidInfo.NumCSTTokensEth.toFixed(2)
                     } CST`
                   : `${
-                      bidInfo.BidPriceEth && bidInfo.BidPriceEth < 1
-                        ? bidInfo.BidPriceEth?.toFixed(7)
-                        : bidInfo.BidPriceEth?.toFixed(2)
+                      bidInfo.BidPriceEth > 0 && bidInfo.BidPriceEth < 1
+                        ? bidInfo.BidPriceEth.toFixed(7)
+                        : bidInfo.BidPriceEth.toFixed(2)
                     } ETH`}
               </Typography>
             </Box>
