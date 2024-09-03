@@ -240,7 +240,7 @@ const Statistics = () => {
                   ) : (
                     <>
                       <Typography>
-                        {convertTimestampToDateTime(data.PrizeClaimTs)}
+                        {convertTimestampToDateTime(data.PrizeClaimTs, true)}
                       </Typography>
                       {data.PrizeClaimTs > Date.now() / 1000 && (
                         <Countdown

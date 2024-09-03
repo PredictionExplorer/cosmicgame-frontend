@@ -37,7 +37,7 @@ const HistoryRow = ({ history, isBanned, showRound }) => {
       }}
     >
       <TablePrimaryCell sx={{ whiteSpace: "nowrap" }}>
-        {convertTimestampToDateTime(history.TimeStamp)}
+        {convertTimestampToDateTime(history.TimeStamp, true)}
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip title={history.BidderAddr}>

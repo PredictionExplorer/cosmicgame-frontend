@@ -625,7 +625,7 @@ const UserInfo = ({ address }) => {
                 </Box>
                 <Box>
                   <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                    Donation History
+                    ETH Donation History
                   </Typography>
                   <EthDonationTable list={ethDonations} />
                 </Box>

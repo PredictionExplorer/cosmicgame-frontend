@@ -49,9 +49,13 @@ import DonatedNFT from "../components/DonatedNFT";
 import {
   Chart,
   ChartArea,
+  ChartCategoryAxis,
+  ChartCategoryAxisItem,
   ChartLegend,
   ChartSeries,
   ChartSeriesItem,
+  ChartValueAxis,
+  ChartValueAxisItem,
 } from "@progress/kendo-react-charts";
 import "@progress/kendo-theme-default/dist/all.css";
 import getErrorMessage from "../utils/alert";
@@ -1348,7 +1352,7 @@ const NewHome = () => {
                 </Grid>
                 <Grid container spacing={2} mb={2} alignItems="center">
                   <Grid item xs={12} sm={4} md={4}>
-                    <Typography>Chronor Warrior</Typography>
+                    <Typography>Chrono Warrior</Typography>
                   </Grid>
                   {championList && championList.length > 0 && (
                     <Grid item xs={12} sm={8} md={8}>
@@ -1524,7 +1528,30 @@ const NewHome = () => {
           <Typography variant="subtitle1" color="primary" textAlign="center">
             Distribution of funds on each round
           </Typography>
-          <Chart
+          <Chart transitions={false} style={{ width: "100%" }}>
+            <ChartLegend visible={false} />
+            <ChartArea background="transparent" />
+            <ChartCategoryAxis>
+              <ChartCategoryAxisItem color="white" />
+            </ChartCategoryAxis>
+            <ChartValueAxis>
+              <ChartValueAxisItem visible={false} />
+            </ChartValueAxis>
+            <ChartSeries>
+              <ChartSeriesItem
+                type="bar"
+                data={series}
+                field="value"
+                categoryField="category"
+                labels={{
+                  visible: true,
+                  color: "white",
+                  background: "none",
+                }}
+              />
+            </ChartSeries>
+          </Chart>
+          {/* <Chart
             transitions={false}
             style={{ width: "100%", height: matches ? 300 : 200 }}
           >
@@ -1544,7 +1571,7 @@ const NewHome = () => {
                 }}
               />
             </ChartSeries>
-          </Chart>
+          </Chart> */}
         </Box>
         <Box mt={10}>
           <Typography variant="h6">TOP RAFFLE TICKETS HOLDERS</Typography>
@@ -1773,5 +1800,6 @@ export default NewHome;
 // get_user_info: remove bid field
 // complete admin page
 // update FAQ page: stellar, endurance champion
-// get_donations_with_info_by_user
 // update donations page
+
+// fix eth-donation page

@@ -26,7 +26,7 @@ export const parseBalance = (
 export const formatId = (id: number | string) => {
   return `#${id.toString().padStart(6, '0')}`
 }
-export const convertTimestampToDateTime = (timestamp: any) => {
+export const convertTimestampToDateTime = (timestamp: any, showSecond: boolean = false) => {
   let month_names = [
     "Jan",
     "Feb",
@@ -47,7 +47,11 @@ export const convertTimestampToDateTime = (timestamp: any) => {
   var date = ("0" + date_ob.getDate()).slice(-2);
   var hours = ("0" + date_ob.getHours()).slice(-2);
   var minutes = ("0" + date_ob.getMinutes()).slice(-2);
+  var seconds = ("0" + date_ob.getSeconds()).slice(-2);
   var result = `${month} ${date}, ${year} ${hours}:${minutes}`;
+  if (showSecond) {
+    result += `:${seconds}`;
+  }
   return result;
 };
 
