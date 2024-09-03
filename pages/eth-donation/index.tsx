@@ -9,7 +9,7 @@ const EthDonations = () => {
   const [charityDonations, setCharityDonations] = useState(null);
   useEffect(() => {
     const fetchCharityDonations = async () => {
-      const donation = await api.get_donations_with_info();
+      const donation = await api.get_donations_both();
       setCharityDonations(donation);
     };
     fetchCharityDonations();

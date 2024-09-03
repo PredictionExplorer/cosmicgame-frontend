@@ -746,6 +746,26 @@ class ApiService {
     }
   }
 
+  public async get_donations_both_by_round(round: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`donations/eth/both/${round}`));
+      return data.CosmicGameDonations;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_donations_both() {
+    try {
+      const { data } = await axios.get(getAPIUrl("donations/eth/both/0"));
+      return data.CosmicGameDonations;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
   public async get_staking_rwalk_mints_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/rwalk/mints/by_user/${address}`));

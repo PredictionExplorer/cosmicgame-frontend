@@ -560,7 +560,7 @@ const NewHome = () => {
       setCurBidList(newBidData);
       const nftData = await api.get_donations_nft_by_round(round);
       setDonatedNFTs(nftData);
-      const donations = await api.get_donations_with_info_by_round(round);
+      const donations = await api.get_donations_both_by_round(round);
       setEthDonations(donations);
       const champions = getEnduranceChampions(newBidData);
       const sortedChampions = [...champions].sort(
