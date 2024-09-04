@@ -30,12 +30,10 @@ export const CTBalanceDistributionChart = ({ list }) => {
         ...list.slice(0, limit),
         {
           OwnerAddr: "Others",
-          BalanceFloat: otherValue / (list.length - limit),
+          BalanceFloat: otherValue,
         },
       ]);
-      setMaxValue(
-        list[0].BalanceFloat > otherValue ? list[0].BalanceFloat : otherValue
-      );
+      setMaxValue(Math.max(list[0].BalanceFloat, otherValue));
     } else if (list.length > 0) {
       setNewList(list);
       setMaxValue(list[0].BalanceFloat);
