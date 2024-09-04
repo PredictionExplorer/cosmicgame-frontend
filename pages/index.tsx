@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { isMobile } from "react-device-detect";
 import {
   Button,
   Box,
@@ -1528,50 +1529,54 @@ const NewHome = () => {
           <Typography variant="subtitle1" color="primary" textAlign="center">
             Distribution of funds on each round
           </Typography>
-          <Chart transitions={false} style={{ width: "100%" }}>
-            <ChartLegend visible={false} />
-            <ChartArea background="transparent" />
-            <ChartCategoryAxis>
-              <ChartCategoryAxisItem color="white" />
-            </ChartCategoryAxis>
-            <ChartValueAxis>
-              <ChartValueAxisItem visible={false} />
-            </ChartValueAxis>
-            <ChartSeries>
-              <ChartSeriesItem
-                type="bar"
-                data={series}
-                field="value"
-                categoryField="category"
-                labels={{
-                  visible: true,
-                  color: "white",
-                  background: "none",
-                }}
-              />
-            </ChartSeries>
-          </Chart>
-          {/* <Chart
-            transitions={false}
-            style={{ width: "100%", height: matches ? 300 : 200 }}
-          >
-            <ChartLegend visible={false} />
-            <ChartArea background="transparent" />
-            <ChartSeries>
-              <ChartSeriesItem
-                type="pie"
-                data={series}
-                field="value"
-                categoryField="category"
-                labels={{
-                  visible: true,
-                  content: labelContent,
-                  color: "white",
-                  background: "none",
-                }}
-              />
-            </ChartSeries>
-          </Chart> */}
+          {isMobile ? (
+            <Chart transitions={false} style={{ width: "100%", height: "100%" }}>
+              <ChartLegend visible={false} />
+              <ChartArea background="transparent" />
+              <ChartCategoryAxis>
+                <ChartCategoryAxisItem color="white" />
+              </ChartCategoryAxis>
+              <ChartValueAxis>
+                <ChartValueAxisItem visible={false} />
+              </ChartValueAxis>
+              <ChartSeries>
+                <ChartSeriesItem
+                  type="bar"
+                  data={series}
+                  field="value"
+                  categoryField="category"
+                  labels={{
+                    visible: true,
+                    color: "white",
+                    background: "none",
+                    content: (props) => props.value + "%",
+                  }}
+                />
+              </ChartSeries>
+            </Chart>
+          ) : (
+            <Chart
+              transitions={false}
+              style={{ width: "100%", height: matches ? 300 : 200 }}
+            >
+              <ChartLegend visible={false} />
+              <ChartArea background="transparent" />
+              <ChartSeries>
+                <ChartSeriesItem
+                  type="pie"
+                  data={series}
+                  field="value"
+                  categoryField="category"
+                  labels={{
+                    visible: true,
+                    content: labelContent,
+                    color: "white",
+                    background: "none",
+                  }}
+                />
+              </ChartSeries>
+            </Chart>
+          )}
         </Box>
         <Box mt={10}>
           <Typography variant="h6">TOP RAFFLE TICKETS HOLDERS</Typography>

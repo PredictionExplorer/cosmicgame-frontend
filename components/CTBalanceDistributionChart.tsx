@@ -67,7 +67,7 @@ export const CTBalanceDistributionChart = ({ list }) => {
               categoryField="category"
               labels={{
                 visible: true,
-                content: (props) => props.value.toFixed(4),
+                content: (props) => props.value.toFixed(2),
                 color: "white",
                 background: "none",
               }}
