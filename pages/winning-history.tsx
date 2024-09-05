@@ -20,25 +20,23 @@ const WinningHistory = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          History of My Winnings
+    <MainWrapper>
+      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
+        History of My Winnings
+      </Typography>
+      {!account ? (
+        <Typography variant="subtitle1">
+          Please login to Metamask to see your winnings.
         </Typography>
-        {!account ? (
-          <Typography variant="subtitle1">
-            Please login to Metamask to see your winnings.
-          </Typography>
-        ) : claimHistory === null ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <WinningHistoryTable
-            winningHistory={claimHistory}
-            showClaimedStatus={true}
-          />
-        )}
-      </MainWrapper>
-    </>
+      ) : claimHistory === null ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <WinningHistoryTable
+          winningHistory={claimHistory}
+          showClaimedStatus={true}
+        />
+      )}
+    </MainWrapper>
   );
 };
 

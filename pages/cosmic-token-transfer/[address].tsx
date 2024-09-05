@@ -120,18 +120,16 @@ const CosmicTokenTransfers = ({ address }) => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          Cosmic Token Transfers
-        </Typography>
-        {loading ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <CosmicTokenTransfersTable list={cosmicTokenTransfers} />
-        )}
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
+        Cosmic Token Transfers
+      </Typography>
+      {loading ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <CosmicTokenTransfersTable list={cosmicTokenTransfers} />
+      )}
+    </MainWrapper>
   );
 };
 

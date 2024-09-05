@@ -143,34 +143,32 @@ const UserRaffleNFT = ({ address }) => {
   }, [address]);
 
   return (
-    <>
-      <MainWrapper>
-        {invalidAddress ? (
-          <Typography variant="h6">Invalid Address</Typography>
-        ) : (
-          <>
-            <Box mb={4}>
-              <Typography variant="h6" color="primary" component="span" mr={2}>
-                User
-              </Typography>
-              <Typography variant="h6" component="span" fontFamily="monospace">
-                {address}
-              </Typography>
-            </Box>
-            <Box mt={4}>
-              <Typography variant="h6" lineHeight={1} mb={2}>
-                Raffle NFTs User Won
-              </Typography>
-              {raffleNfts.loading ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <NFTWinningsTable list={raffleNfts.data} />
-              )}
-            </Box>
-          </>
-        )}
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      {invalidAddress ? (
+        <Typography variant="h6">Invalid Address</Typography>
+      ) : (
+        <>
+          <Box mb={4}>
+            <Typography variant="h6" color="primary" component="span" mr={2}>
+              User
+            </Typography>
+            <Typography variant="h6" component="span" fontFamily="monospace">
+              {address}
+            </Typography>
+          </Box>
+          <Box mt={4}>
+            <Typography variant="h6" lineHeight={1} mb={2}>
+              Raffle NFTs User Won
+            </Typography>
+            {raffleNfts.loading ? (
+              <Typography variant="h6">Loading...</Typography>
+            ) : (
+              <NFTWinningsTable list={raffleNfts.data} />
+            )}
+          </Box>
+        </>
+      )}
+    </MainWrapper>
   );
 };
 

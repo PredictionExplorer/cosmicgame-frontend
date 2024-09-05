@@ -20,26 +20,24 @@ const Gallery = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          flexWrap="wrap"
-        >
-          <Typography variant="h4" component="span" color="primary">
-            CosmicSignature
-          </Typography>
-          &nbsp;
-          <Typography variant="h4" component="span">
-            NFT Gallery
-          </Typography>
-        </Box>
+    <MainWrapper>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        flexWrap="wrap"
+      >
+        <Typography variant="h4" component="span" color="primary">
+          CosmicSignature
+        </Typography>
+        &nbsp;
+        <Typography variant="h4" component="span">
+          NFT Gallery
+        </Typography>
+      </Box>
 
-        <PaginationGrid data={collection} loading={loading} />
-      </MainWrapper>
-    </>
+      <PaginationGrid data={collection} loading={loading} />
+    </MainWrapper>
   );
 };
 

@@ -28,43 +28,41 @@ const UserMarketingRewards = ({ address }) => {
   }, [address]);
 
   return (
-    <>
-      <MainWrapper>
-        {invalidAddress ? (
-          <Typography variant="h6">Invalid Address</Typography>
-        ) : (
-          <>
-            <Box mb={4}>
-              <Typography variant="h6" color="primary" component="span" mr={1}>
-                Marketing Rewards for User
-              </Typography>
-              <Typography
-                variant="h6"
-                component="span"
-                fontFamily="monospace"
-                sx={{ wordBreak: "break-all" }}
+    <MainWrapper>
+      {invalidAddress ? (
+        <Typography variant="h6">Invalid Address</Typography>
+      ) : (
+        <>
+          <Box mb={4}>
+            <Typography variant="h6" color="primary" component="span" mr={1}>
+              Marketing Rewards for User
+            </Typography>
+            <Typography
+              variant="h6"
+              component="span"
+              fontFamily="monospace"
+              sx={{ wordBreak: "break-all" }}
+            >
+              <Link
+                href={`/user/${address}`}
+                style={{
+                  color: "inherit",
+                  fontSize: "inherit",
+                  fontFamily: "monospace",
+                }}
               >
-                <Link
-                  href={`/user/${address}`}
-                  style={{
-                    color: "inherit",
-                    fontSize: "inherit",
-                    fontFamily: "monospace",
-                  }}
-                >
-                  {address}
-                </Link>
-              </Typography>
-            </Box>
-            {loading ? (
-              <Typography variant="h6">Loading...</Typography>
-            ) : (
-              <MarketingRewardsTable list={marketingRewards} />
-            )}
-          </>
-        )}
-      </MainWrapper>
-    </>
+                {address}
+              </Link>
+            </Typography>
+          </Box>
+          {loading ? (
+            <Typography variant="h6">Loading...</Typography>
+          ) : (
+            <MarketingRewardsTable list={marketingRewards} />
+          )}
+        </>
+      )}
+    </MainWrapper>
   );
 };
 

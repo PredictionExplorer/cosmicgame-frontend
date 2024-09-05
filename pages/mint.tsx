@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { Typography, Box, Button, Link } from "@mui/material";
-import "react-slideshow-image/dist/styles.css";
-import Head from "next/head";
 import { MainWrapper, CenterBox } from "../components/styled";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 import { parseBalance } from "../utils";
@@ -71,13 +69,6 @@ const Mint = () => {
 
   return (
     <>
-      <Head>
-        <title>Mint | Random Walk NFT</title>
-        <meta
-          name="description"
-          content="Programmatically generated Random Walk image and video NFTs. ETH spent on minting goes back to the minters."
-        />
-      </Head>
       <MainWrapper>
         <CenterBox>
           <Typography variant="h4" component="span">

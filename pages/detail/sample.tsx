@@ -42,119 +42,117 @@ const SampleDetail = () => {
     setAnchorEl(null);
   };
   return (
-    <>
-      <MainWrapper
-        maxWidth={false}
-        style={{
-          paddingLeft: 0,
-          paddingRight: 0,
-        }}
-      >
-        <Container>
-          <SectionWrapper>
-            <Grid container spacing={4} justifyContent="center">
-              <Grid item xs={12} sm={8} md={6}>
-                <StyledCard>
-                  <CardActionArea onClick={() => setImageOpen(true)}>
-                    <NFTImage src={image} />
-                    <NFTInfoWrapper sx={{ width: "calc(100% - 40px)" }}>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{ color: "#FFFFFF", textAlign: "center" }}
-                      >
-                        Sample NFT
-                      </Typography>
-                    </NFTInfoWrapper>
-                  </CardActionArea>
-                </StyledCard>
-                <Box mt={2}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <Button variant="text" fullWidth onClick={handleMenuOpen}>
-                        Copy link
-                        {anchorEl ? <ExpandLess /> : <ExpandMore />}
-                      </Button>
-                      <Menu
-                        elevation={0}
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "center",
-                        }}
-                        transformOrigin={{
-                          vertical: "top",
-                          horizontal: "center",
-                        }}
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                      >
-                        <CopyToClipboard text={video}>
-                          <PrimaryMenuItem onClick={handleMenuClose}>
-                            <Typography>Video</Typography>
-                          </PrimaryMenuItem>
-                        </CopyToClipboard>
-                        <CopyToClipboard text={image}>
-                          <PrimaryMenuItem onClick={handleMenuClose}>
-                            <Typography>Image</Typography>
-                          </PrimaryMenuItem>
-                        </CopyToClipboard>
-                        <CopyToClipboard text={window.location.href}>
-                          <PrimaryMenuItem onClick={handleMenuClose}>
-                            <Typography>Detail Page</Typography>
-                          </PrimaryMenuItem>
-                        </CopyToClipboard>
-                      </Menu>
-                    </Grid>
+    <MainWrapper
+      maxWidth={false}
+      style={{
+        paddingLeft: 0,
+        paddingRight: 0,
+      }}
+    >
+      <Container>
+        <SectionWrapper>
+          <Grid container spacing={4} justifyContent="center">
+            <Grid item xs={12} sm={8} md={6}>
+              <StyledCard>
+                <CardActionArea onClick={() => setImageOpen(true)}>
+                  <NFTImage src={image} />
+                  <NFTInfoWrapper sx={{ width: "calc(100% - 40px)" }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ color: "#FFFFFF", textAlign: "center" }}
+                    >
+                      Sample NFT
+                    </Typography>
+                  </NFTInfoWrapper>
+                </CardActionArea>
+              </StyledCard>
+              <Box mt={2}>
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Button variant="text" fullWidth onClick={handleMenuOpen}>
+                      Copy link
+                      {anchorEl ? <ExpandLess /> : <ExpandMore />}
+                    </Button>
+                    <Menu
+                      elevation={0}
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "center",
+                      }}
+                      transformOrigin={{
+                        vertical: "top",
+                        horizontal: "center",
+                      }}
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={handleMenuClose}
+                    >
+                      <CopyToClipboard text={video}>
+                        <PrimaryMenuItem onClick={handleMenuClose}>
+                          <Typography>Video</Typography>
+                        </PrimaryMenuItem>
+                      </CopyToClipboard>
+                      <CopyToClipboard text={image}>
+                        <PrimaryMenuItem onClick={handleMenuClose}>
+                          <Typography>Image</Typography>
+                        </PrimaryMenuItem>
+                      </CopyToClipboard>
+                      <CopyToClipboard text={window.location.href}>
+                        <PrimaryMenuItem onClick={handleMenuClose}>
+                          <Typography>Detail Page</Typography>
+                        </PrimaryMenuItem>
+                      </CopyToClipboard>
+                    </Menu>
                   </Grid>
-                </Box>
-              </Grid>
-              <Grid item xs={12} sm={8} md={6}>
-                <Box sx={{ mb: 1, display: "flex" }}>
-                  <Typography color="primary" component="span">
-                    Token Name:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">Sample NFT</Typography>
-                </Box>
-                <Box sx={{ mb: 1, display: "flex" }}>
-                  <Typography color="primary" component="span">
-                    Seed:
-                  </Typography>
-                  &nbsp;
-                  <Typography
-                    fontFamily="monospace"
-                    component="span"
-                    sx={{
-                      fontFamily: "monospace",
-                      display: "inline-block",
-                      wordWrap: "break-word",
-                      width: "32ch",
-                    }}
-                  >
-                    {
-                      "3c8510e4cbe870a700d7c44b05f2cdf84824fcd8108aaaafd7952222590b31de"
-                    }
-                  </Typography>
-                </Box>
-              </Grid>
+                </Grid>
+              </Box>
             </Grid>
-            <Box mt="80px">
-              <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
-            </Box>
-            {imageOpen && (
-              <Lightbox image={image} onClose={() => setImageOpen(false)} />
-            )}
-            <ModalVideo
-              channel="custom"
-              url={videoPath}
-              isOpen={open}
-              onClose={() => setOpen(false)}
-            />
-          </SectionWrapper>
-        </Container>
-      </MainWrapper>
-    </>
+            <Grid item xs={12} sm={8} md={6}>
+              <Box sx={{ mb: 1, display: "flex" }}>
+                <Typography color="primary" component="span">
+                  Token Name:
+                </Typography>
+                &nbsp;
+                <Typography component="span">Sample NFT</Typography>
+              </Box>
+              <Box sx={{ mb: 1, display: "flex" }}>
+                <Typography color="primary" component="span">
+                  Seed:
+                </Typography>
+                &nbsp;
+                <Typography
+                  fontFamily="monospace"
+                  component="span"
+                  sx={{
+                    fontFamily: "monospace",
+                    display: "inline-block",
+                    wordWrap: "break-word",
+                    width: "32ch",
+                  }}
+                >
+                  {
+                    "3c8510e4cbe870a700d7c44b05f2cdf84824fcd8108aaaafd7952222590b31de"
+                  }
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+          <Box mt="80px">
+            <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
+          </Box>
+          {imageOpen && (
+            <Lightbox image={image} onClose={() => setImageOpen(false)} />
+          )}
+          <ModalVideo
+            channel="custom"
+            url={videoPath}
+            isOpen={open}
+            onClose={() => setOpen(false)}
+          />
+        </SectionWrapper>
+      </Container>
+    </MainWrapper>
   );
 };
 

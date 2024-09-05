@@ -65,268 +65,263 @@ const PrizeInfo = ({ roundNum }) => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Box mb={4}>
-          <Typography variant="h4" color="primary" component="span" mr={2}>
-            {`Round #${roundNum}`}
-          </Typography>
-          <Typography variant="h4" component="span">
-            Prize Information
-          </Typography>
-        </Box>
-        {loading ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : prizeInfo ? (
-          <Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Datetime:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                <Link
-                  color="inherit"
-                  fontSize="inherit"
-                  href={`https://arbiscan.io/tx/${prizeInfo.TxHash}`}
-                  target="__blank"
-                >
-                  {convertTimestampToDateTime(prizeInfo.TimeStamp)}
-                </Link>
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Prize Amount:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.AmountEth.toFixed(4)} ETH
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Winner Address:
-              </Typography>
-              &nbsp;
+    <MainWrapper>
+      <Box mb={4}>
+        <Typography variant="h4" color="primary" component="span" mr={2}>
+          {`Round #${roundNum}`}
+        </Typography>
+        <Typography variant="h4" component="span">
+          Prize Information
+        </Typography>
+      </Box>
+      {loading ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : prizeInfo ? (
+        <Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Datetime:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
               <Link
-                href={`/user/${prizeInfo.WinnerAddr}`}
-                style={{ color: "rgb(255, 255, 255)" }}
+                color="inherit"
+                fontSize="inherit"
+                href={`https://arbiscan.io/tx/${prizeInfo.TxHash}`}
+                target="__blank"
               >
-                <Typography fontFamily="monospace" component="span">
-                  {prizeInfo.WinnerAddr}
-                </Typography>
+                {convertTimestampToDateTime(prizeInfo.TimeStamp)}
               </Link>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Charity Address:
-              </Typography>
-              &nbsp;
-              <Typography fontFamily="monospace" component="span">
-                {prizeInfo.CharityAddress}
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Charity Amount:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.CharityAmountETH.toFixed(4)} ETH
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Endurance Champion Prize Winner Address:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                <Link
-                  href={`/user/${prizeInfo.EnduranceWinnerAddr}`}
-                  color="inherit"
-                  fontSize="inherit"
-                >
-                  {prizeInfo.EnduranceWinnerAddr}
-                </Link>
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Endurance Champion rewarded with CST NFT TokenID:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                <Link
-                  href={`/detail/${prizeInfo.EnduranceERC721TokenId}`}
-                  color="inherit"
-                  fontSize="inherit"
-                >
-                  {prizeInfo.EnduranceERC721TokenId}
-                </Link>
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Endurance Champion rewarded with CST (ERC20):
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.EnduranceERC20AmountEth} CST
-              </Typography>
-            </Box>
-            {prizeInfo.StellarWinnerAddr !== "" && (
-              <>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Stellar Spender Prize Winner Address:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    <Link
-                      href={`/user/${prizeInfo.StellarWinnerAddr}`}
-                      color="inherit"
-                      fontSize="inherit"
-                    >
-                      {prizeInfo.StellarWinnerAddr}
-                    </Link>
-                  </Typography>
-                </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Stellar Spender rewarded with CST NFT Token ID:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    <Link
-                      href={`/detail/${prizeInfo.StellarERC721TokenId}`}
-                      color="inherit"
-                      fontSize="inherit"
-                    >
-                      {prizeInfo.StellarERC721TokenId}
-                    </Link>
-                  </Typography>
-                </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Stellar Spender rewarded with CST (ERC20):
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    {prizeInfo.StellarERC20AmountEth} CST
-                  </Typography>
-                </Box>
-              </>
-            )}
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Total Bids:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.RoundStats.TotalBids}
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Total Donated NFTs:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.RoundStats.TotalDonatedNFTs}
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Total Raffle Eth Deposits:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Total Raffle NFTs:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.RoundStats.TotalRaffleNFTs}
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Total Staking Deposit Amount:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Number of Staked Tokens:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
-                {prizeInfo.StakingNumStakedTokens}
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Number of Stakers:
-              </Typography>
-              &nbsp;
-              <Typography component="span">{stakingRewards.length}</Typography>
-            </Box>
-            <Box mt={4}>
-              <Typography variant="h6" lineHeight={1}>
-                Bid History
-              </Typography>
-              <BiddingHistoryTable biddingHistory={bidHistory} />
-            </Box>
-            <Box mt={4}>
-              <Typography variant="h6" mb={2}>
-                Raffle Winners
-              </Typography>
-              <RaffleWinnerTable
-                RaffleETHDeposits={prizeInfo.RaffleETHDeposits}
-                RaffleNFTWinners={prizeInfo.RaffleNFTWinners}
-              />
-            </Box>
-            <Box mt={4}>
-              <Typography variant="h6" mb={2}>
-                Staking Rewards
-              </Typography>
-              <StakingWinnerTable list={stakingRewards} />
-            </Box>
-            <Box mt={8}>
-              <Box
-                sx={{
-                  mb: 2,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography variant="h6">Donated NFTs</Typography>
-                {donatedNFTToClaim.length > 0 && (
-                  <Button
-                    variant="contained"
-                    onClick={handleAllDonatedNFTsClaim}
-                  >
-                    Claim All
-                  </Button>
-                )}
-              </Box>
-              <DonatedNFTTable list={nftDonations} handleClaim={null} />
-            </Box>
+            </Typography>
           </Box>
-        ) : (
-          <Typography>Prize data not found!</Typography>
-        )}
-      </MainWrapper>
-    </>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Prize Amount:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.AmountEth.toFixed(4)} ETH
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Winner Address:
+            </Typography>
+            &nbsp;
+            <Link
+              href={`/user/${prizeInfo.WinnerAddr}`}
+              style={{ color: "rgb(255, 255, 255)" }}
+            >
+              <Typography fontFamily="monospace" component="span">
+                {prizeInfo.WinnerAddr}
+              </Typography>
+            </Link>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Charity Address:
+            </Typography>
+            &nbsp;
+            <Typography fontFamily="monospace" component="span">
+              {prizeInfo.CharityAddress}
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Charity Amount:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.CharityAmountETH.toFixed(4)} ETH
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Endurance Champion Prize Winner Address:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              <Link
+                href={`/user/${prizeInfo.EnduranceWinnerAddr}`}
+                color="inherit"
+                fontSize="inherit"
+              >
+                {prizeInfo.EnduranceWinnerAddr}
+              </Link>
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Endurance Champion rewarded with CST NFT TokenID:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              <Link
+                href={`/detail/${prizeInfo.EnduranceERC721TokenId}`}
+                color="inherit"
+                fontSize="inherit"
+              >
+                {prizeInfo.EnduranceERC721TokenId}
+              </Link>
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Endurance Champion rewarded with CST (ERC20):
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.EnduranceERC20AmountEth} CST
+            </Typography>
+          </Box>
+          {prizeInfo.StellarWinnerAddr !== "" && (
+            <>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Stellar Spender Prize Winner Address:
+                </Typography>
+                &nbsp;
+                <Typography component="span">
+                  <Link
+                    href={`/user/${prizeInfo.StellarWinnerAddr}`}
+                    color="inherit"
+                    fontSize="inherit"
+                  >
+                    {prizeInfo.StellarWinnerAddr}
+                  </Link>
+                </Typography>
+              </Box>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Stellar Spender rewarded with CST NFT Token ID:
+                </Typography>
+                &nbsp;
+                <Typography component="span">
+                  <Link
+                    href={`/detail/${prizeInfo.StellarERC721TokenId}`}
+                    color="inherit"
+                    fontSize="inherit"
+                  >
+                    {prizeInfo.StellarERC721TokenId}
+                  </Link>
+                </Typography>
+              </Box>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Stellar Spender rewarded with CST (ERC20):
+                </Typography>
+                &nbsp;
+                <Typography component="span">
+                  {prizeInfo.StellarERC20AmountEth} CST
+                </Typography>
+              </Box>
+            </>
+          )}
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Total Bids:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.RoundStats.TotalBids}
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Total Donated NFTs:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.RoundStats.TotalDonatedNFTs}
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Total Raffle Eth Deposits:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Total Raffle NFTs:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.RoundStats.TotalRaffleNFTs}
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Total Staking Deposit Amount:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Number of Staked Tokens:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.StakingNumStakedTokens}
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Number of Stakers:
+            </Typography>
+            &nbsp;
+            <Typography component="span">{stakingRewards.length}</Typography>
+          </Box>
+          <Box mt={4}>
+            <Typography variant="h6" lineHeight={1}>
+              Bid History
+            </Typography>
+            <BiddingHistoryTable biddingHistory={bidHistory} />
+          </Box>
+          <Box mt={4}>
+            <Typography variant="h6" mb={2}>
+              Raffle Winners
+            </Typography>
+            <RaffleWinnerTable
+              RaffleETHDeposits={prizeInfo.RaffleETHDeposits}
+              RaffleNFTWinners={prizeInfo.RaffleNFTWinners}
+            />
+          </Box>
+          <Box mt={4}>
+            <Typography variant="h6" mb={2}>
+              Staking Rewards
+            </Typography>
+            <StakingWinnerTable list={stakingRewards} />
+          </Box>
+          <Box mt={8}>
+            <Box
+              sx={{
+                mb: 2,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="h6">Donated NFTs</Typography>
+              {donatedNFTToClaim.length > 0 && (
+                <Button variant="contained" onClick={handleAllDonatedNFTsClaim}>
+                  Claim All
+                </Button>
+              )}
+            </Box>
+            <DonatedNFTTable list={nftDonations} handleClaim={null} />
+          </Box>
+        </Box>
+      ) : (
+        <Typography>Prize data not found!</Typography>
+      )}
+    </MainWrapper>
   );
 };
 

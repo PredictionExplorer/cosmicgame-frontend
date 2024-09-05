@@ -135,167 +135,165 @@ const Contracts = () => {
   }, [charityWalletContract]);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography variant="h4" color="primary" align="center">
-          Contract Addresses
-        </Typography>
-        {loading ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <>
-            <List sx={{ mt: 4 }}>
-              <ContractItem name="Network" value="Local Network" />
-              <ContractItem name="Chain ID" value={31337} />
-              <ContractItem
-                name="Cosmic Game Address"
-                value={data?.ContractAddrs.CosmicGameAddr}
-                copyable={true}
-              />
-              {!!account && (
-                <Box sx={{ display: "flex", p: 2 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", mr: 4 }}>
-                    <TextField
-                      placeholder="Donation amount"
-                      type="number"
-                      value={donateAmount}
-                      size="small"
-                      sx={{ mr: 1 }}
-                      onChange={(e) => setDonateAmount(e.target.value)}
-                    />
-                    <Typography>ETH</Typography>
-                  </Box>
-                  <Button
-                    variant="contained"
-                    disabled={donateAmount === "0" || donateAmount === ""}
-                    onClick={handleDonate}
-                  >
-                    Donate
-                  </Button>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" align="center">
+        Contract Addresses
+      </Typography>
+      {loading ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <>
+          <List sx={{ mt: 4 }}>
+            <ContractItem name="Network" value="Local Network" />
+            <ContractItem name="Chain ID" value={31337} />
+            <ContractItem
+              name="Cosmic Game Address"
+              value={data?.ContractAddrs.CosmicGameAddr}
+              copyable={true}
+            />
+            {!!account && (
+              <Box sx={{ display: "flex", p: 2 }}>
+                <Box sx={{ display: "flex", alignItems: "center", mr: 4 }}>
+                  <TextField
+                    placeholder="Donation amount"
+                    type="number"
+                    value={donateAmount}
+                    size="small"
+                    sx={{ mr: 1 }}
+                    onChange={(e) => setDonateAmount(e.target.value)}
+                  />
+                  <Typography>ETH</Typography>
                 </Box>
-              )}
-              <ContractItem
-                name="Cosmic Token Address"
-                value={data?.ContractAddrs.CosmicTokenAddr}
-                copyable={true}
-              />
-              <ContractItem
-                name="Cosmic Signature Address"
-                value={data?.ContractAddrs.CosmicSignatureAddr}
-                copyable={true}
-              />
-              <ContractItem
-                name="RandomWalk Address"
-                value={data?.ContractAddrs.RandomWalkAddr}
-                copyable={true}
-              />
-              <ContractItem
-                name="Business Logic Address"
-                value={data?.ContractAddrs.BusinessLogicAddr}
-                copyable={true}
-              />
-              <ContractItem
-                name="Cosmic DAO Address"
-                value={data?.ContractAddrs.CosmicDaoAddr}
-                copyable={true}
-              />
-              <ContractItem
-                name="Charity Wallet Address"
-                value={data?.ContractAddrs.CharityWalletAddr}
-                copyable={true}
-              />
-              <ContractItem
-                name="Marketing Wallet Address"
-                value={data?.ContractAddrs.MarketingWalletAddr}
-                copyable={true}
-              />
-              <ContractItem
-                name="Raffle Wallet Address"
-                value={data?.ContractAddrs.RaffleWalletAddr}
-                copyable={true}
-              />
-              <ContractItem
-                name="Cosmic Signature Staking Wallet Address"
-                value={data?.ContractAddrs.StakingWalletCSTAddr}
-                copyable={true}
-              />
-              <ContractItem
-                name="Random Walk Staking Wallet Address"
-                value={data?.ContractAddrs.StakingWalletRWalkAddr}
-                copyable={true}
-              />
-            </List>
-            <Typography variant="h6" mt={5} mb={3}>
-              Current configuration of the contracts
-            </Typography>
-            <List>
-              <ContractItem name="Price Increase" value="1%" />
-              <ContractItem name="Time Increase" value="0.01%" />
-              <ContractItem
-                name="Prize Percentage"
-                value={`${data.PrizePercentage}%`}
-              />
-              <ContractItem
-                name="Raffle Percentage"
-                value={`${data.RafflePercentage}%`}
-              />
-              <ContractItem
-                name="Staking Percentage"
-                value={`${data.StakignPercentage}%`}
-              />
-              <ContractItem
-                name="Raffle ETH Winners for Bidding"
-                value={data.NumRaffleEthWinnersBidding}
-              />
-              <ContractItem
-                name="Raffle NFT Winners for Bidding"
-                value={data.NumRaffleNFTWinnersBidding}
-              />
-              {/* <ContractItem
+                <Button
+                  variant="contained"
+                  disabled={donateAmount === "0" || donateAmount === ""}
+                  onClick={handleDonate}
+                >
+                  Donate
+                </Button>
+              </Box>
+            )}
+            <ContractItem
+              name="Cosmic Token Address"
+              value={data?.ContractAddrs.CosmicTokenAddr}
+              copyable={true}
+            />
+            <ContractItem
+              name="Cosmic Signature Address"
+              value={data?.ContractAddrs.CosmicSignatureAddr}
+              copyable={true}
+            />
+            <ContractItem
+              name="RandomWalk Address"
+              value={data?.ContractAddrs.RandomWalkAddr}
+              copyable={true}
+            />
+            <ContractItem
+              name="Business Logic Address"
+              value={data?.ContractAddrs.BusinessLogicAddr}
+              copyable={true}
+            />
+            <ContractItem
+              name="Cosmic DAO Address"
+              value={data?.ContractAddrs.CosmicDaoAddr}
+              copyable={true}
+            />
+            <ContractItem
+              name="Charity Wallet Address"
+              value={data?.ContractAddrs.CharityWalletAddr}
+              copyable={true}
+            />
+            <ContractItem
+              name="Marketing Wallet Address"
+              value={data?.ContractAddrs.MarketingWalletAddr}
+              copyable={true}
+            />
+            <ContractItem
+              name="Raffle Wallet Address"
+              value={data?.ContractAddrs.RaffleWalletAddr}
+              copyable={true}
+            />
+            <ContractItem
+              name="Cosmic Signature Staking Wallet Address"
+              value={data?.ContractAddrs.StakingWalletCSTAddr}
+              copyable={true}
+            />
+            <ContractItem
+              name="Random Walk Staking Wallet Address"
+              value={data?.ContractAddrs.StakingWalletRWalkAddr}
+              copyable={true}
+            />
+          </List>
+          <Typography variant="h6" mt={5} mb={3}>
+            Current configuration of the contracts
+          </Typography>
+          <List>
+            <ContractItem name="Price Increase" value="1%" />
+            <ContractItem name="Time Increase" value="0.01%" />
+            <ContractItem
+              name="Prize Percentage"
+              value={`${data.PrizePercentage}%`}
+            />
+            <ContractItem
+              name="Raffle Percentage"
+              value={`${data.RafflePercentage}%`}
+            />
+            <ContractItem
+              name="Staking Percentage"
+              value={`${data.StakignPercentage}%`}
+            />
+            <ContractItem
+              name="Raffle ETH Winners for Bidding"
+              value={data.NumRaffleEthWinnersBidding}
+            />
+            <ContractItem
+              name="Raffle NFT Winners for Bidding"
+              value={data.NumRaffleNFTWinnersBidding}
+            />
+            {/* <ContractItem
                 name="Raffle NFT Winners for Staking CST"
                 value={data.NumRaffleNFTWinnersStakingCST}
               /> */}
-              <ContractItem
-                name="Raffle NFT Winners for Staking Random Walk"
-                value={data.NumRaffleNFTWinnersStakingRWalk}
-              />
-              <ContractItem
-                name="Charity Address"
-                value={charityAddress}
-                copyable={true}
-              />
-              <ContractItem
-                name="Charity Percentage"
-                value={`${data.CharityPercentage}%`}
-              />
+            <ContractItem
+              name="Raffle NFT Winners for Staking Random Walk"
+              value={data.NumRaffleNFTWinnersStakingRWalk}
+            />
+            <ContractItem
+              name="Charity Address"
+              value={charityAddress}
+              copyable={true}
+            />
+            <ContractItem
+              name="Charity Percentage"
+              value={`${data.CharityPercentage}%`}
+            />
 
-              <ContractItem
-                name="Amount of CosmicTokens earned per bid"
-                value={100}
-              />
-              <ContractItem
-                name="Auction Duration"
-                value={formatSeconds(data?.RoundStartCSTAuctionLength)}
-              />
-              <ContractItem
-                name="Timeout to claim prize"
-                value={formatSeconds(data?.TimeoutClaimPrize)}
-              />
-              <ContractItem name="Maximum message length" value={280} />
-              <ContractItem
-                name="Initial increment first bid"
-                value={formatSeconds(data?.InitialSecondsUntilPrize)}
-              />
-              <ContractItem
-                name="Random Walk contract address"
-                value={data?.ContractAddrs.RandomWalkAddr}
-                copyable={true}
-              />
-            </List>
-          </>
-        )}
-      </MainWrapper>
-    </>
+            <ContractItem
+              name="Amount of CosmicTokens earned per bid"
+              value={100}
+            />
+            <ContractItem
+              name="Auction Duration"
+              value={formatSeconds(data?.RoundStartCSTAuctionLength)}
+            />
+            <ContractItem
+              name="Timeout to claim prize"
+              value={formatSeconds(data?.TimeoutClaimPrize)}
+            />
+            <ContractItem name="Maximum message length" value={280} />
+            <ContractItem
+              name="Initial increment first bid"
+              value={formatSeconds(data?.InitialSecondsUntilPrize)}
+            />
+            <ContractItem
+              name="Random Walk contract address"
+              value={data?.ContractAddrs.RandomWalkAddr}
+              copyable={true}
+            />
+          </List>
+        </>
+      )}
+    </MainWrapper>
   );
 };
 

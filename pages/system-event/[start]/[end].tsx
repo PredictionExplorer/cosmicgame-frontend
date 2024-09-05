@@ -115,18 +115,16 @@ const AdminEvent = ({ start, end }) => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          Admin Events
-        </Typography>
-        {loading ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <AdminEventsTable list={events} />
-        )}
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
+        Admin Events
+      </Typography>
+      {loading ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <AdminEventsTable list={events} />
+      )}
+    </MainWrapper>
   );
 };
 

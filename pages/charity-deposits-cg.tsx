@@ -25,18 +25,16 @@ const CharityCGDeposits = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          Cosmic Game Charity Deposits
-        </Typography>
-        {loading ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <CharityDepositTable list={CGDeposits} />
-        )}
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
+        Cosmic Game Charity Deposits
+      </Typography>
+      {loading ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <CharityDepositTable list={CGDeposits} />
+      )}
+    </MainWrapper>
   );
 };
 

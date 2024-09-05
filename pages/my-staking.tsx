@@ -290,196 +290,194 @@ const MyStaking = () => {
   }, [account, nftContract, cosmicGameContract]);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-          mb={8}
-        >
-          My Staking
+    <MainWrapper>
+      <Typography
+        variant="h4"
+        color="primary"
+        gutterBottom
+        textAlign="center"
+        mb={8}
+      >
+        My Staking
+      </Typography>
+      {!account ? (
+        <Typography variant="subtitle1">
+          Please login to Metamask to see your staking.
         </Typography>
-        {!account ? (
-          <Typography variant="subtitle1">
-            Please login to Metamask to see your staking.
-          </Typography>
-        ) : loading ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <>
+      ) : loading ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <>
+          <Box sx={{ display: "flex" }}>
+            <Typography variant="subtitle1" mr={1}>
+              Number of globally staked CST tokens:
+            </Typography>
+            <Typography variant="subtitle1">
+              {data?.MainStats.StakeStatisticsCST.TotalTokensStaked}
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex" }}>
+            <Typography variant="subtitle1" mr={1}>
+              Number of globally staked RandomWalk tokens:
+            </Typography>
+            <Typography variant="subtitle1">
+              {data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked}
+            </Typography>
+          </Box>
+          {data?.MainStats.StakeStatisticsCST.TotalTokensStaked > 0 && (
             <Box sx={{ display: "flex" }}>
               <Typography variant="subtitle1" mr={1}>
-                Number of globally staked CST tokens:
+                Reward (as of now) for staking 1 CST token:
               </Typography>
               <Typography variant="subtitle1">
-                {data?.MainStats.StakeStatisticsCST.TotalTokensStaked}
+                {rewardPerCST.toFixed(6)}
               </Typography>
             </Box>
-            <Box sx={{ display: "flex" }}>
-              <Typography variant="subtitle1" mr={1}>
-                Number of globally staked RandomWalk tokens:
+          )}
+          <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              variant="fullWidth"
+              value={stakingTable}
+              onChange={handleTabChange}
+            >
+              <Tab
+                label={
+                  <Box sx={{ display: "flex" }}>
+                    <Image
+                      src={"/images/CosmicSignatureNFT.png"}
+                      width={60}
+                      height={60}
+                      alt="cosmic signature nft"
+                    />
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        whiteSpace: "nowrap",
+                        textTransform: "none",
+                        ml: 2,
+                      }}
+                    >
+                      Cosmic Signature Staking
+                    </Typography>
+                  </Box>
+                }
+              />
+              <Tab
+                label={
+                  <Box sx={{ display: "flex" }}>
+                    <Image
+                      src={"/images/rwalk.jpg"}
+                      width={94}
+                      height={60}
+                      alt="RandomWalk nft"
+                    />
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        whiteSpace: "nowrap",
+                        textTransform: "none",
+                        ml: 2,
+                      }}
+                    >
+                      Random Walk Staking
+                    </Typography>
+                  </Box>
+                }
+              />
+            </Tabs>
+          </Box>
+          <CustomTabPanel value={stakingTable} index={0}>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mb={2}>
+                Earned Staking Rewards
               </Typography>
-              <Typography variant="subtitle1">
-                {data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked}
+              <UnclaimedStakingRewardsTable
+                list={unclaimedStakingRewards}
+                owner={account}
+                fetchData={fetchCSTData}
+              />
+            </Box>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                Collected Staking Deposits
               </Typography>
+              <CollectedStakingRewardsTable
+                list={collectedStakingRewards}
+                owner={account}
+              />
             </Box>
-            {data?.MainStats.StakeStatisticsCST.TotalTokensStaked > 0 && (
-              <Box sx={{ display: "flex" }}>
-                <Typography variant="subtitle1" mr={1}>
-                  Reward (as of now) for staking 1 CST token:
-                </Typography>
-                <Typography variant="subtitle1">
-                  {rewardPerCST.toFixed(6)}
-                </Typography>
-              </Box>
-            )}
-            <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
-              <Tabs
-                variant="fullWidth"
-                value={stakingTable}
-                onChange={handleTabChange}
-              >
-                <Tab
-                  label={
-                    <Box sx={{ display: "flex" }}>
-                      <Image
-                        src={"/images/CosmicSignatureNFT.png"}
-                        width={60}
-                        height={60}
-                        alt="cosmic signature nft"
-                      />
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          whiteSpace: "nowrap",
-                          textTransform: "none",
-                          ml: 2,
-                        }}
-                      >
-                        Cosmic Signature Staking
-                      </Typography>
-                    </Box>
-                  }
-                />
-                <Tab
-                  label={
-                    <Box sx={{ display: "flex" }}>
-                      <Image
-                        src={"/images/rwalk.jpg"}
-                        width={94}
-                        height={60}
-                        alt="RandomWalk nft"
-                      />
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          whiteSpace: "nowrap",
-                          textTransform: "none",
-                          ml: 2,
-                        }}
-                      >
-                        Random Walk Staking
-                      </Typography>
-                    </Box>
-                  }
-                />
-              </Tabs>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                Staking Reward Tokens
+              </Typography>
+              <StakingRewardMintsTable list={cstMints} />
             </Box>
-            <CustomTabPanel value={stakingTable} index={0}>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mb={2}>
-                  Earned Staking Rewards
-                </Typography>
-                <UnclaimedStakingRewardsTable
-                  list={unclaimedStakingRewards}
-                  owner={account}
-                  fetchData={fetchCSTData}
-                />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Collected Staking Deposits
-                </Typography>
-                <CollectedStakingRewardsTable
-                  list={collectedStakingRewards}
-                  owner={account}
-                />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Staking Reward Tokens
-                </Typography>
-                <StakingRewardMintsTable list={cstMints} />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Stake / Unstake Actions
-                </Typography>
-                <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Tokens Available for Staking
-                </Typography>
-                <CSTokensTable
-                  list={CSTokens}
-                  handleStake={handleStake}
-                  handleStakeMany={handleStakeMany}
-                />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Staked Tokens
-                </Typography>
-                <StakedTokensTable
-                  list={stakedCSTokens}
-                  handleUnstake={handleUnstake}
-                  handleUnstakeMany={handleUnstakeMany}
-                  IsRwalk={false}
-                />
-              </Box>
-            </CustomTabPanel>
-            <CustomTabPanel value={stakingTable} index={1}>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mb={2}>
-                  Staking Reward Tokens
-                </Typography>
-                <StakingRewardMintsTable list={rwlkMints} />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Stake / Unstake Actions
-                </Typography>
-                <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Tokens Available for Staking
-                </Typography>
-                <RWLKNFTTable
-                  list={rwlkTokens}
-                  handleStake={handleStake}
-                  handleStakeMany={handleStakeMany}
-                />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Staked Tokens
-                </Typography>
-                <StakedTokensTable
-                  list={stakedRWLKTokens}
-                  handleUnstake={handleUnstake}
-                  handleUnstakeMany={handleUnstakeMany}
-                  IsRwalk={true}
-                />
-              </Box>
-            </CustomTabPanel>
-          </>
-        )}
-      </MainWrapper>
-    </>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                Stake / Unstake Actions
+              </Typography>
+              <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
+            </Box>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                Tokens Available for Staking
+              </Typography>
+              <CSTokensTable
+                list={CSTokens}
+                handleStake={handleStake}
+                handleStakeMany={handleStakeMany}
+              />
+            </Box>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                Staked Tokens
+              </Typography>
+              <StakedTokensTable
+                list={stakedCSTokens}
+                handleUnstake={handleUnstake}
+                handleUnstakeMany={handleUnstakeMany}
+                IsRwalk={false}
+              />
+            </Box>
+          </CustomTabPanel>
+          <CustomTabPanel value={stakingTable} index={1}>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mb={2}>
+                Staking Reward Tokens
+              </Typography>
+              <StakingRewardMintsTable list={rwlkMints} />
+            </Box>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                Stake / Unstake Actions
+              </Typography>
+              <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
+            </Box>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                Tokens Available for Staking
+              </Typography>
+              <RWLKNFTTable
+                list={rwlkTokens}
+                handleStake={handleStake}
+                handleStakeMany={handleStakeMany}
+              />
+            </Box>
+            <Box>
+              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+                Staked Tokens
+              </Typography>
+              <StakedTokensTable
+                list={stakedRWLKTokens}
+                handleUnstake={handleUnstake}
+                handleUnstakeMany={handleUnstakeMany}
+                IsRwalk={true}
+              />
+            </Box>
+          </CustomTabPanel>
+        </>
+      )}
+    </MainWrapper>
   );
 };
 

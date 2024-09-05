@@ -176,36 +176,29 @@ const MyWallet = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-        >
-          My Cosmic Signature (ERC721) Tokens
+    <MainWrapper>
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
+        My Cosmic Signature (ERC721) Tokens
+      </Typography>
+      {!account ? (
+        <Typography variant="subtitle1">
+          Please login to Metamask to see your tokens.
         </Typography>
-        {!account ? (
-          <Typography variant="subtitle1">
-            Please login to Metamask to see your tokens.
-          </Typography>
-        ) : (
-          <>
-            <Box mt={6}>
-              <Typography variant="h6" mb={2}>
-                Cosmic Signature Tokens I Own
-              </Typography>
-              {CSTList.loading ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <CSTTable list={CSTList.data} />
-              )}
-            </Box>
-          </>
-        )}
-      </MainWrapper>
-    </>
+      ) : (
+        <>
+          <Box mt={6}>
+            <Typography variant="h6" mb={2}>
+              Cosmic Signature Tokens I Own
+            </Typography>
+            {CSTList.loading ? (
+              <Typography variant="h6">Loading...</Typography>
+            ) : (
+              <CSTTable list={CSTList.data} />
+            )}
+          </Box>
+        </>
+      )}
+    </MainWrapper>
   );
 };
 

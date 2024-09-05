@@ -16,24 +16,22 @@ const NFTDonations = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-          mb={4}
-        >
-          NFT Donations
-        </Typography>
-        {nftDonations === null ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <DonatedNFTTable list={nftDonations} handleClaim={null} />
-        )}
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography
+        variant="h4"
+        color="primary"
+        gutterBottom
+        textAlign="center"
+        mb={4}
+      >
+        NFT Donations
+      </Typography>
+      {nftDonations === null ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <DonatedNFTTable list={nftDonations} handleClaim={null} />
+      )}
+    </MainWrapper>
   );
 };
 

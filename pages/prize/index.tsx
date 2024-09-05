@@ -21,21 +21,14 @@ const PrizeWinners = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-        >
-          Main Prize Winnings
-        </Typography>
-        <Box mt={6}>
-          <PrizeTable list={prizeClaims} loading={loading} />
-        </Box>
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
+        Main Prize Winnings
+      </Typography>
+      <Box mt={6}>
+        <PrizeTable list={prizeClaims} loading={loading} />
+      </Box>
+    </MainWrapper>
   );
 };
 

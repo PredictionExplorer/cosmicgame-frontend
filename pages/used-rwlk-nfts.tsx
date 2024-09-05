@@ -73,8 +73,8 @@ const UsedRwlkNftsTable = ({ list }) => {
 };
 
 const UsedRwlkNfts = () => {
-  const [curPage, setCurPage] = useState(1);
   const perPage = 5;
+  const [curPage, setCurPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [list, setList] = useState([]);
 
@@ -94,37 +94,30 @@ const UsedRwlkNfts = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-        >
-          Used RandomWalk NFTs
-        </Typography>
-        <Box mt={6}>
-          {loading ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : list.length > 0 ? (
-            <>
-              <UsedRwlkNftsTable
-                list={list.slice((curPage - 1) * perPage, curPage * perPage)}
-              />
-              <CustomPagination
-                page={curPage}
-                setPage={setCurPage}
-                totalLength={list.length}
-                perPage={perPage}
-              />
-            </>
-          ) : (
-            <Typography variant="h6">No NFTs yet.</Typography>
-          )}
-        </Box>
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
+        Used RandomWalk NFTs
+      </Typography>
+      <Box mt={6}>
+        {loading ? (
+          <Typography variant="h6">Loading...</Typography>
+        ) : list.length > 0 ? (
+          <>
+            <UsedRwlkNftsTable
+              list={list.slice((curPage - 1) * perPage, curPage * perPage)}
+            />
+            <CustomPagination
+              page={curPage}
+              setPage={setCurPage}
+              totalLength={list.length}
+              perPage={perPage}
+            />
+          </>
+        ) : (
+          <Typography variant="h6">No NFTs yet.</Typography>
+        )}
+      </Box>
+    </MainWrapper>
   );
 };
 

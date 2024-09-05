@@ -146,57 +146,55 @@ const UserRaffleETH = ({ address }) => {
   }, [address]);
 
   return (
-    <>
-      <MainWrapper>
-        {invalidAddress ? (
-          <Typography variant="h6">Invalid Address</Typography>
-        ) : (
-          <>
-            <Box mb={4}>
-              <Typography variant="h6" color="primary" component="span" mr={2}>
-                User
+    <MainWrapper>
+      {invalidAddress ? (
+        <Typography variant="h6">Invalid Address</Typography>
+      ) : (
+        <>
+          <Box mb={4}>
+            <Typography variant="h6" color="primary" component="span" mr={2}>
+              User
+            </Typography>
+            <Typography variant="h6" component="span" fontFamily="monospace">
+              {address}
+            </Typography>
+          </Box>
+          <Box mt={4}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h6" lineHeight={1}>
+                Raffle ETH User Won
               </Typography>
-              <Typography variant="h6" component="span" fontFamily="monospace">
-                {address}
-              </Typography>
-            </Box>
-            <Box mt={4}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  mb: 2,
-                }}
-              >
-                <Typography variant="h6" lineHeight={1}>
-                  Raffle ETH User Won
-                </Typography>
-                {status?.ETHRaffleToClaim > 0 && account === address && (
-                  <Box>
-                    <Typography component="span" mr={2}>
-                      Your claimable winnings are{" "}
-                      {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
-                    </Typography>
-                    <Button
-                      onClick={handleAllETHClaim}
-                      variant="contained"
-                      disabled={isClaiming}
-                    >
-                      Claim All
-                    </Button>
-                  </Box>
-                )}
-              </Box>
-              {raffleETHToClaim.loading ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <MyWinningsTable list={raffleETHToClaim.data} />
+              {status?.ETHRaffleToClaim > 0 && account === address && (
+                <Box>
+                  <Typography component="span" mr={2}>
+                    Your claimable winnings are{" "}
+                    {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
+                  </Typography>
+                  <Button
+                    onClick={handleAllETHClaim}
+                    variant="contained"
+                    disabled={isClaiming}
+                  >
+                    Claim All
+                  </Button>
+                </Box>
               )}
             </Box>
-          </>
-        )}
-      </MainWrapper>
-    </>
+            {raffleETHToClaim.loading ? (
+              <Typography variant="h6">Loading...</Typography>
+            ) : (
+              <MyWinningsTable list={raffleETHToClaim.data} />
+            )}
+          </Box>
+        </>
+      )}
+    </MainWrapper>
   );
 };
 

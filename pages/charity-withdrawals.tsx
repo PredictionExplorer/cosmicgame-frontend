@@ -25,20 +25,18 @@ const CharityWithdrawals = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          Withdrawals from Charity Wallet
-        </Typography>
-        {loading ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <>
-            <CharityWithdrawalTable list={withdrawals} />
-          </>
-        )}
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
+        Withdrawals from Charity Wallet
+      </Typography>
+      {loading ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <>
+          <CharityWithdrawalTable list={withdrawals} />
+        </>
+      )}
+    </MainWrapper>
   );
 };
 

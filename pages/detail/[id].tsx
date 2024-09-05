@@ -6,17 +6,15 @@ import { cosmicGameBaseUrl } from "../../services/api";
 
 const Detail = ({ tokenId }) => {
   return (
-    <>
-      <MainWrapper
-        maxWidth={false}
-        style={{
-          paddingLeft: 0,
-          paddingRight: 0,
-        }}
-      >
-        <NFTTrait tokenId={tokenId} />
-      </MainWrapper>
-    </>
+    <MainWrapper
+      maxWidth={false}
+      style={{
+        paddingLeft: 0,
+        paddingRight: 0,
+      }}
+    >
+      <NFTTrait tokenId={tokenId} />
+    </MainWrapper>
   );
 };
 

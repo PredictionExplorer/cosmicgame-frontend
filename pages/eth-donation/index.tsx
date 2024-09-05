@@ -16,24 +16,22 @@ const EthDonations = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-          mb={4}
-        >
-          Direct (ETH) Donations
-        </Typography>
-        {charityDonations === null ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <EthDonationTable list={charityDonations} />
-        )}
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography
+        variant="h4"
+        color="primary"
+        gutterBottom
+        textAlign="center"
+        mb={4}
+      >
+        Direct (ETH) Donations
+      </Typography>
+      {charityDonations === null ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <EthDonationTable list={charityDonations} />
+      )}
+    </MainWrapper>
   );
 };
 

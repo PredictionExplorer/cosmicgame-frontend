@@ -20,31 +20,24 @@ const MarketingRewards = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-        >
-          Marketing Rewards
-        </Typography>
-        <Box mt={6}>
-          {loading ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : (
-            <>
-              <GlobalMarketingRewardsTable list={marketingRewards} />
-              <Typography mt={4}>
-                To earn marketing rewards by promoting our project online,
-                please contact our marketing team.
-              </Typography>
-            </>
-          )}
-        </Box>
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
+        Marketing Rewards
+      </Typography>
+      <Box mt={6}>
+        {loading ? (
+          <Typography variant="h6">Loading...</Typography>
+        ) : (
+          <>
+            <GlobalMarketingRewardsTable list={marketingRewards} />
+            <Typography mt={4}>
+              To earn marketing rewards by promoting our project online, please
+              contact our marketing team.
+            </Typography>
+          </>
+        )}
+      </Box>
+    </MainWrapper>
   );
 };
 

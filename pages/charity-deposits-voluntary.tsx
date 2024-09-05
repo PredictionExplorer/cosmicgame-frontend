@@ -25,18 +25,16 @@ const CharityDepositsVoluntary = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          Voluntary Deposits
-        </Typography>
-        {loading ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <CharityDepositTable list={voluntary} />
-        )}
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
+        Voluntary Deposits
+      </Typography>
+      {loading ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <CharityDepositTable list={voluntary} />
+      )}
+    </MainWrapper>
   );
 };
 

@@ -16,32 +16,25 @@ const Staking = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-        >
-          Staking Rewards for staking Cosmic Signature Token
-        </Typography>
-        <Typography
-          variant="h5"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-          mb={6}
-        >
-          (for all the stakers)
-        </Typography>
-        {stakingRewards === null ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <GlobalStakingRewardsTable list={stakingRewards} />
-        )}
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
+        Staking Rewards for staking Cosmic Signature Token
+      </Typography>
+      <Typography
+        variant="h5"
+        color="primary"
+        gutterBottom
+        textAlign="center"
+        mb={6}
+      >
+        (for all the stakers)
+      </Typography>
+      {stakingRewards === null ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <GlobalStakingRewardsTable list={stakingRewards} />
+      )}
+    </MainWrapper>
   );
 };
 

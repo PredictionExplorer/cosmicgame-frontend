@@ -81,37 +81,30 @@ const NamedNFTs = () => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Typography
-          variant="h4"
-          color="primary"
-          gutterBottom
-          textAlign="center"
-        >
-          Named Cosmic Signature Tokens
-        </Typography>
-        <Box mt={6}>
-          {loading ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : list.length > 0 ? (
-            <>
-              <NamedNFTsTable
-                list={list.slice((curPage - 1) * perPage, curPage * perPage)}
-              />
-              <CustomPagination
-                page={curPage}
-                setPage={setCurPage}
-                totalLength={list.length}
-                perPage={perPage}
-              />
-            </>
-          ) : (
-            <Typography variant="h6">No NFTs yet.</Typography>
-          )}
-        </Box>
-      </MainWrapper>
-    </>
+    <MainWrapper>
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
+        Named Cosmic Signature Tokens
+      </Typography>
+      <Box mt={6}>
+        {loading ? (
+          <Typography variant="h6">Loading...</Typography>
+        ) : list.length > 0 ? (
+          <>
+            <NamedNFTsTable
+              list={list.slice((curPage - 1) * perPage, curPage * perPage)}
+            />
+            <CustomPagination
+              page={curPage}
+              setPage={setCurPage}
+              totalLength={list.length}
+              perPage={perPage}
+            />
+          </>
+        ) : (
+          <Typography variant="h6">No NFTs yet.</Typography>
+        )}
+      </Box>
+    </MainWrapper>
   );
 };
 

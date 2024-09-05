@@ -26,102 +26,132 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
   }, []);
 
   return (
-    <>
-      <MainWrapper>
-        <Box mb={4}>
-          <Typography variant="h5" color="primary" component="span" mr={2}>
-            {`Staking Action for ${
-              IsRwalk ? "RandomWalk" : "Cosmic Signature"
-            } Token`}
-          </Typography>
-        </Box>
-        {loading ? (
-          <Typography variant="h6">Loading...</Typography>
-        ) : (
-          <>
-            <Grid container spacing={4}>
-              <Grid item sm={12} md={6}>
-                <Box sx={{ maxWidth: "400px", mb: 2 }}>
-                  <StyledCard>
-                    <CardActionArea>
-                      <Link
-                        href={
+    <MainWrapper>
+      <Box mb={4}>
+        <Typography variant="h5" color="primary" component="span" mr={2}>
+          {`Staking Action for ${
+            IsRwalk ? "RandomWalk" : "Cosmic Signature"
+          } Token`}
+        </Typography>
+      </Box>
+      {loading ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <>
+          <Grid container spacing={4}>
+            <Grid item sm={12} md={6}>
+              <Box sx={{ maxWidth: "400px", mb: 2 }}>
+                <StyledCard>
+                  <CardActionArea>
+                    <Link
+                      href={
+                        IsRwalk
+                          ? `https://randomwalknft.com/detail/${actionInfo.Stake.TokenId}`
+                          : `/detail/${actionInfo.Stake.TokenId}`
+                      }
+                      sx={{ display: "block" }}
+                    >
+                      <NFTImage
+                        src={
                           IsRwalk
-                            ? `https://randomwalknft.com/detail/${actionInfo.Stake.TokenId}`
-                            : `/detail/${actionInfo.Stake.TokenId}`
+                            ? `https://randomwalknft.s3.us-east-2.amazonaws.com/${actionInfo.Stake.TokenId.toString().padStart(
+                                6,
+                                "0"
+                              )}_black_thumb.jpg`
+                            : `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${actionInfo.Stake.Seed}.png`
                         }
-                        sx={{ display: "block" }}
-                      >
-                        <NFTImage
-                          src={
-                            IsRwalk
-                              ? `https://randomwalknft.s3.us-east-2.amazonaws.com/${actionInfo.Stake.TokenId.toString().padStart(
-                                  6,
-                                  "0"
-                                )}_black_thumb.jpg`
-                              : `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${actionInfo.Stake.Seed}.png`
-                          }
-                        />
-                      </Link>
-                    </CardActionArea>
-                  </StyledCard>
-                </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Action Id:
+                      />
+                    </Link>
+                  </CardActionArea>
+                </StyledCard>
+              </Box>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Action Id:
+                </Typography>
+                &nbsp;
+                <Typography component="span">{actionId}</Typography>
+              </Box>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Staker Address:
+                </Typography>
+                &nbsp;
+                <Link
+                  href={`/user/${actionInfo.Stake.StakerAddr}`}
+                  style={{ color: "inherit", wordBreak: "break-all" }}
+                >
+                  <Typography component="span" fontFamily="monospace">
+                    {actionInfo.Stake.StakerAddr}
                   </Typography>
-                  &nbsp;
-                  <Typography component="span">{actionId}</Typography>
-                </Box>
+                </Link>
+              </Box>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Token Id:
+                </Typography>
+                &nbsp;
+                <Link
+                  href={
+                    IsRwalk
+                      ? `https://randomwalknft.com/detail/${actionInfo.Stake.TokenId}`
+                      : `/detail/${actionInfo.Stake.TokenId}`
+                  }
+                  style={{ color: "inherit" }}
+                >
+                  <Typography component="span">
+                    {actionInfo.Stake.TokenId}
+                  </Typography>
+                </Link>
+              </Box>
+            </Grid>
+            <Grid item sm={12} md={6}>
+              <Box>
+                <Typography variant="h6">Stake</Typography>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
-                    Staker Address:
+                    Staked Datetime:
                   </Typography>
                   &nbsp;
                   <Link
-                    href={`/user/${actionInfo.Stake.StakerAddr}`}
-                    style={{ color: "inherit", wordBreak: "break-all" }}
-                  >
-                    <Typography component="span" fontFamily="monospace">
-                      {actionInfo.Stake.StakerAddr}
-                    </Typography>
-                  </Link>
-                </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Token Id:
-                  </Typography>
-                  &nbsp;
-                  <Link
-                    href={
-                      IsRwalk
-                        ? `https://randomwalknft.com/detail/${actionInfo.Stake.TokenId}`
-                        : `/detail/${actionInfo.Stake.TokenId}`
-                    }
-                    style={{ color: "inherit" }}
+                    color="inherit"
+                    fontSize="inherit"
+                    href={`https://arbiscan.io/tx/${actionInfo.Stake.TxHash}`}
+                    target="__blank"
                   >
                     <Typography component="span">
-                      {actionInfo.Stake.TokenId}
+                      {convertTimestampToDateTime(actionInfo.Stake.TimeStamp)}
                     </Typography>
                   </Link>
                 </Box>
-              </Grid>
-              <Grid item sm={12} md={6}>
+                <Box mb={1}>
+                  <Typography color="primary" component="span">
+                    Number of Staked Tokens:
+                  </Typography>
+                  &nbsp;
+                  <Typography component="span">
+                    {actionInfo.Stake.NumStakedNFTs}
+                  </Typography>
+                </Box>
+              </Box>
+              {actionInfo.Unstake.EvtLogId !== 0 && (
                 <Box>
-                  <Typography variant="h6">Stake</Typography>
+                  <Typography variant="h6">Unstake</Typography>
                   <Box mb={1}>
                     <Typography color="primary" component="span">
-                      Staked Datetime:
+                      Unstaked Datetime:
                     </Typography>
                     &nbsp;
                     <Link
                       color="inherit"
                       fontSize="inherit"
-                      href={`https://arbiscan.io/tx/${actionInfo.Stake.TxHash}`}
+                      href={`https://arbiscan.io/tx/${actionInfo.Unstake.TxHash}`}
                       target="__blank"
                     >
                       <Typography component="span">
-                        {convertTimestampToDateTime(actionInfo.Stake.TimeStamp)}
+                        {convertTimestampToDateTime(
+                          actionInfo.Unstake.TimeStamp
+                        )}
                       </Typography>
                     </Link>
                   </Box>
@@ -131,48 +161,16 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
                     </Typography>
                     &nbsp;
                     <Typography component="span">
-                      {actionInfo.Stake.NumStakedNFTs}
+                      {actionInfo.Unstake.NumStakedNFTs}
                     </Typography>
                   </Box>
                 </Box>
-                {actionInfo.Unstake.EvtLogId !== 0 && (
-                  <Box>
-                    <Typography variant="h6">Unstake</Typography>
-                    <Box mb={1}>
-                      <Typography color="primary" component="span">
-                        Unstaked Datetime:
-                      </Typography>
-                      &nbsp;
-                      <Link
-                        color="inherit"
-                        fontSize="inherit"
-                        href={`https://arbiscan.io/tx/${actionInfo.Unstake.TxHash}`}
-                        target="__blank"
-                      >
-                        <Typography component="span">
-                          {convertTimestampToDateTime(
-                            actionInfo.Unstake.TimeStamp
-                          )}
-                        </Typography>
-                      </Link>
-                    </Box>
-                    <Box mb={1}>
-                      <Typography color="primary" component="span">
-                        Number of Staked Tokens:
-                      </Typography>
-                      &nbsp;
-                      <Typography component="span">
-                        {actionInfo.Unstake.NumStakedNFTs}
-                      </Typography>
-                    </Box>
-                  </Box>
-                )}
-              </Grid>
+              )}
             </Grid>
-          </>
-        )}
-      </MainWrapper>
-    </>
+          </Grid>
+        </>
+      )}
+    </MainWrapper>
   );
 };
 

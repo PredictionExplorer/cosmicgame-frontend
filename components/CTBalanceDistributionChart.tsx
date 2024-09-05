@@ -9,6 +9,7 @@ import {
   ChartValueAxis,
   ChartValueAxisItem,
 } from "@progress/kendo-react-charts";
+import "@progress/kendo-theme-default/dist/all.css";
 import { MARKETING_WALLET_ADDRESS } from "../config/app";
 import { shortenHex } from "../utils";
 import { useEffect, useState } from "react";
