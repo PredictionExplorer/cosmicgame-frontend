@@ -30,7 +30,14 @@ const MyWinningsRow = ({ winning }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(winning.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${winning.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(winning.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link

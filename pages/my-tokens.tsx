@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Link, TableBody, Typography } from "@mui/material";
+import { Box, Link, TableBody, Tooltip, Typography } from "@mui/material";
 import {
   MainWrapper,
   TablePrimary,
@@ -61,16 +61,18 @@ const CSTRow = ({ nft }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/user/${nft.WinnerAddr}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {shortenHex(nft.WinnerAddr, 6)}
-        </Link>
+        <Tooltip title={nft.WinnerAddr}>
+          <Link
+            href={`/user/${nft.WinnerAddr}`}
+            style={{
+              color: "inherit",
+              fontSize: "inherit",
+              fontFamily: "monospace",
+            }}
+          >
+            {shortenHex(nft.WinnerAddr, 6)}
+          </Link>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {nft.Staked ? "Yes" : "No"}
