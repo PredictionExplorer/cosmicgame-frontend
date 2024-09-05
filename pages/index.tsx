@@ -1530,14 +1530,17 @@ const NewHome = () => {
             Distribution of funds on each round
           </Typography>
           {isMobile ? (
-            <Chart transitions={false} style={{ width: "100%", height: "100%" }}>
+            <Chart
+              transitions={false}
+              style={{ width: "100%", height: "100%" }}
+            >
               <ChartLegend visible={false} />
               <ChartArea background="transparent" />
               <ChartCategoryAxis>
                 <ChartCategoryAxisItem color="white" />
               </ChartCategoryAxis>
               <ChartValueAxis>
-                <ChartValueAxisItem visible={false} />
+                <ChartValueAxisItem visible={false} max={80} />
               </ChartValueAxis>
               <ChartSeries>
                 <ChartSeriesItem
@@ -1549,7 +1552,11 @@ const NewHome = () => {
                     visible: true,
                     color: "white",
                     background: "none",
-                    content: (props) => props.value + "%",
+                    content: (props) =>
+                      `${props.value}% (${(
+                        (props.dataItem.value * data?.CosmicGameBalanceEth) /
+                        100
+                      ).toFixed(4)} ETH)`,
                   }}
                 />
               </ChartSeries>

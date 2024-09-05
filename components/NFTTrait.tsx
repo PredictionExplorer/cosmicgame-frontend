@@ -422,9 +422,21 @@ const NFTTrait = ({ tokenId }) => {
               </Typography>
               &nbsp;
               <Typography component="span">
-                {nft.RecordType === 1
-                  ? "Raffle Winner"
-                  : `Round Winner (round #${nft.RoundNum})`}
+                {nft.RecordType === 1 ? (
+                  "Raffle Winner"
+                ) : (
+                  <>
+                    Round Winner (
+                    <Link
+                      href={`/prize/${nft.RoundNum}`}
+                      target="_blank"
+                      color="inherit"
+                    >
+                      Round #{nft.RoundNum}
+                    </Link>
+                    )
+                  </>
+                )}
               </Typography>
             </Box>
             {nft.RecordType === 3 && (
