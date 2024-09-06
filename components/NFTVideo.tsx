@@ -1,12 +1,8 @@
 import React from "react";
 import Image from "next/image";
-
 import { VideoCard, NFTImageWrapper } from "./styled";
 import NFTImage from "./NFTImage";
 
-const handleImageError = (event) => {
-  event.target.src = "/images/qmark.png";
-};
 const NFTVideo = ({ image_thumb, onClick }) => (
   <VideoCard>
     <NFTImageWrapper>

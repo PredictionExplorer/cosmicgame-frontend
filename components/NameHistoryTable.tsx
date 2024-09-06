@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TableBody } from "@mui/material";
+import { Link, TableBody } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -21,7 +21,14 @@ const NameHistoryRow = ({ record }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(record.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${record.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(record.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>
         {record.TokenName ? record.TokenName : "Token name was removed."}

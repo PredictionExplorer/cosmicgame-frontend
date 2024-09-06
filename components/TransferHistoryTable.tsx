@@ -26,6 +26,7 @@ const TransferHistoryRow = ({ record }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
+        {/* todo */}
         {convertTimestampToDateTime(record.TimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell>

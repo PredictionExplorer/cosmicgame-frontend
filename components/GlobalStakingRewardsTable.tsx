@@ -32,6 +32,7 @@ const DetailRow = ({ row }) => {
   return (
     <TablePrimaryRow sx={{ borderBottom: 0 }}>
       <TablePrimaryCell align="left">
+        {/* todo */}
         {convertTimestampToDateTime(row.StakeActionTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">

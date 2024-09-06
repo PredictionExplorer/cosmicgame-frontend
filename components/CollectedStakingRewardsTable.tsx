@@ -20,7 +20,6 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
 import { CustomPagination } from "./CustomPagination";
 

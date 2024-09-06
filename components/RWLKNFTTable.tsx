@@ -33,6 +33,7 @@ const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
     };
     fetchTokenData();
   }, []);
+
   return (
     <TablePrimaryRow
       hover="true"
@@ -120,6 +121,7 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
   if (list.length === 0) {
     return <Typography>No available tokens.</Typography>;
   }
+
   return (
     <>
       <TablePrimaryContainer>

@@ -42,6 +42,7 @@ const StakedTokensRow = ({
     }
     return `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${fileName}.png`;
   };
+
   useEffect(() => {
     const getTokenName = async () => {
       if (IsRwalk) {
@@ -56,9 +57,11 @@ const StakedTokensRow = ({
     };
     getTokenName();
   }, []);
+
   if (!row) {
     return <TablePrimaryRow />;
   }
+
   return (
     <TablePrimaryRow
       hover="true"

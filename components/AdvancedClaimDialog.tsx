@@ -119,7 +119,6 @@ const TokensTable = ({ stakeState, setStakeState }) => {
   const [page, setPage] = useState(1);
   const { cstokens: stakedTokens } = useStakedToken();
   const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  const stakedTokenIds = stakedTokens.map((x) => x.TokenInfo.TokenId);
   const [isAllSelected, setAllSelected] = useState({
     unstake: true,
     claim: true,
@@ -264,43 +263,41 @@ export default function AdvancedClaimDialog({
   };
 
   return (
-    <>
-      <Dialog
-        open={open}
-        fullWidth
-        maxWidth="md"
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+    <Dialog
+      open={open}
+      fullWidth
+      maxWidth="md"
+      onClose={handleClose}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title">
+        Advanced Transaction Build
+      </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={handleClose}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
       >
-        <DialogTitle id="alert-dialog-title">
-          Advanced Transaction Build
-        </DialogTitle>
-        <IconButton
-          aria-label="close"
-          onClick={handleClose}
-          sx={{
-            position: "absolute",
-            right: 8,
-            top: 8,
-            color: (theme) => theme.palette.grey[500],
-          }}
+        <CloseIcon />
+      </IconButton>
+      <DialogContent>
+        <TokensTable stakeState={stakeState} setStakeState={setStakeState} />
+      </DialogContent>
+      <DialogActions>
+        <Button
+          disabled={canSendTransaction()}
+          onClick={handleSendTransaction}
+          sx={{ textTransform: "none" }}
         >
-          <CloseIcon />
-        </IconButton>
-        <DialogContent>
-          <TokensTable stakeState={stakeState} setStakeState={setStakeState} />
-        </DialogContent>
-        <DialogActions>
-          <Button
-            disabled={canSendTransaction()}
-            onClick={handleSendTransaction}
-            sx={{ textTransform: "none" }}
-          >
-            Send Transaction
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+          Send Transaction
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }

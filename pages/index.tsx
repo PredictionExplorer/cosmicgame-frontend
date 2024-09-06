@@ -1815,3 +1815,5 @@ export default NewHome;
 // update donations page
 
 // fix eth-donation page
+// add eth donate feature, simple donation, donation with info
+// fix WinningHistoryTable table

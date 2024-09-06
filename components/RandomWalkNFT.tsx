@@ -1,6 +1,5 @@
 import React from "react";
 import { Typography, CardActionArea, Card } from "@mui/material";
-
 import { useRWLKNFT } from "../hooks/useRWLKNFT";
 import { formatId } from "../utils";
 import { NFTSkeleton, NFTInfoWrapper } from "./styled";

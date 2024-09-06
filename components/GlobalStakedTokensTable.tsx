@@ -22,6 +22,7 @@ const GlobalStakedTokensRow = ({ row, IsRWLK }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
+        {/* todo */}
         {convertTimestampToDateTime(row.StakeTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
