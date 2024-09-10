@@ -1,6 +1,7 @@
 import type { BigNumberish } from '@ethersproject/bignumber'
 import { formatUnits } from '@ethersproject/units'
 import axios from "axios";
+import { CHARITY_WALLET_ADDRESS, MARKETING_WALLET_ADDRESS, RAFFLE_WALLET_ADDRESS, STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '../config/app';
 
 const proxyUrl = "/api/proxy?url=";
 
@@ -151,3 +152,14 @@ export async function getMetadata(url: string) {
     return null;
   }
 }
+
+export const isWalletAddress = (address: string) => {
+  if (address === STAKING_WALLET_CST_ADDRESS) return "Staking CST Wallet";
+  if (address === STAKING_WALLET_RWLK_ADDRESS)
+    return "Staking RandomWalk Wallet";
+  if (address === MARKETING_WALLET_ADDRESS) return "Marketing Wallet";
+  if (address === RAFFLE_WALLET_ADDRESS) return "Raffle Wallet";
+  if (address === CHARITY_WALLET_ADDRESS) return "Charity Wallet";
+  return "";
+};
+

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, TableBody, Typography } from "@mui/material";
+import { Link, TableBody, Tooltip, Typography } from "@mui/material";
 import {
   MainWrapper,
   TablePrimary,
@@ -10,12 +10,13 @@ import {
   TablePrimaryRow,
 } from "../../components/styled";
 import api from "../../services/api";
-import { convertTimestampToDateTime } from "../../utils";
+import { convertTimestampToDateTime, isWalletAddress } from "../../utils";
 import { ethers } from "ethers";
 import { GetServerSidePropsContext } from "next";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "../../components/CustomPagination";
+import { AddressLink } from "../../components/AddressLink";
 
 const CosmicTokenTransferRow = ({ row }) => {
   if (!row) {
@@ -37,26 +38,38 @@ const CosmicTokenTransferRow = ({ row }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          fontFamily="monospace"
-          href={`/user/${row.FromAddr}`}
-          target="__blank"
-        >
-          {row.FromAddr}
-        </Link>
+        {isWalletAddress(row.FromAddr) !== "" ? (
+          <Tooltip title={row.FromAddr}>
+            <Link
+              color="inherit"
+              fontSize="inherit"
+              fontFamily="monospace"
+              href={`/user/${row.FromAddr}`}
+              target="__blank"
+            >
+              {isWalletAddress(row.FromAddr)}
+            </Link>
+          </Tooltip>
+        ) : (
+          <AddressLink address={row.FromAddr} url={`/user/${row.FromAddr}`} />
+        )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          fontFamily="monospace"
-          href={`/user/${row.ToAddr}`}
-          target="__blank"
-        >
-          {row.ToAddr}
-        </Link>
+        {isWalletAddress(row.ToAddr) !== "" ? (
+          <Tooltip title={row.ToAddr}>
+            <Link
+              color="inherit"
+              fontSize="inherit"
+              fontFamily="monospace"
+              href={`/user/${row.ToAddr}`}
+              target="__blank"
+            >
+              {isWalletAddress(row.ToAddr)}
+            </Link>
+          </Tooltip>
+        ) : (
+          <AddressLink address={row.ToAddr} url={`/user/${row.ToAddr}`} />
+        )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {row.ValueFloat.toFixed(2)}
