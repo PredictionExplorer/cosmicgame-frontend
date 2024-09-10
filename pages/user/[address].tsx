@@ -628,6 +628,7 @@ const UserInfo = ({ address }) => {
                 <WinningHistoryTable
                   winningHistory={claimHistory}
                   showClaimedStatus={true}
+                  showWinnerAddr={false}
                 />
               </Box>
               <Box>

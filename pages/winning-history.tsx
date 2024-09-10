@@ -34,6 +34,7 @@ const WinningHistory = () => {
         <WinningHistoryTable
           winningHistory={claimHistory}
           showClaimedStatus={true}
+          showWinnerAddr={false}
         />
       )}
     </MainWrapper>
