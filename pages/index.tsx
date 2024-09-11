@@ -1605,10 +1605,14 @@ const NewHome = () => {
           </Typography>
           <EnduranceChampionsTable championList={championList} />
         </Box>
-        <Box mt={10}>
-          <Typography variant="h6">ETH DONATIONS FOR CURRENT ROUND</Typography>
-          <EthDonationTable list={ethDonations} />
-        </Box>
+        {ethDonations.length > 0 && (
+          <Box mt={10}>
+            <Typography variant="h6">
+              ETH DONATIONS FOR CURRENT ROUND
+            </Typography>
+            <EthDonationTable list={ethDonations} />
+          </Box>
+        )}
         <Box marginTop={10}>
           <Box>
             <Typography variant="h6" component="span">
