@@ -273,14 +273,14 @@ const HistoryTable = ({
       <TablePrimary>
         {!isMobile && (
           <colgroup>
-            <col width="21%" />
-            <col width="13%" />
+            <col width="20%" />
+            <col width="14%" />
             {showWinnerAddr && <col width="17%" />}
             <col width="7%" />
-            <col width="8%" />
+            <col width="11%" />
             <col width="17%" />
-            <col width="9%" />
-            <col width="9%" />
+            <col width="8%" />
+            <col width="7%" />
           </colgroup>
         )}
         <TablePrimaryHead>

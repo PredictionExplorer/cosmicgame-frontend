@@ -86,7 +86,7 @@ const NFTRow = ({ nft, handleClaim }) => {
           </Link>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell align="center">
         {tokenURI?.external_url ? (
           <Link
             href={tokenURI?.external_url}
@@ -99,7 +99,7 @@ const NFTRow = ({ nft, handleClaim }) => {
           nft.NFTTokenId || nft.TokenId
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell sx={{ width: "130px" }}>
         <Link href={tokenURI?.external_url} target="_blank">
           <NFTImage src={tokenURI?.image} />
         </Link>
@@ -143,9 +143,7 @@ const DonatedNFTTable = ({ list, handleClaim }) => {
               <TablePrimaryHeadCell align="left">
                 Token Address
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Token ID
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
               {handleClaim && <TablePrimaryHeadCell></TablePrimaryHeadCell>}
             </Tr>
