@@ -748,7 +748,7 @@ class ApiService {
 
   public async get_donations_both_by_round(round: number) {
     try {
-      const { data } = await axios.get(getAPIUrl(`donations/eth/both/${round}`));
+      const { data } = await axios.get(getAPIUrl(`donations/eth/both/by_round/${round}`));
       return data.CosmicGameDonations;
     } catch (err) {
       console.log(err);
@@ -758,7 +758,7 @@ class ApiService {
 
   public async get_donations_both() {
     try {
-      const { data } = await axios.get(getAPIUrl("donations/eth/both/0"));
+      const { data } = await axios.get(getAPIUrl("donations/eth/both/all"));
       return data.CosmicGameDonations;
     } catch (err) {
       console.log(err);
