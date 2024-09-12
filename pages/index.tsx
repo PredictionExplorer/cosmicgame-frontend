@@ -506,8 +506,14 @@ const NewHome = () => {
     let currentRoundBids = [...bidList].sort(
       (a, b) => a.TimeStamp - b.TimeStamp
     );
-
-    if (currentRoundBids.length < 2) {
+    
+    if (currentRoundBids.length === 1) {
+      return [{
+        bidder: currentRoundBids[0].BidderAddr,
+        championTime: currentTime - currentRoundBids[0].TimeStamp,
+        chronoWarrior: 0,
+      }];
+    } else if (currentRoundBids.length === 0) {
       return [];
     }
 
@@ -1355,7 +1361,7 @@ const NewHome = () => {
                   <Grid item xs={12} sm={4} md={4}>
                     <Typography>Chrono Warrior</Typography>
                   </Grid>
-                  {championList && championList.length > 0 && (
+                  {championList?.length > 0 && (
                     <Grid item xs={12} sm={8} md={8}>
                       <Typography>
                         <Link
