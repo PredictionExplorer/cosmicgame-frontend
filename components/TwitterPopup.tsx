@@ -47,7 +47,9 @@ export default function TwitterPopup({ open, setOpen, setTwitterHandle }) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleConfirm}>Ok</Button>
+        <Button onClick={handleConfirm} disabled={handle === ""}>
+          Ok
+        </Button>
         <Button onClick={handleClose}>Cancel</Button>
       </DialogActions>
     </Dialog>

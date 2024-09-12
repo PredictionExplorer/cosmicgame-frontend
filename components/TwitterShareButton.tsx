@@ -39,7 +39,9 @@ Use my referral link and you'll get an extra $100 if you win: https://cosmicsign
 
   return (
     <>
-      <Button variant="outlined" onClick={handleClick}>Share on Twitter</Button>
+      <Button variant="outlined" onClick={handleClick}>
+        Share on Twitter
+      </Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>What is your Twitter handle?</DialogTitle>
         <DialogContent>
@@ -63,7 +65,9 @@ Use my referral link and you'll get an extra $100 if you win: https://cosmicsign
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleConfirm}>Ok</Button>
+          <Button onClick={handleConfirm} disabled={handle === ""}>
+            Ok
+          </Button>
           <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
       </Dialog>
