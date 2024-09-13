@@ -217,7 +217,7 @@ export const GlobalStakingRewardsTable = ({ list }) => {
             <Tr>
               <TablePrimaryHeadCell sx={{ p: 0 }} />
               <TablePrimaryHeadCell align="left">
-                Stake Datetime
+                Deposit Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staker</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
