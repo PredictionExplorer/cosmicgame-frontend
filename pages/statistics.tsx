@@ -175,7 +175,17 @@ const Statistics = () => {
         <>
           <Typography variant="h5">Current Round Statistics</Typography>
           <Box my={4}>
-            <StatisticsItem title="Current Round" value={data.CurRoundNum} />
+            <StatisticsItem
+              title="Current Round"
+              value={
+                <Link
+                  href={`/prize/${data.CurRoundNum}`}
+                  sx={{ color: "inherit", fontSize: "inherit" }}
+                >
+                  {data.CurRoundNum}
+                </Link>
+              }
+            />
             <StatisticsItem
               title="Round Start Date"
               value={
@@ -209,7 +219,7 @@ const Statistics = () => {
               value={formatSeconds(cstBidData?.AuctionDuration)}
             />
             <StatisticsItem
-              title="Num Bids Since Round Start"
+              title="Number of Bids Since Round Start"
               value={data.CurNumBids}
             />
             <StatisticsItem
@@ -277,7 +287,12 @@ const Statistics = () => {
                 color="primary"
                 sx={{ ml: 1.5 }}
               >
-                ROUND {data.CurRoundNum}
+                <Link
+                  href={`/prize/${data.CurRoundNum}`}
+                  sx={{ fontSize: "inherit" }}
+                >
+                  ROUND {data.CurRoundNum}
+                </Link>
               </Typography>
             </Box>
             <BiddingHistoryTable

@@ -49,7 +49,7 @@ export const UniqueBiddersTable = ({ list }) => {
               <TablePrimaryHeadCell align="left">
                 Bidder Address
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Num Bids</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Number of Bids</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Max Bid (ETH)
               </TablePrimaryHeadCell>

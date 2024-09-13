@@ -506,13 +506,15 @@ const NewHome = () => {
     let currentRoundBids = [...bidList].sort(
       (a, b) => a.TimeStamp - b.TimeStamp
     );
-    
+
     if (currentRoundBids.length === 1) {
-      return [{
-        bidder: currentRoundBids[0].BidderAddr,
-        championTime: currentTime - currentRoundBids[0].TimeStamp,
-        chronoWarrior: 0,
-      }];
+      return [
+        {
+          bidder: currentRoundBids[0].BidderAddr,
+          championTime: currentTime - currentRoundBids[0].TimeStamp,
+          chronoWarrior: 0,
+        },
+      ];
     } else if (currentRoundBids.length === 0) {
       return [];
     }
@@ -1671,7 +1673,14 @@ const NewHome = () => {
               color="primary"
               sx={{ ml: 1 }}
             >
-              (ROUND {data?.CurRoundNum})
+              (
+              <Link
+                href={`/prize/${data?.CurRoundNum}`}
+                sx={{ fontSize: "inherit" }}
+              >
+                ROUND {data?.CurRoundNum}
+              </Link>
+              )
             </Typography>
           </Box>
           <BiddingHistory biddingHistory={curBidList} showRound={false} />
