@@ -53,12 +53,12 @@ const HistoryRow = ({ history, isBanned, showRound }) => {
           ? `${
               history.NumCSTTokensEth && history.NumCSTTokensEth < 1
                 ? history.NumCSTTokensEth?.toFixed(7)
-                : history.NumCSTTokensEth?.toFixed(2)
+                : history.NumCSTTokensEth?.toFixed(4)
             } CST`
           : `${
               history.BidPriceEth && history.BidPriceEth < 1
                 ? history.BidPriceEth?.toFixed(7)
-                : history.BidPriceEth?.toFixed(2)
+                : history.BidPriceEth?.toFixed(4)
             } ETH`}
       </TablePrimaryCell>
       {showRound && (

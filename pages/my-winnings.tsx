@@ -67,7 +67,7 @@ const MyWinningsTable = ({ list }) => {
       <TablePrimary>
         <TablePrimaryHead>
           <Tr>
-            <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="right">
               Amount (ETH)
@@ -107,8 +107,7 @@ const MyWinnings = () => {
         ...isClaiming,
         raffleETH: true,
       });
-      const res = await raffleWalletContract.withdraw();
-      console.log(res);
+      await raffleWalletContract.withdraw();
       setTimeout(() => {
         fetchStatusData();
       }, 3000);
@@ -128,8 +127,7 @@ const MyWinnings = () => {
     try {
       e.target.disabled = true;
       e.target.classList.add("Mui-disabled");
-      const res = await cosmicGameContract.claimDonatedNFT(tokenID);
-      console.log(res);
+      await cosmicGameContract.claimDonatedNFT(tokenID);
       setTimeout(() => {
         fetchStatusData();
       }, 3000);

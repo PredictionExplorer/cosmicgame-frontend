@@ -31,7 +31,12 @@ const CSTRow = ({ nft }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell sx={{ width: "120px" }}>
-        <NFTImage src={getTokenImageURL()} />
+        <Link
+          href={`/detail/${nft.TokenId}`}
+          style={{ color: "inherit", fontSize: "inherit" }}
+        >
+          <NFTImage src={getTokenImageURL()} />
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Link

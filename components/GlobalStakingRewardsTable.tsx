@@ -32,7 +32,6 @@ const DetailRow = ({ row }) => {
   return (
     <TablePrimaryRow sx={{ borderBottom: 0 }}>
       <TablePrimaryCell align="left">
-        {/* todo */}
         {convertTimestampToDateTime(row.StakeActionTimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -83,7 +82,7 @@ const DetailTable = ({ list }) => {
                 Claimed?
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right" sx={{ py: 1 }}>
-                Reward
+                Reward (ETH)
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
@@ -224,14 +223,14 @@ export const GlobalStakingRewardsTable = ({ list }) => {
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Deposited</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Deposited (ETH)</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staked Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Fully Claimed?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
-                Collected Amount
+                Collected Amount (ETH)
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
-                Amount to Claim
+                Amount to Claim (ETH)
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

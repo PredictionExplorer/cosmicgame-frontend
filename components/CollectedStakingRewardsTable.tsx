@@ -82,7 +82,7 @@ const DetailTable = ({ list }) => {
                 Action Id
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right" sx={{ py: 1 }}>
-                Reward
+                Reward (ETH)
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
@@ -206,17 +206,21 @@ export const CollectedStakingRewardsTable = ({ list, owner }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell />
-              <TablePrimaryHeadCell align="left" sx={{ minWidth: "145px" }}>
+              <TablePrimaryHeadCell align="left" sx={{ minWidth: "180px" }}>
                 Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Deposited</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Deposited (ETH)</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Your Stake Rewards</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                Your Stake Rewards (ETH)
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staked Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Collected Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Collected Rewards</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                Collected Rewards (ETH)
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Fully Claimed?</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
@@ -238,7 +242,8 @@ export const CollectedStakingRewardsTable = ({ list, owner }) => {
             .reduce((a, b) => {
               return a + b.YourCollectedAmountEth;
             }, 0)
-            .toFixed(6)}
+            .toFixed(6)}{" "}
+          ETH
         </Typography>
       </Box>
       <CustomPagination
