@@ -1673,14 +1673,7 @@ const NewHome = () => {
               color="primary"
               sx={{ ml: 1 }}
             >
-              (
-              <Link
-                href={`/prize/${data?.CurRoundNum}`}
-                sx={{ fontSize: "inherit" }}
-              >
-                ROUND {data?.CurRoundNum}
-              </Link>
-              )
+              (ROUND {data?.CurRoundNum})
             </Typography>
           </Box>
           <BiddingHistory biddingHistory={curBidList} showRound={false} />
