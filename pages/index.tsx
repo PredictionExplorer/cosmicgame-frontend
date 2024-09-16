@@ -1503,8 +1503,8 @@ const NewHome = () => {
         </Grid>
         <Box>
           <Typography variant="body2" mt={4}>
-            When you bid, you will get 100 tokens as a reward. These tokens
-            allow you to participate in the DAO.
+            When you bid, you will get 100 Cosmic Tokens as a reward. These
+            tokens allow you to participate in the DAO.
           </Typography>
           <Box mt={2}>
             <Typography variant="body2" color="primary" component="span">
@@ -1516,7 +1516,6 @@ const NewHome = () => {
               and these people will win {data?.RafflePercentage}% of the pot.
               Also, {data?.NumRaffleNFTWinnersBidding} additional winners and{" "}
               {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers{" "}
-              {/* and {data?.NumRaffleNFTWinnersStakingCST} Cosmic Token stakers */}
               will be chosen which will receive a Cosmic Signature NFT.
             </Typography>
           </Box>

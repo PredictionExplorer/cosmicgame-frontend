@@ -24,6 +24,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import api from "../services/api";
 import NFTImage from "./NFTImage";
 import { CustomPagination } from "./CustomPagination";
+import { isMobile } from "react-device-detect";
 
 const StakedTokensRow = ({
   row,
@@ -200,6 +201,16 @@ export const StakedTokensTable = ({
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="5%" />
+              <col width="15%" />
+              <col width="20%" />
+              <col width="20%" />
+              <col width="20%" />
+              <col width="20%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell padding="checkbox" align="left">
