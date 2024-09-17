@@ -28,6 +28,9 @@ const EthDonations = () => {
         visible: true,
       });
       setDonateAmount("");
+      setTimeout(() => {
+        fetchCharityDonations();
+      }, 1000);
     } catch (e) {
       console.log(e);
     }
@@ -45,16 +48,20 @@ const EthDonations = () => {
       });
       setDonateAmount("");
       setDonationInformation("");
+      setTimeout(() => {
+        fetchCharityDonations();
+      }, 1000);
     } catch (e) {
       console.log(e);
     }
   };
 
+  const fetchCharityDonations = async () => {
+    const donation = await api.get_donations_both();
+    setCharityDonations(donation);
+  };
+
   useEffect(() => {
-    const fetchCharityDonations = async () => {
-      const donation = await api.get_donations_both();
-      setCharityDonations(donation);
-    };
     fetchCharityDonations();
   }, []);
 
@@ -86,6 +93,7 @@ const EthDonations = () => {
               <Typography>ETH</Typography>
             </Box>
             <TextField
+              value={donateInformation}
               multiline
               rows={5}
               fullWidth
