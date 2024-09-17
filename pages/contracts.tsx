@@ -6,21 +6,16 @@ import {
   useTheme,
   useMediaQuery,
   Box,
-  Button,
-  TextField,
 } from "@mui/material";
 import { MainWrapper } from "../components/styled";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import api from "../services/api";
-import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { formatSeconds } from "../utils";
 import { useNotification } from "../contexts/NotificationContext";
-import { ethers } from "ethers";
 import useContractNoSigner from "../hooks/useContractNoSigner";
 import CHARITY_WALLET_ABI from "../contracts/CharityWallet.json";
 import { CHARITY_WALLET_ADDRESS } from "../config/app";
-import { useActiveWeb3React } from "../hooks/web3";
 import { GetServerSideProps } from "next";
 
 const ContractItem = ({ name, value, copyable = false }) => {
@@ -82,32 +77,11 @@ const ContractItem = ({ name, value, copyable = false }) => {
 const Contracts = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [donateAmount, setDonateAmount] = useState("");
-  const { setNotification } = useNotification();
   const [charityAddress, setCharityAddress] = useState("");
-  const cosmicGameContract = useCosmicGameContract();
   const charityWalletContract = useContractNoSigner(
     CHARITY_WALLET_ADDRESS,
     CHARITY_WALLET_ABI
   );
-  const { account } = useActiveWeb3React();
-
-  const handleDonate = async () => {
-    try {
-      const res = await cosmicGameContract.donate({
-        value: ethers.utils.parseEther(donateAmount),
-      });
-      console.log(res);
-      setNotification({
-        text: `${donateAmount} ETH was donated successfully!`,
-        type: "success",
-        visible: true,
-      });
-      setDonateAmount("");
-    } catch (e) {
-      console.log(e);
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -151,28 +125,6 @@ const Contracts = () => {
               value={data?.ContractAddrs.CosmicGameAddr}
               copyable={true}
             />
-            {!!account && (
-              <Box sx={{ display: "flex", p: 2 }}>
-                <Box sx={{ display: "flex", alignItems: "center", mr: 4 }}>
-                  <TextField
-                    placeholder="Donation amount"
-                    type="number"
-                    value={donateAmount}
-                    size="small"
-                    sx={{ mr: 1 }}
-                    onChange={(e) => setDonateAmount(e.target.value)}
-                  />
-                  <Typography>ETH</Typography>
-                </Box>
-                <Button
-                  variant="contained"
-                  disabled={donateAmount === "0" || donateAmount === ""}
-                  onClick={handleDonate}
-                >
-                  Donate
-                </Button>
-              </Box>
-            )}
             <ContractItem
               name="Cosmic Token Address"
               value={data?.ContractAddrs.CosmicTokenAddr}

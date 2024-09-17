@@ -1,12 +1,55 @@
 import React, { useEffect, useState } from "react";
-import { Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { MainWrapper } from "../../components/styled";
 import api from "../../services/api";
 import EthDonationTable from "../../components/EthDonationTable";
 import { GetServerSideProps } from "next";
+import { useNotification } from "../../contexts/NotificationContext";
+import { useActiveWeb3React } from "../../hooks/web3";
+import useCosmicGameContract from "../../hooks/useCosmicGameContract";
+import { ethers } from "ethers";
 
 const EthDonations = () => {
   const [charityDonations, setCharityDonations] = useState(null);
+  const [donateAmount, setDonateAmount] = useState("");
+  const [donateInformation, setDonationInformation] = useState("");
+  const { setNotification } = useNotification();
+  const { account } = useActiveWeb3React();
+  const cosmicGameContract = useCosmicGameContract();
+
+  const handleDonate = async () => {
+    try {
+      await cosmicGameContract.donate({
+        value: ethers.utils.parseEther(donateAmount),
+      });
+      setNotification({
+        text: `${donateAmount} ETH was donated successfully!`,
+        type: "success",
+        visible: true,
+      });
+      setDonateAmount("");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleDonateWithInfo = async () => {
+    try {
+      await cosmicGameContract.donateWithInfo(donateInformation, {
+        value: ethers.utils.parseEther(donateAmount),
+      });
+      setNotification({
+        text: `${donateAmount} ETH was donated with information successfully!`,
+        type: "success",
+        visible: true,
+      });
+      setDonateAmount("");
+      setDonationInformation("");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     const fetchCharityDonations = async () => {
       const donation = await api.get_donations_both();
@@ -26,10 +69,56 @@ const EthDonations = () => {
       >
         Direct (ETH) Donations
       </Typography>
+
+      {!!account && (
+        <>
+          <Box>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Typography mr={1}>Amount: </Typography>
+              <TextField
+                placeholder="Donation amount"
+                type="number"
+                value={donateAmount}
+                size="small"
+                sx={{ mr: 1 }}
+                onChange={(e) => setDonateAmount(e.target.value)}
+              />
+              <Typography>ETH</Typography>
+            </Box>
+            <TextField
+              multiline
+              rows={5}
+              fullWidth
+              placeholder="Please input the donation information in JSON format."
+              onChange={(e) => setDonationInformation(e.target.value)}
+            />
+          </Box>
+          <Box mt={1} mb={1}>
+            <Button
+              variant="contained"
+              disabled={donateAmount === "0" || donateAmount === ""}
+              onClick={handleDonate}
+              sx={{ mr: 1 }}
+            >
+              Donate
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleDonateWithInfo}
+              disabled={donateAmount === "0" || donateAmount === ""}
+            >
+              Donate with info
+            </Button>
+          </Box>
+        </>
+      )}
       {charityDonations === null ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
-        <EthDonationTable list={charityDonations} />
+        <>
+          <Typography variant="h6">History</Typography>
+          <EthDonationTable list={charityDonations} />
+        </>
       )}
     </MainWrapper>
   );
