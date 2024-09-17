@@ -1,6 +1,7 @@
 import { Link, Tooltip } from "@mui/material";
 import { isMobile } from "react-device-detect";
 import { shortenHex } from "../utils";
+import { MARKETING_WALLET_ADDRESS } from "../config/app";
 
 export const AddressLink = ({ address, url }) => {
   return (
@@ -16,7 +17,9 @@ export const AddressLink = ({ address, url }) => {
               fontFamily: "monospace",
             }}
           >
-            {shortenHex(address, 6)}
+            {address === MARKETING_WALLET_ADDRESS
+              ? "Marketing Wallet"
+              : shortenHex(address, 6)}
           </Link>
         </Tooltip>
       ) : (
@@ -28,7 +31,7 @@ export const AddressLink = ({ address, url }) => {
             fontFamily: "monospace",
           }}
         >
-          {address}
+          {address === MARKETING_WALLET_ADDRESS ? "Marketing Wallet" : address}
         </Link>
       )}
     </>
