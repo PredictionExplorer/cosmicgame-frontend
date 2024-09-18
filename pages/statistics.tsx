@@ -335,7 +335,11 @@ const Statistics = () => {
             />
             <StatisticsItem
               title="Number of Marketing Reward Transactions"
-              value={data.MainStats.NumMktRewards}
+              value={
+                <Link color="inherit" fontSize="inherit" href="/marketing">
+                  {data.MainStats.NumMktRewards}
+                </Link>
+              }
             />
             <StatisticsItem
               title="Amount of ETH collected by the winners from raffles"
@@ -349,7 +353,7 @@ const Statistics = () => {
             )}`}</Typography>
             {data.MainStats.NumCosmicGameDonations > 0 && (
               <StatisticsItem
-                title="Num Cosmic Game Donations"
+                title="Number of Cosmic Game Donations"
                 value={
                   <Link
                     color="inherit"
@@ -437,22 +441,6 @@ const Statistics = () => {
               title="Number of Unique Winners"
               value={data.MainStats.NumUniqueWinners}
             />
-            {/* <StatisticsItem
-                title="Number of Raffle Eth Bidding Winners"
-                value={data.NumRaffleEthWinnersBidding}
-              />
-              <StatisticsItem
-                title="Number of Raffle NFT Bidding Winners"
-                value={data.NumRaffleNFTWinnersBidding}
-              />
-              <StatisticsItem
-                title="Number of Raffle NFT CST Staking Winners"
-                value={data.NumRaffleNFTWinnersStakingCST}
-              />
-              <StatisticsItem
-                title="Number of Raffle NFT Random Walk Staking Winners"
-                value={data.NumRaffleNFTWinnersStakingRWalk}
-              /> */}
             <StatisticsItem
               title="Number of Donated NFTs"
               value={
@@ -462,7 +450,7 @@ const Statistics = () => {
               }
             />
             <StatisticsItem
-              title="Number of Direct ETH Donors"
+              title="Number of Direct ETH Donations"
               value={
                 <Link color="inherit" fontSize="inherit" href="/eth-donation">
                   {data.MainStats.NumDirectDonations}
@@ -708,3 +696,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default Statistics;
+
+// number of unique donors
+// current round eth donation table
