@@ -12,6 +12,7 @@ import StakingWinnerTable from "../../components/StakingWinnerTable";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
 import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
+import EthDonationTable from "../../components/EthDonationTable";
 
 const PrizeInfo = ({ roundNum }) => {
   const cosmicGameContract = useCosmicGameContract();
@@ -19,6 +20,7 @@ const PrizeInfo = ({ roundNum }) => {
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState([]);
   const [bidHistory, setBidHistory] = useState([]);
   const [nftDonations, setNftDonations] = useState([]);
+  const [ethDonations, setEthDonations] = useState([]);
   const [prizeInfo, setPrizeInfo] = useState(null);
   const [stakingRewards, setStakingRewards] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +61,8 @@ const PrizeInfo = ({ roundNum }) => {
         roundNum
       );
       setStakingRewards(stakingRewards);
+      const donation = await api.get_donations_both_by_round(roundNum);
+      setEthDonations(donation);
       setLoading(false);
     };
     fetchData();
@@ -283,6 +287,12 @@ const PrizeInfo = ({ roundNum }) => {
               Bid History
             </Typography>
             <BiddingHistoryTable biddingHistory={bidHistory} />
+          </Box>
+          <Box mt={4}>
+            <Typography variant="h6" lineHeight={1}>
+              ETH Donation History
+            </Typography>
+            <EthDonationTable list={ethDonations} />
           </Box>
           <Box mt={4}>
             <Typography variant="h6" mb={2}>
