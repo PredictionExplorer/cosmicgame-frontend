@@ -19,6 +19,7 @@ import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
 import { CSTTable } from "./my-tokens";
 import { GetServerSideProps } from "next";
+import EthDonationTable from "../components/EthDonationTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -63,6 +64,7 @@ const MyStatistics = () => {
   const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
   const [cstList, setCSTList] = useState([]);
+  const [ethDonations, setEthDonations] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [stakingTable, setStakingTable] = useState(0);
   const { fetchData: fetchStakedToken } = useStakedToken();
@@ -103,6 +105,8 @@ const MyStatistics = () => {
     setMarketingRewards(marketingRewards);
     const cstList = await api.get_cst_tokens_by_user(addr);
     setCSTList(cstList);
+    const donations = await api.get_donations_by_user(addr);
+    setEthDonations(donations);
     fetchStakedToken();
     fetchStatusData();
     setLoading(false);
@@ -523,6 +527,12 @@ const MyStatistics = () => {
               Bid History
             </Typography>
             <BiddingHistoryTable biddingHistory={bidHistory} />
+          </Box>
+          <Box mt={6}>
+            <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+              ETH Donation History
+            </Typography>
+            <EthDonationTable list={ethDonations} />
           </Box>
           <Box>
             <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
