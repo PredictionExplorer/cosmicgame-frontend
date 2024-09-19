@@ -4,6 +4,7 @@ import { MainWrapper } from "../components/styled";
 import api from "../services/api";
 import BiddingHistoryTable from "../components/BiddingHistoryTable";
 import WinningHistoryTable from "../components/WinningHistoryTable";
+import EthDonationTable from "../components/EthDonationTable";
 import { ethers } from "ethers";
 import { formatEthValue } from "../utils";
 import { UnclaimedStakingRewardsTable } from "../components/UnclaimedStakingRewardsTable";
@@ -19,7 +20,6 @@ import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
 import { CSTTable } from "./my-tokens";
 import { GetServerSideProps } from "next";
-import EthDonationTable from "../components/EthDonationTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -131,8 +131,7 @@ const MyStatistics = () => {
     try {
       e.target.disabled = true;
       e.target.classList.add("Mui-disabled");
-      const res = await cosmicGameContract.claimDonatedNFT(tokenID);
-      console.log(res);
+      await cosmicGameContract.claimDonatedNFT(tokenID);
       setTimeout(() => {
         fetchData(account, false);
         fetchDonatedNFTs(false);
@@ -153,8 +152,7 @@ const MyStatistics = () => {
     try {
       setIsClaiming(true);
       const indexList = unclaimedDonatedNFTs.data.map((item) => item.Index);
-      const res = await cosmicGameContract.claimManyDonatedNFTs(indexList);
-      console.log(res);
+      await cosmicGameContract.claimManyDonatedNFTs(indexList);
       setTimeout(() => {
         fetchData(account, false);
         fetchDonatedNFTs(false);
@@ -634,3 +632,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default MyStatistics;
+
+// add number of donations
+// total amount of eth dontaions
