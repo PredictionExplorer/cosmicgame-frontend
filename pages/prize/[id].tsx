@@ -109,6 +109,21 @@ const PrizeInfo = ({ roundNum }) => {
           </Box>
           <Box mb={1}>
             <Typography color="primary" component="span">
+              Prize Token ID:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              <Link
+                href={`/detail/${prizeInfo.TokenId}`}
+                color="inherit"
+                fontSize="inherit"
+              >
+                {prizeInfo.TokenId}
+              </Link>
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
               Winner Address:
             </Typography>
             &nbsp;
@@ -156,7 +171,7 @@ const PrizeInfo = ({ roundNum }) => {
           </Box>
           <Box mb={1}>
             <Typography color="primary" component="span">
-              Endurance Champion rewarded with CST NFT TokenID:
+              Endurance Champion rewarded with CST NFT Token ID:
             </Typography>
             &nbsp;
             <Typography component="span">

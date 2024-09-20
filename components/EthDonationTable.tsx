@@ -14,6 +14,7 @@ import { convertTimestampToDateTime } from "../utils";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 import router from "next/router";
+import { isMobile } from "react-device-detect";
 
 const EthDonationRow = ({ row }) => {
   if (!row) {
@@ -78,6 +79,15 @@ const EthDonationTable = ({ list }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="20%" />
+              <col width="20%" />
+              <col width="20%" />
+              <col width="20%" />
+              <col width="20%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
