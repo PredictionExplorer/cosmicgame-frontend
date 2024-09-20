@@ -175,17 +175,7 @@ const Statistics = () => {
         <>
           <Typography variant="h5">Current Round Statistics</Typography>
           <Box my={4}>
-            <StatisticsItem
-              title="Current Round"
-              value={
-                <Link
-                  href={`/prize/${data.CurRoundNum}`}
-                  sx={{ color: "inherit", fontSize: "inherit" }}
-                >
-                  {data.CurRoundNum}
-                </Link>
-              }
-            />
+            <StatisticsItem title="Current Round" value={data.CurRoundNum} />
             <StatisticsItem
               title="Round Start Date"
               value={
