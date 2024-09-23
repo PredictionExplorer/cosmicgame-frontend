@@ -221,6 +221,26 @@ const Statistics = () => {
               value={data.CurRoundStats.TotalDonatedNFTs}
             />
             <StatisticsItem
+              title="Total Raffle Eth Deposits"
+              value={`${data.CurRoundStats.TotalRaffleEthDepositsEth.toFixed(
+                4
+              )} ETH`}
+            />
+            <StatisticsItem
+              title="Total Raffle NFTs"
+              value={data.CurRoundStats.TotalRaffleNFTs}
+            />
+            <StatisticsItem
+              title="Number of Eth Donations"
+              value={data.CurRoundStats.TotalDonatedCount}
+            />
+            <StatisticsItem
+              title="Amount of Eth Donations"
+              value={`${data.CurRoundStats.TotalDonatedAmountEth.toFixed(
+                4
+              )} ETH`}
+            />
+            <StatisticsItem
               title="Prize Amount"
               value={formatEthValue(data.PrizeAmountEth)}
             />
@@ -434,6 +454,10 @@ const Statistics = () => {
             <StatisticsItem
               title="Number of Unique Winners"
               value={data.MainStats.NumUniqueWinners}
+            />
+            <StatisticsItem
+              title="Number of Unique Eth Donors"
+              value={data.MainStats.NumUniqueDonors}
             />
             <StatisticsItem
               title="Number of Donated NFTs"
