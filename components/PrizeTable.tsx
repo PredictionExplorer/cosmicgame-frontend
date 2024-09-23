@@ -41,19 +41,22 @@ const PrizeRow = ({ prize }) => {
         </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {prize.AmountEth.toFixed(4)} ETH
+        {prize.AmountEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {prize.RoundStats.TotalBids}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
+        {prize.RoundStats.TotalDonatedAmountEth.toFixed(4)}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
         {prize.RoundStats.TotalDonatedNFTs}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {prize.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH
+        {prize.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {prize.StakingDepositAmountEth.toFixed(4)} ETH
+        {prize.StakingDepositAmountEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {prize.RoundStats.TotalRaffleNFTs}
@@ -84,6 +87,7 @@ export const PrizeTable = ({ list, loading }) => {
                 Prize Amount
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Bids</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Donated Amount</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Donated NFTs</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Raffle Deposits

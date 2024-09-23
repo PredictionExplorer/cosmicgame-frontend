@@ -231,7 +231,7 @@ const PrizeInfo = ({ roundNum }) => {
                 </Typography>
                 &nbsp;
                 <Typography component="span">
-                  {prizeInfo.StellarERC20AmountEth} CST
+                  {prizeInfo.StellarERC20AmountEth.toFixed(2)} CST
                 </Typography>
               </Box>
             </>
@@ -243,6 +243,24 @@ const PrizeInfo = ({ roundNum }) => {
             &nbsp;
             <Typography component="span">
               {prizeInfo.RoundStats.TotalBids}
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Number of Eth Donations:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.RoundStats.TotalDonatedCount}
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Total Amount of Eth Donations:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {prizeInfo.RoundStats.TotalDonatedAmountEth.toFixed(4)} ETH
             </Typography>
           </Box>
           <Box mb={1}>
