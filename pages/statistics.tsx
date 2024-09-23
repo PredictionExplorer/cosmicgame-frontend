@@ -26,6 +26,7 @@ import { UniqueStakersRWLKTable } from "../components/UniqueStakersRWLKTable";
 import { CustomPagination } from "../components/CustomPagination";
 import { CTBalanceDistributionChart } from "../components/CTBalanceDistributionChart";
 import { GetServerSideProps } from "next";
+import { UniqueEthDonorsTable } from "../components/UniqueEthDonorsTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -69,6 +70,7 @@ const Statistics = () => {
   const [uniqueWinners, setUniqueWinners] = useState([]);
   const [uniqueCSTStakers, setUniqueCSTStakers] = useState([]);
   const [uniqueRWLKStakers, setUniqueRWLKStakers] = useState([]);
+  const [uniqueDonors, setUniqueDonors] = useState([]);
   const [nftDonations, setNftDonations] = useState([]);
   const [cstDistribution, setCSTDistribution] = useState([]);
   const [ctBalanceDistribution, setCTBalanceDistribution] = useState([]);
@@ -108,6 +110,8 @@ const Statistics = () => {
       setUniqueCSTStakers(uniqueStakers);
       uniqueStakers = await api.get_unique_rwalk_stakers();
       setUniqueRWLKStakers(uniqueStakers);
+      const uniqueDonors = await api.get_unique_donors();
+      setUniqueDonors(uniqueDonors);
       const nftDonations = await api.get_donations_nft_list();
       setNftDonations(nftDonations);
       const distribution = await api.get_cst_distribution();
@@ -479,6 +483,12 @@ const Statistics = () => {
               Unique Winners
             </Typography>
             <UniqueWinnersTable list={uniqueWinners} />
+          </Box>
+          <Box mt={4}>
+            <Typography variant="h6" mb={2}>
+              Unique Eth Donors
+            </Typography>
+            <UniqueEthDonorsTable list={uniqueDonors} />
           </Box>
           <Box mt={4}>
             <Typography variant="h6" mb={2}>

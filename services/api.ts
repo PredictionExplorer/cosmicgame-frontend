@@ -755,6 +755,16 @@ class ApiService {
       return null;
     }
   }
+
+  public async get_unique_donors() {
+    try {
+      const { data } = await axios.get(getAPIUrl("user/unique_donors"));
+      return data.UniqueDonors;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  }
 }
 
 export default new ApiService();
