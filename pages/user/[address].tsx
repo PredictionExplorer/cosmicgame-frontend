@@ -403,7 +403,7 @@ const UserInfo = ({ address }) => {
                 </Typography>
                 &nbsp;
                 <Typography component="span">
-                  {userInfo.TotalCSTokensWon}
+                  {userInfo.TotalDonatedCount}
                 </Typography>
               </Box>
               <Box mb={1}>
@@ -412,7 +412,7 @@ const UserInfo = ({ address }) => {
                 </Typography>
                 &nbsp;
                 <Typography component="span">
-                  {userInfo.TotalCSTokensWon}
+                  {userInfo.TotalDonatedAmountEth.toFixed(2)} ETH
                 </Typography>
               </Box>
               {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
