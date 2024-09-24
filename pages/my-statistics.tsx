@@ -45,6 +45,7 @@ function CustomTabPanel(props: TabPanelProps) {
 
 const MyStatistics = () => {
   const { account } = useActiveWeb3React();
+  const [data, setData] = useState(null);
   const [claimedDonatedNFTs, setClaimedDonatedNFTs] = useState({
     data: [],
     loading: false,
@@ -67,6 +68,7 @@ const MyStatistics = () => {
   const [ethDonations, setEthDonations] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [stakingTable, setStakingTable] = useState(0);
+  const [raffleProbability, setRaffleProbability] = useState(0);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -127,6 +129,29 @@ const MyStatistics = () => {
     setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
   };
 
+  const calculateProbability = async () => {
+    let count = 0;
+    const newData = await api.get_dashboard_info();
+    setData(newData);
+    if (newData) {
+      const round = newData?.CurRoundNum;
+      const bidList = await api.get_bid_list_by_round(round, "desc");
+      bidList.forEach((bid) => {
+        if (bid.BidderAddr === account) {
+          count++;
+        }
+      });
+      const probability =
+        1 -
+        Math.pow(
+          (bidList.length - count) / bidList.length,
+          newData?.NumRaffleEthWinnersBidding +
+            newData?.NumRaffleNFTWinnersBidding
+        );
+      setRaffleProbability(probability);
+    }
+  };
+
   const handleDonatedNFTsClaim = async (e, tokenID) => {
     try {
       e.target.disabled = true;
@@ -176,6 +201,7 @@ const MyStatistics = () => {
     if (account) {
       fetchData(account);
       fetchDonatedNFTs();
+      calculateProbability();
     }
   }, [account]);
 
@@ -346,6 +372,35 @@ const MyStatistics = () => {
               {userInfo.TotalCSTokensWon}
             </Typography>
           </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Number of Eth Donations:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {userInfo.TotalCSTokensWon}
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Total Amount of Eth Donations:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {userInfo.TotalCSTokensWon}
+            </Typography>
+          </Box>
+          {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
+            <Box mb={1}>
+              <Typography color="primary" component="span">
+                Probability of Winning Raffle:
+              </Typography>
+              &nbsp;
+              <Typography component="span">
+                {(raffleProbability * 100).toFixed(2)}%
+              </Typography>
+            </Box>
+          )}
           <Typography mt={3}>
             This account has {userInfo.CosmicTokenNumTransfers} CosmicToken
             (ERC20), click{" "}

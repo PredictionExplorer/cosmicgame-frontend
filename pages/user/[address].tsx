@@ -397,6 +397,24 @@ const UserInfo = ({ address }) => {
                   {userInfo.TotalCSTokensWon}
                 </Typography>
               </Box>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Number of Eth Donations:
+                </Typography>
+                &nbsp;
+                <Typography component="span">
+                  {userInfo.TotalCSTokensWon}
+                </Typography>
+              </Box>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Total Amount of Eth Donations:
+                </Typography>
+                &nbsp;
+                <Typography component="span">
+                  {userInfo.TotalCSTokensWon}
+                </Typography>
+              </Box>
               {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
                 <Box mb={1}>
                   <Typography color="primary" component="span">

@@ -139,17 +139,17 @@ const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
           </Link>
         </TablePrimaryCell>
         <TablePrimaryCell align="center">{row.DepositId}</TablePrimaryCell>
-        <TablePrimaryCell align="right">
+        <TablePrimaryCell align="center">
           {row.DepositAmountEth.toFixed(6)}
         </TablePrimaryCell>
         <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
-        <TablePrimaryCell align="right">
+        <TablePrimaryCell align="center">
           {row.AmountPerTokenEth.toFixed(6)}
         </TablePrimaryCell>
         <TablePrimaryCell align="right">
           {row.YourTokensStaked}
         </TablePrimaryCell>
-        <TablePrimaryCell align="right">
+        <TablePrimaryCell align="center">
           {row.YourClaimableAmountEth.toFixed(6)}
         </TablePrimaryCell>
         <TablePrimaryCell align="right">
@@ -421,18 +421,16 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
                 Datetime
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Deposit Amount
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Deposit Amount (ETH)</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Reward Per Token
+              <TablePrimaryHeadCell>
+                Reward Per Token (ETH)
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Staked Tokens
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Claimable Amount
+              <TablePrimaryHeadCell>
+                Claimable Amount (ETH)
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Claimable Tokens
@@ -461,7 +459,8 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
             .reduce((a, b) => {
               return a + b.YourClaimableAmountEth;
             }, 0)
-            .toFixed(6)}
+            .toFixed(6)}{" "}
+          ETH
         </Typography>
       </Box>
       <Box display="flex" justifyContent="end" mt={1}>
