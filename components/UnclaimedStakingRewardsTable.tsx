@@ -185,7 +185,7 @@ const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
                     </Button>
                     {unstakeableActionIds.length > 0 && (
                       <IconButton size="small" onClick={handleMenuOpen}>
-                        <MoreHorizIcon fontSize="small" />
+                        <MoreHorizIcon fontSize="small" aria-hidden="false" />
                       </IconButton>
                     )}
                   </Box>
