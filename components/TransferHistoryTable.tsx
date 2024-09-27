@@ -26,8 +26,14 @@ const TransferHistoryRow = ({ record }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {/* todo */}
-        {convertTimestampToDateTime(record.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${record.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(record.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip title={record.FromAddr}>
@@ -70,6 +76,7 @@ const TransferHistoryRow = ({ record }) => {
 };
 
 export const TransferHistoryTable = ({ list }) => {
+  console.log(list);
   const perPage = 5;
   const [page, setPage] = useState(1);
   return (

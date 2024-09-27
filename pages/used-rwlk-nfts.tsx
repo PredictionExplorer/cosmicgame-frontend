@@ -23,8 +23,14 @@ const UsedRwlkNftRow = ({ nft }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {/* todo */}
-        {convertTimestampToDateTime(nft.TimeStamp)}
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`https://arbiscan.io/tx/${nft.TxHash}`}
+          target="__blank"
+        >
+          {convertTimestampToDateTime(nft.TimeStamp)}
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
