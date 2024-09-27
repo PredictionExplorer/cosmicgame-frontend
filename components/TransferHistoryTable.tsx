@@ -76,7 +76,6 @@ const TransferHistoryRow = ({ record }) => {
 };
 
 export const TransferHistoryTable = ({ list }) => {
-  console.log(list);
   const perPage = 5;
   const [page, setPage] = useState(1);
   return (

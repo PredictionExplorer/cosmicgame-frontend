@@ -27,6 +27,7 @@ import { CustomPagination } from "../components/CustomPagination";
 import { CTBalanceDistributionChart } from "../components/CTBalanceDistributionChart";
 import { GetServerSideProps } from "next";
 import { UniqueEthDonorsTable } from "../components/UniqueEthDonorsTable";
+import EthDonationTable from "../components/EthDonationTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -72,6 +73,7 @@ const Statistics = () => {
   const [uniqueRWLKStakers, setUniqueRWLKStakers] = useState([]);
   const [uniqueDonors, setUniqueDonors] = useState([]);
   const [nftDonations, setNftDonations] = useState([]);
+  const [ethDonations, setEthDonations] = useState([]);
   const [cstDistribution, setCSTDistribution] = useState([]);
   const [ctBalanceDistribution, setCTBalanceDistribution] = useState([]);
   const [stakingCSTActions, setStakingCSTActions] = useState(null);
@@ -114,6 +116,10 @@ const Statistics = () => {
       setUniqueDonors(uniqueDonors);
       const nftDonations = await api.get_donations_nft_list();
       setNftDonations(nftDonations);
+      const donations = await api.get_donations_both_by_round(
+        data?.CurRoundNum
+      );
+      setEthDonations(donations);
       const distribution = await api.get_cst_distribution();
       setCSTDistribution(distribution);
       const ctbDistribution = await api.get_ct_balances_distribution();
@@ -231,11 +237,11 @@ const Statistics = () => {
               value={data.CurRoundStats.TotalRaffleNFTs}
             />
             <StatisticsItem
-              title="Number of Eth Donations"
+              title="Number of Direct ETH Donations"
               value={data.CurRoundStats.TotalDonatedCount}
             />
             <StatisticsItem
-              title="Amount of Eth Donations"
+              title="Amount of Direct ETH Donations"
               value={`${data.CurRoundStats.TotalDonatedAmountEth.toFixed(
                 4
               )} ETH`}
@@ -291,24 +297,22 @@ const Statistics = () => {
             />
           </Box>
           <Box my={4}>
-            <Box display="flex" alignItems="center" flexWrap="wrap">
-              <Typography variant="h6" component="span">
-                CURRENT ROUND BID HISTORY
-              </Typography>
-              <Typography
-                variant="h6"
-                component="span"
-                color="primary"
-                sx={{ ml: 1 }}
-              >
-                (ROUND {data.CurRoundNum})
-              </Typography>
-            </Box>
+            <Typography variant="h6">BID HISTORY FOR CURRENT ROUND</Typography>
             <BiddingHistoryTable
               biddingHistory={currentRoundBidHistory}
               showRound={false}
             />
           </Box>
+          {ethDonations.length > 0 && (
+            <Box my={4}>
+              <Typography variant="h6">
+                ETH DONATIONS FOR CURRENT ROUND
+              </Typography>
+              <EthDonationTable list={ethDonations} />
+            </Box>
+          )}
+
+          {/* Overall Statistics */}
           <Typography variant="h5">Overall Statistics</Typography>
           <Box mt={4}>
             <StatisticsItem
@@ -456,7 +460,7 @@ const Statistics = () => {
               value={data.MainStats.NumUniqueWinners}
             />
             <StatisticsItem
-              title="Number of Unique Eth Donors"
+              title="Number of Unique ETH Donors"
               value={data.MainStats.NumUniqueDonors}
             />
             <StatisticsItem
@@ -720,6 +724,3 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default Statistics;
-
-// number of unique donors
-// current round eth donation table
