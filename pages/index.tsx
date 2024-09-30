@@ -197,7 +197,11 @@ const NewHome = () => {
               try {
                 const t = token_id - index;
                 const seed = await cosmicSignatureContract.seeds(t);
-                await api.create(t, seed, prize?.TokenId === t);
+                let color = '';
+                if (t === prize?.TokenId) color = 'white';
+                if (t === prize?.EnduranceERC721TokenId) color = 'gold';
+                if (t === prize?.StellarERC721TokenId) color = 'silver';
+                await api.create(t, seed, color);
               } catch (err) {
                 if (err?.data?.message) {
                   const msg = err?.data?.message;
@@ -1828,3 +1832,4 @@ export default NewHome;
 // fix eth-donation page
 // add eth donate feature, simple donation, donation with info
 // add link to top 5 donations
+// fix nft detail with prize type
