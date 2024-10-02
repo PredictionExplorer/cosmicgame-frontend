@@ -447,17 +447,6 @@ const NFTTrait = ({ tokenId }) => {
                 )}
               </Typography>
             </Box>
-            {nft.RecordType === 3 && (
-              <Box mb={3}>
-                <Typography color="primary" component="span">
-                  Prize Amount:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {prizeInfo.AmountEth.toFixed(4)} ETH
-                </Typography>
-              </Box>
-            )}
             {!nft.Staked && !nft.WasUnstaked ? (
               <Typography sx={{ color: "#0f0" }}>
                 The token is eligible for staking.

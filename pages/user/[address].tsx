@@ -69,7 +69,8 @@ const UserInfo = ({ address }) => {
   const [cstList, setCSTList] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [stakingTable, setStakingTable] = useState(0);
-  const [raffleProbability, setRaffleProbability] = useState(0);
+  const [raffleETHProbability, setRaffleETHProbability] = useState(0);
+  const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -142,14 +143,20 @@ const UserInfo = ({ address }) => {
           count++;
         }
       });
-      const probability =
+      let probability =
         1 -
         Math.pow(
           (bidList.length - count) / bidList.length,
-          newData?.NumRaffleEthWinnersBidding +
-            newData?.NumRaffleNFTWinnersBidding
+          newData?.NumRaffleEthWinnersBidding
         );
-      setRaffleProbability(probability);
+      setRaffleETHProbability(probability);
+      probability =
+        1 -
+        Math.pow(
+          (bidList.length - count) / bidList.length,
+          newData?.NumRaffleNFTWinnersBidding
+        );
+      setRaffleNFTProbability(probability);
     }
   };
 
@@ -416,15 +423,26 @@ const UserInfo = ({ address }) => {
                 </Typography>
               </Box>
               {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Probability of Winning Raffle:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
-                    {(raffleProbability * 100).toFixed(2)}%
-                  </Typography>
-                </Box>
+                <>
+                  <Box mb={1}>
+                    <Typography color="primary" component="span">
+                      Probability of Winning ETH:
+                    </Typography>
+                    &nbsp;
+                    <Typography component="span">
+                      {(raffleETHProbability * 100).toFixed(2)}%
+                    </Typography>
+                  </Box>
+                  <Box mb={1}>
+                    <Typography color="primary" component="span">
+                      Probability of Winning NFT:
+                    </Typography>
+                    &nbsp;
+                    <Typography component="span">
+                      {(raffleNFTProbability * 100).toFixed(2)}%
+                    </Typography>
+                  </Box>
+                </>
               )}
               <Typography mt={3}>
                 This account has {userInfo.CosmicTokenNumTransfers} CosmicToken

@@ -1629,10 +1629,8 @@ const NewHome = () => {
           <Typography variant="h6">TOP RAFFLE TICKETS HOLDERS</Typography>
           <RaffleHolderTable
             list={curBidList}
-            numRaffleWinner={
-              data?.NumRaffleEthWinnersBidding +
-              data?.NumRaffleNFTWinnersBidding
-            }
+            numRaffleEthWinner={data?.NumRaffleEthWinnersBidding}
+            numRaffleNFTWinner={data?.NumRaffleNFTWinnersBidding}
           />
         </Box>
         <Box mt={10}>

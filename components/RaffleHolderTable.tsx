@@ -38,13 +38,20 @@ const HolderRow = ({ holder }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{holder.count}</TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {(holder.probability * 100).toFixed(2)}%
+        {(holder.ethProbability * 100).toFixed(2)}%
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {(holder.NFTProbability * 100).toFixed(2)}%
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-const RaffleHolderTable = ({ list, numRaffleWinner }) => {
+const RaffleHolderTable = ({
+  list,
+  numRaffleEthWinner,
+  numRaffleNFTWinner,
+}) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const [holderList, setHolderList] = useState(null);
@@ -66,8 +73,12 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
         .map(([bidderAddr, data]) => ({
           userAddr: bidderAddr,
           count: data,
-          probability:
-            1 - Math.pow((list.length - data) / list.length, numRaffleWinner),
+          ethProbability:
+            1 -
+            Math.pow((list.length - data) / list.length, numRaffleEthWinner),
+          NFTProbability:
+            1 -
+            Math.pow((list.length - data) / list.length, numRaffleNFTWinner),
         }))
         .sort((a, b) => b.count - a.count);
 
@@ -82,11 +93,11 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
 
       return sortedResults;
     };
-    if (numRaffleWinner) {
+    if (numRaffleEthWinner && numRaffleNFTWinner) {
       const holders = groupAndCountByBidderAddr();
       setHolderList(holders);
     }
-  }, [list, numRaffleWinner, account]);
+  }, [list, numRaffleEthWinner, numRaffleNFTWinner, account]);
 
   if (list.length === 0) {
     return <Typography>No holders yet.</Typography>;
@@ -102,8 +113,9 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
               {!isMobile && (
                 <colgroup>
                   <col width="40%" />
-                  <col width="30%" />
-                  <col width="30%" />
+                  <col width="20%" />
+                  <col width="20%" />
+                  <col width="20%" />
                 </colgroup>
               )}
               <TablePrimaryHead>
@@ -115,7 +127,10 @@ const RaffleHolderTable = ({ list, numRaffleWinner }) => {
                     Number of Raffle Tickets
                   </TablePrimaryHeadCell>
                   <TablePrimaryHeadCell align="center">
-                    Probability of Winning
+                    Probability of Winning ETH
+                  </TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="center">
+                    Probability of Winning NFT
                   </TablePrimaryHeadCell>
                 </Tr>
               </TablePrimaryHead>
