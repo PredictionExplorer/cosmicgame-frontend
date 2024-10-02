@@ -425,7 +425,7 @@ const NFTTrait = ({ tokenId }) => {
                 {nft.RecordType === 1 ? (
                   "Raffle Winner"
                 ) : nft.RecordType === 2 ? (
-                  "Random Walk Staking Raffle Winner"
+                  "Staking Winner"
                 ) : nft.RecordType === 3 ? (
                   <>
                     Round Winner (
@@ -443,7 +443,7 @@ const NFTTrait = ({ tokenId }) => {
                 ) : nft.RecordType === 5 ? (
                   "Stellar Spender NFT Winner"
                 ) : (
-                  "Cosmic Signature Staking Raffle Winner"
+                  " "
                 )}
               </Typography>
             </Box>
