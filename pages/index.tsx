@@ -184,7 +184,6 @@ const NewHome = () => {
       let token_id = balance.toNumber() - 1;
       const count =
         data?.NumRaffleNFTWinnersBidding +
-        data?.NumRaffleNFTWinnersBidding +
         data?.NumRaffleNFTWinnersStakingRWalk +
         1;
 
