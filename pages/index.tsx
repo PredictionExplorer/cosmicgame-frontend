@@ -119,7 +119,7 @@ const NewHome = () => {
   const [rwlkId, setRwlkId] = useState(-1);
   const [bidPricePlus, setBidPricePlus] = useState(2);
   const [isBidding, setIsBidding] = useState(false);
-  const [bannerTokenId, setBannerTokenId] = useState("");
+  const [bannerToken, setBannerToken] = useState({ seed: "", id: -1 });
   const [rwlknftIds, setRwlknftIds] = useState([]);
   const [offset, setOffset] = useState(0);
   const [roundStarted, setRoundStarted] = useState("");
@@ -182,13 +182,10 @@ const NewHome = () => {
       await cosmicGameContract.claimPrize({ gasLimit }).then((tx) => tx.wait());
       const balance = await cosmicSignatureContract.totalSupply();
       let token_id = balance.toNumber() - 1;
-      const count =
-        data?.NumRaffleNFTWinnersBidding +
-        data?.NumRaffleNFTWinnersStakingRWalk +
-        1;
-
+      let count = data?.NumRaffleNFTWinnersBidding + 3;
+      if (data && data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked > 0)
+        count += data?.NumRaffleNFTWinnersStakingRWalk;
       setTimeout(async () => {
-        const prize = await fetchPrizeInfo();
         await Promise.all(
           Array(count)
             .fill(1)
@@ -197,9 +194,9 @@ const NewHome = () => {
                 const t = token_id - index;
                 const seed = await cosmicSignatureContract.seeds(t);
                 let color = "";
-                // if (t === prize?.TokenId) color = "amethyst"; // white
-                // if (t === prize?.EnduranceERC721TokenId) color = "fuchsia"; // gold
-                // if (t === prize?.StellarERC721TokenId) color = "sapphire"; // silver
+                // if (t === prize?.TokenId) color = "white"; // white
+                // else if (t === prize?.EnduranceERC721TokenId) color = "gold"; // gold
+                // else if (t === prize?.StellarERC721TokenId) color = "silver"; // silver
                 if (index === count - 1) color = "amethyst";
                 else if (index === count - 2) color = "fuchsia";
                 else if (index === count - 3) color = "sapphire";
@@ -604,8 +601,8 @@ const NewHome = () => {
       setCurBidList(newBidData);
       const nftData = await api.get_donations_nft_by_round(round);
       setDonatedNFTs(nftData);
-      const donations = await api.get_donations_both_by_round(round);
-      setEthDonations(donations);
+      // const donations = await api.get_donations_both_by_round(round);
+      // setEthDonations(donations);
       const champions = getEnduranceChampions(newBidData);
       const sortedChampions = [...champions].sort(
         (a, b) => b.chronoWarrior - a.chronoWarrior
@@ -796,16 +793,16 @@ const NewHome = () => {
     const fetchCSTInfo = async (bannerId) => {
       const res = await api.get_cst_info(bannerId);
       const fileName = `0x${res.TokenInfo.Seed}`;
-      setBannerTokenId(fileName);
+      setBannerToken({ seed: fileName, id: bannerId });
     };
-    if (data && bannerTokenId === "") {
+    if (data && bannerToken.seed === "") {
       if (data?.MainStats.NumCSTokenMints > 0) {
         let bannerId = Math.floor(
           Math.random() * data?.MainStats.NumCSTokenMints
         );
         fetchCSTInfo(bannerId);
       } else if (data?.MainStats.NumCSTokenMints === 0) {
-        setBannerTokenId("sample");
+        setBannerToken({ seed: "sample", id: -1 });
       }
     }
 
@@ -1325,17 +1322,17 @@ const NewHome = () => {
                   <CardActionArea>
                     <Link
                       href={
-                        bannerTokenId
-                          ? `/detail/${bannerTokenId}`
+                        bannerToken.id >= 0
+                          ? `/detail/${bannerToken.id}`
                           : "/detail/sample"
                       }
                       sx={{ display: "block" }}
                     >
                       <NFTImage
                         src={
-                          bannerTokenId === ""
+                          bannerToken.seed === ""
                             ? "/images/qmark.png"
-                            : `https://cosmic-game2.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
+                            : `https://cosmic-game2.s3.us-east-2.amazonaws.com/${bannerToken.seed}.png`
                         }
                       />
                     </Link>
@@ -1765,7 +1762,9 @@ const NewHome = () => {
               <GradientBorder sx={{ p: 2 }}>
                 <Typography variant="subtitle1" textAlign="center">
                   {data?.NumRaffleNFTWinnersBidding +
-                    data?.NumRaffleNFTWinnersStakingRWalk}{" "}
+                    (data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked > 0
+                      ? data?.NumRaffleNFTWinnersStakingRWalk + 3
+                      : 3)}{" "}
                   will receive
                 </Typography>
                 <GradientText variant="h4" textAlign="center">
@@ -1802,9 +1801,9 @@ const NewHome = () => {
       {imageOpen && (
         <Lightbox
           image={
-            bannerTokenId === ""
+            bannerToken.seed === ""
               ? "/images/qmark.png"
-              : `https://cosmic-game2.s3.us-east-2.amazonaws.com/${bannerTokenId}.png`
+              : `https://cosmic-game2.s3.us-east-2.amazonaws.com/${bannerToken.seed}.png`
           }
           title="This is a possible image of the NFT you are going to receive."
           onClose={() => setImageOpen(false)}

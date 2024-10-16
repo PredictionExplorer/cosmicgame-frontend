@@ -153,7 +153,7 @@ const MyStatistics = () => {
         1 -
         Math.pow(
           (bidList.length - count) / bidList.length,
-          newData?.NumRaffleNFTWinnersBidding
+            newData?.NumRaffleNFTWinnersBidding
         );
       setRaffleNFTProbability(probability);
     }
@@ -379,7 +379,7 @@ const MyStatistics = () => {
               {userInfo.TotalCSTokensWon}
             </Typography>
           </Box>
-          <Box mb={1}>
+          {/* <Box mb={1}>
             <Typography color="primary" component="span">
               Number of Eth Donations:
             </Typography>
@@ -396,15 +396,15 @@ const MyStatistics = () => {
             <Typography component="span">
               {userInfo.TotalDonatedAmountEth.toFixed(2)} ETH
             </Typography>
-          </Box>
+          </Box> */}
           {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
             <>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
+            <Box mb={1}>
+              <Typography color="primary" component="span">
                   Probability of Winning ETH:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
+              </Typography>
+              &nbsp;
+              <Typography component="span">
                   {(raffleETHProbability * 100).toFixed(2)}%
                 </Typography>
               </Box>
@@ -415,8 +415,8 @@ const MyStatistics = () => {
                 &nbsp;
                 <Typography component="span">
                   {(raffleNFTProbability * 100).toFixed(2)}%
-                </Typography>
-              </Box>
+              </Typography>
+            </Box>
             </>
           )}
           <Typography mt={3}>
@@ -705,6 +705,3 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default MyStatistics;
-
-// add number of donations
-// total amount of eth dontaions

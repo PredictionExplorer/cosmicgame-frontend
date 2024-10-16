@@ -34,8 +34,8 @@ const UniqueEthDonorsRow = ({ row }) => {
 export const UniqueEthDonorsTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
-  if (list.length === 0) {
-    return <Typography>No bidders yet.</Typography>;
+  if (!list || list.length === 0) {
+    return <Typography>No donors yet.</Typography>;
   }
   return (
     <Box sx={{ width: "100%" }}>

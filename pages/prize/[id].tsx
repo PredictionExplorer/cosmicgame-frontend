@@ -61,8 +61,8 @@ const PrizeInfo = ({ roundNum }) => {
         roundNum
       );
       setStakingRewards(stakingRewards);
-      const donation = await api.get_donations_both_by_round(roundNum);
-      setEthDonations(donation);
+      // const donation = await api.get_donations_both_by_round(roundNum);
+      // setEthDonations(donation);
       setLoading(false);
     };
     fetchData();
@@ -245,7 +245,7 @@ const PrizeInfo = ({ roundNum }) => {
               {prizeInfo.RoundStats.TotalBids}
             </Typography>
           </Box>
-          <Box mb={1}>
+          {/* <Box mb={1}>
             <Typography color="primary" component="span">
               Number of Eth Donations:
             </Typography>
@@ -262,7 +262,7 @@ const PrizeInfo = ({ roundNum }) => {
             <Typography component="span">
               {prizeInfo.RoundStats.TotalDonatedAmountEth.toFixed(4)} ETH
             </Typography>
-          </Box>
+          </Box> */}
           <Box mb={1}>
             <Typography color="primary" component="span">
               Total Donated NFTs:
@@ -321,12 +321,12 @@ const PrizeInfo = ({ roundNum }) => {
             </Typography>
             <BiddingHistoryTable biddingHistory={bidHistory} />
           </Box>
-          <Box mt={4}>
+          {/* <Box mt={4}>
             <Typography variant="h6" lineHeight={1}>
               ETH Donation History
             </Typography>
             <EthDonationTable list={ethDonations} />
-          </Box>
+          </Box> */}
           <Box mt={4}>
             <Typography variant="h6" mb={2}>
               Raffle Winners

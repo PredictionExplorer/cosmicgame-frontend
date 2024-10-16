@@ -116,10 +116,10 @@ const Statistics = () => {
       setUniqueDonors(uniqueDonors);
       const nftDonations = await api.get_donations_nft_list();
       setNftDonations(nftDonations);
-      const donations = await api.get_donations_both_by_round(
-        data?.CurRoundNum
-      );
-      setEthDonations(donations);
+      // const donations = await api.get_donations_both_by_round(
+      //   data?.CurRoundNum
+      // );
+      // setEthDonations(donations);
       const distribution = await api.get_cst_distribution();
       setCSTDistribution(distribution);
       const ctbDistribution = await api.get_ct_balances_distribution();
@@ -236,7 +236,7 @@ const Statistics = () => {
               title="Total Raffle NFTs"
               value={data.CurRoundStats.TotalRaffleNFTs}
             />
-            <StatisticsItem
+            {/* <StatisticsItem
               title="Number of Direct ETH Donations"
               value={data.CurRoundStats.TotalDonatedCount}
             />
@@ -245,7 +245,7 @@ const Statistics = () => {
               value={`${data.CurRoundStats.TotalDonatedAmountEth.toFixed(
                 4
               )} ETH`}
-            />
+            /> */}
             <StatisticsItem
               title="Prize Amount"
               value={formatEthValue(data.PrizeAmountEth)}
@@ -471,7 +471,7 @@ const Statistics = () => {
                 </Link>
               }
             />
-            <StatisticsItem
+            {/* <StatisticsItem
               title="Number of Direct ETH Donations"
               value={
                 <Link color="inherit" fontSize="inherit" href="/eth-donation">
@@ -482,7 +482,7 @@ const Statistics = () => {
             <StatisticsItem
               title="Amount of Direct ETH Donations"
               value={`${data.MainStats.DirectDonationsEth.toFixed(2)} ETH`}
-            />
+            /> */}
             <StatisticsItem
               title="Amount of Cosmic Signature Tokens with assigned name"
               value={
