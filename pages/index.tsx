@@ -1842,13 +1842,12 @@ export default NewHome;
 
 // Todo:
 
-// how-to-play page, hide contract option from header: refactor header
+// hide contract option from header: refactor header
 // add donate button, donor list, add eth-donate list to user detail
 // update site-map and show link
 // add link to user-detail for marketing reward for user
 
 // optimize statistics loading speed
-// file naming scheme to seed from token id
 // system mode changes on statistics page
 // update statistics page with new data
 // get_bid_list_by_round: implement pagination
@@ -1860,4 +1859,3 @@ export default NewHome;
 // fix eth-donation page
 // add eth donate feature, simple donation, donation with info
 // add link to top 5 donations
-// fix nft detail with prize type

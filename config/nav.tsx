@@ -9,19 +9,37 @@ type NavItem = {
 
 const getNAVs = (status, account) => {
   let NAVS: NavItem[] = [
-    { title: "Gallery", route: "/gallery" },
-    { title: "Contracts", route: "/contracts" },
     {
-      title: "Prizes & Rewards",
+      title: "Play",
+      route: "",
+      children: [
+        { title: "How-to-Play", route: "/how-to-play" },
+        { title: "FAQ", route: "/faq" },
+      ],
+    },
+    {
+      title: "Resources",
+      route: "",
+      children: [
+        { title: "Gallery", route: "/gallery" },
+        { title: "Contracts", route: "/contracts" },
+        { title: "Statistics", route: "/statistics" },
+      ],
+    },
+    {
+      title: "Rewards",
       route: "",
       children: [
         { title: "Prizes", route: "/prize" },
-        { title: "Staking", route: "/staking" },
-        { title: "Marketing", route: "/marketing" },
+        { title: "Staking Rewards", route: "/staking" },
+        { title: "Marketing Rewards", route: "/marketing" },
       ],
     },
-    { title: "Statistics", route: "/statistics" },
-    { title: "FAQ", route: "/faq" },
+    {
+      title: "Support",
+      route: "",
+      children: [{ title: "Site-Map", route: "/site-map" }],
+    },
   ];
   if (
     account &&

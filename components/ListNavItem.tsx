@@ -52,6 +52,11 @@ const ListNavItem = (props) => {
           keepMounted
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
+          sx={{
+            "& > .MuiPaper-root": {
+              boxShadow: "0px 0px 3px 0px rgba(0,0,0,0.75)",
+            },
+          }}
         >
           {props.nav.children.map((nav, i) => (
             <MenuItem
