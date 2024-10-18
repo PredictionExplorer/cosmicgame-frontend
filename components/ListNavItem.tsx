@@ -63,6 +63,7 @@ const ListNavItem = (props) => {
               key={i}
               style={{ minWidth: 166 }}
               onClick={handleMenuClose}
+              autoFocus={false}
             >
               <NavLink href={nav.route} sx={{ width: "100%" }}>
                 {nav.title}
