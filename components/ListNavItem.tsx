@@ -52,6 +52,7 @@ const ListNavItem = (props) => {
           keepMounted
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
+          disableAutoFocusItem={true}
           sx={{
             "& > .MuiPaper-root": {
               boxShadow: "0px 0px 3px 0px rgba(0,0,0,0.75)",
@@ -63,7 +64,6 @@ const ListNavItem = (props) => {
               key={i}
               style={{ minWidth: 166 }}
               onClick={handleMenuClose}
-              autoFocus={false}
             >
               <NavLink href={nav.route} sx={{ width: "100%" }}>
                 {nav.title}
