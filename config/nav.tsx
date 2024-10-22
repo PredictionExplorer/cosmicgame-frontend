@@ -20,20 +20,20 @@ const getNAVs = (status, account) => {
       ],
     },
     {
+      title: "Resources",
+      route: "",
+      children: [
+        { title: "Contracts", route: "/contracts" },
+        { title: "Statistics", route: "/statistics" },
+      ],
+    },
+    {
       title: "Help",
       route: "",
       children: [
         { title: "How-to-Play", route: "/how-to-play" },
         { title: "FAQ", route: "/faq" },
         { title: "Site-Map", route: "/site-map" },
-      ],
-    },
-    {
-      title: "Resources",
-      route: "",
-      children: [
-        { title: "Contracts", route: "/contracts" },
-        { title: "Statistics", route: "/statistics" },
       ],
     },
   ];

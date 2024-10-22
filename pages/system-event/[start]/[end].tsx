@@ -17,6 +17,7 @@ import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { ADMIN_EVENTS } from "../../../config/misc";
 import { CustomPagination } from "../../../components/CustomPagination";
+import { isMobile } from "react-device-detect";
 
 const AdminEventsRow = ({ row }) => {
   if (!row) {
@@ -62,7 +63,7 @@ const AdminEventsRow = ({ row }) => {
 };
 
 const AdminEventsTable = ({ list }) => {
-  const perPage = 5;
+  const perPage = 10;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
     return <Typography variant="h6">No events yet.</Typography>;
@@ -71,6 +72,13 @@ const AdminEventsTable = ({ list }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="35%" />
+              <col width="20%" />
+              <col width="45%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Event</TablePrimaryHeadCell>
@@ -117,7 +125,7 @@ const AdminEvent = ({ start, end }) => {
   return (
     <MainWrapper>
       <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-        Admin Events
+        Admin Events in range from {start} to {end}
       </Typography>
       {loading ? (
         <Typography variant="h6">Loading...</Typography>

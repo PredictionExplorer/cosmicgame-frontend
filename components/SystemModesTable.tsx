@@ -36,7 +36,7 @@ const SystemModesRow = ({ row }) => {
           {convertTimestampToDateTime(row.TimeStamp)}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{row.SystemMode}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.SystemMode}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -54,7 +54,7 @@ export const SystemModesTable = ({ list }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Mode</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">Mode</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
