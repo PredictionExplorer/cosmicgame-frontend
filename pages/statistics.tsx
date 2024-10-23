@@ -51,36 +51,41 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
-const StatisticsItem = ({ title, value }) => {
-  return (
-    <Box display="flex" my={1}>
-      <Typography color="primary" width={{ md: "400px", xs: "200px" }} mr={2}>
-        {title}
-      </Typography>
-      <Typography sx={{ flex: 1, wordBreak: "break-all" }}>{value}</Typography>
-    </Box>
-  );
-};
+interface StatisticsItemProps {
+  title: string;
+  value: React.ReactNode;
+}
+
+const StatisticsItem = ({ title, value }: StatisticsItemProps) => (
+  <Box display="flex" my={1}>
+    <Typography color="primary" width={{ md: "400px", xs: "200px" }} mr={2}>
+      {title}
+    </Typography>
+    <Typography sx={{ flex: 1, wordBreak: "break-all" }}>{value}</Typography>
+  </Box>
+);
 
 const Statistics = () => {
   const perPage = 12;
   const [curPage, setCurrentPage] = useState(1);
-  const [data, setData] = useState(null);
-  const [currentRoundBidHistory, setCurrentRoundBidHistory] = useState([]);
-  const [uniqueBidders, setUniqueBidders] = useState([]);
-  const [uniqueWinners, setUniqueWinners] = useState([]);
-  const [uniqueCSTStakers, setUniqueCSTStakers] = useState([]);
-  const [uniqueRWLKStakers, setUniqueRWLKStakers] = useState([]);
-  const [uniqueDonors, setUniqueDonors] = useState([]);
-  const [nftDonations, setNftDonations] = useState([]);
-  const [ethDonations, setEthDonations] = useState([]);
-  const [cstDistribution, setCSTDistribution] = useState([]);
-  const [ctBalanceDistribution, setCTBalanceDistribution] = useState([]);
-  const [stakingCSTActions, setStakingCSTActions] = useState(null);
-  const [stakingRWLKActions, setStakingRWLKActions] = useState(null);
-  const [stakedCSTokens, setStakedCSTokens] = useState(null);
-  const [stakedRWLKTokens, setStakedRWLKTokens] = useState(null);
-  const [systemModeChanges, setSystemModeChanges] = useState(null);
+  const [data, setData] = useState<any>(null);
+  const [currentRoundBidHistory, setCurrentRoundBidHistory] = useState<any[]>(
+    []
+  );
+  const [uniqueBidders, setUniqueBidders] = useState<any[]>([]);
+  const [uniqueWinners, setUniqueWinners] = useState<any[]>([]);
+  const [uniqueCSTStakers, setUniqueCSTStakers] = useState<any[]>([]);
+  const [uniqueRWLKStakers, setUniqueRWLKStakers] = useState<any[]>([]);
+  const [uniqueDonors, setUniqueDonors] = useState<any[]>([]);
+  const [nftDonations, setNftDonations] = useState<any[]>([]);
+  const [ethDonations, setEthDonations] = useState<any[]>([]);
+  const [cstDistribution, setCSTDistribution] = useState<any[]>([]);
+  const [ctBalanceDistribution, setCTBalanceDistribution] = useState<any[]>([]);
+  const [stakingCSTActions, setStakingCSTActions] = useState<any>(null);
+  const [stakingRWLKActions, setStakingRWLKActions] = useState<any>(null);
+  const [stakedCSTokens, setStakedCSTokens] = useState<any>(null);
+  const [stakedRWLKTokens, setStakedRWLKTokens] = useState<any>(null);
+  const [systemModeChanges, setSystemModeChanges] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [cstBidData, setCSTBidData] = useState({
     AuctionDuration: 0,
@@ -89,7 +94,7 @@ const Statistics = () => {
   });
   const [stakingType, setStakingType] = useState(0);
 
-  const handleTabChange = (_event, newValue) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setStakingType(newValue);
   };
 
@@ -98,44 +103,65 @@ const Statistics = () => {
       setLoading(true);
       const data = await api.get_dashboard_info();
       setData(data);
-      const curBidHistory = await api.get_bid_list_by_round(
+
+      // Fetch data that depends on 'data'
+      const curBidHistoryPromise = api.get_bid_list_by_round(
         data?.CurRoundNum,
         "desc"
       );
+
+      // Fetch other data in parallel
+      const [
+        uniqueBiddersData,
+        uniqueWinnersData,
+        uniqueCSTStakersData,
+        uniqueRWLKStakersData,
+        uniqueDonorsData,
+        nftDonationsData,
+        cstDistributionData,
+        ctbDistributionData,
+        stakingCSTActionsData,
+        stakingRWLKActionsData,
+        stakedCSTokensData,
+        stakedRWLKTokensData,
+        sysChangesData,
+      ] = await Promise.all([
+        api.get_unique_bidders(),
+        api.get_unique_winners(),
+        api.get_unique_cst_stakers(),
+        api.get_unique_rwalk_stakers(),
+        api.get_unique_donors(),
+        api.get_donations_nft_list(),
+        api.get_cst_distribution(),
+        api.get_ct_balances_distribution(),
+        api.get_staking_cst_actions(),
+        api.get_staking_rwalk_actions(),
+        api.get_staked_cst_tokens(),
+        api.get_staked_rwalk_tokens(),
+        api.get_system_modelist(),
+      ]);
+
+      const curBidHistory = await curBidHistoryPromise;
+
       setCurrentRoundBidHistory(curBidHistory);
-      let uniqueBidders = await api.get_unique_bidders();
-      uniqueBidders = uniqueBidders.sort((a, b) => b.NumBids - a.NumBids);
-      setUniqueBidders(uniqueBidders);
-      const uniqueWinners = await api.get_unique_winners();
-      setUniqueWinners(uniqueWinners);
-      let uniqueStakers = await api.get_unique_cst_stakers();
-      setUniqueCSTStakers(uniqueStakers);
-      uniqueStakers = await api.get_unique_rwalk_stakers();
-      setUniqueRWLKStakers(uniqueStakers);
-      const uniqueDonors = await api.get_unique_donors();
-      setUniqueDonors(uniqueDonors);
-      const nftDonations = await api.get_donations_nft_list();
-      setNftDonations(nftDonations);
-      // const donations = await api.get_donations_both_by_round(
-      //   data?.CurRoundNum
-      // );
-      // setEthDonations(donations);
-      const distribution = await api.get_cst_distribution();
-      setCSTDistribution(distribution);
-      const ctbDistribution = await api.get_ct_balances_distribution();
-      setCTBalanceDistribution(ctbDistribution);
-      let actions = await api.get_staking_cst_actions();
-      setStakingCSTActions(actions);
-      actions = await api.get_staking_rwalk_actions();
-      setStakingRWLKActions(actions);
-      let tokens = await api.get_staked_cst_tokens();
-      setStakedCSTokens(tokens);
-      tokens = await api.get_staked_rwalk_tokens();
-      setStakedRWLKTokens(tokens);
-      const sysChanges = await api.get_system_modelist();
-      setSystemModeChanges(sysChanges);
+      setUniqueBidders(
+        uniqueBiddersData.sort((a: any, b: any) => b.NumBids - a.NumBids)
+      );
+      setUniqueWinners(uniqueWinnersData);
+      setUniqueCSTStakers(uniqueCSTStakersData);
+      setUniqueRWLKStakers(uniqueRWLKStakersData);
+      setUniqueDonors(uniqueDonorsData);
+      setNftDonations(nftDonationsData);
+      setCSTDistribution(cstDistributionData);
+      setCTBalanceDistribution(ctbDistributionData);
+      setStakingCSTActions(stakingCSTActionsData);
+      setStakingRWLKActions(stakingRWLKActionsData);
+      setStakedCSTokens(stakedCSTokensData);
+      setStakedRWLKTokens(stakedRWLKTokensData);
+      setSystemModeChanges(sysChangesData);
       setLoading(false);
     };
+
     const fetchCSTBidData = async () => {
       let ctData = await api.get_ct_price();
       if (ctData) {
@@ -146,6 +172,7 @@ const Statistics = () => {
         });
       }
     };
+
     fetchData();
     fetchCSTBidData();
 
@@ -157,550 +184,509 @@ const Statistics = () => {
     };
   }, []);
 
-  const renderer = ({ days, hours, minutes, seconds }) => {
+  const renderer = ({ days, hours, minutes, seconds }: any) => {
     let result = "";
-    if (days) {
-      result = `${days}d `;
-    }
-    if (hours || result) {
-      result += `${hours}h `;
-    }
-    if (minutes || result) {
-      result += `${minutes}m `;
-    }
-    if (seconds || result) {
-      result += `${seconds}s`;
-    }
-    if (result !== "") {
-      result += " left";
-    }
+    if (days) result += `${days}d `;
+    if (hours || result) result += `${hours}h `;
+    if (minutes || result) result += `${minutes}m `;
+    if (seconds || result) result += `${seconds}s`;
+    if (result !== "") result += " left";
     return result !== "" && <Typography>{result}</Typography>;
   };
 
+  if (loading || !data) {
+    return (
+      <MainWrapper>
+        <Typography variant="h6">Loading...</Typography>
+      </MainWrapper>
+    );
+  }
+
+  const currentRoundStats = [
+    { title: "Current Round", value: data.CurRoundNum },
+    {
+      title: "Round Start Date",
+      value:
+        data.LastBidderAddr === ZERO_ADDRESS
+          ? "Round isn't started yet."
+          : convertTimestampToDateTime(data.TsRoundStart),
+    },
+    { title: "Current Bid Price", value: formatEthValue(data.BidPriceEth) },
+    {
+      title: "Current Bid Price using RandomWalk",
+      value: formatEthValue(data.BidPriceEth / 2),
+    },
+    {
+      title: "Current Bid Price using CST",
+      value:
+        cstBidData?.CSTPrice > 0
+          ? formatCSTValue(cstBidData?.CSTPrice)
+          : "FREE",
+    },
+    { title: "Elapsed Time", value: formatSeconds(cstBidData?.SecondsElapsed) },
+    {
+      title: "Auction Duration",
+      value: formatSeconds(cstBidData?.AuctionDuration),
+    },
+    { title: "Number of Bids Since Round Start", value: data.CurNumBids },
+    {
+      title: "Total Donated NFTs",
+      value: data.CurRoundStats.TotalDonatedNFTs,
+    },
+    {
+      title: "Total Raffle Eth Deposits",
+      value: `${data.CurRoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH`,
+    },
+    {
+      title: "Total Raffle NFTs",
+      value: data.CurRoundStats.TotalRaffleNFTs,
+    },
+    {
+      title: "Prize Amount",
+      value: formatEthValue(data.PrizeAmountEth),
+    },
+    {
+      title: "Prize Claim Date",
+      value:
+        data.PrizeClaimTs === 0
+          ? "Round isn't started yet."
+          : convertTimestampToDateTime(data.PrizeClaimTs, true),
+    },
+    {
+      title: "Last Bidder",
+      value:
+        data.LastBidderAddr === ZERO_ADDRESS ? (
+          "Round isn't started yet."
+        ) : (
+          <Link
+            sx={{
+              color: "inherit",
+              fontSize: "inherit",
+              fontFamily: "monospace",
+            }}
+            href={`/user/${data.LastBidderAddr}`}
+          >
+            {data.LastBidderAddr}
+          </Link>
+        ),
+    },
+  ];
+
+  const overallStats = [
+    {
+      title: "CosmicGame contract balance",
+      value: `${data.CosmicGameBalanceEth.toFixed(4)} ETH`,
+    },
+    {
+      title: "Num Prizes Given",
+      value: (
+        <Link href="/prize" color="inherit" fontSize="inherit">
+          {data.TotalPrizes}
+        </Link>
+      ),
+    },
+    {
+      title: "Total Cosmic Signature Tokens minted",
+      value: (
+        <Link href="/gallery" color="inherit" fontSize="inherit">
+          {data.MainStats.NumCSTokenMints}
+        </Link>
+      ),
+    },
+    {
+      title: "Total Amount Paid in Main Prizes",
+      value: formatEthValue(data.TotalPrizesPaidAmountEth),
+    },
+    {
+      title: "Total Amount Paid in ETH Raffles",
+      value: formatEthValue(data.MainStats.TotalRaffleEthDeposits),
+    },
+    {
+      title: "Total CST Consumed",
+      value: formatCSTValue(data.MainStats.TotalCSTConsumedEth),
+    },
+    {
+      title: "Total Reward Paid to Marketing Agents with CST",
+      value: formatCSTValue(data.MainStats.TotalMktRewardsEth),
+    },
+    {
+      title: "Number of Marketing Reward Transactions",
+      value: (
+        <Link color="inherit" fontSize="inherit" href="/marketing">
+          {data.MainStats.NumMktRewards}
+        </Link>
+      ),
+    },
+    {
+      title: "Amount of ETH collected by the winners from raffles",
+      value: formatEthValue(data.MainStats.TotalRaffleEthWithdrawn),
+    },
+    {
+      title: "RandomWalk Tokens Used",
+      value: (
+        <Link color="inherit" fontSize="inherit" href="/used-rwlk-nfts">
+          {data.NumRwalkTokensUsed}
+        </Link>
+      ),
+    },
+    {
+      title: "Charity Balance",
+      value: formatEthValue(data.CharityBalanceEth),
+    },
+    {
+      title: "Number of Bids with CST",
+      value: data.MainStats.NumBidsCST,
+    },
+    {
+      title: "Number of Unique Bidders",
+      value: data.MainStats.NumUniqueBidders,
+    },
+    {
+      title: "Number of Unique Winners",
+      value: data.MainStats.NumUniqueWinners,
+    },
+    {
+      title: "Number of Unique ETH Donors",
+      value: data.MainStats.NumUniqueDonors,
+    },
+    {
+      title: "Number of Donated NFTs",
+      value: (
+        <Link color="inherit" fontSize="inherit" href="/nft-donations">
+          {data.NumDonatedNFTs}
+        </Link>
+      ),
+    },
+    {
+      title: "Amount of Cosmic Signature Tokens with assigned name",
+      value: (
+        <Link color="inherit" fontSize="inherit" href="/named-nfts">
+          {data.MainStats.TotalNamedTokens}
+        </Link>
+      ),
+    },
+    {
+      title: "Number of Unique CST Stakers",
+      value: data.MainStats.NumUniqueStakersCST,
+    },
+    {
+      title: "Number of Unique Random Walk Stakers",
+      value: data.MainStats.NumUniqueStakersRWalk,
+    },
+  ];
+
   return (
     <MainWrapper>
-      {loading || !data ? (
-        <Typography variant="h6">Loading...</Typography>
-      ) : (
-        <>
-          <Typography variant="h5">Current Round Statistics</Typography>
-          <Box my={4}>
-            <StatisticsItem title="Current Round" value={data.CurRoundNum} />
-            <StatisticsItem
-              title="Round Start Date"
-              value={
-                data.LastBidderAddr === ZERO_ADDRESS
-                  ? "Round isn't started yet."
-                  : convertTimestampToDateTime(data.TsRoundStart)
-              }
-            />
-            <StatisticsItem
-              title="Current Bid Price"
-              value={formatEthValue(data.BidPriceEth)}
-            />
-            <StatisticsItem
-              title="Current Bid Price using RandomWalk"
-              value={formatEthValue(data.BidPriceEth / 2)}
-            />
-            <StatisticsItem
-              title="Current Bid Price using CST"
-              value={
-                cstBidData?.CSTPrice > 0
-                  ? formatCSTValue(cstBidData?.CSTPrice)
-                  : "FREE"
-              }
-            />
-            <StatisticsItem
-              title="Elapsed Time"
-              value={formatSeconds(cstBidData?.SecondsElapsed)}
-            />
-            <StatisticsItem
-              title="Auction Duration"
-              value={formatSeconds(cstBidData?.AuctionDuration)}
-            />
-            <StatisticsItem
-              title="Number of Bids Since Round Start"
-              value={data.CurNumBids}
-            />
-            <StatisticsItem
-              title="Total Donated NFTs"
-              value={data.CurRoundStats.TotalDonatedNFTs}
-            />
-            <StatisticsItem
-              title="Total Raffle Eth Deposits"
-              value={`${data.CurRoundStats.TotalRaffleEthDepositsEth.toFixed(
-                4
-              )} ETH`}
-            />
-            <StatisticsItem
-              title="Total Raffle NFTs"
-              value={data.CurRoundStats.TotalRaffleNFTs}
-            />
-            {/* <StatisticsItem
-              title="Number of Direct ETH Donations"
-              value={data.CurRoundStats.TotalDonatedCount}
-            />
-            <StatisticsItem
-              title="Amount of Direct ETH Donations"
-              value={`${data.CurRoundStats.TotalDonatedAmountEth.toFixed(
-                4
-              )} ETH`}
-            /> */}
-            <StatisticsItem
-              title="Prize Amount"
-              value={formatEthValue(data.PrizeAmountEth)}
-            />
-            <Box display="flex" flexWrap="wrap" my={1}>
-              <Typography
-                color="primary"
-                width={{ md: "400px", xs: "200px" }}
-                mr={2}
-              >
-                Prize Claim Date
-              </Typography>
-              <Box sx={{ flex: 1 }}>
-                {data.PrizeClaimTs === 0 ? (
-                  <Typography>{"Round isn't started yet."}</Typography>
-                ) : (
-                  <>
-                    <Typography>
-                      {convertTimestampToDateTime(data.PrizeClaimTs, true)}
-                    </Typography>
-                    {data.PrizeClaimTs > Date.now() / 1000 && (
-                      <Countdown
-                        date={data.PrizeClaimTs * 1000}
-                        renderer={renderer}
-                      />
-                    )}
-                  </>
-                )}
-              </Box>
+      <Typography variant="h5">Current Round Statistics</Typography>
+      <Box my={4}>
+        {currentRoundStats.map((item) => (
+          <StatisticsItem
+            key={item.title}
+            title={item.title}
+            value={item.value}
+          />
+        ))}
+        {data.PrizeClaimTs > Date.now() / 1000 && (
+          <Box display="flex" flexWrap="wrap" my={1}>
+            <Typography
+              color="primary"
+              width={{ md: "400px", xs: "200px" }}
+              mr={2}
+            >
+              Time Left
+            </Typography>
+            <Box sx={{ flex: 1 }}>
+              <Countdown date={data.PrizeClaimTs * 1000} renderer={renderer} />
             </Box>
-            <StatisticsItem
-              title="Last Bidder"
-              value={
-                data.LastBidderAddr === ZERO_ADDRESS ? (
-                  "Round isn't started yet."
-                ) : (
-                  <Link
-                    sx={{
-                      color: "inherit",
-                      fontSize: "inherit",
-                      fontFamily: "monospace",
-                    }}
-                    href={`/user/${data.LastBidderAddr}`}
-                  >
-                    {data.LastBidderAddr}
-                  </Link>
-                )
-              }
-            />
           </Box>
-          <Box my={4}>
-            <Typography variant="h6">BID HISTORY FOR CURRENT ROUND</Typography>
-            <BiddingHistoryTable
-              biddingHistory={currentRoundBidHistory}
-              showRound={false}
-            />
-          </Box>
-          {ethDonations.length > 0 && (
-            <Box my={4}>
-              <Typography variant="h6">
-                ETH DONATIONS FOR CURRENT ROUND
-              </Typography>
-              <EthDonationTable list={ethDonations} />
-            </Box>
-          )}
-
-          {/* Overall Statistics */}
-          <Typography variant="h5">Overall Statistics</Typography>
-          <Box mt={4}>
-            <StatisticsItem
-              title="CosmicGame contract balance"
-              value={`${data.CosmicGameBalanceEth.toFixed(4)} ETH`}
-            />
-            <StatisticsItem
-              title="Num Prizes Given"
-              value={
-                <Link href="/prize" color="inherit" fontSize="inherit">
-                  {data.TotalPrizes}
-                </Link>
-              }
-            />
-            <StatisticsItem
-              title="Total Cosmic Signature Tokens minted"
-              value={
-                <Link href="/gallery" color="inherit" fontSize="inherit">
-                  {data.MainStats.NumCSTokenMints}
-                </Link>
-              }
-            />
-            <StatisticsItem
-              title="Total Amount Paid in Main Prizes"
-              value={formatEthValue(data.TotalPrizesPaidAmountEth)}
-            />
-            <StatisticsItem
-              title="Total Amount Paid in ETH Raffles"
-              value={formatEthValue(data.MainStats.TotalRaffleEthDeposits)}
-            />
-            <StatisticsItem
-              title="Total CST Consumed"
-              value={formatCSTValue(data.MainStats.TotalCSTConsumedEth)}
-            />
-            <StatisticsItem
-              title="Total Reward Paid to Marketing Agents with CST"
-              value={formatCSTValue(data.MainStats.TotalMktRewardsEth)}
-            />
-            <StatisticsItem
-              title="Number of Marketing Reward Transactions"
-              value={
-                <Link color="inherit" fontSize="inherit" href="/marketing">
-                  {data.MainStats.NumMktRewards}
-                </Link>
-              }
-            />
-            <StatisticsItem
-              title="Amount of ETH collected by the winners from raffles"
-              value={formatEthValue(data.MainStats.TotalRaffleEthWithdrawn)}
-            />
-            <Typography color="primary">{`${
+        )}
+      </Box>
+      <Box my={4}>
+        <Typography variant="h6">BID HISTORY FOR CURRENT ROUND</Typography>
+        <BiddingHistoryTable
+          biddingHistory={currentRoundBidHistory}
+          showRound={false}
+        />
+      </Box>
+      {ethDonations.length > 0 && (
+        <Box my={4}>
+          <Typography variant="h6">ETH DONATIONS FOR CURRENT ROUND</Typography>
+          <EthDonationTable list={ethDonations} />
+        </Box>
+      )}
+      <Typography variant="h5">Overall Statistics</Typography>
+      <Box mt={4}>
+        {overallStats.map((item) => (
+          <StatisticsItem
+            key={item.title}
+            title={item.title}
+            value={item.value}
+          />
+        ))}
+        {data.MainStats.NumWinnersWithPendingRaffleWithdrawal > 0 && (
+          <Typography color="primary">
+            {`${
               data.MainStats.NumWinnersWithPendingRaffleWithdrawal
-            } winners are yet to withdraw funds totalling an amount of ${formatEthValue(
+            } winners are yet to withdraw funds totaling an amount of ${formatEthValue(
               data.MainStats.TotalRaffleEthDeposits -
                 data.MainStats.TotalRaffleEthWithdrawn
-            )}`}</Typography>
-            {data.MainStats.NumCosmicGameDonations > 0 && (
-              <StatisticsItem
-                title="Number of Cosmic Game Donations"
-                value={
-                  <Link
-                    color="inherit"
-                    fontSize="inherit"
-                    href="/charity-deposits-cg"
-                  >
-                    {data.MainStats.NumCosmicGameDonations}
-                  </Link>
-                }
-              />
-            )}
-            {data.MainStats.SumCosmicGameDonationsEth > 0 && (
-              <StatisticsItem
-                title="Sum of Cosmic Game Donations"
-                value={
-                  <Link
-                    color="inherit"
-                    fontSize="inherit"
-                    href="/charity-deposits-cg"
-                  >
-                    {formatEthValue(data.MainStats.SumCosmicGameDonationsEth)}
-                  </Link>
-                }
-              />
-            )}
-            {data.SumVoluntaryDonationsEth > 0 && (
-              <StatisticsItem
-                title="Voluntary Donations Received"
-                value={
-                  <Link
-                    color="inherit"
-                    fontSize="inherit"
-                    href="/charity-deposits-voluntary"
-                  >
-                    {`${
-                      data.NumVoluntaryDonations
-                    } totalling ${data.SumVoluntaryDonationsEth.toFixed(
-                      4
-                    )} ETH`}
-                  </Link>
-                }
-              />
-            )}
-            {data.MainStats.NumWithdrawals > 0 && (
-              <>
-                <StatisticsItem
-                  title="Withdrawals from Charity Wallet"
-                  value={
-                    <Link
-                      color="inherit"
-                      fontSize="inherit"
-                      href="/charity-withdrawals"
-                    >
-                      {data.MainStats.NumWithdrawals}
-                    </Link>
-                  }
-                />
-                <StatisticsItem
-                  title="Total amount withdrawn from Charity Wallet"
-                  value={formatEthValue(data.MainStats.SumWithdrawals)}
-                />
-              </>
-            )}
+            )}`}
+          </Typography>
+        )}
+        {data.MainStats.NumCosmicGameDonations > 0 && (
+          <>
             <StatisticsItem
-              title="RandomWalk Tokens Used"
+              title="Number of Cosmic Game Donations"
               value={
-                <Link color="inherit" fontSize="inherit" href="/used-rwlk-nfts">
-                  {data.NumRwalkTokensUsed}
+                <Link
+                  color="inherit"
+                  fontSize="inherit"
+                  href="/charity-deposits-cg"
+                >
+                  {data.MainStats.NumCosmicGameDonations}
                 </Link>
               }
             />
             <StatisticsItem
-              title="Charity Balance"
-              value={formatEthValue(data.CharityBalanceEth)}
-            />
-            <StatisticsItem
-              title="Number of Bids with CST"
-              value={data.MainStats.NumBidsCST}
-            />
-            <StatisticsItem
-              title="Number of Unique Bidders"
-              value={data.MainStats.NumUniqueBidders}
-            />
-            <StatisticsItem
-              title="Number of Unique Winners"
-              value={data.MainStats.NumUniqueWinners}
-            />
-            <StatisticsItem
-              title="Number of Unique ETH Donors"
-              value={data.MainStats.NumUniqueDonors}
-            />
-            <StatisticsItem
-              title="Number of Donated NFTs"
+              title="Sum of Cosmic Game Donations"
               value={
-                <Link color="inherit" fontSize="inherit" href="/nft-donations">
-                  {data.NumDonatedNFTs}
+                <Link
+                  color="inherit"
+                  fontSize="inherit"
+                  href="/charity-deposits-cg"
+                >
+                  {formatEthValue(data.MainStats.SumCosmicGameDonationsEth)}
                 </Link>
               }
             />
-            {/* <StatisticsItem
-              title="Number of Direct ETH Donations"
-              value={
-                <Link color="inherit" fontSize="inherit" href="/eth-donation">
-                  {data.MainStats.NumDirectDonations}
-                </Link>
-              }
-            />
+          </>
+        )}
+        {data.SumVoluntaryDonationsEth > 0 && (
+          <StatisticsItem
+            title="Voluntary Donations Received"
+            value={
+              <Link
+                color="inherit"
+                fontSize="inherit"
+                href="/charity-deposits-voluntary"
+              >
+                {`${
+                  data.NumVoluntaryDonations
+                } totaling ${data.SumVoluntaryDonationsEth.toFixed(4)} ETH`}
+              </Link>
+            }
+          />
+        )}
+        {data.MainStats.NumWithdrawals > 0 && (
+          <>
             <StatisticsItem
-              title="Amount of Direct ETH Donations"
-              value={`${data.MainStats.DirectDonationsEth.toFixed(2)} ETH`}
-            /> */}
-            <StatisticsItem
-              title="Amount of Cosmic Signature Tokens with assigned name"
+              title="Withdrawals from Charity Wallet"
               value={
-                <Link color="inherit" fontSize="inherit" href="/named-nfts">
-                  {data.MainStats.TotalNamedTokens}
+                <Link
+                  color="inherit"
+                  fontSize="inherit"
+                  href="/charity-withdrawals"
+                >
+                  {data.MainStats.NumWithdrawals}
                 </Link>
               }
             />
             <StatisticsItem
-              title="Number of Unique CST Stakers"
-              value={data.MainStats.NumUniqueStakersCST}
+              title="Total amount withdrawn from Charity Wallet"
+              value={formatEthValue(data.MainStats.SumWithdrawals)}
             />
-            <StatisticsItem
-              title="Number of Unique Random Walk Stakers"
-              value={data.MainStats.NumUniqueStakersRWalk}
+          </>
+        )}
+      </Box>
+      <Box mt={4}>
+        <Typography variant="h6" mb={2}>
+          Unique Bidders
+        </Typography>
+        <UniqueBiddersTable list={uniqueBidders} />
+      </Box>
+      <Box mt={4}>
+        <Typography variant="h6" mb={2}>
+          Unique Winners
+        </Typography>
+        <UniqueWinnersTable list={uniqueWinners} />
+      </Box>
+      <Box mt={4}>
+        <Typography variant="h6" mb={2}>
+          Unique Eth Donors
+        </Typography>
+        <UniqueEthDonorsTable list={uniqueDonors} />
+      </Box>
+      <Box mt={4}>
+        <Typography variant="h6" mb={2}>
+          Donated Token Distribution per Contract Address
+        </Typography>
+        <DonatedNFTDistributionTable
+          list={data.MainStats.DonatedTokenDistribution}
+        />
+      </Box>
+      <Box mt={4}>
+        <Typography variant="h6" mb={2}>
+          Cosmic Signature Token (ERC721) Distribution
+        </Typography>
+        <CSTokenDistributionTable list={cstDistribution} />
+      </Box>
+      <Box mt={4}>
+        <Typography variant="h6" mb={2}>
+          Cosmic Token (ERC20) Balance Distribution
+        </Typography>
+        <CTBalanceDistributionChart list={ctBalanceDistribution} />
+      </Box>
+      <Box mt={4}>
+        <CTBalanceDistributionTable list={ctBalanceDistribution.slice(0, 20)} />
+      </Box>
+      <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
+        <Tabs value={stakingType} onChange={handleTabChange}>
+          <Tab
+            label={<Typography variant="h6">CosmicSignature Token</Typography>}
+          />
+          <Tab label={<Typography variant="h6">RandomWalk Token</Typography>} />
+        </Tabs>
+      </Box>
+      <CustomTabPanel value={stakingType} index={0}>
+        <StatisticsItem
+          title="Number of Active Stakers"
+          value={data.MainStats.StakeStatisticsCST.NumActiveStakers}
+        />
+        <StatisticsItem
+          title="Number of Staking Rewards Deposits"
+          value={data.MainStats.StakeStatisticsCST.NumDeposits}
+        />
+        <StatisticsItem
+          title="Total Staking Rewards"
+          value={`${data.MainStats.StakeStatisticsCST.TotalRewardEth.toFixed(
+            4
+          )} ETH`}
+        />
+        <StatisticsItem
+          title="Total Tokens Minted"
+          value={data.MainStats.StakeStatisticsCST.TotalTokensMinted}
+        />
+        <StatisticsItem
+          title="Total Tokens Staked"
+          value={data.MainStats.StakeStatisticsCST.TotalTokensStaked}
+        />
+        <StatisticsItem
+          title="Unclaimed Staking Rewards"
+          value={`${data.MainStats.StakeStatisticsCST.UnclaimedRewardEth.toFixed(
+            4
+          )} ETH`}
+        />
+        <Box>
+          <Typography variant="subtitle1" mt={2} mb={2}>
+            Stake / Unstake Actions
+          </Typography>
+          {stakingCSTActions === null ? (
+            <Typography variant="h6">Loading...</Typography>
+          ) : (
+            <GlobalStakingActionsTable
+              list={stakingCSTActions}
+              IsRWLK={false}
             />
-          </Box>
-          <Box mt={4}>
-            <Typography variant="h6" mb={2}>
-              Unique Bidders
-            </Typography>
-            <UniqueBiddersTable list={uniqueBidders} />
-          </Box>
-          <Box mt={4}>
-            <Typography variant="h6" mb={2}>
-              Unique Winners
-            </Typography>
-            <UniqueWinnersTable list={uniqueWinners} />
-          </Box>
-          <Box mt={4}>
-            <Typography variant="h6" mb={2}>
-              Unique Eth Donors
-            </Typography>
-            <UniqueEthDonorsTable list={uniqueDonors} />
-          </Box>
-          <Box mt={4}>
-            <Typography variant="h6" mb={2}>
-              Donated Token Distribution per Contract Address
-            </Typography>
-            <DonatedNFTDistributionTable
-              list={data.MainStats.DonatedTokenDistribution}
+          )}
+        </Box>
+        <Box mt={4}>
+          <Typography variant="subtitle1" mb={2}>
+            Staked Tokens
+          </Typography>
+          {stakedCSTokens === null ? (
+            <Typography variant="h6">Loading...</Typography>
+          ) : (
+            <GlobalStakedTokensTable list={stakedCSTokens} IsRWLK={false} />
+          )}
+        </Box>
+        <Box mt={4}>
+          <Typography variant="subtitle1" mb={2}>
+            Unique Stakers
+          </Typography>
+          <UniqueStakersCSTTable list={uniqueCSTStakers} />
+        </Box>
+      </CustomTabPanel>
+      <CustomTabPanel value={stakingType} index={1}>
+        <StatisticsItem
+          title="Number of Active Stakers"
+          value={data.MainStats.StakeStatisticsRWalk.NumActiveStakers}
+        />
+        <StatisticsItem
+          title="Total Tokens Minted"
+          value={data.MainStats.StakeStatisticsRWalk.TotalTokensMinted}
+        />
+        <StatisticsItem
+          title="Total Tokens Staked"
+          value={data.MainStats.StakeStatisticsRWalk.TotalTokensStaked}
+        />
+        <Box>
+          <Typography variant="subtitle1" mt={2} mb={2}>
+            Stake / Unstake Actions
+          </Typography>
+          {stakingRWLKActions === null ? (
+            <Typography variant="h6">Loading...</Typography>
+          ) : (
+            <GlobalStakingActionsTable
+              list={stakingRWLKActions}
+              IsRWLK={true}
             />
-          </Box>
-          <Box mt={4}>
-            <Typography variant="h6" mb={2}>
-              Cosmic Signature Token (ERC721) Distribution
-            </Typography>
-            <CSTokenDistributionTable list={cstDistribution} />
-          </Box>
-
-          <Box mt={4}>
-            <Typography variant="h6" mb={2}>
-              Cosmic Token (ERC20) Balance Distribution
-            </Typography>
-            <CTBalanceDistributionChart list={ctBalanceDistribution} />
-          </Box>
-          <Box mt={4}>
-            <CTBalanceDistributionTable
-              list={ctBalanceDistribution.slice(0, 20)}
+          )}
+        </Box>
+        <Box mt={4}>
+          <Typography variant="subtitle1" mb={2}>
+            Staked Tokens
+          </Typography>
+          {stakedRWLKTokens === null ? (
+            <Typography variant="h6">Loading...</Typography>
+          ) : (
+            <GlobalStakedTokensTable list={stakedRWLKTokens} IsRWLK={true} />
+          )}
+        </Box>
+        <Box mt={4}>
+          <Typography variant="subtitle1" mb={2}>
+            Unique Stakers
+          </Typography>
+          <UniqueStakersRWLKTable list={uniqueRWLKStakers} />
+        </Box>
+      </CustomTabPanel>
+      <Box mt={4}>
+        <Typography variant="h6" mb={2}>
+          Donated NFTs
+        </Typography>
+        {nftDonations.length > 0 ? (
+          <>
+            <Grid container spacing={2} mt={2}>
+              {nftDonations
+                .slice((curPage - 1) * perPage, curPage * perPage)
+                .map((nft) => (
+                  <Grid item key={nft.RecordId} xs={6} sm={4} md={3} lg={2}>
+                    <DonatedNFT nft={nft} />
+                  </Grid>
+                ))}
+            </Grid>
+            <CustomPagination
+              page={curPage}
+              setPage={setCurrentPage}
+              totalLength={nftDonations.length}
+              perPage={perPage}
             />
-          </Box>
-          <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
-            <Tabs value={stakingType} onChange={handleTabChange}>
-              <Tab
-                label={
-                  <Typography variant="h6">CosmicSignature Token</Typography>
-                }
-              />
-              <Tab
-                label={<Typography variant="h6">RandomWalk Token</Typography>}
-              />
-            </Tabs>
-          </Box>
-          <CustomTabPanel value={stakingType} index={0}>
-            <StatisticsItem
-              title="Number of Active Stakers"
-              value={data.MainStats.StakeStatisticsCST.NumActiveStakers}
-            />
-            <StatisticsItem
-              title="Number of Staking Rewards Deposits"
-              value={data.MainStats.StakeStatisticsCST.NumDeposits}
-            />
-            <StatisticsItem
-              title="Total Staking Rewards"
-              value={`${data.MainStats.StakeStatisticsCST.TotalRewardEth.toFixed(
-                4
-              )} ETH`}
-            />
-            <StatisticsItem
-              title="Total Tokens Minted"
-              value={data.MainStats.StakeStatisticsCST.TotalTokensMinted}
-            />
-            <StatisticsItem
-              title="Total Tokens Staked"
-              value={data.MainStats.StakeStatisticsCST.TotalTokensStaked}
-            />
-            <StatisticsItem
-              title="Unclaimed Staking Rewards"
-              value={`${data.MainStats.StakeStatisticsCST.UnclaimedRewardEth.toFixed(
-                4
-              )} ETH`}
-            />
-            <Box>
-              <Typography variant="subtitle1" mt={2} mb={2}>
-                Stake / Unstake Actions
-              </Typography>
-              {stakingCSTActions === null ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <GlobalStakingActionsTable
-                  list={stakingCSTActions}
-                  IsRWLK={false}
-                />
-              )}
-            </Box>
-            <Box mt={4}>
-              <Typography variant="subtitle1" mb={2}>
-                Staked Tokens
-              </Typography>
-              {stakedCSTokens === null ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <GlobalStakedTokensTable list={stakedCSTokens} IsRWLK={false} />
-              )}
-            </Box>
-            <Box mt={4}>
-              <Typography variant="subtitle1" mb={2}>
-                Unique Stakers
-              </Typography>
-              <UniqueStakersCSTTable list={uniqueCSTStakers} />
-            </Box>
-          </CustomTabPanel>
-          <CustomTabPanel value={stakingType} index={1}>
-            <StatisticsItem
-              title="Number of Active Stakers"
-              value={data.MainStats.StakeStatisticsRWalk.NumActiveStakers}
-            />
-            <StatisticsItem
-              title="Total Tokens Minted"
-              value={data.MainStats.StakeStatisticsRWalk.TotalTokensMinted}
-            />
-            <StatisticsItem
-              title="Total Tokens Staked"
-              value={data.MainStats.StakeStatisticsRWalk.TotalTokensStaked}
-            />
-            <Box>
-              <Typography variant="subtitle1" mt={2} mb={2}>
-                Stake / Unstake Actions
-              </Typography>
-              {stakingRWLKActions === null ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <GlobalStakingActionsTable
-                  list={stakingRWLKActions}
-                  IsRWLK={true}
-                />
-              )}
-            </Box>
-            <Box mt={4}>
-              <Typography variant="subtitle1" mb={2}>
-                Staked Tokens
-              </Typography>
-              {stakedRWLKTokens === null ? (
-                <Typography variant="h6">Loading...</Typography>
-              ) : (
-                <GlobalStakedTokensTable
-                  list={stakedRWLKTokens}
-                  IsRWLK={true}
-                />
-              )}
-            </Box>
-            <Box mt={4}>
-              <Typography variant="subtitle1" mb={2}>
-                Unique Stakers
-              </Typography>
-              <UniqueStakersRWLKTable list={uniqueRWLKStakers} />
-            </Box>
-          </CustomTabPanel>
-          <Box mt={4}>
-            <Typography variant="h6" mb={2}>
-              Donated NFTs
-            </Typography>
-            {nftDonations.length > 0 ? (
-              <>
-                <Grid container spacing={2} mt={2}>
-                  {nftDonations
-                    .slice((curPage - 1) * perPage, curPage * perPage)
-                    .map((nft) => (
-                      <Grid item key={nft.RecordId} xs={6} sm={4} md={3} lg={2}>
-                        <DonatedNFT nft={nft} />
-                      </Grid>
-                    ))}
-                </Grid>
-                <CustomPagination
-                  page={curPage}
-                  setPage={setCurrentPage}
-                  totalLength={nftDonations.length}
-                  perPage={perPage}
-                />
-              </>
-            ) : (
-              <Typography mt={2}>
-                No ERC721 tokens were donated on this round.
-              </Typography>
-            )}
-          </Box>
-          <Box>
-            <Typography variant="h6" mb={2} mt={8}>
-              System Mode Changes
-            </Typography>
-            {systemModeChanges === null ? (
-              <Typography variant="h6">Loading...</Typography>
-            ) : (
-              <SystemModesTable list={systemModeChanges} />
-            )}
-          </Box>
-        </>
-      )}
+          </>
+        ) : (
+          <Typography mt={2}>
+            No ERC721 tokens were donated on this round.
+          </Typography>
+        )}
+      </Box>
+      <Box>
+        <Typography variant="h6" mb={2} mt={8}>
+          System Mode Changes
+        </Typography>
+        {systemModeChanges === null ? (
+          <Typography variant="h6">Loading...</Typography>
+        ) : (
+          <SystemModesTable list={systemModeChanges} />
+        )}
+      </Box>
     </MainWrapper>
   );
 };
