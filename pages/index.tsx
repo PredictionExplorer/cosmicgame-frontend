@@ -77,27 +77,12 @@ import EnduranceChampionsTable from "../components/EnduranceChampionsTable";
 import EthDonationTable from "../components/EthDonationTable";
 import axios from "axios";
 
-const bidParamsEncoding: ethers.utils.ParamType = {
-  type: "tuple(string,int256)",
-  name: "bidparams",
-  components: [
-    { name: "msg", type: "string" },
-    { name: "rwalk", type: "int256" },
-  ] as Array<ethers.utils.ParamType>,
-  baseType: "",
-  indexed: false,
-  arrayLength: 0,
-  arrayChildren: null,
-  _isParamType: false,
-  format: function(format?: string): string {
-    throw new Error("Function not implemented.");
-  },
-};
+const bidParamsTypes = ["tuple(string msg,int256 rwalk)"];
 
 const NewHome = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<any>(null);
   const [bidType, setBidType] = useState("ETH");
   const [cstBidData, setCSTBidData] = useState({
     AuctionDuration: 0,
@@ -105,14 +90,14 @@ const NewHome = () => {
     SecondsElapsed: 0,
   });
   const [curBidList, setCurBidList] = useState([]);
-  const [specialWinners, setSpecialWinners] = useState(null);
-  const [winProbability, setWinProbability] = useState(null);
+  const [specialWinners, setSpecialWinners] = useState<any>(null);
+  const [winProbability, setWinProbability] = useState<any>(null);
   const [donatedNFTs, setDonatedNFTs] = useState([]);
   const [ethDonations, setEthDonations] = useState([]);
-  const [championList, setChampionList] = useState(null);
+  const [championList, setChampionList] = useState<any>(null);
   const [prizeTime, setPrizeTime] = useState(0);
   const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
-  const [prizeInfo, setPrizeInfo] = useState(null);
+  const [prizeInfo, setPrizeInfo] = useState<any>(null);
   const [message, setMessage] = useState("");
   const [nftDonateAddress, setNftDonateAddress] = useState("");
   const [nftId, setNftId] = useState("");
@@ -120,7 +105,7 @@ const NewHome = () => {
   const [bidPricePlus, setBidPricePlus] = useState(2);
   const [isBidding, setIsBidding] = useState(false);
   const [bannerToken, setBannerToken] = useState({ seed: "", id: -1 });
-  const [rwlknftIds, setRwlknftIds] = useState([]);
+  const [rwlknftIds, setRwlknftIds] = useState<number[]>([]);
   const [offset, setOffset] = useState(0);
   const [roundStarted, setRoundStarted] = useState("");
   const [lastBidderElapsed, setLastBidderElapsed] = useState("");
@@ -149,42 +134,48 @@ const NewHome = () => {
       ? { xs: 6, sm: 4, md: 3, lg: 3 }
       : { xs: 12, sm: 6, md: 4, lg: 4 };
 
-  const series = [
-    { category: "Prize", value: data?.PrizePercentage },
-    { category: "Raffle", value: data?.RafflePercentage },
-    { category: "Charity", value: data?.CharityPercentage },
-    { category: "Staking", value: data?.StakignPercentage },
-    {
-      category: "Next round",
-      value:
-        100 -
-        data?.CharityPercentage -
-        data?.RafflePercentage -
-        data?.StakignPercentage -
-        data?.PrizePercentage,
-    },
-  ];
+  const series = data
+    ? [
+        { category: "Prize", value: data.PrizePercentage },
+        { category: "Raffle", value: data.RafflePercentage },
+        { category: "Charity", value: data.CharityPercentage },
+        { category: "Staking", value: data.StakingPercentage },
+        {
+          category: "Next round",
+          value:
+            100 -
+            data.CharityPercentage -
+            data.RafflePercentage -
+            data.StakingPercentage -
+            data.PrizePercentage,
+        },
+      ]
+    : [];
 
-  const labelContent = (props) => {
-    return `${props.dataItem.category}: ${props.dataItem.value}% (${(
-      (props.dataItem.value * data?.CosmicGameBalanceEth) /
-      100
-    ).toFixed(4)} ETH)`;
+  const labelContent = (props: any) => {
+    return data
+      ? `${props.dataItem.category}: ${props.dataItem.value}% (${(
+          (props.dataItem.value * data.CosmicGameBalanceEth) /
+          100
+        ).toFixed(4)} ETH)`
+      : "";
   };
 
   const onClaimPrize = async () => {
     try {
-      const estimageGas = await cosmicGameContract.estimateGas.claimPrize();
-      let gasLimit = estimageGas.mul(BigNumber.from(2));
+      const estimateGas = await cosmicGameContract.estimateGas.claimPrize();
+      let gasLimit = estimateGas.mul(BigNumber.from(2));
       gasLimit = gasLimit.gt(BigNumber.from(2000000))
         ? gasLimit
         : BigNumber.from(2000000);
-      await cosmicGameContract.claimPrize({ gasLimit }).then((tx) => tx.wait());
+      await cosmicGameContract
+        .claimPrize({ gasLimit })
+        .then((tx: any) => tx.wait());
       const balance = await cosmicSignatureContract.totalSupply();
       let token_id = balance.toNumber() - 1;
       let count = data?.NumRaffleNFTWinnersBidding + 3;
-      if (data && data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked > 0)
-        count += data?.NumRaffleNFTWinnersStakingRWalk;
+      if (data && data.MainStats.StakeStatisticsRWalk.TotalTokensStaked > 0)
+        count += data.NumRaffleNFTWinnersStakingRWalk;
       setTimeout(async () => {
         await Promise.all(
           Array(count)
@@ -194,9 +185,6 @@ const NewHome = () => {
                 const t = token_id - index;
                 const seed = await cosmicSignatureContract.seeds(t);
                 let color = "";
-                // if (t === prize?.TokenId) color = "white"; // white
-                // else if (t === prize?.EnduranceERC721TokenId) color = "gold"; // gold
-                // else if (t === prize?.StellarERC721TokenId) color = "silver"; // silver
                 if (index === count - 1) color = "amethyst";
                 else if (index === count - 2) color = "fuchsia";
                 else if (index === count - 3) color = "sapphire";
@@ -235,7 +223,7 @@ const NewHome = () => {
     }
   };
 
-  const checkIfContractExist = async (address) => {
+  const checkIfContractExist = async (address: string) => {
     try {
       const byteCode = await library.getCode(address);
       if (byteCode === "0x") {
@@ -247,7 +235,7 @@ const NewHome = () => {
     return true;
   };
 
-  const checkTokenOwnership = async (address, tokenId) => {
+  const checkTokenOwnership = async (address: string, tokenId: number) => {
     try {
       const nftDonateContract = new Contract(
         address,
@@ -278,7 +266,7 @@ const NewHome = () => {
     return true;
   };
 
-  const checkBalance = async (type, amount) => {
+  const checkBalance = async (type: string, amount: BigNumber) => {
     try {
       if (type === "ETH") {
         const ethBalance = await library.getBalance(account);
@@ -287,7 +275,8 @@ const NewHome = () => {
       const balance = await api.get_user_balance(account);
       if (balance) {
         return (
-          Number(ethers.utils.formatEther(balance.CosmicTokenBalance)) >= amount
+          Number(ethers.utils.formatEther(balance.CosmicTokenBalance)) >=
+          Number(ethers.utils.formatEther(amount))
         );
       }
     } catch (e) {
@@ -297,11 +286,10 @@ const NewHome = () => {
   };
 
   const onBid = async () => {
-    let bidPrice, newBidPrice;
     setIsBidding(true);
     try {
-      bidPrice = await cosmicGameContract.getBidPrice();
-      newBidPrice = bidPrice
+      const bidPrice = await cosmicGameContract.getBidPrice();
+      let newBidPrice = bidPrice
         .mul(ethers.utils.parseEther((100 + bidPricePlus).toString()))
         .div(ethers.utils.parseEther("100"));
       if (bidType === "RandomWalk") {
@@ -315,21 +303,18 @@ const NewHome = () => {
           visible: true,
           type: "error",
           text:
-            "Insufficient ETH balance! There isn't enough ETH in you wallet.",
+            "Insufficient ETH balance! There isn't enough ETH in your wallet.",
         });
         setIsBidding(false);
         return;
       }
-      let receipt;
+      let params = ethers.utils.defaultAbiCoder.encode(bidParamsTypes, [
+        { msg: message, rwalk: rwlkId },
+      ]);
       if (!nftDonateAddress || !nftId) {
-        let params = ethers.utils.defaultAbiCoder.encode(
-          [bidParamsEncoding],
-          [{ msg: message, rwalk: rwlkId }]
-        );
-        receipt = await cosmicGameContract
+        await cosmicGameContract
           .bid(params, { value: newBidPrice })
-          .then((tx) => tx.wait());
-        console.log(receipt);
+          .then((tx: any) => tx.wait());
         setTimeout(() => {
           fetchDataCollection();
           setMessage("");
@@ -337,43 +322,32 @@ const NewHome = () => {
         }, 3000);
         return;
       }
-    } catch (err) {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
+      // Proceed with NFT donation
+      // Check if the contract exists
+      const isExist = await checkIfContractExist(nftDonateAddress);
+      if (!isExist) {
         setNotification({
           visible: true,
           type: "error",
-          text: msg,
+          text: "The address provided is not a valid contract address!",
         });
+        setIsBidding(false);
+        return;
       }
-      console.log(err);
-      setIsBidding(false);
-      return;
-    }
-
-    // check if the contract exists
-    const isExist = await checkIfContractExist(nftDonateAddress);
-    if (!isExist) {
-      setNotification({
-        visible: true,
-        type: "error",
-        text: "You selected address that doesn't belong to a contract address!",
-      });
-      setIsBidding(false);
-      return;
-    }
-
-    let receipt;
-    if (nftDonateAddress && nftId) {
       const nftIdNum = Number(nftId);
       const nftDonateContract = new Contract(
         nftDonateAddress,
         NFT_ABI,
         library.getSigner(account)
       );
-
+      // Check if the contract is ERC721
       try {
-        await nftDonateContract.supportsInterface("0x80ac58cd");
+        const supportsInterface = await nftDonateContract.supportsInterface(
+          "0x80ac58cd"
+        );
+        if (!supportsInterface) {
+          throw new Error("Not an ERC721 contract");
+        }
       } catch (err) {
         console.log(err);
         setNotification({
@@ -384,16 +358,14 @@ const NewHome = () => {
         setIsBidding(false);
         return;
       }
-
-      // owner of
+      // Check token ownership
       const isOwner = await checkTokenOwnership(nftDonateAddress, nftIdNum);
       if (!isOwner) {
         setIsBidding(false);
         return;
       }
-
+      // Approve NFT transfer
       try {
-        // setApprovalForAll
         const approvedBy = await nftDonateContract.getApproved(nftIdNum);
         const isApprovedForAll = await nftDonateContract.isApprovedForAll(
           account,
@@ -402,18 +374,13 @@ const NewHome = () => {
         if (!isApprovedForAll && approvedBy !== COSMICGAME_ADDRESS) {
           await nftDonateContract
             .setApprovalForAll(COSMICGAME_ADDRESS, true)
-            .then((tx) => tx.wait());
+            .then((tx: any) => tx.wait());
         }
-        let params = ethers.utils.defaultAbiCoder.encode(
-          [bidParamsEncoding],
-          [{ msg: message, rwalk: rwlkId }]
-        );
-        receipt = await cosmicGameContract
+        await cosmicGameContract
           .bidAndDonateNFT(params, nftDonateAddress, nftIdNum, {
             value: newBidPrice,
           })
-          .then((tx) => tx.wait());
-        console.log(receipt);
+          .then((tx: any) => tx.wait());
         setTimeout(() => {
           fetchDataCollection();
           setMessage("");
@@ -433,6 +400,17 @@ const NewHome = () => {
         console.log(err);
         setIsBidding(false);
       }
+    } catch (err) {
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err?.data?.message);
+        setNotification({
+          visible: true,
+          type: "error",
+          text: msg,
+        });
+      }
+      console.log(err);
+      setIsBidding(false);
     }
   };
 
@@ -440,22 +418,22 @@ const NewHome = () => {
     setIsBidding(true);
     try {
       if (cstBidData?.CSTPrice > 0) {
-        const enoughBalance = await checkBalance("CST", cstBidData?.CSTPrice);
+        const enoughBalance = await checkBalance(
+          "CST",
+          ethers.utils.parseEther(cstBidData.CSTPrice.toString())
+        );
         if (!enoughBalance) {
           setNotification({
             visible: true,
             type: "error",
             text:
-              "Insufficient CST balance! There isn't enough Cosmic Token in you wallet.",
+              "Insufficient CST balance! There isn't enough Cosmic Token in your wallet.",
           });
           setIsBidding(false);
           return;
         }
       }
-      let receipt = await cosmicGameContract
-        .bidWithCST(message)
-        .then((tx) => tx.wait());
-      console.log(receipt);
+      await cosmicGameContract.bidWithCST(message).then((tx: any) => tx.wait());
       setTimeout(() => {
         fetchDataCollection();
         setMessage("");
@@ -488,11 +466,11 @@ const NewHome = () => {
     try {
       if (nftRWLKContract && account) {
         const used_rwalk = await api.get_used_rwlk_nfts();
-        const biddedRWLKIds = used_rwalk.map((x) => x.RWalkTokenId);
+        const biddedRWLKIds = used_rwalk.map((x: any) => x.RWalkTokenId);
         const tokens = await nftRWLKContract.walletOfOwner(account);
         const nftIds = tokens
-          .map((t) => t.toNumber())
-          .filter((t) => !biddedRWLKIds.includes(t))
+          .map((t: BigNumber) => t.toNumber())
+          .filter((t: number) => !biddedRWLKIds.includes(t))
           .reverse();
         setRwlknftIds(nftIds);
       }
@@ -501,7 +479,7 @@ const NewHome = () => {
     }
   };
 
-  const getEnduranceChampions = (bidList) => {
+  const getEnduranceChampions = (bidList: any[]) => {
     const currentTime = Math.floor(Date.now() / 1000);
     if (!bidList || bidList.length === 0) {
       return [];
@@ -522,7 +500,7 @@ const NewHome = () => {
       return [];
     }
 
-    let enduranceChampions = [];
+    let enduranceChampions: any[] = [];
 
     // Calculate endurance champions
     for (let i = 1; i < currentRoundBids.length; i++) {
@@ -594,78 +572,109 @@ const NewHome = () => {
   };
 
   const fetchData = async () => {
-    const newData = await api.get_dashboard_info();
-    if (newData) {
-      const round = newData?.CurRoundNum;
-      const newBidData = await api.get_bid_list_by_round(round, "desc");
-      setCurBidList(newBidData);
-      const nftData = await api.get_donations_nft_by_round(round);
-      setDonatedNFTs(nftData);
-      // const donations = await api.get_donations_both_by_round(round);
-      // setEthDonations(donations);
-      const champions = getEnduranceChampions(newBidData);
-      const sortedChampions = [...champions].sort(
-        (a, b) => b.chronoWarrior - a.chronoWarrior
-      );
-      setChampionList(sortedChampions);
-    }
-    const specials = await api.get_current_special_winners();
-    setSpecialWinners(specials);
-    setData((prevData) => {
-      if (
-        account !== newData?.LastBidderAddr &&
-        prevData &&
-        prevData.CurNumBids < newData?.CurNumBids
-      ) {
-        playAudio();
+    try {
+      const newData = await api.get_dashboard_info();
+      if (newData) {
+        const round = newData.CurRoundNum;
+        const [
+          newBidData,
+          nftData,
+          championsData,
+          specials,
+        ] = await Promise.all([
+          api.get_bid_list_by_round(round, "desc"),
+          api.get_donations_nft_by_round(round),
+          (async () => {
+            const bids = await api.get_bid_list_by_round(round, "desc");
+            const champions = getEnduranceChampions(bids);
+            const sortedChampions = [...champions].sort(
+              (a, b) => b.chronoWarrior - a.chronoWarrior
+            );
+            return sortedChampions;
+          })(),
+          api.get_current_special_winners(),
+        ]);
+        setCurBidList(newBidData);
+        setDonatedNFTs(nftData);
+        setChampionList(championsData);
+        setSpecialWinners(specials);
       }
-      return newData;
-    });
-    setLoading(false);
+      setData((prevData: any) => {
+        if (
+          account !== newData?.LastBidderAddr &&
+          prevData &&
+          prevData.CurNumBids < newData?.CurNumBids
+        ) {
+          playAudio();
+        }
+        return newData;
+      });
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
   };
 
   const fetchPrizeTime = async () => {
-    const t = await api.get_prize_time();
-    const current = await api.get_current_time();
-    const diff = current * 1000 - Date.now();
-    setPrizeTime(t * 1000 - diff);
+    try {
+      const t = await api.get_prize_time();
+      const current = await api.get_current_time();
+      const diff = current * 1000 - Date.now();
+      setPrizeTime(t * 1000 - diff);
+    } catch (err) {
+      console.error("Error fetching prize time:", err);
+    }
   };
 
   const fetchPrizeInfo = async () => {
-    const prizeList = await api.get_prize_list();
-    let prizeInfo;
-    if (prizeList.length) {
-      prizeInfo = await api.get_prize_info(prizeList.length - 1);
-    } else {
-      prizeInfo = null;
+    try {
+      const prizeList = await api.get_prize_list();
+      let prizeInfo;
+      if (prizeList.length) {
+        prizeInfo = await api.get_prize_info(prizeList.length - 1);
+      } else {
+        prizeInfo = null;
+      }
+      setPrizeInfo(prizeInfo);
+      return prizeInfo;
+    } catch (err) {
+      console.error("Error fetching prize info:", err);
     }
-    setPrizeInfo(prizeInfo);
-    return prizeInfo;
   };
 
   const fetchClaimHistory = async () => {
-    const history = await api.get_claim_history();
-    setClaimHistory(history);
-  };
-
-  const fetchCSTBidData = async () => {
-    let ctData = await api.get_ct_price();
-    if (ctData) {
-      setCSTBidData({
-        AuctionDuration: parseInt(ctData.AuctionDuration),
-        CSTPrice: parseFloat(ethers.utils.formatEther(ctData.CSTPrice)),
-        SecondsElapsed: parseInt(ctData.SecondsElapsed),
-      });
+    try {
+      const history = await api.get_claim_history();
+      setClaimHistory(history);
+    } catch (err) {
+      console.error("Error fetching claim history:", err);
     }
   };
 
-  const fetchDataCollection = () => {
-    getRwlkNFTIds();
-    fetchData();
-    fetchPrizeInfo();
-    fetchPrizeTime();
-    fetchClaimHistory();
-    fetchCSTBidData();
+  const fetchCSTBidData = async () => {
+    try {
+      let ctData = await api.get_ct_price();
+      if (ctData) {
+        setCSTBidData({
+          AuctionDuration: parseInt(ctData.AuctionDuration),
+          CSTPrice: parseFloat(ethers.utils.formatEther(ctData.CSTPrice)),
+          SecondsElapsed: parseInt(ctData.SecondsElapsed),
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching CST bid data:", err);
+    }
+  };
+
+  const fetchDataCollection = async () => {
+    await Promise.all([
+      getRwlkNFTIds(),
+      fetchData(),
+      fetchPrizeInfo(),
+      fetchPrizeTime(),
+      fetchClaimHistory(),
+      fetchCSTBidData(),
+    ]);
   };
 
   const requestNotificationPermission = () => {
@@ -678,7 +687,7 @@ const NewHome = () => {
     }
   };
 
-  const sendNotification = (title, options) => {
+  const sendNotification = (title: string, options: any) => {
     if ("Notification" in window && Notification.permission === "granted") {
       new Notification(title, options);
     }
@@ -701,7 +710,7 @@ const NewHome = () => {
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [prizeTime]);
 
   useEffect(() => {
     if (nftRWLKContract && account) {
@@ -745,6 +754,7 @@ const NewHome = () => {
     return () => {
       clearInterval(interval);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -754,17 +764,22 @@ const NewHome = () => {
   }, [twitterHandle]);
 
   useEffect(() => {
-    const probabilityOfSelection = (totalBids, chosenBids, yourBids) => {
+    const probabilityOfSelection = (
+      totalBids: number,
+      chosenBids: number,
+      yourBids: number
+    ) => {
       const probability =
         1 - Math.pow((totalBids - yourBids) / totalBids, chosenBids);
       return probability;
     };
 
     const calculateProbability = async () => {
-      const { Bids } = await api.get_user_info(account);
-      if (Bids) {
+      const userInfo = await api.get_user_info(account);
+      const Bids = userInfo?.Bids || [];
+      if (Bids.length) {
         const curRoundBids = Bids.filter(
-          (bid) => bid.RoundNum === data.CurRoundNum
+          (bid: any) => bid.RoundNum === data.CurRoundNum
         );
         const raffle =
           probabilityOfSelection(
@@ -790,7 +805,7 @@ const NewHome = () => {
   }, [data, account, curBidList]);
 
   useEffect(() => {
-    const fetchCSTInfo = async (bannerId) => {
+    const fetchCSTInfo = async (bannerId: number) => {
       const res = await api.get_cst_info(bannerId);
       const fileName = `0x${res.TokenInfo.Seed}`;
       setBannerToken({ seed: fileName, id: bannerId });
@@ -817,7 +832,7 @@ const NewHome = () => {
     return () => {
       clearInterval(interval);
     };
-  }, [data]);
+  }, [data, offset, curBidList, bannerToken.seed]);
 
   useEffect(() => {
     const fetchTimeoutClaimPrize = async () => {

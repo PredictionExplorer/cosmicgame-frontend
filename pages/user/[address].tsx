@@ -19,7 +19,7 @@ import DonatedNFTTable from "../../components/DonatedNFTTable";
 import { CSTTable } from "../my-tokens";
 import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
-import EthDonationTable from "../../components/EthDonationTable";
+// import EthDonationTable from "../../components/EthDonationTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -65,7 +65,7 @@ const UserInfo = ({ address }) => {
   const [stakingCSTActions, setStakingCSTActions] = useState([]);
   const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
-  const [ethDonations, setEthDonations] = useState([]);
+  // const [ethDonations, setEthDonations] = useState([]);
   const [cstList, setCSTList] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [stakingTable, setStakingTable] = useState(0);
@@ -79,41 +79,59 @@ const UserInfo = ({ address }) => {
 
   const fetchData = async (addr: string, reload: boolean = true) => {
     setLoading(reload);
-    const history = await api.get_claim_history_by_user(addr);
-    setClaimHistory(history);
-    const { Bids, UserInfo } = await api.get_user_info(addr);
-    setBidHistory(Bids);
-    setUserInfo(UserInfo);
-    const balance = await api.get_user_balance(addr);
-    if (balance) {
-      setBalance({
-        CosmicToken: Number(
-          ethers.utils.formatEther(balance.CosmicTokenBalance)
-        ),
-        ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
-      });
+    try {
+      const [
+        history,
+        userInfoResponse,
+        balanceResponse,
+        unclaimedStakingRewards,
+        collectedStakingRewards,
+        stakingCSTActions,
+        stakingRWLKActions,
+        marketingRewards,
+        cstList,
+        // donations,
+      ] = await Promise.all([
+        api.get_claim_history_by_user(addr),
+        api.get_user_info(addr),
+        api.get_user_balance(addr),
+        api.get_unclaimed_staking_rewards_by_user(addr),
+        api.get_collected_staking_rewards_by_user(addr),
+        api.get_staking_cst_actions_by_user(addr),
+        api.get_staking_rwalk_actions_by_user(addr),
+        api.get_marketing_rewards_by_user(addr),
+        api.get_cst_tokens_by_user(addr),
+        // api.get_donations_by_user(addr),
+      ]);
+
+      setClaimHistory(history);
+      const { Bids, UserInfo } = userInfoResponse;
+      setBidHistory(Bids);
+      setUserInfo(UserInfo);
+
+      if (balanceResponse) {
+        setBalance({
+          CosmicToken: Number(
+            ethers.utils.formatEther(balanceResponse.CosmicTokenBalance)
+          ),
+          ETH: Number(ethers.utils.formatEther(balanceResponse.ETH_Balance)),
+        });
+      }
+
+      setUnclaimedStakingRewards(unclaimedStakingRewards);
+      setCollectedStakingRewards(collectedStakingRewards);
+      setStakingCSTActions(stakingCSTActions);
+      setStakingRWLKActions(stakingRWLKActions);
+      setMarketingRewards(marketingRewards);
+      setCSTList(cstList);
+      // setEthDonations(donations);
+      fetchStakedToken();
+      fetchStatusData();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
-    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
-      addr
-    );
-    setUnclaimedStakingRewards(unclaimedStakingRewards);
-    const collectedStakingRewards = await api.get_collected_staking_rewards_by_user(
-      addr
-    );
-    setCollectedStakingRewards(collectedStakingRewards);
-    let stakingActions = await api.get_staking_cst_actions_by_user(addr);
-    setStakingCSTActions(stakingActions);
-    stakingActions = await api.get_staking_rwalk_actions_by_user(addr);
-    setStakingRWLKActions(stakingActions);
-    const marketingRewards = await api.get_marketing_rewards_by_user(addr);
-    setMarketingRewards(marketingRewards);
-    const cstList = await api.get_cst_tokens_by_user(addr);
-    setCSTList(cstList);
-    const donations = await api.get_donations_by_user(addr);
-    setEthDonations(donations);
-    fetchStakedToken();
-    fetchStatusData();
-    setLoading(false);
   };
 
   const fetchDonatedNFTs = async (reload: boolean = true) => {
@@ -121,64 +139,70 @@ const UserInfo = ({ address }) => {
       ...prev,
       loading: reload,
     }));
-    const claimed = await api.get_claimed_donated_nft_by_user(address);
-    setClaimedDonatedNFTs({ data: claimed, loading: false });
     setUnclaimedDonatedNFTs((prev) => ({
       ...prev,
       loading: reload,
     }));
-    const unclaimed = await api.get_unclaimed_donated_nft_by_user(address);
-    setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
-  };
-
-  const calculateProbability = async () => {
-    let count = 0;
-    const newData = await api.get_dashboard_info();
-    setData(newData);
-    if (newData) {
-      const round = newData?.CurRoundNum;
-      const bidList = await api.get_bid_list_by_round(round, "desc");
-      bidList.forEach((bid) => {
-        if (bid.BidderAddr === address) {
-          count++;
-        }
-      });
-      let probability =
-        1 -
-        Math.pow(
-          (bidList.length - count) / bidList.length,
-          newData?.NumRaffleEthWinnersBidding
-        );
-      setRaffleETHProbability(probability);
-      probability =
-        1 -
-        Math.pow(
-          (bidList.length - count) / bidList.length,
-            newData?.NumRaffleNFTWinnersBidding
-        );
-      setRaffleNFTProbability(probability);
+    try {
+      const [claimed, unclaimed] = await Promise.all([
+        api.get_claimed_donated_nft_by_user(address),
+        api.get_unclaimed_donated_nft_by_user(address),
+      ]);
+      setClaimedDonatedNFTs({ data: claimed, loading: false });
+      setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
+    } catch (error) {
+      console.error("Error fetching donated NFTs:", error);
     }
   };
 
-  const handleDonatedNFTsClaim = async (e, tokenID) => {
+  const calculateProbability = async () => {
     try {
-      e.target.disabled = true;
-      e.target.classList.add("Mui-disabled");
-      const res = await cosmicGameContract.claimDonatedNFT(tokenID);
-      console.log(res);
+      const newData = await api.get_dashboard_info();
+      setData(newData); // Added this line to fix the issue
+
+      if (newData) {
+        const round = newData?.CurRoundNum;
+        const bidList = await api.get_bid_list_by_round(round, "desc");
+        const count = bidList.filter((bid) => bid.BidderAddr === address)
+          .length;
+
+        let probability =
+          1 -
+          Math.pow(
+            (bidList.length - count) / bidList.length,
+            newData?.NumRaffleEthWinnersBidding
+          );
+        setRaffleETHProbability(probability);
+
+        probability =
+          1 -
+          Math.pow(
+            (bidList.length - count) / bidList.length,
+            newData?.NumRaffleNFTWinnersBidding
+          );
+        setRaffleNFTProbability(probability);
+      }
+    } catch (error) {
+      console.error("Error calculating probability:", error);
+    }
+  };
+
+  const handleDonatedNFTsClaim = async (tokenID) => {
+    try {
+      setIsClaiming(true);
+      await cosmicGameContract.claimDonatedNFT(tokenID);
       setTimeout(() => {
         fetchData(address, false);
         fetchDonatedNFTs(false);
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       if (err?.data?.message) {
         const msg = getErrorMessage(err?.data?.message);
         setNotification({ text: msg, type: "error", visible: true });
       }
-      e.target.disabled = false;
-      e.target.classList.remove("Mui-disabled");
+      setIsClaiming(false);
     }
   };
 
@@ -186,15 +210,14 @@ const UserInfo = ({ address }) => {
     try {
       setIsClaiming(true);
       const indexList = unclaimedDonatedNFTs.data.map((item) => item.Index);
-      const res = await cosmicGameContract.claimManyDonatedNFTs(indexList);
-      console.log(res);
+      await cosmicGameContract.claimManyDonatedNFTs(indexList);
       setTimeout(() => {
         fetchData(address, false);
         fetchDonatedNFTs(false);
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       if (err?.data?.message) {
         const msg = getErrorMessage(err?.data?.message);
         setNotification({ text: msg, type: "error", visible: true });
@@ -217,6 +240,7 @@ const UserInfo = ({ address }) => {
         setInvalidAddress(true);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
   return (
@@ -424,12 +448,12 @@ const UserInfo = ({ address }) => {
               </Box> */}
               {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
                 <>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
+                  <Box mb={1}>
+                    <Typography color="primary" component="span">
                       Probability of Winning ETH:
-                  </Typography>
-                  &nbsp;
-                  <Typography component="span">
+                    </Typography>
+                    &nbsp;
+                    <Typography component="span">
                       {(raffleETHProbability * 100).toFixed(2)}%
                     </Typography>
                   </Box>
@@ -440,8 +464,8 @@ const UserInfo = ({ address }) => {
                     &nbsp;
                     <Typography component="span">
                       {(raffleNFTProbability * 100).toFixed(2)}%
-                  </Typography>
-                </Box>
+                    </Typography>
+                  </Box>
                 </>
               )}
               <Typography mt={3}>
@@ -645,12 +669,12 @@ const UserInfo = ({ address }) => {
                 </Typography>
                 <BiddingHistoryTable biddingHistory={bidHistory} />
               </Box>
-              <Box>
+              {/* <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                   ETH Donation History
                 </Typography>
                 <EthDonationTable list={ethDonations} />
-              </Box>
+              </Box> */}
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                   Cosmic Signature Tokens User Own
