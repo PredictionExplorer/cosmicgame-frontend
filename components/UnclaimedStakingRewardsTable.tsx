@@ -310,7 +310,7 @@ const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
   );
 };
 
-export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
+const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const { cstokens: stakedTokens } = useStakedToken();
@@ -490,3 +490,5 @@ export const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     </>
   );
 };
+
+export default UnclaimedStakingRewardsTable;

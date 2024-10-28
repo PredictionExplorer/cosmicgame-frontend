@@ -12,7 +12,7 @@ import StakingWinnerTable from "../../components/StakingWinnerTable";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
 import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
-import EthDonationTable from "../../components/EthDonationTable";
+// import EthDonationTable from "../../components/EthDonationTable";
 
 const PrizeInfo = ({ roundNum }) => {
   const cosmicGameContract = useCosmicGameContract();
@@ -20,7 +20,7 @@ const PrizeInfo = ({ roundNum }) => {
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState([]);
   const [bidHistory, setBidHistory] = useState([]);
   const [nftDonations, setNftDonations] = useState([]);
-  const [ethDonations, setEthDonations] = useState([]);
+  // const [ethDonations, setEthDonations] = useState([]);
   const [prizeInfo, setPrizeInfo] = useState(null);
   const [stakingRewards, setStakingRewards] = useState([]);
   const [loading, setLoading] = useState(true);

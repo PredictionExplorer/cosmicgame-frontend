@@ -2,24 +2,23 @@ import React, { useEffect, useState } from "react";
 import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
-import BiddingHistoryTable from "../components/BiddingHistoryTable";
-import WinningHistoryTable from "../components/WinningHistoryTable";
-import EthDonationTable from "../components/EthDonationTable";
 import { ethers } from "ethers";
 import { formatEthValue } from "../utils";
-import { UnclaimedStakingRewardsTable } from "../components/UnclaimedStakingRewardsTable";
-import { CollectedStakingRewardsTable } from "../components/CollectedStakingRewardsTable";
-import { StakingActionsTable } from "../components/StakingActionsTable";
-import { MarketingRewardsTable } from "../components/MarketingRewardsTable";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import { useApiData } from "../contexts/ApiDataContext";
 import { useActiveWeb3React } from "../hooks/web3";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
-import DonatedNFTTable from "../components/DonatedNFTTable";
 import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
-import { CSTTable } from "./my-tokens";
 import { GetServerSideProps } from "next";
+import StakingActionsTable from "../components/StakingActionsTable";
+import BiddingHistoryTable from "../components/BiddingHistoryTable";
+import { CSTTable } from "./my-tokens";
+import WinningHistoryTable from "../components/WinningHistoryTable";
+import UnclaimedStakingRewardsTable from "../components/UnclaimedStakingRewardsTable";
+import CollectedStakingRewardsTable from "../components/CollectedStakingRewardsTable";
+import MarketingRewardsTable from "../components/MarketingRewardsTable";
+import DonatedNFTTable from "../components/DonatedNFTTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -65,7 +64,6 @@ const MyStatistics = () => {
   const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
   const [cstList, setCSTList] = useState([]);
-  const [ethDonations, setEthDonations] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [stakingTable, setStakingTable] = useState(0);
   const [raffleETHProbability, setRaffleETHProbability] = useState(0);
@@ -78,84 +76,114 @@ const MyStatistics = () => {
 
   const fetchData = async (addr: string, reload: boolean = true) => {
     setLoading(reload);
-    const history = await api.get_claim_history_by_user(addr);
-    setClaimHistory(history);
-    const { Bids, UserInfo } = await api.get_user_info(addr);
-    setBidHistory(Bids);
-    setUserInfo(UserInfo);
-    const balance = await api.get_user_balance(addr);
-    if (balance) {
-      setBalance({
-        CosmicToken: Number(
-          ethers.utils.formatEther(balance.CosmicTokenBalance)
-        ),
-        ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
+    try {
+      const [
+        history,
+        { Bids, UserInfo },
+        balance,
+        unclaimedStakingRewards,
+        collectedStakingRewards,
+        stakingCSTActions,
+        stakingRWLKActions,
+        marketingRewards,
+        cstList,
+      ] = await Promise.all([
+        api.get_claim_history_by_user(addr),
+        api.get_user_info(addr),
+        api.get_user_balance(addr),
+        api.get_unclaimed_staking_rewards_by_user(addr),
+        api.get_collected_staking_rewards_by_user(addr),
+        api.get_staking_cst_actions_by_user(addr),
+        api.get_staking_rwalk_actions_by_user(addr),
+        api.get_marketing_rewards_by_user(addr),
+        api.get_cst_tokens_by_user(addr),
+        api.get_donations_by_user(addr),
+      ]);
+      setClaimHistory(history);
+      setBidHistory(Bids);
+      setUserInfo(UserInfo);
+      if (balance) {
+        setBalance({
+          CosmicToken: Number(
+            ethers.utils.formatEther(balance.CosmicTokenBalance)
+          ),
+          ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
+        });
+      }
+      setUnclaimedStakingRewards(unclaimedStakingRewards);
+      setCollectedStakingRewards(collectedStakingRewards);
+      setStakingCSTActions(stakingCSTActions);
+      setStakingRWLKActions(stakingRWLKActions);
+      setMarketingRewards(marketingRewards);
+      setCSTList(cstList);
+      fetchStakedToken();
+      fetchStatusData();
+    } catch (error) {
+      console.error(error);
+      setNotification({
+        text: "Failed to fetch data",
+        type: "error",
+        visible: true,
       });
+    } finally {
+      setLoading(false);
     }
-    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
-      addr
-    );
-    setUnclaimedStakingRewards(unclaimedStakingRewards);
-    const collectedStakingRewards = await api.get_collected_staking_rewards_by_user(
-      addr
-    );
-    setCollectedStakingRewards(collectedStakingRewards);
-    let stakingActions = await api.get_staking_cst_actions_by_user(addr);
-    setStakingCSTActions(stakingActions);
-    stakingActions = await api.get_staking_rwalk_actions_by_user(addr);
-    setStakingRWLKActions(stakingActions);
-    const marketingRewards = await api.get_marketing_rewards_by_user(addr);
-    setMarketingRewards(marketingRewards);
-    const cstList = await api.get_cst_tokens_by_user(addr);
-    setCSTList(cstList);
-    const donations = await api.get_donations_by_user(addr);
-    setEthDonations(donations);
-    fetchStakedToken();
-    fetchStatusData();
-    setLoading(false);
   };
 
   const fetchDonatedNFTs = async (reload: boolean = true) => {
-    setClaimedDonatedNFTs((prev) => ({
-      ...prev,
-      loading: reload,
-    }));
-    const claimed = await api.get_claimed_donated_nft_by_user(account);
-    setClaimedDonatedNFTs({ data: claimed, loading: false });
-    setUnclaimedDonatedNFTs((prev) => ({
-      ...prev,
-      loading: reload,
-    }));
-    const unclaimed = await api.get_unclaimed_donated_nft_by_user(account);
-    setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
+    setClaimedDonatedNFTs((prev) => ({ ...prev, loading: reload }));
+    setUnclaimedDonatedNFTs((prev) => ({ ...prev, loading: reload }));
+    try {
+      const [claimed, unclaimed] = await Promise.all([
+        api.get_claimed_donated_nft_by_user(account),
+        api.get_unclaimed_donated_nft_by_user(account),
+      ]);
+      setClaimedDonatedNFTs({ data: claimed, loading: false });
+      setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
+    } catch (error) {
+      console.error(error);
+      setNotification({
+        text: "Failed to fetch donated NFTs",
+        type: "error",
+        visible: true,
+      });
+      setClaimedDonatedNFTs((prev) => ({ ...prev, loading: false }));
+      setUnclaimedDonatedNFTs((prev) => ({ ...prev, loading: false }));
+    }
   };
 
   const calculateProbability = async () => {
-    let count = 0;
-    const newData = await api.get_dashboard_info();
-    setData(newData);
-    if (newData) {
-      const round = newData?.CurRoundNum;
-      const bidList = await api.get_bid_list_by_round(round, "desc");
-      bidList.forEach((bid) => {
-        if (bid.BidderAddr === account) {
-          count++;
+    try {
+      const newData = await api.get_dashboard_info();
+      setData(newData);
+      if (newData) {
+        const round = newData?.CurRoundNum;
+        const bidList = await api.get_bid_list_by_round(round, "desc");
+        const totalBids = bidList.length;
+        const userBids = bidList.filter((bid) => bid.BidderAddr === account)
+          .length;
+        if (totalBids > 0) {
+          let probability =
+            1 -
+            Math.pow(
+              (totalBids - userBids) / totalBids,
+              newData?.NumRaffleEthWinnersBidding
+            );
+          setRaffleETHProbability(probability);
+          probability =
+            1 -
+            Math.pow(
+              (totalBids - userBids) / totalBids,
+              newData?.NumRaffleNFTWinnersBidding
+            );
+          setRaffleNFTProbability(probability);
+        } else {
+          setRaffleETHProbability(0);
+          setRaffleNFTProbability(0);
         }
-      });
-      let probability =
-        1 -
-        Math.pow(
-          (bidList.length - count) / bidList.length,
-          newData?.NumRaffleEthWinnersBidding
-        );
-      setRaffleETHProbability(probability);
-      probability =
-        1 -
-        Math.pow(
-          (bidList.length - count) / bidList.length,
-            newData?.NumRaffleNFTWinnersBidding
-        );
-      setRaffleNFTProbability(probability);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -170,11 +198,11 @@ const MyStatistics = () => {
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      console.log(err);
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({ text: msg, type: "error", visible: true });
-      }
+      console.error(err);
+      const msg = err?.data?.message
+        ? getErrorMessage(err.data.message)
+        : "An error occurred";
+      setNotification({ text: msg, type: "error", visible: true });
       e.target.disabled = false;
       e.target.classList.remove("Mui-disabled");
     }
@@ -191,11 +219,11 @@ const MyStatistics = () => {
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      console.log(err);
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({ text: msg, type: "error", visible: true });
-      }
+      console.error(err);
+      const msg = err?.data?.message
+        ? getErrorMessage(err.data.message)
+        : "An error occurred";
+      setNotification({ text: msg, type: "error", visible: true });
       setIsClaiming(false);
     }
   };
@@ -399,12 +427,12 @@ const MyStatistics = () => {
           </Box> */}
           {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
             <>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
+              <Box mb={1}>
+                <Typography color="primary" component="span">
                   Probability of Winning ETH:
-              </Typography>
-              &nbsp;
-              <Typography component="span">
+                </Typography>
+                &nbsp;
+                <Typography component="span">
                   {(raffleETHProbability * 100).toFixed(2)}%
                 </Typography>
               </Box>
@@ -415,8 +443,8 @@ const MyStatistics = () => {
                 &nbsp;
                 <Typography component="span">
                   {(raffleNFTProbability * 100).toFixed(2)}%
-              </Typography>
-            </Box>
+                </Typography>
+              </Box>
             </>
           )}
           <Typography mt={3}>
@@ -598,12 +626,6 @@ const MyStatistics = () => {
               Bid History
             </Typography>
             <BiddingHistoryTable biddingHistory={bidHistory} />
-          </Box>
-          <Box mt={6}>
-            <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-              ETH Donation History
-            </Typography>
-            <EthDonationTable list={ethDonations} />
           </Box>
           <Box>
             <Typography variant="h6" lineHeight={1} mt={8} mb={2}>

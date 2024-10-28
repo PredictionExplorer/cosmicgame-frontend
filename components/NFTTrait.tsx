@@ -55,7 +55,7 @@ const NFTTrait = ({ tokenId }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [nft, setNft] = useState(null);
-  const [prizeInfo, setPrizeInfo] = useState(null);
+  // const [prizeInfo, setPrizeInfo] = useState(null);
   const [dashboard, setDashboard] = useState(null);
   const [tokenName, setTokenName] = useState("");
   const [nameHistory, setNameHistory] = useState([]);
@@ -222,7 +222,7 @@ const NFTTrait = ({ tokenId }) => {
     try {
       const res = await api.get_cst_info(tokenId);
       setNft(res.TokenInfo);
-      setPrizeInfo(res.PrizeInfo);
+      // setPrizeInfo(res.PrizeInfo);
       setImage(
         `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${res.TokenInfo.Seed}.png`
       );

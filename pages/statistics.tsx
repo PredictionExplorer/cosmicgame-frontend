@@ -27,7 +27,7 @@ import { CustomPagination } from "../components/CustomPagination";
 import { CTBalanceDistributionChart } from "../components/CTBalanceDistributionChart";
 import { GetServerSideProps } from "next";
 import { UniqueEthDonorsTable } from "../components/UniqueEthDonorsTable";
-import EthDonationTable from "../components/EthDonationTable";
+// import EthDonationTable from "../components/EthDonationTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -68,24 +68,22 @@ const StatisticsItem = ({ title, value }: StatisticsItemProps) => (
 const Statistics = () => {
   const perPage = 12;
   const [curPage, setCurrentPage] = useState(1);
-  const [data, setData] = useState<any>(null);
-  const [currentRoundBidHistory, setCurrentRoundBidHistory] = useState<any[]>(
-    []
-  );
-  const [uniqueBidders, setUniqueBidders] = useState<any[]>([]);
-  const [uniqueWinners, setUniqueWinners] = useState<any[]>([]);
-  const [uniqueCSTStakers, setUniqueCSTStakers] = useState<any[]>([]);
-  const [uniqueRWLKStakers, setUniqueRWLKStakers] = useState<any[]>([]);
-  const [uniqueDonors, setUniqueDonors] = useState<any[]>([]);
-  const [nftDonations, setNftDonations] = useState<any[]>([]);
-  const [ethDonations, setEthDonations] = useState<any[]>([]);
-  const [cstDistribution, setCSTDistribution] = useState<any[]>([]);
-  const [ctBalanceDistribution, setCTBalanceDistribution] = useState<any[]>([]);
-  const [stakingCSTActions, setStakingCSTActions] = useState<any>(null);
-  const [stakingRWLKActions, setStakingRWLKActions] = useState<any>(null);
-  const [stakedCSTokens, setStakedCSTokens] = useState<any>(null);
-  const [stakedRWLKTokens, setStakedRWLKTokens] = useState<any>(null);
-  const [systemModeChanges, setSystemModeChanges] = useState<any>(null);
+  const [data, setData] = useState(null);
+  const [currentRoundBidHistory, setCurrentRoundBidHistory] = useState([]);
+  const [uniqueBidders, setUniqueBidders] = useState([]);
+  const [uniqueWinners, setUniqueWinners] = useState([]);
+  const [uniqueCSTStakers, setUniqueCSTStakers] = useState([]);
+  const [uniqueRWLKStakers, setUniqueRWLKStakers] = useState([]);
+  const [uniqueDonors, setUniqueDonors] = useState([]);
+  const [nftDonations, setNftDonations] = useState([]);
+  // const [ethDonations, setEthDonations] = useState([]);
+  const [cstDistribution, setCSTDistribution] = useState([]);
+  const [ctBalanceDistribution, setCTBalanceDistribution] = useState([]);
+  const [stakingCSTActions, setStakingCSTActions] = useState(null);
+  const [stakingRWLKActions, setStakingRWLKActions] = useState(null);
+  const [stakedCSTokens, setStakedCSTokens] = useState(null);
+  const [stakedRWLKTokens, setStakedRWLKTokens] = useState(null);
+  const [systemModeChanges, setSystemModeChanges] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cstBidData, setCSTBidData] = useState({
     AuctionDuration: 0,
@@ -408,12 +406,12 @@ const Statistics = () => {
           showRound={false}
         />
       </Box>
-      {ethDonations.length > 0 && (
+      {/* {ethDonations.length > 0 && (
         <Box my={4}>
           <Typography variant="h6">ETH DONATIONS FOR CURRENT ROUND</Typography>
           <EthDonationTable list={ethDonations} />
         </Box>
-      )}
+      )} */}
       <Typography variant="h5">Overall Statistics</Typography>
       <Box mt={4}>
         {overallStats.map((item) => (

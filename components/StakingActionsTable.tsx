@@ -54,7 +54,7 @@ const StakingActionsRow = ({ row, IsRwalk }) => {
   );
 };
 
-export const StakingActionsTable = ({ list, IsRwalk }) => {
+const StakingActionsTable = ({ list, IsRwalk }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -102,3 +102,5 @@ export const StakingActionsTable = ({ list, IsRwalk }) => {
     </>
   );
 };
+
+export default StakingActionsTable;

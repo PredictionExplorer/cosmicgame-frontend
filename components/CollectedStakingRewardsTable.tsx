@@ -193,7 +193,7 @@ const CollectedStakingRewardsRow = ({ row, owner }) => {
   );
 };
 
-export const CollectedStakingRewardsTable = ({ list, owner }) => {
+const CollectedStakingRewardsTable = ({ list, owner }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -255,3 +255,5 @@ export const CollectedStakingRewardsTable = ({ list, owner }) => {
     </>
   );
 };
+
+export default CollectedStakingRewardsTable;
