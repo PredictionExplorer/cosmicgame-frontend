@@ -4,9 +4,6 @@ import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
 import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
-import { UnclaimedStakingRewardsTable } from "../components/UnclaimedStakingRewardsTable";
-import { CollectedStakingRewardsTable } from "../components/CollectedStakingRewardsTable";
-import { StakingActionsTable } from "../components/StakingActionsTable";
 import { CSTokensTable } from "../components/CSTokensTable";
 import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
 import useStakingWalletRWLKContract from "../hooks/useStakingWalletRWLKContract";
@@ -25,6 +22,9 @@ import { ethers } from "ethers";
 import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
 import { GetServerSideProps } from "next";
+import UnclaimedStakingRewardsTable from "../components/UnclaimedStakingRewardsTable";
+import CollectedStakingRewardsTable from "../components/CollectedStakingRewardsTable";
+import StakingActionsTable from "../components/StakingActionsTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;

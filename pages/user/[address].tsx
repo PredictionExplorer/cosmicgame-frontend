@@ -7,10 +7,6 @@ import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import WinningHistoryTable from "../../components/WinningHistoryTable";
 import { ethers } from "ethers";
 import { formatEthValue } from "../../utils";
-import { UnclaimedStakingRewardsTable } from "../../components/UnclaimedStakingRewardsTable";
-import { CollectedStakingRewardsTable } from "../../components/CollectedStakingRewardsTable";
-import { StakingActionsTable } from "../../components/StakingActionsTable";
-import { MarketingRewardsTable } from "../../components/MarketingRewardsTable";
 import { useStakedToken } from "../../contexts/StakedTokenContext";
 import { useApiData } from "../../contexts/ApiDataContext";
 import { useActiveWeb3React } from "../../hooks/web3";
@@ -19,6 +15,10 @@ import DonatedNFTTable from "../../components/DonatedNFTTable";
 import { CSTTable } from "../my-tokens";
 import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
+import StakingActionsTable from "../../components/StakingActionsTable";
+import UnclaimedStakingRewardsTable from "../../components/UnclaimedStakingRewardsTable";
+import CollectedStakingRewardsTable from "../../components/CollectedStakingRewardsTable";
+import MarketingRewardsTable from "../../components/MarketingRewardsTable";
 // import EthDonationTable from "../../components/EthDonationTable";
 
 interface TabPanelProps {

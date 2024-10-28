@@ -4,7 +4,7 @@ import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
 import { ethers } from "ethers";
-import { MarketingRewardsTable } from "../../components/MarketingRewardsTable";
+import MarketingRewardsTable from "../../components/MarketingRewardsTable";
 
 const UserMarketingRewards = ({ address }) => {
   const [loading, setLoading] = useState(true);

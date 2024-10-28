@@ -17,13 +17,13 @@ import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 import router from "next/router";
 import { useApiData } from "../contexts/ApiDataContext";
 import api from "../services/api";
-import { UnclaimedStakingRewardsTable } from "../components/UnclaimedStakingRewardsTable";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "../components/CustomPagination";
 import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
 import { GetServerSideProps } from "next";
+import UnclaimedStakingRewardsTable from "../components/UnclaimedStakingRewardsTable";
 
 const MyWinningsRow = ({ winning }) => {
   if (!winning) {
