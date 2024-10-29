@@ -19,14 +19,8 @@ const getNAVs = (status, account) => {
         { title: "Marketing Rewards", route: "/marketing" },
       ],
     },
-    {
-      title: "Resources",
-      route: "",
-      children: [
-        { title: "Contracts", route: "/contracts" },
-        { title: "Statistics", route: "/statistics" },
-      ],
-    },
+    { title: "Contracts", route: "/contracts" },
+    { title: "Statistics", route: "/statistics" },
     {
       title: "Help",
       route: "",
