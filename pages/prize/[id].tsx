@@ -12,61 +12,120 @@ import StakingWinnerTable from "../../components/StakingWinnerTable";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
 import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
-// import EthDonationTable from "../../components/EthDonationTable";
 
-const PrizeInfo = ({ roundNum }) => {
+const InfoRow = ({
+  label,
+  value,
+  link,
+  monospace = false,
+}: {
+  label: string;
+  value: string | number;
+  link?: string;
+  monospace?: boolean;
+}) => (
+  <Box mb={1}>
+    <Typography color="primary" component="span">
+      {label}
+    </Typography>
+    &nbsp;
+    {link ? (
+      <Typography component="span">
+        <Link
+          href={link}
+          color="inherit"
+          fontSize="inherit"
+          target={link.startsWith("http") ? "__blank" : undefined}
+        >
+          {value}
+        </Link>
+      </Typography>
+    ) : (
+      <Typography
+        component="span"
+        fontFamily={monospace ? "monospace" : undefined}
+      >
+        {value}
+      </Typography>
+    )}
+  </Box>
+);
+
+const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
   const cosmicGameContract = useCosmicGameContract();
   const { apiData: status } = useApiData();
+  const { setNotification } = useNotification();
+
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState([]);
   const [bidHistory, setBidHistory] = useState([]);
   const [nftDonations, setNftDonations] = useState([]);
-  // const [ethDonations, setEthDonations] = useState([]);
-  const [prizeInfo, setPrizeInfo] = useState(null);
+  const [prizeInfo, setPrizeInfo] = useState<any>(null);
   const [stakingRewards, setStakingRewards] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { setNotification } = useNotification();
+  const [isClaiming, setIsClaiming] = useState(false);
+
+  const fetchUnclaimedDonatedNFTs = async () => {
+    const nfts = await api.get_donations_nft_unclaimed_by_round(roundNum);
+    setDonatedNFTToClaim(nfts);
+  };
+
   const handleAllDonatedNFTsClaim = async () => {
+    setIsClaiming(true);
     try {
       const indexList = donatedNFTToClaim.map((item) => item.Index);
       const res = await cosmicGameContract.claimManyDonatedNFTs(indexList);
       console.log(res);
+      await fetchUnclaimedDonatedNFTs();
     } catch (err) {
       if (err?.data?.message) {
         const msg = getErrorMessage(err?.data?.message);
         setNotification({ text: msg, type: "error", visible: true });
       }
       console.log(err);
+    } finally {
+      setIsClaiming(false);
     }
   };
+
   useEffect(() => {
-    const fetchUnclaimedDonatedNFTs = async () => {
-      const nfts = await api.get_donations_nft_unclaimed_by_round(roundNum);
-      setDonatedNFTToClaim(nfts);
-    };
     if (status?.NumDonatedNFTToClaim > 0) {
       fetchUnclaimedDonatedNFTs();
     }
-  }, [status]);
+  }, [status, roundNum]);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const nftDonations = await api.get_donations_nft_by_round(roundNum);
-      setNftDonations(nftDonations);
-      const prizeInfo = await api.get_prize_info(roundNum);
-      setPrizeInfo(prizeInfo);
-      const bidHistory = await api.get_bid_list_by_round(roundNum, "desc");
-      setBidHistory(bidHistory);
-      const stakingRewards = await api.get_staking_cst_rewards_by_round(
-        roundNum
-      );
-      setStakingRewards(stakingRewards);
-      // const donation = await api.get_donations_both_by_round(roundNum);
-      // setEthDonations(donation);
-      setLoading(false);
+      try {
+        const [
+          nftDonationsData,
+          prizeInfoData,
+          bidHistoryData,
+          stakingRewardsData,
+        ] = await Promise.all([
+          api.get_donations_nft_by_round(roundNum),
+          api.get_prize_info(roundNum),
+          api.get_bid_list_by_round(roundNum, "desc"),
+          api.get_staking_cst_rewards_by_round(roundNum),
+        ]);
+
+        setNftDonations(nftDonationsData);
+        setPrizeInfo(prizeInfoData);
+        setBidHistory(bidHistoryData);
+        setStakingRewards(stakingRewardsData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setNotification({
+          text: "Failed to load data. Please try again later.",
+          type: "error",
+          visible: true,
+        });
+      } finally {
+        setLoading(false);
+      }
     };
     fetchData();
-  }, []);
+  }, [roundNum]);
 
   return (
     <MainWrapper>
@@ -82,251 +141,97 @@ const PrizeInfo = ({ roundNum }) => {
         <Typography variant="h6">Loading...</Typography>
       ) : prizeInfo ? (
         <Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Datetime:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              <Link
-                color="inherit"
-                fontSize="inherit"
-                href={`https://arbiscan.io/tx/${prizeInfo.TxHash}`}
-                target="__blank"
-              >
-                {convertTimestampToDateTime(prizeInfo.TimeStamp)}
-              </Link>
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Prize Amount:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.AmountEth.toFixed(4)} ETH
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Prize Token ID:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              <Link
-                href={`/detail/${prizeInfo.TokenId}`}
-                color="inherit"
-                fontSize="inherit"
-              >
-                {prizeInfo.TokenId}
-              </Link>
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Winner Address:
-            </Typography>
-            &nbsp;
-            <Link
-              href={`/user/${prizeInfo.WinnerAddr}`}
-              style={{ color: "rgb(255, 255, 255)" }}
-            >
-              <Typography fontFamily="monospace" component="span">
-                {prizeInfo.WinnerAddr}
-              </Typography>
-            </Link>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Charity Address:
-            </Typography>
-            &nbsp;
-            <Typography fontFamily="monospace" component="span">
-              {prizeInfo.CharityAddress}
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Charity Amount:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.CharityAmountETH.toFixed(4)} ETH
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Endurance Champion Prize Winner Address:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              <Link
-                href={`/user/${prizeInfo.EnduranceWinnerAddr}`}
-                color="inherit"
-                fontSize="inherit"
-              >
-                {prizeInfo.EnduranceWinnerAddr}
-              </Link>
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Endurance Champion rewarded with CST NFT Token ID:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              <Link
-                href={`/detail/${prizeInfo.EnduranceERC721TokenId}`}
-                color="inherit"
-                fontSize="inherit"
-              >
-                {prizeInfo.EnduranceERC721TokenId}
-              </Link>
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Endurance Champion rewarded with CST (ERC20):
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.EnduranceERC20AmountEth} CST
-            </Typography>
-          </Box>
+          <InfoRow
+            label="Datetime:"
+            value={convertTimestampToDateTime(prizeInfo.TimeStamp)}
+            link={`https://arbiscan.io/tx/${prizeInfo.TxHash}`}
+          />
+          <InfoRow
+            label="Prize Amount:"
+            value={`${prizeInfo.AmountEth.toFixed(4)} ETH`}
+          />
+          <InfoRow
+            label="Prize Token ID:"
+            value={prizeInfo.TokenId}
+            link={`/detail/${prizeInfo.TokenId}`}
+          />
+          <InfoRow
+            label="Winner Address:"
+            value={prizeInfo.WinnerAddr}
+            link={`/user/${prizeInfo.WinnerAddr}`}
+            monospace
+          />
+          <InfoRow
+            label="Charity Address:"
+            value={prizeInfo.CharityAddress}
+            monospace
+          />
+          <InfoRow
+            label="Charity Amount:"
+            value={`${prizeInfo.CharityAmountETH.toFixed(4)} ETH`}
+          />
+          <InfoRow
+            label="Endurance Champion Prize Winner Address:"
+            value={prizeInfo.EnduranceWinnerAddr}
+            link={`/user/${prizeInfo.EnduranceWinnerAddr}`}
+          />
+          <InfoRow
+            label="Endurance Champion rewarded with CST NFT Token ID:"
+            value={prizeInfo.EnduranceERC721TokenId}
+            link={`/detail/${prizeInfo.EnduranceERC721TokenId}`}
+          />
+          <InfoRow
+            label="Endurance Champion rewarded with CST (ERC20):"
+            value={`${prizeInfo.EnduranceERC20AmountEth} CST`}
+          />
           {prizeInfo.StellarWinnerAddr !== "" && (
             <>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Stellar Spender Prize Winner Address:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  <Link
-                    href={`/user/${prizeInfo.StellarWinnerAddr}`}
-                    color="inherit"
-                    fontSize="inherit"
-                  >
-                    {prizeInfo.StellarWinnerAddr}
-                  </Link>
-                </Typography>
-              </Box>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Stellar Spender rewarded with CST NFT Token ID:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  <Link
-                    href={`/detail/${prizeInfo.StellarERC721TokenId}`}
-                    color="inherit"
-                    fontSize="inherit"
-                  >
-                    {prizeInfo.StellarERC721TokenId}
-                  </Link>
-                </Typography>
-              </Box>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Stellar Spender rewarded with CST (ERC20):
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {prizeInfo.StellarERC20AmountEth.toFixed(2)} CST
-                </Typography>
-              </Box>
+              <InfoRow
+                label="Stellar Spender Prize Winner Address:"
+                value={prizeInfo.StellarWinnerAddr}
+                link={`/user/${prizeInfo.StellarWinnerAddr}`}
+              />
+              <InfoRow
+                label="Stellar Spender rewarded with CST NFT Token ID:"
+                value={prizeInfo.StellarERC721TokenId}
+                link={`/detail/${prizeInfo.StellarERC721TokenId}`}
+              />
+              <InfoRow
+                label="Stellar Spender rewarded with CST (ERC20):"
+                value={`${prizeInfo.StellarERC20AmountEth.toFixed(2)} CST`}
+              />
             </>
           )}
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Total Bids:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.RoundStats.TotalBids}
-            </Typography>
-          </Box>
-          {/* <Box mb={1}>
-            <Typography color="primary" component="span">
-              Number of Eth Donations:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.RoundStats.TotalDonatedCount}
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Total Amount of Eth Donations:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.RoundStats.TotalDonatedAmountEth.toFixed(4)} ETH
-            </Typography>
-          </Box> */}
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Total Donated NFTs:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.RoundStats.TotalDonatedNFTs}
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Total Raffle Eth Deposits:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Total Raffle NFTs:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.RoundStats.TotalRaffleNFTs}
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Total Staking Deposit Amount:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Number of Staked Tokens:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {prizeInfo.StakingNumStakedTokens}
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
-              Number of Stakers:
-            </Typography>
-            &nbsp;
-            <Typography component="span">{stakingRewards.length}</Typography>
-          </Box>
+          <InfoRow label="Total Bids:" value={prizeInfo.RoundStats.TotalBids} />
+          <InfoRow
+            label="Total Donated NFTs:"
+            value={prizeInfo.RoundStats.TotalDonatedNFTs}
+          />
+          <InfoRow
+            label="Total Raffle Eth Deposits:"
+            value={`${prizeInfo.RoundStats.TotalRaffleEthDepositsEth.toFixed(
+              4
+            )} ETH`}
+          />
+          <InfoRow
+            label="Total Raffle NFTs:"
+            value={prizeInfo.RoundStats.TotalRaffleNFTs}
+          />
+          <InfoRow
+            label="Total Staking Deposit Amount:"
+            value={`${prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH`}
+          />
+          <InfoRow
+            label="Number of Staked Tokens:"
+            value={prizeInfo.StakingNumStakedTokens}
+          />
+          <InfoRow label="Number of Stakers:" value={stakingRewards.length} />
           <Box mt={4}>
             <Typography variant="h6" lineHeight={1}>
               Bid History
             </Typography>
             <BiddingHistoryTable biddingHistory={bidHistory} />
           </Box>
-          {/* <Box mt={4}>
-            <Typography variant="h6" lineHeight={1}>
-              ETH Donation History
-            </Typography>
-            <EthDonationTable list={ethDonations} />
-          </Box> */}
           <Box mt={4}>
             <Typography variant="h6" mb={2}>
               Raffle Winners
@@ -353,7 +258,11 @@ const PrizeInfo = ({ roundNum }) => {
             >
               <Typography variant="h6">Donated NFTs</Typography>
               {donatedNFTToClaim.length > 0 && (
-                <Button variant="contained" onClick={handleAllDonatedNFTsClaim}>
+                <Button
+                  variant="contained"
+                  onClick={handleAllDonatedNFTsClaim}
+                  disabled={isClaiming}
+                >
                   Claim All
                 </Button>
               )}
@@ -369,8 +278,8 @@ const PrizeInfo = ({ roundNum }) => {
 };
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const id = context.params!.id;
-  const roundNum = Array.isArray(id) ? id[0] : id;
+  const id = context.params!.id as string | string[];
+  const roundNum = Array.isArray(id) ? parseInt(id[0]) : parseInt(id);
   const title = `Prize Information for Round ${roundNum} | Cosmic Signature`;
   const description = `Prize Information for Round ${roundNum}`;
   const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
@@ -385,7 +294,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   ];
 
   return {
-    props: { title, description, openGraphData, roundNum: parseInt(roundNum) },
+    props: { title, description, openGraphData, roundNum },
   };
 }
 
