@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { TableBody, Tooltip, Typography } from "@mui/material";
 import {
   TablePrimary,
@@ -13,22 +13,20 @@ import { useRouter } from "next/router";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
+import { isMobile } from "react-device-detect";
 
-const PrizeRow = ({ prize }) => {
+const PrizeRow = React.memo(({ prize }: { prize: any }) => {
   const router = useRouter();
-  if (!prize) {
-    return <TablePrimaryRow />;
-  }
+
+  if (!prize) return <TablePrimaryRow />;
 
   return (
     <TablePrimaryRow
       sx={{ cursor: "pointer" }}
-      onClick={() => {
-        router.push(`/prize/${prize.PrizeNum}`);
-      }}
+      onClick={() => router.push(`/prize/${prize.PrizeNum}`)}
     >
       <TablePrimaryCell align="center">{prize.PrizeNum}</TablePrimaryCell>
-      <TablePrimaryCell>
+      <TablePrimaryCell align="center">
         {convertTimestampToDateTime(prize.TimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell>
@@ -40,22 +38,19 @@ const PrizeRow = ({ prize }) => {
           </Typography>
         </Tooltip>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell align="center">
         {prize.AmountEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {prize.RoundStats.TotalBids}
       </TablePrimaryCell>
-      {/* <TablePrimaryCell align="center">
-        {prize.RoundStats.TotalDonatedAmountEth.toFixed(4)}
-      </TablePrimaryCell> */}
       <TablePrimaryCell align="center">
         {prize.RoundStats.TotalDonatedNFTs}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell align="center">
         {prize.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
+      <TablePrimaryCell align="center">
         {prize.StakingDepositAmountEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -63,43 +58,58 @@ const PrizeRow = ({ prize }) => {
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
-};
+});
 
 export const PrizeTable = ({ list, loading }) => {
   const perPage = 10;
   const [page, setPage] = useState(1);
-  if (loading) {
-    return <Typography variant="h6">Loading...</Typography>;
-  }
-  if (list.length === 0) {
+
+  const paginatedList = useMemo(
+    () => list.slice((page - 1) * perPage, page * perPage),
+    [page, perPage, list]
+  );
+
+  if (loading) return <Typography variant="h6">Loading...</Typography>;
+  if (!list.length)
     return <Typography variant="h6">No winners yet.</Typography>;
-  }
+
+  const tableHeaders = [
+    { label: "Round", width: "5%" },
+    { label: "Datetime", width: "20%" },
+    { label: "Winner", width: "7%" },
+    { label: "Prize Amount", width: "15%", align: "center" },
+    { label: "Bids", width: "5%" },
+    { label: "Donated NFTs", width: "12%" },
+    { label: "Raffle Deposits", width: "12%", align: "center" },
+    { label: "Staking Deposit", width: "11%", align: "center" },
+    { label: "Raffle NFTs", width: "13%" },
+  ];
+
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              {tableHeaders.map((header, index) => (
+                <col key={index} style={{ width: header.width }} />
+              ))}
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Prize Amount
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Bids</TablePrimaryHeadCell>
-              {/* <TablePrimaryHeadCell>Donated Amount</TablePrimaryHeadCell> */}
-              <TablePrimaryHeadCell>Donated NFTs</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Raffle Deposits
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Staking Deposit
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Raffle NFTs</TablePrimaryHeadCell>
+              {tableHeaders.map((header, index) => (
+                <TablePrimaryHeadCell
+                  key={index}
+                  align={header.align || "center"}
+                >
+                  {header.label}
+                </TablePrimaryHeadCell>
+              ))}
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((prize) => (
+            {paginatedList.map((prize) => (
               <PrizeRow prize={prize} key={prize.EvtLogId} />
             ))}
           </TableBody>
