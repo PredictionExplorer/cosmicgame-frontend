@@ -75,154 +75,90 @@ const MyStaking = () => {
   const cosmicGameContract = useCosmicGameContract();
   const { setNotification } = useNotification();
 
-  const handleStake = async (tokenId: number, isRwalk: boolean) => {
+  const approveIfNeeded = async (contract, account, stakingWalletAddress) => {
+    const isApprovedForAll = await contract.isApprovedForAll(
+      account,
+      stakingWalletAddress
+    );
+    if (!isApprovedForAll) {
+      await contract
+        .setApprovalForAll(stakingWalletAddress, true)
+        .then((tx) => tx.wait());
+    }
+  };
+
+  const handleError = (err) => {
+    if (err?.data?.message) {
+      const msg = getErrorMessage(err?.data?.message);
+      setNotification({ text: msg, type: "error", visible: true });
+    }
+    console.error(err);
+  };
+
+  const handleStakeAction = async (
+    tokenIds: number | number[],
+    isRwalk: boolean
+  ) => {
     const contract = isRwalk ? rwalkContract : cosmicSignatureContract;
     const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
     const STAKING_WALLET_ADDRESS = isRwalk
       ? STAKING_WALLET_RWLK_ADDRESS
       : STAKING_WALLET_CST_ADDRESS;
     try {
-      const isApprovedForAll = await contract.isApprovedForAll(
-        account,
-        STAKING_WALLET_ADDRESS
-      );
-      if (!isApprovedForAll) {
-        await contract
-          .setApprovalForAll(STAKING_WALLET_ADDRESS, true)
-          .then((tx) => tx.wait());
-      }
-      const res = await stakingContract.stake(tokenId).then((tx) => tx.wait());
-      console.log(res);
+      await approveIfNeeded(contract, account, STAKING_WALLET_ADDRESS);
+
+      const res = Array.isArray(tokenIds)
+        ? await stakingContract.stakeMany(tokenIds).then((tx) => tx.wait())
+        : await stakingContract.stake(tokenIds).then((tx) => tx.wait());
+
       if (!res.code) {
         setNotification({
           visible: true,
-          text: `You have successfully staked token ${tokenId}!`,
+          text: Array.isArray(tokenIds)
+            ? "The selected tokens were staked successfully!"
+            : `You have successfully staked token ${tokenIds}!`,
           type: "success",
         });
       }
-      setTimeout(() => {
-        if (isRwalk) {
-          fetchRWLKData(account);
-        } else {
-          fetchCSTData(account, false);
-        }
-      }, 2000);
+      if (isRwalk) {
+        await fetchRWLKData(account);
+      } else {
+        await fetchCSTData(account, false);
+      }
       return res;
     } catch (err) {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({ text: msg, type: "error", visible: true });
-      }
-      console.error(err);
+      handleError(err);
       return err;
     }
   };
 
-  const handleStakeMany = async (tokenIds: number[], isRwalk: boolean) => {
-    const contract = isRwalk ? rwalkContract : cosmicSignatureContract;
+  const handleUnstakeAction = async (
+    actionIds: number | number[],
+    isRwalk: boolean
+  ) => {
     const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
-    const STAKING_WALLET_ADDRESS = isRwalk
-      ? STAKING_WALLET_RWLK_ADDRESS
-      : STAKING_WALLET_CST_ADDRESS;
     try {
-      const isApprovedForAll = await contract.isApprovedForAll(
-        account,
-        STAKING_WALLET_ADDRESS
-      );
-      if (!isApprovedForAll) {
-        await contract
-          .setApprovalForAll(STAKING_WALLET_ADDRESS, true)
-          .then((tx) => tx.wait());
-      }
-      const res = await stakingContract
-        .stakeMany(tokenIds)
-        .then((tx) => tx.wait());
-      console.log(res);
-      if (!res.code) {
-        setNotification({
-          visible: true,
-          text: "The selected tokens were staked successfully!",
-          type: "success",
-        });
-      }
-      setTimeout(() => {
-        if (isRwalk) {
-          fetchRWLKData(account);
-        } else {
-          fetchCSTData(account, false);
-        }
-      }, 2000);
-      return res;
-    } catch (err) {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({ text: msg, type: "error", visible: true });
-      }
-      console.error(err);
-      return err;
-    }
-  };
+      const res = Array.isArray(actionIds)
+        ? await stakingContract.unstakeMany(actionIds).then((tx) => tx.wait())
+        : await stakingContract.unstake(actionIds).then((tx) => tx.wait());
 
-  const handleUnstakeMany = async (actionIds: number[], isRwalk: boolean) => {
-    const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
-    try {
-      const res = await stakingContract
-        .unstakeMany(actionIds)
-        .then((tx) => tx.wait());
-      console.log(res);
       if (!res.code) {
         setNotification({
           visible: true,
-          text: "The selected tokens were unstaked successfully!",
+          text: Array.isArray(actionIds)
+            ? "The selected tokens were unstaked successfully!"
+            : `You have successfully unstaked token!`,
           type: "success",
         });
       }
-      setTimeout(() => {
-        if (isRwalk) {
-          fetchRWLKData(account);
-        } else {
-          fetchCSTData(account, false);
-        }
-      }, 2000);
+      if (isRwalk) {
+        await fetchRWLKData(account);
+      } else {
+        await fetchCSTData(account, false);
+      }
       return res;
     } catch (err) {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({ text: msg, type: "error", visible: true });
-      }
-      console.error(err);
-      return err;
-    }
-  };
-
-  const handleUnstake = async (actionId: number, isRwalk: boolean) => {
-    const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
-    try {
-      const res = await stakingContract
-        .unstake(actionId)
-        .then((tx) => tx.wait());
-      console.log(res);
-      if (!res.code) {
-        setNotification({
-          visible: true,
-          text: `You have successfully unstaked token!`,
-          type: "success",
-        });
-      }
-      setTimeout(() => {
-        if (isRwalk) {
-          fetchRWLKData(account);
-        } else {
-          fetchCSTData(account, false);
-        }
-      }, 2000);
-      return res;
-    } catch (err) {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({ text: msg, type: "error", visible: true });
-      }
-      console.error(err);
+      handleError(err);
       return err;
     }
   };
@@ -235,49 +171,64 @@ const MyStaking = () => {
     const data = await api.get_dashboard_info();
     setData(data);
     const stakingAmount = await cosmicGameContract.stakingAmount();
-    setRewardPerCST(
-      Number(ethers.utils.formatEther(stakingAmount)) /
-        data?.MainStats.StakeStatisticsCST.TotalTokensStaked
-    );
+    const totalStakedCST =
+      data?.MainStats.StakeStatisticsCST.TotalTokensStaked || 0;
+    if (totalStakedCST > 0) {
+      setRewardPerCST(
+        Number(ethers.utils.formatEther(stakingAmount)) / totalStakedCST
+      );
+    } else {
+      setRewardPerCST(0);
+    }
   };
 
   const fetchCSTData = async (addr: string, reload: boolean = true) => {
-    setLoading(reload);
-    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
-      addr
-    );
-    setUnclaimedStakingRewards(unclaimedStakingRewards);
-    const collectedStakingRewards = await api.get_collected_staking_rewards_by_user(
-      addr
-    );
-    setCollectedStakingRewards(collectedStakingRewards);
-    const stakingActions = await api.get_staking_cst_actions_by_user(addr);
+    if (reload) setLoading(true);
+    const [
+      unclaimedRewards,
+      collectedRewards,
+      stakingActions,
+      tokens,
+      mints,
+    ] = await Promise.all([
+      api.get_unclaimed_staking_rewards_by_user(addr),
+      api.get_collected_staking_rewards_by_user(addr),
+      api.get_staking_cst_actions_by_user(addr),
+      api.get_cst_tokens_by_user(addr),
+      api.get_staking_cst_mints_by_user(addr),
+    ]);
+
+    setUnclaimedStakingRewards(unclaimedRewards);
+    setCollectedStakingRewards(collectedRewards);
     setStakingCSTActions(stakingActions);
-    const CSTokens = await api.get_cst_tokens_by_user(addr);
-    setCSTokens(CSTokens.filter((x) => !x.WasUnstaked));
-    const mints = await api.get_staking_cst_mints_by_user(addr);
+    setCSTokens(tokens.filter((x) => !x.WasUnstaked));
     setCSTMints(mints);
     fetchStakedTokens();
     setLoading(false);
   };
 
   const fetchRWLKData = async (addr: string) => {
-    const stakingActions = await api.get_staking_rwalk_actions_by_user(addr);
+    const [stakingActions, mints] = await Promise.all([
+      api.get_staking_rwalk_actions_by_user(addr),
+      api.get_staking_rwalk_mints_by_user(addr),
+    ]);
+
     setStakingRWLKActions(stakingActions);
-    const mints = await api.get_staking_rwalk_mints_by_user(addr);
     setRwlkMints(mints);
     fetchStakedTokens();
+
     const rwlkStaked = stakedRWLKTokens.map((x) => x.StakedTokenId);
     const tokens = await nftContract.walletOfOwner(account);
     const nftIds = tokens
       .map((t) => t.toNumber())
       .sort()
-      .filter((x) => {
-        if (rwlkStaked.includes(x)) return false;
-        return !stakingActions.some(
-          (action) => action.ActionType !== 1 && action.TokenId === x
-        );
-      });
+      .filter(
+        (x) =>
+          !rwlkStaked.includes(x) &&
+          !stakingActions.some(
+            (action) => action.ActionType !== 1 && action.TokenId === x
+          )
+      );
     setRwlkTokens(nftIds);
   };
 
@@ -324,7 +275,7 @@ const MyStaking = () => {
               {data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked}
             </Typography>
           </Box>
-          {data?.MainStats.StakeStatisticsCST.TotalTokensStaked > 0 && (
+          {rewardPerCST > 0 && (
             <Box sx={{ display: "flex" }}>
               <Typography variant="subtitle1" mr={1}>
                 Reward (as of now) for staking 1 CST token:
@@ -424,8 +375,10 @@ const MyStaking = () => {
               </Typography>
               <CSTokensTable
                 list={CSTokens}
-                handleStake={handleStake}
-                handleStakeMany={handleStakeMany}
+                handleStake={(tokenId) => handleStakeAction(tokenId, false)}
+                handleStakeMany={(tokenIds) =>
+                  handleStakeAction(tokenIds, false)
+                }
               />
             </Box>
             <Box>
@@ -434,8 +387,12 @@ const MyStaking = () => {
               </Typography>
               <StakedTokensTable
                 list={stakedCSTokens}
-                handleUnstake={handleUnstake}
-                handleUnstakeMany={handleUnstakeMany}
+                handleUnstake={(actionId) =>
+                  handleUnstakeAction(actionId, false)
+                }
+                handleUnstakeMany={(actionIds) =>
+                  handleUnstakeAction(actionIds, false)
+                }
                 IsRwalk={false}
               />
             </Box>
@@ -459,8 +416,10 @@ const MyStaking = () => {
               </Typography>
               <RWLKNFTTable
                 list={rwlkTokens}
-                handleStake={handleStake}
-                handleStakeMany={handleStakeMany}
+                handleStake={(tokenId) => handleStakeAction(tokenId, true)}
+                handleStakeMany={(tokenIds) =>
+                  handleStakeAction(tokenIds, true)
+                }
               />
             </Box>
             <Box>
@@ -469,8 +428,12 @@ const MyStaking = () => {
               </Typography>
               <StakedTokensTable
                 list={stakedRWLKTokens}
-                handleUnstake={handleUnstake}
-                handleUnstakeMany={handleUnstakeMany}
+                handleUnstake={(actionId) =>
+                  handleUnstakeAction(actionId, true)
+                }
+                handleUnstakeMany={(actionIds) =>
+                  handleUnstakeAction(actionIds, true)
+                }
                 IsRwalk={true}
               />
             </Box>
