@@ -15,7 +15,7 @@ import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
 
-const PrizeRow = React.memo(({ prize }: { prize: any }) => {
+const PrizeRow = ({ prize }) => {
   const router = useRouter();
 
   if (!prize) return <TablePrimaryRow />;
@@ -58,7 +58,7 @@ const PrizeRow = React.memo(({ prize }: { prize: any }) => {
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
-});
+};
 
 export const PrizeTable = ({ list, loading }) => {
   const perPage = 10;

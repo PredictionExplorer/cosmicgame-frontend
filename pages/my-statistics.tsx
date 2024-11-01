@@ -68,6 +68,7 @@ const MyStatistics = () => {
   const [stakingTable, setStakingTable] = useState(0);
   const [raffleETHProbability, setRaffleETHProbability] = useState(0);
   const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
+  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -188,9 +189,8 @@ const MyStatistics = () => {
   };
 
   const handleDonatedNFTsClaim = async (e, tokenID) => {
+    setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
-      e.target.disabled = true;
-      e.target.classList.add("Mui-disabled");
       await cosmicGameContract.claimDonatedNFT(tokenID);
       setTimeout(() => {
         fetchData(account, false);
@@ -203,8 +203,8 @@ const MyStatistics = () => {
         ? getErrorMessage(err.data.message)
         : "An error occurred";
       setNotification({ text: msg, type: "error", visible: true });
-      e.target.disabled = false;
-      e.target.classList.remove("Mui-disabled");
+    } finally {
+      setClaimingDonatedNFTs((prev) => prev.filter((id) => id !== tokenID));
     }
   };
 
@@ -699,6 +699,7 @@ const MyStatistics = () => {
                   ...claimedDonatedNFTs.data,
                 ]}
                 handleClaim={handleDonatedNFTsClaim}
+                claimingTokens={claimingDonatedNFTs}
               />
             )}
           </Box>

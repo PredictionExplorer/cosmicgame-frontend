@@ -267,7 +267,11 @@ const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
                 </Button>
               )}
             </Box>
-            <DonatedNFTTable list={nftDonations} handleClaim={null} />
+            <DonatedNFTTable
+              list={nftDonations}
+              handleClaim={null}
+              claimingTokens={[]}
+            />
           </Box>
         </Box>
       ) : (

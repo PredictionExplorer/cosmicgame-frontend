@@ -71,6 +71,7 @@ const UserInfo = ({ address }) => {
   const [stakingTable, setStakingTable] = useState(0);
   const [raffleETHProbability, setRaffleETHProbability] = useState(0);
   const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
+  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -188,6 +189,7 @@ const UserInfo = ({ address }) => {
   };
 
   const handleDonatedNFTsClaim = async (tokenID) => {
+    setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
       setIsClaiming(true);
       await cosmicGameContract.claimDonatedNFT(tokenID);
@@ -203,6 +205,8 @@ const UserInfo = ({ address }) => {
         setNotification({ text: msg, type: "error", visible: true });
       }
       setIsClaiming(false);
+    } finally {
+      setClaimingDonatedNFTs((prev) => prev.filter((id) => id !== tokenID));
     }
   };
 
@@ -749,6 +753,7 @@ const UserInfo = ({ address }) => {
                     handleClaim={
                       account === address ? handleDonatedNFTsClaim : null
                     }
+                    claimingTokens={claimingDonatedNFTs}
                   />
                 )}
               </Box>

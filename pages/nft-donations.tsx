@@ -29,7 +29,11 @@ const NFTDonations = () => {
       {nftDonations === null ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
-        <DonatedNFTTable list={nftDonations} handleClaim={null} />
+        <DonatedNFTTable
+          list={nftDonations}
+          handleClaim={null}
+          claimingTokens={[]}
+        />
       )}
     </MainWrapper>
   );

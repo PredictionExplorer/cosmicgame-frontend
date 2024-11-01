@@ -30,59 +30,57 @@ const MyWinningsRow = ({ winning }) => {
     return <TablePrimaryRow />;
   }
 
+  const { TxHash, TimeStamp, RoundNum, Amount } = winning;
+
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${winning.TxHash}`}
+          href={`https://arbiscan.io/tx/${TxHash}`}
           target="__blank"
         >
-          {convertTimestampToDateTime(winning.TimeStamp)}
+          {convertTimestampToDateTime(TimeStamp)}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/prize/${winning.RoundNum}`}
+          href={`/prize/${RoundNum}`}
           style={{
             color: "inherit",
             fontSize: "inherit",
           }}
           target="_blank"
         >
-          {winning.RoundNum}
+          {RoundNum}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">
-        {winning.Amount.toFixed(7)}
-      </TablePrimaryCell>
+      <TablePrimaryCell align="right">{Amount.toFixed(7)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-const MyWinningsTable = ({ list }) => {
-  return (
-    <TablePrimaryContainer>
-      <TablePrimary>
-        <TablePrimaryHead>
-          <Tr>
-            <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">
-              Amount (ETH)
-            </TablePrimaryHeadCell>
-          </Tr>
-        </TablePrimaryHead>
-        <TableBody>
-          {list.map((winning) => (
-            <MyWinningsRow key={winning.EvtLogId} winning={winning} />
-          ))}
-        </TableBody>
-      </TablePrimary>
-    </TablePrimaryContainer>
-  );
-};
+const MyWinningsTable = ({ list }) => (
+  <TablePrimaryContainer>
+    <TablePrimary>
+      <TablePrimaryHead>
+        <Tr>
+          <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+          <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+          <TablePrimaryHeadCell align="right">
+            Amount (ETH)
+          </TablePrimaryHeadCell>
+        </Tr>
+      </TablePrimaryHead>
+      <TableBody>
+        {list.map((winning) => (
+          <MyWinningsRow key={winning.EvtLogId} winning={winning} />
+        ))}
+      </TableBody>
+    </TablePrimary>
+  </TablePrimaryContainer>
+);
 
 const MyWinnings = () => {
   const { account } = useActiveWeb3React();
@@ -96,17 +94,18 @@ const MyWinnings = () => {
     donatedNFT: false,
     raffleETH: false,
   });
+  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
   const { setNotification } = useNotification();
 
   const cosmicGameContract = useCosmicGameContract();
   const raffleWalletContract = useRaffleWalletContract();
 
   const handleAllETHClaim = async () => {
+    setIsClaiming((prevState) => ({
+      ...prevState,
+      raffleETH: true,
+    }));
     try {
-      setIsClaiming({
-        ...isClaiming,
-        raffleETH: true,
-      });
       await raffleWalletContract.withdraw();
       setTimeout(() => {
         fetchStatusData();
@@ -117,16 +116,17 @@ const MyWinnings = () => {
         const msg = getErrorMessage(err?.data?.message);
         setNotification({ text: msg, type: "error", visible: true });
       }
-      setIsClaiming({
-        ...isClaiming,
+    } finally {
+      setIsClaiming((prevState) => ({
+        ...prevState,
         raffleETH: false,
-      });
+      }));
     }
   };
-  const handleDonatedNFTsClaim = async (e, tokenID) => {
+
+  const handleDonatedNFTsClaim = async (tokenID) => {
+    setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
-      e.target.disabled = true;
-      e.target.classList.add("Mui-disabled");
       await cosmicGameContract.claimDonatedNFT(tokenID);
       setTimeout(() => {
         fetchStatusData();
@@ -137,19 +137,19 @@ const MyWinnings = () => {
         const msg = getErrorMessage(err?.data?.message);
         setNotification({ text: msg, type: "error", visible: true });
       }
-      e.target.disabled = false;
-      e.target.classList.remove("Mui-disabled");
+    } finally {
+      setClaimingDonatedNFTs((prev) => prev.filter((id) => id !== tokenID));
     }
   };
+
   const handleAllDonatedNFTsClaim = async () => {
+    setIsClaiming((prevState) => ({
+      ...prevState,
+      donatedNFT: true,
+    }));
     try {
-      setIsClaiming({
-        ...isClaiming,
-        donatedNFT: true,
-      });
       const indexList = donatedNFTToClaim.map((item) => item.Index);
-      const res = await cosmicGameContract.claimManyDonatedNFTs(indexList);
-      console.log(res);
+      await cosmicGameContract.claimManyDonatedNFTs(indexList);
       setTimeout(() => {
         fetchStatusData();
       }, 3000);
@@ -159,33 +159,35 @@ const MyWinnings = () => {
         const msg = getErrorMessage(err?.data?.message);
         setNotification({ text: msg, type: "error", visible: true });
       }
-      setIsClaiming({
-        ...isClaiming,
+    } finally {
+      setIsClaiming((prevState) => ({
+        ...prevState,
         donatedNFT: false,
-      });
+      }));
     }
   };
-  const fetchUnclaimedStakingRewards = async () => {
-    const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
-      account
-    );
-    setUnclaimedStakingRewards(unclaimedStakingRewards);
+
+  const fetchAllUnclaimedData = async () => {
+    if (!account) return;
+
+    try {
+      const [rewards, nfts, deposits] = await Promise.all([
+        api.get_unclaimed_staking_rewards_by_user(account),
+        api.get_unclaimed_donated_nft_by_user(account),
+        api.get_unclaimed_raffle_deposits_by_user(account),
+      ]);
+
+      setUnclaimedStakingRewards(rewards);
+      setDonatedNFTToClaim(nfts.sort((a, b) => a.TimeStamp - b.TimeStamp));
+      setRaffleETHToClaim(deposits.sort((a, b) => b.TimeStamp - a.TimeStamp));
+    } catch (error) {
+      console.error("Error fetching unclaimed data", error);
+    }
   };
-  const fetchUnclaimedDonatedNFTs = async () => {
-    let nfts = await api.get_unclaimed_donated_nft_by_user(account);
-    nfts = nfts.sort((a, b) => a.TimeStamp - b.TimeStamp);
-    setDonatedNFTToClaim(nfts);
-  };
-  const fetchUnclaimedRaffleETHDeposits = async () => {
-    let deposits = await api.get_unclaimed_raffle_deposits_by_user(account);
-    deposits = deposits.sort((a, b) => b.TimeStamp - a.TimeStamp);
-    setRaffleETHToClaim(deposits);
-  };
+
   useEffect(() => {
-    fetchUnclaimedStakingRewards();
-    fetchUnclaimedDonatedNFTs();
-    fetchUnclaimedRaffleETHDeposits();
-  }, [status]);
+    fetchAllUnclaimedData();
+  }, [account, status]);
 
   return (
     <MainWrapper>
@@ -258,7 +260,7 @@ const MyWinnings = () => {
               <UnclaimedStakingRewardsTable
                 list={unclaimedStakingRewards}
                 owner={account}
-                fetchData={fetchUnclaimedStakingRewards}
+                fetchData={fetchAllUnclaimedData}
               />
             )}
           </Box>
@@ -285,6 +287,7 @@ const MyWinnings = () => {
               <DonatedNFTTable
                 list={donatedNFTToClaim}
                 handleClaim={handleDonatedNFTsClaim}
+                claimingTokens={claimingDonatedNFTs}
               />
             )}
           </Box>

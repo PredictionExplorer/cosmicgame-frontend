@@ -15,22 +15,28 @@ import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
 
-const NFTRow = ({ nft, handleClaim }) => {
+const NFTRow = ({ nft, handleClaim, claimingTokens }) => {
   const [tokenURI, setTokenURI] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data } = await axios.get(nft.NFTTokenURI);
-      setTokenURI(data);
+      try {
+        const { data } = await axios.get(nft.NFTTokenURI);
+        setTokenURI(data);
+      } catch (error) {
+        console.error("Error fetching token URI:", error);
+      }
     };
     if (nft.NFTTokenURI) {
       fetchData();
     }
-  }, []);
+  }, [nft.NFTTokenURI]);
 
   if (!nft) {
     return <TablePrimaryRow />;
   }
+
+  const isClaiming = claimingTokens.includes(nft.Index);
 
   return (
     <TablePrimaryRow>
@@ -89,7 +95,7 @@ const NFTRow = ({ nft, handleClaim }) => {
       <TablePrimaryCell align="center">
         {tokenURI?.external_url ? (
           <Link
-            href={tokenURI?.external_url}
+            href={tokenURI.external_url}
             target="_blank"
             sx={{ fontSize: "inherit", color: "inherit" }}
           >
@@ -100,22 +106,25 @@ const NFTRow = ({ nft, handleClaim }) => {
         )}
       </TablePrimaryCell>
       <TablePrimaryCell sx={{ width: "130px" }}>
-        <Link href={tokenURI?.external_url} target="_blank">
-          <NFTImage src={tokenURI?.image} />
-        </Link>
+        {tokenURI?.image ? (
+          <Link href={tokenURI.external_url} target="_blank">
+            <NFTImage src={tokenURI.image} />
+          </Link>
+        ) : (
+          <Typography variant="body2">Image not available</Typography>
+        )}
       </TablePrimaryCell>
       {handleClaim && (
         <TablePrimaryCell>
-          {!nft.WinnerAddr ? (
+          {!nft.WinnerAddr && (
             <Button
               variant="contained"
-              onClick={(e) => handleClaim(e, nft.Index)}
+              onClick={() => handleClaim(nft.Index)}
+              disabled={isClaiming}
               data-testid="Claim Button"
             >
-              Claim
+              {isClaiming ? "Claiming..." : "Claim"}
             </Button>
-          ) : (
-            " "
           )}
         </TablePrimaryCell>
       )}
@@ -123,12 +132,14 @@ const NFTRow = ({ nft, handleClaim }) => {
   );
 };
 
-const DonatedNFTTable = ({ list, handleClaim }) => {
+const DonatedNFTTable = ({ list, handleClaim, claimingTokens }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
-  if (list.length === 0) {
+
+  if (!list || list.length === 0) {
     return <Typography>No donated NFTs yet.</Typography>;
   }
+
   return (
     <>
       <TablePrimaryContainer>
@@ -150,7 +161,12 @@ const DonatedNFTTable = ({ list, handleClaim }) => {
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((nft) => (
-              <NFTRow nft={nft} key={nft.RecordId} handleClaim={handleClaim} />
+              <NFTRow
+                nft={nft}
+                key={nft.RecordId}
+                handleClaim={handleClaim}
+                claimingTokens={claimingTokens}
+              />
             ))}
           </TableBody>
         </TablePrimary>
