@@ -3,7 +3,7 @@ import { Box, Button, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
-import { convertTimestampToDateTime } from "../../utils";
+import { convertTimestampToDateTime, getEnduranceChampions } from "../../utils";
 import RaffleWinnerTable from "../../components/RaffleWinnerTable";
 import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import useCosmicGameContract from "../../hooks/useCosmicGameContract";
@@ -12,6 +12,7 @@ import StakingWinnerTable from "../../components/StakingWinnerTable";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
 import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
+import EnduranceChampionsTable from "../../components/EnduranceChampionsTable";
 
 const InfoRow = ({
   label,
@@ -63,6 +64,7 @@ const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
   const [stakingRewards, setStakingRewards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
+  const [championList, setChampionList] = useState<any>(null);
 
   const fetchUnclaimedDonatedNFTs = async () => {
     const nfts = await api.get_donations_nft_unclaimed_by_round(roundNum);
@@ -102,17 +104,27 @@ const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
           prizeInfoData,
           bidHistoryData,
           stakingRewardsData,
+          championsData,
         ] = await Promise.all([
           api.get_donations_nft_by_round(roundNum),
           api.get_prize_info(roundNum),
           api.get_bid_list_by_round(roundNum, "desc"),
           api.get_staking_cst_rewards_by_round(roundNum),
+          (async () => {
+            const bids = await api.get_bid_list_by_round(roundNum, "desc");
+            const champions = getEnduranceChampions(bids);
+            const sortedChampions = [...champions].sort(
+              (a, b) => b.chronoWarrior - a.chronoWarrior
+            );
+            return sortedChampions;
+          })(),
         ]);
 
         setNftDonations(nftDonationsData);
         setPrizeInfo(prizeInfoData);
         setBidHistory(bidHistoryData);
         setStakingRewards(stakingRewardsData);
+        setChampionList(championsData);
       } catch (error) {
         console.error("Error fetching data:", error);
         setNotification({
@@ -231,6 +243,10 @@ const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
               Bid History
             </Typography>
             <BiddingHistoryTable biddingHistory={bidHistory} />
+          </Box>
+          <Box mt={4}>
+            <Typography variant="h6">Endurance Champions</Typography>
+            <EnduranceChampionsTable championList={championList} />
           </Box>
           <Box mt={4}>
             <Typography variant="h6" mb={2}>

@@ -61,7 +61,11 @@ import {
 import "@progress/kendo-theme-default/dist/all.css";
 import getErrorMessage from "../utils/alert";
 import NFTImage from "../components/NFTImage";
-import { calculateTimeDiff, formatSeconds } from "../utils";
+import {
+  calculateTimeDiff,
+  formatSeconds,
+  getEnduranceChampions,
+} from "../utils";
 import WinningHistoryTable from "../components/WinningHistoryTable";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
@@ -477,98 +481,6 @@ const NewHome = () => {
     } catch (e) {
       console.log(e);
     }
-  };
-
-  const getEnduranceChampions = (bidList: any[]) => {
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (!bidList || bidList.length === 0) {
-      return [];
-    }
-    let currentRoundBids = [...bidList].sort(
-      (a, b) => a.TimeStamp - b.TimeStamp
-    );
-
-    if (currentRoundBids.length === 1) {
-      return [
-        {
-          bidder: currentRoundBids[0].BidderAddr,
-          championTime: currentTime - currentRoundBids[0].TimeStamp,
-          chronoWarrior: 0,
-        },
-      ];
-    } else if (currentRoundBids.length === 0) {
-      return [];
-    }
-
-    let enduranceChampions: any[] = [];
-
-    // Calculate endurance champions
-    for (let i = 1; i < currentRoundBids.length; i++) {
-      const enduranceDuration =
-        currentRoundBids[i].TimeStamp - currentRoundBids[i - 1].TimeStamp;
-
-      if (
-        enduranceChampions.length === 0 ||
-        enduranceDuration >
-          enduranceChampions[enduranceChampions.length - 1].championTime
-      ) {
-        enduranceChampions.push({
-          address: currentRoundBids[i - 1].BidderAddr,
-          championTime: enduranceDuration,
-          startTime: currentRoundBids[i - 1].TimeStamp,
-          endTime: currentRoundBids[i].TimeStamp,
-        });
-      }
-    }
-
-    // Handle the last bid's duration to currentTime
-    const lastBid = currentRoundBids[currentRoundBids.length - 1];
-    const lastEnduranceDuration = currentTime - lastBid.TimeStamp;
-
-    if (
-      enduranceChampions.length === 0 ||
-      lastEnduranceDuration >
-        enduranceChampions[enduranceChampions.length - 1].championTime
-    ) {
-      enduranceChampions.push({
-        address: lastBid.BidderAddr,
-        championTime: lastEnduranceDuration,
-        startTime: lastBid.TimeStamp,
-        endTime: currentTime,
-      });
-    }
-
-    // Calculate chrono warrior time
-    for (let i = 0; i < enduranceChampions.length; i++) {
-      let chronoStartTime, chronoEndTime;
-
-      if (i === 0) {
-        chronoStartTime = enduranceChampions[i].startTime;
-      } else {
-        chronoStartTime =
-          enduranceChampions[i].startTime +
-          enduranceChampions[i - 1].championTime;
-      }
-
-      if (i < enduranceChampions.length - 1) {
-        chronoEndTime =
-          enduranceChampions[i + 1].startTime +
-          enduranceChampions[i].championTime;
-      } else {
-        chronoEndTime = currentTime;
-      }
-
-      enduranceChampions[i].chronoWarrior = Math.max(
-        0,
-        chronoEndTime - chronoStartTime
-      );
-    }
-
-    return enduranceChampions.map((champion) => ({
-      bidder: champion.address,
-      championTime: champion.championTime,
-      chronoWarrior: champion.chronoWarrior,
-    }));
   };
 
   const fetchData = async () => {
