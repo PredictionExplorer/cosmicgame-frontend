@@ -29,19 +29,53 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
 
+const recordTypeMap = {
+  0: { icon: <ConfirmationNumberIcon />, text: "ETH Deposit" },
+  1: { icon: <TokenIcon />, text: "Cosmic Signature Token" },
+  2: { icon: <VolunteerActivismIcon />, text: "Donated NFT" },
+  3: { icon: <EmojiEventsIcon />, text: "Main Prize" },
+  4: {
+    icon: <ConfirmationNumberIcon />,
+    text: "Cosmic Signature Staking ETH Deposit",
+  },
+  5: { icon: <LayersIcon />, text: "Random Walk Staking Raffle Token" },
+  6: { icon: <LayersIcon />, text: "Cosmic Signature Staking Raffle Token" },
+  7: { icon: <EmojiEventsIcon />, text: "Endurance Champion NFT Winner" },
+  8: { icon: <EmojiEventsIcon />, text: "Stellar Spender NFT Winner" },
+  9: { icon: <EmojiEventsIcon />, text: "Endurance Champion ERC20 winner" },
+  10: { icon: <EmojiEventsIcon />, text: "Stellar Spender ERC20 Winner" },
+};
+
 const HistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
   const [tokenURI, setTokenURI] = useState(null);
+
   useEffect(() => {
-    const fetchTokenURI = async () => {
-      const { data } = await axios.get(history.TokenURI);
-      setTokenURI(data);
-    };
-    fetchTokenURI();
+    if (
+      history &&
+      history.TokenId >= 0 &&
+      ![1, 3, 5, 6].includes(history.RecordType)
+    ) {
+      const fetchTokenURI = async () => {
+        try {
+          const { data } = await axios.get(history.TokenURI);
+          setTokenURI(data);
+        } catch (error) {
+          console.error("Failed to fetch token URI:", error);
+        }
+      };
+      fetchTokenURI();
+    }
   }, [history]);
 
   if (!history) {
     return <TablePrimaryRow />;
   }
+
+  const recordType = recordTypeMap[history.RecordType] || {
+    icon: null,
+    text: " ",
+  };
+
   return (
     <TablePrimaryRow
       sx={
@@ -51,64 +85,8 @@ const HistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
     >
       <TablePrimaryCell>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {history.RecordType === 0 ? (
-            <>
-              <ConfirmationNumberIcon />
-              &nbsp;<span>ETH Deposit</span>
-            </>
-          ) : history.RecordType === 1 ? (
-            <>
-              <TokenIcon />
-              &nbsp;<span>Cosmic Signature Token</span>
-            </>
-          ) : history.RecordType === 2 ? (
-            <>
-              <VolunteerActivismIcon />
-              &nbsp;<span>Donated NFT</span>
-            </>
-          ) : history.RecordType === 3 ? (
-            <>
-              <EmojiEventsIcon />
-              &nbsp;<span>Main Prize</span>
-            </>
-          ) : history.RecordType === 4 ? (
-            <>
-              <ConfirmationNumberIcon />
-              &nbsp;<span>Cosmic Signature Staking ETH Deposit</span>
-            </>
-          ) : history.RecordType === 5 ? (
-            <>
-              <LayersIcon />
-              &nbsp;<span>Random Walk Staking Raffle Token</span>
-            </>
-          ) : history.RecordType === 6 ? (
-            <>
-              <LayersIcon />
-              &nbsp;<span>Cosmic Signature Staking Raffle Token</span>
-            </>
-          ) : history.RecordType === 7 ? (
-            <>
-              <EmojiEventsIcon />
-              &nbsp;<span>Endurance Champion NFT Winner</span>
-            </>
-          ) : history.RecordType === 8 ? (
-            <>
-              <EmojiEventsIcon />
-              &nbsp;<span>Stellar Spender NFT Winner</span>
-            </>
-          ) : history.RecordType === 9 ? (
-            <>
-              <EmojiEventsIcon />
-              &nbsp;<span>Endurance Champion ERC20 winner</span>
-            </>
-          ) : history.RecordType === 10 ? (
-            <>
-              <EmojiEventsIcon />
-              &nbsp;<span>Stellar Spender ERC20 Winner</span>
-            </>
-          ) : (
-            " "
-          )}
+          {recordType.icon}
+          &nbsp;<span>{recordType.text}</span>
           &nbsp;
           {!history.Claimed && showClaimedStatus && (
             <Tooltip title="This winning is unclaimed, go to Pending Winnings page and claim it.">
@@ -161,16 +139,12 @@ const HistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
-        {history.RecordType === 1 ||
-        history.RecordType === 5 ||
-        history.RecordType === 6
+        {[1, 5, 6].includes(history.RecordType)
           ? "N/A"
           : history.AmountEth.toFixed(4)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {history.RecordType === 0 ? (
-          " "
-        ) : history.RecordType === 1 ? (
+        {history.RecordType === 1 ? (
           <Tooltip
             title={
               <Typography fontFamily="monospace">
@@ -190,7 +164,7 @@ const HistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
               {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS, 6)}
             </Link>
           </Tooltip>
-        ) : history.TokenAddress !== "" ? (
+        ) : history.TokenAddress ? (
           <Tooltip
             title={
               <Typography fontFamily="monospace">
@@ -215,44 +189,50 @@ const HistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {history.TokenId >= 0 ? (
-          history.RecordType === 1 || history.RecordType === 3 ? (
-            <Link
-              href={`/detail/${history.TokenId}`}
-              sx={{
-                fontSize: "inherit",
-                color: "inherit",
-              }}
-              target="_blank"
-            >
-              {history.TokenId}
-            </Link>
-          ) : history.RecordType === 5 || history.RecordType === 6 ? (
-            <Link
-              href={`https://randomwalknft.com/detail/${history.TokenId}`}
-              sx={{
-                fontSize: "inherit",
-                color: "inherit",
-              }}
-              target="_blank"
-            >
-              {history.TokenId}
-            </Link>
-          ) : (
-            <Link
-              href={tokenURI?.external_url}
-              sx={{
-                fontSize: "inherit",
-                color: "inherit",
-              }}
-              target="_blank"
-            >
-              {history.TokenId}
-            </Link>
-          )
-        ) : (
-          " "
-        )}
+        {history.TokenId >= 0
+          ? (() => {
+              if ([1, 3].includes(history.RecordType)) {
+                return (
+                  <Link
+                    href={`/detail/${history.TokenId}`}
+                    sx={{
+                      fontSize: "inherit",
+                      color: "inherit",
+                    }}
+                    target="_blank"
+                  >
+                    {history.TokenId}
+                  </Link>
+                );
+              } else if ([5, 6].includes(history.RecordType)) {
+                return (
+                  <Link
+                    href={`https://randomwalknft.com/detail/${history.TokenId}`}
+                    sx={{
+                      fontSize: "inherit",
+                      color: "inherit",
+                    }}
+                    target="_blank"
+                  >
+                    {history.TokenId}
+                  </Link>
+                );
+              } else {
+                return (
+                  <Link
+                    href={tokenURI?.external_url}
+                    sx={{
+                      fontSize: "inherit",
+                      color: "inherit",
+                    }}
+                    target="_blank"
+                  >
+                    {history.TokenId}
+                  </Link>
+                );
+              }
+            })()
+          : " "}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">
         {history.WinnerIndex >= 0 ? history.WinnerIndex : " "}
@@ -267,56 +247,52 @@ const HistoryTable = ({
   curPage,
   showClaimedStatus,
   showWinnerAddr,
-}) => {
-  return (
-    <TablePrimaryContainer>
-      <TablePrimary>
-        {!isMobile && (
-          <colgroup>
-            <col width="20%" />
-            <col width="14%" />
-            {showWinnerAddr && <col width="17%" />}
-            <col width="7%" />
-            <col width="11%" />
-            <col width="17%" />
-            <col width="8%" />
-            <col width="7%" />
-          </colgroup>
-        )}
-        <TablePrimaryHead>
-          <Tr>
-            <TablePrimaryHeadCell align="left">
-              Record Type
-            </TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-            {showWinnerAddr && (
-              <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
-            )}
-            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">
-              Amount (ETH)
-            </TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Token Address</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">Position</TablePrimaryHeadCell>
-          </Tr>
-        </TablePrimaryHead>
-        <TableBody>
-          {winningHistory
-            .slice((curPage - 1) * perPage, curPage * perPage)
-            .map((history, index) => (
-              <HistoryRow
-                history={history}
-                key={(curPage - 1) * perPage + index}
-                showClaimedStatus={showClaimedStatus}
-                showWinnerAddr={showWinnerAddr}
-              />
-            ))}
-        </TableBody>
-      </TablePrimary>
-    </TablePrimaryContainer>
-  );
-};
+}) => (
+  <TablePrimaryContainer>
+    <TablePrimary>
+      {!isMobile && (
+        <colgroup>
+          <col width="20%" />
+          <col width="14%" />
+          {showWinnerAddr && <col width="17%" />}
+          <col width="7%" />
+          <col width="11%" />
+          <col width="17%" />
+          <col width="8%" />
+          <col width="7%" />
+        </colgroup>
+      )}
+      <TablePrimaryHead>
+        <Tr>
+          <TablePrimaryHeadCell align="left">Record Type</TablePrimaryHeadCell>
+          <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+          {showWinnerAddr && (
+            <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
+          )}
+          <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+          <TablePrimaryHeadCell align="right">
+            Amount (ETH)
+          </TablePrimaryHeadCell>
+          <TablePrimaryHeadCell>Token Address</TablePrimaryHeadCell>
+          <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+          <TablePrimaryHeadCell align="right">Position</TablePrimaryHeadCell>
+        </Tr>
+      </TablePrimaryHead>
+      <TableBody>
+        {winningHistory
+          .slice((curPage - 1) * perPage, curPage * perPage)
+          .map((history, index) => (
+            <HistoryRow
+              history={history}
+              key={history.TxHash || index}
+              showClaimedStatus={showClaimedStatus}
+              showWinnerAddr={showWinnerAddr}
+            />
+          ))}
+      </TableBody>
+    </TablePrimary>
+  </TablePrimaryContainer>
+);
 
 const WinningHistoryTable = ({
   winningHistory,
@@ -325,9 +301,11 @@ const WinningHistoryTable = ({
 }) => {
   const perPage = 5;
   const [curPage, setCurrentPage] = useState(1);
+
   if (winningHistory.length === 0) {
     return <Typography>No history yet.</Typography>;
   }
+
   return (
     <Box mt={2}>
       <HistoryTable
