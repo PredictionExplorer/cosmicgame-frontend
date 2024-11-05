@@ -55,7 +55,6 @@ const NFTTrait = ({ tokenId }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [nft, setNft] = useState(null);
-  // const [prizeInfo, setPrizeInfo] = useState(null);
   const [dashboard, setDashboard] = useState(null);
   const [tokenName, setTokenName] = useState("");
   const [nameHistory, setNameHistory] = useState([]);
@@ -65,6 +64,8 @@ const NFTTrait = ({ tokenId }) => {
   const nftContract = useCosmicSignatureContract();
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
+
+  const BASE_URL = "https://cosmic-game2.s3.us-east-2.amazonaws.com";
 
   const handleClickTransfer = async () => {
     const { ethereum } = window;
@@ -76,20 +77,22 @@ const NFTTrait = ({ tokenId }) => {
       if (Number(txCount) === 0) {
         setOpenDialog(true);
       } else {
-        handleTransfer();
+        await handleTransfer();
       }
     } catch (err) {
-      console.log(err);
-      return;
+      console.error(err);
     }
   };
-  const handleClose = () => {
+
+  const handleCloseDialog = () => {
     setOpenDialog(false);
   };
-  const handlePlay = (videoPath) => {
-    fetch(videoPath).then((res) => {
+
+  const handlePlay = async (videoUrl) => {
+    try {
+      const res = await fetch(videoUrl, { method: "HEAD" });
       if (res.ok) {
-        setVideoPath(videoPath);
+        setVideoPath(videoUrl);
         setOpen(true);
       } else {
         setNotification({
@@ -98,82 +101,81 @@ const NFTTrait = ({ tokenId }) => {
           text: "Video is being generated, come back later!",
         });
       }
-    });
+    } catch (error) {
+      setNotification({
+        visible: true,
+        type: "info",
+        text: "Video is being generated, come back later!",
+      });
+    }
   };
+
   const handleTransfer = async () => {
-    handleClose();
+    handleCloseDialog();
     try {
-      await nftContract
-        .transferFrom(account, address, tokenId)
-        .then((tx) => tx.wait());
-      setTimeout(() => {
-        fetchCSTInfo();
-        fetchTransferHistory();
-        setAddress("");
-      }, 3000);
+      const tx = await nftContract.transferFrom(account, address, tokenId);
+      await tx.wait();
+      await Promise.all([fetchCSTInfo(), fetchTransferHistory()]);
+      setAddress("");
     } catch (err) {
-      console.log(err);
+      console.error(err);
       if (err.code !== 4001) {
         setNotification({
-          text: "Please input the valid address for the token receiver!",
+          text: "Please input a valid address for the token receiver!",
           type: "error",
           visible: true,
         });
       }
     }
   };
+
   const handleSetTokenName = async () => {
     try {
-      await nftContract
-        .setTokenName(tokenId, tokenName)
-        .then((tx) => tx.wait());
-      setTimeout(async () => {
-        await fetchCSTInfo();
-        await fetchNameHistory();
-        setTokenName("");
-        setNotification({
-          text: "The token name has been changed successfully!",
-          type: "success",
-          visible: true,
-        });
-      }, 2000);
+      const tx = await nftContract.setTokenName(tokenId, tokenName);
+      await tx.wait();
+      await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
+      setTokenName("");
+      setNotification({
+        text: "The token name has been changed successfully!",
+        type: "success",
+        visible: true,
+      });
     } catch (err) {
-      if (err?.data?.message) {
-        const msg = err?.data?.message;
-        setNotification({
-          visible: true,
-          type: "error",
-          text: msg,
-        });
-      }
-      console.log(err);
+      console.error(err);
+      const msg =
+        err?.data?.message || "An error occurred while setting the token name.";
+      setNotification({
+        visible: true,
+        type: "error",
+        text: msg,
+      });
     }
   };
+
   const handleClearName = async () => {
     try {
-      await nftContract.setTokenName(tokenId, "").then((tx) => tx.wait());
-      setTimeout(async () => {
-        await fetchCSTInfo();
-        await fetchNameHistory();
-        setTokenName("");
-        setNotification({
-          text: "The token name has been cleared successfully!",
-          type: "success",
-          visible: true,
-        });
-      }, 2000);
+      const tx = await nftContract.setTokenName(tokenId, "");
+      await tx.wait();
+      await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
+      setTokenName("");
+      setNotification({
+        text: "The token name has been cleared successfully!",
+        type: "success",
+        visible: true,
+      });
     } catch (err) {
-      if (err?.data?.message) {
-        const msg = err?.data?.message;
-        setNotification({
-          visible: true,
-          type: "error",
-          text: msg,
-        });
-      }
-      console.log(err);
+      console.error(err);
+      const msg =
+        err?.data?.message ||
+        "An error occurred while clearing the token name.";
+      setNotification({
+        visible: true,
+        type: "error",
+        text: msg,
+      });
     }
   };
+
   const handleChange = (e) => {
     let name = e.target.value;
     let len = 0;
@@ -191,6 +193,7 @@ const NFTTrait = ({ tokenId }) => {
     }
     setTokenName(name.slice(0, i));
   };
+
   const handlePrev = () => router.push(`/detail/${Math.max(tokenId - 1, 0)}`);
   const handleNext = async () => {
     const totalSupply = await nftContract.totalSupply();
@@ -199,50 +202,54 @@ const NFTTrait = ({ tokenId }) => {
   const handleMenuOpen = (e) => {
     setAnchorEl(e.currentTarget);
   };
-  const handleMenuClose = (e) => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
   const fetchNameHistory = async () => {
     try {
       const history = await api.get_name_history(tokenId);
       setNameHistory(history);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
+
   const fetchTransferHistory = async () => {
     try {
       const history = await api.get_transfer_history(tokenId);
       setTransferHistory(history);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
+
   const fetchCSTInfo = async () => {
     try {
       const res = await api.get_cst_info(tokenId);
       setNft(res.TokenInfo);
-      // setPrizeInfo(res.PrizeInfo);
-      setImage(
-        `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${res.TokenInfo.Seed}.png`
-      );
-      setVideo(
-        `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${res.TokenInfo.Seed}.mp4`
-      );
+      setImage(`${BASE_URL}/0x${res.TokenInfo.Seed}.png`);
+      setVideo(`${BASE_URL}/0x${res.TokenInfo.Seed}.mp4`);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const dashboardData = await api.get_dashboard_info();
-      setDashboard(dashboardData);
-      if (dashboardData.MainStats.NumCSTokenMints > tokenId) {
-        await fetchCSTInfo();
-        await fetchNameHistory();
-        await fetchTransferHistory();
+      try {
+        const dashboardData = await api.get_dashboard_info();
+        setDashboard(dashboardData);
+        if (dashboardData.MainStats.NumCSTokenMints > tokenId) {
+          await Promise.all([
+            fetchCSTInfo(),
+            fetchNameHistory(),
+            fetchTransferHistory(),
+          ]);
+        }
+      } catch (error) {
+        console.error(error);
       }
       setLoading(false);
     };
@@ -422,29 +429,34 @@ const NFTTrait = ({ tokenId }) => {
               </Typography>
               &nbsp;
               <Typography component="span">
-                {nft.RecordType === 1 ? (
-                  "Raffle Winner"
-                ) : nft.RecordType === 2 ? (
-                  "Staking Winner"
-                ) : nft.RecordType === 3 ? (
-                  <>
-                    Round Winner (
-                    <Link
-                      href={`/prize/${nft.RoundNum}`}
-                      target="_blank"
-                      color="inherit"
-                    >
-                      Round #{nft.RoundNum}
-                    </Link>
-                    )
-                  </>
-                ) : nft.RecordType === 4 ? (
-                  "Endurance Champion NFT Winner"
-                ) : nft.RecordType === 5 ? (
-                  "Stellar Spender NFT Winner"
-                ) : (
-                  " "
-                )}
+                {(() => {
+                  switch (nft.RecordType) {
+                    case 1:
+                      return "Raffle Winner";
+                    case 2:
+                      return "Staking Winner";
+                    case 3:
+                      return (
+                        <>
+                          Round Winner (
+                          <Link
+                            href={`/prize/${nft.RoundNum}`}
+                            target="_blank"
+                            color="inherit"
+                          >
+                            Round #{nft.RoundNum}
+                          </Link>
+                          )
+                        </>
+                      );
+                    case 4:
+                      return "Endurance Champion NFT Winner";
+                    case 5:
+                      return "Stellar Spender NFT Winner";
+                    default:
+                      return "";
+                  }
+                })()}
               </Typography>
             </Box>
             {!nft.Staked && !nft.WasUnstaked ? (
@@ -453,7 +465,7 @@ const NFTTrait = ({ tokenId }) => {
               </Typography>
             ) : (
               <Typography sx={{ color: "#f00" }}>
-                {"The token has already been staked, can't bee staked again."}
+                The token has already been staked and cannot be staked again.
               </Typography>
             )}
             <Box mt={6}>
@@ -464,77 +476,75 @@ const NFTTrait = ({ tokenId }) => {
                 View Round Details
               </Button>
             </Box>
-            <Box>
-              {account === nft.CurOwnerAddr && (
-                <>
-                  <Box display="flex" mt={3}>
+            {account === nft.CurOwnerAddr && (
+              <>
+                <Box display="flex" mt={3}>
+                  <TextField
+                    variant="filled"
+                    color="secondary"
+                    placeholder="Enter address here"
+                    fullWidth
+                    size="small"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                  />
+                  <Button
+                    color="secondary"
+                    variant="contained"
+                    onClick={handleClickTransfer}
+                    endIcon={<ArrowForward />}
+                    sx={{ ml: 1 }}
+                    disabled={!address || address === account}
+                  >
+                    Transfer
+                  </Button>
+                </Box>
+                <Box mt={3}>
+                  <Typography variant="h6" align="left">
+                    {nft.TokenName
+                      ? "Rename the token"
+                      : "Set a name to the token"}
+                  </Typography>
+                  <Box display="flex">
                     <TextField
                       variant="filled"
                       color="secondary"
-                      placeholder="Enter address here"
-                      fullWidth
+                      placeholder="Enter token name here"
+                      value={tokenName}
                       size="small"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
+                      fullWidth
+                      sx={{ flex: 1 }}
+                      inputProps={{ maxLength: 32 }}
+                      onChange={handleChange}
                     />
                     <Button
                       color="secondary"
                       variant="contained"
-                      onClick={handleClickTransfer}
-                      endIcon={<ArrowForward />}
-                      sx={{ ml: 1 }}
-                      disabled={!address || address === account}
+                      onClick={handleSetTokenName}
+                      sx={{ ml: 1, whiteSpace: "nowrap" }}
+                      disabled={!tokenName}
                     >
-                      Transfer
+                      {nft.TokenName === "" ? "Set Name" : "Change Name"}
                     </Button>
-                  </Box>
-                  <Box mt={3}>
-                    <Typography variant="h6" align="left">
-                      {nft.TokenName
-                        ? "Rename the token"
-                        : "Set a name to the token"}
-                    </Typography>
-                    <Box display="flex">
-                      <TextField
-                        variant="filled"
-                        color="secondary"
-                        placeholder="Enter token name here"
-                        value={tokenName}
-                        size="small"
-                        fullWidth
-                        sx={{ flex: 1 }}
-                        inputProps={{ maxLength: 32 }}
-                        onChange={handleChange}
-                      />
+                    {nameHistory.length > 0 && nameHistory[0].TokenName && (
                       <Button
                         color="secondary"
                         variant="contained"
-                        onClick={handleSetTokenName}
+                        onClick={handleClearName}
                         sx={{ ml: 1, whiteSpace: "nowrap" }}
-                        disabled={!tokenName}
                       >
-                        {nft.TokenName === "" ? "Set Name" : "Change Name"}
+                        Clear name
                       </Button>
-                      {nameHistory.length > 0 && nameHistory[0].TokenName && (
-                        <Button
-                          color="secondary"
-                          variant="contained"
-                          onClick={handleClearName}
-                          sx={{ ml: 1, whiteSpace: "nowrap" }}
-                        >
-                          Clear name
-                        </Button>
-                      )}
-                    </Box>
-                    <Typography variant="body2" mt={1} fontStyle="italic">
-                      There are {dashboard?.MainStats.TotalNamedTokens} tokens
-                      with a name, click <Link href="/named-nfts">here</Link>{" "}
-                      for a full list.
-                    </Typography>
+                    )}
                   </Box>
-                </>
-              )}
-            </Box>
+                  <Typography variant="body2" mt={1} fontStyle="italic">
+                    There are {dashboard?.MainStats.TotalNamedTokens} tokens
+                    with a name, click <Link href="/named-nfts">here</Link> for
+                    a full list.
+                  </Typography>
+                </Box>
+              </>
+            )}
           </Grid>
         </Grid>
         {nameHistory.length !== 0 && (
@@ -566,22 +576,21 @@ const NFTTrait = ({ tokenId }) => {
           onClose={() => setOpen(false)}
         />
       </SectionWrapper>
-      <Dialog open={openDialog} onClose={handleClose} maxWidth="md">
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md">
         <DialogTitle>
-          Are you sure to send the token to the destination address?
+          Are you sure you want to send the token to the destination address?
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {
-              "The destination account doesn't exist. Please check the provided address."
-            }
+            The destination account doesn't exist. Please check the provided
+            address.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleTransfer} autoFocus>
             Yes
           </Button>
-          <Button onClick={handleClose}>No</Button>
+          <Button onClick={handleCloseDialog}>No</Button>
         </DialogActions>
       </Dialog>
     </Container>
