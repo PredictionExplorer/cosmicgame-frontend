@@ -582,7 +582,7 @@ const NFTTrait = ({ tokenId }) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            The destination account doesn't exist. Please check the provided
+            The destination account doesn&#39;t exist. Please check the provided
             address.
           </DialogContentText>
         </DialogContent>
