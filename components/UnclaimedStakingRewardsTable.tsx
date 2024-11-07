@@ -31,27 +31,26 @@ import { CustomPagination } from "./CustomPagination";
 import { useNotification } from "../contexts/NotificationContext";
 
 const fetchInfo = async (account, depositId, stakedActionIds) => {
-  let unstakeableActionIds = [],
-    claimableActionIds = [];
+  let unstakeableActionIds = [];
+  let claimableActionIds = [];
+
   const response = await api.get_cst_action_ids_by_deposit_id(
     account,
     depositId
   );
-  response.map(async (x) => {
-    try {
-      if (!x.Claimed) {
-        claimableActionIds.push({
-          DepositId: x.DepositId,
-          StakeActionId: x.StakeActionId,
-        });
-      }
-      if (stakedActionIds.includes(x.StakeActionId)) {
-        unstakeableActionIds.push(x.StakeActionId);
-      }
-    } catch (error) {
-      console.log(error);
+
+  response.forEach((x) => {
+    if (!x.Claimed) {
+      claimableActionIds.push({
+        DepositId: x.DepositId,
+        StakeActionId: x.StakeActionId,
+      });
+    }
+    if (stakedActionIds.includes(x.StakeActionId)) {
+      unstakeableActionIds.push(x.StakeActionId);
     }
   });
+
   return {
     unstakeableActionIds,
     claimableActionIds,
@@ -59,23 +58,18 @@ const fetchInfo = async (account, depositId, stakedActionIds) => {
   };
 };
 
-interface stakeStateInterface {
-  TokenId: number;
-  DepositId: number;
-  StakeActionId: number;
-  unstake: boolean;
-  claim: boolean;
-}
-
-const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
+const UnclaimedStakingRewardsRow = ({
+  row,
+  owner,
+  handleUnstakeClaim,
+  stakedActionIds,
+}) => {
   const { account } = useActiveWeb3React();
   const [unstakeableActionIds, setUnstakeableActionIds] = useState([]);
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [openDlg, setOpenDlg] = useState(false);
-  const [stakeState, setStakeState] = useState<stakeStateInterface[]>([]);
-  const { cstokens: stakedTokens } = useStakedToken();
-  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const [stakeState, setStakeState] = useState([]);
 
   const fetchRowData = async () => {
     const res = await fetchInfo(owner, row.DepositId, stakedActionIds);
@@ -90,7 +84,13 @@ const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
     );
   };
 
-  const handleMenuOpen = (e) => {
+  useEffect(() => {
+    fetchRowData();
+    const interval = setInterval(fetchRowData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
   };
   const handleMenuClose = () => {
@@ -106,24 +106,19 @@ const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
     handleUnstakeClaim(type, unstakeActions, claimActions, claimDeposits);
   };
 
-  useEffect(() => {
-    fetchRowData();
-  }, [stakedTokens]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchRowData();
-    }, 30000);
-
-    // Clean up the interval when the component is unmounted
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
   if (!row) {
     return <TablePrimaryRow />;
   }
+
+  const isSingleClaimable = claimableActionIds.length === 1;
+  const hasUnstakeable = unstakeableActionIds.length > 0;
+  const buttonLabel = hasUnstakeable
+    ? isSingleClaimable
+      ? "Unstake & Claim"
+      : "Unstake & Claim All"
+    : isSingleClaimable
+    ? "Claim"
+    : "Claim All";
 
   return (
     <>
@@ -158,126 +153,62 @@ const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
         {account === owner && (
           <TablePrimaryCell align="center">
             {claimableActionIds.length > 0 ? (
-              claimableActionIds.length === 1 ? (
-                <>
-                  <Box sx={{ display: "flex" }}>
-                    <Button
-                      size="small"
-                      sx={{
-                        textTransform: "none",
-                        whiteSpace: "nowrap",
-                        mr: 1,
-                      }}
-                      onClick={() =>
-                        handleUnstakeClaim(
-                          `${
-                            unstakeableActionIds.length > 0 ? "unstaked & " : ""
-                          }claimed`,
-                          unstakeableActionIds,
-                          claimableActionIds.map((x) => x.StakeActionId),
-                          claimableActionIds.map((x) => x.DepositId)
-                        )
-                      }
-                    >
-                      {unstakeableActionIds.length > 0
-                        ? "Unstake & Claim"
-                        : "Claim"}
-                    </Button>
-                    {unstakeableActionIds.length > 0 && (
-                      <IconButton size="small" onClick={handleMenuOpen}>
-                        <MoreHorizIcon fontSize="small" aria-hidden="false" />
-                      </IconButton>
-                    )}
-                  </Box>
-                  <Menu
-                    elevation={0}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "center",
+              <>
+                <Box sx={{ display: "flex" }}>
+                  <Button
+                    size="small"
+                    sx={{
+                      textTransform: "none",
+                      whiteSpace: "nowrap",
+                      mr: 1,
                     }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "center",
-                    }}
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
+                    onClick={() =>
+                      handleUnstakeClaim(
+                        `${hasUnstakeable ? "unstaked & " : ""}claimed`,
+                        unstakeableActionIds,
+                        claimableActionIds.map((x) => x.StakeActionId),
+                        claimableActionIds.map((x) => x.DepositId)
+                      )
+                    }
                   >
-                    {unstakeableActionIds.length > 0 && (
-                      <PrimaryMenuItem
-                        onClick={() => {
-                          handleMenuClose();
-                          handleUnstakeClaim(
-                            "unstaked",
-                            unstakeableActionIds,
-                            [],
-                            []
-                          );
-                        }}
-                      >
-                        <Typography>Unstake Only</Typography>
-                      </PrimaryMenuItem>
-                    )}
-                  </Menu>
-                </>
-              ) : (
-                <>
-                  <Box sx={{ display: "flex" }}>
-                    <Button
-                      size="small"
-                      sx={{
-                        textTransform: "none",
-                        whiteSpace: "nowrap",
-                        mr: 1,
-                      }}
-                      onClick={() =>
-                        handleUnstakeClaim(
-                          `${
-                            unstakeableActionIds.length > 0 ? "unstaked & " : ""
-                          }claimed`,
-                          unstakeableActionIds,
-                          claimableActionIds.map((x) => x.StakeActionId),
-                          claimableActionIds.map((x) => x.DepositId)
-                        )
-                      }
-                    >
-                      {`${
-                        unstakeableActionIds.length > 0 ? "Unstake &" : ""
-                      } Claim All`}
-                    </Button>
+                    {buttonLabel}
+                  </Button>
+                  {(hasUnstakeable || !isSingleClaimable) && (
                     <IconButton size="small" onClick={handleMenuOpen}>
                       <MoreHorizIcon fontSize="small" />
                     </IconButton>
-                  </Box>
-                  <Menu
-                    elevation={0}
-                    anchorOrigin={{
-                      vertical: "bottom",
-                      horizontal: "center",
-                    }}
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "center",
-                    }}
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                  >
-                    {unstakeableActionIds.length > 0 && (
-                      <PrimaryMenuItem
-                        onClick={() => {
-                          handleMenuClose();
-                          handleUnstakeClaim(
-                            "unstaked",
-                            unstakeableActionIds,
-                            [],
-                            []
-                          );
-                        }}
-                      >
-                        <Typography>Unstake Only</Typography>
-                      </PrimaryMenuItem>
-                    )}
+                  )}
+                </Box>
+                <Menu
+                  elevation={0}
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                  }}
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                  }}
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                >
+                  {hasUnstakeable && (
+                    <PrimaryMenuItem
+                      onClick={() => {
+                        handleMenuClose();
+                        handleUnstakeClaim(
+                          "unstaked",
+                          unstakeableActionIds,
+                          [],
+                          []
+                        );
+                      }}
+                    >
+                      <Typography>Unstake Only</Typography>
+                    </PrimaryMenuItem>
+                  )}
+                  {!isSingleClaimable && (
                     <PrimaryMenuItem
                       onClick={() => {
                         setOpenDlg(true);
@@ -285,14 +216,14 @@ const UnclaimedStakingRewardsRow = ({ row, owner, handleUnstakeClaim }) => {
                       }}
                     >
                       <Typography>
-                        {unstakeableActionIds.length > 0
+                        {hasUnstakeable
                           ? "Advanced Claim"
                           : "Advanced Transaction Build"}
                       </Typography>
                     </PrimaryMenuItem>
-                  </Menu>
-                </>
-              )
+                  )}
+                </Menu>
+              </>
             ) : (
               " "
             )}
@@ -314,7 +245,9 @@ const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const { cstokens: stakedTokens } = useStakedToken();
-  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  const stakedActionIds = stakedTokens.map(
+    (x: any) => x.TokenInfo.StakeActionId
+  );
   const [claimableActionIds, setClaimableActionIds] = useState([]);
   const [unstakableActionIds, setUnstakeableActionIds] = useState([]);
   const { account } = useActiveWeb3React();
@@ -328,10 +261,12 @@ const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
     claimDeposits
   ) => {
     try {
-      const res = await stakingContract
-        .unstakeClaimMany(unstakeActions, claimActions, claimDeposits)
-        .then((tx) => tx.wait());
-      console.log(res);
+      const tx = await stakingContract.unstakeClaimMany(
+        unstakeActions,
+        claimActions,
+        claimDeposits
+      );
+      await tx.wait();
       setTimeout(() => {
         fetchData(owner, false);
       }, 2000);
@@ -341,30 +276,23 @@ const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         type: "success",
       });
     } catch (e) {
-      if (e.code === -32603) {
-        fetchData(owner, false);
-        const msg = getErrorMessage(e?.data?.message);
-        setNotification({
-          visible: true,
-          text: msg,
-          type: "error",
-        });
-      } else {
-        console.error(e);
-      }
+      const msg = getErrorMessage(e?.data?.message || e?.message);
+      setNotification({
+        visible: true,
+        text: msg,
+        type: "error",
+      });
     }
   };
 
   const handleUnstakeClaimAll = async () => {
     try {
-      const res = await stakingContract
-        .unstakeClaimMany(
-          unstakableActionIds,
-          claimableActionIds.map((x) => x.StakeActionId),
-          claimableActionIds.map((x) => x.DepositId)
-        )
-        .then((tx) => tx.wait());
-      console.log(res);
+      const tx = await stakingContract.unstakeClaimMany(
+        unstakableActionIds,
+        claimableActionIds.map((x) => x.StakeActionId),
+        claimableActionIds.map((x) => x.DepositId)
+      );
+      await tx.wait();
       setTimeout(() => {
         fetchData(owner, false);
       }, 2000);
@@ -374,36 +302,32 @@ const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
         type: "success",
       });
     } catch (e) {
-      if (e?.data?.message) {
-        const msg = getErrorMessage(e?.data?.message);
-        setNotification({
-          visible: true,
-          text: msg,
-          type: "error",
-        });
-      }
-      console.error(e);
+      const msg = getErrorMessage(e?.data?.message || e?.message);
+      setNotification({
+        visible: true,
+        text: msg,
+        type: "error",
+      });
     }
   };
 
   useEffect(() => {
     const fetchActionIds = async () => {
-      let cl_actionIds = [],
-        us_actionIds = [];
+      let cl_actionIds = [];
+      let us_actionIds = [];
+
       await Promise.all(
-        list.map(async (item) => {
-          const depositId = item.DepositId;
-          const res = await fetchInfo(owner, depositId, stakedActionIds);
+        list.map(async (item: any) => {
+          const res = await fetchInfo(owner, item.DepositId, stakedActionIds);
           cl_actionIds = cl_actionIds.concat(res.claimableActionIds);
           us_actionIds = us_actionIds.concat(res.unstakeableActionIds);
         })
       );
+      us_actionIds = Array.from(new Set(us_actionIds));
       setClaimableActionIds(cl_actionIds);
-      us_actionIds = us_actionIds.filter((item, index) => {
-        return index === us_actionIds.findIndex((o) => o === item);
-      });
       setUnstakeableActionIds(us_actionIds);
     };
+
     fetchActionIds();
   }, [list, stakedTokens]);
 
@@ -447,6 +371,7 @@ const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
                 key={row.EvtLogId}
                 owner={owner}
                 handleUnstakeClaim={handleUnstakeClaim}
+                stakedActionIds={stakedActionIds}
               />
             ))}
           </TableBody>
@@ -455,11 +380,7 @@ const UnclaimedStakingRewardsTable = ({ list, owner, fetchData }) => {
       <Box display="flex" justifyContent="end" mt={1}>
         <Typography mr={1}>Total Rewards:</Typography>
         <Typography>
-          {list
-            .reduce((a, b) => {
-              return a + b.YourClaimableAmountEth;
-            }, 0)
-            .toFixed(6)}{" "}
+          {list.reduce((a, b) => a + b.YourClaimableAmountEth, 0).toFixed(6)}{" "}
           ETH
         </Typography>
       </Box>
