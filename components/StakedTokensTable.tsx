@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Button,
@@ -34,15 +34,15 @@ const StakedTokensRow = ({
   IsRwalk,
 }) => {
   const [tokenName, setTokenName] = useState("");
-  const getTokenImageURL = () => {
+
+  const tokenImageURL = useMemo(() => {
     const fileName = (IsRwalk ? row.StakedTokenId : row.TokenInfo.Seed)
       .toString()
       .padStart(6, "0");
-    if (IsRwalk) {
-      return `https://randomwalknft.s3.us-east-2.amazonaws.com/${fileName}_black_thumb.jpg`;
-    }
-    return `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${fileName}.png`;
-  };
+    return IsRwalk
+      ? `https://randomwalknft.s3.us-east-2.amazonaws.com/${fileName}_black_thumb.jpg`
+      : `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${fileName}.png`;
+  }, [IsRwalk, row]);
 
   useEffect(() => {
     const getTokenName = async () => {
@@ -69,7 +69,7 @@ const StakedTokensRow = ({
       role="checkbox"
       aria-checked={isItemSelected}
       tabIndex={-1}
-      key={row.id}
+      key={IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId}
       selected={isItemSelected}
       onClick={() =>
         handleClick(IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId)
@@ -80,7 +80,7 @@ const StakedTokensRow = ({
         <Checkbox color="primary" checked={isItemSelected} size="small" />
       </TablePrimaryCell>
       <TablePrimaryCell sx={{ width: "120px" }}>
-        <NFTImage src={getTokenImageURL()} />
+        <NFTImage src={tokenImageURL} />
         <Typography variant="caption" mt={1}>
           {tokenName}
         </Typography>
@@ -146,24 +146,26 @@ export const StakedTokensTable = ({
   const [page, setPage] = useState(1);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selected, setSelected] = useState([]);
-  const isSelected = (id: number) => selected.indexOf(id) !== -1;
+
+  const sortedList = useMemo(() => {
+    return [...list].sort((a, b) => a.StakeTimeStamp - b.StakeTimeStamp);
+  }, [list]);
+
+  const isSelected = (id: number) => selected.includes(id);
+
   const handleClick = (id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];
+
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
+      newSelected = [...selected, id];
+    } else {
+      newSelected = selected.filter((itemId) => itemId !== id);
     }
+
     setSelected(newSelected);
   };
+
   const onSelectAllClick = () => {
     const newSelected = list.map((n) =>
       IsRwalk ? n.StakeActionId : n.TokenInfo.StakeActionId
@@ -171,32 +173,33 @@ export const StakedTokensTable = ({
     setSelected(newSelected);
     setAnchorEl(null);
   };
+
   const onSelectCurPgClick = () => {
-    const newSelected = list
+    const newSelected = sortedList
       .slice((page - 1) * perPage, page * perPage)
       .map((n) => (IsRwalk ? n.StakeActionId : n.TokenInfo.StakeActionId));
     setSelected(newSelected);
     setAnchorEl(null);
   };
+
   const onSelectNoneClick = () => {
     setSelected([]);
     setAnchorEl(null);
   };
+
   const onUnstakeMany = async () => {
     await handleUnstakeMany(selected, IsRwalk);
   };
+
   const onUnstake = async (actionId: number) => {
     setSelected([actionId]);
     await handleUnstake(actionId, IsRwalk);
   };
-  useEffect(() => {
-    setSelected([]);
-    setPage(1);
-  }, [list]);
 
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
   }
+
   return (
     <>
       <TablePrimaryContainer>
@@ -279,12 +282,13 @@ export const StakedTokensTable = ({
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list
-              .sort((a, b) => a.StakeTimeStamp - b.StakeTimeStamp)
+            {sortedList
               .slice((page - 1) * perPage, page * perPage)
-              .map((row, index) => (
+              .map((row) => (
                 <StakedTokensRow
-                  key={(page - 1) * perPage + index}
+                  key={
+                    IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
+                  }
                   row={row}
                   handleUnstake={onUnstake}
                   isItemSelected={isSelected(
