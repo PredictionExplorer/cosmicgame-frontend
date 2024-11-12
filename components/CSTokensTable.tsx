@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Button,
@@ -30,14 +30,21 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
     return <TablePrimaryRow />;
   }
 
+  const onRowClick = () => handleClick(row.TokenId);
+
+  const onStakeClick = (e) => {
+    e.stopPropagation();
+    handleStake(row.TokenId);
+  };
+
   return (
     <TablePrimaryRow
-      hover="true"
+      hover
       role="checkbox"
       tabIndex={-1}
       key={row.id}
       selected={isItemSelected}
-      onClick={() => handleClick(row.TokenId)}
+      onClick={onRowClick}
       sx={{ cursor: "pointer" }}
     >
       <TablePrimaryCell padding="checkbox">
@@ -56,10 +63,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
       <TablePrimaryCell align="center">
         <Link
           href={`/detail/${row.TokenId}`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
+          sx={{ color: "inherit", fontSize: "inherit" }}
           target="_blank"
         >
           {row.TokenId}
@@ -69,10 +73,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
       <TablePrimaryCell align="center">
         <Link
           href={`/prize/${row.RoundNum}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
+          style={{ color: "inherit", fontSize: "inherit" }}
           target="_blank"
         >
           {row.RoundNum}
@@ -83,13 +84,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {!row.Staked ? (
-          <Button
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleStake(row.TokenId);
-            }}
-          >
+          <Button size="small" onClick={onStakeClick}>
             Stake
           </Button>
         ) : (
@@ -105,48 +100,47 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState([]);
-  const isSelected = (id: number) => selected.indexOf(id) !== -1;
-  const handleClick = (id: number) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
+  // Memoized pageItems to avoid recomputing on every render
+  const pageItems = useMemo(
+    () => list.slice((page - 1) * perPage, page * perPage),
+    [list, page]
+  );
+
+  const isSelected = (id) => selected.includes(id);
+
+  const handleClick = (id) => {
+    setSelected((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((selectedId) => selectedId !== id)
+        : [...prevSelected, id]
+    );
   };
+
   const onSelectAllClick = () => {
-    const newSelected = list.map((n) => n.TokenId);
-    setSelected(newSelected);
+    setSelected(list.map((n) => n.TokenId));
     setAnchorEl(null);
   };
+
   const onSelectCurPgClick = () => {
-    const newSelected = list
-      .slice((page - 1) * perPage, page * perPage)
-      .map((n) => n.TokenId);
-    setSelected(newSelected);
+    setSelected(pageItems.map((n) => n.TokenId));
     setAnchorEl(null);
   };
+
   const onSelectNoneClick = () => {
     setSelected([]);
     setAnchorEl(null);
   };
+
   const onStakeMany = async () => {
-    const res = await handleStakeMany(selected, false);
+    await handleStakeMany(selected, false);
   };
-  const onStake = async (id: number) => {
+
+  const onStake = async (id) => {
     setSelected([id]);
     await handleStake(id, false);
   };
+
   useEffect(() => {
     setSelected([]);
     setPage(1);
@@ -155,6 +149,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   if (list.length === 0) {
     return <Typography>No available tokens.</Typography>;
   }
+
   return (
     <>
       <TablePrimaryContainer>
@@ -193,7 +188,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
                     }
                     checked={list.length > 0 && selected.length === list.length}
                   />
-                  {anchorEl ? <ExpandLess /> : <ExpandMore />}
+                  {Boolean(anchorEl) ? <ExpandLess /> : <ExpandMore />}
                 </Box>
                 <Menu
                   elevation={0}
@@ -241,7 +236,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
+            {pageItems.map((row) => (
               <CSTokensRow
                 key={row.EvtLogId}
                 row={row}
