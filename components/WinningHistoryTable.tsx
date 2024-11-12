@@ -284,7 +284,7 @@ const HistoryTable = ({
           .map((history, index) => (
             <HistoryRow
               history={history}
-              key={history.TxHash || index}
+              key={curPage * perPage + index}
               showClaimedStatus={showClaimedStatus}
               showWinnerAddr={showWinnerAddr}
             />

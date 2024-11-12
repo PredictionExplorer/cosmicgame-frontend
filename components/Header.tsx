@@ -29,12 +29,8 @@ import { useSystemMode } from "../contexts/SystemModeContext";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 
 const Header = () => {
-  const [state, setState] = useState({
-    mobileView: false,
-    drawerOpen: false,
-  });
-  const [navs, setNavs] = useState([]);
-  const { mobileView, drawerOpen } = state;
+  const [mobileView, setMobileView] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { apiData: status } = useApiData();
   const { account } = useActiveWeb3React();
   const [loading, setLoading] = useState(true);
@@ -53,44 +49,42 @@ const Header = () => {
 
   useEffect(() => {
     const setResponsiveness = () => {
-      return window.innerWidth < 1024
-        ? setState((prevState) => ({ ...prevState, mobileView: true }))
-        : setState((prevState) => ({ ...prevState, mobileView: false }));
+      setMobileView(window.innerWidth < 1024);
     };
 
     setResponsiveness();
 
-    window.addEventListener("resize", () => setResponsiveness());
+    window.addEventListener("resize", setResponsiveness);
 
     return () => {
-      window.removeEventListener("resize", () => setResponsiveness());
+      window.removeEventListener("resize", setResponsiveness);
     };
   }, []);
 
-  useEffect(() => {
-    const fetchData = async (loading = true) => {
-      setLoading(loading);
-      try {
-        const user_balance = await api.get_user_balance(account);
-        const { UserInfo } = await api.get_user_info(account);
-        const rwlkTokens = await nftContract.walletOfOwner(account);
-        if (user_balance) {
-          setBalance({
-            CosmicToken: Number(
-              ethers.utils.formatEther(user_balance.CosmicTokenBalance)
-            ),
-            ETH: Number(ethers.utils.formatEther(user_balance.ETH_Balance)),
-            CosmicSignature: UserInfo?.TotalCSTokensWon,
-            RWLK: rwlkTokens.length,
-          });
-          setLoading(false);
-        }
-      } catch (e) {
-        console.log(e);
+  const fetchData = async (loading = true) => {
+    setLoading(loading);
+    try {
+      const user_balance = await api.get_user_balance(account);
+      const { UserInfo } = await api.get_user_info(account);
+      const rwlkTokens = await nftContract.walletOfOwner(account);
+      if (user_balance) {
+        setBalance({
+          CosmicToken: Number(
+            ethers.utils.formatEther(user_balance.CosmicTokenBalance)
+          ),
+          ETH: Number(ethers.utils.formatEther(user_balance.ETH_Balance)),
+          CosmicSignature: UserInfo?.TotalCSTokensWon,
+          RWLK: rwlkTokens.length,
+        });
         setLoading(false);
       }
-    };
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     let interval;
     if (account && nftContract) {
       fetchData();
@@ -99,14 +93,14 @@ const Header = () => {
       }, 30000);
     }
     return () => {
-      clearInterval(interval);
+      if (interval) clearInterval(interval);
     };
-  }, [account, nftContract]);
+  }, [account, nftContract, fetchData]);
 
-  useEffect(() => {
-    const navs = getNAVs(status, account);
-    setNavs(navs);
-  }, [account, status]);
+  const navs = getNAVs(status, account);
+
+  const handleDrawerOpen = () => setDrawerOpen(true);
+  const handleDrawerClose = () => setDrawerOpen(false);
 
   const renderDesktop = () => {
     return (
@@ -117,26 +111,26 @@ const Header = () => {
         {navs.map((nav, i) => (
           <ListNavItem key={i} nav={nav} />
         ))}
-        {
-          <ConnectWalletButton
-            isMobileView={false}
-            loading={loading}
-            balance={balance}
-            stakedTokenCount={{
-              cst: stakedCSTokens?.length,
-              rwalk: stakedRWLKTokens?.length,
-            }}
-          />
-        }
+        <ConnectWalletButton
+          isMobileView={false}
+          loading={loading}
+          balance={balance}
+          stakedTokenCount={{
+            cst: stakedCSTokens?.length,
+            rwalk: stakedRWLKTokens?.length,
+          }}
+        />
       </Toolbar>
     );
   };
 
   const renderMobile = () => {
-    const handleDrawerOpen = () =>
-      setState((prevState) => ({ ...prevState, drawerOpen: true }));
-    const handleDrawerClose = () =>
-      setState((prevState) => ({ ...prevState, drawerOpen: false }));
+    const hasNotifications =
+      account &&
+      (status?.ETHRaffleToClaim > 0 ||
+        status?.NumDonatedNFTToClaim > 0 ||
+        (status?.UnclaimedStakingReward > 0 &&
+          status?.claimableActionIds.length > 0));
 
     return (
       <Toolbar>
@@ -148,11 +142,7 @@ const Header = () => {
           onClick={handleDrawerOpen}
           style={{ marginRight: "8px" }}
         >
-          {account &&
-          (status?.ETHRaffleToClaim > 0 ||
-            status?.NumDonatedNFTToClaim > 0 ||
-            (status?.UnclaimedStakingReward > 0 &&
-              status?.claimableActionIds.length > 0)) ? (
+          {hasNotifications ? (
             <Badge variant="dot" color="error">
               <MenuIcon />
             </Badge>
