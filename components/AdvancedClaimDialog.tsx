@@ -25,36 +25,33 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 import api from "../services/api";
 import { CustomPagination } from "./CustomPagination";
 
-const TokenRow = ({ row, stakeState, setStakeState }) => {
-  const [tokenName, setTokenName] = useState("");
-  const { cstokens: stakedTokens } = useStakedToken();
-  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
-  const isDisabled = (field) => {
-    if (field === "unstake") {
-      if (stakedActionIds.includes(row.StakeActionId)) {
-        return false;
-      }
-      return true;
-    }
-    if (field === "claim" && !stakeState.unstake) {
-      return true;
-    }
-    return false;
-  };
-  useEffect(() => {
-    const getTokenName = async () => {
-      if (row.IsRandomWalk) {
-        const res = await api.get_info(row.TokenId);
-        setTokenName(res.CurName);
-      } else {
-        const names = await api.get_name_history(row.TokenId);
-        if (names.length > 0) {
-          setTokenName(names[names.length - 1].TokenName);
-        }
-      }
-    };
-    getTokenName();
-  }, []);
+interface Token {
+  TokenId: number;
+  StakeActionId: number;
+  IsRandomWalk: boolean;
+  RecordId: number;
+  DepositId: number;
+  unstake: boolean;
+  claim: boolean;
+}
+
+interface TokenRowProps {
+  row: Token;
+  stakeState: Token;
+  setStakeState: (token: Token) => void;
+  tokenName: string;
+  isUnstakeDisabled: boolean;
+  isClaimDisabled: boolean;
+}
+
+const TokenRow = ({
+  row,
+  stakeState,
+  setStakeState,
+  tokenName,
+  isUnstakeDisabled,
+  isClaimDisabled,
+}: TokenRowProps) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -74,16 +71,13 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
+      <TablePrimaryCell align="center">{tokenName || " "}</TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {tokenName === "" ? " " : tokenName}
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {!isDisabled("unstake") ? (
+        {!isUnstakeDisabled ? (
           <Checkbox
             size="small"
             sx={{ p: 0 }}
             checked={stakeState.unstake}
-            disabled={isDisabled("unstake")}
             onChange={(e) =>
               setStakeState({
                 ...stakeState,
@@ -101,7 +95,7 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
           size="small"
           sx={{ p: 0 }}
           checked={stakeState.claim}
-          disabled={isDisabled("claim")}
+          disabled={isClaimDisabled}
           onChange={(e) =>
             setStakeState({
               ...stakeState,
@@ -114,7 +108,12 @@ const TokenRow = ({ row, stakeState, setStakeState }) => {
   );
 };
 
-const TokensTable = ({ stakeState, setStakeState }) => {
+interface TokensTableProps {
+  stakeState: Token[];
+  setStakeState: (tokens: Token[]) => void;
+}
+
+const TokensTable = ({ stakeState, setStakeState }: TokensTableProps) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   const { cstokens: stakedTokens } = useStakedToken();
@@ -123,47 +122,77 @@ const TokensTable = ({ stakeState, setStakeState }) => {
     unstake: true,
     claim: true,
   });
-  const updateStakeState = (index, param) => {
+  const [tokenNames, setTokenNames] = useState<{ [key: number]: string }>({});
+
+  useEffect(() => {
+    const fetchTokenNames = async () => {
+      const names: { [key: number]: string } = {};
+      await Promise.all(
+        stakeState.map(async (token) => {
+          if (!tokenNames[token.TokenId]) {
+            if (token.IsRandomWalk) {
+              const res = await api.get_info(token.TokenId);
+              names[token.TokenId] = res.CurName || "";
+            } else {
+              const nameHistory = await api.get_name_history(token.TokenId);
+              if (nameHistory.length > 0) {
+                names[token.TokenId] =
+                  nameHistory[nameHistory.length - 1].TokenName || "";
+              } else {
+                names[token.TokenId] = "";
+              }
+            }
+          }
+        })
+      );
+      setTokenNames((prev) => ({ ...prev, ...names }));
+    };
+
+    fetchTokenNames();
+  }, [stakeState]);
+
+  const updateStakeState = (index: number, param: Token) => {
     const newArray = [...stakeState];
     newArray[index] = param;
     setStakeState(newArray);
   };
+
   const handleSelectUnstakeAll = () => {
+    const shouldUnstakeAll = !isAllSelected.unstake;
     const newArray = stakeState.map((x) => ({
       ...x,
-      unstake:
-        !stakedActionIds.includes(x.StakeActionId) || isAllSelected.unstake,
-      claim: x.claim && isAllSelected.unstake,
+      unstake: stakedActionIds.includes(x.StakeActionId) && shouldUnstakeAll,
+      claim: x.claim && shouldUnstakeAll,
     }));
     setStakeState(newArray);
-    setAllSelected({
-      ...isAllSelected,
-      unstake: !isAllSelected.unstake,
-      claim: !isAllSelected.unstake || isAllSelected.claim,
-    });
+    setAllSelected((prev) => ({
+      ...prev,
+      unstake: shouldUnstakeAll,
+      claim: !shouldUnstakeAll ? false : prev.claim,
+    }));
   };
+
   const handleSelectClaimAll = () => {
+    const shouldClaimAll = !isAllSelected.claim;
     const newArray = stakeState.map((x) => ({
       ...x,
-      claim: isAllSelected.claim && x.unstake,
+      claim: shouldClaimAll && x.unstake,
     }));
     setStakeState(newArray);
-    setAllSelected({
-      ...isAllSelected,
-      claim: !isAllSelected.claim,
-    });
+    setAllSelected((prev) => ({
+      ...prev,
+      claim: shouldClaimAll,
+    }));
   };
-  const isDisabled = (type) => {
+
+  const isDisabled = (type: string) => {
     if (type === "unstake") {
-      const filtered = stakeState.filter((x) =>
-        stakedActionIds.includes(x.StakeActionId)
-      );
-      return filtered.length === 0;
+      return !stakeState.some((x) => stakedActionIds.includes(x.StakeActionId));
     }
     if (type === "claim") {
-      const filtered = stakeState.filter((x) => x.unstake);
-      return filtered.length === 0;
+      return !stakeState.some((x) => x.unstake);
     }
+    return false;
   };
 
   return (
@@ -190,6 +219,13 @@ const TokensTable = ({ stakeState, setStakeState }) => {
                   stakeState={stakeState[(page - 1) * perPage + index]}
                   setStakeState={(param) =>
                     updateStakeState((page - 1) * perPage + index, param)
+                  }
+                  tokenName={tokenNames[row.TokenId] || " "}
+                  isUnstakeDisabled={
+                    !stakedActionIds.includes(row.StakeActionId)
+                  }
+                  isClaimDisabled={
+                    !stakeState[(page - 1) * perPage + index].unstake
                   }
                 />
               ))}
@@ -226,18 +262,33 @@ const TokensTable = ({ stakeState, setStakeState }) => {
   );
 };
 
+interface AdvancedClaimDialogProps {
+  stakeState: Token[];
+  setStakeState: (tokens: Token[]) => void;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  handleUnstakeClaim: (
+    message: string,
+    unstakeIds: number[],
+    claimIds: number[],
+    depositIds: number[]
+  ) => void;
+}
+
 export default function AdvancedClaimDialog({
   stakeState,
   setStakeState,
   open,
   setOpen,
   handleUnstakeClaim,
-}) {
+}: AdvancedClaimDialogProps) {
   const { cstokens: stakedCSTTokens } = useStakedToken();
   const stakedActionIds = stakedCSTTokens.map((x) => x.TokenInfo.StakeActionId);
+
   const handleClose = () => {
     setOpen(false);
   };
+
   const handleSendTransaction = async () => {
     handleClose();
     handleUnstakeClaim(
@@ -249,17 +300,15 @@ export default function AdvancedClaimDialog({
       stakeState.filter((x) => x.claim).map((x) => x.DepositId)
     );
   };
-  const canSendTransaction = () => {
+
+  const isSendTransactionDisabled = () => {
     const unstakeActionIds = stakeState
       .filter((x) => x.unstake && stakedActionIds.includes(x.StakeActionId))
-      .map((X) => X.StakeActionId);
+      .map((x) => x.StakeActionId);
     const claimActionIds = stakeState
       .filter((x) => x.claim)
       .map((x) => x.StakeActionId);
-    if (unstakeActionIds.length === 0 && claimActionIds.length === 0) {
-      return true;
-    }
-    return false;
+    return unstakeActionIds.length === 0 && claimActionIds.length === 0;
   };
 
   return (
@@ -291,7 +340,7 @@ export default function AdvancedClaimDialog({
       </DialogContent>
       <DialogActions>
         <Button
-          disabled={canSendTransaction()}
+          disabled={isSendTransactionDisabled()}
           onClick={handleSendTransaction}
           sx={{ textTransform: "none" }}
         >
