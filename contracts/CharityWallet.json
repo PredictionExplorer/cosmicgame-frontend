@@ -1,6 +1,10 @@
 [
-  "error FundTransferFailed(string,uint256,address)",
+  "constructor()",
+  "error FundTransferFailed(string,address,uint256)",
+  "error OwnableInvalidOwner(address)",
+  "error OwnableUnauthorizedAccount(address)",
   "error ZeroAddress(string)",
+  "error ZeroBalance(string)",
   "event CharityUpdatedEvent(address indexed)",
   "event DonationReceivedEvent(address indexed,uint256)",
   "event DonationSentEvent(address indexed,uint256)",

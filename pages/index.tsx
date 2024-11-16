@@ -437,12 +437,94 @@ const NewHome = () => {
           return;
         }
       }
-      await cosmicGameContract.bidWithCST(message).then((tx: any) => tx.wait());
-      setTimeout(() => {
-        fetchDataCollection();
-        setMessage("");
+
+      if (!nftDonateAddress || !nftId) {
+        await cosmicGameContract
+          .bidWithCST(message)
+          .then((tx: any) => tx.wait());
+        setTimeout(() => {
+          fetchDataCollection();
+          setMessage("");
+          setIsBidding(false);
+        }, 3000);
+        return;
+      }
+      // Proceed with NFT donation
+      // Check if the contract exists
+      const isExist = await checkIfContractExist(nftDonateAddress);
+      if (!isExist) {
+        setNotification({
+          visible: true,
+          type: "error",
+          text: "The address provided is not a valid contract address!",
+        });
         setIsBidding(false);
-      }, 3000);
+        return;
+      }
+      const nftIdNum = Number(nftId);
+      const nftDonateContract = new Contract(
+        nftDonateAddress,
+        NFT_ABI,
+        library.getSigner(account)
+      );
+      // Check if the contract is ERC721
+      try {
+        const supportsInterface = await nftDonateContract.supportsInterface(
+          "0x80ac58cd"
+        );
+        if (!supportsInterface) {
+          throw new Error("Not an ERC721 contract");
+        }
+      } catch (err) {
+        console.log(err);
+        setNotification({
+          visible: true,
+          type: "error",
+          text: "The donate NFT contract is not an ERC721 token contract.",
+        });
+        setIsBidding(false);
+        return;
+      }
+      // Check token ownership
+      const isOwner = await checkTokenOwnership(nftDonateAddress, nftIdNum);
+      if (!isOwner) {
+        setIsBidding(false);
+        return;
+      }
+      // Approve NFT transfer
+      try {
+        const approvedBy = await nftDonateContract.getApproved(nftIdNum);
+        const isApprovedForAll = await nftDonateContract.isApprovedForAll(
+          account,
+          COSMICGAME_ADDRESS
+        );
+        if (!isApprovedForAll && approvedBy !== COSMICGAME_ADDRESS) {
+          await nftDonateContract
+            .setApprovalForAll(COSMICGAME_ADDRESS, true)
+            .then((tx: any) => tx.wait());
+        }
+        await cosmicGameContract
+          .bidWithCstAndDonateNft(message, nftDonateAddress, nftIdNum)
+          .then((tx: any) => tx.wait());
+        setTimeout(() => {
+          fetchDataCollection();
+          setMessage("");
+          setNftId("");
+          setNftDonateAddress("");
+          setIsBidding(false);
+        }, 3000);
+      } catch (err) {
+        if (err?.data?.message) {
+          const msg = getErrorMessage(err?.data?.message);
+          setNotification({
+            visible: true,
+            type: "error",
+            text: msg,
+          });
+        }
+        console.log(err);
+        setIsBidding(false);
+      }
     } catch (err) {
       if (err?.data?.message) {
         const msg = err?.data?.message;
@@ -1134,109 +1216,105 @@ const NewHome = () => {
                       sx={{ marginBottom: 2 }}
                       onChange={(e) => setMessage(e.target.value)}
                     />
-                    {bidType !== "CST" && (
-                      <Accordion
-                        expanded={advancedExpanded}
-                        onChange={(_event, isExpanded) =>
-                          setAdvancedExpanded(isExpanded)
-                        }
-                      >
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                          <Typography>Advanced Options</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Typography variant="body2">
-                            If you want to donate one of your NFTs while
-                            bidding, you can put the contract address, NFT id,
-                            and comment here.
+                    <Accordion
+                      expanded={advancedExpanded}
+                      onChange={(_event, isExpanded) =>
+                        setAdvancedExpanded(isExpanded)
+                      }
+                    >
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography>Advanced Options</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography variant="body2">
+                          If you want to donate one of your NFTs while bidding,
+                          you can put the contract address, NFT id, and comment
+                          here.
+                        </Typography>
+                        <TextField
+                          placeholder="NFT contract address"
+                          size="small"
+                          value={nftDonateAddress}
+                          fullWidth
+                          sx={{ marginTop: 2 }}
+                          onChange={(e) => setNftDonateAddress(e.target.value)}
+                        />
+                        <TextField
+                          placeholder="NFT number"
+                          type="number"
+                          value={nftId}
+                          size="small"
+                          fullWidth
+                          sx={{ marginTop: 2 }}
+                          onChange={(e) => setNftId(e.target.value)}
+                        />
+                        <Box
+                          sx={{
+                            border: "1px solid #444",
+                            borderRadius: 1,
+                            p: 2,
+                            mt: 2,
+                          }}
+                        >
+                          <Typography variant="subtitle2">
+                            Bid price collision prevention
                           </Typography>
-                          <TextField
-                            placeholder="NFT contract address"
-                            size="small"
-                            value={nftDonateAddress}
-                            fullWidth
-                            sx={{ marginTop: 2 }}
-                            onChange={(e) =>
-                              setNftDonateAddress(e.target.value)
-                            }
-                          />
-                          <TextField
-                            placeholder="NFT number"
-                            type="number"
-                            value={nftId}
-                            size="small"
-                            fullWidth
-                            sx={{ marginTop: 2 }}
-                            onChange={(e) => setNftId(e.target.value)}
-                          />
                           <Box
                             sx={{
-                              border: "1px solid #444",
-                              borderRadius: 1,
-                              p: 2,
-                              mt: 2,
+                              display: "flex",
+                              marginTop: 2,
+                              alignItems: "center",
                             }}
                           >
-                            <Typography variant="subtitle2">
-                              Bid price collision prevention
-                            </Typography>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                marginTop: 2,
-                                alignItems: "center",
-                              }}
+                            <Typography
+                              whiteSpace="nowrap"
+                              color="rgba(255, 255, 255, 0.68)"
+                              mr={2}
                             >
-                              <Typography
-                                whiteSpace="nowrap"
-                                color="rgba(255, 255, 255, 0.68)"
-                                mr={2}
-                              >
-                                Rise bid price by
-                              </Typography>
-                              <CustomTextField
-                                type="number"
-                                placeholder="Bid Price Plus"
-                                value={bidPricePlus}
-                                size="small"
-                                fullWidth
-                                InputProps={{
-                                  inputComponent: StyledInput,
-                                  endAdornment: (
-                                    <InputAdornment position="end">
-                                      %
-                                    </InputAdornment>
-                                  ),
-                                  inputProps: { min: 0, max: 50 },
-                                }}
-                                onChange={(e) => {
-                                  let value = Number(e.target.value);
-                                  if (value <= 50) {
-                                    setBidPricePlus(value);
-                                  }
-                                }}
-                              />
-                              <Typography
-                                whiteSpace="nowrap"
-                                color="rgba(255, 255, 255, 0.68)"
-                                ml={2}
-                              >
-                                {(
-                                  data?.BidPriceEth *
-                                  (1 + bidPricePlus / 100) *
-                                  (bidType === "RandomWalk" ? 0.5 : 1)
-                                ).toFixed(6)}{" "}
-                                ETH
-                              </Typography>
-                            </Box>
-                            <Typography variant="body2" mt={2}>
-                              The bid price is bumped {bidPricePlus}% to prevent
-                              bidding collision.
+                              Rise bid price by
+                            </Typography>
+                            <CustomTextField
+                              type="number"
+                              placeholder="Bid Price Plus"
+                              value={bidPricePlus}
+                              size="small"
+                              fullWidth
+                              InputProps={{
+                                inputComponent: StyledInput,
+                                endAdornment: (
+                                  <InputAdornment position="end">
+                                    %
+                                  </InputAdornment>
+                                ),
+                                inputProps: { min: 0, max: 50 },
+                              }}
+                              onChange={(e) => {
+                                let value = Number(e.target.value);
+                                if (value <= 50) {
+                                  setBidPricePlus(value);
+                                }
+                              }}
+                            />
+                            <Typography
+                              whiteSpace="nowrap"
+                              color="rgba(255, 255, 255, 0.68)"
+                              ml={2}
+                            >
+                              {(
+                                data?.BidPriceEth *
+                                (1 + bidPricePlus / 100) *
+                                (bidType === "RandomWalk" ? 0.5 : 1)
+                              ).toFixed(6)}{" "}
+                              ETH
                             </Typography>
                           </Box>
-                        </AccordionDetails>
-                      </Accordion>
-                    )}
+                          <Typography variant="body2" mt={2}>
+                            The bid price is bumped {bidPricePlus}% to prevent
+                            bidding collision.
+                          </Typography>
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
                   </>
                 )}
               </>

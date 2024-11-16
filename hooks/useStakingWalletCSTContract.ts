@@ -1,5 +1,5 @@
 import { STAKING_WALLET_CST_ADDRESS } from "../config/app";
-import STAKING_WALLET_CST_ABI from "../contracts/StakingWalletCST.json";
+import STAKING_WALLET_CST_ABI from "../contracts/StakingWalletCosmicSignatureNft.json";
 import useContract from "./useContract";
 
 export default function useStakingWalletCSTContract() {
