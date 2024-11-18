@@ -39,7 +39,7 @@ const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
 
   return (
     <TablePrimaryRow
-      hover
+      hover="true"
       role="checkbox"
       tabIndex={-1}
       key={row.id}

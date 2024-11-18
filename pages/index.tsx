@@ -830,7 +830,7 @@ const NewHome = () => {
 
   useEffect(() => {
     const fetchTimeoutClaimPrize = async () => {
-      const timeout = await cosmicGameContract.timeoutClaimPrize();
+      const timeout = await cosmicGameContract.timeoutDurationToClaimMainPrize();
       setTimeoutClaimPrize(Number(timeout));
     };
     const fetchActivationTime = async () => {
