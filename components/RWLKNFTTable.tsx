@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Box,
   Button,
@@ -24,15 +24,28 @@ import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 import { isMobile } from "react-device-detect";
 
-const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
-  const [tokenInfo, setTokenInfo] = useState(null);
-  useEffect(() => {
-    const fetchTokenData = async () => {
-      const res = await api.get_info(tokenId);
-      setTokenInfo(res);
-    };
-    fetchTokenData();
-  }, []);
+// Moved perPage outside the component to avoid re-declaration on every render
+const perPage = 5;
+
+// Memoized RWLKNFTRow to prevent unnecessary re-renders
+const RWLKNFTRow = ({
+  tokenId,
+  tokenInfo,
+  handleStake,
+  isItemSelected,
+  handleClick,
+}) => {
+  if (!tokenInfo) {
+    // Display a placeholder or loading state if tokenInfo is not yet available
+    return null;
+  }
+
+  const onRowClick = () => handleClick(tokenId);
+
+  const onStakeClick = (e) => {
+    e.stopPropagation();
+    handleStake(tokenId);
+  };
 
   return (
     <TablePrimaryRow
@@ -41,7 +54,7 @@ const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
       tabIndex={-1}
       key={tokenId}
       selected={isItemSelected}
-      onClick={() => handleClick(tokenId)}
+      onClick={onRowClick}
       sx={{ cursor: "pointer" }}
     >
       <TablePrimaryCell padding="checkbox">
@@ -49,19 +62,13 @@ const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
       </TablePrimaryCell>
       <TablePrimaryCell>
         <AddressLink
-          address={tokenInfo?.CurOwnerAddr}
-          url={`/user/${tokenInfo?.CurOwnerAddr}`}
+          address={tokenInfo.CurOwnerAddr}
+          url={`/user/${tokenInfo.CurOwnerAddr}`}
         />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{tokenId}</TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Button
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleStake(tokenId);
-          }}
-        >
+        <Button size="small" onClick={onStakeClick}>
           Stake
         </Button>
       </TablePrimaryCell>
@@ -70,53 +77,72 @@ const RWLKNFTRow = ({ tokenId, handleStake, isItemSelected, handleClick }) => {
 };
 
 export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
-  const perPage = 5;
   const [anchorEl, setAnchorEl] = useState(null);
   const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState([]);
-  const isSelected = (id: number) => selected.indexOf(id) !== -1;
-  const handleClick = (id: number) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
+  const [selected, setSelected] = useState<number[]>([]);
+  const [tokenData, setTokenData] = useState<{ [key: number]: any }>({});
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
+  // Memoized functions to prevent unnecessary re-creations
+  const isSelected = (id: number) => selected.includes(id);
+
+  const handleClick = (id: number) => {
+    setSelected((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((selectedId) => selectedId !== id)
+        : [...prevSelected, id]
+    );
   };
+
   const onSelectAllClick = () => {
     setSelected(list);
     setAnchorEl(null);
   };
+
   const onSelectCurPgClick = () => {
     const newSelected = list.slice((page - 1) * perPage, page * perPage);
     setSelected(newSelected);
     setAnchorEl(null);
   };
+
   const onSelectNoneClick = () => {
     setSelected([]);
     setAnchorEl(null);
   };
+
   const onStakeMany = async () => {
-    await handleStakeMany(selected, new Array(selected.length).fill(true));
+    await handleStakeMany(selected, Array(selected.length).fill(true));
   };
+
   const onStake = async (id: number) => {
-    setSelected([id]);
     await handleStake(id, true);
   };
+
   useEffect(() => {
     setSelected([]);
     setPage(1);
   }, [list]);
+
+  // Fetch all token data in a single batch to optimize API calls
+  useEffect(() => {
+    const fetchTokenData = async () => {
+      const data = await Promise.all(
+        list.map((tokenId) => api.get_info(tokenId))
+      );
+      const tokenDataMap = list.reduce((acc, tokenId, index) => {
+        acc[tokenId] = data[index];
+        return acc;
+      }, {});
+      setTokenData(tokenDataMap);
+    };
+    if (list.length > 0) {
+      fetchTokenData();
+    }
+  }, [list]);
+
+  const paginatedList = useMemo(
+    () => list.slice((page - 1) * perPage, page * perPage),
+    [list, page]
+  );
 
   if (list.length === 0) {
     return <Typography>No available tokens.</Typography>;
@@ -202,17 +228,16 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list
-              .slice((page - 1) * perPage, page * perPage)
-              .map((tokenId, index) => (
-                <RWLKNFTRow
-                  key={index}
-                  tokenId={tokenId}
-                  handleStake={onStake}
-                  isItemSelected={isSelected(tokenId)}
-                  handleClick={handleClick}
-                />
-              ))}
+            {paginatedList.map((tokenId) => (
+              <RWLKNFTRow
+                key={tokenId}
+                tokenId={tokenId}
+                tokenInfo={tokenData[tokenId]}
+                handleStake={onStake}
+                isItemSelected={isSelected(tokenId)}
+                handleClick={handleClick}
+              />
+            ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
