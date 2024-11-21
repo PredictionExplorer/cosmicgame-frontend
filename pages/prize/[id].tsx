@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Box, Button, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
@@ -14,16 +14,18 @@ import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
 import EnduranceChampionsTable from "../../components/EnduranceChampionsTable";
 
-const InfoRow = ({
-  label,
-  value,
-  link,
-  monospace = false,
-}: {
+interface InfoRowProps {
   label: string;
   value: string | number;
   link?: string;
   monospace?: boolean;
+}
+
+const InfoRow: React.FC<InfoRowProps> = ({
+  label,
+  value,
+  link,
+  monospace = false,
 }) => (
   <Box mb={1}>
     <Typography color="primary" component="span">
@@ -52,7 +54,11 @@ const InfoRow = ({
   </Box>
 );
 
-const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
+interface PrizeInfoProps {
+  roundNum: number;
+}
+
+const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
   const cosmicGameContract = useCosmicGameContract();
   const { apiData: status } = useApiData();
   const { setNotification } = useNotification();
@@ -60,15 +66,23 @@ const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState([]);
   const [bidHistory, setBidHistory] = useState([]);
   const [nftDonations, setNftDonations] = useState([]);
-  const [prizeInfo, setPrizeInfo] = useState<any>(null);
+  const [prizeInfo, setPrizeInfo] = useState(null);
   const [stakingRewards, setStakingRewards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
-  const [championList, setChampionList] = useState<any>(null);
 
   const fetchUnclaimedDonatedNFTs = async () => {
-    const nfts = await api.get_donations_nft_unclaimed_by_round(roundNum);
-    setDonatedNFTToClaim(nfts);
+    try {
+      const nfts = await api.get_donations_nft_unclaimed_by_round(roundNum);
+      setDonatedNFTToClaim(nfts);
+    } catch (error) {
+      console.error("Error fetching unclaimed donated NFTs:", error);
+      setNotification({
+        text: "Failed to load unclaimed donated NFTs.",
+        type: "error",
+        visible: true,
+      });
+    }
   };
 
   const handleAllDonatedNFTsClaim = async () => {
@@ -79,21 +93,21 @@ const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
       console.log(res);
       await fetchUnclaimedDonatedNFTs();
     } catch (err) {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({ text: msg, type: "error", visible: true });
-      }
-      console.log(err);
+      const errorMsg = getErrorMessage(
+        err?.data?.message || err.message || "An error occurred"
+      );
+      setNotification({ text: errorMsg, type: "error", visible: true });
+      console.error("Error claiming donated NFTs:", err);
     } finally {
       setIsClaiming(false);
     }
   };
 
   useEffect(() => {
-    if (status?.NumDonatedNFTToClaim > 0) {
+    if (status?.NumDonatedNFTToClaim >= 0) {
       fetchUnclaimedDonatedNFTs();
     }
-  }, [status, roundNum]);
+  }, [status?.NumDonatedNFTToClaim, roundNum]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,27 +118,17 @@ const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
           prizeInfoData,
           bidHistoryData,
           stakingRewardsData,
-          championsData,
         ] = await Promise.all([
           api.get_donations_nft_by_round(roundNum),
           api.get_prize_info(roundNum),
           api.get_bid_list_by_round(roundNum, "desc"),
           api.get_staking_cst_rewards_by_round(roundNum),
-          (async () => {
-            const bids = await api.get_bid_list_by_round(roundNum, "desc");
-            const champions = getEnduranceChampions(bids);
-            const sortedChampions = [...champions].sort(
-              (a, b) => b.chronoWarrior - a.chronoWarrior
-            );
-            return sortedChampions;
-          })(),
         ]);
 
         setNftDonations(nftDonationsData);
         setPrizeInfo(prizeInfoData);
         setBidHistory(bidHistoryData);
         setStakingRewards(stakingRewardsData);
-        setChampionList(championsData);
       } catch (error) {
         console.error("Error fetching data:", error);
         setNotification({
@@ -138,6 +142,17 @@ const PrizeInfo = ({ roundNum }: { roundNum: number }) => {
     };
     fetchData();
   }, [roundNum]);
+
+  const championList = useMemo(() => {
+    if (bidHistory.length > 0 && prizeInfo) {
+      const champions = getEnduranceChampions(bidHistory, prizeInfo.TimeStamp);
+      const sortedChampions = [...champions].sort(
+        (a, b) => b.chronoWarrior - a.chronoWarrior
+      );
+      return sortedChampions;
+    }
+    return [];
+  }, [bidHistory, prizeInfo]);
 
   return (
     <MainWrapper>

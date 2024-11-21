@@ -163,8 +163,8 @@ export const isWalletAddress = (address: string) => {
   return "";
 };
 
-export const getEnduranceChampions = (bidList: any[]) => {
-  const currentTime = Math.floor(Date.now() / 1000);
+export const getEnduranceChampions = (bidList: any[], roundEndTimeStamp: number = 0) => {
+  const currentTime = roundEndTimeStamp > 0 ? roundEndTimeStamp : Math.floor(Date.now() / 1000);
   if (!bidList || bidList.length === 0) {
     return [];
   }
