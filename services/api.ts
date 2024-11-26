@@ -475,6 +475,26 @@ class ApiService {
     }
   }
 
+  public async get_staking_rewards_by_user(address: string) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`staking/cst/by_user/by_token/rewards/${address}`));
+      return data.RewardsByTokenDetails;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
+  public async get_staking_rewards_by_user_by_token_details(address: string, tokenId: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`staking/cst/by_user/by_token/rewards/details/${address}/${tokenId}`));
+      return data.RewardsByTokenDetails;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
   public async get_cst_action_ids_by_deposit_with_claim_info(address: string, depositId: number) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/action_ids_by_deposit_with_claim_info/${address}/${depositId}`));
