@@ -22,8 +22,6 @@ import { ethers } from "ethers";
 import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
 import { GetServerSideProps } from "next";
-import UnclaimedStakingRewardsTable from "../components/UnclaimedStakingRewardsTable";
-import CollectedStakingRewardsTable from "../components/CollectedStakingRewardsTable";
 import StakingActionsTable from "../components/StakingActionsTable";
 
 interface TabPanelProps {
@@ -53,8 +51,6 @@ const MyStaking = () => {
   const nftContract = useRWLKNFTContract();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
-  const [unclaimedStakingRewards, setUnclaimedStakingRewards] = useState([]);
-  const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
   const [stakingCSTActions, setStakingCSTActions] = useState([]);
   const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
   const [CSTokens, setCSTokens] = useState([]);
@@ -184,22 +180,11 @@ const MyStaking = () => {
 
   const fetchCSTData = async (addr: string, reload: boolean = true) => {
     if (reload) setLoading(true);
-    const [
-      unclaimedRewards,
-      collectedRewards,
-      stakingActions,
-      tokens,
-      mints,
-    ] = await Promise.all([
-      api.get_unclaimed_staking_rewards_by_user(addr),
-      api.get_collected_staking_rewards_by_user(addr),
+    const [stakingActions, tokens, mints] = await Promise.all([
       api.get_staking_cst_actions_by_user(addr),
       api.get_cst_tokens_by_user(addr),
       api.get_staking_cst_mints_by_user(addr),
     ]);
-
-    setUnclaimedStakingRewards(unclaimedRewards);
-    setCollectedStakingRewards(collectedRewards);
     setStakingCSTActions(stakingActions);
     setCSTokens(tokens.filter((x) => !x.WasUnstaked));
     setCSTMints(mints);
@@ -339,25 +324,6 @@ const MyStaking = () => {
           </Box>
           <CustomTabPanel value={stakingTable} index={0}>
             <Box>
-              <Typography variant="h6" lineHeight={1} mb={2}>
-                Earned Staking Rewards
-              </Typography>
-              <UnclaimedStakingRewardsTable
-                list={unclaimedStakingRewards}
-                owner={account}
-                fetchData={fetchCSTData}
-              />
-            </Box>
-            <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                Collected Staking Deposits
-              </Typography>
-              <CollectedStakingRewardsTable
-                list={collectedStakingRewards}
-                owner={account}
-              />
-            </Box>
-            <Box>
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                 Staking Reward Tokens
               </Typography>
@@ -463,3 +429,5 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default MyStaking;
+
+// Removed unclaimed staking rewards and collected staking rewards tables

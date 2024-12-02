@@ -10,8 +10,8 @@ export const SystemModeProvider = ({ children }) => {
   const fetchData = async () => {
     try {
       if (cosmicGameContract) {
-        const systemMode = await cosmicGameContract.systemMode();
-        setData(Number(systemMode));
+        // const systemMode = await cosmicGameContract.systemMode();
+        // setData(Number(systemMode));
       }
     } catch (error) {
       console.log("Error fetching data:", error);

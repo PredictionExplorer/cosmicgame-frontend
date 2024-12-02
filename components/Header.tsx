@@ -95,7 +95,7 @@ const Header = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [account, nftContract, fetchData]);
+  }, [account, nftContract]);
 
   const navs = getNAVs(status, account);
 
