@@ -478,7 +478,7 @@ class ApiService {
   public async get_staking_rewards_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/by_user/by_token/rewards/${address}`));
-      return data.RewardsByTokenDetails;
+      return data.RewardsByToken;
     } catch (err) {
       console.log(err);
       return [];
