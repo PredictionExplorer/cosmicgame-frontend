@@ -576,6 +576,15 @@ const UserInfo = ({ address }) => {
                       IsRwalk={false}
                     />
                   </Box>
+                  <Box mt={4}>
+                    <Typography variant="subtitle1" lineHeight={1} mb={2}>
+                      Staking Rewards
+                    </Typography>
+                    <StakingRewardsTable
+                      list={stakingRewards}
+                      address={address}
+                    />
+                  </Box>
                 </CustomTabPanel>
                 <CustomTabPanel value={stakingTable} index={1}>
                   <Box mb={1}>
@@ -646,12 +655,6 @@ const UserInfo = ({ address }) => {
                     IsRwalk={true}
                   />
                 </CustomTabPanel>
-              </Box>
-              <Box mt={6}>
-                <Typography variant="h6" lineHeight={1} mb={2}>
-                  Staking Rewards
-                </Typography>
-                <StakingRewardsTable list={stakingRewards} address={address} />
               </Box>
               <Box mt={8}>
                 <Typography variant="h6" lineHeight={1}>
