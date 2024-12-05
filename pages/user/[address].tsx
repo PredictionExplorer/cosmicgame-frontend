@@ -16,10 +16,8 @@ import { CSTTable } from "../my-tokens";
 import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
 import StakingActionsTable from "../../components/StakingActionsTable";
-import UnclaimedStakingRewardsTable from "../../components/UnclaimedStakingRewardsTable";
-import CollectedStakingRewardsTable from "../../components/CollectedStakingRewardsTable";
 import MarketingRewardsTable from "../../components/MarketingRewardsTable";
-// import EthDonationTable from "../../components/EthDonationTable";
+import { StakingRewardsTable } from "../../components/StakingRewardsTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -60,18 +58,16 @@ const UserInfo = ({ address }) => {
   const [balance, setBalance] = useState({ CosmicToken: 0, ETH: 0 });
   const [loading, setLoading] = useState(true);
   const [invalidAddress, setInvalidAddress] = useState(false);
-  const [unclaimedStakingRewards, setUnclaimedStakingRewards] = useState([]);
-  const [collectedStakingRewards, setCollectedStakingRewards] = useState([]);
   const [stakingCSTActions, setStakingCSTActions] = useState([]);
   const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
   const [marketingRewards, setMarketingRewards] = useState([]);
-  // const [ethDonations, setEthDonations] = useState([]);
   const [cstList, setCSTList] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
   const [stakingTable, setStakingTable] = useState(0);
   const [raffleETHProbability, setRaffleETHProbability] = useState(0);
   const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
+  const [stakingRewards, setStakingRewards] = useState([]);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -85,24 +81,20 @@ const UserInfo = ({ address }) => {
         history,
         userInfoResponse,
         balanceResponse,
-        unclaimedStakingRewards,
-        collectedStakingRewards,
         stakingCSTActions,
         stakingRWLKActions,
         marketingRewards,
         cstList,
-        // donations,
+        stakingRewards,
       ] = await Promise.all([
         api.get_claim_history_by_user(addr),
         api.get_user_info(addr),
         api.get_user_balance(addr),
-        api.get_unclaimed_staking_rewards_by_user(addr),
-        api.get_collected_staking_rewards_by_user(addr),
         api.get_staking_cst_actions_by_user(addr),
         api.get_staking_rwalk_actions_by_user(addr),
         api.get_marketing_rewards_by_user(addr),
         api.get_cst_tokens_by_user(addr),
-        // api.get_donations_by_user(addr),
+        api.get_staking_rewards_by_user(addr),
       ]);
 
       setClaimHistory(history);
@@ -119,11 +111,10 @@ const UserInfo = ({ address }) => {
         });
       }
 
-      setUnclaimedStakingRewards(unclaimedStakingRewards);
-      setCollectedStakingRewards(collectedStakingRewards);
       setStakingCSTActions(stakingCSTActions);
       setStakingRWLKActions(stakingRWLKActions);
       setMarketingRewards(marketingRewards);
+      setStakingRewards(stakingRewards);
       setCSTList(cstList);
       // setEthDonations(donations);
       fetchStakedToken();
@@ -432,24 +423,6 @@ const UserInfo = ({ address }) => {
                   {userInfo.TotalCSTokensWon}
                 </Typography>
               </Box>
-              {/* <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Number of Eth Donations:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {userInfo.TotalDonatedCount}
-                </Typography>
-              </Box>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Total Amount of Eth Donations:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {userInfo.TotalDonatedAmountEth.toFixed(2)} ETH
-                </Typography>
-              </Box> */}
               {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
                 <>
                   <Box mb={1}>
@@ -589,13 +562,20 @@ const UserInfo = ({ address }) => {
                       }
                     </Typography>
                   </Box>
-                  <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
-                    Stake / Unstake Actions
-                  </Typography>
-                  <StakingActionsTable
-                    list={stakingCSTActions}
-                    IsRwalk={false}
-                  />
+                  <Box>
+                    <Typography
+                      variant="subtitle1"
+                      lineHeight={1}
+                      mt={4}
+                      mb={2}
+                    >
+                      Stake / Unstake Actions
+                    </Typography>
+                    <StakingActionsTable
+                      list={stakingCSTActions}
+                      IsRwalk={false}
+                    />
+                  </Box>
                 </CustomTabPanel>
                 <CustomTabPanel value={stakingTable} index={1}>
                   <Box mb={1}>
@@ -668,17 +648,17 @@ const UserInfo = ({ address }) => {
                 </CustomTabPanel>
               </Box>
               <Box mt={6}>
+                <Typography variant="h6" lineHeight={1} mb={2}>
+                  Staking Rewards
+                </Typography>
+                <StakingRewardsTable list={stakingRewards} address={address} />
+              </Box>
+              <Box mt={8}>
                 <Typography variant="h6" lineHeight={1}>
                   Bid History
                 </Typography>
                 <BiddingHistoryTable biddingHistory={bidHistory} />
               </Box>
-              {/* <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  ETH Donation History
-                </Typography>
-                <EthDonationTable list={ethDonations} />
-              </Box> */}
               <Box>
                 <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                   Cosmic Signature Tokens User Own
@@ -693,25 +673,6 @@ const UserInfo = ({ address }) => {
                   winningHistory={claimHistory}
                   showClaimedStatus={true}
                   showWinnerAddr={false}
-                />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Earned Staking Rewards
-                </Typography>
-                <UnclaimedStakingRewardsTable
-                  list={unclaimedStakingRewards}
-                  owner={address}
-                  fetchData={fetchData}
-                />
-              </Box>
-              <Box>
-                <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
-                  Collected Staking Rewards
-                </Typography>
-                <CollectedStakingRewardsTable
-                  list={collectedStakingRewards}
-                  owner={address}
                 />
               </Box>
               {marketingRewards.length > 0 && (
