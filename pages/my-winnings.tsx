@@ -23,7 +23,6 @@ import { CustomPagination } from "../components/CustomPagination";
 import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
 import { GetServerSideProps } from "next";
-import UnclaimedStakingRewardsTable from "../components/UnclaimedStakingRewardsTable";
 
 const MyWinningsRow = ({ winning }) => {
   if (!winning) {
@@ -89,7 +88,6 @@ const MyWinnings = () => {
   const perPage = 5;
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState(null);
   const [raffleETHToClaim, setRaffleETHToClaim] = useState(null);
-  const [unclaimedStakingRewards, setUnclaimedStakingRewards] = useState(null);
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
     raffleETH: false,
@@ -171,13 +169,11 @@ const MyWinnings = () => {
     if (!account) return;
 
     try {
-      const [rewards, nfts, deposits] = await Promise.all([
-        api.get_unclaimed_staking_rewards_by_user(account),
+      const [nfts, deposits] = await Promise.all([
         api.get_unclaimed_donated_nft_by_user(account),
         api.get_unclaimed_raffle_deposits_by_user(account),
       ]);
 
-      setUnclaimedStakingRewards(rewards);
       setDonatedNFTToClaim(nfts.sort((a, b) => a.TimeStamp - b.TimeStamp));
       setRaffleETHToClaim(deposits.sort((a, b) => b.TimeStamp - a.TimeStamp));
     } catch (error) {
@@ -245,23 +241,6 @@ const MyWinnings = () => {
                   perPage={perPage}
                 />
               </>
-            )}
-          </Box>
-          <Box mt={8}>
-            <Typography variant="h5" mb={2}>
-              Earned Staking Rewards
-            </Typography>
-            {unclaimedStakingRewards !== null &&
-            unclaimedStakingRewards.length === 0 ? (
-              <Typography>No rewards yet.</Typography>
-            ) : unclaimedStakingRewards === null ? (
-              <Typography>Loading...</Typography>
-            ) : (
-              <UnclaimedStakingRewardsTable
-                list={unclaimedStakingRewards}
-                owner={account}
-                fetchData={fetchAllUnclaimedData}
-              />
             )}
           </Box>
           <Box mt={8}>
