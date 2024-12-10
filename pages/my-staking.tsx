@@ -130,15 +130,50 @@ const MyStaking = () => {
     }
   };
 
+  async function findMaxLimit(contract, actionIds) {
+    let numEthDepositsToEvaluateMaxLimit = 2;
+    let limit = 100000; // Arbitrary upper limit, can be adjusted as needed
+    // Binary search loop to find the maximum valid numEthDepositsToEvaluateMaxLimit
+    while (limit > numEthDepositsToEvaluateMaxLimit) {
+      const result = Array.isArray(actionIds)
+        ? await contract.callStatic.unstakeMany(
+            actionIds,
+            numEthDepositsToEvaluateMaxLimit
+          )
+        : await contract.callStatic.unstake(
+            actionIds,
+            numEthDepositsToEvaluateMaxLimit
+          );
+
+      if (result !== null) {
+        return numEthDepositsToEvaluateMaxLimit;
+      } else {
+        numEthDepositsToEvaluateMaxLimit *= 2;
+      }
+    }
+
+    console.log("Found max limit:", numEthDepositsToEvaluateMaxLimit);
+    return numEthDepositsToEvaluateMaxLimit;
+  }
+
   const handleUnstakeAction = async (
     actionIds: number | number[],
     isRwalk: boolean
   ) => {
     const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
+    const numEthDepositsToEvaluateMaxLimit = await findMaxLimit(
+      stakingContract,
+      actionIds
+    );
+
     try {
       const res = Array.isArray(actionIds)
-        ? await stakingContract.unstakeMany(actionIds).then((tx) => tx.wait())
-        : await stakingContract.unstake(actionIds).then((tx) => tx.wait());
+        ? await stakingContract
+            .unstakeMany(actionIds, numEthDepositsToEvaluateMaxLimit)
+            .then((tx) => tx.wait())
+        : await stakingContract
+            .unstake(actionIds, numEthDepositsToEvaluateMaxLimit)
+            .then((tx) => tx.wait());
 
       if (!res.code) {
         setNotification({

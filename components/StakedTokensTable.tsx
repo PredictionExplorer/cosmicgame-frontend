@@ -317,3 +317,8 @@ export const StakedTokensTable = ({
     </>
   );
 };
+
+
+// get numEthDepositsToEvaluateMaxLimit_ from smart contract for calling eth_call
+
+
