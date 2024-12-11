@@ -628,7 +628,7 @@ class ApiService {
 
   public async get_staking_cst_rewards() {
     try {
-      const { data } = await axios.get(getAPIUrl("staking/cst/rewards/global/0/1000000"));
+      const { data } = await axios.get(getAPIUrl("staking/cst/rewards/global"));
       return data.StakingCSTRewards;
     } catch (err) {
       console.log(err);
