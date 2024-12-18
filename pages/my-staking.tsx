@@ -57,7 +57,7 @@ const MyStaking = () => {
   const [CSTokens, setCSTokens] = useState([]);
   const [rwlkTokens, setRwlkTokens] = useState([]);
   const [rwlkMints, setRwlkMints] = useState([]);
-  const [cstMints, setCSTMints] = useState([]);
+  // const [cstMints, setCSTMints] = useState([]);
   const [stakingRewards, setStakingRewards] = useState([]);
   const [rewardPerCST, setRewardPerCST] = useState(0);
   const [stakingTable, setStakingTable] = useState(0);
@@ -217,15 +217,15 @@ const MyStaking = () => {
 
   const fetchCSTData = async (addr: string, reload: boolean = true) => {
     if (reload) setLoading(true);
-    const [stakingActions, tokens, mints, stakingRewards] = await Promise.all([
+    const [stakingActions, tokens, stakingRewards] = await Promise.all([
       api.get_staking_cst_actions_by_user(addr),
       api.get_cst_tokens_by_user(addr),
-      api.get_staking_cst_mints_by_user(addr),
+      // api.get_staking_cst_mints_by_user(addr),
       api.get_staking_rewards_by_user(addr),
     ]);
     setStakingCSTActions(stakingActions);
     setCSTokens(tokens.filter((x) => !x.WasUnstaked));
-    setCSTMints(mints);
+    // setCSTMints(mints);
     setStakingRewards(stakingRewards);
     fetchStakedTokens();
     setLoading(false);
@@ -368,12 +368,12 @@ const MyStaking = () => {
               </Typography>
               <StakingRewardsTable list={stakingRewards} address={account} />
             </Box>
-            <Box>
+            {/* <Box>
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                 Staking Reward Cosmic Signature Tokens
               </Typography>
               <StakingRewardMintsTable list={cstMints} />
-            </Box>
+            </Box> */}
             <Box>
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
                 Stake / Unstake Actions

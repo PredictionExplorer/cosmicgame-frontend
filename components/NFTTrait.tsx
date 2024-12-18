@@ -217,7 +217,7 @@ const NFTTrait = ({ tokenId }) => {
 
   const fetchTransferHistory = async () => {
     try {
-      const history = await api.get_transfer_history(tokenId);
+      const history = await api.get_ct_ownership_transfers(tokenId);
       setTransferHistory(history);
     } catch (e) {
       console.error(e);
@@ -227,9 +227,9 @@ const NFTTrait = ({ tokenId }) => {
   const fetchCSTInfo = async () => {
     try {
       const res = await api.get_cst_info(tokenId);
-      setNft(res.TokenInfo);
-      setImage(`${BASE_URL}/0x${res.TokenInfo.Seed}.png`);
-      setVideo(`${BASE_URL}/0x${res.TokenInfo.Seed}.mp4`);
+      setNft(res);
+      setImage(`${BASE_URL}/0x${res.Seed}.png`);
+      setVideo(`${BASE_URL}/0x${res.Seed}.mp4`);
     } catch (e) {
       console.error(e);
     }

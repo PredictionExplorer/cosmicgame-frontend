@@ -12,7 +12,7 @@ const PrizeWinners = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      let prizeClaims = await api.get_prize_list();
+      let prizeClaims = await api.get_round_list();
       prizeClaims = prizeClaims.sort((a, b) => b.TimeStamp - a.TimeStamp);
       setPrizeClaims(prizeClaims);
       setLoading(false);

@@ -27,7 +27,7 @@ const PrizeClaimed = () => {
         const roundNum = parseInt(
           Array.isArray(roundStr) ? roundStr[0] : roundStr
         );
-        const prizeInfo = await api.get_prize_info(roundNum);
+        const prizeInfo = await api.get_round_info(roundNum);
         setPrizeInfo(prizeInfo);
         setLoading(false);
       } catch (e) {

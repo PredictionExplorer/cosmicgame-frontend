@@ -120,7 +120,7 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
           stakingRewardsData,
         ] = await Promise.all([
           api.get_donations_nft_by_round(roundNum),
-          api.get_prize_info(roundNum),
+          api.get_round_info(roundNum),
           api.get_bid_list_by_round(roundNum, "desc"),
           api.get_staking_cst_rewards_by_round(roundNum),
         ]);

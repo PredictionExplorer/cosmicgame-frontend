@@ -622,10 +622,10 @@ const NewHome = () => {
 
   const fetchPrizeInfo = async () => {
     try {
-      const prizeList = await api.get_prize_list();
+      const prizeList = await api.get_round_list();
       let prizeInfo;
       if (prizeList.length) {
-        prizeInfo = await api.get_prize_info(prizeList.length - 1);
+        prizeInfo = await api.get_round_info(prizeList.length - 1);
       } else {
         prizeInfo = null;
       }
@@ -801,7 +801,7 @@ const NewHome = () => {
   useEffect(() => {
     const fetchCSTInfo = async (bannerId: number) => {
       const res = await api.get_cst_info(bannerId);
-      const fileName = `0x${res.TokenInfo.Seed}`;
+      const fileName = `0x${res.Seed}`;
       setBannerToken({ seed: fileName, id: bannerId });
     };
     if (data && bannerToken.seed === "") {
