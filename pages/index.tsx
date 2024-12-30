@@ -81,8 +81,6 @@ import EnduranceChampionsTable from "../components/EnduranceChampionsTable";
 import EthDonationTable from "../components/EthDonationTable";
 import axios from "axios";
 
-const bidParamsTypes = ["tuple(string msg,int256 rwalk)"];
-
 const NewHome = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -105,6 +103,8 @@ const NewHome = () => {
   const [message, setMessage] = useState("");
   const [nftDonateAddress, setNftDonateAddress] = useState("");
   const [nftId, setNftId] = useState("");
+  const [tokenDonateAddress, setTokenDonateAddress] = useState("");
+  const [tokenAmount, setTokenAmount] = useState("");
   const [rwlkId, setRwlkId] = useState(-1);
   const [bidPricePlus, setBidPricePlus] = useState(2);
   const [isBidding, setIsBidding] = useState(false);
@@ -312,12 +312,12 @@ const NewHome = () => {
         setIsBidding(false);
         return;
       }
-      let params = ethers.utils.defaultAbiCoder.encode(bidParamsTypes, [
-        { msg: message, rwalk: rwlkId },
-      ]);
-      if (!nftDonateAddress || !nftId) {
+      if (
+        (!nftDonateAddress || !nftId) &&
+        (!tokenDonateAddress || !tokenAmount)
+      ) {
         await cosmicGameContract
-          .bid(params, { value: newBidPrice })
+          .bid(rwlkId, message, { value: newBidPrice, gasLimit: 30000000 })
           .then((tx: any) => tx.wait());
         setTimeout(() => {
           fetchDataCollection();
@@ -381,8 +381,9 @@ const NewHome = () => {
             .then((tx: any) => tx.wait());
         }
         await cosmicGameContract
-          .bidAndDonateNFT(params, nftDonateAddress, nftIdNum, {
+          .bidAndDonateNFT(rwlkId, message, nftDonateAddress, nftIdNum, {
             value: newBidPrice,
+            gasLimit: 30000000,
           })
           .then((tx: any) => tx.wait());
         setTimeout(() => {
@@ -437,10 +438,13 @@ const NewHome = () => {
           return;
         }
       }
-
-      if (!nftDonateAddress || !nftId) {
+      const priceMaxLimit = await cosmicGameContract.getCurrentBidPriceCST();
+      if (
+        (!nftDonateAddress || !nftId) &&
+        (!tokenDonateAddress || !tokenAmount)
+      ) {
         await cosmicGameContract
-          .bidWithCST(message)
+          .bidWithCST(priceMaxLimit, message)
           .then((tx: any) => tx.wait());
         setTimeout(() => {
           fetchDataCollection();
@@ -504,7 +508,12 @@ const NewHome = () => {
             .then((tx: any) => tx.wait());
         }
         await cosmicGameContract
-          .bidWithCstAndDonateNft(message, nftDonateAddress, nftIdNum)
+          .bidWithCstAndDonateNft(
+            priceMaxLimit,
+            message,
+            nftDonateAddress,
+            nftIdNum
+          )
           .then((tx: any) => tx.wait());
         setTimeout(() => {
           fetchDataCollection();
@@ -1231,6 +1240,25 @@ const NewHome = () => {
                           you can put the contract address, NFT id, and comment
                           here.
                         </Typography>
+                        <TextField
+                          placeholder="Token Contract Address"
+                          size="small"
+                          value={tokenDonateAddress}
+                          fullWidth
+                          sx={{ marginTop: 2 }}
+                          onChange={(e) =>
+                            setTokenDonateAddress(e.target.value)
+                          }
+                        />
+                        <TextField
+                          placeholder="Token Amount"
+                          type="number"
+                          value={tokenAmount}
+                          size="small"
+                          fullWidth
+                          sx={{ marginTop: 2 }}
+                          onChange={(e) => setTokenAmount(e.target.value)}
+                        />
                         <TextField
                           placeholder="NFT contract address"
                           size="small"
