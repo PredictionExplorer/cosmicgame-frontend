@@ -40,6 +40,7 @@ import { ART_BLOCKS_ADDRESS, COSMICGAME_ADDRESS } from "../config/app";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ArrowForward } from "@mui/icons-material";
 import NFT_ABI from "../contracts/RandomWalkNFT.json";
+import ERC20_ABI from "../contracts/CosmicToken.json";
 import PaginationRWLKGrid from "../components/PaginationRWLKGrid";
 import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
 import Prize from "../components/Prize";
@@ -86,6 +87,7 @@ const NewHome = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
   const [bidType, setBidType] = useState("ETH");
+  const [donationType, setDonationType] = useState("NFT");
   const [cstBidData, setCSTBidData] = useState({
     AuctionDuration: 0,
     CSTPrice: 0,
@@ -313,8 +315,8 @@ const NewHome = () => {
         return;
       }
       if (
-        (!nftDonateAddress || !nftId) &&
-        (!tokenDonateAddress || !tokenAmount)
+        (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
+        (donationType === "ETH" && (!tokenDonateAddress || !tokenAmount))
       ) {
         await cosmicGameContract
           .bid(rwlkId, message, { value: newBidPrice, gasLimit: 30000000 })
@@ -326,84 +328,175 @@ const NewHome = () => {
         }, 3000);
         return;
       }
-      // Proceed with NFT donation
-      // Check if the contract exists
-      const isExist = await checkIfContractExist(nftDonateAddress);
-      if (!isExist) {
-        setNotification({
-          visible: true,
-          type: "error",
-          text: "The address provided is not a valid contract address!",
-        });
-        setIsBidding(false);
-        return;
-      }
-      const nftIdNum = Number(nftId);
-      const nftDonateContract = new Contract(
-        nftDonateAddress,
-        NFT_ABI,
-        library.getSigner(account)
-      );
-      // Check if the contract is ERC721
-      try {
-        const supportsInterface = await nftDonateContract.supportsInterface(
-          "0x80ac58cd"
-        );
-        if (!supportsInterface) {
-          throw new Error("Not an ERC721 contract");
-        }
-      } catch (err) {
-        console.log(err);
-        setNotification({
-          visible: true,
-          type: "error",
-          text: "The donate NFT contract is not an ERC721 token contract.",
-        });
-        setIsBidding(false);
-        return;
-      }
-      // Check token ownership
-      const isOwner = await checkTokenOwnership(nftDonateAddress, nftIdNum);
-      if (!isOwner) {
-        setIsBidding(false);
-        return;
-      }
-      // Approve NFT transfer
-      try {
-        const approvedBy = await nftDonateContract.getApproved(nftIdNum);
-        const isApprovedForAll = await nftDonateContract.isApprovedForAll(
-          account,
-          COSMICGAME_ADDRESS
-        );
-        if (!isApprovedForAll && approvedBy !== COSMICGAME_ADDRESS) {
-          await nftDonateContract
-            .setApprovalForAll(COSMICGAME_ADDRESS, true)
-            .then((tx: any) => tx.wait());
-        }
-        await cosmicGameContract
-          .bidAndDonateNFT(rwlkId, message, nftDonateAddress, nftIdNum, {
-            value: newBidPrice,
-            gasLimit: 30000000,
-          })
-          .then((tx: any) => tx.wait());
-        setTimeout(() => {
-          fetchDataCollection();
-          setMessage("");
-          setNftId("");
-          setNftDonateAddress("");
-          setIsBidding(false);
-        }, 3000);
-      } catch (err) {
-        if (err?.data?.message) {
-          const msg = getErrorMessage(err?.data?.message);
+      if (donationType === "NFT") {
+        // Proceed with NFT donation
+        // Check if the contract exists
+        const isExist = await checkIfContractExist(nftDonateAddress);
+        if (!isExist) {
           setNotification({
             visible: true,
             type: "error",
-            text: msg,
+            text: "The address provided is not a valid contract address!",
           });
+          setIsBidding(false);
+          return;
         }
-        console.log(err);
-        setIsBidding(false);
+        const nftIdNum = Number(nftId);
+        const nftDonateContract = new Contract(
+          nftDonateAddress,
+          NFT_ABI,
+          library.getSigner(account)
+        );
+        // Check if the contract is ERC721
+        try {
+          const supportsInterface = await nftDonateContract.supportsInterface(
+            "0x80ac58cd"
+          );
+          if (!supportsInterface) {
+            throw new Error("Not an ERC721 contract");
+          }
+        } catch (err) {
+          console.log(err);
+          setNotification({
+            visible: true,
+            type: "error",
+            text: "The donate NFT contract is not an ERC721 token contract.",
+          });
+          setIsBidding(false);
+          return;
+        }
+        // Check token ownership
+        const isOwner = await checkTokenOwnership(nftDonateAddress, nftIdNum);
+        if (!isOwner) {
+          setIsBidding(false);
+          return;
+        }
+        // Approve NFT transfer
+        try {
+          const approvedBy = await nftDonateContract.getApproved(nftIdNum);
+          const isApprovedForAll = await nftDonateContract.isApprovedForAll(
+            account,
+            COSMICGAME_ADDRESS
+          );
+          if (!isApprovedForAll && approvedBy !== COSMICGAME_ADDRESS) {
+            await nftDonateContract
+              .setApprovalForAll(COSMICGAME_ADDRESS, true)
+              .then((tx: any) => tx.wait());
+          }
+          await cosmicGameContract
+            .bidAndDonateNFT(rwlkId, message, nftDonateAddress, nftIdNum, {
+              value: newBidPrice,
+              gasLimit: 30000000,
+            })
+            .then((tx: any) => tx.wait());
+          setTimeout(() => {
+            fetchDataCollection();
+            setMessage("");
+            setNftId("");
+            setNftDonateAddress("");
+            setIsBidding(false);
+          }, 3000);
+        } catch (err) {
+          if (err?.data?.message) {
+            const msg = getErrorMessage(err?.data?.message);
+            setNotification({
+              visible: true,
+              type: "error",
+              text: msg,
+            });
+          }
+          console.log(err);
+          setIsBidding(false);
+        }
+      } else {
+        // Proceed with Token donation
+        const isExist = await checkIfContractExist(tokenDonateAddress);
+        if (!isExist) {
+          setNotification({
+            visible: true,
+            type: "error",
+            text: "The address provided is not a valid contract address!",
+          });
+          setIsBidding(false);
+          return;
+        }
+
+        const tokenDonateContract = new Contract(
+          tokenDonateAddress,
+          ERC20_ABI,
+          library.getSigner(account)
+        );
+
+        // Check if the contract is ERC20
+        try {
+          const totalSupply = await tokenDonateContract.totalSupply();
+          if (!totalSupply) {
+            throw new Error("Not an ERC20 contract");
+          }
+        } catch (err) {
+          console.log(err);
+          setNotification({
+            visible: true,
+            type: "error",
+            text: "The donate token contract is not an ERC20 token contract.",
+          });
+          setIsBidding(false);
+          return;
+        }
+        // Check wallet balance
+        const walletBalance = await tokenDonateContract.balanceOf(account);
+        const tokenAmountNum = Number(tokenAmount);
+        if (walletBalance.lt(tokenAmountNum)) {
+          setNotification({
+            visible: true,
+            type: "error",
+            text: "Insufficient token balance for donation.",
+          });
+          setIsBidding(false);
+          return;
+        }
+        // Approve token transfer
+        try {
+          const allowance = await tokenDonateContract.allowance(
+            account,
+            COSMICGAME_ADDRESS
+          );
+          if (allowance.lt(tokenAmountNum)) {
+            await tokenDonateContract
+              .approve(COSMICGAME_ADDRESS, tokenAmountNum)
+              .then((tx: any) => tx.wait());
+          }
+          await cosmicGameContract
+            .bidAndDonateToken(
+              rwlkId,
+              message,
+              tokenDonateAddress,
+              tokenAmountNum,
+              {
+                value: newBidPrice,
+                gasLimit: 30000000,
+              }
+            )
+            .then((tx: any) => tx.wait());
+          setTimeout(() => {
+            fetchDataCollection();
+            setMessage("");
+            setTokenAmount("");
+            setTokenDonateAddress("");
+            setIsBidding(false);
+          }, 3000);
+        } catch (err) {
+          if (err?.data?.message) {
+            const msg = getErrorMessage(err?.data?.message);
+            setNotification({
+              visible: true,
+              type: "error",
+              text: msg,
+            });
+          }
+          console.log(err);
+          setIsBidding(false);
+        }
       }
     } catch (err) {
       if (err?.data?.message) {
@@ -440,8 +533,8 @@ const NewHome = () => {
       }
       const priceMaxLimit = await cosmicGameContract.getCurrentBidPriceCST();
       if (
-        (!nftDonateAddress || !nftId) &&
-        (!tokenDonateAddress || !tokenAmount)
+        (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
+        (donationType === "ETH" && (!tokenDonateAddress || !tokenAmount))
       ) {
         await cosmicGameContract
           .bidWithCST(priceMaxLimit, message)
@@ -453,86 +546,173 @@ const NewHome = () => {
         }, 3000);
         return;
       }
-      // Proceed with NFT donation
-      // Check if the contract exists
-      const isExist = await checkIfContractExist(nftDonateAddress);
-      if (!isExist) {
-        setNotification({
-          visible: true,
-          type: "error",
-          text: "The address provided is not a valid contract address!",
-        });
-        setIsBidding(false);
-        return;
-      }
-      const nftIdNum = Number(nftId);
-      const nftDonateContract = new Contract(
-        nftDonateAddress,
-        NFT_ABI,
-        library.getSigner(account)
-      );
-      // Check if the contract is ERC721
-      try {
-        const supportsInterface = await nftDonateContract.supportsInterface(
-          "0x80ac58cd"
-        );
-        if (!supportsInterface) {
-          throw new Error("Not an ERC721 contract");
-        }
-      } catch (err) {
-        console.log(err);
-        setNotification({
-          visible: true,
-          type: "error",
-          text: "The donate NFT contract is not an ERC721 token contract.",
-        });
-        setIsBidding(false);
-        return;
-      }
-      // Check token ownership
-      const isOwner = await checkTokenOwnership(nftDonateAddress, nftIdNum);
-      if (!isOwner) {
-        setIsBidding(false);
-        return;
-      }
-      // Approve NFT transfer
-      try {
-        const approvedBy = await nftDonateContract.getApproved(nftIdNum);
-        const isApprovedForAll = await nftDonateContract.isApprovedForAll(
-          account,
-          COSMICGAME_ADDRESS
-        );
-        if (!isApprovedForAll && approvedBy !== COSMICGAME_ADDRESS) {
-          await nftDonateContract
-            .setApprovalForAll(COSMICGAME_ADDRESS, true)
-            .then((tx: any) => tx.wait());
-        }
-        await cosmicGameContract
-          .bidWithCstAndDonateNft(
-            priceMaxLimit,
-            message,
-            nftDonateAddress,
-            nftIdNum
-          )
-          .then((tx: any) => tx.wait());
-        setTimeout(() => {
-          fetchDataCollection();
-          setMessage("");
-          setNftId("");
-          setNftDonateAddress("");
-          setIsBidding(false);
-        }, 3000);
-      } catch (err) {
-        if (err?.data?.message) {
-          const msg = getErrorMessage(err?.data?.message);
+      if (donationType === "NFT") {
+        // Proceed with NFT donation
+        // Check if the contract exists
+        const isExist = await checkIfContractExist(nftDonateAddress);
+        if (!isExist) {
           setNotification({
             visible: true,
             type: "error",
-            text: msg,
+            text: "The address provided is not a valid contract address!",
           });
+          setIsBidding(false);
+          return;
         }
-        console.log(err);
-        setIsBidding(false);
+        const nftIdNum = Number(nftId);
+        const nftDonateContract = new Contract(
+          nftDonateAddress,
+          NFT_ABI,
+          library.getSigner(account)
+        );
+        // Check if the contract is ERC721
+        try {
+          const supportsInterface = await nftDonateContract.supportsInterface(
+            "0x80ac58cd"
+          );
+          if (!supportsInterface) {
+            throw new Error("Not an ERC721 contract");
+          }
+        } catch (err) {
+          console.log(err);
+          setNotification({
+            visible: true,
+            type: "error",
+            text: "The donate NFT contract is not an ERC721 token contract.",
+          });
+          setIsBidding(false);
+          return;
+        }
+        // Check token ownership
+        const isOwner = await checkTokenOwnership(nftDonateAddress, nftIdNum);
+        if (!isOwner) {
+          setIsBidding(false);
+          return;
+        }
+        // Approve NFT transfer
+        try {
+          const approvedBy = await nftDonateContract.getApproved(nftIdNum);
+          const isApprovedForAll = await nftDonateContract.isApprovedForAll(
+            account,
+            COSMICGAME_ADDRESS
+          );
+          if (!isApprovedForAll && approvedBy !== COSMICGAME_ADDRESS) {
+            await nftDonateContract
+              .setApprovalForAll(COSMICGAME_ADDRESS, true)
+              .then((tx: any) => tx.wait());
+          }
+          await cosmicGameContract
+            .bidWithCstAndDonateNft(
+              priceMaxLimit,
+              message,
+              nftDonateAddress,
+              nftIdNum
+            )
+            .then((tx: any) => tx.wait());
+          setTimeout(() => {
+            fetchDataCollection();
+            setMessage("");
+            setNftId("");
+            setNftDonateAddress("");
+            setIsBidding(false);
+          }, 3000);
+        } catch (err) {
+          if (err?.data?.message) {
+            const msg = getErrorMessage(err?.data?.message);
+            setNotification({
+              visible: true,
+              type: "error",
+              text: msg,
+            });
+          }
+          console.log(err);
+          setIsBidding(false);
+        }
+      } else {
+        // Proceed with Token donation
+        const isExist = await checkIfContractExist(tokenDonateAddress);
+        if (!isExist) {
+          setNotification({
+            visible: true,
+            type: "error",
+            text: "The address provided is not a valid contract address!",
+          });
+          setIsBidding(false);
+          return;
+        }
+
+        const tokenDonateContract = new Contract(
+          tokenDonateAddress,
+          ERC20_ABI,
+          library.getSigner(account)
+        );
+
+        // Check if the contract is ERC20
+        try {
+          const totalSupply = await tokenDonateContract.totalSupply();
+          if (!totalSupply) {
+            throw new Error("Not an ERC20 contract");
+          }
+        } catch (err) {
+          console.log(err);
+          setNotification({
+            visible: true,
+            type: "error",
+            text: "The donate token contract is not an ERC20 token contract.",
+          });
+          setIsBidding(false);
+          return;
+        }
+        // Check wallet balance
+        const walletBalance = await tokenDonateContract.balanceOf(account);
+        const tokenAmountNum = Number(tokenAmount);
+        if (walletBalance.lt(tokenAmountNum)) {
+          setNotification({
+            visible: true,
+            type: "error",
+            text: "Insufficient token balance for donation.",
+          });
+          setIsBidding(false);
+          return;
+        }
+        // Approve token transfer
+        try {
+          const allowance = await tokenDonateContract.allowance(
+            account,
+            COSMICGAME_ADDRESS
+          );
+          if (allowance.lt(tokenAmountNum)) {
+            await tokenDonateContract
+              .approve(COSMICGAME_ADDRESS, tokenAmountNum)
+              .then((tx: any) => tx.wait());
+          }
+          await cosmicGameContract
+            .bidWithCstAndDonateToken(
+              priceMaxLimit,
+              message,
+              tokenDonateAddress,
+              tokenAmountNum
+            )
+            .then((tx: any) => tx.wait());
+          setTimeout(() => {
+            fetchDataCollection();
+            setMessage("");
+            setTokenAmount("");
+            setTokenDonateAddress("");
+            setIsBidding(false);
+          }, 3000);
+        } catch (err) {
+          if (err?.data?.message) {
+            const msg = getErrorMessage(err?.data?.message);
+            setNotification({
+              visible: true,
+              type: "error",
+              text: msg,
+            });
+          }
+          console.log(err);
+          setIsBidding(false);
+        }
       }
     } catch (err) {
       if (err?.data?.message) {
@@ -1236,46 +1416,76 @@ const NewHome = () => {
                       </AccordionSummary>
                       <AccordionDetails>
                         <Typography variant="body2">
-                          If you want to donate one of your NFTs while bidding,
-                          you can put the contract address, NFT id, and comment
-                          here.
+                          If you want to donate tokens or one of your NFTs while
+                          bidding, you can put the contract address, NFT id, and
+                          comment here.
                         </Typography>
-                        <TextField
-                          placeholder="Token Contract Address"
-                          size="small"
-                          value={tokenDonateAddress}
-                          fullWidth
-                          sx={{ marginTop: 2 }}
-                          onChange={(e) =>
-                            setTokenDonateAddress(e.target.value)
-                          }
-                        />
-                        <TextField
-                          placeholder="Token Amount"
-                          type="number"
-                          value={tokenAmount}
-                          size="small"
-                          fullWidth
-                          sx={{ marginTop: 2 }}
-                          onChange={(e) => setTokenAmount(e.target.value)}
-                        />
-                        <TextField
-                          placeholder="NFT contract address"
-                          size="small"
-                          value={nftDonateAddress}
-                          fullWidth
-                          sx={{ marginTop: 2 }}
-                          onChange={(e) => setNftDonateAddress(e.target.value)}
-                        />
-                        <TextField
-                          placeholder="NFT number"
-                          type="number"
-                          value={nftId}
-                          size="small"
-                          fullWidth
-                          sx={{ marginTop: 2 }}
-                          onChange={(e) => setNftId(e.target.value)}
-                        />
+                        <RadioGroup
+                          row
+                          value={donationType}
+                          onChange={(_e, value) => {
+                            setRwlkId(-1);
+                            setDonationType(value);
+                          }}
+                          sx={{ mt: 2 }}
+                        >
+                          <FormControlLabel
+                            value="NFT"
+                            control={<Radio size="small" />}
+                            label="NFT"
+                          />
+                          <FormControlLabel
+                            value="Token"
+                            control={<Radio size="small" />}
+                            label="Token"
+                          />
+                        </RadioGroup>
+                        {donationType === "Token" && (
+                          <>
+                            <TextField
+                              placeholder="Token Contract Address"
+                              size="small"
+                              value={tokenDonateAddress}
+                              fullWidth
+                              sx={{ marginTop: 1 }}
+                              onChange={(e) =>
+                                setTokenDonateAddress(e.target.value)
+                              }
+                            />
+                            <TextField
+                              placeholder="Token Amount"
+                              type="number"
+                              value={tokenAmount}
+                              size="small"
+                              fullWidth
+                              sx={{ marginTop: 2 }}
+                              onChange={(e) => setTokenAmount(e.target.value)}
+                            />
+                          </>
+                        )}
+                        {donationType === "NFT" && (
+                          <>
+                            <TextField
+                              placeholder="NFT contract address"
+                              size="small"
+                              value={nftDonateAddress}
+                              fullWidth
+                              sx={{ marginTop: 1 }}
+                              onChange={(e) =>
+                                setNftDonateAddress(e.target.value)
+                              }
+                            />
+                            <TextField
+                              placeholder="NFT number"
+                              type="number"
+                              value={nftId}
+                              size="small"
+                              fullWidth
+                              sx={{ marginTop: 2 }}
+                              onChange={(e) => setNftId(e.target.value)}
+                            />
+                          </>
+                        )}
                         <Box
                           sx={{
                             border: "1px solid #444",
