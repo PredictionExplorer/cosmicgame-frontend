@@ -8,7 +8,11 @@ import {
   TablePrimaryHeadCell,
   TablePrimary,
 } from "./styled";
-import { shortenHex, convertTimestampToDateTime } from "../utils";
+import {
+  shortenHex,
+  convertTimestampToDateTime,
+  formatSeconds,
+} from "../utils";
 import router from "next/router";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
@@ -28,7 +32,7 @@ const bidTypeLabels = {
   0: "ETH Bid",
 };
 
-const HistoryRow = ({ history, isBanned, showRound }) => {
+const HistoryRow = ({ history, isBanned, showRound, bidDuration }) => {
   if (!history) {
     return <TablePrimaryRow />;
   }
@@ -78,6 +82,9 @@ const HistoryRow = ({ history, isBanned, showRound }) => {
         <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>
       )}
       <TablePrimaryCell align="center">{bidTypeLabel}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {formatSeconds(bidDuration)}
+      </TablePrimaryCell>
       <TablePrimaryCell>
         <Typography sx={{ wordBreak: "break-all" }}>
           {history.BidType === 1 && history.RWalkNFTId && (
@@ -154,11 +161,12 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }) => {
       <TablePrimary>
         {!isMobile && (
           <colgroup>
-            <col width="16%" />
+            <col width="10%" />
             <col width="17%" />
             <col width="15%" />
             {showRound && <col width="8%" />}
             <col width="9%" />
+            <col width="12%" />
             <col width="15%" />
             <col width="20%" />
           </colgroup>
@@ -170,17 +178,27 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }) => {
             <TablePrimaryHeadCell align="right">Price</TablePrimaryHeadCell>
             {showRound && <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>}
             <TablePrimaryHeadCell>Bid Type</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="center">
+              Bid Duration
+            </TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Bid Info</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
         <TableBody>
-          {displayedBids.map((history) => (
+          {displayedBids.map((history, index) => (
             <HistoryRow
               history={history}
               key={history.EvtLogId}
               isBanned={bannedList.includes(history.EvtLogId)}
               showRound={showRound}
+              bidDuration={
+                (curPage - 1) * perPage + index === biddingHistory.length - 1
+                  ? 0
+                  : history.TimeStamp -
+                    biddingHistory[(curPage - 1) * perPage + index + 1]
+                      .TimeStamp
+              }
             />
           ))}
         </TableBody>
@@ -190,6 +208,7 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }) => {
 };
 
 const BiddingHistoryTable = ({ biddingHistory, showRound = true }) => {
+  console.log(biddingHistory);
   const perPage = 5;
   const [curPage, setCurrentPage] = useState(1);
 

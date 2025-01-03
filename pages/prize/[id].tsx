@@ -211,7 +211,7 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
             label="Endurance Champion rewarded with CST (ERC20):"
             value={`${prizeInfo.EnduranceERC20AmountEth} CST`}
           />
-          {prizeInfo.StellarWinnerAddr !== "" && (
+          {prizeInfo.StellarWinnerAddr && (
             <>
               <InfoRow
                 label="Stellar Spender Prize Winner Address:"
