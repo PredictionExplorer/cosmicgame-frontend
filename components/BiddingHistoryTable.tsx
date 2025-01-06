@@ -162,11 +162,11 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }) => {
         {!isMobile && (
           <colgroup>
             <col width="10%" />
-            <col width="17%" />
             <col width="15%" />
+            <col width="14%" />
             {showRound && <col width="8%" />}
             <col width="9%" />
-            <col width="12%" />
+            <col width="15%" />
             <col width="15%" />
             <col width="20%" />
           </colgroup>
@@ -193,11 +193,10 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }) => {
               isBanned={bannedList.includes(history.EvtLogId)}
               showRound={showRound}
               bidDuration={
-                (curPage - 1) * perPage + index === biddingHistory.length - 1
-                  ? 0
-                  : history.TimeStamp -
-                    biddingHistory[(curPage - 1) * perPage + index + 1]
-                      .TimeStamp
+                (curPage - 1) * perPage + index === 0
+                  ? new Date().getTime() / 1000 - history.TimeStamp
+                  : biddingHistory[(curPage - 1) * perPage + index - 1]
+                      .TimeStamp - history.TimeStamp
               }
             />
           ))}
