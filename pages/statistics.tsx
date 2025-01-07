@@ -232,6 +232,22 @@ const Statistics = () => {
       value: data.CurRoundStats.TotalDonatedNFTs,
     },
     {
+      title: "Total Donated ETH",
+      value: (
+        <Link
+          sx={{
+            color: "inherit",
+            fontSize: "inherit",
+            fontFamily: "monospace",
+          }}
+          href={`/eth-donation/round/${data.CurRoundNum}`}
+          target="__blank"
+        >
+          {formatEthValue(data.CurRoundStats.TotalDonatedAmountEth)}
+        </Link>
+      ),
+    },
+    {
       title: "Total Raffle Eth Deposits",
       value: `${data.CurRoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH`,
     },
@@ -489,12 +505,25 @@ const Statistics = () => {
                 </Link>
               }
             />
-            <StatisticsItem
-              title="Total amount withdrawn from Charity Wallet"
-              value={formatEthValue(data.MainStats.SumWithdrawals)}
-            />
           </>
         )}
+        <StatisticsItem
+          title="Total amount withdrawn from Charity Wallet"
+          value={formatEthValue(data.MainStats.SumWithdrawals)}
+        />
+        <StatisticsItem
+          title="Total Donated ETH"
+          value={
+            <Link
+              color="inherit"
+              fontSize="inherit"
+              href="/eth-donation"
+              target="__blank"
+            >
+              {formatEthValue(data.MainStats.TotalEthDonatedAmountEth)}
+            </Link>
+          }
+        />
       </Box>
       <Box mt={4}>
         <Typography variant="h6" mb={2}>

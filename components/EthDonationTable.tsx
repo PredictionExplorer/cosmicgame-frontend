@@ -31,7 +31,7 @@ const EthDonationRow = ({ row }) => {
       onClick={
         row.RecordType > 0
           ? () => {
-              router.push(`/eth-donation/${row.CGRecordId}`);
+              router.push(`/eth-donation/detail/${row.CGRecordId}`);
             }
           : null
       }

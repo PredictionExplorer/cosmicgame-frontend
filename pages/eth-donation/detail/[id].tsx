@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
-import { MainWrapper } from "../../components/styled";
+import { MainWrapper } from "../../../components/styled";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { convertTimestampToDateTime, getMetadata } from "../../utils";
-import api from "../../services/api";
+import { convertTimestampToDateTime, getMetadata } from "../../../utils";
+import api from "../../../services/api";
 
 const EthDonationDetail = ({ id }) => {
   const [loading, setLoading] = useState(true);

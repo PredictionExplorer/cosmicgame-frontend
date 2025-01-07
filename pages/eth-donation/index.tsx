@@ -77,9 +77,17 @@ const EthDonations = () => {
         Direct (ETH) Donations
       </Typography>
 
+      {charityDonations === null ? (
+        <Typography variant="h6">Loading...</Typography>
+      ) : (
+        <>
+          <Typography variant="h6">History</Typography>
+          <EthDonationTable list={charityDonations} />
+        </>
+      )}
       {!!account && (
         <>
-          <Box>
+          <Box mt={6}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
               <Typography mr={1}>Amount: </Typography>
               <TextField
@@ -118,14 +126,6 @@ const EthDonations = () => {
               Donate with info
             </Button>
           </Box>
-        </>
-      )}
-      {charityDonations === null ? (
-        <Typography variant="h6">Loading...</Typography>
-      ) : (
-        <>
-          <Typography variant="h6">History</Typography>
-          <EthDonationTable list={charityDonations} />
         </>
       )}
     </MainWrapper>
