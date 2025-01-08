@@ -207,7 +207,6 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }) => {
 };
 
 const BiddingHistoryTable = ({ biddingHistory, showRound = true }) => {
-  console.log(biddingHistory);
   const perPage = 5;
   const [curPage, setCurrentPage] = useState(1);
 

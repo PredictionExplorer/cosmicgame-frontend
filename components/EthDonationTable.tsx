@@ -16,7 +16,7 @@ import { AddressLink } from "./AddressLink";
 import router from "next/router";
 import { isMobile } from "react-device-detect";
 
-const EthDonationRow = ({ row }) => {
+const EthDonationRow = ({ row, showType }) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -24,12 +24,12 @@ const EthDonationRow = ({ row }) => {
   return (
     <TablePrimaryRow
       sx={
-        row.RecordType > 0 && {
+        (row.RecordType > 0 || !showType) && {
           cursor: "pointer",
         }
       }
       onClick={
-        row.RecordType > 0
+        row.RecordType > 0 || !showType
           ? () => {
               router.push(`/eth-donation/detail/${row.CGRecordId}`);
             }
@@ -46,9 +46,11 @@ const EthDonationRow = ({ row }) => {
           {convertTimestampToDateTime(row.TimeStamp)}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {row.RecordType ? "Donation with info" : "Simple donation"}
-      </TablePrimaryCell>
+      {showType && (
+        <TablePrimaryCell align="center">
+          {row.RecordType ? "Donation with info" : "Simple donation"}
+        </TablePrimaryCell>
+      )}
       <TablePrimaryCell align="center">
         <Link
           color="inherit"
@@ -69,7 +71,7 @@ const EthDonationRow = ({ row }) => {
   );
 };
 
-const EthDonationTable = ({ list }) => {
+const EthDonationTable = ({ list, showType = true }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -82,7 +84,7 @@ const EthDonationTable = ({ list }) => {
           {!isMobile && (
             <colgroup>
               <col width="20%" />
-              <col width="20%" />
+              {showType && <col width="20%" />}
               <col width="20%" />
               <col width="20%" />
               <col width="20%" />
@@ -91,7 +93,7 @@ const EthDonationTable = ({ list }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Type</TablePrimaryHeadCell>
+              {showType && <TablePrimaryHeadCell>Type</TablePrimaryHeadCell>}
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Donor</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
@@ -101,7 +103,11 @@ const EthDonationTable = ({ list }) => {
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <EthDonationRow row={row} key={row.EvtLogId} />
+              <EthDonationRow
+                row={row}
+                key={row.EvtLogId}
+                showType={showType}
+              />
             ))}
           </TableBody>
         </TablePrimary>

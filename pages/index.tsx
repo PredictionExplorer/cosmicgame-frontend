@@ -764,6 +764,7 @@ const NewHome = () => {
           nftData,
           championsData,
           specials,
+          ethDonations,
         ] = await Promise.all([
           api.get_bid_list_by_round(round, "desc"),
           api.get_donations_nft_by_round(round),
@@ -776,11 +777,13 @@ const NewHome = () => {
             return sortedChampions;
           })(),
           api.get_current_special_winners(),
+          api.get_donations_cg_with_info_by_round(round),
         ]);
         setCurBidList(newBidData);
         setDonatedNFTs(nftData);
         setChampionList(championsData);
         setSpecialWinners(specials);
+        setEthDonations(ethDonations);
       }
       setData((prevData: any) => {
         if (
@@ -1890,7 +1893,7 @@ const NewHome = () => {
             <Typography variant="h6">
               ETH DONATIONS FOR CURRENT ROUND
             </Typography>
-            <EthDonationTable list={ethDonations} />
+            <EthDonationTable list={ethDonations} showType={false} />
           </Box>
         )}
         <Box marginTop={10}>

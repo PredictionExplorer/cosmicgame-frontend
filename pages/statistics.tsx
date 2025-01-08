@@ -76,7 +76,6 @@ const Statistics = () => {
   const [uniqueRWLKStakers, setUniqueRWLKStakers] = useState([]);
   const [uniqueDonors, setUniqueDonors] = useState([]);
   const [nftDonations, setNftDonations] = useState([]);
-  // const [ethDonations, setEthDonations] = useState([]);
   const [cstDistribution, setCSTDistribution] = useState([]);
   const [ctBalanceDistribution, setCTBalanceDistribution] = useState([]);
   const [stakingCSTActions, setStakingCSTActions] = useState(null);
@@ -422,12 +421,6 @@ const Statistics = () => {
           showRound={false}
         />
       </Box>
-      {/* {ethDonations.length > 0 && (
-        <Box my={4}>
-          <Typography variant="h6">ETH DONATIONS FOR CURRENT ROUND</Typography>
-          <EthDonationTable list={ethDonations} />
-        </Box>
-      )} */}
       <Typography variant="h5">Overall Statistics</Typography>
       <Box mt={4}>
         {overallStats.map((item) => (
