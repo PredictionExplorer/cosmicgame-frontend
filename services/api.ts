@@ -1,8 +1,9 @@
 import axios from "axios";
 
-const baseUrl = "https://randomwalknft-api.com/";
+// const baseUrl = "https://randomwalknft-api.com/";
+const baseUrl = "http://69.10.55.2/";
 const proxyUrl = "/api/proxy?url=";
-export const cosmicGameBaseUrl = "http://170.187.142.12:7070/api/cosmicgame/";
+export const cosmicGameBaseUrl = "http://161.129.67.42:9090/api/cosmicgame";
 
 const getAPIUrl = (url: string) => {
   return `${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl + url)}`;
@@ -69,8 +70,6 @@ class ApiService {
       return null;
     }
   }
-
-  // r.GET("/api/cosmicgame/statistics/counters",api_cosmic_game_record_counters)
 
   // r.GET("/api/cosmicgame/statistics/unique/bidders",api_cosmic_game_user_unique_bidders)
   public async get_unique_bidders() {
@@ -184,7 +183,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/prizes/history/by_user/:user_addr/:offset/:limit",api_cosmic_game_claim_history_detail)
+  // r.GET("/api/cosmicgame/prizes/history/by_user/:user_addr/:offset/:limit",api_cosmic_game_prize_history_detail_by_user)
   public async get_claim_history_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`prizes/history/by_user/${address}/0/1000000`));
@@ -217,7 +216,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/prizes/deposits/unclaimed/:user_addr/:offset/:limit",api_cosmic_game_unclaimed_prize_deposits_by_user)
+  // r.GET("/api/cosmicgame/prizes/deposits/unclaimed/by_user/:user_addr/:offset/:limit",api_cosmic_game_unclaimed_prize_deposits_by_user)
   public async get_unclaimed_raffle_deposits_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`prizes/deposits/unclaimed/by_user/${address}/0/1000000`));
@@ -406,7 +405,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/ct/transfers/:token_id/:offset/:limit",api_cosmic_game_token_ownership_transfers)
+  // r.GET("/api/cosmicgame/cst/transfers/all/:token_id/:offset/:limit",api_cosmic_game_token_ownership_transfers)
   public async get_ct_ownership_transfers(token_id: number) {
     try {
       const { data } = await axios.get(getAPIUrl(`cst/transfers/all/${token_id}/0/1000000`));
@@ -648,10 +647,10 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/donations/nft/unclaimed/by_prize/:prize_num",api_cosmic_game_unclaimed_donated_nfts_by_prize)
+  // r.GET("/api/cosmicgame/donations/nft/unclaimed/by_round/:prize_num",api_cosmic_game_unclaimed_donated_nfts_by_prize)
   public async get_donations_nft_unclaimed_by_round(round: number) {
     try {
-      const { data } = await axios.get(getAPIUrl(`donations/nft/unclaimed/by_prize/${round}`));
+      const { data } = await axios.get(getAPIUrl(`donations/nft/unclaimed/by_round/${round}`));
       return data.NFTDonations;
     } catch (err) {
       console.log(err);
@@ -691,6 +690,10 @@ class ApiService {
       return [];
     }
   }
+
+  // r.GET("/api/cosmicgame/donations/erc20/global/:offset/:limit",api_cosmic_game_donations_erc20_global)
+
+  // r.GET("/api/cosmicgame/donations/erc20/info/:record_id",api_cosmic_game_donated_erc20_info)
 
   // r.GET("/api/cosmicgame/raffle/deposits/list/:offset/:limit",api_cosmic_game_prize_deposits_list)
   public async get_prize_deposits_list() {
@@ -769,7 +772,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/staking/cst/staked/by_user/:user_addr",api_cosmic_game_staked_tokens_cst_by_user)
+  // r.GET("/api/cosmicgame/staking/cst/staked_tokens/by_user/:user_addr",api_cosmic_game_staked_tokens_cst_by_user)
   public async get_staked_cst_tokens_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/staked_tokens/by_user/${address}`));
@@ -857,7 +860,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/staking/cst/staked_tokens",api_cosmic_game_staked_tokens_cst_global)
+  // r.GET("/api/cosmicgame/staking/cst/staked_tokens/all",api_cosmic_game_staked_tokens_cst_global)
   public async get_staked_cst_tokens() {
     try {
       const { data } = await axios.get(getAPIUrl("staking/cst/staked_tokens/all"));
@@ -868,7 +871,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/staking/cst/by_user/by_token/rewards/:user_addr",api_cosmic_game_staking_cst_by_user_by_token_rewards)
+  // r.GET("/api/cosmicgame/staking/cst/rewards/by_user/by_token/summary/:user_addr",api_cosmic_game_staking_cst_by_user_by_token_rewards)
   public async get_staking_rewards_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/by_user/by_token/summary/${address}`));
@@ -879,7 +882,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/staking/cst/by_user/by_token/rewards/details/:user_addr/:token_id",api_cosmic_game_staking_cst_by_user_by_token_rewards_details)
+  // r.GET("/api/cosmicgame/staking/cst/rewards/by_user/by_token/details/:user_addr/:token_id",api_cosmic_game_staking_cst_by_user_by_token_rewards_details)
   public async get_staking_rewards_by_user_by_token_details(address: string, tokenId: number) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/by_user/by_token/details/${address}/${tokenId}`));
@@ -890,7 +893,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/staking/cst/by_user/by_deposit/rewards/:user_addr",api_cosmic_game_staking_cst_by_user_by_deposit_rewards)
+  // r.GET("/api/cosmicgame/staking/cst/rewards/by_user/by_deposit/:user_addr",api_cosmic_game_staking_cst_by_user_by_deposit_rewards)
   public async get_staking_cst_by_user_by_deposit_rewards(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/by_user/by_deposit/${address}`));
@@ -956,7 +959,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/staking/rwalk/staked_tokens",api_cosmic_game_staked_tokens_rwalk_global)
+  // r.GET("/api/cosmicgame/staking/rwalk/staked_tokens/all",api_cosmic_game_staked_tokens_rwalk_global)
   public async get_staked_rwalk_tokens() {
     try {
       const { data } = await axios.get(getAPIUrl("staking/rwalk/staked_tokens/all"));
@@ -967,7 +970,7 @@ class ApiService {
     }
   }
 
-  // r.GET("/api/cosmicgame/staking/rwalk/staked/by_user/:user_addr",api_cosmic_game_staked_tokens_rwalk_by_user)
+  // r.GET("/api/cosmicgame/staking/rwalk/staked_tokens/by_user/:user_addr",api_cosmic_game_staked_tokens_rwalk_by_user)
   public async get_staked_rwalk_tokens_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/rwalk/staked_tokens/by_user/${address}`));
@@ -1048,8 +1051,11 @@ class ApiService {
 export default new ApiService();
 
 
-// r.GET("/api/cosmicgame/statistics/counters",api_cosmic_game_record_counters)
 // r.GET("/api/cosmicgame/prizes/deposits/chrono_warrior/by_user/:user_addr",api_cosmic_game_prize_deposits_chrono_warrior_by_user)
+// r.GET("/api/cosmicgame/prizes/deposits/unclaimed/by_user/:user_addr/:offset/:limit",api_cosmic_game_unclaimed_prize_deposits_by_user)
+// r.GET("/api/cosmicgame/cst/transfers/all/:token_id/:offset/:limit",api_cosmic_game_token_ownership_transfers)
+// r.GET("/api/cosmicgame/donations/erc20/global/:offset/:limit",api_cosmic_game_donations_erc20_global)
+// r.GET("/api/cosmicgame/donations/erc20/info/:record_id",api_cosmic_game_donated_erc20_info)
 
 // r.GET("/api/cosmicgame/donations/eth/simple/list/:offset/:limit",api_cosmic_game_donations_cg_simple_list)
 // r.GET("/api/cosmicgame/donations/eth/simple/by_round/:round_num",api_cosmic_game_donations_cg_simple_by_round)
@@ -1063,13 +1069,16 @@ export default new ApiService();
 
 // r.GET("/api/cosmicgame/donations/erc20/by_round/:round_num",api_cosmic_game_donations_erc20_by_round)
 // r.GET("/api/cosmicgame/donations/erc20/by_user/:user_addr",api_cosmic_game_donations_erc20_by_user)
+
+
+
 // r.GET("/api/cosmicgame/raffle/deposits/list/:offset/:limit",api_cosmic_game_prize_deposits_list)
 // r.GET("/api/cosmicgame/raffle/deposits/by_round/:round_num",api_cosmic_game_prize_deposits_by_round)
 // r.GET("/api/cosmicgame/raffle/nft/all/list/:offset/:limit",api_cosmic_game_raffle_nft_winners_list)
 // r.GET("/api/cosmicgame/raffle/nft/by_round/:round_num",api_cosmic_game_raffle_nft_winners_by_round)
 
 // r.GET("/api/cosmicgame/staking/cst/rewards/paid/by_user/:user_addr",api_cosmic_game_staking_cst_reward_paid_records_by_user)
-// r.GET("/api/cosmicgame/staking/cst/mints/global/:offset/:limit",api_cosmic_game_staking_cst_mints_global)
 // r.GET("/api/cosmicgame/staking/cst/by_user/by_deposit/rewards/:user_addr",api_cosmic_game_staking_cst_by_user_by_deposit_rewards)
-// r.GET("/api/cosmicgame/time/until_prize",api_cosmic_game_time_until_prize)
+// r.GET("/api/cosmicgame/staking/cst/rewards/by_user/by_deposit/:user_addr",api_cosmic_game_staking_cst_by_user_by_deposit_rewards)
 // r.GET("/api/cosmicgame/staking/rwalk/mints/global/:offset/:limit",api_cosmic_game_staking_rwalk_mints_global)
+
