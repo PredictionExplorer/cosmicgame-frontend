@@ -757,7 +757,5 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 export default UserInfo;
 
-
-
 // do we need to have stake/unstake actions table and staking rewards table both?
 // I can't find claimDonatedNFT() method. it's commented from smart contract.
