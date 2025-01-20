@@ -46,7 +46,7 @@ class ApiService {
 
   public async unban_bid(bid_id: number) {
     try {
-      const { data } = await axios.post(baseUrl + "unban_bid", { bid_id });
+      const { data } = await axios.post(getCosmicSignatureAPIUrl("unban_bid"), { bid_id });
       return data;
     } catch (err) {
       console.log(err);
@@ -56,7 +56,7 @@ class ApiService {
 
   public async get_info(token_id: number | string) {
     try {
-      const { data } = await axios.get(baseUrl + "token_info/" + token_id);
+      const { data } = await axios.get(getCosmicSignatureAPIUrl(`token_info/${token_id}`));
       return data.TokenInfo;
     } catch (err) {
       console.log(err);
