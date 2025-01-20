@@ -9,10 +9,14 @@ const getAPIUrl = (url: string) => {
   return `${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl + url)}`;
 };
 
+const getCosmicSignatureAPIUrl = (url: string) => {
+  return `${proxyUrl}${encodeURIComponent(baseUrl + url)}`;
+};
+
 class ApiService {
   public async create(token_id: number, seed: string, color: string) {
     try {
-      const { data } = await axios.post(baseUrl + "cosmicgame_tokens", { token_id, seed, color });
+      const { data } = await axios.post(getCosmicSignatureAPIUrl("cosmicgame_tokens"), { token_id, seed, color });
       return data?.task_id || -1;
     } catch (err) {
       console.log(err);
@@ -22,7 +26,7 @@ class ApiService {
 
   public async get_banned_bids() {
     try {
-      const { data } = await axios.get(baseUrl + "get_banned_bids");
+      const { data } = await axios.get(getCosmicSignatureAPIUrl("get_banned_bids"));
       return data;
     } catch (err) {
       console.log(err);
@@ -32,7 +36,7 @@ class ApiService {
 
   public async ban_bid(bid_id: number, user_addr: string) {
     try {
-      const { data } = await axios.post(baseUrl + "ban_bid", { bid_id, user_addr });
+      const { data } = await axios.post(getCosmicSignatureAPIUrl("ban_bid"), { bid_id, user_addr });
       return data;
     } catch (err) {
       console.log(err);
