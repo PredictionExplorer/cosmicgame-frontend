@@ -106,7 +106,7 @@ export const ApiDataProvider: React.FC<ApiDataContextProps> = ({
   const fetchData = async () => {
     if (account) {
       const newData = await fetchNotification();
-      const unclaimedStakingRewards = await api.get_unclaimed_staking_rewards_by_user(
+      const unclaimedStakingRewards = await api.get_staking_cst_rewards_to_claim_by_user(
         account
       );
       if (

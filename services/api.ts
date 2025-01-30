@@ -3,7 +3,7 @@ import axios from "axios";
 // const baseUrl = "https://randomwalknft-api.com/";
 const baseUrl = "http://69.10.55.2/";
 const proxyUrl = "/api/proxy?url=";
-export const cosmicGameBaseUrl = "http://161.129.67.42:9090/api/cosmicgame/";
+export const cosmicGameBaseUrl = "http://161.129.67.42:7070/api/cosmicgame/";
 
 const getAPIUrl = (url: string) => {
   return `${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl + url)}`;
@@ -755,7 +755,7 @@ class ApiService {
   }
 
   // r.GET("/api/cosmicgame/staking/cst/rewards/to_claim/by_user/:user_addr",api_cosmic_game_staking_cst_rewards_to_claim_by_user)
-  public async get_unclaimed_staking_rewards_by_user(address: string) {
+  public async get_staking_cst_rewards_to_claim_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/to_claim/by_user/${address}`));
       return data.UnclaimedEthDeposits;
@@ -766,7 +766,7 @@ class ApiService {
   }
 
   // r.GET("/api/cosmicgame/staking/cst/rewards/collected/by_user/:user_addr/:offset/:limit",api_cosmic_game_staking_cst_rewards_collected_by_user)
-  public async get_collected_staking_rewards_by_user(address: string) {
+  public async get_staking_cst_rewards_collected_by_user(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/0/1000000`));
       return data.CollectedStakingCSTRewards;

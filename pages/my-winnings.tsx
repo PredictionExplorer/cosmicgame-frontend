@@ -85,9 +85,11 @@ const MyWinnings = () => {
   const { account } = useActiveWeb3React();
   const [curPage, setCurPage] = useState(1);
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
+  console.log("status", status);
   const perPage = 5;
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState(null);
   const [raffleETHToClaim, setRaffleETHToClaim] = useState(null);
+  const [cstRewardsToClaim, setCstRewardsToClaim] = useState(null);
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
     raffleETH: false,
@@ -169,13 +171,16 @@ const MyWinnings = () => {
     if (!account) return;
 
     try {
-      const [nfts, deposits] = await Promise.all([
+      const [nfts, deposits, cstRewardsToClaim] = await Promise.all([
         api.get_unclaimed_donated_nft_by_user(account),
         api.get_unclaimed_raffle_deposits_by_user(account),
+        api.get_staking_cst_rewards_to_claim_by_user(account),
       ]);
 
       setDonatedNFTToClaim(nfts.sort((a, b) => a.TimeStamp - b.TimeStamp));
       setRaffleETHToClaim(deposits.sort((a, b) => b.TimeStamp - a.TimeStamp));
+      setCstRewardsToClaim(cstRewardsToClaim);
+      console.log(cstRewardsToClaim);
     } catch (error) {
       console.error("Error fetching unclaimed data", error);
     }
@@ -241,6 +246,18 @@ const MyWinnings = () => {
                   perPage={perPage}
                 />
               </>
+            )}
+          </Box>
+          <Box mt={6}>
+            <Typography variant="h5" mb={2}>
+              Claimable CST Staking Rewards
+            </Typography>
+            {cstRewardsToClaim !== null && cstRewardsToClaim.length === 0 ? (
+              <Typography>No winnings yet.</Typography>
+            ) : cstRewardsToClaim === null ? (
+              <Typography>Loading...</Typography>
+            ) : (
+              <></>
             )}
           </Box>
           <Box mt={8}>

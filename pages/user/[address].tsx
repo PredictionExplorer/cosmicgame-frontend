@@ -18,6 +18,8 @@ import { useNotification } from "../../contexts/NotificationContext";
 import StakingActionsTable from "../../components/StakingActionsTable";
 import MarketingRewardsTable from "../../components/MarketingRewardsTable";
 import { StakingRewardsTable } from "../../components/StakingRewardsTable";
+import { GlobalStakingRewardsTable } from "../../components/GlobalStakingRewardsTable";
+import { CollectedCSTStakingRewardsTable } from "../../components/CollectedCSTStakingRewardsTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -68,6 +70,9 @@ const UserInfo = ({ address }) => {
   const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
   const [stakingRewards, setStakingRewards] = useState([]);
+  const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState(
+    []
+  );
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -86,6 +91,7 @@ const UserInfo = ({ address }) => {
         marketingRewards,
         cstList,
         stakingRewards,
+        collectedCstStakingRewards,
       ] = await Promise.all([
         api.get_claim_history_by_user(addr),
         api.get_user_info(addr),
@@ -95,6 +101,7 @@ const UserInfo = ({ address }) => {
         api.get_marketing_rewards_by_user(addr),
         api.get_cst_tokens_by_user(addr),
         api.get_staking_rewards_by_user(addr),
+        api.get_staking_cst_rewards_collected_by_user(addr),
       ]);
 
       setClaimHistory(history);
@@ -116,6 +123,7 @@ const UserInfo = ({ address }) => {
       setMarketingRewards(marketingRewards);
       setStakingRewards(stakingRewards);
       setCSTList(cstList);
+      setCollectedCstStakingRewards(collectedCstStakingRewards);
       // setEthDonations(donations);
       fetchStakedToken();
       fetchStatusData();
@@ -583,6 +591,14 @@ const UserInfo = ({ address }) => {
                     <StakingRewardsTable
                       list={stakingRewards}
                       address={address}
+                    />
+                  </Box>
+                  <Box mt={4}>
+                    <Typography variant="subtitle1" lineHeight={1} mb={2}>
+                      Collected Staking Rewards
+                    </Typography>
+                    <CollectedCSTStakingRewardsTable
+                      list={collectedCstStakingRewards}
                     />
                   </Box>
                 </CustomTabPanel>
