@@ -22,34 +22,23 @@ const CollectedCSTStakingRewardsRow = ({ row }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(row.TimeStamp)}
+        {convertTimestampToDateTime(row.DepositTimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {row.ActionType === 0 ? "Stake" : "Unstake"}
-      </TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.DepositId}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/detail/${row.TokenId}`}
+          href={`/prize/${row.RoundNum}`}
           style={{ color: "inherit", fontSize: "inherit" }}
         >
-          {row.TokenId}
+          {row.RoundNum}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Tooltip title={row.StakerAddr}>
-          <Link
-            href={`/user/${row.StakerAddr}`}
-            style={{
-              color: "inherit",
-              fontSize: "inherit",
-              fontFamily: "monospace",
-            }}
-          >
-            {shortenHex(row.StakerAddr, 6)}
-          </Link>
-        </Tooltip>
+        {row.TotalDepositAmountEth.toFixed(6)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.YourCollectedAmountEth.toFixed(6)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -66,22 +55,24 @@ export const CollectedCSTStakingRewardsTable = ({ list }) => {
         <TablePrimary>
           {!isMobile && (
             <colgroup>
-              <col width="25%" />
-              <col width="15%" />
-              <col width="15%" />
-              <col width="25%" />
-              <col width="15%" />
+              <col width="20%" />
+              <col width="20%" />
+              <col width="20%" />
+              <col width="20%" />
+              <col width="20%" />
             </colgroup>
           )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">
-                Stake Datetime
+                Deposit Datetime
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Staker Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Deposit Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                Collected Amount (ETH)
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
