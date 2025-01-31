@@ -18,8 +18,8 @@ import { useNotification } from "../../contexts/NotificationContext";
 import StakingActionsTable from "../../components/StakingActionsTable";
 import MarketingRewardsTable from "../../components/MarketingRewardsTable";
 import { StakingRewardsTable } from "../../components/StakingRewardsTable";
-import { GlobalStakingRewardsTable } from "../../components/GlobalStakingRewardsTable";
 import { CollectedCSTStakingRewardsTable } from "../../components/CollectedCSTStakingRewardsTable";
+import { UncollectedCSTStakingRewardsTable } from "../../components/UncollectedCSTStakingRewardsTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -73,6 +73,10 @@ const UserInfo = ({ address }) => {
   const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState(
     []
   );
+  const [
+    uncollectedCstStakingRewards,
+    setUncollectedCstStakingRewards,
+  ] = useState([]);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -92,6 +96,7 @@ const UserInfo = ({ address }) => {
         cstList,
         stakingRewards,
         collectedCstStakingRewards,
+        uncollectedCStStakingRewards,
       ] = await Promise.all([
         api.get_claim_history_by_user(addr),
         api.get_user_info(addr),
@@ -102,6 +107,7 @@ const UserInfo = ({ address }) => {
         api.get_cst_tokens_by_user(addr),
         api.get_staking_rewards_by_user(addr),
         api.get_staking_cst_rewards_collected_by_user(addr),
+        api.get_staking_cst_rewards_to_claim_by_user(addr),
       ]);
 
       setClaimHistory(history);
@@ -124,6 +130,7 @@ const UserInfo = ({ address }) => {
       setStakingRewards(stakingRewards);
       setCSTList(cstList);
       setCollectedCstStakingRewards(collectedCstStakingRewards);
+      setUncollectedCstStakingRewards(uncollectedCStStakingRewards);
       // setEthDonations(donations);
       fetchStakedToken();
       fetchStatusData();
@@ -599,6 +606,14 @@ const UserInfo = ({ address }) => {
                     </Typography>
                     <CollectedCSTStakingRewardsTable
                       list={collectedCstStakingRewards}
+                    />
+                  </Box>
+                  <Box mt={4}>
+                    <Typography variant="subtitle1" lineHeight={1} mb={2}>
+                      Uncollected Staking Rewards
+                    </Typography>
+                    <UncollectedCSTStakingRewardsTable
+                      list={uncollectedCstStakingRewards}
                     />
                   </Box>
                 </CustomTabPanel>

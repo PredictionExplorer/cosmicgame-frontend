@@ -14,7 +14,7 @@ import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
 
-const CollectedCSTStakingRewardsRow = ({ row }) => {
+const UncollectedCSTStakingRewardsRow = ({ row }) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -37,13 +37,13 @@ const CollectedCSTStakingRewardsRow = ({ row }) => {
         {row.TotalDepositAmountEth.toFixed(6)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.YourCollectedAmountEth.toFixed(6)}
+        {row.YourAmountToClaimEth.toFixed(6)}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-export const CollectedCSTStakingRewardsTable = ({ list }) => {
+export const UncollectedCSTStakingRewardsTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -71,13 +71,13 @@ export const CollectedCSTStakingRewardsTable = ({ list }) => {
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Amount (ETH)</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
-                Collected Amount (ETH)
+                Uncollected Amount (ETH)
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <CollectedCSTStakingRewardsRow row={row} key={row.EvtLogId} />
+              <UncollectedCSTStakingRewardsRow row={row} key={row.EvtLogId} />
             ))}
           </TableBody>
         </TablePrimary>
