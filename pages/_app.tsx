@@ -39,7 +39,7 @@ interface MyAppProps extends AppProps {
 
 const defaultTitle = "Cosmic Signature";
 const defaultDescription = "Cosmic Signature is a strategy bidding game.";
-const defaultImage = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+const defaultImage = "http://69.10.55.2/images/cosmicsignature/logo.png";
 
 interface OpenGraphDataItem {
   property?: string;

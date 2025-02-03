@@ -253,7 +253,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Contracts | Cosmic Signature";
   const description =
     "Get detailed information on Cosmic Signature's smart contracts, including addresses, default initial values, and more.";
-  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
 
   const openGraphData = [
     { property: "og:title", content: title },

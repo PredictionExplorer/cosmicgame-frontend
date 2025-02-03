@@ -450,7 +450,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const title = "My Staking | Cosmic Signature";
   const description =
     "Manage your staking with Cosmic Signature. View your staking status, rewards, and history. Maximize your earnings and participate in the growth of our blockchain ecosystem with ease.";
-  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
 
   const openGraphData = [
     { property: "og:title", content: title },

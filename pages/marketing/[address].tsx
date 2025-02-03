@@ -76,7 +76,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   const title = `Marketing Rewards for User ${address} | Cosmic Signature`;
   const description = `Marketing Rewards for User ${address}`;
-  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
 
   const openGraphData = [
     { property: "og:title", content: title },

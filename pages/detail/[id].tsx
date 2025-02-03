@@ -25,7 +25,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const description = `Discover the unique attributes and ownership history of Cosmic Signature Token #${tokenId}, an exclusive digital collectible from the Cosmic Signature game.`;
   const { data } = await axios.get(cosmicGameBaseUrl + `cst/info/${tokenId}`);
   const fileName = `0x${data.TokenInfo.Seed}`;
-  const imageUrl = `https://cosmic-game2.s3.us-east-2.amazonaws.com/${fileName}.png`;
+  const imageUrl = `http://69.10.55.2/images/cosmicsignature/${fileName}.png`;
 
   const openGraphData = [
     { property: "og:title", content: title },

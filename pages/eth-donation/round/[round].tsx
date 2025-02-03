@@ -46,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = async (
   const round = Array.isArray(params) ? params[0] : params;
   const title = `Direct (ETH) Donation for Round ${round} | Cosmic Signature`;
   const description = `Direct (ETH) Donation for Round ${round}`;
-  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
 
   const openGraphData = [
     { property: "og:title", content: title },

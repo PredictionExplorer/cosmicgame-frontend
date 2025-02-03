@@ -317,7 +317,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const roundNum = Array.isArray(id) ? parseInt(id[0]) : parseInt(id);
   const title = `Prize Information for Round ${roundNum} | Cosmic Signature`;
   const description = `Prize Information for Round ${roundNum}`;
-  const imageUrl = "https://cosmic-game2.s3.us-east-2.amazonaws.com/logo.png";
+  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
 
   const openGraphData = [
     { property: "og:title", content: title },

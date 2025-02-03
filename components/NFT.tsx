@@ -5,7 +5,7 @@ import { NFTSkeleton, NFTInfoWrapper, StyledCard } from "./styled";
 import NFTImage from "./NFTImage";
 
 const NFT = ({ nft }) => {
-  const image = `https://cosmic-game2.s3.us-east-2.amazonaws.com/0x${nft.Seed}.png`;
+  const image = `http://69.10.55.2/images/cosmicsignature/0x${nft.Seed}.png`;
 
   return (
     <StyledCard>
