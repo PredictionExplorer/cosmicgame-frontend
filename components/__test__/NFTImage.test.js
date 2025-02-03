@@ -3,7 +3,7 @@ import NFTImage from "../NFTImage";
 import "@testing-library/jest-dom";
 
 test("NFTImage with src", () => {
-  const mockData = "http://69.10.55.2/images/cosmicsignature/000000.png";
+  const mockData = getAssetsUrl("cosmicsignature/000000.png");
   render(<NFTImage src={mockData} />);
   setTimeout(() => {
     expect(screen.getByAltText("nft image").getAttribute("src")).toEqual(

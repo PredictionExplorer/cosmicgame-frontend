@@ -27,7 +27,7 @@ test("NFT with mock data", () => {
   render(<NFT nft={mockData} />);
 
   const fileName = mockData.TokenId.toString().padStart(6, "0");
-  const image = `http://69.10.55.2/images/cosmicsignature/${fileName}.png`;
+  const image = getAssetsUrl(`cosmicsignature/${fileName}.png`);
   setTimeout(() => {
     expect(screen.getByAltText("nft image").getAttribute("src")).toEqual(image);
   }, 1000);

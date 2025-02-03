@@ -6,7 +6,7 @@ import api from "../../services/api";
 import axios from "axios";
 import RandomWalkNFT from "../../components/RandomWalkNFT";
 import NFTImage from "../../components/NFTImage";
-import { convertTimestampToDateTime } from "../../utils";
+import { convertTimestampToDateTime, getAssetsUrl } from "../../utils";
 
 const BidInfo = ({ bidId }) => {
   const [loading, setLoading] = useState(true);
@@ -189,7 +189,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = Array.isArray(params) ? params[0] : params;
   const title = "Bid Information | Cosmic Signature";
   const description = `Bid Information for Bid Id=${id}`;
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

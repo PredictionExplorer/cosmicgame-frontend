@@ -5,6 +5,7 @@ import { MainWrapper } from "../components/styled";
 import FAQ from "../components/FAQ";
 import { isFirefox, isMobile } from "react-device-detect";
 import { GetServerSideProps } from "next";
+import { getAssetsUrl } from "../utils";
 
 const StyledPaper = styled(Paper)(
   !(isMobile || isFirefox) && {
@@ -83,7 +84,7 @@ const FAQPage = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "FAQ | Cosmic Signature";
   const description = "Frequenly Asked Questions (FAQ)";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

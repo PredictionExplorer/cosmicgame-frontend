@@ -18,7 +18,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
+import { convertTimestampToDateTime, getAssetsUrl } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import api from "../services/api";
@@ -40,8 +40,8 @@ const StakedTokensRow = ({
       .toString()
       .padStart(6, "0");
     return IsRwalk
-      ? `http://69.10.55.2/images/randomwalk/${fileName}_black_thumb.jpg`
-      : `http://69.10.55.2/images/cosmicsignature/0x${fileName}.png`;
+      ? getAssetsUrl(`randomwalk/${fileName}_black_thumb.jpg`)
+      : getAssetsUrl(`cosmicsignature/0x${fileName}.png`);
   }, [IsRwalk, row]);
 
   useEffect(() => {
@@ -318,7 +318,4 @@ export const StakedTokensTable = ({
   );
 };
 
-
 // get numEthDepositsToEvaluateMaxLimit_ from smart contract for calling eth_call
-
-

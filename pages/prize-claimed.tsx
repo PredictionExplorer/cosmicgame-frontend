@@ -6,6 +6,7 @@ import Fireworks, { FireworksHandlers } from "@fireworks-js/react";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import api from "../services/api";
 import { GetServerSideProps } from "next";
+import { getAssetsUrl } from "../utils";
 
 const PrizeClaimed = () => {
   const router = useRouter();
@@ -115,7 +116,7 @@ const PrizeClaimed = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Claimed Prize Rewards | Cosmic Signature";
   const description = "Claimed Prize Rewards";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

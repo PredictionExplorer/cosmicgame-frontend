@@ -3,7 +3,7 @@ import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
 import { ethers } from "ethers";
-import { formatEthValue } from "../utils";
+import { formatEthValue, getAssetsUrl } from "../utils";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import { useApiData } from "../contexts/ApiDataContext";
 import { useActiveWeb3React } from "../hooks/web3";
@@ -678,7 +678,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const title = "My Statistics | Cosmic Signature";
   const description =
     "Track your performance with Cosmic Signature's My Statistics page. View detailed bid history, stake status, rewards, and more. Stay informed and optimize your participation in our blockchain ecosystem.";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

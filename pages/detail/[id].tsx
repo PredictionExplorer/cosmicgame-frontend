@@ -3,6 +3,7 @@ import NFTTrait from "../../components/NFTTrait";
 import { MainWrapper } from "../../components/styled";
 import axios from "axios";
 import { cosmicGameBaseUrl } from "../../services/api";
+import { getAssetsUrl } from "../../utils";
 
 const Detail = ({ tokenId }) => {
   return (
@@ -25,7 +26,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const description = `Discover the unique attributes and ownership history of Cosmic Signature Token #${tokenId}, an exclusive digital collectible from the Cosmic Signature game.`;
   const { data } = await axios.get(cosmicGameBaseUrl + `cst/info/${tokenId}`);
   const fileName = `0x${data.TokenInfo.Seed}`;
-  const imageUrl = `http://69.10.55.2/images/cosmicsignature/${fileName}.png`;
+  const imageUrl = getAssetsUrl(`cosmicsignature/${fileName}.png`);
 
   const openGraphData = [
     { property: "og:title", content: title },

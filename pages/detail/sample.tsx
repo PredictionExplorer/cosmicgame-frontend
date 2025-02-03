@@ -23,14 +23,15 @@ import "react-awesome-lightbox/build/style.css";
 import ModalVideo from "react-modal-video";
 import "react-modal-video/css/modal-video.min.css";
 import NFTVideo from "../../components/NFTVideo";
+import { getAssetsUrl } from "../../utils";
 
 const SampleDetail = () => {
   const [open, setOpen] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
   const [videoPath, setVideoPath] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
-  const image = "http://69.10.55.2/images/cosmicsignature/sample.png";
-  const video = "http://69.10.55.2/images/cosmicsignature/sample.mp4";
+  const image = getAssetsUrl("cosmicsignature/sample.png");
+  const video = getAssetsUrl("cosmicsignature/sample.mp4");
   const handlePlay = (videoPath) => {
     setVideoPath(videoPath);
     setOpen(true);
@@ -160,7 +161,7 @@ export async function getServerSideProps() {
   const title = "Sample Token | Cosmic Signature Token";
   const description =
     "Discover the unique attributes and ownership history of Cosmic Signature Token, an exclusive digital collectible from the Cosmic Signature game.";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/sample.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/sample.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

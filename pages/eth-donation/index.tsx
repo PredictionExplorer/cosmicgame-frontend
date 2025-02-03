@@ -8,6 +8,7 @@ import { useNotification } from "../../contexts/NotificationContext";
 import { useActiveWeb3React } from "../../hooks/web3";
 import useCosmicGameContract from "../../hooks/useCosmicGameContract";
 import { ethers } from "ethers";
+import { getAssetsUrl } from "../../utils";
 
 const EthDonations = () => {
   const [charityDonations, setCharityDonations] = useState(null);
@@ -135,7 +136,7 @@ const EthDonations = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Direct (ETH) Donations | Cosmic Signature";
   const description = "Direct (ETH) Donations";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

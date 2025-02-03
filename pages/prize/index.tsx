@@ -4,6 +4,7 @@ import { MainWrapper } from "../../components/styled";
 import api from "../../services/api";
 import { PrizeTable } from "../../components/PrizeTable";
 import { GetServerSideProps } from "next";
+import { getAssetsUrl } from "../../utils";
 
 const PrizeWinners = () => {
   const [prizeClaims, setPrizeClaims] = useState([]);
@@ -35,7 +36,7 @@ const PrizeWinners = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Main Prize Winnings | Cosmic Signature";
   const description = "Main Prize Winnings";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

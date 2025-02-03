@@ -12,6 +12,7 @@ import {
 import NFT from "./NFT";
 import api from "../services/api";
 import NFTImage from "./NFTImage";
+import { getAssetsUrl } from "../utils";
 
 const PaginationGrid = ({ data, loading }) => {
   const [searchKey, setSearchKey] = useState("");
@@ -102,9 +103,7 @@ const PaginationGrid = ({ data, loading }) => {
                   <CardActionArea>
                     <Link href="/detail/sample" sx={{ display: "block" }}>
                       <NFTImage
-                        src={
-                          "http://69.10.55.2/images/cosmicsignature/sample.png"
-                        }
+                        src={getAssetsUrl("cosmicsignature/sample.png")}
                       />
                     </Link>
                     <NFTInfoWrapper sx={{ width: "calc(100% - 40px)" }}>

@@ -4,6 +4,7 @@ import { MainWrapper } from "../components/styled";
 import api from "../services/api";
 import { CharityDepositTable } from "../components/CharityDepositTable";
 import { GetServerSideProps } from "next";
+import { getAssetsUrl } from "../utils";
 
 const CharityDepositsVoluntary = () => {
   const [loading, setLoading] = useState(true);
@@ -41,7 +42,7 @@ const CharityDepositsVoluntary = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Deposits To Charity Wallet | Cosmic Signature";
   const description = "Deposits To Charity Wallet";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

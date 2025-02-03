@@ -9,7 +9,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../components/styled";
-import { convertTimestampToDateTime } from "../utils";
+import { convertTimestampToDateTime, getAssetsUrl } from "../utils";
 import api from "../services/api";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
@@ -111,7 +111,7 @@ const NamedNFTs = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Named Cosmic Signature Tokens | Cosmic Signature";
   const description = "Named Cosmic Signature Tokens";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

@@ -17,7 +17,7 @@ import {
 } from "../../../components/styled";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { convertTimestampToDateTime } from "../../../utils";
+import { convertTimestampToDateTime, getAssetsUrl } from "../../../utils";
 import { CustomPagination } from "../../../components/CustomPagination";
 import getErrorMessage from "../../../utils/alert";
 import { useNotification } from "../../../contexts/NotificationContext";
@@ -208,7 +208,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   const title = `Raffle ETH User(${address}) Won | Cosmic Signature`;
   const description = `Raffle ETH User(${address}) Won`;
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

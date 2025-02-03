@@ -5,6 +5,7 @@ import { useActiveWeb3React } from "../hooks/web3";
 import WinningHistoryTable from "../components/WinningHistoryTable";
 import api from "../services/api";
 import { GetServerSideProps } from "next";
+import { getAssetsUrl } from "../utils";
 
 const WinningHistory = () => {
   const { account } = useActiveWeb3React();
@@ -44,7 +45,7 @@ const WinningHistory = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "History of My Winnings | Cosmic Signature";
   const description = "History of My Winnings";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

@@ -6,7 +6,7 @@ import api from "../../services/api";
 import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import WinningHistoryTable from "../../components/WinningHistoryTable";
 import { ethers } from "ethers";
-import { formatEthValue } from "../../utils";
+import { formatEthValue, getAssetsUrl } from "../../utils";
 import { useStakedToken } from "../../contexts/StakedTokenContext";
 import { useApiData } from "../../contexts/ApiDataContext";
 import { useActiveWeb3React } from "../../hooks/web3";
@@ -770,7 +770,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   const title = `Information for User ${address} | Cosmic Signature`;
   const description = `Information for User ${address}`;
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

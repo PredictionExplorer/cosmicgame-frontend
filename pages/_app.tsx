@@ -29,6 +29,7 @@ import { CookiesProvider } from 'react-cookie';
 import { StakedTokenProvider } from '../contexts/StakedTokenContext';
 import { SystemModeProvider } from '../contexts/SystemModeContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
+import { getAssetsUrl } from '../utils';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -39,7 +40,7 @@ interface MyAppProps extends AppProps {
 
 const defaultTitle = "Cosmic Signature";
 const defaultDescription = "Cosmic Signature is a strategy bidding game.";
-const defaultImage = "http://69.10.55.2/images/cosmicsignature/logo.png";
+const defaultImage = getAssetsUrl("cosmicsignature/logo.png");
 
 interface OpenGraphDataItem {
   property?: string;

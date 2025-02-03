@@ -1,6 +1,7 @@
 import { Box, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
 import { GetServerSideProps } from "next";
+import { getAssetsUrl } from "../utils";
 
 const SiteMap = () => {
   return (
@@ -110,7 +111,7 @@ const SiteMap = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Site Map | Cosmic Signature";
   const description = "Site Map";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

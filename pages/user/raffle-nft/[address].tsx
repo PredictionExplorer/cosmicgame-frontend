@@ -14,7 +14,7 @@ import {
 } from "../../../components/styled";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { convertTimestampToDateTime } from "../../../utils";
+import { convertTimestampToDateTime, getAssetsUrl } from "../../../utils";
 import { CustomPagination } from "../../../components/CustomPagination";
 
 const NFTWinningsRow = ({ row }) => {
@@ -167,7 +167,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   const title = `Raffle NFT User(${address}) Won | Cosmic Signature`;
   const description = `Raffle NFT User(${address}) Won`;
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

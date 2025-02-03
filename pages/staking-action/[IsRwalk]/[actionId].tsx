@@ -3,7 +3,7 @@ import { Box, CardActionArea, Grid, Link, Typography } from "@mui/material";
 import { MainWrapper, StyledCard } from "../../../components/styled";
 import { GetServerSidePropsContext } from "next";
 import api from "../../../services/api";
-import { convertTimestampToDateTime } from "../../../utils";
+import { convertTimestampToDateTime, getAssetsUrl } from "../../../utils";
 import NFTImage from "../../../components/NFTImage";
 
 const StakingActionDetail = ({ IsRwalk, actionId }) => {
@@ -54,11 +54,15 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
                       <NFTImage
                         src={
                           IsRwalk
-                            ? `http://69.10.55.2/images/randomwalk/${actionInfo.Stake.TokenId.toString().padStart(
-                                6,
-                                "0"
-                              )}_black_thumb.jpg`
-                            : `http://69.10.55.2/images/cosmicsignature/0x${actionInfo.Stake.Seed}.png`
+                            ? getAssetsUrl(
+                                `randomwalk/${actionInfo.Stake.TokenId.toString().padStart(
+                                  6,
+                                  "0"
+                                )}_black_thumb.jpg`
+                              )
+                            : getAssetsUrl(
+                                `cosmicsignature/0x${actionInfo.Stake.Seed}.png`
+                              )
                         }
                       />
                     </Link>
@@ -185,7 +189,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const description = `Detail for ${
     IsRwalk ? "RandomWalk NFT" : "Cosmic Signature Token"
   } Staking Action Id = ${actionId}`;
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

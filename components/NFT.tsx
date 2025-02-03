@@ -1,11 +1,11 @@
 import React from "react";
 import { Typography, CardActionArea, Link } from "@mui/material";
-import { formatId } from "../utils";
+import { formatId, getAssetsUrl } from "../utils";
 import { NFTSkeleton, NFTInfoWrapper, StyledCard } from "./styled";
 import NFTImage from "./NFTImage";
 
 const NFT = ({ nft }) => {
-  const image = `http://69.10.55.2/images/cosmicsignature/0x${nft.Seed}.png`;
+  const image = getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
 
   return (
     <StyledCard>

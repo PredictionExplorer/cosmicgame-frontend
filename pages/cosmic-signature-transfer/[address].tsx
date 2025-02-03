@@ -10,7 +10,7 @@ import {
   TablePrimaryRow,
 } from "../../components/styled";
 import api from "../../services/api";
-import { convertTimestampToDateTime, isWalletAddress } from "../../utils";
+import { convertTimestampToDateTime, getAssetsUrl, isWalletAddress } from "../../utils";
 import { ethers } from "ethers";
 import { GetServerSidePropsContext } from "next";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
@@ -163,7 +163,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   const title = `Cosmic Signature Token Transfer History for ${address} | Cosmic Signature`;
   const description = `Cosmic Signature Token Transfer History for ${address}`;
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

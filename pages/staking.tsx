@@ -4,6 +4,7 @@ import { MainWrapper } from "../components/styled";
 import api from "../services/api";
 import { GlobalStakingRewardsTable } from "../components/GlobalStakingRewardsTable";
 import { GetServerSideProps } from "next";
+import { getAssetsUrl } from "../utils";
 
 const Staking = () => {
   const [stakingRewards, setStakingRewards] = useState(null);
@@ -41,7 +42,7 @@ const Staking = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Staking | Cosmic Signature";
   const description = "Staking";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },

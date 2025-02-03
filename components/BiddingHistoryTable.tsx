@@ -12,6 +12,7 @@ import {
   shortenHex,
   convertTimestampToDateTime,
   formatSeconds,
+  getAssetsUrl,
 } from "../utils";
 import router from "next/router";
 import { Tr } from "react-super-responsive-table";
@@ -91,10 +92,12 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }) => {
             <>
               {`Bid was made using RandomWalk Token (ID = ${history.RWalkNFTId})`}
               <img
-                src={`http://69.10.55.2/images/randomwalk/${history.RWalkNFTId.toString().padStart(
-                  6,
-                  "0"
-                )}_black_thumb.jpg`}
+                src={getAssetsUrl(
+                  `randomwalk/${history.RWalkNFTId.toString().padStart(
+                    6,
+                    "0"
+                  )}_black_thumb.jpg`
+                )}
                 width="32px"
                 style={{ verticalAlign: "middle" }}
                 alt="RWLK Token"

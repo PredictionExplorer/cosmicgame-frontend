@@ -11,7 +11,7 @@ import { MainWrapper } from "../components/styled";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import api from "../services/api";
-import { formatSeconds } from "../utils";
+import { formatSeconds, getAssetsUrl } from "../utils";
 import { useNotification } from "../contexts/NotificationContext";
 import useContractNoSigner from "../hooks/useContractNoSigner";
 import CHARITY_WALLET_ABI from "../contracts/CharityWallet.json";
@@ -253,7 +253,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Contracts | Cosmic Signature";
   const description =
     "Get detailed information on Cosmic Signature's smart contracts, including addresses, default initial values, and more.";
-  const imageUrl = "http://69.10.55.2/images/cosmicsignature/logo.png";
+  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
