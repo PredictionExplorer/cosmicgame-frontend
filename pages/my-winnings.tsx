@@ -85,7 +85,6 @@ const MyWinnings = () => {
   const { account } = useActiveWeb3React();
   const [curPage, setCurPage] = useState(1);
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
-  console.log("status", status);
   const perPage = 5;
   const [donatedNFTToClaim, setDonatedNFTToClaim] = useState(null);
   const [raffleETHToClaim, setRaffleETHToClaim] = useState(null);
@@ -180,7 +179,6 @@ const MyWinnings = () => {
       setDonatedNFTToClaim(nfts.sort((a, b) => a.TimeStamp - b.TimeStamp));
       setRaffleETHToClaim(deposits.sort((a, b) => b.TimeStamp - a.TimeStamp));
       setCstRewardsToClaim(cstRewardsToClaim);
-      console.log(cstRewardsToClaim);
     } catch (error) {
       console.error("Error fetching unclaimed data", error);
     }
