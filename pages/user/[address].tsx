@@ -20,6 +20,7 @@ import MarketingRewardsTable from "../../components/MarketingRewardsTable";
 import { StakingRewardsTable } from "../../components/StakingRewardsTable";
 import { CollectedCSTStakingRewardsTable } from "../../components/CollectedCSTStakingRewardsTable";
 import { UncollectedCSTStakingRewardsTable } from "../../components/UncollectedCSTStakingRewardsTable";
+import { CSTStakingRewardsByDepositTable } from "../../components/CSTStakingRewardsByDepositTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -69,7 +70,10 @@ const UserInfo = ({ address }) => {
   const [raffleETHProbability, setRaffleETHProbability] = useState(0);
   const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
-  const [stakingRewards, setStakingRewards] = useState([]);
+  const [cstStakingRewards, setCstStakingRewards] = useState([]);
+  const [cstStakingRewardsByDeposit, setCstStakingRewardsByDeposit] = useState(
+    []
+  );
   const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState(
     []
   );
@@ -97,6 +101,7 @@ const UserInfo = ({ address }) => {
         stakingRewards,
         collectedCstStakingRewards,
         uncollectedCStStakingRewards,
+        cstRewardsByDeposit,
       ] = await Promise.all([
         api.get_claim_history_by_user(addr),
         api.get_user_info(addr),
@@ -108,6 +113,7 @@ const UserInfo = ({ address }) => {
         api.get_staking_rewards_by_user(addr),
         api.get_staking_cst_rewards_collected_by_user(addr),
         api.get_staking_cst_rewards_to_claim_by_user(addr),
+        api.get_staking_cst_by_user_by_deposit_rewards(addr),
       ]);
 
       setClaimHistory(history);
@@ -127,10 +133,11 @@ const UserInfo = ({ address }) => {
       setStakingCSTActions(stakingCSTActions);
       setStakingRWLKActions(stakingRWLKActions);
       setMarketingRewards(marketingRewards);
-      setStakingRewards(stakingRewards);
+      setCstStakingRewards(stakingRewards);
       setCSTList(cstList);
       setCollectedCstStakingRewards(collectedCstStakingRewards);
       setUncollectedCstStakingRewards(uncollectedCStStakingRewards);
+      setCstStakingRewardsByDeposit(cstRewardsByDeposit);
       // setEthDonations(donations);
       fetchStakedToken();
       fetchStatusData();
@@ -593,11 +600,19 @@ const UserInfo = ({ address }) => {
                   </Box>
                   <Box mt={4}>
                     <Typography variant="subtitle1" lineHeight={1} mb={2}>
-                      Staking Rewards
+                      Staking Rewards by Token
                     </Typography>
                     <StakingRewardsTable
-                      list={stakingRewards}
+                      list={cstStakingRewards}
                       address={address}
+                    />
+                  </Box>
+                  <Box mt={4}>
+                    <Typography variant="subtitle1" lineHeight={1} mb={2}>
+                      Staking Rewards by Deposit
+                    </Typography>
+                    <CSTStakingRewardsByDepositTable
+                      list={cstStakingRewardsByDeposit}
                     />
                   </Box>
                   <Box mt={4}>

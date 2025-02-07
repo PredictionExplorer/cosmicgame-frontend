@@ -853,6 +853,7 @@ class ApiService {
     }
   }
 
+  // TODO: check this api
   // r.GET("/api/cosmicgame/staking/cst/rewards/paid/by_user/:user_addr",api_cosmic_game_staking_cst_reward_paid_records_by_user)
   public async get_staking_cst_reward_paid_records_by_user(address: string) {
     try {
@@ -897,6 +898,7 @@ class ApiService {
     }
   }
 
+  // TODO: check this api
   // r.GET("/api/cosmicgame/staking/cst/rewards/by_user/by_deposit/:user_addr",api_cosmic_game_staking_cst_by_user_by_deposit_rewards)
   public async get_staking_cst_by_user_by_deposit_rewards(address: string) {
     try {
