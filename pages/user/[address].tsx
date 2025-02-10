@@ -21,6 +21,7 @@ import { StakingRewardsTable } from "../../components/StakingRewardsTable";
 import { CollectedCSTStakingRewardsTable } from "../../components/CollectedCSTStakingRewardsTable";
 import { UncollectedCSTStakingRewardsTable } from "../../components/UncollectedCSTStakingRewardsTable";
 import { CSTStakingRewardsByDepositTable } from "../../components/CSTStakingRewardsByDepositTable";
+import { StakingRewardMintsTable } from "../../components/StakingRewardMintsTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -81,6 +82,7 @@ const UserInfo = ({ address }) => {
     uncollectedCstStakingRewards,
     setUncollectedCstStakingRewards,
   ] = useState([]);
+  const [rwlkMints, setRWLKMints] = useState([]);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -102,6 +104,7 @@ const UserInfo = ({ address }) => {
         collectedCstStakingRewards,
         uncollectedCStStakingRewards,
         cstRewardsByDeposit,
+        rwlkMints,
       ] = await Promise.all([
         api.get_claim_history_by_user(addr),
         api.get_user_info(addr),
@@ -114,6 +117,7 @@ const UserInfo = ({ address }) => {
         api.get_staking_cst_rewards_collected_by_user(addr),
         api.get_staking_cst_rewards_to_claim_by_user(addr),
         api.get_staking_cst_by_user_by_deposit_rewards(addr),
+        api.get_staking_rwalk_mints_by_user(addr),
       ]);
 
       setClaimHistory(history);
@@ -138,6 +142,7 @@ const UserInfo = ({ address }) => {
       setCollectedCstStakingRewards(collectedCstStakingRewards);
       setUncollectedCstStakingRewards(uncollectedCStStakingRewards);
       setCstStakingRewardsByDeposit(cstRewardsByDeposit);
+      setRWLKMints(rwlkMints);
       // setEthDonations(donations);
       fetchStakedToken();
       fetchStatusData();
@@ -693,13 +698,31 @@ const UserInfo = ({ address }) => {
                       }
                     </Typography>
                   </Box>
-                  <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
-                    Stake / Unstake Actions
-                  </Typography>
-                  <StakingActionsTable
-                    list={stakingRWLKActions}
-                    IsRwalk={true}
-                  />
+                  <Box>
+                    <Typography
+                      variant="subtitle1"
+                      lineHeight={1}
+                      mt={4}
+                      mb={2}
+                    >
+                      Stake / Unstake Actions
+                    </Typography>
+                    <StakingActionsTable
+                      list={stakingRWLKActions}
+                      IsRwalk={true}
+                    />
+                  </Box>
+                  <Box>
+                    <Typography
+                      variant="subtitle1"
+                      lineHeight={1}
+                      mt={4}
+                      mb={2}
+                    >
+                      Staking Reward Tokens
+                    </Typography>
+                    <StakingRewardMintsTable list={rwlkMints} />
+                  </Box>
                 </CustomTabPanel>
               </Box>
               <Box mt={8}>

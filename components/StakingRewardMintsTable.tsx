@@ -44,7 +44,7 @@ const StakingRewardMintsRow = ({ row }) => {
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/detail/${row.TokenId}`}
+          href={`https://randomwalknft.com/detail/${row.TokenId}`}
           style={{ color: "inherit", fontSize: "inherit" }}
         >
           {row.TokenId}

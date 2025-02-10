@@ -14,7 +14,12 @@ const StakingActionDetail = ({ IsRwalk, actionId }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const info = await api.get_staking_cst_actions_info(actionId);
+        let info;
+        if (IsRwalk) {
+          info = await api.get_staking_rwalk_actions_info(actionId);
+        } else {
+          info = await api.get_staking_cst_actions_info(actionId);
+        }
         setActionInfo(info);
         setLoading(false);
       } catch (e) {
