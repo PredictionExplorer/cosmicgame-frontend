@@ -25,7 +25,7 @@ const CSTStakingRewardsByDepositRow = ({ row }) => {
   return (
     <>
       <TablePrimaryRow sx={{ borderBottom: 0 }}>
-        <TablePrimaryCell sx={{ p: 0 }}>
+        {/* <TablePrimaryCell sx={{ p: 0 }}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -33,7 +33,7 @@ const CSTStakingRewardsByDepositRow = ({ row }) => {
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-        </TablePrimaryCell>
+        </TablePrimaryCell> */}
         <TablePrimaryCell>
           <Link
             color="inherit"
@@ -93,7 +93,7 @@ export const CSTStakingRewardsByDepositTable = ({ list }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell sx={{ p: 0 }} />
+              {/* <TablePrimaryHeadCell sx={{ p: 0 }} /> */}
               <TablePrimaryHeadCell align="left">
                 Deposit Datetime
               </TablePrimaryHeadCell>
