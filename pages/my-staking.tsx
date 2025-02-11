@@ -60,7 +60,7 @@ const MyStaking = () => {
   const [rwlkMints, setRwlkMints] = useState([]);
   const [stakingRewards, setStakingRewards] = useState([]);
   const [rewardPerCST, setRewardPerCST] = useState(0);
-  const [stakingTable, setStakingTable] = useState(0);
+  const [stakingTab, setStakingTab] = useState(0);
   const {
     cstokens: stakedCSTokens,
     rwlktokens: stakedRWLKTokens,
@@ -197,7 +197,7 @@ const MyStaking = () => {
   };
 
   const handleTabChange = (_event, newValue) => {
-    setStakingTable(newValue);
+    setStakingTab(newValue);
   };
 
   const fetchData = async () => {
@@ -310,7 +310,7 @@ const MyStaking = () => {
           <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
             <Tabs
               variant="fullWidth"
-              value={stakingTable}
+              value={stakingTab}
               onChange={handleTabChange}
             >
               <Tab
@@ -318,7 +318,7 @@ const MyStaking = () => {
                   <Box sx={{ display: "flex" }}>
                     <Image
                       src={"/images/CosmicSignatureNFT.png"}
-                      width={60}
+                      width={94}
                       height={60}
                       alt="cosmic signature nft"
                     />
@@ -359,21 +359,21 @@ const MyStaking = () => {
               />
             </Tabs>
           </Box>
-          <CustomTabPanel value={stakingTable} index={0}>
+          <CustomTabPanel value={stakingTab} index={0}>
             <Box>
-              <Typography variant="h6" lineHeight={1} mb={2}>
-                Staking Rewards
+              <Typography variant="subtitle1" lineHeight={1} mb={2}>
+                Staking Rewards by Token
               </Typography>
               <StakingRewardsTable list={stakingRewards} address={account} />
             </Box>
             <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
                 Stake / Unstake Actions
               </Typography>
               <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
             </Box>
             <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
                 Tokens Available for Staking
               </Typography>
               <CSTokensTable
@@ -385,7 +385,7 @@ const MyStaking = () => {
               />
             </Box>
             <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
                 Staked Tokens
               </Typography>
               <StakedTokensTable
@@ -400,21 +400,21 @@ const MyStaking = () => {
               />
             </Box>
           </CustomTabPanel>
-          <CustomTabPanel value={stakingTable} index={1}>
+          <CustomTabPanel value={stakingTab} index={1}>
             <Box>
-              <Typography variant="h6" lineHeight={1} mb={2}>
+              <Typography variant="subtitle1" lineHeight={1} mb={2}>
                 Staking Reward Tokens
               </Typography>
               <StakingRewardMintsTable list={rwlkMints} />
             </Box>
             <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
                 Stake / Unstake Actions
               </Typography>
               <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
             </Box>
             <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
                 Tokens Available for Staking
               </Typography>
               <RWLKNFTTable
@@ -426,7 +426,7 @@ const MyStaking = () => {
               />
             </Box>
             <Box>
-              <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
+              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
                 Staked Tokens
               </Typography>
               <StakedTokensTable

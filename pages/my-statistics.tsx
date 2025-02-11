@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
@@ -66,7 +67,7 @@ const MyStatistics = () => {
   const [marketingRewards, setMarketingRewards] = useState([]);
   const [cstList, setCSTList] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
-  const [stakingTable, setStakingTable] = useState(0);
+  const [stakingTab, setStakingTab] = useState(0);
   const [raffleETHProbability, setRaffleETHProbability] = useState(0);
   const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
@@ -250,7 +251,7 @@ const MyStatistics = () => {
   };
 
   const handleTabChange = (_event, newValue) => {
-    setStakingTable(newValue);
+    setStakingTab(newValue);
   };
 
   useEffect(() => {
@@ -467,12 +468,58 @@ const MyStatistics = () => {
               Staking Statistics
             </Typography>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs value={stakingTable} onChange={handleTabChange}>
-                <Tab label={<Typography>CosmicSignature Token</Typography>} />
-                <Tab label={<Typography>RandomWalk Token</Typography>} />
+              <Tabs
+                variant="fullWidth"
+                value={stakingTab}
+                onChange={handleTabChange}
+              >
+                <Tab
+                  label={
+                    <Box sx={{ display: "flex" }}>
+                      <Image
+                        src={"/images/CosmicSignatureNFT.png"}
+                        width={94}
+                        height={60}
+                        alt="cosmic signature nft"
+                      />
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          whiteSpace: "nowrap",
+                          textTransform: "none",
+                          ml: 2,
+                        }}
+                      >
+                        Cosmic Signature Staking
+                      </Typography>
+                    </Box>
+                  }
+                />
+                <Tab
+                  label={
+                    <Box sx={{ display: "flex" }}>
+                      <Image
+                        src={"/images/rwalk.jpg"}
+                        width={94}
+                        height={60}
+                        alt="RandomWalk nft"
+                      />
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          whiteSpace: "nowrap",
+                          textTransform: "none",
+                          ml: 2,
+                        }}
+                      >
+                        Random Walk Staking
+                      </Typography>
+                    </Box>
+                  }
+                />
               </Tabs>
             </Box>
-            <CustomTabPanel value={stakingTable} index={0}>
+            <CustomTabPanel value={stakingTab} index={0}>
               <Box mb={1}>
                 <Typography color="primary" component="span">
                   Number of Active Stakers:
@@ -595,7 +642,7 @@ const MyStatistics = () => {
                 />
               </Box>
             </CustomTabPanel>
-            <CustomTabPanel value={stakingTable} index={1}>
+            <CustomTabPanel value={stakingTab} index={1}>
               <Box mb={1}>
                 <Typography color="primary" component="span">
                   Number of Active Stakers:
