@@ -191,11 +191,9 @@ const NewHome = () => {
               try {
                 const t = token_id - index;
                 const seed = await cosmicSignatureContract.seeds(t);
-                let color = "";
-                if (index === count - 1) color = "amethyst";
-                else if (index === count - 2) color = "fuchsia";
-                else if (index === count - 3) color = "sapphire";
-                await api.create(t, seed, color);
+                let special = false;
+                if (index === count - 1) special = true;
+                await api.create(t, seed, special);
               } catch (err) {
                 if (err?.data?.message) {
                   const msg = err?.data?.message;
