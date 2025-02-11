@@ -18,6 +18,10 @@ import WinningHistoryTable from "../components/WinningHistoryTable";
 import MarketingRewardsTable from "../components/MarketingRewardsTable";
 import DonatedNFTTable from "../components/DonatedNFTTable";
 import { StakingRewardsTable } from "../components/StakingRewardsTable";
+import { CSTStakingRewardsByDepositTable } from "../components/CSTStakingRewardsByDepositTable";
+import { CollectedCSTStakingRewardsTable } from "../components/CollectedCSTStakingRewardsTable";
+import { UncollectedCSTStakingRewardsTable } from "../components/UncollectedCSTStakingRewardsTable";
+import { StakingRewardMintsTable } from "../components/StakingRewardMintsTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -66,7 +70,18 @@ const MyStatistics = () => {
   const [raffleETHProbability, setRaffleETHProbability] = useState(0);
   const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
-  const [stakingRewards, setStakingRewards] = useState([]);
+  const [cstStakingRewards, setCstStakingRewards] = useState([]);
+  const [cstStakingRewardsByDeposit, setCstStakingRewardsByDeposit] = useState(
+    []
+  );
+  const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState(
+    []
+  );
+  const [
+    uncollectedCstStakingRewards,
+    setUncollectedCstStakingRewards,
+  ] = useState([]);
+  const [rwlkMints, setRWLKMints] = useState([]);
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
@@ -83,8 +98,12 @@ const MyStatistics = () => {
         stakingCSTActions,
         stakingRWLKActions,
         marketingRewards,
-        stakingRewards,
         cstList,
+        stakingRewards,
+        collectedCstStakingRewards,
+        uncollectedCStStakingRewards,
+        cstRewardsByDeposit,
+        rwlkMints,
       ] = await Promise.all([
         api.get_claim_history_by_user(addr),
         api.get_user_info(addr),
@@ -92,8 +111,12 @@ const MyStatistics = () => {
         api.get_staking_cst_actions_by_user(addr),
         api.get_staking_rwalk_actions_by_user(addr),
         api.get_marketing_rewards_by_user(addr),
-        api.get_staking_rewards_by_user(addr),
         api.get_cst_tokens_by_user(addr),
+        api.get_staking_rewards_by_user(addr),
+        api.get_staking_cst_rewards_collected_by_user(addr),
+        api.get_staking_cst_rewards_to_claim_by_user(addr),
+        api.get_staking_cst_by_user_by_deposit_rewards(addr),
+        api.get_staking_rwalk_mints_by_user(addr),
       ]);
       setClaimHistory(history);
       setBidHistory(Bids);
@@ -109,8 +132,12 @@ const MyStatistics = () => {
       setStakingCSTActions(stakingCSTActions);
       setStakingRWLKActions(stakingRWLKActions);
       setMarketingRewards(marketingRewards);
-      setStakingRewards(stakingRewards);
+      setCstStakingRewards(stakingRewards);
       setCSTList(cstList);
+      setCollectedCstStakingRewards(collectedCstStakingRewards);
+      setUncollectedCstStakingRewards(uncollectedCStStakingRewards);
+      setCstStakingRewardsByDeposit(cstRewardsByDeposit);
+      setRWLKMints(rwlkMints);
       fetchStakedToken();
       fetchStatusData();
     } catch (error) {
@@ -536,9 +563,36 @@ const MyStatistics = () => {
               </Box>
               <Box mt={4}>
                 <Typography variant="subtitle1" lineHeight={1} mb={2}>
-                  Staking Rewards
+                  Staking Rewards by Token
                 </Typography>
-                <StakingRewardsTable list={stakingRewards} address={account} />
+                <StakingRewardsTable
+                  list={cstStakingRewards}
+                  address={account}
+                />
+              </Box>
+              <Box mt={4}>
+                <Typography variant="subtitle1" lineHeight={1} mb={2}>
+                  Staking Rewards by Deposit
+                </Typography>
+                <CSTStakingRewardsByDepositTable
+                  list={cstStakingRewardsByDeposit}
+                />
+              </Box>
+              <Box mt={4}>
+                <Typography variant="subtitle1" lineHeight={1} mb={2}>
+                  Collected Staking Rewards
+                </Typography>
+                <CollectedCSTStakingRewardsTable
+                  list={collectedCstStakingRewards}
+                />
+              </Box>
+              <Box mt={4}>
+                <Typography variant="subtitle1" lineHeight={1} mb={2}>
+                  Uncollected Staking Rewards
+                </Typography>
+                <UncollectedCSTStakingRewardsTable
+                  list={uncollectedCstStakingRewards}
+                />
               </Box>
             </CustomTabPanel>
             <CustomTabPanel value={stakingTable} index={1}>
@@ -599,10 +653,18 @@ const MyStatistics = () => {
                   }
                 </Typography>
               </Box>
-              <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
-                Stake / Unstake Actions
-              </Typography>
-              <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
+              <Box>
+                <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
+                  Stake / Unstake Actions
+                </Typography>
+                <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
+              </Box>
+              <Box>
+                <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
+                  Staking Reward Tokens
+                </Typography>
+                <StakingRewardMintsTable list={rwlkMints} />
+              </Box>
             </CustomTabPanel>
           </Box>
           <Box mt={6}>
