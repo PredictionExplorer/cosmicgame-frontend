@@ -2,19 +2,25 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
-import api from "../services/api";
+import { GetServerSideProps } from "next";
 import { ethers } from "ethers";
-import { formatEthValue, getAssetsUrl } from "../utils";
-import { useStakedToken } from "../contexts/StakedTokenContext";
-import { useApiData } from "../contexts/ApiDataContext";
+
+// Custom hooks and services
 import { useActiveWeb3React } from "../hooks/web3";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
-import getErrorMessage from "../utils/alert";
+import { useStakedToken } from "../contexts/StakedTokenContext";
+import { useApiData } from "../contexts/ApiDataContext";
 import { useNotification } from "../contexts/NotificationContext";
-import { GetServerSideProps } from "next";
-import StakingActionsTable from "../components/StakingActionsTable";
-import BiddingHistoryTable from "../components/BiddingHistoryTable";
+import api from "../services/api";
+
+// Utility imports
+import { formatEthValue, getAssetsUrl } from "../utils";
+import getErrorMessage from "../utils/alert";
+
+// Components
 import { CSTTable } from "./my-tokens";
+import BiddingHistoryTable from "../components/BiddingHistoryTable";
+import StakingActionsTable from "../components/StakingActionsTable";
 import WinningHistoryTable from "../components/WinningHistoryTable";
 import MarketingRewardsTable from "../components/MarketingRewardsTable";
 import DonatedNFTTable from "../components/DonatedNFTTable";
@@ -24,15 +30,32 @@ import { CollectedCSTStakingRewardsTable } from "../components/CollectedCSTStaki
 import { UncollectedCSTStakingRewardsTable } from "../components/UncollectedCSTStakingRewardsTable";
 import { StakingRewardMintsTable } from "../components/StakingRewardMintsTable";
 
+/* ------------------------------------------------------------------
+   Types & Interfaces
+------------------------------------------------------------------ */
+
+/**
+ * Defines the prop structure for CustomTabPanel.
+ * - children: The contents to be rendered inside the panel.
+ * - index: The panel's index (used for tab matching).
+ * - value: The currently selected tab index.
+ */
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
 }
 
-function CustomTabPanel(props: TabPanelProps) {
-  const { children, value, index, ...other } = props;
+/* ------------------------------------------------------------------
+   Helper Components
+------------------------------------------------------------------ */
 
+/**
+ * CustomTabPanel conditionally renders its children based on
+ * whether `value` matches `index`. This allows for tabbed content
+ * using Material-UI Tabs.
+ */
+function CustomTabPanel({ children, value, index, ...other }: TabPanelProps) {
   return (
     <div
       role="tabpanel"
@@ -46,9 +69,32 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
+/* ------------------------------------------------------------------
+   Main Component
+------------------------------------------------------------------ */
+
+/**
+ * MyStatistics component fetches and displays a comprehensive overview
+ * of a user's data, including:
+ * - Balances (ETH & CosmicToken)
+ * - Staking actions and rewards for CST and RWLK
+ * - Bidding history
+ * - Donated NFTs (claimed/unclaimed)
+ * - Marketing rewards
+ * - Raffle probabilities and user stats (bids, prizes, etc.)
+ */
 const MyStatistics = () => {
+  /* ----------------------------------------------
+     Hooks & State
+  ---------------------------------------------- */
+
+  // Web3: current user account from Metamask (or similar)
   const { account } = useActiveWeb3React();
-  const [data, setData] = useState(null);
+
+  // Data state
+  const [data, setData] = useState<any>(null);
+
+  // Donated NFTs state
   const [claimedDonatedNFTs, setClaimedDonatedNFTs] = useState({
     data: [],
     loading: false,
@@ -57,54 +103,91 @@ const MyStatistics = () => {
     data: [],
     loading: false,
   });
-  const [claimHistory, setClaimHistory] = useState(null);
-  const [bidHistory, setBidHistory] = useState([]);
-  const [userInfo, setUserInfo] = useState(null);
+
+  // Bid/claim/user info state
+  const [claimHistory, setClaimHistory] = useState<any>(null);
+  const [bidHistory, setBidHistory] = useState<any[]>([]);
+  const [userInfo, setUserInfo] = useState<any>(null);
+
+  // Balances
   const [balance, setBalance] = useState({ CosmicToken: 0, ETH: 0 });
+
+  // Loading and claiming states
   const [loading, setLoading] = useState(true);
-  const [stakingCSTActions, setStakingCSTActions] = useState([]);
-  const [stakingRWLKActions, setStakingRWLKActions] = useState([]);
-  const [marketingRewards, setMarketingRewards] = useState([]);
-  const [cstList, setCSTList] = useState([]);
   const [isClaiming, setIsClaiming] = useState(false);
-  const [stakingTab, setStakingTab] = useState(0);
-  const [raffleETHProbability, setRaffleETHProbability] = useState(0);
-  const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
-  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
-  const [cstStakingRewards, setCstStakingRewards] = useState([]);
-  const [cstStakingRewardsByDeposit, setCstStakingRewardsByDeposit] = useState(
-    []
-  );
-  const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState(
-    []
-  );
+
+  // Staking actions and marketing rewards
+  const [stakingCSTActions, setStakingCSTActions] = useState<any[]>([]);
+  const [stakingRWLKActions, setStakingRWLKActions] = useState<any[]>([]);
+  const [marketingRewards, setMarketingRewards] = useState<any[]>([]);
+
+  // CST token list and CST staking reward data
+  const [cstList, setCSTList] = useState<any[]>([]);
+  const [cstStakingRewards, setCstStakingRewards] = useState<any[]>([]);
+  const [cstStakingRewardsByDeposit, setCstStakingRewardsByDeposit] = useState<
+    any[]
+  >([]);
+  const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState<
+    any[]
+  >([]);
   const [
     uncollectedCstStakingRewards,
     setUncollectedCstStakingRewards,
-  ] = useState([]);
-  const [rwlkMints, setRWLKMints] = useState([]);
+  ] = useState<any[]>([]);
+
+  // RWLK minted rewards
+  const [rwlkMints, setRWLKMints] = useState<any[]>([]);
+
+  // Probability of winning raffles
+  const [raffleETHProbability, setRaffleETHProbability] = useState(0);
+  const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
+
+  // Track which donated NFT IDs are being claimed
+  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
+
+  // Tab index for staking (0 = CST, 1 = RWLK)
+  const [stakingTab, setStakingTab] = useState(0);
+
+  // Hooks for fetching data, statuses, and notifications
   const { fetchData: fetchStakedToken } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
 
+  // Smart contract interaction for the "Cosmic Game"
   const cosmicGameContract = useCosmicGameContract();
 
+  /* ----------------------------------------------
+     Data Fetching Functions
+  ---------------------------------------------- */
+
+  /**
+   * fetchData - Retrieves user-related data such as:
+   * - Claim history, bidding, user info, balances
+   * - Staking actions & rewards
+   * - Marketing rewards & user CST tokens
+   * This data is requested in parallel from the backend.
+   * @param addr - The user's wallet address
+   * @param reload - Whether to set the loading state during fetch
+   */
   const fetchData = async (addr: string, reload: boolean = true) => {
+    if (!addr) return;
     setLoading(reload);
+
     try {
+      // Parallel API calls to fetch user data
       const [
         history,
-        { Bids, UserInfo },
-        balance,
-        stakingCSTActions,
-        stakingRWLKActions,
-        marketingRewards,
-        cstList,
+        userInfoData,
+        balanceData,
+        cstActions,
+        rwalkActions,
+        mRewards,
+        userCstList,
         stakingRewards,
-        collectedCstStakingRewards,
-        uncollectedCStStakingRewards,
-        cstRewardsByDeposit,
-        rwlkMints,
+        collectedRewards,
+        uncollectedRewards,
+        rewardsByDeposit,
+        rwalkMinted,
       ] = await Promise.all([
         api.get_claim_history_by_user(addr),
         api.get_user_info(addr),
@@ -119,26 +202,41 @@ const MyStatistics = () => {
         api.get_staking_cst_by_user_by_deposit_rewards(addr),
         api.get_staking_rwalk_mints_by_user(addr),
       ]);
+
+      // Extract "Bids" and "UserInfo" from the user info response
+      const { Bids, UserInfo } = userInfoData;
       setClaimHistory(history);
       setBidHistory(Bids);
       setUserInfo(UserInfo);
-      if (balance) {
+
+      // Convert and store user balances (ETH & CST)
+      if (balanceData) {
         setBalance({
           CosmicToken: Number(
-            ethers.utils.formatEther(balance.CosmicTokenBalance)
+            ethers.utils.formatEther(balanceData.CosmicTokenBalance)
           ),
-          ETH: Number(ethers.utils.formatEther(balance.ETH_Balance)),
+          ETH: Number(ethers.utils.formatEther(balanceData.ETH_Balance)),
         });
       }
-      setStakingCSTActions(stakingCSTActions);
-      setStakingRWLKActions(stakingRWLKActions);
-      setMarketingRewards(marketingRewards);
+
+      // Update staking actions (CST & RWLK)
+      setStakingCSTActions(cstActions);
+      setStakingRWLKActions(rwalkActions);
+
+      // Marketing rewards & user CST token list
+      setMarketingRewards(mRewards);
+      setCSTList(userCstList);
+
+      // CST staking rewards (collected/uncollected)
       setCstStakingRewards(stakingRewards);
-      setCSTList(cstList);
-      setCollectedCstStakingRewards(collectedCstStakingRewards);
-      setUncollectedCstStakingRewards(uncollectedCStStakingRewards);
-      setCstStakingRewardsByDeposit(cstRewardsByDeposit);
-      setRWLKMints(rwlkMints);
+      setCollectedCstStakingRewards(collectedRewards);
+      setUncollectedCstStakingRewards(uncollectedRewards);
+      setCstStakingRewardsByDeposit(rewardsByDeposit);
+
+      // RWLK minted rewards (mints)
+      setRWLKMints(rwalkMinted);
+
+      // Fetch additional data from contexts
       fetchStakedToken();
       fetchStatusData();
     } catch (error) {
@@ -153,14 +251,24 @@ const MyStatistics = () => {
     }
   };
 
+  /**
+   * fetchDonatedNFTs - Fetch the user's claimed and unclaimed donated NFTs.
+   * @param reload - Whether to set loading state during fetching
+   */
   const fetchDonatedNFTs = async (reload: boolean = true) => {
+    if (!account) return;
+
     setClaimedDonatedNFTs((prev) => ({ ...prev, loading: reload }));
     setUnclaimedDonatedNFTs((prev) => ({ ...prev, loading: reload }));
+
     try {
+      // Fetch claimed and unclaimed in parallel
       const [claimed, unclaimed] = await Promise.all([
         api.get_claimed_donated_nft_by_user(account),
         api.get_unclaimed_donated_nft_by_user(account),
       ]);
+
+      // Update local states
       setClaimedDonatedNFTs({ data: claimed, loading: false });
       setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
     } catch (error) {
@@ -175,32 +283,51 @@ const MyStatistics = () => {
     }
   };
 
+  /**
+   * calculateProbability - Calculates the probability of winning ETH or NFT
+   * raffles based on the total number of bids and the user's bids.
+   */
   const calculateProbability = async () => {
+    if (!account) return;
     try {
+      // Fetch the dashboard info
       const newData = await api.get_dashboard_info();
-      setData(newData);
+      setData(newData); // Keep for reference in state
+
       if (newData) {
-        const round = newData?.CurRoundNum;
-        const bidList = await api.get_bid_list_by_round(round, "desc");
+        const {
+          CurRoundNum,
+          NumRaffleEthWinnersBidding,
+          NumRaffleNFTWinnersBidding,
+        } = newData;
+
+        // Fetch all bids for the current round
+        const bidList = await api.get_bid_list_by_round(CurRoundNum, "desc");
         const totalBids = bidList.length;
-        const userBids = bidList.filter((bid) => bid.BidderAddr === account)
-          .length;
+        const userBids = bidList.filter(
+          (bid: any) => bid.BidderAddr === account
+        ).length;
+
         if (totalBids > 0) {
+          // Probability of winning ETH
           let probability =
             1 -
             Math.pow(
               (totalBids - userBids) / totalBids,
-              newData?.NumRaffleEthWinnersBidding
+              NumRaffleEthWinnersBidding
             );
           setRaffleETHProbability(probability);
+
+          // Probability of winning NFT
           probability =
             1 -
             Math.pow(
               (totalBids - userBids) / totalBids,
-              newData?.NumRaffleNFTWinnersBidding
+              NumRaffleNFTWinnersBidding
             );
           setRaffleNFTProbability(probability);
         } else {
+          // No bids placed -> zero probability
           setRaffleETHProbability(0);
           setRaffleNFTProbability(0);
         }
@@ -210,12 +337,23 @@ const MyStatistics = () => {
     }
   };
 
-  const handleDonatedNFTsClaim = async (e, tokenID) => {
+  /* ----------------------------------------------
+     Donated NFT Claiming Functions
+  ---------------------------------------------- */
+
+  /**
+   * handleDonatedNFTsClaim - Claims a single Donated NFT by its token ID.
+   * @param tokenID - The ID of the NFT to claim
+   */
+  const handleDonatedNFTsClaim = async (_e: any, tokenID: number) => {
     setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
+      // Claim NFT via the smart contract
       await cosmicGameContract.claimDonatedNFT(tokenID);
+
+      // Refresh data after delay to ensure chain sync
       setTimeout(() => {
-        fetchData(account, false);
+        fetchData(account!, false);
         fetchDonatedNFTs(false);
         setIsClaiming(false);
       }, 3000);
@@ -226,17 +364,28 @@ const MyStatistics = () => {
         : "An error occurred";
       setNotification({ text: msg, type: "error", visible: true });
     } finally {
+      // Remove the token from the "claiming" list
       setClaimingDonatedNFTs((prev) => prev.filter((id) => id !== tokenID));
     }
   };
 
+  /**
+   * handleAllDonatedNFTsClaim - Claims all unclaimed donated NFTs at once.
+   */
   const handleAllDonatedNFTsClaim = async () => {
+    if (!unclaimedDonatedNFTs.data.length) return;
+
     try {
       setIsClaiming(true);
-      const indexList = unclaimedDonatedNFTs.data.map((item) => item.Index);
+
+      // Gather all NFT indexes
+      const indexList = unclaimedDonatedNFTs.data.map(
+        (item: any) => item.Index
+      );
       await cosmicGameContract.claimManyDonatedNFTs(indexList);
+
       setTimeout(() => {
-        fetchData(account, false);
+        fetchData(account!, false);
         fetchDonatedNFTs(false);
         setIsClaiming(false);
       }, 3000);
@@ -250,29 +399,53 @@ const MyStatistics = () => {
     }
   };
 
-  const handleTabChange = (_event, newValue) => {
+  /* ----------------------------------------------
+     Event Handlers
+  ---------------------------------------------- */
+
+  /**
+   * handleTabChange - Switch between CST staking tab and RWLK staking tab.
+   */
+  const handleTabChange = (_event: any, newValue: number) => {
     setStakingTab(newValue);
   };
 
+  /* ----------------------------------------------
+     useEffect - Lifecycle
+  ---------------------------------------------- */
+
+  /**
+   * Fetch user data, donated NFTs, and raffle probability
+   * when 'account' becomes available.
+   */
   useEffect(() => {
     if (account) {
       fetchData(account);
       fetchDonatedNFTs();
       calculateProbability();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
+
+  /* ----------------------------------------------
+     Render
+  ---------------------------------------------- */
 
   return (
     <MainWrapper>
+      {/* Page Title */}
       <Typography variant="h4" color="primary" mb={4}>
         My Statistics
       </Typography>
+
+      {/* Show loading or fallback if no user info is found */}
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : userInfo === null ? (
         <Typography variant="h6">There is no user information yet.</Typography>
       ) : (
         <>
+          {/* User Balances (ETH & CST) */}
           {balance.ETH !== 0 && (
             <Box mb={1}>
               <Typography color="primary" component="span">
@@ -295,6 +468,8 @@ const MyStatistics = () => {
               </Typography>
             </Box>
           )}
+
+          {/* Basic user info/stats (bids, transfers, winnings, etc.) */}
           <Box mb={1}>
             <Typography color="primary" component="span">
               Number of Bids:
@@ -429,6 +604,8 @@ const MyStatistics = () => {
               {userInfo.TotalCSTokensWon}
             </Typography>
           </Box>
+
+          {/* Show probability of winning if there's an active round */}
           {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
             <>
               <Box mb={1}>
@@ -451,6 +628,8 @@ const MyStatistics = () => {
               </Box>
             </>
           )}
+
+          {/* Transfer history links for ERC20 and ERC721 */}
           <Typography mt={3}>
             This account has {userInfo.CosmicTokenNumTransfers} CosmicToken
             (ERC20), click{" "}
@@ -463,6 +642,8 @@ const MyStatistics = () => {
             <Link href={`/cosmic-signature-transfer/${account}`}>here</Link> to
             see all the transfers made by this account.
           </Typography>
+
+          {/* Staking Statistics */}
           <Box>
             <Typography variant="h6" lineHeight={1} mt={4}>
               Staking Statistics
@@ -519,6 +700,8 @@ const MyStatistics = () => {
                 />
               </Tabs>
             </Box>
+
+            {/* CST Staking Tab */}
             <CustomTabPanel value={stakingTab} index={0}>
               <Box mb={1}>
                 <Typography color="primary" component="span">
@@ -602,19 +785,23 @@ const MyStatistics = () => {
                   {userInfo.StakingStatistics.CSTStakingInfo.TotalTokensStaked}
                 </Typography>
               </Box>
+
+              {/* CST Stake/Unstake Actions */}
               <Box>
                 <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
                   Stake / Unstake Actions
                 </Typography>
                 <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
               </Box>
+
+              {/* CST Staking Rewards */}
               <Box mt={4}>
                 <Typography variant="subtitle1" lineHeight={1} mb={2}>
                   Staking Rewards by Token
                 </Typography>
                 <StakingRewardsTable
                   list={cstStakingRewards}
-                  address={account}
+                  address={account!}
                 />
               </Box>
               <Box mt={4}>
@@ -642,6 +829,8 @@ const MyStatistics = () => {
                 />
               </Box>
             </CustomTabPanel>
+
+            {/* RWLK Staking Tab */}
             <CustomTabPanel value={stakingTab} index={1}>
               <Box mb={1}>
                 <Typography color="primary" component="span">
@@ -700,12 +889,16 @@ const MyStatistics = () => {
                   }
                 </Typography>
               </Box>
+
+              {/* RWLK Stake/Unstake Actions */}
               <Box>
                 <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
                   Stake / Unstake Actions
                 </Typography>
                 <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
               </Box>
+
+              {/* RWLK Staking Reward Tokens */}
               <Box>
                 <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
                   Staking Reward Tokens
@@ -714,18 +907,24 @@ const MyStatistics = () => {
               </Box>
             </CustomTabPanel>
           </Box>
+
+          {/* Bidding History */}
           <Box mt={6}>
             <Typography variant="h6" lineHeight={1}>
               Bid History
             </Typography>
             <BiddingHistoryTable biddingHistory={bidHistory} />
           </Box>
+
+          {/* User's CSTokens */}
           <Box>
             <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
               Cosmic Signature Tokens User Own
             </Typography>
             <CSTTable list={cstList} />
           </Box>
+
+          {/* History of Winnings */}
           <Box>
             <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
               History of Winnings
@@ -736,6 +935,8 @@ const MyStatistics = () => {
               showWinnerAddr={false}
             />
           </Box>
+
+          {/* Marketing Rewards (if any) */}
           {marketingRewards.length > 0 && (
             <Box>
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
@@ -744,6 +945,8 @@ const MyStatistics = () => {
               <MarketingRewardsTable list={marketingRewards} />
             </Box>
           )}
+
+          {/* Donated NFT Section */}
           <Box mt={8}>
             <Box
               sx={{
@@ -764,6 +967,8 @@ const MyStatistics = () => {
                 </Button>
               )}
             </Box>
+
+            {/* Display loading if fetching claimed/unclaimed NFTs */}
             {unclaimedDonatedNFTs.loading || claimedDonatedNFTs.loading ? (
               <Typography variant="h6">Loading...</Typography>
             ) : (
@@ -783,12 +988,22 @@ const MyStatistics = () => {
   );
 };
 
+/* ------------------------------------------------------------------
+   getServerSideProps
+------------------------------------------------------------------ */
+
+/**
+ * getServerSideProps sets up SEO metadata (title, description, openGraphData)
+ * for the My Statistics page. This ensures social media previews
+ * and SEO metadata are properly configured when the page is served.
+ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "My Statistics | Cosmic Signature";
   const description =
     "Track your performance with Cosmic Signature's My Statistics page. View detailed bid history, stake status, rewards, and more. Stay informed and optimize your participation in our blockchain ecosystem.";
   const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
+  // Open Graph data for social media sharing
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
