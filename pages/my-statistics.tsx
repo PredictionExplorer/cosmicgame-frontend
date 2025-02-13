@@ -14,7 +14,7 @@ import { useNotification } from "../contexts/NotificationContext";
 import api from "../services/api";
 
 // Utility imports
-import { formatEthValue, getAssetsUrl } from "../utils";
+import { formatEthValue, logoImgUrl } from "../utils";
 import getErrorMessage from "../utils/alert";
 
 // Components
@@ -1001,16 +1001,15 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const title = "My Statistics | Cosmic Signature";
   const description =
     "Track your performance with Cosmic Signature's My Statistics page. View detailed bid history, stake status, rewards, and more. Stay informed and optimize your participation in our blockchain ecosystem.";
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   // Open Graph data for social media sharing
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

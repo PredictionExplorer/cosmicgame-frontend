@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../../../components/styled";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { convertTimestampToDateTime, getAssetsUrl, getMetadata } from "../../../utils";
+import {
+  convertTimestampToDateTime,
+  getMetadata,
+  logoImgUrl,
+} from "../../../utils";
 import api from "../../../services/api";
 
 const EthDonationDetail = ({ id }) => {
@@ -147,15 +151,14 @@ export const getServerSideProps: GetServerSideProps = async (
   const id = Array.isArray(params) ? params[0] : params;
   const title = "Direct (ETH) Donation Detail | Cosmic Signature";
   const description = "Direct (ETH) Donation Detail";
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData, id } };

@@ -4,7 +4,7 @@ import { MainWrapper } from "../../../components/styled";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import api from "../../../services/api";
 import EthDonationTable from "../../../components/EthDonationTable";
-import { getAssetsUrl } from "../../../utils";
+import { logoImgUrl } from "../../../utils";
 
 const EthDonationByRound = ({ round }) => {
   const [loading, setLoading] = useState(true);
@@ -47,15 +47,14 @@ export const getServerSideProps: GetServerSideProps = async (
   const round = Array.isArray(params) ? params[0] : params;
   const title = `Direct (ETH) Donation for Round ${round} | Cosmic Signature`;
   const description = `Direct (ETH) Donation for Round ${round}`;
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData, round } };

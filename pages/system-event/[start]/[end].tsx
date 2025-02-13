@@ -11,7 +11,7 @@ import {
 } from "../../../components/styled";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import api from "../../../services/api";
-import { convertTimestampToDateTime, getAssetsUrl } from "../../../utils";
+import { convertTimestampToDateTime, logoImgUrl } from "../../../utils";
 import { GetServerSidePropsContext } from "next";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
@@ -143,15 +143,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   end = Array.isArray(end) ? end[0] : end;
   const title = `Admin Events | Cosmic Signature`;
   const description = `Admin Events`;
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return {

@@ -4,7 +4,7 @@ import PaginationGrid from "../components/PaginationGrid";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
 import { GetServerSideProps } from "next";
-import { getAssetsUrl } from "../utils";
+import { logoImgUrl } from "../utils";
 
 const Gallery = () => {
   const [loading, setLoading] = useState(true);
@@ -46,15 +46,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Gallery | Cosmic Signature";
   const description =
     "Explore the Cosmic Signature NFT Gallery and discover a unique collection of digital art. Immerse yourself in vibrant, one-of-a-kind NFTs, each telling a cosmic story. Start your journey into the digital universe today!";
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

@@ -7,7 +7,7 @@ import api from "../../services/api";
 import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import WinningHistoryTable from "../../components/WinningHistoryTable";
 import { ethers } from "ethers";
-import { formatEthValue, getAssetsUrl } from "../../utils";
+import { formatEthValue, logoImgUrl } from "../../utils";
 import { useStakedToken } from "../../contexts/StakedTokenContext";
 import { useApiData } from "../../contexts/ApiDataContext";
 import { useActiveWeb3React } from "../../hooks/web3";
@@ -998,16 +998,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   // SEO metadata
   const title = `Information for User ${address} | Cosmic Signature`;
   const description = `Information for User ${address}`;
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   // Open Graph data for social media sharing
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   // Return props to the page component

@@ -9,7 +9,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../components/styled";
-import { convertTimestampToDateTime, getAssetsUrl } from "../utils";
+import { convertTimestampToDateTime, logoImgUrl } from "../utils";
 import api from "../services/api";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
@@ -131,15 +131,14 @@ const UsedRwlkNfts = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Used RandomWalk NFTs for Bid | Cosmic Signature";
   const description = "Used RandomWalk NFTs for Bid";
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

@@ -67,6 +67,7 @@ import {
   formatSeconds,
   getAssetsUrl,
   getEnduranceChampions,
+  logoImgUrl,
 } from "../utils";
 import WinningHistoryTable from "../components/WinningHistoryTable";
 import Lightbox from "react-awesome-lightbox";
@@ -2071,15 +2072,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${data?.PrizeAmountEth.toFixed(
     4
   )}ETH prizes and Cosmic Signature NFTs.`;
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

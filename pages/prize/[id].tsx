@@ -3,7 +3,11 @@ import { Box, Button, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
-import { convertTimestampToDateTime, getAssetsUrl, getEnduranceChampions } from "../../utils";
+import {
+  convertTimestampToDateTime,
+  getEnduranceChampions,
+  logoImgUrl,
+} from "../../utils";
 import RaffleWinnerTable from "../../components/RaffleWinnerTable";
 import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import useCosmicGameContract from "../../hooks/useCosmicGameContract";
@@ -317,15 +321,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const roundNum = Array.isArray(id) ? parseInt(id[0]) : parseInt(id);
   const title = `Prize Information for Round ${roundNum} | Cosmic Signature`;
   const description = `Prize Information for Round ${roundNum}`;
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return {

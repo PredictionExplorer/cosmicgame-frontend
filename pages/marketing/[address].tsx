@@ -5,7 +5,7 @@ import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
 import { ethers } from "ethers";
 import MarketingRewardsTable from "../../components/MarketingRewardsTable";
-import { getAssetsUrl } from "../../utils";
+import { logoImgUrl } from "../../utils";
 
 const UserMarketingRewards = ({ address }) => {
   const [loading, setLoading] = useState(true);
@@ -77,15 +77,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
   const title = `Marketing Rewards for User ${address} | Cosmic Signature`;
   const description = `Marketing Rewards for User ${address}`;
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData, address } };

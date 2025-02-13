@@ -16,7 +16,7 @@ import {
   formatCSTValue,
   formatEthValue,
   formatSeconds,
-  getAssetsUrl,
+  logoImgUrl,
 } from "../utils";
 import { UniqueStakersCSTTable } from "../components/UniqueStakersCSTTable";
 import { GlobalStakingActionsTable } from "../components/GlobalStakingActionsTable";
@@ -716,15 +716,14 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Statistics | Cosmic Signature";
   const description =
     "Explore comprehensive statistics on Cosmic Signature. Access data on market trends, token performance, user activity, and more. Stay informed with real-time insights into our blockchain ecosystem.";
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

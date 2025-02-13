@@ -4,7 +4,7 @@ import { MainWrapper } from "../components/styled";
 import api from "../services/api";
 import CharityWithdrawalTable from "../components/CharityWithdrawalTable";
 import { GetServerSideProps } from "next";
-import { getAssetsUrl } from "../utils";
+import { logoImgUrl } from "../utils";
 
 const CharityWithdrawals = () => {
   const [loading, setLoading] = useState(true);
@@ -44,15 +44,14 @@ const CharityWithdrawals = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Withdrawals from Charity Wallet | Cosmic Signature";
   const description = "Withdrawals from Charity Wallet";
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

@@ -18,7 +18,7 @@ import {
   TablePrimaryRow,
 } from "../../../components/styled";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { convertTimestampToDateTime, getAssetsUrl } from "../../../utils";
+import { convertTimestampToDateTime, logoImgUrl } from "../../../utils";
 import api from "../../../services/api";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
@@ -241,15 +241,14 @@ export const getServerSideProps: GetServerSideProps = async (
   const tokenId = Array.isArray(param2) ? param2[0] : param2;
   const title = "Rewards Details By Token | Cosmic Signature";
   const description = "Rewards Details By Token";
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData, address, tokenId } };

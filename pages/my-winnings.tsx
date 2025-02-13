@@ -9,7 +9,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../components/styled";
-import { convertTimestampToDateTime, getAssetsUrl } from "../utils";
+import { convertTimestampToDateTime, logoImgUrl } from "../utils";
 import DonatedNFTTable from "../components/DonatedNFTTable";
 import { useActiveWeb3React } from "../hooks/web3";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
@@ -302,15 +302,14 @@ const MyWinnings = () => {
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Pending Winnings | Cosmic Signature";
   const description = "Pending Winnings";
-  const imageUrl = getAssetsUrl("cosmicsignature/logo.png");
 
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
+    { property: "og:image", content: logoImgUrl },
     { name: "twitter:title", content: title },
     { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:image", content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };
