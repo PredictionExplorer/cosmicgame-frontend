@@ -6,20 +6,41 @@ import { GlobalStakingRewardsTable } from "../components/GlobalStakingRewardsTab
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../utils";
 
+/**
+ * Staking Component
+ *
+ * Displays the global staking rewards for the Cosmic Signature Token.
+ */
 const Staking = () => {
-  const [stakingRewards, setStakingRewards] = useState(null);
+  /**
+   * State to hold the staking rewards fetched from the API.
+   */
+  const [stakingRewards, setStakingRewards] = useState<any>(null);
+
+  /**
+   * Fetch the staking rewards when the component mounts.
+   */
   useEffect(() => {
     const fetchStakingRewards = async () => {
-      const rewards = await api.get_staking_cst_rewards();
-      setStakingRewards(rewards);
+      try {
+        const rewards = await api.get_staking_cst_rewards();
+        setStakingRewards(rewards);
+      } catch (error) {
+        console.error("Error fetching staking rewards:", error);
+      }
     };
+
     fetchStakingRewards();
   }, []);
 
+  /**
+   * Render the component.
+   */
   return (
     <MainWrapper>
+      {/* Heading Section */}
       <Typography variant="h4" color="primary" gutterBottom textAlign="center">
-        Staking Rewards for staking Cosmic Signature Token
+        Rewards for staking Cosmic Signature Token
       </Typography>
       <Typography
         variant="h5"
@@ -30,6 +51,8 @@ const Staking = () => {
       >
         (for all the stakers)
       </Typography>
+
+      {/* Content: Display a loading indicator or the rewards table */}
       {stakingRewards === null ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
@@ -39,6 +62,11 @@ const Staking = () => {
   );
 };
 
+/**
+ * Server-Side Rendering (SSR) function
+ *
+ * Provides metadata for SEO (Open Graph and Twitter cards).
+ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Staking | Cosmic Signature";
   const description = "Staking";
@@ -56,5 +84,3 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default Staking;
-
-/// Have to Update GlobalStakingRewardsTable
