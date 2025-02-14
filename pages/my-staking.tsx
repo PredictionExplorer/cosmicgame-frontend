@@ -16,7 +16,7 @@ import { StakedTokensTable } from "../components/StakedTokensTable";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import { RWLKNFTTable } from "../components/RWLKNFTTable";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
-import { StakingRewardMintsTable } from "../components/StakingRewardMintsTable";
+import { RwalkStakingRewardMintsTable } from "../components/RwalkStakingRewardMintsTable";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { ethers } from "ethers";
 import getErrorMessage from "../utils/alert";
@@ -575,7 +575,7 @@ const MyStaking = () => {
               <Typography variant="subtitle1" lineHeight={1} mb={2}>
                 Staking Reward Tokens
               </Typography>
-              <StakingRewardMintsTable list={rwlkMints} />
+              <RwalkStakingRewardMintsTable list={rwlkMints} />
             </Box>
 
             {/* RWLK Staking / Unstaking Action History */}

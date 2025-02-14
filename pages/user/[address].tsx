@@ -22,7 +22,7 @@ import { StakingRewardsTable } from "../../components/StakingRewardsTable";
 import { CollectedCSTStakingRewardsTable } from "../../components/CollectedCSTStakingRewardsTable";
 import { UncollectedCSTStakingRewardsTable } from "../../components/UncollectedCSTStakingRewardsTable";
 import { CSTStakingRewardsByDepositTable } from "../../components/CSTStakingRewardsByDepositTable";
-import { StakingRewardMintsTable } from "../../components/StakingRewardMintsTable";
+import { RwalkStakingRewardMintsTable } from "../../components/RwalkStakingRewardMintsTable";
 
 /* ------------------------------------------------------------------
    Types & Interfaces
@@ -888,7 +888,7 @@ const UserInfo = ({ address }: { address: string }) => {
                 <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
                   Staking Reward Tokens
                 </Typography>
-                <StakingRewardMintsTable list={rwlkMints} />
+                <RwalkStakingRewardMintsTable list={rwlkMints} />
               </Box>
             </CustomTabPanel>
           </Box>

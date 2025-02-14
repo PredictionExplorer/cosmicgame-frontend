@@ -3,7 +3,7 @@ import { Box, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
 import api from "../services/api";
 import { GlobalStakingRewardsTable } from "../components/GlobalStakingRewardsTable";
-import { StakingRewardMintsTable } from "../components/StakingRewardMintsTable";
+import { RwalkStakingRewardMintsTable } from "../components/RwalkStakingRewardMintsTable";
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../utils";
 
@@ -96,7 +96,7 @@ const Staking = () => {
         {loading ? (
           <Typography variant="h6">Loading...</Typography>
         ) : (
-          <StakingRewardMintsTable list={randomWalkRewards} />
+          <RwalkStakingRewardMintsTable list={randomWalkRewards} />
         )}
       </Box>
 

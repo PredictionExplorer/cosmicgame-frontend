@@ -28,7 +28,7 @@ import { StakingRewardsTable } from "../components/StakingRewardsTable";
 import { CSTStakingRewardsByDepositTable } from "../components/CSTStakingRewardsByDepositTable";
 import { CollectedCSTStakingRewardsTable } from "../components/CollectedCSTStakingRewardsTable";
 import { UncollectedCSTStakingRewardsTable } from "../components/UncollectedCSTStakingRewardsTable";
-import { StakingRewardMintsTable } from "../components/StakingRewardMintsTable";
+import { RwalkStakingRewardMintsTable } from "../components/RwalkStakingRewardMintsTable";
 
 /* ------------------------------------------------------------------
    Types & Interfaces
@@ -903,7 +903,7 @@ const MyStatistics = () => {
                 <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
                   Staking Reward Tokens
                 </Typography>
-                <StakingRewardMintsTable list={rwlkMints} />
+                <RwalkStakingRewardMintsTable list={rwlkMints} />
               </Box>
             </CustomTabPanel>
           </Box>

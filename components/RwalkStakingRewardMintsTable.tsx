@@ -16,7 +16,7 @@ import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 
 /**
- * Renders a single row for the StakingRewardMintsTable.
+ * Renders a single row for the RwalkStakingRewardMintsTable.
  * Each row displays:
  * - Datetime of mint (linked to Arbiscan)
  * - Winner's address (links to user info page)
@@ -72,7 +72,7 @@ const StakingRewardMintsRow = ({ row }) => {
 };
 
 /**
- * StakingRewardMintsTable displays a paginated list of staking reward mints.
+ * RwalkStakingRewardMintsTable displays a paginated list of staking reward mints.
  * Each row includes details such as:
  * - The mint's date/time and transaction link
  * - The winner's address
@@ -81,7 +81,7 @@ const StakingRewardMintsRow = ({ row }) => {
  *
  * @param list - An array of mint event objects containing TxHash, TimeStamp, WinnerAddr, RoundNum, and TokenId
  */
-export const StakingRewardMintsTable = ({ list }) => {
+export const RwalkStakingRewardMintsTable = ({ list }) => {
   // Number of rows to display per page
   const perPage = 5;
 
