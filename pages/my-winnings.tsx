@@ -24,13 +24,80 @@ import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
 import { GetServerSideProps } from "next";
 
-const MyWinningsRow = ({ winning }) => {
-  if (!winning) {
-    return <TablePrimaryRow />;
-  }
+/* ------------------------------------------------------------------
+  Types
+------------------------------------------------------------------ */
+
+interface RaffleWinning {
+  EvtLogId: number;
+  TxHash: string;
+  TimeStamp: number;
+  RoundNum: number;
+  Amount: number;
+}
+
+/* ------------------------------------------------------------------
+  Custom Hook: useUnclaimedWinnings
+------------------------------------------------------------------ */
+const useUnclaimedWinnings = (account: string | null | undefined) => {
+  const [donatedNFTs, setDonatedNFTs] = useState<any[] | null>(null);
+  const [raffleETHWinnings, setRaffleETHWinnings] = useState<
+    RaffleWinning[] | null
+  >(null);
+  const [cstStakingRewards, setCstStakingRewards] = useState<any[] | null>(
+    null
+  );
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchUnclaimedData = async () => {
+    if (!account) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const [nfts, deposits, cstRewards] = await Promise.all([
+        api.get_unclaimed_donated_nft_by_user(account),
+        api.get_unclaimed_raffle_deposits_by_user(account),
+        api.get_staking_cst_rewards_to_claim_by_user(account),
+      ]);
+
+      // Sort data for consistent ordering
+      setDonatedNFTs(nfts.sort((a: any, b: any) => a.TimeStamp - b.TimeStamp));
+      setRaffleETHWinnings(
+        deposits.sort((a: any, b: any) => b.TimeStamp - a.TimeStamp)
+      );
+      setCstStakingRewards(cstRewards);
+    } catch (err) {
+      console.error("Error fetching unclaimed data", err);
+      setError("Failed to load unclaimed winnings data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnclaimedData();
+  }, [account]);
+
+  return {
+    donatedNFTs,
+    raffleETHWinnings,
+    cstStakingRewards,
+    loading,
+    error,
+    refetch: fetchUnclaimedData,
+  };
+};
+
+/* ------------------------------------------------------------------
+  Sub-Components
+------------------------------------------------------------------ */
+
+// Table row for Raffle Winnings
+const MyWinningsRow = ({ winning }: { winning: RaffleWinning }) => {
+  if (!winning) return <TablePrimaryRow />;
 
   const { TxHash, TimeStamp, RoundNum, Amount } = winning;
-
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
@@ -46,10 +113,7 @@ const MyWinningsRow = ({ winning }) => {
       <TablePrimaryCell align="center">
         <Link
           href={`/prize/${RoundNum}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
+          style={{ color: "inherit", fontSize: "inherit" }}
           target="_blank"
         >
           {RoundNum}
@@ -60,7 +124,8 @@ const MyWinningsRow = ({ winning }) => {
   );
 };
 
-const MyWinningsTable = ({ list }) => (
+// Table for Raffle Winnings
+const MyWinningsTable = ({ list }: { list: RaffleWinning[] }) => (
   <TablePrimaryContainer>
     <TablePrimary>
       <TablePrimaryHead>
@@ -81,59 +146,73 @@ const MyWinningsTable = ({ list }) => (
   </TablePrimaryContainer>
 );
 
+/* ------------------------------------------------------------------
+  Main Component
+------------------------------------------------------------------ */
 const MyWinnings = () => {
   const { account } = useActiveWeb3React();
-  const [curPage, setCurPage] = useState(1);
+  const { setNotification } = useNotification();
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
-  const perPage = 5;
-  const [donatedNFTToClaim, setDonatedNFTToClaim] = useState(null);
-  const [raffleETHToClaim, setRaffleETHToClaim] = useState(null);
-  const [cstRewardsToClaim, setCstRewardsToClaim] = useState(null);
+
+  // Combine all "unclaimed" data into one custom hook
+  const {
+    donatedNFTs,
+    raffleETHWinnings,
+    cstStakingRewards,
+    loading,
+    error,
+    refetch,
+  } = useUnclaimedWinnings(account);
+
+  // Contract Hooks
+  const cosmicGameContract = useCosmicGameContract();
+  const raffleWalletContract = useRaffleWalletContract();
+
+  // UI State
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
     raffleETH: false,
   });
-  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState([]);
-  const { setNotification } = useNotification();
+  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
 
-  const cosmicGameContract = useCosmicGameContract();
-  const raffleWalletContract = useRaffleWalletContract();
+  const perPage = 5;
 
+  /* ------------------------------------------------------------------
+    Handlers
+  ------------------------------------------------------------------ */
   const handleAllETHClaim = async () => {
-    setIsClaiming((prevState) => ({
-      ...prevState,
-      raffleETH: true,
-    }));
+    setIsClaiming((prev) => ({ ...prev, raffleETH: true }));
     try {
       await raffleWalletContract.withdraw();
+      // Re-fetch global statuses after short delay
       setTimeout(() => {
         fetchStatusData();
+        refetch();
       }, 3000);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
+        const msg = getErrorMessage(err.data.message);
         setNotification({ text: msg, type: "error", visible: true });
       }
     } finally {
-      setIsClaiming((prevState) => ({
-        ...prevState,
-        raffleETH: false,
-      }));
+      setIsClaiming((prev) => ({ ...prev, raffleETH: false }));
     }
   };
 
-  const handleDonatedNFTsClaim = async (tokenID) => {
+  const handleDonatedNFTsClaim = async (tokenID: number) => {
     setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
       await cosmicGameContract.claimDonatedNFT(tokenID);
       setTimeout(() => {
         fetchStatusData();
+        refetch();
       }, 3000);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
+        const msg = getErrorMessage(err.data.message);
         setNotification({ text: msg, type: "error", visible: true });
       }
     } finally {
@@ -142,163 +221,179 @@ const MyWinnings = () => {
   };
 
   const handleAllDonatedNFTsClaim = async () => {
-    setIsClaiming((prevState) => ({
-      ...prevState,
-      donatedNFT: true,
-    }));
+    if (!donatedNFTs) return;
+    setIsClaiming((prev) => ({ ...prev, donatedNFT: true }));
     try {
-      const indexList = donatedNFTToClaim.map((item) => item.Index);
+      // Indices for all unclaimed NFTs
+      const indexList = donatedNFTs.map((item) => item.Index);
       await cosmicGameContract.claimManyDonatedNFTs(indexList);
       setTimeout(() => {
         fetchStatusData();
+        refetch();
       }, 3000);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
+        const msg = getErrorMessage(err.data.message);
         setNotification({ text: msg, type: "error", visible: true });
       }
     } finally {
-      setIsClaiming((prevState) => ({
-        ...prevState,
-        donatedNFT: false,
-      }));
+      setIsClaiming((prev) => ({ ...prev, donatedNFT: false }));
     }
   };
 
-  const fetchAllUnclaimedData = async () => {
-    if (!account) return;
+  /* ------------------------------------------------------------------
+    Render
+  ------------------------------------------------------------------ */
 
-    try {
-      const [nfts, deposits, cstRewardsToClaim] = await Promise.all([
-        api.get_unclaimed_donated_nft_by_user(account),
-        api.get_unclaimed_raffle_deposits_by_user(account),
-        api.get_staking_cst_rewards_to_claim_by_user(account),
-      ]);
+  // Early return if user is not connected
+  if (!account) {
+    return (
+      <MainWrapper>
+        <Typography
+          variant="h4"
+          color="primary"
+          gutterBottom
+          textAlign="center"
+        >
+          Pending Winnings
+        </Typography>
+        <Typography variant="subtitle1" mt={4}>
+          Please login to Metamask to see your winnings.
+        </Typography>
+      </MainWrapper>
+    );
+  }
 
-      setDonatedNFTToClaim(nfts.sort((a, b) => a.TimeStamp - b.TimeStamp));
-      setRaffleETHToClaim(deposits.sort((a, b) => b.TimeStamp - a.TimeStamp));
-      setCstRewardsToClaim(cstRewardsToClaim);
-    } catch (error) {
-      console.error("Error fetching unclaimed data", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllUnclaimedData();
-  }, [account, status]);
+  // If there's an error loading data
+  if (error) {
+    return (
+      <MainWrapper>
+        <Typography variant="h4" color="error" gutterBottom textAlign="center">
+          Something went wrong!
+        </Typography>
+        <Typography variant="body1" color="error">
+          {error}
+        </Typography>
+      </MainWrapper>
+    );
+  }
 
   return (
     <MainWrapper>
       <Typography variant="h4" color="primary" gutterBottom textAlign="center">
         Pending Winnings
       </Typography>
-      {!account ? (
-        <Typography variant="subtitle1" mt={4}>
-          Please login to Metamask to see your winnings.
+
+      {/* Raffle ETH Section */}
+      <Box mt={6}>
+        <Typography variant="h5" mb={2}>
+          Claimable Raffle ETH
         </Typography>
-      ) : (
-        <>
-          <Box mt={6}>
-            <Typography variant="h5" mb={2}>
-              Claimable Raffle ETH
-            </Typography>
-            {raffleETHToClaim !== null && raffleETHToClaim.length === 0 ? (
-              <Typography>No winnings yet.</Typography>
-            ) : raffleETHToClaim === null ? (
-              <Typography>Loading...</Typography>
-            ) : (
-              <>
-                <MyWinningsTable
-                  list={raffleETHToClaim.slice(
-                    (curPage - 1) * perPage,
-                    curPage * perPage
-                  )}
-                />
-                {status?.ETHRaffleToClaim > 0 && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "end",
-                      alignItems: "center",
-                      mt: 2,
-                    }}
-                  >
-                    <Typography mr={2}>
-                      Your claimable winnings are{" "}
-                      {`${status?.ETHRaffleToClaim.toFixed(6)} ETH`}
-                    </Typography>
-                    <Button
-                      onClick={handleAllETHClaim}
-                      variant="contained"
-                      disabled={isClaiming.raffleETH}
-                    >
-                      Claim All
-                    </Button>
-                  </Box>
-                )}
-                <CustomPagination
-                  page={curPage}
-                  setPage={setCurPage}
-                  totalLength={raffleETHToClaim.length}
-                  perPage={perPage}
-                />
-              </>
-            )}
-          </Box>
-          <Box mt={6}>
-            <Typography variant="h5" mb={2}>
-              Claimable CST Staking Rewards
-            </Typography>
-            {cstRewardsToClaim !== null && cstRewardsToClaim.length === 0 ? (
-              <Typography>No winnings yet.</Typography>
-            ) : cstRewardsToClaim === null ? (
-              <Typography>Loading...</Typography>
-            ) : (
-              <></>
-            )}
-          </Box>
-          <Box mt={8}>
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
-            >
-              <Typography variant="h5">Donated NFTs</Typography>
-              {status?.NumDonatedNFTToClaim > 0 && (
+        {loading && raffleETHWinnings === null ? (
+          <Typography>Loading...</Typography>
+        ) : !raffleETHWinnings || raffleETHWinnings.length === 0 ? (
+          <Typography>No winnings yet.</Typography>
+        ) : (
+          <>
+            <MyWinningsTable
+              list={raffleETHWinnings.slice(
+                (currentPage - 1) * perPage,
+                currentPage * perPage
+              )}
+            />
+
+            {status?.ETHRaffleToClaim > 0 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "end",
+                  alignItems: "center",
+                  mt: 2,
+                }}
+              >
+                <Typography mr={2}>
+                  Your claimable winnings are{" "}
+                  {`${status.ETHRaffleToClaim.toFixed(6)} ETH`}
+                </Typography>
                 <Button
-                  onClick={handleAllDonatedNFTsClaim}
+                  onClick={handleAllETHClaim}
                   variant="contained"
-                  disabled={isClaiming.donatedNFT}
+                  disabled={isClaiming.raffleETH}
                 >
                   Claim All
                 </Button>
-              )}
-            </Box>
-            {donatedNFTToClaim !== null && donatedNFTToClaim.length === 0 ? (
-              <Typography>No NFTs yet.</Typography>
-            ) : donatedNFTToClaim === null ? (
-              <Typography>Loading...</Typography>
-            ) : (
-              <DonatedNFTTable
-                list={donatedNFTToClaim}
-                handleClaim={handleDonatedNFTsClaim}
-                claimingTokens={claimingDonatedNFTs}
-              />
+              </Box>
             )}
-          </Box>
-          <Box mt={6}>
+
+            <CustomPagination
+              page={currentPage}
+              setPage={setCurrentPage}
+              totalLength={raffleETHWinnings.length}
+              perPage={perPage}
+            />
+          </>
+        )}
+      </Box>
+
+      {/* CST Staking Rewards Section (Currently no claim functionality shown) */}
+      <Box mt={6}>
+        <Typography variant="h5" mb={2}>
+          Claimable CST Staking Rewards
+        </Typography>
+        {loading && cstStakingRewards === null ? (
+          <Typography>Loading...</Typography>
+        ) : !cstStakingRewards || cstStakingRewards.length === 0 ? (
+          <Typography>No winnings yet.</Typography>
+        ) : (
+          <Typography>Rewards are loaded. (Claim UI TBD)</Typography>
+        )}
+      </Box>
+
+      {/* Donated NFTs Section */}
+      <Box mt={8}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+          <Typography variant="h5">Donated NFTs</Typography>
+          {status?.NumDonatedNFTToClaim > 0 && (
             <Button
-              variant="outlined"
-              onClick={() => router.push("/winning-history")}
+              onClick={handleAllDonatedNFTsClaim}
+              variant="contained"
+              disabled={isClaiming.donatedNFT}
             >
-              Go to my winning history page.
+              Claim All
             </Button>
-          </Box>
-        </>
-      )}
+          )}
+        </Box>
+
+        {loading && donatedNFTs === null ? (
+          <Typography>Loading...</Typography>
+        ) : !donatedNFTs || donatedNFTs.length === 0 ? (
+          <Typography>No NFTs yet.</Typography>
+        ) : (
+          <DonatedNFTTable
+            list={donatedNFTs}
+            handleClaim={handleDonatedNFTsClaim}
+            claimingTokens={claimingDonatedNFTs}
+          />
+        )}
+      </Box>
+
+      {/* Bottom Link Section */}
+      <Box mt={6}>
+        <Button
+          variant="outlined"
+          onClick={() => router.push("/winning-history")}
+        >
+          Go to my winning history page.
+        </Button>
+      </Box>
     </MainWrapper>
   );
 };
 
+/* ------------------------------------------------------------------
+  Server-Side Rendering (SEO Config)
+------------------------------------------------------------------ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Pending Winnings | Cosmic Signature";
   const description = "Pending Winnings";
