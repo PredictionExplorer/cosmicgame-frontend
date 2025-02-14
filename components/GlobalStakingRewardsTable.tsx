@@ -189,15 +189,6 @@ export const GlobalStakingRewardsTable = ({ list }: { list: any[] }) => {
         totalLength={list.length}
         perPage={perPage}
       />
-
-      {/* Bottom text/link guiding user to 'MY STAKING' page */}
-      <Typography mt={4}>
-        To participate in Staking go to{" "}
-        <Link href="/my-staking" sx={{ color: "inherit" }}>
-          &quot;MY STAKING&quot;
-        </Link>{" "}
-        . (option available from the Account menu)
-      </Typography>
     </>
   );
 };
