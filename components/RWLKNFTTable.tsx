@@ -24,51 +24,58 @@ import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 import { isMobile } from "react-device-detect";
 
-// Moved perPage outside the component to avoid re-declaration on every render
-const perPage = 5;
+// Reuse this constant to avoid re-declaring on each render
+const ITEMS_PER_PAGE = 5;
 
-// Memoized RWLKNFTRow to prevent unnecessary re-renders
-const RWLKNFTRow = ({
+/* ------------------------------------------------------------------
+  Single Row Component: RWLKRow
+------------------------------------------------------------------ */
+const RWLKRow = ({
   tokenId,
   tokenInfo,
-  handleStake,
-  isItemSelected,
-  handleClick,
+  onSelectToggle,
+  isSelected,
+  onStake,
 }) => {
-  if (!tokenInfo) {
-    // Display a placeholder or loading state if tokenInfo is not yet available
-    return null;
-  }
+  // Avoid rendering if we don't have token info yet
+  if (!tokenInfo) return null;
 
-  const onRowClick = () => handleClick(tokenId);
+  // Handlers
+  const handleRowClick = () => onSelectToggle(tokenId);
 
-  const onStakeClick = (e) => {
+  const handleStakeClick = (e) => {
     e.stopPropagation();
-    handleStake(tokenId);
+    onStake(tokenId);
   };
 
   return (
     <TablePrimaryRow
-      hover="true"
+      hover
       role="checkbox"
       tabIndex={-1}
-      key={tokenId}
-      selected={isItemSelected}
-      onClick={onRowClick}
+      selected={isSelected}
+      onClick={handleRowClick}
       sx={{ cursor: "pointer" }}
     >
+      {/* Checkbox */}
       <TablePrimaryCell padding="checkbox">
-        <Checkbox color="primary" checked={isItemSelected} size="small" />
+        <Checkbox color="primary" checked={isSelected} size="small" />
       </TablePrimaryCell>
+
+      {/* Owner Address */}
       <TablePrimaryCell>
         <AddressLink
           address={tokenInfo.CurOwnerAddr}
           url={`/user/${tokenInfo.CurOwnerAddr}`}
         />
       </TablePrimaryCell>
+
+      {/* Token ID */}
       <TablePrimaryCell align="center">{tokenId}</TablePrimaryCell>
+
+      {/* Stake Action */}
       <TablePrimaryCell align="center">
-        <Button size="small" onClick={onStakeClick}>
+        <Button size="small" onClick={handleStakeClick}>
           Stake
         </Button>
       </TablePrimaryCell>
@@ -76,100 +83,128 @@ const RWLKNFTRow = ({
   );
 };
 
+/* ------------------------------------------------------------------
+  Main Table Component: RWLKNFTTable
+------------------------------------------------------------------ */
 export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Menu anchor for "Select All / Current Page / None"
   const [anchorEl, setAnchorEl] = useState(null);
-  const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState<number[]>([]);
-  const [tokenData, setTokenData] = useState<{ [key: number]: any }>({});
 
-  // Memoized functions to prevent unnecessary re-creations
-  const isSelected = (id: number) => selected.includes(id);
+  // Keep track of selected token IDs
+  const [selectedTokenIds, setSelectedTokenIds] = useState([]);
+  // Store token data fetched from the API
+  const [tokenInfoMap, setTokenInfoMap] = useState({});
 
-  const handleClick = (id: number) => {
-    setSelected((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((selectedId) => selectedId !== id)
-        : [...prevSelected, id]
+  // Reset state when the list changes
+  useEffect(() => {
+    setSelectedTokenIds([]);
+    setCurrentPage(1);
+  }, [list]);
+
+  // Fetch token data in batch
+  useEffect(() => {
+    const fetchTokenData = async () => {
+      if (list.length === 0) return;
+
+      try {
+        // For each tokenId in "list", fetch token info concurrently
+        const data = await Promise.all(
+          list.map((tokenId) => api.get_info(tokenId))
+        );
+
+        // Convert the parallel response into a {tokenId: data} map
+        const infoMap = list.reduce((acc, tokenId, index) => {
+          acc[tokenId] = data[index];
+          return acc;
+        }, {});
+
+        setTokenInfoMap(infoMap);
+      } catch (err) {
+        console.error("Failed to fetch token data:", err);
+      }
+    };
+
+    fetchTokenData();
+  }, [list]);
+
+  // Sliced data for the current page
+  const currentPageData = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = currentPage * ITEMS_PER_PAGE;
+    return list.slice(startIndex, endIndex);
+  }, [list, currentPage]);
+
+  // Selection Logic
+  const isSelected = (id) => selectedTokenIds.includes(id);
+
+  const handleSelectToggle = (id) => {
+    setSelectedTokenIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
-  const onSelectAllClick = () => {
-    setSelected(list);
+  // "Select All" tokens
+  const handleSelectAll = () => {
+    setSelectedTokenIds([...list]);
     setAnchorEl(null);
   };
 
-  const onSelectCurPgClick = () => {
-    const newSelected = list.slice((page - 1) * perPage, page * perPage);
-    setSelected(newSelected);
+  // "Select Current Page"
+  const handleSelectCurrentPage = () => {
+    setSelectedTokenIds([...currentPageData]);
     setAnchorEl(null);
   };
 
-  const onSelectNoneClick = () => {
-    setSelected([]);
+  // "Select None"
+  const handleSelectNone = () => {
+    setSelectedTokenIds([]);
     setAnchorEl(null);
   };
 
-  const onStakeMany = async () => {
-    await handleStakeMany(selected, Array(selected.length).fill(true));
+  // Single Stake
+  const handleSingleStake = async (tokenId) => {
+    await handleStake(tokenId, true); // 'true' indicates RWLK
   };
 
-  const onStake = async (id: number) => {
-    await handleStake(id, true);
+  // Many Stake
+  const handleManyStake = async () => {
+    // Create an array of booleans for the second argument if needed
+    await handleStakeMany(
+      selectedTokenIds,
+      Array(selectedTokenIds.length).fill(true)
+    );
   };
 
-  useEffect(() => {
-    setSelected([]);
-    setPage(1);
-  }, [list]);
-
-  // Fetch all token data in a single batch to optimize API calls
-  useEffect(() => {
-    const fetchTokenData = async () => {
-      const data = await Promise.all(
-        list.map((tokenId) => api.get_info(tokenId))
-      );
-      const tokenDataMap = list.reduce((acc, tokenId, index) => {
-        acc[tokenId] = data[index];
-        return acc;
-      }, {});
-      setTokenData(tokenDataMap);
-    };
-    if (list.length > 0) {
-      fetchTokenData();
-    }
-  }, [list]);
-
-  const paginatedList = useMemo(
-    () => list.slice((page - 1) * perPage, page * perPage),
-    [list, page]
-  );
-
+  // If no tokens are in the list, show a message
   if (list.length === 0) {
     return <Typography>No available tokens.</Typography>;
   }
 
+  /* ------------------------------------------------------------------
+    Render
+  ------------------------------------------------------------------ */
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {/* Optional column widths for non-mobile */}
           {!isMobile && (
             <colgroup>
               <col width="5%" />
               <col width="50%" />
-              <col width="30%" />
-              <col width="10%" />
+              <col width="25%" />
+              <col width="20%" />
             </colgroup>
           )}
+
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell padding="checkbox" align="left">
                 <Box
                   sx={{
-                    display: {
-                      md: "flex",
-                      sm: "flex",
-                      xs: "none",
-                    },
+                    display: { md: "flex", sm: "flex", xs: "none" },
                     alignItems: "center",
                     cursor: "pointer",
                   }}
@@ -179,42 +214,36 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
                     color="info"
                     size="small"
                     indeterminate={
-                      selected.length > 0 && selected.length < list.length
+                      selectedTokenIds.length > 0 &&
+                      selectedTokenIds.length < list.length
                     }
-                    checked={list.length > 0 && selected.length === list.length}
+                    checked={
+                      list.length > 0 && selectedTokenIds.length === list.length
+                    }
                   />
                   {anchorEl ? <ExpandLess /> : <ExpandMore />}
                 </Box>
                 <Menu
                   elevation={0}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "center",
-                  }}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  transformOrigin={{ vertical: "top", horizontal: "center" }}
                   anchorEl={anchorEl}
                   keepMounted
                   open={Boolean(anchorEl)}
                   onClose={() => setAnchorEl(null)}
                 >
-                  <MenuItem
-                    style={{ minWidth: 166 }}
-                    onClick={onSelectAllClick}
-                  >
+                  <MenuItem style={{ minWidth: 166 }} onClick={handleSelectAll}>
                     <Typography>Select All</Typography>
                   </MenuItem>
                   <MenuItem
                     style={{ minWidth: 166 }}
-                    onClick={onSelectCurPgClick}
+                    onClick={handleSelectCurrentPage}
                   >
                     <Typography>Select Current Page</Typography>
                   </MenuItem>
                   <MenuItem
                     style={{ minWidth: 166 }}
-                    onClick={onSelectNoneClick}
+                    onClick={handleSelectNone}
                   >
                     <Typography>Select None</Typography>
                   </MenuItem>
@@ -227,32 +256,38 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
               <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
+
+          {/* Table Body */}
           <TableBody>
-            {paginatedList.map((tokenId) => (
-              <RWLKNFTRow
+            {currentPageData.map((tokenId) => (
+              <RWLKRow
                 key={tokenId}
                 tokenId={tokenId}
-                tokenInfo={tokenData[tokenId]}
-                handleStake={onStake}
-                isItemSelected={isSelected(tokenId)}
-                handleClick={handleClick}
+                tokenInfo={tokenInfoMap[tokenId]}
+                onSelectToggle={handleSelectToggle}
+                isSelected={isSelected(tokenId)}
+                onStake={handleSingleStake}
               />
             ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      {selected.length > 1 && (
-        <Box display="flex" justifyContent="end" mt={2}>
-          <Button variant="text" onClick={onStakeMany}>
+
+      {/* Stake Many Button */}
+      {selectedTokenIds.length > 1 && (
+        <Box display="flex" justifyContent="flex-end" mt={2}>
+          <Button variant="text" onClick={handleManyStake}>
             Stake Many
           </Button>
         </Box>
       )}
+
+      {/* Pagination */}
       <CustomPagination
-        page={page}
-        setPage={setPage}
+        page={currentPage}
+        setPage={setCurrentPage}
         totalLength={list.length}
-        perPage={perPage}
+        perPage={ITEMS_PER_PAGE}
       />
     </>
   );

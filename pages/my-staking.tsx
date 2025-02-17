@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
@@ -36,10 +36,10 @@ interface TabPanelProps {
 }
 
 // ----------------------------------------------
-// Components
+// Sub-Components
 // ----------------------------------------------
 
-// This component conditionally renders its children only if `value` matches `index`
+/** Renders content only if `value` matches `index`. */
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -47,8 +47,8 @@ function CustomTabPanel(props: TabPanelProps) {
     <div
       role="tabpanel"
       hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
+      id={`tab-panel-${index}`}
+      aria-labelledby={`tab-${index}`}
       {...other}
     >
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
@@ -57,351 +57,483 @@ function CustomTabPanel(props: TabPanelProps) {
 }
 
 /**
- * The main MyStaking component manages all staking-related data for
- * both CosmicSignature (CST) and RandomWalk (RWLK) tokens.
- * Users can stake, unstake, view staked tokens, and see their rewards.
+ * CSTStakingPanel - Renders the CST-specific staking UI
+ * (Rewards table, actions table, tokens available for staking, staked tokens).
  */
-const MyStaking = () => {
-  // ----------------------------------------------
-  // Hooks & State
-  // ----------------------------------------------
-  const { account } = useActiveWeb3React(); // Provides active account
-  const { setNotification } = useNotification(); // Manages global notifications
+function CSTStakingPanel({
+  account,
+  stakingActions,
+  userTokens,
+  stakedTokens,
+  stakingRewards,
+  handleStake,
+  handleStakeMany,
+  handleUnstake,
+  handleUnstakeMany,
+}: {
+  account: string;
+  stakingActions: any[];
+  userTokens: any[];
+  stakedTokens: any[];
+  stakingRewards: any[];
+  handleStake: (tokenId: number) => Promise<any>;
+  handleStakeMany: (tokenIds: number[]) => Promise<any>;
+  handleUnstake: (actionId: number) => Promise<any>;
+  handleUnstakeMany: (actionIds: number[]) => Promise<any>;
+}) {
+  return (
+    <>
+      {/* CST Rewards */}
+      <Box>
+        <Typography variant="subtitle1" lineHeight={1} mb={2}>
+          Staking Rewards by Token
+        </Typography>
+        <StakingRewardsTable list={stakingRewards} address={account} />
+      </Box>
 
-  // Smart contract hooks
+      {/* CST Staking / Unstaking Action History */}
+      <Box>
+        <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
+          Stake / Unstake Actions
+        </Typography>
+        <StakingActionsTable list={stakingActions} IsRwalk={false} />
+      </Box>
+
+      {/* CST Tokens Available for Staking */}
+      <Box>
+        <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
+          Tokens Available for Staking
+        </Typography>
+        <CSTokensTable
+          list={userTokens}
+          handleStake={(tokenId) => handleStake(tokenId)}
+          handleStakeMany={(tokenIds) => handleStakeMany(tokenIds)}
+        />
+      </Box>
+
+      {/* CST Tokens Already Staked */}
+      <Box>
+        <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
+          Staked Tokens
+        </Typography>
+        <StakedTokensTable
+          list={stakedTokens}
+          handleUnstake={(actionId) => handleUnstake(actionId)}
+          handleUnstakeMany={(actionIds) => handleUnstakeMany(actionIds)}
+          IsRwalk={false}
+        />
+      </Box>
+    </>
+  );
+}
+
+/**
+ * RWLKStakingPanel - Renders the RWLK-specific staking UI
+ * (Reward tokens, actions table, tokens available for staking, staked tokens).
+ */
+function RWLKStakingPanel({
+  stakingActions,
+  rwlkMints,
+  userTokens,
+  stakedTokens,
+  handleStake,
+  handleStakeMany,
+  handleUnstake,
+  handleUnstakeMany,
+}: {
+  stakingActions: any[];
+  rwlkMints: any[];
+  userTokens: number[]; // array of randomWalk token IDs
+  stakedTokens: any[];
+  handleStake: (tokenId: number) => Promise<any>;
+  handleStakeMany: (tokenIds: number[]) => Promise<any>;
+  handleUnstake: (actionId: number) => Promise<any>;
+  handleUnstakeMany: (actionIds: number[]) => Promise<any>;
+}) {
+  return (
+    <>
+      {/* RWLK Reward Tokens (minted from staking) */}
+      <Box>
+        <Typography variant="subtitle1" lineHeight={1} mb={2}>
+          Staking Reward Tokens
+        </Typography>
+        <RwalkStakingRewardMintsTable list={rwlkMints} />
+      </Box>
+
+      {/* RWLK Staking / Unstaking Action History */}
+      <Box>
+        <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
+          Stake / Unstake Actions
+        </Typography>
+        <StakingActionsTable list={stakingActions} IsRwalk={true} />
+      </Box>
+
+      {/* RWLK Tokens Available for Staking */}
+      <Box>
+        <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
+          Tokens Available for Staking
+        </Typography>
+        <RWLKNFTTable
+          list={userTokens}
+          handleStake={(tokenId) => handleStake(tokenId)}
+          handleStakeMany={(tokenIds) => handleStakeMany(tokenIds)}
+        />
+      </Box>
+
+      {/* RWLK Tokens Already Staked */}
+      <Box>
+        <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
+          Staked Tokens
+        </Typography>
+        <StakedTokensTable
+          list={stakedTokens}
+          handleUnstake={(actionId) => handleUnstake(actionId)}
+          handleUnstakeMany={(actionIds) => handleUnstakeMany(actionIds)}
+          IsRwalk={true}
+        />
+      </Box>
+    </>
+  );
+}
+
+// ----------------------------------------------
+// Main Component
+// ----------------------------------------------
+const MyStaking = () => {
+  const { account } = useActiveWeb3React();
+  const { setNotification } = useNotification();
+
+  // Contracts
   const cosmicSignatureContract = useCosmicSignatureContract();
   const rwalkContract = useRWLKNFTContract();
   const cstStakingContract = useStakingWalletCSTContract();
   const rwlkStakingContract = useStakingWalletRWLKContract();
   const cosmicGameContract = useCosmicGameContract();
 
-  // Global and user-specific staking data
+  // Dashboard data
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [rewardPerCST, setRewardPerCST] = useState(0);
 
   // Loading state
   const [loading, setLoading] = useState(true);
 
-  // CST staking
+  // CST data
   const [stakingCSTActions, setStakingCSTActions] = useState<any[]>([]);
   const [CSTokens, setCSTokens] = useState<any[]>([]);
   const [stakingRewards, setStakingRewards] = useState<any[]>([]);
 
-  // RWLK staking
+  // RWLK data
   const [stakingRWLKActions, setStakingRWLKActions] = useState<any[]>([]);
-  const [rwlkTokens, setRwlkTokens] = useState<any[]>([]);
+  const [rwlkTokens, setRwlkTokens] = useState<number[]>([]);
   const [rwlkMints, setRwlkMints] = useState<any[]>([]);
 
-  // Tab management
+  // Tabs
   const [stakingTab, setStakingTab] = useState(0);
 
-  // Staked tokens from context
+  // Context (already-staked tokens)
   const {
     cstokens: stakedCSTokens,
     rwlktokens: stakedRWLKTokens,
     fetchData: fetchStakedTokens,
   } = useStakedToken();
 
-  // ----------------------------------------------
-  // Helper Functions
-  // ----------------------------------------------
+  /* --------------------------------------------------
+    Helpers
+  -------------------------------------------------- */
 
-  /**
-   * If needed, gives approval for the staking contract to manage user's NFTs.
-   * This is required only once if the user hasn't previously approved.
-   */
-  const approveIfNeeded = async (
-    contract: any,
-    accountAddress: string,
-    stakingWalletAddress: string
-  ) => {
-    const isApprovedForAll = await contract.isApprovedForAll(
-      accountAddress,
-      stakingWalletAddress
+  // Displays a user-friendly error notification
+  const handleError = useCallback(
+    (err: any) => {
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err.data.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
+      console.error(err);
+    },
+    [setNotification]
+  );
+
+  // Approves staking contract for all tokens if needed
+  const approveIfNeeded = async (nftContract: any, walletAddress: string) => {
+    const isApprovedForAll = await nftContract.isApprovedForAll(
+      account,
+      walletAddress
     );
     if (!isApprovedForAll) {
-      // Approve the staking contract for all tokens
-      const tx = await contract.setApprovalForAll(stakingWalletAddress, true);
+      const tx = await nftContract.setApprovalForAll(walletAddress, true);
       await tx.wait();
     }
   };
 
-  /**
-   * Generic error handler that shows a notification with
-   * a human-readable error message.
-   */
-  const handleError = (err: any) => {
-    if (err?.data?.message) {
-      const msg = getErrorMessage(err?.data?.message);
-      setNotification({ text: msg, type: "error", visible: true });
-    }
-    console.error(err);
-  };
+  // Finds the max limit for multiple deposit evaluations (unstake calls)
+  const findMaxLimit = useCallback(
+    async (contract: any, actionIds: number | number[]) => {
+      let numEthDepositsToEvaluateMaxLimit = 2;
+      let limit = 100000;
 
-  /**
-   * Stakes one or multiple tokens (CST or RWLK).
-   * Approves the contract if necessary, then calls the staking functions.
-   */
-  const handleStakeAction = async (
-    tokenIds: number | number[],
-    isRwalk: boolean
-  ) => {
-    try {
-      // Identify which contracts to use based on isRwalk
-      const contract = isRwalk ? rwalkContract : cosmicSignatureContract;
-      const stakingContract = isRwalk
-        ? rwlkStakingContract
-        : cstStakingContract;
-      const STAKING_WALLET_ADDRESS = isRwalk
-        ? STAKING_WALLET_RWLK_ADDRESS
-        : STAKING_WALLET_CST_ADDRESS;
-
-      // Ensure approval before staking
-      await approveIfNeeded(contract, account!, STAKING_WALLET_ADDRESS);
-
-      // Stake either a single token or multiple tokens
-      let res;
-      if (Array.isArray(tokenIds)) {
-        res = await stakingContract
-          .stakeMany(tokenIds)
-          .then((tx: any) => tx.wait());
-      } else {
-        res = await stakingContract
-          .stake(tokenIds)
-          .then((tx: any) => tx.wait());
-      }
-
-      // If successful, show success notification
-      if (!res.code) {
-        setNotification({
-          visible: true,
-          text: Array.isArray(tokenIds)
-            ? "The selected tokens were staked successfully!"
-            : `You have successfully staked token ${tokenIds}!`,
-          type: "success",
-        });
-      }
-
-      // Refresh data based on type (CST or RWLK)
-      if (isRwalk) {
-        await fetchRWLKUserData(account!);
-      } else {
-        await fetchCSTUserData(account!, false);
-      }
-
-      return res;
-    } catch (err) {
-      handleError(err);
-      return err;
-    }
-  };
-
-  /**
-   * Attempts to find the maximum limit for numEthDepositsToEvaluateMaxLimit
-   * by gradually increasing it until the contract call fails or an upper
-   * bound is reached.
-   *
-   * This helps handle scenarios where unstaking might need to account
-   * for multiple deposits with different reward calculations.
-   */
-  async function findMaxLimit(contract: any, actionIds: number | number[]) {
-    let numEthDepositsToEvaluateMaxLimit = 2;
-    let limit = 100000; // An arbitrary upper limit
-
-    // Exponential approach: double the threshold until contract call fails or we exceed our limit
-    while (limit > numEthDepositsToEvaluateMaxLimit) {
-      let result;
-      try {
-        if (Array.isArray(actionIds)) {
-          result = await contract.callStatic.unstakeMany(
-            actionIds,
-            numEthDepositsToEvaluateMaxLimit
-          );
-        } else {
-          result = await contract.callStatic.unstake(
-            actionIds,
-            numEthDepositsToEvaluateMaxLimit
-          );
+      while (limit > numEthDepositsToEvaluateMaxLimit) {
+        let result;
+        try {
+          if (Array.isArray(actionIds)) {
+            // "callStatic" doesn't change state; checks if call will succeed
+            result = await contract.callStatic.unstakeMany(
+              actionIds,
+              numEthDepositsToEvaluateMaxLimit
+            );
+          } else {
+            result = await contract.callStatic.unstake(
+              actionIds,
+              numEthDepositsToEvaluateMaxLimit
+            );
+          }
+        } catch {
+          result = null;
         }
-      } catch {
-        result = null;
+
+        if (result !== null) {
+          // This limit works
+          return numEthDepositsToEvaluateMaxLimit;
+        } else {
+          // Double the limit and try again
+          numEthDepositsToEvaluateMaxLimit *= 2;
+        }
       }
+      return numEthDepositsToEvaluateMaxLimit;
+    },
+    []
+  );
 
-      if (result !== null) {
-        // If it succeeds, we've found a valid limit
-        return numEthDepositsToEvaluateMaxLimit;
-      } else {
-        // Otherwise, double the limit and try again
-        numEthDepositsToEvaluateMaxLimit *= 2;
+  // Generic stake function for CST or RWLK
+  const handleStakeAction = useCallback(
+    async (tokenIds: number | number[], isRwalk: boolean) => {
+      try {
+        const nftContract = isRwalk ? rwalkContract : cosmicSignatureContract;
+        const stakingContract = isRwalk
+          ? rwlkStakingContract
+          : cstStakingContract;
+        const STAKING_WALLET_ADDRESS = isRwalk
+          ? STAKING_WALLET_RWLK_ADDRESS
+          : STAKING_WALLET_CST_ADDRESS;
+
+        // Approve if needed
+        await approveIfNeeded(nftContract, STAKING_WALLET_ADDRESS);
+
+        // Stake single or multiple
+        let res;
+        if (Array.isArray(tokenIds)) {
+          res = await stakingContract
+            .stakeMany(tokenIds)
+            .then((tx: any) => tx.wait());
+        } else {
+          res = await stakingContract
+            .stake(tokenIds)
+            .then((tx: any) => tx.wait());
+        }
+
+        // Show success notification
+        if (!res.code) {
+          setNotification({
+            visible: true,
+            text: Array.isArray(tokenIds)
+              ? "The selected tokens were staked successfully!"
+              : `You have successfully staked token ${tokenIds}!`,
+            type: "success",
+          });
+        }
+
+        // Refresh data
+        if (isRwalk) {
+          await fetchRWLKData(account!);
+        } else {
+          await fetchCSTData(account!);
+        }
+
+        return res;
+      } catch (err) {
+        handleError(err);
+        return err;
       }
-    }
+    },
+    [
+      account,
+      handleError,
+      rwalkContract,
+      cosmicSignatureContract,
+      rwlkStakingContract,
+      cstStakingContract,
+      setNotification,
+    ]
+  );
 
-    console.log("Found max limit:", numEthDepositsToEvaluateMaxLimit);
-    return numEthDepositsToEvaluateMaxLimit;
-  }
+  // Generic unstake function for CST or RWLK
+  const handleUnstakeAction = useCallback(
+    async (actionIds: number | number[], isRwalk: boolean) => {
+      try {
+        const stakingContract = isRwalk
+          ? rwlkStakingContract
+          : cstStakingContract;
 
-  /**
-   * Unstakes one or multiple tokens (CST or RWLK).
-   * Dynamically finds an appropriate limit to handle multiple deposits
-   * and calls the contract to unstake the tokens.
-   */
-  const handleUnstakeAction = async (
-    actionIds: number | number[],
-    isRwalk: boolean
-  ) => {
-    // Identify which staking contract we should use
-    const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
+        // Find the max limit for multiple deposits
+        const numEthDepositsToEvaluateMaxLimit = await findMaxLimit(
+          stakingContract,
+          actionIds
+        );
 
-    // Determine the maximum limit for depositing ETH from the stake
-    const numEthDepositsToEvaluateMaxLimit = await findMaxLimit(
-      stakingContract,
-      actionIds
-    );
+        // Unstake single or multiple
+        let res;
+        if (Array.isArray(actionIds)) {
+          res = await stakingContract
+            .unstakeMany(actionIds, numEthDepositsToEvaluateMaxLimit)
+            .then((tx: any) => tx.wait());
+        } else {
+          res = await stakingContract
+            .unstake(actionIds, numEthDepositsToEvaluateMaxLimit)
+            .then((tx: any) => tx.wait());
+        }
 
+        // Success notification
+        if (!res.code) {
+          setNotification({
+            visible: true,
+            text: Array.isArray(actionIds)
+              ? "The selected tokens were unstaked successfully!"
+              : `You have successfully unstaked token!`,
+            type: "success",
+          });
+        }
+
+        // Refresh data
+        if (isRwalk) {
+          await fetchRWLKData(account!);
+        } else {
+          await fetchCSTData(account!);
+        }
+        return res;
+      } catch (err) {
+        handleError(err);
+        return err;
+      }
+    },
+    [
+      account,
+      handleError,
+      findMaxLimit,
+      rwlkStakingContract,
+      cstStakingContract,
+      setNotification,
+    ]
+  );
+
+  // Fetch dashboard data (global) + compute reward per CST
+  const fetchDashboardData = useCallback(async () => {
     try {
-      // Unstake either a single token or multiple tokens
-      let res;
-      if (Array.isArray(actionIds)) {
-        res = await stakingContract
-          .unstakeMany(actionIds, numEthDepositsToEvaluateMaxLimit)
-          .then((tx: any) => tx.wait());
+      const data = await api.get_dashboard_info();
+      setDashboardData(data);
+
+      const stakingAmount = await cosmicGameContract.stakingAmount();
+      const totalStakedCST =
+        data?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
+
+      if (totalStakedCST > 0) {
+        const rewardCST =
+          Number(ethers.utils.formatEther(stakingAmount)) / totalStakedCST;
+        setRewardPerCST(rewardCST);
       } else {
-        res = await stakingContract
-          .unstake(actionIds, numEthDepositsToEvaluateMaxLimit)
-          .then((tx: any) => tx.wait());
+        setRewardPerCST(0);
       }
-
-      // If successful, show success notification
-      if (!res.code) {
-        setNotification({
-          visible: true,
-          text: Array.isArray(actionIds)
-            ? "The selected tokens were unstaked successfully!"
-            : `You have successfully unstaked token!`,
-          type: "success",
-        });
-      }
-
-      // Refresh data
-      if (isRwalk) {
-        await fetchRWLKUserData(account!);
-      } else {
-        await fetchCSTUserData(account!, false);
-      }
-
-      return res;
     } catch (err) {
-      handleError(err);
-      return err;
+      console.error("Failed to fetch dashboard data:", err);
     }
-  };
+  }, [cosmicGameContract]);
 
-  /**
-   * Retrieves general dashboard data (e.g., total staked tokens),
-   * calculates the reward per staked CST token,
-   * and updates state accordingly.
-   */
-  const fetchDashboardData = async () => {
-    const data = await api.get_dashboard_info();
-    setDashboardData(data);
+  // Fetch CST user data
+  const fetchCSTData = useCallback(
+    async (addr: string) => {
+      setLoading(true);
+      try {
+        const [cstActions, cstUserTokens, cstUserRewards] = await Promise.all([
+          api.get_staking_cst_actions_by_user(addr),
+          api.get_cst_tokens_by_user(addr),
+          api.get_staking_rewards_by_user(addr),
+        ]);
 
-    // The total staking reward (ETH) placed into the pool
-    const stakingAmount = await cosmicGameContract.stakingAmount();
-    const totalStakedCST =
-      data?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
+        setStakingCSTActions(cstActions);
+        setCSTokens(
+          cstUserTokens.filter((x: any) => !x.WasUnstaked) // only show tokens that are truly "unstaked"
+        );
+        setStakingRewards(cstUserRewards);
 
-    // If there are any CST tokens staked, compute reward per token
-    if (totalStakedCST > 0) {
-      const rewardCST =
-        Number(ethers.utils.formatEther(stakingAmount)) / totalStakedCST;
-      setRewardPerCST(rewardCST);
-    } else {
-      setRewardPerCST(0);
-    }
-  };
+        // Refresh staked token context
+        fetchStakedTokens();
+      } catch (err) {
+        handleError(err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchStakedTokens, handleError]
+  );
 
-  /**
-   * Fetches CST user-specific data including:
-   * - Staking actions (stake/unstake history)
-   * - Current CST tokens owned by the user (un-staked)
-   * - Staking rewards earned
-   */
-  const fetchCSTUserData = async (addr: string, reload: boolean = true) => {
-    if (reload) setLoading(true);
+  // Fetch RWLK user data
+  const fetchRWLKData = useCallback(
+    async (addr: string) => {
+      try {
+        setLoading(true);
 
-    // Fetch data in parallel
-    const [cstActions, cstUserTokens, cstRewards] = await Promise.all([
-      api.get_staking_cst_actions_by_user(addr),
-      api.get_cst_tokens_by_user(addr),
-      api.get_staking_rewards_by_user(addr),
-    ]);
+        // Staking Actions + Reward Mints
+        const [rwalkActions, rwalkMintEvents] = await Promise.all([
+          api.get_staking_rwalk_actions_by_user(addr),
+          api.get_staking_rwalk_mints_by_user(addr),
+        ]);
+        setStakingRWLKActions(rwalkActions);
+        setRwlkMints(rwalkMintEvents);
 
-    // Store data in state
-    setStakingCSTActions(cstActions);
-    setCSTokens(cstUserTokens.filter((x: any) => !x.WasUnstaked));
-    setStakingRewards(cstRewards);
+        // Refresh context
+        fetchStakedTokens();
 
-    // Refresh staked token context
-    fetchStakedTokens();
-    setLoading(false);
-  };
+        // Filter user-owned token IDs that are not staked
+        const stakedIds = stakedRWLKTokens.map((x) => x.StakedTokenId);
+        const userOwned = await rwalkContract.walletOfOwner(addr);
+        const rawIds = userOwned.map((t: any) => t.toNumber()).sort();
 
-  /**
-   * Fetches RWLK user-specific data including:
-   * - Staking actions (stake/unstake history)
-   * - RandomWalk NFT tokens owned by the user (un-staked)
-   * - Minted reward tokens from staking
-   */
-  const fetchRWLKUserData = async (addr: string) => {
-    // Fetch data in parallel
-    const [rwalkActions, rwalkMintEvents] = await Promise.all([
-      api.get_staking_rwalk_actions_by_user(addr),
-      api.get_staking_rwalk_mints_by_user(addr),
-    ]);
+        // Exclude tokens that are staked or in some partial action
+        const filteredIds = rawIds.filter(
+          (id) =>
+            !stakedIds.includes(id) &&
+            !rwalkActions.some(
+              (action: any) => action.ActionType !== 1 && action.TokenId === id
+            )
+        );
+        setRwlkTokens(filteredIds);
+      } catch (err) {
+        handleError(err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchStakedTokens, rwalkContract, stakedRWLKTokens, handleError]
+  );
 
-    // Set results in local state
-    setStakingRWLKActions(rwalkActions);
-    setRwlkMints(rwalkMintEvents);
-
-    // Refresh staked token context
-    fetchStakedTokens();
-
-    // Identify RWLK tokens the user owns but has not staked yet
-    const rwlkStakedIds = stakedRWLKTokens.map((x) => x.StakedTokenId);
-    const userOwnedTokenIds = await rwalkContract.walletOfOwner(account!);
-    const rawIds = userOwnedTokenIds.map((t: any) => t.toNumber()).sort();
-
-    // Filter out tokens that are already staked or in some unstaked action
-    const filteredIds = rawIds.filter(
-      (x) =>
-        !rwlkStakedIds.includes(x) &&
-        !rwalkActions.some(
-          (action: any) => action.ActionType !== 1 && action.TokenId === x
-        )
-    );
-
-    setRwlkTokens(filteredIds);
-  };
-
-  /**
-   * Handler for changing the staking tab:
-   * 0 -> CST Staking, 1 -> RWLK Staking
-   */
+  // Tab change handler
   const handleTabChange = (_event: any, newValue: number) => {
     setStakingTab(newValue);
   };
 
-  // ----------------------------------------------
-  // Lifecycle: Fetch data on component mount
-  // ----------------------------------------------
+  // On mount / account change
   useEffect(() => {
     if (account && rwalkContract && cosmicGameContract) {
-      // Fetch both global (dashboard) and user-specific data
-      fetchCSTUserData(account);
-      fetchRWLKUserData(account);
+      fetchCSTData(account);
+      fetchRWLKData(account);
       fetchDashboardData();
     }
-  }, [account, rwalkContract, cosmicGameContract]);
+  }, [
+    account,
+    rwalkContract,
+    cosmicGameContract,
+    fetchCSTData,
+    fetchRWLKData,
+    fetchDashboardData,
+  ]);
 
   // ----------------------------------------------
   // Render
@@ -418,16 +550,18 @@ const MyStaking = () => {
         My Staking
       </Typography>
 
-      {/* If there's no connected account, prompt user to connect */}
       {!account ? (
+        // User is not connected
         <Typography variant="subtitle1">
           Please login to Metamask to see your staking.
         </Typography>
       ) : loading ? (
+        // Data is still loading
         <Typography variant="h6">Loading...</Typography>
       ) : (
+        // Main Staking UI
         <>
-          {/* Global staking statistics (CST and RWLK) */}
+          {/* Global stats */}
           <Box sx={{ display: "flex" }}>
             <Typography variant="subtitle1" mr={1}>
               Number of globally staked CST tokens:
@@ -448,7 +582,7 @@ const MyStaking = () => {
             </Typography>
           </Box>
 
-          {/* Show reward per staked CST token, if available */}
+          {/* Reward per CST token (if any) */}
           {rewardPerCST > 0 && (
             <Box sx={{ display: "flex" }}>
               <Typography variant="subtitle1" mr={1}>
@@ -460,18 +594,19 @@ const MyStaking = () => {
             </Box>
           )}
 
-          {/* Tabs for switching between CST Staking and Random Walk Staking */}
+          {/* Tabs */}
           <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
             <Tabs
               variant="fullWidth"
               value={stakingTab}
               onChange={handleTabChange}
             >
+              {/* CST Tab */}
               <Tab
                 label={
                   <Box sx={{ display: "flex" }}>
                     <Image
-                      src={"/images/CosmicSignatureNFT.png"}
+                      src="/images/CosmicSignatureNFT.png"
                       width={94}
                       height={60}
                       alt="cosmic signature nft"
@@ -489,11 +624,12 @@ const MyStaking = () => {
                   </Box>
                 }
               />
+              {/* RWLK Tab */}
               <Tab
                 label={
                   <Box sx={{ display: "flex" }}>
                     <Image
-                      src={"/images/rwalk.jpg"}
+                      src="/images/rwalk.jpg"
                       width={94}
                       height={60}
                       alt="RandomWalk nft"
@@ -514,108 +650,37 @@ const MyStaking = () => {
             </Tabs>
           </Box>
 
-          {/* 
-            TAB #1: CST (Cosmic Signature) Staking
-          */}
+          {/* CST Panel */}
           <CustomTabPanel value={stakingTab} index={0}>
-            {/* CST Rewards */}
-            <Box>
-              <Typography variant="subtitle1" lineHeight={1} mb={2}>
-                Staking Rewards by Token
-              </Typography>
-              <StakingRewardsTable list={stakingRewards} address={account!} />
-            </Box>
-
-            {/* CST Staking / Unstaking Action History */}
-            <Box>
-              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
-                Stake / Unstake Actions
-              </Typography>
-              <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
-            </Box>
-
-            {/* CST Tokens currently owned by user and available for staking */}
-            <Box>
-              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
-                Tokens Available for Staking
-              </Typography>
-              <CSTokensTable
-                list={CSTokens}
-                handleStake={(tokenId) => handleStakeAction(tokenId, false)}
-                handleStakeMany={(tokenIds) =>
-                  handleStakeAction(tokenIds, false)
-                }
-              />
-            </Box>
-
-            {/* CST Tokens already staked by the user */}
-            <Box>
-              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
-                Staked Tokens
-              </Typography>
-              <StakedTokensTable
-                list={stakedCSTokens}
-                handleUnstake={(actionId) =>
-                  handleUnstakeAction(actionId, false)
-                }
-                handleUnstakeMany={(actionIds) =>
-                  handleUnstakeAction(actionIds, false)
-                }
-                IsRwalk={false}
-              />
-            </Box>
+            <CSTStakingPanel
+              account={account}
+              stakingActions={stakingCSTActions}
+              userTokens={CSTokens}
+              stakedTokens={stakedCSTokens}
+              stakingRewards={stakingRewards}
+              handleStake={(tokenId) => handleStakeAction(tokenId, false)}
+              handleStakeMany={(tokenIds) => handleStakeAction(tokenIds, false)}
+              handleUnstake={(actionId) => handleUnstakeAction(actionId, false)}
+              handleUnstakeMany={(actionIds) =>
+                handleUnstakeAction(actionIds, false)
+              }
+            />
           </CustomTabPanel>
 
-          {/* 
-            TAB #2: RWLK (RandomWalk) Staking
-          */}
+          {/* RWLK Panel */}
           <CustomTabPanel value={stakingTab} index={1}>
-            {/* RWLK Reward Tokens (minted from staking) */}
-            <Box>
-              <Typography variant="subtitle1" lineHeight={1} mb={2}>
-                Staking Reward Tokens
-              </Typography>
-              <RwalkStakingRewardMintsTable list={rwlkMints} />
-            </Box>
-
-            {/* RWLK Staking / Unstaking Action History */}
-            <Box>
-              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
-                Stake / Unstake Actions
-              </Typography>
-              <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
-            </Box>
-
-            {/* RWLK Tokens currently owned by user and available for staking */}
-            <Box>
-              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
-                Tokens Available for Staking
-              </Typography>
-              <RWLKNFTTable
-                list={rwlkTokens}
-                handleStake={(tokenId) => handleStakeAction(tokenId, true)}
-                handleStakeMany={(tokenIds) =>
-                  handleStakeAction(tokenIds, true)
-                }
-              />
-            </Box>
-
-            {/* RWLK Tokens already staked by the user */}
-            <Box>
-              <Typography variant="subtitle1" lineHeight={1} mt={8} mb={2}>
-                Staked Tokens
-              </Typography>
-              <StakedTokensTable
-                list={stakedRWLKTokens}
-                handleUnstake={(actionId) =>
-                  handleUnstakeAction(actionId, true)
-                }
-                handleUnstakeMany={(actionIds) =>
-                  handleUnstakeAction(actionIds, true)
-                }
-                IsRwalk={true}
-              />
-            </Box>
+            <RWLKStakingPanel
+              stakingActions={stakingRWLKActions}
+              rwlkMints={rwlkMints}
+              userTokens={rwlkTokens}
+              stakedTokens={stakedRWLKTokens}
+              handleStake={(tokenId) => handleStakeAction(tokenId, true)}
+              handleStakeMany={(tokenIds) => handleStakeAction(tokenIds, true)}
+              handleUnstake={(actionId) => handleUnstakeAction(actionId, true)}
+              handleUnstakeMany={(actionIds) =>
+                handleUnstakeAction(actionIds, true)
+              }
+            />
           </CustomTabPanel>
         </>
       )}
