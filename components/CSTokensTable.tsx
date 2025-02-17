@@ -19,162 +19,209 @@ import {
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime } from "../utils";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 import { isMobile } from "react-device-detect";
 
-const CSTokensRow = ({ row, handleStake, isItemSelected, handleClick }) => {
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
+/* ------------------------------------------------------------------
+  Sub-Component: CSTokenRow
+  Renders a single row (CSToken).
+------------------------------------------------------------------ */
+const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }) => {
+  if (!row) return null;
 
-  const onRowClick = () => handleClick(row.TokenId);
+  const {
+    TokenId,
+    TxHash,
+    TimeStamp,
+    TokenName,
+    RoundNum,
+    WinnerAddr,
+    Staked,
+  } = row;
 
-  const onStakeClick = (e) => {
+  // Row-level click handlers
+  const handleRowClick = () => onSelectToggle(TokenId);
+
+  const handleStakeClick = (e) => {
     e.stopPropagation();
-    handleStake(row.TokenId);
+    onStakeSingle(TokenId);
   };
 
   return (
     <TablePrimaryRow
-      hover="true"
+      hover
       role="checkbox"
       tabIndex={-1}
-      key={row.id}
       selected={isItemSelected}
-      onClick={onRowClick}
+      onClick={handleRowClick}
       sx={{ cursor: "pointer" }}
     >
+      {/* Checkbox */}
       <TablePrimaryCell padding="checkbox">
         <Checkbox color="primary" checked={isItemSelected} size="small" />
       </TablePrimaryCell>
+
+      {/* Mint Datetime */}
       <TablePrimaryCell>
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${row.TxHash}`}
-          target="__blank"
+          href={`https://arbiscan.io/tx/${TxHash}`}
+          target="_blank"
         >
-          {convertTimestampToDateTime(row.TimeStamp)}
+          {convertTimestampToDateTime(TimeStamp)}
         </Link>
       </TablePrimaryCell>
+
+      {/* Token ID */}
       <TablePrimaryCell align="center">
         <Link
-          href={`/detail/${row.TokenId}`}
+          href={`/detail/${TokenId}`}
           sx={{ color: "inherit", fontSize: "inherit" }}
           target="_blank"
         >
-          {row.TokenId}
+          {TokenId}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.TokenName || " "}</TablePrimaryCell>
+
+      {/* Token Name */}
+      <TablePrimaryCell align="center">{TokenName || " "}</TablePrimaryCell>
+
+      {/* Round Number */}
       <TablePrimaryCell align="center">
         <Link
-          href={`/prize/${row.RoundNum}`}
+          href={`/prize/${RoundNum}`}
           style={{ color: "inherit", fontSize: "inherit" }}
           target="_blank"
         >
-          {row.RoundNum}
+          {RoundNum}
         </Link>
       </TablePrimaryCell>
+
+      {/* Winner Address */}
       <TablePrimaryCell align="center">
-        <AddressLink address={row.WinnerAddr} url={`/user/${row.WinnerAddr}`} />
+        <AddressLink address={WinnerAddr} url={`/user/${WinnerAddr}`} />
       </TablePrimaryCell>
+
+      {/* Stake Button */}
       <TablePrimaryCell align="center">
-        {!row.Staked ? (
-          <Button size="small" onClick={onStakeClick}>
+        {!Staked && (
+          <Button size="small" onClick={handleStakeClick}>
             Stake
           </Button>
-        ) : (
-          " "
         )}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
+/* ------------------------------------------------------------------
+  Main Component: CSTokensTable
+  Renders a paginated table of CSTokens with "stake" functionality.
+------------------------------------------------------------------ */
 export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   const perPage = 5;
-  const [anchorEl, setAnchorEl] = useState(null);
+
+  // Pagination
   const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState([]);
 
-  // Memoized pageItems to avoid recomputing on every render
-  const pageItems = useMemo(
-    () => list.slice((page - 1) * perPage, page * perPage),
-    [list, page]
-  );
+  // Menu anchor (for "Select All / Current Page / None")
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  const isSelected = (id) => selected.includes(id);
+  // Track selected Token IDs
+  const [selectedTokenIds, setSelectedTokenIds] = useState([]);
 
-  const handleClick = (id) => {
-    setSelected((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((selectedId) => selectedId !== id)
-        : [...prevSelected, id]
-    );
-  };
-
-  const onSelectAllClick = () => {
-    setSelected(list.map((n) => n.TokenId));
-    setAnchorEl(null);
-  };
-
-  const onSelectCurPgClick = () => {
-    setSelected(pageItems.map((n) => n.TokenId));
-    setAnchorEl(null);
-  };
-
-  const onSelectNoneClick = () => {
-    setSelected([]);
-    setAnchorEl(null);
-  };
-
-  const onStakeMany = async () => {
-    await handleStakeMany(selected, false);
-  };
-
-  const onStake = async (id) => {
-    setSelected([id]);
-    await handleStake(id, false);
-  };
-
+  // Refresh selection and pagination when the list changes
   useEffect(() => {
-    setSelected([]);
+    setSelectedTokenIds([]);
     setPage(1);
   }, [list]);
 
+  // Slice the data for the current page
+  const pageItems = useMemo(() => {
+    const startIndex = (page - 1) * perPage;
+    const endIndex = page * perPage;
+    return list.slice(startIndex, endIndex);
+  }, [list, page]);
+
+  // Check if a token is selected
+  const isSelected = (id) => selectedTokenIds.includes(id);
+
+  // Toggle selection of a single row
+  const handleSelectToggle = (id) => {
+    setSelectedTokenIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  // Close the select menu
+  const handleCloseMenu = () => setAnchorEl(null);
+
+  // "Select All" from the entire list
+  const handleSelectAll = () => {
+    setSelectedTokenIds(list.map((row) => row.TokenId));
+    handleCloseMenu();
+  };
+
+  // "Select Current Page" only
+  const handleSelectCurrentPage = () => {
+    setSelectedTokenIds(pageItems.map((row) => row.TokenId));
+    handleCloseMenu();
+  };
+
+  // "Select None"
+  const handleSelectNone = () => {
+    setSelectedTokenIds([]);
+    handleCloseMenu();
+  };
+
+  // Single-stake
+  const handleStakeSingle = async (id) => {
+    // Temporarily set only this ID as selected
+    setSelectedTokenIds([id]);
+    await handleStake(id, false);
+  };
+
+  // Stake many tokens
+  const handleStakeManySelected = async () => {
+    await handleStakeMany(selectedTokenIds, false);
+  };
+
+  // If the list is empty
   if (list.length === 0) {
     return <Typography>No available tokens.</Typography>;
   }
 
+  /* ------------------------------------------------------------------
+    Render
+  ------------------------------------------------------------------ */
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {/* (Optional) Column widths for non-mobile devices */}
           {!isMobile && (
             <colgroup>
-              <col width="2%" />
-              <col width="30%" />
-              <col width="15%" />
-              <col width="20%" />
-              <col width="5%" />
-              <col width="20%" />
               <col width="3%" />
+              <col width="25%" />
+              <col width="10%" />
+              <col width="15%" />
+              <col width="10%" />
+              <col width="25%" />
+              <col width="12%" />
             </colgroup>
           )}
+
           <TablePrimaryHead>
             <Tr>
+              {/* Checkbox + Select Menu */}
               <TablePrimaryHeadCell padding="checkbox" align="left">
                 <Box
                   sx={{
-                    display: {
-                      md: "flex",
-                      sm: "flex",
-                      xs: "none",
-                    },
+                    display: { md: "flex", sm: "flex", xs: "none" },
                     alignItems: "center",
                     cursor: "pointer",
                   }}
@@ -184,47 +231,42 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
                     color="info"
                     size="small"
                     indeterminate={
-                      selected.length > 0 && selected.length < list.length
+                      selectedTokenIds.length > 0 &&
+                      selectedTokenIds.length < list.length
                     }
-                    checked={list.length > 0 && selected.length === list.length}
+                    checked={
+                      list.length > 0 && selectedTokenIds.length === list.length
+                    }
                   />
                   {Boolean(anchorEl) ? <ExpandLess /> : <ExpandMore />}
                 </Box>
                 <Menu
                   elevation={0}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "center",
-                  }}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  transformOrigin={{ vertical: "top", horizontal: "center" }}
                   anchorEl={anchorEl}
                   keepMounted
                   open={Boolean(anchorEl)}
-                  onClose={() => setAnchorEl(null)}
+                  onClose={handleCloseMenu}
                 >
-                  <MenuItem
-                    style={{ minWidth: 166 }}
-                    onClick={onSelectAllClick}
-                  >
+                  <MenuItem style={{ minWidth: 166 }} onClick={handleSelectAll}>
                     <Typography>Select All</Typography>
                   </MenuItem>
                   <MenuItem
                     style={{ minWidth: 166 }}
-                    onClick={onSelectCurPgClick}
+                    onClick={handleSelectCurrentPage}
                   >
                     <Typography>Select Current Page</Typography>
                   </MenuItem>
                   <MenuItem
                     style={{ minWidth: 166 }}
-                    onClick={onSelectNoneClick}
+                    onClick={handleSelectNone}
                   >
                     <Typography>Select None</Typography>
                   </MenuItem>
                 </Menu>
               </TablePrimaryHeadCell>
+
               <TablePrimaryHeadCell align="left">
                 Mint Datetime
               </TablePrimaryHeadCell>
@@ -235,26 +277,32 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
               <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
+
+          {/* Table Body */}
           <TableBody>
             {pageItems.map((row) => (
-              <CSTokensRow
+              <CSTokenRow
                 key={row.EvtLogId}
                 row={row}
-                handleStake={onStake}
                 isItemSelected={isSelected(row.TokenId)}
-                handleClick={handleClick}
+                onSelectToggle={handleSelectToggle}
+                onStakeSingle={handleStakeSingle}
               />
             ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      {selected.length > 1 && (
+
+      {/* Stake Many button */}
+      {selectedTokenIds.length > 1 && (
         <Box display="flex" justifyContent="end" mt={2}>
-          <Button variant="text" onClick={onStakeMany}>
+          <Button variant="text" onClick={handleStakeManySelected}>
             Stake Many
           </Button>
         </Box>
       )}
+
+      {/* Pagination */}
       <CustomPagination
         page={page}
         setPage={setPage}
