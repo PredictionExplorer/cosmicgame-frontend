@@ -21,112 +21,181 @@ import {
 import { convertTimestampToDateTime, getAssetsUrl } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import api from "../services/api";
-import NFTImage from "./NFTImage";
 import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
+import api from "../services/api";
+import NFTImage from "./NFTImage";
 
-const StakedTokensRow = ({
-  row,
-  handleUnstake,
-  isItemSelected,
-  handleClick,
-  IsRwalk,
-}) => {
-  const [tokenName, setTokenName] = useState("");
+/* ------------------------------------------------------------------
+  Types (TypeScript) - adjust or remove if not using TypeScript
+------------------------------------------------------------------ */
 
-  const tokenImageURL = useMemo(() => {
-    const fileName = (IsRwalk ? row.StakedTokenId : row.TokenInfo.Seed)
-      .toString()
-      .padStart(6, "0");
-    return IsRwalk
-      ? getAssetsUrl(`randomwalk/${fileName}_black_thumb.jpg`)
-      : getAssetsUrl(`cosmicsignature/0x${fileName}.png`);
-  }, [IsRwalk, row]);
+interface RandomWalkRow {
+  StakeActionId: number;
+  StakedTokenId: number;
+  StakeTimeStamp: number;
+}
+
+interface CosmicSignatureTokenInfo {
+  TokenId: number;
+  Seed: number;
+  StakeActionId: number;
+}
+
+interface CosmicSignatureRow {
+  TokenInfo: CosmicSignatureTokenInfo;
+  StakeTimeStamp: number;
+}
+
+type StakedRow = RandomWalkRow | CosmicSignatureRow;
+
+/* ------------------------------------------------------------------
+  Custom Hook: useTokenName
+  Fetches the token name from your API if available.
+------------------------------------------------------------------ */
+function useTokenName(
+  isRandomWalk: boolean,
+  randomWalkId?: number,
+  cosmicSignatureInfo?: CosmicSignatureTokenInfo
+) {
+  const [tokenName, setTokenName] = useState<string>("");
 
   useEffect(() => {
-    const getTokenName = async () => {
-      if (IsRwalk) {
-        const res = await api.get_info(row.StakedTokenId);
-        setTokenName(res.CurName);
-      } else {
-        const names = await api.get_name_history(row.TokenInfo.TokenId);
-        if (names.length > 0) {
-          setTokenName(names[names.length - 1].TokenName);
+    const fetchName = async () => {
+      try {
+        if (isRandomWalk && typeof randomWalkId === "number") {
+          const res = await api.get_info(randomWalkId);
+          setTokenName(res?.CurName || "");
+        } else if (!isRandomWalk && cosmicSignatureInfo?.TokenId) {
+          const names = await api.get_name_history(cosmicSignatureInfo.TokenId);
+          if (names.length > 0) {
+            setTokenName(names[names.length - 1].TokenName);
+          }
         }
+      } catch (err) {
+        console.error("Error fetching token name:", err);
       }
     };
-    getTokenName();
-  }, []);
+    fetchName();
+  }, [isRandomWalk, randomWalkId, cosmicSignatureInfo]);
 
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
+  return tokenName;
+}
+
+/* ------------------------------------------------------------------
+  StakedTokenRow - Renders a single row in the table
+------------------------------------------------------------------ */
+interface StakedTokenRowProps {
+  row: StakedRow;
+  isRandomWalk: boolean;
+  isItemSelected: boolean;
+  onRowClick: (id: number) => void;
+  onUnstakeSingle: (id: number) => void;
+}
+
+const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
+  row,
+  isRandomWalk,
+  isItemSelected,
+  onRowClick,
+  onUnstakeSingle,
+}) => {
+  // Extract IDs
+  const stakeActionId = isRandomWalk
+    ? (row as RandomWalkRow).StakeActionId
+    : (row as CosmicSignatureRow).TokenInfo.StakeActionId;
+  const tokenId = isRandomWalk
+    ? (row as RandomWalkRow).StakedTokenId
+    : (row as CosmicSignatureRow).TokenInfo.TokenId;
+
+  // Grab the correct "seed" or "StakedTokenId" for generating the image
+  const seedOrRandomId = isRandomWalk
+    ? (row as RandomWalkRow).StakedTokenId
+    : (row as CosmicSignatureRow).TokenInfo.Seed;
+
+  const stakeTimeStamp = isRandomWalk
+    ? (row as RandomWalkRow).StakeTimeStamp
+    : (row as CosmicSignatureRow).StakeTimeStamp;
+
+  // Hook for token name
+  const tokenName = useTokenName(
+    isRandomWalk,
+    isRandomWalk ? tokenId : undefined,
+    !isRandomWalk ? (row as CosmicSignatureRow).TokenInfo : undefined
+  );
+
+  // Build the image URL
+  const tokenImageURL = useMemo(() => {
+    const fileName = seedOrRandomId.toString().padStart(6, "0");
+    return isRandomWalk
+      ? getAssetsUrl(`randomwalk/${fileName}_black_thumb.jpg`)
+      : getAssetsUrl(`cosmicsignature/0x${fileName}.png`);
+  }, [isRandomWalk, seedOrRandomId]);
+
+  if (!row) return null;
 
   return (
     <TablePrimaryRow
-      hover="true"
+      hover
       role="checkbox"
       aria-checked={isItemSelected}
       tabIndex={-1}
-      key={IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId}
+      key={stakeActionId}
       selected={isItemSelected}
-      onClick={() =>
-        handleClick(IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId)
-      }
+      onClick={() => onRowClick(stakeActionId)}
       sx={{ cursor: "pointer" }}
     >
       <TablePrimaryCell padding="checkbox">
         <Checkbox color="primary" checked={isItemSelected} size="small" />
       </TablePrimaryCell>
+
+      {/* Token Image + Name */}
       <TablePrimaryCell sx={{ width: "120px" }}>
         <NFTImage src={tokenImageURL} />
-        <Typography variant="caption" mt={1}>
+        <Typography variant="caption" mt={1} display="block">
           {tokenName}
         </Typography>
       </TablePrimaryCell>
+
+      {/* Token ID */}
       <TablePrimaryCell align="center">
         <Link
           href={
-            IsRwalk
-              ? `https://randomwalknft.com/detail/${row.StakedTokenId}`
-              : `/detail/${row.TokenInfo.TokenId}`
+            isRandomWalk
+              ? `https://randomwalknft.com/detail/${tokenId}`
+              : `/detail/${tokenId}`
           }
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
+          sx={{ color: "inherit", fontSize: "inherit" }}
           target="_blank"
         >
-          {IsRwalk ? row.StakedTokenId : row.TokenInfo.TokenId}
+          {tokenId}
         </Link>
       </TablePrimaryCell>
+
+      {/* Stake Action ID */}
       <TablePrimaryCell align="center">
         <Link
-          href={`/staking-action/${IsRwalk ? 1 : 0}/${
-            IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
-          }`}
-          sx={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
+          href={`/staking-action/${isRandomWalk ? 1 : 0}/${stakeActionId}`}
+          sx={{ color: "inherit", fontSize: "inherit" }}
           target="_blank"
         >
-          {IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId}
+          {stakeActionId}
         </Link>
       </TablePrimaryCell>
+
+      {/* Stake Time */}
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(row.StakeTimeStamp)}
+        {convertTimestampToDateTime(stakeTimeStamp)}
       </TablePrimaryCell>
+
+      {/* Unstake Button */}
       <TablePrimaryCell align="center">
         <Button
           size="small"
           sx={{ mr: 1 }}
           onClick={(e) => {
             e.stopPropagation();
-            handleUnstake(
-              IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
-            );
+            onUnstakeSingle(stakeActionId);
           }}
         >
           Unstake
@@ -136,74 +205,105 @@ const StakedTokensRow = ({
   );
 };
 
-export const StakedTokensTable = ({
+/* ------------------------------------------------------------------
+  StakedTokensTable - Renders the table of staked tokens
+------------------------------------------------------------------ */
+interface StakedTokensTableProps {
+  list: StakedRow[];
+  handleUnstake: (id: number, isRandomWalk?: boolean) => Promise<void>;
+  handleUnstakeMany: (ids: number[], isRandomWalk?: boolean) => Promise<void>;
+  IsRwalk: boolean;
+}
+
+export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
   list,
   handleUnstake,
   handleUnstakeMany,
   IsRwalk,
 }) => {
   const perPage = 5;
-  const [page, setPage] = useState(1);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selected, setSelected] = useState([]);
+  const [page, setPage] = useState<number>(1);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
+  // Sort by timestamp ascending
   const sortedList = useMemo(() => {
-    return [...list].sort((a, b) => a.StakeTimeStamp - b.StakeTimeStamp);
-  }, [list]);
+    return [...list].sort((a, b) => {
+      const aTime = IsRwalk
+        ? (a as RandomWalkRow).StakeTimeStamp
+        : (a as CosmicSignatureRow).StakeTimeStamp;
+      const bTime = IsRwalk
+        ? (b as RandomWalkRow).StakeTimeStamp
+        : (b as CosmicSignatureRow).StakeTimeStamp;
+      return aTime - bTime;
+    });
+  }, [list, IsRwalk]);
 
-  const isSelected = (id: number) => selected.includes(id);
+  // Check if ID is in selected array
+  const isSelected = (id: number) => selectedIds.includes(id);
 
-  const handleClick = (id: number) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected = [];
-
-    if (selectedIndex === -1) {
-      newSelected = [...selected, id];
-    } else {
-      newSelected = selected.filter((itemId) => itemId !== id);
-    }
-
-    setSelected(newSelected);
+  // Toggle selection for single row
+  const handleRowClick = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    );
   };
 
+  // "Select All"
   const onSelectAllClick = () => {
-    const newSelected = list.map((n) =>
-      IsRwalk ? n.StakeActionId : n.TokenInfo.StakeActionId
+    const newSelected = list.map((row) =>
+      IsRwalk
+        ? (row as RandomWalkRow).StakeActionId
+        : (row as CosmicSignatureRow).TokenInfo.StakeActionId
     );
-    setSelected(newSelected);
+    setSelectedIds(newSelected);
     setAnchorEl(null);
   };
 
+  // "Select Current Page"
   const onSelectCurPgClick = () => {
     const newSelected = sortedList
       .slice((page - 1) * perPage, page * perPage)
-      .map((n) => (IsRwalk ? n.StakeActionId : n.TokenInfo.StakeActionId));
-    setSelected(newSelected);
+      .map((row) =>
+        IsRwalk
+          ? (row as RandomWalkRow).StakeActionId
+          : (row as CosmicSignatureRow).TokenInfo.StakeActionId
+      );
+    setSelectedIds(newSelected);
     setAnchorEl(null);
   };
 
+  // "Select None"
   const onSelectNoneClick = () => {
-    setSelected([]);
+    setSelectedIds([]);
     setAnchorEl(null);
   };
 
-  const onUnstakeMany = async () => {
-    await handleUnstakeMany(selected, IsRwalk);
+  // Unstake multiple tokens
+  const onUnstakeManyClick = async () => {
+    await handleUnstakeMany(selectedIds, IsRwalk);
   };
 
-  const onUnstake = async (actionId: number) => {
-    setSelected([actionId]);
+  // Unstake a single token
+  const onUnstakeSingle = async (actionId: number) => {
+    // Temporarily set this as the only selected ID
+    setSelectedIds([actionId]);
     await handleUnstake(actionId, IsRwalk);
   };
 
+  // If there's no staked tokens
   if (list.length === 0) {
     return <Typography>No tokens yet.</Typography>;
   }
 
+  /* ------------------------------------------------------------------
+    Render
+  ------------------------------------------------------------------ */
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {/* Optional column widths for non-mobile */}
           {!isMobile && (
             <colgroup>
               <col width="5%" />
@@ -214,16 +314,14 @@ export const StakedTokensTable = ({
               <col width="20%" />
             </colgroup>
           )}
+
           <TablePrimaryHead>
             <Tr>
+              {/* Select All / Select Current Page / Select None */}
               <TablePrimaryHeadCell padding="checkbox" align="left">
                 <Box
                   sx={{
-                    display: {
-                      md: "flex",
-                      sm: "flex",
-                      xs: "none",
-                    },
+                    display: { md: "flex", sm: "flex", xs: "none" },
                     alignItems: "center",
                     cursor: "pointer",
                   }}
@@ -233,9 +331,11 @@ export const StakedTokensTable = ({
                     color="info"
                     size="small"
                     indeterminate={
-                      selected.length > 0 && selected.length < list.length
+                      selectedIds.length > 0 && selectedIds.length < list.length
                     }
-                    checked={list.length > 0 && selected.length === list.length}
+                    checked={
+                      list.length > 0 && selectedIds.length === list.length
+                    }
                   />
                   {anchorEl ? <ExpandLess /> : <ExpandMore />}
                 </Box>
@@ -274,6 +374,7 @@ export const StakedTokensTable = ({
                   </MenuItem>
                 </Menu>
               </TablePrimaryHeadCell>
+
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
@@ -281,33 +382,41 @@ export const StakedTokensTable = ({
               <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
+
+          {/* Table Body */}
           <TableBody>
             {sortedList
               .slice((page - 1) * perPage, page * perPage)
-              .map((row) => (
-                <StakedTokensRow
-                  key={
-                    IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
-                  }
-                  row={row}
-                  handleUnstake={onUnstake}
-                  isItemSelected={isSelected(
-                    IsRwalk ? row.StakeActionId : row.TokenInfo.StakeActionId
-                  )}
-                  handleClick={handleClick}
-                  IsRwalk={IsRwalk}
-                />
-              ))}
+              .map((row) => {
+                const stakeActionId = IsRwalk
+                  ? (row as RandomWalkRow).StakeActionId
+                  : (row as CosmicSignatureRow).TokenInfo.StakeActionId;
+
+                return (
+                  <StakedTokenRow
+                    key={stakeActionId}
+                    row={row}
+                    isRandomWalk={IsRwalk}
+                    isItemSelected={isSelected(stakeActionId)}
+                    onRowClick={handleRowClick}
+                    onUnstakeSingle={onUnstakeSingle}
+                  />
+                );
+              })}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      {selected.length > 1 && (
+
+      {/* Unstake Many Button */}
+      {selectedIds.length > 1 && (
         <Box display="flex" justifyContent="end" mt={2}>
-          <Button variant="text" onClick={onUnstakeMany}>
+          <Button variant="text" onClick={onUnstakeManyClick}>
             Unstake Many
           </Button>
         </Box>
       )}
+
+      {/* Pagination */}
       <CustomPagination
         page={page}
         setPage={setPage}
