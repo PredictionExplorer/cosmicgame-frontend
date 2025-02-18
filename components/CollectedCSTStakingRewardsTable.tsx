@@ -14,45 +14,73 @@ import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
 
-const CollectedCSTStakingRewardsRow = ({ row }) => {
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
+/* ------------------------------------------------------------------
+  Sub-Component: CollectedRewardsRow
+  Renders a single "collected staking reward" record.
+------------------------------------------------------------------ */
+const CollectedRewardsRow = ({ row }) => {
+  if (!row) return null;
+
+  const {
+    DepositTimeStamp,
+    DepositId,
+    RoundNum,
+    TotalDepositAmountEth,
+    YourCollectedAmountEth,
+  } = row;
 
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {convertTimestampToDateTime(row.DepositTimeStamp)}
+        {convertTimestampToDateTime(DepositTimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.DepositId}</TablePrimaryCell>
+
+      <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
+
       <TablePrimaryCell align="center">
         <Link
-          href={`/prize/${row.RoundNum}`}
+          href={`/prize/${RoundNum}`}
           style={{ color: "inherit", fontSize: "inherit" }}
         >
-          {row.RoundNum}
+          {RoundNum}
         </Link>
       </TablePrimaryCell>
+
       <TablePrimaryCell align="center">
-        {row.TotalDepositAmountEth.toFixed(6)}
+        {TotalDepositAmountEth.toFixed(6)}
       </TablePrimaryCell>
+
       <TablePrimaryCell align="center">
-        {row.YourCollectedAmountEth.toFixed(6)}
+        {YourCollectedAmountEth.toFixed(6)}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
+/* ------------------------------------------------------------------
+  Main Component: CollectedCSTStakingRewardsTable
+  Displays a paginated list of previously collected staking rewards.
+------------------------------------------------------------------ */
 export const CollectedCSTStakingRewardsTable = ({ list }) => {
-  const perPage = 5;
-  const [page, setPage] = useState(1);
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const PER_PAGE = 5;
+
+  // Early return if no data
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
+
+  // Slice data for the current page
+  const startIndex = (currentPage - 1) * PER_PAGE;
+  const endIndex = currentPage * PER_PAGE;
+  const currentData = list.slice(startIndex, endIndex);
+
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {/* Optional: Column widths for non-mobile views */}
           {!isMobile && (
             <colgroup>
               <col width="20%" />
@@ -62,12 +90,14 @@ export const CollectedCSTStakingRewardsTable = ({ list }) => {
               <col width="20%" />
             </colgroup>
           )}
+
+          {/* Table Header */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">
                 Deposit Datetime
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Deposit ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Amount (ETH)</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
@@ -75,18 +105,22 @@ export const CollectedCSTStakingRewardsTable = ({ list }) => {
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
+
+          {/* Table Body */}
           <TableBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <CollectedCSTStakingRewardsRow row={row} key={row.EvtLogId} />
+            {currentData.map((row) => (
+              <CollectedRewardsRow key={row.EvtLogId} row={row} />
             ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
+
+      {/* Pagination */}
       <CustomPagination
-        page={page}
-        setPage={setPage}
+        page={currentPage}
+        setPage={setCurrentPage}
         totalLength={list.length}
-        perPage={perPage}
+        perPage={PER_PAGE}
       />
     </>
   );
