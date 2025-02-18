@@ -30,7 +30,7 @@ const CTBalanceDistributionRow = ({ row }) => {
   );
 };
 
-const CTBalanceDistributionTable = ({ list }) => {
+export const CTBalanceDistributionTable = ({ list }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
   if (list.length === 0) {
@@ -66,5 +66,3 @@ const CTBalanceDistributionTable = ({ list }) => {
     </>
   );
 };
-
-export default CTBalanceDistributionTable;
