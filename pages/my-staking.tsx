@@ -447,72 +447,66 @@ const MyStaking = () => {
   }, [cosmicGameContract]);
 
   // Fetch CST user data
-  const fetchCSTData = useCallback(
-    async (addr: string) => {
-      setLoading(true);
-      try {
-        const [cstActions, cstUserTokens, cstUserRewards] = await Promise.all([
-          api.get_staking_cst_actions_by_user(addr),
-          api.get_cst_tokens_by_user(addr),
-          api.get_staking_rewards_by_user(addr),
-        ]);
+  const fetchCSTData = useCallback(async (addr: string) => {
+    setLoading(true);
+    try {
+      const [cstActions, cstUserTokens, cstUserRewards] = await Promise.all([
+        api.get_staking_cst_actions_by_user(addr),
+        api.get_cst_tokens_by_user(addr),
+        api.get_staking_rewards_by_user(addr),
+      ]);
 
-        setStakingCSTActions(cstActions);
-        setCSTokens(
-          cstUserTokens.filter((x: any) => !x.WasUnstaked) // only show tokens that are truly "unstaked"
-        );
-        setStakingRewards(cstUserRewards);
+      setStakingCSTActions(cstActions);
+      setCSTokens(
+        cstUserTokens.filter((x: any) => !x.WasUnstaked) // only show tokens that are truly "unstaked"
+      );
+      setStakingRewards(cstUserRewards);
 
-        // Refresh staked token context
-        fetchStakedTokens();
-      } catch (err) {
-        handleError(err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchStakedTokens, handleError]
-  );
+      // Refresh staked token context
+      fetchStakedTokens();
+    } catch (err) {
+      handleError(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Fetch RWLK user data
-  const fetchRWLKData = useCallback(
-    async (addr: string) => {
-      try {
-        setLoading(true);
+  const fetchRWLKData = useCallback(async (addr: string) => {
+    try {
+      setLoading(true);
 
-        // Staking Actions + Reward Mints
-        const [rwalkActions, rwalkMintEvents] = await Promise.all([
-          api.get_staking_rwalk_actions_by_user(addr),
-          api.get_staking_rwalk_mints_by_user(addr),
-        ]);
-        setStakingRWLKActions(rwalkActions);
-        setRwlkMints(rwalkMintEvents);
+      // Staking Actions + Reward Mints
+      const [rwalkActions, rwalkMintEvents] = await Promise.all([
+        api.get_staking_rwalk_actions_by_user(addr),
+        api.get_staking_rwalk_mints_by_user(addr),
+      ]);
+      setStakingRWLKActions(rwalkActions);
+      setRwlkMints(rwalkMintEvents);
 
-        // Refresh context
-        fetchStakedTokens();
+      // Refresh context
+      fetchStakedTokens();
 
-        // Filter user-owned token IDs that are not staked
-        const stakedIds = stakedRWLKTokens.map((x) => x.StakedTokenId);
-        const userOwned = await rwalkContract.walletOfOwner(addr);
-        const rawIds = userOwned.map((t: any) => t.toNumber()).sort();
+      // Filter user-owned token IDs that are not staked
+      const stakedIds = stakedRWLKTokens.map((x) => x.StakedTokenId);
+      const userOwned = await rwalkContract.walletOfOwner(addr);
+      const rawIds = userOwned.map((t: any) => t.toNumber()).sort();
 
-        // Exclude tokens that are staked or in some partial action
-        const filteredIds = rawIds.filter(
-          (id) =>
-            !stakedIds.includes(id) &&
-            !rwalkActions.some(
-              (action: any) => action.ActionType !== 1 && action.TokenId === id
-            )
-        );
-        setRwlkTokens(filteredIds);
-      } catch (err) {
-        handleError(err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchStakedTokens, rwalkContract, stakedRWLKTokens, handleError]
-  );
+      // Exclude tokens that are staked or in some partial action
+      const filteredIds = rawIds.filter(
+        (id) =>
+          !stakedIds.includes(id) &&
+          !rwalkActions.some(
+            (action: any) => action.ActionType !== 1 && action.TokenId === id
+          )
+      );
+      setRwlkTokens(filteredIds);
+    } catch (err) {
+      handleError(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // Tab change handler
   const handleTabChange = (_event: any, newValue: number) => {
