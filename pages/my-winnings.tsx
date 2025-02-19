@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, Link, TableBody, Typography } from "@mui/material";
+import router from "next/router";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { GetServerSideProps } from "next";
+
+// Styled & Utilities
 import {
   MainWrapper,
   TablePrimary,
@@ -10,24 +16,25 @@ import {
   TablePrimaryRow,
 } from "../components/styled";
 import { convertTimestampToDateTime, logoImgUrl } from "../utils";
-import DonatedNFTTable from "../components/DonatedNFTTable";
+import { CustomPagination } from "../components/CustomPagination";
+import getErrorMessage from "../utils/alert";
+
+// Hooks & Context
 import { useActiveWeb3React } from "../hooks/web3";
 import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
-import router from "next/router";
 import { useApiData } from "../contexts/ApiDataContext";
-import api from "../services/api";
-import { Tr } from "react-super-responsive-table";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { CustomPagination } from "../components/CustomPagination";
-import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
-import { GetServerSideProps } from "next";
+
+// Services
+import api from "../services/api";
+
+// Components
+import DonatedNFTTable from "../components/DonatedNFTTable";
 
 /* ------------------------------------------------------------------
   Types
 ------------------------------------------------------------------ */
-
 interface RaffleWinning {
   EvtLogId: number;
   TxHash: string;
@@ -39,7 +46,7 @@ interface RaffleWinning {
 /* ------------------------------------------------------------------
   Custom Hook: useUnclaimedWinnings
 ------------------------------------------------------------------ */
-const useUnclaimedWinnings = (account: string | null | undefined) => {
+function useUnclaimedWinnings(account: string | null | undefined) {
   const [donatedNFTs, setDonatedNFTs] = useState<any[] | null>(null);
   const [raffleETHWinnings, setRaffleETHWinnings] = useState<
     RaffleWinning[] | null
@@ -54,6 +61,7 @@ const useUnclaimedWinnings = (account: string | null | undefined) => {
     if (!account) return;
     setLoading(true);
     setError(null);
+
     try {
       const [nfts, deposits, cstRewards] = await Promise.all([
         api.get_unclaimed_donated_nft_by_user(account),
@@ -61,14 +69,14 @@ const useUnclaimedWinnings = (account: string | null | undefined) => {
         api.get_staking_cst_rewards_to_claim_by_user(account),
       ]);
 
-      // Sort data for consistent ordering
+      // Sort data for consistency
       setDonatedNFTs(nfts.sort((a: any, b: any) => a.TimeStamp - b.TimeStamp));
       setRaffleETHWinnings(
         deposits.sort((a: any, b: any) => b.TimeStamp - a.TimeStamp)
       );
       setCstStakingRewards(cstRewards);
     } catch (err) {
-      console.error("Error fetching unclaimed data", err);
+      console.error("Error fetching unclaimed data:", err);
       setError("Failed to load unclaimed winnings data");
     } finally {
       setLoading(false);
@@ -77,6 +85,7 @@ const useUnclaimedWinnings = (account: string | null | undefined) => {
 
   useEffect(() => {
     fetchUnclaimedData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
 
   return {
@@ -87,17 +96,18 @@ const useUnclaimedWinnings = (account: string | null | undefined) => {
     error,
     refetch: fetchUnclaimedData,
   };
-};
+}
 
 /* ------------------------------------------------------------------
   Sub-Components
 ------------------------------------------------------------------ */
 
-// Table row for Raffle Winnings
-const MyWinningsRow = ({ winning }: { winning: RaffleWinning }) => {
+/** Table Row for a single raffle winning */
+function RaffleWinningRow({ winning }: { winning: RaffleWinning }) {
   if (!winning) return <TablePrimaryRow />;
 
   const { TxHash, TimeStamp, RoundNum, Amount } = winning;
+
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
@@ -105,7 +115,7 @@ const MyWinningsRow = ({ winning }: { winning: RaffleWinning }) => {
           color="inherit"
           fontSize="inherit"
           href={`https://arbiscan.io/tx/${TxHash}`}
-          target="__blank"
+          target="_blank"
         >
           {convertTimestampToDateTime(TimeStamp)}
         </Link>
@@ -122,39 +132,41 @@ const MyWinningsRow = ({ winning }: { winning: RaffleWinning }) => {
       <TablePrimaryCell align="right">{Amount.toFixed(7)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
-};
+}
 
-// Table for Raffle Winnings
-const MyWinningsTable = ({ list }: { list: RaffleWinning[] }) => (
-  <TablePrimaryContainer>
-    <TablePrimary>
-      <TablePrimaryHead>
-        <Tr>
-          <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-          <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-          <TablePrimaryHeadCell align="right">
-            Amount (ETH)
-          </TablePrimaryHeadCell>
-        </Tr>
-      </TablePrimaryHead>
-      <TableBody>
-        {list.map((winning) => (
-          <MyWinningsRow key={winning.EvtLogId} winning={winning} />
-        ))}
-      </TableBody>
-    </TablePrimary>
-  </TablePrimaryContainer>
-);
+/** Table layout for raffle winnings */
+function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
+  return (
+    <TablePrimaryContainer>
+      <TablePrimary>
+        <TablePrimaryHead>
+          <Tr>
+            <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="right">
+              Amount (ETH)
+            </TablePrimaryHeadCell>
+          </Tr>
+        </TablePrimaryHead>
+        <TableBody>
+          {list.map((winning) => (
+            <RaffleWinningRow key={winning.EvtLogId} winning={winning} />
+          ))}
+        </TableBody>
+      </TablePrimary>
+    </TablePrimaryContainer>
+  );
+}
 
 /* ------------------------------------------------------------------
-  Main Component
+  Main Component: MyWinnings
 ------------------------------------------------------------------ */
-const MyWinnings = () => {
+export default function MyWinnings() {
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
 
-  // Combine all "unclaimed" data into one custom hook
+  // Get unclaimed winnings data (donated NFTs, raffle ETH, CST staking rewards)
   const {
     donatedNFTs,
     raffleETHWinnings,
@@ -164,11 +176,11 @@ const MyWinnings = () => {
     refetch,
   } = useUnclaimedWinnings(account);
 
-  // Contract Hooks
+  // Smart contract hooks
   const cosmicGameContract = useCosmicGameContract();
   const raffleWalletContract = useRaffleWalletContract();
 
-  // UI State
+  // Local UI states
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
@@ -181,11 +193,14 @@ const MyWinnings = () => {
   /* ------------------------------------------------------------------
     Handlers
   ------------------------------------------------------------------ */
+
+  // Claim all ETH from raffle contract
   const handleAllETHClaim = async () => {
     setIsClaiming((prev) => ({ ...prev, raffleETH: true }));
     try {
       await raffleWalletContract.withdraw();
-      // Re-fetch global statuses after short delay
+
+      // Refresh status and unclaimed data after short delay
       setTimeout(() => {
         fetchStatusData();
         refetch();
@@ -201,10 +216,13 @@ const MyWinnings = () => {
     }
   };
 
+  // Claim a single donated NFT
   const handleDonatedNFTsClaim = async (tokenID: number) => {
     setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
       await cosmicGameContract.claimDonatedNFT(tokenID);
+
+      // Refresh data
       setTimeout(() => {
         fetchStatusData();
         refetch();
@@ -216,17 +234,20 @@ const MyWinnings = () => {
         setNotification({ text: msg, type: "error", visible: true });
       }
     } finally {
+      // Remove token from "claiming" state
       setClaimingDonatedNFTs((prev) => prev.filter((id) => id !== tokenID));
     }
   };
 
+  // Claim all donated NFTs
   const handleAllDonatedNFTsClaim = async () => {
     if (!donatedNFTs) return;
     setIsClaiming((prev) => ({ ...prev, donatedNFT: true }));
+
     try {
-      // Indices for all unclaimed NFTs
       const indexList = donatedNFTs.map((item) => item.Index);
       await cosmicGameContract.claimManyDonatedNFTs(indexList);
+
       setTimeout(() => {
         fetchStatusData();
         refetch();
@@ -246,7 +267,7 @@ const MyWinnings = () => {
     Render
   ------------------------------------------------------------------ */
 
-  // Early return if user is not connected
+  // If user is not connected
   if (!account) {
     return (
       <MainWrapper>
@@ -296,7 +317,7 @@ const MyWinnings = () => {
           <Typography>No winnings yet.</Typography>
         ) : (
           <>
-            <MyWinningsTable
+            <RaffleWinningsTable
               list={raffleETHWinnings.slice(
                 (currentPage - 1) * perPage,
                 currentPage * perPage
@@ -336,7 +357,7 @@ const MyWinnings = () => {
         )}
       </Box>
 
-      {/* CST Staking Rewards Section (Currently no claim functionality shown) */}
+      {/* CST Staking Rewards Section */}
       <Box mt={6}>
         <Typography variant="h5" mb={2}>
           Claimable CST Staking Rewards
@@ -364,7 +385,6 @@ const MyWinnings = () => {
             </Button>
           )}
         </Box>
-
         {loading && donatedNFTs === null ? (
           <Typography>Loading...</Typography>
         ) : !donatedNFTs || donatedNFTs.length === 0 ? (
@@ -389,10 +409,10 @@ const MyWinnings = () => {
       </Box>
     </MainWrapper>
   );
-};
+}
 
 /* ------------------------------------------------------------------
-  Server-Side Rendering (SEO Config)
+  getServerSideProps (SEO config)
 ------------------------------------------------------------------ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Pending Winnings | Cosmic Signature";
@@ -409,5 +429,3 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   return { props: { title, description, openGraphData } };
 };
-
-export default MyWinnings;
