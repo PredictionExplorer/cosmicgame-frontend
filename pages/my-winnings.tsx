@@ -31,6 +31,7 @@ import api from "../services/api";
 
 // Components
 import DonatedNFTTable from "../components/DonatedNFTTable";
+import { UncollectedCSTStakingRewardsTable } from "../components/UncollectedCSTStakingRewardsTable";
 
 /* ------------------------------------------------------------------
   Types
@@ -367,7 +368,7 @@ export default function MyWinnings() {
         ) : !cstStakingRewards || cstStakingRewards.length === 0 ? (
           <Typography>No winnings yet.</Typography>
         ) : (
-          <Typography>Rewards are loaded. (Claim UI TBD)</Typography>
+          <UncollectedCSTStakingRewardsTable list={cstStakingRewards} />
         )}
       </Box>
 
