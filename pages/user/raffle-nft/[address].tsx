@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Box, Link, TableBody, Typography } from "@mui/material";
 import { GetServerSidePropsContext } from "next";
 import { ethers } from "ethers";
+
 import api from "../../../services/api";
+import { logoImgUrl, convertTimestampToDateTime } from "../../../utils";
+import { CustomPagination } from "../../../components/CustomPagination";
+
 import {
   MainWrapper,
   TablePrimary,
@@ -12,15 +16,31 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../../../components/styled";
+
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { convertTimestampToDateTime, logoImgUrl } from "../../../utils";
-import { CustomPagination } from "../../../components/CustomPagination";
 
-const NFTWinningsRow = ({ row }) => {
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
+/* ------------------------------------------------------------------
+  Types
+------------------------------------------------------------------ */
+interface RaffleNFTWinning {
+  EvtLogId: number;
+  TxHash: string;
+  TimeStamp: number;
+  RoundNum: number;
+  IsRWalk: boolean;
+  IsStaker: boolean;
+  TokenId: number;
+}
+
+/* ------------------------------------------------------------------
+  Sub-Component: NFTWinningsRow
+  Renders a single row in the table for Raffle NFT winnings.
+------------------------------------------------------------------ */
+function NFTWinningsRow({ row }: { row: RaffleNFTWinning }) {
+  if (!row) return <TablePrimaryRow />;
+
+  const { TxHash, TimeStamp, RoundNum, IsRWalk, IsStaker, TokenId } = row;
 
   return (
     <TablePrimaryRow>
@@ -28,52 +48,66 @@ const NFTWinningsRow = ({ row }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${row.TxHash}`}
-          target="__blank"
+          href={`https://arbiscan.io/tx/${TxHash}`}
+          target="_blank"
         >
-          {convertTimestampToDateTime(row.TimeStamp)}
+          {convertTimestampToDateTime(TimeStamp)}
         </Link>
       </TablePrimaryCell>
+
       <TablePrimaryCell align="center">
         <Link
-          href={`/prize/${row.RoundNum}`}
+          href={`/prize/${RoundNum}`}
+          style={{
+            color: "inherit",
+            fontSize: "inherit",
+            fontFamily: "monospace",
+          }}
+          target="_blank"
+        >
+          {RoundNum}
+        </Link>
+      </TablePrimaryCell>
+
+      <TablePrimaryCell align="center">
+        {IsRWalk ? "Yes" : "No"}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {IsStaker ? "Yes" : "No"}
+      </TablePrimaryCell>
+
+      <TablePrimaryCell align="center">
+        <Link
+          href={`/detail/${TokenId}`}
           style={{
             color: "inherit",
             fontSize: "inherit",
             fontFamily: "monospace",
           }}
         >
-          {row.RoundNum}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {row.IsRWalk ? "Yes" : "No"}
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {row.IsStaker ? "Yes" : "No"}
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        <Link
-          href={`/detail/${row.TokenId}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
-          }}
-        >
-          {row.TokenId}
+          {TokenId}
         </Link>
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
-};
+}
 
-const NFTWinningsTable = ({ list }) => {
-  const perPage = 10;
-  const [page, setPage] = useState(1);
-  if (list.length === 0) {
+/* ------------------------------------------------------------------
+  Sub-Component: NFTWinningsTable
+  Renders the entire table of Raffle NFT winnings, with pagination.
+------------------------------------------------------------------ */
+function NFTWinningsTable({ list }: { list: RaffleNFTWinning[] }) {
+  const PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  if (!list.length) {
     return <Typography>No NFT winnings yet.</Typography>;
   }
+
+  const startIndex = (currentPage - 1) * PER_PAGE;
+  const endIndex = currentPage * PER_PAGE;
+  const currentItems = list.slice(startIndex, endIndex);
+
   return (
     <>
       <TablePrimaryContainer>
@@ -84,87 +118,122 @@ const NFTWinningsTable = ({ list }) => {
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Is RandomWalk</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Is Staker</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token Id</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
+            {currentItems.map((row) => (
               <NFTWinningsRow key={row.EvtLogId} row={row} />
             ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
+
       <CustomPagination
-        page={page}
-        setPage={setPage}
+        page={currentPage}
+        setPage={setCurrentPage}
         totalLength={list.length}
-        perPage={perPage}
+        perPage={PER_PAGE}
       />
     </>
   );
-};
-const UserRaffleNFT = ({ address }) => {
-  const [raffleNfts, setRaffleNfts] = useState({
+}
+
+/* ------------------------------------------------------------------
+  Custom Hook: useRaffleNFTWinnings
+  Fetches and sorts the user's raffle NFT winnings.
+------------------------------------------------------------------ */
+function useRaffleNFTWinnings(userAddress: string) {
+  const [raffleNfts, setRaffleNfts] = useState<{
+    data: RaffleNFTWinning[];
+    loading: boolean;
+  }>({
     data: [],
     loading: false,
   });
-  const [invalidAddress, setInvalidAddress] = useState(false);
 
-  const fetchRaffleETHDeposits = async () => {
+  const fetchRaffleNFTWinnings = async () => {
     setRaffleNfts((prev) => ({ ...prev, loading: true }));
-    let winnings = await api.get_raffle_nft_winnings_by_user(address);
-    winnings = winnings.sort((a, b) => b.TimeStamp - a.TimeStamp);
-    setRaffleNfts({ data: winnings, loading: false });
+    try {
+      const response = await api.get_raffle_nft_winnings_by_user(userAddress);
+      const sorted = response.sort(
+        (a: RaffleNFTWinning, b: RaffleNFTWinning) => b.TimeStamp - a.TimeStamp
+      );
+      setRaffleNfts({ data: sorted, loading: false });
+    } catch (err) {
+      console.error("Error fetching raffle NFT winnings:", err);
+      setRaffleNfts({ data: [], loading: false });
+    }
   };
 
+  return { raffleNfts, fetchRaffleNFTWinnings };
+}
+
+/* ------------------------------------------------------------------
+  Main Component: UserRaffleNFT
+------------------------------------------------------------------ */
+function UserRaffleNFT({ address }: { address: string }) {
+  const [invalidAddress, setInvalidAddress] = useState(false);
+
+  const { raffleNfts, fetchRaffleNFTWinnings } = useRaffleNFTWinnings(address);
+
+  // On mount / address changes
   useEffect(() => {
-    if (address) {
-      if (address !== "Invalid Address") {
-        fetchRaffleETHDeposits();
-      } else {
-        setInvalidAddress(true);
-      }
+    if (!address || address === "Invalid Address") {
+      setInvalidAddress(true);
+    } else {
+      fetchRaffleNFTWinnings();
     }
-  }, [address]);
+  }, [address, fetchRaffleNFTWinnings]);
+
+  if (invalidAddress) {
+    return (
+      <MainWrapper>
+        <Typography variant="h6">Invalid Address</Typography>
+      </MainWrapper>
+    );
+  }
 
   return (
     <MainWrapper>
-      {invalidAddress ? (
-        <Typography variant="h6">Invalid Address</Typography>
-      ) : (
-        <>
-          <Box mb={4}>
-            <Typography variant="h6" color="primary" component="span" mr={2}>
-              User
-            </Typography>
-            <Typography variant="h6" component="span" fontFamily="monospace">
-              {address}
-            </Typography>
-          </Box>
-          <Box mt={4}>
-            <Typography variant="h6" lineHeight={1} mb={2}>
-              Raffle NFTs User Won
-            </Typography>
-            {raffleNfts.loading ? (
-              <Typography variant="h6">Loading...</Typography>
-            ) : (
-              <NFTWinningsTable list={raffleNfts.data} />
-            )}
-          </Box>
-        </>
-      )}
+      <Box mb={4}>
+        <Typography variant="h6" color="primary" component="span" mr={2}>
+          User
+        </Typography>
+        <Typography variant="h6" component="span" fontFamily="monospace">
+          {address}
+        </Typography>
+      </Box>
+
+      <Box mt={4}>
+        <Typography variant="h6" lineHeight={1} mb={2}>
+          Raffle NFTs User Won
+        </Typography>
+
+        {raffleNfts.loading ? (
+          <Typography variant="h6">Loading...</Typography>
+        ) : (
+          <NFTWinningsTable list={raffleNfts.data} />
+        )}
+      </Box>
     </MainWrapper>
   );
-};
+}
 
+/* ------------------------------------------------------------------
+  getServerSideProps
+------------------------------------------------------------------ */
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const params = context.params!.address;
-  let address = Array.isArray(params) ? params[0] : params;
+  const param = context.params!.address;
+  let address = Array.isArray(param) ? param[0] : param;
+
+  // Validate address
   if (ethers.utils.isAddress(address.toLowerCase())) {
     address = ethers.utils.getAddress(address.toLowerCase());
   } else {
     address = "Invalid Address";
   }
+
   const title = `Raffle NFT User(${address}) Won | Cosmic Signature`;
   const description = `Raffle NFT User(${address}) Won`;
 
