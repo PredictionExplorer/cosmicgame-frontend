@@ -2,79 +2,324 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Box, Button, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
+
 import api from "../../services/api";
+import useCosmicGameContract from "../../hooks/useCosmicGameContract";
+import { useApiData } from "../../contexts/ApiDataContext";
+import { useNotification } from "../../contexts/NotificationContext";
+
 import {
   convertTimestampToDateTime,
   getEnduranceChampions,
   logoImgUrl,
 } from "../../utils";
+import getErrorMessage from "../../utils/alert";
+
+// Child Components
 import RaffleWinnerTable from "../../components/RaffleWinnerTable";
 import BiddingHistoryTable from "../../components/BiddingHistoryTable";
-import useCosmicGameContract from "../../hooks/useCosmicGameContract";
-import { useApiData } from "../../contexts/ApiDataContext";
 import StakingWinnerTable from "../../components/StakingWinnerTable";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
-import getErrorMessage from "../../utils/alert";
-import { useNotification } from "../../contexts/NotificationContext";
 import EnduranceChampionsTable from "../../components/EnduranceChampionsTable";
 
+/* ------------------------------------------------------------------
+  Helper Sub-Component: InfoRow
+  Displays a single label-value pair (optionally linked)
+------------------------------------------------------------------ */
 interface InfoRowProps {
   label: string;
   value: string | number;
   link?: string;
   monospace?: boolean;
 }
-
 const InfoRow: React.FC<InfoRowProps> = ({
   label,
   value,
   link,
   monospace = false,
-}) => (
-  <Box mb={1}>
-    <Typography color="primary" component="span">
-      {label}
-    </Typography>
-    &nbsp;
-    {link ? (
-      <Typography component="span">
-        <Link
-          href={link}
-          color="inherit"
-          fontSize="inherit"
-          target={link.startsWith("http") ? "__blank" : undefined}
+}) => {
+  return (
+    <Box mb={1}>
+      <Typography color="primary" component="span">
+        {label}
+      </Typography>
+      &nbsp;
+      {link ? (
+        <Typography component="span">
+          <Link
+            href={link}
+            color="inherit"
+            fontSize="inherit"
+            target={link.startsWith("http") ? "__blank" : undefined}
+            sx={monospace ? { fontFamily: "monospace" } : {}}
+          >
+            {value}
+          </Link>
+        </Typography>
+      ) : (
+        <Typography
+          component="span"
+          fontFamily={monospace ? "monospace" : "inherit"}
         >
           {value}
-        </Link>
-      </Typography>
-    ) : (
-      <Typography
-        component="span"
-        fontFamily={monospace ? "monospace" : undefined}
-      >
-        {value}
-      </Typography>
-    )}
+        </Typography>
+      )}
+    </Box>
+  );
+};
+
+/* ------------------------------------------------------------------
+  Sub-Component: PrizeDetails
+  Renders the main "prize info" rows using `InfoRow`.
+------------------------------------------------------------------ */
+interface PrizeDetailsProps {
+  prizeInfo: any; // shape from your API, e.g. RoundInfo
+  stakingRewards: any[];
+}
+const PrizeDetails: React.FC<PrizeDetailsProps> = ({
+  prizeInfo,
+  stakingRewards,
+}) => {
+  return (
+    <>
+      <InfoRow
+        label="Datetime:"
+        value={convertTimestampToDateTime(prizeInfo.TimeStamp)}
+        link={`https://arbiscan.io/tx/${prizeInfo.TxHash}`}
+      />
+      <InfoRow
+        label="Prize Amount:"
+        value={`${prizeInfo.AmountEth.toFixed(4)} ETH`}
+      />
+      <InfoRow
+        label="Prize Token ID:"
+        value={prizeInfo.TokenId}
+        link={`/detail/${prizeInfo.TokenId}`}
+      />
+      <InfoRow
+        label="Winner Address:"
+        value={prizeInfo.WinnerAddr}
+        link={`/user/${prizeInfo.WinnerAddr}`}
+        monospace
+      />
+      <InfoRow
+        label="Charity Address:"
+        value={prizeInfo.CharityAddress}
+        monospace
+      />
+      <InfoRow
+        label="Charity Amount:"
+        value={`${prizeInfo.CharityAmountETH.toFixed(4)} ETH`}
+      />
+      <InfoRow
+        label="Endurance Champion Prize Winner Address:"
+        value={prizeInfo.EnduranceWinnerAddr}
+        link={`/user/${prizeInfo.EnduranceWinnerAddr}`}
+      />
+      <InfoRow
+        label="Endurance Champion rewarded with CST NFT Token ID:"
+        value={prizeInfo.EnduranceERC721TokenId}
+        link={`/detail/${prizeInfo.EnduranceERC721TokenId}`}
+      />
+      <InfoRow
+        label="Endurance Champion rewarded with CST (ERC20):"
+        value={`${prizeInfo.EnduranceERC20AmountEth} CST`}
+      />
+
+      {prizeInfo.StellarWinnerAddr && (
+        <>
+          <InfoRow
+            label="Stellar Spender Prize Winner Address:"
+            value={prizeInfo.StellarWinnerAddr}
+            link={`/user/${prizeInfo.StellarWinnerAddr}`}
+          />
+          <InfoRow
+            label="Stellar Spender rewarded with CST NFT Token ID:"
+            value={prizeInfo.StellarERC721TokenId}
+            link={`/detail/${prizeInfo.StellarERC721TokenId}`}
+          />
+          <InfoRow
+            label="Stellar Spender rewarded with CST (ERC20):"
+            value={`${prizeInfo.StellarERC20AmountEth.toFixed(2)} CST`}
+          />
+        </>
+      )}
+
+      <InfoRow label="Total Bids:" value={prizeInfo.RoundStats.TotalBids} />
+      <InfoRow
+        label="Total Donated NFTs:"
+        value={prizeInfo.RoundStats.TotalDonatedNFTs}
+      />
+      <InfoRow
+        label="Total Raffle Eth Deposits:"
+        value={`${prizeInfo.RoundStats.TotalRaffleEthDepositsEth.toFixed(
+          4
+        )} ETH`}
+      />
+      <InfoRow
+        label="Total Raffle NFTs:"
+        value={prizeInfo.RoundStats.TotalRaffleNFTs}
+      />
+      <InfoRow
+        label="Total Staking Deposit Amount:"
+        value={`${prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH`}
+      />
+      <InfoRow
+        label="Number of Staked Tokens:"
+        value={prizeInfo.StakingNumStakedTokens}
+      />
+      <InfoRow label="Number of Stakers:" value={stakingRewards.length} />
+    </>
+  );
+};
+
+/* ------------------------------------------------------------------
+  Sub-Component: BiddingHistorySection
+  Renders the "Bid History" portion
+------------------------------------------------------------------ */
+interface BiddingHistorySectionProps {
+  bidHistory: any[];
+}
+const BiddingHistorySection: React.FC<BiddingHistorySectionProps> = ({
+  bidHistory,
+}) => (
+  <Box mt={4}>
+    <Typography variant="h6" lineHeight={1}>
+      Bid History
+    </Typography>
+    <BiddingHistoryTable biddingHistory={bidHistory} />
   </Box>
 );
 
+/* ------------------------------------------------------------------
+  Sub-Component: EnduranceChampionsSection
+  Renders the "Endurance Champions" portion
+------------------------------------------------------------------ */
+interface EnduranceChampionsSectionProps {
+  championList: any[];
+}
+const EnduranceChampionsSection: React.FC<EnduranceChampionsSectionProps> = ({
+  championList,
+}) => (
+  <Box mt={4}>
+    <Typography variant="h6">Endurance Champions</Typography>
+    <EnduranceChampionsTable championList={championList} />
+  </Box>
+);
+
+/* ------------------------------------------------------------------
+  Sub-Component: RaffleWinnersSection
+  Renders the "Raffle Winners" portion
+------------------------------------------------------------------ */
+interface RaffleWinnersSectionProps {
+  RaffleETHDeposits: any[];
+  RaffleNFTWinners: any[];
+}
+const RaffleWinnersSection: React.FC<RaffleWinnersSectionProps> = ({
+  RaffleETHDeposits,
+  RaffleNFTWinners,
+}) => (
+  <Box mt={4}>
+    <Typography variant="h6" mb={2}>
+      Raffle Winners
+    </Typography>
+    <RaffleWinnerTable
+      RaffleETHDeposits={RaffleETHDeposits}
+      RaffleNFTWinners={RaffleNFTWinners}
+    />
+  </Box>
+);
+
+/* ------------------------------------------------------------------
+  Sub-Component: StakingRewardsSection
+  Renders the "Staking Rewards" portion
+------------------------------------------------------------------ */
+interface StakingRewardsSectionProps {
+  stakingRewards: any[];
+}
+const StakingRewardsSection: React.FC<StakingRewardsSectionProps> = ({
+  stakingRewards,
+}) => (
+  <Box mt={4}>
+    <Typography variant="h6" mb={2}>
+      Staking Rewards
+    </Typography>
+    <StakingWinnerTable list={stakingRewards} />
+  </Box>
+);
+
+/* ------------------------------------------------------------------
+  Sub-Component: DonatedNFTsSection
+  Renders the "Donated NFTs" portion, including "Claim All" button
+------------------------------------------------------------------ */
+interface DonatedNFTsSectionProps {
+  roundNum: number;
+  nftDonations: any[];
+  donatedNFTToClaim: any[];
+  handleAllDonatedNFTsClaim: () => Promise<void>;
+  isClaiming: boolean;
+}
+const DonatedNFTsSection: React.FC<DonatedNFTsSectionProps> = ({
+  roundNum,
+  nftDonations,
+  donatedNFTToClaim,
+  handleAllDonatedNFTsClaim,
+  isClaiming,
+}) => {
+  return (
+    <Box mt={8}>
+      <Box
+        sx={{
+          mb: 2,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="h6">Donated NFTs</Typography>
+        {donatedNFTToClaim.length > 0 && (
+          <Button
+            variant="contained"
+            onClick={handleAllDonatedNFTsClaim}
+            disabled={isClaiming}
+          >
+            Claim All
+          </Button>
+        )}
+      </Box>
+      <DonatedNFTTable
+        list={nftDonations}
+        handleClaim={null}
+        claimingTokens={[]}
+      />
+    </Box>
+  );
+};
+
+/* ------------------------------------------------------------------
+  Main Component: PrizeInfo
+------------------------------------------------------------------ */
 interface PrizeInfoProps {
   roundNum: number;
 }
-
 const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
   const cosmicGameContract = useCosmicGameContract();
   const { apiData: status } = useApiData();
   const { setNotification } = useNotification();
 
-  const [donatedNFTToClaim, setDonatedNFTToClaim] = useState([]);
-  const [bidHistory, setBidHistory] = useState([]);
-  const [nftDonations, setNftDonations] = useState([]);
-  const [prizeInfo, setPrizeInfo] = useState(null);
-  const [stakingRewards, setStakingRewards] = useState([]);
+  const [donatedNFTToClaim, setDonatedNFTToClaim] = useState<any[]>([]);
+  const [bidHistory, setBidHistory] = useState<any[]>([]);
+  const [nftDonations, setNftDonations] = useState<any[]>([]);
+  const [prizeInfo, setPrizeInfo] = useState<any>(null);
+  const [stakingRewards, setStakingRewards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
 
+  /* ------------------------------------------------------------------
+    Data Fetching
+  ------------------------------------------------------------------ */
+
+  // Fetch unclaimed donated NFTs
   const fetchUnclaimedDonatedNFTs = async () => {
     try {
       const nfts = await api.get_donations_nft_unclaimed_by_round(roundNum);
@@ -89,12 +334,12 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
     }
   };
 
+  // "Claim All" Donated NFTs
   const handleAllDonatedNFTsClaim = async () => {
     setIsClaiming(true);
     try {
       const indexList = donatedNFTToClaim.map((item) => item.Index);
-      const res = await cosmicGameContract.claimManyDonatedNFTs(indexList);
-      console.log(res);
+      await cosmicGameContract.claimManyDonatedNFTs(indexList);
       await fetchUnclaimedDonatedNFTs();
     } catch (err) {
       const errorMsg = getErrorMessage(
@@ -107,12 +352,15 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
     }
   };
 
+  // Re-fetch unclaimed NFTs if the global status changes
   useEffect(() => {
-    if (status?.NumDonatedNFTToClaim >= 0) {
+    if (typeof status?.NumDonatedNFTToClaim === "number") {
       fetchUnclaimedDonatedNFTs();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status?.NumDonatedNFTToClaim, roundNum]);
 
+  // Fetch main data for the selected round
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -145,18 +393,28 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
       }
     };
     fetchData();
-  }, [roundNum]);
+  }, [roundNum, setNotification]);
 
+  // Compute the champion list using memo
   const championList = useMemo(() => {
     if (bidHistory.length > 0 && prizeInfo) {
       const champions = getEnduranceChampions(bidHistory, prizeInfo.TimeStamp);
-      const sortedChampions = [...champions].sort(
-        (a, b) => b.chronoWarrior - a.chronoWarrior
-      );
-      return sortedChampions;
+      return champions.sort((a, b) => b.chronoWarrior - a.chronoWarrior);
     }
     return [];
   }, [bidHistory, prizeInfo]);
+
+  /* ------------------------------------------------------------------
+    Render
+  ------------------------------------------------------------------ */
+
+  if (loading) {
+    return (
+      <MainWrapper>
+        <Typography variant="h6">Loading...</Typography>
+      </MainWrapper>
+    );
+  }
 
   return (
     <MainWrapper>
@@ -168,154 +426,46 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
           Prize Information
         </Typography>
       </Box>
-      {loading ? (
-        <Typography variant="h6">Loading...</Typography>
-      ) : prizeInfo ? (
-        <Box>
-          <InfoRow
-            label="Datetime:"
-            value={convertTimestampToDateTime(prizeInfo.TimeStamp)}
-            link={`https://arbiscan.io/tx/${prizeInfo.TxHash}`}
-          />
-          <InfoRow
-            label="Prize Amount:"
-            value={`${prizeInfo.AmountEth.toFixed(4)} ETH`}
-          />
-          <InfoRow
-            label="Prize Token ID:"
-            value={prizeInfo.TokenId}
-            link={`/detail/${prizeInfo.TokenId}`}
-          />
-          <InfoRow
-            label="Winner Address:"
-            value={prizeInfo.WinnerAddr}
-            link={`/user/${prizeInfo.WinnerAddr}`}
-            monospace
-          />
-          <InfoRow
-            label="Charity Address:"
-            value={prizeInfo.CharityAddress}
-            monospace
-          />
-          <InfoRow
-            label="Charity Amount:"
-            value={`${prizeInfo.CharityAmountETH.toFixed(4)} ETH`}
-          />
-          <InfoRow
-            label="Endurance Champion Prize Winner Address:"
-            value={prizeInfo.EnduranceWinnerAddr}
-            link={`/user/${prizeInfo.EnduranceWinnerAddr}`}
-          />
-          <InfoRow
-            label="Endurance Champion rewarded with CST NFT Token ID:"
-            value={prizeInfo.EnduranceERC721TokenId}
-            link={`/detail/${prizeInfo.EnduranceERC721TokenId}`}
-          />
-          <InfoRow
-            label="Endurance Champion rewarded with CST (ERC20):"
-            value={`${prizeInfo.EnduranceERC20AmountEth} CST`}
-          />
-          {prizeInfo.StellarWinnerAddr && (
-            <>
-              <InfoRow
-                label="Stellar Spender Prize Winner Address:"
-                value={prizeInfo.StellarWinnerAddr}
-                link={`/user/${prizeInfo.StellarWinnerAddr}`}
-              />
-              <InfoRow
-                label="Stellar Spender rewarded with CST NFT Token ID:"
-                value={prizeInfo.StellarERC721TokenId}
-                link={`/detail/${prizeInfo.StellarERC721TokenId}`}
-              />
-              <InfoRow
-                label="Stellar Spender rewarded with CST (ERC20):"
-                value={`${prizeInfo.StellarERC20AmountEth.toFixed(2)} CST`}
-              />
-            </>
-          )}
-          <InfoRow label="Total Bids:" value={prizeInfo.RoundStats.TotalBids} />
-          <InfoRow
-            label="Total Donated NFTs:"
-            value={prizeInfo.RoundStats.TotalDonatedNFTs}
-          />
-          <InfoRow
-            label="Total Raffle Eth Deposits:"
-            value={`${prizeInfo.RoundStats.TotalRaffleEthDepositsEth.toFixed(
-              4
-            )} ETH`}
-          />
-          <InfoRow
-            label="Total Raffle NFTs:"
-            value={prizeInfo.RoundStats.TotalRaffleNFTs}
-          />
-          <InfoRow
-            label="Total Staking Deposit Amount:"
-            value={`${prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH`}
-          />
-          <InfoRow
-            label="Number of Staked Tokens:"
-            value={prizeInfo.StakingNumStakedTokens}
-          />
-          <InfoRow label="Number of Stakers:" value={stakingRewards.length} />
-          <Box mt={4}>
-            <Typography variant="h6" lineHeight={1}>
-              Bid History
-            </Typography>
-            <BiddingHistoryTable biddingHistory={bidHistory} />
-          </Box>
-          <Box mt={4}>
-            <Typography variant="h6">Endurance Champions</Typography>
-            <EnduranceChampionsTable championList={championList} />
-          </Box>
-          <Box mt={4}>
-            <Typography variant="h6" mb={2}>
-              Raffle Winners
-            </Typography>
-            <RaffleWinnerTable
-              RaffleETHDeposits={prizeInfo.RaffleETHDeposits}
-              RaffleNFTWinners={prizeInfo.RaffleNFTWinners}
-            />
-          </Box>
-          <Box mt={4}>
-            <Typography variant="h6" mb={2}>
-              Staking Rewards
-            </Typography>
-            <StakingWinnerTable list={stakingRewards} />
-          </Box>
-          <Box mt={8}>
-            <Box
-              sx={{
-                mb: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Typography variant="h6">Donated NFTs</Typography>
-              {donatedNFTToClaim.length > 0 && (
-                <Button
-                  variant="contained"
-                  onClick={handleAllDonatedNFTsClaim}
-                  disabled={isClaiming}
-                >
-                  Claim All
-                </Button>
-              )}
-            </Box>
-            <DonatedNFTTable
-              list={nftDonations}
-              handleClaim={null}
-              claimingTokens={[]}
-            />
-          </Box>
-        </Box>
-      ) : (
+
+      {!prizeInfo ? (
         <Typography>Prize data not found!</Typography>
+      ) : (
+        <Box>
+          {/* Prize Details */}
+          <PrizeDetails prizeInfo={prizeInfo} stakingRewards={stakingRewards} />
+
+          {/* Bid History */}
+          <BiddingHistorySection bidHistory={bidHistory} />
+
+          {/* Endurance Champions */}
+          <EnduranceChampionsSection championList={championList} />
+
+          {/* Raffle Winners */}
+          <RaffleWinnersSection
+            RaffleETHDeposits={prizeInfo.RaffleETHDeposits}
+            RaffleNFTWinners={prizeInfo.RaffleNFTWinners}
+          />
+
+          {/* Staking Rewards */}
+          <StakingRewardsSection stakingRewards={stakingRewards} />
+
+          {/* Donated NFTs */}
+          <DonatedNFTsSection
+            roundNum={roundNum}
+            nftDonations={nftDonations}
+            donatedNFTToClaim={donatedNFTToClaim}
+            handleAllDonatedNFTsClaim={handleAllDonatedNFTsClaim}
+            isClaiming={isClaiming}
+          />
+        </Box>
       )}
     </MainWrapper>
   );
 };
 
+/* ------------------------------------------------------------------
+  getServerSideProps for SEO and default export
+------------------------------------------------------------------ */
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = context.params!.id as string | string[];
   const roundNum = Array.isArray(id) ? parseInt(id[0]) : parseInt(id);
