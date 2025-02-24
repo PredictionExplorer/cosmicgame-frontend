@@ -8,6 +8,13 @@ import {
   TableBody,
   Typography,
 } from "@mui/material";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+
+import api from "../../../services/api";
+import { convertTimestampToDateTime, logoImgUrl } from "../../../utils";
 import {
   MainWrapper,
   TablePrimary,
@@ -17,58 +24,142 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../../../components/styled";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { convertTimestampToDateTime, logoImgUrl } from "../../../utils";
-import api from "../../../services/api";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "../../../components/CustomPagination";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
-const DetailRow = ({ row }) => {
-  const [open, setOpen] = useState(false);
-  if (!row) {
-    return <TablePrimaryRow />;
-  }
+/* ------------------------------------------------------------------
+  Types
+------------------------------------------------------------------ */
+interface StakeInfo {
+  TxHash: string;
+  TimeStamp: number;
+  NumStakedNFTs: number;
+}
+
+interface UnstakeInfo {
+  EvtLogId: number;
+  TxHash: string;
+  TimeStamp: number;
+  NumStakedNFTs: number;
+  MaxUnpaidDepositIndex: number;
+  RewardAmountEth: number;
+}
+
+interface RewardsRowData {
+  DepositTimeStamp: number;
+  RoundNum: number;
+  DepositId: number;
+  DepositIndex: number;
+  Claimed: boolean;
+  RewardEth: number;
+  Stake: StakeInfo;
+  Unstake: UnstakeInfo;
+}
+
+/* ------------------------------------------------------------------
+  Custom Hook: useRewardsByTokenDetails
+  Fetches staking rewards data for a specific user & token.
+------------------------------------------------------------------ */
+function useRewardsByTokenDetails(address: string, tokenId: number) {
+  const [rewardsData, setRewardsData] = useState<RewardsRowData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get_staking_rewards_by_user_by_token_details(
+        address,
+        tokenId
+      );
+
+      // The API returns a map. Convert it to an array
+      // and sort if you need to. Example: sort by DepositIndex.
+      const arrayData = Object.keys(response)
+        .filter((key) => !isNaN(Number(key)))
+        .map((key) => response[key]) as RewardsRowData[];
+
+      setRewardsData(arrayData);
+    } catch (err) {
+      console.error("Error fetching token details:", err);
+      setRewardsData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, tokenId]);
+
+  return { rewardsData, loading };
+}
+
+/* ------------------------------------------------------------------
+  Sub-Component: RewardsDetailRow
+  Renders a single row (with a collapsible section) in the table.
+------------------------------------------------------------------ */
+function RewardsDetailRow({ row }: { row: RewardsRowData }) {
+  const [open, setOpen] = useState<boolean>(false);
+
+  if (!row) return <TablePrimaryRow />;
+
+  const {
+    DepositTimeStamp,
+    RoundNum,
+    DepositId,
+    DepositIndex,
+    Claimed,
+    RewardEth,
+    Stake,
+    Unstake,
+  } = row;
 
   return (
     <>
+      {/* Main Row */}
       <TablePrimaryRow>
         <TablePrimaryCell>
           <IconButton
             aria-label="expand row"
             size="small"
-            onClick={() => setOpen(!open)}
+            onClick={() => setOpen((prev) => !prev)}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TablePrimaryCell>
+
         <TablePrimaryCell align="left">
-          {convertTimestampToDateTime(row.DepositTimeStamp)}
+          {convertTimestampToDateTime(DepositTimeStamp)}
         </TablePrimaryCell>
+
         <TablePrimaryCell align="center">
           <Link
-            href={`/prize/${row.RoundNum}`}
+            href={`/prize/${RoundNum}`}
             style={{ color: "inherit", fontSize: "inherit" }}
           >
-            {row.RoundNum}
+            {RoundNum}
           </Link>
         </TablePrimaryCell>
-        <TablePrimaryCell align="center">{row.DepositId}</TablePrimaryCell>
-        <TablePrimaryCell align="center">{row.DepositIndex}</TablePrimaryCell>
+
+        <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
+        <TablePrimaryCell align="center">{DepositIndex}</TablePrimaryCell>
         <TablePrimaryCell align="center">
-          {row.Claimed ? "Yes" : "No"}
+          {Claimed ? "Yes" : "No"}
         </TablePrimaryCell>
         <TablePrimaryCell align="right">
-          {row.RewardEth.toFixed(6)}
+          {RewardEth.toFixed(6)}
         </TablePrimaryCell>
       </TablePrimaryRow>
+
+      {/* Collapsible Row */}
       <TablePrimaryRow sx={{ borderBottom: 0 }}>
         <TablePrimaryCell sx={{ py: 0 }} colSpan={7}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Grid container spacing={4}>
-              <Grid item sm={12} md={6}>
+              {/* Stake Section */}
+              <Grid item xs={12} md={6}>
                 <Typography variant="h6">Stake</Typography>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
@@ -78,11 +169,11 @@ const DetailRow = ({ row }) => {
                   <Link
                     color="inherit"
                     fontSize="inherit"
-                    href={`https://arbiscan.io/tx/${row.Stake.TxHash}`}
-                    target="__blank"
+                    href={`https://arbiscan.io/tx/${Stake.TxHash}`}
+                    target="_blank"
                   >
                     <Typography component="span">
-                      {convertTimestampToDateTime(row.Stake.TimeStamp)}
+                      {convertTimestampToDateTime(Stake.TimeStamp)}
                     </Typography>
                   </Link>
                 </Box>
@@ -92,12 +183,14 @@ const DetailRow = ({ row }) => {
                   </Typography>
                   &nbsp;
                   <Typography component="span">
-                    {row.Stake.NumStakedNFTs}
+                    {Stake.NumStakedNFTs}
                   </Typography>
                 </Box>
               </Grid>
-              {row.Unstake.EvtLogId !== 0 && (
-                <Grid item sm={12} md={6}>
+
+              {/* Unstake Section (only if EvtLogId != 0) */}
+              {Unstake.EvtLogId !== 0 && (
+                <Grid item xs={12} md={6}>
                   <Typography variant="h6">Unstake</Typography>
                   <Box mb={1}>
                     <Typography color="primary" component="span">
@@ -107,11 +200,11 @@ const DetailRow = ({ row }) => {
                     <Link
                       color="inherit"
                       fontSize="inherit"
-                      href={`https://arbiscan.io/tx/${row.Unstake.TxHash}`}
-                      target="__blank"
+                      href={`https://arbiscan.io/tx/${Unstake.TxHash}`}
+                      target="_blank"
                     >
                       <Typography component="span">
-                        {convertTimestampToDateTime(row.Unstake.TimeStamp)}
+                        {convertTimestampToDateTime(Unstake.TimeStamp)}
                       </Typography>
                     </Link>
                   </Box>
@@ -121,7 +214,7 @@ const DetailRow = ({ row }) => {
                     </Typography>
                     &nbsp;
                     <Typography component="span">
-                      {row.Unstake.NumStakedNFTs}
+                      {Unstake.NumStakedNFTs}
                     </Typography>
                   </Box>
                   <Box mb={1}>
@@ -130,7 +223,7 @@ const DetailRow = ({ row }) => {
                     </Typography>
                     &nbsp;
                     <Typography component="span">
-                      {row.Unstake.MaxUnpaidDepositIndex}
+                      {Unstake.MaxUnpaidDepositIndex}
                     </Typography>
                   </Box>
                   <Box mb={1}>
@@ -139,7 +232,7 @@ const DetailRow = ({ row }) => {
                     </Typography>
                     &nbsp;
                     <Typography component="span">
-                      {row.Unstake.RewardAmountEth.toFixed(6)} ETH
+                      {Unstake.RewardAmountEth.toFixed(6)} ETH
                     </Typography>
                   </Box>
                 </Grid>
@@ -150,11 +243,21 @@ const DetailRow = ({ row }) => {
       </TablePrimaryRow>
     </>
   );
-};
+}
 
-const DetailTable = ({ list }) => {
-  const perPage = 5;
-  const [page, setPage] = useState(1);
+/* ------------------------------------------------------------------
+  Sub-Component: RewardsDetailTable
+  Renders the table of all reward items, with pagination.
+------------------------------------------------------------------ */
+function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
+  const PER_PAGE = 5;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const paginatedData = list.slice(
+    (currentPage - 1) * PER_PAGE,
+    currentPage * PER_PAGE
+  );
+
   return (
     <>
       <TablePrimaryContainer>
@@ -175,38 +278,34 @@ const DetailTable = ({ list }) => {
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((row) => (
-              <DetailRow row={row} key={row.DepositIndex} />
+            {paginatedData.map((row) => (
+              <RewardsDetailRow key={row.DepositIndex} row={row} />
             ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
+
       <CustomPagination
-        page={page}
-        setPage={setPage}
+        page={currentPage}
+        setPage={setCurrentPage}
         totalLength={list.length}
-        perPage={perPage}
+        perPage={PER_PAGE}
       />
     </>
   );
-};
+}
 
-const RewardsByTokenDetails = ({ address, tokenId }) => {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const data = await api.get_staking_rewards_by_user_by_token_details(
-        address,
-        tokenId
-      );
-      setData(data);
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
+/* ------------------------------------------------------------------
+  Main Component: RewardsByTokenDetails
+------------------------------------------------------------------ */
+function RewardsByTokenDetails({
+  address,
+  tokenId,
+}: {
+  address: string;
+  tokenId: number;
+}) {
+  const { rewardsData, loading } = useRewardsByTokenDetails(address, tokenId);
 
   return (
     <MainWrapper>
@@ -219,26 +318,30 @@ const RewardsByTokenDetails = ({ address, tokenId }) => {
       >
         Staking Rewards Details for Token {tokenId}
       </Typography>
-      {loading || data === null ? (
+
+      {loading ? (
         <Typography>Loading...</Typography>
       ) : (
-        <DetailTable
-          list={Object.keys(data)
-            .filter((key) => !isNaN(Number(key)))
-            .map((key) => data[key])}
-        />
+        <RewardsDetailTable list={rewardsData} />
       )}
     </MainWrapper>
   );
-};
+}
 
+/* ------------------------------------------------------------------
+  getServerSideProps
+------------------------------------------------------------------ */
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const param1 = context.params!.address;
-  const address = Array.isArray(param1) ? param1[0] : param1;
-  const param2 = context.params!.tokenId;
-  const tokenId = Array.isArray(param2) ? param2[0] : param2;
+  const paramAddress = context.params!.address;
+  const paramTokenId = context.params!.tokenId;
+  let address = Array.isArray(paramAddress) ? paramAddress[0] : paramAddress;
+  let tokenId = Array.isArray(paramTokenId) ? paramTokenId[0] : paramTokenId;
+
+  // (Optional) Validate address or tokenId if needed
+  // e.g., if using ethers/utils to check address
+
   const title = "Rewards Details By Token | Cosmic Signature";
   const description = "Rewards Details By Token";
 
@@ -251,7 +354,9 @@ export const getServerSideProps: GetServerSideProps = async (
     { name: "twitter:image", content: logoImgUrl },
   ];
 
-  return { props: { title, description, openGraphData, address, tokenId } };
+  return {
+    props: { title, description, openGraphData, address, tokenId },
+  };
 };
 
 export default RewardsByTokenDetails;
