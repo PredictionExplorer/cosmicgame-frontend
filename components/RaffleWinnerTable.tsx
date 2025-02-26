@@ -8,70 +8,101 @@ import {
   TablePrimary,
   TablePrimaryHeadCell,
 } from "./styled";
-import { convertTimestampToDateTime, shortenHex } from "../utils";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
+import { convertTimestampToDateTime, shortenHex } from "../utils";
 import { isMobile } from "react-device-detect";
 
+/**
+ * Displays a single row in the table with winner information.
+ *
+ * @param {Object} props
+ * @param {Object} props.winner - Data object containing details about a raffle winner.
+ */
 const WinnerRow = ({ winner }) => {
+  // If there is no winner data, return an empty table row to prevent errors.
   if (!winner) {
     return <TablePrimaryRow />;
   }
 
+  // Destructure the winner object with default values or optional chaining
+  // to guard against missing fields.
+  const {
+    TxHash = "",
+    TimeStamp = 0,
+    WinnerAddr = "",
+    RoundNum = 0,
+    Amount = 0,
+    IsStaker = false,
+    IsRwalk = false,
+    TokenId = null,
+  } = winner;
+
   return (
     <TablePrimaryRow>
+      {/* Datetime Column - links to Arbiscan for the transaction */}
       <TablePrimaryCell>
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${winner.TxHash}`}
+          href={`https://arbiscan.io/tx/${TxHash}`}
           target="__blank"
         >
-          {convertTimestampToDateTime(winner.TimeStamp)}
+          {convertTimestampToDateTime(TimeStamp)}
         </Link>
       </TablePrimaryCell>
+
+      {/* Winner Address Column */}
       <TablePrimaryCell>
-        <Tooltip title={winner.WinnerAddr}>
+        <Tooltip title={WinnerAddr}>
           <Link
-            href={`/user/${winner.WinnerAddr}`}
+            href={`/user/${WinnerAddr}`}
             style={{
               color: "inherit",
               fontSize: "inherit",
               fontFamily: "monospace",
             }}
           >
-            {shortenHex(winner.WinnerAddr, 6)}
+            {shortenHex(WinnerAddr, 6)}
           </Link>
         </Tooltip>
       </TablePrimaryCell>
+
+      {/* Round Number Column */}
       <TablePrimaryCell align="center">
         <Link
-          href={`/prize/${winner.RoundNum}`}
+          href={`/prize/${RoundNum}`}
           style={{ color: "inherit", fontSize: "inherit" }}
         >
-          {winner.RoundNum}
+          {RoundNum}
         </Link>
       </TablePrimaryCell>
+
+      {/* Type Column - different text based on whether the user is a staker, is Rwalk, etc. */}
       <TablePrimaryCell>
-        {winner.Amount
+        {Amount
           ? "ETH Deposit"
-          : winner.IsStaker && winner.IsRwalk
+          : IsStaker && IsRwalk
           ? "Random Walk Staking Raffle Token"
-          : winner.IsStaker && !winner.IsRwalk
+          : IsStaker && !IsRwalk
           ? "Cosmic Signature Staking Raffle Token"
           : "Cosmic Signature Token"}
       </TablePrimaryCell>
+
+      {/* Amount Column (in ETH) - shown only if Amount is truthy */}
       <TablePrimaryCell align="right">
-        {winner.Amount ? `${winner.Amount.toFixed(4)} ETH` : " "}
+        {Amount ? `${Amount.toFixed(4)} ETH` : " "}
       </TablePrimaryCell>
+
+      {/* Token ID Column - Link to detail page if TokenId exists */}
       <TablePrimaryCell align="center">
-        {winner.TokenId ? (
+        {TokenId ? (
           <Link
-            href={`/detail/${winner.TokenId}`}
+            href={`/detail/${TokenId}`}
             style={{ color: "inherit", fontSize: "inherit" }}
           >
-            {winner.TokenId}
+            {TokenId}
           </Link>
         ) : (
           " "
@@ -81,17 +112,37 @@ const WinnerRow = ({ winner }) => {
   );
 };
 
+/**
+ * Renders a table of raffle winners (both ETH deposits and NFT winners).
+ * Paginated to show a limited number of rows per page.
+ *
+ * @param {Object} props
+ * @param {Array} props.RaffleETHDeposits - List of raffle winners who won ETH deposits.
+ * @param {Array} props.RaffleNFTWinners  - List of raffle winners who won NFTs or tokens.
+ */
 const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
-  const perPage = 5;
+  // Combine both arrays into a single list of winners.
   const list = [...RaffleETHDeposits, ...RaffleNFTWinners];
+
+  // Number of rows to display per page.
+  const perPage = 5;
+
+  // Tracks the current page in the pagination.
   const [page, setPage] = useState(1);
+
+  // If there are no winners to display, show a message and return early.
   if (list.length === 0) {
     return <Typography>No winners yet.</Typography>;
   }
+
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {/* 
+            Conditionally render a column width setup (colgroup) if not on mobile.
+            This helps control column sizing on larger screens.
+          */}
           {!isMobile && (
             <colgroup>
               <col width="20%" />
@@ -102,6 +153,8 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
               <col width="10%" />
             </colgroup>
           )}
+
+          {/* Table Header */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
@@ -116,13 +169,24 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
+
+          {/* Table Body */}
           <TableBody>
+            {/* 
+              Slice the list for pagination and map through each winner.
+              Using a unique key 'EvtLogId' to identify each row.
+            */}
             {list.slice((page - 1) * perPage, page * perPage).map((winner) => (
               <WinnerRow key={winner.EvtLogId} winner={winner} />
             ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
+
+      {/* 
+        CustomPagination controls allow page navigation.
+        Pass page, setPage, totalLength of the list, and perPage to the pagination component.
+      */}
       <CustomPagination
         page={page}
         setPage={setPage}
