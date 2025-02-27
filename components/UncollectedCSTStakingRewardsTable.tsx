@@ -16,12 +16,13 @@ import { isMobile } from "react-device-detect";
 
 /* ------------------------------------------------------------------
   Sub-Component: UncollectedRewardsRow
-  Renders a single row in the rewards table.
+  Renders a single row in the rewards table with the provided data.
 ------------------------------------------------------------------ */
 const UncollectedRewardsRow = ({ row }) => {
-  // Early return if no row data
+  // Early return if no row data to avoid errors.
   if (!row) return <TablePrimaryRow />;
 
+  // Destructure row for clarity and fallback values if needed.
   const {
     DepositTimeStamp,
     DepositId,
@@ -31,24 +32,38 @@ const UncollectedRewardsRow = ({ row }) => {
     DepositAmountEth,
     YourRewardAmountEth,
     PendingToClaimEth,
+    // EvtLogId,  <-- Usually used as a key, so not needed here
   } = row;
 
   return (
     <TablePrimaryRow>
+      {/* Convert the timestamp to a readable date/time format */}
       <TablePrimaryCell>
         {convertTimestampToDateTime(DepositTimeStamp)}
       </TablePrimaryCell>
+
+      {/* Simple text display of the deposit's unique identifier */}
       <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
+
+      {/* Show how many tokens you have staked out of total staked */}
       <TablePrimaryCell align="center">
         {`${YourTokensStaked} / ${NumStakedNFTs}`}
       </TablePrimaryCell>
+
+      {/* Total unclaimed tokens for this deposit */}
       <TablePrimaryCell align="center">{NumUnclaimedTokens}</TablePrimaryCell>
+
+      {/* The ETH amount originally deposited, formatted to 6 decimal places */}
       <TablePrimaryCell align="center">
         {DepositAmountEth.toFixed(6)}
       </TablePrimaryCell>
+
+      {/* Your reward in ETH so far, formatted to 6 decimals */}
       <TablePrimaryCell align="center">
         {YourRewardAmountEth.toFixed(6)}
       </TablePrimaryCell>
+
+      {/* Pending reward in ETH that hasn't been collected yet */}
       <TablePrimaryCell align="center">
         {PendingToClaimEth.toFixed(6)}
       </TablePrimaryCell>
@@ -58,29 +73,35 @@ const UncollectedRewardsRow = ({ row }) => {
 
 /* ------------------------------------------------------------------
   Main Component: UncollectedCSTStakingRewardsTable
-  Displays a paginated list of uncollected staking rewards.
+  Displays a paginated list of uncollected CST staking rewards.
 ------------------------------------------------------------------ */
 export const UncollectedCSTStakingRewardsTable = ({ list }) => {
+  // Current page in the pagination
   const [currentPage, setCurrentPage] = useState(1);
 
   // Number of rows to display per page
   const PER_PAGE = 5;
 
-  // Early return if no data
+  // If there is no data to display, show a fallback message
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
 
-  // Compute start and end indices for the current page
+  // Calculate slice indices for the current page
   const startIndex = (currentPage - 1) * PER_PAGE;
   const endIndex = currentPage * PER_PAGE;
+
+  // Extract the portion of the list corresponding to the current page
   const currentPageData = list.slice(startIndex, endIndex);
 
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          {/* Optional column widths for non-mobile views */}
+          {/* 
+            Conditionally render a colgroup for desktop screens
+            to control column widths. This is optional on mobile.
+          */}
           {!isMobile && (
             <colgroup>
               <col width="15%" />
@@ -114,6 +135,7 @@ export const UncollectedCSTStakingRewardsTable = ({ list }) => {
 
           {/* Table Body */}
           <TableBody>
+            {/* Map over the current page of data to render each row */}
             {currentPageData.map((row) => (
               <UncollectedRewardsRow key={row.EvtLogId} row={row} />
             ))}
@@ -121,7 +143,7 @@ export const UncollectedCSTStakingRewardsTable = ({ list }) => {
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Pagination */}
+      {/* Pagination Controls */}
       <CustomPagination
         page={currentPage}
         setPage={setCurrentPage}
@@ -131,3 +153,6 @@ export const UncollectedCSTStakingRewardsTable = ({ list }) => {
     </>
   );
 };
+
+
+// Todo: add buttons for claim rewards to table
