@@ -16,7 +16,7 @@ const NETWORK_URLS: { [key in SupportedChainId]: string } = {
   [SupportedChainId.ARBITRUM_ONE]: `https://arbitrum-mainnet.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.ARBITRUM_RINKEBY]: `https://arbitrum-rinkeby.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.ARBITRUM_GOERLI]: `https://arbitrum-goerli.infura.io/v3/${INFURA_KEY}`,
-  [SupportedChainId.LOCAL_NETWORK]: 'http://170.187.142.12:11845',
+  [SupportedChainId.LOCAL_NETWORK]: 'http://161.129.67.42:22945',
   [SupportedChainId.SEPOLIA]: `https://sepolia-rollup.arbitrum.io/rpc`,
 }
 

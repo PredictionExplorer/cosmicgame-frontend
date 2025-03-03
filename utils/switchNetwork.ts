@@ -16,8 +16,8 @@ const addChainRequest = (ethereum: any) => {
     params: [
       {
         chainId: '0x7A69',
-        chainName: 'Localhost 11845',
-        rpcUrls: ['http://170.187.142.12:11845'],
+        chainName: 'Localhost 22945',
+        rpcUrls: ['http://161.129.67.42:22945'],
         nativeCurrency: {
           name: 'AGOR',
           symbol: 'AGOR',

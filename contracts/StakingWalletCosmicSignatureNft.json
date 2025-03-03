@@ -1,19 +1,19 @@
 [
   "constructor(address,address)",
-  "error CallDenied(string,address)",
   "error FundTransferFailed(string,address,uint256)",
   "error InvalidOperationInCurrentState(string)",
   "error NftAlreadyUnstaked(string,uint256)",
+  "error NftHasAlreadyBeenStaked(string,uint256)",
   "error NftNotUnstaked(string,uint256)",
-  "error NftOneTimeStaking(string,uint256)",
   "error NftStakeActionAccessDenied(string,uint256,address)",
   "error NftStakeActionInvalidId(string,uint256)",
   "error NoStakedNfts(string)",
   "error NumEthDepositsToEvaluateMaxLimitIsOutOfAllowedRange(string,uint256)",
   "error OwnableInvalidOwner(address)",
   "error OwnableUnauthorizedAccount(address)",
+  "error UnauthorizedCaller(string,address)",
   "error ZeroAddress(string)",
-  "event EthDepositReceived(uint256 indexed,uint256,uint256,uint256,uint256,uint256)",
+  "event EthDepositReceived(uint256 indexed,uint256,uint256,uint256 indexed,uint256,uint256)",
   "event FundTransferFailed(string,address indexed,uint256)",
   "event FundsTransferredToCharity(address indexed,uint256)",
   "event NftStaked(uint256 indexed,uint8,uint256 indexed,address indexed,uint256)",
@@ -21,7 +21,6 @@
   "event OwnershipTransferred(address indexed,address indexed)",
   "event RewardPaid(uint256 indexed,uint256 indexed,address indexed,uint256,uint256)",
   "event StateReset(uint256)",
-  "function NUM_ETH_DEPOSITS_TO_EVALUATE_HARD_MAX_LIMIT() view returns (uint256)",
   "function actionCounter() view returns (uint256)",
   "function depositIfPossible(uint256) payable",
   "function ethDeposits(uint256) view returns (uint64, uint192)",
@@ -42,5 +41,5 @@
   "function tryPerformMaintenance(bool,address) returns (bool)",
   "function unstake(uint256,uint256)",
   "function unstakeMany(uint256[],uint256)",
-  "function wasNftUsed(uint256) view returns (bool)"
+  "function wasNftUsed(uint256) view returns (uint256)"
 ]

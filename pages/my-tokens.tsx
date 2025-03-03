@@ -181,7 +181,7 @@ function CSTRow({ nft }: { nft: CSTToken }) {
   Sub-Component: CSTTable
   Renders a paginated table of CST tokens.
 ------------------------------------------------------------------ */
-function CSTTable({ list }: { list: CSTToken[] }) {
+export function CSTTable({ list }: { list: CSTToken[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const PER_PAGE = 5;
 

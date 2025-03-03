@@ -21,11 +21,6 @@ import { useActiveWeb3React } from "../hooks/web3";
   the current user's address matches the holder's address.
 ------------------------------------------------------------------ */
 const HolderRow = ({ holder }) => {
-  // If there's no holder data, render an empty row (prevents errors).
-  if (!holder) {
-    return <TablePrimaryRow />;
-  }
-
   // Destructure the active account from context (e.g., Metamask).
   const { account } = useActiveWeb3React();
 
@@ -34,6 +29,11 @@ const HolderRow = ({ holder }) => {
     account === holder.userAddr
       ? { backgroundColor: "rgba(255, 255, 255, 0.06)" }
       : {};
+
+  // If there's no holder data, render an empty row (prevents errors).
+  if (!holder) {
+    return <TablePrimaryRow />;
+  }
 
   return (
     <TablePrimaryRow sx={highlightStyle}>
