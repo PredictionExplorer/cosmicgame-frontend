@@ -294,7 +294,7 @@ const NewHome = () => {
   const onBid = async () => {
     setIsBidding(true);
     try {
-      const bidPrice = await cosmicGameContract.getBidPrice();
+      const bidPrice = await cosmicGameContract.getNextEthBidPrice(0);
       let newBidPrice = bidPrice
         .mul(ethers.utils.parseEther((100 + bidPricePlus).toString()))
         .div(ethers.utils.parseEther("100"));
@@ -319,7 +319,10 @@ const NewHome = () => {
         (donationType === "ETH" && (!tokenDonateAddress || !tokenAmount))
       ) {
         await cosmicGameContract
-          .bid(rwlkId, message, { value: newBidPrice, gasLimit: 30000000 })
+          .bidWithEth(rwlkId, message, {
+            value: newBidPrice,
+            gasLimit: 30000000,
+          })
           .then((tx: any) => tx.wait());
         setTimeout(() => {
           fetchDataCollection();
@@ -384,10 +387,16 @@ const NewHome = () => {
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
-            .bidAndDonateNFT(rwlkId, message, nftDonateAddress, nftIdNum, {
-              value: newBidPrice,
-              gasLimit: 30000000,
-            })
+            .bidWithEthAndDonateNft(
+              rwlkId,
+              message,
+              nftDonateAddress,
+              nftIdNum,
+              {
+                value: newBidPrice,
+                gasLimit: 30000000,
+              }
+            )
             .then((tx: any) => tx.wait());
           setTimeout(() => {
             fetchDataCollection();
@@ -467,7 +476,7 @@ const NewHome = () => {
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
-            .bidAndDonateToken(
+            .bidWithEthAndDonateToken(
               rwlkId,
               message,
               tokenDonateAddress,
@@ -531,13 +540,13 @@ const NewHome = () => {
           return;
         }
       }
-      const priceMaxLimit = await cosmicGameContract.getCurrentBidPriceCST();
+      const priceMaxLimit = await cosmicGameContract.getNextCstBidPrice(0);
       if (
         (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
         (donationType === "ETH" && (!tokenDonateAddress || !tokenAmount))
       ) {
         await cosmicGameContract
-          .bidWithCST(priceMaxLimit, message)
+          .bidWithCst(priceMaxLimit, message)
           .then((tx: any) => tx.wait());
         setTimeout(() => {
           fetchDataCollection();
@@ -1026,7 +1035,7 @@ const NewHome = () => {
       setTimeoutClaimPrize(Number(timeout));
     };
     const fetchActivationTime = async () => {
-      const activationTime = await cosmicGameContract.activationTime();
+      const activationTime = await cosmicGameContract.roundActivationTime();
       setActivationTime(Number(activationTime));
     };
 
