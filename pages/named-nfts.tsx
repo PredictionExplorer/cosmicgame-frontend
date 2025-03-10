@@ -16,15 +16,27 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "../components/CustomPagination";
 import { GetServerSideProps } from "next";
 
+/* ------------------------------------------------------------------
+  Sub-Component: NamedNFTRow
+  Renders a single row in the table, showing:
+    - DateTime (formatted),
+    - Token ID (link to token detail page),
+    - Token Name.
+------------------------------------------------------------------ */
 const NamedNFTRow = ({ nft }) => {
+  // If there's no data for nft, return an empty row.
   if (!nft) {
     return <TablePrimaryRow />;
   }
+
   return (
     <TablePrimaryRow>
+      {/* NFT's minting datetime */}
       <TablePrimaryCell>
         {convertTimestampToDateTime(nft.MintTimeStamp)}
       </TablePrimaryCell>
+
+      {/* Token ID, linking to a detail page */}
       <TablePrimaryCell align="center">
         <Link
           sx={{ color: "inherit", fontSize: "inherit" }}
@@ -33,11 +45,17 @@ const NamedNFTRow = ({ nft }) => {
           {nft.TokenId}
         </Link>
       </TablePrimaryCell>
+
+      {/* Token's custom name */}
       <TablePrimaryCell>{nft.TokenName}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
+/* ------------------------------------------------------------------
+  Sub-Component: NamedNFTsTable
+  Receives a list of NFT objects and renders them in a styled table.
+------------------------------------------------------------------ */
 const NamedNFTsTable = ({ list }) => {
   return (
     <TablePrimaryContainer>
@@ -59,32 +77,51 @@ const NamedNFTsTable = ({ list }) => {
   );
 };
 
+/* ------------------------------------------------------------------
+  Main Page Component: NamedNFTs
+  - Fetches named NFT data from an API on mount.
+  - Displays them in a paginated table with 5 rows per page.
+  - Shows loading and empty states.
+------------------------------------------------------------------ */
 const NamedNFTs = () => {
+  // Current page in the pagination
   const [curPage, setCurPage] = useState(1);
+
+  // Number of items to show per page
   const perPage = 5;
+
+  // Loading state to display progress while fetching data
   const [loading, setLoading] = useState(true);
+
+  // List of named NFTs fetched from the API
   const [list, setList] = useState([]);
 
+  // Fetch named NFTs from the API upon component mount
   useEffect(() => {
     const fetchNamedNFTs = async () => {
       try {
         setLoading(true);
-        let nfts = await api.get_named_nfts();
+        const nfts = await api.get_named_nfts();
         setList(nfts);
         setLoading(false);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         setLoading(false);
       }
     };
     fetchNamedNFTs();
   }, []);
 
+  // Rendering logic:
+  //  - If we're loading, show loading text
+  //  - If no NFTs, show a "No NFTs yet." message
+  //  - Otherwise, slice the data for the current page and show the table + pagination
   return (
     <MainWrapper>
       <Typography variant="h4" color="primary" gutterBottom textAlign="center">
         Named Cosmic Signature Tokens
       </Typography>
+
       <Box mt={6}>
         {loading ? (
           <Typography variant="h6">Loading...</Typography>
@@ -108,6 +145,11 @@ const NamedNFTs = () => {
   );
 };
 
+/* ------------------------------------------------------------------
+  getServerSideProps:
+  Provides server-side rendered meta tags for SEO (title, description, 
+  and Open Graph data). This ensures correct social media previews.
+------------------------------------------------------------------ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Named Cosmic Signature Tokens | Cosmic Signature";
   const description = "Named Cosmic Signature Tokens";
