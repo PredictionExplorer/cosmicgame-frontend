@@ -131,7 +131,7 @@ const NFTTrait = ({ tokenId }) => {
 
   const handleSetTokenName = async () => {
     try {
-      const tx = await nftContract.setTokenName(tokenId, tokenName);
+      const tx = await nftContract.setNftName(tokenId, tokenName);
       await tx.wait();
       await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
       setTokenName("");
@@ -154,7 +154,7 @@ const NFTTrait = ({ tokenId }) => {
 
   const handleClearName = async () => {
     try {
-      const tx = await nftContract.setTokenName(tokenId, "");
+      const tx = await nftContract.setNftName(tokenId, "");
       await tx.wait();
       await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
       setTokenName("");
