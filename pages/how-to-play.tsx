@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, SyntheticEvent } from "react";
 import {
   Accordion,
   AccordionDetails,
@@ -12,14 +12,32 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../utils";
 
+/**
+ * HowToPlay: A guide explaining how to play the Cosmic Signature game,
+ * including step-by-step instructions and FAQs in expandable accordions.
+ */
 const HowToPlay = () => {
-  const [expanded, setExpanded] = useState(null);
+  /**
+   * We track which accordion is currently expanded. If no accordion is open, the value is `false`.
+   */
+  const [expanded, setExpanded] = useState<number | false>(false);
 
-  const handleChange = (index) => (_event, isExpanded) => {
+  /**
+   * handleChange: Higher-order function that returns an event handler for the Accordion's onChange.
+   * - index: The index of the accordion
+   * - event: The event triggered by Accordion change
+   * - isExpanded: Whether the accordion is expanded or not
+   */
+  const handleChange = (index: number) => (
+    _event: SyntheticEvent,
+    isExpanded: boolean
+  ) => {
     setExpanded(isExpanded ? index : false);
   };
+
   return (
     <MainWrapper>
+      {/* Page Title */}
       <Typography
         variant="h4"
         color="primary"
@@ -29,6 +47,8 @@ const HowToPlay = () => {
       >
         How To Play Guide
       </Typography>
+
+      {/* Introductory Text */}
       <Typography mb={2}>
         Cosmic Signature is a strategy bidding game. In an exhilarating contest,
         players will bid against other players and against time to win exciting
@@ -37,13 +57,19 @@ const HowToPlay = () => {
       <Typography mb={4}>
         Here are the exact steps to play the Cosmic Signature game.
       </Typography>
+
+      {/* Step 1 Section */}
       <Box mt={8}>
         <Typography variant="h5" mb={4}>
           Step 1: Connect Your Wallet.
         </Typography>
         <Typography mb={2}>
           When you land on the Cosmic Signature website (
-          <Link href="www.cosmicsignature.com" target="_blank">
+          <Link
+            href="https://www.cosmicsignature.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             www.cosmicsignature.com
           </Link>
           ), you will be automatically prompted to connect your crypto wallet to
@@ -53,9 +79,17 @@ const HowToPlay = () => {
           If you are not prompted, click the [Connect Wallet] button at the top
           of your homepage screen.
         </Typography>
+
+        {/* Screenshot */}
         <Box mb={4}>
-          <img src="/images/screenshot1.png" width="100%" />
+          {/* Adding alt text for accessibility */}
+          <img
+            src="/images/screenshot1.png"
+            width="100%"
+            alt="Connecting wallet screenshot"
+          />
         </Box>
+
         <Typography mb={2}>
           Since the game is deployed on the Arbitrum blockchain, you will have
           to connect with a wallet that supports the Arbitrum blockchain, like
@@ -71,6 +105,8 @@ const HowToPlay = () => {
           of the Cosmic Signature website.
         </Typography>
       </Box>
+
+      {/* Step 2 Section */}
       <Box mt={8}>
         <Typography variant="h5" mb={4}>
           Step#2: Check The Bid Price!
@@ -82,15 +118,24 @@ const HowToPlay = () => {
         <Typography mb={2}>
           Review these 4 fields before placing a bid:
         </Typography>
+
+        {/* Timer Details */}
         <Typography mb={4}>
           1. <b>[Round Timer]:</b> At the top left of the website, you will see
           a countdown timer ticking down. At the start of each round, this timer
           is reset to 24 hours. Every time someone places a bid, the timer adds
           1 hour. The last person to bid when the timer runs out wins the game.
         </Typography>
+
         <Box mb={4}>
-          <img src="/images/screenshot2.png" width="100%" />
+          <img
+            src="/images/screenshot2.png"
+            width="100%"
+            alt="Round timer screenshot"
+          />
         </Box>
+
+        {/* Bid Price */}
         <Typography mb={2}>
           2. <b>[Bid Price]:</b> Before you place a bid, you want to check the
           bid price. You can make a bid using $ETH or Cosmic Tokens ($CST).
@@ -100,16 +145,29 @@ const HowToPlay = () => {
           get a 50% discount on your $ETH bid price. However, keep in mind that
           you can avail the 50% discount once, so be wise about using it.
         </Typography>
+
         <Box mb={4}>
-          <img src="/images/screenshot3.png" width="100%" />
+          <img
+            src="/images/screenshot3.png"
+            width="100%"
+            alt="Bid price screenshot"
+          />
         </Box>
+
+        {/* Main Prize Reward */}
         <Typography mb={4}>
           3. <b>[Main Prize Reward]:</b> The Main Prize Reward displays the
           amount you will get if you win the round.
         </Typography>
         <Box mb={4}>
-          <img src="/images/screenshot4.png" width="100%" />
+          <img
+            src="/images/screenshot4.png"
+            width="100%"
+            alt="Main prize reward screenshot"
+          />
         </Box>
+
+        {/* Last Bidder Address */}
         <Typography mb={2}>
           4. <b>[Last Bidder Address]:</b> The wallet address of the last person
           that made a bid.
@@ -120,6 +178,8 @@ const HowToPlay = () => {
           blockchain.
         </Typography>
       </Box>
+
+      {/* Step 3 Section */}
       <Box mt={8}>
         <Typography variant="h5" mb={4}>
           Step#3: Make A Bid!
@@ -154,6 +214,8 @@ const HowToPlay = () => {
           the last player to make the bid will win the round.
         </Typography>
       </Box>
+
+      {/* Accordion #1: How To Claim My Rewards */}
       <Box mt={8}>
         <Accordion expanded={expanded === 0} onChange={handleChange(0)}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -187,6 +249,8 @@ const HowToPlay = () => {
           </AccordionDetails>
         </Accordion>
       </Box>
+
+      {/* Accordion #2: Things To Keep In Mind */}
       <Box mt={8}>
         <Accordion
           expanded={expanded === 1}
@@ -234,16 +298,23 @@ const HowToPlay = () => {
           </AccordionDetails>
         </Accordion>
       </Box>
+
+      {/* Closing Notes */}
       <Typography mt={8}>
         If you have any questions or confusion, feel free to ask them in the{" "}
         <Link
           href="https://discord.com/channels/1258032742084509779/1258691600951935056"
           target="_blank"
+          rel="noopener noreferrer"
         >
           #cosmic-gameroom
         </Link>{" "}
         channel inside our Discord, or{" "}
-        <Link href="https://x.com/CosmicSignatureNFT" target="_blank">
+        <Link
+          href="https://x.com/CosmicSignatureNFT"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           write us a message on Twitter/X
         </Link>
         .
@@ -255,6 +326,10 @@ const HowToPlay = () => {
   );
 };
 
+/**
+ * getServerSideProps: Fetches the title, description, and Open Graph data
+ * to be injected into the page for SEO purposes.
+ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "How To Play Guide | Cosmic Signature";
   const description =
