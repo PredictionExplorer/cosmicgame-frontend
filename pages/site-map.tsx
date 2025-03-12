@@ -3,9 +3,36 @@ import { MainWrapper } from "../components/styled";
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../utils";
 
+/**
+ * A list of links that provide per-user information routes.
+ */
+const perUserLinks = [
+  { href: "/my-tokens", label: "My tokens" },
+  { href: "/#", label: "Unclaimed assets" },
+  { href: "/winning-history", label: "Transactional history" },
+  { href: "/my-staking", label: "Staking" },
+];
+
+/**
+ * A list of links that provide overall system information routes.
+ */
+const systemLinks = [
+  { href: "/gallery", label: "CosmicSignature gallery" },
+  { href: "/prize", label: "Prizes" },
+  { href: "/staking", label: "Staking Rewards" },
+  { href: "/marketing", label: "Marketing Rewards" },
+  { href: "/statistics", label: "System Statistics" },
+  { href: "/contracts", label: "Contract Addresses" },
+  { href: "/faq", label: "FAQ" },
+];
+
+/**
+ * SiteMap: A page component displaying a list of internal links grouped into categories.
+ */
 const SiteMap = () => {
   return (
     <MainWrapper>
+      {/* Page heading */}
       <Typography
         variant="h4"
         color="primary"
@@ -15,103 +42,49 @@ const SiteMap = () => {
       >
         Site Map
       </Typography>
+
+      {/* Section for per-user information */}
       <Box>
         <Typography variant="h5">Per-user information</Typography>
         <Box ml={4}>
-          <Typography variant="subtitle1">
-            <Link
-              href="/my-tokens"
-              sx={{ fontSize: "inherit", color: "inherit" }}
-            >
-              My tokens
-            </Link>
-          </Typography>
-          <Typography variant="subtitle1">
-            <Link href="/#" sx={{ fontSize: "inherit", color: "inherit" }}>
-              Unclaimed assets
-            </Link>
-          </Typography>
-          <Typography variant="subtitle1">
-            <Link
-              href="/winning-history"
-              sx={{ fontSize: "inherit", color: "inherit" }}
-            >
-              Transactional history
-            </Link>
-          </Typography>
-          <Typography variant="subtitle1">
-            <Link
-              href="/my-staking"
-              sx={{ fontSize: "inherit", color: "inherit" }}
-            >
-              Staking
-            </Link>
-          </Typography>
+          {/* Map over perUserLinks to render them dynamically */}
+          {perUserLinks.map(({ href, label }) => (
+            <Typography variant="subtitle1" key={href}>
+              <Link href={href} sx={{ fontSize: "inherit", color: "inherit" }}>
+                {label}
+              </Link>
+            </Typography>
+          ))}
         </Box>
       </Box>
+
+      {/* Section for overall system information */}
       <Box mt={4}>
         <Typography variant="h5">Overall system information</Typography>
         <Box ml={4}>
-          <Typography variant="subtitle1">
-            <Link
-              href="/gallery"
-              sx={{ fontSize: "inherit", color: "inherit" }}
-            >
-              CosmicSignature gallery
-            </Link>
-          </Typography>
-          <Typography variant="subtitle1">
-            <Link href="/prize" sx={{ fontSize: "inherit", color: "inherit" }}>
-              Prizes
-            </Link>
-          </Typography>
-          <Typography variant="subtitle1">
-            <Link
-              href="/staking"
-              sx={{ fontSize: "inherit", color: "inherit" }}
-            >
-              Staking Rewards
-            </Link>
-          </Typography>
-          <Typography variant="subtitle1">
-            <Link
-              href="/marketing"
-              sx={{ fontSize: "inherit", color: "inherit" }}
-            >
-              Marketing Rewards
-            </Link>
-          </Typography>
-          <Typography variant="subtitle1">
-            <Link
-              href="/statistics"
-              sx={{ fontSize: "inherit", color: "inherit" }}
-            >
-              System Statistics
-            </Link>
-          </Typography>
-          <Typography variant="subtitle1">
-            <Link
-              href="/contracts"
-              sx={{ fontSize: "inherit", color: "inherit" }}
-            >
-              Contract Addresses
-            </Link>
-          </Typography>
-          <Typography variant="subtitle1">
-            <Link href="/faq" sx={{ fontSize: "inherit", color: "inherit" }}>
-              FAQ
-            </Link>
-          </Typography>
+          {/* Map over systemLinks to render them dynamically */}
+          {systemLinks.map(({ href, label }) => (
+            <Typography variant="subtitle1" key={href}>
+              <Link href={href} sx={{ fontSize: "inherit", color: "inherit" }}>
+                {label}
+              </Link>
+            </Typography>
+          ))}
         </Box>
       </Box>
     </MainWrapper>
   );
 };
 
+/**
+ * getServerSideProps: Fetches and sets metadata (e.g., for SEO and social sharing)
+ * before rendering the SiteMap page on the server side.
+ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Site Map | Cosmic Signature";
   const description = "Site Map";
 
+  // Open Graph and Twitter meta data
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
