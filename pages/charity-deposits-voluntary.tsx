@@ -6,22 +6,30 @@ import { CharityDepositTable } from "../components/CharityDepositTable";
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../utils";
 
+/**
+ * Page component for displaying voluntary deposits to the charity wallet.
+ */
 const CharityDepositsVoluntary = () => {
+  // Track the loading state to conditionally render a loading message or the table
   const [loading, setLoading] = useState(true);
-  const [voluntary, setVoluntary] = useState([]);
 
+  // Store the list of voluntary deposits fetched from the API
+  const [voluntaryDeposits, setVoluntaryDeposits] = useState([]);
+
+  // Fetch voluntary deposits from the API on component mount
   useEffect(() => {
     const fetchCharityDeposits = async () => {
       try {
         setLoading(true);
-        const voluntary = await api.get_charity_voluntary();
-        setVoluntary(voluntary);
-        setLoading(false);
+        const response = await api.get_charity_voluntary();
+        setVoluntaryDeposits(response);
       } catch (err) {
-        console.log(err);
+        console.error("Failed to fetch charity voluntary deposits:", err);
+      } finally {
         setLoading(false);
       }
     };
+
     fetchCharityDeposits();
   }, []);
 
@@ -30,15 +38,21 @@ const CharityDepositsVoluntary = () => {
       <Typography variant="h4" color="primary" textAlign="center" mb={4}>
         Voluntary Deposits
       </Typography>
+
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
-        <CharityDepositTable list={voluntary} />
+        // Pass the fetched voluntary deposits to the table component
+        <CharityDepositTable list={voluntaryDeposits} />
       )}
     </MainWrapper>
   );
 };
 
+/**
+ * Fetches metadata for server-side rendering, including title, description,
+ * and open graph data for social sharing.
+ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Deposits To Charity Wallet | Cosmic Signature";
   const description = "Deposits To Charity Wallet";
@@ -52,7 +66,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     { name: "twitter:image", content: logoImgUrl },
   ];
 
-  return { props: { title, description, openGraphData } };
+  return {
+    props: { title, description, openGraphData },
+  };
 };
 
 export default CharityDepositsVoluntary;

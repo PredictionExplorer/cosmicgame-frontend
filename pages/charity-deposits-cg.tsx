@@ -6,22 +6,32 @@ import { CharityDepositTable } from "../components/CharityDepositTable";
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../utils";
 
+/**
+ * Component for displaying Cosmic Game Charity Deposits.
+ */
 const CharityCGDeposits = () => {
+  // Tracks whether the data is still being fetched.
   const [loading, setLoading] = useState(true);
-  const [CGDeposits, setCGDeposits] = useState([]);
 
+  // Stores the array of CG deposit data.
+  const [charityCGDeposits, setCharityCGDeposits] = useState([]);
+
+  /**
+   * Fetches the CG deposit data from the API on component mount.
+   */
   useEffect(() => {
     const fetchCharityDeposits = async () => {
       try {
         setLoading(true);
         const cg_deposits = await api.get_charity_cg_deposits();
-        setCGDeposits(cg_deposits);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
+        setCharityCGDeposits(cg_deposits);
+      } catch (error) {
+        console.error("Failed to fetch CG deposits:", error);
+      } finally {
         setLoading(false);
       }
     };
+
     fetchCharityDeposits();
   }, []);
 
@@ -33,12 +43,16 @@ const CharityCGDeposits = () => {
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
-        <CharityDepositTable list={CGDeposits} />
+        <CharityDepositTable list={charityCGDeposits} />
       )}
     </MainWrapper>
   );
 };
 
+/**
+ * Retrieves SEO-related metadata for server-side rendering,
+ * including open graph data for social media previews.
+ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Cosmic Game Charity Deposits | Cosmic Signature";
   const description = "Cosmic Game Charity Deposits";
@@ -52,7 +66,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     { name: "twitter:image", content: logoImgUrl },
   ];
 
-  return { props: { title, description, openGraphData } };
+  return {
+    props: { title, description, openGraphData },
+  };
 };
 
 export default CharityCGDeposits;
