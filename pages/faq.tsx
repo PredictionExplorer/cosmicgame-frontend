@@ -7,6 +7,11 @@ import { isFirefox, isMobile } from "react-device-detect";
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../utils";
 
+/**
+ * Conditionally styled Paper component.
+ * If the user is NOT on a mobile device and NOT using Firefox,
+ * we apply a custom, gradient-based background with a rounded shape mask.
+ */
 const StyledPaper = styled(Paper)(
   !(isMobile || isFirefox) && {
     position: "relative",
@@ -23,14 +28,23 @@ const StyledPaper = styled(Paper)(
   }
 );
 
+/**
+ * FAQPage: Displays a list of frequently asked questions and
+ * provides links to external resources for further queries.
+ */
 const FAQPage = () => {
   return (
     <MainWrapper>
+      {/* Page Title */}
       <Typography variant="h4" color="primary" textAlign="center" gutterBottom>
         FAQ
       </Typography>
+
       <Box mt={4}>
+        {/* Render the FAQ component, presumably a list of questions/answers */}
         <FAQ />
+
+        {/* Bottom Section prompting further queries via Twitter/Discord */}
         <StyledPaper sx={{ display: "flex", alignItems: "center" }}>
           <Box>
             <Typography variant="h4">Have a question?</Typography>
@@ -51,6 +65,8 @@ const FAQPage = () => {
                   color: "#fff",
                 }}
                 href="https://twitter.com/RandomWalkNFT"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Twitter
               </Link>
@@ -62,6 +78,8 @@ const FAQPage = () => {
                   color: "#fff",
                 }}
                 href="https://discord.gg/bGnPn96Qwt"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Discord
               </Link>
@@ -81,10 +99,14 @@ const FAQPage = () => {
   );
 };
 
+/**
+ * getServerSideProps: Pre-renders the FAQ page with SEO meta tags for social sharing.
+ */
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "FAQ | Cosmic Signature";
   const description = "Frequenly Asked Questions (FAQ)";
 
+  // Open Graph and Twitter meta data
   const openGraphData = [
     { property: "og:title", content: title },
     { property: "og:description", content: description },
