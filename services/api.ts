@@ -547,6 +547,17 @@ class ApiService {
     }
   }
 
+  // r.GET("/api/cosmicgame/donations/eth/with_info/info/:record_id",api_cosmic_game_donations_cg_with_info_record_info)
+  public async get_donations_with_info_by_id(id: number) {
+    try {
+      const { data } = await axios.get(getAPIUrl(`donations/eth/with_info/info/${id}`));
+      return data.ETHDonation;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  }
+
   // r.GET("/api/cosmicgame/donations/eth/by_user/:user_addr",api_cosmic_game_donations_by_user)
   public async get_donations_eth_by_user(address: string) {
     try {
