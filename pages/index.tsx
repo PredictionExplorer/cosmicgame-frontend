@@ -185,29 +185,7 @@ const NewHome = () => {
       if (data && data.MainStats.StakeStatisticsRWalk.TotalTokensStaked > 0)
         count += data.NumRaffleNFTWinnersStakingRWalk;
       setTimeout(async () => {
-        await Promise.all(
-          Array(count)
-            .fill(1)
-            .map(async (_value, index) => {
-              try {
-                const t = token_id - index;
-                const seed = await cosmicSignatureContract.seeds(t);
-                let special = false;
-                if (index === count - 1) special = true;
-                await api.create(t, seed, special);
-              } catch (err) {
-                if (err?.data?.message) {
-                  const msg = err?.data?.message;
-                  setNotification({
-                    visible: true,
-                    type: "error",
-                    text: msg,
-                  });
-                }
-                console.log(err);
-              }
-            })
-        );
+        await api.create(token_id, count);
         router.push({
           pathname: "/prize-claimed",
           query: {

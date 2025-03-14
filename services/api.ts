@@ -14,12 +14,9 @@ const getMainAPIUrl = (url: string) => {
 };
 
 class ApiService {
-  public async create(token_id: number, seed: string, special: boolean) {
+  public async create(token_id: number, count: number) {
     try {
-      const { data } = await axios.post(
-        getMainAPIUrl("cosmicgame_tokens"),
-        { token_id, seed, special }
-      );
+      const { data } = await axios.post(getMainAPIUrl("cosmicgame_tokens"), { token_id, count });
       return data?.task_id || -1;
     } catch (err) {
       console.log(err);
