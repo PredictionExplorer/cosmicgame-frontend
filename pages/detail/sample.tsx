@@ -23,7 +23,7 @@ import "react-awesome-lightbox/build/style.css";
 import ModalVideo from "react-modal-video";
 import "react-modal-video/css/modal-video.min.css";
 import NFTVideo from "../../components/NFTVideo";
-import { getAssetsUrl } from "../../utils";
+import { getAssetsUrl, getOriginUrl } from "../../utils";
 
 const SampleDetail = () => {
   // State for modal video visibility
@@ -97,8 +97,8 @@ const SampleDetail = () => {
                       onClose={handleMenuClose}
                     >
                       {[
-                        { label: "Video", link: video },
-                        { label: "Image", link: image },
+                        { label: "Video", link: getOriginUrl(video) },
+                        { label: "Image", link: getOriginUrl(image) },
                         { label: "Detail Page", link: window.location.href },
                       ].map(({ label, link }) => (
                         <CopyToClipboard key={label} text={link}>

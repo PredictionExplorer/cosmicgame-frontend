@@ -261,4 +261,10 @@ export const getAssetsUrl = (url: string) => {
   return `${proxyUrl}${encodeURIComponent(imageServerUrl + url)}`;
 };
 
+export const getOriginUrl = (url: string) => {
+  const strippedUrl = url.replace("/api/proxy?url=", "");
+  const decodedUrl = decodeURIComponent(strippedUrl);
+  return decodedUrl;
+}
+
 export const logoImgUrl = getAssetsUrl("cosmicsignature/logo.png");

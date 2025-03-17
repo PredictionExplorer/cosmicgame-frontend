@@ -25,7 +25,12 @@ import "react-modal-video/css/modal-video.min.css";
 
 import NFTVideo from "./NFTVideo";
 import { useActiveWeb3React } from "../hooks/web3";
-import { convertTimestampToDateTime, formatId } from "../utils";
+import {
+  convertTimestampToDateTime,
+  formatId,
+  getAssetsUrl,
+  getOriginUrl,
+} from "../utils";
 import {
   StyledCard,
   SectionWrapper,
@@ -64,8 +69,6 @@ const NFTTrait = ({ tokenId }) => {
   const nftContract = useCosmicSignatureContract();
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
-
-  const BASE_URL = "https://cosmic-game2.s3.us-east-2.amazonaws.com";
 
   const handleClickTransfer = async () => {
     const { ethereum } = window;
@@ -228,8 +231,8 @@ const NFTTrait = ({ tokenId }) => {
     try {
       const res = await api.get_cst_info(tokenId);
       setNft(res);
-      setImage(`${BASE_URL}/0x${res.Seed}.png`);
-      setVideo(`${BASE_URL}/0x${res.Seed}.mp4`);
+      setImage(getAssetsUrl(`cosmicsignature/0x${res.Seed}.png`));
+      setVideo(getAssetsUrl(`cosmicsignature/0x${res.Seed}.mp4`));
     } catch (e) {
       console.error(e);
     }
@@ -312,12 +315,12 @@ const NFTTrait = ({ tokenId }) => {
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
                   >
-                    <CopyToClipboard text={video}>
+                    <CopyToClipboard text={getOriginUrl(video)}>
                       <PrimaryMenuItem onClick={handleMenuClose}>
                         <Typography>Video</Typography>
                       </PrimaryMenuItem>
                     </CopyToClipboard>
-                    <CopyToClipboard text={image}>
+                    <CopyToClipboard text={getOriginUrl(image)}>
                       <PrimaryMenuItem onClick={handleMenuClose}>
                         <Typography>Image</Typography>
                       </PrimaryMenuItem>
