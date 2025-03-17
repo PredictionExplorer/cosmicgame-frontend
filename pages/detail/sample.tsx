@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, MouseEvent } from "react";
 import {
   MainWrapper,
   NFTInfoWrapper,
@@ -26,30 +26,36 @@ import NFTVideo from "../../components/NFTVideo";
 import { getAssetsUrl } from "../../utils";
 
 const SampleDetail = () => {
-  const [open, setOpen] = useState(false);
-  const [imageOpen, setImageOpen] = useState(false);
-  const [videoPath, setVideoPath] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
+  // State for modal video visibility
+  const [isVideoOpen, setVideoOpen] = useState(false);
+  // State for image lightbox visibility
+  const [isImageOpen, setImageOpen] = useState(false);
+  // State to hold currently selected video path
+  const [videoPath, setVideoPath] = useState<string | null>(null);
+  // State for anchor element used in menu positioning
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   const image = getAssetsUrl("cosmicsignature/sample.png");
   const video = getAssetsUrl("cosmicsignature/sample.mp4");
-  const handlePlay = (videoPath) => {
-    setVideoPath(videoPath);
-    setOpen(true);
+
+  // Opens the video modal and sets video source
+  const handlePlayVideo = (path: string) => {
+    setVideoPath(path);
+    setVideoOpen(true);
   };
-  const handleMenuOpen = (e) => {
+
+  // Opens dropdown menu
+  const handleMenuOpen = (e: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
   };
-  const handleMenuClose = (e) => {
+
+  // Closes dropdown menu
+  const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
   return (
-    <MainWrapper
-      maxWidth={false}
-      style={{
-        paddingLeft: 0,
-        paddingRight: 0,
-      }}
-    >
+    <MainWrapper maxWidth={false} sx={{ px: 0 }}>
       <Container>
         <SectionWrapper>
           <Grid container spacing={4} justifyContent="center">
@@ -67,6 +73,7 @@ const SampleDetail = () => {
                   </NFTInfoWrapper>
                 </CardActionArea>
               </StyledCard>
+
               <Box mt={2}>
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
@@ -89,67 +96,62 @@ const SampleDetail = () => {
                       open={Boolean(anchorEl)}
                       onClose={handleMenuClose}
                     >
-                      <CopyToClipboard text={video}>
-                        <PrimaryMenuItem onClick={handleMenuClose}>
-                          <Typography>Video</Typography>
-                        </PrimaryMenuItem>
-                      </CopyToClipboard>
-                      <CopyToClipboard text={image}>
-                        <PrimaryMenuItem onClick={handleMenuClose}>
-                          <Typography>Image</Typography>
-                        </PrimaryMenuItem>
-                      </CopyToClipboard>
-                      <CopyToClipboard text={window.location.href}>
-                        <PrimaryMenuItem onClick={handleMenuClose}>
-                          <Typography>Detail Page</Typography>
-                        </PrimaryMenuItem>
-                      </CopyToClipboard>
+                      {[
+                        { label: "Video", link: video },
+                        { label: "Image", link: image },
+                        { label: "Detail Page", link: window.location.href },
+                      ].map(({ label, link }) => (
+                        <CopyToClipboard key={label} text={link}>
+                          <PrimaryMenuItem onClick={handleMenuClose}>
+                            <Typography>{label}</Typography>
+                          </PrimaryMenuItem>
+                        </CopyToClipboard>
+                      ))}
                     </Menu>
                   </Grid>
                 </Grid>
               </Box>
             </Grid>
+
             <Grid item xs={12} sm={8} md={6}>
               <Box sx={{ mb: 1, display: "flex" }}>
-                <Typography color="primary" component="span">
-                  Token Name:
-                </Typography>
-                &nbsp;
-                <Typography component="span">Sample NFT</Typography>
+                <Typography color="primary">Token Name:</Typography>&nbsp;
+                <Typography>Sample NFT</Typography>
               </Box>
               <Box sx={{ mb: 1, display: "flex" }}>
-                <Typography color="primary" component="span">
-                  Seed:
-                </Typography>
-                &nbsp;
+                <Typography color="primary">Seed:</Typography>&nbsp;
                 <Typography
                   fontFamily="monospace"
-                  component="span"
                   sx={{
-                    fontFamily: "monospace",
                     display: "inline-block",
                     wordWrap: "break-word",
                     width: "32ch",
                   }}
                 >
-                  {
-                    "3c8510e4cbe870a700d7c44b05f2cdf84824fcd8108aaaafd7952222590b31de"
-                  }
+                  3c8510e4cbe870a700d7c44b05f2cdf84824fcd8108aaaafd7952222590b31de
                 </Typography>
               </Box>
             </Grid>
           </Grid>
+
           <Box mt="80px">
-            <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
+            <NFTVideo
+              image_thumb={image}
+              onClick={() => handlePlayVideo(video)}
+            />
           </Box>
-          {imageOpen && (
+
+          {/* Image Lightbox */}
+          {isImageOpen && (
             <Lightbox image={image} onClose={() => setImageOpen(false)} />
           )}
+
+          {/* Video Modal */}
           <ModalVideo
             channel="custom"
-            url={videoPath}
-            isOpen={open}
-            onClose={() => setOpen(false)}
+            url={videoPath || ""}
+            isOpen={isVideoOpen}
+            onClose={() => setVideoOpen(false)}
           />
         </SectionWrapper>
       </Container>
@@ -157,6 +159,7 @@ const SampleDetail = () => {
   );
 };
 
+// Server-side props for page metadata
 export async function getServerSideProps() {
   const title = "Sample Token | Cosmic Signature Token";
   const description =
@@ -171,9 +174,8 @@ export async function getServerSideProps() {
     { name: "twitter:description", content: description },
     { name: "twitter:image", content: imageUrl },
   ];
-  return {
-    props: { title, description, openGraphData },
-  };
+
+  return { props: { title, description, openGraphData } };
 }
 
 export default SampleDetail;
