@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, ChangeEvent, MouseEvent } from "react";
 import { useRouter } from "next/router";
 import {
   Box,
@@ -19,64 +19,91 @@ import {
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-
 import ModalVideo from "react-modal-video";
 import "react-modal-video/css/modal-video.min.css";
 
 import NFTVideo from "./NFTVideo";
+import NFTImage from "./NFTImage";
+import NameHistoryTable from "./NameHistoryTable";
+import { TransferHistoryTable } from "./TransferHistoryTable";
+
 import { useActiveWeb3React } from "../hooks/web3";
+import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
+import { useNotification } from "../contexts/NotificationContext";
+
+import api from "../services/api";
 import {
   convertTimestampToDateTime,
   formatId,
   getAssetsUrl,
   getOriginUrl,
 } from "../utils";
+
 import {
   StyledCard,
   SectionWrapper,
   NFTInfoWrapper,
   PrimaryMenuItem,
 } from "./styled";
+
 import {
   ArrowBack,
   ArrowForward,
   ExpandLess,
   ExpandMore,
 } from "@mui/icons-material";
-import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
-import NFTImage from "./NFTImage";
-import NameHistoryTable from "./NameHistoryTable";
-import { TransferHistoryTable } from "./TransferHistoryTable";
-import api from "../services/api";
-import { useNotification } from "../contexts/NotificationContext";
 
-const NFTTrait = ({ tokenId }) => {
+/**
+ * Props for the NFTTrait component.
+ */
+interface NFTTraitProps {
+  tokenId: number;
+}
+
+/**
+ * Displays an NFT's details and functionalities such as viewing the image/video,
+ * transferring ownership, renaming, and viewing historical information.
+ */
+const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
+  // Local state for media display and modals
   const [image, setImage] = useState("/images/qmark.png");
   const [video, setVideo] = useState("");
-  const [open, setOpen] = useState(false);
-  const [imageOpen, setImageOpen] = useState(false);
-  const [videoPath, setVideoPath] = useState(null);
-  const [address, setAddress] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [nft, setNft] = useState(null);
-  const [dashboard, setDashboard] = useState(null);
-  const [tokenName, setTokenName] = useState("");
-  const [nameHistory, setNameHistory] = useState([]);
-  const [transferHistory, setTransferHistory] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openVideo, setOpenVideo] = useState(false);
+  const [imageOpen, setImageOpen] = useState(false);
+  const [videoPath, setVideoPath] = useState<string | null>(null);
+
+  // Local state for transfer and renaming
+  const [address, setAddress] = useState("");
+  const [tokenName, setTokenName] = useState("");
+
+  // Local state for advanced data
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [nft, setNft] = useState<any>(null);
+  const [dashboard, setDashboard] = useState<any>(null);
+  const [nameHistory, setNameHistory] = useState<any[]>([]);
+  const [transferHistory, setTransferHistory] = useState<any[]>([]);
+
+  // Hooks for blockchain, notifications, and routing
   const router = useRouter();
   const nftContract = useCosmicSignatureContract();
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
 
+  /**
+   * Checks if the destination address has any transactions.
+   * If not, opens a dialog to confirm transfer to a non-existing address.
+   */
   const handleClickTransfer = async () => {
-    const { ethereum } = window;
+    const { ethereum } = window as any;
     try {
       const txCount = await ethereum.request({
         method: "eth_getTransactionCount",
         params: [address, "latest"],
       });
+
+      // If the address is brand new (no transactions), prompt a warning dialog
       if (Number(txCount) === 0) {
         setOpenDialog(true);
       } else {
@@ -87,16 +114,25 @@ const NFTTrait = ({ tokenId }) => {
     }
   };
 
+  /**
+   * Closes the transfer confirmation dialog.
+   */
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
 
-  const handlePlay = async (videoUrl) => {
+  /**
+   * Confirms if the video is accessible. If it is, open it in a modal video player;
+   * otherwise, show a notification that the video is still being generated.
+   *
+   * @param videoUrl The URL of the video to be played.
+   */
+  const handlePlay = async (videoUrl: string) => {
     try {
       const res = await fetch(videoUrl, { method: "HEAD" });
       if (res.ok) {
         setVideoPath(videoUrl);
-        setOpen(true);
+        setOpenVideo(true);
       } else {
         setNotification({
           visible: true,
@@ -113,11 +149,16 @@ const NFTTrait = ({ tokenId }) => {
     }
   };
 
+  /**
+   * Transfers the NFT to the address stored in the "address" state.
+   */
   const handleTransfer = async () => {
     handleCloseDialog();
     try {
       const tx = await nftContract.transferFrom(account, address, tokenId);
       await tx.wait();
+
+      // Re-fetch data after a successful transfer
       await Promise.all([fetchCSTInfo(), fetchTransferHistory()]);
       setAddress("");
     } catch (err) {
@@ -132,10 +173,15 @@ const NFTTrait = ({ tokenId }) => {
     }
   };
 
+  /**
+   * Sets or updates the name of the token via the smart contract.
+   */
   const handleSetTokenName = async () => {
     try {
       const tx = await nftContract.setNftName(tokenId, tokenName);
       await tx.wait();
+
+      // Re-fetch data after setting the name
       await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
       setTokenName("");
       setNotification({
@@ -155,10 +201,15 @@ const NFTTrait = ({ tokenId }) => {
     }
   };
 
+  /**
+   * Clears the name of the token via the smart contract.
+   */
   const handleClearName = async () => {
     try {
       const tx = await nftContract.setNftName(tokenId, "");
       await tx.wait();
+
+      // Re-fetch data after clearing the name
       await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
       setTokenName("");
       setNotification({
@@ -179,12 +230,17 @@ const NFTTrait = ({ tokenId }) => {
     }
   };
 
-  const handleChange = (e) => {
-    let name = e.target.value;
+  /**
+   * Restricts the length of the token name to 32 characters
+   * (multi-byte characters count more heavily).
+   */
+  const handleChangeName = (e: ChangeEvent<HTMLInputElement>) => {
+    const inputName = e.target.value;
     let len = 0;
     let i;
-    for (i = 0; i < name.length; i++) {
-      if (name.charCodeAt(i) > 255) {
+    for (i = 0; i < inputName.length; i++) {
+      if (inputName.charCodeAt(i) > 255) {
+        // Multi-byte character
         len += 3;
       } else {
         len++;
@@ -194,21 +250,39 @@ const NFTTrait = ({ tokenId }) => {
         break;
       }
     }
-    setTokenName(name.slice(0, i));
+    setTokenName(inputName.slice(0, i));
   };
 
+  /**
+   * Navigates to the previous NFT if it exists.
+   */
   const handlePrev = () => router.push(`/detail/${Math.max(tokenId - 1, 0)}`);
+
+  /**
+   * Navigates to the next NFT if it exists, based on the total supply.
+   */
   const handleNext = async () => {
     const totalSupply = await nftContract.totalSupply();
     router.push(`/detail/${Math.min(tokenId + 1, totalSupply.toNumber() - 1)}`);
   };
-  const handleMenuOpen = (e) => {
+
+  /**
+   * Opens the copy link menu.
+   */
+  const handleMenuOpen = (e: MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget);
   };
+
+  /**
+   * Closes the copy link menu.
+   */
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
 
+  /**
+   * Fetches the name history for the current token from the backend.
+   */
   const fetchNameHistory = async () => {
     try {
       const history = await api.get_name_history(tokenId);
@@ -218,6 +292,9 @@ const NFTTrait = ({ tokenId }) => {
     }
   };
 
+  /**
+   * Fetches the ownership transfer history for the current token.
+   */
   const fetchTransferHistory = async () => {
     try {
       const history = await api.get_ct_ownership_transfers(tokenId);
@@ -227,6 +304,9 @@ const NFTTrait = ({ tokenId }) => {
     }
   };
 
+  /**
+   * Fetches the main NFT information (like seed, image, video) from the backend.
+   */
   const fetchCSTInfo = async () => {
     try {
       const res = await api.get_cst_info(tokenId);
@@ -238,12 +318,18 @@ const NFTTrait = ({ tokenId }) => {
     }
   };
 
+  /**
+   * Fetches dashboard info and, if the tokenId is valid, fetches
+   * the NFT info, name history, and ownership transfer history.
+   */
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const dashboardData = await api.get_dashboard_info();
         setDashboard(dashboardData);
+
+        // Only fetch data if the token exists (tokenId < NumCSTokenMints)
         if (dashboardData.MainStats.NumCSTokenMints > tokenId) {
           await Promise.all([
             fetchCSTInfo(),
@@ -256,9 +342,11 @@ const NFTTrait = ({ tokenId }) => {
       }
       setLoading(false);
     };
+
     fetchData();
   }, [tokenId]);
 
+  // Show a simple loading text while data is being fetched
   if (loading) {
     return (
       <Container>
@@ -271,6 +359,7 @@ const NFTTrait = ({ tokenId }) => {
     <Container>
       <SectionWrapper>
         <Grid container spacing={4} justifyContent="center">
+          {/* Left column: NFT image and navigations */}
           <Grid item xs={12} sm={8} md={6}>
             <StyledCard>
               <CardActionArea onClick={() => setImageOpen(true)}>
@@ -364,6 +453,8 @@ const NFTTrait = ({ tokenId }) => {
               </Grid>
             </Box>
           </Grid>
+
+          {/* Right column: NFT metadata and actions */}
           <Grid item xs={12} sm={8} md={6}>
             {nft.TimeStamp && (
               <Box mb={1}>
@@ -417,7 +508,6 @@ const NFTTrait = ({ tokenId }) => {
                 fontFamily="monospace"
                 component="span"
                 sx={{
-                  fontFamily: "monospace",
                   display: "inline-block",
                   wordWrap: "break-word",
                   width: "32ch",
@@ -433,6 +523,7 @@ const NFTTrait = ({ tokenId }) => {
               &nbsp;
               <Typography component="span">
                 {(() => {
+                  // Mapping the record type to specific labels
                   switch (nft.RecordType) {
                     case 1:
                       return "Raffle Winner";
@@ -462,6 +553,8 @@ const NFTTrait = ({ tokenId }) => {
                 })()}
               </Typography>
             </Box>
+
+            {/* Display staking eligibility */}
             {!nft.Staked && !nft.WasUnstaked ? (
               <Typography sx={{ color: "#0f0" }}>
                 The token is eligible for staking.
@@ -471,6 +564,8 @@ const NFTTrait = ({ tokenId }) => {
                 The token has already been staked and cannot be staked again.
               </Typography>
             )}
+
+            {/* Button to view round details */}
             <Box mt={6}>
               <Button
                 variant="outlined"
@@ -479,6 +574,8 @@ const NFTTrait = ({ tokenId }) => {
                 View Round Details
               </Button>
             </Box>
+
+            {/* Transfer and rename controls (only visible to the owner) */}
             {account === nft.CurOwnerAddr && (
               <>
                 <Box display="flex" mt={3}>
@@ -502,6 +599,7 @@ const NFTTrait = ({ tokenId }) => {
                     Transfer
                   </Button>
                 </Box>
+
                 <Box mt={3}>
                   <Typography variant="h6" align="left">
                     {nft.TokenName
@@ -518,7 +616,7 @@ const NFTTrait = ({ tokenId }) => {
                       fullWidth
                       sx={{ flex: 1 }}
                       inputProps={{ maxLength: 32 }}
-                      onChange={handleChange}
+                      onChange={handleChangeName}
                     />
                     <Button
                       color="secondary"
@@ -550,6 +648,8 @@ const NFTTrait = ({ tokenId }) => {
             )}
           </Grid>
         </Grid>
+
+        {/* Name history table */}
         {nameHistory.length !== 0 && (
           <Box mt="40px">
             <Typography variant="h6" mb={2}>
@@ -558,6 +658,8 @@ const NFTTrait = ({ tokenId }) => {
             <NameHistoryTable list={nameHistory} />
           </Box>
         )}
+
+        {/* Transfer history table */}
         {transferHistory.length !== 0 && !transferHistory[0].TransferType && (
           <Box mt="40px">
             <Typography variant="h6" mb={2}>
@@ -566,19 +668,27 @@ const NFTTrait = ({ tokenId }) => {
             <TransferHistoryTable list={transferHistory} />
           </Box>
         )}
+
+        {/* Video section */}
         <Box mt="80px">
           <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
         </Box>
+
+        {/* Lightbox for full-size image */}
         {imageOpen && (
           <Lightbox image={image} onClose={() => setImageOpen(false)} />
         )}
+
+        {/* Modal video player */}
         <ModalVideo
           channel="custom"
-          url={videoPath}
-          isOpen={open}
-          onClose={() => setOpen(false)}
+          url={videoPath ?? ""}
+          isOpen={openVideo}
+          onClose={() => setOpenVideo(false)}
         />
       </SectionWrapper>
+
+      {/* Dialog for transfer confirmation to new address */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md">
         <DialogTitle>
           Are you sure you want to send the token to the destination address?
