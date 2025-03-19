@@ -22,11 +22,7 @@ interface ApiData {
    * If stakeActionIds are numeric or string, adjust this array type accordingly.
    */
   unstakeableActionIds: (number | string)[];
-
-  /**
-   * Example: If you store claimable action IDs in state as well, add it here.
-   * claimableActionIds?: { DepositId: number; StakeActionId: number }[];
-   */
+  claimableActionIds?: { DepositId: number; StakeActionId: number }[];
 }
 
 /**
@@ -219,8 +215,7 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({
       setApiData({
         ...newData,
         unstakeableActionIds: [],
-        // Optionally handle claimableActionIds in the same manner:
-        // claimableActionIds: [],
+        claimableActionIds: [],
       });
     }
   };
