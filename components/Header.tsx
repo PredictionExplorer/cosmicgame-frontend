@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { FC, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
   Toolbar,
@@ -28,112 +28,182 @@ import { useStakedToken } from "../contexts/StakedTokenContext";
 import { useSystemMode } from "../contexts/SystemModeContext";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 
-const Header = () => {
-  const [mobileView, setMobileView] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+/**
+ * Interface representing the structure of a user’s balance.
+ */
+interface Balance {
+  CosmicToken: number;
+  ETH: number;
+  CosmicSignature: number;
+  RWLK: number;
+}
+
+/**
+ * The Header component is responsible for displaying the top navigation bar,
+ * handling both desktop and mobile viewports. It also fetches and displays
+ * user balances, staked tokens, and system mode notifications.
+ */
+const Header: FC = () => {
+  // State to check if the screen is in mobile view
+  const [mobileView, setMobileView] = useState<boolean>(false);
+
+  // State to control the open/close status of the mobile drawer
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+
+  // Pull in global API data from context
   const { apiData: status } = useApiData();
+
+  // Active Web3 account info
   const { account } = useActiveWeb3React();
-  const [loading, setLoading] = useState(true);
-  const [balance, setBalance] = useState({
+
+  // Loading state used for async data fetch calls
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Track the user's balances (ERC20, ETH, etc.)
+  const [balance, setBalance] = useState<Balance>({
     CosmicToken: 0,
     ETH: 0,
     CosmicSignature: 0,
     RWLK: 0,
   });
+
+  // Staked tokens from context
   const {
     cstokens: stakedCSTokens,
     rwlktokens: stakedRWLKTokens,
   } = useStakedToken();
+
+  // System mode data (e.g., maintenance)
   const { data: systemMode } = useSystemMode();
+
+  // Contract to fetch user RWLK NFTs
   const nftContract = useRWLKNFTContract();
 
+  /**
+   * Adjust mobileView based on window width changes.
+   */
   useEffect(() => {
-    const setResponsiveness = () => {
+    const handleWindowResize = () => {
       setMobileView(window.innerWidth < 1024);
     };
 
-    setResponsiveness();
+    handleWindowResize(); // Initial check on mount
 
-    window.addEventListener("resize", setResponsiveness);
-
+    window.addEventListener("resize", handleWindowResize);
     return () => {
-      window.removeEventListener("resize", setResponsiveness);
+      window.removeEventListener("resize", handleWindowResize);
     };
   }, []);
 
-  const fetchData = async (loading = true) => {
-    setLoading(loading);
-    try {
-      const user_balance = await api.get_user_balance(account);
-      const { UserInfo } = await api.get_user_info(account);
-      const rwlkTokens = await nftContract.walletOfOwner(account);
-      if (user_balance) {
-        setBalance({
-          CosmicToken: Number(
-            ethers.utils.formatEther(user_balance.CosmicTokenBalance)
-          ),
-          ETH: Number(ethers.utils.formatEther(user_balance.ETH_Balance)),
-          CosmicSignature: UserInfo?.TotalCSTokensWon,
-          RWLK: rwlkTokens.length,
-        });
+  /**
+   * Fetch and set user balance data from the API and NFT contract.
+   *
+   * @param showLoading - Whether to toggle the loading state while fetching.
+   */
+  const fetchData = useCallback(
+    async (showLoading: boolean = true) => {
+      if (showLoading) setLoading(true);
+      try {
+        // Fetch user balances for account
+        const userBalance = await api.get_user_balance(account!);
+        // Fetch user info
+        const { UserInfo } = await api.get_user_info(account!);
+
+        // Fetch RWLK tokens from the NFT contract
+        const rwlkTokens = await nftContract.walletOfOwner(account!);
+
+        // Update the local state with fetched balance data
+        if (userBalance) {
+          setBalance({
+            CosmicToken: Number(
+              ethers.utils.formatEther(userBalance.CosmicTokenBalance)
+            ),
+            ETH: Number(ethers.utils.formatEther(userBalance.ETH_Balance)),
+            CosmicSignature: UserInfo?.TotalCSTokensWon ?? 0,
+            RWLK: rwlkTokens.length,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
         setLoading(false);
       }
-    } catch (e) {
-      console.log(e);
-      setLoading(false);
-    }
-  };
+    },
+    [account, nftContract]
+  );
 
+  /**
+   * Effect to fetch balance data periodically (every 30s) when user is connected.
+   */
   useEffect(() => {
-    let interval;
+    let intervalId: NodeJS.Timeout | null = null;
+
     if (account && nftContract) {
-      fetchData();
-      interval = setInterval(() => {
+      // Initial fetch when component mounts
+      fetchData(true);
+
+      // Periodically update data
+      intervalId = setInterval(() => {
         fetchData(false);
       }, 30000);
     }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [account, nftContract]);
 
+    // Cleanup interval on unmount
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [account, nftContract, fetchData]);
+
+  // Dynamically retrieve navigation links based on user status and account
   const navs = getNAVs(status, account);
 
+  // Handlers to open/close the mobile drawer
   const handleDrawerOpen = () => setDrawerOpen(true);
   const handleDrawerClose = () => setDrawerOpen(false);
 
-  const renderDesktop = () => {
-    return (
-      <Toolbar disableGutters>
-        <Link href="/">
-          <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
-        </Link>
-        {navs.map((nav, i) => (
-          <ListNavItem key={i} nav={nav} />
-        ))}
-        <ConnectWalletButton
-          isMobileView={false}
-          loading={loading}
-          balance={balance}
-          stakedTokenCount={{
-            cst: stakedCSTokens?.length,
-            rwalk: stakedRWLKTokens?.length,
-          }}
-        />
-      </Toolbar>
-    );
-  };
+  /**
+   * Renders the navigation bar for desktop view.
+   */
+  const renderDesktop = () => (
+    <Toolbar disableGutters>
+      {/* Logo link */}
+      <Link href="/">
+        <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
+      </Link>
 
+      {/* Navigation items */}
+      {navs.map((nav, i) => (
+        <ListNavItem key={i} nav={nav} />
+      ))}
+
+      {/* Connect Wallet button (desktop) */}
+      <ConnectWalletButton
+        isMobileView={false}
+        loading={loading}
+        balance={balance}
+        stakedTokenCount={{
+          cst: stakedCSTokens?.length,
+          rwalk: stakedRWLKTokens?.length,
+        }}
+      />
+    </Toolbar>
+  );
+
+  /**
+   * Renders the navigation bar for mobile view, including a drawer.
+   */
   const renderMobile = () => {
+    // Check if user has any claimable notifications
     const hasNotifications =
       account &&
       (status?.ETHRaffleToClaim > 0 ||
         status?.NumDonatedNFTToClaim > 0 ||
         (status?.UnclaimedStakingReward > 0 &&
-          status?.claimableActionIds.length > 0));
+          status?.claimableActionIds?.length > 0));
 
     return (
       <Toolbar>
+        {/* Mobile menu icon */}
         <IconButton
           aria-label="menu"
           aria-haspopup="true"
@@ -150,10 +220,13 @@ const Header = () => {
             <MenuIcon />
           )}
         </IconButton>
+
+        {/* Logo link */}
         <Link href="/">
           <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
         </Link>
 
+        {/* Drawer for mobile navigation */}
         <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerClose}>
           <DrawerList>
             <ListItem>
@@ -167,6 +240,8 @@ const Header = () => {
                 }}
               />
             </ListItem>
+
+            {/* Navigation items */}
             {navs.map((nav, i) => (
               <ListItemButton
                 key={i}
@@ -174,9 +249,12 @@ const Header = () => {
                 sx={{ justifyContent: "center" }}
               />
             ))}
+
+            {/* Additional links and balance details if account is connected */}
             {account && (
               <>
                 <Divider />
+
                 <ListItemButton
                   nav={{ title: "My Statistics", route: "/my-statistics" }}
                   sx={{ justifyContent: "center" }}
@@ -196,13 +274,16 @@ const Header = () => {
                   }}
                   sx={{ justifyContent: "center" }}
                 />
+
                 <Divider />
+
                 <ListItem sx={{ display: "block" }}>
                   <Typography sx={{ fontSize: 16 }}>BALANCE:</Typography>
                   {loading ? (
                     <Typography color="primary">Loading...</Typography>
                   ) : (
                     <>
+                      {/* ETH Balance */}
                       <Box
                         sx={{
                           display: "flex",
@@ -225,6 +306,8 @@ const Header = () => {
                           {balance.ETH.toFixed(2)}
                         </Typography>
                       </Box>
+
+                      {/* CosmicToken (ERC20) Balance */}
                       <Box
                         sx={{
                           display: "flex",
@@ -247,6 +330,8 @@ const Header = () => {
                           {balance.CosmicToken.toFixed(2)}
                         </Typography>
                       </Box>
+
+                      {/* CosmicSignature (ERC721) Balance */}
                       <Box
                         sx={{
                           display: "flex",
@@ -269,6 +354,8 @@ const Header = () => {
                           {balance.CosmicSignature} tokens
                         </Typography>
                       </Box>
+
+                      {/* RWLK (ERC721) Balance */}
                       <Box
                         sx={{
                           display: "flex",
@@ -294,7 +381,10 @@ const Header = () => {
                     </>
                   )}
                 </ListItem>
+
                 <Divider />
+
+                {/* Staked token counts */}
                 <ListItem sx={{ justifyContent: "space-between" }}>
                   <Typography sx={{ fontSize: 16 }}>STAKED CST NFT:</Typography>
                   <Typography
@@ -326,6 +416,7 @@ const Header = () => {
   return (
     <AppBarWrapper position="fixed">
       <Container>
+        {/* Maintenance pending / active warning banner */}
         {systemMode > 0 && (
           <Box
             sx={{
@@ -357,6 +448,8 @@ const Header = () => {
             </Grid>
           </Box>
         )}
+
+        {/* Conditionally render desktop or mobile layout */}
         {mobileView ? renderMobile() : renderDesktop()}
       </Container>
     </AppBarWrapper>
