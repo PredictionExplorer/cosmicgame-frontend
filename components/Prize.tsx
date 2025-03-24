@@ -13,10 +13,19 @@ import { useTokenPrice } from "../hooks/useTokenPrice";
 
 const Prize = ({ prizeAmount }) => {
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("md"));
-  const ethPrice = useTokenPrice();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md")); // Determine if the screen size is medium or larger
+  const ethPrice = useTokenPrice(); // Fetch current ETH price from custom hook
+
+  // Format ETH amount to 5 decimal places if < 1, else 1 decimal place
+  const formattedETH =
+    prizeAmount < 1 ? prizeAmount.toFixed(5) : prizeAmount.toFixed(1);
+
+  // Convert ETH to USD using current price
+  const prizeInUSD = (ethPrice * prizeAmount).toFixed(2);
+
   return (
-    <Box mt={matches ? "80px" : "50px"}>
+    <Box mt={isDesktop ? "80px" : "50px"}>
+      {/* Header Section */}
       <Box
         display="flex"
         alignItems="center"
@@ -38,54 +47,52 @@ const Prize = ({ prizeAmount }) => {
           will Receive
         </Typography>
       </Box>
+
+      {/* Divider */}
       <Box textAlign="center" mb={6}>
-        <Image
-          src={"/images/divider.svg"}
-          width={93}
-          height={3}
-          alt="divider"
-        />
+        <Image src="/images/divider.svg" width={93} height={3} alt="divider" />
       </Box>
 
+      {/* Prize Cards */}
       <Grid container spacing={4}>
-        <Grid item xs={12} sm={12} md={6} lg={6}>
+        {/* NFT Prize Card */}
+        <Grid item xs={12} md={6}>
           <StyledCard2>
             <CardActionArea
-              sx={{ display: "flex", justifyContent: "start", p: "16px" }}
+              sx={{ display: "flex", justifyContent: "start", p: 2 }}
             >
               <Image
-                src={"/images/CosmicSignatureNFT.png"}
+                src="/images/CosmicSignatureNFT.png"
                 width={88}
                 height={88}
                 alt="cosmic signature nft"
               />
               <GradientText variant="h5" marginLeft="16px">
                 1 Cosmic
-                {matches ? " " : <br />}
+                {isDesktop ? " " : <br />}
                 Signature NFT
               </GradientText>
             </CardActionArea>
           </StyledCard2>
         </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={6}>
+
+        {/* ETH Prize Card */}
+        <Grid item xs={12} md={6}>
           <StyledCard2>
             <CardActionArea
-              sx={{ display: "flex", justifyContent: "start", p: "16px" }}
+              sx={{ display: "flex", justifyContent: "start", p: 2 }}
             >
               <Image
-                src={"/images/Ethereum.png"}
+                src="/images/Ethereum.png"
                 width={88}
                 height={88}
-                alt="cosmic signture nft"
+                alt="ethereum logo"
               />
               <GradientText variant="h5" marginLeft="16px">
-                {prizeAmount < 1
-                  ? prizeAmount.toFixed(5)
-                  : prizeAmount.toFixed(1)}{" "}
-                ETH
+                {formattedETH} ETH
               </GradientText>
               <Typography color="primary" ml={1}>
-                ({(ethPrice * prizeAmount).toFixed(2)} USD)
+                (${prizeInUSD} USD)
               </Typography>
             </CardActionArea>
           </StyledCard2>
