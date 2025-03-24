@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import Image from "next/image";
 import {
   Box,
@@ -11,21 +11,31 @@ import {
 import { GradientText, StyledCard2 } from "./styled";
 import { useTokenPrice } from "../hooks/useTokenPrice";
 
-const Prize = ({ prizeAmount }) => {
-  const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up("md")); // Determine if the screen size is medium or larger
-  const ethPrice = useTokenPrice(); // Fetch current ETH price from custom hook
+// -----------------------------
+// Props Interface
+// -----------------------------
+interface PrizeProps {
+  prizeAmount: number; // ETH prize amount
+}
 
-  // Format ETH amount to 5 decimal places if < 1, else 1 decimal place
+// -----------------------------
+// Prize Component
+// -----------------------------
+const Prize: FC<PrizeProps> = ({ prizeAmount }) => {
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md")); // Check if screen size is medium or larger
+  const ethPrice = useTokenPrice(); // Get current ETH price in USD
+
+  // Format the ETH prize display based on amount
   const formattedETH =
     prizeAmount < 1 ? prizeAmount.toFixed(5) : prizeAmount.toFixed(1);
 
-  // Convert ETH to USD using current price
+  // Calculate the equivalent USD value
   const prizeInUSD = (ethPrice * prizeAmount).toFixed(2);
 
   return (
     <Box mt={isDesktop ? "80px" : "50px"}>
-      {/* Header Section */}
+      {/* Title/Header */}
       <Box
         display="flex"
         alignItems="center"
@@ -48,14 +58,14 @@ const Prize = ({ prizeAmount }) => {
         </Typography>
       </Box>
 
-      {/* Divider */}
+      {/* Decorative Divider */}
       <Box textAlign="center" mb={6}>
         <Image src="/images/divider.svg" width={93} height={3} alt="divider" />
       </Box>
 
-      {/* Prize Cards */}
+      {/* Prize Cards Grid */}
       <Grid container spacing={4}>
-        {/* NFT Prize Card */}
+        {/* NFT Card */}
         <Grid item xs={12} md={6}>
           <StyledCard2>
             <CardActionArea
@@ -76,7 +86,7 @@ const Prize = ({ prizeAmount }) => {
           </StyledCard2>
         </Grid>
 
-        {/* ETH Prize Card */}
+        {/* ETH Card */}
         <Grid item xs={12} md={6}>
           <StyledCard2>
             <CardActionArea
