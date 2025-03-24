@@ -52,7 +52,6 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }) => {
 
   return (
     <TablePrimaryRow
-      hover
       role="checkbox"
       tabIndex={-1}
       selected={isItemSelected}

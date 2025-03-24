@@ -265,44 +265,6 @@ const MyStaking = () => {
     }
   };
 
-  // Finds the max limit for multiple deposit evaluations (unstake calls)
-  const findMaxLimit = useCallback(
-    async (contract: any, actionIds: number | number[]) => {
-      let numEthDepositsToEvaluateMaxLimit = 2;
-      let limit = 100000;
-
-      while (limit > numEthDepositsToEvaluateMaxLimit) {
-        let result;
-        try {
-          if (Array.isArray(actionIds)) {
-            // "callStatic" doesn't change state; checks if call will succeed
-            result = await contract.callStatic.unstakeMany(
-              actionIds,
-              numEthDepositsToEvaluateMaxLimit
-            );
-          } else {
-            result = await contract.callStatic.unstake(
-              actionIds,
-              numEthDepositsToEvaluateMaxLimit
-            );
-          }
-        } catch {
-          result = null;
-        }
-
-        if (result !== null) {
-          // This limit works
-          return numEthDepositsToEvaluateMaxLimit;
-        } else {
-          // Double the limit and try again
-          numEthDepositsToEvaluateMaxLimit *= 2;
-        }
-      }
-      return numEthDepositsToEvaluateMaxLimit;
-    },
-    []
-  );
-
   // Generic stake function for CST or RWLK
   const handleStakeAction = useCallback(
     async (tokenIds: number | number[], isRwalk: boolean) => {
@@ -373,21 +335,15 @@ const MyStaking = () => {
           ? rwlkStakingContract
           : cstStakingContract;
 
-        // Find the max limit for multiple deposits
-        const numEthDepositsToEvaluateMaxLimit = await findMaxLimit(
-          stakingContract,
-          actionIds
-        );
-
         // Unstake single or multiple
         let res;
         if (Array.isArray(actionIds)) {
           res = await stakingContract
-            .unstakeMany(actionIds, numEthDepositsToEvaluateMaxLimit)
+            .unstakeMany(actionIds)
             .then((tx: any) => tx.wait());
         } else {
           res = await stakingContract
-            .unstake(actionIds, numEthDepositsToEvaluateMaxLimit)
+            .unstake(actionIds)
             .then((tx: any) => tx.wait());
         }
 
@@ -417,7 +373,6 @@ const MyStaking = () => {
     [
       account,
       handleError,
-      findMaxLimit,
       rwlkStakingContract,
       cstStakingContract,
       setNotification,
@@ -447,7 +402,7 @@ const MyStaking = () => {
   }, [cosmicGameContract]);
 
   // Fetch CST user data
-  const fetchCSTData = useCallback(async (addr: string) => {
+  const fetchCSTData = async (addr: string) => {
     setLoading(true);
     try {
       const [cstActions, cstUserTokens, cstUserRewards] = await Promise.all([
@@ -469,10 +424,10 @@ const MyStaking = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   // Fetch RWLK user data
-  const fetchRWLKData = useCallback(async (addr: string) => {
+  const fetchRWLKData = async (addr: string) => {
     try {
       setLoading(true);
 
@@ -506,7 +461,7 @@ const MyStaking = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   // Tab change handler
   const handleTabChange = (_event: any, newValue: number) => {
@@ -520,14 +475,7 @@ const MyStaking = () => {
       fetchRWLKData(account);
       fetchDashboardData();
     }
-  }, [
-    account,
-    rwalkContract,
-    cosmicGameContract,
-    fetchCSTData,
-    fetchRWLKData,
-    fetchDashboardData,
-  ]);
+  }, [account, rwalkContract, cosmicGameContract]);
 
   // ----------------------------------------------
   // Render

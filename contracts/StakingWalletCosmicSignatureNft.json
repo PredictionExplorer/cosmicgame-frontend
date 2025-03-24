@@ -39,7 +39,7 @@
   "function stakeMany(uint256[])",
   "function transferOwnership(address)",
   "function tryPerformMaintenance(bool,address) returns (bool)",
-  "function unstake(uint256,uint256)",
-  "function unstakeMany(uint256[],uint256)",
+  "function unstake(uint256)",
+  "function unstakeMany(uint256[])",
   "function wasNftUsed(uint256) view returns (uint256)"
 ]

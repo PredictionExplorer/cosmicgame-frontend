@@ -136,7 +136,6 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
 
   return (
     <TablePrimaryRow
-      hover
       role="checkbox"
       aria-checked={isItemSelected}
       tabIndex={-1}
