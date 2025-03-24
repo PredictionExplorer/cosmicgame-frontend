@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FC, ChangeEvent } from "react";
 import Image from "next/image";
 import {
   Grid,
@@ -11,42 +11,64 @@ import {
 import Pagination from "@mui/material/Pagination";
 import RandomWalkNFT from "./RandomWalkNFT";
 
-const PaginationRWLKGrid = ({
+// -----------------------------
+// Props Type Definition
+// -----------------------------
+interface PaginationRWLKGridProps {
+  loading: boolean;
+  data: number[]; // Array of token IDs
+  selectedToken?: number;
+  setSelectedToken?: (tokenId: number) => void;
+}
+
+// -----------------------------
+// Component
+// -----------------------------
+const PaginationRWLKGrid: FC<PaginationRWLKGridProps> = ({
   loading,
   data,
   selectedToken = -1,
   setSelectedToken = null,
 }) => {
-  const [collection, setCollection] = useState([]);
-  const [perPage] = useState(6);
-  const [curPage, setCurPage] = useState(1);
-  const [searchId, setSearchId] = useState("");
+  const [filteredData, setFilteredData] = useState<number[]>([]);
+  const [itemsPerPage] = useState<number>(6);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchId, setSearchId] = useState<string>("");
 
-  const handleClick = (index) => {
+  // Handle click on NFT card
+  const handleCardClick = (tokenId: number) => {
     if (setSelectedToken) {
-      if (index === selectedToken) {
-        setSelectedToken(-1);
-      } else {
-        setSelectedToken(index);
-      }
+      const isAlreadySelected = tokenId === selectedToken;
+      setSelectedToken(isAlreadySelected ? -1 : tokenId);
     }
   };
 
+  // Filter NFT list based on search input
   useEffect(() => {
     const filtered = data.filter(
-      (x) => searchId === "" || x === Number(searchId)
+      (id) => searchId === "" || id === Number(searchId)
     );
-    setCollection(filtered);
+    setFilteredData(filtered);
+    setCurrentPage(1); // Reset to first page on search
   }, [data, searchId]);
+
+  // Slice current page's items from the filtered data
+  const paginatedItems = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <Box mt={4}>
+      {/* Search Input */}
       <TextField
         placeholder="Enter NFT ID"
         size="small"
         fullWidth
         sx={{ marginBottom: 2 }}
-        onChange={(e) => setSearchId(e.target.value)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          setSearchId(e.target.value)
+        }
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -60,46 +82,52 @@ const PaginationRWLKGrid = ({
           ),
         }}
       />
+
+      {/* Loading Spinner */}
       {loading && (
         <Box display="flex" justifyContent="center">
           <CircularProgress color="secondary" />
         </Box>
       )}
-      {data.length > 0 && (
+
+      {/* Grid + Pagination when data is available */}
+      {!loading && filteredData.length > 0 && (
         <>
-          <Grid spacing={4} container>
-            {collection
-              .slice((curPage - 1) * perPage, curPage * perPage)
-              .map((index) => (
-                <Grid
-                  key={index}
-                  item
-                  xs={6}
-                  sm={6}
-                  md={4}
-                  onClick={() => handleClick(index)}
-                >
-                  <RandomWalkNFT
-                    tokenId={index}
-                    selected={index === selectedToken}
-                  />
-                </Grid>
-              ))}
+          <Grid container spacing={4}>
+            {paginatedItems.map((tokenId) => (
+              <Grid
+                key={tokenId}
+                item
+                xs={6}
+                sm={6}
+                md={4}
+                onClick={() => handleCardClick(tokenId)}
+              >
+                <RandomWalkNFT
+                  tokenId={tokenId}
+                  selected={tokenId === selectedToken}
+                />
+              </Grid>
+            ))}
           </Grid>
+
+          {/* Pagination Controls */}
           <Box mt={3}>
             <Pagination
               color="primary"
-              page={curPage}
-              onChange={(_e, page) => setCurPage(page)}
-              count={Math.ceil(collection.length / perPage)}
+              shape="rounded"
+              page={currentPage}
+              onChange={(_e, page) => setCurrentPage(page)}
+              count={Math.ceil(filteredData.length / itemsPerPage)}
               hideNextButton
               hidePrevButton
-              shape="rounded"
             />
           </Box>
         </>
       )}
-      {!loading && !data.length && (
+
+      {/* Empty State */}
+      {!loading && data.length === 0 && (
         <Typography variant="body1" align="center">
           Nothing Found!
         </Typography>
