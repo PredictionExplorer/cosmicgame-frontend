@@ -1014,7 +1014,7 @@ const NewHome = () => {
     };
     const fetchActivationTime = async () => {
       const activationTime = await cosmicGameContract.roundActivationTime();
-      setActivationTime(Number(activationTime));
+      setActivationTime(Number(activationTime - offset / 1000));
     };
 
     if (cosmicGameContract) {
