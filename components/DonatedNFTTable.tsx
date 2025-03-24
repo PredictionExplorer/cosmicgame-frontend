@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, FC } from "react";
+import axios from "axios";
 import { Button, Link, TableBody, Tooltip, Typography } from "@mui/material";
 import {
   TablePrimary,
@@ -9,47 +10,80 @@ import {
   TablePrimaryRow,
 } from "./styled";
 import { convertTimestampToDateTime, shortenHex } from "../utils";
-import axios from "axios";
 import NFTImage from "./NFTImage";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
 
-const NFTRow = ({ nft, handleClaim, claimingTokens }) => {
-  const [tokenURI, setTokenURI] = useState(null);
+// ----------------------------
+// Type Definitions
+// ----------------------------
+interface NFTRecord {
+  RecordId: string;
+  TxHash: string;
+  TimeStamp: number;
+  DonorAddr: string;
+  RoundNum: number;
+  TokenAddr: string;
+  TokenId?: string;
+  NFTTokenId?: string;
+  NFTTokenURI?: string;
+  WinnerAddr?: string;
+  Index: number;
+}
+
+interface NFTRowProps {
+  nft: NFTRecord;
+  handleClaim?: (tokenIndex: number) => void;
+  claimingTokens: number[];
+}
+
+interface DonatedNFTTableProps {
+  list: NFTRecord[];
+  handleClaim?: (tokenIndex: number) => void;
+  claimingTokens: number[];
+}
+
+// ----------------------------
+// NFT Row Component
+// ----------------------------
+const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
+  const [tokenURI, setTokenURI] = useState<any>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchTokenMetadata = async () => {
       try {
-        const { data } = await axios.get(nft.NFTTokenURI);
+        const { data } = await axios.get(nft.NFTTokenURI!);
         setTokenURI(data);
       } catch (error) {
         console.error("Error fetching token URI:", error);
       }
     };
+
     if (nft.NFTTokenURI) {
-      fetchData();
+      fetchTokenMetadata();
     }
   }, [nft.NFTTokenURI]);
 
-  if (!nft) {
-    return <TablePrimaryRow />;
-  }
+  if (!nft) return <TablePrimaryRow />;
 
   const isClaiming = claimingTokens.includes(nft.Index);
 
   return (
     <TablePrimaryRow>
+      {/* Timestamp */}
       <TablePrimaryCell>
         <Link
           color="inherit"
           fontSize="inherit"
           href={`https://arbiscan.io/tx/${nft.TxHash}`}
-          target="__blank"
+          target="_blank"
         >
           {convertTimestampToDateTime(nft.TimeStamp)}
         </Link>
       </TablePrimaryCell>
+
+      {/* Donor Address */}
       <TablePrimaryCell>
         <Tooltip title={nft.DonorAddr}>
           <Link
@@ -65,18 +99,19 @@ const NFTRow = ({ nft, handleClaim, claimingTokens }) => {
           </Link>
         </Tooltip>
       </TablePrimaryCell>
+
+      {/* Round Number */}
       <TablePrimaryCell align="center">
         <Link
           href={`/prize/${nft.RoundNum}`}
-          style={{
-            color: "inherit",
-            fontSize: "inherit",
-          }}
+          style={{ color: "inherit", fontSize: "inherit" }}
           target="_blank"
         >
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
+
+      {/* Token Address */}
       <TablePrimaryCell>
         <Tooltip title={nft.TokenAddr}>
           <Link
@@ -92,6 +127,8 @@ const NFTRow = ({ nft, handleClaim, claimingTokens }) => {
           </Link>
         </Tooltip>
       </TablePrimaryCell>
+
+      {/* Token ID */}
       <TablePrimaryCell align="center">
         {tokenURI?.external_url ? (
           <Link
@@ -105,6 +142,8 @@ const NFTRow = ({ nft, handleClaim, claimingTokens }) => {
           nft.NFTTokenId || nft.TokenId
         )}
       </TablePrimaryCell>
+
+      {/* Token Image */}
       <TablePrimaryCell sx={{ width: "130px" }}>
         {tokenURI?.image ? (
           <Link href={tokenURI.external_url} target="_blank">
@@ -114,6 +153,8 @@ const NFTRow = ({ nft, handleClaim, claimingTokens }) => {
           <Typography variant="body2">Image not available</Typography>
         )}
       </TablePrimaryCell>
+
+      {/* Claim Button */}
       {handleClaim && (
         <TablePrimaryCell>
           {!nft.WinnerAddr && (
@@ -132,9 +173,16 @@ const NFTRow = ({ nft, handleClaim, claimingTokens }) => {
   );
 };
 
-const DonatedNFTTable = ({ list, handleClaim, claimingTokens }) => {
+// ----------------------------
+// Main Table Component
+// ----------------------------
+const DonatedNFTTable: FC<DonatedNFTTableProps> = ({
+  list,
+  handleClaim,
+  claimingTokens,
+}) => {
   const perPage = 5;
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState<number>(1);
 
   if (!list || list.length === 0) {
     return <Typography>No donated NFTs yet.</Typography>;
@@ -162,8 +210,8 @@ const DonatedNFTTable = ({ list, handleClaim, claimingTokens }) => {
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((nft) => (
               <NFTRow
-                nft={nft}
                 key={nft.RecordId}
+                nft={nft}
                 handleClaim={handleClaim}
                 claimingTokens={claimingTokens}
               />
@@ -171,6 +219,8 @@ const DonatedNFTTable = ({ list, handleClaim, claimingTokens }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
+
+      {/* Pagination */}
       <CustomPagination
         page={page}
         setPage={setPage}
