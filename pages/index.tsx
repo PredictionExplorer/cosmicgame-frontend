@@ -171,13 +171,13 @@ const NewHome = () => {
 
   const onClaimPrize = async () => {
     try {
-      const estimateGas = await cosmicGameContract.estimateGas.claimPrize();
+      const estimateGas = await cosmicGameContract.estimateGas.claimMainPrize();
       let gasLimit = estimateGas.mul(BigNumber.from(2));
       gasLimit = gasLimit.gt(BigNumber.from(2000000))
         ? gasLimit
         : BigNumber.from(2000000);
       await cosmicGameContract
-        .claimPrize({ gasLimit })
+        .claimMainPrize({ gasLimit })
         .then((tx: any) => tx.wait());
       const balance = await cosmicSignatureContract.totalSupply();
       let token_id = balance.toNumber() - 1;
