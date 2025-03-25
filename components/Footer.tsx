@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 
+
 import {
   Toolbar,
   Box,
@@ -9,11 +10,13 @@ import {
   Typography,
   Link,
 } from "@mui/material";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import { FooterWrapper } from "./styled";
 
+// Footer component displaying the company logo, links, and social media icons
 const Footer = () => (
   <FooterWrapper position="relative" color="primary">
     <Toolbar>
@@ -30,7 +33,10 @@ const Footer = () => (
             lg: "row",
           }}
         >
+          {/* Company Logo */}
           <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
+
+          {/* Main content: Copyright, Terms, Privacy links, and Social Media icons */}
           <Box
             sx={{
               display: "flex",
@@ -43,6 +49,7 @@ const Footer = () => (
               alignItems: "center",
             }}
           >
+            {/* Text and legal links section */}
             <Box
               sx={{
                 display: "flex",
@@ -51,38 +58,51 @@ const Footer = () => (
                 alignItems: "center",
               }}
             >
+              {/* Copyright Information */}
               <Typography
                 variant="body2"
                 color="textSecondary"
-                width={{ xs: "100%", sm: "100%", md: "100%", lg: "auto" }}
+                width={{ xs: "100%", lg: "auto" }}
                 textAlign="center"
-                marginRight={{ xs: 0, sm: 0, md: 0, lg: 10 }}
+                marginRight={{ lg: 10 }}
                 lineHeight={4}
               >
                 Copyright © 2024 Cosmic Signature
               </Typography>
+
+              {/* Terms and Conditions link */}
               <Link
                 color="textSecondary"
                 target="_blank"
                 href="#"
-                style={{ fontSize: "13px", textDecoration: "none" }}
-                marginRight={10}
+                sx={{
+                  fontSize: "13px",
+                  textDecoration: "none",
+                  mr: { lg: 10 },
+                }}
               >
                 Terms and conditions
               </Link>
+
+              {/* Privacy Policy link */}
               <Link
                 color="textSecondary"
                 target="_blank"
                 href="#"
-                style={{ fontSize: "13px", textDecoration: "none" }}
+                sx={{ fontSize: "13px", textDecoration: "none" }}
               >
                 Privacy policy
               </Link>
             </Box>
-            <Box ml={{ xs: 0, sm: 0, md: 0, lg: 6 }}>
+
+            {/* Social Media Icons and Sitemap link */}
+            <Box ml={{ lg: 6 }}>
+              {/* Sitemap icon */}
               <IconButton href="/site-map">
                 <AccountTreeIcon sx={{ color: "#A9AAB5" }} />
               </IconButton>
+
+              {/* Twitter icon */}
               <IconButton
                 href="https://twitter.com/CosmicSignatureNFT"
                 target="_blank"
@@ -94,6 +114,8 @@ const Footer = () => (
                   height={24}
                 />
               </IconButton>
+
+              {/* Discord icon */}
               <IconButton href="https://discord.gg/bGnPn96Qwt" target="_blank">
                 <FontAwesomeIcon
                   icon={faDiscord}
