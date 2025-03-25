@@ -1136,24 +1136,6 @@ const NewHome = () => {
                         <Grid container spacing={2} mb={2} alignItems="center">
                           <Grid item sm={12} md={4}>
                             <Typography variant="subtitle1">
-                              Stellar Spender Address
-                            </Typography>
-                          </Grid>
-                          <Grid item sm={12} md={8}>
-                            <Typography>
-                              <Link
-                                href={`/user/${prizeInfo?.StellarWinnerAddr}`}
-                                color="rgb(255, 255, 255)"
-                                fontSize="inherit"
-                              >
-                                {prizeInfo?.StellarWinnerAddr}
-                              </Link>
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                        <Grid container spacing={2} mb={2} alignItems="center">
-                          <Grid item sm={12} md={4}>
-                            <Typography variant="subtitle1">
                               Previous Reward
                             </Typography>
                           </Grid>
@@ -1601,28 +1583,6 @@ const NewHome = () => {
                           )})`}
                         </>
                       )}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2} mb={2} alignItems="center">
-                  <Grid item xs={12} sm={4} md={4}>
-                    <Typography>Stellar Spender</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={8} md={8}>
-                    <Typography>
-                      <Link
-                        href={`/user/${specialWinners?.StellarSpenderAddress}`}
-                        color="rgb(255, 255, 255)"
-                        fontSize="inherit"
-                        sx={{ wordBreak: "break-all" }}
-                      >
-                        {specialWinners?.StellarSpenderAddress}
-                      </Link>
-                      &nbsp;
-                      {specialWinners?.StellarSpenderAmountEth > 0 &&
-                        `(${specialWinners?.StellarSpenderAmountEth.toFixed(
-                          4
-                        )} ETH)`}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -2087,11 +2047,10 @@ export default NewHome;
 // get_bid_list_by_round: implement pagination
 // get_user_info: remove bid field
 // complete admin page
-// update FAQ page: stellar, endurance champion
+// update FAQ page: endurance champion
 // update donations page
 
 // fix eth-donation page
 // add eth donate feature, simple donation, donation with info
 // add link to top 5 donations
 
-// Add StellarWinnerAddr in prizeInfo

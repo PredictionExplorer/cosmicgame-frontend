@@ -545,8 +545,6 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
                       );
                     case 4:
                       return "Endurance Champion NFT Winner";
-                    case 5:
-                      return "Stellar Spender NFT Winner";
                     default:
                       return "";
                   }

@@ -46,9 +46,7 @@ const RECORD_TYPE_MAP = {
   5: { icon: <LayersIcon />, text: "Random Walk Staking Raffle Token" },
   6: { icon: <LayersIcon />, text: "Cosmic Signature Staking Raffle Token" },
   7: { icon: <EmojiEventsIcon />, text: "Endurance Champion NFT Winner" },
-  8: { icon: <EmojiEventsIcon />, text: "Stellar Spender NFT Winner" },
-  9: { icon: <EmojiEventsIcon />, text: "Endurance Champion ERC20 winner" },
-  10: { icon: <EmojiEventsIcon />, text: "Stellar Spender ERC20 Winner" },
+  8: { icon: <EmojiEventsIcon />, text: "Endurance Champion ERC20 winner" },
 };
 
 /* ------------------------------------------------------------------

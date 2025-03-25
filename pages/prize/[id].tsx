@@ -125,26 +125,6 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
         label="Endurance Champion rewarded with CST (ERC20):"
         value={`${prizeInfo.EnduranceERC20AmountEth} CST`}
       />
-
-      {prizeInfo.StellarWinnerAddr && (
-        <>
-          <InfoRow
-            label="Stellar Spender Prize Winner Address:"
-            value={prizeInfo.StellarWinnerAddr}
-            link={`/user/${prizeInfo.StellarWinnerAddr}`}
-          />
-          <InfoRow
-            label="Stellar Spender rewarded with CST NFT Token ID:"
-            value={prizeInfo.StellarERC721TokenId}
-            link={`/detail/${prizeInfo.StellarERC721TokenId}`}
-          />
-          <InfoRow
-            label="Stellar Spender rewarded with CST (ERC20):"
-            value={`${prizeInfo.StellarERC20AmountEth.toFixed(2)} CST`}
-          />
-        </>
-      )}
-
       <InfoRow label="Total Bids:" value={prizeInfo.RoundStats.TotalBids} />
       <InfoRow
         label="Total Donated NFTs:"
