@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Button,
   Dialog,
@@ -7,19 +8,33 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { useState } from "react";
 
-export default function TwitterPopup({ open, setOpen, setTwitterHandle }) {
-  const [handle, setHandle] = useState("");
+interface TwitterPopupProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  setTwitterHandle: (handle: string) => void;
+}
+
+/**
+ * TwitterPopup Component
+ * A modal dialog that collects and validates the user's Twitter handle.
+ */
+const TwitterPopup: React.FC<TwitterPopupProps> = ({
+  open,
+  setOpen,
+  setTwitterHandle,
+}) => {
+  const [handle, setHandle] = useState<string>("");
+
+  // Close the dialog without saving
   const handleClose = () => {
     setOpen(false);
   };
+
+  // Validate and confirm the Twitter handle input
   const handleConfirm = () => {
-    if (handle.startsWith("@")) {
-      setTwitterHandle(handle.slice(1));
-    } else {
-      setTwitterHandle(handle);
-    }
+    const formattedHandle = handle.startsWith("@") ? handle.slice(1) : handle;
+    setTwitterHandle(formattedHandle);
     handleClose();
   };
 
@@ -28,11 +43,12 @@ export default function TwitterPopup({ open, setOpen, setTwitterHandle }) {
       <DialogTitle>What is your Twitter handle?</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          What is your Twitter handle? (It must have a blue checkmark).
+          Please provide your Twitter handle. Ensure it has a blue checkmark to
+          qualify.
         </DialogContentText>
         <DialogContentText>
-          You must follow additional instructions to be eligible. Check our
-          Twitter.
+          Follow additional instructions on our Twitter page to be fully
+          eligible.
         </DialogContentText>
         <TextField
           autoFocus
@@ -43,15 +59,24 @@ export default function TwitterPopup({ open, setOpen, setTwitterHandle }) {
           placeholder="@userhandle"
           fullWidth
           variant="standard"
-          onChange={(e) => setHandle(e.target.value)}
+          value={handle}
+          onChange={(e) => setHandle(e.target.value.trim())}
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleConfirm} disabled={handle === ""}>
+        <Button
+          onClick={handleConfirm}
+          disabled={!handle.trim()}
+          variant="contained"
+        >
           Ok
         </Button>
-        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={handleClose} variant="outlined">
+          Cancel
+        </Button>
       </DialogActions>
     </Dialog>
   );
-}
+};
+
+export default TwitterPopup;
