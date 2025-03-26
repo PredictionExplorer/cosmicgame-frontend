@@ -969,7 +969,7 @@ const MyStatistics = () => {
                   ...unclaimedDonatedNFTs.data,
                   ...claimedDonatedNFTs.data,
                 ]}
-                handleClaim={(_e, tokenID) => handleDonatedNFTsClaim(tokenID)}
+                handleClaim={handleDonatedNFTsClaim}
                 claimingTokens={claimingDonatedNFTs}
               />
             )}
