@@ -13,7 +13,12 @@ import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import LayersIcon from "@mui/icons-material/Layers";
 import TokenIcon from "@mui/icons-material/Token";
-
+import axios from "axios";
+import { Tr } from "react-super-responsive-table";
+import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { CustomPagination } from "./CustomPagination";
+import { isMobile } from "react-device-detect";
+import { COSMIC_SIGNATURE_TOKEN_ADDRESS } from "../config/app";
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -22,18 +27,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimary,
 } from "./styled";
-
 import { convertTimestampToDateTime, shortenHex } from "../utils";
-import axios from "axios";
-import { Tr } from "react-super-responsive-table";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { CustomPagination } from "./CustomPagination";
-import { isMobile } from "react-device-detect";
-import { COSMIC_SIGNATURE_TOKEN_ADDRESS } from "../config/app";
 
-/* ------------------------------------------------------------------
-  Constants / Mappings
------------------------------------------------------------------- */
+// Map record types to their corresponding icons and descriptive texts
 const RECORD_TYPE_MAP = {
   0: { icon: <ConfirmationNumberIcon />, text: "ETH Deposit" },
   1: { icon: <TokenIcon />, text: "Cosmic Signature Token" },
@@ -49,43 +45,21 @@ const RECORD_TYPE_MAP = {
   8: { icon: <EmojiEventsIcon />, text: "Endurance Champion ERC20 winner" },
 };
 
-/* ------------------------------------------------------------------
-  Sub-Component: WinningHistoryRow
-  Renders a single row of the history table.
------------------------------------------------------------------- */
-function WinningHistoryRow({
-  history,
-  showClaimedStatus,
-  showWinnerAddr,
-}: {
-  history: any;
-  showClaimedStatus: boolean;
-  showWinnerAddr: boolean;
-}) {
-  const [tokenURI, setTokenURI] = useState<any>(null);
+// Row component representing each winning history entry
+const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
+  const [tokenURI, setTokenURI] = useState(null);
 
   useEffect(() => {
-    // Fetch tokenURI if needed for certain record types
-    if (
-      history &&
-      history.TokenId >= 0 &&
-      ![1, 3, 5, 6].includes(history.RecordType)
-    ) {
-      const fetchTokenURI = async () => {
-        try {
-          const { data } = await axios.get(history.TokenURI);
-          setTokenURI(data);
-        } catch (err) {
-          console.error("Failed to fetch token URI:", err);
-        }
-      };
-      fetchTokenURI();
+    // Fetch TokenURI only if applicable
+    if (history?.TokenId >= 0 && ![1, 3, 5, 6].includes(history.RecordType)) {
+      axios
+        .get(history.TokenURI)
+        .then(({ data }) => setTokenURI(data))
+        .catch((err) => console.error("Failed to fetch token URI:", err));
     }
   }, [history]);
 
-  if (!history) {
-    return <TablePrimaryRow />;
-  }
+  if (!history) return <TablePrimaryRow />;
 
   const recordType = RECORD_TYPE_MAP[history.RecordType] || {
     icon: null,
@@ -96,72 +70,57 @@ function WinningHistoryRow({
     <TablePrimaryRow
       sx={
         !history.Claimed &&
-        showClaimedStatus && { background: "rgba(255, 255, 255, 0.06)" }
+        showClaimedStatus && { background: "rgba(255,255,255,0.06)" }
       }
     >
-      {/* Record Type */}
+      {/* Record type with icon */}
       <TablePrimaryCell>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {recordType.icon}
-          &nbsp;
-          <span>{recordType.text}</span>
-          &nbsp;
-          {/* Show icon if not claimed */}
+          {recordType.icon}&nbsp;<span>{recordType.text}</span>&nbsp;
           {!history.Claimed && showClaimedStatus && (
-            <Tooltip title="This winning is unclaimed, go to Pending Winnings page and claim it.">
-              <IconButton size="small" sx={{ fontSize: "16px" }}>
-                <PriorityHighIcon fontSize="inherit" color="error" />
+            <Tooltip title="Unclaimed, go to Pending Winnings to claim.">
+              <IconButton size="small">
+                <PriorityHighIcon color="error" fontSize="inherit" />
               </IconButton>
             </Tooltip>
           )}
         </Box>
       </TablePrimaryCell>
 
-      {/* Datetime */}
+      {/* Datetime with transaction link */}
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          href={`https://arbiscan.io/tx/${history.TxHash}`}
-          target="_blank"
-        >
+        <Link href={`https://arbiscan.io/tx/${history.TxHash}`} target="_blank">
           {convertTimestampToDateTime(history.TimeStamp)}
         </Link>
       </TablePrimaryCell>
 
-      {/* Winner Address (optional) */}
+      {/* Winner Address if enabled */}
       {showWinnerAddr && (
         <TablePrimaryCell align="center">
-          {history.WinnerAddr === "" ? (
-            " "
-          ) : (
+          {history.WinnerAddr ? (
             <Tooltip title={history.WinnerAddr}>
               <Link
-                color="inherit"
-                fontSize="inherit"
-                fontFamily="monospace"
                 href={`/user/${history.WinnerAddr}`}
                 target="_blank"
+                fontFamily="monospace"
               >
                 {shortenHex(history.WinnerAddr, 6)}
               </Link>
             </Tooltip>
+          ) : (
+            " "
           )}
         </TablePrimaryCell>
       )}
 
-      {/* Round Number */}
+      {/* Round number linking to prize details */}
       <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${history.RoundNum}`}
-          sx={{ fontSize: "inherit", color: "inherit" }}
-          target="_blank"
-        >
+        <Link href={`/prize/${history.RoundNum}`} target="_blank">
           {history.RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      {/* Amount in ETH */}
+      {/* Amount ETH or N/A based on record type */}
       <TablePrimaryCell align="right">
         {[1, 5, 6].includes(history.RecordType)
           ? "N/A"
@@ -171,99 +130,51 @@ function WinningHistoryRow({
       {/* Token Address */}
       <TablePrimaryCell align="center">
         {history.RecordType === 1 ? (
-          <Tooltip
-            title={
-              <Typography fontFamily="monospace">
-                {COSMIC_SIGNATURE_TOKEN_ADDRESS}
-              </Typography>
-            }
+          <Link
+            href={`https://arbiscan.io/address/${COSMIC_SIGNATURE_TOKEN_ADDRESS}`}
+            target="_blank"
           >
-            <Link
-              href={`https://arbiscan.io/address/${COSMIC_SIGNATURE_TOKEN_ADDRESS}`}
-              sx={{
-                fontSize: "inherit",
-                color: "inherit",
-                fontFamily: "monospace",
-              }}
-              target="_blank"
-            >
-              {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS, 6)}
-            </Link>
-          </Tooltip>
-        ) : history.TokenAddress ? (
-          <Tooltip
-            title={
-              <Typography fontFamily="monospace">
-                {history.TokenAddress}
-              </Typography>
-            }
-          >
+            {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS, 6)}
+          </Link>
+        ) : (
+          history.TokenAddress && (
             <Link
               href={`https://arbiscan.io/address/${history.TokenAddress}`}
-              sx={{
-                fontSize: "inherit",
-                color: "inherit",
-                fontFamily: "monospace",
-              }}
               target="_blank"
             >
               {shortenHex(history.TokenAddress, 6)}
             </Link>
-          </Tooltip>
+          )
+        )}
+      </TablePrimaryCell>
+
+      {/* Token ID links */}
+      <TablePrimaryCell align="center">
+        {history.TokenId >= 0 ? (
+          <Link
+            href={
+              [1, 3].includes(history.RecordType)
+                ? `/detail/${history.TokenId}`
+                : [5, 6].includes(history.RecordType)
+                ? `https://randomwalknft.com/detail/${history.TokenId}`
+                : tokenURI?.external_url
+            }
+            target="_blank"
+          >
+            {history.TokenId}
+          </Link>
         ) : (
           " "
         )}
       </TablePrimaryCell>
 
-      {/* Token ID */}
-      <TablePrimaryCell align="center">
-        {history.TokenId >= 0
-          ? (() => {
-              if ([1, 3].includes(history.RecordType)) {
-                // Link to "detail/:TokenId" (CST main)
-                return (
-                  <Link
-                    href={`/detail/${history.TokenId}`}
-                    sx={{ fontSize: "inherit", color: "inherit" }}
-                    target="_blank"
-                  >
-                    {history.TokenId}
-                  </Link>
-                );
-              } else if ([5, 6].includes(history.RecordType)) {
-                // Link to "randomwalknft.com/detail/:TokenId"
-                return (
-                  <Link
-                    href={`https://randomwalknft.com/detail/${history.TokenId}`}
-                    sx={{ fontSize: "inherit", color: "inherit" }}
-                    target="_blank"
-                  >
-                    {history.TokenId}
-                  </Link>
-                );
-              } else {
-                // Possibly a direct link from tokenURI
-                return (
-                  <Link
-                    href={tokenURI?.external_url}
-                    sx={{ fontSize: "inherit", color: "inherit" }}
-                    target="_blank"
-                  >
-                    {history.TokenId}
-                  </Link>
-                );
-              }
-            })()
-          : " "}
-      </TablePrimaryCell>
-
-      {/* Position (WinnerIndex) */}
+      {/* Winner position */}
       <TablePrimaryCell align="right">
         {history.WinnerIndex >= 0 ? history.WinnerIndex : " "}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
-}
+};
 
 /* ------------------------------------------------------------------
   Sub-Component: WinningHistorySubTable
