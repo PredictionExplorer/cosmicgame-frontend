@@ -6,17 +6,33 @@ import { GlobalMarketingRewardsTable } from "../../components/GlobalMarketingRew
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../../utils";
 
-const MarketingRewards = () => {
-  const [marketingRewards, setMarketingRewards] = useState([]);
-  const [loading, setLoading] = useState(true);
+// Define the structure for marketing reward items
+interface MarketingReward {
+  id: number;
+  reward: string;
+  description?: string;
+}
 
+// Main component for displaying marketing rewards
+const MarketingRewards: React.FC = () => {
+  const [marketingRewards, setMarketingRewards] = useState<MarketingReward[]>(
+    []
+  );
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Fetch marketing rewards data on component mount
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      let marketingRewards = await api.get_marketing_rewards();
-      setMarketingRewards(marketingRewards);
+      try {
+        const rewards = await api.get_marketing_rewards();
+        setMarketingRewards(rewards);
+      } catch (error) {
+        console.error("Error fetching marketing rewards:", error);
+      }
       setLoading(false);
     };
+
     fetchData();
   }, []);
 
@@ -42,9 +58,10 @@ const MarketingRewards = () => {
   );
 };
 
+// Generate SEO and Open Graph metadata server-side
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Marketing Rewards | Cosmic Signature";
-  const description = "Marketing Rewards";
+  const description = "Earn marketing rewards by promoting our project online.";
 
   const openGraphData = [
     { property: "og:title", content: title },
@@ -55,7 +72,9 @@ export const getServerSideProps: GetServerSideProps = async () => {
     { name: "twitter:image", content: logoImgUrl },
   ];
 
-  return { props: { title, description, openGraphData } };
+  return {
+    props: { title, description, openGraphData },
+  };
 };
 
 export default MarketingRewards;
