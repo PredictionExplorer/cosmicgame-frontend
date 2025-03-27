@@ -7,31 +7,48 @@ import { ethers } from "ethers";
 import MarketingRewardsTable from "../../components/MarketingRewardsTable";
 import { logoImgUrl } from "../../utils";
 
-const UserMarketingRewards = ({ address }) => {
-  const [loading, setLoading] = useState(true);
-  const [invalidAddress, setInvalidAddress] = useState(false);
-  const [marketingRewards, setMarketingRewards] = useState([]);
+interface UserMarketingRewardsProps {
+  address: string;
+}
+
+interface RewardItem {
+  id: number;
+  reward: string;
+  date: string;
+}
+
+// Component for displaying user's marketing rewards based on Ethereum address
+const UserMarketingRewards: React.FC<UserMarketingRewardsProps> = ({
+  address,
+}) => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [invalidAddress, setInvalidAddress] = useState<boolean>(false);
+  const [marketingRewards, setMarketingRewards] = useState<RewardItem[]>([]);
 
   useEffect(() => {
-    const fetchData = async (addr: string) => {
+    const fetchRewards = async (userAddress: string) => {
       setLoading(true);
-      const marketingRewards = await api.get_marketing_rewards_by_user(addr);
-      setMarketingRewards(marketingRewards);
+      try {
+        const rewards = await api.get_marketing_rewards_by_user(userAddress);
+        setMarketingRewards(rewards);
+      } catch (error) {
+        console.error("Error fetching user marketing rewards:", error);
+      }
       setLoading(false);
     };
-    if (address) {
-      if (address !== "Invalid Address") {
-        fetchData(address);
-      } else {
-        setInvalidAddress(true);
-      }
+
+    if (address === "Invalid Address") {
+      setInvalidAddress(true);
+      setLoading(false);
+    } else if (address) {
+      fetchRewards(address);
     }
   }, [address]);
 
   return (
     <MainWrapper>
       {invalidAddress ? (
-        <Typography variant="h6">Invalid Address</Typography>
+        <Typography variant="h6">Invalid Ethereum Address</Typography>
       ) : (
         <>
           <Box mb={4}>
@@ -67,16 +84,19 @@ const UserMarketingRewards = ({ address }) => {
   );
 };
 
+// Server-side function to validate Ethereum address and prepare SEO metadata
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const params = context.params!.address;
-  let address = Array.isArray(params) ? params[0] : params;
+  const param = context.params!.address;
+  let address = Array.isArray(param) ? param[0] : param;
+
   if (ethers.utils.isAddress(address.toLowerCase())) {
     address = ethers.utils.getAddress(address.toLowerCase());
   } else {
     address = "Invalid Address";
   }
+
   const title = `Marketing Rewards for User ${address} | Cosmic Signature`;
-  const description = `Marketing Rewards for User ${address}`;
+  const description = `Marketing Rewards earned by User ${address}`;
 
   const openGraphData = [
     { property: "og:title", content: title },
