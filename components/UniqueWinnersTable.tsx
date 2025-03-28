@@ -13,11 +13,27 @@ import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 
-const UniqueWinnersRow = ({ winner }) => {
+// TypeScript types for better clarity and type-safety
+interface Winner {
+  WinnerAid: string;
+  WinnerAddr: string;
+  PrizesCount: number;
+  MaxWinAmountEth: number;
+  PrizesSum: number;
+}
+
+interface UniqueWinnersRowProps {
+  winner?: Winner;
+}
+
+// Component rendering a single row of winner data
+const UniqueWinnersRow: React.FC<UniqueWinnersRowProps> = ({ winner }) => {
   if (!winner) {
+    // Return empty row when winner data isn't available
     return <TablePrimaryRow />;
   }
 
+  // Render row with winner details
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
@@ -37,12 +53,25 @@ const UniqueWinnersRow = ({ winner }) => {
   );
 };
 
-export const UniqueWinnersTable = ({ list }) => {
+interface UniqueWinnersTableProps {
+  list: Winner[];
+}
+
+// Component rendering a paginated table of winners
+export const UniqueWinnersTable: React.FC<UniqueWinnersTableProps> = ({
+  list,
+}) => {
+  // Items per page constant
   const perPage = 5;
+
+  // State for current page
   const [page, setPage] = useState(1);
+
+  // Display message when there are no winners
   if (list.length === 0) {
     return <Typography>No winners yet.</Typography>;
   }
+
   return (
     <>
       <TablePrimaryContainer>
@@ -63,6 +92,7 @@ export const UniqueWinnersTable = ({ list }) => {
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
+
           <TableBody>
             {list.slice((page - 1) * perPage, page * perPage).map((winner) => (
               <UniqueWinnersRow winner={winner} key={winner.WinnerAid} />
@@ -70,6 +100,8 @@ export const UniqueWinnersTable = ({ list }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
+
+      {/* Pagination component to navigate between pages */}
       <CustomPagination
         page={page}
         setPage={setPage}
