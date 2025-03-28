@@ -15,22 +15,36 @@ import NFT from "./NFT";
 import api from "../services/api";
 
 const LatestNFTs = () => {
-  const [data, setData] = useState([]);
+  const [nftData, setNftData] = useState<any[]>([]);
+
+  // Material UI hooks for responsive design
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("md"));
+  const isDesktopView = useMediaQuery(theme.breakpoints.up("md"));
+
+  // Carousel hook for mobile view
   const { scrollRef, pages, activePageIndex, next, prev } = useSnapCarousel();
+
+  // Fetch NFT data on component mount
   useEffect(() => {
     const fetchData = async () => {
-      const nfts = await api.get_cst_list();
-      const data = nfts.sort((a, b) => Number(b.TokenId) - Number(a.TokenId));
-      setData(data);
+      try {
+        const nfts = await api.get_cst_list();
+        const sortedNfts = nfts.sort(
+          (a: any, b: any) => Number(b.TokenId) - Number(a.TokenId)
+        );
+        setNftData(sortedNfts);
+      } catch (error) {
+        console.error("Failed to fetch NFTs", error);
+      }
     };
     fetchData();
   }, []);
 
   return (
     <Box sx={{ backgroundColor: "#101441" }}>
-      <Container sx={{ padding: matches ? "80px 10px 150px" : "80px 10px" }}>
+      <Container
+        sx={{ padding: isDesktopView ? "80px 10px 150px" : "80px 10px" }}
+      >
         <Box
           display="flex"
           alignItems="center"
@@ -38,25 +52,26 @@ const LatestNFTs = () => {
           flexWrap="wrap"
         >
           <Typography variant="h4" component="span">
-            Latest NFT&#39;s
+            Latest NFT&apos;s
           </Typography>
         </Box>
         <Box textAlign="center" marginBottom="56px">
           <Image
-            src={"/images/divider.svg"}
+            src="/images/divider.svg"
             width={93}
             height={3}
             alt="divider"
           />
         </Box>
-        {data.length > 0 ? (
+
+        {nftData.length > 0 ? (
           <>
-            {matches && (
+            {/* Grid layout for Desktop view */}
+            {isDesktopView && (
               <Grid container spacing={2} marginTop="58px">
-                {data.slice(0, 6).map((nft, i) => (
+                {nftData.slice(0, 6).map((nft, index) => (
                   <Grid
-                    key={i}
-                    sx={{ position: "relative" }}
+                    key={nft.TokenId || index}
                     item
                     xs={12}
                     sm={12}
@@ -68,52 +83,58 @@ const LatestNFTs = () => {
                 ))}
               </Grid>
             )}
-            <Box display={matches ? "none" : "block"}>
-              <ul
-                ref={scrollRef}
-                style={{
-                  listStyle: "none",
-                  display: "flex",
-                  overflow: "hidden",
-                  scrollSnapType: "x mandatory",
-                  padding: 0,
-                }}
-              >
-                {data.slice(0, 6).map((nft, i) => (
-                  <li
-                    key={i}
-                    style={{
-                      width: "100%",
-                      flexShrink: 0,
-                      marginRight: "10px",
-                      position: "relative",
-                    }}
+
+            {/* Carousel layout for Mobile view */}
+            {!isDesktopView && (
+              <Box>
+                <ul
+                  ref={scrollRef}
+                  style={{
+                    listStyle: "none",
+                    display: "flex",
+                    overflow: "hidden",
+                    scrollSnapType: "x mandatory",
+                    padding: 0,
+                  }}
+                >
+                  {nftData.slice(0, 6).map((nft, index) => (
+                    <li
+                      key={nft.TokenId || index}
+                      style={{
+                        width: "100%",
+                        flexShrink: 0,
+                        marginRight: "10px",
+                      }}
+                    >
+                      <NFT nft={nft} />
+                    </li>
+                  ))}
+                </ul>
+                <Box textAlign="center" mt={2}>
+                  <Button
+                    variant="contained"
+                    sx={{ mr: 1 }}
+                    onClick={prev}
+                    disabled={activePageIndex === 0}
                   >
-                    <NFT nft={nft} />
-                  </li>
-                ))}
-              </ul>
-              <Box textAlign="center">
-                <Button
-                  variant="contained"
-                  sx={{ mr: 1 }}
-                  onClick={() => prev()}
-                  disabled={activePageIndex === 0}
-                >
-                  <ArrowBack fontSize="small" />
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => next()}
-                  disabled={activePageIndex === pages.length - 1}
-                >
-                  <ArrowForward fontSize="small" />
-                </Button>
+                    <ArrowBack fontSize="small" />
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={next}
+                    disabled={activePageIndex === pages.length - 1}
+                  >
+                    <ArrowForward fontSize="small" />
+                  </Button>
+                </Box>
               </Box>
-            </Box>
+            )}
           </>
         ) : (
-          <Typography>There is no NFT yet.</Typography>
+          // Display a friendly message if there are no NFTs
+          <Typography textAlign="center" mt={4}>
+            There is no NFT yet.
+          </Typography>
         )}
       </Container>
     </Box>
