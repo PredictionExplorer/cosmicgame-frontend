@@ -21,7 +21,6 @@ import getErrorMessage from "../utils/alert";
 
 // Hooks & Context
 import { useActiveWeb3React } from "../hooks/web3";
-import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 import { useApiData } from "../contexts/ApiDataContext";
 import { useNotification } from "../contexts/NotificationContext";
@@ -178,7 +177,6 @@ export default function MyWinnings() {
   } = useUnclaimedWinnings(account);
 
   // Smart contract hooks
-  const cosmicGameContract = useCosmicGameContract();
   const raffleWalletContract = useRaffleWalletContract();
 
   // Local UI states
@@ -199,7 +197,7 @@ export default function MyWinnings() {
   const handleAllETHClaim = async () => {
     setIsClaiming((prev) => ({ ...prev, raffleETH: true }));
     try {
-      await raffleWalletContract.withdraw();
+      await raffleWalletContract["withdrawEth()"]();
 
       // Refresh status and unclaimed data after short delay
       setTimeout(() => {
@@ -221,7 +219,7 @@ export default function MyWinnings() {
   const handleDonatedNFTsClaim = async (tokenID: number) => {
     setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
-      await cosmicGameContract.claimDonatedNFT(tokenID);
+      await raffleWalletContract.claimDonatedNFT(tokenID);
 
       // Refresh data
       setTimeout(() => {
@@ -247,7 +245,7 @@ export default function MyWinnings() {
 
     try {
       const indexList = donatedNFTs.map((item) => item.Index);
-      await cosmicGameContract.claimManyDonatedNFTs(indexList);
+      await raffleWalletContract.claimManyDonatedNFTs(indexList);
 
       setTimeout(() => {
         fetchStatusData();

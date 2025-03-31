@@ -20,7 +20,7 @@ const EthDonations = () => {
 
   const handleDonate = async () => {
     try {
-      await cosmicGameContract.donate({
+      await cosmicGameContract.donateEth({
         value: ethers.utils.parseEther(donateAmount),
       });
       setNotification({
@@ -39,7 +39,7 @@ const EthDonations = () => {
 
   const handleDonateWithInfo = async () => {
     try {
-      await cosmicGameContract.donateWithInfo(donateInformation, {
+      await cosmicGameContract.donateEthWithInfo(donateInformation, {
         value: ethers.utils.parseEther(donateAmount),
       });
       setNotification({

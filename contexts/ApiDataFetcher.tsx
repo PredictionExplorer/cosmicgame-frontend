@@ -45,7 +45,7 @@ const ApiDataFetcher: React.FC<ApiDataFetcherProps> = ({ interval }) => {
     // - setApiData: context setter (not directly used here, but included for completeness)
     // - stakedTokens: if staked tokens change, it will refetch the data
     // - fetchData: the function that actually retrieves the API data
-  }, [interval, setApiData, stakedTokens, fetchData]);
+  }, [interval, setApiData, stakedTokens]);
 
   // This component does not render any UI,
   // it only triggers side effects for data fetching.
