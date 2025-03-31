@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { TableBody, TableSortLabel, Typography } from "@mui/material";
 import {
   TablePrimaryContainer,
@@ -8,17 +8,25 @@ import {
   TablePrimary,
   TablePrimaryHeadCell,
 } from "./styled";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
 import { AddressLink } from "./AddressLink";
 import { formatSeconds } from "../utils";
 
-const EnduranceChampionsRow = ({ row }) => {
+interface ChampionRowProps {
+  row: {
+    bidder: string;
+    championTime: number;
+    chronoWarrior?: number;
+  };
+}
+
+const EnduranceChampionsRow: React.FC<ChampionRowProps> = ({ row }) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
+
   return (
     <TablePrimaryRow>
       <TablePrimaryCell align="left">
@@ -34,93 +42,99 @@ const EnduranceChampionsRow = ({ row }) => {
   );
 };
 
-const EnduranceChampionsTable = ({ championList }) => {
-  const perPage = 5;
-  const [sortField, setSortField] = useState("championTime");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [page, setPage] = useState(1);
+interface ChampionsTableProps {
+  championList: ChampionRowProps["row"][] | null;
+}
 
-  const handleSort = (field) => {
+const EnduranceChampionsTable: React.FC<ChampionsTableProps> = ({
+  championList,
+}) => {
+  const [sortField, setSortField] = useState<"championTime" | "chronoWarrior">(
+    "championTime"
+  );
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [page, setPage] = useState<number>(1);
+  const perPage = 5;
+
+  // Handle sorting logic
+  const handleSort = (field: "championTime" | "chronoWarrior") => {
     if (field === sortField) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
       setSortField(field);
       setSortDirection("desc");
     }
   };
 
-  const sortedChampionList = championList
-    ? [...championList].sort((a, b) => {
-        if (sortDirection === "asc") {
-          return a[sortField] - b[sortField];
-        } else {
-          return b[sortField] - a[sortField];
-        }
-      })
-    : [];
+  // Memoized sorted and paginated data
+  const paginatedList = useMemo(() => {
+    if (!championList) return [];
 
-  const paginatedList = sortedChampionList.slice(
-    (page - 1) * perPage,
-    page * perPage
-  );
+    const sortedList = [...championList].sort((a, b) =>
+      sortDirection === "asc"
+        ? a[sortField] - b[sortField]
+        : b[sortField] - a[sortField]
+    );
 
-  if (!championList || championList.length === 0) {
-    return <Typography>No bid data available.</Typography>;
+    return sortedList.slice((page - 1) * perPage, page * perPage);
+  }, [championList, sortField, sortDirection, page]);
+
+  // Conditional rendering based on list status
+  if (!championList) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (championList.length === 0) {
+    return <Typography>No endurance champions yet.</Typography>;
   }
 
   return (
     <>
-      {championList === null ? (
-        <Typography>Loading...</Typography>
-      ) : championList.length === 0 ? (
-        <Typography>No endurance champions yet.</Typography>
-      ) : (
-        <TablePrimaryContainer>
-          <TablePrimary>
-            {!isMobile && (
-              <colgroup>
-                <col width="50%" />
-                <col width="25%" />
-                <col width="25%" />
-              </colgroup>
-            )}
-            <TablePrimaryHead>
-              <Tr>
-                <TablePrimaryHeadCell align="left">
-                  User Address
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="center">
-                  <TableSortLabel
-                    active={sortField === "championTime"}
-                    direction={sortDirection}
-                    onClick={() => handleSort("championTime")}
-                  >
-                    Champion Time
-                  </TableSortLabel>
-                </TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="center">
-                  <TableSortLabel
-                    active={sortField === "chronoWarrior"}
-                    direction={sortDirection}
-                    onClick={() => handleSort("chronoWarrior")}
-                  >
-                    Chrono Warrior
-                  </TableSortLabel>
-                </TablePrimaryHeadCell>
-              </Tr>
-            </TablePrimaryHead>
-            <TableBody>
-              {paginatedList.map((row, index) => (
-                <EnduranceChampionsRow
-                  key={`${row.bidder}-${index}-${page}`}
-                  row={row}
-                />
-              ))}
-            </TableBody>
-          </TablePrimary>
-        </TablePrimaryContainer>
-      )}
-      {championList && championList.length > perPage && (
+      <TablePrimaryContainer>
+        <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="50%" />
+              <col width="25%" />
+              <col width="25%" />
+            </colgroup>
+          )}
+          <TablePrimaryHead>
+            <Tr>
+              <TablePrimaryHeadCell align="left">
+                User Address
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                <TableSortLabel
+                  active={sortField === "championTime"}
+                  direction={sortDirection}
+                  onClick={() => handleSort("championTime")}
+                >
+                  Champion Time
+                </TableSortLabel>
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                <TableSortLabel
+                  active={sortField === "chronoWarrior"}
+                  direction={sortDirection}
+                  onClick={() => handleSort("chronoWarrior")}
+                >
+                  Chrono Warrior
+                </TableSortLabel>
+              </TablePrimaryHeadCell>
+            </Tr>
+          </TablePrimaryHead>
+          <TableBody>
+            {paginatedList.map((row, index) => (
+              <EnduranceChampionsRow
+                key={`${row.bidder}-${index}-${page}`}
+                row={row}
+              />
+            ))}
+          </TableBody>
+        </TablePrimary>
+      </TablePrimaryContainer>
+      {championList.length > perPage && (
         <CustomPagination
           page={page}
           setPage={setPage}
