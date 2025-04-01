@@ -6,19 +6,35 @@ import api from "../../../services/api";
 import EthDonationTable from "../../../components/EthDonationTable";
 import { logoImgUrl } from "../../../utils";
 
-const EthDonationByRound = ({ round }) => {
-  const [loading, setLoading] = useState(true);
-  const [donationInfo, setDonationInfo] = useState([]);
+// Define TypeScript types for props
+interface EthDonationByRoundProps {
+  round: number;
+}
+
+// Component to display Ethereum donations by specific round
+const EthDonationByRound: React.FC<EthDonationByRoundProps> = ({ round }) => {
+  // State for loading indicator
+  const [loading, setLoading] = useState<boolean>(true);
+  // State to hold fetched donation data
+  const [donationInfo, setDonationInfo] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const info = await api.get_donations_both_by_round(round);
-      setDonationInfo(info);
-      setLoading(false);
+    // Async function to fetch donation data based on round number
+    const fetchDonationData = async () => {
+      try {
+        setLoading(true);
+        const donations = await api.get_donations_both_by_round(round);
+        setDonationInfo(donations);
+      } catch (error) {
+        console.error("Error fetching donation data:", error);
+        setDonationInfo([]);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchData();
-  }, []);
+
+    fetchDonationData();
+  }, [round]); // Added round as a dependency for better clarity
 
   return (
     <MainWrapper>
@@ -29,8 +45,9 @@ const EthDonationByRound = ({ round }) => {
         textAlign="center"
         mb={4}
       >
-        Direct (ETH) Donation for Round {round}
+        Direct (ETH) Donations for Round {round}
       </Typography>
+
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
@@ -40,13 +57,17 @@ const EthDonationByRound = ({ round }) => {
   );
 };
 
+// Server-side rendering to fetch initial props
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const params = context.params!.round;
-  const round = Array.isArray(params) ? params[0] : params;
-  const title = `Direct (ETH) Donation for Round ${round} | Cosmic Signature`;
-  const description = `Direct (ETH) Donation for Round ${round}`;
+  // Extract round parameter from URL context
+  const paramRound = context.params!.round;
+  const round = Array.isArray(paramRound) ? paramRound[0] : paramRound;
+
+  // Page metadata setup
+  const title = `Direct (ETH) Donations for Round ${round} | Cosmic Signature`;
+  const description = `View Direct (ETH) Donations for Round ${round}`;
 
   const openGraphData = [
     { property: "og:title", content: title },
