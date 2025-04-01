@@ -11,60 +11,79 @@ import { ethers } from "ethers";
 import { logoImgUrl } from "../../utils";
 
 const EthDonations = () => {
+  // State for donation data, amount, and donation information (JSON format)
   const [charityDonations, setCharityDonations] = useState(null);
   const [donateAmount, setDonateAmount] = useState("");
   const [donateInformation, setDonationInformation] = useState("");
+
   const { setNotification } = useNotification();
   const { account } = useActiveWeb3React();
   const cosmicGameContract = useCosmicGameContract();
 
-  const handleDonate = async () => {
-    try {
-      await cosmicGameContract.donateEth({
-        value: ethers.utils.parseEther(donateAmount),
-      });
-      setNotification({
-        text: `${donateAmount} ETH was donated successfully!`,
-        type: "success",
-        visible: true,
-      });
-      setDonateAmount("");
-      setTimeout(() => {
-        fetchCharityDonations();
-      }, 1000);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const handleDonateWithInfo = async () => {
-    try {
-      await cosmicGameContract.donateEthWithInfo(donateInformation, {
-        value: ethers.utils.parseEther(donateAmount),
-      });
-      setNotification({
-        text: `${donateAmount} ETH was donated with information successfully!`,
-        type: "success",
-        visible: true,
-      });
-      setDonateAmount("");
-      setDonationInformation("");
-      setTimeout(() => {
-        fetchCharityDonations();
-      }, 1000);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
+  // Fetches the donation history
   const fetchCharityDonations = async () => {
-    const donation = await api.get_donations_both();
-    setCharityDonations(donation);
+    const donations = await api.get_donations_both();
+    setCharityDonations(donations);
   };
 
   useEffect(() => {
     fetchCharityDonations();
   }, []);
+
+  // Handles basic ETH donation
+  const handleDonate = async () => {
+    try {
+      await cosmicGameContract.donateEth({
+        value: ethers.utils.parseEther(donateAmount),
+      });
+
+      setNotification({
+        text: `${donateAmount} ETH was donated successfully!`,
+        type: "success",
+        visible: true,
+      });
+
+      setDonateAmount("");
+
+      // Refresh donations after 1 second
+      setTimeout(fetchCharityDonations, 1000);
+    } catch (error) {
+      console.error("Donation error:", error);
+      setNotification({
+        text: "Donation failed, please try again.",
+        type: "error",
+        visible: true,
+      });
+    }
+  };
+
+  // Handles ETH donation with additional JSON information
+  const handleDonateWithInfo = async () => {
+    try {
+      await cosmicGameContract.donateEthWithInfo(donateInformation, {
+        value: ethers.utils.parseEther(donateAmount),
+      });
+
+      setNotification({
+        text: `${donateAmount} ETH with information was donated successfully!`,
+        type: "success",
+        visible: true,
+      });
+
+      setDonateAmount("");
+      setDonationInformation("");
+
+      // Refresh donations after 1 second
+      setTimeout(fetchCharityDonations, 1000);
+    } catch (error) {
+      console.error("Donation with info error:", error);
+      setNotification({
+        text: "Donation with information failed, please check your input.",
+        type: "error",
+        visible: true,
+      });
+    }
+  };
 
   return (
     <MainWrapper>
@@ -82,15 +101,16 @@ const EthDonations = () => {
         <Typography variant="h6">Loading...</Typography>
       ) : (
         <>
-          <Typography variant="h6">History</Typography>
+          <Typography variant="h6">Donation History</Typography>
           <EthDonationTable list={charityDonations} />
         </>
       )}
+
       {!!account && (
         <>
           <Box mt={6}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-              <Typography mr={1}>Amount: </Typography>
+              <Typography mr={1}>Amount:</Typography>
               <TextField
                 placeholder="Donation amount"
                 type="number"
@@ -101,19 +121,21 @@ const EthDonations = () => {
               />
               <Typography>ETH</Typography>
             </Box>
+
             <TextField
               value={donateInformation}
               multiline
               rows={5}
               fullWidth
-              placeholder="Please input the donation information in JSON format."
+              placeholder="Donation information (JSON format)"
               onChange={(e) => setDonationInformation(e.target.value)}
             />
           </Box>
+
           <Box mt={1} mb={1}>
             <Button
               variant="contained"
-              disabled={donateAmount === "0" || donateAmount === ""}
+              disabled={!donateAmount || donateAmount === "0"}
               onClick={handleDonate}
               sx={{ mr: 1 }}
             >
@@ -121,10 +143,10 @@ const EthDonations = () => {
             </Button>
             <Button
               variant="contained"
+              disabled={!donateAmount || donateAmount === "0"}
               onClick={handleDonateWithInfo}
-              disabled={donateAmount === "0" || donateAmount === ""}
             >
-              Donate with info
+              Donate with Info
             </Button>
           </Box>
         </>
