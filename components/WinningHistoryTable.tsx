@@ -89,7 +89,11 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
 
       {/* Datetime with transaction link */}
       <TablePrimaryCell>
-        <Link href={`https://arbiscan.io/tx/${history.TxHash}`} target="_blank">
+        <Link
+          href={`https://arbiscan.io/tx/${history.TxHash}`}
+          target="_blank"
+          color="inherit"
+        >
           {convertTimestampToDateTime(history.TimeStamp)}
         </Link>
       </TablePrimaryCell>
@@ -103,6 +107,7 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
                 href={`/user/${history.WinnerAddr}`}
                 target="_blank"
                 fontFamily="monospace"
+                color="inherit"
               >
                 {shortenHex(history.WinnerAddr, 6)}
               </Link>
@@ -115,7 +120,11 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
 
       {/* Round number linking to prize details */}
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${history.RoundNum}`} target="_blank">
+        <Link
+          href={`/prize/${history.RoundNum}`}
+          target="_blank"
+          color="inherit"
+        >
           {history.RoundNum}
         </Link>
       </TablePrimaryCell>
@@ -130,20 +139,26 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
       {/* Token Address */}
       <TablePrimaryCell align="center">
         {history.RecordType === 1 ? (
-          <Link
-            href={`https://arbiscan.io/address/${COSMIC_SIGNATURE_TOKEN_ADDRESS}`}
-            target="_blank"
-          >
-            {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS, 6)}
-          </Link>
+          <Tooltip title={COSMIC_SIGNATURE_TOKEN_ADDRESS}>
+            <Link
+              href={`https://arbiscan.io/address/${COSMIC_SIGNATURE_TOKEN_ADDRESS}`}
+              target="_blank"
+              color="inherit"
+            >
+              {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS, 6)}
+            </Link>
+          </Tooltip>
         ) : (
           history.TokenAddress && (
-            <Link
-              href={`https://arbiscan.io/address/${history.TokenAddress}`}
-              target="_blank"
-            >
-              {shortenHex(history.TokenAddress, 6)}
-            </Link>
+            <Tooltip title={history.TokenAddress}>
+              <Link
+                href={`https://arbiscan.io/address/${history.TokenAddress}`}
+                target="_blank"
+                color="inherit"
+              >
+                {shortenHex(history.TokenAddress, 6)}
+              </Link>
+            </Tooltip>
           )
         )}
       </TablePrimaryCell>
@@ -160,6 +175,7 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
                 : tokenURI?.external_url
             }
             target="_blank"
+            color="inherit"
           >
             {history.TokenId}
           </Link>

@@ -111,7 +111,7 @@ const GlobalStakingRewardsRow = ({ row }: { row: any }) => {
 
         {/* Pending to Collect (ETH) */}
         <TablePrimaryCell align="right">
-          {(row.TotalDepositAmountEth - row.AmountCollectedEth).toFixed(6)}
+          {row.PendingToCollectEth.toFixed(6)}
         </TablePrimaryCell>
       </TablePrimaryRow>
 
