@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 
 // Custom hooks and services
 import { useActiveWeb3React } from "../hooks/web3";
-import useCosmicGameContract from "../hooks/useCosmicGameContract";
+import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 import { useStakedToken } from "../contexts/StakedTokenContext";
 import { useApiData } from "../contexts/ApiDataContext";
 import { useNotification } from "../contexts/NotificationContext";
@@ -508,7 +508,7 @@ function RWLKStakingTab({
 ------------------------------------------------------------------ */
 const MyStatistics = () => {
   const { account } = useActiveWeb3React(); // active account
-  const cosmicGameContract = useCosmicGameContract();
+  const prizeWalletContract = useRaffleWalletContract();
 
   // Hooks & Context
   const { fetchData: fetchStakedTokens } = useStakedToken();
@@ -733,7 +733,7 @@ const MyStatistics = () => {
   const handleDonatedNFTsClaim = async (tokenID: number) => {
     setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
-      await cosmicGameContract.claimDonatedNFT(tokenID);
+      await prizeWalletContract.claimDonatedNFT(tokenID);
       setTimeout(() => {
         fetchUserData(account!, false);
         fetchDonatedNFTs(false);
@@ -758,7 +758,7 @@ const MyStatistics = () => {
       const indexList = unclaimedDonatedNFTs.data.map(
         (item: any) => item.Index
       );
-      await cosmicGameContract.claimManyDonatedNFTs(indexList);
+      await prizeWalletContract.claimManyDonatedNFTs(indexList);
       setTimeout(() => {
         fetchUserData(account!, false);
         fetchDonatedNFTs(false);

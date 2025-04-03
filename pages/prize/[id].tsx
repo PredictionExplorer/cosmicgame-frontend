@@ -4,7 +4,7 @@ import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
 
 import api from "../../services/api";
-import useCosmicGameContract from "../../hooks/useCosmicGameContract";
+import useRaffleWalletContract from "../../hooks/useRaffleWalletContract";
 import { useApiData } from "../../contexts/ApiDataContext";
 import { useNotification } from "../../contexts/NotificationContext";
 
@@ -283,7 +283,7 @@ interface PrizeInfoProps {
   roundNum: number;
 }
 const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
-  const cosmicGameContract = useCosmicGameContract();
+  const prizeWalletContract = useRaffleWalletContract();
   const { apiData: status } = useApiData();
   const { setNotification } = useNotification();
 
@@ -319,7 +319,7 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
     setIsClaiming(true);
     try {
       const indexList = donatedNFTToClaim.map((item) => item.Index);
-      await cosmicGameContract.claimManyDonatedNFTs(indexList);
+      await prizeWalletContract.claimManyDonatedNFTs(indexList);
       await fetchUnclaimedDonatedNFTs();
     } catch (err) {
       const errorMsg = getErrorMessage(

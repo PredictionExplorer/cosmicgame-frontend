@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
-import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
-import api from "../../services/api";
-import BiddingHistoryTable from "../../components/BiddingHistoryTable";
-import WinningHistoryTable from "../../components/WinningHistoryTable";
-import { ethers } from "ethers";
-import { formatEthValue, logoImgUrl } from "../../utils";
+import { useActiveWeb3React } from "../../hooks/web3";
+import useRaffleWalletContract from "../../hooks/useRaffleWalletContract";
+import { CSTTable } from "../my-tokens";
 import { useStakedToken } from "../../contexts/StakedTokenContext";
 import { useApiData } from "../../contexts/ApiDataContext";
-import { useActiveWeb3React } from "../../hooks/web3";
-import useCosmicGameContract from "../../hooks/useCosmicGameContract";
-import DonatedNFTTable from "../../components/DonatedNFTTable";
-import { CSTTable } from "../my-tokens";
-import getErrorMessage from "../../utils/alert";
 import { useNotification } from "../../contexts/NotificationContext";
+import { MainWrapper } from "../../components/styled";
 import StakingActionsTable from "../../components/StakingActionsTable";
 import MarketingRewardsTable from "../../components/MarketingRewardsTable";
 import { StakingRewardsTable } from "../../components/StakingRewardsTable";
+import BiddingHistoryTable from "../../components/BiddingHistoryTable";
+import WinningHistoryTable from "../../components/WinningHistoryTable";
+import DonatedNFTTable from "../../components/DonatedNFTTable";
 import { CollectedCSTStakingRewardsTable } from "../../components/CollectedCSTStakingRewardsTable";
 import { UncollectedCSTStakingRewardsTable } from "../../components/UncollectedCSTStakingRewardsTable";
 import { CSTStakingRewardsByDepositTable } from "../../components/CSTStakingRewardsByDepositTable";
 import { RwalkStakingRewardMintsTable } from "../../components/RwalkStakingRewardMintsTable";
+import getErrorMessage from "../../utils/alert";
+import { formatEthValue, logoImgUrl } from "../../utils";
+import api from "../../services/api";
+import { ethers } from "ethers";
 
 /* ------------------------------------------------------------------
    Types & Interfaces
@@ -85,7 +85,7 @@ const UserInfo = ({ address }: { address: string }) => {
   const { fetchData: fetchStatusData } = useApiData();
 
   // Contract interaction hook
-  const cosmicGameContract = useCosmicGameContract();
+  const prizeWalletContract = useRaffleWalletContract();
 
   // Basic user data and loading states
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -304,7 +304,7 @@ const UserInfo = ({ address }: { address: string }) => {
     setIsClaiming(true);
 
     try {
-      await cosmicGameContract.claimDonatedNFT(tokenID);
+      await prizeWalletContract.claimDonatedNFT(tokenID);
 
       // Refresh data after a small delay
       setTimeout(() => {
@@ -337,7 +337,7 @@ const UserInfo = ({ address }: { address: string }) => {
       const indexList = unclaimedDonatedNFTs.data.map(
         (item: any) => item.Index
       );
-      await cosmicGameContract.claimManyDonatedNFTs(indexList);
+      await prizeWalletContract.claimManyDonatedNFTs(indexList);
 
       // Refresh data after a small delay
       setTimeout(() => {

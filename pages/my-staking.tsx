@@ -4,7 +4,6 @@ import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
 import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
-import { CSTokensTable } from "../components/CSTokensTable";
 import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
 import useStakingWalletRWLKContract from "../hooks/useStakingWalletRWLKContract";
 import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
@@ -12,19 +11,18 @@ import {
   STAKING_WALLET_CST_ADDRESS,
   STAKING_WALLET_RWLK_ADDRESS,
 } from "../config/app";
-import { StakedTokensTable } from "../components/StakedTokensTable";
 import { useStakedToken } from "../contexts/StakedTokenContext";
-import { RWLKNFTTable } from "../components/RWLKNFTTable";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
-import { RwalkStakingRewardMintsTable } from "../components/RwalkStakingRewardMintsTable";
-import useCosmicGameContract from "../hooks/useCosmicGameContract";
-import { ethers } from "ethers";
-import getErrorMessage from "../utils/alert";
 import { useNotification } from "../contexts/NotificationContext";
 import { GetServerSideProps } from "next";
 import StakingActionsTable from "../components/StakingActionsTable";
 import { StakingRewardsTable } from "../components/StakingRewardsTable";
+import { StakedTokensTable } from "../components/StakedTokensTable";
+import { RWLKNFTTable } from "../components/RWLKNFTTable";
+import { RwalkStakingRewardMintsTable } from "../components/RwalkStakingRewardMintsTable";
+import { CSTokensTable } from "../components/CSTokensTable";
 import { logoImgUrl } from "../utils";
+import getErrorMessage from "../utils/alert";
 
 // ----------------------------------------------
 // Types & Interfaces
@@ -208,7 +206,6 @@ const MyStaking = () => {
   const rwalkContract = useRWLKNFTContract();
   const cstStakingContract = useStakingWalletCSTContract();
   const rwlkStakingContract = useStakingWalletRWLKContract();
-  const cosmicGameContract = useCosmicGameContract();
 
   // Dashboard data
   const [dashboardData, setDashboardData] = useState<any>(null);
@@ -380,18 +377,16 @@ const MyStaking = () => {
   );
 
   // Fetch dashboard data (global) + compute reward per CST
-  const fetchDashboardData = useCallback(async () => {
+  const fetchDashboardData = async () => {
     try {
       const data = await api.get_dashboard_info();
       setDashboardData(data);
 
-      const stakingAmount = await cosmicGameContract.stakingAmount();
       const totalStakedCST =
         data?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
 
       if (totalStakedCST > 0) {
-        const rewardCST =
-          Number(ethers.utils.formatEther(stakingAmount)) / totalStakedCST;
+        const rewardCST = data?.StakingAmountEth / totalStakedCST;
         setRewardPerCST(rewardCST);
       } else {
         setRewardPerCST(0);
@@ -399,7 +394,7 @@ const MyStaking = () => {
     } catch (err) {
       console.error("Failed to fetch dashboard data:", err);
     }
-  }, [cosmicGameContract]);
+  };
 
   // Fetch CST user data
   const fetchCSTData = async (addr: string) => {
@@ -470,12 +465,12 @@ const MyStaking = () => {
 
   // On mount / account change
   useEffect(() => {
-    if (account && rwalkContract && cosmicGameContract) {
+    if (account && rwalkContract) {
       fetchCSTData(account);
       fetchRWLKData(account);
       fetchDashboardData();
     }
-  }, [account, rwalkContract, cosmicGameContract]);
+  }, [account, rwalkContract]);
 
   // ----------------------------------------------
   // Render
