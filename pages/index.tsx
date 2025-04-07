@@ -1021,7 +1021,7 @@ const NewHome = () => {
       fetchTimeoutClaimPrize();
       fetchActivationTime();
     }
-  }, [cosmicGameContract]);
+  }, [cosmicGameContract, offset]);
 
   return (
     <>
@@ -2053,4 +2053,3 @@ export default NewHome;
 // fix eth-donation page
 // add eth donate feature, simple donation, donation with info
 // add link to top 5 donations
-
