@@ -304,7 +304,7 @@ const UserInfo = ({ address }: { address: string }) => {
     setIsClaiming(true);
 
     try {
-      await prizeWalletContract.claimDonatedNFT(tokenID);
+      await prizeWalletContract.claimDonatedNft(tokenID);
 
       // Refresh data after a small delay
       setTimeout(() => {
@@ -337,7 +337,7 @@ const UserInfo = ({ address }: { address: string }) => {
       const indexList = unclaimedDonatedNFTs.data.map(
         (item: any) => item.Index
       );
-      await prizeWalletContract.claimManyDonatedNFTs(indexList);
+      await prizeWalletContract.claimManyDonatedNfts(indexList);
 
       // Refresh data after a small delay
       setTimeout(() => {
@@ -1018,4 +1018,4 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 export default UserInfo;
 
 // do we need to have stake/unstake actions table and staking rewards table both?
-// I can't find claimDonatedNFT() method. it's commented from smart contract.
+// I can't find claimDonatedNft() method. it's commented from smart contract.

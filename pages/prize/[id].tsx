@@ -319,7 +319,7 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
     setIsClaiming(true);
     try {
       const indexList = donatedNFTToClaim.map((item) => item.Index);
-      await prizeWalletContract.claimManyDonatedNFTs(indexList);
+      await prizeWalletContract.claimManyDonatedNfts(indexList);
       await fetchUnclaimedDonatedNFTs();
     } catch (err) {
       const errorMsg = getErrorMessage(

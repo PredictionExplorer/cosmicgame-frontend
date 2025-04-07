@@ -219,7 +219,7 @@ export default function MyWinnings() {
   const handleDonatedNFTsClaim = async (tokenID: number) => {
     setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
-      await raffleWalletContract.claimDonatedNFT(tokenID);
+      await raffleWalletContract.claimDonatedNft(tokenID);
 
       // Refresh data
       setTimeout(() => {
@@ -245,7 +245,7 @@ export default function MyWinnings() {
 
     try {
       const indexList = donatedNFTs.map((item) => item.Index);
-      await raffleWalletContract.claimManyDonatedNFTs(indexList);
+      await raffleWalletContract.claimManyDonatedNfts(indexList);
 
       setTimeout(() => {
         fetchStatusData();

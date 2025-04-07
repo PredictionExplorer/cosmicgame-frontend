@@ -733,7 +733,7 @@ const MyStatistics = () => {
   const handleDonatedNFTsClaim = async (tokenID: number) => {
     setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
-      await prizeWalletContract.claimDonatedNFT(tokenID);
+      await prizeWalletContract.claimDonatedNft(tokenID);
       setTimeout(() => {
         fetchUserData(account!, false);
         fetchDonatedNFTs(false);
@@ -758,7 +758,7 @@ const MyStatistics = () => {
       const indexList = unclaimedDonatedNFTs.data.map(
         (item: any) => item.Index
       );
-      await prizeWalletContract.claimManyDonatedNFTs(indexList);
+      await prizeWalletContract.claimManyDonatedNfts(indexList);
       setTimeout(() => {
         fetchUserData(account!, false);
         fetchDonatedNFTs(false);
