@@ -257,7 +257,7 @@ export const getEnduranceChampions = (bidList: any[], roundEndTimeStamp: number 
 
 export const getAssetsUrl = (url: string) => {
   const proxyUrl = "/api/proxy?url=";
-  const imageServerUrl = "http://69.10.55.2/images/";
+  const imageServerUrl = "http://161.129.67.58/images/";
   return `${proxyUrl}${encodeURIComponent(imageServerUrl + url)}`;
 };
 
