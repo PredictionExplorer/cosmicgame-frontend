@@ -125,6 +125,29 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
         label="Endurance Champion rewarded with CST (ERC20):"
         value={`${prizeInfo.EnduranceERC20AmountEth} CST`}
       />
+      <InfoRow
+        label="Last CST Bidder Address:"
+        value={prizeInfo.LastCstBidderAddr}
+        link={`/user/${prizeInfo.LastCstBidderAddr}`}
+      />
+      <InfoRow
+        label="Last CST Bidder NFT Token ID:"
+        value={prizeInfo.LastCstBidderERC721TokenId}
+        link={`/detail/${prizeInfo.LastCstBidderERC721TokenId}`}
+      />
+      <InfoRow
+        label="Last CST Bidder ETH Amount:"
+        value={`${prizeInfo.LastCstBidderERC20AmountEth.toFixed(4)} ETH`}
+      />
+      <InfoRow
+        label="Chrono Warrior Address:"
+        value={prizeInfo.ChronoWarriorAddr}
+        link={`/user/${prizeInfo.ChronoWarriorAddr}`}
+      />
+      <InfoRow
+        label="Chrono Warrior ETH Amount:"
+        value={`${prizeInfo.ChronoWarriorAmountEth.toFixed(4)} ETH`}
+      />
       <InfoRow label="Total Bids:" value={prizeInfo.RoundStats.TotalBids} />
       <InfoRow
         label="Total Donated NFTs:"

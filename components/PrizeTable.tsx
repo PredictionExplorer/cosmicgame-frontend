@@ -22,7 +22,7 @@ import { isMobile } from "react-device-detect";
     - Datetime
     - Winner address (shortened)
     - Various stats (ETH amounts, # of bids, # of donated NFTs, etc.)
-  Clicking on a row navigates to the '/prize/:PrizeNum' page.
+  Clicking on a row navigates to the '/prize/:RoundNum' page.
 ------------------------------------------------------------------ */
 const PrizeRow = ({ prize }) => {
   const router = useRouter();
@@ -32,13 +32,13 @@ const PrizeRow = ({ prize }) => {
 
   // Handle row click to navigate to a detail page for this specific prize.
   const handleRowClick = () => {
-    router.push(`/prize/${prize.PrizeNum}`);
+    router.push(`/prize/${prize.RoundNum}`);
   };
 
   return (
     <TablePrimaryRow sx={{ cursor: "pointer" }} onClick={handleRowClick}>
       {/* Round Number */}
-      <TablePrimaryCell align="center">{prize.PrizeNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{prize.RoundNum}</TablePrimaryCell>
 
       {/* Datetime (converted from timestamp) */}
       <TablePrimaryCell align="center">
