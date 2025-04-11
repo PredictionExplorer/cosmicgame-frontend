@@ -225,6 +225,12 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
+  // Refresh selection and pagination when the list changes
+  useEffect(() => {
+    setSelectedIds([]);
+    setPage(1);
+  }, [list]);
+
   // Sort by timestamp ascending
   const sortedList = useMemo(() => {
     return [...list].sort((a, b) => {

@@ -300,12 +300,15 @@ const MyStaking = () => {
           });
         }
 
-        // Refresh data
-        if (isRwalk) {
-          await fetchRWLKData(account!);
-        } else {
-          await fetchCSTData(account!);
-        }
+        setTimeout(async () => {
+          // Refresh data
+          if (isRwalk) {
+            await fetchRWLKData(account!);
+          } else {
+            await fetchCSTData(account!);
+          }
+          await fetchDashboardData();
+        }, 4000);
 
         return res;
       } catch (err) {
@@ -355,12 +358,16 @@ const MyStaking = () => {
           });
         }
 
-        // Refresh data
-        if (isRwalk) {
-          await fetchRWLKData(account!);
-        } else {
-          await fetchCSTData(account!);
-        }
+        setTimeout(async () => {
+          // Refresh data
+          if (isRwalk) {
+            await fetchRWLKData(account!);
+          } else {
+            await fetchCSTData(account!);
+          }
+          await fetchDashboardData();
+        }, 4000);
+
         return res;
       } catch (err) {
         handleError(err);
@@ -397,8 +404,8 @@ const MyStaking = () => {
   };
 
   // Fetch CST user data
-  const fetchCSTData = async (addr: string) => {
-    setLoading(true);
+  const fetchCSTData = async (addr: string, refresh: boolean = false) => {
+    setLoading(refresh);
     try {
       const [cstActions, cstUserTokens, cstUserRewards] = await Promise.all([
         api.get_staking_cst_actions_by_user(addr),
@@ -422,9 +429,9 @@ const MyStaking = () => {
   };
 
   // Fetch RWLK user data
-  const fetchRWLKData = async (addr: string) => {
+  const fetchRWLKData = async (addr: string, refresh: boolean = false) => {
     try {
-      setLoading(true);
+      setLoading(refresh);
 
       // Staking Actions + Reward Mints
       const [rwalkActions, rwalkMintEvents] = await Promise.all([
@@ -466,8 +473,8 @@ const MyStaking = () => {
   // On mount / account change
   useEffect(() => {
     if (account && rwalkContract) {
-      fetchCSTData(account);
-      fetchRWLKData(account);
+      fetchCSTData(account, true);
+      fetchRWLKData(account, true);
       fetchDashboardData();
     }
   }, [account, rwalkContract]);
