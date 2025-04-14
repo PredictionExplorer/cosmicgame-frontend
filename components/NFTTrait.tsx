@@ -182,7 +182,9 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
       await tx.wait();
 
       // Re-fetch data after setting the name
-      await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
+      setTimeout(async () => {
+        await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
+      }, 3000);
       setTokenName("");
       setNotification({
         text: "The token name has been changed successfully!",
@@ -210,7 +212,9 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
       await tx.wait();
 
       // Re-fetch data after clearing the name
-      await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
+      setTimeout(async () => {
+        await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
+      }, 3000);
       setTokenName("");
       setNotification({
         text: "The token name has been cleared successfully!",
