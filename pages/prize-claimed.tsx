@@ -116,11 +116,11 @@ const PrizeClaimed = () => {
             textAlign="center"
             mb={6}
           >
-            {`Congratulations! You won Round ${prizeInfo.PrizeNum}.`}
+            {`Congratulations! You won Round ${prizeInfo.RoundNum}.`}
           </Typography>
 
           <Typography variant="h5" mb={2}>
-            {`Round ${prizeInfo.PrizeNum} rewards are:`}
+            {`Round ${prizeInfo.RoundNum} rewards are:`}
           </Typography>
           <Box ml={4}>
             {/* ETH Reward */}
