@@ -1094,7 +1094,7 @@ const NewHome = () => {
                   </Grid>
                 ) : (
                   <>
-                    {data?.CurRoundNum > 0 && data?.TsRoundStart === 0 ? (
+                    {data?.CurRoundNum > 0 ? (
                       <>
                         <Typography variant="h4" mb={2}>
                           Round {data?.CurRoundNum - 1} ended
@@ -1133,7 +1133,7 @@ const NewHome = () => {
                             </Typography>
                           </Grid>
                         </Grid>
-                        <Grid container spacing={2} mb={2} alignItems="center">
+                        {/* <Grid container spacing={2} mb={2} alignItems="center">
                           <Grid item sm={12} md={4}>
                             <Typography variant="subtitle1">
                               Previous Reward
@@ -1144,7 +1144,7 @@ const NewHome = () => {
                               {prizeInfo?.AmountEth.toFixed(4)} ETH
                             </Typography>
                           </Grid>
-                        </Grid>
+                        </Grid> */}
                       </>
                     ) : (
                       <Typography variant="subtitle1">
@@ -1152,7 +1152,8 @@ const NewHome = () => {
                       </Typography>
                     )}
                     <Typography variant="subtitle1" mt={2} mb={2}>
-                      Be the first to start a new round, place a bid.
+                      Dutch auction for the first bid in ETH has started. Make
+                      your bid.
                     </Typography>
                   </>
                 )}
@@ -1173,34 +1174,38 @@ const NewHome = () => {
                         {data?.BidPriceEth.toFixed(2)} ETH
                       </Typography>
                     </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        mb: 1,
-                      }}
-                    >
-                      <Typography>Using RandomWalk</Typography>
-                      <Typography>
-                        {(data?.BidPriceEth / 2).toFixed(2)} ETH
-                      </Typography>
-                    </Box>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        mb: 1,
-                      }}
-                    >
-                      <Typography>Using CST</Typography>
-                      {cstBidData?.CSTPrice > 0 ? (
-                        <Typography>
-                          {cstBidData?.CSTPrice.toFixed(2)} CST
-                        </Typography>
-                      ) : (
-                        <Typography color="#ff0">FREE</Typography>
-                      )}
-                    </Box>
+                    {data?.LastBidderAddr !== constants.AddressZero && (
+                      <>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            mb: 1,
+                          }}
+                        >
+                          <Typography>Using RandomWalk</Typography>
+                          <Typography>
+                            {(data?.BidPriceEth / 2).toFixed(2)} ETH
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            mb: 1,
+                          }}
+                        >
+                          <Typography>Using CST</Typography>
+                          {cstBidData?.CSTPrice > 0 ? (
+                            <Typography>
+                              {cstBidData?.CSTPrice.toFixed(2)} CST
+                            </Typography>
+                          ) : (
+                            <Typography color="#ff0">FREE</Typography>
+                          )}
+                        </Box>
+                      </>
+                    )}
                   </Grid>
                 </Grid>
                 <Grid container spacing={2} mb={2} alignItems="center">
