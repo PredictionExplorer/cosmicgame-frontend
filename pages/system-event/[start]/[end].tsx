@@ -1,3 +1,8 @@
+/**
+ * System Events Page - Displays administrative events within a specified time range
+ * This page shows a paginated table of system events with their types, timestamps, and values
+ */
+
 import React, { useEffect, useState } from "react";
 import { Link, TableBody, Tooltip, Typography } from "@mui/material";
 import {
@@ -19,7 +24,21 @@ import { ADMIN_EVENTS } from "../../../config/misc";
 import { CustomPagination } from "../../../components/CustomPagination";
 import { isMobile } from "react-device-detect";
 
-const AdminEventsRow = ({ row }) => {
+/**
+ * Renders a single row in the admin events table
+ * @param row - The event data to display
+ */
+interface AdminEventRow {
+  EvtLogId: string;
+  RecordType: number;
+  TransferType: number;
+  TimeStamp: number;
+  TxHash: string;
+  IntegerValue: number;
+  AddressValue: string;
+}
+
+const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -62,9 +81,14 @@ const AdminEventsRow = ({ row }) => {
   );
 };
 
-const AdminEventsTable = ({ list }) => {
+/**
+ * Renders the paginated table of admin events
+ * @param list - Array of admin events to display
+ */
+const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
   const perPage = 10;
   const [page, setPage] = useState(1);
+
   if (list.length === 0) {
     return <Typography variant="h6">No events yet.</Typography>;
   }
@@ -103,9 +127,20 @@ const AdminEventsTable = ({ list }) => {
   );
 };
 
-const AdminEvent = ({ start, end }) => {
+/**
+ * Main component for the admin events page
+ * Fetches and displays system events within the specified time range
+ * @param start - Start timestamp for event range
+ * @param end - End timestamp for event range
+ */
+interface AdminEventProps {
+  start: number;
+  end: number;
+}
+
+const AdminEvent = ({ start, end }: AdminEventProps) => {
   const [loading, setLoading] = useState(true);
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<AdminEventRow[]>([]);
 
   useEffect(() => {
     const fetchTransfers = async () => {
@@ -136,6 +171,10 @@ const AdminEvent = ({ start, end }) => {
   );
 };
 
+/**
+ * Generates server-side props for the admin events page
+ * Handles URL parameters and sets up SEO metadata
+ */
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   let start = context.params!.start;
   let end = context.params!.end;
