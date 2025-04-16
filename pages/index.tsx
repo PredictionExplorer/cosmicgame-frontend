@@ -64,6 +64,7 @@ import getErrorMessage from "../utils/alert";
 import NFTImage from "../components/NFTImage";
 import {
   calculateTimeDiff,
+  convertTimestampToDateTime,
   formatSeconds,
   getAssetsUrl,
   getEnduranceChampions,
@@ -1043,7 +1044,8 @@ const NewHome = () => {
                       textAlign="center"
                       fontWeight={400}
                     >
-                      Activates In
+                      Round {data?.CurRoundNum} becomes active at{" "}
+                      {convertTimestampToDateTime(activationTime, true)}
                     </Typography>
                     <Countdown
                       key={3}
@@ -1173,7 +1175,7 @@ const NewHome = () => {
                         >
                           <Typography>Using Ether</Typography>
                           <Typography>
-                            {data?.BidPriceEth.toFixed(2)} ETH
+                            {data?.BidPriceEth.toFixed(4)} ETH
                           </Typography>
                         </Box>
                         <Box
@@ -1185,7 +1187,7 @@ const NewHome = () => {
                         >
                           <Typography>Using RandomWalk</Typography>
                           <Typography>
-                            {(data?.BidPriceEth / 2).toFixed(2)} ETH
+                            {(data?.BidPriceEth / 2).toFixed(4)} ETH
                           </Typography>
                         </Box>
                         <Box
@@ -1198,7 +1200,7 @@ const NewHome = () => {
                           <Typography>Using CST</Typography>
                           {cstBidData?.CSTPrice > 0 ? (
                             <Typography>
-                              {cstBidData?.CSTPrice.toFixed(2)} CST
+                              {cstBidData?.CSTPrice.toFixed(4)} CST
                             </Typography>
                           ) : (
                             <Typography color="#ff0">FREE</Typography>
@@ -1294,90 +1296,99 @@ const NewHome = () => {
                 )}
                 {account !== null && (
                   <>
-                    <Typography mb={1} mt={4}>
-                      Make your bid with:
-                    </Typography>
-                    <RadioGroup
-                      row
-                      value={bidType}
-                      onChange={(_e, value) => {
-                        setRwlkId(-1);
-                        setBidType(value);
-                      }}
-                      sx={{ mb: 2 }}
-                    >
-                      <FormControlLabel
-                        value="ETH"
-                        control={<Radio size="small" />}
-                        label="ETH"
-                      />
-                      <FormControlLabel
-                        value="RandomWalk"
-                        control={<Radio size="small" />}
-                        label="RandomWalk"
-                      />
-                      <FormControlLabel
-                        value="CST"
-                        control={<Radio size="small" />}
-                        label="CST(Cosmic Token)"
-                      />
-                    </RadioGroup>
-                    {bidType === "RandomWalk" && (
-                      <Box mb={4} mx={2}>
-                        <Typography variant="h6">
-                          Random Walk NFT Gallery
+                    {data?.LastBidderAddr !== constants.AddressZero && (
+                      <>
+                        <Typography mb={1} mt={4}>
+                          Make your bid with:
                         </Typography>
-                        <Typography variant="body2">
-                          If you own some RandomWalkNFTs and one of them is used
-                          when bidding, you can get a 50% discount!
-                        </Typography>
-                        <PaginationRWLKGrid
-                          loading={false}
-                          data={rwlknftIds}
-                          selectedToken={rwlkId}
-                          setSelectedToken={setRwlkId}
-                        />
-                      </Box>
-                    )}
-                    {bidType === "CST" && (
-                      <Box ml={2}>
-                        {cstBidData?.SecondsElapsed >
-                        cstBidData?.AuctionDuration ? (
-                          <Typography variant="subtitle1">
-                            Auction ended, you can bid for free.
-                          </Typography>
-                        ) : (
-                          <Grid
-                            container
-                            spacing={2}
-                            mb={2}
-                            alignItems="center"
-                          >
-                            <Grid item sm={12} md={5}>
-                              <Typography variant="subtitle1">
-                                Elapsed Time:
-                              </Typography>
-                            </Grid>
-                            <Grid item sm={12} md={7}>
-                              <Typography>
-                                {formatSeconds(cstBidData?.SecondsElapsed)}
-                              </Typography>
-                            </Grid>
-                          </Grid>
+                        <RadioGroup
+                          row
+                          value={bidType}
+                          onChange={(_e, value) => {
+                            setRwlkId(-1);
+                            setBidType(value);
+                          }}
+                          sx={{ mb: 2 }}
+                        >
+                          <FormControlLabel
+                            value="ETH"
+                            control={<Radio size="small" />}
+                            label="ETH"
+                          />
+                          <FormControlLabel
+                            value="RandomWalk"
+                            control={<Radio size="small" />}
+                            label="RandomWalk"
+                          />
+                          <FormControlLabel
+                            value="CST"
+                            control={<Radio size="small" />}
+                            label="CST(Cosmic Token)"
+                          />
+                        </RadioGroup>
+                        {bidType === "RandomWalk" && (
+                          <Box mb={4} mx={2}>
+                            <Typography variant="h6">
+                              Random Walk NFT Gallery
+                            </Typography>
+                            <Typography variant="body2">
+                              If you own some RandomWalkNFTs and one of them is
+                              used when bidding, you can get a 50% discount!
+                            </Typography>
+                            <PaginationRWLKGrid
+                              loading={false}
+                              data={rwlknftIds}
+                              selectedToken={rwlkId}
+                              setSelectedToken={setRwlkId}
+                            />
+                          </Box>
                         )}
-                        <Grid container spacing={2} mb={2} alignItems="center">
-                          <Grid item sm={12} md={5}>
-                            <Typography variant="subtitle1">
-                              Auction Duration:
-                            </Typography>
-                          </Grid>
-                          <Grid item sm={12} md={7}>
-                            <Typography>
-                              {formatSeconds(cstBidData?.AuctionDuration)}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </Box>
+                        {bidType === "CST" && (
+                          <Box ml={2}>
+                            {cstBidData?.SecondsElapsed >
+                            cstBidData?.AuctionDuration ? (
+                              <Typography variant="subtitle1">
+                                Auction ended, you can bid for free.
+                              </Typography>
+                            ) : (
+                              <Grid
+                                container
+                                spacing={2}
+                                mb={2}
+                                alignItems="center"
+                              >
+                                <Grid item sm={12} md={5}>
+                                  <Typography variant="subtitle1">
+                                    Elapsed Time:
+                                  </Typography>
+                                </Grid>
+                                <Grid item sm={12} md={7}>
+                                  <Typography>
+                                    {formatSeconds(cstBidData?.SecondsElapsed)}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            )}
+                            <Grid
+                              container
+                              spacing={2}
+                              mb={2}
+                              alignItems="center"
+                            >
+                              <Grid item sm={12} md={5}>
+                                <Typography variant="subtitle1">
+                                  Auction Duration:
+                                </Typography>
+                              </Grid>
+                              <Grid item sm={12} md={7}>
+                                <Typography>
+                                  {formatSeconds(cstBidData?.AuctionDuration)}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        )}
+                      </>
                     )}
                     <TextField
                       placeholder="Message (280 characters, optional)"
