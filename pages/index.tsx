@@ -1097,7 +1097,7 @@ const NewHome = () => {
                     {data?.CurRoundNum > 0 ? (
                       <>
                         <Typography variant="h4" mb={2}>
-                          Round {data?.CurRoundNum - 1} ended
+                          Round {data?.CurRoundNum} started
                         </Typography>
                         <Grid container spacing={2} mb={2} alignItems="center">
                           <Grid item sm={12} md={4}>
@@ -1157,25 +1157,25 @@ const NewHome = () => {
                     </Typography>
                   </>
                 )}
-                <Grid container spacing={2} mb={2}>
+                <Grid container spacing={2} mb={2} alignItems="center">
                   <Grid item xs={12} sm={3} md={4}>
                     <Typography variant="subtitle1">Bid Price</Typography>
                   </Grid>
                   <Grid item xs={8} sm={5} md={8}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        mb: 1,
-                      }}
-                    >
-                      <Typography>Using Ether</Typography>
-                      <Typography>
-                        {data?.BidPriceEth.toFixed(2)} ETH
-                      </Typography>
-                    </Box>
-                    {data?.LastBidderAddr !== constants.AddressZero && (
+                    {data?.LastBidderAddr !== constants.AddressZero ? (
                       <>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            mb: 1,
+                          }}
+                        >
+                          <Typography>Using Ether</Typography>
+                          <Typography>
+                            {data?.BidPriceEth.toFixed(2)} ETH
+                          </Typography>
+                        </Box>
                         <Box
                           sx={{
                             display: "flex",
@@ -1204,6 +1204,14 @@ const NewHome = () => {
                             <Typography color="#ff0">FREE</Typography>
                           )}
                         </Box>
+                      </>
+                    ) : (
+                      <>
+                        <Grid item xs={12} sm={8} md={8}>
+                          <GradientText variant="h6" sx={{ display: "inline" }}>
+                            {data?.BidPriceEth.toFixed(4)} ETH
+                          </GradientText>
+                        </Grid>
                       </>
                     )}
                   </Grid>
