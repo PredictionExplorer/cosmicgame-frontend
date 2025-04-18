@@ -99,6 +99,7 @@ const NewHome = () => {
   const [curBidList, setCurBidList] = useState([]);
   const [specialWinners, setSpecialWinners] = useState<any>(null);
   const [winProbability, setWinProbability] = useState<any>(null);
+  const [ethBidInfo, setEthBidInfo] = useState<any>(null);
   const [donatedNFTs, setDonatedNFTs] = useState([]);
   const [ethDonations, setEthDonations] = useState([]);
   const [championList, setChampionList] = useState<any>(null);
@@ -843,6 +844,15 @@ const NewHome = () => {
     }
   };
 
+  const fetchEthBidInfo = async () => {
+    const ethBidInfo = await api.get_bid_eth_price();
+    setEthBidInfo({
+      AuctionDuration: parseInt(ethBidInfo.AuctionDuration),
+      ETHPrice: parseFloat(ethers.utils.formatEther(ethBidInfo.ETHPrice)),
+      SecondsElapsed: parseInt(ethBidInfo.SecondsElapsed),
+    });
+  };
+
   const fetchDataCollection = async () => {
     await Promise.all([
       getRwlkNFTIds(),
@@ -851,6 +861,7 @@ const NewHome = () => {
       // fetchPrizeTime(),
       fetchClaimHistory(),
       fetchCSTBidData(),
+      fetchEthBidInfo(),
     ]);
   };
 
@@ -921,8 +932,10 @@ const NewHome = () => {
       const offset = current * 1000 - Date.now();
       setOffset(offset);
     };
+
     calculateTimeOffset();
     fetchDataCollection();
+    fetchEthBidInfo();
 
     // Fetch data every 12 seconds
     const interval = setInterval(fetchDataCollection, 12000);
@@ -1139,18 +1152,6 @@ const NewHome = () => {
                             </Typography>
                           </Grid>
                         </Grid>
-                        {/* <Grid container spacing={2} mb={2} alignItems="center">
-                          <Grid item sm={12} md={4}>
-                            <Typography variant="subtitle1">
-                              Previous Reward
-                            </Typography>
-                          </Grid>
-                          <Grid item sm={12} md={8}>
-                            <Typography>
-                              {prizeInfo?.AmountEth.toFixed(4)} ETH
-                            </Typography>
-                          </Grid>
-                        </Grid> */}
                       </>
                     ) : (
                       <Typography variant="subtitle1">
@@ -1179,7 +1180,7 @@ const NewHome = () => {
                         >
                           <Typography>Using Ether</Typography>
                           <Typography>
-                            {data?.BidPriceEth.toFixed(4)} ETH
+                            {ethBidInfo.ETHPrice.toFixed(4)} ETH
                           </Typography>
                         </Box>
                         <Box
@@ -1191,7 +1192,7 @@ const NewHome = () => {
                         >
                           <Typography>Using RandomWalk</Typography>
                           <Typography>
-                            {(data?.BidPriceEth / 2).toFixed(4)} ETH
+                            {(ethBidInfo.ETHPrice / 2).toFixed(4)} ETH
                           </Typography>
                         </Box>
                         <Box
@@ -1215,7 +1216,7 @@ const NewHome = () => {
                       <>
                         <Grid item xs={12} sm={8} md={8}>
                           <GradientText variant="h6" sx={{ display: "inline" }}>
-                            {data?.BidPriceEth.toFixed(4)} ETH
+                            {ethBidInfo?.ETHPrice.toFixed(4)} ETH
                           </GradientText>
                         </Grid>
                       </>
@@ -1303,104 +1304,144 @@ const NewHome = () => {
                     )}
                     {account !== null && (
                       <>
-                        {data?.LastBidderAddr !== constants.AddressZero && (
-                          <>
-                            <Typography mb={1} mt={4}>
-                              Make your bid with:
-                            </Typography>
-                            <RadioGroup
-                              row
-                              value={bidType}
-                              onChange={(_e, value) => {
-                                setRwlkId(-1);
-                                setBidType(value);
-                              }}
-                              sx={{ mb: 2 }}
-                            >
-                              <FormControlLabel
-                                value="ETH"
-                                control={<Radio size="small" />}
-                                label="ETH"
-                              />
-                              <FormControlLabel
-                                value="RandomWalk"
-                                control={<Radio size="small" />}
-                                label="RandomWalk"
-                              />
-                              <FormControlLabel
-                                value="CST"
-                                control={<Radio size="small" />}
-                                label="CST(Cosmic Token)"
-                              />
-                            </RadioGroup>
-                            {bidType === "RandomWalk" && (
-                              <Box mb={4} mx={2}>
-                                <Typography variant="h6">
-                                  Random Walk NFT Gallery
-                                </Typography>
-                                <Typography variant="body2">
-                                  If you own some RandomWalkNFTs and one of them
-                                  is used when bidding, you can get a 50%
-                                  discount!
-                                </Typography>
-                                <PaginationRWLKGrid
-                                  loading={false}
-                                  data={rwlknftIds}
-                                  selectedToken={rwlkId}
-                                  setSelectedToken={setRwlkId}
-                                />
-                              </Box>
-                            )}
-                            {bidType === "CST" && (
-                              <Box ml={2}>
-                                {cstBidData?.SecondsElapsed >
-                                cstBidData?.AuctionDuration ? (
+                        <Typography mb={1} mt={4}>
+                          Make your bid with:
+                        </Typography>
+                        <RadioGroup
+                          row
+                          value={bidType}
+                          onChange={(_e, value) => {
+                            setRwlkId(-1);
+                            setBidType(value);
+                          }}
+                          sx={{ mb: 2 }}
+                        >
+                          <FormControlLabel
+                            value="ETH"
+                            control={<Radio size="small" />}
+                            label="ETH"
+                          />
+                          {data?.LastBidderAddr !== constants.AddressZero && (
+                            <FormControlLabel
+                              value="RandomWalk"
+                              control={<Radio size="small" />}
+                              label="RandomWalk"
+                            />
+                          )}
+                          {data?.LastBidderAddr !== constants.AddressZero && (
+                            <FormControlLabel
+                              value="CST"
+                              control={<Radio size="small" />}
+                              label="CST(Cosmic Token)"
+                            />
+                          )}
+                        </RadioGroup>
+                        {bidType === "ETH" && (
+                          <Box ml={2}>
+                            {ethBidInfo?.SecondsElapsed >
+                            ethBidInfo?.AuctionDuration ? (
+                              <Typography variant="subtitle1">
+                                Auction ended.
+                              </Typography>
+                            ) : (
+                              <Grid
+                                container
+                                spacing={2}
+                                mb={2}
+                                alignItems="center"
+                              >
+                                <Grid item sm={12} md={5}>
                                   <Typography variant="subtitle1">
-                                    Auction ended, you can bid for free.
+                                    Elapsed Time:
                                   </Typography>
-                                ) : (
-                                  <Grid
-                                    container
-                                    spacing={2}
-                                    mb={2}
-                                    alignItems="center"
-                                  >
-                                    <Grid item sm={12} md={5}>
-                                      <Typography variant="subtitle1">
-                                        Elapsed Time:
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item sm={12} md={7}>
-                                      <Typography>
-                                        {formatSeconds(
-                                          cstBidData?.SecondsElapsed
-                                        )}
-                                      </Typography>
-                                    </Grid>
-                                  </Grid>
-                                )}
-                                <Grid
-                                  container
-                                  spacing={2}
-                                  mb={2}
-                                  alignItems="center"
-                                >
-                                  <Grid item sm={12} md={5}>
-                                    <Typography variant="subtitle1">
-                                      Auction Duration:
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item sm={12} md={7}>
-                                    <Typography>
-                                      {formatSeconds(
-                                        cstBidData?.AuctionDuration
-                                      )}
-                                    </Typography>
-                                  </Grid>
                                 </Grid>
-                              </Box>
+                                <Grid item sm={12} md={7}>
+                                  <Typography>
+                                    {formatSeconds(ethBidInfo?.SecondsElapsed)}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
                             )}
-                          </>
+                            <Grid
+                              container
+                              spacing={2}
+                              mb={2}
+                              alignItems="center"
+                            >
+                              <Grid item sm={12} md={5}>
+                                <Typography variant="subtitle1">
+                                  Auction Duration:
+                                </Typography>
+                              </Grid>
+                              <Grid item sm={12} md={7}>
+                                <Typography>
+                                  {formatSeconds(ethBidInfo?.AuctionDuration)}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        )}
+                        {bidType === "RandomWalk" && (
+                          <Box mb={4} mx={2}>
+                            <Typography variant="h6">
+                              Random Walk NFT Gallery
+                            </Typography>
+                            <Typography variant="body2">
+                              If you own some RandomWalkNFTs and one of them is
+                              used when bidding, you can get a 50% discount!
+                            </Typography>
+                            <PaginationRWLKGrid
+                              loading={false}
+                              data={rwlknftIds}
+                              selectedToken={rwlkId}
+                              setSelectedToken={setRwlkId}
+                            />
+                          </Box>
+                        )}
+                        {bidType === "CST" && (
+                          <Box ml={2}>
+                            {cstBidData?.SecondsElapsed >
+                            cstBidData?.AuctionDuration ? (
+                              <Typography variant="subtitle1">
+                                Auction ended, you can bid for free.
+                              </Typography>
+                            ) : (
+                              <Grid
+                                container
+                                spacing={2}
+                                mb={2}
+                                alignItems="center"
+                              >
+                                <Grid item sm={12} md={5}>
+                                  <Typography variant="subtitle1">
+                                    Elapsed Time:
+                                  </Typography>
+                                </Grid>
+                                <Grid item sm={12} md={7}>
+                                  <Typography>
+                                    {formatSeconds(cstBidData?.SecondsElapsed)}
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            )}
+                            <Grid
+                              container
+                              spacing={2}
+                              mb={2}
+                              alignItems="center"
+                            >
+                              <Grid item sm={12} md={5}>
+                                <Typography variant="subtitle1">
+                                  Auction Duration:
+                                </Typography>
+                              </Grid>
+                              <Grid item sm={12} md={7}>
+                                <Typography>
+                                  {formatSeconds(cstBidData?.AuctionDuration)}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                          </Box>
                         )}
                         <TextField
                           placeholder="Message (280 characters, optional)"
@@ -1549,7 +1590,7 @@ const NewHome = () => {
                                   ml={2}
                                 >
                                   {(
-                                    data?.BidPriceEth *
+                                    ethBidInfo.ETHPrice *
                                     (1 + bidPricePlus / 100) *
                                     (bidType === "RandomWalk" ? 0.5 : 1)
                                   ).toFixed(6)}{" "}
@@ -1674,26 +1715,28 @@ const NewHome = () => {
                       {`Bid now with ${bidType} ${
                         bidType === "ETH"
                           ? `(${
-                              data?.BidPriceEth * (1 + bidPricePlus / 100) > 0.1
+                              ethBidInfo.ETHPrice * (1 + bidPricePlus / 100) >
+                              0.1
                                 ? (
-                                    data?.BidPriceEth *
+                                    ethBidInfo.ETHPrice *
                                     (1 + bidPricePlus / 100)
                                   ).toFixed(2)
                                 : (
-                                    data?.BidPriceEth *
+                                    ethBidInfo.ETHPrice *
                                     (1 + bidPricePlus / 100)
                                   ).toFixed(5)
                             } ETH)`
                           : bidType === "RandomWalk" && rwlkId !== -1
                           ? ` token ${rwlkId} (${
-                              data?.BidPriceEth * (1 + bidPricePlus / 100) > 0.2
+                              ethBidInfo.ETHPrice * (1 + bidPricePlus / 100) >
+                              0.2
                                 ? (
-                                    data?.BidPriceEth *
+                                    ethBidInfo.ETHPrice *
                                     (1 + bidPricePlus / 100) *
                                     0.5
                                   ).toFixed(2)
                                 : (
-                                    data?.BidPriceEth *
+                                    ethBidInfo.ETHPrice *
                                     (1 + bidPricePlus / 100) *
                                     0.5
                                   ).toFixed(5)
