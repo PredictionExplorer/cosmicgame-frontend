@@ -16,7 +16,10 @@ const getMainAPIUrl = (url: string) => {
 class ApiService {
   public async create(token_id: number, count: number) {
     try {
-      const { data } = await axios.post(getMainAPIUrl("cosmicgame_tokens"), { token_id, count });
+      const { data } = await axios.post(getMainAPIUrl("cosmicgame_tokens"), {
+        token_id,
+        count,
+      });
       return data?.task_id || -1;
     } catch (err) {
       console.log(err);
@@ -36,10 +39,10 @@ class ApiService {
 
   public async ban_bid(bid_id: number, user_addr: string) {
     try {
-      const { data } = await axios.post(
-        getMainAPIUrl("ban_bid"),
-        { bid_id, user_addr }
-      );
+      const { data } = await axios.post(getMainAPIUrl("ban_bid"), {
+        bid_id,
+        user_addr,
+      });
       return data;
     } catch (err) {
       console.log(err);
@@ -49,10 +52,7 @@ class ApiService {
 
   public async unban_bid(bid_id: number) {
     try {
-      const { data } = await axios.post(
-        getMainAPIUrl("unban_bid"),
-        { bid_id }
-      );
+      const { data } = await axios.post(getMainAPIUrl("unban_bid"), { bid_id });
       return data;
     } catch (err) {
       console.log(err);
@@ -156,9 +156,7 @@ class ApiService {
   // r.GET("/api/cosmicgame/rounds/list/:offset/:limit",api_cosmic_game_prize_list)
   public async get_round_list() {
     try {
-      const { data } = await axios.get(
-        getAPIUrl("rounds/list/0/1000000")
-      );
+      const { data } = await axios.get(getAPIUrl("rounds/list/0/1000000"));
       return data.Rounds;
     } catch (err) {
       console.log(err);
@@ -280,8 +278,10 @@ class ApiService {
   // r.GET("/api/cosmicgame/bid/list/by_round/:round_num/:sort/:offset/:limit",api_cosmic_game_bid_list_by_round)
   public async get_bid_list_by_round(round: number, sortDir: string) {
     try {
-      const dir = sortDir === 'asc' ? 0 : 1;
-      const { data } = await axios.get(getAPIUrl(`bid/list/by_round/${round}/${dir}/0/1000000`));
+      const dir = sortDir === "asc" ? 0 : 1;
+      const { data } = await axios.get(
+        getAPIUrl(`bid/list/by_round/${round}/${dir}/0/1000000`)
+      );
       return data.BidsByRound;
     } catch (err) {
       console.log(err);
@@ -292,7 +292,7 @@ class ApiService {
   // r.GET("/api/cosmicgame/bid/used_rwalk_nfts",api_cosmic_game_used_rwalk_nfts)
   public async get_used_rwlk_nfts() {
     try {
-      const { data } = await axios.get(getAPIUrl('bid/used_rwalk_nfts'));
+      const { data } = await axios.get(getAPIUrl("bid/used_rwalk_nfts"));
       return data.UsedRwalkNFTs;
     } catch (err) {
       console.log(err);
@@ -314,7 +314,9 @@ class ApiService {
   // r.GET("/api/cosmicgame/bid/current_special_winners",api_cosmic_game_bid_special_winners)
   public async get_current_special_winners() {
     try {
-      const { data } = await axios.get(getAPIUrl("bid/current_special_winners"));
+      const { data } = await axios.get(
+        getAPIUrl("bid/current_special_winners")
+      );
       return data;
     } catch (err) {
       console.log(err);
@@ -325,9 +327,7 @@ class ApiService {
   // r.GET("/api/cosmicgame/cst/list/all/:offset/:limit",api_cosmic_game_cosmic_signature_token_list)
   public async get_cst_list() {
     try {
-      const { data } = await axios.get(
-        getAPIUrl("cst/list/all/0/1000000")
-      );
+      const { data } = await axios.get(getAPIUrl("cst/list/all/0/1000000"));
       const cstList = data.CosmicSignatureTokenList;
       return cstList;
     } catch (err) {
@@ -461,9 +461,7 @@ class ApiService {
   // r.GET("/api/cosmicgame/user/info/:user_addr",api_cosmic_game_user_info)
   public async get_user_info(address: string) {
     try {
-      const { data } = await axios.get(
-        getAPIUrl(`user/info/${address}`)
-      );
+      const { data } = await axios.get(getAPIUrl(`user/info/${address}`));
       return data;
     } catch (err) {
       console.log(err);
@@ -550,7 +548,9 @@ class ApiService {
   // r.GET("/api/cosmicgame/donations/eth/with_info/info/:record_id",api_cosmic_game_donations_cg_with_info_record_info)
   public async get_donations_with_info_by_id(id: number) {
     try {
-      const { data } = await axios.get(getAPIUrl(`donations/eth/with_info/info/${id}`));
+      const { data } = await axios.get(
+        getAPIUrl(`donations/eth/with_info/info/${id}`)
+      );
       return data.ETHDonation;
     } catch (err) {
       console.log(err);
@@ -598,9 +598,7 @@ class ApiService {
   // r.GET("/api/cosmicgame/donations/charity/deposits",api_cosmic_game_charity_donations_deposits)
   public async get_charity_donations_deposits() {
     try {
-      const { data } = await axios.get(
-        getAPIUrl("donations/charity/deposits")
-      );
+      const { data } = await axios.get(getAPIUrl("donations/charity/deposits"));
       return data.CharityDonations;
     } catch (err) {
       console.log(err);
@@ -702,9 +700,7 @@ class ApiService {
   // r.GET("/api/cosmicgame/donations/nft/statistics",api_cosmic_game_nft_donation_stats)
   public async get_nft_donation_stats() {
     try {
-      const { data } = await axios.get(
-        getAPIUrl("donations/nft/statistics")
-      );
+      const { data } = await axios.get(getAPIUrl("donations/nft/statistics"));
       return data.NFTDonationStats;
     } catch (err) {
       console.log(err);
@@ -888,7 +884,9 @@ class ApiService {
   ) {
     try {
       const { data } = await axios.get(
-        getAPIUrl(`staking/cst/rewards/action_ids_by_deposit/${user_addr}/${deposit_id}`)
+        getAPIUrl(
+          `staking/cst/rewards/action_ids_by_deposit/${user_addr}/${deposit_id}`
+        )
       );
       return data.ActionIdsWithClaimInfo;
     } catch (err) {
@@ -1007,7 +1005,9 @@ class ApiService {
   ) {
     try {
       const { data } = await axios.get(
-        getAPIUrl(`staking/cst/rewards/by_user/by_token/details/${address}/${tokenId}`)
+        getAPIUrl(
+          `staking/cst/rewards/by_user/by_token/details/${address}/${tokenId}`
+        )
       );
       return data.RewardsByTokenDetails;
     } catch (err) {
@@ -1172,9 +1172,7 @@ class ApiService {
   // r.GET("/api/cosmicgame/system/modelist/:offset/:limit",api_cosmic_game_sysmode_changes)
   public async get_system_modelist() {
     try {
-      const { data } = await axios.get(
-        getAPIUrl("system/modelist/0/1000000")
-      );
+      const { data } = await axios.get(getAPIUrl("system/modelist/0/1000000"));
       return data.SystemModeChanges;
     } catch (err) {
       console.log(err);
