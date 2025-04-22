@@ -811,6 +811,7 @@ const UserInfo = ({ address }: { address: string }) => {
                 </Typography>
                 <UncollectedCSTStakingRewardsTable
                   list={uncollectedCstStakingRewards}
+                  user={address}
                 />
               </Box>
             </CustomTabPanel>

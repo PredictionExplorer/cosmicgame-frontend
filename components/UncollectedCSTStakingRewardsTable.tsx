@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { TableBody, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Button, TableBody, Typography } from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -13,6 +13,8 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
+import { useActiveWeb3React } from "../hooks/web3";
+import api from "../services/api";
 
 /* ------------------------------------------------------------------
   Sub-Component: UncollectedRewardsRow
@@ -75,9 +77,12 @@ const UncollectedRewardsRow = ({ row }) => {
   Main Component: UncollectedCSTStakingRewardsTable
   Displays a paginated list of uncollected CST staking rewards.
 ------------------------------------------------------------------ */
-export const UncollectedCSTStakingRewardsTable = ({ list }) => {
+export const UncollectedCSTStakingRewardsTable = ({ list, user }) => {
+  const { account } = useActiveWeb3React();
+  const [status, setStatus] = useState(null);
   // Current page in the pagination
   const [currentPage, setCurrentPage] = useState(1);
+  const [isUnstaking, setIsUnstaking] = useState(false);
 
   // Number of rows to display per page
   const PER_PAGE = 5;
@@ -93,6 +98,30 @@ export const UncollectedCSTStakingRewardsTable = ({ list }) => {
 
   // Extract the portion of the list corresponding to the current page
   const currentPageData = list.slice(startIndex, endIndex);
+
+  const fetchStatusData = async () => {
+    try {
+      const res = await api.notify_red_box(user);
+      setStatus(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const unstakeAllCST = async () => {
+    setIsUnstaking(true);
+    try {
+      fetchStatusData();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsUnstaking(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStatusData();
+  }, [user]);
 
   return (
     <>
@@ -143,6 +172,29 @@ export const UncollectedCSTStakingRewardsTable = ({ list }) => {
         </TablePrimary>
       </TablePrimaryContainer>
 
+      {user === account && status?.UnclaimedStakingReward > 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "end",
+            alignItems: "center",
+            mt: 2,
+          }}
+        >
+          <Typography mr={2}>
+            Your claimable rewards are{" "}
+            {`${status.UnclaimedStakingReward.toFixed(6)} ETH`}
+          </Typography>
+          <Button
+            onClick={unstakeAllCST}
+            variant="contained"
+            disabled={isUnstaking}
+          >
+            Claim All
+          </Button>
+        </Box>
+      )}
+
       {/* Pagination Controls */}
       <CustomPagination
         page={currentPage}
@@ -153,6 +205,3 @@ export const UncollectedCSTStakingRewardsTable = ({ list }) => {
     </>
   );
 };
-
-
-// Todo: add buttons for claim rewards to table

@@ -416,6 +416,7 @@ function CSTStakingTab({
         </Typography>
         <UncollectedCSTStakingRewardsTable
           list={uncollectedCstStakingRewards}
+          user={account}
         />
       </Box>
     </>

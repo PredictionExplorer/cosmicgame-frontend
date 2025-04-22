@@ -366,7 +366,10 @@ export default function MyWinnings() {
         ) : !cstStakingRewards || cstStakingRewards.length === 0 ? (
           <Typography>No winnings yet.</Typography>
         ) : (
-          <UncollectedCSTStakingRewardsTable list={cstStakingRewards} />
+          <UncollectedCSTStakingRewardsTable
+            list={cstStakingRewards}
+            user={account}
+          />
         )}
       </Box>
 
