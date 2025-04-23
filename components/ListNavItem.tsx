@@ -1,72 +1,105 @@
-import React, { useState } from "react";
+import React, { FC, useState, MouseEvent } from "react";
 import { Menu, MenuItem, Box } from "@mui/material";
-import { NavLink } from "./styled";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { NavLink } from "./styled";
 
-const ListNavItem = (props) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleMenuOpen = (e) => {
-    setAnchorEl(e.currentTarget);
-  };
-  const handleMenuClose = (e) => {
-    setAnchorEl(null);
-  };
+/** -----------------------------------------------------------------------
+ * Type Definitions
+ * ------------------------------------------------------------------------*/
+
+/**
+ * Navigation item descriptor used throughout the sitemap.
+ */
+export interface NavDescriptor {
+  /** Label displayed to the user */
+  title: string;
+  /** Path to navigate to. **Required** when `children` is undefined */
+  route?: string;
+  /** Nested sub‑items rendered as a dropdown menu */
+  children?: NavDescriptor[];
+}
+
+interface ListNavItemProps {
+  /** Data describing the link (and its optional children) */
+  nav: NavDescriptor;
+}
+
+/** -----------------------------------------------------------------------
+ * Component
+ * ------------------------------------------------------------------------*/
+
+/**
+ * A single entry inside the top‑level navigation bar.
+ *
+ *  - If `nav.children` is provided, clicking the item opens a dropdown menu
+ *    with additional links.
+ *  - Otherwise, it behaves as a normal link to `nav.route`.
+ */
+const ListNavItem: FC<ListNavItemProps> = ({ nav }) => {
+  /** Anchor element that the dropdown menu is attached to */
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  /** -------------------------------------------------------------------
+   * Event handlers
+   * ------------------------------------------------------------------*/
+
+  const openMenu = (e: MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget);
+  const closeMenu = () => setAnchorEl(null);
+
+  /** Derived boolean for convenience */
+  const menuOpen = Boolean(anchorEl);
+
+  /* -------------------------------------------------------------------- */
 
   return (
     <>
-      <Box ml={3}>
-        {props.nav.children ? (
+      {/* Primary nav link ------------------------------------------------ */}
+      <Box ml={3 /* left padding between navbar items */}>
+        {nav.children ? (
           <NavLink
-            onClick={handleMenuOpen}
+            // Acts as a button when there are sub‑items
+            onClick={openMenu}
             sx={{
               display: "flex",
               alignItems: "center",
-              "&:hover": { textDecoration: "none" },
               cursor: "pointer",
+              "&:hover": { textDecoration: "none" },
             }}
           >
-            {props.nav.title}
-            {anchorEl ? <ExpandLess /> : <ExpandMore />}
+            {nav.title}
+            {menuOpen ? <ExpandLess /> : <ExpandMore />}
           </NavLink>
         ) : (
           <NavLink
-            href={props.nav.route}
+            href={nav.route}
             sx={{ "&:hover": { textDecoration: "none" } }}
           >
-            {props.nav.title}
+            {nav.title}
           </NavLink>
         )}
       </Box>
-      {props.nav.children && (
+
+      {/* Dropdown menu --------------------------------------------------- */}
+      {nav.children && (
         <Menu
           elevation={0}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "center",
-          }}
           anchorEl={anchorEl}
+          open={menuOpen}
+          onClose={closeMenu}
           keepMounted
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-          disableAutoFocusItem={true}
+          disableAutoFocusItem
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          transformOrigin={{ vertical: "top", horizontal: "center" }}
           sx={{
             "& > .MuiPaper-root": {
               boxShadow: "0px 0px 3px 0px rgba(0,0,0,0.75)",
             },
           }}
         >
-          {props.nav.children.map((nav, i) => (
-            <MenuItem
-              key={i}
-              style={{ minWidth: 166 }}
-              onClick={handleMenuClose}
-            >
-              <NavLink href={nav.route} sx={{ width: "100%" }}>
-                {nav.title}
+          {nav.children.map((child, i) => (
+            <MenuItem key={i} sx={{ minWidth: 166 }} onClick={closeMenu}>
+              <NavLink href={child.route} sx={{ width: "100%" }}>
+                {child.title}
               </NavLink>
             </MenuItem>
           ))}
