@@ -229,8 +229,10 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
       }
     };
 
-    fetchAccumulatedRewards();
-  }, [account]);
+    if (!IsRwalk) {
+      fetchAccumulatedRewards();
+    }
+  }, [account, IsRwalk]);
 
   // Refresh selection and pagination when the list changes
   useEffect(() => {
@@ -385,7 +387,9 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Accumulated Rewards</TablePrimaryHeadCell>
+              {!IsRwalk && (
+                <TablePrimaryHeadCell>Accumulated Rewards</TablePrimaryHeadCell>
+              )}
               <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
