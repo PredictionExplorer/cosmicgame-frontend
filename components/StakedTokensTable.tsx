@@ -25,11 +25,9 @@ import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
 import api from "../services/api";
 import NFTImage from "./NFTImage";
+import { useActiveWeb3React } from "../hooks/web3";
 
-/* ------------------------------------------------------------------
-  Types (TypeScript) - adjust or remove if not using TypeScript
------------------------------------------------------------------- */
-
+// Types
 interface RandomWalkRow {
   StakeActionId: number;
   StakedTokenId: number;
@@ -49,10 +47,7 @@ interface CosmicSignatureRow {
 
 type StakedRow = RandomWalkRow | CosmicSignatureRow;
 
-/* ------------------------------------------------------------------
-  Custom Hook: useTokenName
-  Fetches the token name from your API if available.
------------------------------------------------------------------- */
+// Custom Hook: useTokenName
 function useTokenName(
   isRandomWalk: boolean,
   randomWalkId?: number,
@@ -82,13 +77,12 @@ function useTokenName(
   return tokenName;
 }
 
-/* ------------------------------------------------------------------
-  StakedTokenRow - Renders a single row in the table
------------------------------------------------------------------- */
+// StakedTokenRow
 interface StakedTokenRowProps {
   row: StakedRow;
   isRandomWalk: boolean;
   isItemSelected: boolean;
+  accumulatedRewards: number;
   onRowClick: (id: number) => void;
   onUnstakeSingle: (id: number) => void;
 }
@@ -97,10 +91,10 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
   row,
   isRandomWalk,
   isItemSelected,
+  accumulatedRewards,
   onRowClick,
   onUnstakeSingle,
 }) => {
-  // Extract IDs
   const stakeActionId = isRandomWalk
     ? (row as RandomWalkRow).StakeActionId
     : (row as CosmicSignatureRow).TokenInfo.StakeActionId;
@@ -108,7 +102,6 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
     ? (row as RandomWalkRow).StakedTokenId
     : (row as CosmicSignatureRow).TokenInfo.TokenId;
 
-  // Grab the correct "seed" or "StakedTokenId" for generating the image
   const seedOrRandomId = isRandomWalk
     ? (row as RandomWalkRow).StakedTokenId
     : (row as CosmicSignatureRow).TokenInfo.Seed;
@@ -124,7 +117,6 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
     !isRandomWalk ? (row as CosmicSignatureRow).TokenInfo : undefined
   );
 
-  // Build the image URL
   const tokenImageURL = useMemo(() => {
     const fileName = seedOrRandomId.toString().padStart(6, "0");
     return isRandomWalk
@@ -148,7 +140,6 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
         <Checkbox color="primary" checked={isItemSelected} size="small" />
       </TablePrimaryCell>
 
-      {/* Token Image + Name */}
       <TablePrimaryCell sx={{ width: "120px" }}>
         <NFTImage src={tokenImageURL} />
         <Typography variant="caption" mt={1} display="block">
@@ -156,7 +147,6 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
         </Typography>
       </TablePrimaryCell>
 
-      {/* Token ID */}
       <TablePrimaryCell align="center">
         <Link
           href={
@@ -171,7 +161,6 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
         </Link>
       </TablePrimaryCell>
 
-      {/* Stake Action ID */}
       <TablePrimaryCell align="center">
         <Link
           href={`/staking-action/${isRandomWalk ? 1 : 0}/${stakeActionId}`}
@@ -182,12 +171,16 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
         </Link>
       </TablePrimaryCell>
 
-      {/* Stake Time */}
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(stakeTimeStamp)}
       </TablePrimaryCell>
 
-      {/* Unstake Button */}
+      {!isRandomWalk && (
+        <TablePrimaryCell align="center">
+          {accumulatedRewards.toFixed(4)}
+        </TablePrimaryCell>
+      )}
+
       <TablePrimaryCell align="center">
         <Button
           size="small"
@@ -204,9 +197,7 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
   );
 };
 
-/* ------------------------------------------------------------------
-  StakedTokensTable - Renders the table of staked tokens
------------------------------------------------------------------- */
+// StakedTokensTable
 interface StakedTokensTableProps {
   list: StakedRow[];
   handleUnstake: (id: number, isRandomWalk?: boolean) => Promise<void>;
@@ -220,10 +211,26 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
   handleUnstakeMany,
   IsRwalk,
 }) => {
+  const { account } = useActiveWeb3React();
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  const [accumulatedRewardsByToken, setAccumulatedRewardsByToken] = useState<
+    any[]
+  >([]);
+
+  useEffect(() => {
+    const fetchAccumulatedRewards = async () => {
+      if (account) {
+        const rewards = await api.get_staking_rewards_by_user(account);
+        setAccumulatedRewardsByToken(rewards);
+      }
+    };
+
+    fetchAccumulatedRewards();
+  }, [account]);
 
   // Refresh selection and pagination when the list changes
   useEffect(() => {
@@ -231,7 +238,6 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
     setPage(1);
   }, [list]);
 
-  // Sort by timestamp ascending
   const sortedList = useMemo(() => {
     return [...list].sort((a, b) => {
       const aTime = IsRwalk
@@ -291,7 +297,6 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
 
   // Unstake a single token
   const onUnstakeSingle = async (actionId: number) => {
-    // Temporarily set this as the only selected ID
     setSelectedIds([actionId]);
     await handleUnstake(actionId, IsRwalk);
   };
@@ -301,28 +306,24 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
     return <Typography>No tokens yet.</Typography>;
   }
 
-  /* ------------------------------------------------------------------
-    Render
-  ------------------------------------------------------------------ */
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          {/* Optional column widths for non-mobile */}
           {!isMobile && (
             <colgroup>
               <col width="5%" />
               <col width="15%" />
               <col width="20%" />
-              <col width="20%" />
-              <col width="20%" />
-              <col width="20%" />
+              <col width="15%" />
+              <col width="15%" />
+              {!IsRwalk && <col width="15%" />}
+              <col width="15%" />
             </colgroup>
           )}
 
           <TablePrimaryHead>
             <Tr>
-              {/* Select All / Select Current Page / Select None */}
               <TablePrimaryHeadCell padding="checkbox" align="left">
                 <Box
                   sx={{
@@ -384,11 +385,11 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Accumulated Rewards</TablePrimaryHeadCell>
               <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
 
-          {/* Table Body */}
           <TableBody>
             {sortedList
               .slice((page - 1) * perPage, page * perPage)
@@ -397,11 +398,20 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
                   ? (row as RandomWalkRow).StakeActionId
                   : (row as CosmicSignatureRow).TokenInfo.StakeActionId;
 
+                const accumulatedRewards = IsRwalk
+                  ? 0
+                  : accumulatedRewardsByToken.find(
+                      (x) =>
+                        x.TokenId ===
+                        (row as CosmicSignatureRow).TokenInfo.TokenId
+                    )?.RewardToCollectEth || 0;
+
                 return (
                   <StakedTokenRow
                     key={stakeActionId}
                     row={row}
                     isRandomWalk={IsRwalk}
+                    accumulatedRewards={accumulatedRewards}
                     isItemSelected={isSelected(stakeActionId)}
                     onRowClick={handleRowClick}
                     onUnstakeSingle={onUnstakeSingle}
@@ -412,7 +422,6 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Unstake Many Button */}
       {selectedIds.length > 1 && (
         <Box display="flex" justifyContent="end" mt={2}>
           <Button variant="text" onClick={onUnstakeManyClick}>
@@ -421,7 +430,6 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
         </Box>
       )}
 
-      {/* Pagination */}
       <CustomPagination
         page={page}
         setPage={setPage}
@@ -431,5 +439,3 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
     </>
   );
 };
-
-// get numEthDepositsToEvaluateMaxLimit_ from smart contract for calling eth_call

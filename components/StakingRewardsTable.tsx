@@ -41,7 +41,7 @@ const StakingRewardsRow = ({ row, address }) => {
         {row.RewardCollectedEth.toFixed(6)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.RewardCollectedEth.toFixed(6)}
+        {row.RewardToCollectEth.toFixed(6)}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
