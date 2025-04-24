@@ -1,34 +1,75 @@
-import React, { useState } from "react";
+import React, { FC, useState } from "react";
 import { ListItem, Collapse, List } from "@mui/material";
-import { NavLink } from "./styled";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import { NavLink } from "./styled";
 
-const ListItemButton = (props) => {
+/** -----------------------------------------------------------------------
+ * Type Definitions
+ * ------------------------------------------------------------------------*/
+
+/** Re-use the same descriptor type we introduced in ListNavItem.tsx */
+export interface NavDescriptor {
+  title: string;
+  route?: string;
+  children?: NavDescriptor[];
+}
+
+interface NestedListItemProps {
+  /** Primary navigation entry with optional sub-items */
+  nav: NavDescriptor;
+}
+
+/** -----------------------------------------------------------------------
+ * Component
+ * ------------------------------------------------------------------------*/
+
+/**
+ * Recursively renders a sidebar/table-of-contents entry that can expand to
+ * reveal nested links. Designed for mobile drawers or doc sidebars.
+ */
+export const NestedListItem: FC<NestedListItemProps> = ({ nav }) => {
+  /** Whether the submenu is expanded */
   const [open, setOpen] = useState(false);
-  const handleClick = () => {
-    setOpen(!open);
-  };
+
+  /** Toggle handler for accordion behaviour */
+  const handleToggle = () => setOpen((prev) => !prev);
+
+  /* -------------------------------------------------------------------- */
 
   return (
     <>
-      {props.nav.children ? (
-        <ListItem onClick={handleClick}>
-          <NavLink display="flex">
-            {props.nav.title}
-            {open ? <ExpandLess /> : <ExpandMore />}
+      {nav.children ? (
+        // ---------------------------------------------------------------
+        // Parent item that controls a collapsible submenu
+        // ---------------------------------------------------------------
+        <ListItem button onClick={handleToggle} aria-expanded={open}>
+          <NavLink sx={{ display: "flex", alignItems: "center" }}>
+            {nav.title}
+            {open ? (
+              <ExpandLess sx={{ ml: "auto" }} />
+            ) : (
+              <ExpandMore sx={{ ml: "auto" }} />
+            )}
           </NavLink>
         </ListItem>
       ) : (
-        <ListItem>
-          <NavLink href={props.nav.route}>{props.nav.title}</NavLink>
+        // ---------------------------------------------------------------
+        // Leaf node — a normal link without submenu
+        // ---------------------------------------------------------------
+        <ListItem button>
+          <NavLink href={nav.route}>{nav.title}</NavLink>
         </ListItem>
       )}
-      {props.nav.children && (
+
+      {/* ---------------------------------------------------------------
+       * Collapsible children (if any)
+       * -------------------------------------------------------------*/}
+      {nav.children && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            {props.nav.children.map((nav, i) => (
-              <ListItem sx={{ pl: 4 }} key={i}>
-                <NavLink href={nav.route}>{nav.title}</NavLink>
+            {nav.children.map((child, i) => (
+              <ListItem key={i} sx={{ pl: 4 }} button>
+                <NavLink href={child.route}>{child.title}</NavLink>
               </ListItem>
             ))}
           </List>
@@ -38,4 +79,4 @@ const ListItemButton = (props) => {
   );
 };
 
-export default ListItemButton;
+export default NestedListItem;
