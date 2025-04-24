@@ -27,7 +27,7 @@ interface NestedListItemProps {
  * Recursively renders a sidebar/table-of-contents entry that can expand to
  * reveal nested links. Designed for mobile drawers or doc sidebars.
  */
-export const NestedListItem: FC<NestedListItemProps> = ({ nav }) => {
+const NestedListItem: FC<NestedListItemProps> = ({ nav }) => {
   /** Whether the submenu is expanded */
   const [open, setOpen] = useState(false);
 
