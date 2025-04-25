@@ -353,7 +353,7 @@ const MyStaking = () => {
             visible: true,
             text: Array.isArray(actionIds)
               ? "The selected tokens were unstaked successfully!"
-              : `You have successfully unstaked token!`,
+              : "You have successfully unstaked token!",
             type: "success",
           });
         }
