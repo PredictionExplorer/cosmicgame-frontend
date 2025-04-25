@@ -119,7 +119,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
   return (
     <>
       {/* Main Row */}
-      <TablePrimaryRow>
+      <TablePrimaryRow sx={{ borderBottom: 0 }}>
         <TablePrimaryCell>
           <IconButton
             aria-label="expand row"
@@ -144,7 +144,6 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
         </TablePrimaryCell>
 
         <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
-        <TablePrimaryCell align="center">{DepositIndex}</TablePrimaryCell>
         <TablePrimaryCell align="center">
           {Claimed ? "Yes" : "No"}
         </TablePrimaryCell>
@@ -154,8 +153,8 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
       </TablePrimaryRow>
 
       {/* Collapsible Row */}
-      <TablePrimaryRow sx={{ borderBottom: 0 }}>
-        <TablePrimaryCell sx={{ py: 0 }} colSpan={7}>
+      <TablePrimaryRow sx={{ borderTop: 0 }}>
+        <TablePrimaryCell sx={{ py: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Grid container spacing={4}>
               {/* Stake Section */}
@@ -270,7 +269,6 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit Index</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Is Claimed?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
                 Reward (ETH)
@@ -279,7 +277,7 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
           </TablePrimaryHead>
           <TableBody>
             {paginatedData.map((row) => (
-              <RewardsDetailRow key={row.DepositIndex} row={row} />
+              <RewardsDetailRow key={row.DepositId} row={row} />
             ))}
           </TableBody>
         </TablePrimary>
