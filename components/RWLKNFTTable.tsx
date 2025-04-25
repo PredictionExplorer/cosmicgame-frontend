@@ -50,7 +50,6 @@ const RWLKRow = ({
 
   return (
     <TablePrimaryRow
-      hover
       role="checkbox"
       tabIndex={-1}
       selected={isSelected}
