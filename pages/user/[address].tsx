@@ -129,10 +129,6 @@ const UserInfo = ({ address }: { address: string }) => {
   const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState<
     any[]
   >([]);
-  const [
-    uncollectedCstStakingRewards,
-    setUncollectedCstStakingRewards,
-  ] = useState<any[]>([]);
   const [cstStakingRewardsByDeposit, setCstStakingRewardsByDeposit] = useState<
     any[]
   >([]);
@@ -166,7 +162,6 @@ const UserInfo = ({ address }: { address: string }) => {
         cstTokens,
         stakingRewards,
         cstRewardsCollected,
-        cstRewardsUncollected,
         cstRewardsByDeposit,
         rwlkMinted,
       ] = await Promise.all([
@@ -179,7 +174,6 @@ const UserInfo = ({ address }: { address: string }) => {
         api.get_cst_tokens_by_user(addr),
         api.get_staking_rewards_by_user(addr),
         api.get_staking_cst_rewards_collected_by_user(addr),
-        api.get_staking_cst_rewards_to_claim_by_user(addr),
         api.get_staking_cst_by_user_by_deposit_rewards(addr),
         api.get_staking_rwalk_mints_by_user(addr),
       ]);
@@ -213,7 +207,6 @@ const UserInfo = ({ address }: { address: string }) => {
       // Store CST staking reward information
       setCstStakingRewards(stakingRewards);
       setCollectedCstStakingRewards(cstRewardsCollected);
-      setUncollectedCstStakingRewards(cstRewardsUncollected);
       setCstStakingRewardsByDeposit(cstRewardsByDeposit);
 
       // Store RWLK minted reward data
@@ -809,10 +802,7 @@ const UserInfo = ({ address }: { address: string }) => {
                 <Typography variant="subtitle1" lineHeight={1} mb={2}>
                   Uncollected Staking Rewards
                 </Typography>
-                <UncollectedCSTStakingRewardsTable
-                  list={uncollectedCstStakingRewards}
-                  user={address}
-                />
+                <UncollectedCSTStakingRewardsTable user={address} />
               </Box>
             </CustomTabPanel>
 

@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, TableBody, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TableBody,
+  Typography,
+} from "@mui/material";
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -15,6 +25,8 @@ import { CustomPagination } from "./CustomPagination";
 import { isMobile } from "react-device-detect";
 import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
+import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
+import { useNotification } from "../contexts/NotificationContext";
 
 /* ------------------------------------------------------------------
   Sub-Component: UncollectedRewardsRow
@@ -77,22 +89,28 @@ const UncollectedRewardsRow = ({ row }) => {
   Main Component: UncollectedCSTStakingRewardsTable
   Displays a paginated list of uncollected CST staking rewards.
 ------------------------------------------------------------------ */
-export const UncollectedCSTStakingRewardsTable = ({ list, user }) => {
+export const UncollectedCSTStakingRewardsTable = ({ user }) => {
   const { account } = useActiveWeb3React();
   const [status, setStatus] = useState(null);
   // Current page in the pagination
+  const [list, setList] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isUnstaking, setIsUnstaking] = useState(false);
+  const [cstWithRewards, setCstWithRewards] = useState([]);
+  const cstStakingContract = useStakingWalletCSTContract();
+  const { setNotification } = useNotification();
 
   // Number of rows to display per page
   const PER_PAGE = 5;
 
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   // Calculate slice indices for the current page
   const startIndex = (currentPage - 1) * PER_PAGE;
   const endIndex = currentPage * PER_PAGE;
-
-  // Extract the portion of the list corresponding to the current page
-  const currentPageData = list.slice(startIndex, endIndex);
 
   const fetchStatusData = async () => {
     try {
@@ -102,26 +120,67 @@ export const UncollectedCSTStakingRewardsTable = ({ list, user }) => {
       console.log(err);
     }
   };
-
-  const unstakeAllCST = async () => {
-    setIsUnstaking(true);
+  const fetchCstWithRewards = async () => {
     try {
-      fetchStatusData();
+      const res = await api.get_staking_cst_by_user_by_deposit_rewards(user);
+      const actions = res[res.length - 1].Actions.filter((x) => !x.Claimed);
+      const actionIds = actions.map((x) => x.Stake.ActionId);
+      setCstWithRewards(actionIds);
     } catch (err) {
       console.log(err);
-    } finally {
+    }
+  };
+  const fetchUncollectedCstStakingRewards = async () => {
+    try {
+      const res = await api.get_staking_cst_rewards_to_claim_by_user(user);
+      setList(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const unstakeAllCST = async () => {
+    handleClose();
+    setIsUnstaking(true);
+    try {
+      const res = await cstStakingContract
+        .unstakeMany(cstWithRewards)
+        .then((tx: any) => tx.wait());
+      // Success notification
+      if (!res.code) {
+        setNotification({
+          visible: true,
+          text: "The selected tokens were unstaked successfully!",
+          type: "success",
+        });
+      }
+      setTimeout(() => {
+        fetchStatusData();
+        fetchUncollectedCstStakingRewards();
+      }, 4000);
+    } catch (err) {
+      console.log(err);
       setIsUnstaking(false);
     }
   };
 
   useEffect(() => {
+    fetchUncollectedCstStakingRewards();
     fetchStatusData();
+    fetchCstWithRewards();
   }, [user]);
+
+  if (list === null) {
+    return <Typography>Loading...</Typography>;
+  }
 
   // If there is no data to display, show a fallback message
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
+
+  // Extract the portion of the list corresponding to the current page
+  const currentPageData = list.slice(startIndex, endIndex);
 
   return (
     <>
@@ -186,7 +245,7 @@ export const UncollectedCSTStakingRewardsTable = ({ list, user }) => {
             {`${status.UnclaimedStakingReward.toFixed(6)} ETH`}
           </Typography>
           <Button
-            onClick={unstakeAllCST}
+            onClick={handleOpen}
             variant="contained"
             disabled={isUnstaking}
           >
@@ -202,6 +261,23 @@ export const UncollectedCSTStakingRewardsTable = ({ list, user }) => {
         totalLength={list.length}
         perPage={PER_PAGE}
       />
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Claim all staking rewards</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Do you want to claim all staking rewards? If you unstake the tokens,
+            then you can stake those tokens again.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={unstakeAllCST} variant="contained">
+            Ok
+          </Button>
+          <Button onClick={handleClose} variant="outlined">
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

@@ -291,7 +291,6 @@ function CSTStakingTab({
   cstStakingRewards,
   cstStakingRewardsByDeposit,
   collectedCstStakingRewards,
-  uncollectedCstStakingRewards,
   account,
 }: {
   userInfo: any;
@@ -299,7 +298,6 @@ function CSTStakingTab({
   cstStakingRewards: any[];
   cstStakingRewardsByDeposit: any[];
   collectedCstStakingRewards: any[];
-  uncollectedCstStakingRewards: any[];
   account: string;
 }) {
   const { CSTStakingInfo } = userInfo.StakingStatistics || {};
@@ -414,10 +412,7 @@ function CSTStakingTab({
         <Typography variant="subtitle1" lineHeight={1} mb={2}>
           Uncollected Staking Rewards
         </Typography>
-        <UncollectedCSTStakingRewardsTable
-          list={uncollectedCstStakingRewards}
-          user={account}
-        />
+        <UncollectedCSTStakingRewardsTable user={account} />
       </Box>
     </>
   );
@@ -540,10 +535,6 @@ const MyStatistics = () => {
   const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState<
     any[]
   >([]);
-  const [
-    uncollectedCstStakingRewards,
-    setUncollectedCstStakingRewards,
-  ] = useState<any[]>([]);
   const [cstStakingRewardsByDeposit, setCstStakingRewardsByDeposit] = useState<
     any[]
   >([]);
@@ -587,7 +578,6 @@ const MyStatistics = () => {
           userCstList,
           stakingRewards,
           collectedRewards,
-          uncollectedRewards,
           rewardsByDeposit,
           rwalkMinted,
         ] = await Promise.all([
@@ -600,7 +590,6 @@ const MyStatistics = () => {
           api.get_cst_tokens_by_user(addr),
           api.get_staking_rewards_by_user(addr),
           api.get_staking_cst_rewards_collected_by_user(addr),
-          api.get_staking_cst_rewards_to_claim_by_user(addr),
           api.get_staking_cst_by_user_by_deposit_rewards(addr),
           api.get_staking_rwalk_mints_by_user(addr),
         ]);
@@ -632,7 +621,6 @@ const MyStatistics = () => {
         // CST Staking rewards
         setCstStakingRewards(stakingRewards);
         setCollectedCstStakingRewards(collectedRewards);
-        setUncollectedCstStakingRewards(uncollectedRewards);
         setCstStakingRewardsByDeposit(rewardsByDeposit);
 
         // RWLK minted
@@ -887,7 +875,6 @@ const MyStatistics = () => {
                 cstStakingRewards={cstStakingRewards}
                 cstStakingRewardsByDeposit={cstStakingRewardsByDeposit}
                 collectedCstStakingRewards={collectedCstStakingRewards}
-                uncollectedCstStakingRewards={uncollectedCstStakingRewards}
                 account={account!}
               />
             </CustomTabPanel>

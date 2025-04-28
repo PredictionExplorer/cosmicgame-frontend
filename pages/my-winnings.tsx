@@ -51,9 +51,6 @@ function useUnclaimedWinnings(account: string | null | undefined) {
   const [raffleETHWinnings, setRaffleETHWinnings] = useState<
     RaffleWinning[] | null
   >(null);
-  const [cstStakingRewards, setCstStakingRewards] = useState<any[] | null>(
-    null
-  );
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,10 +60,9 @@ function useUnclaimedWinnings(account: string | null | undefined) {
     setError(null);
 
     try {
-      const [nfts, deposits, cstRewards] = await Promise.all([
+      const [nfts, deposits] = await Promise.all([
         api.get_unclaimed_donated_nft_by_user(account),
         api.get_unclaimed_raffle_deposits_by_user(account),
-        api.get_staking_cst_rewards_to_claim_by_user(account),
       ]);
 
       // Sort data for consistency
@@ -74,7 +70,6 @@ function useUnclaimedWinnings(account: string | null | undefined) {
       setRaffleETHWinnings(
         deposits.sort((a: any, b: any) => b.TimeStamp - a.TimeStamp)
       );
-      setCstStakingRewards(cstRewards);
     } catch (err) {
       console.error("Error fetching unclaimed data:", err);
       setError("Failed to load unclaimed winnings data");
@@ -91,7 +86,6 @@ function useUnclaimedWinnings(account: string | null | undefined) {
   return {
     donatedNFTs,
     raffleETHWinnings,
-    cstStakingRewards,
     loading,
     error,
     refetch: fetchUnclaimedData,
@@ -170,7 +164,6 @@ export default function MyWinnings() {
   const {
     donatedNFTs,
     raffleETHWinnings,
-    cstStakingRewards,
     loading,
     error,
     refetch,
@@ -361,16 +354,7 @@ export default function MyWinnings() {
         <Typography variant="h5" mb={2}>
           Claimable CST Staking Rewards
         </Typography>
-        {loading && cstStakingRewards === null ? (
-          <Typography>Loading...</Typography>
-        ) : !cstStakingRewards || cstStakingRewards.length === 0 ? (
-          <Typography>No winnings yet.</Typography>
-        ) : (
-          <UncollectedCSTStakingRewardsTable
-            list={cstStakingRewards}
-            user={account}
-          />
-        )}
+        <UncollectedCSTStakingRewardsTable user={account} />
       </Box>
 
       {/* Donated NFTs Section */}
