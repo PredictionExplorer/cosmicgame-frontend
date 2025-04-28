@@ -1,18 +1,14 @@
 import React, { FC, useState } from "react";
-import { ListItem, Collapse, List } from "@mui/material";
+import { Collapse, List, ListItemButton } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { NavLink } from "./styled";
+import { NavDescriptor } from "../config/nav";
 
 /** -----------------------------------------------------------------------
  * Type Definitions
  * ------------------------------------------------------------------------*/
 
 /** Re-use the same descriptor type we introduced in ListNavItem.tsx */
-export interface NavDescriptor {
-  title: string;
-  route?: string;
-  children?: NavDescriptor[];
-}
 
 interface NestedListItemProps {
   /** Primary navigation entry with optional sub-items */
@@ -42,7 +38,7 @@ const NestedListItem: FC<NestedListItemProps> = ({ nav }) => {
         // ---------------------------------------------------------------
         // Parent item that controls a collapsible submenu
         // ---------------------------------------------------------------
-        <ListItem button onClick={handleToggle} aria-expanded={open}>
+        <ListItemButton onClick={handleToggle} aria-expanded={open}>
           <NavLink sx={{ display: "flex", alignItems: "center" }}>
             {nav.title}
             {open ? (
@@ -51,14 +47,14 @@ const NestedListItem: FC<NestedListItemProps> = ({ nav }) => {
               <ExpandMore sx={{ ml: "auto" }} />
             )}
           </NavLink>
-        </ListItem>
+        </ListItemButton>
       ) : (
         // ---------------------------------------------------------------
         // Leaf node — a normal link without submenu
         // ---------------------------------------------------------------
-        <ListItem button>
+        <ListItemButton>
           <NavLink href={nav.route}>{nav.title}</NavLink>
-        </ListItem>
+        </ListItemButton>
       )}
 
       {/* ---------------------------------------------------------------
@@ -68,9 +64,9 @@ const NestedListItem: FC<NestedListItemProps> = ({ nav }) => {
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             {nav.children.map((child, i) => (
-              <ListItem key={i} sx={{ pl: 4 }} button>
+              <ListItemButton key={i} sx={{ pl: 4 }}>
                 <NavLink href={child.route}>{child.title}</NavLink>
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </Collapse>

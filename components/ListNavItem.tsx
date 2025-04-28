@@ -2,22 +2,11 @@ import React, { FC, useState, MouseEvent } from "react";
 import { Menu, MenuItem, Box } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { NavLink } from "./styled";
+import { NavDescriptor } from "../config/nav";
 
 /** -----------------------------------------------------------------------
  * Type Definitions
  * ------------------------------------------------------------------------*/
-
-/**
- * Navigation item descriptor used throughout the sitemap.
- */
-export interface NavDescriptor {
-  /** Label displayed to the user */
-  title: string;
-  /** Path to navigate to. **Required** when `children` is undefined */
-  route?: string;
-  /** Nested sub‑items rendered as a dropdown menu */
-  children?: NavDescriptor[];
-}
 
 interface ListNavItemProps {
   /** Data describing the link (and its optional children) */

@@ -1,14 +1,14 @@
 import { ReactNode } from "react";
 import { Badge } from "@mui/material";
 
-type NavItem = {
+export interface NavDescriptor {
   title: string | ReactNode;
-  route: string;
-  children?: Array<NavItem>;
-};
+  route?: string;
+  children?: NavDescriptor[];
+}
 
 const getNAVs = (status, account) => {
-  let NAVS: NavItem[] = [
+  let NAVS: NavDescriptor[] = [
     { title: "Gallery", route: "/gallery" },
     {
       title: "Rewards",

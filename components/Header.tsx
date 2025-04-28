@@ -243,11 +243,7 @@ const Header: FC = () => {
 
             {/* Navigation items */}
             {navs.map((nav, i) => (
-              <ListItemButton
-                key={i}
-                nav={nav}
-                sx={{ justifyContent: "center" }}
-              />
+              <ListItemButton key={i} nav={nav} />
             ))}
 
             {/* Additional links and balance details if account is connected */}
@@ -257,22 +253,18 @@ const Header: FC = () => {
 
                 <ListItemButton
                   nav={{ title: "My Statistics", route: "/my-statistics" }}
-                  sx={{ justifyContent: "center" }}
                 />
                 <ListItemButton
                   nav={{ title: "My Tokens", route: "/my-tokens" }}
-                  sx={{ justifyContent: "center" }}
                 />
                 <ListItemButton
                   nav={{ title: "My Staking", route: "/my-staking" }}
-                  sx={{ justifyContent: "center" }}
                 />
                 <ListItemButton
                   nav={{
                     title: "History of Winnings",
                     route: "/winning-history",
                   }}
-                  sx={{ justifyContent: "center" }}
                 />
 
                 <Divider />

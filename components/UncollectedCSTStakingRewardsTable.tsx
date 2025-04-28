@@ -87,11 +87,6 @@ export const UncollectedCSTStakingRewardsTable = ({ list, user }) => {
   // Number of rows to display per page
   const PER_PAGE = 5;
 
-  // If there is no data to display, show a fallback message
-  if (list.length === 0) {
-    return <Typography>No rewards yet.</Typography>;
-  }
-
   // Calculate slice indices for the current page
   const startIndex = (currentPage - 1) * PER_PAGE;
   const endIndex = currentPage * PER_PAGE;
@@ -122,6 +117,11 @@ export const UncollectedCSTStakingRewardsTable = ({ list, user }) => {
   useEffect(() => {
     fetchStatusData();
   }, [user]);
+
+  // If there is no data to display, show a fallback message
+  if (list.length === 0) {
+    return <Typography>No rewards yet.</Typography>;
+  }
 
   return (
     <>
