@@ -28,7 +28,7 @@ import { isMobile } from "react-device-detect";
  * Renders a single row in the admin events table
  * @param row - The event data to display
  */
-interface AdminEventRow {
+export interface AdminEventRow {
   EvtLogId: string;
   RecordType: number;
   TransferType: number;
@@ -85,7 +85,7 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
  * Renders the paginated table of admin events
  * @param list - Array of admin events to display
  */
-const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
+export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
   const perPage = 10;
   const [page, setPage] = useState(1);
 
