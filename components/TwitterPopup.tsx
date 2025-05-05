@@ -9,29 +9,31 @@ import {
   TextField,
 } from "@mui/material";
 
+// Props interface for TwitterPopup component
 interface TwitterPopupProps {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  setTwitterHandle: (handle: string) => void;
+  open: boolean; // Controls whether the dialog is open
+  setOpen: (open: boolean) => void; // Function to update the open state
+  setTwitterHandle: (handle: string) => void; // Callback to set the confirmed handle
 }
 
 /**
  * TwitterPopup Component
- * A modal dialog that collects and validates the user's Twitter handle.
+ * A modal dialog to collect and validate the user's Twitter handle.
  */
 const TwitterPopup: React.FC<TwitterPopupProps> = ({
   open,
   setOpen,
   setTwitterHandle,
 }) => {
+  // Local state for the user-inputted handle
   const [handle, setHandle] = useState<string>("");
 
-  // Close the dialog without saving
+  // Closes the dialog without saving the input
   const handleClose = () => {
     setOpen(false);
   };
 
-  // Validate and confirm the Twitter handle input
+  // Validates and confirms the handle, stripping any leading "@"
   const handleConfirm = () => {
     const formattedHandle = handle.startsWith("@") ? handle.slice(1) : handle;
     setTwitterHandle(formattedHandle);
