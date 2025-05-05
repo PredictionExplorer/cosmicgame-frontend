@@ -4,35 +4,63 @@ import { StyledCard } from "./styled";
 import axios from "axios";
 import NFTImage from "./NFTImage";
 
-const DonatedNFT = ({ nft }) => {
-  const [tokenURI, setTokenURI] = useState(null);
+// Define the expected shape of the `nft` prop
+interface NFT {
+  NFTTokenId: number | string;
+  NFTTokenURI: string;
+}
+
+// Define the expected structure of the fetched tokenURI data
+interface TokenURI {
+  image?: string;
+  external_url?: string;
+}
+
+interface DonatedNFTProps {
+  nft: NFT;
+}
+
+const DonatedNFT: React.FC<DonatedNFTProps> = ({ nft }) => {
+  const [tokenURI, setTokenURI] = useState<TokenURI | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { data } = await axios.get(nft.NFTTokenURI);
-      setTokenURI(data);
+    // Fetch metadata from the provided NFT token URI
+    const fetchTokenData = async () => {
+      try {
+        const { data } = await axios.get<TokenURI>(nft.NFTTokenURI);
+        setTokenURI(data);
+      } catch (error) {
+        console.error("Failed to fetch token URI data:", error);
+      }
     };
+
     if (nft.NFTTokenURI) {
-      fetchData();
+      fetchTokenData();
     }
-  }, []);
+  }, [nft.NFTTokenURI]); // dependency ensures it refetches if the URI changes
 
   return (
     <StyledCard>
+      {/* Clickable area that opens the NFT's external URL in a new tab */}
       <CardActionArea
-        onClick={() =>
-          window.open(tokenURI?.external_url, "_blank", "noopener")
-        }
+        onClick={() => {
+          if (tokenURI?.external_url) {
+            window.open(tokenURI.external_url, "_blank", "noopener");
+          }
+        }}
       >
+        {/* Renders the NFT image */}
         <NFTImage src={tokenURI?.image} />
       </CardActionArea>
+
+      {/* Overlay box for token ID and 'Donated' label */}
       <Box
         sx={{
           display: "flex",
           position: "absolute",
           inset: "16px",
           justifyContent: "space-between",
-          pointerEvents: "none",
+          pointerEvents: "none", // ensures overlay doesn't interfere with clicks
         }}
       >
         <Typography

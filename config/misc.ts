@@ -41,7 +41,7 @@ export const ADMIN_EVENTS = [
     type: "number",
     description: "The number of raffle NFT winners per round has been changed.",
   },
-  { name: "Unused", description: "" },
+  { name: "Unused", type: "", description: "" },
   {
     name: "NumRaffleNFTWinnersStakingRWalkChanged",
     type: "number",
@@ -91,7 +91,7 @@ export const ADMIN_EVENTS = [
     description:
       "The address of the Cosmic Signature Token (ERC-721) contract has been changed.",
   },
-  { name: "Upgraded", description: "" },
+  { name: "Upgraded", type: "", description: "" },
   {
     name: "TimeIncreaseChanged",
     type: "number",
@@ -161,3 +161,55 @@ export const ADMIN_EVENTS = [
     description: "",
   },
 ];
+
+/*
+
+setDelayDurationBeforeRoundActivation
+# setRoundActivationTime (ActivationTimeChanged)
+setEthDutchAuctionDurationDivisor
+setEthDutchAuctionEndingBidPriceDivisor
+# setEthBidPriceIncreaseDivisor (PriceIncreaseChanged)
+setEthBidRefundAmountInGasMinLimit
+# setCstDutchAuctionDurationDivisor (RoundStartCSTAuctionLengthChanged)
+# setCstDutchAuctionBeginningBidPriceMinLimit (StartingBidPriceCSTMinLimitChanged)
+# setBidMessageLengthMaxLimit (MaxMessageLengthChanged)
+# setCstRewardAmountForBidding (TokenRewardChanged)
+# setCstPrizeAmountMultiplier (Erc20RewardMultiplierChanged)
+setChronoWarriorEthPrizeAmountPercentage
+# setRaffleTotalEthPrizeAmountForBiddersPercentage (RafflePercentageChanged)
+# setNumRaffleEthPrizesForBidders (NumRaffleWinnersPerRoundChanged)
+# setNumRaffleCosmicSignatureNftsForBidders (NumRaffleNFTWinnersPerRoundChanged)
+# setNumRaffleCosmicSignatureNftsForRandomWalkNftStakers (NumRaffleNFTWinnersStakingRWalkChanged)
+# setCosmicSignatureNftStakingTotalEthRewardAmountPercentage (StakingPercentageChanged)
+# setInitialDurationUntilMainPrizeDivisor (InitialSecondsUntilPrizeChanged)
+# setMainPrizeTimeIncrementInMicroSeconds (NanoSecondsExtraChanged)
+# setMainPrizeTimeIncrementIncreaseDivisor (TimeIncreaseChanged)
+# setTimeoutDurationToClaimMainPrize (TimeoutClaimPrizeChanged)
+# setMainEthPrizeAmountPercentage (PrizePercentageChanged)
+# setCosmicSignatureToken (CosmicTokenAddressChanged)
+# setRandomWalkNft (RandomWalkAddressChanged)
+# setCosmicSignatureNft (CosmicSignatureAddressChanged)
+# setPrizesWallet (PrizeWalletAddressChanged)
+# setStakingWalletRandomWalkNft (StakingWalletRWalkAddressChanged)
+# setStakingWalletCosmicSignatureNft (StakingWalletAddressChanged)
+# setMarketingWallet (MarketingWalletAddressChanged)
+setMarketingWalletCstContributionAmount
+# setCharityAddress (CharityAddressChanged)
+# setCharityEthDonationAmountPercentage (CharityPercentageChanged)
+
+
+
+
+
+
+(InitialBidAmountFractionChanged)
+(ETHToCSTBidRatioChanged)
+(MarketingRewardChanged)
+(TokenGenerationScriptURLEvent)
+(BaseURI (CosmicSignature))
+(Initialized (Initialized event, openzeppelin))
+(OwnershipTransferred)
+(TimeoutDurationToWithdrawPrizesChanged)
+
+
+*/
