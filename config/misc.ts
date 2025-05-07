@@ -41,7 +41,11 @@ export const ADMIN_EVENTS = [
     type: "number",
     description: "The number of raffle NFT winners per round has been changed.",
   },
-  { name: "Unused", type: "", description: "" },
+  {
+    name: "DelayDurationBeforeRoundActivationChanged",
+    type: "time",
+    description: "",
+  },
   {
     name: "NumRaffleNFTWinnersStakingRWalkChanged",
     type: "number",
@@ -119,19 +123,9 @@ export const ADMIN_EVENTS = [
     description: "The initial value of the time until prize has been changed.",
   },
   {
-    name: "InitialBidAmountFractionChanged",
-    type: "number",
-    description: "The initial bid amount fraction has been changed.",
-  },
-  {
     name: "ActivationTimeChanged",
     type: "timestamp",
     description: "The round activation time has been changed.",
-  },
-  {
-    name: "ETHToCSTBidRatioChanged",
-    type: "number",
-    description: "The ratio of ETH to CST bid has been changed.",
   },
   {
     name: "RoundStartCSTAuctionLengthChanged",
@@ -152,7 +146,7 @@ export const ADMIN_EVENTS = [
   {
     name: "Initialized (Initialized event, openzeppelin)",
     type: "",
-    description: "",
+    description: "Contract initialization completed",
   },
   { name: "OwnershipTransferred", type: "address", description: "" },
   {
@@ -160,14 +154,29 @@ export const ADMIN_EVENTS = [
     type: "time",
     description: "",
   },
+  {
+    name: "EthDutchAuctionDurationDivisorChanged",
+    type: "number",
+    description: "",
+  },
+  {
+    name: "EthDutchAuctionEndingBidPriceDivisorChanged",
+    type: "number",
+    description: "",
+  },
+  {
+    name: "ChronoWarriorEthPrizeAmountPercentageChanged",
+    type: "number",
+    description: "",
+  },
 ];
 
 /*
 
-setDelayDurationBeforeRoundActivation
+# setDelayDurationBeforeRoundActivation (DelayDurationBeforeRoundActivationChanged)
 # setRoundActivationTime (ActivationTimeChanged)
-setEthDutchAuctionDurationDivisor
-setEthDutchAuctionEndingBidPriceDivisor
+# setEthDutchAuctionDurationDivisor (EthDutchAuctionDurationDivisorChanged)
+# setEthDutchAuctionEndingBidPriceDivisor (EthDutchAuctionEndingBidPriceDivisorChanged)
 # setEthBidPriceIncreaseDivisor (PriceIncreaseChanged)
 setEthBidRefundAmountInGasMinLimit
 # setCstDutchAuctionDurationDivisor (RoundStartCSTAuctionLengthChanged)
@@ -175,7 +184,7 @@ setEthBidRefundAmountInGasMinLimit
 # setBidMessageLengthMaxLimit (MaxMessageLengthChanged)
 # setCstRewardAmountForBidding (TokenRewardChanged)
 # setCstPrizeAmountMultiplier (Erc20RewardMultiplierChanged)
-setChronoWarriorEthPrizeAmountPercentage
+# setChronoWarriorEthPrizeAmountPercentage (ChronoWarriorEthPrizeAmountPercentageChanged)
 # setRaffleTotalEthPrizeAmountForBiddersPercentage (RafflePercentageChanged)
 # setNumRaffleEthPrizesForBidders (NumRaffleWinnersPerRoundChanged)
 # setNumRaffleCosmicSignatureNftsForBidders (NumRaffleNFTWinnersPerRoundChanged)
@@ -193,7 +202,7 @@ setChronoWarriorEthPrizeAmountPercentage
 # setStakingWalletRandomWalkNft (StakingWalletRWalkAddressChanged)
 # setStakingWalletCosmicSignatureNft (StakingWalletAddressChanged)
 # setMarketingWallet (MarketingWalletAddressChanged)
-setMarketingWalletCstContributionAmount
+# setMarketingWalletCstContributionAmount(MarketingRewardChanged)
 # setCharityAddress (CharityAddressChanged)
 # setCharityEthDonationAmountPercentage (CharityPercentageChanged)
 
@@ -202,9 +211,6 @@ setMarketingWalletCstContributionAmount
 
 
 
-(InitialBidAmountFractionChanged)
-(ETHToCSTBidRatioChanged)
-(MarketingRewardChanged)
 (TokenGenerationScriptURLEvent)
 (BaseURI (CosmicSignature))
 (Initialized (Initialized event, openzeppelin))
