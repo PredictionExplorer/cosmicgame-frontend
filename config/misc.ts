@@ -117,6 +117,7 @@ export const ADMIN_EVENTS = [
     description:
       "The value for the increment of prize time after every bid has been changed.",
   },
+  { name: "InitialBidAmountFractionChanged", type: "number", description: "" }, // have to remove this event
   {
     name: "InitialSecondsUntilPrizeChanged",
     type: "time",

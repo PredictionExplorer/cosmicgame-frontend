@@ -1109,6 +1109,7 @@ const NewHome = () => {
                           (Round was started {roundStarted} ago.)
                         </Typography>
                       )}
+                      <Link href="/changed-parameters">Changed Parameters</Link>
                     </Grid>
                   </Grid>
                 ) : (

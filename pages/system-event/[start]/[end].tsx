@@ -16,7 +16,11 @@ import {
 } from "../../../components/styled";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import api from "../../../services/api";
-import { convertTimestampToDateTime, logoImgUrl } from "../../../utils";
+import {
+  convertTimestampToDateTime,
+  formatSeconds,
+  logoImgUrl,
+} from "../../../utils";
 import { GetServerSidePropsContext } from "next";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
@@ -36,6 +40,7 @@ export interface AdminEventRow {
   TxHash: string;
   IntegerValue: number;
   AddressValue: string;
+  StringValue: string;
 }
 
 const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
@@ -68,13 +73,23 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
           {convertTimestampToDateTime(row.TimeStamp)}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
+      <TablePrimaryCell>
         {row.RecordType === 0 ? (
           "Undefined"
-        ) : row.RecordType < 8 || row.RecordType > 15 ? (
+        ) : ADMIN_EVENTS[row.RecordType].type === "timestamp" ? (
+          convertTimestampToDateTime(row.IntegerValue)
+        ) : ADMIN_EVENTS[row.RecordType].type === "percentage" ? (
+          `${row.IntegerValue}%`
+        ) : ADMIN_EVENTS[row.RecordType].type === "number" ? (
           row.IntegerValue
-        ) : (
+        ) : ADMIN_EVENTS[row.RecordType].type === "time" ? (
+          formatSeconds(row.IntegerValue)
+        ) : ADMIN_EVENTS[row.RecordType].type === "address" ? (
           <Typography fontFamily="monospace">{row.AddressValue}</Typography>
+        ) : (
+          <Link href={row.StringValue} target="_blank">
+            {row.StringValue}
+          </Link>
         )}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -98,8 +113,8 @@ export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
         <TablePrimary>
           {!isMobile && (
             <colgroup>
-              <col width="35%" />
-              <col width="20%" />
+              <col width="40%" />
+              <col width="15%" />
               <col width="45%" />
             </colgroup>
           )}
@@ -107,7 +122,9 @@ export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
             <Tr>
               <TablePrimaryHeadCell align="left">Event</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>New Value</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                New Value
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
