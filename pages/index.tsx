@@ -1109,51 +1109,17 @@ const NewHome = () => {
                           (Round was started {roundStarted} ago.)
                         </Typography>
                       )}
-                      <Link href="/changed-parameters">Changed Parameters</Link>
+                      <Link href="/changed-parameters" color="inherit">
+                        Changed Parameters
+                      </Link>
                     </Grid>
                   </Grid>
                 ) : (
                   <>
                     {data?.CurRoundNum > 0 ? (
-                      <>
-                        <Typography variant="h4" mb={2}>
-                          Round {data?.CurRoundNum} started
-                        </Typography>
-                        {/* <Grid container spacing={2} mb={2} alignItems="center">
-                          <Grid item sm={12} md={4}>
-                            <Typography variant="subtitle1">Winner</Typography>
-                          </Grid>
-                          <Grid item sm={12} md={8}>
-                            <Typography textAlign="center">
-                              <Link
-                                href={`/user/${prizeInfo?.WinnerAddr}`}
-                                color="rgb(255, 255, 255)"
-                                fontSize="inherit"
-                              >
-                                {prizeInfo?.WinnerAddr}
-                              </Link>
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                        <Grid container spacing={2} mb={2} alignItems="center">
-                          <Grid item sm={12} md={4}>
-                            <Typography variant="subtitle1">
-                              Endurance Champion Address
-                            </Typography>
-                          </Grid>
-                          <Grid item sm={12} md={8}>
-                            <Typography>
-                              <Link
-                                href={`/user/${prizeInfo?.EnduranceWinnerAddr}`}
-                                color="rgb(255, 255, 255)"
-                                fontSize="inherit"
-                              >
-                                {prizeInfo?.EnduranceWinnerAddr}
-                              </Link>
-                            </Typography>
-                          </Grid>
-                        </Grid> */}
-                      </>
+                      <Typography variant="h4" mb={2}>
+                        Round {data?.CurRoundNum} started
+                      </Typography>
                     ) : (
                       <Typography variant="subtitle1">
                         Start the game with your first bid!
@@ -1613,31 +1579,32 @@ const NewHome = () => {
             )}
           </Grid>
           <Grid item sm={12} md={6}>
+            <Link href={`/prize/${data?.CurRoundNum - 1}`} color="inherit">
+              Round {data?.CurRoundNum - 1} ended, check results here
+            </Link>
             {matches && (
-              <>
-                <StyledCard>
-                  <CardActionArea>
-                    <Link
-                      href={
-                        bannerToken.id >= 0
-                          ? `/detail/${bannerToken.id}`
-                          : "/detail/sample"
+              <StyledCard sx={{ mt: 1 }}>
+                <CardActionArea>
+                  <Link
+                    href={
+                      bannerToken.id >= 0
+                        ? `/detail/${bannerToken.id}`
+                        : "/detail/sample"
+                    }
+                    sx={{ display: "block" }}
+                  >
+                    <NFTImage
+                      src={
+                        bannerToken.seed === ""
+                          ? "/images/qmark.png"
+                          : getAssetsUrl(
+                              `cosmicsignature/${bannerToken.seed}.png`
+                            )
                       }
-                      sx={{ display: "block" }}
-                    >
-                      <NFTImage
-                        src={
-                          bannerToken.seed === ""
-                            ? "/images/qmark.png"
-                            : getAssetsUrl(
-                                `cosmicsignature/${bannerToken.seed}.png`
-                              )
-                        }
-                      />
-                    </Link>
-                  </CardActionArea>
-                </StyledCard>
-              </>
+                    />
+                  </Link>
+                </CardActionArea>
+              </StyledCard>
             )}
             {data?.TsRoundStart !== 0 && (
               <>
