@@ -1119,7 +1119,7 @@ const NewHome = () => {
                         <Typography variant="h4" mb={2}>
                           Round {data?.CurRoundNum} started
                         </Typography>
-                        <Grid container spacing={2} mb={2} alignItems="center">
+                        {/* <Grid container spacing={2} mb={2} alignItems="center">
                           <Grid item sm={12} md={4}>
                             <Typography variant="subtitle1">Winner</Typography>
                           </Grid>
@@ -1152,7 +1152,7 @@ const NewHome = () => {
                               </Link>
                             </Typography>
                           </Grid>
-                        </Grid>
+                        </Grid> */}
                       </>
                     ) : (
                       <Typography variant="subtitle1">
