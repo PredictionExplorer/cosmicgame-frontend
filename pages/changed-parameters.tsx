@@ -8,31 +8,41 @@ import { logoImgUrl } from "../utils";
 import { AdminEventRow, AdminEventsTable } from "./system-event/[start]/[end]";
 
 function ChangedParameters() {
+  // Retrieve connected wallet account
   const { account } = useActiveWeb3React();
+
+  // Local state for loading indicator and event data
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<AdminEventRow[]>([]);
 
-  const getSysEventsForLastRound = async () => {
+  // Fetches the most recent system events using API
+  const fetchLatestSystemEvents = async () => {
     try {
-      setLoading(true);
-      const mode_list = await api.get_system_modelist();
-      const start = mode_list[0].EvtLogId;
-      const end = 9999999999;
-      const system_events = await api.get_system_events(start, end);
-      setEvents(system_events);
-      setLoading(false);
+      setLoading(true); // Start loading
+
+      // Get the list of modes, extract the start ID from the first item
+      const modeList = await api.get_system_modelist();
+      const startId = modeList[0].EvtLogId;
+      const endId = 9999999999; // A hardcoded high end range
+
+      // Fetch events from API within the given range
+      const systemEvents = await api.get_system_events(startId, endId);
+
+      // Store results in state
+      setEvents(systemEvents);
     } catch (err) {
-      console.log(err);
+      console.error("Error fetching system events:", err);
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading in all cases
     }
   };
 
+  // Fetch events on component mount
   useEffect(() => {
-    getSysEventsForLastRound();
+    fetchLatestSystemEvents();
   }, []);
 
-  // If user is not connected
+  // Render if no wallet is connected
   if (!account) {
     return (
       <MainWrapper>
@@ -46,11 +56,14 @@ function ChangedParameters() {
     );
   }
 
+  // Render main content
   return (
     <MainWrapper>
       <Typography variant="h4" color="primary" textAlign="center" mb={4}>
         Changed Parameters
       </Typography>
+
+      {/* Show loading message or data table */}
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
@@ -60,6 +73,7 @@ function ChangedParameters() {
   );
 }
 
+// Metadata for SEO and Open Graph
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Changed Parameters | Cosmic Signature";
   const description = "Changed Parameters";
