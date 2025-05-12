@@ -105,7 +105,6 @@ const NewHome = () => {
   const [championList, setChampionList] = useState<any>(null);
   const [prizeTime, setPrizeTime] = useState(0);
   const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
-  const [prizeInfo, setPrizeInfo] = useState<any>(null);
   const [message, setMessage] = useState("");
   const [nftDonateAddress, setNftDonateAddress] = useState("");
   const [nftId, setNftId] = useState("");
@@ -804,22 +803,6 @@ const NewHome = () => {
     }
   };
 
-  const fetchPrizeInfo = async () => {
-    try {
-      const prizeList = await api.get_round_list();
-      let prizeInfo;
-      if (prizeList.length) {
-        prizeInfo = await api.get_round_info(prizeList.length - 1);
-      } else {
-        prizeInfo = null;
-      }
-      setPrizeInfo(prizeInfo);
-      return prizeInfo;
-    } catch (err) {
-      console.error("Error fetching prize info:", err);
-    }
-  };
-
   const fetchClaimHistory = async () => {
     try {
       const history = await api.get_claim_history();
@@ -857,7 +840,6 @@ const NewHome = () => {
     await Promise.all([
       getRwlkNFTIds(),
       fetchData(),
-      fetchPrizeInfo(),
       // fetchPrizeTime(),
       fetchClaimHistory(),
       fetchCSTBidData(),
