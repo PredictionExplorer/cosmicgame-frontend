@@ -298,7 +298,7 @@ const NewHome = () => {
       }
       if (
         (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
-        (donationType === "ETH" && (!tokenDonateAddress || !tokenAmount))
+        (donationType === "Token" && (!tokenDonateAddress || !tokenAmount))
       ) {
         await cosmicGameContract
           .bidWithEth(rwlkId, message, {
@@ -525,7 +525,7 @@ const NewHome = () => {
       const priceMaxLimit = await cosmicGameContract.getNextCstBidPrice(0);
       if (
         (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
-        (donationType === "ETH" && (!tokenDonateAddress || !tokenAmount))
+        (donationType === "Token" && (!tokenDonateAddress || !tokenAmount))
       ) {
         await cosmicGameContract
           .bidWithCst(priceMaxLimit, message)
@@ -1011,6 +1011,7 @@ const NewHome = () => {
     const activationTime = await cosmicGameContract.roundActivationTime();
     setActivationTime(Number(activationTime - offset / 1000));
   };
+
   useEffect(() => {
     const fetchTimeoutClaimPrize = async () => {
       const timeout = await cosmicGameContract.timeoutDurationToClaimMainPrize();
