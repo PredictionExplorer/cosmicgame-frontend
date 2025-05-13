@@ -32,6 +32,9 @@ class ApiService {
       const { data } = await axios.get(getMainAPIUrl("get_banned_bids"));
       return data;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -65,6 +68,9 @@ class ApiService {
       const { data } = await axios.get(getMainAPIUrl(`token_info/${token_id}`));
       return data.TokenInfo;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -76,6 +82,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("statistics/dashboard"));
       return data;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -87,6 +96,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("statistics/unique/bidders"));
       return data.UniqueBidders;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -98,6 +110,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("statistics/unique/winners"));
       return data.UniqueWinners;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -109,6 +124,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("statistics/unique/donors"));
       return data.UniqueDonors;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -122,6 +140,9 @@ class ApiService {
       );
       return data.UniqueStakersCST;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -135,6 +156,9 @@ class ApiService {
       );
       return data.UniqueStakersRWalk;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -148,6 +172,9 @@ class ApiService {
       );
       return data.UniqueStakersBoth;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -159,6 +186,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("rounds/list/0/1000000"));
       return data.Rounds;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -172,6 +202,9 @@ class ApiService {
       const prizeInfo = data.RoundInfo;
       return prizeInfo;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -183,6 +216,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("rounds/current/time"));
       return data.CurRoundPrizeTime;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return 0;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -196,6 +232,9 @@ class ApiService {
       );
       return data.GlobalPrizeHistory;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -209,6 +248,9 @@ class ApiService {
       );
       return data.USerPrizeHistory;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -222,6 +264,9 @@ class ApiService {
       );
       return data.UserRaffleDeposits;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -235,6 +280,9 @@ class ApiService {
       );
       return data.UserChronoWarriorDeposits;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -248,6 +296,9 @@ class ApiService {
       );
       return data.UnclaimedDeposits;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -259,6 +310,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("bid/list/all/0/1000000"));
       return data.Bids;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -270,6 +324,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl(`bid/info/${evtLogID}`));
       return data.BidInfo;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -284,6 +341,9 @@ class ApiService {
       );
       return data.BidsByRound;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -295,6 +355,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("bid/used_rwalk_nfts"));
       return data.UsedRwalkNFTs;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -306,6 +369,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("bid/cst_price"));
       return data;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return 0;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -319,6 +385,9 @@ class ApiService {
       );
       return data;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -331,6 +400,9 @@ class ApiService {
       const cstList = data.CosmicSignatureTokenList;
       return cstList;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -344,6 +416,9 @@ class ApiService {
       );
       return data.UserTokens;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -355,6 +430,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl(`cst/info/${tokenId}`));
       return data.TokenInfo;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -368,6 +446,9 @@ class ApiService {
       );
       return data.TokenNameHistory;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -381,6 +462,9 @@ class ApiService {
       );
       return data.TokenNameSearchResults;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -392,6 +476,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("cst/names/named_only"));
       return data.NamedTokens;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -405,6 +492,9 @@ class ApiService {
       );
       return data.CosmicSignatureTransfers;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -416,6 +506,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("cst/distribution"));
       return data.CosmicSignatureTokenDistribution;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -427,6 +520,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("ct/balances"));
       return data.CosmicTokenBalances;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -440,6 +536,9 @@ class ApiService {
       );
       return data.CosmicTokenTransfers;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -453,6 +552,9 @@ class ApiService {
       );
       return data.TokenTransfers;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -464,6 +566,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl(`user/info/${address}`));
       return data;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -477,6 +582,9 @@ class ApiService {
       );
       return data.Winnings;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -488,6 +596,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl(`user/balances/${address}`));
       return data;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return 0;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -501,6 +612,9 @@ class ApiService {
       );
       return data.DirectCGDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -514,6 +628,9 @@ class ApiService {
       );
       return data.DirectCGDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -527,6 +644,9 @@ class ApiService {
       );
       return data.DirectCGDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -540,6 +660,9 @@ class ApiService {
       );
       return data.DirectCGDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -553,6 +676,9 @@ class ApiService {
       );
       return data.ETHDonation;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       return [];
     }
@@ -566,6 +692,9 @@ class ApiService {
       );
       return data.CombinedDonationRecords;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -579,6 +708,9 @@ class ApiService {
       );
       return data.CosmicGameDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -590,6 +722,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("donations/eth/both/all"));
       return data.CosmicGameDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -601,6 +736,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("donations/charity/deposits"));
       return data.CharityDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -614,6 +752,9 @@ class ApiService {
       );
       return data.CharityDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -627,6 +768,9 @@ class ApiService {
       );
       return data.CharityDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -640,6 +784,9 @@ class ApiService {
       );
       return data.CharityWithdrawals;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -653,6 +800,9 @@ class ApiService {
       );
       return data.NFTDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -666,6 +816,9 @@ class ApiService {
       );
       return data.NFTDonation;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -679,6 +832,9 @@ class ApiService {
       );
       return data.DonatedNFTClaims;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -692,6 +848,9 @@ class ApiService {
       );
       return data.DonatedNFTClaims;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -703,6 +862,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("donations/nft/statistics"));
       return data.NFTDonationStats;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -716,6 +878,9 @@ class ApiService {
       );
       return data.NFTDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -729,6 +894,9 @@ class ApiService {
       );
       return data.NFTDonations;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -742,6 +910,9 @@ class ApiService {
       );
       return data.UnclaimedDonatedNFTs;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -755,6 +926,9 @@ class ApiService {
       );
       return data.DonationsERC20;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -768,6 +942,9 @@ class ApiService {
       );
       return data.DonationsERC20ByUser;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -781,6 +958,9 @@ class ApiService {
       );
       return data.RaffleDeposits;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -794,6 +974,9 @@ class ApiService {
       );
       return data.RaffleDeposits;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -807,6 +990,9 @@ class ApiService {
       );
       return data.RaffleNFTWinners;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -820,6 +1006,9 @@ class ApiService {
       );
       return data.RaffleNFTWinners;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -833,6 +1022,9 @@ class ApiService {
       );
       return data.UserRaffleNFTWinnings;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -847,6 +1039,9 @@ class ApiService {
       return data.UnclaimedEthDeposits;
     } catch (err) {
       console.log(err);
+      if (err.response?.status === 400) {
+        return [];
+      }
       throw new Error("Network response was not OK");
     }
   }
@@ -859,6 +1054,9 @@ class ApiService {
       );
       return data.CollectedStakingCSTRewards;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -872,6 +1070,9 @@ class ApiService {
       );
       return data.StakedTokensCST;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -890,6 +1091,9 @@ class ApiService {
       );
       return data.ActionIdsWithClaimInfo;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -903,6 +1107,9 @@ class ApiService {
       );
       return data.StakingCSTActions;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -916,6 +1123,9 @@ class ApiService {
       );
       return data.StakingCSTActions;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -929,6 +1139,9 @@ class ApiService {
       );
       return data.CombinedStakingRecordInfo;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -940,6 +1153,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("staking/cst/rewards/global"));
       return data.StakingCSTRewards;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -953,6 +1169,9 @@ class ApiService {
       );
       return data.Rewards;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -967,6 +1186,9 @@ class ApiService {
       );
       return data.RewardPaidRecords;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -980,6 +1202,9 @@ class ApiService {
       );
       return data.StakedTokensCST;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -993,6 +1218,9 @@ class ApiService {
       );
       return data.RewardsByToken;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1011,6 +1239,9 @@ class ApiService {
       );
       return data.RewardsByTokenDetails;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1025,6 +1256,9 @@ class ApiService {
       );
       return data.RewardsByDeposit;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1038,6 +1272,9 @@ class ApiService {
       );
       return data.CombinedRWalkStakingRecordInfo;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return null;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1051,6 +1288,9 @@ class ApiService {
       );
       return data.GlobalStakingActionsRWalk;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1064,6 +1304,9 @@ class ApiService {
       );
       return data.UserStakingActionsRWalk;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1077,6 +1320,9 @@ class ApiService {
       );
       return data.StakingRWalkRewardsMints;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1090,6 +1336,9 @@ class ApiService {
       );
       return data.RWalkStakingRewardMints;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1103,6 +1352,9 @@ class ApiService {
       );
       return data.StakedTokensRWalk;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1116,6 +1368,9 @@ class ApiService {
       );
       return data.StakedTokensRWalk;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1129,6 +1384,9 @@ class ApiService {
       );
       return data.MarketingRewards;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1142,6 +1400,9 @@ class ApiService {
       );
       return data.UserMarketingRewards;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1153,6 +1414,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("time/current"));
       return data.CurrentTimeStamp;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return 0;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1164,6 +1428,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("time/until_prize"));
       return data.TimeUntilPrize;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return 0;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1175,6 +1442,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl("system/modelist/0/1000000"));
       return data.SystemModeChanges;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1188,6 +1458,9 @@ class ApiService {
       );
       return data.AdminEvents;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return [];
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }
@@ -1198,6 +1471,9 @@ class ApiService {
       const { data } = await axios.get(getAPIUrl(`bid/eth_price`));
       return data;
     } catch (err) {
+      if (err.response?.status === 400) {
+        return 0;
+      }
       console.log(err);
       throw new Error("Network response was not OK");
     }

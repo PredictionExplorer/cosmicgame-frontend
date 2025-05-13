@@ -46,7 +46,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     response.data.pipe(res);
   } catch (error: any) {
     console.error('Proxy request failed:', error.message);
-
     res.status(error.response?.status || 500).json({
       message: 'Proxy request failed',
       status: error.response?.status || 500,
