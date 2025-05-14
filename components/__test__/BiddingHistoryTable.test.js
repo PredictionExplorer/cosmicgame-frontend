@@ -25,7 +25,7 @@ test("BiddingHistoryTable with mock data", () => {
       RWalkNFTId: -1,
       RoundNum: 4,
       ERC20_Amount: "100000000000000000000",
-      ERC20_AmountEth: 100,
+      ERC20RewardAmountEth: 100,
       NFTDonationTokenId: -1,
       NFTDonationTokenAddr: "",
       NFTTokenURI: "",

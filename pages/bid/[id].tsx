@@ -132,6 +132,14 @@ const BidInfo = ({ bidId }: { bidId: number }) => {
             </Typography>
           </Box>
 
+          <Box mb={1} display="flex" flexWrap="wrap">
+            <Typography color="primary">CST Reward Amount:</Typography>
+            &nbsp;
+            <Typography>
+              {bidInfo.ERC20RewardAmountEth.toFixed(2)} ETH
+            </Typography>
+          </Box>
+
           {/* Indicates whether the bid used a RandomWalkNFT */}
           <Box mb={1} display="flex" flexWrap="wrap">
             <Typography color="primary">Was bid with RandomWalkNFT:</Typography>
@@ -153,6 +161,27 @@ const BidInfo = ({ bidId }: { bidId: number }) => {
               &nbsp;
               <Typography>{bidInfo.RWalkNFTId}</Typography>
             </Box>
+          )}
+
+          {bidInfo.DonatedERC20TokenAddr && (
+            <>
+              <Box mb={1} display="flex" flexWrap="wrap">
+                <Typography color="primary">
+                  Donated ERC20 Token Address:
+                </Typography>
+                &nbsp;
+                <Typography>{bidInfo.DonatedERC20TokenAddr}</Typography>
+              </Box>
+              <Box mb={1} display="flex" flexWrap="wrap">
+                <Typography color="primary">
+                  Donated ERC20 Token Amount:
+                </Typography>
+                &nbsp;
+                <Typography>
+                  {bidInfo.DonatedERC20TokenAmountEth.toFixed(2)}
+                </Typography>
+              </Box>
+            </>
           )}
 
           {/* 
