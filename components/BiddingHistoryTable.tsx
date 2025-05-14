@@ -1,21 +1,5 @@
-// BiddingHistoryTable.tsx
-// This file contains two main components:
-// 1. BiddingHistoryTable: Manages pagination and displays the HistoryTable.
-// 2. HistoryTable: Renders the bidding history details.
-// Additionally, it includes a HistoryRow component for each table row.
-//
-// Usage:
-// <BiddingHistoryTable biddingHistory={data} showRound={true} />
-//
-// Dependencies:
-// - Material UI for styling.
-// - React Super Responsive Table for responsive table layout.
-// - CustomPagination for pagination controls.
-// - Utility functions (shortenHex, convertTimestampToDateTime, etc.).
-// - API service to fetch banned bids.
-
 import React, { useEffect, useState } from "react";
-import { Box, TableBody, Typography, Tooltip } from "@mui/material";
+import { Box, TableBody, Typography, Tooltip, Link } from "@mui/material";
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -36,6 +20,9 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
 import api from "../services/api";
 import { isMobile } from "react-device-detect";
+import { Contract } from "ethers";
+import ERC20_ABI from "../contracts/CosmicToken.json";
+import { useActiveWeb3React } from "../hooks/web3";
 
 //------------------------------------------------------------------------------
 // Types & Interfaces
@@ -51,6 +38,8 @@ interface BidHistory {
   RWalkNFTId?: number;
   NFTDonationTokenAddr?: string;
   NFTDonationTokenId?: number;
+  DonatedERC20TokenAddr?: string;
+  DonatedERC20TokenAmountEth?: number;
   Message?: string;
 }
 
@@ -105,10 +94,28 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
   showRound,
   bidDuration,
 }) => {
+  const { library, account } = useActiveWeb3React();
+  const [symbol, setSymbol] = useState("");
   // If the history object is undefined or null, render an empty row.
   if (!history) {
     return <TablePrimaryRow />;
   }
+
+  useEffect(() => {
+    const getSymbol = async () => {
+      const tokenDonateContract = new Contract(
+        history.DonatedERC20TokenAddr,
+        ERC20_ABI,
+        library.getSigner(account)
+      );
+      const symbol = await tokenDonateContract.symbol();
+      setSymbol(symbol);
+    };
+
+    if (!!history.DonatedERC20TokenAddr) {
+      getSymbol();
+    }
+  }, []);
 
   /**
    * Redirect the user to a page with more details about the specific bid.
@@ -197,14 +204,29 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
           )}
 
           {/* If there was a donated token involved */}
-          {!!history.NFTDonationTokenAddr && (
+          {(!!history.NFTDonationTokenAddr ||
+            !!history.DonatedERC20TokenAddr) && (
             <>
               {history.BidType === 2 && "Bid was made using Cosmic Tokens"}
               {history.BidType === 0 && "Bid was made using ETH"}
-              {` and a token (${shortenHex(
-                history.NFTDonationTokenAddr,
-                6
-              )}) with ID ${history.NFTDonationTokenId} was donated`}
+              {!!history.NFTDonationTokenAddr &&
+                ` and a token (${shortenHex(
+                  history.NFTDonationTokenAddr,
+                  6
+                )}) with ID ${history.NFTDonationTokenId} was donated`}
+              {!!history.DonatedERC20TokenAddr && (
+                <>
+                  {` and ${history.DonatedERC20TokenAmountEth.toFixed(4)}`}
+                  <Link
+                    href={`https://etherscan.io/token/${history.DonatedERC20TokenAddr}`}
+                    target="_blank"
+                    color="inherit"
+                  >
+                    {symbol}
+                  </Link>
+                  {" was donated"}
+                </>
+              )}
             </>
           )}
         </Typography>

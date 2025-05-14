@@ -100,6 +100,7 @@ const theme = createTheme({
           fontFamily: "ClashDisplay-Variable",
           fontSize: 18,
           fontWeight: 500,
+          letterSpacing: "1px",
           [breakpoints.up('md')]: {
             fontSize: 20,
           },
