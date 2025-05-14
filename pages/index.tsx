@@ -1286,14 +1286,35 @@ const NewHome = () => {
                             />
                           )}
                         </RadioGroup>
-                        {bidType === "ETH" && (
-                          <Box ml={2}>
-                            {ethBidInfo?.SecondsElapsed >
-                            ethBidInfo?.AuctionDuration ? (
-                              <Typography variant="subtitle1">
-                                Auction ended.
-                              </Typography>
-                            ) : (
+                        {bidType === "ETH" &&
+                          data?.LastBidderAddr === constants.AddressZero && (
+                            <Box ml={2}>
+                              {ethBidInfo?.SecondsElapsed >
+                              ethBidInfo?.AuctionDuration ? (
+                                <Typography variant="subtitle1">
+                                  Auction ended.
+                                </Typography>
+                              ) : (
+                                <Grid
+                                  container
+                                  spacing={2}
+                                  mb={2}
+                                  alignItems="center"
+                                >
+                                  <Grid item sm={12} md={5}>
+                                    <Typography variant="subtitle1">
+                                      Elapsed Time:
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item sm={12} md={7}>
+                                    <Typography>
+                                      {formatSeconds(
+                                        ethBidInfo?.SecondsElapsed
+                                      )}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              )}
                               <Grid
                                 container
                                 spacing={2}
@@ -1302,35 +1323,17 @@ const NewHome = () => {
                               >
                                 <Grid item sm={12} md={5}>
                                   <Typography variant="subtitle1">
-                                    Elapsed Time:
+                                    Auction Duration:
                                   </Typography>
                                 </Grid>
                                 <Grid item sm={12} md={7}>
                                   <Typography>
-                                    {formatSeconds(ethBidInfo?.SecondsElapsed)}
+                                    {formatSeconds(ethBidInfo?.AuctionDuration)}
                                   </Typography>
                                 </Grid>
                               </Grid>
-                            )}
-                            <Grid
-                              container
-                              spacing={2}
-                              mb={2}
-                              alignItems="center"
-                            >
-                              <Grid item sm={12} md={5}>
-                                <Typography variant="subtitle1">
-                                  Auction Duration:
-                                </Typography>
-                              </Grid>
-                              <Grid item sm={12} md={7}>
-                                <Typography>
-                                  {formatSeconds(ethBidInfo?.AuctionDuration)}
-                                </Typography>
-                              </Grid>
-                            </Grid>
-                          </Box>
-                        )}
+                            </Box>
+                          )}
                         {bidType === "RandomWalk" && (
                           <Box mb={4} mx={2}>
                             <Typography variant="h6">
