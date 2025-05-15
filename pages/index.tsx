@@ -84,6 +84,7 @@ import ETHSpentTable from "../components/ETHSpentTable";
 import EnduranceChampionsTable from "../components/EnduranceChampionsTable";
 import EthDonationTable from "../components/EthDonationTable";
 import axios from "axios";
+import { parseUnits } from "ethers/lib/utils";
 
 const NewHome = () => {
   const router = useRouter();
@@ -436,8 +437,21 @@ const NewHome = () => {
         }
         // Check wallet balance
         const walletBalance = await tokenDonateContract.balanceOf(account);
-        const tokenAmountNum = Number(tokenAmount);
-        if (walletBalance.lt(tokenAmountNum)) {
+        let decimals = 18;
+        try {
+          decimals = await tokenDonateContract.decimals();
+        } catch (err) {
+          console.warn("decimals() not found, assuming 18.");
+          setNotification({
+            visible: true,
+            type: "warning",
+            text:
+              "The token with this address doesn't implement decimals() function, we assume 18 decimal places for the amount entered.",
+          });
+        }
+        const tokenAmountInWei = parseUnits(tokenAmount, decimals);
+
+        if (walletBalance.lt(tokenAmountInWei)) {
           setNotification({
             visible: true,
             type: "error",
@@ -452,9 +466,9 @@ const NewHome = () => {
             account,
             COSMICGAME_ADDRESS
           );
-          if (allowance.lt(tokenAmountNum)) {
+          if (allowance.lt(tokenAmountInWei)) {
             await tokenDonateContract
-              .approve(COSMICGAME_ADDRESS, tokenAmountNum)
+              .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
@@ -462,7 +476,7 @@ const NewHome = () => {
               rwlkId,
               message,
               tokenDonateAddress,
-              tokenAmountNum,
+              tokenAmountInWei,
               {
                 value: newBidPrice,
                 gasLimit: 30000000,
@@ -656,8 +670,20 @@ const NewHome = () => {
         }
         // Check wallet balance
         const walletBalance = await tokenDonateContract.balanceOf(account);
-        const tokenAmountNum = Number(tokenAmount);
-        if (walletBalance.lt(tokenAmountNum)) {
+        let decimals = 18;
+        try {
+          decimals = await tokenDonateContract.decimals();
+        } catch (err) {
+          console.warn("decimals() not found, assuming 18.");
+          setNotification({
+            visible: true,
+            type: "warning",
+            text:
+              "The token with this address doesn't implement decimals() function, we assume 18 decimal places for the amount entered.",
+          });
+        }
+        const tokenAmountInWei = parseUnits(tokenAmount, decimals);
+        if (walletBalance.lt(tokenAmountInWei)) {
           setNotification({
             visible: true,
             type: "error",
@@ -672,9 +698,9 @@ const NewHome = () => {
             account,
             COSMICGAME_ADDRESS
           );
-          if (allowance.lt(tokenAmountNum)) {
+          if (allowance.lt(tokenAmountInWei)) {
             await tokenDonateContract
-              .approve(COSMICGAME_ADDRESS, tokenAmountNum)
+              .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
@@ -682,7 +708,7 @@ const NewHome = () => {
               priceMaxLimit,
               message,
               tokenDonateAddress,
-              tokenAmountNum
+              tokenAmountInWei
             )
             .then((tx: any) => tx.wait());
           setTimeout(() => {
