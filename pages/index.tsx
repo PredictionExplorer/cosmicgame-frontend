@@ -1140,65 +1140,55 @@ const NewHome = () => {
                     </Typography>
                   </>
                 )}
-                <Grid container spacing={2} mb={2} alignItems="center">
-                  <Grid item xs={12} sm={3} md={4}>
-                    <Typography variant="subtitle1">Bid Price</Typography>
-                  </Grid>
-                  <Grid item xs={8} sm={5} md={8}>
-                    {data?.LastBidderAddr !== constants.AddressZero ? (
-                      <>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            mb: 1,
-                          }}
-                        >
-                          <Typography>Using Ether</Typography>
+                {data?.LastBidderAddr !== constants.AddressZero && (
+                  <Grid container spacing={2} mb={2} alignItems="center">
+                    <Grid item xs={12} sm={3} md={4}>
+                      <Typography variant="subtitle1">Bid Price</Typography>
+                    </Grid>
+                    <Grid item xs={8} sm={5} md={8}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          mb: 1,
+                        }}
+                      >
+                        <Typography>Using Ether</Typography>
+                        <Typography>
+                          {ethBidInfo.ETHPrice.toFixed(5)} ETH
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          mb: 1,
+                        }}
+                      >
+                        <Typography>Using RandomWalk</Typography>
+                        <Typography>
+                          {(ethBidInfo.ETHPrice / 2).toFixed(5)} ETH
+                        </Typography>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          mb: 1,
+                        }}
+                      >
+                        <Typography>Using CST</Typography>
+                        {cstBidData?.CSTPrice > 0 ? (
                           <Typography>
-                            {ethBidInfo.ETHPrice.toFixed(4)} ETH
+                            {cstBidData?.CSTPrice.toFixed(5)} CST
                           </Typography>
-                        </Box>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            mb: 1,
-                          }}
-                        >
-                          <Typography>Using RandomWalk</Typography>
-                          <Typography>
-                            {(ethBidInfo.ETHPrice / 2).toFixed(4)} ETH
-                          </Typography>
-                        </Box>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            mb: 1,
-                          }}
-                        >
-                          <Typography>Using CST</Typography>
-                          {cstBidData?.CSTPrice > 0 ? (
-                            <Typography>
-                              {cstBidData?.CSTPrice.toFixed(4)} CST
-                            </Typography>
-                          ) : (
-                            <Typography color="#ff0">FREE</Typography>
-                          )}
-                        </Box>
-                      </>
-                    ) : (
-                      <>
-                        <Grid item xs={12} sm={8} md={8}>
-                          <GradientText variant="h6" sx={{ display: "inline" }}>
-                            {ethBidInfo?.ETHPrice.toFixed(4)} ETH
-                          </GradientText>
-                        </Grid>
-                      </>
-                    )}
+                        ) : (
+                          <Typography color="#ff0">FREE</Typography>
+                        )}
+                      </Box>
+                    </Grid>
                   </Grid>
-                </Grid>
+                )}
                 {activationTime < Date.now() / 1000 && (
                   <>
                     <Grid container spacing={2} mb={2} alignItems="center">
@@ -1591,9 +1581,11 @@ const NewHome = () => {
             )}
           </Grid>
           <Grid item sm={12} md={6}>
-            <Link href={`/prize/${data?.CurRoundNum - 1}`} color="inherit">
-              Round {data?.CurRoundNum - 1} ended, check results here
-            </Link>
+            {data?.CurRoundNum > 1 && (
+              <Link href={`/prize/${data?.CurRoundNum - 1}`} color="inherit">
+                Round {data?.CurRoundNum - 1} ended, check results here
+              </Link>
+            )}
             {matches && (
               <StyledCard sx={{ mt: 1 }}>
                 <CardActionArea>
