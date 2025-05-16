@@ -160,17 +160,23 @@ function CSTRow({ nft }: { nft: CSTToken }) {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="right">
-        {nft.RecordType === 3 ? (
+        {nft.RecordType === 1 ? (
+          "Raffle NFT Token"
+        ) : nft.RecordType === 2 ? (
+          "Staking RandomWalk NFT"
+        ) : nft.RecordType === 3 ? (
           <Link
             href={`/prize/${nft.RoundNum}`}
             style={{ color: "inherit", fontSize: "inherit" }}
           >
-            Prize Winner (#{nft.RoundNum})
+            Main Prize Winner (#{nft.RoundNum})
           </Link>
         ) : nft.RecordType === 4 ? (
-          "Random Walk Staking Raffle Token"
+          "Endurance Champion"
+        ) : nft.RecordType === 5 ? (
+          "Last CST Bidder"
         ) : (
-          "Raffle Winner"
+          ""
         )}
       </TablePrimaryCell>
     </TablePrimaryRow>
