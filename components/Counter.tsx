@@ -33,12 +33,20 @@ const Counter: React.FC<CounterProps> = ({ days, hours, minutes, seconds }) => {
   const padZero = (value: number): string => value.toString().padStart(2, "0");
 
   // Define time units for consistent rendering
-  const timeUnits: TimeUnit[] = [
+  let timeUnits: TimeUnit[] = [
     { value: days, label: "DAYS" },
     { value: hours, label: "HOURS" },
     { value: minutes, label: "MIN" },
     { value: seconds, label: "SEC" },
   ];
+
+  // Apply visibility rules
+  if (days === 0) {
+    timeUnits = timeUnits.filter((unit) => unit.label !== "DAYS");
+  }
+  if (days === 0 && hours === 0) {
+    timeUnits = timeUnits.filter((unit) => unit.label !== "HOURS");
+  }
 
   return (
     <CounterWrapper>
