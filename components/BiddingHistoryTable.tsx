@@ -96,10 +96,6 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
 }) => {
   const { library, account } = useActiveWeb3React();
   const [symbol, setSymbol] = useState("");
-  // If the history object is undefined or null, render an empty row.
-  if (!history) {
-    return <TablePrimaryRow />;
-  }
 
   useEffect(() => {
     const getSymbol = async () => {
@@ -141,6 +137,11 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
             ? (history.BidPriceEth || 0).toFixed(7)
             : (history.BidPriceEth || 0).toFixed(4)
         } ETH`;
+
+  // If the history object is undefined or null, render an empty row.
+  if (!history) {
+    return <TablePrimaryRow />;
+  }
 
   return (
     <TablePrimaryRow
