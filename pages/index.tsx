@@ -36,7 +36,11 @@ import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { BigNumber, Contract, constants, ethers } from "ethers";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 import { useActiveWeb3React } from "../hooks/web3";
-import { ART_BLOCKS_ADDRESS, COSMICGAME_ADDRESS } from "../config/app";
+import {
+  ART_BLOCKS_ADDRESS,
+  COSMICGAME_ADDRESS,
+  RAFFLE_WALLET_ADDRESS,
+} from "../config/app";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ArrowForward } from "@mui/icons-material";
 import NFT_ABI from "../contracts/RandomWalkNFT.json";
@@ -85,6 +89,7 @@ import EnduranceChampionsTable from "../components/EnduranceChampionsTable";
 import EthDonationTable from "../components/EthDonationTable";
 import axios from "axios";
 import { parseUnits } from "ethers/lib/utils";
+import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 
 const NewHome = () => {
   const router = useRouter();
@@ -132,6 +137,7 @@ const NewHome = () => {
   const cosmicGameContract = useCosmicGameContract();
   const nftRWLKContract = useRWLKNFTContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
+  const raffleWalletContract = useRaffleWalletContract();
   const { setNotification } = useNotification();
 
   const theme = useTheme();
@@ -462,13 +468,22 @@ const NewHome = () => {
         }
         // Approve token transfer
         try {
-          const allowance = await tokenDonateContract.allowance(
+          let allowance = await tokenDonateContract.allowance(
             account,
             COSMICGAME_ADDRESS
           );
           if (allowance.lt(tokenAmountInWei)) {
             await tokenDonateContract
               .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
+              .then((tx: any) => tx.wait());
+          }
+          allowance = await tokenDonateContract.allowance(
+            account,
+            RAFFLE_WALLET_ADDRESS
+          );
+          if (allowance.lt(tokenAmountInWei)) {
+            await tokenDonateContract
+              .approve(RAFFLE_WALLET_ADDRESS, tokenAmountInWei)
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
@@ -694,13 +709,22 @@ const NewHome = () => {
         }
         // Approve token transfer
         try {
-          const allowance = await tokenDonateContract.allowance(
+          let allowance = await tokenDonateContract.allowance(
             account,
             COSMICGAME_ADDRESS
           );
           if (allowance.lt(tokenAmountInWei)) {
             await tokenDonateContract
               .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
+              .then((tx: any) => tx.wait());
+          }
+          allowance = await tokenDonateContract.allowance(
+            account,
+            RAFFLE_WALLET_ADDRESS
+          );
+          if (allowance.lt(tokenAmountInWei)) {
+            await tokenDonateContract
+              .approve(RAFFLE_WALLET_ADDRESS, tokenAmountInWei)
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
