@@ -206,7 +206,7 @@ export const CenterBox = styled(Box)(({ theme }) => ({
 
 export const CounterWrapper = styled(Box)({
   display: 'flex',
-  // justifyContent: "center",
+  justifyContent: "right",
   alignItems: 'center',
 })
 
