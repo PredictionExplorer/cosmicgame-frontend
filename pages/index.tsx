@@ -89,7 +89,6 @@ import EnduranceChampionsTable from "../components/EnduranceChampionsTable";
 import EthDonationTable from "../components/EthDonationTable";
 import axios from "axios";
 import { parseUnits } from "ethers/lib/utils";
-import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 
 const NewHome = () => {
   const router = useRouter();
@@ -137,7 +136,6 @@ const NewHome = () => {
   const cosmicGameContract = useCosmicGameContract();
   const nftRWLKContract = useRWLKNFTContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
-  const raffleWalletContract = useRaffleWalletContract();
   const { setNotification } = useNotification();
 
   const theme = useTheme();
