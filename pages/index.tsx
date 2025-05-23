@@ -103,7 +103,6 @@ const NewHome = () => {
   });
   const [curBidList, setCurBidList] = useState([]);
   const [specialWinners, setSpecialWinners] = useState<any>(null);
-  console.log(specialWinners);
   const [winProbability, setWinProbability] = useState<any>(null);
   const [ethBidInfo, setEthBidInfo] = useState<any>(null);
   const [donatedNFTs, setDonatedNFTs] = useState([]);
@@ -1549,71 +1548,73 @@ const NewHome = () => {
                                 />
                               </>
                             )}
-                            <Box
-                              sx={{
-                                border: "1px solid #444",
-                                borderRadius: 1,
-                                p: 2,
-                                mt: 2,
-                              }}
-                            >
-                              <Typography variant="subtitle2">
-                                Bid price collision prevention
-                              </Typography>
+                            {bidType !== "CST" && (
                               <Box
                                 sx={{
-                                  display: "flex",
-                                  marginTop: 2,
-                                  alignItems: "center",
+                                  border: "1px solid #444",
+                                  borderRadius: 1,
+                                  p: 2,
+                                  mt: 2,
                                 }}
                               >
-                                <Typography
-                                  whiteSpace="nowrap"
-                                  color="rgba(255, 255, 255, 0.68)"
-                                  mr={2}
-                                >
-                                  Rise bid price by
+                                <Typography variant="subtitle2">
+                                  Bid price collision prevention
                                 </Typography>
-                                <CustomTextField
-                                  type="number"
-                                  placeholder="Bid Price Plus"
-                                  value={bidPricePlus}
-                                  size="small"
-                                  fullWidth
-                                  InputProps={{
-                                    inputComponent: StyledInput,
-                                    endAdornment: (
-                                      <InputAdornment position="end">
-                                        %
-                                      </InputAdornment>
-                                    ),
-                                    inputProps: { min: 0, max: 50 },
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    marginTop: 2,
+                                    alignItems: "center",
                                   }}
-                                  onChange={(e) => {
-                                    let value = Number(e.target.value);
-                                    if (value <= 50) {
-                                      setBidPricePlus(value);
-                                    }
-                                  }}
-                                />
-                                <Typography
-                                  whiteSpace="nowrap"
-                                  color="rgba(255, 255, 255, 0.68)"
-                                  ml={2}
                                 >
-                                  {(
-                                    ethBidInfo.ETHPrice *
-                                    (1 + bidPricePlus / 100) *
-                                    (bidType === "RandomWalk" ? 0.5 : 1)
-                                  ).toFixed(6)}{" "}
-                                  ETH
+                                  <Typography
+                                    whiteSpace="nowrap"
+                                    color="rgba(255, 255, 255, 0.68)"
+                                    mr={2}
+                                  >
+                                    Rise bid price by
+                                  </Typography>
+                                  <CustomTextField
+                                    type="number"
+                                    placeholder="Bid Price Plus"
+                                    value={bidPricePlus}
+                                    size="small"
+                                    fullWidth
+                                    InputProps={{
+                                      inputComponent: StyledInput,
+                                      endAdornment: (
+                                        <InputAdornment position="end">
+                                          %
+                                        </InputAdornment>
+                                      ),
+                                      inputProps: { min: 0, max: 50 },
+                                    }}
+                                    onChange={(e) => {
+                                      let value = Number(e.target.value);
+                                      if (value <= 50) {
+                                        setBidPricePlus(value);
+                                      }
+                                    }}
+                                  />
+                                  <Typography
+                                    whiteSpace="nowrap"
+                                    color="rgba(255, 255, 255, 0.68)"
+                                    ml={2}
+                                  >
+                                    {(
+                                      ethBidInfo.ETHPrice *
+                                      (1 + bidPricePlus / 100) *
+                                      (bidType === "RandomWalk" ? 0.5 : 1)
+                                    ).toFixed(6)}{" "}
+                                    ETH
+                                  </Typography>
+                                </Box>
+                                <Typography variant="body2" mt={2}>
+                                  The bid price is bumped {bidPricePlus}% to
+                                  prevent bidding collision.
                                 </Typography>
                               </Box>
-                              <Typography variant="body2" mt={2}>
-                                The bid price is bumped {bidPricePlus}% to
-                                prevent bidding collision.
-                              </Typography>
-                            </Box>
+                            )}
                           </AccordionDetails>
                         </Accordion>
                       </>
@@ -1707,26 +1708,6 @@ const NewHome = () => {
                       </Typography>
                     </Grid>
                   )}
-                </Grid>
-                <Grid container spacing={2} mb={2} alignItems="center">
-                  <Grid item xs={12} sm={4} md={4}>
-                    <Typography>Last Bidder</Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={8} md={8}>
-                    <Typography>
-                      <Link
-                        href={`/user/${specialWinners?.LastBidderAddress}`}
-                        color="rgb(255, 255, 255)"
-                        fontSize="inherit"
-                        sx={{ wordBreak: "break-all" }}
-                      >
-                        {specialWinners?.LastBidderAddress}
-                      </Link>
-                      {` (Bidded ${convertTimestampToDateTime(
-                        specialWinners?.LastBidderLastBidTime
-                      )})`}
-                    </Typography>
-                  </Grid>
                 </Grid>
                 <Grid container spacing={2} mb={2} alignItems="center">
                   <Grid item xs={12} sm={4} md={4}>
