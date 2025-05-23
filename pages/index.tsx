@@ -94,7 +94,6 @@ const NewHome = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
-  console.log(data);
   const [bidType, setBidType] = useState("ETH");
   const [donationType, setDonationType] = useState("NFT");
   const [cstBidData, setCSTBidData] = useState({

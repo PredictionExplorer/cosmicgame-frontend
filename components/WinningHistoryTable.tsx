@@ -31,8 +31,8 @@ import { convertTimestampToDateTime, shortenHex } from "../utils";
 
 // Map record types to their corresponding icons and descriptive texts
 const RECORD_TYPE_MAP = {
-  0: { icon: <ConfirmationNumberIcon />, text: "ETH Deposit" },
-  1: { icon: <TokenIcon />, text: "Cosmic Signature Token" },
+  0: { icon: <ConfirmationNumberIcon />, text: "Raffle ETH Deposit" },
+  1: { icon: <TokenIcon />, text: "Cosmic Signature NFT Token" },
   2: { icon: <VolunteerActivismIcon />, text: "Donated NFT" },
   3: { icon: <EmojiEventsIcon />, text: "Main Prize" },
   4: {
@@ -40,9 +40,16 @@ const RECORD_TYPE_MAP = {
     text: "Cosmic Signature Staking ETH Deposit",
   },
   5: { icon: <LayersIcon />, text: "Random Walk Staking Raffle Token" },
-  6: { icon: <LayersIcon />, text: "Cosmic Signature Staking Raffle Token" },
-  7: { icon: <EmojiEventsIcon />, text: "Endurance Champion NFT Winner" },
-  8: { icon: <EmojiEventsIcon />, text: "Endurance Champion ERC20 winner" },
+  6: {
+    icon: <LayersIcon />,
+    text: "Cosmic Signature Token Staking Raffle Token",
+  },
+  7: { icon: <EmojiEventsIcon />, text: "Endurance Champion NFT Prize" },
+  8: { icon: <EmojiEventsIcon />, text: "Last CST Bidder NFT Prize" },
+  9: { icon: <EmojiEventsIcon />, text: "Endurance Champion ERC20 Prize" },
+  10: { icon: <EmojiEventsIcon />, text: "Last CST Bidder ERC20 Prize" },
+  11: { icon: <EmojiEventsIcon />, text: "Donated ERC20 Token" },
+  12: { icon: <ConfirmationNumberIcon />, text: "Chrono Warrior Prize" },
 };
 
 // Row component representing each winning history entry
