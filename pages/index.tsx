@@ -204,7 +204,6 @@ const NewHome = () => {
         await fetchActivationTime();
       }, 3000);
     } catch (err) {
-      console.log(err);
       if (err?.data?.message) {
         const msg = getErrorMessage(err?.data?.message);
         setNotification({
@@ -212,6 +211,13 @@ const NewHome = () => {
           type: "error",
           text: msg,
         });
+      }
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        // Handle other errors
       }
     }
   };
@@ -525,7 +531,13 @@ const NewHome = () => {
           text: msg,
         });
       }
-      console.log(err);
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        // Handle other errors
+      }
       setIsBidding(false);
     }
   };
@@ -762,7 +774,13 @@ const NewHome = () => {
           text: msg,
         });
       }
-      console.log(err);
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        // Handle other errors
+      }
       setIsBidding(false);
     }
   };

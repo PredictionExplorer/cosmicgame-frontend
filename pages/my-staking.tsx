@@ -245,7 +245,13 @@ const MyStaking = () => {
         const msg = getErrorMessage(err.data.message);
         setNotification({ text: msg, type: "error", visible: true });
       }
-      console.error(err);
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        // Handle other errors
+      }
     },
     [setNotification]
   );

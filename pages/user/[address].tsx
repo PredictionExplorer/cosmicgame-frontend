@@ -306,11 +306,16 @@ const UserInfo = ({ address }: { address: string }) => {
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      console.error(err);
-      // If there's an error message from the blockchain, display it
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({ text: msg, type: "error", visible: true });
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        // If there's an error message from the blockchain, display it
+        if (err?.data?.message) {
+          const msg = getErrorMessage(err?.data?.message);
+          setNotification({ text: msg, type: "error", visible: true });
+        }
       }
       setIsClaiming(false);
     } finally {

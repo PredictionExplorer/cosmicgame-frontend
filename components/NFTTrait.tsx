@@ -162,13 +162,14 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
       await Promise.all([fetchCSTInfo(), fetchTransferHistory()]);
       setAddress("");
     } catch (err) {
-      console.error(err);
-      if (err.code !== 4001) {
+      if (err?.code !== 4001) {
         setNotification({
           text: "Please input a valid address for the token receiver!",
           type: "error",
           visible: true,
         });
+      } else {
+        console.log("User denied transaction signature.");
       }
     }
   };
@@ -192,14 +193,21 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
         visible: true,
       });
     } catch (err) {
-      console.error(err);
-      const msg =
-        err?.data?.message || "An error occurred while setting the token name.";
-      setNotification({
-        visible: true,
-        type: "error",
-        text: msg,
-      });
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        // Handle other errors
+        const msg =
+          err?.data?.message ||
+          "An error occurred while setting the token name.";
+        setNotification({
+          visible: true,
+          type: "error",
+          text: msg,
+        });
+      }
     }
   };
 
@@ -222,15 +230,21 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
         visible: true,
       });
     } catch (err) {
-      console.error(err);
-      const msg =
-        err?.data?.message ||
-        "An error occurred while clearing the token name.";
-      setNotification({
-        visible: true,
-        type: "error",
-        text: msg,
-      });
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        // Handle other errors
+        const msg =
+          err?.data?.message ||
+          "An error occurred while clearing the token name.";
+        setNotification({
+          visible: true,
+          type: "error",
+          text: msg,
+        });
+      }
     }
   };
 

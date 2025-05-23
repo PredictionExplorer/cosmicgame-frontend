@@ -256,14 +256,12 @@ const StakingRewardsSection: React.FC<StakingRewardsSectionProps> = ({
   Renders the "Donated NFTs" portion, including "Claim All" button
 ------------------------------------------------------------------ */
 interface DonatedNFTsSectionProps {
-  roundNum: number;
   nftDonations: any[];
   donatedNFTToClaim: any[];
   handleAllDonatedNFTsClaim: () => Promise<void>;
   isClaiming: boolean;
 }
 const DonatedNFTsSection: React.FC<DonatedNFTsSectionProps> = ({
-  roundNum,
   nftDonations,
   donatedNFTToClaim,
   handleAllDonatedNFTsClaim,
@@ -345,11 +343,16 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
       await prizeWalletContract.claimManyDonatedNfts(indexList);
       await fetchUnclaimedDonatedNFTs();
     } catch (err) {
-      const errorMsg = getErrorMessage(
-        err?.data?.message || err.message || "An error occurred"
-      );
-      setNotification({ text: errorMsg, type: "error", visible: true });
-      console.error("Error claiming donated NFTs:", err);
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        const errorMsg = getErrorMessage(
+          err?.data?.message || err.message || "An error occurred"
+        );
+        setNotification({ text: errorMsg, type: "error", visible: true });
+        console.error("Error claiming donated NFTs:", err);
+      }
     } finally {
       setIsClaiming(false);
     }
@@ -454,7 +457,6 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
 
           {/* Donated NFTs */}
           <DonatedNFTsSection
-            roundNum={roundNum}
             nftDonations={nftDonations}
             donatedNFTToClaim={donatedNFTToClaim}
             handleAllDonatedNFTsClaim={handleAllDonatedNFTsClaim}

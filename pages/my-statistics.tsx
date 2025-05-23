@@ -754,11 +754,16 @@ const MyStatistics = () => {
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      console.error(err);
-      const msg = err?.data?.message
-        ? getErrorMessage(err.data.message)
-        : "An error occurred";
-      setNotification({ text: msg, type: "error", visible: true });
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        const msg = err?.data?.message
+          ? getErrorMessage(err.data.message)
+          : "An error occurred while claiming donated NFTs!";
+        setNotification({ text: msg, type: "error", visible: true });
+      }
       setIsClaiming(false);
     }
   };

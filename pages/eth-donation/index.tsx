@@ -48,12 +48,17 @@ const EthDonations = () => {
       // Refresh donations after 1 second
       setTimeout(fetchCharityDonations, 1000);
     } catch (error) {
-      console.error("Donation error:", error);
-      setNotification({
-        text: "Donation failed, please try again.",
-        type: "error",
-        visible: true,
-      });
+      if (error?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error("Donation error:", error);
+        setNotification({
+          text: "Donation failed, please try again.",
+          type: "error",
+          visible: true,
+        });
+      }
     }
   };
 
@@ -76,12 +81,17 @@ const EthDonations = () => {
       // Refresh donations after 1 second
       setTimeout(fetchCharityDonations, 1000);
     } catch (error) {
-      console.error("Donation with info error:", error);
-      setNotification({
-        text: "Donation with information failed, please check your input.",
-        type: "error",
-        visible: true,
-      });
+      if (error?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error("Donation with info error:", error);
+        setNotification({
+          text: "Donation with information failed, please check your input.",
+          type: "error",
+          visible: true,
+        });
+      }
     }
   };
 

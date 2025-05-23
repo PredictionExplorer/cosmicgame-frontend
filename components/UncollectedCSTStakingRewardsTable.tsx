@@ -27,6 +27,7 @@ import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
 import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
 import { useNotification } from "../contexts/NotificationContext";
+import getErrorMessage from "../utils/alert";
 
 /* ------------------------------------------------------------------
   Sub-Component: UncollectedRewardsRow
@@ -159,7 +160,20 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
         fetchUncollectedCstStakingRewards();
       }, 4000);
     } catch (err) {
-      console.log(err);
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        if (err?.data?.message) {
+          const msg = getErrorMessage(err?.data?.message);
+          setNotification({
+            visible: true,
+            type: "error",
+            text: msg,
+          });
+        }
+      }
       setIsUnstaking(false);
     }
   };

@@ -177,10 +177,15 @@ const UserRaffleETH = ({ address }: { address: string }) => {
         setIsClaiming(false);
       }, 2000);
     } catch (err) {
-      console.error(err);
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err.data.message);
-        setNotification({ text: msg, type: "error", visible: true });
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
+      } else {
+        console.error(err);
+        if (err?.data?.message) {
+          const msg = getErrorMessage(err.data.message);
+          setNotification({ text: msg, type: "error", visible: true });
+        }
       }
       setIsClaiming(false);
     }
