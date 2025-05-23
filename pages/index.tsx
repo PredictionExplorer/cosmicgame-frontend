@@ -103,6 +103,7 @@ const NewHome = () => {
   });
   const [curBidList, setCurBidList] = useState([]);
   const [specialWinners, setSpecialWinners] = useState<any>(null);
+  console.log(specialWinners);
   const [winProbability, setWinProbability] = useState<any>(null);
   const [ethBidInfo, setEthBidInfo] = useState<any>(null);
   const [donatedNFTs, setDonatedNFTs] = useState([]);
@@ -154,7 +155,7 @@ const NewHome = () => {
         { category: "Raffle", value: data.RafflePercentage },
         { category: "Charity", value: data.CharityPercentage },
         { category: "Staking", value: data.StakignPercentage },
-        { category: "Chrono Warrior", value: data.ChronoPercentage },
+        { category: "Chrono Warrior", value: data.ChronoWarriorPercentage },
         {
           category: "Next round",
           value:
@@ -162,7 +163,7 @@ const NewHome = () => {
             data.CharityPercentage -
             data.RafflePercentage -
             data.StakignPercentage -
-            data.ChronoPercentage -
+            data.ChronoWarriorPercentage -
             data.PrizePercentage,
         },
       ]
@@ -1685,27 +1686,64 @@ const NewHome = () => {
                   <Grid item xs={12} sm={4} md={4}>
                     <Typography>Chrono Warrior</Typography>
                   </Grid>
-                  {championList?.length > 0 && (
+                  {specialWinners?.EnduranceChampionAddress && (
                     <Grid item xs={12} sm={8} md={8}>
                       <Typography>
                         <Link
-                          href={`/user/${championList[0].bidder}`}
+                          href={`/user/${specialWinners?.EnduranceChampionAddress}`}
                           color="rgb(255, 255, 255)"
                           fontSize="inherit"
                           sx={{ wordBreak: "break-all" }}
                         >
-                          {championList[0].bidder}
+                          {specialWinners?.EnduranceChampionAddress}
                         </Link>
-                        {championList[0].chronoWarrior > 0 && (
+                        {specialWinners?.EnduranceChampionDuration > 0 && (
                           <>
                             {` (Lasted ${formatSeconds(
-                              championList[0].chronoWarrior
+                              specialWinners?.EnduranceChampionDuration
                             )})`}
                           </>
                         )}
                       </Typography>
                     </Grid>
                   )}
+                </Grid>
+                <Grid container spacing={2} mb={2} alignItems="center">
+                  <Grid item xs={12} sm={4} md={4}>
+                    <Typography>Last Bidder</Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={8}>
+                    <Typography>
+                      <Link
+                        href={`/user/${specialWinners?.LastBidderAddress}`}
+                        color="rgb(255, 255, 255)"
+                        fontSize="inherit"
+                        sx={{ wordBreak: "break-all" }}
+                      >
+                        {specialWinners?.LastBidderAddress}
+                      </Link>
+                      {` (Bidded ${convertTimestampToDateTime(
+                        specialWinners?.LastBidderLastBidTime
+                      )})`}
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Grid container spacing={2} mb={2} alignItems="center">
+                  <Grid item xs={12} sm={4} md={4}>
+                    <Typography>Last Cst Bidder</Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={8}>
+                    <Typography>
+                      <Link
+                        href={`/user/${specialWinners?.LastCstBidderAddress}`}
+                        color="rgb(255, 255, 255)"
+                        fontSize="inherit"
+                        sx={{ wordBreak: "break-all" }}
+                      >
+                        {specialWinners?.LastCstBidderAddress}
+                      </Link>
+                    </Typography>
+                  </Grid>
                 </Grid>
               </>
             )}
