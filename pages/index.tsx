@@ -94,6 +94,7 @@ const NewHome = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<any>(null);
+  console.log(data);
   const [bidType, setBidType] = useState("ETH");
   const [donationType, setDonationType] = useState("NFT");
   const [cstBidData, setCSTBidData] = useState({
@@ -154,6 +155,7 @@ const NewHome = () => {
         { category: "Raffle", value: data.RafflePercentage },
         { category: "Charity", value: data.CharityPercentage },
         { category: "Staking", value: data.StakignPercentage },
+        { category: "Chrono Warrior", value: data.ChronoPercentage },
         {
           category: "Next round",
           value:
@@ -161,6 +163,7 @@ const NewHome = () => {
             data.CharityPercentage -
             data.RafflePercentage -
             data.StakignPercentage -
+            data.ChronoPercentage -
             data.PrizePercentage,
         },
       ]
