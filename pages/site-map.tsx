@@ -7,18 +7,18 @@ import { logoImgUrl } from "../utils";
  * A list of links that provide per-user information routes.
  */
 const perUserLinks = [
-  { href: "/my-tokens", label: "My tokens" },
-  { href: "/#", label: "Unclaimed assets" },
-  { href: "/winning-history", label: "Transactional history" },
-  { href: "/my-staking", label: "Staking" },
+  { href: "/my-tokens", label: "My Tokens" },
+  { href: "/#", label: "My Unclaimed Winnings" },
+  { href: "/winning-history", label: "History of My Winnings" },
+  { href: "/my-staking", label: "My Staking" },
 ];
 
 /**
  * A list of links that provide overall system information routes.
  */
 const systemLinks = [
-  { href: "/gallery", label: "CosmicSignature gallery" },
-  { href: "/prize", label: "Prizes" },
+  { href: "/gallery", label: "CosmicSignature Gallery" },
+  { href: "/prize", label: "Rounds Played" },
   { href: "/staking", label: "Staking Rewards" },
   { href: "/marketing", label: "Marketing Rewards" },
   { href: "/statistics", label: "System Statistics" },
