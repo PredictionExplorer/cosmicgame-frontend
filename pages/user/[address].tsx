@@ -21,8 +21,9 @@ import { CSTStakingRewardsByDepositTable } from "../../components/CSTStakingRewa
 import { RwalkStakingRewardMintsTable } from "../../components/RwalkStakingRewardMintsTable";
 import getErrorMessage from "../../utils/alert";
 import { formatEthValue, logoImgUrl } from "../../utils";
-import api from "../../services/api";
+import api, { cosmicGameBaseUrl } from "../../services/api";
 import { ethers } from "ethers";
+import axios from "axios";
 
 /* ------------------------------------------------------------------
    Types & Interfaces
@@ -180,6 +181,7 @@ const UserInfo = ({ address }: { address: string }) => {
 
       // Store claim history, user info, and bid history
       setClaimHistory(history);
+      console.log(userInfoResponse);
       const { Bids, UserInfo } = userInfoResponse;
       setBidHistory(Bids);
       setUserInfo(UserInfo);
@@ -985,10 +987,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   // Validate if it's a proper Ethereum address
   if (ethers.utils.isAddress(address.toLowerCase())) {
     address = ethers.utils.getAddress(address.toLowerCase());
+    const { data } = await axios.get(
+      `${cosmicGameBaseUrl}user/info/${address}`
+    );
+    if (!data || !data.Bids.length) {
+      address = "Invalid Address";
+    }
   } else {
     address = "Invalid Address";
   }
-
   // SEO metadata
   const title = `Information for User ${address} | Cosmic Signature`;
   const description = `Information for User ${address}`;
