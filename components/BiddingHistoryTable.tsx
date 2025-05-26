@@ -217,7 +217,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
                 )}) with ID ${history.NFTDonationTokenId} was donated`}
               {!!history.DonatedERC20TokenAddr && (
                 <>
-                  {` and ${history.DonatedERC20TokenAmountEth.toFixed(4)}`}
+                  {` and ${history.DonatedERC20TokenAmountEth.toFixed(4)} `}
                   <Link
                     href={`https://etherscan.io/token/${history.DonatedERC20TokenAddr}`}
                     target="_blank"
