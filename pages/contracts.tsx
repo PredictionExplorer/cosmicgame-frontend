@@ -15,8 +15,10 @@ import { formatSeconds, logoImgUrl } from "../utils";
 import { useNotification } from "../contexts/NotificationContext";
 import useContractNoSigner from "../hooks/useContractNoSigner";
 import CHARITY_WALLET_ABI from "../contracts/CharityWallet.json";
-import { CHARITY_WALLET_ADDRESS } from "../config/app";
+import COSMICGAME_ABI from "../contracts/CosmicGame.json";
+import { CHARITY_WALLET_ADDRESS, COSMICGAME_ADDRESS } from "../config/app";
 import { GetServerSideProps } from "next";
+import { ethers } from "ethers";
 
 /**
  * Defines the structure of props accepted by the ContractItem component.
@@ -106,6 +108,7 @@ interface ContractAddresses {
 interface DashboardData {
   ContractAddrs: ContractAddresses;
   PrizePercentage: number;
+  ChronoWarriorPercentage: number;
   RafflePercentage: number;
   StakignPercentage: number;
   NumRaffleEthWinnersBidding: number;
@@ -125,11 +128,19 @@ const Contracts = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [charityAddress, setCharityAddress] = useState("");
+  const [priceIncrease, setPriceIncrease] = useState(0);
+  const [timeIncrease, setTimeIncrease] = useState(0);
+  const [msgMaxLen, setMsgMaxLen] = useState(0);
+  const [cstRewardAmountForBidding, setCstRewardAmountForBidding] = useState(0);
 
   // Use a read-only contract instance (without signer) for the Charity Wallet.
   const charityWalletContract = useContractNoSigner(
     CHARITY_WALLET_ADDRESS,
     CHARITY_WALLET_ABI
+  );
+  const cosmicGameContract = useContractNoSigner(
+    COSMICGAME_ADDRESS,
+    COSMICGAME_ABI
   );
 
   /**
@@ -150,12 +161,42 @@ const Contracts = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchMessageMaxLength = async () => {
+      const maxLength = await cosmicGameContract.bidMessageLengthMaxLimit();
+      setMsgMaxLen(maxLength);
+    };
+    const fetchPriceIncrease = async () => {
+      const priceIncrease = await cosmicGameContract.ethBidPriceIncreaseDivisor();
+      setPriceIncrease(100 / Number(priceIncrease));
+    };
+    const fetchTimeIncrease = async () => {
+      const timeIncrease = await cosmicGameContract.mainPrizeTimeIncrementIncreaseDivisor();
+      setTimeIncrease(100 / Number(timeIncrease));
+    };
+    const fetchCstRewardAmountForBidding = async () => {
+      const cstRewardAmountForBidding = await cosmicGameContract.cstRewardAmountForBidding();
+      setCstRewardAmountForBidding(
+        Number(ethers.utils.formatEther(cstRewardAmountForBidding))
+      );
+    };
+    if (cosmicGameContract) {
+      try {
+        fetchMessageMaxLength();
+        fetchPriceIncrease();
+        fetchTimeIncrease();
+        fetchCstRewardAmountForBidding();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }, [cosmicGameContract]);
+
   /**
    * If the CharityWallet contract is loaded, fetch the charity address on mount.
    */
   useEffect(() => {
     const fetchData = async () => {
-      if (!charityWalletContract) return;
       const addr = await charityWalletContract.charityAddress();
       setCharityAddress(addr);
     };
@@ -227,11 +268,15 @@ const Contracts = () => {
    * Configuration Items: List of additional contract configurations.
    */
   const configItems = [
-    { name: "Price Increase", value: "1%" },
-    { name: "Time Increase", value: "0.01%" },
+    { name: "Price Increase", value: `${priceIncrease}%` },
+    { name: "Time Increase", value: `${timeIncrease}%` },
     {
       name: "Prize Percentage",
       value: data ? `${data.PrizePercentage}%` : "--",
+    },
+    {
+      name: "Chrono Warrior Percentage",
+      value: data ? `${data.ChronoWarriorPercentage}%` : "--",
     },
     {
       name: "Raffle Percentage",
@@ -249,8 +294,6 @@ const Contracts = () => {
       name: "Raffle NFT Winners for Bidding",
       value: data?.NumRaffleNFTWinnersBidding,
     },
-    // Example of a hidden/canceled item:
-    // { name: "Raffle NFT Winners for Staking CST", value: data?.NumRaffleNFTWinnersStakingCST },
     {
       name: "Raffle NFT Winners for Staking Random Walk",
       value: data?.NumRaffleNFTWinnersStakingRWalk,
@@ -264,7 +307,10 @@ const Contracts = () => {
       name: "Charity Percentage",
       value: data ? `${data.CharityPercentage}%` : "--",
     },
-    { name: "Amount of CosmicTokens earned per bid", value: 100 },
+    {
+      name: "Amount of CosmicTokens earned per bid",
+      value: Number(cstRewardAmountForBidding),
+    },
     {
       name: "Auction Duration",
       value: data ? formatSeconds(data.RoundStartCSTAuctionLength) : "--",
@@ -273,7 +319,7 @@ const Contracts = () => {
       name: "Timeout to claim prize",
       value: data ? formatSeconds(data.TimeoutClaimPrize) : "--",
     },
-    { name: "Maximum message length", value: 280 },
+    { name: "Maximum message length", value: Number(msgMaxLen) },
     {
       name: "Initial increment first bid",
       value: data ? formatSeconds(data.InitialSecondsUntilPrize) : "--",

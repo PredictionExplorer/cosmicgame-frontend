@@ -135,6 +135,7 @@
   "function marketingWalletCstContributionAmount() view returns (uint256)",
   "function nextEthBidPrice() view returns (uint256)",
   "function nextEthBidPriceIncreaseDivisor() view returns (uint256)",
+  "function ethBidPriceIncreaseDivisor() view returns (uint256)",
   "function nextRoundFirstCstDutchAuctionBeginningBidPrice() view returns (uint256)",
   "function nft() view returns (address)",
   "function numEthDonationWithInfoRecords() view returns (uint256)",
