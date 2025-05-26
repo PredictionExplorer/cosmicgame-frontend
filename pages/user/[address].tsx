@@ -572,15 +572,6 @@ const UserInfo = ({ address }: { address: string }) => {
           </Box>
           <Box mb={1}>
             <Typography color="primary" component="span">
-              Number of Raffle NFTs Claimed:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {userInfo.RaffleNFTClaimed}
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
               Number of Cosmic Signature Tokens Won:
             </Typography>
             &nbsp;
