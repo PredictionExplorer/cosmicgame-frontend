@@ -129,14 +129,14 @@ export const PrizeTable = ({ list, loading }) => {
   // Define columns for the table header.
   const tableHeaders = [
     { label: "Round", width: "5%" },
-    { label: "Datetime", width: "20%" },
+    { label: "Finalized", width: "20%" },
     { label: "Winner", width: "7%" },
     { label: "Prize Amount", width: "15%", align: "center" },
     { label: "Bids", width: "5%" },
     { label: "Donated NFTs", width: "12%" },
     { label: "Raffle Deposits", width: "12%", align: "center" },
     { label: "Staking Deposit", width: "11%", align: "center" },
-    { label: "Raffle NFTs", width: "13%" },
+    { label: "NFTs Awarded", width: "13%" },
   ];
 
   return (
