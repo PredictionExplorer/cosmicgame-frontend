@@ -184,7 +184,7 @@ function UserRaffleNFT({ address }: { address: string }) {
     } else {
       fetchRaffleNFTWinnings();
     }
-  }, [address, fetchRaffleNFTWinnings]);
+  }, [address]);
 
   if (invalidAddress) {
     return (

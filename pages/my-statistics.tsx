@@ -191,7 +191,7 @@ function UserStatsSection({
         &nbsp;
         <Typography component="span">
           <Link
-            href={`/user/raffle-eth/${userInfo.UserAddr}`}
+            href={`/user/raffle-eth/${userInfo.Address}`}
             sx={{ color: "inherit", fontSize: "inherit" }}
           >
             {(
@@ -212,17 +212,24 @@ function UserStatsSection({
       </Box>
       <Box mb={1}>
         <Typography color="primary" component="span">
-          Number of Raffle NFTs Won:
+          Raffle NFTs Count (Raffle Mints):
         </Typography>
         &nbsp;
         <Typography component="span">
           <Link
-            href={`/user/raffle-nft/${userInfo.UserAddr}`}
+            href={`/user/raffle-nft/${userInfo.Address}`}
             sx={{ color: "inherit", fontSize: "inherit" }}
           >
-            {userInfo.RaffleNFTWon}
+            {userInfo.RaffleNFTsCount}
           </Link>
         </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Reward NFTs Count (All Mints):
+        </Typography>
+        &nbsp;
+        <Typography component="span">{userInfo.RewardNFTsCount}</Typography>
       </Box>
       <Box mb={1}>
         <Typography color="primary" component="span">
@@ -267,13 +274,13 @@ function UserStatsSection({
       <Typography mt={3}>
         This account has {userInfo.CosmicTokenNumTransfers} CosmicToken (ERC20).
         Click{" "}
-        <Link href={`/cosmic-token-transfer/${userInfo.UserAddr}`}>here</Link>{" "}
-        to see all the transfers made by this account.
+        <Link href={`/cosmic-token-transfer/${userInfo.Address}`}>here</Link> to
+        see all the transfers made by this account.
       </Typography>
       <Typography mt={1}>
         This account has {userInfo.CosmicSignatureNumTransfers} CosmicSignature
         (ERC721). Click{" "}
-        <Link href={`/cosmic-signature-transfer/${userInfo.UserAddr}`}>
+        <Link href={`/cosmic-signature-transfer/${userInfo.Address}`}>
           here
         </Link>{" "}
         to see all the transfers made by this account.

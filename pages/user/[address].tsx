@@ -551,7 +551,7 @@ const UserInfo = ({ address }: { address: string }) => {
           </Box>
           <Box mb={1}>
             <Typography color="primary" component="span">
-              Number of Raffle NFTs Won:
+              Raffle NFTs Count (Raffle Mints):
             </Typography>
             &nbsp;
             <Typography component="span">
@@ -559,9 +559,16 @@ const UserInfo = ({ address }: { address: string }) => {
                 href={`/user/raffle-nft/${address}`}
                 sx={{ color: "inherit", fontSize: "inherit" }}
               >
-                {userInfo.RaffleNFTWon}
+                {userInfo.RaffleNFTsCount}
               </Link>
             </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Reward NFTs Count (All Mints):
+            </Typography>
+            &nbsp;
+            <Typography component="span">{userInfo.RewardNFTsCount}</Typography>
           </Box>
           <Box mb={1}>
             <Typography color="primary" component="span">
