@@ -314,11 +314,11 @@ const Statistics = () => {
         cstBidData?.CSTPrice > 0 ? formatCSTValue(cstBidData.CSTPrice) : "FREE",
     },
     {
-      title: "Elapsed Time",
+      title: "CST Auction Elapsed Time",
       value: formatSeconds(cstBidData.SecondsElapsed),
     },
     {
-      title: "Auction Duration",
+      title: "CST Auction Duration",
       value: formatSeconds(cstBidData.AuctionDuration),
     },
     { title: "Number of Bids Since Round Start", value: data.CurNumBids },
@@ -341,14 +341,6 @@ const Statistics = () => {
           {formatEthValue(data.CurRoundStats.TotalDonatedAmountEth)}
         </Link>
       ),
-    },
-    {
-      title: "Total Raffle Eth Deposits",
-      value: `${data.CurRoundStats.TotalRaffleEthDepositsEth.toFixed(4)} ETH`,
-    },
-    {
-      title: "Total Raffle NFTs",
-      value: data.CurRoundStats.TotalRaffleNFTs,
     },
     {
       title: "Prize Amount",
@@ -821,10 +813,10 @@ const Statistics = () => {
         )}
       </Box>
 
-      {/* System Mode Changes */}
+      {/* Round Activations */}
       <Box>
         <Typography variant="h6" mb={2} mt={8}>
-          System Mode Changes
+          Round Activations
         </Typography>
         {systemModeChanges === null ? (
           <Typography variant="h6">Loading...</Typography>
