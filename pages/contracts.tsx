@@ -95,11 +95,10 @@ interface ContractAddresses {
   CosmicTokenAddr: string;
   CosmicSignatureAddr: string;
   RandomWalkAddr: string;
-  BusinessLogicAddr: string;
   CosmicDaoAddr: string;
   CharityWalletAddr: string;
   MarketingWalletAddr: string;
-  RaffleWalletAddr: string;
+  PrizesWalletAddr: string;
   StakingWalletCSTAddr: string;
   StakingWalletRWalkAddr: string;
 }
@@ -193,11 +192,6 @@ const Contracts = () => {
       copyable: true,
     },
     {
-      name: "Business Logic Address",
-      value: data?.ContractAddrs.BusinessLogicAddr,
-      copyable: true,
-    },
-    {
       name: "Cosmic DAO Address",
       value: data?.ContractAddrs.CosmicDaoAddr,
       copyable: true,
@@ -213,8 +207,8 @@ const Contracts = () => {
       copyable: true,
     },
     {
-      name: "Raffle Wallet Address",
-      value: data?.ContractAddrs.RaffleWalletAddr,
+      name: "Prizes Wallet Address",
+      value: data?.ContractAddrs.PrizesWalletAddr,
       copyable: true,
     },
     {
