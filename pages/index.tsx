@@ -2052,7 +2052,7 @@ const NewHome = () => {
             <Grid item xs={12} sm={12} md={6} lg={6}>
               <GradientBorder sx={{ p: 2 }}>
                 <Typography variant="subtitle1" textAlign="center">
-                  {data?.NumRaffleEthWinnersBidding} will receive
+                  {data?.NumRaffleEthWinnersBidding} random bidders will receive
                 </Typography>
                 <GradientText variant="h4" textAlign="center">
                   {(
@@ -2065,7 +2065,7 @@ const NewHome = () => {
                   color="rgba(255, 255, 255, 0.68)"
                   textAlign="center"
                 >
-                  in the pot each
+                  from the pot each
                 </Typography>
               </GradientBorder>
             </Grid>
@@ -2076,7 +2076,7 @@ const NewHome = () => {
                     (data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked > 0
                       ? data?.NumRaffleNFTWinnersStakingRWalk + 3
                       : 3)}{" "}
-                  will receive
+                  random bidders will receive
                 </Typography>
                 <GradientText variant="h4" textAlign="center">
                   1 Cosmic NFT

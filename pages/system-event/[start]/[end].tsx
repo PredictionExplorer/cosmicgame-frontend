@@ -177,7 +177,7 @@ const AdminEvent = ({ start, end }: AdminEventProps) => {
   return (
     <MainWrapper>
       <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-        Admin Events in range from {start} to {end}
+        System Configuration Made before round xxx
       </Typography>
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
