@@ -5,7 +5,7 @@ import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../utils";
-import { AdminEventRow, AdminEventsTable } from "./system-event/[start]/[end]";
+import { AdminEventRow, AdminEventsTable } from "./system-event/[round]/[start]/[end]";
 
 function ChangedParameters() {
   // Retrieve connected wallet account

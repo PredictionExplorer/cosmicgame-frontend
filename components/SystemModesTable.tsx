@@ -13,6 +13,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { convertTimestampToDateTime } from "../utils";
 import router from "next/router";
 import { CustomPagination } from "./CustomPagination";
+import { isMobile } from "react-device-detect";
 
 const SystemModesRow = ({ row }) => {
   if (!row) {
@@ -23,20 +24,17 @@ const SystemModesRow = ({ row }) => {
     <TablePrimaryRow
       style={{ cursor: "pointer" }}
       onClick={() => {
-        router.push(`/system-event/${row.EvtLogId}/${row.NextEvtLogId}`);
+        router.push(
+          `/system-event/${row.RoundNum}/${row.EvtLogId}/${row.NextEvtLogId}`
+        );
       }}
     >
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          href={`https://arbiscan.io/tx/${row.TxHash}`}
-          target="__blank"
-        >
-          {convertTimestampToDateTime(row.TimeStamp)}
-        </Link>
+        {convertTimestampToDateTime(row.TimeStamp)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{row.SystemMode}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.RoundNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.EvtLogId}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{row.NextEvtLogId}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -51,10 +49,24 @@ export const SystemModesTable = ({ list }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="25%" />
+              <col width="25%" />
+              <col width="25%" />
+              <col width="25%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Mode</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                Event Id From
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                Event Id To
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>

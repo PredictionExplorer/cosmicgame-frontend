@@ -13,19 +13,19 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../../../components/styled";
+} from "../../../../components/styled";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import api from "../../../services/api";
+import api from "../../../../services/api";
 import {
   convertTimestampToDateTime,
   formatSeconds,
   logoImgUrl,
-} from "../../../utils";
+} from "../../../../utils";
 import { GetServerSidePropsContext } from "next";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { ADMIN_EVENTS } from "../../../config/misc";
-import { CustomPagination } from "../../../components/CustomPagination";
+import { ADMIN_EVENTS } from "../../../../config/misc";
+import { CustomPagination } from "../../../../components/CustomPagination";
 import { isMobile } from "react-device-detect";
 
 /**
@@ -153,9 +153,10 @@ export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
 interface AdminEventProps {
   start: number;
   end: number;
+  round: number;
 }
 
-const AdminEvent = ({ start, end }: AdminEventProps) => {
+const AdminEvent = ({ start, end, round }: AdminEventProps) => {
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<AdminEventRow[]>([]);
 
@@ -176,8 +177,8 @@ const AdminEvent = ({ start, end }: AdminEventProps) => {
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-        System Configuration Made before round xxx
+      <Typography variant="h4" color="primary" textAlign="center" mb={4} letterSpacing="1px">
+        System Configuration Made Before Round {round}
       </Typography>
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
@@ -195,8 +196,10 @@ const AdminEvent = ({ start, end }: AdminEventProps) => {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   let start = context.params!.start;
   let end = context.params!.end;
+  let round = context.params!.round;
   start = Array.isArray(start) ? start[0] : start;
   end = Array.isArray(end) ? end[0] : end;
+  round = Array.isArray(round) ? round[0] : round;
   const title = `Admin Events | Cosmic Signature`;
   const description = `Admin Events`;
 
@@ -216,6 +219,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       openGraphData,
       start,
       end,
+      round,
     },
   };
 }
