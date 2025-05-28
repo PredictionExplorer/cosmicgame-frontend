@@ -2092,6 +2092,19 @@ const NewHome = () => {
             </Grid>
           </Grid>
         </Box>
+        <Box margin="50px 0">
+          <Typography variant="h4" textAlign="center">
+            Special Prizes
+          </Typography>
+          <Typography
+            fontSize={matches ? 22 : 18}
+            color="rgba(255, 255, 255, 0.68)"
+            textAlign="center"
+          >
+            Each winner of special prize (except ChronoWarrior) will also
+            receive XZY CosmicSignature ERC20 tokens.
+          </Typography>
+        </Box>
         <Box margin="100px 0">
           <Typography variant="h4" textAlign="center" mb={6}>
             History of Winnings

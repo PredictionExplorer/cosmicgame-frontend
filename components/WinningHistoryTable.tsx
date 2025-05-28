@@ -13,7 +13,6 @@ import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import LayersIcon from "@mui/icons-material/Layers";
 import TokenIcon from "@mui/icons-material/Token";
-import axios from "axios";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
@@ -54,18 +53,6 @@ const RECORD_TYPE_MAP = {
 
 // Row component representing each winning history entry
 const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
-  const [tokenURI, setTokenURI] = useState(null);
-
-  useEffect(() => {
-    // Fetch TokenURI only if applicable
-    if (history?.TokenId >= 0 && ![1, 3, 5, 6].includes(history.RecordType)) {
-      axios
-        .get(history.TokenURI)
-        .then(({ data }) => setTokenURI(data))
-        .catch((err) => console.error("Failed to fetch token URI:", err));
-    }
-  }, [history]);
-
   if (!history) return <TablePrimaryRow />;
 
   const recordType = RECORD_TYPE_MAP[history.RecordType] || {
@@ -138,9 +125,11 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
 
       {/* Amount ETH or N/A based on record type */}
       <TablePrimaryCell align="right">
-        {[1, 5, 6].includes(history.RecordType)
+        {[9, 10, 11].includes(history.RecordType)
+          ? `${history.Amount} CST`
+          : [1, 2, 5, 7, 8].includes(history.RecordType)
           ? "N/A"
-          : history.AmountEth.toFixed(4)}
+          : `${history.AmountEth.toFixed(4)} ETH`}
       </TablePrimaryCell>
 
       {/* Token Address */}
@@ -174,13 +163,7 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
       <TablePrimaryCell align="center">
         {history.TokenId >= 0 ? (
           <Link
-            href={
-              [1, 3].includes(history.RecordType)
-                ? `/detail/${history.TokenId}`
-                : [5, 6].includes(history.RecordType)
-                ? `https://randomwalknft.com/detail/${history.TokenId}`
-                : tokenURI?.external_url
-            }
+            href={`/detail/${history.TokenId}`}
             target="_blank"
             color="inherit"
           >
@@ -243,9 +226,7 @@ function WinningHistorySubTable({
               <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
             )}
             <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">
-              Amount (ETH)
-            </TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Token Address</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="right">Position</TablePrimaryHeadCell>
