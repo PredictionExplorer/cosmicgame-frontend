@@ -20,7 +20,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
 import api from "../services/api";
 import { isMobile } from "react-device-detect";
-import { Contract } from "ethers";
+import { Contract, ethers } from "ethers";
 import ERC20_ABI from "../contracts/CosmicToken.json";
 import { useActiveWeb3React } from "../hooks/web3";
 
@@ -39,7 +39,7 @@ interface BidHistory {
   NFTDonationTokenAddr?: string;
   NFTDonationTokenId?: number;
   DonatedERC20TokenAddr?: string;
-  DonatedERC20TokenAmountEth?: number;
+  DonatedERC20TokenAmount?: string;
   Message?: string;
 }
 
@@ -96,6 +96,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
 }) => {
   const { library, account } = useActiveWeb3React();
   const [symbol, setSymbol] = useState("");
+  const [decimals, setDecimals] = useState(18);
 
   useEffect(() => {
     const getSymbol = async () => {
@@ -106,6 +107,8 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
       );
       const symbol = await tokenDonateContract.symbol();
       setSymbol(symbol);
+      const decimals = await tokenDonateContract.decimals();
+      setDecimals(Number(decimals));
     };
 
     if (!!history.DonatedERC20TokenAddr) {
@@ -217,7 +220,10 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
                 )}) with ID ${history.NFTDonationTokenId} was donated`}
               {!!history.DonatedERC20TokenAddr && (
                 <>
-                  {` and ${history.DonatedERC20TokenAmountEth.toFixed(4)} `}
+                  {` and ${ethers.utils.formatUnits(
+                    history.DonatedERC20TokenAmount,
+                    decimals
+                  )} `}
                   <Link
                     href={`https://etherscan.io/token/${history.DonatedERC20TokenAddr}`}
                     target="_blank"

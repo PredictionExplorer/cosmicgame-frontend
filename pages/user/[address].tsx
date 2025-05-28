@@ -181,7 +181,6 @@ const UserInfo = ({ address }: { address: string }) => {
 
       // Store claim history, user info, and bid history
       setClaimHistory(history);
-      console.log(userInfoResponse);
       const { Bids, UserInfo } = userInfoResponse;
       setBidHistory(Bids);
       setUserInfo(UserInfo);
