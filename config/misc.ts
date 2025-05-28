@@ -44,7 +44,8 @@ export const ADMIN_EVENTS = [
   {
     name: "DelayDurationBeforeRoundActivationChanged",
     type: "time",
-    description: "",
+    description:
+      "The delay duration time before round activation has been changed.",
   },
   {
     name: "NumRaffleNFTWinnersStakingRWalkChanged",
@@ -95,7 +96,11 @@ export const ADMIN_EVENTS = [
     description:
       "The address of the Cosmic Signature Token (ERC-721) contract has been changed.",
   },
-  { name: "Upgraded", type: "", description: "" },
+  {
+    name: "Upgraded",
+    type: "address",
+    description: "The CosmicSignature contract has been upgraded.",
+  },
   {
     name: "TimeIncreaseChanged",
     type: "number",
@@ -117,6 +122,7 @@ export const ADMIN_EVENTS = [
     description:
       "The value for the increment of prize time after every bid has been changed.",
   },
+  { name: "InitialBidAmountFractionChanged", type: "number", description: "" }, // have to remove this event
   {
     name: "InitialSecondsUntilPrizeChanged",
     type: "time",
@@ -130,43 +136,76 @@ export const ADMIN_EVENTS = [
   {
     name: "RoundStartCSTAuctionLengthChanged",
     type: "number",
-    description: "",
+    description: "The length of the starting CST auction has been changed.",
   },
-  { name: "Erc20RewardMultiplierChanged", type: "number", description: "" },
+  {
+    name: "Erc20RewardMultiplierChanged",
+    type: "number",
+    description: "The ERC20 reward multiplier has been changed.",
+  },
   {
     name: "StartingBidPriceCSTMinLimitChanged",
     type: "number",
-    description: "",
+    description:
+      "The minimum limit for the starting bid price with CST has been changed.",
   },
-  { name: "MarketingRewardChanged", type: "number", description: "" },
-  { name: "TokenRewardChanged", type: "number", description: "" },
-  { name: "MaxMessageLengthChanged", type: "number", description: "" },
-  { name: "TokenGenerationScriptURLEvent", type: "url", description: "" },
-  { name: "BaseURI (CosmicSignature)", type: "url", description: "" },
+  {
+    name: "MarketingRewardChanged",
+    type: "percentage",
+    description:
+      "The allocation percentage for funds designated for marketing rewards has been changed.",
+  },
+  {
+    name: "TokenRewardChanged",
+    type: "percentage",
+    description:
+      "The allocation percentage for funds designated for token rewards has been changed.",
+  },
+  {
+    name: "MaxMessageLengthChanged",
+    type: "number",
+    description: "The max length of the bid message has been changed.",
+  },
+  {
+    name: "TokenGenerationScriptURLEvent",
+    type: "url",
+    description: "Token Generation Script URL has been changed.",
+  },
+  {
+    name: "BaseURI (CosmicSignature)",
+    type: "url",
+    description: "CosmicSignature NFT BaseURI has been changed.",
+  },
   {
     name: "Initialized (Initialized event, openzeppelin)",
-    type: "",
+    type: "number",
     description: "Contract initialization completed",
   },
-  { name: "OwnershipTransferred", type: "address", description: "" },
+  {
+    name: "OwnershipTransferred",
+    type: "address",
+    description: "The ownership of the contract has been transferred.",
+  },
   {
     name: "TimeoutDurationToWithdrawPrizesChanged",
     type: "time",
-    description: "",
+    description: "The timeout duration to withdraw prizes has been changed.",
   },
   {
     name: "EthDutchAuctionDurationDivisorChanged",
     type: "number",
-    description: "",
+    description: "The Eth dutch auction duration has been changed.",
   },
   {
     name: "EthDutchAuctionEndingBidPriceDivisorChanged",
     type: "number",
-    description: "",
+    description:
+      "The divisor for Eth dutch auction ending bid price has been changed.",
   },
   {
     name: "ChronoWarriorEthPrizeAmountPercentageChanged",
     type: "number",
-    description: "",
+    description:
+      "The allocation percentage for funds designated for chrono warrior Eth prize rewards has been changed.",
   },
 ];

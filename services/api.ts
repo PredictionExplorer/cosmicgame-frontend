@@ -1439,7 +1439,7 @@ class ApiService {
   // r.GET("/api/cosmicgame/system/modelist/:offset/:limit",api_cosmic_game_sysmode_changes)
   public async get_system_modelist() {
     try {
-      const { data } = await axios.get(getAPIUrl("system/modelist/0/1000000"));
+      const { data } = await axios.get(getAPIUrl("system/modelist/-1/1000000"));
       return data.SystemModeChanges;
     } catch (err) {
       if (err.response?.status === 400) {
