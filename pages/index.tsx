@@ -381,6 +381,15 @@ const NewHome = () => {
               .setApprovalForAll(COSMICGAME_ADDRESS, true)
               .then((tx: any) => tx.wait());
           }
+          const isApproved = await nftDonateContract.isApprovedForAll(
+            account,
+            RAFFLE_WALLET_ADDRESS
+          );
+          if (!isApproved) {
+            await nftDonateContract
+              .setApprovalForAll(RAFFLE_WALLET_ADDRESS, true)
+              .then((tx: any) => tx.wait());
+          }
           await cosmicGameContract
             .bidWithEthAndDonateNft(
               rwlkId,
@@ -631,6 +640,15 @@ const NewHome = () => {
           if (!isApprovedForAll && approvedBy !== COSMICGAME_ADDRESS) {
             await nftDonateContract
               .setApprovalForAll(COSMICGAME_ADDRESS, true)
+              .then((tx: any) => tx.wait());
+          }
+          const isApproved = await nftDonateContract.isApprovedForAll(
+            account,
+            RAFFLE_WALLET_ADDRESS
+          );
+          if (!isApproved) {
+            await nftDonateContract
+              .setApprovalForAll(RAFFLE_WALLET_ADDRESS, true)
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
