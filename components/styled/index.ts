@@ -188,6 +188,8 @@ export const MainWrapper = styled(Container)(({ theme }) => ({
   overflow: 'hidden',
   lineHeight: 1,
   minHeight: 'calc(100vh - 100px)',
+  position: 'relative',
+  zIndex: 1,
   [theme.breakpoints.down('sm')]: {
     paddingTop: theme.spacing(18),
     paddingBottom: theme.spacing(12),
