@@ -10,6 +10,7 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  let targetUrl: string | undefined = undefined;
   try {
     const { url } = req.query;
 
@@ -18,7 +19,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return;
     }
 
-    let targetUrl: string;
     try {
       const parsedUrl = new URL(url.startsWith('http') ? url : `http://${url}`);
       targetUrl = parsedUrl.href;
@@ -46,10 +46,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.writeHead(response.status, response.headers);
     response.data.pipe(res);
   } catch (error: any) {
-    console.error('Proxy request failed:', error.message);
+    console.error('Proxy request failed for target URL:', targetUrl, 'Error:', error.message);
     res.status(error.response?.status || 500).json({
       message: 'Proxy request failed',
+      targetUrl: targetUrl,
       status: error.response?.status || 500,
+      errorDetails: error.message,
     });
   }
 }
