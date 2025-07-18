@@ -223,7 +223,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
                   {` and ${ethers.utils.formatUnits(
                     history.DonatedERC20TokenAmount,
                     decimals
-                  )} `}
+                  )}`}{" "}
                   <Link
                     href={`https://etherscan.io/token/${history.DonatedERC20TokenAddr}`}
                     target="_blank"
