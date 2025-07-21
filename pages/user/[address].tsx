@@ -986,10 +986,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   // Validate if it's a proper Ethereum address
   if (ethers.utils.isAddress(address.toLowerCase())) {
     address = ethers.utils.getAddress(address.toLowerCase());
-    const { data } = await axios.get(
-      `${cosmicGameBaseUrl}user/info/${address}`
-    );
-    if (!data || !data.Bids.length) {
+    try {
+      const { data } = await axios.get(
+        `${cosmicGameBaseUrl}user/info/${address}`
+      );
+      if (!data || !data.Bids.length) {
+        address = "Invalid Address";
+      }
+    } catch {
       address = "Invalid Address";
     }
   } else {

@@ -1776,7 +1776,7 @@ const NewHome = () => {
                                     ethBidInfo.ETHPrice *
                                     (1 + bidPricePlus / 100)
                                   ).toFixed(5)
-                          } ETH)`
+                            } ETH)`
                           : bidType === "RandomWalk" && rwlkId !== -1
                           ? ` token ${rwlkId} (${
                               ethBidInfo.ETHPrice * (1 + bidPricePlus / 100) >
@@ -1791,7 +1791,7 @@ const NewHome = () => {
                                     (1 + bidPricePlus / 100) *
                                     0.5
                                   ).toFixed(5)
-                          } ETH)`
+                            } ETH)`
                           : bidType === "CST"
                           ? cstBidData?.SecondsElapsed >
                             cstBidData?.AuctionDuration
