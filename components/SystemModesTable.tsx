@@ -44,7 +44,9 @@ const SystemModesRow: React.FC<SystemModesRowProps> = ({ row, prevRow }) => {
 
   return (
     <TablePrimaryRow style={{ cursor: "pointer" }} onClick={handleRowClick}>
-      <TablePrimaryCell align="center">{row.RoundNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {row.RoundNum ? row.RoundNum : "Deployment"}
+      </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(row.TimeStamp)}
       </TablePrimaryCell>

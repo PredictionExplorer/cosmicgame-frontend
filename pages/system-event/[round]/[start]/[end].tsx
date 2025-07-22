@@ -177,9 +177,27 @@ const AdminEvent = ({ start, end, round }: AdminEventProps) => {
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" textAlign="center" mb={4} letterSpacing="1px">
-        System Configuration Made Before Round {round}
-      </Typography>
+      {round > 0 ? (
+        <Typography
+          variant="h4"
+          color="primary"
+          textAlign="center"
+          mb={4}
+          letterSpacing="1px"
+        >
+          System Configuration Made Before Round {round}
+        </Typography>
+      ) : (
+        <Typography
+          variant="h4"
+          color="primary"
+          textAlign="center"
+          mb={4}
+          letterSpacing="1px"
+        >
+          System Configuration Made Before Deployment
+        </Typography>
+      )}
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
