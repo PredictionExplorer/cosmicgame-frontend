@@ -309,7 +309,7 @@ const Contracts = () => {
     },
     {
       name: "Amount of CosmicTokens earned per bid",
-      value: Number(cstRewardAmountForBidding),
+      value: `${Number(cstRewardAmountForBidding)} ETH`,
     },
     {
       name: "Auction Duration",
