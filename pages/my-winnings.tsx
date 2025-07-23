@@ -287,8 +287,11 @@ export default function MyWinnings() {
         Number(timeoutDurationToWithdrawPrizes)
       );
     };
-    fetchTimeoutDurationToWithdrawPrizes();
-  }, []);
+
+    if (raffleWalletContract) {
+      fetchTimeoutDurationToWithdrawPrizes();
+    }
+  }, [raffleWalletContract]);
 
   /* ------------------------------------------------------------------
     Render
