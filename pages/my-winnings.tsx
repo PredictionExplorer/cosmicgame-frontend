@@ -107,7 +107,6 @@ function RaffleWinningRow({
   if (!winning) return <TablePrimaryRow />;
 
   const { TxHash, TimeStamp, RoundNum, Amount } = winning;
-  console.log(timeoutDurationToWithdrawPrizes);
 
   return (
     <TablePrimaryRow>
