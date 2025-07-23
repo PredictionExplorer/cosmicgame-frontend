@@ -64,7 +64,6 @@ function useUnclaimedWinnings(account: string | null | undefined) {
         api.get_unclaimed_donated_nft_by_user(account),
         api.get_unclaimed_raffle_deposits_by_user(account),
       ]);
-      console.log(deposits);
       // Sort data for consistency
       setDonatedNFTs(nfts.sort((a: any, b: any) => a.TimeStamp - b.TimeStamp));
       setRaffleETHWinnings(
