@@ -96,13 +96,7 @@ function useUnclaimedWinnings(account: string | null | undefined) {
 ------------------------------------------------------------------ */
 
 /** Table Row for a single raffle winning */
-function RaffleWinningRow({
-  winning,
-  timeoutDurationToWithdrawPrizes,
-}: {
-  winning: RaffleWinning;
-  timeoutDurationToWithdrawPrizes: number;
-}) {
+function RaffleWinningRow({ winning }: { winning: RaffleWinning }) {
   if (!winning) return <TablePrimaryRow />;
 
   const { TxHash, TimeStamp, RoundNum, Amount } = winning;
@@ -128,24 +122,13 @@ function RaffleWinningRow({
           {RoundNum}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(
-          TimeStamp + timeoutDurationToWithdrawPrizes
-        )}
-      </TablePrimaryCell>
       <TablePrimaryCell align="right">{Amount.toFixed(7)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 }
 
 /** Table layout for raffle winnings */
-function RaffleWinningsTable({
-  list,
-  timeoutDurationToWithdrawPrizes,
-}: {
-  list: RaffleWinning[];
-  timeoutDurationToWithdrawPrizes: number;
-}) {
+function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
   return (
     <TablePrimaryContainer>
       <TablePrimary>
@@ -153,7 +136,6 @@ function RaffleWinningsTable({
           <Tr>
             <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="right">
               Amount (ETH)
             </TablePrimaryHeadCell>
@@ -161,11 +143,7 @@ function RaffleWinningsTable({
         </TablePrimaryHead>
         <TableBody>
           {list.map((winning) => (
-            <RaffleWinningRow
-              key={winning.EvtLogId}
-              winning={winning}
-              timeoutDurationToWithdrawPrizes={timeoutDurationToWithdrawPrizes}
-            />
+            <RaffleWinningRow key={winning.EvtLogId} winning={winning} />
           ))}
         </TableBody>
       </TablePrimary>
@@ -200,10 +178,6 @@ export default function MyWinnings() {
     raffleETH: false,
   });
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
-  const [
-    timeoutDurationToWithdrawPrizes,
-    setTimeoutDurationToWithdrawPrizes,
-  ] = useState<number>(0);
 
   const perPage = 5;
 
@@ -280,19 +254,6 @@ export default function MyWinnings() {
     }
   };
 
-  useEffect(() => {
-    const fetchTimeoutDurationToWithdrawPrizes = async () => {
-      const timeoutDurationToWithdrawPrizes = await raffleWalletContract.timeoutDurationToWithdrawPrizes();
-      setTimeoutDurationToWithdrawPrizes(
-        Number(timeoutDurationToWithdrawPrizes)
-      );
-    };
-
-    if (raffleWalletContract) {
-      fetchTimeoutDurationToWithdrawPrizes();
-    }
-  }, [raffleWalletContract]);
-
   /* ------------------------------------------------------------------
     Render
   ------------------------------------------------------------------ */
@@ -352,7 +313,6 @@ export default function MyWinnings() {
                 (currentPage - 1) * perPage,
                 currentPage * perPage
               )}
-              timeoutDurationToWithdrawPrizes={timeoutDurationToWithdrawPrizes}
             />
 
             {status?.ETHRaffleToClaim > 0 && (
