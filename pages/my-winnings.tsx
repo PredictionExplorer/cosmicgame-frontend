@@ -404,7 +404,10 @@ export default function MyWinnings() {
         <Typography variant="h5" mb={2}>
           Claimable CST Staking Rewards
         </Typography>
-        <UncollectedCSTStakingRewardsTable user={account} />
+        <UncollectedCSTStakingRewardsTable
+          user={account}
+          timeoutDurationToWithdrawPrizes={timeoutDurationToWithdrawPrizes}
+        />
       </Box>
 
       {/* Donated NFTs Section */}

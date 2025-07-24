@@ -18,7 +18,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
+import { convertTimestampToDateTime, formatSeconds } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
@@ -33,7 +33,7 @@ import getErrorMessage from "../utils/alert";
   Sub-Component: UncollectedRewardsRow
   Renders a single row in the rewards table with the provided data.
 ------------------------------------------------------------------ */
-const UncollectedRewardsRow = ({ row }) => {
+const UncollectedRewardsRow = ({ row, timeoutDurationToWithdrawPrizes }) => {
   // Early return if no row data to avoid errors.
   if (!row) return <TablePrimaryRow />;
 
@@ -82,6 +82,18 @@ const UncollectedRewardsRow = ({ row }) => {
       <TablePrimaryCell align="center">
         {PendingToClaimEth.toFixed(6)}
       </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {convertTimestampToDateTime(
+          DepositTimeStamp + timeoutDurationToWithdrawPrizes
+        )}{" "}
+        {DepositTimeStamp + timeoutDurationToWithdrawPrizes < Date.now() / 1000
+          ? "(Expired)"
+          : `(${formatSeconds(
+              DepositTimeStamp +
+                timeoutDurationToWithdrawPrizes -
+                Math.ceil(Date.now() / 1000)
+            )})`}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -90,7 +102,10 @@ const UncollectedRewardsRow = ({ row }) => {
   Main Component: UncollectedCSTStakingRewardsTable
   Displays a paginated list of uncollected CST staking rewards.
 ------------------------------------------------------------------ */
-export const UncollectedCSTStakingRewardsTable = ({ user }) => {
+export const UncollectedCSTStakingRewardsTable = ({
+  user,
+  timeoutDurationToWithdrawPrizes,
+}) => {
   const { account } = useActiveWeb3React();
   const [status, setStatus] = useState(null);
   // Current page in the pagination
@@ -212,7 +227,8 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
               <col width="15%" />
               <col width="15%" />
               <col width="15%" />
-              <col width="25%" />
+              <col width="15%" />
+              <col width="10%" />
             </colgroup>
           )}
 
@@ -232,6 +248,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
               <TablePrimaryHeadCell>
                 Uncollected Amount (ETH)
               </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 
@@ -239,7 +256,13 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
           <TableBody>
             {/* Map over the current page of data to render each row */}
             {currentPageData.map((row) => (
-              <UncollectedRewardsRow key={row.EvtLogId} row={row} />
+              <UncollectedRewardsRow
+                key={row.EvtLogId}
+                row={row}
+                timeoutDurationToWithdrawPrizes={
+                  timeoutDurationToWithdrawPrizes
+                }
+              />
             ))}
           </TableBody>
         </TablePrimary>
