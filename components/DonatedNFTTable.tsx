@@ -9,11 +9,16 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime, shortenHex } from "../utils";
+import {
+  convertTimestampToDateTime,
+  formatSeconds,
+  shortenHex,
+} from "../utils";
 import NFTImage from "./NFTImage";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
+import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 
 // ----------------------------
 // Type Definitions
@@ -49,6 +54,27 @@ interface DonatedNFTTableProps {
 // ----------------------------
 const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
   const [tokenURI, setTokenURI] = useState<any>(null);
+
+  const [
+    roundTimeoutTimesToWithdrawPrizes,
+    setRoundTimeoutTimesToWithdrawPrizes,
+  ] = useState(0);
+  const raffleWalletContract = useRaffleWalletContract();
+
+  useEffect(() => {
+    const fetchRoundTimeoutTimesToWithdrawPrizes = async () => {
+      const roundTimeoutTimesToWithdrawPrizes = await raffleWalletContract.roundTimeoutTimesToWithdrawPrizes(
+        nft.RoundNum
+      );
+      setRoundTimeoutTimesToWithdrawPrizes(
+        Number(roundTimeoutTimesToWithdrawPrizes)
+      );
+    };
+
+    if (raffleWalletContract) {
+      fetchRoundTimeoutTimesToWithdrawPrizes();
+    }
+  }, [raffleWalletContract]);
 
   useEffect(() => {
     const fetchTokenMetadata = async () => {
@@ -142,6 +168,14 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
           nft.NFTTokenId || nft.TokenId
         )}
       </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {convertTimestampToDateTime(roundTimeoutTimesToWithdrawPrizes)}{" "}
+        {roundTimeoutTimesToWithdrawPrizes < Date.now() / 1000
+          ? "(Expired)"
+          : `(${formatSeconds(
+              roundTimeoutTimesToWithdrawPrizes - Math.ceil(Date.now() / 1000)
+            )})`}
+      </TablePrimaryCell>
 
       {/* Token Image */}
       <TablePrimaryCell sx={{ width: "130px" }}>
@@ -203,6 +237,7 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({
                 Token Address
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
               {handleClaim && <TablePrimaryHeadCell></TablePrimaryHeadCell>}
             </Tr>
