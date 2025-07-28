@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TableBody, Link, Typography, Tooltip } from "@mui/material";
 import {
   TablePrimaryContainer,
@@ -13,6 +13,7 @@ import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
 import { convertTimestampToDateTime, shortenHex } from "../utils";
 import { isMobile } from "react-device-detect";
+import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 
 /**
  * Displays a single row in the table with winner information.
@@ -21,11 +22,6 @@ import { isMobile } from "react-device-detect";
  * @param {Object} props.winner - Data object containing details about a raffle winner.
  */
 const WinnerRow = ({ winner }) => {
-  // If there is no winner data, return an empty table row to prevent errors.
-  if (!winner) {
-    return <TablePrimaryRow />;
-  }
-
   // Destructure the winner object with default values or optional chaining
   // to guard against missing fields.
   const {
@@ -38,6 +34,31 @@ const WinnerRow = ({ winner }) => {
     IsRwalk = false,
     TokenId = null,
   } = winner;
+  const [
+    roundTimeoutTimesToWithdrawPrizes,
+    setRoundTimeoutTimesToWithdrawPrizes,
+  ] = useState(0);
+  const raffleWalletContract = useRaffleWalletContract();
+
+  useEffect(() => {
+    const fetchRoundTimeoutTimesToWithdrawPrizes = async () => {
+      const roundTimeoutTimesToWithdrawPrizes = await raffleWalletContract.roundTimeoutTimesToWithdrawPrizes(
+        RoundNum
+      );
+      setRoundTimeoutTimesToWithdrawPrizes(
+        Number(roundTimeoutTimesToWithdrawPrizes)
+      );
+    };
+
+    if (raffleWalletContract) {
+      fetchRoundTimeoutTimesToWithdrawPrizes();
+    }
+  }, [raffleWalletContract]);
+
+  // If there is no winner data, return an empty table row to prevent errors.
+  if (!winner) {
+    return <TablePrimaryRow />;
+  }
 
   return (
     <TablePrimaryRow>
@@ -89,7 +110,9 @@ const WinnerRow = ({ winner }) => {
           ? "Cosmic Signature Staking Raffle Token"
           : "Cosmic Signature Token"}
       </TablePrimaryCell>
-
+      <TablePrimaryCell align="center">
+        {convertTimestampToDateTime(roundTimeoutTimesToWithdrawPrizes)}
+      </TablePrimaryCell>
       {/* Amount Column (in ETH) - shown only if Amount is truthy */}
       <TablePrimaryCell align="right">
         {Amount ? `${Amount.toFixed(4)} ETH` : " "}
@@ -108,6 +131,7 @@ const WinnerRow = ({ winner }) => {
           " "
         )}
       </TablePrimaryCell>
+      <TablePrimaryCell></TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -145,11 +169,13 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
           */}
           {!isMobile && (
             <colgroup>
-              <col width="20%" />
+              <col width="12%" />
               <col width="15%" />
-              <col width="10%" />
-              <col width="32%" />
+              <col width="9%" />
+              <col width="16%" />
+              <col width="15%" />
               <col width="13%" />
+              <col width="10%" />
               <col width="10%" />
             </colgroup>
           )}
@@ -163,10 +189,14 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
                 Round #
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Type</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                Expiration Date
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">
                 Token ID
               </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
 
