@@ -21,6 +21,7 @@ import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import StakingWinnerTable from "../../components/StakingWinnerTable";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
 import EnduranceChampionsTable from "../../components/EnduranceChampionsTable";
+import RaffleETHRewardsTable from "../../components/RaffleETHRewardsTable";
 
 /* ------------------------------------------------------------------
   Helper Sub-Component: InfoRow
@@ -313,6 +314,7 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
   const [nftDonations, setNftDonations] = useState<any[]>([]);
   const [prizeInfo, setPrizeInfo] = useState<any>(null);
   const [stakingRewards, setStakingRewards] = useState<any[]>([]);
+  const [raffleETHRewards, setRaffleETHRewards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
 
@@ -376,17 +378,21 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
           prizeInfoData,
           bidHistoryData,
           stakingRewardsData,
+          raffleETHRewardsData,
         ] = await Promise.all([
           api.get_donations_nft_by_round(roundNum),
           api.get_round_info(roundNum),
           api.get_bid_list_by_round(roundNum, "desc"),
           api.get_staking_cst_rewards_by_round(roundNum),
+          api.get_prize_deposits_by_round(roundNum),
         ]);
-
+        console.log(prizeInfoData);
         setNftDonations(nftDonationsData);
         setPrizeInfo(prizeInfoData);
         setBidHistory(bidHistoryData);
         setStakingRewards(stakingRewardsData);
+        setRaffleETHRewards(raffleETHRewardsData);
+        console.log(raffleETHRewardsData);
       } catch (error) {
         console.error("Error fetching data:", error);
         setNotification({
@@ -462,6 +468,9 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
             handleAllDonatedNFTsClaim={handleAllDonatedNFTsClaim}
             isClaiming={isClaiming}
           />
+
+          <Typography>Raffle Rewards</Typography>
+          <RaffleETHRewardsTable list={raffleETHRewards} />
         </Box>
       )}
     </MainWrapper>
