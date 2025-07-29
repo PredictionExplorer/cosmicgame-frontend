@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TableBody, Link, Typography, Tooltip } from "@mui/material";
+import { TableBody, Link, Typography, Tooltip, Button } from "@mui/material";
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -131,7 +131,11 @@ const WinnerRow = ({ winner }) => {
           " "
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell></TablePrimaryCell>
+      <TablePrimaryCell>
+        {Amount && roundTimeoutTimesToWithdrawPrizes * 1000 < Date.now() && (
+          <Button size="small">Claim</Button>
+        )}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
