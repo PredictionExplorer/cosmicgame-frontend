@@ -324,12 +324,6 @@ const Contracts = () => {
       name: "Initial increment first bid",
       value: data ? formatSeconds(data.InitialSecondsUntilPrize) : "--",
     },
-    // Redundant but included if you want it in both sections:
-    {
-      name: "Random Walk contract address",
-      value: data?.ContractAddrs.RandomWalkAddr,
-      copyable: true,
-    },
   ];
 
   return (
