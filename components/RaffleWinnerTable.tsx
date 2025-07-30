@@ -131,11 +131,6 @@ const WinnerRow = ({ winner }) => {
           " "
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell>
-        {Amount && roundTimeoutTimesToWithdrawPrizes * 1000 < Date.now() && (
-          <Button size="small">Claim</Button>
-        )}
-      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -180,7 +175,6 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
               <col width="15%" />
               <col width="13%" />
               <col width="10%" />
-              <col width="10%" />
             </colgroup>
           )}
 
@@ -200,7 +194,6 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
               <TablePrimaryHeadCell align="center">
                 Token ID
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell />
             </Tr>
           </TablePrimaryHead>
 
