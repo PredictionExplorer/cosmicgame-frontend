@@ -109,7 +109,6 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
     DepositTimeStamp,
     RoundNum,
     DepositId,
-    DepositIndex,
     Claimed,
     RewardEth,
     Stake,
@@ -214,15 +213,6 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                     &nbsp;
                     <Typography component="span">
                       {Unstake.NumStakedNFTs}
-                    </Typography>
-                  </Box>
-                  <Box mb={1}>
-                    <Typography color="primary" component="span">
-                      Max Unpaid Deposit Index:
-                    </Typography>
-                    &nbsp;
-                    <Typography component="span">
-                      {Unstake.MaxUnpaidDepositIndex}
                     </Typography>
                   </Box>
                   <Box mb={1}>
