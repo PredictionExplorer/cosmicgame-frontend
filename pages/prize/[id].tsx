@@ -10,6 +10,7 @@ import { useNotification } from "../../contexts/NotificationContext";
 
 import {
   convertTimestampToDateTime,
+  formatEthValue,
   getEnduranceChampions,
   logoImgUrl,
 } from "../../utils";
@@ -123,7 +124,7 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
       />
       <InfoRow
         label="Endurance Champion rewarded with CST (ERC20):"
-        value={`${prizeInfo.EnduranceERC20AmountEth} CST`}
+        value={`${prizeInfo.EnduranceERC20AmountEth * 10 ** 18} CST`}
       />
       <InfoRow
         label="Last CST Bidder Address:"
@@ -149,6 +150,10 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
         value={`${prizeInfo.ChronoWarriorAmountEth.toFixed(4)} ETH`}
       />
       <InfoRow label="Total Bids:" value={prizeInfo.RoundStats.TotalBids} />
+      <InfoRow
+        label="Total Donated Amount:"
+        value={formatEthValue(prizeInfo.RoundStats.TotalDonatedAmountEth)}
+      />
       <InfoRow
         label="Total Donated NFTs:"
         value={prizeInfo.RoundStats.TotalDonatedNFTs}
