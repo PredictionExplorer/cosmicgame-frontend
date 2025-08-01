@@ -8,7 +8,7 @@ import { logoImgUrl } from "../utils";
  */
 const perUserLinks = [
   { href: "/my-tokens", label: "My Tokens" },
-  { href: "/#", label: "My Unclaimed Winnings" },
+  { href: "/my-winnings", label: "My Unclaimed Winnings" },
   { href: "/winning-history", label: "History of My Winnings" },
   { href: "/my-staking", label: "My Staking" },
 ];
