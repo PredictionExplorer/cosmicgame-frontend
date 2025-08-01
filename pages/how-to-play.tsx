@@ -241,8 +241,8 @@ const HowToPlay = () => {
               to withdraw this prize money from a special contract.
             </Typography>
             <Typography mb={2}>
-              At the end of each round, 3 raffle tickets will be chosen at
-              random by our smart contract to win 12% of the pot. Also, 5
+              At the end of each round, 4 raffle tickets will be chosen at
+              random by our smart contract to win 6% of the pot. Also, 5
               additional winners and 4 Random Walk NFT stakers will be chosen
               who will receive a Cosmic Signature NFT.
             </Typography>

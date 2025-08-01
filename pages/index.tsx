@@ -1890,7 +1890,7 @@ const NewHome = () => {
               https://protocol-guild.readthedocs.io
             </Link>
             ) will receive 10% of the prize pool (at least{" "}
-            {(data?.CosmicGameBalanceEth / 10).toFixed(4)} ETH)
+            {(data?.CosmicGameBalanceEth / 10).toFixed(4)} ETH).
           </Typography>
         </Box>
         <Box mt={6}>
