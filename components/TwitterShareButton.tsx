@@ -32,7 +32,7 @@ const TwitterShareButton: React.FC = () => {
     const tweetText = `I'm joining the @CosmicSignature test round on @arbitrum Sepolia for free! Over $60,000 in prizes up for grabs! https://x.com/CosmicSignature/status/1821607885819785412\nUse my referral link and you'll get an extra $100 if you win: https://cosmicsignature.com/?referred_by=${formattedHandle}`;
 
     // Encode tweet for Twitter intent URL
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+    const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(
       tweetText
     )}`;
 

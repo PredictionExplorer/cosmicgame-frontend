@@ -102,7 +102,7 @@ const Footer = () => (
 
               {/* Twitter icon */}
               <IconButton
-                href="https://twitter.com/CosmicSignatureNFT"
+                href="https://x.com/CosmicSignatureNFT"
                 target="_blank"
               >
                 <FontAwesomeIcon

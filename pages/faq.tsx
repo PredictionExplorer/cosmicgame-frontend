@@ -64,7 +64,7 @@ const FAQPage = () => {
                   fontWeight: 800,
                   color: "#fff",
                 }}
-                href="https://twitter.com/RandomWalkNFT"
+                href="https://x.com/RandomWalkNFT"
                 target="_blank"
                 rel="noopener noreferrer"
               >
