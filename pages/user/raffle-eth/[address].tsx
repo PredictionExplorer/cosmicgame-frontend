@@ -168,7 +168,7 @@ const UserRaffleETH = ({ address }: { address: string }) => {
   const handleAllETHClaim = async () => {
     try {
       setIsClaiming(true);
-      await raffleWalletContract.withdraw();
+      await raffleWalletContract["withdrawEth()"]();
 
       // Refresh data & statuses after short delay
       setTimeout(() => {
