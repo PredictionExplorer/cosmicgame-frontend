@@ -123,15 +123,14 @@ export const ADMIN_EVENTS = [
       "The value for the increment of prize time after every bid has been changed.",
   },
   {
-    name: "InitialBidAmountFractionChanged",
-    type: "number",
-    description:
-      "The initial value of the bid amount fraction has been changed.",
-  }, // have to remove this event
-  {
     name: "InitialSecondsUntilPrizeChanged",
     type: "time",
     description: "The initial value of the time until prize has been changed.",
+  },
+  {
+    name: "TreasurerAddressChanged",
+    type: "address",
+    description: "The address of the marketing wallet has been changed.",
   },
   {
     name: "ActivationTimeChanged",

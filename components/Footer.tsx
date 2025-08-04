@@ -65,7 +65,7 @@ const Footer = () => (
                 marginRight={{ lg: 10 }}
                 lineHeight={4}
               >
-                Copyright © 2024 Cosmic Signature
+                Copyright © 2025 Cosmic Signature
               </Typography>
 
               {/* Terms and Conditions link */}
