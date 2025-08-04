@@ -29,6 +29,7 @@ import { CSTStakingRewardsByDepositTable } from "../components/CSTStakingRewards
 import { CollectedCSTStakingRewardsTable } from "../components/CollectedCSTStakingRewardsTable";
 import { UncollectedCSTStakingRewardsTable } from "../components/UncollectedCSTStakingRewardsTable";
 import { RwalkStakingRewardMintsTable } from "../components/RwalkStakingRewardMintsTable";
+import DonatedERC20Table from "../components/DonatedERC20Table";
 
 /* ------------------------------------------------------------------
    Types & Interfaces
@@ -554,6 +555,10 @@ const MyStatistics = () => {
     loading: false,
   });
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
+  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState({
+    data: [],
+    loading: false,
+  });
 
   // Staking Tab
   const [stakingTab, setStakingTab] = useState(0);
@@ -671,6 +676,29 @@ const MyStatistics = () => {
     [account]
   );
 
+  const fetchDonatedERC20Tokens = useCallback(
+    async (reload = true) => {
+      if (!account) return;
+      setDonatedERC20Tokens((prev) => ({ ...prev, loading: reload }));
+      try {
+        const donatedERC20Tokens = await api.get_donations_erc20_by_user(
+          account
+        );
+        setDonatedERC20Tokens({ data: donatedERC20Tokens, loading: false });
+        console.log(donatedERC20Tokens);
+      } catch (err) {
+        console.error(err);
+        setNotification({
+          text: "Failed to fetch donated NFTs",
+          type: "error",
+          visible: true,
+        });
+        setDonatedERC20Tokens((prev) => ({ ...prev, loading: false }));
+      }
+    },
+    [account]
+  );
+
   const calculateProbability = useCallback(async () => {
     if (!account) return;
     try {
@@ -768,6 +796,10 @@ const MyStatistics = () => {
     }
   };
 
+  const handleDonatedERC20Claim = async () => {};
+
+  const handleAllDonatedERC20Claim = async () => {};
+
   /* --------------------------------------------------
     Tab Handling
   -------------------------------------------------- */
@@ -782,6 +814,7 @@ const MyStatistics = () => {
     if (account) {
       fetchUserData(account);
       fetchDonatedNFTs();
+      fetchDonatedERC20Tokens();
       calculateProbability();
     }
   }, [account, fetchUserData, fetchDonatedNFTs, calculateProbability]);
@@ -964,6 +997,38 @@ const MyStatistics = () => {
                 ]}
                 handleClaim={handleDonatedNFTsClaim}
                 claimingTokens={claimingDonatedNFTs}
+              />
+            )}
+          </Box>
+
+          {/* Donated ERC20 Section */}
+          <Box mt={8}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h6">Donated ERC20 Tokens</Typography>
+              {donatedERC20Tokens.data.length > 0 && (
+                <Button
+                  onClick={handleAllDonatedERC20Claim}
+                  variant="contained"
+                  disabled={isClaiming}
+                >
+                  Claim All
+                </Button>
+              )}
+            </Box>
+
+            {donatedERC20Tokens.loading ? (
+              <Typography variant="h6">Loading...</Typography>
+            ) : (
+              <DonatedERC20Table
+                list={donatedERC20Tokens.data}
+                handleClaim={handleDonatedERC20Claim}
               />
             )}
           </Box>
