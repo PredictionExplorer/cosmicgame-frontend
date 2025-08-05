@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Box, Button, Link, Typography } from "@mui/material";
+import { Box, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../../components/styled";
 import { GetServerSidePropsContext } from "next";
 
 import api from "../../services/api";
-import useRaffleWalletContract from "../../hooks/useRaffleWalletContract";
-import { useApiData } from "../../contexts/ApiDataContext";
 import { useNotification } from "../../contexts/NotificationContext";
 
 import {
@@ -14,7 +12,6 @@ import {
   getEnduranceChampions,
   logoImgUrl,
 } from "../../utils";
-import getErrorMessage from "../../utils/alert";
 
 // Child Components
 import RaffleWinnerTable from "../../components/RaffleWinnerTable";
@@ -22,6 +19,7 @@ import BiddingHistoryTable from "../../components/BiddingHistoryTable";
 import StakingWinnerTable from "../../components/StakingWinnerTable";
 import DonatedNFTTable from "../../components/DonatedNFTTable";
 import EnduranceChampionsTable from "../../components/EnduranceChampionsTable";
+import DonatedERC20Table from "../../components/DonatedERC20Table";
 
 /* ------------------------------------------------------------------
   Helper Sub-Component: InfoRow
@@ -256,43 +254,17 @@ const StakingRewardsSection: React.FC<StakingRewardsSectionProps> = ({
   </Box>
 );
 
-/* ------------------------------------------------------------------
-  Sub-Component: DonatedNFTsSection
-  Renders the "Donated NFTs" portion, including "Claim All" button
------------------------------------------------------------------- */
 interface DonatedNFTsSectionProps {
   nftDonations: any[];
-  donatedNFTToClaim: any[];
-  handleAllDonatedNFTsClaim: () => Promise<void>;
-  isClaiming: boolean;
 }
 const DonatedNFTsSection: React.FC<DonatedNFTsSectionProps> = ({
   nftDonations,
-  donatedNFTToClaim,
-  handleAllDonatedNFTsClaim,
-  isClaiming,
 }) => {
   return (
     <Box mt={8}>
-      <Box
-        sx={{
-          mb: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h6">Donated NFTs</Typography>
-        {donatedNFTToClaim.length > 0 && (
-          <Button
-            variant="contained"
-            onClick={handleAllDonatedNFTsClaim}
-            disabled={isClaiming}
-          >
-            Claim All
-          </Button>
-        )}
-      </Box>
+      <Typography variant="h6" mb={2}>
+        Donated NFTs
+      </Typography>
       <DonatedNFTTable
         list={nftDonations}
         handleClaim={null}
@@ -309,67 +281,34 @@ interface PrizeInfoProps {
   roundNum: number;
 }
 const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
-  const prizeWalletContract = useRaffleWalletContract();
-  const { apiData: status } = useApiData();
   const { setNotification } = useNotification();
 
-  const [donatedNFTToClaim, setDonatedNFTToClaim] = useState<any[]>([]);
+  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState<any[]>([]);
   const [bidHistory, setBidHistory] = useState<any[]>([]);
   const [nftDonations, setNftDonations] = useState<any[]>([]);
   const [prizeInfo, setPrizeInfo] = useState<any>(null);
   const [stakingRewards, setStakingRewards] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isClaiming, setIsClaiming] = useState(false);
 
   /* ------------------------------------------------------------------
     Data Fetching
   ------------------------------------------------------------------ */
 
-  // Fetch unclaimed donated NFTs
-  const fetchUnclaimedDonatedNFTs = async () => {
+  const fetchDonatedERC20Tokens = async () => {
     try {
-      const nfts = await api.get_donations_nft_unclaimed_by_round(roundNum);
-      setDonatedNFTToClaim(nfts);
+      const donatedERC20Tokens = await api.get_donations_erc20_by_round(
+        roundNum
+      );
+      setDonatedERC20Tokens(donatedERC20Tokens);
     } catch (error) {
-      console.error("Error fetching unclaimed donated NFTs:", error);
+      console.error("Error fetching donated ERC20 tokens:", error);
       setNotification({
-        text: "Failed to load unclaimed donated NFTs.",
+        text: "Failed to load donated ERC20 tokens.",
         type: "error",
         visible: true,
       });
     }
   };
-
-  // "Claim All" Donated NFTs
-  const handleAllDonatedNFTsClaim = async () => {
-    setIsClaiming(true);
-    try {
-      const indexList = donatedNFTToClaim.map((item) => item.Index);
-      await prizeWalletContract.claimManyDonatedNfts(indexList);
-      await fetchUnclaimedDonatedNFTs();
-    } catch (err) {
-      if (err?.code === 4001) {
-        console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
-      } else {
-        const errorMsg = getErrorMessage(
-          err?.data?.message || err.message || "An error occurred"
-        );
-        setNotification({ text: errorMsg, type: "error", visible: true });
-        console.error("Error claiming donated NFTs:", err);
-      }
-    } finally {
-      setIsClaiming(false);
-    }
-  };
-
-  // Re-fetch unclaimed NFTs if the global status changes
-  useEffect(() => {
-    if (typeof status?.NumDonatedNFTToClaim === "number") {
-      fetchUnclaimedDonatedNFTs();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status?.NumDonatedNFTToClaim, roundNum]);
 
   // Fetch main data for the selected round
   useEffect(() => {
@@ -387,7 +326,6 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
           api.get_bid_list_by_round(roundNum, "desc"),
           api.get_staking_cst_rewards_by_round(roundNum),
         ]);
-        console.log(prizeInfoData);
         setNftDonations(nftDonationsData);
         setPrizeInfo(prizeInfoData);
         setBidHistory(bidHistoryData);
@@ -404,6 +342,7 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
       }
     };
     fetchData();
+    fetchDonatedERC20Tokens();
   }, [roundNum, setNotification]);
 
   // Compute the champion list using memo
@@ -461,12 +400,15 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
           <StakingRewardsSection stakingRewards={stakingRewards} />
 
           {/* Donated NFTs */}
-          <DonatedNFTsSection
-            nftDonations={nftDonations}
-            donatedNFTToClaim={donatedNFTToClaim}
-            handleAllDonatedNFTsClaim={handleAllDonatedNFTsClaim}
-            isClaiming={isClaiming}
-          />
+          <DonatedNFTsSection nftDonations={nftDonations} />
+
+          {/* Donated ERC20 Tokens */}
+          <Box mt={8}>
+            <Typography variant="h6" mb={2}>
+              Donated ERC20 Tokens
+            </Typography>
+            <DonatedERC20Table list={donatedERC20Tokens} handleClaim={null} />
+          </Box>
         </Box>
       )}
     </MainWrapper>
