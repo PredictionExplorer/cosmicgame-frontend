@@ -141,7 +141,9 @@ const TokenRow = ({ token, handleClaim }) => {
           {!token.WinnerAddr && (
             <Button
               variant="contained"
-              onClick={() => handleClaim(token.Index)}
+              onClick={() =>
+                handleClaim(token.RoundNum, token.TokenAddr, token.AmountEth)
+              }
               data-testid="Claim Button"
             >
               Claim

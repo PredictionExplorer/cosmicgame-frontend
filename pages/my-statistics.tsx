@@ -685,7 +685,6 @@ const MyStatistics = () => {
           account
         );
         setDonatedERC20Tokens({ data: donatedERC20Tokens, loading: false });
-        console.log(donatedERC20Tokens);
       } catch (err) {
         console.error(err);
         setNotification({
@@ -796,9 +795,42 @@ const MyStatistics = () => {
     }
   };
 
-  const handleDonatedERC20Claim = async () => {};
+  const handleDonatedERC20Claim = async (roundNum, tokenAddr, amount) => {
+    try {
+      await prizeWalletContract.claimDonatedToken(roundNum, tokenAddr, amount);
+      setTimeout(() => {
+        fetchDonatedERC20Tokens(false);
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      const msg = err?.data?.message
+        ? getErrorMessage(err.data.message)
+        : "An error occurred";
+      setNotification({ text: msg, type: "error", visible: true });
+    }
+  };
 
-  const handleAllDonatedERC20Claim = async () => {};
+  const handleAllDonatedERC20Claim = async () => {
+    try {
+      const donatedTokensToClaim = donatedERC20Tokens.data
+        .filter((x) => !x.Claimed)
+        .map((x) => ({
+          roundNum: x.RoundNum,
+          tokenAddress: x.TokenAddr,
+          amount: x.AmountEth,
+        }));
+      await prizeWalletContract.claimManyDonatedTokens(donatedTokensToClaim);
+      setTimeout(() => {
+        fetchDonatedERC20Tokens(false);
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      const msg = err?.data?.message
+        ? getErrorMessage(err.data.message)
+        : "An error occurred";
+      setNotification({ text: msg, type: "error", visible: true });
+    }
+  };
 
   /* --------------------------------------------------
     Tab Handling
