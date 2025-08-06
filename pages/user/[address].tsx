@@ -1040,7 +1040,7 @@ const UserInfo = ({ address }: { address: string }) => {
               }}
             >
               <Typography variant="h6">Donated ERC20 Tokens</Typography>
-              {donatedERC20Tokens.data.length > 0 && (
+              {donatedERC20Tokens.data.length > 0 && account === address && (
                 <Button
                   onClick={handleAllDonatedERC20Claim}
                   variant="contained"
@@ -1055,7 +1055,9 @@ const UserInfo = ({ address }: { address: string }) => {
             ) : (
               <DonatedERC20Table
                 list={donatedERC20Tokens.data}
-                handleClaim={handleDonatedERC20Claim}
+                handleClaim={
+                  account === address ? handleDonatedERC20Claim : null
+                }
               />
             )}
           </Box>
