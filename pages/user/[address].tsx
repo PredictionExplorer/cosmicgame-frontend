@@ -251,11 +251,11 @@ const UserInfo = ({ address }: { address: string }) => {
 
   const fetchDonatedERC20Tokens = useCallback(
     async (reload = true) => {
-      if (!account) return;
+      if (!address) return;
       setDonatedERC20Tokens((prev) => ({ ...prev, loading: reload }));
       try {
         const donatedERC20Tokens = await api.get_donations_erc20_by_user(
-          account
+          address
         );
         setDonatedERC20Tokens({ data: donatedERC20Tokens, loading: false });
       } catch (err) {
@@ -268,7 +268,7 @@ const UserInfo = ({ address }: { address: string }) => {
         setDonatedERC20Tokens((prev) => ({ ...prev, loading: false }));
       }
     },
-    [account]
+    [address]
   );
 
   /**
