@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
 import { GetServerSidePropsContext } from "next";
@@ -24,6 +24,7 @@ import { formatEthValue, logoImgUrl } from "../../utils";
 import api, { cosmicGameBaseUrl } from "../../services/api";
 import { ethers } from "ethers";
 import axios from "axios";
+import DonatedERC20Table from "../../components/DonatedERC20Table";
 
 /* ------------------------------------------------------------------
    Types & Interfaces
@@ -133,6 +134,10 @@ const UserInfo = ({ address }: { address: string }) => {
   const [cstStakingRewardsByDeposit, setCstStakingRewardsByDeposit] = useState<
     any[]
   >([]);
+  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState({
+    data: [],
+    loading: false,
+  });
 
   // RWLK minted rewards
   const [rwlkMints, setRWLKMints] = useState<any[]>([]);
@@ -244,6 +249,28 @@ const UserInfo = ({ address }: { address: string }) => {
     }
   };
 
+  const fetchDonatedERC20Tokens = useCallback(
+    async (reload = true) => {
+      if (!account) return;
+      setDonatedERC20Tokens((prev) => ({ ...prev, loading: reload }));
+      try {
+        const donatedERC20Tokens = await api.get_donations_erc20_by_user(
+          account
+        );
+        setDonatedERC20Tokens({ data: donatedERC20Tokens, loading: false });
+      } catch (err) {
+        console.error(err);
+        setNotification({
+          text: "Failed to fetch donated NFTs",
+          type: "error",
+          visible: true,
+        });
+        setDonatedERC20Tokens((prev) => ({ ...prev, loading: false }));
+      }
+    },
+    [account]
+  );
+
   /**
    * calculateProbability: Calculates the probability that the user
    * wins ETH or NFT in the current raffle based on their number of bids.
@@ -352,6 +379,43 @@ const UserInfo = ({ address }: { address: string }) => {
         setNotification({ text: msg, type: "error", visible: true });
       }
       setIsClaiming(false);
+    }
+  };
+
+  const handleDonatedERC20Claim = async (roundNum, tokenAddr, amount) => {
+    try {
+      await prizeWalletContract.claimDonatedToken(roundNum, tokenAddr, amount);
+      setTimeout(() => {
+        fetchDonatedERC20Tokens(false);
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      const msg = err?.data?.message
+        ? getErrorMessage(err.data.message)
+        : "An error occurred";
+      setNotification({ text: msg, type: "error", visible: true });
+    }
+  };
+
+  const handleAllDonatedERC20Claim = async () => {
+    try {
+      const donatedTokensToClaim = donatedERC20Tokens.data
+        .filter((x) => !x.Claimed)
+        .map((x) => ({
+          roundNum: x.RoundNum,
+          tokenAddress: x.TokenAddr,
+          amount: x.AmountEth,
+        }));
+      await prizeWalletContract.claimManyDonatedTokens(donatedTokensToClaim);
+      setTimeout(() => {
+        fetchDonatedERC20Tokens(false);
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      const msg = err?.data?.message
+        ? getErrorMessage(err.data.message)
+        : "An error occurred";
+      setNotification({ text: msg, type: "error", visible: true });
     }
   };
 
@@ -961,6 +1025,37 @@ const UserInfo = ({ address }: { address: string }) => {
                   account === address ? handleDonatedNFTsClaim : null
                 }
                 claimingTokens={claimingDonatedNFTs}
+              />
+            )}
+          </Box>
+
+          {/* Donated ERC20 Section */}
+          <Box mt={8}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h6">Donated ERC20 Tokens</Typography>
+              {donatedERC20Tokens.data.length > 0 && (
+                <Button
+                  onClick={handleAllDonatedERC20Claim}
+                  variant="contained"
+                >
+                  Claim All
+                </Button>
+              )}
+            </Box>
+
+            {donatedERC20Tokens.loading ? (
+              <Typography variant="h6">Loading...</Typography>
+            ) : (
+              <DonatedERC20Table
+                list={donatedERC20Tokens.data}
+                handleClaim={handleDonatedERC20Claim}
               />
             )}
           </Box>
