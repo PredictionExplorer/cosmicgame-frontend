@@ -1048,7 +1048,6 @@ const MyStatistics = () => {
                 <Button
                   onClick={handleAllDonatedERC20Claim}
                   variant="contained"
-                  disabled={isClaiming}
                 >
                   Claim All
                 </Button>
