@@ -17,8 +17,9 @@ import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
 import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
+import api from "../services/api";
 
-const TokenRow = ({ token, handleClaim }) => {
+const TokenRow = ({ currentTime, token, handleClaim }) => {
   const [
     roundTimeoutTimesToWithdrawPrizes,
     setRoundTimeoutTimesToWithdrawPrizes,
@@ -128,15 +129,15 @@ const TokenRow = ({ token, handleClaim }) => {
 
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(roundTimeoutTimesToWithdrawPrizes)}{" "}
-        {roundTimeoutTimesToWithdrawPrizes < Date.now() / 1000
+        {roundTimeoutTimesToWithdrawPrizes < currentTime
           ? "(Expired)"
           : `(${formatSeconds(
-              roundTimeoutTimesToWithdrawPrizes - Math.ceil(Date.now() / 1000)
-            )})`}
+              roundTimeoutTimesToWithdrawPrizes - currentTime
+            )} left)`}
       </TablePrimaryCell>
 
       {/* Claim Button */}
-      {handleClaim && (
+      {handleClaim && roundTimeoutTimesToWithdrawPrizes < currentTime && (
         <TablePrimaryCell>
           {!token.WinnerAddr && (
             <Button
@@ -161,6 +162,17 @@ const TokenRow = ({ token, handleClaim }) => {
 const DonatedERC20Table = ({ list, handleClaim }) => {
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const currentTime = await api.get_current_time();
+      setCurrentTime(currentTime);
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   if (!list || list.length === 0) {
     return <Typography>No donated ERC20 tokens yet.</Typography>;
@@ -191,6 +203,7 @@ const DonatedERC20Table = ({ list, handleClaim }) => {
             {list.slice((page - 1) * perPage, page * perPage).map((token) => (
               <TokenRow
                 key={token.RecordId}
+                currentTime={currentTime}
                 token={token}
                 handleClaim={handleClaim}
               />
