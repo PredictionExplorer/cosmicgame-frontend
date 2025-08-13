@@ -289,7 +289,7 @@ const NewHome = () => {
   const onBid = async () => {
     setIsBidding(true);
     try {
-      const bidPrice = await cosmicGameContract.getNextEthBidPrice(0);
+      const bidPrice = await cosmicGameContract.getNextEthBidPrice();
       let newBidPrice = bidPrice
         .mul(ethers.utils.parseEther((100 + bidPricePlus).toString()))
         .div(ethers.utils.parseEther("100"));
@@ -572,7 +572,7 @@ const NewHome = () => {
           return;
         }
       }
-      const priceMaxLimit = await cosmicGameContract.getNextCstBidPrice(0);
+      const priceMaxLimit = await cosmicGameContract.getNextCstBidPrice();
       if (
         (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
         (donationType === "Token" && (!tokenDonateAddress || !tokenAmount))
