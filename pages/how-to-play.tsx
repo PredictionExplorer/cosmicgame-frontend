@@ -237,7 +237,7 @@ const HowToPlay = () => {
               </li>
             </ul>
             <Typography mb={2}>
-              When you win, you get 25% of the prize pool. You will be required
+              When you win, you get 32% of the prize pool. You will be required
               to withdraw this prize money from a special contract.
             </Typography>
             <Typography mb={2}>
