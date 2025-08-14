@@ -487,18 +487,15 @@ const NewHome = () => {
             account,
             COSMICGAME_ADDRESS
           );
-          if (allowance.lt(tokenAmountInWei)) {
-            await tokenDonateContract
-              .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
+          let receipt;
+          if (allowance.lt(ethers.constants.MaxUint256)) {
+            receipt = await tokenDonateContract
+              .approve(COSMICGAME_ADDRESS, ethers.constants.MaxUint256)
               .then((tx: any) => tx.wait());
           }
-          allowance = await tokenDonateContract.allowance(
-            account,
-            RAFFLE_WALLET_ADDRESS
-          );
-          if (allowance.lt(tokenAmountInWei)) {
+          if (!receipt?.status && allowance.lt(tokenAmountInWei)) {
             await tokenDonateContract
-              .approve(RAFFLE_WALLET_ADDRESS, tokenAmountInWei)
+              .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
@@ -743,18 +740,15 @@ const NewHome = () => {
             account,
             COSMICGAME_ADDRESS
           );
-          if (allowance.lt(tokenAmountInWei)) {
-            await tokenDonateContract
-              .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
+          let receipt;
+          if (allowance.lt(ethers.constants.MaxUint256)) {
+            receipt = await tokenDonateContract
+              .approve(COSMICGAME_ADDRESS, ethers.constants.MaxUint256)
               .then((tx: any) => tx.wait());
           }
-          allowance = await tokenDonateContract.allowance(
-            account,
-            RAFFLE_WALLET_ADDRESS
-          );
-          if (allowance.lt(tokenAmountInWei)) {
+          if (!receipt?.status && allowance.lt(tokenAmountInWei)) {
             await tokenDonateContract
-              .approve(RAFFLE_WALLET_ADDRESS, tokenAmountInWei)
+              .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
