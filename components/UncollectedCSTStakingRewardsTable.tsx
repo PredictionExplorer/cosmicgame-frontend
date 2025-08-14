@@ -279,8 +279,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
         <DialogTitle>Claim all staking rewards</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to claim all staking rewards? If you unstake the tokens,
-            then you can stake those tokens again.
+            {`Do you want to claim all staking rewards? If you unstake the tokens, then you can't stake those tokens again.`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
