@@ -295,17 +295,6 @@ const MyStaking = () => {
             .then((tx: any) => tx.wait());
         }
 
-        // Show success notification
-        if (!res.code) {
-          setNotification({
-            visible: true,
-            text: Array.isArray(tokenIds)
-              ? "The selected tokens were staked successfully!"
-              : `You have successfully staked token ${tokenIds}!`,
-            type: "success",
-          });
-        }
-
         setTimeout(async () => {
           // Refresh data
           if (isRwalk) {
@@ -314,7 +303,18 @@ const MyStaking = () => {
             await fetchCSTData(account!);
           }
           await fetchDashboardData();
-        }, 4000);
+
+          // Show success notification
+          if (!res.code) {
+            setNotification({
+              visible: true,
+              text: Array.isArray(tokenIds)
+                ? "The selected tokens were staked successfully!"
+                : `You have successfully staked token ${tokenIds}!`,
+              type: "success",
+            });
+          }
+        }, 2000);
 
         return res;
       } catch (err) {
@@ -353,17 +353,6 @@ const MyStaking = () => {
             .then((tx: any) => tx.wait());
         }
 
-        // Success notification
-        if (!res.code) {
-          setNotification({
-            visible: true,
-            text: Array.isArray(actionIds)
-              ? "The selected tokens were unstaked successfully!"
-              : "You have successfully unstaked token!",
-            type: "success",
-          });
-        }
-
         setTimeout(async () => {
           // Refresh data
           if (isRwalk) {
@@ -372,7 +361,18 @@ const MyStaking = () => {
             await fetchCSTData(account!);
           }
           await fetchDashboardData();
-        }, 4000);
+
+          // Success notification
+          if (!res.code) {
+            setNotification({
+              visible: true,
+              text: Array.isArray(actionIds)
+                ? "The selected tokens were unstaked successfully!"
+                : "You have successfully unstaked token!",
+              type: "success",
+            });
+          }
+        }, 2000);
 
         return res;
       } catch (err) {

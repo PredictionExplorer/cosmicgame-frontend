@@ -30,6 +30,7 @@ import { isMobile } from "react-device-detect";
   Renders a single row (CSToken).
 ------------------------------------------------------------------ */
 const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }) => {
+  const [processing, setProcessing] = useState(false);
   if (!row) return null;
 
   const {
@@ -45,9 +46,11 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }) => {
   // Row-level click handlers
   const handleRowClick = () => onSelectToggle(TokenId);
 
-  const handleStakeClick = (e) => {
+  const handleStakeClick = async (e) => {
     e.stopPropagation();
-    onStakeSingle(TokenId);
+    setProcessing(true);
+    await onStakeSingle(TokenId);
+    setProcessing(false);
   };
 
   return (
@@ -108,7 +111,7 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }) => {
       {/* Stake Button */}
       <TablePrimaryCell align="center">
         {!Staked && (
-          <Button size="small" onClick={handleStakeClick}>
+          <Button size="small" disabled={processing} onClick={handleStakeClick}>
             Stake
           </Button>
         )}
@@ -132,6 +135,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
 
   // Track selected Token IDs
   const [selectedTokenIds, setSelectedTokenIds] = useState([]);
+  const [processing, setProcessing] = useState(false);
 
   // Refresh selection and pagination when the list changes
   useEffect(() => {
@@ -186,7 +190,9 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
 
   // Stake many tokens
   const handleStakeManySelected = async () => {
+    setProcessing(true);
     await handleStakeMany(selectedTokenIds, false);
+    setProcessing(false);
   };
 
   // If the list is empty
@@ -295,7 +301,11 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
       {/* Stake Many button */}
       {selectedTokenIds.length > 1 && (
         <Box display="flex" justifyContent="end" mt={2}>
-          <Button variant="text" onClick={handleStakeManySelected}>
+          <Button
+            variant="text"
+            disabled={processing}
+            onClick={handleStakeManySelected}
+          >
             Stake Many
           </Button>
         </Box>

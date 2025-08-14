@@ -95,6 +95,7 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
   onRowClick,
   onUnstakeSingle,
 }) => {
+  const [processing, setProcessing] = useState(false);
   const stakeActionId = isRandomWalk
     ? (row as RandomWalkRow).StakeActionId
     : (row as CosmicSignatureRow).TokenInfo.StakeActionId;
@@ -185,9 +186,12 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
         <Button
           size="small"
           sx={{ mr: 1 }}
-          onClick={(e) => {
+          disabled={processing}
+          onClick={async (e) => {
             e.stopPropagation();
-            onUnstakeSingle(stakeActionId);
+            setProcessing(true);
+            await onUnstakeSingle(stakeActionId);
+            setProcessing(false);
           }}
         >
           Unstake
@@ -216,6 +220,7 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
   const [page, setPage] = useState<number>(1);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [processing, setProcessing] = useState(false);
 
   const [accumulatedRewardsByToken, setAccumulatedRewardsByToken] = useState<
     any[]
@@ -294,7 +299,9 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
 
   // Unstake multiple tokens
   const onUnstakeManyClick = async () => {
+    setProcessing(true);
     await handleUnstakeMany(selectedIds, IsRwalk);
+    setProcessing(false);
   };
 
   // Unstake a single token
@@ -428,7 +435,11 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
 
       {selectedIds.length > 1 && (
         <Box display="flex" justifyContent="end" mt={2}>
-          <Button variant="text" onClick={onUnstakeManyClick}>
+          <Button
+            variant="text"
+            disabled={processing}
+            onClick={onUnstakeManyClick}
+          >
             Unstake Many
           </Button>
         </Box>
