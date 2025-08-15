@@ -357,6 +357,13 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
   /* ------------------------------------------------------------------
     Render
   ------------------------------------------------------------------ */
+  if (roundNum < 0) {
+    return (
+      <MainWrapper>
+        <Typography variant="h6">Invalid Round Number</Typography>
+      </MainWrapper>
+    );
+  }
 
   if (loading) {
     return (
