@@ -42,6 +42,16 @@ const FAQ = () => {
         "When you bid with ETH, you will earn 100 Cosmic Tokens (ERC-20). These tokens can be used to make another bid through the Dutch auction. A Dutch auction is a type of auction that lowers the bid price if nobody bids after a certain amount of time; the more time passes, the lower the bid price gets. This feature allows you to save on bidding and continue playing the game.",
     },
     {
+      summary: "What is an Endurance Champion?",
+      detail:
+        "The bidder who held the lead position for the longest continuous time between two bids (or until the round ended).",
+    },
+    {
+      summary: "What is a Chrono Warrior?",
+      detail:
+        "The bidder who spent the most total time in the lead position during a round, regardless of whether that time came from one long stretch or multiple shorter stretches.",
+    },
+    {
       summary: "How does the raffle work?",
       detail:
         "Each bid also serves as a raffle ticket. There are 13 raffle winners in each round — 4 who win a portion of the pot and 9 who receive a newly minted Cosmic Signature NFT.",
