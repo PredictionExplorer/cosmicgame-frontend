@@ -69,7 +69,7 @@ export const GlobalMarketingRewardsTable = ({ list }: { list: any[] }) => {
             {/* Table Head with column names */}
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Marketer</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Marketing Agent</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
