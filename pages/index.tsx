@@ -426,7 +426,7 @@ const NewHome = () => {
               nftIdNum,
               {
                 value: newBidPrice,
-                gasLimit: 30000000,
+                // gasLimit: 30000000,
               }
             )
             .then((tx: any) => tx.wait());
@@ -534,7 +534,7 @@ const NewHome = () => {
               tokenAmountInWei,
               {
                 value: newBidPrice,
-                gasLimit: 30000000,
+                // gasLimit: 30000000,
               }
             )
             .then((tx: any) => tx.wait());
@@ -784,8 +784,7 @@ const NewHome = () => {
               priceMaxLimit,
               message,
               tokenDonateAddress,
-              tokenAmountInWei,
-              { gasLimit: 30000000 }
+              tokenAmountInWei
             )
             .then((tx: any) => tx.wait());
           setTimeout(() => {
