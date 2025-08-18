@@ -784,7 +784,8 @@ const NewHome = () => {
               priceMaxLimit,
               message,
               tokenDonateAddress,
-              tokenAmountInWei
+              tokenAmountInWei,
+              { gasLimit: 30000000 }
             )
             .then((tx: any) => tx.wait());
           setTimeout(() => {
