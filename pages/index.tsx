@@ -21,6 +21,8 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import {
   CustomTextField,
@@ -89,6 +91,7 @@ import EnduranceChampionsTable from "../components/EnduranceChampionsTable";
 import EthDonationTable from "../components/EthDonationTable";
 import axios from "axios";
 import { parseUnits } from "ethers/lib/utils";
+import DonatedERC20Table from "../components/DonatedERC20Table";
 
 const NewHome = () => {
   const router = useRouter();
@@ -130,6 +133,8 @@ const NewHome = () => {
   const [twitterPopupOpen, setTwitterPopupOpen] = useState(false);
   const [twitterHandle, setTwitterHandle] = useState("");
   const [activationTime, setActivationTime] = useState(0);
+  const [donatedTokensTab, setDonatedTokensTab] = useState(0);
+  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState([]);
   const perPage = 12;
 
   const { library, account } = useActiveWeb3React();
@@ -140,6 +145,25 @@ const NewHome = () => {
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
+
+  interface TabPanelProps {
+    children?: React.ReactNode;
+    index: number;
+    value: number;
+  }
+  function CustomTabPanel({ children, value, index, ...other }: TabPanelProps) {
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`simple-tabpanel-${index}`}
+        aria-labelledby={`simple-tab-${index}`}
+        {...other}
+      >
+        {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      </div>
+    );
+  }
 
   const gridLayout =
     donatedNFTs.length > 16
@@ -175,6 +199,10 @@ const NewHome = () => {
           100
         ).toFixed(4)} ETH)`
       : "";
+  };
+
+  const handleTabChange = (_event: any, newValue: number) => {
+    setDonatedTokensTab(newValue);
   };
 
   const onClaimPrize = async () => {
@@ -836,6 +864,7 @@ const NewHome = () => {
           championsData,
           specials,
           ethDonations,
+          donatedERC20Tokens,
         ] = await Promise.all([
           api.get_bid_list_by_round(round, "desc"),
           api.get_donations_nft_by_round(round),
@@ -849,12 +878,14 @@ const NewHome = () => {
           })(),
           api.get_current_special_winners(),
           api.get_donations_cg_with_info_by_round(round),
+          api.get_donations_erc20_by_round(round),
         ]);
         setCurBidList(newBidData);
         setDonatedNFTs(nftData);
         setChampionList(championsData);
         setSpecialWinners(specials);
         setEthDonations(ethDonations);
+        setDonatedERC20Tokens(donatedERC20Tokens);
       }
       setData((prevData: any) => {
         if (
@@ -1974,45 +2005,50 @@ const NewHome = () => {
           </Box>
         )}
         <Box marginTop={10}>
-          <Box>
-            <Typography variant="h6" component="span">
-              DONATED
-            </Typography>
-            <Typography variant="h6" color="primary" component="span" mx={1}>
-              ERC721 TOKENS
-            </Typography>
-            <Typography variant="h6" component="span">
-              FOR CURRENT ROUND
-            </Typography>
+          <Typography variant="h6">DONATED TOKENS FOR CURRENT ROUND</Typography>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              variant="fullWidth"
+              value={donatedTokensTab}
+              onChange={handleTabChange}
+            >
+              <Tab label="ERC721 Tokens" />
+              <Tab label="ERC20 Tokens" />
+            </Tabs>
           </Box>
-          {donatedNFTs.length > 0 ? (
-            <>
-              <Grid container spacing={2} mt={2}>
-                {donatedNFTs.map((nft) => (
-                  <Grid
-                    item
-                    key={nft.RecordId}
-                    xs={gridLayout.xs}
-                    sm={gridLayout.sm}
-                    md={gridLayout.md}
-                    lg={gridLayout.lg}
-                  >
-                    <DonatedNFT nft={nft} />
-                  </Grid>
-                ))}
-              </Grid>
-              <CustomPagination
-                page={curPage}
-                setPage={setCurrentPage}
-                totalLength={donatedNFTs.length}
-                perPage={perPage}
-              />
-            </>
-          ) : (
-            <Typography mt={2}>
-              No ERC721 tokens were donated on this round.
-            </Typography>
-          )}
+          <CustomTabPanel value={donatedTokensTab} index={0}>
+            {donatedNFTs.length > 0 ? (
+              <>
+                <Grid container spacing={2} mt={2}>
+                  {donatedNFTs.map((nft) => (
+                    <Grid
+                      item
+                      key={nft.RecordId}
+                      xs={gridLayout.xs}
+                      sm={gridLayout.sm}
+                      md={gridLayout.md}
+                      lg={gridLayout.lg}
+                    >
+                      <DonatedNFT nft={nft} />
+                    </Grid>
+                  ))}
+                </Grid>
+                <CustomPagination
+                  page={curPage}
+                  setPage={setCurrentPage}
+                  totalLength={donatedNFTs.length}
+                  perPage={perPage}
+                />
+              </>
+            ) : (
+              <Typography>
+                No ERC721 tokens were donated on this round.
+              </Typography>
+            )}
+          </CustomTabPanel>
+          <CustomTabPanel value={donatedTokensTab} index={1}>
+            <DonatedERC20Table list={donatedERC20Tokens} handleClaim={null} />
+          </CustomTabPanel>
         </Box>
         <Box mt={10}>
           <Box>
