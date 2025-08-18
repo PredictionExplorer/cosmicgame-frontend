@@ -526,6 +526,20 @@ const NewHome = () => {
               .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
               .then((tx: any) => tx.wait());
           }
+          allowance = await tokenDonateContract.allowance(
+            account,
+            RAFFLE_WALLET_ADDRESS
+          );
+          if (allowance.lt(ethers.constants.MaxUint256)) {
+            receipt = await tokenDonateContract
+              .approve(RAFFLE_WALLET_ADDRESS, ethers.constants.MaxUint256)
+              .then((tx: any) => tx.wait());
+          }
+          if (!receipt?.status && allowance.lt(tokenAmountInWei)) {
+            await tokenDonateContract
+              .approve(RAFFLE_WALLET_ADDRESS, tokenAmountInWei)
+              .then((tx: any) => tx.wait());
+          }
           await cosmicGameContract
             .bidWithEthAndDonateToken(
               rwlkId,
@@ -777,6 +791,20 @@ const NewHome = () => {
           if (!receipt?.status && allowance.lt(tokenAmountInWei)) {
             await tokenDonateContract
               .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
+              .then((tx: any) => tx.wait());
+          }
+          allowance = await tokenDonateContract.allowance(
+            account,
+            RAFFLE_WALLET_ADDRESS
+          );
+          if (allowance.lt(ethers.constants.MaxUint256)) {
+            receipt = await tokenDonateContract
+              .approve(RAFFLE_WALLET_ADDRESS, ethers.constants.MaxUint256)
+              .then((tx: any) => tx.wait());
+          }
+          if (!receipt?.status && allowance.lt(tokenAmountInWei)) {
+            await tokenDonateContract
+              .approve(RAFFLE_WALLET_ADDRESS, tokenAmountInWei)
               .then((tx: any) => tx.wait());
           }
           await cosmicGameContract
