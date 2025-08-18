@@ -4,6 +4,7 @@ import { MainWrapper } from "../../components/styled";
 import axios from "axios";
 import { cosmicGameBaseUrl } from "../../services/api";
 import { getAssetsUrl } from "../../utils";
+import { Typography } from "@mui/material";
 
 interface DetailProps {
   tokenId: number;
@@ -14,6 +15,14 @@ interface DetailProps {
 
 // Detail component that renders NFTTrait inside a styled MainWrapper
 const Detail = ({ tokenId }: DetailProps) => {
+  if (tokenId < 0) {
+    return (
+      <MainWrapper>
+        <Typography variant="h6">Invalid Token Id</Typography>
+      </MainWrapper>
+    );
+  }
+
   return (
     <MainWrapper
       maxWidth={false}

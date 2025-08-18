@@ -45,6 +45,14 @@ const EthDonationDetail = ({ id }: EthDonationDetailProps) => {
     fetchDonationDetail();
   }, [id]);
 
+  if (id < 0) {
+    return (
+      <MainWrapper>
+        <Typography variant="h6">Invalid Donation Id</Typography>
+      </MainWrapper>
+    );
+  }
+
   if (loading) {
     return (
       <MainWrapper>

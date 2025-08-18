@@ -36,6 +36,14 @@ const EthDonationByRound: React.FC<EthDonationByRoundProps> = ({ round }) => {
     fetchDonationData();
   }, [round]); // Added round as a dependency for better clarity
 
+  if (round < 0) {
+    return (
+      <MainWrapper>
+        <Typography variant="h6">Invalid Round Number</Typography>
+      </MainWrapper>
+    );
+  }
+
   return (
     <MainWrapper>
       <Typography

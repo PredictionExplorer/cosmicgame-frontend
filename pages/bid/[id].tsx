@@ -52,6 +52,14 @@ const BidInfo = ({ bidId }: { bidId: number }) => {
     fetchData();
   }, [bidId]);
 
+  if (bidId < 0) {
+    return (
+      <MainWrapper>
+        <Typography variant="h6">Invalid Bid Id</Typography>
+      </MainWrapper>
+    );
+  }
+
   // Render
   return (
     <MainWrapper>
