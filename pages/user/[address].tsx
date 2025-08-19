@@ -444,6 +444,7 @@ const UserInfo = ({ address }: { address: string }) => {
     } else {
       fetchUserData(address);
       fetchDonatedNFTs();
+      fetchDonatedERC20Tokens();
       calculateProbability();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
