@@ -251,6 +251,10 @@ export default function MyWinnings() {
     [account]
   );
 
+  useEffect(() => {
+    fetchDonatedERC20Tokens();
+  }, []);
+
   // Claim all ETH from raffle contract
   const handleAllETHClaim = async () => {
     setIsClaiming((prev) => ({ ...prev, raffleETH: true }));
