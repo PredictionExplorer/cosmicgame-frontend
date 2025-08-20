@@ -1041,14 +1041,15 @@ const UserInfo = ({ address }: { address: string }) => {
               }}
             >
               <Typography variant="h6">Donated ERC20 Tokens</Typography>
-              {donatedERC20Tokens.data.length > 0 && account === address && (
-                <Button
-                  onClick={handleAllDonatedERC20Claim}
-                  variant="contained"
-                >
-                  Claim All
-                </Button>
-              )}
+              {donatedERC20Tokens.data.filter((x) => !x.Claimed).length > 0 &&
+                account === address && (
+                  <Button
+                    onClick={handleAllDonatedERC20Claim}
+                    variant="contained"
+                  >
+                    Claim All
+                  </Button>
+                )}
             </Box>
 
             {donatedERC20Tokens.loading ? (
