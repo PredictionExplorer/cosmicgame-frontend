@@ -200,14 +200,16 @@ const DonatedERC20Table = ({ list, handleClaim }) => {
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((token) => (
-              <TokenRow
-                key={token.RecordId}
-                currentTime={currentTime}
-                token={token}
-                handleClaim={handleClaim}
-              />
-            ))}
+            {list
+              .slice((page - 1) * perPage, page * perPage)
+              .map((token, i) => (
+                <TokenRow
+                  key={page * perPage + i}
+                  currentTime={currentTime}
+                  token={token}
+                  handleClaim={handleClaim}
+                />
+              ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>

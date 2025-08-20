@@ -940,7 +940,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/erc20/by_user/${address}`)
       );
-      return data.DonationsERC20ByUser;
+      return data.DonatedPrizesERC20ByWinner;
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
