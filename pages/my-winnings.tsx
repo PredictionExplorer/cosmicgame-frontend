@@ -500,7 +500,7 @@ export default function MyWinnings() {
             mb: 2,
           }}
         >
-          <Typography variant="h6">Donated ERC20 Tokens</Typography>
+          <Typography variant="h5">Donated ERC20 Tokens</Typography>
           {donatedERC20Tokens.data.filter((x) => !x.Claimed).length > 0 && (
             <Button onClick={handleAllDonatedERC20Claim} variant="contained">
               Claim All
