@@ -103,7 +103,11 @@ const TokenRow = ({ currentTime, token, handleClaim }) => {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {token.AmountEth.toFixed(2)}
+        {token.AmountDonatedEth.toFixed(2)}
+      </TablePrimaryCell>
+
+      <TablePrimaryCell align="center">
+        {token.AmountClaimedEth.toFixed(2)}
       </TablePrimaryCell>
 
       {/* Winner Address */}
@@ -192,7 +196,8 @@ const DonatedERC20Table = ({ list, handleClaim }) => {
               <TablePrimaryHeadCell align="left">
                 Token Address
               </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Amount</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Donated Amount</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Claimed Amount</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Claimed</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
