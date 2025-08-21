@@ -922,9 +922,9 @@ class ApiService {
   public async get_donations_erc20_by_round(round: number) {
     try {
       const { data } = await axios.get(
-        getAPIUrl(`donations/erc20/by_round/${round}`)
+        getAPIUrl(`donations/erc20/by_round/detailed/${round}`)
       );
-      return data.DonationsERC20;
+      return data.DonationsERC20ByRoundDetailed;
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
