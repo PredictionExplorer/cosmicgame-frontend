@@ -996,6 +996,73 @@ const MyStatistics = () => {
               <MarketingRewardsTable list={marketingRewards} />
             </Box>
           )}
+
+          {/* Donated NFT Section */}
+          <Box mt={8}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h6">Donated NFTs User Won</Typography>
+              {unclaimedDonatedNFTs.data.length > 0 && (
+                <Button
+                  onClick={handleAllDonatedNFTsClaim}
+                  variant="contained"
+                  disabled={isClaiming}
+                >
+                  Claim All
+                </Button>
+              )}
+            </Box>
+
+            {unclaimedDonatedNFTs.loading || claimedDonatedNFTs.loading ? (
+              <Typography variant="h6">Loading...</Typography>
+            ) : (
+              <DonatedNFTTable
+                list={[
+                  ...unclaimedDonatedNFTs.data,
+                  ...claimedDonatedNFTs.data,
+                ]}
+                handleClaim={handleDonatedNFTsClaim}
+                claimingTokens={claimingDonatedNFTs}
+              />
+            )}
+          </Box>
+
+          {/* Donated ERC20 Section */}
+          <Box mt={8}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h6">Donated ERC20 Tokens</Typography>
+              {donatedERC20Tokens.data.filter((x) => !x.Claimed).length > 0 && (
+                <Button
+                  onClick={handleAllDonatedERC20Claim}
+                  variant="contained"
+                >
+                  Claim All
+                </Button>
+              )}
+            </Box>
+
+            {donatedERC20Tokens.loading ? (
+              <Typography variant="h6">Loading...</Typography>
+            ) : (
+              <DonatedERC20Table
+                list={donatedERC20Tokens.data}
+                handleClaim={handleDonatedERC20Claim}
+              />
+            )}
+          </Box>
         </>
       )}
     </MainWrapper>
