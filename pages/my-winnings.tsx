@@ -36,6 +36,7 @@ import api from "../services/api";
 import DonatedNFTTable from "../components/DonatedNFTTable";
 import { UncollectedCSTStakingRewardsTable } from "../components/UncollectedCSTStakingRewardsTable";
 import DonatedERC20Table from "../components/DonatedERC20Table";
+import { ethers } from "ethers";
 
 /* ------------------------------------------------------------------
   Types
@@ -326,7 +327,11 @@ export default function MyWinnings() {
 
   const handleDonatedERC20Claim = async (roundNum, tokenAddr, amount) => {
     try {
-      await raffleWalletContract.claimDonatedToken(roundNum, tokenAddr, amount);
+      await raffleWalletContract.claimDonatedToken(
+        roundNum,
+        tokenAddr,
+        ethers.utils.parseUnits(amount.toString(), 18)
+      );
       setTimeout(() => {
         fetchDonatedERC20Tokens(false);
       }, 3000);

@@ -130,7 +130,11 @@ const TokenRow = ({ currentTime, token, handleClaim }) => {
             <Button
               variant="contained"
               onClick={() =>
-                handleClaim(token.RoundNum, token.TokenAddr, token.AmountEth)
+                handleClaim(
+                  token.RoundNum,
+                  token.TokenAddr,
+                  token.DonateClaimDiffEth
+                )
               }
               data-testid="Claim Button"
             >
