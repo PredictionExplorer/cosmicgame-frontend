@@ -143,7 +143,7 @@ const TokenRow = ({ currentTime, token, handleClaim }) => {
       {/* Claim Button */}
       {handleClaim && roundTimeoutTimesToWithdrawPrizes < currentTime && (
         <TablePrimaryCell>
-          {!token.WinnerAddr && (
+          {!token.Claimed && (
             <Button
               variant="contained"
               onClick={() =>
