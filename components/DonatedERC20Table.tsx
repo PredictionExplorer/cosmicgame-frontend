@@ -57,23 +57,6 @@ const TokenRow = ({ currentTime, token, handleClaim }) => {
         </Link>
       </TablePrimaryCell>
 
-      {/* Donor Address */}
-      <TablePrimaryCell>
-        <Tooltip title={token.DonorAddr}>
-          <Link
-            href={`/user/${token.DonorAddr}`}
-            style={{
-              color: "inherit",
-              fontSize: "inherit",
-              fontFamily: "monospace",
-            }}
-            target="_blank"
-          >
-            {shortenHex(token.DonorAddr, 6)}
-          </Link>
-        </Tooltip>
-      </TablePrimaryCell>
-
       {/* Round Number */}
       <TablePrimaryCell align="center">
         <Link
@@ -189,9 +172,6 @@ const DonatedERC20Table = ({ list, handleClaim }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">
-                Donor Address
-              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round #</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">
                 Token Address
