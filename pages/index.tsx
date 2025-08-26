@@ -145,7 +145,7 @@ const NewHome = () => {
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
-
+  console.log("ASDF");
   interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
