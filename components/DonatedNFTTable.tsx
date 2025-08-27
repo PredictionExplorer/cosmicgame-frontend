@@ -243,9 +243,9 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({
             </Tr>
           </TablePrimaryHead>
           <TableBody>
-            {list.slice((page - 1) * perPage, page * perPage).map((nft) => (
+            {list.slice((page - 1) * perPage, page * perPage).map((nft, i) => (
               <NFTRow
-                key={nft.RecordId}
+                key={page * perPage + i}
                 nft={nft}
                 handleClaim={handleClaim}
                 claimingTokens={claimingTokens}
