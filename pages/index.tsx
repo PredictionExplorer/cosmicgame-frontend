@@ -2099,7 +2099,7 @@ const NewHome = () => {
       <LatestNFTs />
 
       <Container>
-        <Prize prizeAmount={data?.PrizeAmountEth || 0} />
+        {data && <Prize data={data} />}
         <Box margin="50px 0">
           <Typography variant="h4" textAlign="center">
             Every time you bid
