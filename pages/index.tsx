@@ -2112,8 +2112,7 @@ const NewHome = () => {
             you are also buying a raffle ticket. When the round ends, there
             are&nbsp;
             {data?.NumRaffleEthWinnersBidding +
-              data?.NumRaffleNFTWinnersBidding +
-              data?.NumRaffleNFTWinnersStakingRWalk}
+              data?.NumRaffleNFTWinnersBidding}
             &nbsp;raffle winners:
           </Typography>
           <Box textAlign="center" mb={6}>
@@ -2148,11 +2147,7 @@ const NewHome = () => {
             <Grid item xs={12} sm={12} md={6} lg={6}>
               <GradientBorder sx={{ p: 2 }}>
                 <Typography variant="subtitle1" textAlign="center">
-                  {data?.NumRaffleNFTWinnersBidding +
-                    (data?.MainStats.StakeStatisticsRWalk.TotalTokensStaked > 0
-                      ? data?.NumRaffleNFTWinnersStakingRWalk + 3
-                      : 3)}{" "}
-                  random bidders will receive
+                  {data?.NumRaffleNFTWinnersBidding} random bidders will receive
                 </Typography>
                 <GradientText variant="h4" textAlign="center">
                   1 Cosmic NFT
