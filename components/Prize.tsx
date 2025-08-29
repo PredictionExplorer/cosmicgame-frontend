@@ -45,30 +45,8 @@ const Prize: FC<PrizeProps> = ({ data }) => {
 
   return (
     <Box mt={isDesktop ? "80px" : "50px"}>
-      {/* Title/Header */}
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        flexWrap="wrap"
-      >
-        <Typography variant="h4" component="span">
-          The
-        </Typography>
-        <Typography
-          variant="h4"
-          component="span"
-          color="primary"
-          sx={{ ml: 1.5 }}
-        >
-          Winner
-        </Typography>
-        <Typography variant="h4" component="span" sx={{ ml: 1.5 }}>
-          will Receive
-        </Typography>
-      </Box>
-
-      <TablePrimaryContainer sx={{ mt: 4 }}>
+      <Typography variant="h6">LIST OF AVAILABLE PRIZES</Typography>
+      <TablePrimaryContainer>
         <TablePrimary>
           {!isMobile && (
             <colgroup>
@@ -79,8 +57,10 @@ const Prize: FC<PrizeProps> = ({ data }) => {
           )}
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Winner</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Prize</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                Prize Type
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Amounts</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Number of Winners</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

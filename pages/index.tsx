@@ -2004,6 +2004,9 @@ const NewHome = () => {
             </Chart>
           )}
         </Box>
+
+        {data && <Prize data={data} />}
+
         <Box mt={10}>
           <Typography variant="h6">TOP RAFFLE TICKETS HOLDERS</Typography>
           <RaffleHolderTable
@@ -2097,7 +2100,6 @@ const NewHome = () => {
       <LatestNFTs />
 
       <Container>
-        {data && <Prize data={data} />}
         <Box margin="100px 0">
           <Typography variant="h4" textAlign="center" mb={6}>
             History of Winnings
