@@ -132,7 +132,9 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                 <Typography>1 Cosmic Signature NFT</Typography>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>{data?.NumRaffleNFTWinnersStakingRWalk}</Typography>
+                <Typography>
+                  {data?.NumRaffleNFTWinnersStakingRWalk} or 0
+                </Typography>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
@@ -185,7 +187,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                 <Typography>1 Cosmic Signature NFT</Typography>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>1</Typography>
+                <Typography>1 or 0</Typography>
               </TablePrimaryCell>
             </TablePrimaryRow>
           </TableBody>
