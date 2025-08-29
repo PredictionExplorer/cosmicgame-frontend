@@ -1,17 +1,12 @@
 import React, { FC } from "react";
-import Image from "next/image";
 import {
   Box,
   Typography,
-  CardActionArea,
-  Grid,
   useTheme,
   useMediaQuery,
   TableBody,
 } from "@mui/material";
 import {
-  GradientText,
-  StyledCard2,
   TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
@@ -22,6 +17,7 @@ import {
 import { useTokenPrice } from "../hooks/useTokenPrice";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import { isMobile } from "react-device-detect";
 
 // -----------------------------
 // Props Interface
@@ -72,63 +68,20 @@ const Prize: FC<PrizeProps> = ({ data }) => {
         </Typography>
       </Box>
 
-      {/* Decorative Divider */}
-      <Box textAlign="center" mb={6}>
-        <Image src="/images/divider.svg" width={93} height={3} alt="divider" />
-      </Box>
-
-      {/* Prize Cards Grid */}
-      <Grid container spacing={4}>
-        {/* NFT Card */}
-        <Grid item xs={12} md={6}>
-          <StyledCard2>
-            <CardActionArea
-              sx={{ display: "flex", justifyContent: "start", p: 2 }}
-            >
-              <Image
-                src="/images/CosmicSignatureNFT.png"
-                width={88}
-                height={88}
-                alt="cosmic signature nft"
-              />
-              <GradientText variant="h5" marginLeft="16px">
-                1 Cosmic
-                {isDesktop ? " " : <br />}
-                Signature NFT
-              </GradientText>
-            </CardActionArea>
-          </StyledCard2>
-        </Grid>
-
-        {/* ETH Card */}
-        <Grid item xs={12} md={6}>
-          <StyledCard2>
-            <CardActionArea
-              sx={{ display: "flex", justifyContent: "start", p: 2 }}
-            >
-              <Image
-                src="/images/Ethereum.png"
-                width={88}
-                height={88}
-                alt="ethereum logo"
-              />
-              <GradientText variant="h5" marginLeft="16px">
-                {formattedETH} ETH
-              </GradientText>
-              <Typography color="primary" ml={1}>
-                (${prizeInUSD} USD)
-              </Typography>
-            </CardActionArea>
-          </StyledCard2>
-        </Grid>
-      </Grid>
-
       <TablePrimaryContainer sx={{ mt: 4 }}>
         <TablePrimary>
+          {!isMobile && (
+            <colgroup>
+              <col width="33%" />
+              <col width="33%" />
+              <col width="33%" />
+            </colgroup>
+          )}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Winner</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Prize</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Number of Winners</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
@@ -140,12 +93,13 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                 <Typography>{data?.PrizeAmountEth.toFixed(4)} ETH</Typography>
                 <Typography>1 Cosmic Signature NFT</Typography>
               </TablePrimaryCell>
+              <TablePrimaryCell align="center">
+                <Typography>1</Typography>
+              </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>
-                  {data?.NumRaffleEthWinnersBidding} Random Raffle ETH Bidders
-                </Typography>
+                <Typography>Raffle ETH Bidder</Typography>
               </TablePrimaryCell>
               <TablePrimaryCell>
                 <Typography>
@@ -155,26 +109,41 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                   ETH
                 </Typography>
               </TablePrimaryCell>
-            </TablePrimaryRow>
-            <TablePrimaryRow>
-              <TablePrimaryCell>
-                <Typography>
-                  {data?.NumRaffleNFTWinnersBidding} Random Raffle ETH Bidders
-                </Typography>
-              </TablePrimaryCell>
-              <TablePrimaryCell>
-                <Typography>1 Cosmic Signature NFT</Typography>
+              <TablePrimaryCell align="center">
+                <Typography>{data?.NumRaffleEthWinnersBidding}</Typography>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>
-                  {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT
-                  Stakers
-                </Typography>
+                <Typography>Raffle ETH Bidder</Typography>
               </TablePrimaryCell>
               <TablePrimaryCell>
                 <Typography>1 Cosmic Signature NFT</Typography>
+              </TablePrimaryCell>
+              <TablePrimaryCell align="center">
+                <Typography>{data?.NumRaffleNFTWinnersBidding}</Typography>
+              </TablePrimaryCell>
+            </TablePrimaryRow>
+            <TablePrimaryRow>
+              <TablePrimaryCell>
+                <Typography>Random Walk NFT Staker</Typography>
+              </TablePrimaryCell>
+              <TablePrimaryCell>
+                <Typography>1 Cosmic Signature NFT</Typography>
+              </TablePrimaryCell>
+              <TablePrimaryCell align="center">
+                <Typography>{data?.NumRaffleNFTWinnersStakingRWalk}</Typography>
+              </TablePrimaryCell>
+            </TablePrimaryRow>
+            <TablePrimaryRow>
+              <TablePrimaryCell>
+                <Typography>Cosmic Signature NFT Staker</Typography>
+              </TablePrimaryCell>
+              <TablePrimaryCell>
+                <Typography>{data?.StakingAmountEth.toFixed(4)} ETH</Typography>
+              </TablePrimaryCell>
+              <TablePrimaryCell align="center">
+                <Typography>1</Typography>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
@@ -191,15 +160,32 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                   ETH
                 </Typography>
               </TablePrimaryCell>
+              <TablePrimaryCell align="center">
+                <Typography>1</Typography>
+              </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>Endurance Champion and Last Bidder</Typography>
+                <Typography>Endurance Champion</Typography>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <Typography>
-                  1 Cosmic Signature NFT and {data?.CurNumBids * 10} CST
-                </Typography>
+                <Typography>{data?.CurNumBids * 10} CST</Typography>
+                <Typography>1 Cosmic Signature NFT</Typography>
+              </TablePrimaryCell>
+              <TablePrimaryCell align="center">
+                <Typography>1</Typography>
+              </TablePrimaryCell>
+            </TablePrimaryRow>
+            <TablePrimaryRow>
+              <TablePrimaryCell>
+                <Typography>Last CST Bidder</Typography>
+              </TablePrimaryCell>
+              <TablePrimaryCell>
+                <Typography>{data?.CurNumBids * 10} CST</Typography>
+                <Typography>1 Cosmic Signature NFT</Typography>
+              </TablePrimaryCell>
+              <TablePrimaryCell align="center">
+                <Typography>1</Typography>
               </TablePrimaryCell>
             </TablePrimaryRow>
           </TableBody>

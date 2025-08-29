@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { isMobile } from "react-device-detect";
 import {
   Button,
@@ -26,7 +25,6 @@ import {
 } from "@mui/material";
 import {
   CustomTextField,
-  GradientBorder,
   GradientText,
   MainWrapper,
   StyledCard,
@@ -2100,139 +2098,6 @@ const NewHome = () => {
 
       <Container>
         {data && <Prize data={data} />}
-        <Box margin="50px 0">
-          <Typography variant="h4" textAlign="center">
-            Every time you bid
-          </Typography>
-          <Typography
-            fontSize={matches ? 22 : 18}
-            color="rgba(255, 255, 255, 0.68)"
-            textAlign="center"
-          >
-            you are also buying a raffle ticket. When the round ends, there
-            are&nbsp;
-            {data?.NumRaffleEthWinnersBidding +
-              data?.NumRaffleNFTWinnersBidding}
-            &nbsp;raffle winners:
-          </Typography>
-          <Box textAlign="center" mb={6}>
-            <Image
-              src={"/images/divider.svg"}
-              width={93}
-              height={3}
-              alt="divider"
-            />
-          </Box>
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={12} md={6} lg={6}>
-              <GradientBorder sx={{ p: 2 }}>
-                <Typography variant="subtitle1" textAlign="center">
-                  {data?.NumRaffleEthWinnersBidding} random bidders will receive
-                </Typography>
-                <GradientText variant="h4" textAlign="center">
-                  {(
-                    data?.RaffleAmountEth / data?.NumRaffleEthWinnersBidding
-                  ).toFixed(4)}{" "}
-                  ETH
-                </GradientText>
-                <Typography
-                  variant="subtitle1"
-                  color="rgba(255, 255, 255, 0.68)"
-                  textAlign="center"
-                >
-                  from the pot each
-                </Typography>
-              </GradientBorder>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6}>
-              <GradientBorder sx={{ p: 2 }}>
-                <Typography variant="subtitle1" textAlign="center">
-                  {data?.NumRaffleNFTWinnersBidding} random bidders will receive
-                </Typography>
-                <GradientText variant="h4" textAlign="center">
-                  1 Cosmic NFT
-                </GradientText>
-                <Typography
-                  variant="subtitle1"
-                  color="rgba(255, 255, 255, 0.68)"
-                  textAlign="center"
-                >
-                  each
-                </Typography>
-              </GradientBorder>
-            </Grid>
-          </Grid>
-        </Box>
-        <Box margin="50px 0">
-          <Typography variant="h4" textAlign="center">
-            Special Prizes
-          </Typography>
-          <Typography
-            fontSize={matches ? 22 : 18}
-            color="rgba(255, 255, 255, 0.68)"
-            textAlign="center"
-          >
-            Each winner of special prize (except ChronoWarrior) will receive{" "}
-            {curBidList.length * 10} Cosmic Signature ERC20 tokens and 1 Cosmic
-            Signature NFT.
-          </Typography>
-          <Typography
-            fontSize={matches ? 22 : 18}
-            color="rgba(255, 255, 255, 0.68)"
-            textAlign="center"
-          >
-            Chrono Warrior will win {data?.ChronoWarriorPercentage}% of the pot.
-          </Typography>
-          <Box textAlign="center" mb={6}>
-            <Image
-              src={"/images/divider.svg"}
-              width={93}
-              height={3}
-              alt="divider"
-            />
-          </Box>
-          <Grid container spacing={4}>
-            <Grid item xs={12} sm={12} md={6} lg={6}>
-              <GradientBorder sx={{ p: 2 }}>
-                <Typography variant="subtitle1" textAlign="center">
-                  Chrono warrior will receive
-                </Typography>
-                <GradientText variant="h4" textAlign="center" lineHeight="60px">
-                  {(
-                    (data?.CosmicGameBalanceEth *
-                      data?.ChronoWarriorPercentage) /
-                    100
-                  ).toFixed(4)}{" "}
-                  ETH
-                </GradientText>
-                <Typography
-                  variant="subtitle1"
-                  color="rgba(255, 255, 255, 0.68)"
-                  textAlign="center"
-                >
-                  from the pot each
-                </Typography>
-              </GradientBorder>
-            </Grid>
-            <Grid item xs={12} sm={12} md={6} lg={6}>
-              <GradientBorder sx={{ p: 2 }}>
-                <Typography variant="subtitle1" textAlign="center">
-                  Endurance champion & last bidder will receive
-                </Typography>
-                <GradientText variant="h5" textAlign="center" lineHeight="60px">
-                  1 Cosmic NFT & {curBidList.length * 10} CST
-                </GradientText>
-                <Typography
-                  variant="subtitle1"
-                  color="rgba(255, 255, 255, 0.68)"
-                  textAlign="center"
-                >
-                  each
-                </Typography>
-              </GradientBorder>
-            </Grid>
-          </Grid>
-        </Box>
         <Box margin="100px 0">
           <Typography variant="h4" textAlign="center" mb={6}>
             History of Winnings
