@@ -144,18 +144,18 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
               {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS, 6)}
             </Link>
           </Tooltip>
+        ) : history.TokenAddress ? (
+          <Tooltip title={history.TokenAddress}>
+            <Link
+              href={`https://arbiscan.io/address/${history.TokenAddress}`}
+              target="_blank"
+              color="inherit"
+            >
+              {shortenHex(history.TokenAddress, 6)}
+            </Link>
+          </Tooltip>
         ) : (
-          history.TokenAddress && (
-            <Tooltip title={history.TokenAddress}>
-              <Link
-                href={`https://arbiscan.io/address/${history.TokenAddress}`}
-                target="_blank"
-                color="inherit"
-              >
-                {shortenHex(history.TokenAddress, 6)}
-              </Link>
-            </Tooltip>
-          )
+          " "
         )}
       </TablePrimaryCell>
 
