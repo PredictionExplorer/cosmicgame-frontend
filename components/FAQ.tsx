@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Typography, AccordionSummary } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -285,16 +285,49 @@ const FAQ = () => {
   ];
 
   const [expanded, setExpanded] = useState(null);
+  const itemRefs = useRef([]);
 
   const handleChange = (index) => (_event, isExpanded) => {
-    setExpanded(isExpanded ? index : false);
+    setExpanded(isExpanded ? index : -1);
   };
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      const hash = window.location.hash;
+      let index = -1;
+      switch (hash) {
+        case "#main-prize":
+          index = 3;
+          break;
+        case "#endurance-champion":
+          index = 7;
+          break;
+        case "#chrono-warrior":
+          index = 8;
+          break;
+      }
+      if (index > 0) {
+        setExpanded(index);
+        setTimeout(() => {
+          const el = itemRefs.current[index];
+          if (el) {
+            const yOffset = -100;
+            const y =
+              el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+            window.scrollTo({ top: y, behavior: "smooth" });
+          }
+        }, 300);
+      }
+    }
+  }, []);
 
   return (
     <Box mt={4}>
       {items.map(({ summary, detail }, i) => (
         <FaqAccordion
           key={i}
+          ref={(el) => (itemRefs.current[i] = el)}
           expanded={expanded === i}
           onChange={handleChange(i)}
         >
