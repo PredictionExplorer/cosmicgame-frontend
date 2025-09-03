@@ -5,6 +5,7 @@ import {
   useTheme,
   useMediaQuery,
   TableBody,
+  Link,
 } from "@mui/material";
 import {
   TablePrimary,
@@ -67,7 +68,13 @@ const Prize: FC<PrizeProps> = ({ data }) => {
           <TableBody>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>Main Prize</Typography>
+                <Link
+                  href="/faq#main-prize"
+                  sx={{ color: "inherit", fontSize: "inherit" }}
+                  target="_blank"
+                >
+                  Main Prize
+                </Link>
               </TablePrimaryCell>
               <TablePrimaryCell>
                 <Typography>{data?.PrizeAmountEth.toFixed(4)} ETH</Typography>
@@ -130,7 +137,13 @@ const Prize: FC<PrizeProps> = ({ data }) => {
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>Chrono Warrior</Typography>
+                <Link
+                  href="/faq#chrono-warrior"
+                  sx={{ color: "inherit", fontSize: "inherit" }}
+                  target="_blank"
+                >
+                  Chrono Warrior
+                </Link>
               </TablePrimaryCell>
               <TablePrimaryCell>
                 <Typography>
@@ -148,7 +161,13 @@ const Prize: FC<PrizeProps> = ({ data }) => {
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>Endurance Champion</Typography>
+                <Link
+                  href="/faq#endurance-champion"
+                  sx={{ color: "inherit", fontSize: "inherit" }}
+                  target="_blank"
+                >
+                  Endurance Champion
+                </Link>
               </TablePrimaryCell>
               <TablePrimaryCell>
                 <Typography>{data?.CurNumBids * 10} CST</Typography>
