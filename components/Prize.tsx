@@ -79,6 +79,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
               <TablePrimaryCell>
                 <Typography>{data?.PrizeAmountEth.toFixed(4)} ETH</Typography>
                 <Typography>1 Cosmic Signature NFT</Typography>
+                <Typography>Tokens donated during round, if any</Typography>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
                 <Typography>1</Typography>
