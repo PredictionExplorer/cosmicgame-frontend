@@ -1,21 +1,11 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import {
-  Box,
-  Paper,
-  Typography,
-  Link,
-  styled,
-  Fab,
-  IconButton,
-} from "@mui/material";
+import { Box, Paper, Typography, Link, styled } from "@mui/material";
 import { MainWrapper } from "../components/styled";
 import FAQ from "../components/FAQ";
 import { isFirefox, isMobile } from "react-device-detect";
 import { GetServerSideProps } from "next";
 import { logoImgUrl } from "../utils";
-import SupportAgentIcon from "@mui/icons-material/SupportAgent";
-import CloseIcon from "@mui/icons-material/Close";
 
 /**
  * Conditionally styled Paper component.
@@ -106,92 +96,6 @@ const FAQPage = () => {
           </Box>
         </StyledPaper>
       </Box>
-
-      <Fab
-        color="primary"
-        aria-label="support"
-        sx={{
-          position: "fixed",
-          bottom: 24,
-          right: 24,
-          boxShadow: 4,
-        }}
-        onClick={() => setOpen(!open)}
-      >
-        <SupportAgentIcon />
-      </Fab>
-
-      {open && (
-        <Paper
-          elevation={6}
-          sx={{
-            position: "fixed",
-            bottom: 90, // above button
-            right: 24,
-            width: 320,
-            height: 400,
-            p: 2,
-            display: "flex",
-            flexDirection: "column",
-            borderRadius: 2,
-            zIndex: 1300,
-          }}
-        >
-          {/* Header */}
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <h3 style={{ margin: 0 }}>Live Chat</h3>
-            <IconButton size="small" onClick={() => setOpen(false)}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </Box>
-
-          {/* Body */}
-          <Box
-            sx={{
-              flex: 1,
-              overflowY: "auto",
-              mt: 1,
-              bgcolor: "grey.50",
-              p: 1,
-              borderRadius: 1,
-            }}
-          >
-            {/* Replace with your chat messages */}
-            <p>Welcome! How can we help you?</p>
-          </Box>
-
-          {/* Footer (input) */}
-          <Box mt={1} display="flex">
-            <input
-              type="text"
-              placeholder="Type a message..."
-              style={{
-                flex: 1,
-                padding: "8px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-              }}
-            />
-            <button
-              style={{
-                marginLeft: "8px",
-                padding: "8px 12px",
-                borderRadius: "8px",
-                border: "none",
-                background: "#1976d2",
-                color: "white",
-                cursor: "pointer",
-              }}
-            >
-              Send
-            </button>
-          </Box>
-        </Paper>
-      )}
     </MainWrapper>
   );
 };
