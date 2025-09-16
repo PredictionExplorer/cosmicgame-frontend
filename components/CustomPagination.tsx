@@ -77,13 +77,14 @@ export const CustomPagination: React.FC<CustomPaginationProps> = ({
         <Box sx={{ display: "flex", alignItems: "center", ml: 4, my: 1 }}>
           <Typography sx={{ mr: 1 }}>Go to page:</Typography>
           <TextField
-            hiddenLabel
             type="number"
             size="small"
+            label="go to page"
             value={page}
             sx={{ maxWidth: 100 }}
             onChange={handleInputChange}
             inputProps={{ min: 1, max: pageCount }}
+            InputLabelProps={{ shrink: false, style: { display: "none" } }}
           />
         </Box>
       )}

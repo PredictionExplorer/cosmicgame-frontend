@@ -96,7 +96,7 @@ const Footer = () => (
             {/* Social Media Icons and Sitemap link */}
             <Box ml={{ lg: 6 }}>
               {/* Sitemap icon */}
-              <IconButton href="/site-map">
+              <IconButton href="/site-map" aria-label="site-map">
                 <AccountTreeIcon sx={{ color: "#A9AAB5" }} />
               </IconButton>
 
@@ -104,6 +104,7 @@ const Footer = () => (
               <IconButton
                 href="https://x.com/CosmicSignatureNFT"
                 target="_blank"
+                aria-label="twitter"
               >
                 <FontAwesomeIcon
                   icon={faTwitter}
@@ -114,7 +115,11 @@ const Footer = () => (
               </IconButton>
 
               {/* Discord icon */}
-              <IconButton href="https://discord.gg/bGnPn96Qwt" target="_blank">
+              <IconButton
+                href="https://discord.gg/bGnPn96Qwt"
+                target="_blank"
+                aria-label="discord"
+              >
                 <FontAwesomeIcon
                   icon={faDiscord}
                   color="#A9AAB5"
