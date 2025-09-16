@@ -84,7 +84,6 @@ export const CustomPagination: React.FC<CustomPaginationProps> = ({
             sx={{ maxWidth: 100 }}
             onChange={handleInputChange}
             inputProps={{ min: 1, max: pageCount }}
-            InputLabelProps={{ shrink: false, style: { display: "none" } }}
           />
         </Box>
       )}
