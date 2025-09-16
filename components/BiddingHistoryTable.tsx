@@ -206,7 +206,6 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
               />
             </>
           )}
-
           {/* If there was a donated token involved */}
           {(!!history.NFTDonationTokenAddr ||
             !!history.DonatedERC20TokenAddr) && (
@@ -235,7 +234,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
                 </>
               )}
             </>
-          )}
+          )}{" "}
         </Typography>
       </TablePrimaryCell>
 
@@ -257,7 +256,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
               {history.Message}
             </Typography>
           </Tooltip>
-        )}
+        )}{" "}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );

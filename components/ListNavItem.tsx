@@ -32,7 +32,10 @@ const ListNavItem: FC<ListNavItemProps> = ({ nav }) => {
    * Event handlers
    * ------------------------------------------------------------------*/
 
-  const openMenu = (e: MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget);
+  const openMenu = (e: MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    setAnchorEl(e.currentTarget);
+  };
   const closeMenu = () => setAnchorEl(null);
 
   /** Derived boolean for convenience */
@@ -48,6 +51,7 @@ const ListNavItem: FC<ListNavItemProps> = ({ nav }) => {
           <NavLink
             // Acts as a button when there are sub‑items
             onClick={openMenu}
+            href="#"
             sx={{
               display: "flex",
               alignItems: "center",

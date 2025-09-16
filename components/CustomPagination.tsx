@@ -82,7 +82,7 @@ export const CustomPagination: React.FC<CustomPaginationProps> = ({
             value={page}
             sx={{ maxWidth: 100 }}
             onChange={handleInputChange}
-            inputProps={{ min: 1, max: pageCount }}
+            inputProps={{ min: 1, max: pageCount, "aria-label": "go to page" }}
           />
         </Box>
       )}
