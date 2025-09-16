@@ -75,7 +75,9 @@ export const CustomPagination: React.FC<CustomPaginationProps> = ({
       {/* Direct page selector, shown only for large datasets */}
       {showGoToInput && (
         <Box sx={{ display: "flex", alignItems: "center", ml: 4, my: 1 }}>
-          <Typography sx={{ mr: 1 }}>Go to page:</Typography>
+          <Typography id="go_to_page" sx={{ mr: 1 }}>
+            Go to page:
+          </Typography>
           <TextField
             type="number"
             size="small"
@@ -83,6 +85,7 @@ export const CustomPagination: React.FC<CustomPaginationProps> = ({
             sx={{ maxWidth: 100 }}
             onChange={handleInputChange}
             inputProps={{ min: 1, max: pageCount }}
+            aria-labelledby="go_to_page"
           />
         </Box>
       )}
