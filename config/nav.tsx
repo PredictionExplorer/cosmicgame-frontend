@@ -12,7 +12,7 @@ const getNAVs = (status, account) => {
     { title: "Gallery", route: "/gallery" },
     {
       title: "Rewards",
-      route: "",
+      route: "#",
       children: [
         { title: "Prizes", route: "/prize" },
         { title: "Staking Rewards", route: "/staking" },
@@ -23,7 +23,7 @@ const getNAVs = (status, account) => {
     { title: "Statistics", route: "/statistics" },
     {
       title: "Help",
-      route: "",
+      route: "#",
       children: [
         { title: "How-to-Play", route: "/how-to-play" },
         { title: "FAQ", route: "/faq" },
