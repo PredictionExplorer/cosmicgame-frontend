@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { isMobile } from "react-device-detect";
 import {
   Button,
   Box,
@@ -52,18 +51,6 @@ import LatestNFTs from "../components/LatestNFTs";
 import Countdown from "react-countdown";
 import Counter from "../components/Counter";
 import DonatedNFT from "../components/DonatedNFT";
-import {
-  Chart,
-  ChartArea,
-  ChartCategoryAxis,
-  ChartCategoryAxisItem,
-  ChartLegend,
-  ChartSeries,
-  ChartSeriesItem,
-  ChartValueAxis,
-  ChartValueAxisItem,
-} from "@progress/kendo-react-charts";
-import "@progress/kendo-theme-default/dist/all.css";
 import getErrorMessage from "../utils/alert";
 import NFTImage from "../components/NFTImage";
 import {
@@ -90,6 +77,7 @@ import EthDonationTable from "../components/EthDonationTable";
 import axios from "axios";
 import { parseUnits } from "ethers/lib/utils";
 import DonatedERC20Table from "../components/DonatedERC20Table";
+import ChartOrPie from "../components/ChartOrPie";
 
 const NewHome = () => {
   const router = useRouter();
@@ -169,35 +157,6 @@ const NewHome = () => {
       : donatedNFTs.length > 9
       ? { xs: 6, sm: 4, md: 3, lg: 3 }
       : { xs: 12, sm: 6, md: 4, lg: 4 };
-
-  const series = data
-    ? [
-        { category: "Prize", value: data.PrizePercentage },
-        { category: "Raffle", value: data.RafflePercentage },
-        { category: "Charity", value: data.CharityPercentage },
-        { category: "Staking", value: data.StakignPercentage },
-        { category: "Chrono Warrior", value: data.ChronoWarriorPercentage },
-        {
-          category: "Next round",
-          value:
-            100 -
-            data.CharityPercentage -
-            data.RafflePercentage -
-            data.StakignPercentage -
-            data.ChronoWarriorPercentage -
-            data.PrizePercentage,
-        },
-      ]
-    : [];
-
-  const labelContent = (props: any) => {
-    return data
-      ? `${props.dataItem.category}: ${props.dataItem.value}% (${(
-          (props.dataItem.value * data.CosmicGameBalanceEth) /
-          100
-        ).toFixed(4)} ETH)`
-      : "";
-  };
 
   const handleTabChange = (_event: any, newValue: number) => {
     setDonatedTokensTab(newValue);
@@ -1948,61 +1907,7 @@ const NewHome = () => {
           <Typography variant="subtitle1" color="primary" textAlign="center">
             Distribution of funds on each round
           </Typography>
-          {isMobile ? (
-            <Chart
-              transitions={false}
-              style={{ width: "100%", height: "100%" }}
-            >
-              <ChartLegend visible={false} />
-              <ChartArea background="transparent" />
-              <ChartCategoryAxis>
-                <ChartCategoryAxisItem color="white" />
-              </ChartCategoryAxis>
-              <ChartValueAxis>
-                <ChartValueAxisItem visible={false} max={80} />
-              </ChartValueAxis>
-              <ChartSeries>
-                <ChartSeriesItem
-                  type="bar"
-                  data={series}
-                  field="value"
-                  categoryField="category"
-                  labels={{
-                    visible: true,
-                    color: "white",
-                    background: "none",
-                    content: (props) =>
-                      `${props.value}% (${(
-                        (props.dataItem.value * data?.CosmicGameBalanceEth) /
-                        100
-                      ).toFixed(4)} ETH)`,
-                  }}
-                />
-              </ChartSeries>
-            </Chart>
-          ) : (
-            <Chart
-              transitions={false}
-              style={{ width: "100%", height: matches ? 300 : 200 }}
-            >
-              <ChartLegend visible={false} />
-              <ChartArea background="transparent" />
-              <ChartSeries>
-                <ChartSeriesItem
-                  type="pie"
-                  data={series}
-                  field="value"
-                  categoryField="category"
-                  labels={{
-                    visible: true,
-                    content: labelContent,
-                    color: "white",
-                    background: "none",
-                  }}
-                />
-              </ChartSeries>
-            </Chart>
-          )}
+          <ChartOrPie data={data} />
         </Box>
 
         {data && <Prize data={data} />}
@@ -2157,23 +2062,3 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 export default NewHome;
-
-// Todo:
-
-// hide contract option from header: refactor header
-// add donate button, donor list, add eth-donate list to user detail
-// update site-map and show link
-// add link to user-detail for marketing reward for user
-
-// optimize statistics loading speed
-// system mode changes on statistics page
-// update statistics page with new data
-// get_bid_list_by_round: implement pagination
-// get_user_info: remove bid field
-// complete admin page
-// update FAQ page: endurance champion
-// update donations page
-
-// fix eth-donation page
-// add eth donate feature, simple donation, donation with info
-// add link to top 5 donations
