@@ -132,6 +132,10 @@ const Contracts = () => {
   const [timeIncrease, setTimeIncrease] = useState(0);
   const [msgMaxLen, setMsgMaxLen] = useState(0);
   const [cstRewardAmountForBidding, setCstRewardAmountForBidding] = useState(0);
+  const [
+    cstDutchAuctionBeginningBidPriceMinLimit,
+    setCstDutchAuctionBeginningBidPriceMinLimit,
+  ] = useState(0);
 
   // Use a read-only contract instance (without signer) for the Charity Wallet.
   const charityWalletContract = useContractNoSigner(
@@ -180,12 +184,22 @@ const Contracts = () => {
         Number(ethers.utils.formatEther(cstRewardAmountForBidding))
       );
     };
+    const fetchCstDutchAuctionBeginningBidPriceMinLimit = async () => {
+      const cstDutchAuctionBeginningBidPriceMinLimit = await cosmicGameContract.cstDutchAuctionBeginningBidPriceMinLimit();
+      setCstDutchAuctionBeginningBidPriceMinLimit(
+        Number(
+          ethers.utils.formatEther(cstDutchAuctionBeginningBidPriceMinLimit)
+        )
+      );
+    };
+
     if (cosmicGameContract) {
       try {
         fetchMessageMaxLength();
         fetchPriceIncrease();
         fetchTimeIncrease();
         fetchCstRewardAmountForBidding();
+        fetchCstDutchAuctionBeginningBidPriceMinLimit();
       } catch (err) {
         console.error(err);
       }
@@ -323,6 +337,10 @@ const Contracts = () => {
     {
       name: "Initial increment first bid",
       value: data ? formatSeconds(data.InitialSecondsUntilPrize) : "--",
+    },
+    {
+      name: "CST dutch auction beginning bid price",
+      value: `${Number(cstDutchAuctionBeginningBidPriceMinLimit)} CST`,
     },
   ];
 
