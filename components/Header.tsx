@@ -336,7 +336,7 @@ const Header: FC = () => {
                           color="secondary"
                           sx={{ fontStyle: "italic", fontWeight: 600 }}
                         >
-                          CSN (ERC721):
+                          CS NFT (ERC721):
                         </Typography>
                         <Typography
                           variant="body2"
