@@ -218,7 +218,7 @@ const ConnectWalletButton: React.FC<ConnectWalletButtonProps> = ({
                   </Typography>
                 </Box>
 
-                {/* CSN (ERC721) balance */}
+                {/* CS NFT (ERC721) balance */}
                 <Box
                   sx={{
                     display: "flex",
@@ -231,7 +231,7 @@ const ConnectWalletButton: React.FC<ConnectWalletButtonProps> = ({
                     color="secondary"
                     sx={{ fontStyle: "italic", fontWeight: 600 }}
                   >
-                    CSN (ERC721):
+                    CS NFT (ERC721):
                   </Typography>
                   <Typography
                     variant="body2"
