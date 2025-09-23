@@ -356,16 +356,6 @@ const NewHome = () => {
         }
         // Approve NFT transfer
         try {
-          const approvedBy = await nftDonateContract.getApproved(nftIdNum);
-          const isApprovedForAll = await nftDonateContract.isApprovedForAll(
-            account,
-            COSMICGAME_ADDRESS
-          );
-          if (!isApprovedForAll && approvedBy !== COSMICGAME_ADDRESS) {
-            await nftDonateContract
-              .setApprovalForAll(COSMICGAME_ADDRESS, true)
-              .then((tx: any) => tx.wait());
-          }
           const isApproved = await nftDonateContract.isApprovedForAll(
             account,
             RAFFLE_WALLET_ADDRESS
@@ -468,22 +458,8 @@ const NewHome = () => {
         }
         // Approve token transfer
         try {
-          let allowance = await tokenDonateContract.allowance(
-            account,
-            COSMICGAME_ADDRESS
-          );
           let receipt;
-          if (allowance.lt(ethers.constants.MaxUint256)) {
-            receipt = await tokenDonateContract
-              .approve(COSMICGAME_ADDRESS, ethers.constants.MaxUint256)
-              .then((tx: any) => tx.wait());
-          }
-          if (!receipt?.status && allowance.lt(tokenAmountInWei)) {
-            await tokenDonateContract
-              .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
-              .then((tx: any) => tx.wait());
-          }
-          allowance = await tokenDonateContract.allowance(
+          const allowance = await tokenDonateContract.allowance(
             account,
             RAFFLE_WALLET_ADDRESS
           );
@@ -505,7 +481,6 @@ const NewHome = () => {
               tokenAmountInWei,
               {
                 value: newBidPrice,
-                // gasLimit: 30000000,
               }
             )
             .then((tx: any) => tx.wait());
@@ -628,16 +603,6 @@ const NewHome = () => {
         }
         // Approve NFT transfer
         try {
-          const approvedBy = await nftDonateContract.getApproved(nftIdNum);
-          const isApprovedForAll = await nftDonateContract.isApprovedForAll(
-            account,
-            COSMICGAME_ADDRESS
-          );
-          if (!isApprovedForAll && approvedBy !== COSMICGAME_ADDRESS) {
-            await nftDonateContract
-              .setApprovalForAll(COSMICGAME_ADDRESS, true)
-              .then((tx: any) => tx.wait());
-          }
           const isApproved = await nftDonateContract.isApprovedForAll(
             account,
             RAFFLE_WALLET_ADDRESS
@@ -735,22 +700,8 @@ const NewHome = () => {
         }
         // Approve token transfer
         try {
-          let allowance = await tokenDonateContract.allowance(
-            account,
-            COSMICGAME_ADDRESS
-          );
           let receipt;
-          if (allowance.lt(ethers.constants.MaxUint256)) {
-            receipt = await tokenDonateContract
-              .approve(COSMICGAME_ADDRESS, ethers.constants.MaxUint256)
-              .then((tx: any) => tx.wait());
-          }
-          if (!receipt?.status && allowance.lt(tokenAmountInWei)) {
-            await tokenDonateContract
-              .approve(COSMICGAME_ADDRESS, tokenAmountInWei)
-              .then((tx: any) => tx.wait());
-          }
-          allowance = await tokenDonateContract.allowance(
+          const allowance = await tokenDonateContract.allowance(
             account,
             RAFFLE_WALLET_ADDRESS
           );
