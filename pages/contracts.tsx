@@ -132,6 +132,14 @@ const Contracts = () => {
   const [timeIncrease, setTimeIncrease] = useState(0);
   const [msgMaxLen, setMsgMaxLen] = useState(0);
   const [cstRewardAmountForBidding, setCstRewardAmountForBidding] = useState(0);
+  const [cstDutchAuctionDurations, setCstDutchAuctionDurations] = useState({
+    AuctionDuration: 0,
+    ElapsedDuration: 0,
+  });
+  const [ethDutchAuctionDurations, setEthDutchAuctionDurations] = useState({
+    AuctionDuration: 0,
+    ElapsedDuration: 0,
+  });
   const [
     cstDutchAuctionBeginningBidPriceMinLimit,
     setCstDutchAuctionBeginningBidPriceMinLimit,
@@ -184,6 +192,20 @@ const Contracts = () => {
         Number(ethers.utils.formatEther(cstRewardAmountForBidding))
       );
     };
+    const fetchCstDutchAuctionDurations = async () => {
+      const cstDutchAuctionDurations = await cosmicGameContract.getCstDutchAuctionDurations();
+      setCstDutchAuctionDurations({
+        AuctionDuration: Number(cstDutchAuctionDurations[0]),
+        ElapsedDuration: Number(cstDutchAuctionDurations[1]),
+      });
+    };
+    const fetchEthDutchAuctionDurations = async () => {
+      const ethDutchAuctionDurations = await cosmicGameContract.getEthDutchAuctionDurations();
+      setEthDutchAuctionDurations({
+        AuctionDuration: Number(ethDutchAuctionDurations[0]),
+        ElapsedDuration: Number(ethDutchAuctionDurations[1]),
+      });
+    };
     const fetchCstDutchAuctionBeginningBidPriceMinLimit = async () => {
       const cstDutchAuctionBeginningBidPriceMinLimit = await cosmicGameContract.cstDutchAuctionBeginningBidPriceMinLimit();
       setCstDutchAuctionBeginningBidPriceMinLimit(
@@ -199,6 +221,8 @@ const Contracts = () => {
         fetchPriceIncrease();
         fetchTimeIncrease();
         fetchCstRewardAmountForBidding();
+        fetchCstDutchAuctionDurations();
+        fetchEthDutchAuctionDurations();
         fetchCstDutchAuctionBeginningBidPriceMinLimit();
       } catch (err) {
         console.error(err);
@@ -326,8 +350,28 @@ const Contracts = () => {
       value: `${Number(cstRewardAmountForBidding)} CST`,
     },
     {
-      name: "Auction Duration",
-      value: data ? formatSeconds(data.RoundStartCSTAuctionLength) : "--",
+      name: "CST Dutch Auction Duration",
+      value: data
+        ? formatSeconds(cstDutchAuctionDurations.AuctionDuration)
+        : "--",
+    },
+    {
+      name: "CST Dutch Auction Elapsed Duration",
+      value: data
+        ? formatSeconds(cstDutchAuctionDurations.ElapsedDuration)
+        : "--",
+    },
+    {
+      name: "ETH Dutch Auction Duration",
+      value: data
+        ? formatSeconds(ethDutchAuctionDurations.AuctionDuration)
+        : "--",
+    },
+    {
+      name: "ETH Dutch Auction Elapsed Duration",
+      value: data
+        ? formatSeconds(ethDutchAuctionDurations.ElapsedDuration)
+        : "--",
     },
     {
       name: "Timeout to claim prize",
