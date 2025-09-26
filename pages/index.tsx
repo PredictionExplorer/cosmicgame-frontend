@@ -35,11 +35,7 @@ import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { BigNumber, Contract, constants, ethers } from "ethers";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 import { useActiveWeb3React } from "../hooks/web3";
-import {
-  ART_BLOCKS_ADDRESS,
-  COSMICGAME_ADDRESS,
-  RAFFLE_WALLET_ADDRESS,
-} from "../config/app";
+import { ART_BLOCKS_ADDRESS, RAFFLE_WALLET_ADDRESS } from "../config/app";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ArrowForward } from "@mui/icons-material";
 import NFT_ABI from "../contracts/RandomWalkNFT.json";
