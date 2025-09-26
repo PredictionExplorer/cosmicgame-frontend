@@ -35,11 +35,7 @@ import useCosmicGameContract from "../hooks/useCosmicGameContract";
 import { BigNumber, Contract, constants, ethers } from "ethers";
 import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
 import { useActiveWeb3React } from "../hooks/web3";
-import {
-  ART_BLOCKS_ADDRESS,
-  COSMICGAME_ADDRESS,
-  RAFFLE_WALLET_ADDRESS,
-} from "../config/app";
+import { ART_BLOCKS_ADDRESS, RAFFLE_WALLET_ADDRESS } from "../config/app";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ArrowForward } from "@mui/icons-material";
 import NFT_ABI from "../contracts/RandomWalkNFT.json";
@@ -131,6 +127,10 @@ const NewHome = () => {
 
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.up("md"));
+
+  const GAS_FLOOR = BigNumber.from(2_000_000);
+  const GAS_BUFFER_BPS = 12000; // 120% (20% buffer)
+
   interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -161,364 +161,347 @@ const NewHome = () => {
     setDonatedTokensTab(newValue);
   };
 
-  const onClaimPrize = async () => {
-    try {
-      const estimateGas = await cosmicGameContract.estimateGas.claimMainPrize();
-      let gasLimit = estimateGas.mul(BigNumber.from(2));
-      gasLimit = gasLimit.gt(BigNumber.from(2000000))
-        ? gasLimit
-        : BigNumber.from(2000000);
-      await cosmicGameContract
-        .claimMainPrize({ gasLimit })
-        .then((tx: any) => tx.wait());
-      const balance = await cosmicSignatureContract.totalSupply();
-      let token_id = balance.toNumber() - 1;
-      let count = data?.NumRaffleNFTWinnersBidding + 3;
-      if (data && data.MainStats.StakeStatisticsRWalk.TotalTokensStaked > 0)
-        count += data.NumRaffleNFTWinnersStakingRWalk;
-      setTimeout(async () => {
-        await api.create(token_id, count);
-        router.push({
-          pathname: "/prize-claimed",
-          query: {
-            round: data?.CurRoundNum,
-            message: "success",
-          },
-        });
-      }, 1000);
-      setTimeout(async () => {
-        await fetchActivationTime();
-      }, 3000);
-    } catch (err) {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({
-          visible: true,
-          type: "error",
-          text: msg,
-        });
-      }
-      if (err?.code === 4001) {
-        console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
-      } else {
-        console.error(err);
-        // Handle other errors
-      }
+  const notify = (
+    type: "error" | "warning" | "success" | "info",
+    text: string
+  ) => setNotification({ visible: true, type, text });
+
+  const notifyErrorFromEthers = (err: any) => {
+    if (err?.data?.message) {
+      notify("error", getErrorMessage(err.data.message));
+    } else if (err?.message) {
+      notify("error", err.message);
+    } else {
+      console.error(err);
+      notify("error", "Unexpected error. Please try again.");
     }
   };
 
-  const checkIfContractExist = async (address: string) => {
+  const withPostTxRefresh = async (
+    afterMs = 1500,
+    alsoFetchActivationMs = 3000
+  ) => {
+    // Allow a brief delay if your UI relies on indexers/subgraphs.
+    setTimeout(() => {
+      fetchDataCollection();
+      setMessage("");
+    }, afterMs);
+
+    setTimeout(async () => {
+      try {
+        await fetchActivationTime();
+      } catch (e) {
+        console.warn("fetchActivationTime failed:", e);
+      }
+    }, alsoFetchActivationMs);
+  };
+
+  const handleTx = async (txPromise: Promise<any>) => {
+    const tx = await txPromise;
+    await tx.wait();
+  };
+
+  const withSigner = () => library.getSigner(account);
+
+  const isContractAddress = async (address: string) => {
+    if (!ethers.utils.isAddress(address)) return false;
     try {
       const byteCode = await library.getCode(address);
-      if (byteCode === "0x") {
-        return false;
-      }
-    } catch (err) {
+      return byteCode && byteCode !== "0x";
+    } catch {
       return false;
     }
-    return true;
   };
 
-  const checkTokenOwnership = async (address: string, tokenId: number) => {
+  const getNft = (address: string) =>
+    new Contract(address, NFT_ABI, withSigner());
+
+  const getErc20 = (address: string) =>
+    new Contract(address, ERC20_ABI, withSigner());
+
+  const isERC721 = async (nft: Contract) => {
     try {
-      const nftDonateContract = new Contract(
-        address,
-        NFT_ABI,
-        library.getSigner(account)
+      // ERC721 interface id
+      return await nft.supportsInterface("0x80ac58cd");
+    } catch {
+      return false;
+    }
+  };
+
+  const ensureNftOwnership = async (nft: Contract, tokenId: number) => {
+    try {
+      const owner = await nft.ownerOf(tokenId);
+      if (owner?.toLowerCase() !== account?.toLowerCase()) {
+        notify("error", "You aren't the owner of the token!");
+        return false;
+      }
+      return true;
+    } catch (err) {
+      notifyErrorFromEthers(err);
+      return false;
+    }
+  };
+
+  const ensureNftApprovalForAll = async (nft: Contract) => {
+    const approved = await nft.isApprovedForAll(account, RAFFLE_WALLET_ADDRESS);
+    if (!approved) {
+      await handleTx(nft.setApprovalForAll(RAFFLE_WALLET_ADDRESS, true));
+    }
+  };
+
+  const ensureErc20Allowance = async (token: Contract, required: BigNumber) => {
+    let receipt: any;
+    const allowance: BigNumber = await token.allowance(
+      account,
+      RAFFLE_WALLET_ADDRESS
+    );
+
+    // prefer setting MaxUint256 once
+    if (allowance.lt(ethers.constants.MaxUint256)) {
+      receipt = await token
+        .approve(RAFFLE_WALLET_ADDRESS, ethers.constants.MaxUint256)
+        .then((tx: any) => tx.wait());
+    }
+    // fallback to exact amount if the unlimited approval failed
+    if (!receipt?.status && allowance.lt(required)) {
+      await handleTx(token.approve(RAFFLE_WALLET_ADDRESS, required));
+    }
+  };
+
+  const getErc20Decimals = async (token: Contract) => {
+    try {
+      return await token.decimals();
+    } catch {
+      console.warn("decimals() not found, assuming 18.");
+      notify(
+        "warning",
+        "Token doesn't implement decimals(); assuming 18 decimal places."
       );
-      const addr = await nftDonateContract.ownerOf(tokenId);
-      if (addr !== account) {
-        setNotification({
-          visible: true,
-          type: "error",
-          text: "You aren't the owner of the token!",
-        });
-        return false;
-      }
-    } catch (err) {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({
-          visible: true,
-          type: "error",
-          text: msg,
-        });
-      }
-      console.log(err);
+      return 18;
+    }
+  };
+
+  const hasEthBalance = async (amount: BigNumber) => {
+    try {
+      const bal = await library.getBalance(account);
+      return bal.gte(amount);
+    } catch (e) {
+      console.error(e);
       return false;
     }
+  };
+
+  const hasCstBalance = async (amountWei: BigNumber) => {
+    try {
+      const bal = await api.get_user_balance(account);
+      if (!bal) return false;
+      const wallet = BigNumber.from(bal.CosmicTokenBalance);
+      return wallet.gte(amountWei);
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+  };
+
+  const minGasWithBuffer = (estimate: BigNumber) => {
+    const buffered = estimate.mul(GAS_BUFFER_BPS).div(10_000);
+    return buffered.gt(GAS_FLOOR) ? buffered : GAS_FLOOR;
+  };
+
+  const getNextEthBidPriceWithModifiers = async () => {
+    const base = await cosmicGameContract.getNextEthBidPrice();
+    // Apply +X% (bidPricePlus)
+    let price = base
+      .mul(ethers.utils.parseEther((100 + bidPricePlus).toString()))
+      .div(ethers.utils.parseEther("100"));
+    // RandomWalk discount
+    if (bidType === "RandomWalk") {
+      price = price
+        .mul(ethers.utils.parseEther("50"))
+        .div(ethers.utils.parseEther("100"));
+    }
+    return price;
+  };
+
+  // -----------------------------
+  // Prize claim
+  // -----------------------------
+
+  const onClaimPrize = async () => {
+    try {
+      const estimate = await cosmicGameContract.estimateGas.claimMainPrize();
+      const gasLimit = minGasWithBuffer(estimate);
+
+      await handleTx(cosmicGameContract.claimMainPrize({ gasLimit }));
+
+      // Post-claim actions
+      const totalSupply = await cosmicSignatureContract.totalSupply();
+      const tokenId = totalSupply.toNumber() - 1;
+
+      let count = (data?.NumRaffleNFTWinnersBidding ?? 0) + 3;
+      if (data?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked > 0) {
+        count += data?.NumRaffleNFTWinnersStakingRWalk ?? 0;
+      }
+
+      // Create prize artifact + route
+      await api.create(tokenId, count);
+      router.push({
+        pathname: "/prize-claimed",
+        query: { round: data?.CurRoundNum, message: "success" },
+      });
+
+      await withPostTxRefresh(1000, 3000);
+    } catch (err) {
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+        return;
+      }
+      notifyErrorFromEthers(err);
+    }
+  };
+
+  // -----------------------------
+  // Donation helpers
+  // -----------------------------
+
+  const withNftDonation = async (nftAddress: string, tokenId: number) => {
+    if (!nftAddress || nftAddress.trim() === "" || Number.isNaN(tokenId)) {
+      throw new Error("Missing NFT donation address or tokenId.");
+    }
+    if (!(await isContractAddress(nftAddress))) {
+      notify("error", "The address provided is not a valid contract address!");
+      return false;
+    }
+    const nft = getNft(nftAddress);
+    if (!(await isERC721(nft))) {
+      notify(
+        "error",
+        "The donate NFT contract is not an ERC721 token contract."
+      );
+      return false;
+    }
+    if (!(await ensureNftOwnership(nft, tokenId))) return false;
+    await ensureNftApprovalForAll(nft);
     return true;
   };
 
-  const checkBalance = async (type: string, amount: BigNumber) => {
-    try {
-      if (type === "ETH") {
-        const ethBalance = await library.getBalance(account);
-        return ethBalance.gte(amount);
-      }
-      const balance = await api.get_user_balance(account);
-      if (balance) {
-        return (
-          Number(ethers.utils.formatEther(balance.CosmicTokenBalance)) >=
-          Number(ethers.utils.formatEther(amount))
-        );
-      }
-    } catch (e) {
-      console.log(e);
+  const withTokenDonation = async (tokenAddress: string, amountStr: string) => {
+    if (!tokenAddress || !amountStr) {
+      throw new Error("Missing token donation address or amount.");
     }
-    return false;
+    if (!(await isContractAddress(tokenAddress))) {
+      notify("error", "The address provided is not a valid contract address!");
+      return { ok: false as const };
+    }
+    const erc20 = getErc20(tokenAddress);
+
+    // Basic ERC20 sanity
+    try {
+      const ts = await erc20.totalSupply();
+      if (!ts) throw new Error("Not an ERC20");
+    } catch (err) {
+      console.log(err);
+      notify(
+        "error",
+        "The donate token contract is not an ERC20 token contract."
+      );
+      return { ok: false as const };
+    }
+
+    const decimals = await getErc20Decimals(erc20);
+    const amountWei = parseUnits(amountStr, decimals);
+    const bal: BigNumber = await erc20.balanceOf(account);
+
+    if (bal.lt(amountWei)) {
+      notify("error", "Insufficient token balance for donation.");
+      return { ok: false as const };
+    }
+    await ensureErc20Allowance(erc20, amountWei);
+    return { ok: true as const, token: erc20, amountWei, decimals };
   };
+
+  // -----------------------------
+  // Bids
+  // -----------------------------
 
   const onBid = async () => {
     setIsBidding(true);
     try {
-      const bidPrice = await cosmicGameContract.getNextEthBidPrice();
-      let newBidPrice = bidPrice
-        .mul(ethers.utils.parseEther((100 + bidPricePlus).toString()))
-        .div(ethers.utils.parseEther("100"));
-      if (bidType === "RandomWalk") {
-        newBidPrice = newBidPrice
-          .mul(ethers.utils.parseEther("50"))
-          .div(ethers.utils.parseEther("100"));
-      }
-      const enoughBalance = await checkBalance("ETH", newBidPrice);
-      if (!enoughBalance) {
-        setNotification({
-          visible: true,
-          type: "error",
-          text:
-            "Insufficient ETH balance! There isn't enough ETH in your wallet.",
-        });
+      const ethBidPrice = await getNextEthBidPriceWithModifiers();
+
+      // Ensure ETH balance if paying in ETH
+      const enoughEth = await hasEthBalance(ethBidPrice);
+      if (!enoughEth) {
+        notify(
+          "error",
+          "Insufficient ETH balance! There isn't enough ETH in your wallet."
+        );
         setIsBidding(false);
         return;
       }
-      if (
+
+      // No donation path
+      const noDonation =
         (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
-        (donationType === "Token" && (!tokenDonateAddress || !tokenAmount))
-      ) {
-        await cosmicGameContract
-          .bidWithEth(rwlkId, message, {
-            value: newBidPrice,
-            gasLimit: 30000000,
+        (donationType === "Token" && (!tokenDonateAddress || !tokenAmount));
+
+      if (noDonation || !donationType) {
+        await handleTx(
+          cosmicGameContract.bidWithEth(rwlkId, message, {
+            value: ethBidPrice,
+            gasLimit: 30_000_000,
           })
-          .then((tx: any) => tx.wait());
-        setTimeout(() => {
-          fetchDataCollection();
-          setMessage("");
-          setIsBidding(false);
-        }, 3000);
+        );
+        await withPostTxRefresh();
+        setIsBidding(false);
         return;
       }
+
       if (donationType === "NFT") {
-        // Proceed with NFT donation
-        // Check if the contract exists
-        const isExist = await checkIfContractExist(nftDonateAddress);
-        if (!isExist) {
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "The address provided is not a valid contract address!",
-          });
-          setIsBidding(false);
-          return;
-        }
         const nftIdNum = Number(nftId);
-        const nftDonateContract = new Contract(
-          nftDonateAddress,
-          NFT_ABI,
-          library.getSigner(account)
+        const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
+        if (!ok) {
+          setIsBidding(false);
+          return;
+        }
+        await handleTx(
+          cosmicGameContract.bidWithEthAndDonateNft(
+            rwlkId,
+            message,
+            nftDonateAddress,
+            nftIdNum,
+            { value: ethBidPrice }
+          )
         );
-        // Check if the contract is ERC721
-        try {
-          const supportsInterface = await nftDonateContract.supportsInterface(
-            "0x80ac58cd"
-          );
-          if (!supportsInterface) {
-            throw new Error("Not an ERC721 contract");
-          }
-        } catch (err) {
-          console.log(err);
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "The donate NFT contract is not an ERC721 token contract.",
-          });
-          setIsBidding(false);
-          return;
-        }
-        // Check token ownership
-        const isOwner = await checkTokenOwnership(nftDonateAddress, nftIdNum);
-        if (!isOwner) {
-          setIsBidding(false);
-          return;
-        }
-        // Approve NFT transfer
-        try {
-          const isApproved = await nftDonateContract.isApprovedForAll(
-            account,
-            RAFFLE_WALLET_ADDRESS
-          );
-          if (!isApproved) {
-            await nftDonateContract
-              .setApprovalForAll(RAFFLE_WALLET_ADDRESS, true)
-              .then((tx: any) => tx.wait());
-          }
-          await cosmicGameContract
-            .bidWithEthAndDonateNft(
-              rwlkId,
-              message,
-              nftDonateAddress,
-              nftIdNum,
-              {
-                value: newBidPrice,
-                // gasLimit: 30000000,
-              }
-            )
-            .then((tx: any) => tx.wait());
-          setTimeout(() => {
-            fetchDataCollection();
-            setMessage("");
-            setNftId("");
-            setNftDonateAddress("");
-            setIsBidding(false);
-          }, 3000);
-        } catch (err) {
-          if (err?.data?.message) {
-            const msg = getErrorMessage(err?.data?.message);
-            setNotification({
-              visible: true,
-              type: "error",
-              text: msg,
-            });
-          }
-          console.log(err);
-          setIsBidding(false);
-        }
+        setNftId("");
+        setNftDonateAddress("");
       } else {
-        // Proceed with Token donation
-        const isExist = await checkIfContractExist(tokenDonateAddress);
-        if (!isExist) {
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "The address provided is not a valid contract address!",
-          });
+        const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
+        if (!res.ok) {
           setIsBidding(false);
           return;
         }
-
-        const tokenDonateContract = new Contract(
-          tokenDonateAddress,
-          ERC20_ABI,
-          library.getSigner(account)
+        await handleTx(
+          cosmicGameContract.bidWithEthAndDonateToken(
+            rwlkId,
+            message,
+            tokenDonateAddress,
+            res.amountWei,
+            { value: ethBidPrice }
+          )
         );
-
-        // Check if the contract is ERC20
-        try {
-          const totalSupply = await tokenDonateContract.totalSupply();
-          if (!totalSupply) {
-            throw new Error("Not an ERC20 contract");
-          }
-        } catch (err) {
-          console.log(err);
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "The donate token contract is not an ERC20 token contract.",
-          });
-          setIsBidding(false);
-          return;
-        }
-        // Check wallet balance
-        const walletBalance = await tokenDonateContract.balanceOf(account);
-        let decimals = 18;
-        try {
-          decimals = await tokenDonateContract.decimals();
-        } catch (err) {
-          console.warn("decimals() not found, assuming 18.");
-          setNotification({
-            visible: true,
-            type: "warning",
-            text:
-              "The token with this address doesn't implement decimals() function, we assume 18 decimal places for the amount entered.",
-          });
-        }
-        const tokenAmountInWei = parseUnits(tokenAmount, decimals);
-
-        if (walletBalance.lt(tokenAmountInWei)) {
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "Insufficient token balance for donation.",
-          });
-          setIsBidding(false);
-          return;
-        }
-        // Approve token transfer
-        try {
-          let receipt;
-          const allowance = await tokenDonateContract.allowance(
-            account,
-            RAFFLE_WALLET_ADDRESS
-          );
-          if (allowance.lt(ethers.constants.MaxUint256)) {
-            receipt = await tokenDonateContract
-              .approve(RAFFLE_WALLET_ADDRESS, ethers.constants.MaxUint256)
-              .then((tx: any) => tx.wait());
-          }
-          if (!receipt?.status && allowance.lt(tokenAmountInWei)) {
-            await tokenDonateContract
-              .approve(RAFFLE_WALLET_ADDRESS, tokenAmountInWei)
-              .then((tx: any) => tx.wait());
-          }
-          await cosmicGameContract
-            .bidWithEthAndDonateToken(
-              rwlkId,
-              message,
-              tokenDonateAddress,
-              tokenAmountInWei,
-              {
-                value: newBidPrice,
-              }
-            )
-            .then((tx: any) => tx.wait());
-          setTimeout(() => {
-            fetchDataCollection();
-            setMessage("");
-            setTokenAmount("");
-            setTokenDonateAddress("");
-            setIsBidding(false);
-          }, 3000);
-        } catch (err) {
-          if (err?.data?.message) {
-            const msg = getErrorMessage(err?.data?.message);
-            setNotification({
-              visible: true,
-              type: "error",
-              text: msg,
-            });
-          }
-          console.log(err);
-          setIsBidding(false);
-        }
+        setTokenAmount("");
+        setTokenDonateAddress("");
       }
+
+      await withPostTxRefresh();
     } catch (err) {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err?.data?.message);
-        setNotification({
-          visible: true,
-          type: "error",
-          text: msg,
-        });
-      }
       if (err?.code === 4001) {
         console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
       } else {
-        console.error(err);
-        // Handle other errors
+        notifyErrorFromEthers(err);
       }
+    } finally {
       setIsBidding(false);
     }
   };
@@ -526,251 +509,84 @@ const NewHome = () => {
   const onBidWithCST = async () => {
     setIsBidding(true);
     try {
+      // CST balance check (if price provided)
       if (cstBidData?.CSTPrice > 0) {
-        const enoughBalance = await checkBalance(
-          "CST",
-          ethers.utils.parseEther(cstBidData.CSTPrice.toString())
-        );
-        if (!enoughBalance) {
-          setNotification({
-            visible: true,
-            type: "error",
-            text:
-              "Insufficient CST balance! There isn't enough Cosmic Token in your wallet.",
-          });
+        const cstWei = ethers.utils.parseEther(cstBidData.CSTPrice.toString());
+        const enoughCst = await hasCstBalance(cstWei);
+        if (!enoughCst) {
+          notify(
+            "error",
+            "Insufficient CST balance! There isn't enough Cosmic Token in your wallet."
+          );
           setIsBidding(false);
           return;
         }
       }
-      const priceMaxLimit = await cosmicGameContract.getNextCstBidPrice();
-      if (
+
+      const priceMaxLimit: BigNumber = await cosmicGameContract.getNextCstBidPrice();
+
+      const noDonation =
         (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
-        (donationType === "Token" && (!tokenDonateAddress || !tokenAmount))
-      ) {
-        await cosmicGameContract
-          .bidWithCst(priceMaxLimit, message)
-          .then((tx: any) => tx.wait());
-        setTimeout(() => {
-          fetchDataCollection();
-          setMessage("");
-          setIsBidding(false);
-        }, 3000);
+        (donationType === "Token" && (!tokenDonateAddress || !tokenAmount));
+
+      if (noDonation || !donationType) {
+        await handleTx(cosmicGameContract.bidWithCst(priceMaxLimit, message));
+        await withPostTxRefresh();
+        setIsBidding(false);
         return;
       }
+
       if (donationType === "NFT") {
-        // Proceed with NFT donation
-        // Check if the contract exists
-        const isExist = await checkIfContractExist(nftDonateAddress);
-        if (!isExist) {
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "The address provided is not a valid contract address!",
-          });
-          setIsBidding(false);
-          return;
-        }
         const nftIdNum = Number(nftId);
-        const nftDonateContract = new Contract(
-          nftDonateAddress,
-          NFT_ABI,
-          library.getSigner(account)
+        const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
+        if (!ok) {
+          setIsBidding(false);
+          return;
+        }
+        await handleTx(
+          cosmicGameContract.bidWithCstAndDonateNft(
+            priceMaxLimit,
+            message,
+            nftDonateAddress,
+            nftIdNum
+          )
         );
-        // Check if the contract is ERC721
-        try {
-          const supportsInterface = await nftDonateContract.supportsInterface(
-            "0x80ac58cd"
-          );
-          if (!supportsInterface) {
-            throw new Error("Not an ERC721 contract");
-          }
-        } catch (err) {
-          console.log(err);
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "The donate NFT contract is not an ERC721 token contract.",
-          });
-          setIsBidding(false);
-          return;
-        }
-        // Check token ownership
-        const isOwner = await checkTokenOwnership(nftDonateAddress, nftIdNum);
-        if (!isOwner) {
-          setIsBidding(false);
-          return;
-        }
-        // Approve NFT transfer
-        try {
-          const isApproved = await nftDonateContract.isApprovedForAll(
-            account,
-            RAFFLE_WALLET_ADDRESS
-          );
-          if (!isApproved) {
-            await nftDonateContract
-              .setApprovalForAll(RAFFLE_WALLET_ADDRESS, true)
-              .then((tx: any) => tx.wait());
-          }
-          await cosmicGameContract
-            .bidWithCstAndDonateNft(
-              priceMaxLimit,
-              message,
-              nftDonateAddress,
-              nftIdNum
-            )
-            .then((tx: any) => tx.wait());
-          setTimeout(() => {
-            fetchDataCollection();
-            setMessage("");
-            setNftId("");
-            setNftDonateAddress("");
-            setIsBidding(false);
-          }, 3000);
-        } catch (err) {
-          if (err?.data?.message) {
-            const msg = getErrorMessage(err?.data?.message);
-            setNotification({
-              visible: true,
-              type: "error",
-              text: msg,
-            });
-          }
-          console.log(err);
-          setIsBidding(false);
-        }
+        setNftId("");
+        setNftDonateAddress("");
       } else {
-        // Proceed with Token donation
-        const isExist = await checkIfContractExist(tokenDonateAddress);
-        if (!isExist) {
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "The address provided is not a valid contract address!",
-          });
+        const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
+        if (!res.ok) {
           setIsBidding(false);
           return;
         }
-
-        const tokenDonateContract = new Contract(
-          tokenDonateAddress,
-          ERC20_ABI,
-          library.getSigner(account)
+        await handleTx(
+          cosmicGameContract.bidWithCstAndDonateToken(
+            priceMaxLimit,
+            message,
+            tokenDonateAddress,
+            res.amountWei
+          )
         );
+        setTokenAmount("");
+        setTokenDonateAddress("");
+      }
 
-        // Check if the contract is ERC20
-        try {
-          const totalSupply = await tokenDonateContract.totalSupply();
-          if (!totalSupply) {
-            throw new Error("Not an ERC20 contract");
-          }
-        } catch (err) {
-          console.log(err);
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "The donate token contract is not an ERC20 token contract.",
-          });
-          setIsBidding(false);
-          return;
-        }
-        // Check wallet balance
-        const walletBalance = await tokenDonateContract.balanceOf(account);
-        let decimals = 18;
-        try {
-          decimals = await tokenDonateContract.decimals();
-        } catch (err) {
-          console.warn("decimals() not found, assuming 18.");
-          setNotification({
-            visible: true,
-            type: "warning",
-            text:
-              "The token with this address doesn't implement decimals() function, we assume 18 decimal places for the amount entered.",
-          });
-        }
-        const tokenAmountInWei = parseUnits(tokenAmount, decimals);
-        if (walletBalance.lt(tokenAmountInWei)) {
-          setNotification({
-            visible: true,
-            type: "error",
-            text: "Insufficient token balance for donation.",
-          });
-          setIsBidding(false);
-          return;
-        }
-        // Approve token transfer
-        try {
-          let receipt;
-          const allowance = await tokenDonateContract.allowance(
-            account,
-            RAFFLE_WALLET_ADDRESS
-          );
-          if (allowance.lt(ethers.constants.MaxUint256)) {
-            receipt = await tokenDonateContract
-              .approve(RAFFLE_WALLET_ADDRESS, ethers.constants.MaxUint256)
-              .then((tx: any) => tx.wait());
-          }
-          if (!receipt?.status && allowance.lt(tokenAmountInWei)) {
-            await tokenDonateContract
-              .approve(RAFFLE_WALLET_ADDRESS, tokenAmountInWei)
-              .then((tx: any) => tx.wait());
-          }
-          await cosmicGameContract
-            .bidWithCstAndDonateToken(
-              priceMaxLimit,
-              message,
-              tokenDonateAddress,
-              tokenAmountInWei
-            )
-            .then((tx: any) => tx.wait());
-          setTimeout(() => {
-            fetchDataCollection();
-            setMessage("");
-            setTokenAmount("");
-            setTokenDonateAddress("");
-            setIsBidding(false);
-          }, 3000);
-        } catch (err) {
-          if (err?.data?.message) {
-            const msg = getErrorMessage(err?.data?.message);
-            setNotification({
-              visible: true,
-              type: "error",
-              text: msg,
-            });
-          }
-          console.log(err);
-          setIsBidding(false);
-        }
-      }
+      await withPostTxRefresh();
     } catch (err) {
-      if (err?.data?.message) {
-        const msg = err?.data?.message;
-        setNotification({
-          visible: true,
-          type: "error",
-          text: msg,
-        });
-      }
       if (err?.code === 4001) {
         console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
       } else {
-        console.error(err);
-        // Handle other errors
+        // CST path returns raw string sometimes — show verbatim if present
+        if (err?.data?.message) {
+          notify("error", err.data.message);
+        } else {
+          notifyErrorFromEthers(err);
+        }
       }
+    } finally {
       setIsBidding(false);
     }
   };
-
-  const playAudio = async () => {
-    try {
-      const audioElement = new Audio("/audio/notification.wav");
-      await audioElement.play();
-    } catch (error) {
-      console.error("Error requesting sound permission:", error);
-    }
-  };
-
   const getRwlkNFTIds = async () => {
     try {
       if (nftRWLKContract && account) {
@@ -835,6 +651,15 @@ const NewHome = () => {
       setLoading(false);
     } catch (err) {
       console.error("Error fetching data:", err);
+    }
+  };
+
+  const playAudio = async () => {
+    try {
+      const audioElement = new Audio("/audio/notification.wav");
+      await audioElement.play();
+    } catch (error) {
+      console.error("Error requesting sound permission:", error);
     }
   };
 
