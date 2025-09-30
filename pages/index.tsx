@@ -587,6 +587,7 @@ const NewHome = () => {
       setIsBidding(false);
     }
   };
+
   const getRwlkNFTIds = async () => {
     try {
       if (nftRWLKContract && account) {
@@ -734,6 +735,11 @@ const NewHome = () => {
     }
   };
 
+  const fetchActivationTime = async () => {
+    const activationTime = await cosmicGameContract.roundActivationTime();
+    setActivationTime(Number(activationTime - offset / 1000));
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
@@ -877,11 +883,6 @@ const NewHome = () => {
       clearInterval(interval);
     };
   }, [data, offset, curBidList, bannerToken.seed]);
-
-  const fetchActivationTime = async () => {
-    const activationTime = await cosmicGameContract.roundActivationTime();
-    setActivationTime(Number(activationTime - offset / 1000));
-  };
 
   useEffect(() => {
     const fetchTimeoutClaimPrize = async () => {
