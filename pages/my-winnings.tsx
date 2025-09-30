@@ -61,7 +61,6 @@ function useUnclaimedWinnings(account: string | null | undefined) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchUnclaimedData = async () => {
-    if (!account) return;
     setLoading(true);
     setError(null);
 
@@ -84,8 +83,9 @@ function useUnclaimedWinnings(account: string | null | undefined) {
   };
 
   useEffect(() => {
-    fetchUnclaimedData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (account) {
+      fetchUnclaimedData();
+    }
   }, [account]);
 
   return {
@@ -160,7 +160,7 @@ function RaffleWinningRow({ winning }: { winning: RaffleWinning }) {
                 )})`}
           </>
         ) : (
-          ""
+          " "
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="right">{Amount.toFixed(7)}</TablePrimaryCell>
@@ -230,27 +230,22 @@ export default function MyWinnings() {
     Handlers
   ------------------------------------------------------------------ */
 
-  const fetchDonatedERC20Tokens = useCallback(
-    async (reload = true) => {
-      if (!account) return;
-      setDonatedERC20Tokens((prev) => ({ ...prev, loading: reload }));
-      try {
-        const donatedERC20Tokens = await api.get_donations_erc20_by_user(
-          account
-        );
-        setDonatedERC20Tokens({ data: donatedERC20Tokens, loading: false });
-      } catch (err) {
-        console.error(err);
-        setNotification({
-          text: "Failed to fetch donated NFTs",
-          type: "error",
-          visible: true,
-        });
-        setDonatedERC20Tokens((prev) => ({ ...prev, loading: false }));
-      }
-    },
-    [account]
-  );
+  const fetchDonatedERC20Tokens = async (reload = true) => {
+    if (!account) return;
+    setDonatedERC20Tokens((prev) => ({ ...prev, loading: reload }));
+    try {
+      const donatedERC20Tokens = await api.get_donations_erc20_by_user(account);
+      setDonatedERC20Tokens({ data: donatedERC20Tokens, loading: false });
+    } catch (err) {
+      console.error(err);
+      setNotification({
+        text: "Failed to fetch donated NFTs",
+        type: "error",
+        visible: true,
+      });
+      setDonatedERC20Tokens((prev) => ({ ...prev, loading: false }));
+    }
+  };
 
   useEffect(() => {
     fetchDonatedERC20Tokens();
