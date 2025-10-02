@@ -246,7 +246,7 @@ export const getEnduranceChampions = (bidList: any[], roundEndTimeStamp: number 
 
 // Utility function to get the full URL for assets (e.g., images) via proxy
 export const getAssetsUrl = (url: string): string => {
-  const imageServerUrl = "http://69.10.55.2/images/new/";
+  const imageServerUrl = "https://nfts.cosmicsignature.com/images/new/";
   return `${proxyUrl}${encodeURIComponent(imageServerUrl + url)}`;
 };
 
