@@ -407,7 +407,7 @@ export default function MyWinnings() {
       {/* Raffle ETH Section */}
       <Box mt={6}>
         <Typography variant="h5" mb={2}>
-          Claimable Raffle ETH
+          Claimable ETH Rewards
         </Typography>
         {loading && raffleETHWinnings === null ? (
           <Typography>Loading...</Typography>
