@@ -295,10 +295,6 @@ const NewHome = () => {
     prevCurNumBids,
   } = state;
 
-  // single ticking "now" for countdown displays
-  const [now, setNow] = useState(() => Date.now());
-  useInterval(() => setNow(Date.now()), 1000);
-
   const notify = (
     type: "error" | "warning" | "success" | "info",
     text: string
@@ -913,19 +909,30 @@ const NewHome = () => {
   useEffect(() => {
     if (!("Notification" in window)) return;
     if (!prizeTime || sentFiveMin) return;
-    const remaining = prizeTime - now;
-    if (
-      remaining <= 5 * 60 * 1000 &&
-      remaining > 0 &&
-      Notification.permission === "granted"
-    ) {
-      new Notification("Bid Now or Miss Out!", {
-        body:
-          "Time is running out! You have 5 minutes to place your bids and win amazing prizes.",
-      });
-      dispatch({ type: "PATCH", payload: { sentFiveMin: true } });
-    }
-  }, [now, prizeTime, sentFiveMin]);
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const remaining = prizeTime - now;
+      if (
+        remaining <= 5 * 60 * 1000 &&
+        remaining > 0 &&
+        Notification.permission === "granted"
+      ) {
+        new Notification("Bid Now or Miss Out!", {
+          body:
+            "Time is running out! You have 5 minutes to place your bids and win amazing prizes.",
+        });
+        clearInterval(interval);
+        dispatch({ type: "PATCH", payload: { sentFiveMin: true } });
+      }
+      if (now > prizeTime) {
+        clearInterval(interval);
+      }
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [prizeTime, sentFiveMin]);
 
   // Play audio *once* when bids increase and you are not last bidder
   useEffect(() => {
@@ -954,7 +961,6 @@ const NewHome = () => {
      Derived values for render
      =========================== */
 
-  const adjustedNow = now + offset; // server-adjusted "now"
   const roundStartedText = data?.TsRoundStart
     ? calculateTimeDiff(data?.TsRoundStart - offset / 1000)
     : "";
