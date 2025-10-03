@@ -1588,6 +1588,13 @@ const NewHome = () => {
                                   The bid price is bumped {bidPricePlus}% to
                                   prevent bidding collision.
                                 </Typography>
+                                <Typography variant="body2">
+                                  This percentage won't rise the bid price
+                                  arbitrarily after your bid, it is only meant
+                                  for allowing both bid transactions to pass
+                                  through in case two simultaneous bids occur
+                                  within the same block.
+                                </Typography>
                               </Box>
                             )}
                           </AccordionDetails>
