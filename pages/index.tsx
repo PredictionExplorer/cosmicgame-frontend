@@ -608,7 +608,7 @@ const NewHome = () => {
         if (!enoughCst) {
           notify(
             "error",
-            "Insufficient CST balance! There isn't enough Cosmic Token in your wallet."
+            "Insufficient CST balance! There isn't enough Cosmic Signature Token in your wallet."
           );
           dispatch({ type: "PATCH", payload: { isBidding: false } });
           return;
@@ -1266,7 +1266,7 @@ const NewHome = () => {
                             <FormControlLabel
                               value="CST"
                               control={<Radio size="small" />}
-                              label="CST(Cosmic Token)"
+                              label="CST(Cosmic Signature Token)"
                             />
                           )}
                         </RadioGroup>
@@ -1808,8 +1808,8 @@ const NewHome = () => {
 
         <Box>
           <Typography variant="body2" mt={4}>
-            When you bid, you will get 100 Cosmic Tokens as a reward. These
-            tokens allow you to participate in the DAO.
+            When you bid, you will get 100 Cosmic Signature Tokens as a reward.
+            These tokens allow you to participate in the DAO.
           </Typography>
           <Box mt={2}>
             <Typography variant="body2" color="primary" component="span">

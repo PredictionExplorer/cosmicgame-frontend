@@ -644,7 +644,7 @@ const Statistics = () => {
       {/* CT Balance Distribution */}
       <Box mt={4}>
         <Typography variant="h6" mb={2}>
-          Cosmic Token (ERC20) Balance Distribution
+          Cosmic Signature Token (ERC20) Balance Distribution
         </Typography>
         <CTBalanceDistributionChart list={ctBalanceDistribution} />
       </Box>

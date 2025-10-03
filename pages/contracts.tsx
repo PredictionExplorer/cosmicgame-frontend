@@ -256,7 +256,7 @@ const Contracts = () => {
       copyable: true,
     },
     {
-      name: "Cosmic Token Address",
+      name: "Cosmic Signature Token Address",
       value: data?.ContractAddrs.CosmicTokenAddr,
       copyable: true,
     },

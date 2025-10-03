@@ -19,7 +19,7 @@ const FAQ = () => {
     {
       summary: "What type of bids are available?",
       detail:
-        "It is possible to bid with ETH or Cosmic Tokens (ERC-20). You can also attach a RandomWalk token to the bid and receive a 50% discount on the bid price. The bid price in Cosmic Tokens continuously decreases according to the rules of a Dutch auction.",
+        "It is possible to bid with ETH or Cosmic Signature Tokens (ERC-20). You can also attach a RandomWalk token to the bid and receive a 50% discount on the bid price. The bid price in Cosmic Signature Tokens continuously decreases according to the rules of a Dutch auction.",
     },
     {
       summary: "What is the main prize?",
@@ -29,17 +29,17 @@ const FAQ = () => {
     {
       summary: "What are marketing rewards?",
       detail:
-        "You can earn Cosmic Tokens (ERC-20) by promoting the Cosmic Game website on your Twitter account. Marketing rewards are paid on every bid placed during the round. Contact the marketing team for more info.",
+        "You can earn Cosmic Signature Tokens (ERC-20) by promoting the Cosmic Game website on your Twitter account. Marketing rewards are paid on every bid placed during the round. Contact the marketing team for more info.",
     },
     {
-      summary: "What are Cosmic Tokens and the Cosmic DAO?",
+      summary: "What are Cosmic Signature Tokens and the Cosmic DAO?",
       detail:
-        "Every bid also earns you Cosmic Tokens, which can be used to vote in the Cosmic DAO. The DAO helps decide which beneficiary receives 10% of the pot each round and may be used for other governance decisions in the future.",
+        "Every bid also earns you Cosmic Signature Tokens, which can be used to vote in the Cosmic DAO. The DAO helps decide which beneficiary receives 10% of the pot each round and may be used for other governance decisions in the future.",
     },
     {
       summary: "What is Dutch Auction bidding?",
       detail:
-        "When you bid with ETH, you will earn 100 Cosmic Tokens (ERC-20). These tokens can be used to make another bid through the Dutch auction. A Dutch auction is a type of auction that lowers the bid price if nobody bids after a certain amount of time; the more time passes, the lower the bid price gets. This feature allows you to save on bidding and continue playing the game.",
+        "When you bid with ETH, you will earn 100 Cosmic Signature Tokens (ERC-20). These tokens can be used to make another bid through the Dutch auction. A Dutch auction is a type of auction that lowers the bid price if nobody bids after a certain amount of time; the more time passes, the lower the bid price gets. This feature allows you to save on bidding and continue playing the game.",
     },
     {
       summary: "What is an Endurance Champion?",
@@ -108,20 +108,20 @@ const FAQ = () => {
     },
     {
       summary:
-        "How can I trade or sell my Cosmic Signature NFTs or Cosmic Tokens?",
+        "How can I trade or sell my Cosmic Signature NFTs or Cosmic Signature Tokens?",
       detail:
-        "Cosmic Signature NFTs and Cosmic Tokens are compatible with any marketplace or exchange that supports ERC-721 and ERC-20 tokens, respectively. This includes popular platforms like OpenSea for NFTs and Uniswap for tokens.",
+        "Cosmic Signature NFTs and Cosmic Signature Tokens are compatible with any marketplace or exchange that supports ERC-721 and ERC-20 tokens, respectively. This includes popular platforms like OpenSea for NFTs and Uniswap for tokens.",
     },
     {
       summary: "Can I place multiple bids during a round?",
       detail:
-        "Yes, you can place as many bids as you like during a round. Each bid increases your chances of winning and earns you more Cosmic Tokens.",
+        "Yes, you can place as many bids as you like during a round. Each bid increases your chances of winning and earns you more Cosmic Signature Tokens.",
     },
     {
       summary:
         "Can I participate in the Cosmic DAO without bidding in the game?",
       detail:
-        "Yes, you can purchase Cosmic Tokens on a supported exchange and use them to participate in the DAO. However, bidding in the game is the primary way to earn tokens.",
+        "Yes, you can purchase Cosmic Signature Tokens on a supported exchange and use them to participate in the DAO. However, bidding in the game is the primary way to earn tokens.",
     },
     {
       summary: "Can I donate to the pot without participating in the bidding?",
@@ -179,14 +179,14 @@ const FAQ = () => {
         "Yes, you can use your existing Ethereum wallet on Arbitrum. The same private keys are valid on both networks. However, you will need to adjust your wallet's network settings to connect to Arbitrum. Instructions for this can vary by wallet, so please refer to your wallet's specific guidance on connecting to other networks.",
     },
     {
-      summary: "How do I view my Cosmic Tokens and NFTs on Arbitrum?",
+      summary: "How do I view my Cosmic Signature Tokens and NFTs on Arbitrum?",
       detail:
-        "You can view your Cosmic Tokens and NFTs directly on the Cosmic Signature website or in your wallet like any other ERC-20 or ERC-721 asset. However, to view them in your wallet, you will need to add the tokens' contract addresses manually. These addresses can be found on our website or by asking in our community chat. Always ensure that you're connected to the Arbitrum network in your wallet to view your assets correctly.",
+        "You can view your Cosmic Signature Tokens and NFTs directly on the Cosmic Signature website or in your wallet like any other ERC-20 or ERC-721 asset. However, to view them in your wallet, you will need to add the tokens' contract addresses manually. These addresses can be found on our website or by asking in our community chat. Always ensure that you're connected to the Arbitrum network in your wallet to view your assets correctly.",
     },
     {
-      summary: "Can I trade my Cosmic Tokens and NFTs on Arbitrum?",
+      summary: "Can I trade my Cosmic Signature Tokens and NFTs on Arbitrum?",
       detail:
-        "Yes, Cosmic Tokens and NFTs can be traded on any marketplace or exchange that supports the Arbitrum network. This includes popular platforms like Uniswap for tokens and OpenSea for NFTs. Always make sure to verify that you are interacting with the correct contract addresses when trading.",
+        "Yes, Cosmic Signature Tokens and NFTs can be traded on any marketplace or exchange that supports the Arbitrum network. This includes popular platforms like Uniswap for tokens and OpenSea for NFTs. Always make sure to verify that you are interacting with the correct contract addresses when trading.",
     },
     {
       summary:

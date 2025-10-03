@@ -193,7 +193,7 @@ const CosmicTokenTransfers = ({ address }) => {
     <MainWrapper>
       {/* Page title */}
       <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-        Cosmic Token Transfers
+        Cosmic Signature Token Transfers
       </Typography>
 
       {/* Conditionally render a loading message or the transfers table */}
@@ -226,8 +226,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 
   // Build page title/description dynamically with the address
-  const title = `Cosmic Token Transfer History for ${address} | Cosmic Signature`;
-  const description = `Cosmic Token Transfer History for ${address}`;
+  const title = `Cosmic Signature Token Transfer History for ${address} | Cosmic Signature`;
+  const description = `Cosmic Signature Token Transfer History for ${address}`;
 
   // Set Open Graph and Twitter meta tags
   const openGraphData = [

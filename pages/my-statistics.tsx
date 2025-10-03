@@ -127,14 +127,16 @@ function UserStatsSection({
         <Row label="ETH Balance:">{balanceETH.toFixed(6)} ETH</Row>
       )}
       {balanceCST !== 0 && (
-        <Row label="Cosmic Tokens Balance:">{balanceCST.toFixed(2)} CST</Row>
+        <Row label="Cosmic Signature Tokens Balance:">
+          {balanceCST.toFixed(2)} CST
+        </Row>
       )}
 
       <Row label="Number of Bids:">{userInfo.NumBids}</Row>
       <Row label="Number of Cosmic Signature Transfers:">
         {userInfo.CosmicSignatureNumTransfers}
       </Row>
-      <Row label="Number of Cosmic Token Transfers:">
+      <Row label="Number of Cosmic Signature Token Transfers:">
         {userInfo.CosmicTokenNumTransfers}
       </Row>
       <Row label="Maximum Bid Amount:">

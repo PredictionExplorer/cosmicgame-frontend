@@ -503,7 +503,7 @@ const UserInfo = ({ address }: { address: string }) => {
           {balance.CosmicToken !== 0 && (
             <Box mb={1}>
               <Typography color="primary" component="span">
-                Cosmic Tokens Balance:
+                Cosmic Signature Tokens Balance:
               </Typography>
               &nbsp;
               <Typography component="span">
@@ -531,7 +531,7 @@ const UserInfo = ({ address }: { address: string }) => {
           </Box>
           <Box mb={1}>
             <Typography color="primary" component="span">
-              Number of Cosmic Token Transfers:
+              Number of Cosmic Signature Token Transfers:
             </Typography>
             &nbsp;
             <Typography component="span">
