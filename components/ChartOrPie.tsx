@@ -1,6 +1,8 @@
 import {
   Chart,
   ChartArea,
+  ChartCategoryAxis,
+  ChartCategoryAxisItem,
   ChartLegend,
   ChartSeries,
   ChartSeriesItem,
@@ -54,13 +56,18 @@ const ChartOrPie: React.FC<{ data?: DistData }> = ({ data }) => {
   return (
     <Chart
       transitions={false}
-      style={{ width: "100%", height: "100%", margin: "auto" }}
+      style={{ width: "100%", height: "200px", margin: "auto" }}
     >
       <ChartLegend visible={false} />
       <ChartArea background="transparent" />
       <ChartValueAxis>
         <ChartValueAxisItem visible={false} max={barAxisMax} />
       </ChartValueAxis>
+      <ChartCategoryAxis>
+        <ChartCategoryAxisItem
+          labels={{ font: "13px Inter, system-ui, sans-serif", color: "white" }}
+        />
+      </ChartCategoryAxis>
       <ChartSeries>
         <ChartSeriesItem
           type="bar"
