@@ -210,7 +210,8 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
           {(!!history.NFTDonationTokenAddr ||
             !!history.DonatedERC20TokenAddr) && (
             <>
-              {history.BidType === 2 && "Bid was made using Cosmic Tokens"}
+              {history.BidType === 2 &&
+                "Bid was made using Cosmic Signature Tokens"}
               {history.BidType === 0 && "Bid was made using ETH"}
               {!!history.NFTDonationTokenAddr &&
                 ` and a token (${shortenHex(

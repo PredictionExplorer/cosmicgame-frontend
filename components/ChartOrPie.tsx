@@ -1,8 +1,8 @@
-import React, { useCallback } from "react";
-import { useMediaQuery, useTheme } from "@mui/material";
 import {
   Chart,
   ChartArea,
+  ChartCategoryAxis,
+  ChartCategoryAxisItem,
   ChartLegend,
   ChartSeries,
   ChartSeriesItem,
@@ -30,9 +30,6 @@ const fmtEth = (eth: number) =>
   Number.isFinite(eth) ? eth.toFixed(4) : "0.0000";
 
 const ChartOrPie: React.FC<{ data?: DistData }> = ({ data }) => {
-  const theme = useTheme();
-  const upMd = useMediaQuery(theme.breakpoints.up("md"));
-
   // normalize and guard values
   const prize = clamp(data?.PrizePercentage);
   const raffle = clamp(data?.RafflePercentage);
@@ -52,49 +49,25 @@ const ChartOrPie: React.FC<{ data?: DistData }> = ({ data }) => {
     { category: "Next round", value: remainder },
   ];
 
-  const labelContent = useCallback(
-    (props: any) => {
-      const v = Number(props?.dataItem?.value) || 0;
-      const cat = String(props?.dataItem?.category || "");
-      const eth = (v * balance) / 100;
-      return `${cat}: ${v}% (${fmtEth(eth)} ETH)`;
-    },
-    [balance]
-  );
-
   const barAxisMax = Math.min(
     100,
     Math.max(80, Math.ceil(Math.max(...series.map((s) => s.value)) * 1.2))
   );
-
-  return upMd ? (
-    // Desktop/tablet: PIE chart
-    <Chart transitions={false} style={{ width: "100%", height: 300 }}>
-      <ChartLegend visible={false} />
-      <ChartArea background="transparent" />
-      <ChartSeries>
-        <ChartSeriesItem
-          type="pie"
-          data={series}
-          field="value"
-          categoryField="category"
-          labels={{
-            visible: true,
-            content: labelContent,
-            color: "white",
-            background: "none",
-          }}
-        />
-      </ChartSeries>
-    </Chart>
-  ) : (
-    // Mobile: BAR chart
-    <Chart transitions={false} style={{ width: "100%", height: "100%" }}>
+  return (
+    <Chart
+      transitions={false}
+      style={{ width: "100%", height: "200px", margin: "auto" }}
+    >
       <ChartLegend visible={false} />
       <ChartArea background="transparent" />
       <ChartValueAxis>
         <ChartValueAxisItem visible={false} max={barAxisMax} />
       </ChartValueAxis>
+      <ChartCategoryAxis>
+        <ChartCategoryAxisItem
+          labels={{ font: "13px Inter, system-ui, sans-serif", color: "white" }}
+        />
+      </ChartCategoryAxis>
       <ChartSeries>
         <ChartSeriesItem
           type="bar"

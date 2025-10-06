@@ -145,7 +145,8 @@ const WinnerRow = ({ winner }) => {
  */
 const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
   // Combine both arrays into a single list of winners.
-  const list = [...RaffleETHDeposits, ...RaffleNFTWinners];
+  const depositsExcludingLast = RaffleETHDeposits.slice(0, -1);
+  const list = [...depositsExcludingLast, ...RaffleNFTWinners];
 
   // Number of rows to display per page.
   const perPage = 5;

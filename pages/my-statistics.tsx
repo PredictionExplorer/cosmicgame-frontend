@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { Box, Button, Link, Tab, Tabs, Typography } from "@mui/material";
 import { MainWrapper } from "../components/styled";
@@ -42,9 +42,13 @@ interface TabPanelProps {
 }
 
 /* ------------------------------------------------------------------
-   Sub-Components (pure)
+   Sub-Components
 ------------------------------------------------------------------ */
 
+/**
+ * CustomTabPanel conditionally renders its children
+ * based on whether `value` matches `index`.
+ */
 function CustomTabPanel({ children, value, index, ...other }: TabPanelProps) {
   return (
     <div
@@ -56,28 +60,6 @@ function CustomTabPanel({ children, value, index, ...other }: TabPanelProps) {
     >
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
-  );
-}
-
-function LabelWithImage({
-  src,
-  alt,
-  text,
-}: {
-  src: string;
-  alt: string;
-  text: string;
-}) {
-  return (
-    <Box sx={{ display: "flex" }}>
-      <Image src={src} width={94} height={60} alt={alt} />
-      <Typography
-        variant="h6"
-        sx={{ whiteSpace: "nowrap", textTransform: "none", ml: 2 }}
-      >
-        {text}
-      </Typography>
-    </Box>
   );
 }
 
@@ -105,92 +87,184 @@ function UserStatsSection({
     );
   }
 
-  const Row = ({
-    label,
-    children,
-  }: {
-    label: string;
-    children: React.ReactNode;
-  }) => (
-    <Box mb={1}>
-      <Typography color="primary" component="span">
-        {label}
-      </Typography>
-      &nbsp;
-      <Typography component="span">{children}</Typography>
-    </Box>
-  );
-
   return (
     <>
+      {/* Balances */}
       {balanceETH !== 0 && (
-        <Row label="ETH Balance:">{balanceETH.toFixed(6)} ETH</Row>
+        <Box mb={1}>
+          <Typography color="primary" component="span">
+            ETH Balance:
+          </Typography>
+          &nbsp;
+          <Typography component="span">{balanceETH.toFixed(6)} ETH</Typography>
+        </Box>
       )}
       {balanceCST !== 0 && (
-        <Row label="Cosmic Tokens Balance:">{balanceCST.toFixed(2)} CST</Row>
+        <Box mb={1}>
+          <Typography color="primary" component="span">
+            Cosmic Tokens Balance:
+          </Typography>
+          &nbsp;
+          <Typography component="span">{balanceCST.toFixed(2)} CST</Typography>
+        </Box>
       )}
 
-      <Row label="Number of Bids:">{userInfo.NumBids}</Row>
-      <Row label="Number of Cosmic Signature Transfers:">
-        {userInfo.CosmicSignatureNumTransfers}
-      </Row>
-      <Row label="Number of Cosmic Token Transfers:">
-        {userInfo.CosmicTokenNumTransfers}
-      </Row>
-      <Row label="Maximum Bid Amount:">
-        {formatEthValue(userInfo.MaxBidAmount)}
-      </Row>
-      <Row label="Number of Prizes Taken:">{userInfo.NumPrizes}</Row>
-      <Row label="Maximum Amount Gained (in prize winnings):">
-        {userInfo.MaxWinAmount.toFixed(6)} ETH
-      </Row>
-      <Row label="Amount of Winnings in ETH raffles:">
-        {userInfo.SumRaffleEthWinnings.toFixed(6)} ETH
-      </Row>
-      <Row label="Amount Withdrawn from ETH raffles:">
-        {userInfo.SumRaffleEthWithdrawal.toFixed(6)} ETH
-      </Row>
-      <Row label="Unclaimed Donated NFTs:">{userInfo.UnclaimedNFTs}</Row>
-      <Row label="Total ETH Won in raffles:">
-        <Link
-          href={`/user/raffle-eth/${userInfo.Address}`}
-          sx={{ color: "inherit", fontSize: "inherit" }}
-        >
-          {(
-            userInfo.SumRaffleEthWinnings + userInfo.SumRaffleEthWithdrawal
-          ).toFixed(6)}{" "}
-          ETH
-        </Link>
-      </Row>
-      <Row label="Number of (ETH) raffles Participated in:">
-        {userInfo.NumRaffleEthWinnings}
-      </Row>
-      <Row label="Raffle NFTs Count (Raffle Mints):">
-        <Link
-          href={`/user/raffle-nft/${userInfo.Address}`}
-          sx={{ color: "inherit", fontSize: "inherit" }}
-        >
-          {userInfo.RaffleNFTsCount}
-        </Link>
-      </Row>
-      <Row label="Reward NFTs Count (All Mints):">
-        {userInfo.RewardNFTsCount}
-      </Row>
-      <Row label="Number of Cosmic Signature Tokens Won:">
-        {userInfo.TotalCSTokensWon}
-      </Row>
+      {/* Basic user info & stats */}
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Number of Bids:
+        </Typography>
+        &nbsp;
+        <Typography component="span">{userInfo.NumBids}</Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Number of Cosmic Signature Transfers:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {userInfo.CosmicSignatureNumTransfers}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Number of Cosmic Token Transfers:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {userInfo.CosmicTokenNumTransfers}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Maximum Bid Amount:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {formatEthValue(userInfo.MaxBidAmount)}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Number of Prizes Taken:
+        </Typography>
+        &nbsp;
+        <Typography component="span">{userInfo.NumPrizes}</Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Maximum Amount Gained (in prize winnings):
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {userInfo.MaxWinAmount.toFixed(6)} ETH
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Amount of Winnings in ETH raffles:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {userInfo.SumRaffleEthWinnings.toFixed(6)} ETH
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Amount Withdrawn from ETH raffles:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {userInfo.SumRaffleEthWithdrawal.toFixed(6)} ETH
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Unclaimed Donated NFTs:
+        </Typography>
+        &nbsp;
+        <Typography component="span">{userInfo.UnclaimedNFTs}</Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total ETH Won in raffles:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          <Link
+            href={`/user/raffle-eth/${userInfo.Address}`}
+            sx={{ color: "inherit", fontSize: "inherit" }}
+          >
+            {(
+              userInfo.SumRaffleEthWinnings + userInfo.SumRaffleEthWithdrawal
+            ).toFixed(6)}{" "}
+            ETH
+          </Link>
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Number of (ETH) raffles Participated in:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {userInfo.NumRaffleEthWinnings}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Raffle NFTs Count (Raffle Mints):
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          <Link
+            href={`/user/raffle-nft/${userInfo.Address}`}
+            sx={{ color: "inherit", fontSize: "inherit" }}
+          >
+            {userInfo.RaffleNFTsCount}
+          </Link>
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Reward NFTs Count (All Mints):
+        </Typography>
+        &nbsp;
+        <Typography component="span">{userInfo.RewardNFTsCount}</Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Number of Cosmic Signature Tokens Won:
+        </Typography>
+        &nbsp;
+        <Typography component="span">{userInfo.TotalCSTokensWon}</Typography>
+      </Box>
 
+      {/* Raffle Probability */}
       {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
         <>
-          <Row label="Probability of Winning ETH:">
-            {(raffleETHProbability * 100).toFixed(2)}%
-          </Row>
-          <Row label="Probability of Winning NFT:">
-            {(raffleNFTProbability * 100).toFixed(2)}%
-          </Row>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Probability of Winning ETH:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {(raffleETHProbability * 100).toFixed(2)}%
+            </Typography>
+          </Box>
+          <Box mb={1}>
+            <Typography color="primary" component="span">
+              Probability of Winning NFT:
+            </Typography>
+            &nbsp;
+            <Typography component="span">
+              {(raffleNFTProbability * 100).toFixed(2)}%
+            </Typography>
+          </Box>
         </>
       )}
 
+      {/* Transfer History Links */}
       <Typography mt={3}>
         This account has {userInfo.CosmicTokenNumTransfers} CosmicToken (ERC20).
         Click{" "}
@@ -228,47 +302,81 @@ function CSTStakingTab({
   account: string;
 }) {
   const { CSTStakingInfo } = userInfo.StakingStatistics || {};
-  const Row = ({
-    label,
-    children,
-  }: {
-    label: string;
-    children: React.ReactNode;
-  }) => (
-    <Box mb={1}>
-      <Typography color="primary" component="span">
-        {label}
-      </Typography>
-      &nbsp;
-      <Typography component="span">{children}</Typography>
-    </Box>
-  );
 
   return (
     <>
-      <Row label="Number of Active Stakers:">
-        {CSTStakingInfo?.NumActiveStakers}
-      </Row>
-      <Row label="Number of Deposits:">{CSTStakingInfo?.NumDeposits}</Row>
-      <Row label="Total Number of Stake Actions:">
-        {CSTStakingInfo?.TotalNumStakeActions}
-      </Row>
-      <Row label="Total Number of Unstake Actions:">
-        {CSTStakingInfo?.TotalNumUnstakeActions}
-      </Row>
-      <Row label="Total Rewards:">
-        {formatEthValue(CSTStakingInfo?.TotalRewardEth)}
-      </Row>
-      <Row label="Unclaimed Rewards:">
-        {formatEthValue(CSTStakingInfo?.UnclaimedRewardEth)}
-      </Row>
-      <Row label="Total Tokens Minted:">
-        {CSTStakingInfo?.TotalTokensMinted}
-      </Row>
-      <Row label="Total Tokens Staked:">
-        {CSTStakingInfo?.TotalTokensStaked}
-      </Row>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Number of Active Stakers:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {CSTStakingInfo?.NumActiveStakers}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Number of Deposits:
+        </Typography>
+        &nbsp;
+        <Typography component="span">{CSTStakingInfo?.NumDeposits}</Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Number of Stake Actions:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {CSTStakingInfo?.TotalNumStakeActions}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Number of Unstake Actions:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {CSTStakingInfo?.TotalNumUnstakeActions}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Rewards:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {formatEthValue(CSTStakingInfo?.TotalRewardEth)}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Unclaimed Rewards:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {formatEthValue(CSTStakingInfo?.UnclaimedRewardEth)}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Tokens Minted:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {CSTStakingInfo?.TotalTokensMinted}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Tokens Staked:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {CSTStakingInfo?.TotalTokensStaked}
+        </Typography>
+      </Box>
 
+      {/* CST Stake/Unstake Actions */}
       <Box>
         <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
           Stake / Unstake Actions
@@ -276,6 +384,7 @@ function CSTStakingTab({
         <StakingActionsTable list={stakingActions} IsRwalk={false} />
       </Box>
 
+      {/* CST Staking Rewards */}
       <Box mt={4}>
         <Typography variant="subtitle1" lineHeight={1} mb={2}>
           Staking Rewards by Token
@@ -283,6 +392,7 @@ function CSTStakingTab({
         <StakingRewardsTable list={cstStakingRewards} address={account} />
       </Box>
 
+      {/* CST Staking Rewards by Deposit */}
       <Box mt={4}>
         <Typography variant="subtitle1" lineHeight={1} mb={2}>
           Staking Rewards by Deposit
@@ -290,6 +400,7 @@ function CSTStakingTab({
         <CSTStakingRewardsByDepositTable list={cstStakingRewardsByDeposit} />
       </Box>
 
+      {/* CST Collected Staking Rewards */}
       <Box mt={4}>
         <Typography variant="subtitle1" lineHeight={1} mb={2}>
           Collected Staking Rewards
@@ -297,6 +408,7 @@ function CSTStakingTab({
         <CollectedCSTStakingRewardsTable list={collectedCstStakingRewards} />
       </Box>
 
+      {/* CST Uncollected Staking Rewards */}
       <Box mt={4}>
         <Typography variant="subtitle1" lineHeight={1} mb={2}>
           Uncollected Staking Rewards
@@ -320,47 +432,64 @@ function RWLKStakingTab({
   rwlkMints: any[];
 }) {
   const { RWalkStakingInfo } = userInfo.StakingStatistics || {};
-  const Row = ({
-    label,
-    children,
-  }: {
-    label: string;
-    children: React.ReactNode;
-  }) => (
-    <Box mb={1}>
-      <Typography color="primary" component="span">
-        {label}
-      </Typography>
-      &nbsp;
-      <Typography component="span">{children}</Typography>
-    </Box>
-  );
 
   return (
     <>
-      <Row label="Number of Active Stakers:">
-        {RWalkStakingInfo?.NumActiveStakers}
-      </Row>
-      <Row label="Total Number of Stake Actions:">
-        {RWalkStakingInfo?.TotalNumStakeActions}
-      </Row>
-      <Row label="Total Number of Unstake Actions:">
-        {RWalkStakingInfo?.TotalNumUnstakeActions}
-      </Row>
-      <Row label="Total Tokens Minted:">
-        {RWalkStakingInfo?.TotalTokensMinted}
-      </Row>
-      <Row label="Total Tokens Staked:">
-        {RWalkStakingInfo?.TotalTokensStaked}
-      </Row>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Number of Active Stakers:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {RWalkStakingInfo?.NumActiveStakers}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Number of Stake Actions:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {RWalkStakingInfo?.TotalNumStakeActions}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Number of Unstake Actions:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {RWalkStakingInfo?.TotalNumUnstakeActions}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Tokens Minted:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {RWalkStakingInfo?.TotalTokensMinted}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Tokens Staked:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {RWalkStakingInfo?.TotalTokensStaked}
+        </Typography>
+      </Box>
 
+      {/* RWLK Stake/Unstake Actions */}
       <Box>
         <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
           Stake / Unstake Actions
         </Typography>
-        <StakingActionsTable list={stakingActions} IsRwalk />
+        <StakingActionsTable list={stakingActions} IsRwalk={true} />
       </Box>
 
+      {/* RWLK Staking Reward Tokens */}
       <Box>
         <Typography variant="subtitle1" lineHeight={1} mt={4} mb={2}>
           Staking Reward Tokens
@@ -372,322 +501,260 @@ function RWLKStakingTab({
 }
 
 /* ------------------------------------------------------------------
-   State management
------------------------------------------------------------------- */
-
-type DonatedNFTState = {
-  claimed: any[];
-  unclaimed: any[];
-  loading: boolean;
-  claimingIds: number[];
-};
-
-type DonatedERC20State = { data: any[]; loading: boolean };
-
-type State = {
-  loading: boolean;
-  isClaiming: boolean;
-  data: any;
-  userInfo: any;
-  balance: { CosmicToken: number; ETH: number };
-  raffleETHProbability: number;
-  raffleNFTProbability: number;
-  bidHistory: any[];
-  claimHistory: any;
-  marketingRewards: any[];
-  stakingCSTActions: any[];
-  cstStakingRewards: any[];
-  collectedCstStakingRewards: any[];
-  cstStakingRewardsByDeposit: any[];
-  cstList: any[];
-  stakingRWLKActions: any[];
-  rwlkMints: any[];
-  donatedNFTs: DonatedNFTState;
-  donatedERC20: DonatedERC20State;
-  stakingTab: number;
-  combinedDonatedNFTs: any[];
-};
-
-const initialState: State = {
-  loading: true,
-  isClaiming: false,
-  data: null,
-  userInfo: null,
-  balance: { CosmicToken: 0, ETH: 0 },
-  raffleETHProbability: 0,
-  raffleNFTProbability: 0,
-  bidHistory: [],
-  claimHistory: null,
-  marketingRewards: [],
-  stakingCSTActions: [],
-  cstStakingRewards: [],
-  collectedCstStakingRewards: [],
-  cstStakingRewardsByDeposit: [],
-  cstList: [],
-  stakingRWLKActions: [],
-  rwlkMints: [],
-  donatedNFTs: { claimed: [], unclaimed: [], loading: false, claimingIds: [] },
-  donatedERC20: { data: [], loading: false },
-  stakingTab: 0,
-  combinedDonatedNFTs: [],
-};
-
-type Action =
-  | { type: "SET_LOADING"; payload: boolean }
-  | { type: "SET_ALL"; payload: Partial<State> }
-  | { type: "SET_DONATED_NFT_LOADING"; payload: boolean }
-  | {
-      type: "SET_DONATED_NFTS";
-      payload: { claimed?: any[]; unclaimed?: any[] };
-    }
-  | { type: "ADD_CLAIMING_NFT"; payload: number }
-  | { type: "REMOVE_CLAIMING_NFT"; payload: number }
-  | { type: "SET_DONATED_ERC20_LOADING"; payload: boolean }
-  | { type: "SET_DONATED_ERC20"; payload: any[] }
-  | { type: "SET_STAKING_TAB"; payload: number };
-
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case "SET_LOADING":
-      return { ...state, loading: action.payload };
-    case "SET_ALL": {
-      const next = { ...state, ...action.payload } as State;
-      // keep combinedDonatedNFTs in sync when either list changes
-      const claimed =
-        action.payload.donatedNFTs?.claimed ?? state.donatedNFTs.claimed;
-      const unclaimed =
-        action.payload.donatedNFTs?.unclaimed ?? state.donatedNFTs.unclaimed;
-      if (claimed || unclaimed) {
-        next.combinedDonatedNFTs = [...(unclaimed ?? []), ...(claimed ?? [])];
-      }
-      return next;
-    }
-    case "SET_DONATED_NFT_LOADING":
-      return {
-        ...state,
-        donatedNFTs: { ...state.donatedNFTs, loading: action.payload },
-      };
-    case "SET_DONATED_NFTS": {
-      const claimed = action.payload.claimed ?? state.donatedNFTs.claimed;
-      const unclaimed = action.payload.unclaimed ?? state.donatedNFTs.unclaimed;
-      return {
-        ...state,
-        donatedNFTs: {
-          ...state.donatedNFTs,
-          claimed,
-          unclaimed,
-          loading: false,
-        },
-        combinedDonatedNFTs: [...(unclaimed ?? []), ...(claimed ?? [])],
-      };
-    }
-    case "ADD_CLAIMING_NFT":
-      return {
-        ...state,
-        donatedNFTs: {
-          ...state.donatedNFTs,
-          claimingIds: [...state.donatedNFTs.claimingIds, action.payload],
-        },
-      };
-    case "REMOVE_CLAIMING_NFT":
-      return {
-        ...state,
-        donatedNFTs: {
-          ...state.donatedNFTs,
-          claimingIds: state.donatedNFTs.claimingIds.filter(
-            (x) => x !== action.payload
-          ),
-        },
-      };
-    case "SET_DONATED_ERC20_LOADING":
-      return {
-        ...state,
-        donatedERC20: { ...state.donatedERC20, loading: action.payload },
-      };
-    case "SET_DONATED_ERC20":
-      return {
-        ...state,
-        donatedERC20: { data: action.payload, loading: false },
-      };
-    case "SET_STAKING_TAB":
-      return { ...state, stakingTab: action.payload };
-    default:
-      return state;
-  }
-}
-
-/* ------------------------------------------------------------------
-   Main Component: MyStatistics (no useMemo/useCallback/useRef)
+   Main Component: MyStatistics
 ------------------------------------------------------------------ */
 const MyStatistics = () => {
-  const { account } = useActiveWeb3React();
+  const { account } = useActiveWeb3React(); // active account
   const prizeWalletContract = useRaffleWalletContract();
 
+  // Hooks & Context
   const { fetchData: fetchStakedTokens } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  // Loading states
+  const [loading, setLoading] = useState(true);
+  const [isClaiming, setIsClaiming] = useState(false);
 
-  const handleTabChange = (_event: any, newValue: number) => {
-    dispatch({ type: "SET_STAKING_TAB", payload: newValue });
-  };
+  // Data states
+  const [data, setData] = useState<any>(null);
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [balance, setBalance] = useState({ CosmicToken: 0, ETH: 0 });
 
-  // --- Data Fetchers (plain functions; no useCallback) ---
-  async function fetchUserData(addr: string, reload = true) {
-    if (!addr) return;
-    if (reload) dispatch({ type: "SET_LOADING", payload: true });
+  // Raffle Probability
+  const [raffleETHProbability, setRaffleETHProbability] = useState(0);
+  const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
 
+  // Bids, claims, marketing, staking
+  const [bidHistory, setBidHistory] = useState<any[]>([]);
+  const [claimHistory, setClaimHistory] = useState<any>(null);
+  const [marketingRewards, setMarketingRewards] = useState<any[]>([]);
+
+  // CST Data
+  const [stakingCSTActions, setStakingCSTActions] = useState<any[]>([]);
+  const [cstStakingRewards, setCstStakingRewards] = useState<any[]>([]);
+  const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState<
+    any[]
+  >([]);
+  const [cstStakingRewardsByDeposit, setCstStakingRewardsByDeposit] = useState<
+    any[]
+  >([]);
+  const [cstList, setCSTList] = useState<any[]>([]);
+
+  // RWLK Data
+  const [stakingRWLKActions, setStakingRWLKActions] = useState<any[]>([]);
+  const [rwlkMints, setRWLKMints] = useState<any[]>([]);
+
+  // Donated NFTs
+  const [claimedDonatedNFTs, setClaimedDonatedNFTs] = useState({
+    data: [],
+    loading: false,
+  });
+  const [unclaimedDonatedNFTs, setUnclaimedDonatedNFTs] = useState({
+    data: [],
+    loading: false,
+  });
+  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
+  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState({
+    data: [],
+    loading: false,
+  });
+
+  // Staking Tab
+  const [stakingTab, setStakingTab] = useState(0);
+
+  /* --------------------------------------------------
+    Data Fetching
+  -------------------------------------------------- */
+  const fetchUserData = useCallback(
+    async (addr: string, reload: boolean = true) => {
+      if (!addr) return;
+      if (reload) setLoading(true);
+
+      try {
+        // Parallel API calls
+        const [
+          claimHist,
+          userInfoData,
+          balanceData,
+          cstActions,
+          rwalkActions,
+          mRewards,
+          userCstList,
+          stakingRewards,
+          collectedRewards,
+          rewardsByDeposit,
+          rwalkMinted,
+        ] = await Promise.all([
+          api.get_claim_history_by_user(addr),
+          api.get_user_info(addr),
+          api.get_user_balance(addr),
+          api.get_staking_cst_actions_by_user(addr),
+          api.get_staking_rwalk_actions_by_user(addr),
+          api.get_marketing_rewards_by_user(addr),
+          api.get_cst_tokens_by_user(addr),
+          api.get_staking_rewards_by_user(addr),
+          api.get_staking_cst_rewards_collected_by_user(addr),
+          api.get_staking_cst_by_user_by_deposit_rewards(addr),
+          api.get_staking_rwalk_mints_by_user(addr),
+        ]);
+
+        // Bids come from userInfoData
+        const { Bids, UserInfo } = userInfoData;
+
+        // Basic user/balance data
+        setClaimHistory(claimHist);
+        setBidHistory(Bids);
+        setUserInfo(UserInfo);
+        if (balanceData) {
+          setBalance({
+            CosmicToken: Number(
+              ethers.utils.formatEther(balanceData.CosmicTokenBalance)
+            ),
+            ETH: Number(ethers.utils.formatEther(balanceData.ETH_Balance)),
+          });
+        }
+
+        // Staking
+        setStakingCSTActions(cstActions);
+        setStakingRWLKActions(rwalkActions);
+
+        // Marketing & Tokens
+        setMarketingRewards(mRewards);
+        setCSTList(userCstList);
+
+        // CST Staking rewards
+        setCstStakingRewards(stakingRewards);
+        setCollectedCstStakingRewards(collectedRewards);
+        setCstStakingRewardsByDeposit(rewardsByDeposit);
+
+        // RWLK minted
+        setRWLKMints(rwalkMinted);
+
+        // Refresh other contexts
+        fetchStakedTokens();
+        fetchStatusData();
+      } catch (err) {
+        console.error(err);
+        setNotification({
+          text: "Failed to fetch data",
+          type: "error",
+          visible: true,
+        });
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const fetchDonatedNFTs = useCallback(
+    async (reload = true) => {
+      if (!account) return;
+      setClaimedDonatedNFTs((prev) => ({ ...prev, loading: reload }));
+      setUnclaimedDonatedNFTs((prev) => ({ ...prev, loading: reload }));
+
+      try {
+        const [claimed, unclaimed] = await Promise.all([
+          api.get_claimed_donated_nft_by_user(account),
+          api.get_unclaimed_donated_nft_by_user(account),
+        ]);
+
+        setClaimedDonatedNFTs({ data: claimed, loading: false });
+        setUnclaimedDonatedNFTs({ data: unclaimed, loading: false });
+      } catch (err) {
+        console.error(err);
+        setNotification({
+          text: "Failed to fetch donated NFTs",
+          type: "error",
+          visible: true,
+        });
+        setClaimedDonatedNFTs((prev) => ({ ...prev, loading: false }));
+        setUnclaimedDonatedNFTs((prev) => ({ ...prev, loading: false }));
+      }
+    },
+    [account]
+  );
+
+  const fetchDonatedERC20Tokens = useCallback(
+    async (reload = true) => {
+      if (!account) return;
+      setDonatedERC20Tokens((prev) => ({ ...prev, loading: reload }));
+      try {
+        const donatedERC20Tokens = await api.get_donations_erc20_by_user(
+          account
+        );
+        setDonatedERC20Tokens({ data: donatedERC20Tokens, loading: false });
+      } catch (err) {
+        console.error(err);
+        setNotification({
+          text: "Failed to fetch donated NFTs",
+          type: "error",
+          visible: true,
+        });
+        setDonatedERC20Tokens((prev) => ({ ...prev, loading: false }));
+      }
+    },
+    [account]
+  );
+
+  const calculateProbability = useCallback(async () => {
+    if (!account) return;
     try {
-      const [
-        claimHist,
-        userInfoData,
-        balanceData,
-        cstActions,
-        rwalkActions,
-        mRewards,
-        userCstList,
-        stakingRewards,
-        collectedRewards,
-        rewardsByDeposit,
-        rwalkMinted,
-        dashboardInfo,
-      ] = await Promise.all([
-        api.get_claim_history_by_user(addr),
-        api.get_user_info(addr),
-        api.get_user_balance(addr),
-        api.get_staking_cst_actions_by_user(addr),
-        api.get_staking_rwalk_actions_by_user(addr),
-        api.get_marketing_rewards_by_user(addr),
-        api.get_cst_tokens_by_user(addr),
-        api.get_staking_rewards_by_user(addr),
-        api.get_staking_cst_rewards_collected_by_user(addr),
-        api.get_staking_cst_by_user_by_deposit_rewards(addr),
-        api.get_staking_rwalk_mints_by_user(addr),
-        api.get_dashboard_info(),
-      ]);
+      const newData = await api.get_dashboard_info();
+      setData(newData);
 
-      const { Bids, UserInfo } = userInfoData;
-
-      // Compute probabilities without extra renders
-      let raffleETHProbability = 0;
-      let raffleNFTProbability = 0;
-      if (dashboardInfo) {
+      if (newData) {
         const {
           CurRoundNum,
           NumRaffleEthWinnersBidding,
           NumRaffleNFTWinnersBidding,
-        } = dashboardInfo;
-        try {
-          const bidList = await api.get_bid_list_by_round(CurRoundNum, "desc");
-          const totalBids = bidList.length;
-          const userBids = bidList.filter((bid: any) => bid.BidderAddr === addr)
-            .length;
-          if (totalBids > 0) {
-            const othersFrac = (totalBids - userBids) / totalBids;
-            raffleETHProbability =
-              1 - Math.pow(othersFrac, NumRaffleEthWinnersBidding);
-            raffleNFTProbability =
-              1 - Math.pow(othersFrac, NumRaffleNFTWinnersBidding);
-          }
-        } catch (e) {
-          console.error("Failed to compute probabilities", e);
+        } = newData;
+        const bidList = await api.get_bid_list_by_round(CurRoundNum, "desc");
+        const totalBids = bidList.length;
+        const userBids = bidList.filter(
+          (bid: any) => bid.BidderAddr === account
+        ).length;
+
+        if (totalBids > 0) {
+          // Probability: 1 - ((totalBids - userBids) / totalBids)^NumWinners
+          let prob =
+            1 -
+            Math.pow(
+              (totalBids - userBids) / totalBids,
+              NumRaffleEthWinnersBidding
+            );
+          setRaffleETHProbability(prob);
+
+          prob =
+            1 -
+            Math.pow(
+              (totalBids - userBids) / totalBids,
+              NumRaffleNFTWinnersBidding
+            );
+          setRaffleNFTProbability(prob);
+        } else {
+          setRaffleETHProbability(0);
+          setRaffleNFTProbability(0);
         }
       }
-
-      dispatch({
-        type: "SET_ALL",
-        payload: {
-          claimHistory: claimHist,
-          bidHistory: Bids,
-          userInfo: UserInfo,
-          balance: balanceData
-            ? {
-                CosmicToken: Number(
-                  ethers.utils.formatEther(balanceData.CosmicTokenBalance)
-                ),
-                ETH: Number(ethers.utils.formatEther(balanceData.ETH_Balance)),
-              }
-            : { CosmicToken: 0, ETH: 0 },
-          stakingCSTActions: cstActions,
-          stakingRWLKActions: rwalkActions,
-          marketingRewards: mRewards,
-          cstList: userCstList,
-          cstStakingRewards: stakingRewards,
-          collectedCstStakingRewards: collectedRewards,
-          cstStakingRewardsByDeposit: rewardsByDeposit,
-          rwlkMints: rwalkMinted,
-          data: dashboardInfo,
-          raffleETHProbability,
-          raffleNFTProbability,
-        },
-      });
-
-      // Refresh other contexts (not awaited)
-      fetchStakedTokens();
-      fetchStatusData();
     } catch (err) {
       console.error(err);
-      setNotification({
-        text: "Failed to fetch data",
-        type: "error",
-        visible: true,
-      });
-    } finally {
-      dispatch({ type: "SET_LOADING", payload: false });
     }
-  }
+  }, [account]);
 
-  async function fetchDonatedNFTs(reload = true) {
-    if (!account) return;
-    if (reload) dispatch({ type: "SET_DONATED_NFT_LOADING", payload: true });
+  /* --------------------------------------------------
+    Donated NFT Claim
+  -------------------------------------------------- */
+  const handleDonatedNFTsClaim = async (tokenID: number) => {
+    setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
-      const [claimed, unclaimed] = await Promise.all([
-        api.get_claimed_donated_nft_by_user(account),
-        api.get_unclaimed_donated_nft_by_user(account),
-      ]);
-      dispatch({
-        type: "SET_DONATED_NFTS",
-        payload: { claimed, unclaimed },
-      });
-    } catch (err) {
-      console.error(err);
-      setNotification({
-        text: "Failed to fetch donated NFTs",
-        type: "error",
-        visible: true,
-      });
-      dispatch({ type: "SET_DONATED_NFT_LOADING", payload: false });
-    }
-  }
-
-  async function fetchDonatedERC20Tokens(reload = true) {
-    if (!account) return;
-    if (reload) dispatch({ type: "SET_DONATED_ERC20_LOADING", payload: true });
-    try {
-      const donated = await api.get_donations_erc20_by_user(account);
-      dispatch({ type: "SET_DONATED_ERC20", payload: donated });
-    } catch (err) {
-      console.error(err);
-      setNotification({
-        text: "Failed to fetch donated tokens",
-        type: "error",
-        visible: true,
-      });
-      dispatch({ type: "SET_DONATED_ERC20_LOADING", payload: false });
-    }
-  }
-
-  // --- Claim handlers (await tx receipts instead of setTimeout) ---
-  async function handleDonatedNFTsClaim(tokenID: number) {
-    dispatch({ type: "ADD_CLAIMING_NFT", payload: tokenID });
-    try {
-      const tx = await prizeWalletContract.claimDonatedNft(tokenID);
-      await tx.wait();
-      await Promise.all([
-        fetchUserData(account!, false),
-        fetchDonatedNFTs(false),
-      ]);
+      await prizeWalletContract.claimDonatedNft(tokenID);
+      setTimeout(() => {
+        fetchUserData(account!, false);
+        fetchDonatedNFTs(false);
+        setIsClaiming(false);
+      }, 3000);
     } catch (err) {
       console.error(err);
       const msg = err?.data?.message
@@ -695,25 +762,28 @@ const MyStatistics = () => {
         : "An error occurred";
       setNotification({ text: msg, type: "error", visible: true });
     } finally {
-      dispatch({ type: "REMOVE_CLAIMING_NFT", payload: tokenID });
+      setClaimingDonatedNFTs((prev) => prev.filter((id) => id !== tokenID));
     }
-  }
+  };
 
-  async function handleAllDonatedNFTsClaim() {
-    const list = state.donatedNFTs.unclaimed;
-    if (!list.length) return;
+  const handleAllDonatedNFTsClaim = async () => {
+    if (!unclaimedDonatedNFTs.data.length) return;
+
     try {
-      dispatch({ type: "SET_ALL", payload: { isClaiming: true } });
-      const indexList = list.map((item: any) => item.Index);
-      const tx = await prizeWalletContract.claimManyDonatedNfts(indexList);
-      await tx.wait();
-      await Promise.all([
-        fetchUserData(account!, false),
-        fetchDonatedNFTs(false),
-      ]);
+      setIsClaiming(true);
+      const indexList = unclaimedDonatedNFTs.data.map(
+        (item: any) => item.Index
+      );
+      await prizeWalletContract.claimManyDonatedNfts(indexList);
+      setTimeout(() => {
+        fetchUserData(account!, false);
+        fetchDonatedNFTs(false);
+        setIsClaiming(false);
+      }, 3000);
     } catch (err) {
       if (err?.code === 4001) {
         console.log("User denied transaction signature.");
+        // Handle the case where the user denies the transaction signature
       } else {
         console.error(err);
         const msg = err?.data?.message
@@ -721,24 +791,16 @@ const MyStatistics = () => {
           : "An error occurred while claiming donated NFTs!";
         setNotification({ text: msg, type: "error", visible: true });
       }
-    } finally {
-      dispatch({ type: "SET_ALL", payload: { isClaiming: false } });
+      setIsClaiming(false);
     }
-  }
+  };
 
-  async function handleDonatedERC20Claim(
-    roundNum: any,
-    tokenAddr: string,
-    amount: any
-  ) {
+  const handleDonatedERC20Claim = async (roundNum, tokenAddr, amount) => {
     try {
-      const tx = await prizeWalletContract.claimDonatedToken(
-        roundNum,
-        tokenAddr,
-        amount
-      );
-      await tx.wait();
-      await fetchDonatedERC20Tokens(false);
+      await prizeWalletContract.claimDonatedToken(roundNum, tokenAddr, amount);
+      setTimeout(() => {
+        fetchDonatedERC20Tokens(false);
+      }, 3000);
     } catch (err) {
       console.error(err);
       const msg = err?.data?.message
@@ -746,22 +808,21 @@ const MyStatistics = () => {
         : "An error occurred";
       setNotification({ text: msg, type: "error", visible: true });
     }
-  }
+  };
 
-  async function handleAllDonatedERC20Claim() {
+  const handleAllDonatedERC20Claim = async () => {
     try {
-      const donatedTokensToClaim = state.donatedERC20.data
-        .filter((x: any) => !x.Claimed)
-        .map((x: any) => ({
+      const donatedTokensToClaim = donatedERC20Tokens.data
+        .filter((x) => !x.Claimed)
+        .map((x) => ({
           roundNum: x.RoundNum,
           tokenAddress: x.TokenAddr,
           amount: x.AmountEth,
         }));
-      const tx = await prizeWalletContract.claimManyDonatedTokens(
-        donatedTokensToClaim
-      );
-      await tx.wait();
-      await fetchDonatedERC20Tokens(false);
+      await prizeWalletContract.claimManyDonatedTokens(donatedTokensToClaim);
+      setTimeout(() => {
+        fetchDonatedERC20Tokens(false);
+      }, 3000);
     } catch (err) {
       console.error(err);
       const msg = err?.data?.message
@@ -769,56 +830,30 @@ const MyStatistics = () => {
         : "An error occurred";
       setNotification({ text: msg, type: "error", visible: true });
     }
-  }
+  };
 
   /* --------------------------------------------------
-    Effects
+    Tab Handling
+  -------------------------------------------------- */
+  const handleTabChange = (_event: any, newValue: number) => {
+    setStakingTab(newValue);
+  };
+
+  /* --------------------------------------------------
+    useEffect
   -------------------------------------------------- */
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (!account) return;
-      await Promise.all([
-        fetchUserData(account),
-        fetchDonatedNFTs(),
-        fetchDonatedERC20Tokens(),
-      ]);
-      if (!cancelled) {
-        // no-op; state updated inside fetchers
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [account]);
+    if (account) {
+      fetchUserData(account);
+      fetchDonatedNFTs();
+      fetchDonatedERC20Tokens();
+      calculateProbability();
+    }
+  }, [account, fetchUserData, fetchDonatedNFTs, calculateProbability]);
 
   /* --------------------------------------------------
     Render
   -------------------------------------------------- */
-  const {
-    loading,
-    isClaiming,
-    data,
-    userInfo,
-    balance,
-    raffleETHProbability,
-    raffleNFTProbability,
-    bidHistory,
-    claimHistory,
-    marketingRewards,
-    stakingCSTActions,
-    cstStakingRewards,
-    cstStakingRewardsByDeposit,
-    collectedCstStakingRewards,
-    cstList,
-    stakingRWLKActions,
-    rwlkMints,
-    stakingTab,
-    combinedDonatedNFTs,
-    donatedNFTs,
-    donatedERC20,
-  } = state;
-
   return (
     <MainWrapper>
       <Typography variant="h4" color="primary" mb={4}>
@@ -831,6 +866,7 @@ const MyStatistics = () => {
         <Typography variant="h6">There is no user information yet.</Typography>
       ) : (
         <>
+          {/* User Stats Section */}
           <UserStatsSection
             userInfo={userInfo}
             balanceETH={balance.ETH}
@@ -840,6 +876,7 @@ const MyStatistics = () => {
             data={data}
           />
 
+          {/* Staking Stats (Tabs) */}
           <Box mt={4}>
             <Typography variant="h6" lineHeight={1} mb={1}>
               Staking Statistics
@@ -850,27 +887,57 @@ const MyStatistics = () => {
                 value={stakingTab}
                 onChange={handleTabChange}
               >
+                {/* CST Tab */}
                 <Tab
                   label={
-                    <LabelWithImage
-                      src="/images/CosmicSignatureNFT.png"
-                      alt="cosmic signature nft"
-                      text="Cosmic Signature Staking"
-                    />
+                    <Box sx={{ display: "flex" }}>
+                      <Image
+                        src="/images/CosmicSignatureNFT.png"
+                        width={94}
+                        height={60}
+                        alt="cosmic signature nft"
+                      />
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          whiteSpace: "nowrap",
+                          textTransform: "none",
+                          ml: 2,
+                        }}
+                      >
+                        Cosmic Signature Staking
+                      </Typography>
+                    </Box>
                   }
                 />
+
+                {/* RWLK Tab */}
                 <Tab
                   label={
-                    <LabelWithImage
-                      src="/images/rwalk.jpg"
-                      alt="RandomWalk nft"
-                      text="Random Walk Staking"
-                    />
+                    <Box sx={{ display: "flex" }}>
+                      <Image
+                        src="/images/rwalk.jpg"
+                        width={94}
+                        height={60}
+                        alt="RandomWalk nft"
+                      />
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          whiteSpace: "nowrap",
+                          textTransform: "none",
+                          ml: 2,
+                        }}
+                      >
+                        Random Walk Staking
+                      </Typography>
+                    </Box>
                   }
                 />
               </Tabs>
             </Box>
 
+            {/* CST Panel */}
             <CustomTabPanel value={stakingTab} index={0}>
               <CSTStakingTab
                 userInfo={userInfo}
@@ -882,6 +949,7 @@ const MyStatistics = () => {
               />
             </CustomTabPanel>
 
+            {/* RWLK Panel */}
             <CustomTabPanel value={stakingTab} index={1}>
               <RWLKStakingTab
                 userInfo={userInfo}
@@ -891,6 +959,7 @@ const MyStatistics = () => {
             </CustomTabPanel>
           </Box>
 
+          {/* Bidding History */}
           <Box mt={6}>
             <Typography variant="h6" lineHeight={1} mb={2}>
               Bid History
@@ -898,6 +967,7 @@ const MyStatistics = () => {
             <BiddingHistoryTable biddingHistory={bidHistory} />
           </Box>
 
+          {/* User CST Tokens */}
           <Box>
             <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
               Cosmic Signature Tokens User Own
@@ -905,6 +975,7 @@ const MyStatistics = () => {
             <CSTTable list={cstList} />
           </Box>
 
+          {/* History of Winnings */}
           <Box>
             <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
               History of Winnings
@@ -916,6 +987,7 @@ const MyStatistics = () => {
             />
           </Box>
 
+          {/* Marketing Rewards */}
           {marketingRewards.length > 0 && (
             <Box>
               <Typography variant="h6" lineHeight={1} mt={8} mb={2}>
@@ -936,7 +1008,7 @@ const MyStatistics = () => {
               }}
             >
               <Typography variant="h6">Donated NFTs User Won</Typography>
-              {state.donatedNFTs.unclaimed.length > 0 && (
+              {unclaimedDonatedNFTs.data.length > 0 && (
                 <Button
                   onClick={handleAllDonatedNFTsClaim}
                   variant="contained"
@@ -947,13 +1019,16 @@ const MyStatistics = () => {
               )}
             </Box>
 
-            {donatedNFTs.loading ? (
+            {unclaimedDonatedNFTs.loading || claimedDonatedNFTs.loading ? (
               <Typography variant="h6">Loading...</Typography>
             ) : (
               <DonatedNFTTable
-                list={combinedDonatedNFTs}
+                list={[
+                  ...unclaimedDonatedNFTs.data,
+                  ...claimedDonatedNFTs.data,
+                ]}
                 handleClaim={handleDonatedNFTsClaim}
-                claimingTokens={donatedNFTs.claimingIds}
+                claimingTokens={claimingDonatedNFTs}
               />
             )}
           </Box>
@@ -969,7 +1044,7 @@ const MyStatistics = () => {
               }}
             >
               <Typography variant="h6">Donated ERC20 Tokens</Typography>
-              {donatedERC20.data.some((x: any) => !x.Claimed) && (
+              {donatedERC20Tokens.data.filter((x) => !x.Claimed).length > 0 && (
                 <Button
                   onClick={handleAllDonatedERC20Claim}
                   variant="contained"
@@ -979,11 +1054,11 @@ const MyStatistics = () => {
               )}
             </Box>
 
-            {donatedERC20.loading ? (
+            {donatedERC20Tokens.loading ? (
               <Typography variant="h6">Loading...</Typography>
             ) : (
               <DonatedERC20Table
-                list={donatedERC20.data}
+                list={donatedERC20Tokens.data}
                 handleClaim={handleDonatedERC20Claim}
               />
             )}

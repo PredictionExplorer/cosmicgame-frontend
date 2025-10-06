@@ -138,7 +138,8 @@ const HowToPlay = () => {
         {/* Bid Price */}
         <Typography mb={2}>
           2. <b>[Bid Price]:</b> Before you place a bid, you want to check the
-          bid price. You can make a bid using $ETH or Cosmic Tokens ($CST).
+          bid price. You can make a bid using $ETH or Cosmic Signature Tokens
+          ($CST).
         </Typography>
         <Typography mb={4}>
           If you hold an NFT from our sister collection Random Walk NFT, you can
@@ -225,7 +226,7 @@ const HowToPlay = () => {
             <Typography>For each bid you make, you get:</Typography>
             <ul>
               <li>
-                <Typography>100 Cosmic Tokens as a reward</Typography>
+                <Typography>100 Cosmic Signature Tokens as a reward</Typography>
               </li>
               <li>
                 <Typography>1 raffle ticket</Typography>

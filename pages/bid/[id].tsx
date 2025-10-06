@@ -157,7 +157,9 @@ const BidInfo = ({ bidId }: { bidId: number }) => {
 
           {/* Indicates whether the bid used a Cosmic Signature Token (CST) */}
           <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Was bid with Cosmic Token:</Typography>
+            <Typography color="primary">
+              Was bid with Cosmic Signature Token:
+            </Typography>
             &nbsp;
             <Typography>{bidInfo.BidType === 2 ? "Yes" : "No"}</Typography>
           </Box>
