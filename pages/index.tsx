@@ -1418,7 +1418,7 @@ const NewHome = () => {
                                   prevent bidding collision.
                                 </Typography>
                                 <Typography variant="body2">
-                                  This percentage won't rise the bid price
+                                  This percentage won&apos;t rise the bid price
                                   arbitrarily after your bid, it is only meant
                                   for allowing both bid transactions to pass
                                   through in case two simultaneous bids occur
