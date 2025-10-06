@@ -74,6 +74,7 @@ const ChartOrPie: React.FC<{ data?: DistData }> = ({ data }) => {
           data={series.sort((a, b) => b.value - a.value)}
           field="value"
           categoryField="category"
+          color="#15bffd"
           labels={{
             visible: true,
             color: "white",
