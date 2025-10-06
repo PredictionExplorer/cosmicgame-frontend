@@ -71,7 +71,7 @@ const ChartOrPie: React.FC<{ data?: DistData }> = ({ data }) => {
       <ChartSeries>
         <ChartSeriesItem
           type="bar"
-          data={series}
+          data={series.sort((a, b) => b.value - a.value)}
           field="value"
           categoryField="category"
           labels={{
