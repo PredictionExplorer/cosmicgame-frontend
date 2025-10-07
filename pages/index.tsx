@@ -24,7 +24,6 @@ import {
 } from "@mui/material";
 import {
   CustomTextField,
-  GradientText,
   MainWrapper,
   StyledCard,
   StyledInput,
@@ -45,13 +44,10 @@ import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
 import Prize from "../components/Prize";
 import LatestNFTs from "../components/LatestNFTs";
 import Countdown from "react-countdown";
-import Counter from "../components/Counter";
 import DonatedNFT from "../components/DonatedNFT";
 import getErrorMessage from "../utils/alert";
 import NFTImage from "../components/NFTImage";
 import {
-  calculateTimeDiff,
-  convertTimestampToDateTime,
   formatSeconds,
   getAssetsUrl,
   getEnduranceChampions,
@@ -89,8 +85,6 @@ const NewHome = () => {
     SecondsElapsed: 0,
   });
   const [curBidList, setCurBidList] = useState([]);
-  const [specialWinners, setSpecialWinners] = useState<any>(null);
-  const [winProbability, setWinProbability] = useState<any>(null);
   const [ethBidInfo, setEthBidInfo] = useState<any>(null);
   const [donatedNFTs, setDonatedNFTs] = useState([]);
   const [ethDonations, setEthDonations] = useState([]);
@@ -108,8 +102,6 @@ const NewHome = () => {
   const [bannerToken, setBannerToken] = useState({ seed: "", id: -1 });
   const [rwlknftIds, setRwlknftIds] = useState<number[]>([]);
   const [offset, setOffset] = useState(0);
-  const [roundStarted, setRoundStarted] = useState("");
-  const [lastBidderElapsed, setLastBidderElapsed] = useState("");
   const [curPage, setCurrentPage] = useState(1);
   const [claimHistory, setClaimHistory] = useState(null);
   const [imageOpen, setImageOpen] = useState(false);
@@ -616,7 +608,6 @@ const NewHome = () => {
           newBidData,
           nftData,
           championsData,
-          specials,
           ethDonations,
           donatedERC20Tokens,
         ] = await Promise.all([
@@ -630,14 +621,12 @@ const NewHome = () => {
             );
             return sortedChampions;
           })(),
-          api.get_current_special_winners(),
           api.get_donations_cg_with_info_by_round(round),
           api.get_donations_erc20_by_round(round),
         ]);
         setCurBidList(newBidData);
         setDonatedNFTs(nftData);
         setChampionList(championsData);
-        setSpecialWinners(specials);
         setEthDonations(ethDonations);
         setDonatedERC20Tokens(donatedERC20Tokens);
       }
@@ -815,47 +804,6 @@ const NewHome = () => {
   }, [twitterHandle]);
 
   useEffect(() => {
-    const probabilityOfSelection = (
-      totalBids: number,
-      chosenBids: number,
-      yourBids: number
-    ) => {
-      const probability =
-        1 - Math.pow((totalBids - yourBids) / totalBids, chosenBids);
-      return probability;
-    };
-
-    const calculateProbability = async () => {
-      const userInfo = await api.get_user_info(account);
-      const Bids = userInfo?.Bids || [];
-      if (Bids.length) {
-        const curRoundBids = Bids.filter(
-          (bid: any) => bid.RoundNum === data.CurRoundNum
-        );
-        const raffle =
-          probabilityOfSelection(
-            curBidList.length,
-            data?.NumRaffleEthWinnersBidding,
-            curRoundBids.length
-          ) * 100;
-        const nft =
-          probabilityOfSelection(
-            curBidList.length,
-            data?.NumRaffleNFTWinnersBidding,
-            curRoundBids.length
-          ) * 100;
-        setWinProbability({
-          raffle: raffle,
-          nft: nft,
-        });
-      }
-    };
-    if (data && account && curBidList.length) {
-      calculateProbability();
-    }
-  }, [data, account, curBidList]);
-
-  useEffect(() => {
     const fetchCSTInfo = async (bannerId: number) => {
       const res = await api.get_cst_info(bannerId);
       const fileName = `0x${res.Seed}`;
@@ -874,11 +822,6 @@ const NewHome = () => {
 
     const interval = setInterval(async () => {
       await fetchPrizeTime();
-      setRoundStarted(calculateTimeDiff(data?.TsRoundStart - offset / 1000));
-      if (curBidList.length) {
-        const lastBidTime = curBidList[0].TimeStamp;
-        setLastBidderElapsed(calculateTimeDiff(lastBidTime - offset / 1000));
-      }
     }, 1000);
 
     return () => {
@@ -909,14 +852,14 @@ const NewHome = () => {
         </Backdrop>
         <Grid container spacing={{ lg: 16, md: 8, sm: 8, xs: 4 }} mb={4}>
           <Grid item sm={12} md={6}>
-            {!loading && (
-              <BiddingStatus
-                data={data}
-                activationTime={activationTime}
-                curBidList={curBidList}
-                ethBidInfo={ethBidInfo}
-              />
-            )}
+            <BiddingStatus
+              data={data}
+              loading={loading}
+              activationTime={activationTime}
+              curBidList={curBidList}
+              ethBidInfo={ethBidInfo}
+              prizeTime={prizeTime}
+            />
             {!loading &&
               activationTime < Date.now() / 1000 &&
               account !== null && (
