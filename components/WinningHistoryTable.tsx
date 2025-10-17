@@ -30,25 +30,37 @@ import { convertTimestampToDateTime, shortenHex } from "../utils";
 
 // Map record types to their corresponding icons and descriptive texts
 const RECORD_TYPE_MAP = {
-  0: { icon: <ConfirmationNumberIcon />, text: "Raffle ETH Deposit" },
-  1: { icon: <TokenIcon />, text: "Cosmic Signature NFT Token" },
-  2: { icon: <VolunteerActivismIcon />, text: "Donated NFT" },
-  3: { icon: <EmojiEventsIcon />, text: "Main Prize" },
+  0: { icon: <ConfirmationNumberIcon />, text: "Main Prize ETH" },
+  1: { icon: <TokenIcon />, text: "Main Prize CST (ERC20)" },
+  2: { icon: <VolunteerActivismIcon />, text: "Main Prize CS NFT" },
+  3: { icon: <EmojiEventsIcon />, text: "Raffle ETH (for bidders)" },
   4: {
     icon: <ConfirmationNumberIcon />,
-    text: "Cosmic Signature Staking ETH Deposit",
+    text: "Raffle CST (for bidders)",
   },
-  5: { icon: <LayersIcon />, text: "Random Walk Staking Raffle Token" },
+  5: { icon: <LayersIcon />, text: "Raffle CS NFT (for bidders)" },
   6: {
     icon: <LayersIcon />,
-    text: "Cosmic Signature Token Staking Raffle Token",
+    text: "Raffle CST (for RandomWalk stakers)",
   },
-  7: { icon: <EmojiEventsIcon />, text: "Endurance Champion NFT Prize" },
-  8: { icon: <EmojiEventsIcon />, text: "Last CST Bidder NFT Prize" },
-  9: { icon: <EmojiEventsIcon />, text: "Endurance Champion ERC20 Prize" },
-  10: { icon: <EmojiEventsIcon />, text: "Last CST Bidder ERC20 Prize" },
-  11: { icon: <EmojiEventsIcon />, text: "Donated ERC20 Token" },
-  12: { icon: <ConfirmationNumberIcon />, text: "Chrono Warrior Prize" },
+  7: {
+    icon: <EmojiEventsIcon />,
+    text: "Raffle CS NFT (for RandomWalk stakers)",
+  },
+  8: { icon: <EmojiEventsIcon />, text: "Endurance Champion CS NFT" },
+  9: { icon: <EmojiEventsIcon />, text: "Endurance Champion ERC20 (CST)" },
+  10: { icon: <EmojiEventsIcon />, text: "Chrono Warrior ETH" },
+  11: { icon: <EmojiEventsIcon />, text: "Chrono Warrior CST (ERC20)" },
+  12: { icon: <ConfirmationNumberIcon />, text: "Chrono Warrior CS NFT" },
+  13: {
+    icon: <ConfirmationNumberIcon />,
+    text: "Staking Deposit ETH (for CS NFT stakers)",
+  },
+  15: {
+    icon: <ConfirmationNumberIcon />,
+    text: "Last CST Bidder CS NFT (ERC721)",
+  },
+  16: { icon: <ConfirmationNumberIcon />, text: "Last CST Bidder ERC20 (CST)" },
 };
 
 // Row component representing each winning history entry
@@ -125,11 +137,11 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
 
       {/* Amount ETH or N/A based on record type */}
       <TablePrimaryCell align="right">
-        {[9, 10, 11].includes(history.RecordType)
-          ? `${history.Amount} CST`
-          : [1, 2, 5, 7, 8].includes(history.RecordType)
+        {[0, 3, 10, 13].includes(history.RecordType)
+          ? `${history.AmountEth.toFixed(4)} ETH`
+          : [2, 5, 7, 8, 12, 15].includes(history.RecordType)
           ? "N/A"
-          : `${history.AmountEth.toFixed(4)} ETH`}
+          : `${history.AmountEth.toFixed(2)} CST`}
       </TablePrimaryCell>
 
       {/* Token Address */}
@@ -199,6 +211,7 @@ function WinningHistorySubTable({
   showClaimedStatus: boolean;
   showWinnerAddr: boolean;
 }) {
+  console.log(winningHistory);
   return (
     <TablePrimaryContainer>
       <TablePrimary>
