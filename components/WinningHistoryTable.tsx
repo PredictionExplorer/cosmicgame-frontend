@@ -56,11 +56,11 @@ const RECORD_TYPE_MAP = {
     icon: <ConfirmationNumberIcon />,
     text: "Staking Deposit ETH (for CS NFT stakers)",
   },
-  15: {
+  14: {
     icon: <ConfirmationNumberIcon />,
     text: "Last CST Bidder CS NFT (ERC721)",
   },
-  16: { icon: <ConfirmationNumberIcon />, text: "Last CST Bidder ERC20 (CST)" },
+  15: { icon: <ConfirmationNumberIcon />, text: "Last CST Bidder ERC20 (CST)" },
 };
 
 // Row component representing each winning history entry
