@@ -211,7 +211,6 @@ function WinningHistorySubTable({
   showClaimedStatus: boolean;
   showWinnerAddr: boolean;
 }) {
-  console.log(winningHistory);
   return (
     <TablePrimaryContainer>
       <TablePrimary>
