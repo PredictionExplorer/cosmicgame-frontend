@@ -258,6 +258,9 @@ const MyStaking = () => {
 
   // Approves staking contract for all tokens if needed
   const approveIfNeeded = async (nftContract: any, walletAddress: string) => {
+    if (!nftContract) {
+      throw new Error("Contract not initialized");
+    }
     const isApprovedForAll = await nftContract.isApprovedForAll(
       account,
       walletAddress
@@ -279,6 +282,16 @@ const MyStaking = () => {
         const STAKING_WALLET_ADDRESS = isRwalk
           ? STAKING_WALLET_RWLK_ADDRESS
           : STAKING_WALLET_CST_ADDRESS;
+
+        // Check if contracts are initialized
+        if (!nftContract || !stakingContract) {
+          setNotification({
+            visible: true,
+            text: "Please connect your wallet and ensure you are on the correct network.",
+            type: "error",
+          });
+          return;
+        }
 
         // Approve if needed
         await approveIfNeeded(nftContract, STAKING_WALLET_ADDRESS);
@@ -340,6 +353,16 @@ const MyStaking = () => {
         const stakingContract = isRwalk
           ? rwlkStakingContract
           : cstStakingContract;
+
+        // Check if contract is initialized
+        if (!stakingContract) {
+          setNotification({
+            visible: true,
+            text: "Please connect your wallet and ensure you are on the correct network.",
+            type: "error",
+          });
+          return;
+        }
 
         // Unstake single or multiple
         let res;

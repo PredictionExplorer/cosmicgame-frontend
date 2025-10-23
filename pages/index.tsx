@@ -323,12 +323,28 @@ const NewHome = () => {
 
   const onClaimPrize = async () => {
     try {
+      // Check if contract is initialized
+      if (!cosmicGameContract) {
+        notify(
+          "error",
+          "Please connect your wallet and ensure you are on the correct network."
+        );
+        return;
+      }
+
       const estimate = await cosmicGameContract.estimateGas.claimMainPrize();
       const gasLimit = minGasWithBuffer(estimate);
 
       await handleTx(cosmicGameContract.claimMainPrize({ gasLimit }));
 
       // Post-claim actions
+      if (!cosmicSignatureContract) {
+        notify(
+          "error",
+          "Unable to complete post-claim actions. Please refresh the page."
+        );
+        return;
+      }
       const totalSupply = await cosmicSignatureContract.totalSupply();
       const tokenId = totalSupply.toNumber() - 1;
 
@@ -421,6 +437,16 @@ const NewHome = () => {
   const onBid = async () => {
     setIsBidding(true);
     try {
+      // Check if contract is initialized
+      if (!cosmicGameContract) {
+        notify(
+          "error",
+          "Please connect your wallet and ensure you are on the correct network."
+        );
+        setIsBidding(false);
+        return;
+      }
+
       const ethBidPrice = await getNextEthBidPriceWithModifiers();
 
       // Ensure ETH balance if paying in ETH
@@ -503,6 +529,16 @@ const NewHome = () => {
   const onBidWithCST = async () => {
     setIsBidding(true);
     try {
+      // Check if contract is initialized
+      if (!cosmicGameContract) {
+        notify(
+          "error",
+          "Please connect your wallet and ensure you are on the correct network."
+        );
+        setIsBidding(false);
+        return;
+      }
+
       // CST balance check (if price provided)
       if (cstBidData?.CSTPrice > 0) {
         const cstWei = ethers.utils.parseEther(cstBidData.CSTPrice.toString());
@@ -727,6 +763,7 @@ const NewHome = () => {
   };
 
   const fetchActivationTime = async () => {
+    if (!cosmicGameContract) return;
     const activationTime = await cosmicGameContract.roundActivationTime();
     setActivationTime(Number(activationTime - offset / 1000));
   };
@@ -831,6 +868,7 @@ const NewHome = () => {
 
   useEffect(() => {
     const fetchTimeoutClaimPrize = async () => {
+      if (!cosmicGameContract) return;
       const timeout = await cosmicGameContract.timeoutDurationToClaimMainPrize();
       setTimeoutClaimPrize(Number(timeout));
     };

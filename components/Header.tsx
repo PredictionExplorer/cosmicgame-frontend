@@ -104,6 +104,12 @@ const Header: FC = () => {
     async (showLoading: boolean = true) => {
       if (showLoading) setLoading(true);
       try {
+        // Check if contract is initialized
+        if (!nftContract) {
+          if (showLoading) setLoading(false);
+          return;
+        }
+
         // Fetch user balances for account
         const userBalance = await api.get_user_balance(account!);
         // Fetch user info
