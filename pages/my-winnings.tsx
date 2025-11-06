@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Button, Link, TableBody, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Link,
+  TableBody,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import router from "next/router";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
@@ -19,6 +26,7 @@ import {
   convertTimestampToDateTime,
   formatSeconds,
   logoImgUrl,
+  shortenHex,
 } from "../utils";
 import { CustomPagination } from "../components/CustomPagination";
 import getErrorMessage from "../utils/alert";
@@ -47,6 +55,8 @@ interface RaffleWinning {
   TimeStamp: number;
   RoundNum: number;
   Amount: number;
+  WinnerAddr: string;
+  Claimed: boolean;
 }
 
 /* ------------------------------------------------------------------
@@ -102,8 +112,16 @@ function useUnclaimedWinnings(account: string | null | undefined) {
 ------------------------------------------------------------------ */
 
 /** Table Row for a single raffle winning */
-function RaffleWinningRow({ winning }: { winning: RaffleWinning }) {
-  const { TxHash, TimeStamp, RoundNum, Amount } = winning;
+function RaffleWinningRow({ 
+  winning, 
+  onClaim, 
+  isClaiming 
+}: { 
+  winning: RaffleWinning;
+  onClaim: (roundNum: number) => void;
+  isClaiming: boolean;
+}) {
+  const { TxHash, TimeStamp, RoundNum, Amount, WinnerAddr, Claimed } = winning;
   const [
     roundTimeoutTimesToWithdrawPrizes,
     setRoundTimeoutTimesToWithdrawPrizes,
@@ -149,6 +167,16 @@ function RaffleWinningRow({ winning }: { winning: RaffleWinning }) {
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
+        <Tooltip title={WinnerAddr}>
+          <Link
+            href={`/user/${WinnerAddr}`}
+            style={{ color: "inherit", fontSize: "inherit" }}
+          >
+            {shortenHex(WinnerAddr, 6)}
+          </Link>
+        </Tooltip>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
         {roundTimeoutTimesToWithdrawPrizes ? (
           <>
             {convertTimestampToDateTime(roundTimeoutTimesToWithdrawPrizes)}{" "}
@@ -163,13 +191,36 @@ function RaffleWinningRow({ winning }: { winning: RaffleWinning }) {
           " "
         )}
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{Amount.toFixed(7)}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{Amount.toFixed(7)}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {Claimed ? "Yes" : "No"}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {!Claimed && (
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => onClaim(RoundNum)}
+            disabled={isClaiming || roundTimeoutTimesToWithdrawPrizes < Date.now() / 1000}
+          >
+            {isClaiming ? "Claiming..." : "Claim"}
+          </Button>
+        )}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 }
 
 /** Table layout for raffle winnings */
-function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
+function RaffleWinningsTable({ 
+  list, 
+  onClaim, 
+  claimingRounds 
+}: { 
+  list: RaffleWinning[];
+  onClaim: (roundNum: number) => void;
+  claimingRounds: number[];
+}) {
   return (
     <TablePrimaryContainer>
       <TablePrimary>
@@ -177,15 +228,21 @@ function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
           <Tr>
             <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">
-              Amount (ETH)
-            </TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Amount (ETH)</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Claimed</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Action</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
         <TableBody>
           {list.map((winning) => (
-            <RaffleWinningRow key={winning.EvtLogId} winning={winning} />
+            <RaffleWinningRow 
+              key={winning.EvtLogId} 
+              winning={winning} 
+              onClaim={onClaim}
+              isClaiming={claimingRounds.includes(winning.RoundNum)}
+            />
           ))}
         </TableBody>
       </TablePrimary>
@@ -209,7 +266,7 @@ export default function MyWinnings() {
     error,
     refetch,
   } = useUnclaimedWinnings(account);
-
+  console.log(raffleETHWinnings);
   // Smart contract hooks
   const raffleWalletContract = useRaffleWalletContract();
 
@@ -220,6 +277,7 @@ export default function MyWinnings() {
     raffleETH: false,
   });
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
+  const [claimingRaffleRounds, setClaimingRaffleRounds] = useState<number[]>([]);
   const [donatedERC20Tokens, setDonatedERC20Tokens] = useState({
     data: [],
     loading: false,
@@ -270,6 +328,28 @@ export default function MyWinnings() {
       }
     } finally {
       setIsClaiming((prev) => ({ ...prev, raffleETH: false }));
+    }
+  };
+
+  // Claim ETH for a specific round
+  const handleRaffleETHClaim = async (roundNum: number) => {
+    setClaimingRaffleRounds((prev) => [...prev, roundNum]);
+    try {
+      await raffleWalletContract["withdrawEth()"]();
+
+      // Refresh status and unclaimed data after short delay
+      setTimeout(() => {
+        fetchStatusData();
+        refetch();
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      if (err?.data?.message) {
+        const msg = getErrorMessage(err.data.message);
+        setNotification({ text: msg, type: "error", visible: true });
+      }
+    } finally {
+      setClaimingRaffleRounds((prev) => prev.filter((r) => r !== roundNum));
     }
   };
 
@@ -420,6 +500,8 @@ export default function MyWinnings() {
                 (currentPage - 1) * perPage,
                 currentPage * perPage
               )}
+              onClaim={handleRaffleETHClaim}
+              claimingRounds={claimingRaffleRounds}
             />
 
             {status?.ETHRaffleToClaim > 0 && (

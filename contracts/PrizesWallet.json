@@ -42,8 +42,8 @@
     "function setTimeoutDurationToWithdrawPrizes(uint256)",
     "function timeoutDurationToWithdrawPrizes() view returns (uint256)",
     "function transferOwnership(address)",
-    "function withdrawEth(address)",
-    "function withdrawEth()",
-    "function withdrawEverything(bool,tuple(uint256,address)[],uint256[])"
+    "function withdrawEth(uint256, address)",
+    "function withdrawEth(uint256)",
+    "function withdrawEverything(uint256[],tuple(uint256,address)[],uint256[])"
   ]
   
