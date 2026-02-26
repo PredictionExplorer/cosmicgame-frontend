@@ -1363,7 +1363,27 @@ class ApiService {
           `staking/cst/rewards/by_user/by_token/details/${address}/${tokenId}`
         )
       );
-      return data.RewardsByTokenDetails;
+      const details = data.RewardsByTokenDetails;
+      if (!details || typeof details !== 'object') return details;
+      const result: any = {};
+      Object.keys(details).forEach(key => {
+        const item = details[key];
+        if (!item) { result[key] = item; return; }
+        const flattenStakeOrUnstake = (obj: any) => {
+          if (!obj) return obj;
+          if (obj.Tx && typeof obj.Tx === 'object') {
+            const { Tx, ...rest } = obj;
+            return { ...rest, EvtLogId: Tx.EvtLogId, BlockNum: Tx.BlockNum, TxId: Tx.TxId, TxHash: Tx.TxHash, TimeStamp: Tx.TimeStamp, DateTime: Tx.DateTime };
+          }
+          return obj;
+        };
+        result[key] = {
+          ...item,
+          Stake: flattenStakeOrUnstake(item.Stake),
+          Unstake: flattenStakeOrUnstake(item.Unstake),
+        };
+      });
+      return result;
     } catch (err) {
       if (err.response?.status === 400) {
         return null;
