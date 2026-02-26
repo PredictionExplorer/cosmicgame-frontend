@@ -201,7 +201,7 @@ function RaffleWinningRow({
             variant="contained"
             size="small"
             onClick={() => onClaim(RoundNum)}
-            disabled={isClaiming || roundTimeoutTimesToWithdrawPrizes < Date.now() / 1000}
+            disabled={isClaiming || (roundTimeoutTimesToWithdrawPrizes > 0 && roundTimeoutTimesToWithdrawPrizes < Date.now() / 1000)}
           >
             {isClaiming ? "Claiming..." : "Claim"}
           </Button>
@@ -313,7 +313,12 @@ export default function MyWinnings() {
   const handleAllETHClaim = async () => {
     setIsClaiming((prev) => ({ ...prev, raffleETH: true }));
     try {
-      await raffleWalletContract["withdrawEth()"]();
+      const roundNums = (raffleETHWinnings || [])
+        .filter((w) => !w.Claimed)
+        .map((w) => w.RoundNum);
+      await raffleWalletContract[
+        "withdrawEverything(uint256[],tuple(uint256,address)[],uint256[])"
+      ](roundNums, [], []);
 
       // Refresh status and unclaimed data after short delay
       setTimeout(() => {
@@ -335,7 +340,7 @@ export default function MyWinnings() {
   const handleRaffleETHClaim = async (roundNum: number) => {
     setClaimingRaffleRounds((prev) => [...prev, roundNum]);
     try {
-      await raffleWalletContract["withdrawEth()"]();
+      await raffleWalletContract["withdrawEth(uint256)"](roundNum);
 
       // Refresh status and unclaimed data after short delay
       setTimeout(() => {
