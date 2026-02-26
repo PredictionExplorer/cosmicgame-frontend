@@ -104,10 +104,16 @@ const Header: FC = () => {
     async (showLoading: boolean = true) => {
       if (showLoading) setLoading(true);
       try {
+        // Check if contract is initialized
+        if (!nftContract) {
+          if (showLoading) setLoading(false);
+          return;
+        }
+
         // Fetch user balances for account
         const userBalance = await api.get_user_balance(account!);
         // Fetch user info
-        const { UserInfo } = await api.get_user_info(account!);
+        const userInfoData = await api.get_user_info(account!);
 
         // Fetch RWLK tokens from the NFT contract
         const rwlkTokens = await nftContract.walletOfOwner(account!);
@@ -119,7 +125,7 @@ const Header: FC = () => {
               ethers.utils.formatEther(userBalance.CosmicTokenBalance)
             ),
             ETH: Number(ethers.utils.formatEther(userBalance.ETH_Balance)),
-            CosmicSignature: UserInfo?.TotalCSTokensWon ?? 0,
+            CosmicSignature: userInfoData?.UserInfo?.TotalCSTokensWon ?? 0,
             RWLK: rwlkTokens.length,
           });
         }

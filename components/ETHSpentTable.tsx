@@ -21,7 +21,7 @@ import { useActiveWeb3React } from "../hooks/web3";
  */
 interface BidEvent {
   BidderAddr: string; // Ethereum address of the bidder
-  BidPriceEth: number; // ETH amount used in the bid
+  EthPriceEth: number; // ETH amount used in the bid
 }
 
 /**
@@ -70,7 +70,7 @@ const ETHSpentRow: FC<ETHSpentRowProps> = ({ row }) => {
 
       {/* Display the total ETH spent by this user, formatted to 4 decimals. */}
       <TablePrimaryCell align="center">
-        {row.amount.toFixed(4)} ETH
+        {(row.amount || 0).toFixed(4)} ETH
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -112,10 +112,11 @@ const ETHSpentTable: FC<ETHSpentTableProps> = ({ list }) => {
 
       // Sum up the total spending for each bidder address
       list.forEach((event) => {
+        const ethPrice = event.EthPriceEth || 0;
         if (result[event.BidderAddr]) {
-          result[event.BidderAddr] += event.BidPriceEth;
+          result[event.BidderAddr] += ethPrice;
         } else {
-          result[event.BidderAddr] = event.BidPriceEth;
+          result[event.BidderAddr] = ethPrice;
         }
       });
 

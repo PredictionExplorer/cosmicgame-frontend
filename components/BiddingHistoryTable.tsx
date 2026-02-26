@@ -31,8 +31,8 @@ interface BidHistory {
   EvtLogId: number;
   TimeStamp: number;
   BidderAddr: string;
-  BidPriceEth?: number;
-  NumCSTTokensEth?: number;
+  EthPriceEth?: number;
+  CstPriceEth?: number;
   BidType: number;
   RoundNum?: number;
   RWalkNFTId?: number;
@@ -131,14 +131,14 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
   const price =
     history.BidType === 2
       ? `${
-          (history.NumCSTTokensEth || 0) < 1
-            ? (history.NumCSTTokensEth || 0).toFixed(7)
-            : (history.NumCSTTokensEth || 0).toFixed(4)
+          (history.CstPriceEth || 0) < 1
+            ? (history.CstPriceEth || 0).toFixed(7)
+            : (history.CstPriceEth || 0).toFixed(4)
         } CST`
       : `${
-          (history.BidPriceEth || 0) < 1
-            ? (history.BidPriceEth || 0).toFixed(7)
-            : (history.BidPriceEth || 0).toFixed(4)
+          (history.EthPriceEth || 0) < 1
+            ? (history.EthPriceEth || 0).toFixed(7)
+            : (history.EthPriceEth || 0).toFixed(4)
         } ETH`;
 
   // If the history object is undefined or null, render an empty row.

@@ -13,6 +13,112 @@ const getMainAPIUrl = (url: string) => {
   return `${proxyUrl}${encodeURIComponent(baseUrl + url)}`;
 };
 
+// Helper function to flatten nested Tx object to top level
+const flattenTx = (item: any) => {
+  if (!item) return item;
+  if (item.Tx && typeof item.Tx === 'object') {
+    const { Tx, ...rest } = item;
+    return {
+      ...rest,
+      EvtLogId: Tx.EvtLogId,
+      BlockNum: Tx.BlockNum,
+      TxId: Tx.TxId,
+      TxHash: Tx.TxHash,
+      TimeStamp: Tx.TimeStamp,
+      DateTime: Tx.DateTime,
+    };
+  }
+  return item;
+};
+
+// Helper to flatten array of items with nested Tx
+const flattenTxArray = (items: any[]) => {
+  if (!Array.isArray(items)) return items;
+  return items.map(flattenTx);
+};
+
+// Helper to flatten RoundInfo response structure
+const flattenRoundInfo = (roundInfo: any) => {
+  if (!roundInfo) return null;
+  
+  const {
+    ClaimPrizeTx,
+    MainPrize,
+    CharityDeposit,
+    StakingDeposit,
+    EnduranceChampion,
+    LastCstBidder,
+    ChronoWarrior,
+    RoundStats,
+    RaffleNFTWinners,
+    StakingNFTWinners,
+    RaffleETHDeposits,
+    AllPrizes,
+    ...rest
+  } = roundInfo;
+  
+  return {
+    ...rest,
+    // Preserve nested objects that components expect
+    RoundStats: RoundStats || {},
+    RaffleNFTWinners: RaffleNFTWinners || [],
+    StakingNFTWinners: StakingNFTWinners || [],
+    RaffleETHDeposits: RaffleETHDeposits || [],
+    AllPrizes: AllPrizes || [],
+    // Flatten ClaimPrizeTx.Tx fields
+    EvtLogId: ClaimPrizeTx?.Tx?.EvtLogId,
+    BlockNum: ClaimPrizeTx?.Tx?.BlockNum,
+    TxId: ClaimPrizeTx?.Tx?.TxId,
+    TxHash: ClaimPrizeTx?.Tx?.TxHash,
+    TimeStamp: ClaimPrizeTx?.Tx?.TimeStamp,
+    DateTime: ClaimPrizeTx?.Tx?.DateTime,
+    // Flatten MainPrize fields
+    WinnerAddr: MainPrize?.WinnerAddr || '',
+    AmountEth: MainPrize?.EthAmountEth || 0,
+    TokenId: MainPrize?.NftTokenId ?? -1,
+    CSTAmountEth: MainPrize?.CstAmountEth || 0,
+    // Flatten CharityDeposit fields
+    CharityAddress: CharityDeposit?.CharityAddress || '',
+    CharityAmountETH: CharityDeposit?.CharityAmountETH || 0,
+    // Flatten StakingDeposit fields (match component's expected field names)
+    StakingDepositAmountEth: StakingDeposit?.StakingDepositAmountEth || 0,
+    StakingPerTokenEth: StakingDeposit?.StakingPerTokenEth || 0,
+    StakingNumStakedTokens: StakingDeposit?.StakingNumStakedTokens || 0,
+    // Flatten EnduranceChampion fields
+    EnduranceWinnerAddr: EnduranceChampion?.WinnerAddr || '',
+    EnduranceERC721TokenId: EnduranceChampion?.NftTokenId ?? -1,
+    EnduranceERC20AmountEth: EnduranceChampion?.CstAmountEth || 0,
+    // Flatten LastCstBidder fields
+    LastCstBidderAddr: LastCstBidder?.WinnerAddr || '',
+    LastCstBidderERC721TokenId: LastCstBidder?.NftTokenId ?? -1,
+    LastCstBidderERC20AmountEth: LastCstBidder?.CstAmountEth || 0,
+    // Flatten ChronoWarrior fields (match component's expected field names)
+    ChronoWarriorAddr: ChronoWarrior?.WinnerAddr || '',
+    ChronoWarriorAmountEth: ChronoWarrior?.EthAmountEth || 0,
+    ChronoWarriorCstAmountEth: ChronoWarrior?.CstAmountEth || 0,
+    ChronoWarriorNftTokenId: ChronoWarrior?.NftTokenId ?? -1,
+  };
+};
+
+// Helper to normalize field names (TokenAddress -> TokenAddr for backward compatibility)
+const normalizeFieldNames = (item: any) => {
+  if (!item) return item;
+  const normalized = { ...item };
+  
+  // Map TokenAddress to TokenAddr for components expecting the old field name
+  if (normalized.TokenAddress !== undefined && normalized.TokenAddr === undefined) {
+    normalized.TokenAddr = normalized.TokenAddress;
+  }
+  
+  return normalized;
+};
+
+// Helper to normalize array of items
+const normalizeFieldNamesArray = (items: any[]) => {
+  if (!Array.isArray(items)) return items;
+  return items.map(normalizeFieldNames);
+};
+
 class ApiService {
   public async create(token_id: number, count: number) {
     try {
@@ -184,7 +290,8 @@ class ApiService {
   public async get_round_list() {
     try {
       const { data } = await axios.get(getAPIUrl("rounds/list/0/1000000"));
-      return data.Rounds;
+      // Each round has the same nested structure as RoundInfo, so flatten them all
+      return (data.Rounds || []).map(flattenRoundInfo);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -199,8 +306,7 @@ class ApiService {
     const id = roundNum < 0 ? 0 : roundNum;
     try {
       const { data } = await axios.get(getAPIUrl(`rounds/info/${id}`));
-      const prizeInfo = data.RoundInfo;
-      return prizeInfo;
+      return flattenRoundInfo(data.RoundInfo);
     } catch (err) {
       if (err.response?.status === 400) {
         return null;
@@ -230,7 +336,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("prizes/history/global/0/1000000")
       );
-      return data.GlobalPrizeHistory;
+      return flattenTxArray(data.GlobalPrizeHistory);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -246,7 +352,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`prizes/history/by_user/${address}/0/1000000`)
       );
-      return data.USerPrizeHistory;
+      return flattenTxArray(data.USerPrizeHistory);
     } catch (err) {
       if (err.response?.status === 400) {
         return null;
@@ -308,7 +414,7 @@ class ApiService {
   public async get_bid_list() {
     try {
       const { data } = await axios.get(getAPIUrl("bid/list/all/0/1000000"));
-      return data.Bids;
+      return flattenTxArray(data.Bids);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -322,7 +428,7 @@ class ApiService {
   public async get_bid_info(evtLogID: number) {
     try {
       const { data } = await axios.get(getAPIUrl(`bid/info/${evtLogID}`));
-      return data.BidInfo;
+      return flattenTx(data.BidInfo);
     } catch (err) {
       if (err.response?.status === 400) {
         return null;
@@ -339,7 +445,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`bid/list/by_round/${round}/${dir}/0/1000000`)
       );
-      return data.BidsByRound;
+      return flattenTxArray(data.BidsByRound);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -370,7 +476,7 @@ class ApiService {
       return data;
     } catch (err) {
       if (err.response?.status === 400) {
-        return 0;
+        return null;
       }
       console.log(err);
       throw new Error("Network response was not OK");
@@ -397,8 +503,7 @@ class ApiService {
   public async get_cst_list() {
     try {
       const { data } = await axios.get(getAPIUrl("cst/list/all/0/1000000"));
-      const cstList = data.CosmicSignatureTokenList;
-      return cstList;
+      return flattenTxArray(data.CosmicSignatureTokenList);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -414,7 +519,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`cst/list/by_user/${address}/0/1000000`)
       );
-      return data.UserTokens;
+      return flattenTxArray(data.UserTokens);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -428,7 +533,7 @@ class ApiService {
   public async get_cst_info(tokenId: number) {
     try {
       const { data } = await axios.get(getAPIUrl(`cst/info/${tokenId}`));
-      return data.TokenInfo;
+      return flattenTx(data.TokenInfo);
     } catch (err) {
       if (err.response?.status === 400) {
         return null;
@@ -444,7 +549,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`cst/names/history/${token_id}`)
       );
-      return data.TokenNameHistory;
+      return flattenTxArray(data.TokenNameHistory);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -460,7 +565,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`cst/names/search/${token_name}`)
       );
-      return data.TokenNameSearchResults;
+      return flattenTxArray(data.TokenNameSearchResults);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -474,7 +579,7 @@ class ApiService {
   public async get_named_nfts() {
     try {
       const { data } = await axios.get(getAPIUrl("cst/names/named_only"));
-      return data.NamedTokens;
+      return flattenTxArray(data.NamedTokens);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -490,7 +595,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`cst/transfers/by_user/${address}/0/1000000`)
       );
-      return data.CosmicSignatureTransfers;
+      return flattenTxArray(data.CosmicSignatureTransfers);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -534,7 +639,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`ct/transfers/by_user/${address}/0/1000000`)
       );
-      return data.CosmicTokenTransfers;
+      return flattenTxArray(data.CosmicTokenTransfers);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -550,7 +655,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`cst/transfers/all/${token_id}/0/1000000`)
       );
-      return data.TokenTransfers;
+      return flattenTxArray(data.TokenTransfers);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -564,6 +669,27 @@ class ApiService {
   public async get_user_info(address: string) {
     try {
       const { data } = await axios.get(getAPIUrl(`user/info/${address}`));
+      
+      // Flatten nested Tx objects in all arrays within the user info response
+      if (data) {
+        return {
+          ...data,
+          Bids: flattenTxArray(data.Bids || []),
+          PrizeHistory: flattenTxArray(data.PrizeHistory || []),
+          CosmicSignatureTokensOwned: flattenTxArray(data.CosmicSignatureTokensOwned || []),
+          CurrentlyStakedTokens: flattenTxArray(data.CurrentlyStakedTokens || []),
+          DonatedNFTsClaimed: flattenTxArray(data.DonatedNFTsClaimed || []),
+          DonatedTokensClaimed: flattenTxArray(data.DonatedTokensClaimed || []),
+          ERC20Transfers: flattenTxArray(data.ERC20Transfers || []),
+          ERC721Transfers: flattenTxArray(data.ERC721Transfers || []),
+          ETHDonationsMade: flattenTxArray(data.ETHDonationsMade || []),
+          MainPrizeClaims: flattenTxArray(data.MainPrizeClaims || []),
+          MarketingRewardsAwarded: flattenTxArray(data.MarketingRewardsAwarded || []),
+          StakingActions: flattenTxArray(data.StakingActions || []),
+          TokenDonationsMade: flattenTxArray(data.TokenDonationsMade || []),
+        };
+      }
+      
       return data;
     } catch (err) {
       if (err.response?.status === 400) {
@@ -597,7 +723,7 @@ class ApiService {
       return data;
     } catch (err) {
       if (err.response?.status === 400) {
-        return 0;
+        return null;
       }
       console.log(err);
       throw new Error("Network response was not OK");
@@ -610,7 +736,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("donations/eth/simple/list/0/1000000")
       );
-      return data.DirectCGDonations;
+      return flattenTxArray(data.DirectCGDonations);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -626,7 +752,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/eth/simple/by_round/${round}`)
       );
-      return data.DirectCGDonations;
+      return flattenTxArray(data.DirectCGDonations);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -642,7 +768,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("donations/eth/with_info/list/0/1000000")
       );
-      return data.DirectCGDonations;
+      return flattenTxArray(data.DirectCGDonations);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -658,7 +784,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/eth/with_info/by_round/${round}`)
       );
-      return data.DirectCGDonations;
+      return flattenTxArray(data.DirectCGDonations);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -674,13 +800,13 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/eth/with_info/info/${id}`)
       );
-      return data.ETHDonation;
+      return flattenTx(data.ETHDonation);
     } catch (err) {
       if (err.response?.status === 400) {
         return null;
       }
       console.log(err);
-      return [];
+      return null;
     }
   }
 
@@ -690,7 +816,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/eth/by_user/${address}`)
       );
-      return data.CombinedDonationRecords;
+      return flattenTxArray(data.CombinedDonationRecords);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -706,7 +832,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/eth/both/by_round/${round}`)
       );
-      return data.CosmicGameDonations;
+      return flattenTxArray(data.CosmicGameDonations);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -720,7 +846,7 @@ class ApiService {
   public async get_donations_both() {
     try {
       const { data } = await axios.get(getAPIUrl("donations/eth/both/all"));
-      return data.CosmicGameDonations;
+      return flattenTxArray(data.CosmicGameDonations);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -734,7 +860,7 @@ class ApiService {
   public async get_charity_donations_deposits() {
     try {
       const { data } = await axios.get(getAPIUrl("donations/charity/deposits"));
-      return data.CharityDonations;
+      return flattenTxArray(data.CharityDonations);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -750,7 +876,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("donations/charity/cg_deposits")
       );
-      return data.CharityDonations;
+      return flattenTxArray(data.CharityDonations);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -766,7 +892,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("donations/charity/voluntary")
       );
-      return data.CharityDonations;
+      return flattenTxArray(data.CharityDonations);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -782,7 +908,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("donations/charity/withdrawals")
       );
-      return data.CharityWithdrawals;
+      return flattenTxArray(data.CharityWithdrawals);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -798,7 +924,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("donations/nft/list/0/1000000")
       );
-      return data.NFTDonations;
+      return normalizeFieldNamesArray(flattenTxArray(data.NFTDonations));
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -814,7 +940,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/nft/info/${record_id}`)
       );
-      return data.NFTDonation;
+      return normalizeFieldNames(flattenTx(data.NFTDonation));
     } catch (err) {
       if (err.response?.status === 400) {
         return null;
@@ -830,7 +956,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("donations/nft/claims/0/100000")
       );
-      return data.DonatedNFTClaims;
+      return flattenTxArray(data.DonatedNFTClaims);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -846,7 +972,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/nft/claims/by_user/${address}`)
       );
-      return data.DonatedNFTClaims;
+      return flattenTxArray(data.DonatedNFTClaims);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -876,7 +1002,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/nft/by_round/${round}`)
       );
-      return data.NFTDonations;
+      return normalizeFieldNamesArray(flattenTxArray(data.NFTDonations));
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -892,7 +1018,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/nft/unclaimed/by_round/${round}`)
       );
-      return data.NFTDonations;
+      return normalizeFieldNamesArray(flattenTxArray(data.NFTDonations));
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -908,7 +1034,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/nft/unclaimed/by_user/${address}`)
       );
-      return data.UnclaimedDonatedNFTs;
+      return normalizeFieldNamesArray(flattenTxArray(data.UnclaimedDonatedNFTs));
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -924,7 +1050,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/erc20/by_round/detailed/${round}`)
       );
-      return data.DonationsERC20ByRoundDetailed;
+      return normalizeFieldNamesArray(flattenTxArray(data.DonationsERC20ByRoundDetailed));
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -940,7 +1066,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`donations/erc20/by_user/${address}`)
       );
-      return data.DonatedPrizesERC20ByWinner;
+      return normalizeFieldNamesArray(flattenTxArray(data.DonatedPrizesERC20ByWinner));
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -956,7 +1082,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("raffle/deposits/list/0/1000000")
       );
-      return data.RaffleDeposits;
+      return flattenTxArray(data.RaffleDeposits);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -972,7 +1098,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`raffle/deposits/by_round/${round}`)
       );
-      return data.RaffleDeposits;
+      return flattenTxArray(data.RaffleDeposits);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -988,7 +1114,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("raffle/nft/all/list/0/1000000")
       );
-      return data.RaffleNFTWinners;
+      return flattenTxArray(data.RaffleNFTWinners);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1004,7 +1130,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`raffle/nft/by_round/${round}`)
       );
-      return data.RaffleNFTWinners;
+      return flattenTxArray(data.RaffleNFTWinners);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1020,7 +1146,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`raffle/nft/by_user/${address}`)
       );
-      return data.UserRaffleNFTWinnings;
+      return flattenTxArray(data.UserRaffleNFTWinnings);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1052,7 +1178,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/0/1000000`)
       );
-      return data.CollectedStakingCSTRewards;
+      return flattenTxArray(data.CollectedStakingCSTRewards);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1105,7 +1231,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/cst/actions/by_user/${address}/0/1000000`)
       );
-      return data.StakingCSTActions;
+      return flattenTxArray(data.StakingCSTActions);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1121,7 +1247,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("staking/cst/actions/global/0/1000000")
       );
-      return data.StakingCSTActions;
+      return flattenTxArray(data.StakingCSTActions);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1286,7 +1412,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("staking/rwalk/actions/global/0/1000000")
       );
-      return data.GlobalStakingActionsRWalk;
+      return flattenTxArray(data.GlobalStakingActionsRWalk);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1302,7 +1428,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/rwalk/actions/by_user/${address}/0/1000000`)
       );
-      return data.UserStakingActionsRWalk;
+      return flattenTxArray(data.UserStakingActionsRWalk);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1318,7 +1444,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("staking/rwalk/mints/global/0/1000000")
       );
-      return data.StakingRWalkRewardsMints;
+      return flattenTxArray(data.StakingRWalkRewardsMints);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1334,7 +1460,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/rwalk/mints/by_user/${address}`)
       );
-      return data.RWalkStakingRewardMints;
+      return flattenTxArray(data.RWalkStakingRewardMints);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1382,7 +1508,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl("marketing/rewards/global/0/1000000")
       );
-      return data.MarketingRewards;
+      return flattenTxArray(data.MarketingRewards);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1398,7 +1524,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`marketing/rewards/by_user/${address}/0/1000000`)
       );
-      return data.UserMarketingRewards;
+      return flattenTxArray(data.UserMarketingRewards);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1440,7 +1566,7 @@ class ApiService {
   public async get_system_modelist() {
     try {
       const { data } = await axios.get(getAPIUrl("system/modelist/-1/1000000"));
-      return data.SystemModeChanges;
+      return flattenTxArray(data.SystemModeChanges);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1472,7 +1598,7 @@ class ApiService {
       return data;
     } catch (err) {
       if (err.response?.status === 400) {
-        return 0;
+        return null;
       }
       console.log(err);
       throw new Error("Network response was not OK");

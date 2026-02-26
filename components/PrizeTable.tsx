@@ -47,43 +47,43 @@ const PrizeRow = ({ prize }) => {
 
       {/* Winner Address, shortened + Tooltip for full address */}
       <TablePrimaryCell>
-        <Tooltip title={prize.WinnerAddr}>
+        <Tooltip title={prize.WinnerAddr || ''}>
           <Typography
             sx={{ fontSize: "inherit !important", fontFamily: "monospace" }}
           >
-            {shortenHex(prize.WinnerAddr, 6)}
+            {prize.WinnerAddr ? shortenHex(prize.WinnerAddr, 6) : '-'}
           </Typography>
         </Tooltip>
       </TablePrimaryCell>
 
       {/* Prize Amount (in ETH), formatted to 4 decimals */}
       <TablePrimaryCell align="center">
-        {prize.AmountEth.toFixed(4)}
+        {(prize.AmountEth || 0).toFixed(4)}
       </TablePrimaryCell>
 
       {/* Number of Bids */}
       <TablePrimaryCell align="center">
-        {prize.RoundStats.TotalBids}
+        {prize.RoundStats?.TotalBids || 0}
       </TablePrimaryCell>
 
       {/* Donated NFTs count */}
       <TablePrimaryCell align="center">
-        {prize.RoundStats.TotalDonatedNFTs}
+        {prize.RoundStats?.TotalDonatedNFTs || 0}
       </TablePrimaryCell>
 
       {/* Raffle Deposits (in ETH), formatted to 4 decimals */}
       <TablePrimaryCell align="center">
-        {prize.RoundStats.TotalRaffleEthDepositsEth.toFixed(4)}
+        {(prize.RoundStats?.TotalRaffleEthDepositsEth || 0).toFixed(4)}
       </TablePrimaryCell>
 
       {/* Staking Deposit (in ETH), formatted to 4 decimals */}
       <TablePrimaryCell align="center">
-        {prize.StakingDepositAmountEth.toFixed(4)}
+        {(prize.StakingDepositAmountEth || 0).toFixed(4)}
       </TablePrimaryCell>
 
       {/* Number of Raffle NFTs */}
       <TablePrimaryCell align="center">
-        {prize.RoundStats.TotalRaffleNFTs}
+        {prize.RoundStats?.TotalRaffleNFTs || 0}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -172,8 +172,8 @@ export const PrizeTable = ({ list, loading }) => {
           {/* Table Body */}
           <TableBody>
             {/* Render each prize row in the current page slice */}
-            {paginatedList.map((prize) => (
-              <PrizeRow prize={prize} key={prize.EvtLogId} />
+            {paginatedList.map((prize, index) => (
+              <PrizeRow prize={prize} key={prize.RoundNum ?? `round-${index}`} />
             ))}
           </TableBody>
         </TablePrimary>
