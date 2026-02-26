@@ -204,8 +204,8 @@ const RaffleWinnerTable = ({ RaffleETHDeposits, RaffleNFTWinners }) => {
               Slice the list for pagination and map through each winner.
               Using a unique key combination to identify each row.
             */}
-            {list.slice((page - 1) * perPage, page * perPage).map((winner, index) => (
-              <WinnerRow key={winner.RecordId ?? `${winner.EvtLogId}-${index}`} winner={winner} />
+            {list.slice((page - 1) * perPage, page * perPage).map((winner) => (
+              <WinnerRow key={winner.Tx.EvtLogId} winner={winner} />
             ))}
           </TableBody>
         </TablePrimary>

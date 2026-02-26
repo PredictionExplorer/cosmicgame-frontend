@@ -3,7 +3,7 @@ import axios from "axios";
 // const baseUrl = "https://randomwalknft-api.com/";
 const baseUrl = "https://nfts.cosmicsignature.com/";
 const proxyUrl = "/api/proxy?url=";
-export const cosmicGameBaseUrl = "http://161.129.67.42:8353/api/cosmicgame/";
+export const cosmicGameBaseUrl = "http://161.129.67.42:7070/api/cosmicgame/";
 
 const getAPIUrl = (url: string) => {
   return `${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl + url)}`;
@@ -368,7 +368,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`prizes/deposits/raffle/by_user/${address}`)
       );
-      return data.UserRaffleDeposits;
+      return flattenTxArray(data.UserRaffleDeposits);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -384,7 +384,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`prizes/deposits/chrono_warrior/by_user/${address}`)
       );
-      return data.UserChronoWarriorDeposits;
+      return flattenTxArray(data.UserChronoWarriorDeposits);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -400,7 +400,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`prizes/deposits/unclaimed/by_user/${address}/0/1000000`)
       );
-      return data.UnclaimedDeposits;
+      return flattenTxArray(data.UnclaimedDeposits);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1162,7 +1162,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/cst/rewards/to_claim/by_user/${address}`)
       );
-      return data.UnclaimedEthDeposits;
+      return flattenTxArray(data.UnclaimedEthDeposits);
     } catch (err) {
       console.log(err);
       if (err.response?.status === 400) {
@@ -1277,7 +1277,7 @@ class ApiService {
   public async get_staking_cst_rewards() {
     try {
       const { data } = await axios.get(getAPIUrl("staking/cst/rewards/global"));
-      return data.StakingCSTRewards;
+      return flattenTxArray(data.StakingCSTRewards);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1293,7 +1293,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/cst/rewards/by_round/${round}`)
       );
-      return data.Rewards;
+      return flattenTxArray(data.Rewards);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1310,7 +1310,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/cst/rewards/paid/by_user/${address}`)
       );
-      return data.RewardPaidRecords;
+      return flattenTxArray(data.RewardPaidRecords);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
@@ -1582,7 +1582,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`system/admin_events/${start}/${end}`)
       );
-      return data.AdminEvents;
+      return flattenTxArray(data.AdminEvents);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];
