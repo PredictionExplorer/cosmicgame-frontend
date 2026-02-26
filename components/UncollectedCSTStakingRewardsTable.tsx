@@ -33,11 +33,22 @@ import getErrorMessage from "../utils/alert";
   Sub-Component: UncollectedRewardsRow
   Renders a single row in the rewards table with the provided data.
 ------------------------------------------------------------------ */
-const UncollectedRewardsRow = ({ row }) => {
+const UncollectedRewardsRow = ({
+  row,
+  isOwner,
+  claimableActionIds,
+  isClaiming,
+  onClaim,
+}: {
+  row: any;
+  isOwner: boolean;
+  claimableActionIds: number[];
+  isClaiming: boolean;
+  onClaim: (depositId: number) => void;
+}) => {
   // Early return if no row data to avoid errors.
   if (!row) return <TablePrimaryRow />;
 
-  // Destructure row for clarity and fallback values if needed.
   const {
     DepositTimeStamp,
     DepositId,
@@ -47,40 +58,52 @@ const UncollectedRewardsRow = ({ row }) => {
     DepositAmountEth,
     YourRewardAmountEth,
     PendingToClaimEth,
-    // EvtLogId,  <-- Usually used as a key, so not needed here
   } = row;
+
+  const hasClaimable = claimableActionIds.length > 0 && PendingToClaimEth > 0;
 
   return (
     <TablePrimaryRow>
-      {/* Convert the timestamp to a readable date/time format */}
       <TablePrimaryCell>
         {convertTimestampToDateTime(DepositTimeStamp)}
       </TablePrimaryCell>
 
-      {/* Simple text display of the deposit's unique identifier */}
       <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
 
-      {/* Show how many tokens you have staked out of total staked */}
       <TablePrimaryCell align="center">
         {`${YourTokensStaked} / ${NumStakedNFTs}`}
       </TablePrimaryCell>
 
-      {/* Total unclaimed tokens for this deposit */}
       <TablePrimaryCell align="center">{NumUnclaimedTokens}</TablePrimaryCell>
 
-      {/* The ETH amount originally deposited, formatted to 6 decimal places */}
       <TablePrimaryCell align="center">
         {DepositAmountEth.toFixed(6)}
       </TablePrimaryCell>
 
-      {/* Your reward in ETH so far, formatted to 6 decimals */}
       <TablePrimaryCell align="center">
         {YourRewardAmountEth.toFixed(6)}
       </TablePrimaryCell>
 
-      {/* Pending reward in ETH that hasn't been collected yet */}
       <TablePrimaryCell align="center">
         {PendingToClaimEth.toFixed(6)}
+      </TablePrimaryCell>
+
+      {/* Per-row Claim button — only visible to the owner */}
+      <TablePrimaryCell align="center">
+        {isOwner && hasClaimable ? (
+          <Button
+            size="small"
+            variant="contained"
+            disabled={isClaiming}
+            onClick={() => onClaim(DepositId)}
+          >
+            {isClaiming ? "Claiming..." : "Claim"}
+          </Button>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            —
+          </Typography>
+        )}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -93,25 +116,37 @@ const UncollectedRewardsRow = ({ row }) => {
 export const UncollectedCSTStakingRewardsTable = ({ user }) => {
   const { account } = useActiveWeb3React();
   const [status, setStatus] = useState(null);
-  // Current page in the pagination
   const [list, setList] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Track global "Claim All" in-flight state
   const [isUnstaking, setIsUnstaking] = useState(false);
-  const [cstWithRewards, setCstWithRewards] = useState([]);
+
+  // Track which deposit is currently being claimed individually (null = none)
+  const [claimingDepositId, setClaimingDepositId] = useState<number | null>(null);
+
+  // All unclaimed action IDs across every deposit (for Claim All)
+  const [cstWithRewards, setCstWithRewards] = useState<number[]>([]);
+
+  // Map of DepositId -> unclaimed action IDs (for per-row Claim)
+  const [depositActionMap, setDepositActionMap] = useState<Record<number, number[]>>({});
+
   const cstStakingContract = useStakingWalletCSTContract();
   const { setNotification } = useNotification();
 
-  // Number of rows to display per page
   const PER_PAGE = 5;
-
   const [open, setOpen] = useState<boolean>(false);
-
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  // Calculate slice indices for the current page
   const startIndex = (currentPage - 1) * PER_PAGE;
   const endIndex = currentPage * PER_PAGE;
+
+  const isOwner = user === account;
+
+  /* ----------------------------------------------------------------
+    Data fetching helpers
+  ---------------------------------------------------------------- */
 
   const fetchStatusData = async () => {
     try {
@@ -121,16 +156,47 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
       console.log(err);
     }
   };
+
+  /**
+   * Fetch ALL unclaimed action IDs across EVERY deposit.
+   *
+   * Bug fix: the previous version used `res[res.length - 1]` which only
+   * read the last deposit, missing claimable actions from earlier deposits.
+   * We now flatMap over the entire array.
+   */
   const fetchCstWithRewards = async () => {
     try {
       const res = await api.get_staking_cst_by_user_by_deposit_rewards(user);
-      const actions = res[res.length - 1].Actions.filter((x) => !x.Claimed);
-      const actionIds = actions.map((x) => x.Stake.ActionId);
-      setCstWithRewards(actionIds);
+
+      if (!res || !Array.isArray(res) || res.length === 0) {
+        setCstWithRewards([]);
+        setDepositActionMap({});
+        return;
+      }
+
+      // Build per-deposit map and global list in a single pass
+      const depositMap: Record<number, number[]> = {};
+      const allActionIds: number[] = [];
+
+      res.forEach((deposit) => {
+        const unclaimedActions = (deposit.Actions ?? []).filter(
+          (x: any) => !x.Claimed
+        );
+        const actionIds = unclaimedActions.map((x: any) => x.Stake.ActionId);
+
+        if (actionIds.length > 0) {
+          depositMap[deposit.DepositId] = actionIds;
+          allActionIds.push(...actionIds);
+        }
+      });
+
+      setDepositActionMap(depositMap);
+      setCstWithRewards(allActionIds);
     } catch (err) {
       console.log(err);
     }
   };
+
   const fetchUncollectedCstStakingRewards = async () => {
     try {
       const res = await api.get_staking_cst_rewards_to_claim_by_user(user);
@@ -140,41 +206,81 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
     }
   };
 
-  const unstakeAllCST = async () => {
-    handleClose();
-    setIsUnstaking(true);
+  const refreshAll = () => {
+    setTimeout(() => {
+      fetchStatusData();
+      fetchUncollectedCstStakingRewards();
+      fetchCstWithRewards();
+    }, 4000);
+  };
+
+  /* ----------------------------------------------------------------
+    Contract interaction helpers
+  ---------------------------------------------------------------- */
+
+  /**
+   * Internal helper that calls unstakeMany with the given action IDs.
+   * Returns true on success, false on failure.
+   */
+  const executeUnstakeMany = async (actionIds: number[]): Promise<boolean> => {
     try {
       const res = await cstStakingContract
-        .unstakeMany(cstWithRewards)
+        .unstakeMany(actionIds)
         .then((tx: any) => tx.wait());
-      // Success notification
+
       if (!res.code) {
         setNotification({
           visible: true,
-          text: "The selected tokens were unstaked successfully!",
+          text: "The selected tokens were unstaked and rewards claimed successfully!",
           type: "success",
         });
       }
-      setTimeout(() => {
-        fetchStatusData();
-        fetchUncollectedCstStakingRewards();
-      }, 4000);
-    } catch (err) {
+      refreshAll();
+      return true;
+    } catch (err: any) {
       if (err?.code === 4001) {
         console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
       } else {
         console.error(err);
         if (err?.data?.message) {
           const msg = getErrorMessage(err?.data?.message);
-          setNotification({
-            visible: true,
-            type: "error",
-            text: msg,
-          });
+          setNotification({ visible: true, type: "error", text: msg });
         }
       }
+      return false;
+    }
+  };
+
+  /** "Claim All" — unstakes every token with pending rewards across all deposits. */
+  const unstakeAllCST = async () => {
+    handleClose();
+    setIsUnstaking(true);
+    try {
+      await executeUnstakeMany(cstWithRewards);
+    } finally {
+      // Bug fix: always reset the flag so the button becomes clickable again
       setIsUnstaking(false);
+    }
+  };
+
+  const claimForDeposit = async (depositId: number) => {
+    const actionIds = depositActionMap[depositId];
+    if (!actionIds || actionIds.length === 0) return;
+    setClaimingDepositId(depositId);
+    try {
+      await executeUnstakeMany(actionIds);
+    } catch (err: any) {
+      if (err?.code === 4001) {
+        console.log("User denied transaction signature.");
+      } else {
+        console.error(err);
+        if (err?.data?.message) {
+          const msg = getErrorMessage(err?.data?.message);
+          setNotification({ visible: true, type: "error", text: msg });
+        }
+      }
+    } finally {
+      setClaimingDepositId(null);
     }
   };
 
@@ -188,35 +294,28 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
     return <Typography>Loading...</Typography>;
   }
 
-  // If there is no data to display, show a fallback message
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
 
-  // Extract the portion of the list corresponding to the current page
   const currentPageData = list.slice(startIndex, endIndex);
 
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          {/* 
-            Conditionally render a colgroup for desktop screens
-            to control column widths. This is optional on mobile.
-          */}
           {!isMobile && (
             <colgroup>
-              <col width="15%" />
-              <col width="10%" />
-              <col width="15%" />
-              <col width="15%" />
-              <col width="15%" />
-              <col width="15%" />
-              <col width="25%" />
+              <col width="14%" />
+              <col width="9%" />
+              <col width="13%" />
+              <col width="13%" />
+              <col width="12%" />
+              <col width="12%" />
+              <col width="12%" />
+              {isOwner && <col width="15%" />}
             </colgroup>
           )}
-
-          {/* Table Header */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">
@@ -232,20 +331,25 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
               <TablePrimaryHeadCell>
                 Uncollected Amount (ETH)
               </TablePrimaryHeadCell>
+              {isOwner && <TablePrimaryHeadCell>Action</TablePrimaryHeadCell>}
             </Tr>
           </TablePrimaryHead>
-
-          {/* Table Body */}
           <TableBody>
-            {/* Map over the current page of data to render each row */}
             {currentPageData.map((row) => (
-              <UncollectedRewardsRow key={row.EvtLogId} row={row} />
+              <UncollectedRewardsRow
+                key={row.EvtLogId}
+                row={row}
+                isOwner={isOwner}
+                claimableActionIds={depositActionMap[row.DepositId] ?? []}
+                isClaiming={claimingDepositId === row.DepositId}
+                onClaim={claimForDeposit}
+              />
             ))}
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {user === account && status?.UnclaimedStakingReward > 0 && (
+      {isOwner && status?.UnclaimedStakingReward > 0 && (
         <Box
           sx={{
             display: "flex",
@@ -261,25 +365,25 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
           <Button
             onClick={handleOpen}
             variant="contained"
-            disabled={isUnstaking}
+            disabled={isUnstaking || cstWithRewards.length === 0}
           >
-            Claim All
+            {isUnstaking ? "Claiming..." : "Claim All"}
           </Button>
         </Box>
       )}
 
-      {/* Pagination Controls */}
       <CustomPagination
         page={currentPage}
         setPage={setCurrentPage}
         totalLength={list.length}
         perPage={PER_PAGE}
       />
+
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Claim all staking rewards</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {`Do you want to claim all staking rewards? If you unstake the tokens, then you can't stake those tokens again.`}
+            {"Do you want to claim all staking rewards? If you unstake the tokens, you won't be able to stake those tokens again."}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

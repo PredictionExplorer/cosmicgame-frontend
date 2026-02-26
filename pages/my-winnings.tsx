@@ -316,9 +316,7 @@ export default function MyWinnings() {
       const roundNums = (raffleETHWinnings || [])
         .filter((w) => !w.Claimed)
         .map((w) => w.RoundNum);
-      await raffleWalletContract[
-        "withdrawEverything(uint256[],tuple(uint256,address)[],uint256[])"
-      ](roundNums, [], []);
+      await raffleWalletContract.withdrawEverything(roundNums, [], []);
 
       // Refresh status and unclaimed data after short delay
       setTimeout(() => {
