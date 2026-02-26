@@ -248,8 +248,8 @@ const Contracts = () => {
    * Contract Items: List of essential contracts or metadata to display in the first List.
    */
   const contractItems = [
-    { name: "Network", value: "Local Network" },
-    { name: "Chain ID", value: 31337 },
+    { name: "Network", value: "Arbitrum Sepolia" },
+    { name: "Chain ID", value: 421614 },
     {
       name: "Cosmic Game Address",
       value: data?.ContractAddrs.CosmicGameAddr,
