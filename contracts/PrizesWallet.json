@@ -142,7 +142,7 @@
     "inputs": [],
     "outputs": [
       {
-        "name": "",
+        "name": "param0",
         "type": "address",
         "internalType": "address"
       }
@@ -166,7 +166,7 @@
     ],
     "outputs": [
       {
-        "name": "",
+        "name": "param0",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -179,7 +179,7 @@
     "inputs": [],
     "outputs": [
       {
-        "name": "",
+        "name": "param0",
         "type": "tuple",
         "internalType": "struct PrizesWallet.EthBalance",
         "components": [
@@ -210,7 +210,7 @@
     ],
     "outputs": [
       {
-        "name": "",
+        "name": "param0",
         "type": "tuple",
         "internalType": "struct PrizesWallet.EthBalance",
         "components": [
@@ -241,7 +241,7 @@
     ],
     "outputs": [
       {
-        "name": "",
+        "name": "param0",
         "type": "address",
         "internalType": "address"
       }
@@ -254,7 +254,7 @@
     "inputs": [],
     "outputs": [
       {
-        "name": "",
+        "name": "param0",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -273,7 +273,7 @@
     ],
     "outputs": [
       {
-        "name": "",
+        "name": "param0",
         "type": "uint256",
         "internalType": "uint256"
       }

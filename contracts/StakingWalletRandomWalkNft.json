@@ -4,10 +4,12 @@
     "type": "error",
     "inputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       }
     ]
   },
@@ -16,13 +18,16 @@
     "type": "error",
     "inputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       },
       {
-        "type": "address"
+        "type": "address",
+        "name": "param2"
       }
     ]
   },
@@ -31,10 +36,12 @@
     "type": "error",
     "inputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       }
     ]
   },
@@ -43,7 +50,8 @@
     "type": "error",
     "inputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       }
     ]
   },
@@ -53,21 +61,26 @@
     "inputs": [
       {
         "type": "uint256",
-        "indexed": true
+        "indexed": true,
+        "name": "param0"
       },
       {
-        "type": "uint8"
+        "type": "uint8",
+        "name": "param1"
       },
       {
         "type": "uint256",
-        "indexed": true
+        "indexed": true,
+        "name": "param2"
       },
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param3"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param4"
       }
     ]
   },
@@ -77,18 +90,22 @@
     "inputs": [
       {
         "type": "uint256",
-        "indexed": true
+        "indexed": true,
+        "name": "param0"
       },
       {
         "type": "uint256",
-        "indexed": true
+        "indexed": true,
+        "name": "param1"
       },
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param2"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param3"
       }
     ]
   },
@@ -99,7 +116,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -110,7 +128,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -120,15 +139,18 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       }
     ],
     "outputs": [
       {
-        "type": "address[]"
+        "type": "address[]",
+        "name": "param0"
       }
     ]
   },
@@ -139,7 +161,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -149,7 +172,8 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": []
@@ -160,12 +184,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -175,18 +201,22 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       },
       {
-        "type": "address"
+        "type": "address",
+        "name": "param2"
       }
     ]
   },
@@ -196,7 +226,8 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "uint256[]"
+        "type": "uint256[]",
+        "name": "param0"
       }
     ],
     "outputs": []
@@ -207,7 +238,8 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": []
@@ -218,7 +250,8 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "uint256[]"
+        "type": "uint256[]",
+        "name": "param0"
       }
     ],
     "outputs": []
@@ -229,12 +262,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   }

@@ -9,13 +9,16 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       },
       {
-        "type": "address"
+        "type": "address",
+        "name": "param2"
       }
     ]
   },
@@ -24,10 +27,12 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       }
     ]
   },
@@ -36,7 +41,8 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -45,7 +51,8 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -54,7 +61,8 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -63,7 +71,8 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -72,7 +81,8 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -81,7 +91,8 @@
     "type": "error",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -90,10 +101,12 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       }
     ]
   },
@@ -102,7 +115,8 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -111,7 +125,8 @@
     "type": "error",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -121,15 +136,18 @@
     "inputs": [
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param0"
       },
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param1"
       },
       {
         "type": "uint256",
-        "indexed": true
+        "indexed": true,
+        "name": "param2"
       }
     ]
   },
@@ -139,14 +157,17 @@
     "inputs": [
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param0"
       },
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param1"
       },
       {
-        "type": "bool"
+        "type": "bool",
+        "name": "param2"
       }
     ]
   },
@@ -156,17 +177,21 @@
     "inputs": [
       {
         "type": "uint256",
-        "indexed": true
+        "indexed": true,
+        "name": "param0"
       },
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param1"
       },
       {
-        "type": "bytes32"
+        "type": "bytes32",
+        "name": "param2"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param3"
       }
     ]
   },
@@ -176,11 +201,13 @@
     "inputs": [
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param0"
       },
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param1"
       }
     ]
   },
@@ -189,10 +216,12 @@
     "type": "event",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       },
       {
-        "type": "string"
+        "type": "string",
+        "name": "param1"
       }
     ]
   },
@@ -202,15 +231,18 @@
     "inputs": [
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param0"
       },
       {
         "type": "address",
-        "indexed": true
+        "indexed": true,
+        "name": "param1"
       },
       {
         "type": "uint256",
-        "indexed": true
+        "indexed": true,
+        "name": "param2"
       }
     ]
   },
@@ -220,13 +252,16 @@
     "inputs": [
       {
         "type": "uint256",
-        "indexed": true
+        "indexed": true,
+        "name": "param0"
       },
       {
-        "type": "address"
+        "type": "address",
+        "name": "param1"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param2"
       }
     ]
   },
@@ -236,10 +271,12 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       }
     ],
     "outputs": []
@@ -250,12 +287,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -266,7 +305,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "bytes32"
+        "type": "bytes32",
+        "name": "param0"
       }
     ]
   },
@@ -276,12 +316,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -292,7 +334,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -302,15 +345,18 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "address"
+        "type": "address",
+        "name": "param1"
       }
     ],
     "outputs": [
       {
-        "type": "bool"
+        "type": "bool",
+        "name": "param0"
       }
     ]
   },
@@ -321,7 +367,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -332,7 +379,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -350,7 +398,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       }
     ]
   },
@@ -361,7 +410,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -372,7 +422,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -383,7 +434,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -393,12 +445,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ]
   },
@@ -409,7 +463,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -426,13 +481,16 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "address"
+        "type": "address",
+        "name": "param1"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param2"
       }
     ],
     "outputs": []
@@ -443,16 +501,20 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "address"
+        "type": "address",
+        "name": "param1"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param2"
       },
       {
-        "type": "bytes"
+        "type": "bytes",
+        "name": "param3"
       }
     ],
     "outputs": []
@@ -464,7 +526,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -474,12 +537,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "bytes32"
+        "type": "bytes32",
+        "name": "param0"
       }
     ]
   },
@@ -489,12 +554,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "bytes32[]"
+        "type": "bytes32[]",
+        "name": "param0"
       }
     ]
   },
@@ -504,10 +571,12 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "bool"
+        "type": "bool",
+        "name": "param1"
       }
     ],
     "outputs": []
@@ -518,7 +587,8 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       }
     ],
     "outputs": []
@@ -529,10 +599,12 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       },
       {
-        "type": "string"
+        "type": "string",
+        "name": "param1"
       }
     ],
     "outputs": []
@@ -543,12 +615,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "bytes4"
+        "type": "bytes4",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "bool"
+        "type": "bool",
+        "name": "param0"
       }
     ]
   },
@@ -559,7 +633,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       }
     ]
   },
@@ -570,7 +645,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -581,7 +657,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -591,12 +668,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -607,7 +686,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       }
     ]
   },
@@ -617,12 +697,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       }
     ]
   },
@@ -632,15 +714,18 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param1"
       }
     ],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -650,12 +735,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "string"
+        "type": "string",
+        "name": "param0"
       }
     ]
   },
@@ -666,7 +753,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -676,13 +764,16 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       },
       {
-        "type": "address"
+        "type": "address",
+        "name": "param1"
       },
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param2"
       }
     ],
     "outputs": []
@@ -693,7 +784,8 @@
     "stateMutability": "nonpayable",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ],
     "outputs": []
@@ -704,12 +796,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "address"
+        "type": "address",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "uint256[]"
+        "type": "uint256[]",
+        "name": "param0"
       }
     ]
   },
@@ -727,7 +821,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -737,12 +832,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -752,12 +849,14 @@
     "stateMutability": "view",
     "inputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   },
@@ -768,7 +867,8 @@
     "inputs": [],
     "outputs": [
       {
-        "type": "uint256"
+        "type": "uint256",
+        "name": "param0"
       }
     ]
   }
