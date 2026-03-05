@@ -130,6 +130,7 @@ function CSTStakingPanel({
  * (Reward tokens, actions table, tokens available for staking, staked tokens).
  */
 function RWLKStakingPanel({
+  account,
   stakingActions,
   rwlkMints,
   userTokens,
@@ -139,6 +140,7 @@ function RWLKStakingPanel({
   handleUnstake,
   handleUnstakeMany,
 }: {
+  account: string;
   stakingActions: any[];
   rwlkMints: any[];
   userTokens: number[]; // array of randomWalk token IDs
@@ -173,6 +175,7 @@ function RWLKStakingPanel({
         </Typography>
         <RWLKNFTTable
           list={userTokens}
+          ownerAddress={account}
           handleStake={(tokenId) => handleStake(tokenId)}
           handleStakeMany={(tokenIds) => handleStakeMany(tokenIds)}
         />
@@ -643,6 +646,7 @@ const MyStaking = () => {
           {/* RWLK Panel */}
           <CustomTabPanel value={stakingTab} index={1}>
             <RWLKStakingPanel
+              account={account}
               stakingActions={stakingRWLKActions}
               rwlkMints={rwlkMints}
               userTokens={rwlkTokens}

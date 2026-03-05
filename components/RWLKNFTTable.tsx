@@ -19,7 +19,6 @@ import {
 } from "./styled";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
-import api from "../services/api";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 import { isMobile } from "react-device-detect";
@@ -32,14 +31,11 @@ const ITEMS_PER_PAGE = 5;
 ------------------------------------------------------------------ */
 const RWLKRow = ({
   tokenId,
-  tokenInfo,
+  ownerAddress,
   onSelectToggle,
   isSelected,
   onStake,
 }) => {
-  // Avoid rendering if we don't have token info yet
-  if (!tokenInfo) return null;
-
   // Handlers
   const handleRowClick = () => onSelectToggle(tokenId);
 
@@ -64,8 +60,8 @@ const RWLKRow = ({
       {/* Owner Address */}
       <TablePrimaryCell>
         <AddressLink
-          address={tokenInfo.CurOwnerAddr}
-          url={`/user/${tokenInfo.CurOwnerAddr}`}
+          address={ownerAddress}
+          url={`/user/${ownerAddress}`}
         />
       </TablePrimaryCell>
 
@@ -85,7 +81,7 @@ const RWLKRow = ({
 /* ------------------------------------------------------------------
   Main Table Component: RWLKNFTTable
 ------------------------------------------------------------------ */
-export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
+export const RWLKNFTTable = ({ list, ownerAddress, handleStake, handleStakeMany }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Menu anchor for "Select All / Current Page / None"
@@ -93,39 +89,11 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
 
   // Keep track of selected token IDs
   const [selectedTokenIds, setSelectedTokenIds] = useState([]);
-  // Store token data fetched from the API
-  const [tokenInfoMap, setTokenInfoMap] = useState({});
 
   // Reset state when the list changes
   useEffect(() => {
     setSelectedTokenIds([]);
     setCurrentPage(1);
-  }, [list]);
-
-  // Fetch token data in batch
-  useEffect(() => {
-    const fetchTokenData = async () => {
-      if (list.length === 0) return;
-
-      try {
-        // For each tokenId in "list", fetch token info concurrently
-        const data = await Promise.all(
-          list.map((tokenId) => api.get_info(tokenId))
-        );
-
-        // Convert the parallel response into a {tokenId: data} map
-        const infoMap = list.reduce((acc, tokenId, index) => {
-          acc[tokenId] = data[index];
-          return acc;
-        }, {});
-
-        setTokenInfoMap(infoMap);
-      } catch (err) {
-        console.error("Failed to fetch token data:", err);
-      }
-    };
-
-    fetchTokenData();
   }, [list]);
 
   // Sliced data for the current page
@@ -262,7 +230,7 @@ export const RWLKNFTTable = ({ list, handleStake, handleStakeMany }) => {
               <RWLKRow
                 key={tokenId}
                 tokenId={tokenId}
-                tokenInfo={tokenInfoMap[tokenId]}
+                ownerAddress={ownerAddress}
                 onSelectToggle={handleSelectToggle}
                 isSelected={isSelected(tokenId)}
                 onStake={handleSingleStake}

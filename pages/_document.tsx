@@ -8,6 +8,8 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+          <link rel="alternate icon" href="/favicon.ico" />
           <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
