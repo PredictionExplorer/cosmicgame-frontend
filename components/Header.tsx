@@ -174,7 +174,7 @@ const Header: FC = () => {
     <Toolbar disableGutters>
       {/* Logo link */}
       <Link href="/">
-        <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
+        <Image src="/images/logo2.svg" width={48} height={48} alt="logo" />
       </Link>
 
       {/* Navigation items */}
@@ -229,7 +229,7 @@ const Header: FC = () => {
 
         {/* Logo link */}
         <Link href="/">
-          <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
+          <Image src="/images/logo2.svg" width={48} height={48} alt="logo" />
         </Link>
 
         {/* Drawer for mobile navigation */}
