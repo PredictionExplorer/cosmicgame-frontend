@@ -311,7 +311,7 @@ const Contracts = () => {
                     fullWidth
                     size="small"
                     sx={{ flex: 1 }}
-                    value={data?.StakignPercentage}
+                    value={data?.StakingPercentage}
                   />
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
                     Set

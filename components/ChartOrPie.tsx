@@ -16,7 +16,6 @@ type DistData = {
   RafflePercentage?: number;
   CharityPercentage?: number;
   StakingPercentage?: number;
-  StakignPercentage?: number; // fallback
   ChronoWarriorPercentage?: number;
   CosmicGameBalanceEth?: number;
 };
@@ -34,7 +33,7 @@ const ChartOrPie: React.FC<{ data?: DistData }> = ({ data }) => {
   const prize = clamp(data?.PrizePercentage);
   const raffle = clamp(data?.RafflePercentage);
   const charity = clamp(data?.CharityPercentage);
-  const staking = clamp(data?.StakingPercentage ?? data?.StakignPercentage);
+  const staking = clamp(data?.StakingPercentage);
   const chrono = clamp(data?.ChronoWarriorPercentage);
   const balance = Number(data?.CosmicGameBalanceEth) || 0;
 
