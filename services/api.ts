@@ -3,7 +3,8 @@ import axios from "axios";
 // const baseUrl = "https://randomwalknft-api.com/";
 const baseUrl = "https://nfts.cosmicsignature.com/";
 const proxyUrl = "/api/proxy?url=";
-export const cosmicGameBaseUrl = "http://161.129.67.42:8353/api/cosmicgame/";
+// export const cosmicGameBaseUrl = "http://161.129.67.42:8353/api/cosmicgame/"; // sepolia
+export const cosmicGameBaseUrl = "http://69.10.55.2:2121/api/cosmicgame/";
 
 const getAPIUrl = (url: string) => {
   return `${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl + url)}`;
