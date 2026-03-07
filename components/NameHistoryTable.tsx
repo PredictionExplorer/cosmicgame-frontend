@@ -8,7 +8,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
@@ -19,7 +19,7 @@ const NameHistoryRow = ({ record }) => {
     return <TablePrimaryRow />;
   }
 
-  const txUrl = `https://arbiscan.io/tx/${record.TxHash}`;
+  const txUrl = getExplorerUrl('tx', record.TxHash);
   const displayName = record.TokenName || "Token name was removed.";
 
   return (

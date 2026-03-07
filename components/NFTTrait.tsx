@@ -32,7 +32,7 @@ import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
 import { useNotification } from "../contexts/NotificationContext";
 
 import api from "../services/api";
-import {
+import { getExplorerUrl,
   convertTimestampToDateTime,
   formatId,
   getAssetsUrl,
@@ -484,7 +484,7 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
                   <Link
                     color="inherit"
                     fontSize="inherit"
-                    href={`https://arbiscan.io/tx/${nft.TxHash}`}
+                    href={getExplorerUrl('tx', nft.TxHash)}
                     target="__blank"
                   >
                     {convertTimestampToDateTime(nft.TimeStamp)}

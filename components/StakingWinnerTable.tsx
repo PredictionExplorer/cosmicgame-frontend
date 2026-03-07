@@ -8,7 +8,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimary,
 } from "./styled";
-import { convertTimestampToDateTime, shortenHex } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
@@ -33,7 +33,7 @@ const WinnerRow = ({ winner }: { winner: any }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${winner.TxHash}`}
+          href={getExplorerUrl('tx', winner.TxHash)}
           target="__blank"
         >
           {convertTimestampToDateTime(winner.TimeStamp)}

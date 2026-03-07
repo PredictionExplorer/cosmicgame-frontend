@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Link, Typography } from "@mui/material";
 import { MainWrapper } from "../../../components/styled";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import {
+import { getExplorerUrl,
   convertTimestampToDateTime,
   getMetadata,
   logoImgUrl,
@@ -77,7 +77,7 @@ const EthDonationDetail = ({ id }: EthDonationDetailProps) => {
       <Box mb={1} display="flex" flexWrap="wrap">
         <Typography color="primary">Donate Datetime:</Typography>&nbsp;
         <Link
-          href={`https://arbiscan.io/tx/${donationInfo.TxHash}`}
+          href={getExplorerUrl('tx', donationInfo.TxHash)}
           target="_blank"
           color="inherit"
         >

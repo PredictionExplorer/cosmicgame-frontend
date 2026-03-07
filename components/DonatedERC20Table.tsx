@@ -8,7 +8,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import {
+import { getExplorerUrl,
   convertTimestampToDateTime,
   formatSeconds,
   shortenHex,
@@ -50,7 +50,7 @@ const TokenRow = ({ currentTime, token, handleClaim }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${token.TxHash}`}
+          href={getExplorerUrl('tx', token.TxHash)}
           target="_blank"
         >
           {convertTimestampToDateTime(token.TimeStamp)}
@@ -72,7 +72,7 @@ const TokenRow = ({ currentTime, token, handleClaim }) => {
       <TablePrimaryCell>
         <Tooltip title={token.TokenAddr}>
           <Link
-            href={`https://arbiscan.io/address/${token.TokenAddr}`}
+            href={getExplorerUrl('address', token.TokenAddr)}
             style={{
               color: "inherit",
               fontSize: "inherit",

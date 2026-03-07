@@ -9,7 +9,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../components/styled";
-import { convertTimestampToDateTime, logoImgUrl } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from "../utils";
 import api from "../services/api";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
@@ -37,7 +37,7 @@ const UsedRwlkNftRow = ({ nft }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${nft.TxHash}`}
+          href={getExplorerUrl('tx', nft.TxHash)}
           target="__blank"
         >
           {convertTimestampToDateTime(nft.TimeStamp)}

@@ -11,7 +11,7 @@ import {
 import { Tbody, Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 
-import { convertTimestampToDateTime } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime } from "../utils";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 
@@ -36,7 +36,7 @@ const StakingRewardMintsRow = ({ row }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${row.TxHash}`}
+          href={getExplorerUrl('tx', row.TxHash)}
           target="__blank"
         >
           {convertTimestampToDateTime(row.TimeStamp)}

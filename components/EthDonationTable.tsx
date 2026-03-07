@@ -10,7 +10,7 @@ import {
 } from "./styled";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
-import { convertTimestampToDateTime } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime } from "../utils";
 import { CustomPagination } from "./CustomPagination";
 import { AddressLink } from "./AddressLink";
 import router from "next/router";
@@ -73,7 +73,7 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${row.TxHash}`}
+          href={getExplorerUrl('tx', row.TxHash)}
           target="_blank"
         >
           {convertTimestampToDateTime(row.TimeStamp)}

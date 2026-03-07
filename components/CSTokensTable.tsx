@@ -18,7 +18,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
@@ -71,7 +71,7 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${TxHash}`}
+          href={getExplorerUrl('tx', TxHash)}
           target="_blank"
         >
           {convertTimestampToDateTime(TimeStamp)}

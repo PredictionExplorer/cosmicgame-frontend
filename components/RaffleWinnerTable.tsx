@@ -11,7 +11,7 @@ import {
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
-import { convertTimestampToDateTime, shortenHex } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from "../utils";
 import { isMobile } from "react-device-detect";
 import useRaffleWalletContract from "../hooks/useRaffleWalletContract";
 
@@ -67,7 +67,7 @@ const WinnerRow = ({ winner }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${TxHash}`}
+          href={getExplorerUrl('tx', TxHash)}
           target="__blank"
         >
           {convertTimestampToDateTime(TimeStamp)}

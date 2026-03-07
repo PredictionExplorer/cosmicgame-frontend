@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { networkConfig } from "../config/networks";
 import {
   Typography,
   List,
@@ -248,8 +249,8 @@ const Contracts = () => {
    * Contract Items: List of essential contracts or metadata to display in the first List.
    */
   const contractItems = [
-    { name: "Network", value: "Arbitrum One" },
-    { name: "Chain ID", value: 42161 },
+    { name: "Network", value: networkConfig.chainName },
+    { name: "Chain ID", value: networkConfig.chainId },
     {
       name: "Cosmic Game Address",
       value: data?.ContractAddrs.CosmicGameAddr,

@@ -4,7 +4,7 @@ import { GetServerSidePropsContext } from "next";
 import { ethers } from "ethers";
 
 import api from "../../../services/api";
-import { logoImgUrl, convertTimestampToDateTime } from "../../../utils";
+import { getExplorerUrl, logoImgUrl, convertTimestampToDateTime } from "../../../utils";
 import { CustomPagination } from "../../../components/CustomPagination";
 
 import {
@@ -48,7 +48,7 @@ function NFTWinningsRow({ row }: { row: RaffleNFTWinning }) {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${TxHash}`}
+          href={getExplorerUrl('tx', TxHash)}
           target="_blank"
         >
           {convertTimestampToDateTime(TimeStamp)}

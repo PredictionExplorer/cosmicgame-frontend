@@ -5,7 +5,7 @@ import { GetServerSidePropsContext } from "next";
 import { MainWrapper, StyledCard } from "../../../components/styled";
 import api from "../../../services/api";
 import NFTImage from "../../../components/NFTImage";
-import {
+import { getExplorerUrl,
   getAssetsUrl,
   convertTimestampToDateTime,
   logoImgUrl,
@@ -140,7 +140,7 @@ function StakeInfo({ stake }: StakeInfoProps) {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${TxHash}`}
+          href={getExplorerUrl('tx', TxHash)}
           target="_blank"
         >
           <Typography component="span">
@@ -183,7 +183,7 @@ function UnstakeInfo({ unstake }: UnstakeInfoProps) {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${TxHash}`}
+          href={getExplorerUrl('tx', TxHash)}
           target="_blank"
         >
           <Typography component="span">

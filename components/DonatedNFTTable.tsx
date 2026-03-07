@@ -9,7 +9,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import {
+import { getExplorerUrl,
   convertTimestampToDateTime,
   formatSeconds,
   shortenHex,
@@ -102,7 +102,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${nft.TxHash}`}
+          href={getExplorerUrl('tx', nft.TxHash)}
           target="_blank"
         >
           {convertTimestampToDateTime(nft.TimeStamp)}
@@ -141,7 +141,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
       <TablePrimaryCell>
         <Tooltip title={nft.TokenAddr}>
           <Link
-            href={`https://arbiscan.io/address/${nft.TokenAddr}`}
+            href={getExplorerUrl('address', nft.TokenAddr)}
             style={{
               color: "inherit",
               fontSize: "inherit",

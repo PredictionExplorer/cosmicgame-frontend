@@ -6,7 +6,7 @@ import { GetServerSidePropsContext } from "next";
 import api from "../../services/api";
 import { useNotification } from "../../contexts/NotificationContext";
 
-import {
+import { getExplorerUrl,
   convertTimestampToDateTime,
   formatEthValue,
   getEnduranceChampions,
@@ -84,7 +84,7 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
       <InfoRow
         label="Datetime:"
         value={convertTimestampToDateTime(prizeInfo.TimeStamp)}
-        link={`https://arbiscan.io/tx/${prizeInfo.TxHash}`}
+        link={getExplorerUrl('tx', prizeInfo.TxHash)}
       />
       <InfoRow
         label="Prize Amount:"

@@ -26,7 +26,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimary,
 } from "./styled";
-import { convertTimestampToDateTime, shortenHex } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from "../utils";
 
 // Map record types to their corresponding icons and descriptive texts
 const RECORD_TYPE_MAP = {
@@ -96,7 +96,7 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
       {/* Datetime with transaction link */}
       <TablePrimaryCell>
         <Link
-          href={`https://arbiscan.io/tx/${history.TxHash}`}
+          href={getExplorerUrl('tx', history.TxHash)}
           target="_blank"
           color="inherit"
         >
@@ -149,7 +149,7 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
         {history.RecordType === 1 ? (
           <Tooltip title={COSMIC_SIGNATURE_TOKEN_ADDRESS}>
             <Link
-              href={`https://arbiscan.io/address/${COSMIC_SIGNATURE_TOKEN_ADDRESS}`}
+              href={getExplorerUrl('address', COSMIC_SIGNATURE_TOKEN_ADDRESS)}
               target="_blank"
               color="inherit"
             >
@@ -159,7 +159,7 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
         ) : history.TokenAddress ? (
           <Tooltip title={history.TokenAddress}>
             <Link
-              href={`https://arbiscan.io/address/${history.TokenAddress}`}
+              href={getExplorerUrl('address', history.TokenAddress)}
               target="_blank"
               color="inherit"
             >

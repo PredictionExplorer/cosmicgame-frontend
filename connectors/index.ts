@@ -18,12 +18,14 @@ import { NetworkConnector } from "./NetworkConnector";
  * Mapping of supported chain IDs to their respective RPC URLs.
  * This includes Infura endpoints for Arbitrum networks and local/other chains.
  */
+import { networkConfig } from '../config/networks';
+
 const NETWORK_URLS: Record<SupportedChainId, string> = {
   [SupportedChainId.ARBITRUM_ONE]: `https://arbitrum-mainnet.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.ARBITRUM_RINKEBY]: `https://arbitrum-rinkeby.infura.io/v3/${INFURA_KEY}`,
   [SupportedChainId.ARBITRUM_GOERLI]: `https://arbitrum-goerli.infura.io/v3/${INFURA_KEY}`,
-  [SupportedChainId.LOCAL_NETWORK]: "http://161.129.67.42:22945",
-  [SupportedChainId.SEPOLIA]: "https://sepolia-rollup.arbitrum.io/rpc",
+  [SupportedChainId.LOCAL_NETWORK]: networkConfig.rpcUrl,
+  [SupportedChainId.SEPOLIA]: networkConfig.rpcUrl,
 };
 
 /**

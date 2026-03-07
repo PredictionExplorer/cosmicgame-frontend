@@ -8,7 +8,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime, shortenHex } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from "../utils";
 import { ZERO_ADDRESS } from "../config/misc";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
@@ -42,7 +42,7 @@ const TransferHistoryRow = ({ record }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${TxHash}`}
+          href={getExplorerUrl('tx', TxHash)}
           target="__blank"
         >
           {convertTimestampToDateTime(TimeStamp)}

@@ -14,7 +14,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 import api from "../../../services/api";
-import { convertTimestampToDateTime, logoImgUrl } from "../../../utils";
+import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from "../../../utils";
 import {
   MainWrapper,
   TablePrimary,
@@ -167,7 +167,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                   <Link
                     color="inherit"
                     fontSize="inherit"
-                    href={`https://arbiscan.io/tx/${Stake.TxHash}`}
+                    href={getExplorerUrl('tx', Stake.TxHash)}
                     target="_blank"
                   >
                     <Typography component="span">
@@ -198,7 +198,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                     <Link
                       color="inherit"
                       fontSize="inherit"
-                      href={`https://arbiscan.io/tx/${Unstake.TxHash}`}
+                      href={getExplorerUrl('tx', Unstake.TxHash)}
                       target="_blank"
                     >
                       <Typography component="span">

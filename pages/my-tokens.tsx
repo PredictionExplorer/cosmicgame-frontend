@@ -4,7 +4,7 @@ import { GetServerSideProps } from "next";
 import { isMobile } from "react-device-detect";
 
 import { MainWrapper } from "../components/styled";
-import {
+import { getExplorerUrl,
   convertTimestampToDateTime,
   getAssetsUrl,
   logoImgUrl,
@@ -109,7 +109,7 @@ function CSTRow({ nft }: { nft: CSTToken }) {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${nft.TxHash}`}
+          href={getExplorerUrl('tx', nft.TxHash)}
           target="_blank"
         >
           {convertTimestampToDateTime(nft.TimeStamp)}

@@ -10,7 +10,7 @@ import {
   TablePrimaryRow,
 } from "../../components/styled";
 import api from "../../services/api";
-import {
+import { getExplorerUrl,
   convertTimestampToDateTime,
   isWalletAddress,
   logoImgUrl,
@@ -49,7 +49,7 @@ const CosmicSignatureTransferRow = ({ row }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${row.TxHash}`}
+          href={getExplorerUrl('tx', row.TxHash)}
           target="__blank"
         >
           {convertTimestampToDateTime(row.TimeStamp)}

@@ -15,7 +15,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import api from "../services/api";
@@ -79,7 +79,7 @@ const GlobalStakingRewardsRow = ({ row }: { row: any }) => {
           <Link
             color="inherit"
             fontSize="inherit"
-            href={`https://arbiscan.io/tx/${row.TxHash}`}
+            href={getExplorerUrl('tx', row.TxHash)}
             target="__blank"
           >
             {convertTimestampToDateTime(row.TimeStamp)}

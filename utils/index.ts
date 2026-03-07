@@ -9,6 +9,14 @@ import {
   STAKING_WALLET_RWLK_ADDRESS 
 } from '../config/app';
 
+import { networkConfig } from '../config/networks';
+
+const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
+
+/** Returns a block-explorer URL for a tx hash, address, or token. */
+export const getExplorerUrl = (type: 'tx' | 'address' | 'token', value: string): string =>
+  `${EXPLORER_BASE}/${type}/${value}`;
+
 const proxyUrl = "/api/proxy?url=";
 
 // Helper function to construct the API URL with proxy and URL encoding

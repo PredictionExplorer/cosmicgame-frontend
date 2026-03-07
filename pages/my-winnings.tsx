@@ -22,7 +22,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "../components/styled";
-import {
+import { getExplorerUrl,
   convertTimestampToDateTime,
   formatSeconds,
   logoImgUrl,
@@ -151,7 +151,7 @@ function RaffleWinningRow({
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${TxHash}`}
+          href={getExplorerUrl('tx', TxHash)}
           target="_blank"
         >
           {convertTimestampToDateTime(TimeStamp)}

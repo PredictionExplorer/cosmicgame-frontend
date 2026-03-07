@@ -8,7 +8,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime } from "../utils";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { Tr } from "react-super-responsive-table";
 import { CustomPagination } from "./CustomPagination";
@@ -49,7 +49,7 @@ const WithdrawalRow: FC<WithdrawalRowProps> = ({ withdrawal }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${withdrawal.TxHash}`}
+          href={getExplorerUrl('tx', withdrawal.TxHash)}
           target="_blank"
         >
           {convertTimestampToDateTime(withdrawal.TimeStamp)}

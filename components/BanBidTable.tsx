@@ -30,7 +30,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimary,
 } from "./styled";
-import { convertTimestampToDateTime } from "../utils";
+import { getExplorerUrl, convertTimestampToDateTime } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
@@ -163,7 +163,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${history.TxHash}`}
+          href={getExplorerUrl('tx', history.TxHash)}
           target="__blank"
         >
           {convertTimestampToDateTime(history.TimeStamp)}

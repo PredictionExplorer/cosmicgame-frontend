@@ -16,7 +16,7 @@ import {
 } from "../../../../components/styled";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import api from "../../../../services/api";
-import {
+import { getExplorerUrl,
   convertTimestampToDateTime,
   formatSeconds,
   logoImgUrl,
@@ -67,7 +67,7 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${row.TxHash}`}
+          href={getExplorerUrl('tx', row.TxHash)}
           target="__blank"
         >
           {convertTimestampToDateTime(row.TimeStamp)}

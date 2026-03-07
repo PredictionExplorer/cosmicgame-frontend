@@ -6,7 +6,7 @@ import api from "../../services/api";
 import axios from "axios";
 import RandomWalkNFT from "../../components/RandomWalkNFT";
 import NFTImage from "../../components/NFTImage";
-import { convertTimestampToDateTime, logoImgUrl } from "../../utils";
+import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from "../../utils";
 
 /* ------------------------------------------------------------------
   Page Component: BidInfo
@@ -83,7 +83,7 @@ const BidInfo = ({ bidId }: { bidId: number }) => {
             <Typography color="primary">Bid Datetime:</Typography>
             &nbsp;
             <Link
-              href={`https://arbiscan.io/tx/${bidInfo.TxHash}`}
+              href={getExplorerUrl('tx', bidInfo.TxHash)}
               style={{ color: "inherit" }}
               target="_blank"
             >

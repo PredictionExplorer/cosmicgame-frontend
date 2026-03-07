@@ -10,7 +10,7 @@ import { useNotification } from "../../../contexts/NotificationContext";
 
 import api from "../../../services/api";
 import getErrorMessage from "../../../utils/alert";
-import { convertTimestampToDateTime, logoImgUrl } from "../../../utils";
+import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from "../../../utils";
 
 import {
   MainWrapper,
@@ -52,7 +52,7 @@ const RaffleWinningsRow = ({ deposit }: { deposit: RaffleETHDeposit }) => {
         <Link
           color="inherit"
           fontSize="inherit"
-          href={`https://arbiscan.io/tx/${TxHash}`}
+          href={getExplorerUrl('tx', TxHash)}
           target="_blank"
         >
           {convertTimestampToDateTime(TimeStamp)}
