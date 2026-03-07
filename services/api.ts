@@ -1263,7 +1263,13 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/cst/actions/info/${actionId}`)
       );
-      return data.CombinedStakingRecordInfo;
+      const info = data.CombinedStakingRecordInfo;
+      if (!info) return null;
+      return {
+        ...info,
+        Stake: flattenTx(info.Stake),
+        Unstake: flattenTx(info.Unstake),
+      };
     } catch (err) {
       if (err.response?.status === 400) {
         return null;
@@ -1416,7 +1422,13 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/rwalk/actions/info/${actionId}`)
       );
-      return data.CombinedRWalkStakingRecordInfo;
+      const info = data.CombinedRWalkStakingRecordInfo;
+      if (!info) return null;
+      return {
+        ...info,
+        Stake: flattenTx(info.Stake),
+        Unstake: flattenTx(info.Unstake),
+      };
     } catch (err) {
       if (err.response?.status === 400) {
         return null;
