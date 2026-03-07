@@ -113,19 +113,17 @@ function useUnclaimedWinnings(account: string | null | undefined) {
 
 /** Table Row for a single raffle winning — receives pre-fetched timeout */
 function RaffleWinningRow({ 
-  winning, 
-  onClaim, 
-  isClaiming,
+  winning,
   roundTimeout,
 }: { 
   winning: RaffleWinning;
-  onClaim: (roundNum: number) => void;
-  isClaiming: boolean;
   roundTimeout: number;
 }) {
   const { TxHash, TimeStamp, RoundNum, Amount, WinnerAddr, Claimed } = winning;
 
   if (!winning) return <TablePrimaryRow />;
+
+  const isExpired = roundTimeout > 0 && roundTimeout < Date.now() / 1000;
 
   return (
     <TablePrimaryRow>
@@ -162,7 +160,7 @@ function RaffleWinningRow({
         {roundTimeout ? (
           <>
             {convertTimestampToDateTime(roundTimeout)}{" "}
-            {roundTimeout < Date.now() / 1000
+            {isExpired
               ? "(Expired)"
               : `(${formatSeconds(roundTimeout - Math.ceil(Date.now() / 1000))})`}
           </>
@@ -172,32 +170,12 @@ function RaffleWinningRow({
       <TablePrimaryCell align="center">
         {Claimed ? "Yes" : "No"}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {!Claimed && (
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => onClaim(RoundNum)}
-            disabled={isClaiming || (roundTimeout > 0 && roundTimeout < Date.now() / 1000)}
-          >
-            {isClaiming ? "Claiming..." : "Claim"}
-          </Button>
-        )}
-      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 }
 
 /** Table layout for raffle winnings — fetches round timeouts once per unique round */
-function RaffleWinningsTable({ 
-  list, 
-  onClaim, 
-  claimingRounds 
-}: { 
-  list: RaffleWinning[];
-  onClaim: (roundNum: number) => void;
-  claimingRounds: number[];
-}) {
+function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
   const raffleWalletContract = useRaffleWalletContract();
   // Map of roundNum → timeout timestamp, fetched once per unique round
   const [roundTimeouts, setRoundTimeouts] = useState<Record<number, number>>({});
@@ -236,16 +214,13 @@ function RaffleWinningsTable({
             <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Amount (ETH)</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Claimed</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Action</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
         <TableBody>
           {list.map((winning) => (
-            <RaffleWinningRow 
-              key={winning.EvtLogId} 
-              winning={winning} 
-              onClaim={onClaim}
-              isClaiming={claimingRounds.includes(winning.RoundNum)}
+            <RaffleWinningRow
+              key={winning.EvtLogId}
+              winning={winning}
               roundTimeout={roundTimeouts[winning.RoundNum] ?? 0}
             />
           ))}
@@ -280,7 +255,6 @@ export default function MyWinnings() {
     raffleETH: false,
   });
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
-  const [claimingRaffleRounds, setClaimingRaffleRounds] = useState<number[]>([]);
   const [donatedERC20Tokens, setDonatedERC20Tokens] = useState({
     data: [],
     loading: false,
@@ -339,33 +313,6 @@ export default function MyWinnings() {
       }
     } finally {
       setIsClaiming((prev) => ({ ...prev, raffleETH: false }));
-    }
-  };
-
-  // Claim ETH for a specific round
-  const handleRaffleETHClaim = async (roundNum: number) => {
-    if (!raffleWalletContract) {
-      setNotification({ text: "Wallet not connected", type: "error", visible: true });
-      return;
-    }
-    setClaimingRaffleRounds((prev) => [...prev, roundNum]);
-    try {
-      // withdrawEth has two overloads; use full signature to pick the single-arg one
-      await raffleWalletContract["withdrawEth(uint256)"](roundNum);
-
-      // Refresh status and unclaimed data after short delay
-      setTimeout(() => {
-        fetchStatusData();
-        refetch();
-      }, 3000);
-    } catch (err) {
-      console.error(err);
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err.data.message);
-        setNotification({ text: msg, type: "error", visible: true });
-      }
-    } finally {
-      setClaimingRaffleRounds((prev) => prev.filter((r) => r !== roundNum));
     }
   };
 
@@ -524,8 +471,6 @@ export default function MyWinnings() {
                 (currentPage - 1) * perPage,
                 currentPage * perPage
               )}
-              onClaim={handleRaffleETHClaim}
-              claimingRounds={claimingRaffleRounds}
             />
 
             {status?.ETHRaffleToClaim > 0 && (
