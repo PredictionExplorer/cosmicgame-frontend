@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Link,
   Menu,
   MenuItem,
@@ -49,8 +50,11 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }) => {
   const handleStakeClick = async (e) => {
     e.stopPropagation();
     setProcessing(true);
-    await onStakeSingle(TokenId);
-    setProcessing(false);
+    try {
+      await onStakeSingle(TokenId);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -112,7 +116,12 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }) => {
       <TablePrimaryCell align="center">
         {!Staked && (
           <Button size="small" disabled={processing} onClick={handleStakeClick}>
-            Stake
+            {processing ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <CircularProgress size={14} color="inherit" />
+                Staking...
+              </Box>
+            ) : "Stake"}
           </Button>
         )}
       </TablePrimaryCell>
@@ -191,8 +200,11 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
   // Stake many tokens
   const handleStakeManySelected = async () => {
     setProcessing(true);
-    await handleStakeMany(selectedTokenIds, false);
-    setProcessing(false);
+    try {
+      await handleStakeMany(selectedTokenIds, false);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   // If the list is empty
@@ -306,7 +318,12 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }) => {
             disabled={processing}
             onClick={handleStakeManySelected}
           >
-            Stake Many
+            {processing ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <CircularProgress size={14} color="inherit" />
+                Staking...
+              </Box>
+            ) : "Stake Many"}
           </Button>
         </Box>
       )}

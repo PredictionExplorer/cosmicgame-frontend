@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -148,7 +149,6 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
       const res = await cstStakingContract
         .unstakeMany(cstWithRewards)
         .then((tx: any) => tx.wait());
-      // Success notification
       if (!res.code) {
         setNotification({
           visible: true,
@@ -161,20 +161,14 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
         fetchUncollectedCstStakingRewards();
       }, 4000);
     } catch (err) {
-      if (err?.code === 4001) {
-        console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
-      } else {
+      if (err?.code !== 4001) {
         console.error(err);
         if (err?.data?.message) {
           const msg = getErrorMessage(err?.data?.message);
-          setNotification({
-            visible: true,
-            type: "error",
-            text: msg,
-          });
+          setNotification({ visible: true, type: "error", text: msg });
         }
       }
+    } finally {
       setIsUnstaking(false);
     }
   };
@@ -264,7 +258,12 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
             variant="contained"
             disabled={isUnstaking}
           >
-            Claim All
+            {isUnstaking ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CircularProgress size={16} color="inherit" />
+                Processing...
+              </Box>
+            ) : "Claim All"}
           </Button>
         </Box>
       )}
@@ -284,8 +283,13 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={unstakeAllCST} variant="contained">
-            Ok
+          <Button onClick={unstakeAllCST} variant="contained" disabled={isUnstaking}>
+            {isUnstaking ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <CircularProgress size={16} color="inherit" />
+                Processing...
+              </Box>
+            ) : "Ok"}
           </Button>
           <Button onClick={handleClose} variant="outlined">
             Cancel

@@ -99,6 +99,7 @@ const NewHome = () => {
   const [rwlkId, setRwlkId] = useState(-1);
   const [bidPricePlus, setBidPricePlus] = useState(2);
   const [isBidding, setIsBidding] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
   const [bannerToken, setBannerToken] = useState({ seed: "", id: -1 });
   const [rwlknftIds, setRwlknftIds] = useState<number[]>([]);
   const [offset, setOffset] = useState(0);
@@ -322,8 +323,8 @@ const NewHome = () => {
   // -----------------------------
 
   const onClaimPrize = async () => {
+    setIsClaiming(true);
     try {
-      // Check if contract is initialized
       if (!cosmicGameContract) {
         notify(
           "error",
@@ -337,7 +338,6 @@ const NewHome = () => {
 
       await handleTx(cosmicGameContract.claimMainPrize({ gasLimit }));
 
-      // Post-claim actions
       if (!cosmicSignatureContract) {
         notify(
           "error",
@@ -353,7 +353,6 @@ const NewHome = () => {
         count += data?.NumRaffleNFTWinnersStakingRWalk ?? 0;
       }
 
-      // Create prize artifact + route
       await api.create(tokenId, count);
       router.push({
         pathname: "/prize-claimed",
@@ -363,10 +362,11 @@ const NewHome = () => {
       await withPostTxRefresh(1000, 3000);
     } catch (err) {
       if (err?.code === 4001) {
-        console.log("User denied transaction signature.");
         return;
       }
       notifyErrorFromEthers(err);
+    } finally {
+      setIsClaiming(false);
     }
   };
 
@@ -1242,7 +1242,7 @@ const NewHome = () => {
                     <Button
                       variant="outlined"
                       size="large"
-                      endIcon={<ArrowForward />}
+                      endIcon={isBidding ? undefined : <ArrowForward />}
                       onClick={bidType === "CST" ? onBidWithCST : onBid}
                       fullWidth
                       disabled={
@@ -1252,7 +1252,12 @@ const NewHome = () => {
                       }
                       sx={{ mt: 3 }}
                     >
-                      {`Bid now with ${bidType} ${
+                      {isBidding ? (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <CircularProgress size={18} color="inherit" />
+                          Processing...
+                        </Box>
+                      ) : `Bid now with ${bidType} ${
                         bidType === "ETH"
                           ? `(${
                               (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100) >
@@ -1302,25 +1307,35 @@ const NewHome = () => {
                       onClick={onClaimPrize}
                       fullWidth
                       disabled={
-                        data?.LastBidderAddr !== account &&
-                        prizeTime + timeoutClaimPrize * 1000 > Date.now()
+                        isClaiming ||
+                        (data?.LastBidderAddr !== account &&
+                          prizeTime + timeoutClaimPrize * 1000 > Date.now())
                       }
                       sx={{ mt: 3 }}
                     >
-                      Claim Prize
-                      <Box sx={{ display: "flex", alignItems: "center" }}>
-                        {prizeTime + timeoutClaimPrize * 1000 > Date.now() &&
-                          data?.LastBidderAddr !== account && (
-                            <>
-                              &nbsp;available in &nbsp;
-                              <Countdown
-                                date={prizeTime + timeoutClaimPrize * 1000}
-                              />
-                            </>
-                          )}
-                        &nbsp;
-                        <ArrowForward sx={{ width: 22, height: 22 }} />
-                      </Box>
+                      {isClaiming ? (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <CircularProgress size={18} color="inherit" />
+                          Processing...
+                        </Box>
+                      ) : (
+                        <>
+                          Claim Prize
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            {prizeTime + timeoutClaimPrize * 1000 > Date.now() &&
+                              data?.LastBidderAddr !== account && (
+                                <>
+                                  &nbsp;available in &nbsp;
+                                  <Countdown
+                                    date={prizeTime + timeoutClaimPrize * 1000}
+                                  />
+                                </>
+                              )}
+                            &nbsp;
+                            <ArrowForward sx={{ width: 22, height: 22 }} />
+                          </Box>
+                        </>
+                      )}
                     </Button>
                     {data?.LastBidderAddr !== account &&
                       prizeTime + timeoutClaimPrize * 1000 > Date.now() && (
@@ -1378,8 +1393,8 @@ const NewHome = () => {
             >
               https://protocol-guild.readthedocs.io
             </Link>
-            ) will receive 10% of the prize pool (at least{" "}
-            {(data?.CosmicGameBalanceEth / 10).toFixed(4)} ETH).
+            ) will receive {data?.CharityPercentage ?? 0}% of the prize pool (at least{" "}
+            {((data?.CosmicGameBalanceEth ?? 0) * ((data?.CharityPercentage ?? 0) / 100)).toFixed(4)} ETH).
           </Typography>
         </Box>
         <Box mt={6}>

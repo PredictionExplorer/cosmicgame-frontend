@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Link,
   Menu,
   MenuItem,
@@ -190,11 +191,19 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
           onClick={async (e) => {
             e.stopPropagation();
             setProcessing(true);
-            await onUnstakeSingle(stakeActionId);
-            setProcessing(false);
+            try {
+              await onUnstakeSingle(stakeActionId);
+            } finally {
+              setProcessing(false);
+            }
           }}
         >
-          Unstake
+          {processing ? (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <CircularProgress size={14} color="inherit" />
+              Unstaking...
+            </Box>
+          ) : "Unstake"}
         </Button>
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -300,8 +309,11 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
   // Unstake multiple tokens
   const onUnstakeManyClick = async () => {
     setProcessing(true);
-    await handleUnstakeMany(selectedIds, IsRwalk);
-    setProcessing(false);
+    try {
+      await handleUnstakeMany(selectedIds, IsRwalk);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   // Unstake a single token
@@ -440,7 +452,12 @@ export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
             disabled={processing}
             onClick={onUnstakeManyClick}
           >
-            Unstake Many
+            {processing ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <CircularProgress size={14} color="inherit" />
+                Unstaking...
+              </Box>
+            ) : "Unstake Many"}
           </Button>
         </Box>
       )}
