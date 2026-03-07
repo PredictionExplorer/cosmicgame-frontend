@@ -111,35 +111,19 @@ function useUnclaimedWinnings(account: string | null | undefined) {
   Sub-Components
 ------------------------------------------------------------------ */
 
-/** Table Row for a single raffle winning */
+/** Table Row for a single raffle winning — receives pre-fetched timeout */
 function RaffleWinningRow({ 
   winning, 
   onClaim, 
-  isClaiming 
+  isClaiming,
+  roundTimeout,
 }: { 
   winning: RaffleWinning;
   onClaim: (roundNum: number) => void;
   isClaiming: boolean;
+  roundTimeout: number;
 }) {
   const { TxHash, TimeStamp, RoundNum, Amount, WinnerAddr, Claimed } = winning;
-  const [
-    roundTimeoutTimesToWithdrawPrizes,
-    setRoundTimeoutTimesToWithdrawPrizes,
-  ] = useState(0);
-  const raffleWalletContract = useRaffleWalletContract();
-
-  useEffect(() => {
-    if (!raffleWalletContract) return;
-    const fetchRoundTimeoutTimesToWithdrawPrizes = async () => {
-      try {
-        const timeout = await raffleWalletContract.roundTimeoutTimesToWithdrawPrizes(RoundNum);
-        setRoundTimeoutTimesToWithdrawPrizes(Number(timeout));
-      } catch (e) {
-        console.error("Failed to fetch round timeout:", e);
-      }
-    };
-    fetchRoundTimeoutTimesToWithdrawPrizes();
-  }, [raffleWalletContract, RoundNum]);
 
   if (!winning) return <TablePrimaryRow />;
 
@@ -175,19 +159,14 @@ function RaffleWinningRow({
         </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {roundTimeoutTimesToWithdrawPrizes ? (
+        {roundTimeout ? (
           <>
-            {convertTimestampToDateTime(roundTimeoutTimesToWithdrawPrizes)}{" "}
-            {roundTimeoutTimesToWithdrawPrizes < Date.now() / 1000
+            {convertTimestampToDateTime(roundTimeout)}{" "}
+            {roundTimeout < Date.now() / 1000
               ? "(Expired)"
-              : `(${formatSeconds(
-                  roundTimeoutTimesToWithdrawPrizes -
-                    Math.ceil(Date.now() / 1000)
-                )})`}
+              : `(${formatSeconds(roundTimeout - Math.ceil(Date.now() / 1000))})`}
           </>
-        ) : (
-          " "
-        )}
+        ) : " "}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{Amount.toFixed(7)}</TablePrimaryCell>
       <TablePrimaryCell align="center">
@@ -199,7 +178,7 @@ function RaffleWinningRow({
             variant="contained"
             size="small"
             onClick={() => onClaim(RoundNum)}
-            disabled={isClaiming || (roundTimeoutTimesToWithdrawPrizes > 0 && roundTimeoutTimesToWithdrawPrizes < Date.now() / 1000)}
+            disabled={isClaiming || (roundTimeout > 0 && roundTimeout < Date.now() / 1000)}
           >
             {isClaiming ? "Claiming..." : "Claim"}
           </Button>
@@ -209,7 +188,7 @@ function RaffleWinningRow({
   );
 }
 
-/** Table layout for raffle winnings */
+/** Table layout for raffle winnings — fetches round timeouts once per unique round */
 function RaffleWinningsTable({ 
   list, 
   onClaim, 
@@ -219,6 +198,33 @@ function RaffleWinningsTable({
   onClaim: (roundNum: number) => void;
   claimingRounds: number[];
 }) {
+  const raffleWalletContract = useRaffleWalletContract();
+  // Map of roundNum → timeout timestamp, fetched once per unique round
+  const [roundTimeouts, setRoundTimeouts] = useState<Record<number, number>>({});
+
+  useEffect(() => {
+    if (!raffleWalletContract || list.length === 0) return;
+
+    const uniqueRounds = Array.from(new Set(list.map((w) => w.RoundNum)));
+
+    const fetchTimeouts = async () => {
+      const results = await Promise.allSettled(
+        uniqueRounds.map((r) =>
+          raffleWalletContract.roundTimeoutTimesToWithdrawPrizes(r)
+        )
+      );
+      const map: Record<number, number> = {};
+      results.forEach((res, i) => {
+        if (res.status === "fulfilled") {
+          map[uniqueRounds[i]] = Number(res.value);
+        }
+      });
+      setRoundTimeouts(map);
+    };
+
+    fetchTimeouts();
+  }, [raffleWalletContract, list]);
+
   return (
     <TablePrimaryContainer>
       <TablePrimary>
@@ -240,6 +246,7 @@ function RaffleWinningsTable({
               winning={winning} 
               onClaim={onClaim}
               isClaiming={claimingRounds.includes(winning.RoundNum)}
+              roundTimeout={roundTimeouts[winning.RoundNum] ?? 0}
             />
           ))}
         </TableBody>
@@ -316,9 +323,8 @@ export default function MyWinnings() {
       const roundNums = (raffleETHWinnings || [])
         .filter((w) => !w.Claimed)
         .map((w) => w.RoundNum);
-      await raffleWalletContract[
-        "withdrawEverything(uint256[],tuple(uint256,address)[],uint256[])"
-      ](roundNums, [], []);
+      // Use direct method name — JSON ABI doesn't need string signature notation
+      await raffleWalletContract.withdrawEverything(roundNums, [], []);
 
       // Refresh status and unclaimed data after short delay
       setTimeout(() => {
@@ -344,6 +350,7 @@ export default function MyWinnings() {
     }
     setClaimingRaffleRounds((prev) => [...prev, roundNum]);
     try {
+      // withdrawEth has two overloads; use full signature to pick the single-arg one
       await raffleWalletContract["withdrawEth(uint256)"](roundNum);
 
       // Refresh status and unclaimed data after short delay
