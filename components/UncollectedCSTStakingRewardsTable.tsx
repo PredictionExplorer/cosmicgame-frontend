@@ -10,6 +10,7 @@ import {
   DialogTitle,
   TableBody,
   Typography,
+  Alert,
 } from "@mui/material";
 import {
   TablePrimary,
@@ -267,7 +268,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
                 <CircularProgress size={16} color="inherit" />
                 Processing...
               </Box>
-            ) : "Claim All"}
+            ) : "Unstake & Claim All"}
           </Button>
         </Box>
       )}
@@ -279,24 +280,38 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
         totalLength={list.length}
         perPage={PER_PAGE}
       />
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Claim all staking rewards</DialogTitle>
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle>Unstake Tokens &amp; Claim Rewards</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {`Do you want to claim all staking rewards? If you unstake the tokens, then you can't stake those tokens again.`}
+          <DialogContentText mb={2}>
+            This will <strong>unstake all your CST tokens</strong> and pay out{" "}
+            <strong>
+              {(status?.UnclaimedStakingReward ?? 0).toFixed(6)} ETH
+            </strong>{" "}
+            in accumulated rewards to your wallet.
           </DialogContentText>
+          <Alert severity="warning" variant="outlined">
+            <strong>Permanent action:</strong> Once unstaked, these tokens
+            cannot be staked again. Only proceed if you want to exit staking
+            entirely.
+          </Alert>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={unstakeAllCST} variant="contained" disabled={isUnstaking}>
+        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
+          <Button onClick={handleClose} variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            onClick={unstakeAllCST}
+            variant="contained"
+            color="error"
+            disabled={isUnstaking}
+          >
             {isUnstaking ? (
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                 <CircularProgress size={16} color="inherit" />
                 Processing...
               </Box>
-            ) : "Ok"}
-          </Button>
-          <Button onClick={handleClose} variant="outlined">
-            Cancel
+            ) : "Unstake & Claim"}
           </Button>
         </DialogActions>
       </Dialog>
