@@ -138,10 +138,10 @@ const WinningHistoryRow = ({ history, showClaimedStatus, showWinnerAddr }) => {
       {/* Amount ETH or N/A based on record type */}
       <TablePrimaryCell align="right">
         {[0, 3, 10, 13].includes(history.RecordType)
-          ? `${history.AmountEth.toFixed(4)} ETH`
+          ? `${(history.AmountEth ?? 0).toFixed(4)} ETH`
           : [2, 5, 7, 8, 12, 15].includes(history.RecordType)
           ? "N/A"
-          : `${history.AmountEth.toFixed(2)} CST`}
+          : `${(history.AmountEth ?? 0).toFixed(2)} CST`}
       </TablePrimaryCell>
 
       {/* Token Address */}

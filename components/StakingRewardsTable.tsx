@@ -38,10 +38,10 @@ const StakingRewardsRow = ({ row, address }) => {
     <TablePrimaryRow sx={{ cursor: "pointer" }} onClick={handleRowClick}>
       <TablePrimaryCell align="center">{row.TokenId}</TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.RewardCollectedEth.toFixed(6)}
+        {(row.RewardCollectedEth ?? 0).toFixed(6)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {row.RewardToCollectEth.toFixed(6)}
+        {(row.RewardToCollectEth ?? 0).toFixed(6)}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -62,7 +62,7 @@ export const StakingRewardsTable = ({ list, address }) => {
   const [page, setPage] = useState(1);
 
   // If there are no rewards, show a fallback message
-  if (list.length === 0) {
+  if (!list || list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
 

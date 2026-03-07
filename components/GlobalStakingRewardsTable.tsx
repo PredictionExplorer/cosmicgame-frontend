@@ -101,7 +101,7 @@ const GlobalStakingRewardsRow = ({ row }: { row: any }) => {
 
         {/* Total Deposited (ETH) */}
         <TablePrimaryCell align="center">
-          {row.TotalDepositAmountEth.toFixed(6)}
+          {(row.TotalDepositAmountEth ?? 0).toFixed(6)}
         </TablePrimaryCell>
 
         {/* Fully Claimed? */}
@@ -111,7 +111,7 @@ const GlobalStakingRewardsRow = ({ row }: { row: any }) => {
 
         {/* Pending to Collect (ETH) */}
         <TablePrimaryCell align="right">
-          {row.PendingToCollectEth.toFixed(6)}
+          {(row.PendingToCollectEth ?? 0).toFixed(6)}
         </TablePrimaryCell>
       </TablePrimaryRow>
 

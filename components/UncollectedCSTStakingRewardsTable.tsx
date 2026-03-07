@@ -70,17 +70,17 @@ const UncollectedRewardsRow = ({ row }) => {
 
       {/* The ETH amount originally deposited, formatted to 6 decimal places */}
       <TablePrimaryCell align="center">
-        {DepositAmountEth.toFixed(6)}
+        {(DepositAmountEth ?? 0).toFixed(6)}
       </TablePrimaryCell>
 
       {/* Your reward in ETH so far, formatted to 6 decimals */}
       <TablePrimaryCell align="center">
-        {YourRewardAmountEth.toFixed(6)}
+        {(YourRewardAmountEth ?? 0).toFixed(6)}
       </TablePrimaryCell>
 
       {/* Pending reward in ETH that hasn't been collected yet */}
       <TablePrimaryCell align="center">
-        {PendingToClaimEth.toFixed(6)}
+        {(PendingToClaimEth ?? 0).toFixed(6)}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -124,8 +124,9 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
   const fetchCstWithRewards = async () => {
     try {
       const res = await api.get_staking_cst_by_user_by_deposit_rewards(user);
-      const actions = res[res.length - 1].Actions.filter((x) => !x.Claimed);
-      const actionIds = actions.map((x) => x.Stake.ActionId);
+      const lastEntry = res?.[res.length - 1];
+      const actions = lastEntry?.Actions?.filter((x: any) => !x.Claimed) ?? [];
+      const actionIds = actions.map((x: any) => x.Stake.ActionId);
       setCstWithRewards(actionIds);
     } catch (err) {
       console.log(err);

@@ -23,15 +23,20 @@ export function useEagerConnect() {
   // first, try connecting to a gnosis safe
   useEffect(() => {
     if (!triedSafe && gnosisSafe) {
-      gnosisSafe.isSafeApp().then((loadedInSafe) => {
-        if (loadedInSafe) {
-          activate(gnosisSafe, undefined, true).catch(() => {
+      gnosisSafe
+        .isSafeApp()
+        .then((loadedInSafe) => {
+          if (loadedInSafe) {
+            activate(gnosisSafe, undefined, true).catch(() => {
+              setTriedSafe(true);
+            });
+          } else {
             setTriedSafe(true);
-          });
-        } else {
+          }
+        })
+        .catch(() => {
           setTriedSafe(true);
-        }
-      });
+        });
     }
   }, [activate, setTriedSafe, triedSafe]);
 

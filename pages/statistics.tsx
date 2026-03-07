@@ -146,8 +146,8 @@ const Statistics = () => {
   const [stakedRWLKTokens, setStakedRWLKTokens] = useState<any>(null);
   const [systemModeChanges, setSystemModeChanges] = useState<any>(null);
 
-  // Loading state
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   /* ------------------------------------------------------------------
     Data Fetching
@@ -217,6 +217,7 @@ const Statistics = () => {
       setSystemModeChanges(sysChangesData);
     } catch (err) {
       console.error("Error fetching data:", err);
+      setFetchError("Failed to load statistics data. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -283,10 +284,20 @@ const Statistics = () => {
   /* ------------------------------------------------------------------
     Conditional Renders
   ------------------------------------------------------------------ */
-  if (loading || !data) {
+  if (loading) {
     return (
       <MainWrapper>
         <Typography variant="h6">Loading...</Typography>
+      </MainWrapper>
+    );
+  }
+
+  if (fetchError || !data) {
+    return (
+      <MainWrapper>
+        <Typography variant="h6" color="error">
+          {fetchError || "Failed to load statistics. Please refresh the page."}
+        </Typography>
       </MainWrapper>
     );
   }
@@ -376,7 +387,7 @@ const Statistics = () => {
   const overallStats = [
     {
       title: "CosmicGame contract balance",
-      value: `${data.CosmicGameBalanceEth.toFixed(4)} ETH`,
+      value: `${(data.CosmicGameBalanceEth ?? 0).toFixed(4)} ETH`,
     },
     {
       title: "Num Prizes Given",
@@ -674,9 +685,7 @@ const Statistics = () => {
         />
         <StatisticsItem
           title="Total Staking Rewards"
-          value={`${data.MainStats.StakeStatisticsCST.TotalRewardEth.toFixed(
-            4
-          )} ETH`}
+          value={`${(data.MainStats?.StakeStatisticsCST?.TotalRewardEth ?? 0).toFixed(4)} ETH`}
         />
         <StatisticsItem
           title="Total Tokens Minted"
@@ -688,9 +697,7 @@ const Statistics = () => {
         />
         <StatisticsItem
           title="Unclaimed Staking Rewards"
-          value={`${data.MainStats.StakeStatisticsCST.UnclaimedRewardEth.toFixed(
-            4
-          )} ETH`}
+          value={`${(data.MainStats?.StakeStatisticsCST?.UnclaimedRewardEth ?? 0).toFixed(4)} ETH`}
         />
 
         {/* CST Stake/Unstake Actions */}

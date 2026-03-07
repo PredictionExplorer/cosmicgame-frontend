@@ -13,6 +13,7 @@ import {
   convertTimestampToDateTime,
   formatSeconds,
   getAssetsUrl,
+  getExplorerUrl,
 } from "../utils";
 import router from "next/router";
 import { Tr } from "react-super-responsive-table";
@@ -111,10 +112,10 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
       setDecimals(Number(decimals));
     };
 
-    if (!!history.DonatedERC20TokenAddr) {
+    if (!!history.DonatedERC20TokenAddr && library) {
       getSymbol();
     }
-  }, []);
+  }, [history.DonatedERC20TokenAddr, library, account]);
 
   /**
    * Redirect the user to a page with more details about the specific bid.
@@ -122,6 +123,9 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
   const handleRowClick = () => {
     router.push(`/bid/${history.EvtLogId}`);
   };
+
+  // If the history object is undefined or null, render an empty row.
+  if (!history) return <TablePrimaryRow />;
 
   // Determine the background color and label based on the bid type.
   const backgroundStyle = bidTypeStyles[history.BidType] || "rgba(0,0,0,0.1)";
@@ -140,11 +144,6 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
             ? (history.EthPriceEth || 0).toFixed(7)
             : (history.EthPriceEth || 0).toFixed(4)
         } ETH`;
-
-  // If the history object is undefined or null, render an empty row.
-  if (!history) {
-    return <TablePrimaryRow />;
-  }
 
   return (
     <TablePrimaryRow
@@ -225,7 +224,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
                     decimals
                   )}`}{" "}
                   <Link
-                    href={`https://etherscan.io/token/${history.DonatedERC20TokenAddr}`}
+                    href={getExplorerUrl('token', history.DonatedERC20TokenAddr)}
                     target="_blank"
                     color="inherit"
                   >

@@ -1179,7 +1179,7 @@ const NewHome = () => {
                               ml={2}
                             >
                               {(
-                                ethBidInfo.ETHPrice *
+                                (ethBidInfo?.ETHPrice ?? 0) *
                                 (1 + bidPricePlus / 100) *
                                 (bidType === "RandomWalk" ? 0.5 : 1)
                               ).toFixed(6)}{" "}
@@ -1255,28 +1255,28 @@ const NewHome = () => {
                       {`Bid now with ${bidType} ${
                         bidType === "ETH"
                           ? `(${
-                              ethBidInfo.ETHPrice * (1 + bidPricePlus / 100) >
+                              (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100) >
                               0.1
                                 ? (
-                                    ethBidInfo.ETHPrice *
+                                    (ethBidInfo?.ETHPrice ?? 0) *
                                     (1 + bidPricePlus / 100)
                                   ).toFixed(2)
                                 : (
-                                    ethBidInfo.ETHPrice *
+                                    (ethBidInfo?.ETHPrice ?? 0) *
                                     (1 + bidPricePlus / 100)
                                   ).toFixed(5)
                             } ETH)`
                           : bidType === "RandomWalk" && rwlkId !== -1
                           ? ` token ${rwlkId} (${
-                              ethBidInfo.ETHPrice * (1 + bidPricePlus / 100) >
+                              (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100) >
                               0.2
                                 ? (
-                                    ethBidInfo.ETHPrice *
+                                    (ethBidInfo?.ETHPrice ?? 0) *
                                     (1 + bidPricePlus / 100) *
                                     0.5
                                   ).toFixed(2)
                                 : (
-                                    ethBidInfo.ETHPrice *
+                                    (ethBidInfo?.ETHPrice ?? 0) *
                                     (1 + bidPricePlus / 100) *
                                     0.5
                                   ).toFixed(5)
@@ -1523,10 +1523,15 @@ const NewHome = () => {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const title = "Cosmic Signature";
-  const { data } = await axios.get(cosmicGameBaseUrl + "statistics/dashboard");
-  const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${data?.PrizeAmountEth.toFixed(
-    4
-  )}ETH prizes and Cosmic Signature NFTs.`;
+  let prizeAmountStr = "";
+  try {
+    const { data } = await axios.get(cosmicGameBaseUrl + "statistics/dashboard");
+    const prize = data?.PrizeAmountEth ?? 0;
+    prizeAmountStr = `${(prize).toFixed(4)}ETH `;
+  } catch {
+    // Non-critical: fallback to empty string if API is unavailable
+  }
+  const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${prizeAmountStr}prizes and Cosmic Signature NFTs.`;
 
   const openGraphData = [
     { property: "og:title", content: title },

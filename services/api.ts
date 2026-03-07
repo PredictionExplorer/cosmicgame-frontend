@@ -806,7 +806,7 @@ class ApiService {
         return null;
       }
       console.log(err);
-      return null;
+      throw new Error("Network response was not OK");
     }
   }
 
@@ -1164,10 +1164,10 @@ class ApiService {
       );
       return flattenTxArray(data.UnclaimedEthDeposits);
     } catch (err) {
-      console.log(err);
       if (err.response?.status === 400) {
         return [];
       }
+      console.log(err);
       throw new Error("Network response was not OK");
     }
   }

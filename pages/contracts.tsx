@@ -175,74 +175,63 @@ const Contracts = () => {
   }, []);
 
   useEffect(() => {
-    const fetchMessageMaxLength = async () => {
-      const maxLength = await cosmicGameContract.bidMessageLengthMaxLimit();
-      setMsgMaxLen(maxLength);
-    };
-    const fetchPriceIncrease = async () => {
-      const priceIncrease = await cosmicGameContract.ethBidPriceIncreaseDivisor();
-      setPriceIncrease(100 / Number(priceIncrease));
-    };
-    const fetchTimeIncrease = async () => {
-      const timeIncrease = await cosmicGameContract.mainPrizeTimeIncrementIncreaseDivisor();
-      setTimeIncrease(100 / Number(timeIncrease));
-    };
-    const fetchCstRewardAmountForBidding = async () => {
-      const cstRewardAmountForBidding = await cosmicGameContract.cstRewardAmountForBidding();
-      setCstRewardAmountForBidding(
-        Number(ethers.utils.formatEther(cstRewardAmountForBidding))
-      );
-    };
-    const fetchCstDutchAuctionDurations = async () => {
-      const cstDutchAuctionDurations = await cosmicGameContract.getCstDutchAuctionDurations();
-      setCstDutchAuctionDurations({
-        AuctionDuration: Number(cstDutchAuctionDurations[0]),
-        ElapsedDuration: Number(cstDutchAuctionDurations[1]),
-      });
-    };
-    const fetchEthDutchAuctionDurations = async () => {
-      const ethDutchAuctionDurations = await cosmicGameContract.getEthDutchAuctionDurations();
-      setEthDutchAuctionDurations({
-        AuctionDuration: Number(ethDutchAuctionDurations[0]),
-        ElapsedDuration: Number(ethDutchAuctionDurations[1]),
-      });
-    };
-    const fetchCstDutchAuctionBeginningBidPriceMinLimit = async () => {
-      const cstDutchAuctionBeginningBidPriceMinLimit = await cosmicGameContract.cstDutchAuctionBeginningBidPriceMinLimit();
-      setCstDutchAuctionBeginningBidPriceMinLimit(
-        Number(
-          ethers.utils.formatEther(cstDutchAuctionBeginningBidPriceMinLimit)
-        )
-      );
+    if (!cosmicGameContract) return;
+
+    const safeCall = async (fn: () => Promise<void>, name: string) => {
+      try { await fn(); } catch (e) { console.error(`contracts.tsx: ${name} failed`, e); }
     };
 
-    if (cosmicGameContract) {
-      try {
-        fetchMessageMaxLength();
-        fetchPriceIncrease();
-        fetchTimeIncrease();
-        fetchCstRewardAmountForBidding();
-        fetchCstDutchAuctionDurations();
-        fetchEthDutchAuctionDurations();
-        fetchCstDutchAuctionBeginningBidPriceMinLimit();
-      } catch (err) {
-        console.error(err);
-      }
-    }
+    safeCall(async () => {
+      const v = await cosmicGameContract.bidMessageLengthMaxLimit();
+      setMsgMaxLen(v);
+    }, "bidMessageLengthMaxLimit");
+
+    safeCall(async () => {
+      const v = await cosmicGameContract.ethBidPriceIncreaseDivisor();
+      setPriceIncrease(100 / Number(v));
+    }, "ethBidPriceIncreaseDivisor");
+
+    safeCall(async () => {
+      const v = await cosmicGameContract.mainPrizeTimeIncrementIncreaseDivisor();
+      setTimeIncrease(100 / Number(v));
+    }, "mainPrizeTimeIncrementIncreaseDivisor");
+
+    safeCall(async () => {
+      const v = await cosmicGameContract.cstRewardAmountForBidding();
+      setCstRewardAmountForBidding(Number(ethers.utils.formatEther(v)));
+    }, "cstRewardAmountForBidding");
+
+    safeCall(async () => {
+      const v = await cosmicGameContract.getCstDutchAuctionDurations();
+      setCstDutchAuctionDurations({ AuctionDuration: Number(v[0]), ElapsedDuration: Number(v[1]) });
+    }, "getCstDutchAuctionDurations");
+
+    safeCall(async () => {
+      const v = await cosmicGameContract.getEthDutchAuctionDurations();
+      setEthDutchAuctionDurations({ AuctionDuration: Number(v[0]), ElapsedDuration: Number(v[1]) });
+    }, "getEthDutchAuctionDurations");
+
+    safeCall(async () => {
+      const v = await cosmicGameContract.cstDutchAuctionBeginningBidPriceMinLimit();
+      setCstDutchAuctionBeginningBidPriceMinLimit(Number(ethers.utils.formatEther(v)));
+    }, "cstDutchAuctionBeginningBidPriceMinLimit");
+
   }, [cosmicGameContract]);
 
   /**
    * If the CharityWallet contract is loaded, fetch the charity address on mount.
    */
   useEffect(() => {
+    if (!charityWalletContract) return;
     const fetchData = async () => {
-      const addr = await charityWalletContract.charityAddress();
-      setCharityAddress(addr);
+      try {
+        const addr = await charityWalletContract.charityAddress();
+        setCharityAddress(addr);
+      } catch (e) {
+        console.error("contracts.tsx: charityAddress failed", e);
+      }
     };
-
-    if (charityWalletContract) {
-      fetchData();
-    }
+    fetchData();
   }, [charityWalletContract]);
 
   /**

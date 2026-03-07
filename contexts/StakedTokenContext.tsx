@@ -63,23 +63,27 @@ export const StakedTokenProvider: React.FC<StakedTokenProviderProps> = ({
    * Fetches staked tokens for the connected user.
    */
   const fetchData = async () => {
+    if (!account) return;
     try {
-      if (account) {
-        const cst = await api.get_staked_cst_tokens_by_user(account);
-        setCsTokens(cst);
-        const rwlk = await api.get_staked_rwalk_tokens_by_user(account);
-        setRwlkTokens(rwlk);
-      }
+      const [cst, rwlk] = await Promise.all([
+        api.get_staked_cst_tokens_by_user(account),
+        api.get_staked_rwalk_tokens_by_user(account),
+      ]);
+      setCsTokens(cst ?? []);
+      setRwlkTokens(rwlk ?? []);
     } catch (error) {
       console.error("Error fetching staked token data:", error);
     }
   };
 
-  /**
-   * Refetch data anytime `account` changes (i.e., user changes wallet).
-   */
   useEffect(() => {
-    fetchData();
+    let cancelled = false;
+    const run = async () => {
+      if (!cancelled) await fetchData();
+    };
+    run();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
 
   return (

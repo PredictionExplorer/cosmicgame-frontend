@@ -47,11 +47,11 @@ const CollectedRewardsRow = ({ row }) => {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {TotalDepositAmountEth.toFixed(6)}
+        {(TotalDepositAmountEth ?? 0).toFixed(6)}
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {YourCollectedAmountEth.toFixed(6)}
+        {(YourCollectedAmountEth ?? 0).toFixed(6)}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
@@ -67,7 +67,7 @@ export const CollectedCSTStakingRewardsTable = ({ list }) => {
   const PER_PAGE = 5;
 
   // Early return if no data
-  if (list.length === 0) {
+  if (!list || list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
 

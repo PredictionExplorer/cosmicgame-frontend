@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -129,19 +129,17 @@ function RaffleWinningRow({
   const raffleWalletContract = useRaffleWalletContract();
 
   useEffect(() => {
+    if (!raffleWalletContract) return;
     const fetchRoundTimeoutTimesToWithdrawPrizes = async () => {
-      const roundTimeoutTimesToWithdrawPrizes = await raffleWalletContract.roundTimeoutTimesToWithdrawPrizes(
-        RoundNum
-      );
-      setRoundTimeoutTimesToWithdrawPrizes(
-        Number(roundTimeoutTimesToWithdrawPrizes)
-      );
+      try {
+        const timeout = await raffleWalletContract.roundTimeoutTimesToWithdrawPrizes(RoundNum);
+        setRoundTimeoutTimesToWithdrawPrizes(Number(timeout));
+      } catch (e) {
+        console.error("Failed to fetch round timeout:", e);
+      }
     };
-
-    if (raffleWalletContract) {
-      fetchRoundTimeoutTimesToWithdrawPrizes();
-    }
-  }, [raffleWalletContract]);
+    fetchRoundTimeoutTimesToWithdrawPrizes();
+  }, [raffleWalletContract, RoundNum]);
 
   if (!winning) return <TablePrimaryRow />;
 
@@ -258,7 +256,6 @@ export default function MyWinnings() {
   const { setNotification } = useNotification();
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
 
-  // Get unclaimed winnings data (donated NFTs, raffle ETH, CST staking rewards)
   const {
     donatedNFTs,
     raffleETHWinnings,
@@ -266,7 +263,6 @@ export default function MyWinnings() {
     error,
     refetch,
   } = useUnclaimedWinnings(account);
-  console.log(raffleETHWinnings);
   // Smart contract hooks
   const raffleWalletContract = useRaffleWalletContract();
 
@@ -307,10 +303,14 @@ export default function MyWinnings() {
 
   useEffect(() => {
     fetchDonatedERC20Tokens();
-  }, []);
+  }, [account]);
 
   // Claim all ETH from raffle contract
   const handleAllETHClaim = async () => {
+    if (!raffleWalletContract) {
+      setNotification({ text: "Wallet not connected", type: "error", visible: true });
+      return;
+    }
     setIsClaiming((prev) => ({ ...prev, raffleETH: true }));
     try {
       const roundNums = (raffleETHWinnings || [])
@@ -338,6 +338,10 @@ export default function MyWinnings() {
 
   // Claim ETH for a specific round
   const handleRaffleETHClaim = async (roundNum: number) => {
+    if (!raffleWalletContract) {
+      setNotification({ text: "Wallet not connected", type: "error", visible: true });
+      return;
+    }
     setClaimingRaffleRounds((prev) => [...prev, roundNum]);
     try {
       await raffleWalletContract["withdrawEth(uint256)"](roundNum);
@@ -360,6 +364,10 @@ export default function MyWinnings() {
 
   // Claim a single donated NFT
   const handleDonatedNFTsClaim = async (tokenID: number) => {
+    if (!raffleWalletContract) {
+      setNotification({ text: "Wallet not connected", type: "error", visible: true });
+      return;
+    }
     setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     try {
       await raffleWalletContract.claimDonatedNft(tokenID);
@@ -383,6 +391,10 @@ export default function MyWinnings() {
 
   // Claim all donated NFTs
   const handleAllDonatedNFTsClaim = async () => {
+    if (!raffleWalletContract) {
+      setNotification({ text: "Wallet not connected", type: "error", visible: true });
+      return;
+    }
     if (!donatedNFTs) return;
     setIsClaiming((prev) => ({ ...prev, donatedNFT: true }));
 
