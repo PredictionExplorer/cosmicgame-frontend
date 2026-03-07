@@ -3,6 +3,7 @@ import React, {
   useContext,
   useState,
   useCallback,
+  useRef,
   ReactNode,
   useEffect,
 } from "react";
@@ -35,6 +36,8 @@ interface ApiDataContextValue {
   apiData: ApiData;
   setApiData: React.Dispatch<React.SetStateAction<ApiData>>;
   fetchData: () => Promise<void>;
+  /** Raw unclaimed staking rewards — shared so consumers don't re-fetch */
+  unclaimedRewards: any[];
 }
 
 const ApiDataContext = createContext<ApiDataContextValue | undefined>(undefined);
@@ -49,37 +52,41 @@ export const useApiData = (): ApiDataContextValue => {
 
 export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) => {
   const [apiData, setApiData] = useState<ApiData>(initialApiData);
+  const [unclaimedRewards, setUnclaimedRewards] = useState<any[]>([]);
+
   const { cstokens: stakedTokens } = useStakedToken();
-  const stakedActionIds = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
   const { account } = useActiveWeb3React();
 
+  // Use a ref so fetchActionIds/fetchData never need it as a useCallback dep.
+  // The ref is always up-to-date without causing reference churn.
+  const stakedActionIdsRef = useRef<(number | string)[]>([]);
+  stakedActionIdsRef.current = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+
   const fetchInfo = useCallback(
-    async (depositId: number, stakedActionIds: (number | string)[]) => {
+    async (depositId: number) => {
       const unstakeableActionIds: (number | string)[] = [];
       const claimableActionIds: { DepositId: number; StakeActionId: number }[] = [];
 
       const response = await api.get_cst_action_ids_by_deposit_id(account, depositId);
-
-      // Guard: api returns null on 400
       if (!response) return { unstakeableActionIds, claimableActionIds };
 
-      await Promise.all(
-        response.map(async (item: any) => {
-          try {
-            if (!item.Claimed) {
-              claimableActionIds.push({ DepositId: item.DepositId, StakeActionId: item.StakeActionId });
-            }
-            if (stakedActionIds.includes(item.StakeActionId)) {
-              unstakeableActionIds.push(item.StakeActionId);
-            }
-          } catch (error) {
-            console.error(error);
+      const currentStakedActionIds = stakedActionIdsRef.current;
+      for (const item of response) {
+        try {
+          if (!item.Claimed) {
+            claimableActionIds.push({ DepositId: item.DepositId, StakeActionId: item.StakeActionId });
           }
-        })
-      );
+          if (currentStakedActionIds.includes(item.StakeActionId)) {
+            unstakeableActionIds.push(item.StakeActionId);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
 
       return { unstakeableActionIds, claimableActionIds };
     },
+    // Only depends on account — stakedActionIds is read from ref
     [account]
   );
 
@@ -90,10 +97,7 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
 
       await Promise.all(
         list.map(async (item) => {
-          const { claimableActionIds, unstakeableActionIds } = await fetchInfo(
-            item.DepositId,
-            stakedActionIds
-          );
+          const { claimableActionIds, unstakeableActionIds } = await fetchInfo(item.DepositId);
           cl_actionIds = cl_actionIds.concat(claimableActionIds);
           us_actionIds = us_actionIds.concat(unstakeableActionIds);
         })
@@ -105,24 +109,27 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
 
       return { unstakeableActionIds: us_actionIds, claimableActionIds: cl_actionIds };
     },
-    [fetchInfo, stakedActionIds]
+    // Stable: fetchInfo only changes when account changes
+    [fetchInfo]
   );
 
   const fetchData = useCallback(async (): Promise<void> => {
     if (!account) return;
 
     try {
-      const [newData, unclaimedStakingRewards] = await Promise.all([
+      const [newData, rewards] = await Promise.all([
         api.notify_red_box(account),
         api.get_staking_cst_rewards_to_claim_by_user(account),
       ]);
 
-      const rewards = unclaimedStakingRewards ?? [];
+      const rewardList = rewards ?? [];
+      setUnclaimedRewards(rewardList);
+
       const hasUnclaimed =
-        rewards.length > 0 && (newData?.UnclaimedStakingReward ?? 0) > 0;
+        rewardList.length > 0 && (newData?.UnclaimedStakingReward ?? 0) > 0;
 
       if (hasUnclaimed) {
-        const actionIds = await fetchActionIds(rewards);
+        const actionIds = await fetchActionIds(rewardList);
         setApiData({ ...initialApiData, ...newData, ...actionIds });
       } else {
         setApiData({
@@ -135,6 +142,7 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
     } catch (error) {
       console.error("ApiDataContext fetchData failed:", error);
     }
+    // Stable deps: only account and fetchActionIds (which only changes when account changes)
   }, [account, fetchActionIds]);
 
   useEffect(() => {
@@ -147,7 +155,7 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
   }, [fetchData]);
 
   return (
-    <ApiDataContext.Provider value={{ apiData, setApiData, fetchData }}>
+    <ApiDataContext.Provider value={{ apiData, setApiData, fetchData, unclaimedRewards }}>
       {children}
     </ApiDataContext.Provider>
   );

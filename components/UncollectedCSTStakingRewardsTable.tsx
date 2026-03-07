@@ -28,6 +28,7 @@ import { useActiveWeb3React } from "../hooks/web3";
 import api from "../services/api";
 import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
 import { useNotification } from "../contexts/NotificationContext";
+import { useApiData } from "../contexts/ApiDataContext";
 import getErrorMessage from "../utils/alert";
 
 /* ------------------------------------------------------------------
@@ -93,35 +94,27 @@ const UncollectedRewardsRow = ({ row }) => {
 ------------------------------------------------------------------ */
 export const UncollectedCSTStakingRewardsTable = ({ user }) => {
   const { account } = useActiveWeb3React();
-  const [status, setStatus] = useState(null);
-  // Current page in the pagination
-  const [list, setList] = useState(null);
+  const { apiData: status, fetchData: refetchApiData, unclaimedRewards: contextRewards } = useApiData();
+
+  // Use context rewards when viewing own account — avoids a duplicate API call.
+  // Fall back to independent fetch only when viewing another user's profile.
+  const isOwnAccount = user?.toLowerCase() === account?.toLowerCase();
+
+  const [localList, setLocalList] = useState<any[] | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isUnstaking, setIsUnstaking] = useState(false);
   const [cstWithRewards, setCstWithRewards] = useState([]);
   const cstStakingContract = useStakingWalletCSTContract();
   const { setNotification } = useNotification();
 
-  // Number of rows to display per page
   const PER_PAGE = 5;
-
   const [open, setOpen] = useState<boolean>(false);
-
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  // Calculate slice indices for the current page
   const startIndex = (currentPage - 1) * PER_PAGE;
   const endIndex = currentPage * PER_PAGE;
 
-  const fetchStatusData = async () => {
-    try {
-      const res = await api.notify_red_box(user);
-      setStatus(res);
-    } catch (err) {
-      console.log(err);
-    }
-  };
   const fetchCstWithRewards = async () => {
     try {
       const res = await api.get_staking_cst_by_user_by_deposit_rewards(user);
@@ -130,15 +123,16 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
       const actionIds = actions.map((x: any) => x.Stake.ActionId);
       setCstWithRewards(actionIds);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
+
   const fetchUncollectedCstStakingRewards = async () => {
     try {
       const res = await api.get_staking_cst_rewards_to_claim_by_user(user);
-      setList(res);
+      setLocalList(res);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -157,8 +151,13 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
         });
       }
       setTimeout(() => {
-        fetchStatusData();
-        fetchUncollectedCstStakingRewards();
+        if (isOwnAccount) {
+          // Context refetch updates both context rewards and status in one request
+          refetchApiData();
+        } else {
+          fetchUncollectedCstStakingRewards();
+        }
+        fetchCstWithRewards();
       }, 4000);
     } catch (err) {
       if (err?.code !== 4001) {
@@ -174,21 +173,26 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
   };
 
   useEffect(() => {
-    fetchUncollectedCstStakingRewards();
-    fetchStatusData();
+    // Only fetch independently when viewing another user's profile.
+    // Own account data comes from ApiDataContext.
+    if (!isOwnAccount) {
+      fetchUncollectedCstStakingRewards();
+    }
     fetchCstWithRewards();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  // Decide which list to display
+  const list = isOwnAccount ? contextRewards : localList;
 
   if (list === null) {
     return <Typography>Loading...</Typography>;
   }
 
-  // If there is no data to display, show a fallback message
   if (list.length === 0) {
     return <Typography>No rewards yet.</Typography>;
   }
 
-  // Extract the portion of the list corresponding to the current page
   const currentPageData = list.slice(startIndex, endIndex);
 
   return (
@@ -240,7 +244,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {user === account && status?.UnclaimedStakingReward > 0 && (
+      {isOwnAccount && (status?.UnclaimedStakingReward ?? 0) > 0 && (
         <Box
           sx={{
             display: "flex",
@@ -251,7 +255,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }) => {
         >
           <Typography mr={2}>
             Your claimable rewards are{" "}
-            {`${status.UnclaimedStakingReward.toFixed(6)} ETH`}
+            {`${(status?.UnclaimedStakingReward ?? 0).toFixed(6)} ETH`}
           </Typography>
           <Button
             onClick={handleOpen}
