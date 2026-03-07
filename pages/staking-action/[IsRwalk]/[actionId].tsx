@@ -5,8 +5,10 @@ import { GetServerSidePropsContext } from "next";
 import { MainWrapper, StyledCard } from "../../../components/styled";
 import api from "../../../services/api";
 import NFTImage from "../../../components/NFTImage";
-import { getExplorerUrl,
+import {
+  getExplorerUrl,
   getAssetsUrl,
+  getRWLKImageUrl,
   convertTimestampToDateTime,
   logoImgUrl,
 } from "../../../utils";
@@ -60,9 +62,7 @@ function TokenInfoPanel({ isRwalk, actionId, stake }: TokenInfoPanelProps) {
 
   // Build image URL
   const tokenImageURL = isRwalk
-    ? getAssetsUrl(
-        `${"randomwalk"}/${TokenId.toString().padStart(6, "0")}_black_thumb.jpg`
-      )
+    ? getRWLKImageUrl(TokenId.toString().padStart(6, "0"))
     : getAssetsUrl(`cosmicsignature/0x${Seed}.png`);
 
   // Build link to NFT detail

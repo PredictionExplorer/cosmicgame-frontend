@@ -252,10 +252,16 @@ export const getEnduranceChampions = (bidList: any[], roundEndTimeStamp: number 
   }));
 };
 
-// Utility function to get the full URL for assets (e.g., images) via proxy
+// Utility function to get the full URL for CST assets (e.g., images) via proxy
 export const getAssetsUrl = (url: string): string => {
   const imageServerUrl = "https://nfts.cosmicsignature.com/images/new/";
   return `${proxyUrl}${encodeURIComponent(imageServerUrl + url)}`;
+};
+
+// Utility function for RandomWalk NFT images (different base path — no /new/)
+export const getRWLKImageUrl = (fileName: string, variant: string = "black_thumb.jpg"): string => {
+  const imageServerUrl = "https://nfts.cosmicsignature.com/images/randomwalk/";
+  return `${proxyUrl}${encodeURIComponent(`${imageServerUrl}${fileName}_${variant}`)}`;
 };
 
 // Utility function to extract the original URL from the proxy URL

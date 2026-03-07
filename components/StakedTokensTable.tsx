@@ -19,7 +19,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from "./styled";
-import { convertTimestampToDateTime, getAssetsUrl } from "../utils";
+import { convertTimestampToDateTime, getAssetsUrl, getRWLKImageUrl } from "../utils";
 import { Tr } from "react-super-responsive-table";
 import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
 import { CustomPagination } from "./CustomPagination";
@@ -122,7 +122,7 @@ const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
   const tokenImageURL = useMemo(() => {
     const fileName = seedOrRandomId.toString().padStart(6, "0");
     return isRandomWalk
-      ? getAssetsUrl(`randomwalk/${fileName}_black_thumb.jpg`)
+      ? getRWLKImageUrl(fileName)
       : getAssetsUrl(`cosmicsignature/0x${fileName}.png`);
   }, [isRandomWalk, seedOrRandomId]);
 

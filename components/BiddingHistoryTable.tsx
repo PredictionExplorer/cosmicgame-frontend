@@ -13,6 +13,7 @@ import {
   convertTimestampToDateTime,
   formatSeconds,
   getAssetsUrl,
+  getRWLKImageUrl,
   getExplorerUrl,
 } from "../utils";
 import router from "next/router";
@@ -193,12 +194,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({
             <>
               {`Bid was made using RandomWalk Token (ID = ${history.RWalkNFTId})`}
               <img
-                src={getAssetsUrl(
-                  `randomwalk/${history.RWalkNFTId.toString().padStart(
-                    6,
-                    "0"
-                  )}_black_thumb.jpg`
-                )}
+                src={getRWLKImageUrl(history.RWalkNFTId.toString().padStart(6, "0"))}
                 width="32px"
                 style={{ verticalAlign: "middle" }}
                 alt="RWLK Token"
