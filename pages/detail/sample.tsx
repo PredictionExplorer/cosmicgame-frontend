@@ -11,6 +11,8 @@ import {
   Button,
   CardActionArea,
   Container,
+  Dialog,
+  DialogContent,
   Grid,
   Menu,
   Typography,
@@ -20,8 +22,6 @@ import NFTImage from "../../components/NFTImage";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import ModalVideo from "react-modal-video";
-import "react-modal-video/css/modal-video.min.css";
 import NFTVideo from "../../components/NFTVideo";
 import { getAssetsUrl, getOriginUrl } from "../../utils";
 
@@ -146,13 +146,31 @@ const SampleDetail = () => {
             <Lightbox image={image} onClose={() => setImageOpen(false)} />
           )}
 
-          {/* Video Modal */}
-          <ModalVideo
-            channel="custom"
-            url={videoPath || ""}
-            isOpen={isVideoOpen}
-            onClose={() => setVideoOpen(false)}
-          />
+          {/* Video player dialog */}
+          <Dialog
+            open={isVideoOpen}
+            onClose={() => { setVideoOpen(false); setVideoPath(null); }}
+            maxWidth="lg"
+            fullWidth
+            PaperProps={{ sx: { bgcolor: "black", boxShadow: "none" } }}
+          >
+            <DialogContent sx={{ p: 0, position: "relative", lineHeight: 0 }}>
+              <Button
+                onClick={() => { setVideoOpen(false); setVideoPath(null); }}
+                sx={{ position: "absolute", top: 8, right: 8, color: "white", zIndex: 1, minWidth: "auto", fontSize: "1.5rem" }}
+              >
+                ✕
+              </Button>
+              {videoPath && (
+                <video
+                  src={videoPath}
+                  controls
+                  autoPlay
+                  style={{ width: "100%", maxHeight: "80vh", display: "block" }}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
         </SectionWrapper>
       </Container>
     </MainWrapper>

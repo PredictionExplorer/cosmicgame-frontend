@@ -19,8 +19,6 @@ import {
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Lightbox from "react-awesome-lightbox";
 import "react-awesome-lightbox/build/style.css";
-import ModalVideo from "react-modal-video";
-import "react-modal-video/css/modal-video.min.css";
 
 import NFTVideo from "./NFTVideo";
 import NFTImage from "./NFTImage";
@@ -695,13 +693,39 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
           <Lightbox image={image} onClose={() => setImageOpen(false)} />
         )}
 
-        {/* Modal video player */}
-        <ModalVideo
-          channel="custom"
-          url={videoPath ?? ""}
-          isOpen={openVideo}
-          onClose={() => setOpenVideo(false)}
-        />
+        {/* Video player dialog — uses native <video> to avoid iframe + proxy issues in Chrome */}
+        <Dialog
+          open={openVideo}
+          onClose={() => { setOpenVideo(false); setVideoPath(null); }}
+          maxWidth="lg"
+          fullWidth
+          PaperProps={{ sx: { bgcolor: "black", boxShadow: "none" } }}
+        >
+          <DialogContent sx={{ p: 0, position: "relative", lineHeight: 0 }}>
+            <Button
+              onClick={() => { setOpenVideo(false); setVideoPath(null); }}
+              sx={{
+                position: "absolute",
+                top: 8,
+                right: 8,
+                color: "white",
+                zIndex: 1,
+                minWidth: "auto",
+                fontSize: "1.5rem",
+              }}
+            >
+              ✕
+            </Button>
+            {videoPath && (
+              <video
+                src={videoPath}
+                controls
+                autoPlay
+                style={{ width: "100%", maxHeight: "80vh", display: "block" }}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
       </SectionWrapper>
 
       {/* Dialog for transfer confirmation to new address */}
