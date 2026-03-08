@@ -111,8 +111,8 @@ const UserInfo = ({ address }: { address: string }) => {
 
   // Raffle data
   const [data, setData] = useState<any>(null);
-  const [raffleETHProbability, setRaffleETHProbability] = useState(0);
-  const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
+  const [raffleETHProbability, setRaffleETHProbability] = useState(-1);
+  const [raffleNFTProbability, setRaffleNFTProbability] = useState(-1);
 
   // Bids, Winnings, Marketing Rewards
   const [bidHistory, setBidHistory] = useState<any[]>([]);
@@ -284,27 +284,31 @@ const UserInfo = ({ address }: { address: string }) => {
         // Current round info and total bids
         const round = newData?.CurRoundNum;
         const bidList = await api.get_bid_list_by_round(round, "desc");
+        const totalBids = bidList.length;
         const userBidsThisRound = bidList.filter(
-          (bid) => bid.BidderAddr === address
+          (bid) => bid.BidderAddr?.toLowerCase() === address?.toLowerCase()
         ).length;
 
-        // Probability of winning ETH in the raffle
-        let probability =
-          1 -
-          Math.pow(
-            (bidList.length - userBidsThisRound) / bidList.length,
-            newData?.NumRaffleEthWinnersBidding
-          );
-        setRaffleETHProbability(probability);
+        if (totalBids > 0) {
+          const ethProb =
+            1 -
+            Math.pow(
+              (totalBids - userBidsThisRound) / totalBids,
+              newData?.NumRaffleEthWinnersBidding
+            );
+          setRaffleETHProbability(ethProb);
 
-        // Probability of winning NFT in the raffle
-        probability =
-          1 -
-          Math.pow(
-            (bidList.length - userBidsThisRound) / bidList.length,
-            newData?.NumRaffleNFTWinnersBidding
-          );
-        setRaffleNFTProbability(probability);
+          const nftProb =
+            1 -
+            Math.pow(
+              (totalBids - userBidsThisRound) / totalBids,
+              newData?.NumRaffleNFTWinnersBidding
+            );
+          setRaffleNFTProbability(nftProb);
+        } else {
+          setRaffleETHProbability(-1); // sentinel: no bids yet
+          setRaffleNFTProbability(-1);
+        }
       }
     } catch (error) {
       console.error("Error calculating probability:", error);
@@ -484,7 +488,7 @@ const UserInfo = ({ address }: { address: string }) => {
       {/* Loading or No Data states */}
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
-      ) : userInfo === null ? (
+      ) : !userInfo ? (
         <Typography variant="h6">There is no user information yet.</Typography>
       ) : (
         <>
@@ -531,15 +535,6 @@ const UserInfo = ({ address }: { address: string }) => {
           </Box>
           <Box mb={1}>
             <Typography color="primary" component="span">
-              Number of Cosmic Signature Token Transfers:
-            </Typography>
-            &nbsp;
-            <Typography component="span">
-              {userInfo.CosmicTokenNumTransfers}
-            </Typography>
-          </Box>
-          <Box mb={1}>
-            <Typography color="primary" component="span">
               Maximum Bid Amount:
             </Typography>
             &nbsp;
@@ -560,7 +555,7 @@ const UserInfo = ({ address }: { address: string }) => {
             </Typography>
             &nbsp;
             <Typography component="span">
-              {userInfo.MaxWinAmount.toFixed(6)} ETH
+              {(userInfo.MaxWinAmount ?? 0).toFixed(6)} ETH
             </Typography>
           </Box>
           <Box mb={1}>
@@ -569,7 +564,7 @@ const UserInfo = ({ address }: { address: string }) => {
             </Typography>
             &nbsp;
             <Typography component="span">
-              {userInfo.SumRaffleEthWinnings.toFixed(6)} ETH
+              {(userInfo.SumRaffleEthWinnings ?? 0).toFixed(6)} ETH
             </Typography>
           </Box>
           <Box mb={1}>
@@ -578,7 +573,7 @@ const UserInfo = ({ address }: { address: string }) => {
             </Typography>
             &nbsp;
             <Typography component="span">
-              {userInfo.SumRaffleEthWithdrawal.toFixed(6)} ETH
+              {(userInfo.SumRaffleEthWithdrawal ?? 0).toFixed(6)} ETH
             </Typography>
           </Box>
           <Box mb={1}>
@@ -599,8 +594,8 @@ const UserInfo = ({ address }: { address: string }) => {
                 sx={{ color: "inherit", fontSize: "inherit" }}
               >
                 {(
-                  userInfo.SumRaffleEthWinnings +
-                  userInfo.SumRaffleEthWithdrawal
+                  (userInfo.SumRaffleEthWinnings ?? 0) +
+                  (userInfo.SumRaffleEthWithdrawal ?? 0)
                 ).toFixed(6)}{" "}
                 ETH
               </Link>
@@ -646,8 +641,8 @@ const UserInfo = ({ address }: { address: string }) => {
             </Typography>
           </Box>
 
-          {/* Probabilities of winning raffles (only if round is active) */}
-          {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
+          {/* Probabilities of winning raffles (only if round is active and has bids) */}
+          {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && raffleETHProbability >= 0 && (
             <>
               <Box mb={1}>
                 <Typography color="primary" component="span">
@@ -672,16 +667,15 @@ const UserInfo = ({ address }: { address: string }) => {
 
           {/* Links to see all transfers made by this account */}
           <Typography mt={3}>
-            This account has {userInfo.CosmicTokenNumTransfers} CosmicToken
-            (ERC20) transfers, click{" "}
-            <Link href={`/cosmic-token-transfer/${address}`}>here</Link> to see
-            all the transfers made by this account.
-          </Typography>
-          <Typography mt={1}>
             This account has {userInfo.CosmicSignatureNumTransfers}{" "}
-            CosmicSignature (ERC721) transfers, click{" "}
+            CosmicSignature (ERC721) transfers. Click{" "}
             <Link href={`/cosmic-signature-transfer/${address}`}>here</Link> to
             see all the transfers made by this account.
+          </Typography>
+          <Typography mt={1}>
+            Click{" "}
+            <Link href={`/cosmic-token-transfer/${address}`}>here</Link> to see
+            all CosmicToken (ERC20) transfers made by this account.
           </Typography>
 
           {/* Staking Statistics */}
@@ -746,32 +740,11 @@ const UserInfo = ({ address }: { address: string }) => {
             <CustomTabPanel value={stakingTab} index={0}>
               <Box mb={1}>
                 <Typography color="primary" component="span">
-                  Number of Active Stakers:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {userInfo.StakingStatistics.CSTStakingInfo.NumActiveStakers}
-                </Typography>
-              </Box>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Number of Deposits:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {userInfo.StakingStatistics.CSTStakingInfo.NumDeposits}
-                </Typography>
-              </Box>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
                   Total Number of Stake Actions:
                 </Typography>
                 &nbsp;
                 <Typography component="span">
-                  {
-                    userInfo.StakingStatistics.CSTStakingInfo
-                      .TotalNumStakeActions
-                  }
+                  {stakingCSTActions.filter((a) => a.ActionType !== 1).length}
                 </Typography>
               </Box>
               <Box mb={1}>
@@ -780,11 +753,15 @@ const UserInfo = ({ address }: { address: string }) => {
                 </Typography>
                 &nbsp;
                 <Typography component="span">
-                  {
-                    userInfo.StakingStatistics.CSTStakingInfo
-                      .TotalNumUnstakeActions
-                  }
+                  {stakingCSTActions.filter((a) => a.ActionType === 1).length}
                 </Typography>
+              </Box>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Total Tokens with Rewards:
+                </Typography>
+                &nbsp;
+                <Typography component="span">{cstStakingRewards.length}</Typography>
               </Box>
               <Box mb={1}>
                 <Typography color="primary" component="span">
@@ -793,7 +770,9 @@ const UserInfo = ({ address }: { address: string }) => {
                 &nbsp;
                 <Typography component="span">
                   {formatEthValue(
-                    userInfo.StakingStatistics.CSTStakingInfo.TotalRewardEth
+                    cstStakingRewards.reduce(
+                      (s, r) => s + (r.RewardCollectedEth ?? 0) + (r.RewardToCollectEth ?? 0), 0
+                    )
                   )}
                 </Typography>
               </Box>
@@ -804,26 +783,10 @@ const UserInfo = ({ address }: { address: string }) => {
                 &nbsp;
                 <Typography component="span">
                   {formatEthValue(
-                    userInfo.StakingStatistics.CSTStakingInfo.UnclaimedRewardEth
+                    cstStakingRewards.reduce(
+                      (s, r) => s + (r.RewardToCollectEth ?? 0), 0
+                    )
                   )}
-                </Typography>
-              </Box>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Total Tokens Minted:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {userInfo.StakingStatistics.CSTStakingInfo.TotalTokensMinted}
-                </Typography>
-              </Box>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Total Tokens Staked:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {userInfo.StakingStatistics.CSTStakingInfo.TotalTokensStaked}
                 </Typography>
               </Box>
 
@@ -879,23 +842,11 @@ const UserInfo = ({ address }: { address: string }) => {
             <CustomTabPanel value={stakingTab} index={1}>
               <Box mb={1}>
                 <Typography color="primary" component="span">
-                  Number of Active Stakers:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {userInfo.StakingStatistics.RWalkStakingInfo.NumActiveStakers}
-                </Typography>
-              </Box>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
                   Total Number of Stake Actions:
                 </Typography>
                 &nbsp;
                 <Typography component="span">
-                  {
-                    userInfo.StakingStatistics.RWalkStakingInfo
-                      .TotalNumStakeActions
-                  }
+                  {userInfo.StakingStatisticsRWalk?.TotalNumStakeActions ?? 0}
                 </Typography>
               </Box>
               <Box mb={1}>
@@ -904,22 +855,7 @@ const UserInfo = ({ address }: { address: string }) => {
                 </Typography>
                 &nbsp;
                 <Typography component="span">
-                  {
-                    userInfo.StakingStatistics.RWalkStakingInfo
-                      .TotalNumUnstakeActions
-                  }
-                </Typography>
-              </Box>
-              <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Total Tokens Minted:
-                </Typography>
-                &nbsp;
-                <Typography component="span">
-                  {
-                    userInfo.StakingStatistics.RWalkStakingInfo
-                      .TotalTokensMinted
-                  }
+                  {userInfo.StakingStatisticsRWalk?.TotalNumUnstakeActions ?? 0}
                 </Typography>
               </Box>
               <Box mb={1}>
@@ -928,10 +864,16 @@ const UserInfo = ({ address }: { address: string }) => {
                 </Typography>
                 &nbsp;
                 <Typography component="span">
-                  {
-                    userInfo.StakingStatistics.RWalkStakingInfo
-                      .TotalTokensStaked
-                  }
+                  {userInfo.StakingStatisticsRWalk?.TotalTokensStaked ?? 0}
+                </Typography>
+              </Box>
+              <Box mb={1}>
+                <Typography color="primary" component="span">
+                  Total Tokens Minted:
+                </Typography>
+                &nbsp;
+                <Typography component="span">
+                  {userInfo.StakingStatisticsRWalk?.TotalTokensMinted ?? 0}
                 </Typography>
               </Box>
 
@@ -1089,7 +1031,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       const { data } = await axios.get(
         `${cosmicGameBaseUrl}user/info/${address}`
       );
-      if (!data || !data.Bids.length) {
+      if (!data || !data.Bids?.length) {
         address = "Invalid Address";
       }
     } catch {

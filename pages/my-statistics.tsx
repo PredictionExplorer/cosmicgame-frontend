@@ -128,15 +128,6 @@ function UserStatsSection({
       </Box>
       <Box mb={1}>
         <Typography color="primary" component="span">
-          Number of Cosmic Token Transfers:
-        </Typography>
-        &nbsp;
-        <Typography component="span">
-          {userInfo.CosmicTokenNumTransfers}
-        </Typography>
-      </Box>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
           Maximum Bid Amount:
         </Typography>
         &nbsp;
@@ -240,8 +231,8 @@ function UserStatsSection({
         <Typography component="span">{userInfo.TotalCSTokensWon}</Typography>
       </Box>
 
-      {/* Raffle Probability */}
-      {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && (
+      {/* Raffle Probability — only show when round is active and has bids */}
+      {!(data?.CurRoundNum > 0 && data?.TsRoundStart === 0) && raffleETHProbability >= 0 && (
         <>
           <Box mb={1}>
             <Typography color="primary" component="span">
@@ -266,18 +257,17 @@ function UserStatsSection({
 
       {/* Transfer History Links */}
       <Typography mt={3}>
-        This account has {userInfo.CosmicTokenNumTransfers} CosmicToken (ERC20).
-        Click{" "}
-        <Link href={`/cosmic-token-transfer/${userInfo.Address}`}>here</Link> to
-        see all the transfers made by this account.
-      </Typography>
-      <Typography mt={1}>
         This account has {userInfo.CosmicSignatureNumTransfers} CosmicSignature
-        (ERC721). Click{" "}
+        (ERC721) transfers. Click{" "}
         <Link href={`/cosmic-signature-transfer/${userInfo.Address}`}>
           here
         </Link>{" "}
         to see all the transfers made by this account.
+      </Typography>
+      <Typography mt={1}>
+        Click{" "}
+        <Link href={`/cosmic-token-transfer/${userInfo.Address}`}>here</Link>{" "}
+        to see all CosmicToken (ERC20) transfers made by this account.
       </Typography>
     </>
   );
@@ -287,57 +277,52 @@ function UserStatsSection({
  * CSTStakingTab: Renders the CST-specific staking data & tables.
  */
 function CSTStakingTab({
-  userInfo,
   stakingActions,
   cstStakingRewards,
   cstStakingRewardsByDeposit,
   collectedCstStakingRewards,
   account,
 }: {
-  userInfo: any;
   stakingActions: any[];
   cstStakingRewards: any[];
   cstStakingRewardsByDeposit: any[];
   collectedCstStakingRewards: any[];
   account: string;
 }) {
-  const { CSTStakingInfo } = userInfo.StakingStatistics || {};
+  // Derive stats from already-fetched data (no separate API field for CST staking stats)
+  const totalStakeActions = stakingActions.filter((a) => a.ActionType !== 1).length;
+  const totalUnstakeActions = stakingActions.filter((a) => a.ActionType === 1).length;
+  const totalRewardEth = cstStakingRewards.reduce(
+    (sum, r) => sum + (r.RewardCollectedEth ?? 0) + (r.RewardToCollectEth ?? 0),
+    0
+  );
+  const unclaimedRewardEth = cstStakingRewards.reduce(
+    (sum, r) => sum + (r.RewardToCollectEth ?? 0),
+    0
+  );
 
   return (
     <>
       <Box mb={1}>
         <Typography color="primary" component="span">
-          Number of Active Stakers:
-        </Typography>
-        &nbsp;
-        <Typography component="span">
-          {CSTStakingInfo?.NumActiveStakers}
-        </Typography>
-      </Box>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Number of Deposits:
-        </Typography>
-        &nbsp;
-        <Typography component="span">{CSTStakingInfo?.NumDeposits}</Typography>
-      </Box>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
           Total Number of Stake Actions:
         </Typography>
         &nbsp;
-        <Typography component="span">
-          {CSTStakingInfo?.TotalNumStakeActions}
-        </Typography>
+        <Typography component="span">{totalStakeActions}</Typography>
       </Box>
       <Box mb={1}>
         <Typography color="primary" component="span">
           Total Number of Unstake Actions:
         </Typography>
         &nbsp;
-        <Typography component="span">
-          {CSTStakingInfo?.TotalNumUnstakeActions}
+        <Typography component="span">{totalUnstakeActions}</Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Tokens with Rewards:
         </Typography>
+        &nbsp;
+        <Typography component="span">{cstStakingRewards.length}</Typography>
       </Box>
       <Box mb={1}>
         <Typography color="primary" component="span">
@@ -345,7 +330,7 @@ function CSTStakingTab({
         </Typography>
         &nbsp;
         <Typography component="span">
-          {formatEthValue(CSTStakingInfo?.TotalRewardEth)}
+          {formatEthValue(totalRewardEth)}
         </Typography>
       </Box>
       <Box mb={1}>
@@ -354,25 +339,7 @@ function CSTStakingTab({
         </Typography>
         &nbsp;
         <Typography component="span">
-          {formatEthValue(CSTStakingInfo?.UnclaimedRewardEth)}
-        </Typography>
-      </Box>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Total Tokens Minted:
-        </Typography>
-        &nbsp;
-        <Typography component="span">
-          {CSTStakingInfo?.TotalTokensMinted}
-        </Typography>
-      </Box>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Total Tokens Staked:
-        </Typography>
-        &nbsp;
-        <Typography component="span">
-          {CSTStakingInfo?.TotalTokensStaked}
+          {formatEthValue(unclaimedRewardEth)}
         </Typography>
       </Box>
 
@@ -431,26 +398,18 @@ function RWLKStakingTab({
   stakingActions: any[];
   rwlkMints: any[];
 }) {
-  const { RWalkStakingInfo } = userInfo.StakingStatistics || {};
+  // API returns StakingStatisticsRWalk directly on userInfo (not nested)
+  const rwlkStats = userInfo?.StakingStatisticsRWalk;
 
   return (
     <>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Number of Active Stakers:
-        </Typography>
-        &nbsp;
-        <Typography component="span">
-          {RWalkStakingInfo?.NumActiveStakers}
-        </Typography>
-      </Box>
       <Box mb={1}>
         <Typography color="primary" component="span">
           Total Number of Stake Actions:
         </Typography>
         &nbsp;
         <Typography component="span">
-          {RWalkStakingInfo?.TotalNumStakeActions}
+          {rwlkStats?.TotalNumStakeActions ?? 0}
         </Typography>
       </Box>
       <Box mb={1}>
@@ -459,16 +418,7 @@ function RWLKStakingTab({
         </Typography>
         &nbsp;
         <Typography component="span">
-          {RWalkStakingInfo?.TotalNumUnstakeActions}
-        </Typography>
-      </Box>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Total Tokens Minted:
-        </Typography>
-        &nbsp;
-        <Typography component="span">
-          {RWalkStakingInfo?.TotalTokensMinted}
+          {rwlkStats?.TotalNumUnstakeActions ?? 0}
         </Typography>
       </Box>
       <Box mb={1}>
@@ -477,7 +427,16 @@ function RWLKStakingTab({
         </Typography>
         &nbsp;
         <Typography component="span">
-          {RWalkStakingInfo?.TotalTokensStaked}
+          {rwlkStats?.TotalTokensStaked ?? 0}
+        </Typography>
+      </Box>
+      <Box mb={1}>
+        <Typography color="primary" component="span">
+          Total Tokens Minted:
+        </Typography>
+        &nbsp;
+        <Typography component="span">
+          {rwlkStats?.TotalTokensMinted ?? 0}
         </Typography>
       </Box>
 
@@ -522,8 +481,8 @@ const MyStatistics = () => {
   const [balance, setBalance] = useState({ CosmicToken: 0, ETH: 0 });
 
   // Raffle Probability
-  const [raffleETHProbability, setRaffleETHProbability] = useState(0);
-  const [raffleNFTProbability, setRaffleNFTProbability] = useState(0);
+  const [raffleETHProbability, setRaffleETHProbability] = useState(-1);
+  const [raffleNFTProbability, setRaffleNFTProbability] = useState(-1);
 
   // Bids, claims, marketing, staking
   const [bidHistory, setBidHistory] = useState<any[]>([]);
@@ -713,11 +672,10 @@ const MyStatistics = () => {
         const bidList = await api.get_bid_list_by_round(CurRoundNum, "desc");
         const totalBids = bidList.length;
         const userBids = bidList.filter(
-          (bid: any) => bid.BidderAddr === account
+          (bid: any) => bid.BidderAddr?.toLowerCase() === account?.toLowerCase()
         ).length;
 
         if (totalBids > 0) {
-          // Probability: 1 - ((totalBids - userBids) / totalBids)^NumWinners
           let prob =
             1 -
             Math.pow(
@@ -734,8 +692,8 @@ const MyStatistics = () => {
             );
           setRaffleNFTProbability(prob);
         } else {
-          setRaffleETHProbability(0);
-          setRaffleNFTProbability(0);
+          setRaffleETHProbability(-1); // sentinel: no bids in current round
+          setRaffleNFTProbability(-1);
         }
       }
     } catch (err) {
@@ -940,7 +898,6 @@ const MyStatistics = () => {
             {/* CST Panel */}
             <CustomTabPanel value={stakingTab} index={0}>
               <CSTStakingTab
-                userInfo={userInfo}
                 stakingActions={stakingCSTActions}
                 cstStakingRewards={cstStakingRewards}
                 cstStakingRewardsByDeposit={cstStakingRewardsByDeposit}

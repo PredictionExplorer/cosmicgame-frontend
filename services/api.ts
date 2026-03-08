@@ -1406,7 +1406,7 @@ class ApiService {
       const { data } = await axios.get(
         getAPIUrl(`staking/cst/rewards/by_user/by_deposit/${address}`)
       );
-      return data.RewardsByDeposit;
+      return flattenTxArray(data.RewardsByDeposit);
     } catch (err) {
       if (err.response?.status === 400) {
         return [];

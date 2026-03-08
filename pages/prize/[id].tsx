@@ -122,7 +122,7 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
       />
       <InfoRow
         label="Endurance Champion rewarded with CST (ERC20):"
-        value={`${prizeInfo.EnduranceERC20AmountEth * 10 ** 18} CST`}
+        value={`${(prizeInfo.EnduranceERC20AmountEth ?? 0).toFixed(4)} CST`}
       />
       <InfoRow
         label="Last CST Bidder Address:"
@@ -135,8 +135,8 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
         link={`/detail/${prizeInfo.LastCstBidderERC721TokenId}`}
       />
       <InfoRow
-        label="Last CST Bidder ETH Amount:"
-        value={`${prizeInfo.LastCstBidderERC20AmountEth.toFixed(4)} ETH`}
+        label="Last CST Bidder CST Reward:"
+        value={`${(prizeInfo.LastCstBidderERC20AmountEth ?? 0).toFixed(4)} CST`}
       />
       <InfoRow
         label="Chrono Warrior Address:"
