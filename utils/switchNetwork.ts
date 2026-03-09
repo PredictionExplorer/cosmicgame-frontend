@@ -1,4 +1,4 @@
-import { networkConfig } from '../config/networks';
+import { networkConfig } from "../config/networks";
 
 const { chainHex, chainName, rpcUrl } = networkConfig;
 
