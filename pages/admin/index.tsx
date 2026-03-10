@@ -1,16 +1,18 @@
-import { Box, Typography } from "@mui/material";
-import { MainWrapper } from "../../components/styled";
-import { useEffect, useState } from "react";
-import api from "../../services/api";
-import BanBidTable from "../../components/BanBidTable";
+import { Box, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+
+import { MainWrapper } from '../../components/styled';
+import api from '../../services/api';
+import type { BidInfo } from '../../services/api/types';
+import BanBidTable from '../../components/tables/BanBidTable';
 
 const Admin = () => {
-  const [bidList, setBidList] = useState(null);
+  const [bidList, setBidList] = useState<BidInfo[] | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       let bidList = await api.get_bid_list();
-      bidList = bidList.filter((x) => x.Message !== "");
+      bidList = bidList.filter((x) => x.Message !== '');
       setBidList(bidList);
     };
     fetchData();

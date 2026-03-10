@@ -1,6 +1,7 @@
+import { URL } from 'url';
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios, { Method, AxiosRequestConfig } from 'axios';
-import { URL } from 'url';
 
 export const config = {
   api: {
@@ -8,6 +9,39 @@ export const config = {
     bodyParser: false,
   },
 };
+
+const ALLOWED_HOSTS = new Set(
+  (process.env.PROXY_ALLOWED_HOSTS || '')
+    .split(',')
+    .map((h) => h.trim())
+    .filter(Boolean),
+);
+
+ALLOWED_HOSTS.add('nfts.cosmicsignature.com');
+
+function isAllowedUrl(raw: string): URL | null {
+  try {
+    const parsed = new URL(raw.startsWith('http') ? raw : `http://${raw}`);
+
+    if (ALLOWED_HOSTS.has(parsed.hostname)) return parsed;
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (apiUrl) {
+      try {
+        const allowed = new URL(apiUrl);
+        if (parsed.hostname === allowed.hostname && parsed.port === allowed.port) {
+          return parsed;
+        }
+      } catch {
+        /* ignore bad env */
+      }
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   let targetUrl: string | undefined = undefined;
@@ -19,39 +53,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return;
     }
 
-    try {
-      const parsedUrl = new URL(url.startsWith('http') ? url : `http://${url}`);
-      targetUrl = parsedUrl.href;
-    } catch {
-      res.status(400).json({ error: 'Invalid URL format' });
+    const parsed = isAllowedUrl(url);
+    if (!parsed) {
+      res.status(403).json({ error: 'Target host is not allowed' });
       return;
     }
+
+    targetUrl = parsed.href;
 
     const axiosConfig: AxiosRequestConfig = {
       method: req.method as Method,
       url: targetUrl,
       headers: {
         ...req.headers,
-        host: new URL(targetUrl).host,
+        host: parsed.host,
       } as unknown as Record<string, string>,
       responseType: 'stream',
     };
 
     if (req.method !== 'GET' && req.method !== 'HEAD') {
-      axiosConfig.data = req; // forward the body stream
+      axiosConfig.data = req;
     }
 
     const response = await axios(axiosConfig);
 
-    res.writeHead(response.status, response.headers);
+    res.writeHead(response.status, response.headers as Record<string, string>);
     response.data.pipe(res);
-  } catch (error: any) {
-    console.error('Proxy request failed for target URL:', targetUrl, 'Error:', error.message);
-    res.status(error.response?.status || 500).json({
+  } catch (error: unknown) {
+    const axiosErr = error as { message?: string; response?: { status?: number } };
+    console.error('Proxy request failed:', axiosErr.message);
+    res.status(axiosErr.response?.status || 500).json({
       message: 'Proxy request failed',
-      targetUrl: targetUrl,
-      status: error.response?.status || 500,
-      errorDetails: error.message,
+      status: axiosErr.response?.status || 500,
     });
   }
 }

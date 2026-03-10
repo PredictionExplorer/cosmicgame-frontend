@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from 'react';
 import {
   Button,
   Box,
@@ -21,110 +21,130 @@ import {
   Radio,
   Tabs,
   Tab,
-} from "@mui/material";
-import {
-  CustomTextField,
-  MainWrapper,
-  StyledCard,
-  StyledInput,
-} from "../components/styled";
-import BiddingHistory from "../components/BiddingHistoryTable";
-import api, { cosmicGameBaseUrl } from "../services/api";
-import useCosmicGameContract from "../hooks/useCosmicGameContract";
-import { BigNumber, Contract, constants, ethers } from "ethers";
-import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
-import { useActiveWeb3React } from "../hooks/web3";
-import { ART_BLOCKS_ADDRESS, RAFFLE_WALLET_ADDRESS } from "../config/app";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { ArrowForward } from "@mui/icons-material";
-import NFT_ABI from "../contracts/RandomWalkNFT.json";
-import ERC20_ABI from "../contracts/CosmicToken.json";
-import PaginationRWLKGrid from "../components/PaginationRWLKGrid";
-import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
-import Prize from "../components/Prize";
-import LatestNFTs from "../components/LatestNFTs";
-import Countdown from "react-countdown";
-import DonatedNFT from "../components/DonatedNFT";
-import getErrorMessage from "../utils/alert";
-import NFTImage from "../components/NFTImage";
+} from '@mui/material';
+import { usePublicClient, useWalletClient } from 'wagmi';
+import { formatEther, isAddress, maxUint256, parseEther, parseUnits, zeroAddress } from 'viem';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowForward from '@mui/icons-material/ArrowForward';
+import Countdown from 'react-countdown';
+import Lightbox from 'react-awesome-lightbox';
+import { useRouter } from 'next/router';
+import { GetServerSideProps } from 'next';
+
+import { CustomTextField, MainWrapper, StyledCard, StyledInput } from '../components/styled';
+import BiddingHistory from '../components/tables/BiddingHistoryTable';
+import api, { cosmicGameBaseUrl } from '../services/api';
+import useCosmicGameContract from '../hooks/useCosmicGameContract';
+import useRWLKNFTContract from '../hooks/useRWLKNFTContract';
+import { useActiveWeb3React } from '../hooks/web3';
+import { ART_BLOCKS_ADDRESS, RAFFLE_WALLET_ADDRESS } from '../config/networks';
+import { randomWalkNftAbi as NFT_ABI, cosmicTokenAbi as ERC20_ABI } from '../contracts/abis';
+import PaginationRWLKGrid from '../components/nft/PaginationRWLKGrid';
+import useCosmicSignatureContract from '../hooks/useCosmicSignatureContract';
+import Prize from '../components/common/Prize';
+import LatestNFTs from '../components/nft/LatestNFTs';
+import DonatedNFT from '../components/donations/DonatedNFT';
+import getErrorMessage from '../utils/alert';
+import NFTImage from '../components/nft/NFTImage';
 import {
   formatSeconds,
   getAssetsUrl,
   getEnduranceChampions,
   logoImgUrl,
-} from "../utils";
-import WinningHistoryTable from "../components/WinningHistoryTable";
-import Lightbox from "react-awesome-lightbox";
-import "react-awesome-lightbox/build/style.css";
-import { useRouter } from "next/router";
-import { CustomPagination } from "../components/CustomPagination";
-import { useNotification } from "../contexts/NotificationContext";
-import RaffleHolderTable from "../components/RaffleHolderTable";
-import { GetServerSideProps } from "next";
-import TwitterPopup from "../components/TwitterPopup";
-import TwitterShareButton from "../components/TwitterShareButton";
-import ETHSpentTable from "../components/ETHSpentTable";
-import EnduranceChampionsTable from "../components/EnduranceChampionsTable";
-import EthDonationTable from "../components/EthDonationTable";
-import axios from "axios";
-import { parseUnits } from "ethers/lib/utils";
-import DonatedERC20Table from "../components/DonatedERC20Table";
-import ChartOrPie from "../components/ChartOrPie";
-import { SpecialPrizeWinners } from "../components/SpecialPrizeWinners";
-import { BiddingStatus } from "../components/BiddingStatus";
+  EnduranceChampion,
+} from '../utils';
+import type {
+  DashboardInfo,
+  BidInfo,
+  DonatedNFT as DonatedNFTType,
+  UsedRWLKNFT,
+  TxInfo,
+} from '../services/api/types';
+import { isUserRejection, isEthProviderError } from '../utils/errors';
+import WinningHistoryTable from '../components/tables/WinningHistoryTable';
+
+import 'react-awesome-lightbox/build/style.css';
+
+import { CustomPagination } from '../components/common/CustomPagination';
+import { useNotification } from '../contexts/NotificationContext';
+import RaffleHolderTable from '../components/tables/RaffleHolderTable';
+import TwitterPopup from '../components/common/TwitterPopup';
+import TwitterShareButton from '../components/common/TwitterShareButton';
+import ETHSpentTable from '../components/tables/ETHSpentTable';
+import EnduranceChampionsTable from '../components/tables/EnduranceChampionsTable';
+import EthDonationTable from '../components/tables/EthDonationTable';
+
+import axios from 'axios';
+
+import DonatedERC20Table from '../components/donations/DonatedERC20Table';
+import ChartOrPie from '../components/tokens/ChartOrPie';
+import { SpecialPrizeWinners } from '../components/tables/SpecialPrizeWinners';
+import { BiddingStatus } from '../components/common/BiddingStatus';
 
 const NewHome = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any>(null);
-  const [bidType, setBidType] = useState("ETH");
-  const [donationType, setDonationType] = useState("NFT");
+  const [data, setData] = useState<DashboardInfo | null>(null);
+  const [bidType, setBidType] = useState('ETH');
+  const [donationType, setDonationType] = useState('NFT');
   const [cstBidData, setCSTBidData] = useState({
     AuctionDuration: 0,
     CSTPrice: 0,
     SecondsElapsed: 0,
   });
-  const [curBidList, setCurBidList] = useState([]);
-  const [ethBidInfo, setEthBidInfo] = useState<any>(null);
-  const [donatedNFTs, setDonatedNFTs] = useState([]);
-  const [ethDonations, setEthDonations] = useState([]);
-  const [championList, setChampionList] = useState<any>(null);
+  const [curBidList, setCurBidList] = useState<BidInfo[]>([]);
+  const [ethBidInfo, setEthBidInfo] = useState<{
+    AuctionDuration: number;
+    ETHPrice: number;
+    SecondsElapsed: number;
+  } | null>(null);
+  const [donatedNFTs, setDonatedNFTs] = useState<DonatedNFTType[]>([]);
+  const [ethDonations, setEthDonations] = useState<
+    import('../components/tables/EthDonationTable').EthDonation[]
+  >([]);
+  const [championList, setChampionList] = useState<EnduranceChampion[] | null>(null);
   const [prizeTime, setPrizeTime] = useState(0);
   const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
-  const [message, setMessage] = useState("");
-  const [nftDonateAddress, setNftDonateAddress] = useState("");
-  const [nftId, setNftId] = useState("");
-  const [tokenDonateAddress, setTokenDonateAddress] = useState("");
-  const [tokenAmount, setTokenAmount] = useState("");
+  const [message, setMessage] = useState('');
+  const [nftDonateAddress, setNftDonateAddress] = useState('');
+  const [nftId, setNftId] = useState('');
+  const [tokenDonateAddress, setTokenDonateAddress] = useState('');
+  const [tokenAmount, setTokenAmount] = useState('');
   const [rwlkId, setRwlkId] = useState(-1);
   const [bidPricePlus, setBidPricePlus] = useState(2);
   const [isBidding, setIsBidding] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
-  const [bannerToken, setBannerToken] = useState({ seed: "", id: -1 });
+  const [bannerToken, setBannerToken] = useState({ seed: '', id: -1 });
   const [rwlknftIds, setRwlknftIds] = useState<number[]>([]);
   const [offset, setOffset] = useState(0);
   const [curPage, setCurrentPage] = useState(1);
-  const [claimHistory, setClaimHistory] = useState(null);
+  const [claimHistory, setClaimHistory] = useState<
+    import('../components/tables/WinningHistoryTable').WinningHistoryEntry[] | null
+  >(null);
   const [imageOpen, setImageOpen] = useState(false);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const [twitterPopupOpen, setTwitterPopupOpen] = useState(false);
-  const [twitterHandle, setTwitterHandle] = useState("");
+  const [twitterHandle, setTwitterHandle] = useState('');
   const [activationTime, setActivationTime] = useState(0);
   const [donatedTokensTab, setDonatedTokensTab] = useState(0);
-  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState([]);
+  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState<
+    import('../components/donations/DonatedERC20Table').DonatedERC20Token[]
+  >([]);
   const perPage = 12;
 
-  const { library, account } = useActiveWeb3React();
+  const { account } = useActiveWeb3React();
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
   const cosmicGameContract = useCosmicGameContract();
   const nftRWLKContract = useRWLKNFTContract();
   const cosmicSignatureContract = useCosmicSignatureContract();
   const { setNotification } = useNotification();
 
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.up("md"));
+  const matches = useMediaQuery(theme.breakpoints.up('md'));
 
-  const GAS_FLOOR = BigNumber.from(2_000_000);
-  const GAS_BUFFER_BPS = 12000; // 120% (20% buffer)
+  const GAS_FLOOR = BigInt(2_000_000);
+  const GAS_BUFFER_BPS = BigInt(12000); // 120% (20% buffer)
 
   interface TabPanelProps {
     children?: React.ReactNode;
@@ -149,85 +169,81 @@ const NewHome = () => {
     donatedNFTs.length > 16
       ? { xs: 6, sm: 3, md: 2, lg: 2 }
       : donatedNFTs.length > 9
-      ? { xs: 6, sm: 4, md: 3, lg: 3 }
-      : { xs: 12, sm: 6, md: 4, lg: 4 };
+        ? { xs: 6, sm: 4, md: 3, lg: 3 }
+        : { xs: 12, sm: 6, md: 4, lg: 4 };
 
-  const handleTabChange = (_event: any, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setDonatedTokensTab(newValue);
   };
 
-  const notify = (
-    type: "error" | "warning" | "success" | "info",
-    text: string
-  ) => setNotification({ visible: true, type, text });
+  const notify = (type: 'error' | 'warning' | 'success' | 'info', text: string) =>
+    setNotification({ visible: true, type, text });
 
-  const notifyErrorFromEthers = (err: any) => {
-    if (err?.data?.message) {
-      notify("error", getErrorMessage(err.data.message));
-    } else if (err?.message) {
-      notify("error", err.message);
+  const notifyErrorFromEthers = (err: unknown) => {
+    if (isEthProviderError(err) && err.data?.message) {
+      notify('error', getErrorMessage(err.data.message));
+    } else if (err instanceof Error) {
+      notify('error', err.message);
     } else {
       console.error(err);
-      notify("error", "Unexpected error. Please try again.");
+      notify('error', 'Unexpected error. Please try again.');
     }
   };
 
-  const withPostTxRefresh = async (
-    afterMs = 1500,
-    alsoFetchActivationMs = 3000
-  ) => {
+  const withPostTxRefresh = async (afterMs = 1500, alsoFetchActivationMs = 3000) => {
     // Allow a brief delay if your UI relies on indexers/subgraphs.
     setTimeout(() => {
       fetchDataCollection();
-      setMessage("");
+      setMessage('');
     }, afterMs);
 
     setTimeout(async () => {
       try {
         await fetchActivationTime();
       } catch (e) {
-        console.warn("fetchActivationTime failed:", e);
+        console.warn('fetchActivationTime failed:', e);
       }
     }, alsoFetchActivationMs);
   };
 
-  const handleTx = async (txPromise: Promise<any>) => {
-    const tx = await txPromise;
-    await tx.wait();
+  const handleTx = async (hashPromise: Promise<`0x${string}`>) => {
+    const hash = await hashPromise;
+    await publicClient!.waitForTransactionReceipt({ hash });
   };
-
-  const withSigner = () => library.getSigner(account);
 
   const isContractAddress = async (address: string) => {
-    if (!ethers.utils.isAddress(address)) return false;
+    if (!isAddress(address)) return false;
     try {
-      const byteCode = await library.getCode(address);
-      return byteCode && byteCode !== "0x";
+      const byteCode = await publicClient!.getCode({ address: address as `0x${string}` });
+      return !!byteCode && byteCode !== '0x';
     } catch {
       return false;
     }
   };
 
-  const getNft = (address: string) =>
-    new Contract(address, NFT_ABI, withSigner());
-
-  const getErc20 = (address: string) =>
-    new Contract(address, ERC20_ABI, withSigner());
-
-  const isERC721 = async (nft: Contract) => {
+  const isERC721 = async (nftAddress: string) => {
     try {
-      // ERC721 interface id
-      return await nft.supportsInterface("0x80ac58cd");
+      return await publicClient!.readContract({
+        address: nftAddress as `0x${string}`,
+        abi: NFT_ABI,
+        functionName: 'supportsInterface',
+        args: ['0x80ac58cd'],
+      });
     } catch {
       return false;
     }
   };
 
-  const ensureNftOwnership = async (nft: Contract, tokenId: number) => {
+  const ensureNftOwnership = async (nftAddress: string, tokenId: number) => {
     try {
-      const owner = await nft.ownerOf(tokenId);
+      const owner = (await publicClient!.readContract({
+        address: nftAddress as `0x${string}`,
+        abi: NFT_ABI,
+        functionName: 'ownerOf',
+        args: [BigInt(tokenId)],
+      })) as string;
       if (owner?.toLowerCase() !== account?.toLowerCase()) {
-        notify("error", "You aren't the owner of the token!");
+        notify('error', "You aren't the owner of the token!");
         return false;
       }
       return true;
@@ -237,83 +253,100 @@ const NewHome = () => {
     }
   };
 
-  const ensureNftApprovalForAll = async (nft: Contract) => {
-    const approved = await nft.isApprovedForAll(account, RAFFLE_WALLET_ADDRESS);
+  const ensureNftApprovalForAll = async (nftAddress: string) => {
+    const approved = await publicClient!.readContract({
+      address: nftAddress as `0x${string}`,
+      abi: NFT_ABI,
+      functionName: 'isApprovedForAll',
+      args: [account as `0x${string}`, RAFFLE_WALLET_ADDRESS as `0x${string}`],
+    });
     if (!approved) {
-      await handleTx(nft.setApprovalForAll(RAFFLE_WALLET_ADDRESS, true));
+      const hash = await walletClient!.writeContract({
+        address: nftAddress as `0x${string}`,
+        abi: NFT_ABI,
+        functionName: 'setApprovalForAll',
+        args: [RAFFLE_WALLET_ADDRESS as `0x${string}`, true],
+      });
+      await publicClient!.waitForTransactionReceipt({ hash });
     }
   };
 
-  const ensureErc20Allowance = async (token: Contract, required: BigNumber) => {
-    let receipt: any;
-    const allowance: BigNumber = await token.allowance(
-      account,
-      RAFFLE_WALLET_ADDRESS
-    );
+  const ensureErc20Allowance = async (tokenAddress: string, required: bigint) => {
+    let approved = false;
+    const allowance = (await publicClient!.readContract({
+      address: tokenAddress as `0x${string}`,
+      abi: ERC20_ABI,
+      functionName: 'allowance',
+      args: [account as `0x${string}`, RAFFLE_WALLET_ADDRESS as `0x${string}`],
+    })) as bigint;
 
-    // prefer setting MaxUint256 once
-    if (allowance.lt(ethers.constants.MaxUint256)) {
-      receipt = await token
-        .approve(RAFFLE_WALLET_ADDRESS, ethers.constants.MaxUint256)
-        .then((tx: any) => tx.wait());
+    if (allowance < maxUint256) {
+      const hash = await walletClient!.writeContract({
+        address: tokenAddress as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: 'approve',
+        args: [RAFFLE_WALLET_ADDRESS as `0x${string}`, maxUint256],
+      });
+      const receipt = await publicClient!.waitForTransactionReceipt({ hash });
+      approved = receipt.status === 'success';
     }
-    // fallback to exact amount if the unlimited approval failed
-    if (!receipt?.status && allowance.lt(required)) {
-      await handleTx(token.approve(RAFFLE_WALLET_ADDRESS, required));
+    if (!approved && allowance < required) {
+      const hash = await walletClient!.writeContract({
+        address: tokenAddress as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: 'approve',
+        args: [RAFFLE_WALLET_ADDRESS as `0x${string}`, required],
+      });
+      await publicClient!.waitForTransactionReceipt({ hash });
     }
   };
 
-  const getErc20Decimals = async (token: Contract) => {
+  const getErc20Decimals = async (tokenAddress: string) => {
     try {
-      return await token.decimals();
+      return (await publicClient!.readContract({
+        address: tokenAddress as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: 'decimals',
+      })) as number;
     } catch {
-      console.warn("decimals() not found, assuming 18.");
-      notify(
-        "warning",
-        "Token doesn't implement decimals(); assuming 18 decimal places."
-      );
+      console.warn('decimals() not found, assuming 18.');
+      notify('warning', "Token doesn't implement decimals(); assuming 18 decimal places.");
       return 18;
     }
   };
 
-  const hasEthBalance = async (amount: BigNumber) => {
+  const hasEthBalance = async (amount: bigint) => {
     try {
-      const bal = await library.getBalance(account);
-      return bal.gte(amount);
+      const bal = await publicClient!.getBalance({ address: account as `0x${string}` });
+      return bal >= amount;
     } catch (e) {
       console.error(e);
       return false;
     }
   };
 
-  const hasCstBalance = async (amountWei: BigNumber) => {
+  const hasCstBalance = async (amountWei: bigint) => {
     try {
-      const bal = await api.get_user_balance(account);
+      const bal = await api.get_user_balance(account!);
       if (!bal) return false;
-      const wallet = BigNumber.from(bal.CosmicTokenBalance);
-      return wallet.gte(amountWei);
+      const wallet = BigInt(bal.CosmicTokenBalance);
+      return wallet >= amountWei;
     } catch (e) {
       console.error(e);
       return false;
     }
   };
 
-  const minGasWithBuffer = (estimate: BigNumber) => {
-    const buffered = estimate.mul(GAS_BUFFER_BPS).div(10_000);
-    return buffered.gt(GAS_FLOOR) ? buffered : GAS_FLOOR;
+  const minGasWithBuffer = (estimate: bigint) => {
+    const buffered = (estimate * GAS_BUFFER_BPS) / BigInt(10_000);
+    return buffered > GAS_FLOOR ? buffered : GAS_FLOOR;
   };
 
   const getNextEthBidPriceWithModifiers = async () => {
-    const base = await cosmicGameContract.getNextEthBidPrice();
-    // Apply +X% (bidPricePlus)
-    let price = base
-      .mul(ethers.utils.parseEther((100 + bidPricePlus).toString()))
-      .div(ethers.utils.parseEther("100"));
-    // RandomWalk discount
-    if (bidType === "RandomWalk") {
-      price = price
-        .mul(ethers.utils.parseEther("50"))
-        .div(ethers.utils.parseEther("100"));
+    const base = (await cosmicGameContract!.read.getNextEthBidPrice?.()) as bigint;
+    let price = (base * parseEther((100 + bidPricePlus).toString())) / parseEther('100');
+    if (bidType === 'RandomWalk') {
+      price = (price * parseEther('50')) / parseEther('100');
     }
     return price;
   };
@@ -326,42 +359,42 @@ const NewHome = () => {
     setIsClaiming(true);
     try {
       if (!cosmicGameContract) {
-        notify(
-          "error",
-          "Please connect your wallet and ensure you are on the correct network."
-        );
+        notify('error', 'Please connect your wallet and ensure you are on the correct network.');
         return;
       }
 
-      const estimate = await cosmicGameContract.estimateGas.claimMainPrize();
-      const gasLimit = minGasWithBuffer(estimate);
+      const estimate = await cosmicGameContract.estimateGas.claimMainPrize?.({});
+      const gasLimit = estimate ? minGasWithBuffer(estimate) : GAS_FLOOR;
 
-      await handleTx(cosmicGameContract.claimMainPrize({ gasLimit }));
+      await handleTx(
+        (
+          cosmicGameContract.write.claimMainPrize as unknown as (
+            ...a: unknown[]
+          ) => Promise<`0x${string}`>
+        )({ gas: gasLimit }),
+      );
 
       if (!cosmicSignatureContract) {
-        notify(
-          "error",
-          "Unable to complete post-claim actions. Please refresh the page."
-        );
+        notify('error', 'Unable to complete post-claim actions. Please refresh the page.');
         return;
       }
-      const totalSupply = await cosmicSignatureContract.totalSupply();
-      const tokenId = totalSupply.toNumber() - 1;
+      const totalSupply = await cosmicSignatureContract.read.totalSupply?.();
+      const tokenId = Number(totalSupply ?? 0) - 1;
 
       let count = (data?.NumRaffleNFTWinnersBidding ?? 0) + 3;
-      if (data?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked > 0) {
+      if ((data?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0) > 0) {
         count += data?.NumRaffleNFTWinnersStakingRWalk ?? 0;
       }
 
       await api.create(tokenId, count);
       router.push({
-        pathname: "/prize-claimed",
-        query: { round: data?.CurRoundNum, message: "success" },
+        pathname: '/prize-claimed',
+        query: { round: data?.CurRoundNum, message: 'success' },
       });
 
       await withPostTxRefresh(1000, 3000);
-    } catch (err) {
-      if (err?.code === 4001) {
+    } catch (err: unknown) {
+      if (isUserRejection(err)) {
         return;
       }
       notifyErrorFromEthers(err);
@@ -375,59 +408,58 @@ const NewHome = () => {
   // -----------------------------
 
   const withNftDonation = async (nftAddress: string, tokenId: number) => {
-    if (!nftAddress || nftAddress.trim() === "" || Number.isNaN(tokenId)) {
-      throw new Error("Missing NFT donation address or tokenId.");
+    if (!nftAddress || nftAddress.trim() === '' || Number.isNaN(tokenId)) {
+      throw new Error('Missing NFT donation address or tokenId.');
     }
     if (!(await isContractAddress(nftAddress))) {
-      notify("error", "The address provided is not a valid contract address!");
+      notify('error', 'The address provided is not a valid contract address!');
       return false;
     }
-    const nft = getNft(nftAddress);
-    if (!(await isERC721(nft))) {
-      notify(
-        "error",
-        "The donate NFT contract is not an ERC721 token contract."
-      );
+    if (!(await isERC721(nftAddress))) {
+      notify('error', 'The donate NFT contract is not an ERC721 token contract.');
       return false;
     }
-    if (!(await ensureNftOwnership(nft, tokenId))) return false;
-    await ensureNftApprovalForAll(nft);
+    if (!(await ensureNftOwnership(nftAddress, tokenId))) return false;
+    await ensureNftApprovalForAll(nftAddress);
     return true;
   };
 
   const withTokenDonation = async (tokenAddress: string, amountStr: string) => {
     if (!tokenAddress || !amountStr) {
-      throw new Error("Missing token donation address or amount.");
+      throw new Error('Missing token donation address or amount.');
     }
     if (!(await isContractAddress(tokenAddress))) {
-      notify("error", "The address provided is not a valid contract address!");
+      notify('error', 'The address provided is not a valid contract address!');
       return { ok: false as const };
     }
-    const erc20 = getErc20(tokenAddress);
 
-    // Basic ERC20 sanity
     try {
-      const ts = await erc20.totalSupply();
-      if (!ts) throw new Error("Not an ERC20");
+      const ts = await publicClient!.readContract({
+        address: tokenAddress as `0x${string}`,
+        abi: ERC20_ABI,
+        functionName: 'totalSupply',
+      });
+      if (!ts) throw new Error('Not an ERC20');
     } catch (err) {
-      console.log(err);
-      notify(
-        "error",
-        "The donate token contract is not an ERC20 token contract."
-      );
+      notify('error', 'The donate token contract is not an ERC20 token contract.');
       return { ok: false as const };
     }
 
-    const decimals = await getErc20Decimals(erc20);
+    const decimals = await getErc20Decimals(tokenAddress);
     const amountWei = parseUnits(amountStr, decimals);
-    const bal: BigNumber = await erc20.balanceOf(account);
+    const bal = (await publicClient!.readContract({
+      address: tokenAddress as `0x${string}`,
+      abi: ERC20_ABI,
+      functionName: 'balanceOf',
+      args: [account as `0x${string}`],
+    })) as bigint;
 
-    if (bal.lt(amountWei)) {
-      notify("error", "Insufficient token balance for donation.");
+    if (bal < amountWei) {
+      notify('error', 'Insufficient token balance for donation.');
       return { ok: false as const };
     }
-    await ensureErc20Allowance(erc20, amountWei);
-    return { ok: true as const, token: erc20, amountWei, decimals };
+    await ensureErc20Allowance(tokenAddress, amountWei);
+    return { ok: true as const, amountWei, decimals };
   };
 
   // -----------------------------
@@ -439,10 +471,7 @@ const NewHome = () => {
     try {
       // Check if contract is initialized
       if (!cosmicGameContract) {
-        notify(
-          "error",
-          "Please connect your wallet and ensure you are on the correct network."
-        );
+        notify('error', 'Please connect your wallet and ensure you are on the correct network.');
         setIsBidding(false);
         return;
       }
@@ -452,32 +481,30 @@ const NewHome = () => {
       // Ensure ETH balance if paying in ETH
       const enoughEth = await hasEthBalance(ethBidPrice);
       if (!enoughEth) {
-        notify(
-          "error",
-          "Insufficient ETH balance! There isn't enough ETH in your wallet."
-        );
+        notify('error', "Insufficient ETH balance! There isn't enough ETH in your wallet.");
         setIsBidding(false);
         return;
       }
 
       // No donation path
       const noDonation =
-        (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
-        (donationType === "Token" && (!tokenDonateAddress || !tokenAmount));
+        (donationType === 'NFT' && (!nftDonateAddress || !nftId)) ||
+        (donationType === 'Token' && (!tokenDonateAddress || !tokenAmount));
 
       if (noDonation || !donationType) {
         await handleTx(
-          cosmicGameContract.bidWithEth(rwlkId, message, {
-            value: ethBidPrice,
-            gasLimit: 30_000_000,
-          })
+          (
+            cosmicGameContract.write.bidWithEth as unknown as (
+              ...a: unknown[]
+            ) => Promise<`0x${string}`>
+          )([rwlkId, message], { value: ethBidPrice, gas: BigInt(30_000_000) }),
         );
         await withPostTxRefresh();
         setIsBidding(false);
         return;
       }
 
-      if (donationType === "NFT") {
+      if (donationType === 'NFT') {
         const nftIdNum = Number(nftId);
         const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
         if (!ok) {
@@ -485,16 +512,14 @@ const NewHome = () => {
           return;
         }
         await handleTx(
-          cosmicGameContract.bidWithEthAndDonateNft(
-            rwlkId,
-            message,
-            nftDonateAddress,
-            nftIdNum,
-            { value: ethBidPrice }
-          )
+          (
+            cosmicGameContract.write.bidWithEthAndDonateNft as unknown as (
+              ...a: unknown[]
+            ) => Promise<`0x${string}`>
+          )([rwlkId, message, nftDonateAddress, nftIdNum], { value: ethBidPrice }),
         );
-        setNftId("");
-        setNftDonateAddress("");
+        setNftId('');
+        setNftDonateAddress('');
       } else {
         const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
         if (!res.ok) {
@@ -502,23 +527,19 @@ const NewHome = () => {
           return;
         }
         await handleTx(
-          cosmicGameContract.bidWithEthAndDonateToken(
-            rwlkId,
-            message,
-            tokenDonateAddress,
-            res.amountWei,
-            { value: ethBidPrice }
-          )
+          (
+            cosmicGameContract.write.bidWithEthAndDonateToken as unknown as (
+              ...a: unknown[]
+            ) => Promise<`0x${string}`>
+          )([rwlkId, message, tokenDonateAddress, res.amountWei], { value: ethBidPrice }),
         );
-        setTokenAmount("");
-        setTokenDonateAddress("");
+        setTokenAmount('');
+        setTokenDonateAddress('');
       }
 
       await withPostTxRefresh();
-    } catch (err) {
-      if (err?.code === 4001) {
-        console.log("User denied transaction signature.");
-      } else {
+    } catch (err: unknown) {
+      if (!isUserRejection(err)) {
         notifyErrorFromEthers(err);
       }
     } finally {
@@ -531,42 +552,39 @@ const NewHome = () => {
     try {
       // Check if contract is initialized
       if (!cosmicGameContract) {
-        notify(
-          "error",
-          "Please connect your wallet and ensure you are on the correct network."
-        );
+        notify('error', 'Please connect your wallet and ensure you are on the correct network.');
         setIsBidding(false);
         return;
       }
 
       // CST balance check (if price provided)
       if (cstBidData?.CSTPrice > 0) {
-        const cstWei = ethers.utils.parseEther(cstBidData.CSTPrice.toString());
+        const cstWei = parseEther(cstBidData.CSTPrice.toString());
         const enoughCst = await hasCstBalance(cstWei);
         if (!enoughCst) {
           notify(
-            "error",
-            "Insufficient CST balance! There isn't enough Cosmic Token in your wallet."
+            'error',
+            "Insufficient CST balance! There isn't enough Cosmic Token in your wallet.",
           );
           setIsBidding(false);
           return;
         }
       }
 
-      const priceMaxLimit: BigNumber = await cosmicGameContract.getNextCstBidPrice();
+      const priceMaxLimit = await cosmicGameContract.read.getNextCstBidPrice?.();
 
       const noDonation =
-        (donationType === "NFT" && (!nftDonateAddress || !nftId)) ||
-        (donationType === "Token" && (!tokenDonateAddress || !tokenAmount));
+        (donationType === 'NFT' && (!nftDonateAddress || !nftId)) ||
+        (donationType === 'Token' && (!tokenDonateAddress || !tokenAmount));
 
       if (noDonation || !donationType) {
-        await handleTx(cosmicGameContract.bidWithCst(priceMaxLimit, message));
+        await handleTx(cosmicGameContract.write.bidWithCst!([priceMaxLimit, message]));
         await withPostTxRefresh();
         setIsBidding(false);
         return;
       }
 
-      if (donationType === "NFT") {
+      if (donationType === 'NFT') {
         const nftIdNum = Number(nftId);
         const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
         if (!ok) {
@@ -574,15 +592,15 @@ const NewHome = () => {
           return;
         }
         await handleTx(
-          cosmicGameContract.bidWithCstAndDonateNft(
+          cosmicGameContract.write.bidWithCstAndDonateNft!([
             priceMaxLimit,
             message,
             nftDonateAddress,
-            nftIdNum
-          )
+            nftIdNum,
+          ]),
         );
-        setNftId("");
-        setNftDonateAddress("");
+        setNftId('');
+        setNftDonateAddress('');
       } else {
         const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
         if (!res.ok) {
@@ -590,25 +608,22 @@ const NewHome = () => {
           return;
         }
         await handleTx(
-          cosmicGameContract.bidWithCstAndDonateToken(
+          cosmicGameContract.write.bidWithCstAndDonateToken!([
             priceMaxLimit,
             message,
             tokenDonateAddress,
-            res.amountWei
-          )
+            res.amountWei,
+          ]),
         );
-        setTokenAmount("");
-        setTokenDonateAddress("");
+        setTokenAmount('');
+        setTokenDonateAddress('');
       }
 
       await withPostTxRefresh();
-    } catch (err) {
-      if (err?.code === 4001) {
-        console.log("User denied transaction signature.");
-      } else {
-        // CST path returns raw string sometimes — show verbatim if present
-        if (err?.data?.message) {
-          notify("error", err.data.message);
+    } catch (err: unknown) {
+      if (!isUserRejection(err)) {
+        if (isEthProviderError(err) && err.data?.message) {
+          notify('error', err.data.message);
         } else {
           notifyErrorFromEthers(err);
         }
@@ -618,59 +633,65 @@ const NewHome = () => {
     }
   };
 
-  const getRwlkNFTIds = async () => {
+  const playAudio = useCallback(async () => {
+    try {
+      const audioElement = new Audio('/audio/notification.wav');
+      await audioElement.play();
+    } catch (error) {
+      console.error('Error requesting sound permission:', error);
+    }
+  }, []);
+
+  const getRwlkNFTIds = useCallback(async () => {
     try {
       if (nftRWLKContract && account) {
         const used_rwalk = await api.get_used_rwlk_nfts();
-        const biddedRWLKIds = used_rwalk.map((x: any) => x.RWalkTokenId);
-        const tokens = await nftRWLKContract.walletOfOwner(account);
+        const biddedRWLKIds = used_rwalk.map((x: UsedRWLKNFT) => x.RWalkTokenId);
+        const tokens = (await nftRWLKContract.read.walletOfOwner?.([account])) as readonly bigint[];
         const nftIds = tokens
-          .map((t: BigNumber) => t.toNumber())
+          .map((t) => Number(t))
           .filter((t: number) => !biddedRWLKIds.includes(t))
           .reverse();
         setRwlknftIds(nftIds);
       }
-    } catch (e) {
-      console.log(e);
-    }
-  };
+    } catch (e) {}
+  }, [nftRWLKContract, account]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const newData = await api.get_dashboard_info();
       if (newData) {
         const round = newData.CurRoundNum;
-        const [
-          newBidData,
-          nftData,
-          championsData,
-          ethDonations,
-          donatedERC20Tokens,
-        ] = await Promise.all([
-          api.get_bid_list_by_round(round, "desc"),
-          api.get_donations_nft_by_round(round),
-          (async () => {
-            const bids = await api.get_bid_list_by_round(round, "desc");
-            const champions = getEnduranceChampions(bids);
-            const sortedChampions = [...champions].sort(
-              (a, b) => b.chronoWarrior - a.chronoWarrior
-            );
-            return sortedChampions;
-          })(),
-          api.get_donations_cg_with_info_by_round(round),
-          api.get_donations_erc20_by_round(round),
-        ]);
+        const [newBidData, nftData, championsData, ethDonations, donatedERC20Tokens] =
+          await Promise.all([
+            api.get_bid_list_by_round(round, 'desc'),
+            api.get_donations_nft_by_round(round),
+            (async () => {
+              const bids = await api.get_bid_list_by_round(round, 'desc');
+              const champions = getEnduranceChampions(bids);
+              const sortedChampions = [...champions].sort(
+                (a, b) => b.chronoWarrior - a.chronoWarrior,
+              );
+              return sortedChampions;
+            })(),
+            api.get_donations_cg_with_info_by_round(round),
+            api.get_donations_erc20_by_round(round),
+          ]);
         setCurBidList(newBidData);
-        setDonatedNFTs(nftData);
+        setDonatedNFTs(nftData as DonatedNFTType[]);
         setChampionList(championsData);
-        setEthDonations(ethDonations);
-        setDonatedERC20Tokens(donatedERC20Tokens);
+        setEthDonations(
+          ethDonations as import('../components/tables/EthDonationTable').EthDonation[],
+        );
+        setDonatedERC20Tokens(
+          donatedERC20Tokens as import('../components/donations/DonatedERC20Table').DonatedERC20Token[],
+        );
       }
-      setData((prevData: any) => {
+      setData((prevData: DashboardInfo | null) => {
         if (
           account !== newData?.LastBidderAddr &&
           prevData &&
-          prevData.CurNumBids < newData?.CurNumBids
+          prevData.CurNumBids < (newData?.CurNumBids ?? 0)
         ) {
           playAudio();
         }
@@ -678,18 +699,9 @@ const NewHome = () => {
       });
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.error('Error fetching data:', err);
     }
-  };
-
-  const playAudio = async () => {
-    try {
-      const audioElement = new Audio("/audio/notification.wav");
-      await audioElement.play();
-    } catch (error) {
-      console.error("Error requesting sound permission:", error);
-    }
-  };
+  }, [account, playAudio]);
 
   const fetchPrizeTime = async () => {
     try {
@@ -698,50 +710,52 @@ const NewHome = () => {
       const diff = current * 1000 - Date.now();
       setPrizeTime(t * 1000 - diff);
     } catch (err) {
-      console.error("Error fetching prize time:", err);
+      console.error('Error fetching prize time:', err);
     }
   };
 
-  const fetchClaimHistory = async () => {
+  const fetchClaimHistory = useCallback(async () => {
     try {
       const history = await api.get_claim_history();
-      setClaimHistory(history);
+      setClaimHistory(
+        history as unknown as import('../components/tables/WinningHistoryTable').WinningHistoryEntry[],
+      );
     } catch (err) {
-      console.error("Error fetching claim history:", err);
+      console.error('Error fetching claim history:', err);
     }
-  };
+  }, []);
 
-  const fetchCSTBidData = async () => {
+  const fetchCSTBidData = useCallback(async () => {
     try {
       let ctData = await api.get_ct_price();
       if (ctData) {
         setCSTBidData({
           AuctionDuration: parseInt(ctData.AuctionDuration),
-          CSTPrice: parseFloat(ethers.utils.formatEther(ctData.CSTPrice)),
+          CSTPrice: parseFloat(formatEther(BigInt(ctData.CSTPrice))),
           SecondsElapsed: parseInt(ctData.SecondsElapsed),
         });
       }
     } catch (err) {
-      console.error("Error fetching CST bid data:", err);
+      console.error('Error fetching CST bid data:', err);
     }
-  };
+  }, []);
 
-  const fetchEthBidInfo = async () => {
+  const fetchEthBidInfo = useCallback(async () => {
     try {
       const ethBidInfo = await api.get_bid_eth_price();
       if (ethBidInfo) {
         setEthBidInfo({
           AuctionDuration: parseInt(ethBidInfo.AuctionDuration),
-          ETHPrice: parseFloat(ethers.utils.formatEther(ethBidInfo.ETHPrice)),
+          ETHPrice: parseFloat(formatEther(BigInt(ethBidInfo.ETHPrice))),
           SecondsElapsed: parseInt(ethBidInfo.SecondsElapsed),
         });
       }
     } catch (err) {
-      console.error("Error fetching ETH bid info:", err);
+      console.error('Error fetching ETH bid info:', err);
     }
-  };
+  }, []);
 
-  const fetchDataCollection = async () => {
+  const fetchDataCollection = useCallback(async () => {
     await Promise.all([
       getRwlkNFTIds(),
       fetchData(),
@@ -750,37 +764,35 @@ const NewHome = () => {
       fetchCSTBidData(),
       fetchEthBidInfo(),
     ]);
-  };
+  }, [getRwlkNFTIds, fetchData, fetchClaimHistory, fetchCSTBidData, fetchEthBidInfo]);
 
-  const requestNotificationPermission = () => {
-    if ("Notification" in window && Notification.permission !== "granted") {
+  const requestNotificationPermission = useCallback(() => {
+    if ('Notification' in window && Notification.permission !== 'granted') {
       Notification.requestPermission().then((permission) => {
-        if (permission === "granted") {
-          console.log("Notification permission granted.");
+        if (permission === 'granted') {
         }
       });
     }
-  };
+  }, []);
 
-  const sendNotification = (title: string, options: any) => {
-    if ("Notification" in window && Notification.permission === "granted") {
+  const sendNotification = (title: string, options: NotificationOptions) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(title, options);
     }
   };
 
   const fetchActivationTime = async () => {
     if (!cosmicGameContract) return;
-    const activationTime = await cosmicGameContract.roundActivationTime();
-    setActivationTime(Number(activationTime - offset / 1000));
+    const activationTime = await cosmicGameContract.read.roundActivationTime?.();
+    setActivationTime(Number(activationTime ?? 0) - offset / 1000);
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
       if (prizeTime && now >= prizeTime - 5 * 60 * 1000 && now <= prizeTime) {
-        sendNotification("Bid Now or Miss Out!", {
-          body:
-            "Time is running out! You have 5 minutes to place your bids and win amazing prizes.",
+        sendNotification('Bid Now or Miss Out!', {
+          body: 'Time is running out! You have 5 minutes to place your bids and win amazing prizes.',
         });
         clearInterval(interval); // Stop the interval once the notification is sent
       }
@@ -804,15 +816,15 @@ const NewHome = () => {
     if (router.query) {
       if (router.query.randomwalk) {
         setRwlkId(Number(router.query.tokenId));
-        setBidType("RandomWalk");
+        setBidType('RandomWalk');
       }
       if (router.query.donation) {
         setNftDonateAddress(ART_BLOCKS_ADDRESS);
         const tokenId = Array.isArray(router.query.tokenId)
           ? router.query.tokenId[0]
           : router.query.tokenId;
-        setNftId(tokenId);
-        setBidType("ETH");
+        setNftId(tokenId ?? '');
+        setBidType('ETH');
         setAdvancedExpanded(true);
       }
       if (router.query.referred_by) {
@@ -837,8 +849,13 @@ const NewHome = () => {
     return () => {
       clearInterval(interval);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [
+    router.isReady,
+    router.query,
+    requestNotificationPermission,
+    fetchDataCollection,
+    fetchEthBidInfo,
+  ]);
 
   useEffect(() => {
     if (twitterHandle) {
@@ -849,17 +866,15 @@ const NewHome = () => {
   useEffect(() => {
     const fetchCSTInfo = async (bannerId: number) => {
       const res = await api.get_cst_info(bannerId);
-      const fileName = `0x${res.Seed}`;
+      const fileName = `0x${res!.Seed}`;
       setBannerToken({ seed: fileName, id: bannerId });
     };
-    if (data && bannerToken.seed === "") {
+    if (data && bannerToken.seed === '') {
       if (data?.MainStats.NumCSTokenMints > 0) {
-        let bannerId = Math.floor(
-          Math.random() * data?.MainStats.NumCSTokenMints
-        );
+        let bannerId = Math.floor(Math.random() * data?.MainStats.NumCSTokenMints);
         fetchCSTInfo(bannerId);
       } else if (data?.MainStats.NumCSTokenMints === 0) {
-        setBannerToken({ seed: "sample", id: -1 });
+        setBannerToken({ seed: 'sample', id: -1 });
       }
     }
 
@@ -875,8 +890,8 @@ const NewHome = () => {
   useEffect(() => {
     const fetchTimeoutClaimPrize = async () => {
       if (!cosmicGameContract) return;
-      const timeout = await cosmicGameContract.timeoutDurationToClaimMainPrize();
-      setTimeoutClaimPrize(Number(timeout));
+      const timeout = await cosmicGameContract.read.timeoutDurationToClaimMainPrize?.();
+      setTimeoutClaimPrize(Number(timeout ?? 0));
     };
 
     if (cosmicGameContract) {
@@ -888,14 +903,11 @@ const NewHome = () => {
   return (
     <>
       <MainWrapper>
-        <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={loading}
-        >
+        <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
           <CircularProgress color="inherit" />
         </Backdrop>
         <Grid container spacing={{ lg: 16, md: 8, sm: 8, xs: 4 }} mb={4}>
-          <Grid item sm={12} md={6}>
+          <Grid size={{ sm: 12, md: 6 }}>
             <BiddingStatus
               data={data}
               loading={loading}
@@ -904,330 +916,262 @@ const NewHome = () => {
               ethBidInfo={ethBidInfo}
               prizeTime={prizeTime}
             />
-            {!loading &&
-              activationTime < Date.now() / 1000 &&
-              account !== null && (
-                <>
-                  <Typography mb={1} mt={4}>
-                    Make your bid with:
-                  </Typography>
-                  <RadioGroup
-                    row
-                    value={bidType}
-                    onChange={(_e, value) => {
-                      setRwlkId(-1);
-                      setBidType(value);
-                    }}
-                    sx={{ mb: 2 }}
-                  >
+            {!loading && activationTime < Date.now() / 1000 && account !== null && (
+              <>
+                <Typography mb={1} mt={4}>
+                  Make your bid with:
+                </Typography>
+                <RadioGroup
+                  row
+                  value={bidType}
+                  onChange={(_e, value) => {
+                    setRwlkId(-1);
+                    setBidType(value);
+                  }}
+                  sx={{ mb: 2 }}
+                >
+                  <FormControlLabel value="ETH" control={<Radio size="small" />} label="ETH" />
+                  {data?.LastBidderAddr !== zeroAddress && (
                     <FormControlLabel
-                      value="ETH"
+                      value="RandomWalk"
                       control={<Radio size="small" />}
-                      label="ETH"
+                      label="RandomWalk"
                     />
-                    {data?.LastBidderAddr !== constants.AddressZero && (
-                      <FormControlLabel
-                        value="RandomWalk"
-                        control={<Radio size="small" />}
-                        label="RandomWalk"
-                      />
-                    )}
-                    {data?.LastBidderAddr !== constants.AddressZero && (
-                      <FormControlLabel
-                        value="CST"
-                        control={<Radio size="small" />}
-                        label="CST(Cosmic Token)"
-                      />
-                    )}
-                  </RadioGroup>
-                  {bidType === "ETH" &&
-                    data?.LastBidderAddr === constants.AddressZero && (
-                      <Box ml={2}>
-                        {ethBidInfo?.SecondsElapsed >
-                        ethBidInfo?.AuctionDuration ? (
-                          <Typography variant="subtitle1">
-                            Auction ended.
-                          </Typography>
-                        ) : (
-                          <Grid
-                            container
-                            spacing={2}
-                            mb={2}
-                            alignItems="center"
-                          >
-                            <Grid item sm={12} md={5}>
-                              <Typography variant="subtitle1">
-                                Elapsed Time:
-                              </Typography>
-                            </Grid>
-                            <Grid item sm={12} md={7}>
-                              <Typography>
-                                {formatSeconds(ethBidInfo?.SecondsElapsed)}
-                              </Typography>
-                            </Grid>
-                          </Grid>
-                        )}
-                        <Grid container spacing={2} mb={2} alignItems="center">
-                          <Grid item sm={12} md={5}>
-                            <Typography variant="subtitle1">
-                              Auction Duration:
-                            </Typography>
-                          </Grid>
-                          <Grid item sm={12} md={7}>
-                            <Typography>
-                              {formatSeconds(ethBidInfo?.AuctionDuration)}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </Box>
-                    )}
-                  {bidType === "RandomWalk" && (
-                    <Box mb={4} mx={2}>
-                      <Typography variant="h6">
-                        Random Walk NFT Gallery
-                      </Typography>
-                      <Typography variant="body2">
-                        If you own some RandomWalkNFTs and one of them is used
-                        when bidding, you can get a 50% discount!
-                      </Typography>
-                      <PaginationRWLKGrid
-                        loading={false}
-                        data={rwlknftIds}
-                        selectedToken={rwlkId}
-                        setSelectedToken={setRwlkId}
-                      />
-                    </Box>
                   )}
-                  {bidType === "CST" && (
-                    <Box ml={2}>
-                      {cstBidData?.SecondsElapsed >
-                      cstBidData?.AuctionDuration ? (
-                        <Typography variant="subtitle1">
-                          Auction ended, you can bid for free.
-                        </Typography>
-                      ) : (
-                        <Grid container spacing={2} mb={2} alignItems="center">
-                          <Grid item sm={12} md={5}>
-                            <Typography variant="subtitle1">
-                              Elapsed Time:
-                            </Typography>
-                          </Grid>
-                          <Grid item sm={12} md={7}>
-                            <Typography>
-                              {formatSeconds(cstBidData?.SecondsElapsed)}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      )}
+                  {data?.LastBidderAddr !== zeroAddress && (
+                    <FormControlLabel
+                      value="CST"
+                      control={<Radio size="small" />}
+                      label="CST(Cosmic Token)"
+                    />
+                  )}
+                </RadioGroup>
+                {bidType === 'ETH' && data?.LastBidderAddr === zeroAddress && (
+                  <Box ml={2}>
+                    {(ethBidInfo?.SecondsElapsed ?? 0) > (ethBidInfo?.AuctionDuration ?? 0) ? (
+                      <Typography variant="subtitle1">Auction ended.</Typography>
+                    ) : (
                       <Grid container spacing={2} mb={2} alignItems="center">
-                        <Grid item sm={12} md={5}>
-                          <Typography variant="subtitle1">
-                            Auction Duration:
-                          </Typography>
+                        <Grid size={{ sm: 12, md: 5 }}>
+                          <Typography variant="subtitle1">Elapsed Time:</Typography>
                         </Grid>
-                        <Grid item sm={12} md={7}>
-                          <Typography>
-                            {formatSeconds(cstBidData?.AuctionDuration)}
-                          </Typography>
+                        <Grid size={{ sm: 12, md: 7 }}>
+                          <Typography>{formatSeconds(ethBidInfo?.SecondsElapsed ?? 0)}</Typography>
                         </Grid>
                       </Grid>
-                    </Box>
-                  )}
-                  <TextField
-                    placeholder="Message (280 characters, optional)"
-                    value={message}
-                    size="small"
-                    multiline
-                    fullWidth
-                    rows={4}
-                    inputProps={{ maxLength: 280 }}
-                    sx={{ marginBottom: 2 }}
-                    onChange={(e) => setMessage(e.target.value)}
-                  />
-                  <Accordion
-                    expanded={advancedExpanded}
-                    onChange={(_event, isExpanded) =>
-                      setAdvancedExpanded(isExpanded)
-                    }
-                  >
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                      <Typography>Advanced Options</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Typography variant="body2">
-                        If you want to donate tokens or one of your NFTs while
-                        bidding, you can put the contract address, NFT id, and
-                        comment here.
+                    )}
+                    <Grid container spacing={2} mb={2} alignItems="center">
+                      <Grid size={{ sm: 12, md: 5 }}>
+                        <Typography variant="subtitle1">Auction Duration:</Typography>
+                      </Grid>
+                      <Grid size={{ sm: 12, md: 7 }}>
+                        <Typography>{formatSeconds(ethBidInfo?.AuctionDuration ?? 0)}</Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                )}
+                {bidType === 'RandomWalk' && (
+                  <Box mb={4} mx={2}>
+                    <Typography variant="h6">Random Walk NFT Gallery</Typography>
+                    <Typography variant="body2">
+                      If you own some RandomWalkNFTs and one of them is used when bidding, you can
+                      get a 50% discount!
+                    </Typography>
+                    <PaginationRWLKGrid
+                      loading={false}
+                      data={rwlknftIds}
+                      selectedToken={rwlkId}
+                      setSelectedToken={setRwlkId}
+                    />
+                  </Box>
+                )}
+                {bidType === 'CST' && (
+                  <Box ml={2}>
+                    {cstBidData?.SecondsElapsed > cstBidData?.AuctionDuration ? (
+                      <Typography variant="subtitle1">
+                        Auction ended, you can bid for free.
                       </Typography>
-                      <RadioGroup
-                        row
-                        value={donationType}
-                        onChange={(_e, value) => {
-                          setRwlkId(-1);
-                          setDonationType(value);
+                    ) : (
+                      <Grid container spacing={2} mb={2} alignItems="center">
+                        <Grid size={{ sm: 12, md: 5 }}>
+                          <Typography variant="subtitle1">Elapsed Time:</Typography>
+                        </Grid>
+                        <Grid size={{ sm: 12, md: 7 }}>
+                          <Typography>{formatSeconds(cstBidData?.SecondsElapsed)}</Typography>
+                        </Grid>
+                      </Grid>
+                    )}
+                    <Grid container spacing={2} mb={2} alignItems="center">
+                      <Grid size={{ sm: 12, md: 5 }}>
+                        <Typography variant="subtitle1">Auction Duration:</Typography>
+                      </Grid>
+                      <Grid size={{ sm: 12, md: 7 }}>
+                        <Typography>{formatSeconds(cstBidData?.AuctionDuration)}</Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                )}
+                <TextField
+                  placeholder="Message (280 characters, optional)"
+                  value={message}
+                  size="small"
+                  multiline
+                  fullWidth
+                  rows={4}
+                  inputProps={{ maxLength: 280 }}
+                  sx={{ marginBottom: 2 }}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                <Accordion
+                  expanded={advancedExpanded}
+                  onChange={(_event, isExpanded) => setAdvancedExpanded(isExpanded)}
+                >
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography>Advanced Options</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography variant="body2">
+                      If you want to donate tokens or one of your NFTs while bidding, you can put
+                      the contract address, NFT id, and comment here.
+                    </Typography>
+                    <RadioGroup
+                      row
+                      value={donationType}
+                      onChange={(_e, value) => {
+                        setRwlkId(-1);
+                        setDonationType(value);
+                      }}
+                      sx={{ mt: 2 }}
+                    >
+                      <FormControlLabel value="NFT" control={<Radio size="small" />} label="NFT" />
+                      <FormControlLabel
+                        value="Token"
+                        control={<Radio size="small" />}
+                        label="Token"
+                      />
+                    </RadioGroup>
+                    {donationType === 'Token' && (
+                      <>
+                        <TextField
+                          placeholder="Token Contract Address"
+                          size="small"
+                          value={tokenDonateAddress}
+                          fullWidth
+                          sx={{ marginTop: 1 }}
+                          onChange={(e) => setTokenDonateAddress(e.target.value)}
+                        />
+                        <TextField
+                          placeholder="Token Amount"
+                          type="number"
+                          value={tokenAmount}
+                          size="small"
+                          fullWidth
+                          sx={{ marginTop: 2 }}
+                          onChange={(e) => setTokenAmount(e.target.value)}
+                        />
+                      </>
+                    )}
+                    {donationType === 'NFT' && (
+                      <>
+                        <TextField
+                          placeholder="NFT contract address"
+                          size="small"
+                          value={nftDonateAddress}
+                          fullWidth
+                          sx={{ marginTop: 1 }}
+                          onChange={(e) => setNftDonateAddress(e.target.value)}
+                        />
+                        <TextField
+                          placeholder="NFT number"
+                          type="number"
+                          value={nftId}
+                          size="small"
+                          fullWidth
+                          sx={{ marginTop: 2 }}
+                          onChange={(e) => setNftId(e.target.value)}
+                        />
+                      </>
+                    )}
+                    {bidType !== 'CST' && (
+                      <Box
+                        sx={{
+                          border: '1px solid #444',
+                          borderRadius: 1,
+                          p: 2,
+                          mt: 2,
                         }}
-                        sx={{ mt: 2 }}
                       >
-                        <FormControlLabel
-                          value="NFT"
-                          control={<Radio size="small" />}
-                          label="NFT"
-                        />
-                        <FormControlLabel
-                          value="Token"
-                          control={<Radio size="small" />}
-                          label="Token"
-                        />
-                      </RadioGroup>
-                      {donationType === "Token" && (
-                        <>
-                          <TextField
-                            placeholder="Token Contract Address"
-                            size="small"
-                            value={tokenDonateAddress}
-                            fullWidth
-                            sx={{ marginTop: 1 }}
-                            onChange={(e) =>
-                              setTokenDonateAddress(e.target.value)
-                            }
-                          />
-                          <TextField
-                            placeholder="Token Amount"
-                            type="number"
-                            value={tokenAmount}
-                            size="small"
-                            fullWidth
-                            sx={{ marginTop: 2 }}
-                            onChange={(e) => setTokenAmount(e.target.value)}
-                          />
-                        </>
-                      )}
-                      {donationType === "NFT" && (
-                        <>
-                          <TextField
-                            placeholder="NFT contract address"
-                            size="small"
-                            value={nftDonateAddress}
-                            fullWidth
-                            sx={{ marginTop: 1 }}
-                            onChange={(e) =>
-                              setNftDonateAddress(e.target.value)
-                            }
-                          />
-                          <TextField
-                            placeholder="NFT number"
-                            type="number"
-                            value={nftId}
-                            size="small"
-                            fullWidth
-                            sx={{ marginTop: 2 }}
-                            onChange={(e) => setNftId(e.target.value)}
-                          />
-                        </>
-                      )}
-                      {bidType !== "CST" && (
+                        <Typography variant="subtitle2">Bid price collision prevention</Typography>
                         <Box
                           sx={{
-                            border: "1px solid #444",
-                            borderRadius: 1,
-                            p: 2,
-                            mt: 2,
+                            display: 'flex',
+                            marginTop: 2,
+                            alignItems: 'center',
                           }}
                         >
-                          <Typography variant="subtitle2">
-                            Bid price collision prevention
+                          <Typography whiteSpace="nowrap" color="rgba(255, 255, 255, 0.68)" mr={2}>
+                            Rise bid price by
                           </Typography>
-                          <Box
-                            sx={{
-                              display: "flex",
-                              marginTop: 2,
-                              alignItems: "center",
+                          <CustomTextField
+                            type="number"
+                            placeholder="Bid Price Plus"
+                            value={bidPricePlus}
+                            size="small"
+                            fullWidth
+                            InputProps={{
+                              inputComponent: StyledInput,
+                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                              inputProps: { min: 0, max: 50 },
                             }}
-                          >
-                            <Typography
-                              whiteSpace="nowrap"
-                              color="rgba(255, 255, 255, 0.68)"
-                              mr={2}
-                            >
-                              Rise bid price by
-                            </Typography>
-                            <CustomTextField
-                              type="number"
-                              placeholder="Bid Price Plus"
-                              value={bidPricePlus}
-                              size="small"
-                              fullWidth
-                              InputProps={{
-                                inputComponent: StyledInput,
-                                endAdornment: (
-                                  <InputAdornment position="end">
-                                    %
-                                  </InputAdornment>
-                                ),
-                                inputProps: { min: 0, max: 50 },
-                              }}
-                              onChange={(e) => {
-                                let value = Number(e.target.value);
-                                if (value <= 50) {
-                                  setBidPricePlus(value);
-                                }
-                              }}
-                            />
-                            <Typography
-                              whiteSpace="nowrap"
-                              color="rgba(255, 255, 255, 0.68)"
-                              ml={2}
-                            >
-                              {(
-                                (ethBidInfo?.ETHPrice ?? 0) *
-                                (1 + bidPricePlus / 100) *
-                                (bidType === "RandomWalk" ? 0.5 : 1)
-                              ).toFixed(6)}{" "}
-                              ETH
-                            </Typography>
-                          </Box>
-                          <Typography variant="body2" mt={2}>
-                            The bid price is bumped {bidPricePlus}% to prevent
-                            bidding collision.
-                          </Typography>
-                          <Typography variant="body2">
-                            This percentage won&apos;t rise the bid price
-                            arbitrarily after your bid, it is only meant for
-                            allowing both bid transactions to pass through in
-                            case two simultaneous bids occur within the same
-                            block.
+                            onChange={(e) => {
+                              let value = Number(e.target.value);
+                              if (value <= 50) {
+                                setBidPricePlus(value);
+                              }
+                            }}
+                          />
+                          <Typography whiteSpace="nowrap" color="rgba(255, 255, 255, 0.68)" ml={2}>
+                            {(
+                              (ethBidInfo?.ETHPrice ?? 0) *
+                              (1 + bidPricePlus / 100) *
+                              (bidType === 'RandomWalk' ? 0.5 : 1)
+                            ).toFixed(6)}{' '}
+                            ETH
                           </Typography>
                         </Box>
-                      )}
-                    </AccordionDetails>
-                  </Accordion>
-                </>
-              )}
+                        <Typography variant="body2" mt={2}>
+                          The bid price is bumped {bidPricePlus}% to prevent bidding collision.
+                        </Typography>
+                        <Typography variant="body2">
+                          This percentage won&apos;t rise the bid price arbitrarily after your bid,
+                          it is only meant for allowing both bid transactions to pass through in
+                          case two simultaneous bids occur within the same block.
+                        </Typography>
+                      </Box>
+                    )}
+                  </AccordionDetails>
+                </Accordion>
+              </>
+            )}
           </Grid>
-          <Grid item sm={12} md={6}>
-            {data?.CurRoundNum > 1 && (
-              <Link href={`/prize/${data?.CurRoundNum - 1}`} color="inherit">
-                Round {data?.CurRoundNum - 1} ended, check results here
+          <Grid size={{ sm: 12, md: 6 }}>
+            {(data?.CurRoundNum ?? 0) > 1 && (
+              <Link href={`/prize/${(data?.CurRoundNum ?? 0) - 1}`} color="inherit">
+                Round {(data?.CurRoundNum ?? 0) - 1} ended, check results here
               </Link>
             )}
             {matches && (
               <StyledCard sx={{ mt: 1 }}>
                 <CardActionArea>
                   <Link
-                    href={
-                      bannerToken.id >= 0
-                        ? `/detail/${bannerToken.id}`
-                        : "/detail/sample"
-                    }
-                    sx={{ display: "block" }}
+                    href={bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample'}
+                    sx={{ display: 'block' }}
                   >
                     <NFTImage
                       src={
-                        bannerToken.seed === ""
-                          ? "/images/qmark.png"
-                          : getAssetsUrl(
-                              `cosmicsignature/${bannerToken.seed}.png`
-                            )
+                        bannerToken.seed === ''
+                          ? '/images/qmark.png'
+                          : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
                       }
                     />
                   </Link>
@@ -1237,69 +1181,59 @@ const NewHome = () => {
             {data?.TsRoundStart !== 0 && <SpecialPrizeWinners />}
             {account !== null && activationTime < Date.now() / 1000 && (
               <>
-                {(prizeTime > Date.now() || data?.LastBidderAddr !== account) &&
-                  !loading && (
-                    <Button
-                      variant="outlined"
-                      size="large"
-                      endIcon={isBidding ? undefined : <ArrowForward />}
-                      onClick={bidType === "CST" ? onBidWithCST : onBid}
-                      fullWidth
-                      disabled={
-                        isBidding ||
-                        (bidType === "RandomWalk" && rwlkId === -1) ||
-                        bidType === ""
-                      }
-                      sx={{ mt: 3 }}
-                    >
-                      {isBidding ? (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                          <CircularProgress size={18} color="inherit" />
-                          Processing...
-                        </Box>
-                      ) : `Bid now with ${bidType} ${
-                        bidType === "ETH"
+                {(prizeTime > Date.now() || data?.LastBidderAddr !== account) && !loading && (
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    endIcon={isBidding ? undefined : <ArrowForward />}
+                    onClick={bidType === 'CST' ? onBidWithCST : onBid}
+                    fullWidth
+                    disabled={
+                      isBidding || (bidType === 'RandomWalk' && rwlkId === -1) || bidType === ''
+                    }
+                    sx={{ mt: 3 }}
+                  >
+                    {isBidding ? (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <CircularProgress size={18} color="inherit" />
+                        Processing...
+                      </Box>
+                    ) : (
+                      `Bid now with ${bidType} ${
+                        bidType === 'ETH'
                           ? `(${
-                              (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100) >
-                              0.1
-                                ? (
-                                    (ethBidInfo?.ETHPrice ?? 0) *
-                                    (1 + bidPricePlus / 100)
-                                  ).toFixed(2)
-                                : (
-                                    (ethBidInfo?.ETHPrice ?? 0) *
-                                    (1 + bidPricePlus / 100)
-                                  ).toFixed(5)
+                              (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100) > 0.1
+                                ? ((ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100)).toFixed(
+                                    2,
+                                  )
+                                : ((ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100)).toFixed(
+                                    5,
+                                  )
                             } ETH)`
-                          : bidType === "RandomWalk" && rwlkId !== -1
-                          ? ` token ${rwlkId} (${
-                              (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100) >
-                              0.2
-                                ? (
-                                    (ethBidInfo?.ETHPrice ?? 0) *
-                                    (1 + bidPricePlus / 100) *
-                                    0.5
-                                  ).toFixed(2)
-                                : (
-                                    (ethBidInfo?.ETHPrice ?? 0) *
-                                    (1 + bidPricePlus / 100) *
-                                    0.5
-                                  ).toFixed(5)
-                            } ETH)`
-                          : bidType === "CST"
-                          ? cstBidData?.SecondsElapsed >
-                            cstBidData?.AuctionDuration
-                            ? "(FREE BID)"
-                            : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
-                          : ""
-                      }`}
-                    </Button>
-                  )}
-                {!(
-                  prizeTime > Date.now() ||
-                  data?.LastBidderAddr === constants.AddressZero ||
-                  loading
-                ) && (
+                          : bidType === 'RandomWalk' && rwlkId !== -1
+                            ? ` token ${rwlkId} (${
+                                (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100) > 0.2
+                                  ? (
+                                      (ethBidInfo?.ETHPrice ?? 0) *
+                                      (1 + bidPricePlus / 100) *
+                                      0.5
+                                    ).toFixed(2)
+                                  : (
+                                      (ethBidInfo?.ETHPrice ?? 0) *
+                                      (1 + bidPricePlus / 100) *
+                                      0.5
+                                    ).toFixed(5)
+                              } ETH)`
+                            : bidType === 'CST'
+                              ? cstBidData?.SecondsElapsed > cstBidData?.AuctionDuration
+                                ? '(FREE BID)'
+                                : `(${cstBidData?.CSTPrice.toFixed(2)} CST)`
+                              : ''
+                      }`
+                    )}
+                  </Button>
+                )}
+                {!(prizeTime > Date.now() || data?.LastBidderAddr === zeroAddress || loading) && (
                   <>
                     <Button
                       variant="contained"
@@ -1314,21 +1248,19 @@ const NewHome = () => {
                       sx={{ mt: 3 }}
                     >
                       {isClaiming ? (
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <CircularProgress size={18} color="inherit" />
                           Processing...
                         </Box>
                       ) : (
                         <>
                           Claim Prize
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             {prizeTime + timeoutClaimPrize * 1000 > Date.now() &&
                               data?.LastBidderAddr !== account && (
                                 <>
                                   &nbsp;available in &nbsp;
-                                  <Countdown
-                                    date={prizeTime + timeoutClaimPrize * 1000}
-                                  />
+                                  <Countdown date={prizeTime + timeoutClaimPrize * 1000} />
                                 </>
                               )}
                             &nbsp;
@@ -1368,20 +1300,19 @@ const NewHome = () => {
         </Grid>
         <Box>
           <Typography variant="body2" mt={4}>
-            When you bid, you will get 100 Cosmic Tokens as a reward. These
-            tokens allow you to participate in the DAO.
+            When you bid, you will get 100 Cosmic Tokens as a reward. These tokens allow you to
+            participate in the DAO.
           </Typography>
           <Box mt={2}>
             <Typography variant="body2" color="primary" component="span">
               *
             </Typography>
             <Typography variant="body2" component="span">
-              When you bid, you are also buying a raffle ticket.{" "}
-              {data?.NumRaffleEthWinnersBidding} raffle tickets will be chosen
-              and these people will win {data?.RafflePercentage}% of the pot.
-              Also, {data?.NumRaffleNFTWinnersBidding} additional winners and{" "}
-              {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers{" "}
-              will be chosen which will receive a Cosmic Signature NFT.
+              When you bid, you are also buying a raffle ticket. {data?.NumRaffleEthWinnersBidding}{' '}
+              raffle tickets will be chosen and these people will win {data?.RafflePercentage}% of
+              the pot. Also, {data?.NumRaffleNFTWinnersBidding} additional winners and{' '}
+              {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers will be chosen which
+              will receive a Cosmic Signature NFT.
             </Typography>
           </Box>
           <Typography variant="body2" mt={2}>
@@ -1389,22 +1320,26 @@ const NewHome = () => {
             <Link
               href="https://protocol-guild.readthedocs.io"
               target="_blank"
-              sx={{ color: "inherit" }}
+              sx={{ color: 'inherit' }}
             >
               https://protocol-guild.readthedocs.io
             </Link>
-            ) will receive {data?.CharityPercentage ?? 0}% of the prize pool (at least{" "}
-            {((data?.CosmicGameBalanceEth ?? 0) * ((data?.CharityPercentage ?? 0) / 100)).toFixed(4)} ETH).
+            ) will receive {data?.CharityPercentage ?? 0}% of the prize pool (at least{' '}
+            {(
+              (Number(data?.CosmicGameBalanceEth) || 0) *
+              ((data?.CharityPercentage ?? 0) / 100)
+            ).toFixed(4)}{' '}
+            ETH).
           </Typography>
         </Box>
         <Box mt={6}>
           <Typography variant="subtitle1" color="primary" textAlign="center">
             Distribution of funds on each round
           </Typography>
-          <ChartOrPie data={data} />
+          <ChartOrPie data={data ?? undefined} />
         </Box>
 
-        {data && <Prize data={data} />}
+        {data && <Prize data={data as unknown as React.ComponentProps<typeof Prize>['data']} />}
 
         <Box mt={10}>
           <Typography variant="h6">TOP RAFFLE TICKETS HOLDERS</Typography>
@@ -1416,30 +1351,22 @@ const NewHome = () => {
         </Box>
         <Box mt={10}>
           <Typography variant="h6">TOP ETH SPENDERS FOR BID</Typography>
-          <ETHSpentTable list={curBidList} />
+          <ETHSpentTable list={curBidList as React.ComponentProps<typeof ETHSpentTable>['list']} />
         </Box>
         <Box mt={10}>
-          <Typography variant="h6">
-            ENDURANCE CHAMPIONS FOR CURRENT ROUND
-          </Typography>
+          <Typography variant="h6">ENDURANCE CHAMPIONS FOR CURRENT ROUND</Typography>
           <EnduranceChampionsTable championList={championList} />
         </Box>
         {ethDonations.length > 0 && (
           <Box mt={10}>
-            <Typography variant="h6">
-              ETH DONATIONS FOR CURRENT ROUND
-            </Typography>
+            <Typography variant="h6">ETH DONATIONS FOR CURRENT ROUND</Typography>
             <EthDonationTable list={ethDonations} showType={false} />
           </Box>
         )}
         <Box marginTop={10}>
           <Typography variant="h6">DONATED TOKENS FOR CURRENT ROUND</Typography>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs
-              variant="fullWidth"
-              value={donatedTokensTab}
-              onChange={handleTabChange}
-            >
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs variant="fullWidth" value={donatedTokensTab} onChange={handleTabChange}>
               <Tab label="ERC721 Tokens" />
               <Tab label="ERC20 Tokens" />
             </Tabs>
@@ -1450,12 +1377,13 @@ const NewHome = () => {
                 <Grid container spacing={2} mt={2}>
                   {donatedNFTs.map((nft) => (
                     <Grid
-                      item
                       key={nft.RecordId}
-                      xs={gridLayout.xs}
-                      sm={gridLayout.sm}
-                      md={gridLayout.md}
-                      lg={gridLayout.lg}
+                      size={{
+                        xs: gridLayout.xs,
+                        sm: gridLayout.sm,
+                        md: gridLayout.md,
+                        lg: gridLayout.lg,
+                      }}
                     >
                       <DonatedNFT nft={nft} />
                     </Grid>
@@ -1469,9 +1397,7 @@ const NewHome = () => {
                 />
               </>
             ) : (
-              <Typography>
-                No ERC721 tokens were donated on this round.
-              </Typography>
+              <Typography>No ERC721 tokens were donated on this round.</Typography>
             )}
           </CustomTabPanel>
           <CustomTabPanel value={donatedTokensTab} index={1}>
@@ -1483,12 +1409,7 @@ const NewHome = () => {
             <Typography variant="h6" component="span">
               CURRENT ROUND BID HISTORY
             </Typography>
-            <Typography
-              variant="h6"
-              component="span"
-              color="primary"
-              sx={{ ml: 1 }}
-            >
+            <Typography variant="h6" component="span" color="primary" sx={{ ml: 1 }}>
               (ROUND {data?.CurRoundNum})
             </Typography>
           </Box>
@@ -1519,11 +1440,10 @@ const NewHome = () => {
       {imageOpen && (
         <Lightbox
           image={
-            bannerToken.seed === ""
-              ? "/images/qmark.png"
+            bannerToken.seed === ''
+              ? '/images/qmark.png'
               : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
           }
-          title="This is a possible image of the NFT you are going to receive."
           onClose={() => setImageOpen(false)}
         />
       )}
@@ -1537,24 +1457,24 @@ const NewHome = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Cosmic Signature";
-  let prizeAmountStr = "";
+  const title = 'Cosmic Signature';
+  let prizeAmountStr = '';
   try {
-    const { data } = await axios.get(cosmicGameBaseUrl + "statistics/dashboard");
+    const { data } = await axios.get(cosmicGameBaseUrl + 'statistics/dashboard');
     const prize = data?.PrizeAmountEth ?? 0;
-    prizeAmountStr = `${(prize).toFixed(4)}ETH `;
+    prizeAmountStr = `${prize.toFixed(4)}ETH `;
   } catch {
     // Non-critical: fallback to empty string if API is unavailable
   }
   const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${prizeAmountStr}prizes and Cosmic Signature NFTs.`;
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

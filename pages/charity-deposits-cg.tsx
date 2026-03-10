@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Typography } from "@mui/material";
-import { MainWrapper } from "../components/styled";
-import api from "../services/api";
-import { CharityDepositTable } from "../components/CharityDepositTable";
-import { GetServerSideProps } from "next";
-import { logoImgUrl } from "../utils";
+import React, { useEffect, useState } from 'react';
+import { Typography } from '@mui/material';
+import { GetServerSideProps } from 'next';
+
+import { MainWrapper } from '../components/styled';
+import api from '../services/api';
+import {
+  CharityDepositTable,
+  type CharityDepositDonation,
+} from '../components/tables/CharityDepositTable';
+import { logoImgUrl } from '../utils';
 
 /**
  * Component for displaying Cosmic Game Charity Deposits.
@@ -14,7 +18,7 @@ const CharityCGDeposits = () => {
   const [loading, setLoading] = useState(true);
 
   // Stores the array of CG deposit data.
-  const [charityCGDeposits, setCharityCGDeposits] = useState([]);
+  const [charityCGDeposits, setCharityCGDeposits] = useState<CharityDepositDonation[]>([]);
 
   /**
    * Fetches the CG deposit data from the API on component mount.
@@ -24,9 +28,9 @@ const CharityCGDeposits = () => {
       try {
         setLoading(true);
         const cg_deposits = await api.get_charity_cg_deposits();
-        setCharityCGDeposits(cg_deposits);
+        setCharityCGDeposits(cg_deposits as CharityDepositDonation[]);
       } catch (error) {
-        console.error("Failed to fetch CG deposits:", error);
+        console.error('Failed to fetch CG deposits:', error);
       } finally {
         setLoading(false);
       }
@@ -54,16 +58,16 @@ const CharityCGDeposits = () => {
  * including open graph data for social media previews.
  */
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Cosmic Game Charity Deposits | Cosmic Signature";
-  const description = "Cosmic Game Charity Deposits";
+  const title = 'Cosmic Game Charity Deposits | Cosmic Signature';
+  const description = 'Cosmic Game Charity Deposits';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return {

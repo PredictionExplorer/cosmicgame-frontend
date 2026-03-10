@@ -1,47 +1,47 @@
-import React, { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import { Typography, Box, Button, Link } from "@mui/material";
-import { MainWrapper, CenterBox } from "../components/styled";
-import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
-import { parseBalance } from "../utils";
-import { useActiveWeb3React } from "../hooks/web3";
+import React, { useState, useEffect } from 'react';
+import { formatEther, parseEther } from 'viem';
+import { usePublicClient } from 'wagmi';
+import { Typography, Box, Button, Link } from '@mui/material';
+
+import { MainWrapper, CenterBox } from '../components/styled';
+import useRWLKNFTContract from '../hooks/useRWLKNFTContract';
+import { parseBalance } from '../utils';
+import { useActiveWeb3React } from '../hooks/web3';
 
 const Mint = () => {
-  const [mintPrice, setMintPrice] = useState("0");
-  const [nftIds, setNftIds] = useState([]);
+  const [mintPrice, setMintPrice] = useState('0');
+  const [nftIds, setNftIds] = useState<number[]>([]);
   const { account } = useActiveWeb3React();
+  const publicClient = usePublicClient();
   const nftContract = useRWLKNFTContract();
 
   const handleMint = async () => {
     if (nftContract) {
       try {
-        const mintPrice = await nftContract.getMintPrice();
-        const newPrice = parseFloat(ethers.utils.formatEther(mintPrice)) * 1.01;
+        const mintPrice = (await nftContract.read.getMintPrice?.()) as bigint;
+        const newPrice = parseFloat(formatEther(mintPrice)) * 1.01;
 
-        const receipt = await nftContract
-          .mint({ value: ethers.utils.parseEther(newPrice.toFixed(6)) })
-          .then((tx) => tx.wait());
-
-        receipt.events[0].args[2].toNumber();
-      } catch (err) {
-        const { data } = err;
-        if (data && data.message) {
-          alert(data.message);
-        } else {
-          console.log(err);
+        const hash = await (
+          nftContract.write.mint as unknown as (...a: unknown[]) => Promise<`0x${string}`>
+        )({
+          value: parseEther(newPrice.toFixed(6)),
+        });
+        await publicClient?.waitForTransactionReceipt({ hash });
+      } catch (err: unknown) {
+        if (err instanceof Error && 'data' in err) {
+          const data = (err as { data?: { message?: string } }).data;
+          if (data?.message) {
+            alert(data.message);
+          }
         }
       }
-    } else {
-      console.log("Please connect your wallet on Arbitrum network");
     }
   };
 
   useEffect(() => {
     const getData = async () => {
-      const mintPrice = await nftContract.getMintPrice();
-      setMintPrice(
-        (parseFloat(parseBalance(mintPrice)) * 1.01 + 0.008).toFixed(4)
-      );
+      const mintPrice = (await nftContract!.read.getMintPrice?.()) as bigint;
+      setMintPrice((parseFloat(parseBalance(mintPrice)) * 1.01 + 0.008).toFixed(4));
     };
     if (nftContract) {
       getData();
@@ -51,15 +51,13 @@ const Mint = () => {
   useEffect(() => {
     const getTokens = async () => {
       try {
-        const tokens = await nftContract.walletOfOwner(account);
+        const tokens = (await nftContract!.read.walletOfOwner?.([account])) as readonly bigint[];
         const nftIds = tokens
-          .map((t) => t.toNumber())
+          .map((t) => Number(t))
           .sort()
           .reverse();
         setNftIds(nftIds);
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) {}
     };
 
     if (account && nftContract) {
@@ -74,23 +72,13 @@ const Mint = () => {
           <Typography variant="h4" component="span">
             GET A
           </Typography>
-          <Typography
-            variant="h4"
-            component="span"
-            color="primary"
-            sx={{ ml: 1.5 }}
-          >
+          <Typography variant="h4" component="span" color="primary" sx={{ ml: 1.5 }}>
             RANDOM WALK
           </Typography>
           <Typography variant="h4" component="span" sx={{ ml: 1.5 }}>
             NFT FOR
           </Typography>
-          <Typography
-            variant="h4"
-            component="span"
-            color="primary"
-            sx={{ ml: 1.5 }}
-          >
+          <Typography variant="h4" component="span" color="primary" sx={{ ml: 1.5 }}>
             {mintPrice}Ξ
           </Typography>
         </CenterBox>
@@ -100,25 +88,14 @@ const Mint = () => {
           </Button>
         </Box>
         {/* My NFTs */}
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          flexWrap="wrap"
-          mt={4}
-        >
+        <Box display="flex" justifyContent="center" alignItems="center" flexWrap="wrap" mt={4}>
           <Typography variant="h4" component="span" color="secondary">
             MY
           </Typography>
           <Typography variant="h4" component="span" sx={{ ml: 1.5 }}>
             RANDOM
           </Typography>
-          <Typography
-            variant="h4"
-            component="span"
-            color="primary"
-            sx={{ ml: 1.5 }}
-          >
+          <Typography variant="h4" component="span" color="primary" sx={{ ml: 1.5 }}>
             WALK
           </Typography>
           <Typography variant="h4" component="span" sx={{ ml: 1.5 }}>
@@ -131,7 +108,7 @@ const Mint = () => {
               <Link
                 key={tokenId}
                 href={`/?randomwalk=true&tokenId=${tokenId}`}
-                sx={{ mr: 2, color: "inherit" }}
+                sx={{ mr: 2, color: 'inherit' }}
               >
                 <Typography variant="subtitle1" component="span">
                   {tokenId}

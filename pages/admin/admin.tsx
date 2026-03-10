@@ -1,18 +1,11 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { MainWrapper } from "../../components/styled";
-import { useEffect, useState } from "react";
-import api from "../../services/api";
+import { Box, Button, FormControl, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+
+import { MainWrapper } from '../../components/styled';
+import api from '../../services/api';
 
 const Contracts = () => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<import('../../services/api/types').DashboardInfo | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +39,7 @@ const Contracts = () => {
                     fullWidth
                     size="small"
                     sx={{ flex: 1 }}
-                    value={data?.ContractAddrs.CosmicSignatureAddr}
+                    value={data?.ContractAddrs?.CosmicSignatureAddr}
                   />
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
                     Set Address
@@ -54,9 +47,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Cosmic Token (ERC20) Contract Address
-                </Typography>
+                <Typography variant="subtitle1">Cosmic Token (ERC20) Contract Address</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     variant="filled"
@@ -65,7 +56,7 @@ const Contracts = () => {
                     fullWidth
                     size="small"
                     sx={{ flex: 1 }}
-                    value={data?.ContractAddrs.CosmicTokenAddr}
+                    value={data?.ContractAddrs?.CosmicTokenAddr}
                   />
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
                     Set Address
@@ -73,9 +64,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Charity Wallet Contract Address
-                </Typography>
+                <Typography variant="subtitle1">Charity Wallet Contract Address</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     variant="filled"
@@ -84,7 +73,7 @@ const Contracts = () => {
                     fullWidth
                     size="small"
                     sx={{ flex: 1 }}
-                    value={data?.ContractAddrs.CharityWalletAddr}
+                    value={data?.ContractAddrs?.CharityWalletAddr}
                   />
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
                     Set Address
@@ -92,9 +81,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  RandomWalk NFT Contract Address
-                </Typography>
+                <Typography variant="subtitle1">RandomWalk NFT Contract Address</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     variant="filled"
@@ -103,7 +90,7 @@ const Contracts = () => {
                     fullWidth
                     size="small"
                     sx={{ flex: 1 }}
-                    value={data?.ContractAddrs.RandomWalkAddr}
+                    value={data?.ContractAddrs?.RandomWalkAddr}
                   />
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
                     Set Address
@@ -111,9 +98,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Raffle Wallet Contract Address
-                </Typography>
+                <Typography variant="subtitle1">Raffle Wallet Contract Address</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     variant="filled"
@@ -122,7 +107,7 @@ const Contracts = () => {
                     fullWidth
                     size="small"
                     sx={{ flex: 1 }}
-                    value={data?.ContractAddrs.RaffleWalletAddr}
+                    value={data?.ContractAddrs?.RaffleWalletAddr}
                   />
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
                     Set Address
@@ -130,9 +115,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Staking Wallet Contract Address
-                </Typography>
+                <Typography variant="subtitle1">Staking Wallet Contract Address</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     variant="filled"
@@ -141,7 +124,7 @@ const Contracts = () => {
                     fullWidth
                     size="small"
                     sx={{ flex: 1 }}
-                    value={data?.ContractAddrs.StakingWalletAddr}
+                    value={data?.ContractAddrs?.StakingWalletAddr}
                   />
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
                     Set Address
@@ -149,9 +132,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Marketing Wallet Contract Address
-                </Typography>
+                <Typography variant="subtitle1">Marketing Wallet Contract Address</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     variant="filled"
@@ -160,7 +141,7 @@ const Contracts = () => {
                     fullWidth
                     size="small"
                     sx={{ flex: 1 }}
-                    value={data?.ContractAddrs.MarketingWalletAddr}
+                    value={data?.ContractAddrs?.MarketingWalletAddr}
                   />
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
                     Set Address
@@ -168,9 +149,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Business Logic Contract Address
-                </Typography>
+                <Typography variant="subtitle1">Business Logic Contract Address</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     variant="filled"
@@ -179,7 +158,7 @@ const Contracts = () => {
                     fullWidth
                     size="small"
                     sx={{ flex: 1 }}
-                    value={data?.ContractAddrs.BusinessLogicAddr}
+                    value={data?.ContractAddrs?.BusinessLogicAddr}
                   />
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
                     Set Address
@@ -187,9 +166,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Number of Raffle Winners Per Round
-                </Typography>
+                <Typography variant="subtitle1">Number of Raffle Winners Per Round</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     type="number"
@@ -207,9 +184,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Number of Raffle NFT Winners Per Round
-                </Typography>
+                <Typography variant="subtitle1">Number of Raffle NFT Winners Per Round</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     type="number"
@@ -227,9 +202,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Number of NFT Holder Winners Per Round
-                </Typography>
+                <Typography variant="subtitle1">Number of NFT Holder Winners Per Round</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     type="number"
@@ -391,9 +364,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Initial Seconds Until Prize
-                </Typography>
+                <Typography variant="subtitle1">Initial Seconds Until Prize</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     type="number"
@@ -411,9 +382,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Initial Bid Amount Fraction
-                </Typography>
+                <Typography variant="subtitle1">Initial Bid Amount Fraction</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     type="number"
@@ -449,9 +418,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  ETH To CST Bid Ratio
-                </Typography>
+                <Typography variant="subtitle1">ETH To CST Bid Ratio</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     type="number"
@@ -468,9 +435,7 @@ const Contracts = () => {
                 </Box>
               </Box>
               <Box mt={4}>
-                <Typography variant="subtitle1">
-                  Round Start CST Auction Length
-                </Typography>
+                <Typography variant="subtitle1">Round Start CST Auction Length</Typography>
                 <Box display="flex" mt={1}>
                   <TextField
                     type="number"
@@ -490,11 +455,9 @@ const Contracts = () => {
                 <Typography variant="subtitle1">Switch Mode</Typography>
                 <Box display="flex" mt={1}>
                   <FormControl fullWidth>
-                    <Select value={"runtime"}>
-                      <MenuItem value={"runtime"}>Runtime Mode</MenuItem>
-                      <MenuItem value={"maintenance"}>
-                        Maintenance Mode
-                      </MenuItem>
+                    <Select value={'runtime'}>
+                      <MenuItem value={'runtime'}>Runtime Mode</MenuItem>
+                      <MenuItem value={'maintenance'}>Maintenance Mode</MenuItem>
                     </Select>
                   </FormControl>
                   <Button color="secondary" variant="contained" sx={{ ml: 1 }}>

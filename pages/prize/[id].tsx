@@ -1,25 +1,25 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Box, Link, Typography } from "@mui/material";
-import { MainWrapper } from "../../components/styled";
-import { GetServerSidePropsContext } from "next";
+import React, { useEffect, useState, useMemo } from 'react';
+import { Box, Link, Typography } from '@mui/material';
+import { GetServerSidePropsContext } from 'next';
 
-import api from "../../services/api";
-import { useNotification } from "../../contexts/NotificationContext";
-
-import { getExplorerUrl,
+import { MainWrapper } from '../../components/styled';
+import api from '../../services/api';
+import { useNotification } from '../../contexts/NotificationContext';
+import {
+  getExplorerUrl,
   convertTimestampToDateTime,
   formatEthValue,
   getEnduranceChampions,
   logoImgUrl,
-} from "../../utils";
+} from '../../utils';
 
 // Child Components
-import RaffleWinnerTable from "../../components/RaffleWinnerTable";
-import BiddingHistoryTable from "../../components/BiddingHistoryTable";
-import StakingWinnerTable from "../../components/StakingWinnerTable";
-import DonatedNFTTable from "../../components/DonatedNFTTable";
-import EnduranceChampionsTable from "../../components/EnduranceChampionsTable";
-import DonatedERC20Table from "../../components/DonatedERC20Table";
+import RaffleWinnerTable from '../../components/tables/RaffleWinnerTable';
+import BiddingHistoryTable from '../../components/tables/BiddingHistoryTable';
+import StakingWinnerTable from '../../components/tables/StakingWinnerTable';
+import DonatedNFTTable from '../../components/donations/DonatedNFTTable';
+import EnduranceChampionsTable from '../../components/tables/EnduranceChampionsTable';
+import DonatedERC20Table from '../../components/donations/DonatedERC20Table';
 
 /* ------------------------------------------------------------------
   Helper Sub-Component: InfoRow
@@ -31,12 +31,7 @@ interface InfoRowProps {
   link?: string;
   monospace?: boolean;
 }
-const InfoRow: React.FC<InfoRowProps> = ({
-  label,
-  value,
-  link,
-  monospace = false,
-}) => {
+const InfoRow: React.FC<InfoRowProps> = ({ label, value, link, monospace = false }) => {
   return (
     <Box mb={1}>
       <Typography color="primary" component="span">
@@ -49,17 +44,14 @@ const InfoRow: React.FC<InfoRowProps> = ({
             href={link}
             color="inherit"
             fontSize="inherit"
-            target={link.startsWith("http") ? "__blank" : undefined}
-            sx={monospace ? { fontFamily: "monospace" } : {}}
+            target={link.startsWith('http') ? '__blank' : undefined}
+            sx={monospace ? { fontFamily: 'monospace' } : {}}
           >
             {value}
           </Link>
         </Typography>
       ) : (
-        <Typography
-          component="span"
-          fontFamily={monospace ? "monospace" : "inherit"}
-        >
+        <Typography component="span" fontFamily={monospace ? 'monospace' : 'inherit'}>
           {value}
         </Typography>
       )}
@@ -72,13 +64,10 @@ const InfoRow: React.FC<InfoRowProps> = ({
   Renders the main "prize info" rows using `InfoRow`.
 ------------------------------------------------------------------ */
 interface PrizeDetailsProps {
-  prizeInfo: any; // shape from your API, e.g. RoundInfo
-  stakingRewards: any[];
+  prizeInfo: import('../../services/api/types').RoundInfo;
+  stakingRewards: unknown[];
 }
-const PrizeDetails: React.FC<PrizeDetailsProps> = ({
-  prizeInfo,
-  stakingRewards,
-}) => {
+const PrizeDetails: React.FC<PrizeDetailsProps> = ({ prizeInfo, stakingRewards }) => {
   return (
     <>
       <InfoRow
@@ -86,10 +75,7 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
         value={convertTimestampToDateTime(prizeInfo.TimeStamp)}
         link={getExplorerUrl('tx', prizeInfo.TxHash)}
       />
-      <InfoRow
-        label="Prize Amount:"
-        value={`${prizeInfo.AmountEth.toFixed(4)} ETH`}
-      />
+      <InfoRow label="Prize Amount:" value={`${prizeInfo.AmountEth.toFixed(4)} ETH`} />
       <InfoRow
         label="Prize Token ID:"
         value={prizeInfo.TokenId}
@@ -101,15 +87,8 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
         link={`/user/${prizeInfo.WinnerAddr}`}
         monospace
       />
-      <InfoRow
-        label="Charity Address:"
-        value={prizeInfo.CharityAddress}
-        monospace
-      />
-      <InfoRow
-        label="Charity Amount:"
-        value={`${prizeInfo.CharityAmountETH.toFixed(4)} ETH`}
-      />
+      <InfoRow label="Charity Address:" value={prizeInfo.CharityAddress} monospace />
+      <InfoRow label="Charity Amount:" value={`${prizeInfo.CharityAmountETH.toFixed(4)} ETH`} />
       <InfoRow
         label="Endurance Champion Prize Winner Address:"
         value={prizeInfo.EnduranceWinnerAddr}
@@ -150,30 +129,19 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
       <InfoRow label="Total Bids:" value={prizeInfo.RoundStats.TotalBids} />
       <InfoRow
         label="Total Donated Amount:"
-        value={formatEthValue(prizeInfo.RoundStats.TotalDonatedAmountEth)}
+        value={formatEthValue(prizeInfo.RoundStats.TotalDonatedAmountEth ?? 0)}
       />
-      <InfoRow
-        label="Total Donated NFTs:"
-        value={prizeInfo.RoundStats.TotalDonatedNFTs}
-      />
+      <InfoRow label="Total Donated NFTs:" value={prizeInfo.RoundStats.TotalDonatedNFTs ?? 0} />
       <InfoRow
         label="Total Raffle Eth Deposits:"
-        value={`${prizeInfo.RoundStats.TotalRaffleEthDepositsEth.toFixed(
-          4
-        )} ETH`}
+        value={`${(prizeInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4)} ETH`}
       />
-      <InfoRow
-        label="Total Raffle NFTs:"
-        value={prizeInfo.RoundStats.TotalRaffleNFTs}
-      />
+      <InfoRow label="Total Raffle NFTs:" value={prizeInfo.RoundStats.TotalRaffleNFTs ?? 0} />
       <InfoRow
         label="Total Staking Deposit Amount:"
         value={`${prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH`}
       />
-      <InfoRow
-        label="Number of Staked Tokens:"
-        value={prizeInfo.StakingNumStakedTokens}
-      />
+      <InfoRow label="Number of Staked Tokens:" value={prizeInfo.StakingNumStakedTokens} />
       <InfoRow label="Number of Stakers:" value={stakingRewards.length} />
     </>
   );
@@ -184,11 +152,9 @@ const PrizeDetails: React.FC<PrizeDetailsProps> = ({
   Renders the "Bid History" portion
 ------------------------------------------------------------------ */
 interface BiddingHistorySectionProps {
-  bidHistory: any[];
+  bidHistory: import('../../services/api/types').BidInfo[];
 }
-const BiddingHistorySection: React.FC<BiddingHistorySectionProps> = ({
-  bidHistory,
-}) => (
+const BiddingHistorySection: React.FC<BiddingHistorySectionProps> = ({ bidHistory }) => (
   <Box mt={4}>
     <Typography variant="h6" lineHeight={1}>
       Bid History
@@ -202,11 +168,9 @@ const BiddingHistorySection: React.FC<BiddingHistorySectionProps> = ({
   Renders the "Endurance Champions" portion
 ------------------------------------------------------------------ */
 interface EnduranceChampionsSectionProps {
-  championList: any[];
+  championList: import('../../utils').EnduranceChampion[];
 }
-const EnduranceChampionsSection: React.FC<EnduranceChampionsSectionProps> = ({
-  championList,
-}) => (
+const EnduranceChampionsSection: React.FC<EnduranceChampionsSectionProps> = ({ championList }) => (
   <Box mt={4}>
     <Typography variant="h6">Endurance Champions</Typography>
     <EnduranceChampionsTable championList={championList} />
@@ -218,8 +182,8 @@ const EnduranceChampionsSection: React.FC<EnduranceChampionsSectionProps> = ({
   Renders the "Raffle Winners" portion
 ------------------------------------------------------------------ */
 interface RaffleWinnersSectionProps {
-  RaffleETHDeposits: any[];
-  RaffleNFTWinners: any[];
+  RaffleETHDeposits: import('../../services/api/types').RaffleETHDeposit[];
+  RaffleNFTWinners: import('../../services/api/types').RaffleNFTWinner[];
 }
 const RaffleWinnersSection: React.FC<RaffleWinnersSectionProps> = ({
   RaffleETHDeposits,
@@ -229,10 +193,7 @@ const RaffleWinnersSection: React.FC<RaffleWinnersSectionProps> = ({
     <Typography variant="h6" mb={2}>
       Raffle Rewards
     </Typography>
-    <RaffleWinnerTable
-      RaffleETHDeposits={RaffleETHDeposits}
-      RaffleNFTWinners={RaffleNFTWinners}
-    />
+    <RaffleWinnerTable RaffleETHDeposits={RaffleETHDeposits} RaffleNFTWinners={RaffleNFTWinners} />
   </Box>
 );
 
@@ -241,35 +202,29 @@ const RaffleWinnersSection: React.FC<RaffleWinnersSectionProps> = ({
   Renders the "Staking Rewards" portion
 ------------------------------------------------------------------ */
 interface StakingRewardsSectionProps {
-  stakingRewards: any[];
+  stakingRewards: unknown[];
 }
-const StakingRewardsSection: React.FC<StakingRewardsSectionProps> = ({
-  stakingRewards,
-}) => (
+const StakingRewardsSection: React.FC<StakingRewardsSectionProps> = ({ stakingRewards }) => (
   <Box mt={4}>
     <Typography variant="h6" mb={2}>
       Staking Rewards
     </Typography>
-    <StakingWinnerTable list={stakingRewards} />
+    <StakingWinnerTable
+      list={stakingRewards as React.ComponentProps<typeof StakingWinnerTable>['list']}
+    />
   </Box>
 );
 
 interface DonatedNFTsSectionProps {
-  nftDonations: any[];
+  nftDonations: import('../../components/donations/DonatedNFTTable').NFTRecord[];
 }
-const DonatedNFTsSection: React.FC<DonatedNFTsSectionProps> = ({
-  nftDonations,
-}) => {
+const DonatedNFTsSection: React.FC<DonatedNFTsSectionProps> = ({ nftDonations }) => {
   return (
     <Box mt={8}>
       <Typography variant="h6" mb={2}>
         Donated NFTs
       </Typography>
-      <DonatedNFTTable
-        list={nftDonations}
-        handleClaim={null}
-        claimingTokens={[]}
-      />
+      <DonatedNFTTable list={nftDonations} handleClaim={undefined} claimingTokens={[]} />
     </Box>
   );
 };
@@ -283,11 +238,17 @@ interface PrizeInfoProps {
 const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
   const { setNotification } = useNotification();
 
-  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState<any[]>([]);
-  const [bidHistory, setBidHistory] = useState<any[]>([]);
-  const [nftDonations, setNftDonations] = useState<any[]>([]);
-  const [prizeInfo, setPrizeInfo] = useState<any>(null);
-  const [stakingRewards, setStakingRewards] = useState<any[]>([]);
+  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState<
+    import('../../components/donations/DonatedERC20Table').DonatedERC20Token[]
+  >([]);
+  const [bidHistory, setBidHistory] = useState<import('../../services/api/types').BidInfo[]>([]);
+  const [nftDonations, setNftDonations] = useState<
+    import('../../components/donations/DonatedNFTTable').NFTRecord[]
+  >([]);
+  const [prizeInfo, setPrizeInfo] = useState<import('../../services/api/types').RoundInfo | null>(
+    null,
+  );
+  const [stakingRewards, setStakingRewards] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
 
   /* ------------------------------------------------------------------
@@ -296,15 +257,15 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
 
   const fetchDonatedERC20Tokens = async () => {
     try {
-      const donatedERC20Tokens = await api.get_donations_erc20_by_round(
-        roundNum
+      const donatedERC20Tokens = await api.get_donations_erc20_by_round(roundNum);
+      setDonatedERC20Tokens(
+        donatedERC20Tokens as import('../../components/donations/DonatedERC20Table').DonatedERC20Token[],
       );
-      setDonatedERC20Tokens(donatedERC20Tokens);
     } catch (error) {
-      console.error("Error fetching donated ERC20 tokens:", error);
+      console.error('Error fetching donated ERC20 tokens:', error);
       setNotification({
-        text: "Failed to load donated ERC20 tokens.",
-        type: "error",
+        text: 'Failed to load donated ERC20 tokens.',
+        type: 'error',
         visible: true,
       });
     }
@@ -315,26 +276,24 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [
-          nftDonationsData,
-          prizeInfoData,
-          bidHistoryData,
-          stakingRewardsData,
-        ] = await Promise.all([
-          api.get_donations_nft_by_round(roundNum),
-          api.get_round_info(roundNum),
-          api.get_bid_list_by_round(roundNum, "desc"),
-          api.get_staking_cst_rewards_by_round(roundNum),
-        ]);
-        setNftDonations(nftDonationsData);
+        const [nftDonationsData, prizeInfoData, bidHistoryData, stakingRewardsData] =
+          await Promise.all([
+            api.get_donations_nft_by_round(roundNum),
+            api.get_round_info(roundNum),
+            api.get_bid_list_by_round(roundNum, 'desc'),
+            api.get_staking_cst_rewards_by_round(roundNum),
+          ]);
+        setNftDonations(
+          nftDonationsData as import('../../components/donations/DonatedNFTTable').NFTRecord[],
+        );
         setPrizeInfo(prizeInfoData);
         setBidHistory(bidHistoryData);
         setStakingRewards(stakingRewardsData);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching data:', error);
         setNotification({
-          text: "Failed to load data. Please try again later.",
-          type: "error",
+          text: 'Failed to load data. Please try again later.',
+          type: 'error',
           visible: true,
         });
       } finally {
@@ -427,17 +386,17 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
 ------------------------------------------------------------------ */
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = context.params!.id as string | string[];
-  const roundNum = Array.isArray(id) ? parseInt(id[0]) : parseInt(id);
+  const roundNum = Array.isArray(id) ? parseInt(id[0] ?? '0') : parseInt(id);
   const title = `Prize Information for Round ${roundNum} | Cosmic Signature`;
   const description = `Prize Information for Round ${roundNum}`;
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return {

@@ -1,0 +1,57 @@
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+
+const tsPlugin = nextCoreWebVitals.find(
+  (c) => c.name === "next/typescript"
+)?.plugins?.["@typescript-eslint"];
+
+const reactHooksPlugin = nextCoreWebVitals.find(
+  (c) => c.plugins?.["react-hooks"]
+)?.plugins?.["react-hooks"];
+
+export default [
+  ...nextCoreWebVitals,
+  {
+    files: ["**/*.ts", "**/*.tsx"],
+    plugins: {
+      ...(tsPlugin ? { "@typescript-eslint": tsPlugin } : {}),
+      ...(reactHooksPlugin ? { "react-hooks": reactHooksPlugin } : {}),
+    },
+    rules: {
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "no-loss-of-precision": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/purity": "warn",
+      "react-hooks/refs": "warn",
+      "react-hooks/immutability": "warn",
+      "import/order": [
+        "warn",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+          ],
+          "newlines-between": "always",
+        },
+      ],
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+    },
+  },
+  {
+    ignores: [
+      ".next/",
+      "node_modules/",
+      "contracts/types/",
+      "public/paint-worklet.js",
+      "__mocks__/",
+    ],
+  },
+];

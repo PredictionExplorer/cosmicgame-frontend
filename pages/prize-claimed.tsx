@@ -1,12 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Box, Link, Typography } from "@mui/material";
-import { MainWrapper } from "../components/styled";
-import { useRouter } from "next/router";
-import Fireworks, { FireworksHandlers } from "@fireworks-js/react";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import api from "../services/api";
-import { GetServerSideProps } from "next";
-import { logoImgUrl } from "../utils";
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Link, Typography } from '@mui/material';
+
+import { MainWrapper } from '../components/styled';
+
+import { useRouter } from 'next/router';
+import Fireworks, { FireworksHandlers } from '@fireworks-js/react';
+
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { GetServerSideProps } from 'next';
+
+import api from '../services/api';
+import { logoImgUrl } from '../utils';
 
 /* ------------------------------------------------------------------
   Page Component: PrizeClaimed
@@ -28,7 +32,9 @@ const PrizeClaimed = () => {
   const [finishFireworks, setFinishFireworks] = useState(false);
 
   // Prize data fetched from the API.
-  const [prizeInfo, setPrizeInfo] = useState<any>(null);
+  const [prizeInfo, setPrizeInfo] = useState<import('../services/api/types').RoundInfo | null>(
+    null,
+  );
 
   // Loading state to show a spinner/message while data is being fetched.
   const [loading, setLoading] = useState(true);
@@ -54,9 +60,7 @@ const PrizeClaimed = () => {
 
         // Safely parse the "round" query parameter to a number.
         const roundStr = router.query.round;
-        const roundNum = parseInt(
-          Array.isArray(roundStr) ? roundStr[0] : roundStr
-        );
+        const roundNum = parseInt((Array.isArray(roundStr) ? roundStr[0] : roundStr) ?? '0');
 
         // Fetch round/prize info from the API.
         const fetchedPrizeInfo = await api.get_round_info(roundNum);
@@ -99,9 +103,9 @@ const PrizeClaimed = () => {
               style={{
                 top: 0,
                 left: 0,
-                width: "100%",
-                height: "100%",
-                position: "fixed",
+                width: '100%',
+                height: '100%',
+                position: 'fixed',
                 zIndex: 10000,
               }}
               onClick={handleFireworksClick}
@@ -109,13 +113,7 @@ const PrizeClaimed = () => {
           )}
 
           {/* Main Prize Info */}
-          <Typography
-            variant="h4"
-            color="primary"
-            gutterBottom
-            textAlign="center"
-            mb={6}
-          >
+          <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={6}>
             {`Congratulations! You won Round ${prizeInfo.RoundNum}.`}
           </Typography>
 
@@ -124,40 +122,37 @@ const PrizeClaimed = () => {
           </Typography>
           <Box ml={4}>
             {/* ETH Reward */}
-            <Typography variant="subtitle1">
-              {prizeInfo?.AmountEth.toFixed(6)} ETH
-            </Typography>
+            <Typography variant="subtitle1">{prizeInfo?.AmountEth.toFixed(6)} ETH</Typography>
 
             {/* Winning Token */}
             <Typography variant="subtitle1">
-              Cosmic Signature Token Number{" "}
+              Cosmic Signature Token Number{' '}
               <Link
                 href={`/detail/${prizeInfo.TokenId}`}
-                sx={{ fontSize: "inherit", color: "inherit" }}
+                sx={{ fontSize: 'inherit', color: 'inherit' }}
               >
                 {prizeInfo.TokenId}
               </Link>
             </Typography>
 
             {/* Donated NFTs, if any */}
-            {!!prizeInfo.RoundStats.TotalDonatedNFTs && (
+            {!!(prizeInfo.RoundStats.TotalDonatedNFTs as number) && (
               <Typography variant="subtitle1">
-                {prizeInfo.RoundStats.TotalDonatedNFTs} donated tokens (ERC721)
+                {prizeInfo.RoundStats.TotalDonatedNFTs as React.ReactNode} donated tokens (ERC721)
               </Typography>
             )}
           </Box>
 
           {/* Additional Info + Links to check other potential rewards */}
           <Typography variant="subtitle2" mt={4}>
-            There could also be random rewards from raffles. To check your
-            winnings, go to{" "}
+            There could also be random rewards from raffles. To check your winnings, go to{' '}
             <Link href="/my-winnings" color="inherit">
               My-Winnings
-            </Link>{" "}
-            page. For staking rewards, visit{" "}
+            </Link>{' '}
+            page. For staking rewards, visit{' '}
             <Link href="/my-staking" color="inherit">
               My-Staking
-            </Link>{" "}
+            </Link>{' '}
             page.
           </Typography>
         </>
@@ -172,16 +167,16 @@ const PrizeClaimed = () => {
   Open Graph data). This ensures proper SEO for social sharing.
 ------------------------------------------------------------------ */
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Claimed Prize Rewards | Cosmic Signature";
-  const description = "Claimed Prize Rewards";
+  const title = 'Claimed Prize Rewards | Cosmic Signature';
+  const description = 'Claimed Prize Rewards';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

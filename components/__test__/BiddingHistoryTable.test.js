@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import BiddingHistoryTable from "../BiddingHistoryTable";
+import BiddingHistoryTable from "../tables/BiddingHistoryTable";
 import "@testing-library/jest-dom";
 import { convertTimestampToDateTime, shortenHex } from "../../utils";
 
@@ -21,7 +21,8 @@ test("BiddingHistoryTable with mock data", () => {
       BidderAid: 77430,
       BidderAddr: "0x555eced709352759Ed0f1317dfC0a5FEf1310e60",
       BidPrice: "100415642728686138",
-      BidPriceEth: 0.10041564272868614,
+      EthPriceEth: 0.10041564272868614,
+      BidType: 0,
       RWalkNFTId: -1,
       RoundNum: 4,
       ERC20_Amount: "100000000000000000000",
@@ -34,14 +35,16 @@ test("BiddingHistoryTable with mock data", () => {
     },
   ];
   render(<BiddingHistoryTable biddingHistory={mockData} />);
+  // Component uses convertTimestampToDateTime(ts, true) - includes seconds
   expect(
-    screen.getByText(convertTimestampToDateTime(mockData[0].TimeStamp))
+    screen.getByText(convertTimestampToDateTime(mockData[0].TimeStamp, true))
   ).toBeInTheDocument();
   expect(
     screen.getByText(shortenHex(mockData[0].BidderAddr, 6))
   ).toBeInTheDocument();
+  // Component displays "X ETH" suffix, not "Ξ"
   expect(
-    screen.getByText(`${mockData[0].BidPriceEth.toFixed(7)}Ξ`)
+    screen.getByText(`${mockData[0].EthPriceEth.toFixed(7)} ETH`)
   ).toBeInTheDocument();
   expect(screen.getByText(mockData[0].RoundNum)).toBeInTheDocument();
   expect(screen.getByText(mockData[0].Message)).toBeInTheDocument();

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import CTBalanceDistributionTable from "../CTBalanceDistributionTable";
+import { CTBalanceDistributionTable } from "../tokens/CTBalanceDistributionTable";
 import "@testing-library/jest-dom";
 
 test("CTBalanceDistributionTable with no records", () => {
@@ -16,6 +16,13 @@ test("CTBalanceDistributionTable with mock data", () => {
     },
   ];
   render(<CTBalanceDistributionTable list={mockData} />);
-  expect(screen.getByText(mockData[0].OwnerAddr)).toBeInTheDocument();
-  expect(screen.getByText(mockData[0].BalanceFloat)).toBeInTheDocument();
+  // AddressLink shows full address on desktop or shortened (0x555ece....310e60) on mobile
+  const addressEl =
+    screen.queryByText(mockData[0].OwnerAddr) ||
+    screen.queryByText(/0x555ece.*310e60/);
+  expect(addressEl).toBeInTheDocument();
+  // Component displays balance with toFixed(6)
+  expect(
+    screen.getByText(mockData[0].BalanceFloat.toFixed(6))
+  ).toBeInTheDocument();
 });

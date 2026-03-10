@@ -35,4 +35,9 @@ yarn-error.log*
 /contracts/types
 
 # typescript
-tsconfig.buildinfo
+tsconfig.tsbuildinfo
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/

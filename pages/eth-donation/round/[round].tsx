@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Typography } from "@mui/material";
-import { MainWrapper } from "../../../components/styled";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import api from "../../../services/api";
-import EthDonationTable from "../../../components/EthDonationTable";
-import { logoImgUrl } from "../../../utils";
+import React, { useEffect, useState } from 'react';
+import { Typography } from '@mui/material';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+
+import { MainWrapper } from '../../../components/styled';
+import api from '../../../services/api';
+import EthDonationTable, { type EthDonation } from '../../../components/tables/EthDonationTable';
+import { logoImgUrl } from '../../../utils';
 
 // Define TypeScript types for props
 interface EthDonationByRoundProps {
@@ -16,7 +17,7 @@ const EthDonationByRound: React.FC<EthDonationByRoundProps> = ({ round }) => {
   // State for loading indicator
   const [loading, setLoading] = useState<boolean>(true);
   // State to hold fetched donation data
-  const [donationInfo, setDonationInfo] = useState<any[]>([]);
+  const [donationInfo, setDonationInfo] = useState<EthDonation[]>([]);
 
   useEffect(() => {
     // Async function to fetch donation data based on round number
@@ -24,9 +25,9 @@ const EthDonationByRound: React.FC<EthDonationByRoundProps> = ({ round }) => {
       try {
         setLoading(true);
         const donations = await api.get_donations_both_by_round(round);
-        setDonationInfo(donations);
+        setDonationInfo(donations as EthDonation[]);
       } catch (error) {
-        console.error("Error fetching donation data:", error);
+        console.error('Error fetching donation data:', error);
         setDonationInfo([]);
       } finally {
         setLoading(false);
@@ -46,13 +47,7 @@ const EthDonationByRound: React.FC<EthDonationByRoundProps> = ({ round }) => {
 
   return (
     <MainWrapper>
-      <Typography
-        variant="h4"
-        color="primary"
-        gutterBottom
-        textAlign="center"
-        mb={4}
-      >
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={4}>
         Direct (ETH) Donations for Round {round}
       </Typography>
 
@@ -67,7 +62,7 @@ const EthDonationByRound: React.FC<EthDonationByRoundProps> = ({ round }) => {
 
 // Server-side rendering to fetch initial props
 export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ) => {
   // Extract round parameter from URL context
   const paramRound = context.params!.round;
@@ -78,12 +73,12 @@ export const getServerSideProps: GetServerSideProps = async (
   const description = `View Direct (ETH) Donations for Round ${round}`;
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData, round } };

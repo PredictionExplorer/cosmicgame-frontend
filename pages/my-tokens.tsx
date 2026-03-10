@@ -1,25 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { Box, Link, TableBody, Tooltip, Typography } from "@mui/material";
-import { GetServerSideProps } from "next";
-import { isMobile } from "react-device-detect";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Box, Link, TableBody, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { GetServerSideProps } from 'next';
+import { Tr } from 'react-super-responsive-table';
 
-import { MainWrapper } from "../components/styled";
-import { getExplorerUrl,
+import { MainWrapper } from '../components/styled';
+import {
+  getExplorerUrl,
   convertTimestampToDateTime,
   getAssetsUrl,
   logoImgUrl,
   shortenHex,
-} from "../utils";
-import { useActiveWeb3React } from "../hooks/web3";
-import { useApiData } from "../contexts/ApiDataContext";
-import api from "../services/api";
+} from '../utils';
+import { useActiveWeb3React } from '../hooks/web3';
+import { useApiData } from '../contexts/ApiDataContext';
+import api from '../services/api';
 
-import { Tr } from "react-super-responsive-table";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import NFTImage from "../components/NFTImage";
-import { CustomPagination } from "../components/CustomPagination";
-
+import NFTImage from '../components/nft/NFTImage';
+import { CustomPagination } from '../components/common/CustomPagination';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -27,12 +26,12 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../components/styled";
+} from '../components/styled';
 
 /* ------------------------------------------------------------------
   Types
 ------------------------------------------------------------------ */
-interface CSTToken {
+export interface CSTToken {
   EvtLogId: number;
   TxHash: string;
   TimeStamp: number;
@@ -55,27 +54,29 @@ function useUserCSTTokens(account: string | null | undefined) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTokens = async (showLoading = true) => {
-    if (!account) return;
+  const fetchTokens = useCallback(
+    async (showLoading = true) => {
+      if (!account) return;
 
-    try {
-      if (showLoading) setLoading(true);
-      const cstList = await api.get_cst_tokens_by_user(account);
-      setTokens(cstList);
-    } catch (err) {
-      console.error("Failed to fetch user CST tokens:", err);
-      setError("Failed to load CST tokens.");
-      setTokens([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        if (showLoading) setLoading(true);
+        const cstList = await api.get_cst_tokens_by_user(account);
+        setTokens(cstList as unknown as CSTToken[]);
+      } catch (err) {
+        console.error('Failed to fetch user CST tokens:', err);
+        setError('Failed to load CST tokens.');
+        setTokens([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [account],
+  );
 
   // Fetch on mount (or whenever account changes)
   useEffect(() => {
     fetchTokens();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account]);
+  }, [fetchTokens]);
 
   return { tokens, loading, error, refetch: fetchTokens };
 }
@@ -86,8 +87,7 @@ function useUserCSTTokens(account: string | null | undefined) {
 ------------------------------------------------------------------ */
 function CSTRow({ nft }: { nft: CSTToken }) {
   // Generate image URL
-  const getTokenImageURL = () =>
-    getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
+  const getTokenImageURL = () => getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
 
   // If no data
   if (!nft) {
@@ -96,11 +96,8 @@ function CSTRow({ nft }: { nft: CSTToken }) {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell sx={{ width: "120px" }}>
-        <Link
-          href={`/detail/${nft.TokenId}`}
-          style={{ color: "inherit", fontSize: "inherit" }}
-        >
+      <TablePrimaryCell sx={{ width: '120px' }}>
+        <Link href={`/detail/${nft.TokenId}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
           <NFTImage src={getTokenImageURL()} />
         </Link>
       </TablePrimaryCell>
@@ -117,21 +114,15 @@ function CSTRow({ nft }: { nft: CSTToken }) {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link
-          href={`/detail/${nft.TokenId}`}
-          style={{ color: "inherit", fontSize: "inherit" }}
-        >
+        <Link href={`/detail/${nft.TokenId}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
           {nft.TokenId}
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{nft.TokenName || " "}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{nft.TokenName || ' '}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${nft.RoundNum}`}
-          style={{ color: "inherit", fontSize: "inherit" }}
-        >
+        <Link href={`/prize/${nft.RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
@@ -141,9 +132,9 @@ function CSTRow({ nft }: { nft: CSTToken }) {
           <Link
             href={`/user/${nft.WinnerAddr}`}
             style={{
-              color: "inherit",
-              fontSize: "inherit",
-              fontFamily: "monospace",
+              color: 'inherit',
+              fontSize: 'inherit',
+              fontFamily: 'monospace',
             }}
           >
             {shortenHex(nft.WinnerAddr, 6)}
@@ -151,32 +142,25 @@ function CSTRow({ nft }: { nft: CSTToken }) {
         </Tooltip>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
-        {nft.Staked ? "Yes" : "No"}
-      </TablePrimaryCell>
+      <TablePrimaryCell align="center">{nft.Staked ? 'Yes' : 'No'}</TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
-        {nft.WasUnstaked ? "Yes" : "No"}
-      </TablePrimaryCell>
+      <TablePrimaryCell align="center">{nft.WasUnstaked ? 'Yes' : 'No'}</TablePrimaryCell>
 
       <TablePrimaryCell align="right">
         {nft.RecordType === 1 ? (
-          "Raffle NFT Token"
+          'Raffle NFT Token'
         ) : nft.RecordType === 2 ? (
-          "Staking RandomWalk NFT"
+          'Staking RandomWalk NFT'
         ) : nft.RecordType === 3 ? (
-          <Link
-            href={`/prize/${nft.RoundNum}`}
-            style={{ color: "inherit", fontSize: "inherit" }}
-          >
+          <Link href={`/prize/${nft.RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
             Main Prize Winner (#{nft.RoundNum})
           </Link>
         ) : nft.RecordType === 4 ? (
-          "Endurance Champion"
+          'Endurance Champion'
         ) : nft.RecordType === 5 ? (
-          "Last CST Bidder"
+          'Last CST Bidder'
         ) : (
-          ""
+          ''
         )}
       </TablePrimaryCell>
     </TablePrimaryRow>
@@ -188,6 +172,8 @@ function CSTRow({ nft }: { nft: CSTToken }) {
   Renders a paginated table of CST tokens.
 ------------------------------------------------------------------ */
 export function CSTTable({ list }: { list: CSTToken[] }) {
+  const theme = useTheme();
+  const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
   const [currentPage, setCurrentPage] = useState(1);
   const PER_PAGE = 5;
 
@@ -204,7 +190,7 @@ export function CSTTable({ list }: { list: CSTToken[] }) {
       <TablePrimaryContainer>
         <TablePrimary>
           {/* Optional column sizing for non-mobile displays */}
-          {!isMobile && (
+          {!isMobileView && (
             <colgroup>
               <col width="10%" />
               <col width="15%" />
@@ -227,9 +213,7 @@ export function CSTTable({ list }: { list: CSTToken[] }) {
               <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Currently Staked?</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Staked Once?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Prize Type
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Prize Type</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
@@ -274,9 +258,7 @@ function MyWallet() {
       </Typography>
 
       {!account ? (
-        <Typography variant="subtitle1">
-          Please login to Metamask to see your tokens.
-        </Typography>
+        <Typography variant="subtitle1">Please login to Metamask to see your tokens.</Typography>
       ) : loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : error ? (
@@ -299,17 +281,17 @@ function MyWallet() {
   getServerSideProps (for SEO)
 ------------------------------------------------------------------ */
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "My Tokens | Cosmic Signature";
+  const title = 'My Tokens | Cosmic Signature';
   const description =
-    "Manage your digital assets on the My Tokens page at Cosmic Signature. View your token balance, transaction history, and ownership details. Keep track of your NFTs and tokens effortlessly.";
+    'Manage your digital assets on the My Tokens page at Cosmic Signature. View your token balance, transaction history, and ownership details. Keep track of your NFTs and tokens effortlessly.';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

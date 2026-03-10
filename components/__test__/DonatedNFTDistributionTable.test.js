@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
-import DonatedNFTDistributionTable from "../DonatedNFTDistributionTable";
+import DonatedNFTDistributionTable from "../donations/DonatedNFTDistributionTable";
 import "@testing-library/jest-dom";
 
 test("DonatedNFTDistributionTable with no records", () => {
   render(<DonatedNFTDistributionTable list={[]} />);
-  expect(screen.getByText("No bidders yet.")).toBeInTheDocument();
+  expect(screen.getByText("No donated tokens yet.")).toBeInTheDocument();
 });
 
 test("DonatedNFTDistributionTable with mock data", () => {

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import NameHistoryTable from "../NameHistoryTable";
+import NameHistoryTable from "../tables/NameHistoryTable";
 import "@testing-library/jest-dom";
 import { convertTimestampToDateTime } from "../../utils";
 

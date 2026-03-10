@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { MainWrapper } from "../../components/styled";
-import api from "../../services/api";
-import EthDonationTable from "../../components/EthDonationTable";
-import { GetServerSideProps } from "next";
-import { useNotification } from "../../contexts/NotificationContext";
-import { useActiveWeb3React } from "../../hooks/web3";
-import useCosmicGameContract from "../../hooks/useCosmicGameContract";
-import { ethers } from "ethers";
-import { logoImgUrl } from "../../utils";
+import React, { useEffect, useState } from 'react';
+import { Box, Button, TextField, Typography } from '@mui/material';
+import { GetServerSideProps } from 'next';
+import { parseEther } from 'viem';
+
+import { MainWrapper } from '../../components/styled';
+import api from '../../services/api';
+import EthDonationTable, { EthDonation } from '../../components/tables/EthDonationTable';
+import { useNotification } from '../../contexts/NotificationContext';
+import { useActiveWeb3React } from '../../hooks/web3';
+import useCosmicGameContract from '../../hooks/useCosmicGameContract';
+import { logoImgUrl } from '../../utils';
 
 const EthDonations = () => {
   // State for donation data, amount, and donation information (JSON format)
-  const [charityDonations, setCharityDonations] = useState(null);
-  const [donateAmount, setDonateAmount] = useState("");
-  const [donateInformation, setDonationInformation] = useState("");
+  const [charityDonations, setCharityDonations] = useState<EthDonation[] | null>(null);
+  const [donateAmount, setDonateAmount] = useState('');
+  const [donateInformation, setDonationInformation] = useState('');
 
   const { setNotification } = useNotification();
   const { account } = useActiveWeb3React();
@@ -23,7 +24,7 @@ const EthDonations = () => {
   // Fetches the donation history
   const fetchCharityDonations = async () => {
     const donations = await api.get_donations_both();
-    setCharityDonations(donations);
+    setCharityDonations(donations as EthDonation[]);
   };
 
   useEffect(() => {
@@ -33,62 +34,64 @@ const EthDonations = () => {
   // Handles basic ETH donation
   const handleDonate = async () => {
     try {
-      await cosmicGameContract.donateEth({
-        value: ethers.utils.parseEther(donateAmount),
+      await (
+        cosmicGameContract!.write.donateEth as unknown as (
+          ...a: unknown[]
+        ) => Promise<`0x${string}`>
+      )([], {
+        value: parseEther(donateAmount),
       });
 
       setNotification({
         text: `${donateAmount} ETH was donated successfully!`,
-        type: "success",
+        type: 'success',
         visible: true,
       });
 
-      setDonateAmount("");
+      setDonateAmount('');
 
       // Refresh donations after 1 second
       setTimeout(fetchCharityDonations, 1000);
-    } catch (error) {
-      if (error?.code === 4001) {
-        console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
-      } else {
-        console.error("Donation error:", error);
+    } catch (error: unknown) {
+      if (
+        !(error instanceof Error && 'code' in error && (error as { code: number }).code === 4001)
+      ) {
+        console.error('Donation error:', error);
         setNotification({
-          text: "Donation failed, please try again.",
-          type: "error",
+          text: 'Donation failed, please try again.',
+          type: 'error',
           visible: true,
         });
       }
     }
   };
 
-  // Handles ETH donation with additional JSON information
   const handleDonateWithInfo = async () => {
     try {
-      await cosmicGameContract.donateEthWithInfo(donateInformation, {
-        value: ethers.utils.parseEther(donateAmount),
-      });
+      await (
+        cosmicGameContract!.write.donateEthWithInfo as unknown as (
+          ...a: unknown[]
+        ) => Promise<`0x${string}`>
+      )([donateInformation], { value: parseEther(donateAmount) });
 
       setNotification({
         text: `${donateAmount} ETH with information was donated successfully!`,
-        type: "success",
+        type: 'success',
         visible: true,
       });
 
-      setDonateAmount("");
-      setDonationInformation("");
+      setDonateAmount('');
+      setDonationInformation('');
 
-      // Refresh donations after 1 second
       setTimeout(fetchCharityDonations, 1000);
-    } catch (error) {
-      if (error?.code === 4001) {
-        console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
-      } else {
-        console.error("Donation with info error:", error);
+    } catch (error: unknown) {
+      if (
+        !(error instanceof Error && 'code' in error && (error as { code: number }).code === 4001)
+      ) {
+        console.error('Donation with info error:', error);
         setNotification({
-          text: "Donation with information failed, please check your input.",
-          type: "error",
+          text: 'Donation with information failed, please check your input.',
+          type: 'error',
           visible: true,
         });
       }
@@ -97,13 +100,7 @@ const EthDonations = () => {
 
   return (
     <MainWrapper>
-      <Typography
-        variant="h4"
-        color="primary"
-        gutterBottom
-        textAlign="center"
-        mb={4}
-      >
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={4}>
         Direct (ETH) Donations
       </Typography>
 
@@ -119,7 +116,7 @@ const EthDonations = () => {
       {!!account && (
         <>
           <Box mt={6}>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Typography mr={1}>Amount:</Typography>
               <TextField
                 placeholder="Donation amount"
@@ -145,7 +142,7 @@ const EthDonations = () => {
           <Box mt={1} mb={1}>
             <Button
               variant="contained"
-              disabled={!donateAmount || donateAmount === "0"}
+              disabled={!donateAmount || donateAmount === '0'}
               onClick={handleDonate}
               sx={{ mr: 1 }}
             >
@@ -153,7 +150,7 @@ const EthDonations = () => {
             </Button>
             <Button
               variant="contained"
-              disabled={!donateAmount || donateAmount === "0"}
+              disabled={!donateAmount || donateAmount === '0'}
               onClick={handleDonateWithInfo}
             >
               Donate with Info
@@ -166,16 +163,16 @@ const EthDonations = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Direct (ETH) Donations | Cosmic Signature";
-  const description = "Direct (ETH) Donations";
+  const title = 'Direct (ETH) Donations | Cosmic Signature';
+  const description = 'Direct (ETH) Donations';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

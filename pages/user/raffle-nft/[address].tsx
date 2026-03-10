@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Box, Link, TableBody, Typography } from "@mui/material";
-import { GetServerSidePropsContext } from "next";
-import { ethers } from "ethers";
+import React, { useEffect, useState } from 'react';
+import { Box, Link, TableBody, Typography } from '@mui/material';
+import { GetServerSidePropsContext } from 'next';
+import { getAddress, isAddress } from 'viem';
+import { Tr } from 'react-super-responsive-table';
 
-import api from "../../../services/api";
-import { getExplorerUrl, logoImgUrl, convertTimestampToDateTime } from "../../../utils";
-import { CustomPagination } from "../../../components/CustomPagination";
-
+import api from '../../../services/api';
+import { getExplorerUrl, logoImgUrl, convertTimestampToDateTime } from '../../../utils';
+import { CustomPagination } from '../../../components/common/CustomPagination';
 import {
   MainWrapper,
   TablePrimary,
@@ -15,10 +15,9 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../../../components/styled";
+} from '../../../components/styled';
 
-import { Tr } from "react-super-responsive-table";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 /* ------------------------------------------------------------------
   Types
@@ -59,9 +58,9 @@ function NFTWinningsRow({ row }: { row: RaffleNFTWinning }) {
         <Link
           href={`/prize/${RoundNum}`}
           style={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
+            color: 'inherit',
+            fontSize: 'inherit',
+            fontFamily: 'monospace',
           }}
           target="_blank"
         >
@@ -69,20 +68,16 @@ function NFTWinningsRow({ row }: { row: RaffleNFTWinning }) {
         </Link>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
-        {IsRWalk ? "Yes" : "No"}
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {IsStaker ? "Yes" : "No"}
-      </TablePrimaryCell>
+      <TablePrimaryCell align="center">{IsRWalk ? 'Yes' : 'No'}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{IsStaker ? 'Yes' : 'No'}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
         <Link
           href={`/detail/${TokenId}`}
           style={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
+            color: 'inherit',
+            fontSize: 'inherit',
+            fontFamily: 'monospace',
           }}
         >
           {TokenId}
@@ -156,12 +151,12 @@ function useRaffleNFTWinnings(userAddress: string) {
     setRaffleNfts((prev) => ({ ...prev, loading: true }));
     try {
       const response = await api.get_raffle_nft_winnings_by_user(userAddress);
-      const sorted = response.sort(
-        (a: RaffleNFTWinning, b: RaffleNFTWinning) => b.TimeStamp - a.TimeStamp
+      const sorted = (response as RaffleNFTWinning[]).sort(
+        (a: RaffleNFTWinning, b: RaffleNFTWinning) => b.TimeStamp - a.TimeStamp,
       );
-      setRaffleNfts({ data: sorted, loading: false });
+      setRaffleNfts({ data: sorted as RaffleNFTWinning[], loading: false });
     } catch (err) {
-      console.error("Error fetching raffle NFT winnings:", err);
+      console.error('Error fetching raffle NFT winnings:', err);
       setRaffleNfts({ data: [], loading: false });
     }
   };
@@ -179,7 +174,7 @@ function UserRaffleNFT({ address }: { address: string }) {
 
   // On mount / address changes
   useEffect(() => {
-    if (!address || address === "Invalid Address") {
+    if (!address || address === 'Invalid Address') {
       setInvalidAddress(true);
     } else {
       fetchRaffleNFTWinnings();
@@ -228,22 +223,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   let address = Array.isArray(param) ? param[0] : param;
 
   // Validate address
-  if (ethers.utils.isAddress(address.toLowerCase())) {
-    address = ethers.utils.getAddress(address.toLowerCase());
+  if (isAddress(address!.toLowerCase())) {
+    address = getAddress(address!.toLowerCase());
   } else {
-    address = "Invalid Address";
+    address = 'Invalid Address';
   }
 
   const title = `Raffle NFT User(${address}) Won | Cosmic Signature`;
   const description = `Raffle NFT User(${address}) Won`;
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return {

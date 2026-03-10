@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Box, Link, TableBody, Typography } from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { Box, Link, TableBody, Typography } from '@mui/material';
+
 import {
   MainWrapper,
   TablePrimary,
@@ -8,23 +9,27 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../components/styled";
-import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from "../utils";
-import api from "../services/api";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { Tr } from "react-super-responsive-table";
-import { CustomPagination } from "../components/CustomPagination";
-import { GetServerSideProps } from "next";
+} from '../components/styled';
+import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from '../utils';
+import api from '../services/api';
 
-/* ------------------------------------------------------------------
-  Sub-Component: UsedRwlkNftRow
-  Renders a single row with NFT information, including:
-    - Datetime (links to Arbiscan for transaction),
-    - Bidder Address (links to user page),
-    - Round Number (links to a 'prize' detail page),
-    - RWalk Token ID.
------------------------------------------------------------------- */
-const UsedRwlkNftRow = ({ nft }) => {
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { Tr } from 'react-super-responsive-table';
+
+import { CustomPagination } from '../components/common/CustomPagination';
+
+import { GetServerSideProps } from 'next';
+
+interface UsedRwlkNftRecord {
+  RWalkTokenId: number;
+  BidderAddr: string;
+  RoundNum: number;
+  TxHash: string;
+  TimeStamp: number;
+  [key: string]: unknown;
+}
+
+const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
   // If nft is null/undefined, render an empty row to avoid errors.
   if (!nft) {
     return <TablePrimaryRow />;
@@ -48,9 +53,9 @@ const UsedRwlkNftRow = ({ nft }) => {
       <TablePrimaryCell align="center">
         <Link
           sx={{
-            color: "inherit",
-            fontSize: "inherit",
-            fontFamily: "monospace",
+            color: 'inherit',
+            fontSize: 'inherit',
+            fontFamily: 'monospace',
           }}
           href={`/user/${nft.BidderAddr}`}
         >
@@ -60,10 +65,7 @@ const UsedRwlkNftRow = ({ nft }) => {
 
       {/* Round Number -> Prize detail page */}
       <TablePrimaryCell align="center">
-        <Link
-          sx={{ color: "inherit", fontSize: "inherit" }}
-          href={`/prize/${nft.RoundNum}`}
-        >
+        <Link sx={{ color: 'inherit', fontSize: 'inherit' }} href={`/prize/${nft.RoundNum}`}>
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
@@ -79,7 +81,7 @@ const UsedRwlkNftRow = ({ nft }) => {
   A table wrapper that maps over a list of NFT objects and displays
   each in a UsedRwlkNftRow.
 ------------------------------------------------------------------ */
-const UsedRwlkNftsTable = ({ list }) => {
+const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
   return (
     <TablePrimaryContainer>
       <TablePrimary>
@@ -92,7 +94,7 @@ const UsedRwlkNftsTable = ({ list }) => {
           </Tr>
         </TablePrimaryHead>
         <TableBody>
-          {list.map((nft, i) => (
+          {list.map((nft, i: number) => (
             <UsedRwlkNftRow key={i} nft={nft} />
           ))}
         </TableBody>
@@ -118,7 +120,7 @@ const UsedRwlkNfts = () => {
   const [loading, setLoading] = useState(true);
 
   // The complete list of used RandomWalk NFTs.
-  const [list, setList] = useState([]);
+  const [list, setList] = useState<UsedRwlkNftRecord[]>([]);
 
   // Fetch the used RandomWalk NFTs from the API upon component mount.
   useEffect(() => {
@@ -126,7 +128,7 @@ const UsedRwlkNfts = () => {
       try {
         setLoading(true);
         const nfts = await api.get_used_rwlk_nfts();
-        setList(nfts);
+        setList(nfts as UsedRwlkNftRecord[]);
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -151,9 +153,7 @@ const UsedRwlkNfts = () => {
           <Typography variant="h6">Loading...</Typography>
         ) : list.length > 0 ? (
           <>
-            <UsedRwlkNftsTable
-              list={list.slice((curPage - 1) * perPage, curPage * perPage)}
-            />
+            <UsedRwlkNftsTable list={list.slice((curPage - 1) * perPage, curPage * perPage)} />
             {/* Pagination Controls */}
             <CustomPagination
               page={curPage}
@@ -177,16 +177,16 @@ const UsedRwlkNfts = () => {
   up correctly.
 ------------------------------------------------------------------ */
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Used RandomWalk NFTs for Bid | Cosmic Signature";
-  const description = "Used RandomWalk NFTs for Bid";
+  const title = 'Used RandomWalk NFTs for Bid | Cosmic Signature';
+  const description = 'Used RandomWalk NFTs for Bid';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

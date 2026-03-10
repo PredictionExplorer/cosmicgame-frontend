@@ -1,5 +1,5 @@
 import { render, screen, act } from "@testing-library/react";
-import LatestNFTs from "../LatestNFTs";
+import LatestNFTs from "../nft/LatestNFTs";
 import "@testing-library/jest-dom";
 
 test("LatestNFTs with no records", () => {

@@ -1,7 +1,8 @@
-import { RAFFLE_WALLET_ADDRESS } from "../config/app";
-import RAFFLE_WALLET_ABI from "../contracts/PrizesWallet.json";
-import useContract from "./useContract";
+import { RAFFLE_WALLET_ADDRESS } from '../config/networks';
+import { prizesWalletAbi } from '../contracts/abis';
+
+import useContract from './useContract';
 
 export default function useRaffleWalletContract() {
-  return useContract(RAFFLE_WALLET_ADDRESS, RAFFLE_WALLET_ABI);
+  return useContract(RAFFLE_WALLET_ADDRESS, prizesWalletAbi);
 }

@@ -1,20 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Box, Link, Typography } from "@mui/material";
-import { MainWrapper } from "../components/styled";
-import api from "../services/api";
-import { GlobalStakingRewardsTable } from "../components/GlobalStakingRewardsTable";
-import { RwalkStakingRewardMintsTable } from "../components/RwalkStakingRewardMintsTable";
-import { GetServerSideProps } from "next";
-import { logoImgUrl } from "../utils";
+import React, { useEffect, useState } from 'react';
+import { Box, Link, Typography } from '@mui/material';
+import { GetServerSideProps } from 'next';
+
+import { MainWrapper } from '../components/styled';
+import api from '../services/api';
+import { GlobalStakingRewardsTable } from '../components/staking/GlobalStakingRewardsTable';
+import { RwalkStakingRewardMintsTable } from '../components/staking/RwalkStakingRewardMintsTable';
+import { logoImgUrl } from '../utils';
 
 /**
  * Custom hook to fetch staking rewards data
  */
 const useStakingData = () => {
-  const [cosmicSignatureRewards, setCosmicSignatureRewards] = useState<any>(
-    null
-  );
-  const [randomWalkRewards, setRandomWalkRewards] = useState<any>(null);
+  const [cosmicSignatureRewards, setCosmicSignatureRewards] = useState<
+    import('../services/api/types').StakingCSTReward[] | null
+  >(null);
+  const [randomWalkRewards, setRandomWalkRewards] = useState<
+    import('../services/api/types').StakingRewardMint[] | null
+  >(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,8 +32,8 @@ const useStakingData = () => {
         setCosmicSignatureRewards(cosmicData);
         setRandomWalkRewards(randomWalkData);
       } catch (err) {
-        console.error("Error fetching staking rewards:", err);
-        setError(err?.message ?? "Failed to fetch staking rewards");
+        console.error('Error fetching staking rewards:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch staking rewards');
       } finally {
         setLoading(false);
       }
@@ -49,12 +52,7 @@ const useStakingData = () => {
  * and the RandomWalk NFT.
  */
 const Staking = () => {
-  const {
-    cosmicSignatureRewards,
-    randomWalkRewards,
-    loading,
-    error,
-  } = useStakingData();
+  const { cosmicSignatureRewards, randomWalkRewards, loading, error } = useStakingData();
 
   // Early return if there's an error
   if (error) {
@@ -84,7 +82,13 @@ const Staking = () => {
         {loading ? (
           <Typography variant="h6">Loading...</Typography>
         ) : (
-          <GlobalStakingRewardsTable list={cosmicSignatureRewards} />
+          <GlobalStakingRewardsTable
+            list={
+              (cosmicSignatureRewards ?? []) as unknown as React.ComponentProps<
+                typeof GlobalStakingRewardsTable
+              >['list']
+            }
+          />
         )}
       </Box>
 
@@ -96,14 +100,20 @@ const Staking = () => {
         {loading ? (
           <Typography variant="h6">Loading...</Typography>
         ) : (
-          <RwalkStakingRewardMintsTable list={randomWalkRewards} />
+          <RwalkStakingRewardMintsTable
+            list={
+              (randomWalkRewards ?? []) as unknown as React.ComponentProps<
+                typeof RwalkStakingRewardMintsTable
+              >['list']
+            }
+          />
         )}
       </Box>
 
       {/* Link to "My Staking" Page */}
       <Typography mt={6}>
-        To participate in Staking, visit{" "}
-        <Link href="/my-staking" sx={{ color: "inherit" }}>
+        To participate in Staking, visit{' '}
+        <Link href="/my-staking" sx={{ color: 'inherit' }}>
           &quot;MY STAKING&quot;
         </Link>
         . (option available from the Account menu)
@@ -117,16 +127,16 @@ const Staking = () => {
  * Provides metadata for SEO (Open Graph and Twitter cards).
  */
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Staking | Cosmic Signature";
-  const description = "Staking";
+  const title = 'Staking | Cosmic Signature';
+  const description = 'Staking';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

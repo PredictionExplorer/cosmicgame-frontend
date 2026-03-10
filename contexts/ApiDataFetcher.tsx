@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
-import { useApiData } from "./ApiDataContext";
+import React, { useEffect } from 'react';
+
+import { useApiData } from './ApiDataContext';
 
 /**
  * Props for the ApiDataFetcher component.

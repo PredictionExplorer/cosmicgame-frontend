@@ -3,8 +3,12 @@
  * This page shows a paginated table of system events with their types, timestamps, and values
  */
 
-import React, { useEffect, useState } from "react";
-import { Link, TableBody, Tooltip, Typography } from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { Link, TableBody, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { GetServerSidePropsContext } from 'next';
+import { Tr } from 'react-super-responsive-table';
+
 import {
   MainWrapper,
   TablePrimary,
@@ -13,20 +17,18 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../../../../components/styled";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import api from "../../../../services/api";
-import { getExplorerUrl,
+} from '../../../../components/styled';
+import api from '../../../../services/api';
+import {
+  getExplorerUrl,
   convertTimestampToDateTime,
   formatSeconds,
   logoImgUrl,
-} from "../../../../utils";
-import { GetServerSidePropsContext } from "next";
-import { Tr } from "react-super-responsive-table";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { ADMIN_EVENTS } from "../../../../config/misc";
-import { CustomPagination } from "../../../../components/CustomPagination";
-import { isMobile } from "react-device-detect";
+} from '../../../../utils';
+
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { ADMIN_EVENTS } from '../../../../config/misc';
+import { CustomPagination } from '../../../../components/common/CustomPagination';
 
 /**
  * Renders a single row in the admin events table
@@ -49,15 +51,11 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
   }
 
   return (
-    <TablePrimaryRow
-      sx={row.TransferType > 0 && { background: "rgba(255, 255, 255, 0.06)" }}
-    >
+    <TablePrimaryRow sx={row.TransferType > 0 && { background: 'rgba(255, 255, 255, 0.06)' }}>
       <TablePrimaryCell>
-        {ADMIN_EVENTS[row.RecordType].name}
+        {ADMIN_EVENTS[row.RecordType]?.name}
         <Tooltip
-          title={
-            <Typography>{ADMIN_EVENTS[row.RecordType].description}</Typography>
-          }
+          title={<Typography>{ADMIN_EVENTS[row.RecordType]?.description}</Typography>}
           sx={{ ml: 1 }}
         >
           <ErrorOutlineIcon fontSize="inherit" />
@@ -75,16 +73,16 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
       </TablePrimaryCell>
       <TablePrimaryCell>
         {row.RecordType === 0 ? (
-          "Undefined"
-        ) : ADMIN_EVENTS[row.RecordType].type === "timestamp" ? (
+          'Undefined'
+        ) : ADMIN_EVENTS[row.RecordType]?.type === 'timestamp' ? (
           convertTimestampToDateTime(row.IntegerValue)
-        ) : ADMIN_EVENTS[row.RecordType].type === "percentage" ? (
+        ) : ADMIN_EVENTS[row.RecordType]?.type === 'percentage' ? (
           `${row.IntegerValue}%`
-        ) : ADMIN_EVENTS[row.RecordType].type === "number" ? (
+        ) : ADMIN_EVENTS[row.RecordType]?.type === 'number' ? (
           row.IntegerValue
-        ) : ADMIN_EVENTS[row.RecordType].type === "time" ? (
+        ) : ADMIN_EVENTS[row.RecordType]?.type === 'time' ? (
           formatSeconds(row.IntegerValue)
-        ) : ADMIN_EVENTS[row.RecordType].type === "address" ? (
+        ) : ADMIN_EVENTS[row.RecordType]?.type === 'address' ? (
           <Typography fontFamily="monospace">{row.AddressValue}</Typography>
         ) : (
           <Link href={row.StringValue} target="_blank">
@@ -101,6 +99,8 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
  * @param list - Array of admin events to display
  */
 export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
+  const theme = useTheme();
+  const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
   const perPage = 10;
   const [page, setPage] = useState(1);
 
@@ -111,7 +111,7 @@ export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          {!isMobile && (
+          {!isMobileView && (
             <colgroup>
               <col width="40%" />
               <col width="15%" />
@@ -122,9 +122,7 @@ export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
             <Tr>
               <TablePrimaryHeadCell align="left">Event</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">
-                New Value
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">New Value</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
@@ -134,12 +132,7 @@ export const AdminEventsTable = ({ list }: { list: AdminEventRow[] }) => {
           </TableBody>
         </TablePrimary>
       </TablePrimaryContainer>
-      <CustomPagination
-        page={page}
-        setPage={setPage}
-        totalLength={list.length}
-        perPage={perPage}
-      />
+      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );
 };
@@ -165,10 +158,9 @@ const AdminEvent = ({ start, end, round }: AdminEventProps) => {
       try {
         setLoading(true);
         const sys_events = await api.get_system_events(start, end);
-        setEvents(sys_events);
+        setEvents(sys_events as AdminEventRow[]);
         setLoading(false);
       } catch (err) {
-        console.log(err);
         setLoading(false);
       }
     };
@@ -178,23 +170,11 @@ const AdminEvent = ({ start, end, round }: AdminEventProps) => {
   return (
     <MainWrapper>
       {round > 0 ? (
-        <Typography
-          variant="h4"
-          color="primary"
-          textAlign="center"
-          mb={4}
-          letterSpacing="1px"
-        >
+        <Typography variant="h4" color="primary" textAlign="center" mb={4} letterSpacing="1px">
           System Configuration Made Before Round {round}
         </Typography>
       ) : (
-        <Typography
-          variant="h4"
-          color="primary"
-          textAlign="center"
-          mb={4}
-          letterSpacing="1px"
-        >
+        <Typography variant="h4" color="primary" textAlign="center" mb={4} letterSpacing="1px">
           System Configuration Made Before Deployment
         </Typography>
       )}
@@ -222,12 +202,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const description = `Admin Events`;
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return {

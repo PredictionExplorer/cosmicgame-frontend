@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { networkConfig } from "../config/networks";
+import React, { useEffect, useState } from 'react';
+import { Typography, List, ListItem, useTheme, useMediaQuery, Box } from '@mui/material';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { GetServerSideProps } from 'next';
+import { formatEther } from 'viem';
+
+import { networkConfig } from '../config/networks';
+import { MainWrapper } from '../components/styled';
+import api from '../services/api';
+import { formatSeconds, logoImgUrl } from '../utils';
+import { useNotification } from '../contexts/NotificationContext';
+import useContractNoSigner from '../hooks/useContractNoSigner';
 import {
-  Typography,
-  List,
-  ListItem,
-  useTheme,
-  useMediaQuery,
-  Box,
-} from "@mui/material";
-import { MainWrapper } from "../components/styled";
-import { CopyToClipboard } from "react-copy-to-clipboard";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import api from "../services/api";
-import { formatSeconds, logoImgUrl } from "../utils";
-import { useNotification } from "../contexts/NotificationContext";
-import useContractNoSigner from "../hooks/useContractNoSigner";
-import CHARITY_WALLET_ABI from "../contracts/CharityWallet.json";
-import COSMICGAME_ABI from "../contracts/CosmicGame.json";
-import { CHARITY_WALLET_ADDRESS, COSMICGAME_ADDRESS } from "../config/app";
-import { GetServerSideProps } from "next";
-import { ethers } from "ethers";
+  charityWalletAbi as CHARITY_WALLET_ABI,
+  cosmicGameAbi as COSMICGAME_ABI,
+} from '../contracts/abis';
+import { CHARITY_WALLET_ADDRESS, COSMICGAME_ADDRESS } from '../config/networks';
 
 /**
  * Defines the structure of props accepted by the ContractItem component.
@@ -35,8 +31,8 @@ interface ContractItemProps {
  */
 const ContractItem = ({ name, value, copyable = false }: ContractItemProps) => {
   const theme = useTheme();
-  const md = useMediaQuery(theme.breakpoints.up("md"));
-  const sm = useMediaQuery(theme.breakpoints.up("sm"));
+  const md = useMediaQuery(theme.breakpoints.up('md'));
+  const sm = useMediaQuery(theme.breakpoints.up('sm'));
   const { setNotification } = useNotification();
 
   return (
@@ -46,30 +42,30 @@ const ContractItem = ({ name, value, copyable = false }: ContractItemProps) => {
         color="primary"
         sx={{
           mr: 2,
-          minWidth: md ? "350px" : "150px",
-          maxWidth: md ? "350px" : "150px",
+          minWidth: md ? '350px' : '150px',
+          maxWidth: md ? '350px' : '150px',
         }}
-        variant={sm ? "subtitle1" : "body1"}
+        variant={sm ? 'subtitle1' : 'body1'}
       >
         {name}:
       </Typography>
 
       {copyable ? (
-        <CopyToClipboard text={value ? String(value) : ""}>
+        <CopyToClipboard text={value ? String(value) : ''}>
           <Box
-            sx={{ display: "flex", cursor: "pointer", alignItems: "center" }}
+            sx={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }}
             onClick={() =>
               setNotification({
-                text: "Address copied!",
-                type: "success",
+                text: 'Address copied!',
+                type: 'success',
                 visible: true,
               })
             }
           >
             <Typography
               fontFamily="monospace"
-              variant={sm ? "subtitle1" : "body1"}
-              sx={{ wordBreak: "break-all", mr: 1 }}
+              variant={sm ? 'subtitle1' : 'body1'}
+              sx={{ wordBreak: 'break-all', mr: 1 }}
             >
               {value}
             </Typography>
@@ -79,8 +75,8 @@ const ContractItem = ({ name, value, copyable = false }: ContractItemProps) => {
       ) : (
         <Typography
           fontFamily="monospace"
-          variant={sm ? "subtitle1" : "body1"}
-          sx={{ wordBreak: "break-all" }}
+          variant={sm ? 'subtitle1' : 'body1'}
+          sx={{ wordBreak: 'break-all' }}
         >
           {value}
         </Typography>
@@ -128,7 +124,7 @@ interface DashboardData {
 const Contracts = () => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [charityAddress, setCharityAddress] = useState("");
+  const [charityAddress, setCharityAddress] = useState('');
   const [priceIncrease, setPriceIncrease] = useState(0);
   const [timeIncrease, setTimeIncrease] = useState(0);
   const [msgMaxLen, setMsgMaxLen] = useState(0);
@@ -141,20 +137,12 @@ const Contracts = () => {
     AuctionDuration: 0,
     ElapsedDuration: 0,
   });
-  const [
-    cstDutchAuctionBeginningBidPriceMinLimit,
-    setCstDutchAuctionBeginningBidPriceMinLimit,
-  ] = useState(0);
+  const [cstDutchAuctionBeginningBidPriceMinLimit, setCstDutchAuctionBeginningBidPriceMinLimit] =
+    useState(0);
 
   // Use a read-only contract instance (without signer) for the Charity Wallet.
-  const charityWalletContract = useContractNoSigner(
-    CHARITY_WALLET_ADDRESS,
-    CHARITY_WALLET_ABI
-  );
-  const cosmicGameContract = useContractNoSigner(
-    COSMICGAME_ADDRESS,
-    COSMICGAME_ABI
-  );
+  const charityWalletContract = useContractNoSigner(CHARITY_WALLET_ADDRESS, CHARITY_WALLET_ABI);
+  const cosmicGameContract = useContractNoSigner(COSMICGAME_ADDRESS, COSMICGAME_ABI);
 
   /**
    * Fetch initial dashboard data from the server via API.
@@ -164,7 +152,7 @@ const Contracts = () => {
       try {
         setLoading(true);
         const newData = await api.get_dashboard_info();
-        setData(newData);
+        setData(newData as unknown as DashboardData);
       } catch (error) {
         console.error(error);
       } finally {
@@ -178,44 +166,57 @@ const Contracts = () => {
     if (!cosmicGameContract) return;
 
     const safeCall = async (fn: () => Promise<void>, name: string) => {
-      try { await fn(); } catch (e) { console.error(`contracts.tsx: ${name} failed`, e); }
+      try {
+        await fn();
+      } catch (e) {
+        console.error(`contracts.tsx: ${name} failed`, e);
+      }
     };
 
     safeCall(async () => {
-      const v = await cosmicGameContract.bidMessageLengthMaxLimit();
-      setMsgMaxLen(v);
-    }, "bidMessageLengthMaxLimit");
+      const v = await cosmicGameContract.read.bidMessageLengthMaxLimit?.();
+      setMsgMaxLen(Number(v ?? 0));
+    }, 'bidMessageLengthMaxLimit');
 
     safeCall(async () => {
-      const v = await cosmicGameContract.ethBidPriceIncreaseDivisor();
-      setPriceIncrease(100 / Number(v));
-    }, "ethBidPriceIncreaseDivisor");
+      const v = await cosmicGameContract.read.ethBidPriceIncreaseDivisor?.();
+      setPriceIncrease(100 / Number(v ?? 1));
+    }, 'ethBidPriceIncreaseDivisor');
 
     safeCall(async () => {
-      const v = await cosmicGameContract.mainPrizeTimeIncrementIncreaseDivisor();
-      setTimeIncrease(100 / Number(v));
-    }, "mainPrizeTimeIncrementIncreaseDivisor");
+      const v = await cosmicGameContract.read.mainPrizeTimeIncrementIncreaseDivisor?.();
+      setTimeIncrease(100 / Number(v ?? 1));
+    }, 'mainPrizeTimeIncrementIncreaseDivisor');
 
     safeCall(async () => {
-      const v = await cosmicGameContract.cstRewardAmountForBidding();
-      setCstRewardAmountForBidding(Number(ethers.utils.formatEther(v)));
-    }, "cstRewardAmountForBidding");
+      const v = await cosmicGameContract.read.cstRewardAmountForBidding?.();
+      setCstRewardAmountForBidding(Number(formatEther((v ?? 0n) as bigint)));
+    }, 'cstRewardAmountForBidding');
 
     safeCall(async () => {
-      const v = await cosmicGameContract.getCstDutchAuctionDurations();
-      setCstDutchAuctionDurations({ AuctionDuration: Number(v[0]), ElapsedDuration: Number(v[1]) });
-    }, "getCstDutchAuctionDurations");
+      const v = (await cosmicGameContract.read.getCstDutchAuctionDurations?.()) as
+        | bigint[]
+        | undefined;
+      setCstDutchAuctionDurations({
+        AuctionDuration: Number(v?.[0] ?? 0n),
+        ElapsedDuration: Number(v?.[1] ?? 0n),
+      });
+    }, 'getCstDutchAuctionDurations');
 
     safeCall(async () => {
-      const v = await cosmicGameContract.getEthDutchAuctionDurations();
-      setEthDutchAuctionDurations({ AuctionDuration: Number(v[0]), ElapsedDuration: Number(v[1]) });
-    }, "getEthDutchAuctionDurations");
+      const v = (await cosmicGameContract.read.getEthDutchAuctionDurations?.()) as
+        | bigint[]
+        | undefined;
+      setEthDutchAuctionDurations({
+        AuctionDuration: Number(v?.[0] ?? 0n),
+        ElapsedDuration: Number(v?.[1] ?? 0n),
+      });
+    }, 'getEthDutchAuctionDurations');
 
     safeCall(async () => {
-      const v = await cosmicGameContract.cstDutchAuctionBeginningBidPriceMinLimit();
-      setCstDutchAuctionBeginningBidPriceMinLimit(Number(ethers.utils.formatEther(v)));
-    }, "cstDutchAuctionBeginningBidPriceMinLimit");
-
+      const v = await cosmicGameContract.read.cstDutchAuctionBeginningBidPriceMinLimit?.();
+      setCstDutchAuctionBeginningBidPriceMinLimit(Number(formatEther((v ?? 0n) as bigint)));
+    }, 'cstDutchAuctionBeginningBidPriceMinLimit');
   }, [cosmicGameContract]);
 
   /**
@@ -225,10 +226,10 @@ const Contracts = () => {
     if (!charityWalletContract) return;
     const fetchData = async () => {
       try {
-        const addr = await charityWalletContract.charityAddress();
+        const addr = (await charityWalletContract.read.charityAddress?.()) as string;
         setCharityAddress(addr);
       } catch (e) {
-        console.error("contracts.tsx: charityAddress failed", e);
+        console.error('contracts.tsx: charityAddress failed', e);
       }
     };
     fetchData();
@@ -238,55 +239,55 @@ const Contracts = () => {
    * Contract Items: List of essential contracts or metadata to display in the first List.
    */
   const contractItems = [
-    { name: "Network", value: networkConfig.chainName },
-    { name: "Chain ID", value: networkConfig.chainId },
+    { name: 'Network', value: networkConfig.chainName },
+    { name: 'Chain ID', value: networkConfig.chainId },
     {
-      name: "Cosmic Game Address",
+      name: 'Cosmic Game Address',
       value: data?.ContractAddrs.CosmicGameAddr,
       copyable: true,
     },
     {
-      name: "Cosmic Signature Token Address",
+      name: 'Cosmic Signature Token Address',
       value: data?.ContractAddrs.CosmicTokenAddr,
       copyable: true,
     },
     {
-      name: "Cosmic Signature Address",
+      name: 'Cosmic Signature Address',
       value: data?.ContractAddrs.CosmicSignatureAddr,
       copyable: true,
     },
     {
-      name: "RandomWalk Address",
+      name: 'RandomWalk Address',
       value: data?.ContractAddrs.RandomWalkAddr,
       copyable: true,
     },
     {
-      name: "Cosmic DAO Address",
+      name: 'Cosmic DAO Address',
       value: data?.ContractAddrs.CosmicDaoAddr,
       copyable: true,
     },
     {
-      name: "Charity Wallet Address",
+      name: 'Charity Wallet Address',
       value: data?.ContractAddrs.CharityWalletAddr,
       copyable: true,
     },
     {
-      name: "Marketing Wallet Address",
+      name: 'Marketing Wallet Address',
       value: data?.ContractAddrs.MarketingWalletAddr,
       copyable: true,
     },
     {
-      name: "Prizes Wallet Address",
+      name: 'Prizes Wallet Address',
       value: data?.ContractAddrs.PrizesWalletAddr,
       copyable: true,
     },
     {
-      name: "Cosmic Signature Staking Wallet Address",
+      name: 'Cosmic Signature Staking Wallet Address',
       value: data?.ContractAddrs.StakingWalletCSTAddr,
       copyable: true,
     },
     {
-      name: "Random Walk Staking Wallet Address",
+      name: 'Random Walk Staking Wallet Address',
       value: data?.ContractAddrs.StakingWalletRWalkAddr,
       copyable: true,
     },
@@ -296,84 +297,76 @@ const Contracts = () => {
    * Configuration Items: List of additional contract configurations.
    */
   const configItems = [
-    { name: "Price Increase", value: `${priceIncrease}%` },
-    { name: "Time Increase", value: `${timeIncrease}%` },
+    { name: 'Price Increase', value: `${priceIncrease}%` },
+    { name: 'Time Increase', value: `${timeIncrease}%` },
     {
-      name: "Prize Percentage",
-      value: data ? `${data.PrizePercentage}%` : "--",
+      name: 'Prize Percentage',
+      value: data ? `${data.PrizePercentage}%` : '--',
     },
     {
-      name: "Chrono Warrior Percentage",
-      value: data ? `${data.ChronoWarriorPercentage}%` : "--",
+      name: 'Chrono Warrior Percentage',
+      value: data ? `${data.ChronoWarriorPercentage}%` : '--',
     },
     {
-      name: "Raffle Percentage",
-      value: data ? `${data.RafflePercentage}%` : "--",
+      name: 'Raffle Percentage',
+      value: data ? `${data.RafflePercentage}%` : '--',
     },
     {
-      name: "Staking Percentage",
-      value: data ? `${data.StakingPercentage}%` : "--",
+      name: 'Staking Percentage',
+      value: data ? `${data.StakingPercentage}%` : '--',
     },
     {
-      name: "Raffle ETH Winners for Bidding",
+      name: 'Raffle ETH Winners for Bidding',
       value: data?.NumRaffleEthWinnersBidding,
     },
     {
-      name: "Raffle NFT Winners for Bidding",
+      name: 'Raffle NFT Winners for Bidding',
       value: data?.NumRaffleNFTWinnersBidding,
     },
     {
-      name: "Raffle NFT Winners for Staking Random Walk",
+      name: 'Raffle NFT Winners for Staking Random Walk',
       value: data?.NumRaffleNFTWinnersStakingRWalk,
     },
     {
-      name: "Charity Address",
+      name: 'Charity Address',
       value: charityAddress,
       copyable: true,
     },
     {
-      name: "Charity Percentage",
-      value: data ? `${data.CharityPercentage}%` : "--",
+      name: 'Charity Percentage',
+      value: data ? `${data.CharityPercentage}%` : '--',
     },
     {
-      name: "Amount of CosmicTokens earned per bid",
+      name: 'Amount of CosmicTokens earned per bid',
       value: `${Number(cstRewardAmountForBidding)} CST`,
     },
     {
-      name: "CST Dutch Auction Duration",
-      value: data
-        ? formatSeconds(cstDutchAuctionDurations.AuctionDuration)
-        : "--",
+      name: 'CST Dutch Auction Duration',
+      value: data ? formatSeconds(cstDutchAuctionDurations.AuctionDuration) : '--',
     },
     {
-      name: "CST Dutch Auction Elapsed Duration",
-      value: data
-        ? formatSeconds(cstDutchAuctionDurations.ElapsedDuration)
-        : "--",
+      name: 'CST Dutch Auction Elapsed Duration',
+      value: data ? formatSeconds(cstDutchAuctionDurations.ElapsedDuration) : '--',
     },
     {
-      name: "ETH Dutch Auction Duration",
-      value: data
-        ? formatSeconds(ethDutchAuctionDurations.AuctionDuration)
-        : "--",
+      name: 'ETH Dutch Auction Duration',
+      value: data ? formatSeconds(ethDutchAuctionDurations.AuctionDuration) : '--',
     },
     {
-      name: "ETH Dutch Auction Elapsed Duration",
-      value: data
-        ? formatSeconds(ethDutchAuctionDurations.ElapsedDuration)
-        : "--",
+      name: 'ETH Dutch Auction Elapsed Duration',
+      value: data ? formatSeconds(ethDutchAuctionDurations.ElapsedDuration) : '--',
     },
     {
-      name: "Timeout to claim prize",
-      value: data ? formatSeconds(data.TimeoutClaimPrize) : "--",
+      name: 'Timeout to claim prize',
+      value: data ? formatSeconds(data.TimeoutClaimPrize) : '--',
     },
-    { name: "Maximum message length", value: Number(msgMaxLen) },
+    { name: 'Maximum message length', value: Number(msgMaxLen) },
     {
-      name: "Initial increment first bid",
-      value: data ? formatSeconds(data.InitialSecondsUntilPrize) : "--",
+      name: 'Initial increment first bid',
+      value: data ? formatSeconds(data.InitialSecondsUntilPrize) : '--',
     },
     {
-      name: "CST dutch auction beginning bid price",
+      name: 'CST dutch auction beginning bid price',
       value: `${Number(cstDutchAuctionBeginningBidPriceMinLimit)} CST`,
     },
   ];
@@ -391,12 +384,7 @@ const Contracts = () => {
           {/* List of essential contract addresses */}
           <List sx={{ mt: 4 }}>
             {contractItems.map(({ name, value, copyable }) => (
-              <ContractItem
-                key={name}
-                name={name}
-                value={value}
-                copyable={copyable}
-              />
+              <ContractItem key={name} name={name} value={value} copyable={copyable} />
             ))}
           </List>
 
@@ -406,12 +394,7 @@ const Contracts = () => {
           </Typography>
           <List>
             {configItems.map(({ name, value, copyable }) => (
-              <ContractItem
-                key={name}
-                name={name}
-                value={value}
-                copyable={copyable}
-              />
+              <ContractItem key={name} name={name} value={value} copyable={copyable} />
             ))}
           </List>
         </>
@@ -424,18 +407,18 @@ const Contracts = () => {
  * getServerSideProps: Pre-renders the page with SEO data and social metadata.
  */
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Contracts | Cosmic Signature";
+  const title = 'Contracts | Cosmic Signature';
   const description =
     "Get detailed information on Cosmic Signature's smart contracts, including addresses, default initial values, and more.";
 
   // Open Graph and Twitter metadata
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

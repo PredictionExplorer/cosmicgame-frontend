@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Typography } from "@mui/material";
-import { MainWrapper } from "../components/styled";
-import { useActiveWeb3React } from "../hooks/web3";
-import api from "../services/api";
-import { GetServerSideProps } from "next";
-import { logoImgUrl } from "../utils";
-import { AdminEventRow, AdminEventsTable } from "./system-event/[round]/[start]/[end]";
+import React, { useEffect, useState } from 'react';
+import { Typography } from '@mui/material';
+import { GetServerSideProps } from 'next';
+
+import { MainWrapper } from '../components/styled';
+import { useActiveWeb3React } from '../hooks/web3';
+import api from '../services/api';
+import { logoImgUrl } from '../utils';
+
+import { AdminEventRow, AdminEventsTable } from './system-event/[round]/[start]/[end]';
 
 function ChangedParameters() {
   // Retrieve connected wallet account
@@ -22,16 +24,14 @@ function ChangedParameters() {
 
       // Get the list of modes, extract the start ID from the first item
       const modeList = await api.get_system_modelist();
-      const startId = modeList[0].EvtLogId;
-      const endId = 9999999999; // A hardcoded high end range
+      const startId = (modeList as { EvtLogId: number }[])[0]?.EvtLogId ?? 0;
+      const endId = 9999999999;
 
-      // Fetch events from API within the given range
       const systemEvents = await api.get_system_events(startId, endId);
 
-      // Store results in state
-      setEvents(systemEvents);
+      setEvents(systemEvents as AdminEventRow[]);
     } catch (err) {
-      console.error("Error fetching system events:", err);
+      console.error('Error fetching system events:', err);
     } finally {
       setLoading(false); // Stop loading in all cases
     }
@@ -49,9 +49,7 @@ function ChangedParameters() {
         <Typography variant="h4" color="primary" textAlign="center" mb={4}>
           Changed Parameters
         </Typography>
-        <Typography variant="subtitle1">
-          Please login to Metamask to see your winnings.
-        </Typography>
+        <Typography variant="subtitle1">Please login to Metamask to see your winnings.</Typography>
       </MainWrapper>
     );
   }
@@ -75,16 +73,16 @@ function ChangedParameters() {
 
 // Metadata for SEO and Open Graph
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Changed Parameters | Cosmic Signature";
-  const description = "Changed Parameters";
+  const title = 'Changed Parameters | Cosmic Signature';
+  const description = 'Changed Parameters';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

@@ -1,45 +1,27 @@
-import { Contract } from "@ethersproject/contracts";
-import { useEffect, useMemo, useState } from "react";
-import { useActiveWeb3React } from "./web3";
+import { useMemo } from 'react';
+import { usePublicClient, useWalletClient } from 'wagmi';
+import { getContract, type Abi } from 'viem';
 
-export default function useContract<T extends Contract = Contract>(
-  address: string,
-  ABI: any
-): T | null {
-  const { library, account, chainId } = useActiveWeb3React();
-  const [byteCode, setByteCode] = useState("");
-
-  useEffect(() => {
-    if (!library) return;
-
-    let cancelled = false;
-
-    const getByteCode = async () => {
-      try {
-        const code = await library.getCode(address);
-        if (!cancelled) setByteCode(code);
-      } catch (e) {
-        console.error("Failed to fetch contract bytecode:", e);
-      }
-    };
-
-    getByteCode();
-
-    return () => { cancelled = true; };
-  }, [address, library]);
+/**
+ * Generic contract hook that preserves viem's ABI-level type inference.
+ * Each contract hook passes a `const`-asserted ABI, so the returned
+ * contract has fully typed `.read`, `.write`, and `.estimateGas` methods.
+ */
+export default function useContract<const TAbi extends Abi>(address: string, abi: TAbi) {
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
 
   return useMemo(() => {
-    if (!address || !ABI || !library || !chainId || byteCode.length <= 2) {
-      return null;
-    }
+    if (!address || !abi || !publicClient) return null;
     try {
-      return account
-        ? new Contract(address, ABI, library.getSigner(account))
-        : new Contract(address, ABI, library);
+      return getContract({
+        address: address as `0x${string}`,
+        abi,
+        client: walletClient ? { public: publicClient, wallet: walletClient } : publicClient,
+      });
     } catch (error) {
-      console.error("Failed to create contract instance:", error);
+      console.error('Failed to create contract instance:', error);
       return null;
     }
-    // chainId added so the contract instance re-creates on network switch
-  }, [address, ABI, library, account, chainId, byteCode]) as T;
+  }, [address, abi, publicClient, walletClient]);
 }

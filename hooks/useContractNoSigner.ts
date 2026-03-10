@@ -1,58 +1,38 @@
-import { Contract, ContractInterface } from "@ethersproject/contracts";
-import { useEffect, useMemo, useState } from "react";
-import { getNetworkLibrary } from "../connectors";
+import { useMemo } from 'react';
+import { createPublicClient, getContract, http, type Abi } from 'viem';
+import { arbitrum, arbitrumSepolia, hardhat } from 'viem/chains';
+
+import { networkConfig } from '../config/networks';
+
+const chainMap = {
+  42161: arbitrum,
+  421614: arbitrumSepolia,
+  31337: hardhat,
+} as const;
+
+const chain = chainMap[networkConfig.chainId as keyof typeof chainMap] ?? arbitrumSepolia;
+
+const readOnlyClient = createPublicClient({
+  chain,
+  transport: http(networkConfig.rpcUrl),
+});
 
 /**
- * React hook that returns a **read-only** ethers.js `Contract` instance.
- *
- * ⚠️ Because the contract is connected to a provider—not a signer—only
- * constant/view methods can be called (no gas-spending writes).
- *
- * @template T  Contract subclass the caller expects (defaults to `Contract`)
- * @param address  Target contract address (hex string, checksum-formatted)
- * @param ABI      Contract ABI (array/fragments or JSON string)
- * @returns        A memoised contract instance or `null` until ready
+ * Returns a read-only viem contract instance (no wallet/signer).
+ * Preserves full ABI type inference like useContract.
  */
-export default function useContractNoSigner<T extends Contract = Contract>(
-  address: string,
-  ABI: ContractInterface
-): T | null {
-  const library = getNetworkLibrary(); // RPC provider (no signer)
-  const [byteCode, setByteCode] = useState<string>("");
-
-  useEffect(() => {
-    if (!library || !address) return;
-
-    let cancelled = false;
-
-    const fetchByteCode = async (addr: string) => {
-      try {
-        const code = await library.getCode(addr); // "0x" when not a contract
-        if (!cancelled) setByteCode(code);
-      } catch (err) {
-        console.error("useContractNoSigner → getCode error:", err);
-        if (!cancelled) setByteCode("");
-      }
-    };
-
-    fetchByteCode(address);
-
-    /*  Cleanup so we don’t try to set state after unmount */
-    return () => {
-      cancelled = true;
-    };
-  }, [address, library]);
-
+export default function useContractNoSigner<const TAbi extends Abi>(address: string, abi: TAbi) {
   return useMemo(() => {
-    // Bail out until we have enough information *and* the target is a contract
-    if (!address || !ABI || !library || byteCode.length <= 2) return null;
-
+    if (!address || !abi) return null;
     try {
-      // Plain provider → read-only contract (no signer attached)
-      return new Contract(address, ABI, library) as T;
+      return getContract({
+        address: address as `0x${string}`,
+        abi,
+        client: readOnlyClient,
+      });
     } catch (err) {
-      console.error("useContractNoSigner → contract init error:", err);
+      console.error('useContractNoSigner → contract init error:', err);
       return null;
     }
-  }, [address, ABI, library, byteCode]);
+  }, [address, abi]);
 }

@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Link, TableBody, Tooltip, Typography } from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { Link, TableBody, Tooltip, Typography } from '@mui/material';
+import { getAddress, isAddress } from 'viem';
+import { GetServerSidePropsContext } from 'next';
+
 import {
   MainWrapper,
   TablePrimary,
@@ -8,19 +11,20 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../../components/styled";
-import api from "../../services/api";
-import { getExplorerUrl,
+} from '../../components/styled';
+import api from '../../services/api';
+import {
+  getExplorerUrl,
   convertTimestampToDateTime,
   isWalletAddress,
   logoImgUrl,
-} from "../../utils";
-import { ethers } from "ethers";
-import { GetServerSidePropsContext } from "next";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { Tr } from "react-super-responsive-table";
-import { CustomPagination } from "../../components/CustomPagination";
-import { AddressLink } from "../../components/AddressLink";
+} from '../../utils';
+
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { Tr } from 'react-super-responsive-table';
+
+import { CustomPagination } from '../../components/common/CustomPagination';
+import { AddressLink } from '../../components/common/AddressLink';
 
 /* ------------------------------------------------------------------
   Sub-Component: CosmicSignatureTransferRow
@@ -32,15 +36,21 @@ import { AddressLink } from "../../components/AddressLink";
     - Token ID.
   If row.TransferType > 0, adds a background highlight (e.g., stake?).
 ------------------------------------------------------------------ */
-const CosmicSignatureTransferRow = ({ row }) => {
+import type { CSTTransferRecord } from '../../services/api/types';
+
+interface TransferRow extends CSTTransferRecord {
+  TransferType?: number;
+  ValueEth?: number;
+}
+
+const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
   // If no row data, render an empty row to avoid errors.
   if (!row) {
     return <TablePrimaryRow />;
   }
 
   // Conditional styling based on 'TransferType'
-  const rowStyle =
-    row.TransferType > 0 ? { background: "rgba(255, 255, 255, 0.06)" } : {};
+  const rowStyle = (row.TransferType ?? 0) > 0 ? { background: 'rgba(255, 255, 255, 0.06)' } : {};
 
   return (
     <TablePrimaryRow sx={rowStyle}>
@@ -58,8 +68,8 @@ const CosmicSignatureTransferRow = ({ row }) => {
 
       {/* "From" address - If 'isWalletAddress()' returns a string, show tooltip + link, else use AddressLink */}
       <TablePrimaryCell align="center">
-        {isWalletAddress(row.FromAddr) !== "" ? (
-          <Tooltip title={row.FromAddr}>
+        {isWalletAddress(row.FromAddr ?? '') !== '' ? (
+          <Tooltip title={row.FromAddr ?? ''}>
             <Link
               color="inherit"
               fontSize="inherit"
@@ -67,18 +77,17 @@ const CosmicSignatureTransferRow = ({ row }) => {
               href={`/user/${row.FromAddr}`}
               target="__blank"
             >
-              {isWalletAddress(row.FromAddr)}
+              {isWalletAddress(row.FromAddr ?? '')}
             </Link>
           </Tooltip>
         ) : (
-          <AddressLink address={row.FromAddr} url={`/user/${row.FromAddr}`} />
+          <AddressLink address={row.FromAddr ?? ''} url={`/user/${row.FromAddr}`} />
         )}
       </TablePrimaryCell>
 
-      {/* "To" address - Same logic as "From" address */}
       <TablePrimaryCell align="center">
-        {isWalletAddress(row.ToAddr) !== "" ? (
-          <Tooltip title={row.ToAddr}>
+        {isWalletAddress(row.ToAddr ?? '') !== '' ? (
+          <Tooltip title={row.ToAddr ?? ''}>
             <Link
               color="inherit"
               fontSize="inherit"
@@ -86,22 +95,17 @@ const CosmicSignatureTransferRow = ({ row }) => {
               href={`/user/${row.ToAddr}`}
               target="__blank"
             >
-              {isWalletAddress(row.ToAddr)}
+              {isWalletAddress(row.ToAddr ?? '')}
             </Link>
           </Tooltip>
         ) : (
-          <AddressLink address={row.ToAddr} url={`/user/${row.ToAddr}`} />
+          <AddressLink address={row.ToAddr ?? ''} url={`/user/${row.ToAddr}`} />
         )}
       </TablePrimaryCell>
 
       {/* Token ID - link to token detail page */}
       <TablePrimaryCell align="center">
-        <Link
-          color="inherit"
-          fontSize="inherit"
-          href={`/detail/${row.TokenId}`}
-          target="__blank"
-        >
+        <Link color="inherit" fontSize="inherit" href={`/detail/${row.TokenId}`} target="__blank">
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
@@ -114,16 +118,14 @@ const CosmicSignatureTransferRow = ({ row }) => {
   Displays a paginated table of CST transfers. Each page shows 10 rows.
   Shows a "No transfers yet." message if the list is empty.
 ------------------------------------------------------------------ */
-const CosmicTokenTransfersTable = ({ list }) => {
-  const perPage = 10; // Number of transfers per page
+const CosmicTokenTransfersTable = ({ list }: { list: TransferRow[] }) => {
+  const perPage = 10;
   const [page, setPage] = useState(1);
 
-  // If there's nothing to display, show a "No transfers yet." message.
   if (list.length === 0) {
     return <Typography variant="h6">No transfers yet.</Typography>;
   }
 
-  // Slice the list for the current page.
   const currentPageList = list.slice((page - 1) * perPage, page * perPage);
 
   return (
@@ -148,12 +150,7 @@ const CosmicTokenTransfersTable = ({ list }) => {
       </TablePrimaryContainer>
 
       {/* Pagination controls */}
-      <CustomPagination
-        page={page}
-        setPage={setPage}
-        totalLength={list.length}
-        perPage={perPage}
-      />
+      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );
 };
@@ -165,12 +162,12 @@ const CosmicTokenTransfersTable = ({ list }) => {
   - Fetches data from an API on mount, shows a loading state, 
     and then renders the table or a fallback if no data is found.
 ------------------------------------------------------------------ */
-const CosmicSignatureTransfers = ({ address }) => {
+const CosmicSignatureTransfers = ({ address }: { address: string }) => {
   // Loading state for asynchronous data fetch
   const [loading, setLoading] = useState(true);
 
   // CST transfer data
-  const [cosmicSignatureTransfers, setCosmicSignatureTransfers] = useState([]);
+  const [cosmicSignatureTransfers, setCosmicSignatureTransfers] = useState<CSTTransferRecord[]>([]);
 
   /**
    * Fetch transfers for the provided address on component mount.
@@ -220,10 +217,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   let address = Array.isArray(params) ? params[0] : params;
 
   // Validate address; if valid, normalize, otherwise mark as "Invalid Address".
-  if (ethers.utils.isAddress(address.toLowerCase())) {
-    address = ethers.utils.getAddress(address.toLowerCase());
+  if (address && isAddress(address.toLowerCase())) {
+    address = getAddress(address.toLowerCase());
   } else {
-    address = "Invalid Address";
+    address = 'Invalid Address';
   }
 
   // Construct dynamic page title and description
@@ -231,12 +228,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const description = `Cosmic Signature Token Transfer History for ${address}`;
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   // Return the updated props to the component

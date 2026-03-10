@@ -1,43 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { Box, Link, Typography } from "@mui/material";
-import { MainWrapper } from "../../components/styled";
-import { GetServerSidePropsContext } from "next";
-import api from "../../services/api";
-import { ethers } from "ethers";
-import MarketingRewardsTable from "../../components/MarketingRewardsTable";
-import { logoImgUrl } from "../../utils";
+import React, { useEffect, useState } from 'react';
+import { Box, Link, Typography } from '@mui/material';
+import { GetServerSidePropsContext } from 'next';
+import { getAddress, isAddress } from 'viem';
+
+import { MainWrapper } from '../../components/styled';
+import api from '../../services/api';
+import MarketingRewardsTable, {
+  MarketingReward,
+} from '../../components/tables/MarketingRewardsTable';
+import { logoImgUrl } from '../../utils';
 
 interface UserMarketingRewardsProps {
   address: string;
 }
 
-interface RewardItem {
-  id: number;
-  reward: string;
-  date: string;
-}
-
 // Component for displaying user's marketing rewards based on Ethereum address
-const UserMarketingRewards: React.FC<UserMarketingRewardsProps> = ({
-  address,
-}) => {
+const UserMarketingRewards: React.FC<UserMarketingRewardsProps> = ({ address }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [invalidAddress, setInvalidAddress] = useState<boolean>(false);
-  const [marketingRewards, setMarketingRewards] = useState<RewardItem[]>([]);
+  const [marketingRewards, setMarketingRewards] = useState<MarketingReward[]>([]);
 
   useEffect(() => {
     const fetchRewards = async (userAddress: string) => {
       setLoading(true);
       try {
         const rewards = await api.get_marketing_rewards_by_user(userAddress);
-        setMarketingRewards(rewards);
+        setMarketingRewards(rewards as MarketingReward[]);
       } catch (error) {
-        console.error("Error fetching user marketing rewards:", error);
+        console.error('Error fetching user marketing rewards:', error);
       }
       setLoading(false);
     };
 
-    if (address === "Invalid Address") {
+    if (address === 'Invalid Address') {
       setInvalidAddress(true);
       setLoading(false);
     } else if (address) {
@@ -59,14 +54,14 @@ const UserMarketingRewards: React.FC<UserMarketingRewardsProps> = ({
               variant="h6"
               component="span"
               fontFamily="monospace"
-              sx={{ wordBreak: "break-all" }}
+              sx={{ wordBreak: 'break-all' }}
             >
               <Link
                 href={`/user/${address}`}
                 style={{
-                  color: "inherit",
-                  fontSize: "inherit",
-                  fontFamily: "monospace",
+                  color: 'inherit',
+                  fontSize: 'inherit',
+                  fontFamily: 'monospace',
                 }}
               >
                 {address}
@@ -89,22 +84,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const param = context.params!.address;
   let address = Array.isArray(param) ? param[0] : param;
 
-  if (ethers.utils.isAddress(address.toLowerCase())) {
-    address = ethers.utils.getAddress(address.toLowerCase());
+  if (isAddress(address!.toLowerCase())) {
+    address = getAddress(address!.toLowerCase());
   } else {
-    address = "Invalid Address";
+    address = 'Invalid Address';
   }
 
   const title = `Marketing Rewards for User ${address} | Cosmic Signature`;
   const description = `Marketing Rewards earned by User ${address}`;
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData, address } };

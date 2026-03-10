@@ -1,9 +1,16 @@
-import { render, screen, act } from "@testing-library/react";
-import DonatedNFT from "../DonatedNFT";
+import { render, screen, waitFor } from "@testing-library/react";
+import DonatedNFT from "../donations/DonatedNFT";
 import "@testing-library/jest-dom";
 import axios from "axios";
 
+jest.mock("axios");
+
 test("DonatedNFT with mock data", async () => {
+  const mockImageUrl = "https://example.com/nft-image.png";
+  axios.get.mockResolvedValue({
+    data: { image: mockImageUrl, external_url: "https://example.com" },
+  });
+
   const mockData = {
     RecordId: 45,
     EvtLogId: 8344,
@@ -24,16 +31,12 @@ test("DonatedNFT with mock data", async () => {
   };
   render(<DonatedNFT nft={mockData} />);
   expect(screen.getByTestId("NFTTokenId")).toHaveTextContent(
-    mockData.NFTTokenId
+    String(mockData.NFTTokenId)
   );
 
-  let result;
-  await act(async () => {
-    result = await axios.get(mockData.NFTTokenURI);
-  });
-  setTimeout(() => {
+  await waitFor(() => {
     expect(screen.getByAltText("nft image").getAttribute("src")).toEqual(
-      result.data.image
+      mockImageUrl
     );
-  }, 1000);
+  });
 });

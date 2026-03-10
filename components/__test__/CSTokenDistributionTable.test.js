@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import CSTokenDistributionTable from "../CSTokenDistributionTable";
+import { CSTokenDistributionTable } from "../tokens/CSTokenDistributionTable";
 import "@testing-library/jest-dom";
 
 test("CSTokenDistributionTable with no records", () => {
@@ -16,6 +16,11 @@ test("CSTokenDistributionTable with mock data", () => {
     },
   ];
   render(<CSTokenDistributionTable list={mockData} />);
-  expect(screen.getByText(mockData[0].OwnerAddr)).toBeInTheDocument();
+  // AddressLink shows full address on desktop or shortened (0x555ece....310e60) on mobile
+  const addressEl =
+    screen.queryByText(mockData[0].OwnerAddr) ||
+    screen.queryByText(/0x555ece.*310e60/);
+  expect(addressEl).toBeTruthy();
+  expect(addressEl).toBeInTheDocument();
   expect(screen.getByText(mockData[0].NumTokens)).toBeInTheDocument();
 });

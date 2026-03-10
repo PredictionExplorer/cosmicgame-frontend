@@ -1,14 +1,15 @@
-import type { BigNumberish } from '@ethersproject/bignumber';
-import { formatUnits } from '@ethersproject/units';
-import axios from "axios";
-import { 
-  CHARITY_WALLET_ADDRESS, 
-  MARKETING_WALLET_ADDRESS, 
-  RAFFLE_WALLET_ADDRESS, 
-  STAKING_WALLET_CST_ADDRESS, 
-  STAKING_WALLET_RWLK_ADDRESS 
-} from '../config/app';
+import { formatUnits } from 'viem';
 
+type BigNumberish = bigint | string | number;
+import axios from 'axios';
+
+import {
+  CHARITY_WALLET_ADDRESS,
+  MARKETING_WALLET_ADDRESS,
+  RAFFLE_WALLET_ADDRESS,
+  STAKING_WALLET_CST_ADDRESS,
+  STAKING_WALLET_RWLK_ADDRESS,
+} from '../config/networks';
 import { networkConfig } from '../config/networks';
 
 const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
@@ -17,7 +18,7 @@ const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
 export const getExplorerUrl = (type: 'tx' | 'address' | 'token', value: string): string =>
   `${EXPLORER_BASE}/${type}/${value}`;
 
-const proxyUrl = "/api/proxy?url=";
+const proxyUrl = '/api/proxy?url=';
 
 // Helper function to construct the API URL with proxy and URL encoding
 const getAPIUrl = (url: string): string => {
@@ -29,15 +30,12 @@ export function shortenHex(hex: string, length = 4): string {
   if (hex) {
     return `${hex.substring(0, length + 2)}....${hex.substring(hex.length - length)}`;
   }
-  return "";
+  return '';
 }
 
 // Parses a balance from a BigNumberish value, formatting it with the specified number of decimals to display
-export const parseBalance = (
-  value: BigNumberish,
-  decimals = 18,
-  decimalsToDisplay = 4
-): string => parseFloat(formatUnits(value, decimals)).toFixed(decimalsToDisplay);
+export const parseBalance = (value: BigNumberish, decimals = 18, decimalsToDisplay = 4): string =>
+  parseFloat(formatUnits(BigInt(value), decimals)).toFixed(decimalsToDisplay);
 
 // Formats a numeric ID by padding it with leading zeros (e.g., #000123)
 export const formatId = (id: number | string): string => {
@@ -47,18 +45,29 @@ export const formatId = (id: number | string): string => {
 // Converts a Unix timestamp to a human-readable date string (e.g., "Jan 01, 12:34")
 export const convertTimestampToDateTime = (
   timestamp: number,
-  showSecond: boolean = false
+  showSecond: boolean = false,
 ): string => {
   const month_names = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   const date_ob = new Date(timestamp * 1000); // Convert to Date object
   const month = month_names[date_ob.getMonth()];
-  const date = ("0" + date_ob.getDate()).slice(-2);
-  const hours = ("0" + date_ob.getHours()).slice(-2);
-  const minutes = ("0" + date_ob.getMinutes()).slice(-2);
-  const seconds = ("0" + date_ob.getSeconds()).slice(-2);
+  const date = ('0' + date_ob.getDate()).slice(-2);
+  const hours = ('0' + date_ob.getHours()).slice(-2);
+  const minutes = ('0' + date_ob.getMinutes()).slice(-2);
+  const seconds = ('0' + date_ob.getSeconds()).slice(-2);
   let result = `${month} ${date}, ${hours}:${minutes}`;
 
   if (showSecond) {
@@ -70,8 +79,8 @@ export const convertTimestampToDateTime = (
 
 // Converts seconds into a human-readable format (e.g., "1d 2h 30m 45s")
 export const formatSeconds = (seconds: number): string => {
-  if (seconds < 0) return " ";
-  
+  if (seconds < 0) return ' ';
+
   let minutes = Math.floor(seconds / 60);
   seconds = Math.floor(seconds % 60);
   let hours = Math.floor(minutes / 60);
@@ -79,28 +88,28 @@ export const formatSeconds = (seconds: number): string => {
   let days = Math.floor(hours / 24);
   hours = hours % 24;
 
-  let str = "";
+  let str = '';
   if (days) str += `${days}d `;
   if (hours || (str && (minutes || seconds))) str += `${hours}h `;
   if (minutes || (str && seconds)) str += `${minutes}m `;
   if (seconds) str += `${seconds}s`;
 
-  return str || "0s";
+  return str || '0s';
 };
 /**
  * Calculates the difference between the current time and a given timestamp.
  * Returns the time difference in a human-readable format (e.g., "1d 2h 30m 45s").
- * 
+ *
  * @param timestamp - The timestamp to compare against, in seconds.
  * @returns A string representing the time difference, e.g., "1d 2h 30m 45s".
  */
 export const calculateTimeDiff = (timestamp: number): string => {
   // Calculate the difference in seconds between now and the given timestamp
   let seconds = Math.floor(Date.now() / 1000) - timestamp;
-  
+
   // If the timestamp is in the future, return an empty string
   if (seconds < 0) {
-    return "";
+    return '';
   }
 
   // Calculate the difference in minutes, hours, and days
@@ -112,7 +121,7 @@ export const calculateTimeDiff = (timestamp: number): string => {
   hours = hours % 24;
 
   // Construct the string to represent the time difference
-  let str = "";
+  let str = '';
   if (days) {
     str = `${days}d `;
   }
@@ -127,9 +136,8 @@ export const calculateTimeDiff = (timestamp: number): string => {
   }
 
   // Return the time difference, defaulting to "0s" if no time is calculated
-  return str === "" ? "0s" : str;
+  return str === '' ? '0s' : str;
 };
-
 
 // Formats a given ETH value into a user-friendly string, displaying the value with either 2 or 4 decimal places
 export const formatEthValue = (value: number): string => {
@@ -152,7 +160,9 @@ export async function getMetadata(url: string) {
     const titleMatch = html.match(/<title>(.*?)<\/title>/);
     const title = titleMatch ? titleMatch[1] : '';
 
-    const descriptionMatch = html.match(/<meta\s+name=["']description["']\s+content=["'](.*?)["']/i);
+    const descriptionMatch = html.match(
+      /<meta\s+name=["']description["']\s+content=["'](.*?)["']/i,
+    );
     const description = descriptionMatch ? descriptionMatch[1] : '';
 
     const keywordsMatch = html.match(/<meta\s+name=["']keywords["']\s+content=["'](.*?)["']/i);
@@ -171,78 +181,109 @@ export async function getMetadata(url: string) {
 // Returns the wallet name for known wallet addresses or an empty string for unknown addresses
 export const isWalletAddress = (address: string): string => {
   switch (address) {
-    case STAKING_WALLET_CST_ADDRESS: return "Staking CST Wallet";
-    case STAKING_WALLET_RWLK_ADDRESS: return "Staking RandomWalk Wallet";
-    case MARKETING_WALLET_ADDRESS: return "Marketing Wallet";
-    case RAFFLE_WALLET_ADDRESS: return "Raffle Wallet";
-    case CHARITY_WALLET_ADDRESS: return "Charity Wallet";
-    default: return "";
+    case STAKING_WALLET_CST_ADDRESS:
+      return 'Staking CST Wallet';
+    case STAKING_WALLET_RWLK_ADDRESS:
+      return 'Staking RandomWalk Wallet';
+    case MARKETING_WALLET_ADDRESS:
+      return 'Marketing Wallet';
+    case RAFFLE_WALLET_ADDRESS:
+      return 'Raffle Wallet';
+    case CHARITY_WALLET_ADDRESS:
+      return 'Charity Wallet';
+    default:
+      return '';
   }
 };
 
-// Calculates the endurance champions based on a list of bids, including a chrono warrior time
-export const getEnduranceChampions = (bidList: any[], roundEndTimeStamp: number = 0) => {
+interface BidEntry {
+  TimeStamp: number;
+  BidderAddr: string;
+  [key: string]: unknown;
+}
+
+export interface EnduranceChampion {
+  bidder: string;
+  championTime: number;
+  chronoWarrior: number;
+}
+
+interface EnduranceRecord {
+  address: string;
+  championTime: number;
+  startTime: number;
+  endTime: number;
+  chronoWarrior: number;
+}
+
+export const getEnduranceChampions = (
+  bidList: BidEntry[],
+  roundEndTimeStamp: number = 0,
+): EnduranceChampion[] => {
   const currentTime = roundEndTimeStamp > 0 ? roundEndTimeStamp : Math.floor(Date.now() / 1000);
 
   if (!bidList || bidList.length === 0) {
     return [];
   }
 
-  // Sort the bids by timestamp
   let currentRoundBids = [...bidList].sort((a, b) => a.TimeStamp - b.TimeStamp);
 
-  // If only one bid, return that as the endurance champion
   if (currentRoundBids.length === 1) {
     return [
       {
-        bidder: currentRoundBids[0].BidderAddr,
-        championTime: currentTime - currentRoundBids[0].TimeStamp,
+        bidder: currentRoundBids[0]!.BidderAddr,
+        championTime: currentTime - currentRoundBids[0]!.TimeStamp,
         chronoWarrior: 0,
       },
     ];
   }
 
-  let enduranceChampions: any[] = [];
+  let enduranceChampions: EnduranceRecord[] = [];
 
-  // Calculate endurance champions from sorted bids
   for (let i = 1; i < currentRoundBids.length; i++) {
-    const enduranceDuration = currentRoundBids[i].TimeStamp - currentRoundBids[i - 1].TimeStamp;
+    const enduranceDuration = currentRoundBids[i]!.TimeStamp - currentRoundBids[i - 1]!.TimeStamp;
 
     if (
       enduranceChampions.length === 0 ||
-      enduranceDuration > enduranceChampions[enduranceChampions.length - 1].championTime
+      enduranceDuration > enduranceChampions[enduranceChampions.length - 1]!.championTime
     ) {
       enduranceChampions.push({
-        address: currentRoundBids[i - 1].BidderAddr,
+        address: currentRoundBids[i - 1]!.BidderAddr,
         championTime: enduranceDuration,
-        startTime: currentRoundBids[i - 1].TimeStamp,
-        endTime: currentRoundBids[i].TimeStamp,
+        startTime: currentRoundBids[i - 1]!.TimeStamp,
+        endTime: currentRoundBids[i]!.TimeStamp,
+        chronoWarrior: 0,
       });
     }
   }
 
-  // Handle the last bid's duration to currentTime
-  const lastBid = currentRoundBids[currentRoundBids.length - 1];
+  const lastBid = currentRoundBids[currentRoundBids.length - 1]!;
   const lastEnduranceDuration = currentTime - lastBid.TimeStamp;
 
   if (
     enduranceChampions.length === 0 ||
-    lastEnduranceDuration > enduranceChampions[enduranceChampions.length - 1].championTime
+    lastEnduranceDuration > enduranceChampions[enduranceChampions.length - 1]!.championTime
   ) {
     enduranceChampions.push({
       address: lastBid.BidderAddr,
       championTime: lastEnduranceDuration,
       startTime: lastBid.TimeStamp,
       endTime: currentTime,
+      chronoWarrior: 0,
     });
   }
 
-  // Calculate chrono warrior time (time difference between endurance champions)
   for (let i = 0; i < enduranceChampions.length; i++) {
-    let chronoStartTime = i === 0 ? enduranceChampions[i].startTime : enduranceChampions[i].startTime + enduranceChampions[i - 1].championTime;
-    let chronoEndTime = i < enduranceChampions.length - 1 ? enduranceChampions[i + 1].startTime + enduranceChampions[i].championTime : currentTime;
+    let chronoStartTime =
+      i === 0
+        ? enduranceChampions[i]!.startTime
+        : enduranceChampions[i]!.startTime + enduranceChampions[i - 1]!.championTime;
+    let chronoEndTime =
+      i < enduranceChampions.length - 1
+        ? enduranceChampions[i + 1]!.startTime + enduranceChampions[i]!.championTime
+        : currentTime;
 
-    enduranceChampions[i].chronoWarrior = Math.max(0, chronoEndTime - chronoStartTime);
+    enduranceChampions[i]!.chronoWarrior = Math.max(0, chronoEndTime - chronoStartTime);
   }
 
   return enduranceChampions.map((champion) => ({
@@ -254,21 +295,21 @@ export const getEnduranceChampions = (bidList: any[], roundEndTimeStamp: number 
 
 // Utility function to get the full URL for CST assets (e.g., images) via proxy
 export const getAssetsUrl = (url: string): string => {
-  const imageServerUrl = "https://nfts.cosmicsignature.com/images/new/";
+  const imageServerUrl = 'https://nfts.cosmicsignature.com/images/new/';
   return `${proxyUrl}${encodeURIComponent(imageServerUrl + url)}`;
 };
 
 // Utility function for RandomWalk NFT images (different base path — no /new/)
-export const getRWLKImageUrl = (fileName: string, variant: string = "black_thumb.jpg"): string => {
-  const imageServerUrl = "https://nfts.cosmicsignature.com/images/randomwalk/";
+export const getRWLKImageUrl = (fileName: string, variant: string = 'black_thumb.jpg'): string => {
+  const imageServerUrl = 'https://nfts.cosmicsignature.com/images/randomwalk/';
   return `${proxyUrl}${encodeURIComponent(`${imageServerUrl}${fileName}_${variant}`)}`;
 };
 
 // Utility function to extract the original URL from the proxy URL
 export const getOriginUrl = (url: string): string => {
-  const strippedUrl = url.replace("/api/proxy?url=", "");
+  const strippedUrl = url.replace('/api/proxy?url=', '');
   return decodeURIComponent(strippedUrl);
-}
+};
 
 // Logo image URL
-export const logoImgUrl = getAssetsUrl("cosmicsignature/logo.png");
+export const logoImgUrl = getAssetsUrl('cosmicsignature/logo.png');

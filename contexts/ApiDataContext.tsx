@@ -6,10 +6,13 @@ import React, {
   useRef,
   ReactNode,
   useEffect,
-} from "react";
-import { useStakedToken } from "./StakedTokenContext";
-import { useActiveWeb3React } from "../hooks/web3";
-import api from "../services/api";
+} from 'react';
+
+import { useActiveWeb3React } from '../hooks/web3';
+import api from '../services/api';
+import type { StakingCSTReward } from '../services/api/types';
+
+import { useStakedToken } from './StakedTokenContext';
 
 interface ApiData {
   ETHRaffleToClaim: number;
@@ -37,7 +40,7 @@ interface ApiDataContextValue {
   setApiData: React.Dispatch<React.SetStateAction<ApiData>>;
   fetchData: () => Promise<void>;
   /** Raw unclaimed staking rewards — shared so consumers don't re-fetch */
-  unclaimedRewards: any[];
+  unclaimedRewards: StakingCSTReward[];
 }
 
 const ApiDataContext = createContext<ApiDataContextValue | undefined>(undefined);
@@ -45,14 +48,14 @@ const ApiDataContext = createContext<ApiDataContextValue | undefined>(undefined)
 export const useApiData = (): ApiDataContextValue => {
   const context = useContext(ApiDataContext);
   if (!context) {
-    throw new Error("useApiData must be used within an ApiDataProvider");
+    throw new Error('useApiData must be used within an ApiDataProvider');
   }
   return context;
 };
 
 export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) => {
   const [apiData, setApiData] = useState<ApiData>(initialApiData);
-  const [unclaimedRewards, setUnclaimedRewards] = useState<any[]>([]);
+  const [unclaimedRewards, setUnclaimedRewards] = useState<StakingCSTReward[]>([]);
 
   const { cstokens: stakedTokens } = useStakedToken();
   const { account } = useActiveWeb3React();
@@ -60,21 +63,26 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
   // Use a ref so fetchActionIds/fetchData never need it as a useCallback dep.
   // The ref is always up-to-date without causing reference churn.
   const stakedActionIdsRef = useRef<(number | string)[]>([]);
-  stakedActionIdsRef.current = stakedTokens.map((x) => x.TokenInfo.StakeActionId);
+  stakedActionIdsRef.current = stakedTokens.flatMap((x) =>
+    x.TokenInfo?.StakeActionId != null ? [x.TokenInfo.StakeActionId] : [],
+  );
 
   const fetchInfo = useCallback(
     async (depositId: number) => {
       const unstakeableActionIds: (number | string)[] = [];
       const claimableActionIds: { DepositId: number; StakeActionId: number }[] = [];
 
-      const response = await api.get_cst_action_ids_by_deposit_id(account, depositId);
+      const response = await api.get_cst_action_ids_by_deposit_id(account!, depositId);
       if (!response) return { unstakeableActionIds, claimableActionIds };
 
       const currentStakedActionIds = stakedActionIdsRef.current;
       for (const item of response) {
         try {
           if (!item.Claimed) {
-            claimableActionIds.push({ DepositId: item.DepositId, StakeActionId: item.StakeActionId });
+            claimableActionIds.push({
+              DepositId: item.DepositId,
+              StakeActionId: item.StakeActionId,
+            });
           }
           if (currentStakedActionIds.includes(item.StakeActionId)) {
             unstakeableActionIds.push(item.StakeActionId);
@@ -87,30 +95,33 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
       return { unstakeableActionIds, claimableActionIds };
     },
     // Only depends on account — stakedActionIds is read from ref
-    [account]
+    [account],
   );
 
   const fetchActionIds = useCallback(
-    async (list: any[]) => {
+    async (list: StakingCSTReward[]) => {
       let cl_actionIds: { DepositId: number; StakeActionId: number }[] = [];
       let us_actionIds: (number | string)[] = [];
 
       await Promise.all(
-        list.map(async (item) => {
-          const { claimableActionIds, unstakeableActionIds } = await fetchInfo(item.DepositId);
-          cl_actionIds = cl_actionIds.concat(claimableActionIds);
-          us_actionIds = us_actionIds.concat(unstakeableActionIds);
-        })
+        list
+          .filter((item) => item.DepositId != null)
+          .map(async (item) => {
+            const depositId = item.DepositId!;
+            const { claimableActionIds, unstakeableActionIds } = await fetchInfo(depositId);
+            cl_actionIds = cl_actionIds.concat(claimableActionIds);
+            us_actionIds = us_actionIds.concat(unstakeableActionIds);
+          }),
       );
 
       us_actionIds = us_actionIds.filter(
-        (item, index) => index === us_actionIds.findIndex((o) => o === item)
+        (item, index) => index === us_actionIds.findIndex((o) => o === item),
       );
 
       return { unstakeableActionIds: us_actionIds, claimableActionIds: cl_actionIds };
     },
     // Stable: fetchInfo only changes when account changes
-    [fetchInfo]
+    [fetchInfo],
   );
 
   const fetchData = useCallback(async (): Promise<void> => {
@@ -125,8 +136,7 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
       const rewardList = rewards ?? [];
       setUnclaimedRewards(rewardList);
 
-      const hasUnclaimed =
-        rewardList.length > 0 && (newData?.UnclaimedStakingReward ?? 0) > 0;
+      const hasUnclaimed = rewardList.length > 0 && (newData?.UnclaimedStakingReward ?? 0) > 0;
 
       if (hasUnclaimed) {
         const actionIds = await fetchActionIds(rewardList);
@@ -140,7 +150,7 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
         });
       }
     } catch (error) {
-      console.error("ApiDataContext fetchData failed:", error);
+      console.error('ApiDataContext fetchData failed:', error);
     }
     // Stable deps: only account and fetchActionIds (which only changes when account changes)
   }, [account, fetchActionIds]);
@@ -151,7 +161,9 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
       if (!cancelled) await fetchData();
     };
     run();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [fetchData]);
 
   return (

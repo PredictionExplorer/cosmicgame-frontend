@@ -1,9 +1,15 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import useCosmicGameContract from "../hooks/useCosmicGameContract";
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-const SystemModeContext = createContext(undefined);
+import useCosmicGameContract from '../hooks/useCosmicGameContract';
 
-export const SystemModeProvider = ({ children }) => {
+interface SystemModeContextValue {
+  data: number;
+  fetchData: () => Promise<void>;
+}
+
+const SystemModeContext = createContext<SystemModeContextValue | undefined>(undefined);
+
+export const SystemModeProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState(0);
   const cosmicGameContract = useCosmicGameContract();
 
@@ -13,9 +19,7 @@ export const SystemModeProvider = ({ children }) => {
         // const systemMode = await cosmicGameContract.systemMode();
         // setData(Number(systemMode));
       }
-    } catch (error) {
-      console.log("Error fetching data:", error);
-    }
+    } catch (error) {}
   };
   useEffect(() => {
     fetchData();
@@ -25,9 +29,7 @@ export const SystemModeProvider = ({ children }) => {
   }, [cosmicGameContract]);
 
   return (
-    <SystemModeContext.Provider value={{ data, fetchData }}>
-      {children}
-    </SystemModeContext.Provider>
+    <SystemModeContext.Provider value={{ data, fetchData }}>{children}</SystemModeContext.Provider>
   );
 };
 

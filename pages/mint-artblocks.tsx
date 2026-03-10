@@ -1,46 +1,46 @@
-import React, { useState, useEffect } from "react";
-import { Typography, Box, Button, Link, Select, MenuItem } from "@mui/material";
-import { MainWrapper, CenterBox } from "../components/styled";
-import { useActiveWeb3React } from "../hooks/web3";
-import useArtBlocksContract from "../hooks/useArtBlocksContract";
+import React, { useState, useEffect } from 'react';
+import { Typography, Box, Button, Link, Select, MenuItem } from '@mui/material';
+import { usePublicClient } from 'wagmi';
+
+import { MainWrapper, CenterBox } from '../components/styled';
+import { useActiveWeb3React } from '../hooks/web3';
+import useArtBlocksContract from '../hooks/useArtBlocksContract';
 
 const MintArcBlocks = () => {
   const [count, setCount] = useState(1);
   const [curTokenId, setCurTokenId] = useState(-1);
-  const [mintedTokens, setMintedTokens] = useState([]);
+  const [mintedTokens, setMintedTokens] = useState<number[]>([]);
   const { account } = useActiveWeb3React();
+  const publicClient = usePublicClient();
   const nftContract = useArtBlocksContract();
 
   const handleMint = async () => {
     if (nftContract) {
       try {
         let tokenIds = [...mintedTokens];
-        await nftContract.multimint(account, count).then((tx) => tx.wait());
+        const hash = await nftContract.write.multimint?.([account, count]);
+        if (hash) await publicClient?.waitForTransactionReceipt({ hash });
         for (let i = 0; i < count; i++) {
           tokenIds.push(curTokenId + i);
         }
         setMintedTokens(tokenIds);
         getCurrentTokenId();
-      } catch (err) {
-        const { data } = err;
-        if (data && data.message) {
-          alert(data.message);
-        } else {
-          console.log(err);
+      } catch (err: unknown) {
+        if (err instanceof Error && 'data' in err) {
+          const data = (err as { data?: { message?: string } }).data;
+          if (data?.message) {
+            alert(data.message);
+          }
         }
       }
-    } else {
-      console.log("Please connect your wallet on Arbitrum network");
     }
   };
 
   const getCurrentTokenId = async () => {
     try {
-      const curTokenId = await nftContract.curTokenId();
-      setCurTokenId(Number(curTokenId));
-    } catch (err) {
-      console.log(err);
-    }
+      const curTokenId = await nftContract!.read.curTokenId?.();
+      setCurTokenId(Number(curTokenId ?? 0));
+    } catch (err) {}
   };
   useEffect(() => {
     if (nftContract) {
@@ -55,12 +55,7 @@ const MintArcBlocks = () => {
           <Typography variant="h4" component="span">
             GET AN
           </Typography>
-          <Typography
-            variant="h4"
-            component="span"
-            color="primary"
-            sx={{ ml: 1.5 }}
-          >
+          <Typography variant="h4" component="span" color="primary" sx={{ ml: 1.5 }}>
             ART BLOCKS
           </Typography>
           <Typography variant="h4" component="span" sx={{ ml: 1.5 }}>
@@ -71,7 +66,7 @@ const MintArcBlocks = () => {
           <Select
             value={count}
             onChange={(e) => setCount(Number(e.target.value))}
-            sx={{ minWidth: "100px" }}
+            sx={{ minWidth: '100px' }}
           >
             <MenuItem value={1}>1</MenuItem>
             <MenuItem value={2}>2</MenuItem>
@@ -90,9 +85,9 @@ const MintArcBlocks = () => {
             Mint now
           </Button>
         </Box>
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: 'flex' }}>
           <Typography variant="subtitle1" mr={1}>
-            Current Token ID:{" "}
+            Current Token ID:{' '}
           </Typography>
           <Typography variant="subtitle1">{curTokenId}</Typography>
         </Box>
@@ -102,7 +97,7 @@ const MintArcBlocks = () => {
               <Link
                 key={tokenId}
                 href={`/?donation=true&tokenId=${tokenId}`}
-                sx={{ mr: 2, color: "inherit" }}
+                sx={{ mr: 2, color: 'inherit' }}
               >
                 <Typography variant="subtitle1" component="span">
                   {tokenId}

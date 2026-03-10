@@ -1,5 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Link, TableBody, Tooltip, Typography } from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { Link, TableBody, Tooltip, Typography } from '@mui/material';
+import { getAddress, isAddress } from 'viem';
+import { GetServerSidePropsContext } from 'next';
+import { Tr } from 'react-super-responsive-table';
+
 import {
   MainWrapper,
   TablePrimary,
@@ -8,19 +12,18 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../../components/styled";
-import api from "../../services/api";
-import { getExplorerUrl,
+} from '../../components/styled';
+import api from '../../services/api';
+import {
+  getExplorerUrl,
   convertTimestampToDateTime,
   isWalletAddress,
   logoImgUrl,
-} from "../../utils";
-import { ethers } from "ethers";
-import { GetServerSidePropsContext } from "next";
-import { Tr } from "react-super-responsive-table";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { CustomPagination } from "../../components/CustomPagination";
-import { AddressLink } from "../../components/AddressLink";
+} from '../../utils';
+
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { CustomPagination } from '../../components/common/CustomPagination';
+import { AddressLink } from '../../components/common/AddressLink';
 
 /* ------------------------------------------------------------------
   Sub-Component: CosmicTokenTransferRow
@@ -31,15 +34,26 @@ import { AddressLink } from "../../components/AddressLink";
     • Amount/value transferred (in ETH)
   If row.TransferType > 0, a subtle background highlight is applied.
 ------------------------------------------------------------------ */
-const CosmicTokenTransferRow = ({ row }) => {
+interface TokenTransferRow {
+  EvtLogId: number;
+  TxHash: string;
+  TimeStamp: number;
+  FromAddr?: string;
+  ToAddr?: string;
+  ValueEth?: number;
+  ValueFloat?: number;
+  TransferType?: number;
+  [key: string]: unknown;
+}
+
+const CosmicTokenTransferRow = ({ row }: { row: TokenTransferRow }) => {
   // If no row data, return an empty row to avoid errors
   if (!row) {
     return <TablePrimaryRow />;
   }
 
   // Conditionally style the row if TransferType > 0
-  const rowStyle =
-    row.TransferType > 0 ? { background: "rgba(255, 255, 255, 0.06)" } : {};
+  const rowStyle = (row.TransferType ?? 0) > 0 ? { background: 'rgba(255, 255, 255, 0.06)' } : {};
 
   return (
     <TablePrimaryRow sx={rowStyle}>
@@ -57,8 +71,8 @@ const CosmicTokenTransferRow = ({ row }) => {
 
       {/* "From" address: checks if it's a wallet address for styling/tooltip */}
       <TablePrimaryCell align="center">
-        {isWalletAddress(row.FromAddr) !== "" ? (
-          <Tooltip title={row.FromAddr}>
+        {isWalletAddress(row.FromAddr ?? '') !== '' ? (
+          <Tooltip title={row.FromAddr ?? ''}>
             <Link
               color="inherit"
               fontSize="inherit"
@@ -66,18 +80,17 @@ const CosmicTokenTransferRow = ({ row }) => {
               href={`/user/${row.FromAddr}`}
               target="__blank"
             >
-              {isWalletAddress(row.FromAddr)}
+              {isWalletAddress(row.FromAddr ?? '')}
             </Link>
           </Tooltip>
         ) : (
-          <AddressLink address={row.FromAddr} url={`/user/${row.FromAddr}`} />
+          <AddressLink address={row.FromAddr ?? ''} url={`/user/${row.FromAddr}`} />
         )}
       </TablePrimaryCell>
 
-      {/* "To" address: same logic as "From" address */}
       <TablePrimaryCell align="center">
-        {isWalletAddress(row.ToAddr) !== "" ? (
-          <Tooltip title={row.ToAddr}>
+        {isWalletAddress(row.ToAddr ?? '') !== '' ? (
+          <Tooltip title={row.ToAddr ?? ''}>
             <Link
               color="inherit"
               fontSize="inherit"
@@ -85,18 +98,16 @@ const CosmicTokenTransferRow = ({ row }) => {
               href={`/user/${row.ToAddr}`}
               target="__blank"
             >
-              {isWalletAddress(row.ToAddr)}
+              {isWalletAddress(row.ToAddr ?? '')}
             </Link>
           </Tooltip>
         ) : (
-          <AddressLink address={row.ToAddr} url={`/user/${row.ToAddr}`} />
+          <AddressLink address={row.ToAddr ?? ''} url={`/user/${row.ToAddr}`} />
         )}
       </TablePrimaryCell>
 
       {/* Transfer amount/value in ETH, to 2 decimal places */}
-      <TablePrimaryCell align="center">
-        {row.ValueFloat.toFixed(2)}
-      </TablePrimaryCell>
+      <TablePrimaryCell align="center">{(row.ValueFloat ?? 0).toFixed(2)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -108,7 +119,7 @@ const CosmicTokenTransferRow = ({ row }) => {
     • Slices the data based on the current page.
     • Renders CustomPagination controls at the bottom.
 ------------------------------------------------------------------ */
-const CosmicTokenTransfersTable = ({ list }) => {
+const CosmicTokenTransfersTable = ({ list }: { list: TokenTransferRow[] }) => {
   // Number of rows to display per page
   const perPage = 10;
 
@@ -147,12 +158,7 @@ const CosmicTokenTransfersTable = ({ list }) => {
       </TablePrimaryContainer>
 
       {/* Pagination controls */}
-      <CustomPagination
-        page={page}
-        setPage={setPage}
-        totalLength={list.length}
-        perPage={perPage}
-      />
+      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );
 };
@@ -163,12 +169,12 @@ const CosmicTokenTransfersTable = ({ list }) => {
   - Displays them in a table with pagination.
   - Shows a loading state while data is being fetched.
 ------------------------------------------------------------------ */
-const CosmicTokenTransfers = ({ address }) => {
+const CosmicTokenTransfers = ({ address }: { address: string }) => {
   // Loading flag for data fetch
   const [loading, setLoading] = useState(true);
 
   // State holding all fetched transfers
-  const [cosmicTokenTransfers, setCosmicTokenTransfers] = useState([]);
+  const [cosmicTokenTransfers, setCosmicTokenTransfers] = useState<TokenTransferRow[]>([]);
 
   /* 
     useEffect: On component mount, fetch the transfers from the API.
@@ -179,7 +185,7 @@ const CosmicTokenTransfers = ({ address }) => {
       try {
         setLoading(true);
         const transfers = await api.get_ct_transfers(address);
-        setCosmicTokenTransfers(transfers);
+        setCosmicTokenTransfers(transfers as TokenTransferRow[]);
       } catch (err) {
         console.error(err);
       } finally {
@@ -219,10 +225,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   let address = Array.isArray(params) ? params[0] : params;
 
   // Validate and normalize the address if valid; otherwise, label as invalid
-  if (ethers.utils.isAddress(address.toLowerCase())) {
-    address = ethers.utils.getAddress(address.toLowerCase());
+  if (address && isAddress(address.toLowerCase())) {
+    address = getAddress(address.toLowerCase());
   } else {
-    address = "Invalid Address";
+    address = 'Invalid Address';
   }
 
   // Build page title/description dynamically with the address
@@ -231,12 +237,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   // Set Open Graph and Twitter meta tags
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData, address } };

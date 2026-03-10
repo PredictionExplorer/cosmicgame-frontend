@@ -1,20 +1,12 @@
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Collapse,
-  Grid,
-  IconButton,
-  Link,
-  TableBody,
-  Typography,
-} from "@mui/material";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Box, Collapse, Grid, IconButton, Link, TableBody, Typography } from '@mui/material';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Tr } from 'react-super-responsive-table';
 
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-
-import api from "../../../services/api";
-import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from "../../../utils";
+import api from '../../../services/api';
+import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from '../../../utils';
 import {
   MainWrapper,
   TablePrimary,
@@ -23,10 +15,9 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../../../components/styled";
-import { Tr } from "react-super-responsive-table";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { CustomPagination } from "../../../components/CustomPagination";
+} from '../../../components/styled';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { CustomPagination } from '../../../components/common/CustomPagination';
 
 /* ------------------------------------------------------------------
   Types
@@ -65,13 +56,10 @@ function useRewardsByTokenDetails(address: string, tokenId: number) {
   const [rewardsData, setRewardsData] = useState<RewardsRowData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get_staking_rewards_by_user_by_token_details(
-        address,
-        tokenId
-      );
+      const response = await api.get_staking_rewards_by_user_by_token_details(address, tokenId);
 
       // The API returns a map. Convert it to an array
       // and sort if you need to. Example: sort by DepositIndex.
@@ -81,17 +69,16 @@ function useRewardsByTokenDetails(address: string, tokenId: number) {
 
       setRewardsData(arrayData);
     } catch (err) {
-      console.error("Error fetching token details:", err);
+      console.error('Error fetching token details:', err);
       setRewardsData([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [address, tokenId]);
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address, tokenId]);
+  }, [fetchData]);
 
   return { rewardsData, loading };
 }
@@ -105,26 +92,14 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
 
   if (!row) return <TablePrimaryRow />;
 
-  const {
-    DepositTimeStamp,
-    RoundNum,
-    DepositId,
-    Claimed,
-    RewardEth,
-    Stake,
-    Unstake,
-  } = row;
+  const { DepositTimeStamp, RoundNum, DepositId, Claimed, RewardEth, Stake, Unstake } = row;
 
   return (
     <>
       {/* Main Row */}
       <TablePrimaryRow sx={{ borderBottom: 0 }}>
         <TablePrimaryCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen((prev) => !prev)}
-          >
+          <IconButton aria-label="expand row" size="small" onClick={() => setOpen((prev) => !prev)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TablePrimaryCell>
@@ -134,21 +109,14 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
         </TablePrimaryCell>
 
         <TablePrimaryCell align="center">
-          <Link
-            href={`/prize/${RoundNum}`}
-            style={{ color: "inherit", fontSize: "inherit" }}
-          >
+          <Link href={`/prize/${RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
             {RoundNum}
           </Link>
         </TablePrimaryCell>
 
         <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
-        <TablePrimaryCell align="center">
-          {Claimed ? "Yes" : "No"}
-        </TablePrimaryCell>
-        <TablePrimaryCell align="right">
-          {RewardEth.toFixed(6)}
-        </TablePrimaryCell>
+        <TablePrimaryCell align="center">{Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
+        <TablePrimaryCell align="right">{RewardEth.toFixed(6)}</TablePrimaryCell>
       </TablePrimaryRow>
 
       {/* Collapsible Row */}
@@ -157,7 +125,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Grid container spacing={4}>
               {/* Stake Section */}
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="h6">Stake</Typography>
                 <Box mb={1}>
                   <Typography color="primary" component="span">
@@ -180,15 +148,13 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                     Number of Staked NFTs:
                   </Typography>
                   &nbsp;
-                  <Typography component="span">
-                    {Stake.NumStakedNFTs}
-                  </Typography>
+                  <Typography component="span">{Stake.NumStakedNFTs}</Typography>
                 </Box>
               </Grid>
 
               {/* Unstake Section (only if EvtLogId != 0) */}
               {Unstake.EvtLogId !== 0 && (
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                   <Typography variant="h6">Unstake</Typography>
                   <Box mb={1}>
                     <Typography color="primary" component="span">
@@ -211,9 +177,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                       Number of Staked NFTs:
                     </Typography>
                     &nbsp;
-                    <Typography component="span">
-                      {Unstake.NumStakedNFTs}
-                    </Typography>
+                    <Typography component="span">{Unstake.NumStakedNFTs}</Typography>
                   </Box>
                   <Box mb={1}>
                     <Typography color="primary" component="span">
@@ -242,10 +206,7 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
   const PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const paginatedData = list.slice(
-    (currentPage - 1) * PER_PAGE,
-    currentPage * PER_PAGE
-  );
+  const paginatedData = list.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
 
   return (
     <>
@@ -254,15 +215,11 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell />
-              <TablePrimaryHeadCell align="left">
-                Deposit Datetime
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Is Claimed?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Reward (ETH)
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Reward (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
@@ -286,32 +243,16 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
 /* ------------------------------------------------------------------
   Main Component: RewardsByTokenDetails
 ------------------------------------------------------------------ */
-function RewardsByTokenDetails({
-  address,
-  tokenId,
-}: {
-  address: string;
-  tokenId: number;
-}) {
+function RewardsByTokenDetails({ address, tokenId }: { address: string; tokenId: number }) {
   const { rewardsData, loading } = useRewardsByTokenDetails(address, tokenId);
 
   return (
     <MainWrapper>
-      <Typography
-        variant="h4"
-        color="primary"
-        gutterBottom
-        textAlign="center"
-        mb={4}
-      >
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={4}>
         Staking Rewards Details for Token {tokenId}
       </Typography>
 
-      {loading ? (
-        <Typography>Loading...</Typography>
-      ) : (
-        <RewardsDetailTable list={rewardsData} />
-      )}
+      {loading ? <Typography>Loading...</Typography> : <RewardsDetailTable list={rewardsData} />}
     </MainWrapper>
   );
 }
@@ -320,7 +261,7 @@ function RewardsByTokenDetails({
   getServerSideProps
 ------------------------------------------------------------------ */
 export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ) => {
   const paramAddress = context.params!.address;
   const paramTokenId = context.params!.tokenId;
@@ -330,16 +271,16 @@ export const getServerSideProps: GetServerSideProps = async (
   // (Optional) Validate address or tokenId if needed
   // e.g., if using ethers/utils to check address
 
-  const title = "Rewards Details By Token | Cosmic Signature";
-  const description = "Rewards Details By Token";
+  const title = 'Rewards Details By Token | Cosmic Signature';
+  const description = 'Rewards Details By Token';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return {

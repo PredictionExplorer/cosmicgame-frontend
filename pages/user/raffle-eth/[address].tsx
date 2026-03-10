@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { Box, Button, Link, TableBody, Typography } from "@mui/material";
-import { GetServerSidePropsContext } from "next";
-import { ethers } from "ethers";
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Link, TableBody, Typography } from '@mui/material';
+import { GetServerSidePropsContext } from 'next';
+import { getAddress, isAddress } from 'viem';
+import { Tr } from 'react-super-responsive-table';
 
-import { useActiveWeb3React } from "../../../hooks/web3";
-import { useApiData } from "../../../contexts/ApiDataContext";
-import useRaffleWalletContract from "../../../hooks/useRaffleWalletContract";
-import { useNotification } from "../../../contexts/NotificationContext";
-
-import api from "../../../services/api";
-import getErrorMessage from "../../../utils/alert";
-import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from "../../../utils";
-
+import { useActiveWeb3React } from '../../../hooks/web3';
+import { useApiData } from '../../../contexts/ApiDataContext';
+import useRaffleWalletContract from '../../../hooks/useRaffleWalletContract';
+import { useNotification } from '../../../contexts/NotificationContext';
+import api from '../../../services/api';
+import getErrorMessage from '../../../utils/alert';
+import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from '../../../utils';
 import {
   MainWrapper,
   TablePrimary,
@@ -20,11 +19,10 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../../../components/styled";
-import { Tr } from "react-super-responsive-table";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
+} from '../../../components/styled';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { CustomPagination } from "../../../components/CustomPagination";
+import { CustomPagination } from '../../../components/common/CustomPagination';
 
 /* ------------------------------------------------------------------
   Types
@@ -61,7 +59,7 @@ const RaffleWinningsRow = ({ deposit }: { deposit: RaffleETHDeposit }) => {
       <TablePrimaryCell align="center">
         <Link
           href={`/prize/${RoundNum}`}
-          style={{ color: "inherit", fontSize: "inherit" }}
+          style={{ color: 'inherit', fontSize: 'inherit' }}
           target="_blank"
         >
           {RoundNum}
@@ -93,9 +91,7 @@ const RaffleWinningsTable = ({ list }: { list: RaffleETHDeposit[] }) => {
             <Tr>
               <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Amount (ETH)
-              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Amount (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <TableBody>
@@ -132,13 +128,13 @@ function useRaffleETHDeposits(address: string) {
   const fetchRaffleETHDeposits = async (reload = true) => {
     setRaffleETHToClaim((prev) => ({ ...prev, loading: reload }));
     try {
-      let deposits = await api.get_raffle_deposits_by_user(address);
-      deposits = deposits.sort(
-        (a: RaffleETHDeposit, b: RaffleETHDeposit) => b.TimeStamp - a.TimeStamp
+      const deposits = await api.get_raffle_deposits_by_user(address);
+      const sorted = (deposits as RaffleETHDeposit[]).sort(
+        (a: RaffleETHDeposit, b: RaffleETHDeposit) => b.TimeStamp - a.TimeStamp,
       );
-      setRaffleETHToClaim({ data: deposits, loading: false });
+      setRaffleETHToClaim({ data: sorted, loading: false });
     } catch (err) {
-      console.error("Failed to fetch Raffle ETH deposits:", err);
+      console.error('Failed to fetch Raffle ETH deposits:', err);
       setRaffleETHToClaim({ data: [], loading: false });
     }
   };
@@ -160,15 +156,13 @@ const UserRaffleETH = ({ address }: { address: string }) => {
   const [isClaiming, setIsClaiming] = useState(false);
 
   // Custom Hook for fetching user deposits
-  const { raffleETHToClaim, fetchRaffleETHDeposits } = useRaffleETHDeposits(
-    address
-  );
+  const { raffleETHToClaim, fetchRaffleETHDeposits } = useRaffleETHDeposits(address);
 
   // Handler: Claim all user Raffle ETH
   const handleAllETHClaim = async () => {
     try {
       setIsClaiming(true);
-      await raffleWalletContract["withdrawEth()"]();
+      await raffleWalletContract!.write.withdrawEth?.();
 
       // Refresh data & statuses after short delay
       setTimeout(() => {
@@ -176,15 +170,15 @@ const UserRaffleETH = ({ address }: { address: string }) => {
         fetchRaffleETHDeposits(false);
         setIsClaiming(false);
       }, 2000);
-    } catch (err) {
-      if (err?.code === 4001) {
-        console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
+    } catch (err: unknown) {
+      const ethErr = err as { code?: number; data?: { message?: string } };
+      if (ethErr?.code === 4001) {
+        // user rejected
       } else {
         console.error(err);
-        if (err?.data?.message) {
-          const msg = getErrorMessage(err.data.message);
-          setNotification({ text: msg, type: "error", visible: true });
+        if (ethErr?.data?.message) {
+          const msg = getErrorMessage(ethErr.data.message);
+          setNotification({ text: msg, type: 'error', visible: true });
         }
       }
       setIsClaiming(false);
@@ -193,7 +187,7 @@ const UserRaffleETH = ({ address }: { address: string }) => {
 
   // Fetch data on mount if address is valid
   useEffect(() => {
-    if (!address || address === "Invalid Address") {
+    if (!address || address === 'Invalid Address') {
       setInvalidAddress(true);
       return;
     }
@@ -224,8 +218,8 @@ const UserRaffleETH = ({ address }: { address: string }) => {
       <Box mt={4}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
+            display: 'flex',
+            justifyContent: 'space-between',
             mb: 2,
           }}
         >
@@ -237,14 +231,9 @@ const UserRaffleETH = ({ address }: { address: string }) => {
           {status?.ETHRaffleToClaim > 0 && account === address && (
             <Box>
               <Typography component="span" mr={2}>
-                Your claimable winnings are {status.ETHRaffleToClaim.toFixed(6)}{" "}
-                ETH
+                Your claimable winnings are {status.ETHRaffleToClaim.toFixed(6)} ETH
               </Typography>
-              <Button
-                onClick={handleAllETHClaim}
-                variant="contained"
-                disabled={isClaiming}
-              >
+              <Button onClick={handleAllETHClaim} variant="contained" disabled={isClaiming}>
                 Claim All
               </Button>
             </Box>
@@ -269,22 +258,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   let address = Array.isArray(params) ? params[0] : params;
 
   // Validate address
-  if (ethers.utils.isAddress(address.toLowerCase())) {
-    address = ethers.utils.getAddress(address.toLowerCase());
+  if (address && isAddress(address.toLowerCase())) {
+    address = getAddress(address.toLowerCase());
   } else {
-    address = "Invalid Address";
+    address = 'Invalid Address';
   }
 
   const title = `Raffle ETH User(${address}) Won | Cosmic Signature`;
   const description = `Raffle ETH User(${address}) Won`;
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return {

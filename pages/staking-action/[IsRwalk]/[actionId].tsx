@@ -1,28 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { Box, CardActionArea, Grid, Link, Typography } from "@mui/material";
-import { GetServerSidePropsContext } from "next";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Box, CardActionArea, Grid, Link, Typography } from '@mui/material';
+import { GetServerSidePropsContext } from 'next';
 
-import { MainWrapper, StyledCard } from "../../../components/styled";
-import api from "../../../services/api";
-import NFTImage from "../../../components/NFTImage";
+import { MainWrapper, StyledCard } from '../../../components/styled';
+import api from '../../../services/api';
+import type { CombinedStakingRecordInfo, StakingAction } from '../../../services/api/types';
+import NFTImage from '../../../components/nft/NFTImage';
 import {
   getExplorerUrl,
   getAssetsUrl,
   getRWLKImageUrl,
   convertTimestampToDateTime,
   logoImgUrl,
-} from "../../../utils";
+} from '../../../utils';
 
 /* ------------------------------------------------------------------
   Custom Hook: useStakingActionDetail
   Handles data fetching & loading states for a single staking action.
 ------------------------------------------------------------------ */
 function useStakingActionDetail(actionId: number, isRwalk: boolean) {
-  const [actionInfo, setActionInfo] = useState<any>(null);
+  const [actionInfo, setActionInfo] = useState<CombinedStakingRecordInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchStakingAction = async () => {
+  const fetchStakingAction = useCallback(async () => {
     try {
       setLoading(true);
       let info;
@@ -33,17 +34,16 @@ function useStakingActionDetail(actionId: number, isRwalk: boolean) {
       }
       setActionInfo(info);
     } catch (e) {
-      console.error("Error fetching staking action info:", e);
-      setError("Failed to load staking action info.");
+      console.error('Error fetching staking action info:', e);
+      setError('Failed to load staking action info.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [actionId, isRwalk]);
 
   useEffect(() => {
     fetchStakingAction();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [actionId, isRwalk]);
+  }, [fetchStakingAction]);
 
   return { actionInfo, loading, error };
 }
@@ -55,14 +55,14 @@ function useStakingActionDetail(actionId: number, isRwalk: boolean) {
 interface TokenInfoPanelProps {
   isRwalk: boolean;
   actionId: number;
-  stake: any; // shape from API (Stake info)
+  stake: StakingAction;
 }
 function TokenInfoPanel({ isRwalk, actionId, stake }: TokenInfoPanelProps) {
   const { TokenId, Seed, StakerAddr } = stake;
 
   // Build image URL
   const tokenImageURL = isRwalk
-    ? getRWLKImageUrl(TokenId.toString().padStart(6, "0"))
+    ? getRWLKImageUrl(TokenId.toString().padStart(6, '0'))
     : getAssetsUrl(`cosmicsignature/0x${Seed}.png`);
 
   // Build link to NFT detail
@@ -71,11 +71,11 @@ function TokenInfoPanel({ isRwalk, actionId, stake }: TokenInfoPanelProps) {
     : `/detail/${TokenId}`;
 
   return (
-    <Grid item sm={12} md={6}>
-      <Box sx={{ maxWidth: "400px", mb: 2 }}>
+    <Grid size={{ sm: 12, md: 6 }}>
+      <Box sx={{ maxWidth: '400px', mb: 2 }}>
         <StyledCard>
           <CardActionArea>
-            <Link href={tokenDetailHref} sx={{ display: "block" }}>
+            <Link href={tokenDetailHref} sx={{ display: 'block' }}>
               <NFTImage src={tokenImageURL} />
             </Link>
           </CardActionArea>
@@ -96,10 +96,7 @@ function TokenInfoPanel({ isRwalk, actionId, stake }: TokenInfoPanelProps) {
           Staker Address:
         </Typography>
         &nbsp;
-        <Link
-          href={`/user/${StakerAddr}`}
-          style={{ color: "inherit", wordBreak: "break-all" }}
-        >
+        <Link href={`/user/${StakerAddr}`} style={{ color: 'inherit', wordBreak: 'break-all' }}>
           <Typography component="span" fontFamily="monospace">
             {StakerAddr}
           </Typography>
@@ -111,7 +108,7 @@ function TokenInfoPanel({ isRwalk, actionId, stake }: TokenInfoPanelProps) {
           Token Id:
         </Typography>
         &nbsp;
-        <Link href={tokenDetailHref} style={{ color: "inherit" }}>
+        <Link href={tokenDetailHref} style={{ color: 'inherit' }}>
           <Typography component="span">{TokenId}</Typography>
         </Link>
       </Box>
@@ -124,7 +121,7 @@ function TokenInfoPanel({ isRwalk, actionId, stake }: TokenInfoPanelProps) {
   Renders the "Stake" section data
 ------------------------------------------------------------------ */
 interface StakeInfoProps {
-  stake: any; // shape from API
+  stake: StakingAction;
 }
 function StakeInfo({ stake }: StakeInfoProps) {
   const { TxHash, TimeStamp, NumStakedNFTs } = stake;
@@ -143,9 +140,7 @@ function StakeInfo({ stake }: StakeInfoProps) {
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
         >
-          <Typography component="span">
-            {convertTimestampToDateTime(TimeStamp)}
-          </Typography>
+          <Typography component="span">{convertTimestampToDateTime(TimeStamp)}</Typography>
         </Link>
       </Box>
       <Box mb={1}>
@@ -164,7 +159,7 @@ function StakeInfo({ stake }: StakeInfoProps) {
   Renders the "Unstake" section data (shown only if EvtLogId !== 0)
 ------------------------------------------------------------------ */
 interface UnstakeInfoProps {
-  unstake: any; // shape from API
+  unstake: StakingAction;
 }
 function UnstakeInfo({ unstake }: UnstakeInfoProps) {
   const { EvtLogId, TxHash, TimeStamp, NumStakedNFTs } = unstake;
@@ -186,9 +181,7 @@ function UnstakeInfo({ unstake }: UnstakeInfoProps) {
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
         >
-          <Typography component="span">
-            {convertTimestampToDateTime(TimeStamp)}
-          </Typography>
+          <Typography component="span">{convertTimestampToDateTime(TimeStamp)}</Typography>
         </Link>
       </Box>
       <Box mb={1}>
@@ -205,28 +198,17 @@ function UnstakeInfo({ unstake }: UnstakeInfoProps) {
 /* ------------------------------------------------------------------
   Main Component: StakingActionDetail
 ------------------------------------------------------------------ */
-function StakingActionDetail({
-  IsRwalk,
-  actionId,
-}: {
-  IsRwalk: number;
-  actionId: number;
-}) {
+function StakingActionDetail({ IsRwalk, actionId }: { IsRwalk: number; actionId: number }) {
   const isRwalk = Boolean(IsRwalk);
 
   // Use the custom hook
-  const { actionInfo, loading, error } = useStakingActionDetail(
-    actionId,
-    isRwalk
-  );
+  const { actionInfo, loading, error } = useStakingActionDetail(actionId, isRwalk);
 
   return (
     <MainWrapper>
       <Box mb={4}>
         <Typography variant="h5" color="primary" component="span" mr={2}>
-          {`Staking Action for ${
-            isRwalk ? "RandomWalk" : "Cosmic Signature"
-          } Token`}
+          {`Staking Action for ${isRwalk ? 'RandomWalk' : 'Cosmic Signature'} Token`}
         </Typography>
       </Box>
 
@@ -239,16 +221,12 @@ function StakingActionDetail({
       ) : actionInfo ? (
         <Grid container spacing={4}>
           {/* Left Panel: Token Info */}
-          <TokenInfoPanel
-            isRwalk={isRwalk}
-            actionId={actionId}
-            stake={actionInfo.Stake}
-          />
+          <TokenInfoPanel isRwalk={isRwalk} actionId={actionId} stake={actionInfo.Stake!} />
 
           {/* Right Panel: Stake & Unstake Info */}
-          <Grid item sm={12} md={6}>
-            <StakeInfo stake={actionInfo.Stake} />
-            <UnstakeInfo unstake={actionInfo.Unstake} />
+          <Grid size={{ sm: 12, md: 6 }}>
+            <StakeInfo stake={actionInfo.Stake!} />
+            <UnstakeInfo unstake={actionInfo.Unstake!} />
           </Grid>
         </Grid>
       ) : (
@@ -262,27 +240,25 @@ function StakingActionDetail({
   getServerSideProps
 ------------------------------------------------------------------ */
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { actionId, IsRwalk } = context.params as any;
+  const { actionId, IsRwalk } = context.params as { actionId: string; IsRwalk: string };
 
-  const parsedActionId = parseInt(
-    Array.isArray(actionId) ? actionId[0] : actionId
-  );
+  const parsedActionId = parseInt(Array.isArray(actionId) ? actionId[0] : actionId);
   const parsedIsRwalk = parseInt(Array.isArray(IsRwalk) ? IsRwalk[0] : IsRwalk);
 
   const title = `Detail for ${
-    parsedIsRwalk ? "RandomWalk NFT" : "Cosmic Signature Token"
+    parsedIsRwalk ? 'RandomWalk NFT' : 'Cosmic Signature Token'
   } Staking Action Id = ${parsedActionId} | Cosmic Signature`;
   const description = `Detail for ${
-    parsedIsRwalk ? "RandomWalk NFT" : "Cosmic Signature Token"
+    parsedIsRwalk ? 'RandomWalk NFT' : 'Cosmic Signature Token'
   } Staking Action Id = ${parsedActionId}`;
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return {

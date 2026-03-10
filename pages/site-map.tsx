@@ -1,29 +1,30 @@
-import { Box, Link, Typography } from "@mui/material";
-import { MainWrapper } from "../components/styled";
-import { GetServerSideProps } from "next";
-import { logoImgUrl } from "../utils";
+import { Box, Link, Typography } from '@mui/material';
+import { GetStaticProps } from 'next';
+
+import { MainWrapper } from '../components/styled';
+import { logoImgUrl } from '../utils';
 
 /**
  * A list of links that provide per-user information routes.
  */
 const perUserLinks = [
-  { href: "/my-tokens", label: "My Tokens" },
-  { href: "/my-winnings", label: "My Unclaimed Winnings" },
-  { href: "/winning-history", label: "History of My Winnings" },
-  { href: "/my-staking", label: "My Staking" },
+  { href: '/my-tokens', label: 'My Tokens' },
+  { href: '/my-winnings', label: 'My Unclaimed Winnings' },
+  { href: '/winning-history', label: 'History of My Winnings' },
+  { href: '/my-staking', label: 'My Staking' },
 ];
 
 /**
  * A list of links that provide overall system information routes.
  */
 const systemLinks = [
-  { href: "/gallery", label: "CosmicSignature Gallery" },
-  { href: "/prize", label: "Rounds Played" },
-  { href: "/staking", label: "Staking Rewards" },
-  { href: "/marketing", label: "Marketing Rewards" },
-  { href: "/statistics", label: "System Statistics" },
-  { href: "/contracts", label: "Contract Addresses" },
-  { href: "/faq", label: "FAQ" },
+  { href: '/gallery', label: 'CosmicSignature Gallery' },
+  { href: '/prize', label: 'Rounds Played' },
+  { href: '/staking', label: 'Staking Rewards' },
+  { href: '/marketing', label: 'Marketing Rewards' },
+  { href: '/statistics', label: 'System Statistics' },
+  { href: '/contracts', label: 'Contract Addresses' },
+  { href: '/faq', label: 'FAQ' },
 ];
 
 /**
@@ -33,13 +34,7 @@ const SiteMap = () => {
   return (
     <MainWrapper>
       {/* Page heading */}
-      <Typography
-        variant="h4"
-        color="primary"
-        gutterBottom
-        textAlign="center"
-        mb={6}
-      >
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={6}>
         Site Map
       </Typography>
 
@@ -50,7 +45,7 @@ const SiteMap = () => {
           {/* Map over perUserLinks to render them dynamically */}
           {perUserLinks.map(({ href, label }) => (
             <Typography variant="subtitle1" key={href}>
-              <Link href={href} sx={{ fontSize: "inherit", color: "inherit" }}>
+              <Link href={href} sx={{ fontSize: 'inherit', color: 'inherit' }}>
                 {label}
               </Link>
             </Typography>
@@ -65,7 +60,7 @@ const SiteMap = () => {
           {/* Map over systemLinks to render them dynamically */}
           {systemLinks.map(({ href, label }) => (
             <Typography variant="subtitle1" key={href}>
-              <Link href={href} sx={{ fontSize: "inherit", color: "inherit" }}>
+              <Link href={href} sx={{ fontSize: 'inherit', color: 'inherit' }}>
                 {label}
               </Link>
             </Typography>
@@ -80,18 +75,18 @@ const SiteMap = () => {
  * getServerSideProps: Fetches and sets metadata (e.g., for SEO and social sharing)
  * before rendering the SiteMap page on the server side.
  */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Site Map | Cosmic Signature";
-  const description = "Site Map";
+export const getStaticProps: GetStaticProps = async () => {
+  const title = 'Site Map | Cosmic Signature';
+  const description = 'Site Map';
 
   // Open Graph and Twitter meta data
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

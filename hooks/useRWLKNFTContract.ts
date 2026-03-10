@@ -1,7 +1,8 @@
-import { NFT_ADDRESS } from "../config/app";
-import NFT_ABI from "../contracts/RandomWalkNFT.json";
-import useContract from "./useContract";
+import { NFT_ADDRESS } from '../config/networks';
+import { randomWalkNftAbi } from '../contracts/abis';
+
+import useContract from './useContract';
 
 export default function useRWLKNFTContract() {
-  return useContract(NFT_ADDRESS, NFT_ABI);
+  return useContract(NFT_ADDRESS, randomWalkNftAbi);
 }

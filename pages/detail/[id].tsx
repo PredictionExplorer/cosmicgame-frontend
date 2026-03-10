@@ -1,10 +1,11 @@
-import { GetServerSidePropsContext } from "next";
-import NFTTrait from "../../components/NFTTrait";
-import { MainWrapper } from "../../components/styled";
-import axios from "axios";
-import { cosmicGameBaseUrl } from "../../services/api";
-import { getAssetsUrl } from "../../utils";
-import { Typography } from "@mui/material";
+import { GetServerSidePropsContext } from 'next';
+import axios from 'axios';
+import { Typography } from '@mui/material';
+
+import NFTTrait from '../../components/nft/NFTTrait';
+import { MainWrapper } from '../../components/styled';
+import { cosmicGameBaseUrl } from '../../services/api';
+import { getAssetsUrl } from '../../utils';
 
 interface DetailProps {
   tokenId: number;
@@ -55,18 +56,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   // Open Graph meta data
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: imageUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: imageUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: imageUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: imageUrl },
   ];
 
   // Return props to component
   return {
     props: {
-      tokenId: parseInt(tokenId, 10),
+      tokenId: parseInt(tokenId as string, 10),
       title,
       description,
       openGraphData,

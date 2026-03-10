@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Box, Link, TableBody, Typography } from "@mui/material";
+import React, { useEffect, useState } from 'react';
+import { Box, Link, TableBody, Typography } from '@mui/material';
+import { Tr } from 'react-super-responsive-table';
+
 import {
   MainWrapper,
   TablePrimary,
@@ -8,22 +10,22 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from "../components/styled";
-import { convertTimestampToDateTime, logoImgUrl } from "../utils";
-import api from "../services/api";
-import { Tr } from "react-super-responsive-table";
-import "react-super-responsive-table/dist/SuperResponsiveTableStyle.css";
-import { CustomPagination } from "../components/CustomPagination";
-import { GetServerSideProps } from "next";
+} from '../components/styled';
+import { convertTimestampToDateTime, logoImgUrl } from '../utils';
+import api from '../services/api';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { CustomPagination } from '../components/common/CustomPagination';
 
-/* ------------------------------------------------------------------
-  Sub-Component: NamedNFTRow
-  Renders a single row in the table, showing:
-    - DateTime (formatted),
-    - Token ID (link to token detail page),
-    - Token Name.
------------------------------------------------------------------- */
-const NamedNFTRow = ({ nft }) => {
+import { GetServerSideProps } from 'next';
+
+interface NamedNFTRecord {
+  MintTimeStamp: number;
+  TokenId: number;
+  TokenName: string;
+  [key: string]: unknown;
+}
+
+const NamedNFTRow = ({ nft }: { nft: NamedNFTRecord }) => {
   // If there's no data for nft, return an empty row.
   if (!nft) {
     return <TablePrimaryRow />;
@@ -32,16 +34,11 @@ const NamedNFTRow = ({ nft }) => {
   return (
     <TablePrimaryRow>
       {/* NFT's minting datetime */}
-      <TablePrimaryCell>
-        {convertTimestampToDateTime(nft.MintTimeStamp)}
-      </TablePrimaryCell>
+      <TablePrimaryCell>{convertTimestampToDateTime(nft.MintTimeStamp)}</TablePrimaryCell>
 
       {/* Token ID, linking to a detail page */}
       <TablePrimaryCell align="center">
-        <Link
-          sx={{ color: "inherit", fontSize: "inherit" }}
-          href={`/detail/${nft.TokenId}`}
-        >
+        <Link sx={{ color: 'inherit', fontSize: 'inherit' }} href={`/detail/${nft.TokenId}`}>
           {nft.TokenId}
         </Link>
       </TablePrimaryCell>
@@ -56,7 +53,7 @@ const NamedNFTRow = ({ nft }) => {
   Sub-Component: NamedNFTsTable
   Receives a list of NFT objects and renders them in a styled table.
 ------------------------------------------------------------------ */
-const NamedNFTsTable = ({ list }) => {
+const NamedNFTsTable = ({ list }: { list: NamedNFTRecord[] }) => {
   return (
     <TablePrimaryContainer>
       <TablePrimary>
@@ -68,7 +65,7 @@ const NamedNFTsTable = ({ list }) => {
           </Tr>
         </TablePrimaryHead>
         <TableBody>
-          {list.map((nft, i) => (
+          {list.map((nft, i: number) => (
             <NamedNFTRow key={i} nft={nft} />
           ))}
         </TableBody>
@@ -94,7 +91,7 @@ const NamedNFTs = () => {
   const [loading, setLoading] = useState(true);
 
   // List of named NFTs fetched from the API
-  const [list, setList] = useState([]);
+  const [list, setList] = useState<NamedNFTRecord[]>([]);
 
   // Fetch named NFTs from the API upon component mount
   useEffect(() => {
@@ -102,7 +99,7 @@ const NamedNFTs = () => {
       try {
         setLoading(true);
         const nfts = await api.get_named_nfts();
-        setList(nfts);
+        setList(nfts as unknown as NamedNFTRecord[]);
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -127,9 +124,7 @@ const NamedNFTs = () => {
           <Typography variant="h6">Loading...</Typography>
         ) : list.length > 0 ? (
           <>
-            <NamedNFTsTable
-              list={list.slice((curPage - 1) * perPage, curPage * perPage)}
-            />
+            <NamedNFTsTable list={list.slice((curPage - 1) * perPage, curPage * perPage)} />
             <CustomPagination
               page={curPage}
               setPage={setCurPage}
@@ -151,16 +146,16 @@ const NamedNFTs = () => {
   and Open Graph data). This ensures correct social media previews.
 ------------------------------------------------------------------ */
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "Named Cosmic Signature Tokens | Cosmic Signature";
-  const description = "Named Cosmic Signature Tokens";
+  const title = 'Named Cosmic Signature Tokens | Cosmic Signature';
+  const description = 'Named Cosmic Signature Tokens';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

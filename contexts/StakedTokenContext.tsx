@@ -1,35 +1,22 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
   ReactNode,
-} from "react";
-import api from "../services/api";
-import { useActiveWeb3React } from "../hooks/web3";
+} from 'react';
 
-/**
- * Represents a single staked CST token item.
- * Replace `any` with the proper type if available.
- */
-interface CstToken {
-  [key: string]: any;
-}
-
-/**
- * Represents a single staked RWALK token item.
- * Replace `any` with the proper type if available.
- */
-interface RwlkToken {
-  [key: string]: any;
-}
+import api from '../services/api';
+import { useActiveWeb3React } from '../hooks/web3';
+import type { StakedTokenInfo } from '../services/api/types';
 
 /**
  * Describes the shape of the StakedTokenContext value.
  */
 interface StakedTokenContextValue {
-  cstokens: CstToken[];
-  rwlktokens: RwlkToken[];
+  cstokens: StakedTokenInfo[];
+  rwlktokens: StakedTokenInfo[];
   fetchData: () => Promise<void>;
 }
 
@@ -37,9 +24,7 @@ interface StakedTokenContextValue {
  * Create the token context with a default value of `undefined`.
  * This allows TypeScript to catch usage outside of a proper provider.
  */
-const StakedTokenContext = createContext<StakedTokenContextValue | undefined>(
-  undefined
-);
+const StakedTokenContext = createContext<StakedTokenContextValue | undefined>(undefined);
 
 /**
  * Describes the props for the StakedTokenProvider.
@@ -52,17 +37,15 @@ interface StakedTokenProviderProps {
  * Provider component responsible for fetching and storing
  * the user's staked tokens (CST and RWALK).
  */
-export const StakedTokenProvider: React.FC<StakedTokenProviderProps> = ({
-  children,
-}) => {
-  const [cstokens, setCsTokens] = useState<CstToken[]>([]);
-  const [rwlktokens, setRwlkTokens] = useState<RwlkToken[]>([]);
+export const StakedTokenProvider: React.FC<StakedTokenProviderProps> = ({ children }) => {
+  const [cstokens, setCsTokens] = useState<StakedTokenInfo[]>([]);
+  const [rwlktokens, setRwlkTokens] = useState<StakedTokenInfo[]>([]);
   const { account } = useActiveWeb3React();
 
   /**
    * Fetches staked tokens for the connected user.
    */
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!account) return;
     try {
       const [cst, rwlk] = await Promise.all([
@@ -72,9 +55,9 @@ export const StakedTokenProvider: React.FC<StakedTokenProviderProps> = ({
       setCsTokens(cst ?? []);
       setRwlkTokens(rwlk ?? []);
     } catch (error) {
-      console.error("Error fetching staked token data:", error);
+      console.error('Error fetching staked token data:', error);
     }
-  };
+  }, [account]);
 
   useEffect(() => {
     let cancelled = false;
@@ -82,9 +65,10 @@ export const StakedTokenProvider: React.FC<StakedTokenProviderProps> = ({
       if (!cancelled) await fetchData();
     };
     run();
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account]);
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchData]);
 
   return (
     <StakedTokenContext.Provider value={{ cstokens, rwlktokens, fetchData }}>
@@ -100,7 +84,7 @@ export const StakedTokenProvider: React.FC<StakedTokenProviderProps> = ({
 export const useStakedToken = (): StakedTokenContextValue => {
   const context = useContext(StakedTokenContext);
   if (!context) {
-    throw new Error("useStakedToken must be used within a StakedTokenProvider");
+    throw new Error('useStakedToken must be used within a StakedTokenProvider');
   }
   return context;
 };

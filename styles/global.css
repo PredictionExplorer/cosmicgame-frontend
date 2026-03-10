@@ -1,19 +1,16 @@
-@import url(/fonts/ClashDisplay/css/clash-display.css);
-@import url(/fonts/Inter/css/inter.css);
-
 a {
   -webkit-text-decoration-color: white !important;
   text-decoration-color: white !important;
 }
 
 @property --radius {
-  syntax: "<length>";
+  syntax: '<length>';
   inherits: true;
   initial-value: 0;
 }
 
 @property --border {
-  syntax: "<length>";
+  syntax: '<length>';
   inherits: true;
   initial-value: 0;
 }
@@ -67,5 +64,11 @@ a {
     color: #000;
     font-weight: 400 !important;
     padding: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #tsparticles {
+    display: none !important;
   }
 }

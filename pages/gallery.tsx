@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
-import { Box, Typography } from "@mui/material";
-import PaginationGrid from "../components/PaginationGrid";
-import { MainWrapper } from "../components/styled";
-import api from "../services/api";
-import { GetServerSideProps } from "next";
-import { logoImgUrl } from "../utils";
+import { useState, useEffect } from 'react';
+import { Box, Typography } from '@mui/material';
+import { GetStaticProps } from 'next';
+
+import PaginationGrid from '../components/nft/PaginationGrid';
+import { MainWrapper } from '../components/styled';
+import api from '../services/api';
+import type { CSTTokenInfo } from '../services/api/types';
+import { logoImgUrl } from '../utils';
 
 /* ------------------------------------------------------------------
   Page Component: Gallery
@@ -19,7 +21,7 @@ const Gallery = () => {
   const [loading, setLoading] = useState(true);
 
   // Collection state to store the fetched array of NFT objects.
-  const [collection, setCollection] = useState([]);
+  const [collection, setCollection] = useState<CSTTokenInfo[]>([]);
 
   /* 
     useEffect: On component mount, fetch NFT list from the server
@@ -48,12 +50,7 @@ const Gallery = () => {
   return (
     <MainWrapper>
       {/* Page Header */}
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        flexWrap="wrap"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" flexWrap="wrap">
         <Typography variant="h4" component="span" color="primary">
           CosmicSignature
         </Typography>
@@ -77,26 +74,26 @@ const Gallery = () => {
   Provides server-side rendering for meta tags (title, description, 
   and Open Graph data), ensuring proper SEO for social sharing.
 ------------------------------------------------------------------ */
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   // SEO title for the page
-  const title = "Gallery | Cosmic Signature";
+  const title = 'Gallery | Cosmic Signature';
 
   // Meta description for search engines and social media
   const description =
-    "Explore the Cosmic Signature NFT Gallery and discover a unique collection of digital art. Immerse yourself in vibrant, one-of-a-kind NFTs, each telling a cosmic story. Start your journey into the digital universe today!";
+    'Explore the Cosmic Signature NFT Gallery and discover a unique collection of digital art. Immerse yourself in vibrant, one-of-a-kind NFTs, each telling a cosmic story. Start your journey into the digital universe today!';
 
   // Open Graph and Twitter meta tags
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   // Return these props to the page component
-  return { props: { title, description, openGraphData } };
+  return { props: { title, description, openGraphData }, revalidate: 60 };
 };
 
 export default Gallery;

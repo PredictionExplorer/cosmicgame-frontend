@@ -1,47 +1,53 @@
 import type { AppProps } from 'next/app';
-import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
-import { Web3ReactProvider } from '@web3-react/core';
 import { useState, useEffect, useCallback } from 'react';
-import Particles from 'react-tsparticles';
 import type { Engine } from 'tsparticles-engine';
 import { loadSlim } from 'tsparticles-slim';
 
-// Correctly restore dynamic import for Web3ProviderNetwork
-const Web3ProviderNetwork = dynamic(
-  () => import('../components/Web3ProviderNetwork'),
+const Particles = dynamic(
+  () => import('react-tsparticles').then((mod) => ({ default: mod.default })),
   { ssr: false },
 );
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import '@rainbow-me/rainbowkit/styles.css';
 
-import Web3ReactManager from '../components/Web3ReactManager';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import createEmotionCache from '../cache/createEmotionCache';
-import getLibrary from '../utils/getLibrary';
+import { wagmiConfig } from '../config/wagmi';
+// import { inter, clashDisplay } from '../config/fonts';
+import ErrorBoundary from '../components/layout/ErrorBoundary';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+import createEmotionCache from '../utils/createEmotionCache';
 import theme from '../config/styles';
+
 import '../styles/global.css';
 import { useRouter } from 'next/router';
+
 import * as ga from '../utils/analytics';
 import { ApiDataProvider } from '../contexts/ApiDataContext';
 import ApiDataFetcher from '../contexts/ApiDataFetcher';
+
 import { CookiesProvider } from 'react-cookie';
+
 import { StakedTokenProvider } from '../contexts/StakedTokenContext';
 import { SystemModeProvider } from '../contexts/SystemModeContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import { logoImgUrl } from '../utils';
 
-// Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
+const queryClient = new QueryClient();
 
 interface MyAppProps extends AppProps {
-  emotionCache?: EmotionCache
+  emotionCache?: EmotionCache;
 }
 
-const defaultTitle = "Cosmic Signature";
-const defaultDescription = "Cosmic Signature is a strategy bidding game.";
+const defaultTitle = 'Cosmic Signature';
+const defaultDescription = 'Cosmic Signature is a strategy bidding game.';
 
 interface OpenGraphDataItem {
   property?: string;
@@ -50,41 +56,27 @@ interface OpenGraphDataItem {
 }
 
 const defaultOpenGraphData = [
-  { property: "og:type", content: "website" },
-  { property: "og:site_name", content: defaultTitle },
-  { property: "og:description", content: defaultDescription },
-  { property: "og:title", content: defaultTitle },
-  { property: "og:image", content: logoImgUrl },
-  { name: "twitter:card", content: "summary_large_image" },
-  { name: "twitter:title", content: defaultTitle },
-  { name: "twitter:description", content: defaultDescription },
-  { name: "twitter:image", content: logoImgUrl },
+  { property: 'og:type', content: 'website' },
+  { property: 'og:site_name', content: defaultTitle },
+  { property: 'og:description', content: defaultDescription },
+  { property: 'og:title', content: defaultTitle },
+  { property: 'og:image', content: logoImgUrl },
+  { name: 'twitter:card', content: 'summary_large_image' },
+  { name: 'twitter:title', content: defaultTitle },
+  { name: 'twitter:description', content: defaultDescription },
+  { name: 'twitter:image', content: logoImgUrl },
 ];
 
 const particleOptions = {
-  background: {
-    color: {
-      value: 'transparent',
-    },
-  },
+  background: { color: { value: 'transparent' } },
   fpsLimit: 60,
   interactivity: {
     events: {
-      onHover: {
-        enable: true,
-        mode: 'grab',
-      },
-      onClick: {
-        enable: false,
-      },
+      onHover: { enable: true, mode: 'grab' },
+      onClick: { enable: false },
     },
     modes: {
-      grab: {
-        distance: 140,
-        links: {
-          opacity: 0.3,
-        },
-      },
+      grab: { distance: 140, links: { opacity: 0.3 } },
     },
   },
   particles: {
@@ -99,16 +91,8 @@ const particleOptions = {
         l: { enable: false, offset: 0, speed: 1, sync: true },
       },
     },
-    links: {
-      color: '#ffffff',
-      distance: 150,
-      enable: true,
-      opacity: 0.15,
-      width: 1,
-    },
-    collisions: {
-      enable: false,
-    },
+    links: { color: '#ffffff', distance: 150, enable: true, opacity: 0.15, width: 1 },
+    collisions: { enable: false },
     move: {
       direction: 'none',
       enable: true,
@@ -117,12 +101,9 @@ const particleOptions = {
       speed: 0.5,
       straight: false,
     },
-    number: {
-      density: { enable: true, area: 1000 },
-      value: 30,
-    },
+    number: { density: { enable: true, area: 1000 }, value: 30 },
     opacity: {
-      value: {min: 0.1, max: 0.4},
+      value: { min: 0.1, max: 0.4 },
       animation: { enable: true, speed: 0.5, minimumValue: 0.05, sync: false },
     },
     shape: { type: 'circle' },
@@ -135,29 +116,25 @@ const particleOptions = {
 };
 
 function MyApp(props: MyAppProps) {
-  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   const { openGraphData = defaultOpenGraphData, title, description } = pageProps;
-  const router = useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const handleRouteChange = (url: string) => {
-      ga.pageview(url)
-    }
-    router.events.on('routeChangeComplete', handleRouteChange)
+      ga.pageview(url);
+    };
+    router.events.on('routeChangeComplete', handleRouteChange);
     return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router.events])
+      router.events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [router.events]);
 
-  // particlesInit function for the init prop
   const particlesInit = useCallback(async (engine: Engine) => {
-    // console.log(engine);
     await loadSlim(engine);
   }, []);
 
-  const particlesLoaded = useCallback(async (container: any) => {
-    // await console.log("Particles container loaded", container);
-  }, []);
+  const particlesLoaded = useCallback(async () => {}, []);
 
   return (
     <>
@@ -174,15 +151,17 @@ function MyApp(props: MyAppProps) {
           <meta key={og.property || og.name} {...og} />
         ))}
       </Head>
-      <Web3ReactProvider getLibrary={getLibrary}>
-        <Web3ProviderNetwork getLibrary={getLibrary}>
-          <CacheProvider value={emotionCache}>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
+      <WagmiProvider config={wagmiConfig}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider theme={darkTheme()}>
+            <CacheProvider value={emotionCache}>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
                 <Particles
                   id="tsparticles"
                   init={particlesInit}
                   loaded={particlesLoaded}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- tsparticles ISourceOptions type is incompatible with react-tsparticles prop types
                   options={particleOptions as any}
                   style={{
                     position: 'fixed',
@@ -192,29 +171,34 @@ function MyApp(props: MyAppProps) {
                     height: '100%',
                     zIndex: 0,
                   }}
+                  aria-hidden="true"
                 />
-              <Web3ReactManager>
-              <CookiesProvider>
-                <StakedTokenProvider>
-                  <SystemModeProvider>
-                    <ApiDataProvider>
-                      <NotificationProvider>
-                        <Header />
-                        <Component {...pageProps} />
-                        <Footer />
-                        <ApiDataFetcher interval={30000} />
-                      </NotificationProvider>
-                    </ApiDataProvider>
-                  </SystemModeProvider>
-                </StakedTokenProvider>
-              </CookiesProvider>
-              </Web3ReactManager>
-            </ThemeProvider>
-          </CacheProvider>
-        </Web3ProviderNetwork>
-      </Web3ReactProvider>
+                <ErrorBoundary>
+                  {/* @ts-expect-error React types version mismatch */}
+                  <CookiesProvider>
+                    <StakedTokenProvider>
+                      <SystemModeProvider>
+                        <ApiDataProvider>
+                          <NotificationProvider>
+                            <Header />
+                            <ErrorBoundary>
+                              <Component {...pageProps} />
+                            </ErrorBoundary>
+                            <Footer />
+                            <ApiDataFetcher interval={30000} />
+                          </NotificationProvider>
+                        </ApiDataProvider>
+                      </SystemModeProvider>
+                    </StakedTokenProvider>
+                  </CookiesProvider>
+                </ErrorBoundary>
+              </ThemeProvider>
+            </CacheProvider>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
     </>
-  )
+  );
 }
 
-export default MyApp
+export default MyApp;

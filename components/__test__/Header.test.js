@@ -1,5 +1,5 @@
 import { render, screen, act } from "@testing-library/react";
-import Header from "../Header";
+import Header from "../layout/Header";
 import "@testing-library/jest-dom";
 
 test("Header for desktop UI", () => {

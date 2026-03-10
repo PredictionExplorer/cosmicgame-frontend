@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { Badge } from "@mui/material";
+import { ReactNode } from 'react';
+import { Badge } from '@mui/material';
 
 export interface NavDescriptor {
   title: string | ReactNode;
@@ -7,35 +7,41 @@ export interface NavDescriptor {
   children?: NavDescriptor[];
 }
 
-const getNAVs = (status, account) => {
+interface ClaimStatus {
+  ETHRaffleToClaim?: number;
+  NumDonatedNFTToClaim?: number;
+  UnclaimedStakingReward?: number;
+}
+
+const getNAVs = (status: ClaimStatus | null, account: string | null) => {
   let NAVS: NavDescriptor[] = [
-    { title: "Gallery", route: "/gallery" },
+    { title: 'Gallery', route: '/gallery' },
     {
-      title: "Rewards",
-      route: "#",
+      title: 'Rewards',
+      route: '#',
       children: [
-        { title: "Prizes", route: "/prize" },
-        { title: "Staking Rewards", route: "/staking" },
-        { title: "Marketing Rewards", route: "/marketing" },
+        { title: 'Prizes', route: '/prize' },
+        { title: 'Staking Rewards', route: '/staking' },
+        { title: 'Marketing Rewards', route: '/marketing' },
       ],
     },
-    { title: "Contracts", route: "/contracts" },
-    { title: "Statistics", route: "/statistics" },
+    { title: 'Contracts', route: '/contracts' },
+    { title: 'Statistics', route: '/statistics' },
     {
-      title: "Help",
-      route: "#",
+      title: 'Help',
+      route: '#',
       children: [
-        { title: "How-to-Play", route: "/how-to-play" },
-        { title: "FAQ", route: "/faq" },
-        { title: "Site-Map", route: "/site-map" },
+        { title: 'How-to-Play', route: '/how-to-play' },
+        { title: 'FAQ', route: '/faq' },
+        { title: 'Site-Map', route: '/site-map' },
       ],
     },
   ];
   if (
     account &&
-    (status?.ETHRaffleToClaim > 0 ||
-      status?.NumDonatedNFTToClaim > 0 ||
-      status?.UnclaimedStakingReward > 0)
+    ((status?.ETHRaffleToClaim ?? 0) > 0 ||
+      (status?.NumDonatedNFTToClaim ?? 0) > 0 ||
+      (status?.UnclaimedStakingReward ?? 0) > 0)
   ) {
     NAVS.push({
       title: (
@@ -43,7 +49,7 @@ const getNAVs = (status, account) => {
           Claim
         </Badge>
       ),
-      route: "/my-winnings",
+      route: '/my-winnings',
     });
   }
   return NAVS;

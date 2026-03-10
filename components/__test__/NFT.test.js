@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
-import NFT from "../NFT";
+import NFT from "../nft/NFT";
 import "@testing-library/jest-dom";
-import { formatId } from "../../utils";
+import { formatId, getAssetsUrl } from "../../utils";
 
 test("NFT with mock data", () => {
   const mockData = {
@@ -26,11 +26,8 @@ test("NFT with mock data", () => {
   };
   render(<NFT nft={mockData} />);
 
-  const fileName = mockData.TokenId.toString().padStart(6, "0");
-  const image = getAssetsUrl(`cosmicsignature/${fileName}.png`);
-  setTimeout(() => {
-    expect(screen.getByAltText("nft image").getAttribute("src")).toEqual(image);
-  }, 1000);
+  const image = getAssetsUrl(`cosmicsignature/0x${mockData.Seed}.png`);
+  expect(screen.getByAltText("nft image").getAttribute("src")).toEqual(image);
   expect(screen.getByText(formatId(mockData.TokenId))).toBeInTheDocument();
   expect(screen.getByText(mockData.TokenName)).toBeInTheDocument();
 });

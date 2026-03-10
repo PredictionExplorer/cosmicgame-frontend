@@ -1,28 +1,27 @@
-import React, { useEffect, useState, useCallback } from "react";
-import Image from "next/image";
-import { Box, Tab, Tabs, Typography } from "@mui/material";
-import { MainWrapper } from "../components/styled";
-import { useActiveWeb3React } from "../hooks/web3";
-import api from "../services/api";
-import useStakingWalletCSTContract from "../hooks/useStakingWalletCSTContract";
-import useStakingWalletRWLKContract from "../hooks/useStakingWalletRWLKContract";
-import useCosmicSignatureContract from "../hooks/useCosmicSignatureContract";
-import {
-  STAKING_WALLET_CST_ADDRESS,
-  STAKING_WALLET_RWLK_ADDRESS,
-} from "../config/app";
-import { useStakedToken } from "../contexts/StakedTokenContext";
-import useRWLKNFTContract from "../hooks/useRWLKNFTContract";
-import { useNotification } from "../contexts/NotificationContext";
-import { GetServerSideProps } from "next";
-import StakingActionsTable from "../components/StakingActionsTable";
-import { StakingRewardsTable } from "../components/StakingRewardsTable";
-import { StakedTokensTable } from "../components/StakedTokensTable";
-import { RWLKNFTTable } from "../components/RWLKNFTTable";
-import { RwalkStakingRewardMintsTable } from "../components/RwalkStakingRewardMintsTable";
-import { CSTokensTable } from "../components/CSTokensTable";
-import { logoImgUrl } from "../utils";
-import getErrorMessage from "../utils/alert";
+import React, { useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
+import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { usePublicClient } from 'wagmi';
+import { GetServerSideProps } from 'next';
+
+import { MainWrapper } from '../components/styled';
+import { useActiveWeb3React } from '../hooks/web3';
+import api from '../services/api';
+import useStakingWalletCSTContract from '../hooks/useStakingWalletCSTContract';
+import useStakingWalletRWLKContract from '../hooks/useStakingWalletRWLKContract';
+import useCosmicSignatureContract from '../hooks/useCosmicSignatureContract';
+import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '../config/networks';
+import { useStakedToken } from '../contexts/StakedTokenContext';
+import useRWLKNFTContract from '../hooks/useRWLKNFTContract';
+import { useNotification } from '../contexts/NotificationContext';
+import StakingActionsTable from '../components/staking/StakingActionsTable';
+import { StakingRewardsTable } from '../components/staking/StakingRewardsTable';
+import { StakedTokensTable } from '../components/staking/StakedTokensTable';
+import { RWLKNFTTable } from '../components/tokens/RWLKNFTTable';
+import { RwalkStakingRewardMintsTable } from '../components/staking/RwalkStakingRewardMintsTable';
+import { CSTokensTable } from '../components/tokens/CSTokensTable';
+import { logoImgUrl } from '../utils';
+import getErrorMessage from '../utils/alert';
 
 // ----------------------------------------------
 // Types & Interfaces
@@ -70,14 +69,14 @@ function CSTStakingPanel({
   handleUnstakeMany,
 }: {
   account: string;
-  stakingActions: any[];
-  userTokens: any[];
-  stakedTokens: any[];
-  stakingRewards: any[];
-  handleStake: (tokenId: number) => Promise<any>;
-  handleStakeMany: (tokenIds: number[]) => Promise<any>;
-  handleUnstake: (actionId: number) => Promise<any>;
-  handleUnstakeMany: (actionIds: number[]) => Promise<any>;
+  stakingActions: import('../services/api/types').StakingAction[];
+  userTokens: import('../services/api/types').CSTTokenInfo[];
+  stakedTokens: import('../services/api/types').StakedTokenInfo[];
+  stakingRewards: import('../services/api/types').RewardsByToken[];
+  handleStake: (tokenId: number) => Promise<unknown>;
+  handleStakeMany: (tokenIds: number[]) => Promise<unknown>;
+  handleUnstake: (actionId: number) => Promise<unknown>;
+  handleUnstakeMany: (actionIds: number[]) => Promise<unknown>;
 }) {
   return (
     <>
@@ -104,8 +103,12 @@ function CSTStakingPanel({
         </Typography>
         <CSTokensTable
           list={userTokens}
-          handleStake={(tokenId) => handleStake(tokenId)}
-          handleStakeMany={(tokenIds) => handleStakeMany(tokenIds)}
+          handleStake={async (tokenId) => {
+            await handleStake(tokenId);
+          }}
+          handleStakeMany={async (tokenIds) => {
+            await handleStakeMany(tokenIds);
+          }}
         />
       </Box>
 
@@ -116,8 +119,12 @@ function CSTStakingPanel({
         </Typography>
         <StakedTokensTable
           list={stakedTokens}
-          handleUnstake={(actionId) => handleUnstake(actionId)}
-          handleUnstakeMany={(actionIds) => handleUnstakeMany(actionIds)}
+          handleUnstake={async (actionId) => {
+            await handleUnstake(actionId);
+          }}
+          handleUnstakeMany={async (actionIds) => {
+            await handleUnstakeMany(actionIds);
+          }}
           IsRwalk={false}
         />
       </Box>
@@ -141,14 +148,14 @@ function RWLKStakingPanel({
   handleUnstakeMany,
 }: {
   account: string;
-  stakingActions: any[];
-  rwlkMints: any[];
-  userTokens: number[]; // array of randomWalk token IDs
-  stakedTokens: any[];
-  handleStake: (tokenId: number) => Promise<any>;
-  handleStakeMany: (tokenIds: number[]) => Promise<any>;
-  handleUnstake: (actionId: number) => Promise<any>;
-  handleUnstakeMany: (actionIds: number[]) => Promise<any>;
+  stakingActions: import('../services/api/types').StakingAction[];
+  rwlkMints: import('../services/api/types').StakingRewardMint[];
+  userTokens: number[];
+  stakedTokens: import('../services/api/types').StakedTokenInfo[];
+  handleStake: (tokenId: number) => Promise<unknown>;
+  handleStakeMany: (tokenIds: number[]) => Promise<unknown>;
+  handleUnstake: (actionId: number) => Promise<unknown>;
+  handleUnstakeMany: (actionIds: number[]) => Promise<unknown>;
 }) {
   return (
     <>
@@ -176,8 +183,12 @@ function RWLKStakingPanel({
         <RWLKNFTTable
           list={userTokens}
           ownerAddress={account}
-          handleStake={(tokenId) => handleStake(tokenId)}
-          handleStakeMany={(tokenIds) => handleStakeMany(tokenIds)}
+          handleStake={async (tokenId) => {
+            await handleStake(tokenId);
+          }}
+          handleStakeMany={async (tokenIds) => {
+            await handleStakeMany(tokenIds);
+          }}
         />
       </Box>
 
@@ -188,8 +199,12 @@ function RWLKStakingPanel({
         </Typography>
         <StakedTokensTable
           list={stakedTokens}
-          handleUnstake={(actionId) => handleUnstake(actionId)}
-          handleUnstakeMany={(actionIds) => handleUnstakeMany(actionIds)}
+          handleUnstake={async (actionId) => {
+            await handleUnstake(actionId);
+          }}
+          handleUnstakeMany={async (actionIds) => {
+            await handleUnstakeMany(actionIds);
+          }}
           IsRwalk={true}
         />
       </Box>
@@ -203,6 +218,7 @@ function RWLKStakingPanel({
 const MyStaking = () => {
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
+  const publicClient = usePublicClient();
 
   // Contracts
   const cosmicSignatureContract = useCosmicSignatureContract();
@@ -211,21 +227,31 @@ const MyStaking = () => {
   const rwlkStakingContract = useStakingWalletRWLKContract();
 
   // Dashboard data
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<
+    import('../services/api/types').DashboardInfo | null
+  >(null);
   const [rewardPerCST, setRewardPerCST] = useState(0);
 
   // Loading state
   const [loading, setLoading] = useState(true);
 
   // CST data
-  const [stakingCSTActions, setStakingCSTActions] = useState<any[]>([]);
-  const [CSTokens, setCSTokens] = useState<any[]>([]);
-  const [stakingRewards, setStakingRewards] = useState<any[]>([]);
+  const [stakingCSTActions, setStakingCSTActions] = useState<
+    import('../services/api/types').StakingAction[]
+  >([]);
+  const [CSTokens, setCSTokens] = useState<import('../services/api/types').CSTTokenInfo[]>([]);
+  const [stakingRewards, setStakingRewards] = useState<
+    import('../services/api/types').RewardsByToken[]
+  >([]);
 
   // RWLK data
-  const [stakingRWLKActions, setStakingRWLKActions] = useState<any[]>([]);
+  const [stakingRWLKActions, setStakingRWLKActions] = useState<
+    import('../services/api/types').StakingAction[]
+  >([]);
   const [rwlkTokens, setRwlkTokens] = useState<number[]>([]);
-  const [rwlkMints, setRwlkMints] = useState<any[]>([]);
+  const [rwlkMints, setRwlkMints] = useState<import('../services/api/types').StakingRewardMint[]>(
+    [],
+  );
 
   // Tabs
   const [stakingTab, setStakingTab] = useState(0);
@@ -243,34 +269,31 @@ const MyStaking = () => {
 
   // Displays a user-friendly error notification
   const handleError = useCallback(
-    (err: any) => {
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err.data.message);
-        setNotification({ text: msg, type: "error", visible: true });
+    (err: unknown) => {
+      const ethErr = err as { code?: number; data?: { message?: string } };
+      if (ethErr?.data?.message) {
+        const msg = getErrorMessage(ethErr.data.message);
+        setNotification({ text: msg, type: 'error', visible: true });
       }
-      if (err?.code === 4001) {
-        console.log("User denied transaction signature.");
-        // Handle the case where the user denies the transaction signature
-      } else {
+      if (ethErr?.code !== 4001) {
         console.error(err);
-        // Handle other errors
       }
     },
-    [setNotification]
+    [setNotification],
   );
 
   // Approves staking contract for all tokens if needed
-  const approveIfNeeded = async (nftContract: any, walletAddress: string) => {
+  const approveIfNeeded = async (
+    nftContract: NonNullable<typeof cosmicSignatureContract | typeof rwalkContract>,
+    walletAddress: string,
+  ) => {
     if (!nftContract) {
-      throw new Error("Contract not initialized");
+      throw new Error('Contract not initialized');
     }
-    const isApprovedForAll = await nftContract.isApprovedForAll(
-      account,
-      walletAddress
-    );
+    const isApprovedForAll = await nftContract.read.isApprovedForAll?.([account, walletAddress]);
     if (!isApprovedForAll) {
-      const tx = await nftContract.setApprovalForAll(walletAddress, true);
-      await tx.wait();
+      const hash = await nftContract.write.setApprovalForAll?.([walletAddress, true]);
+      if (hash) await publicClient?.waitForTransactionReceipt({ hash });
     }
   };
 
@@ -279,9 +302,7 @@ const MyStaking = () => {
     async (tokenIds: number | number[], isRwalk: boolean) => {
       try {
         const nftContract = isRwalk ? rwalkContract : cosmicSignatureContract;
-        const stakingContract = isRwalk
-          ? rwlkStakingContract
-          : cstStakingContract;
+        const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
         const STAKING_WALLET_ADDRESS = isRwalk
           ? STAKING_WALLET_RWLK_ADDRESS
           : STAKING_WALLET_CST_ADDRESS;
@@ -290,8 +311,8 @@ const MyStaking = () => {
         if (!nftContract || !stakingContract) {
           setNotification({
             visible: true,
-            text: "Please connect your wallet and ensure you are on the correct network.",
-            type: "error",
+            text: 'Please connect your wallet and ensure you are on the correct network.',
+            type: 'error',
           });
           return;
         }
@@ -300,19 +321,15 @@ const MyStaking = () => {
         await approveIfNeeded(nftContract, STAKING_WALLET_ADDRESS);
 
         // Stake single or multiple
-        let res;
+        let hash;
         if (Array.isArray(tokenIds)) {
-          res = await stakingContract
-            .stakeMany(tokenIds)
-            .then((tx: any) => tx.wait());
+          hash = await stakingContract.write.stakeMany?.([tokenIds]);
         } else {
-          res = await stakingContract
-            .stake(tokenIds)
-            .then((tx: any) => tx.wait());
+          hash = await stakingContract.write.stake?.([tokenIds]);
         }
+        const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
 
         setTimeout(async () => {
-          // Refresh data
           if (isRwalk) {
             await fetchRWLKData(account!);
           } else {
@@ -320,14 +337,13 @@ const MyStaking = () => {
           }
           await fetchDashboardData();
 
-          // Show success notification
-          if (!res.code) {
+          if (res) {
             setNotification({
               visible: true,
               text: Array.isArray(tokenIds)
-                ? "The selected tokens were staked successfully!"
+                ? 'The selected tokens were staked successfully!'
                 : `You have successfully staked token ${tokenIds}!`,
-              type: "success",
+              type: 'success',
             });
           }
         }, 2000);
@@ -346,41 +362,35 @@ const MyStaking = () => {
       rwlkStakingContract,
       cstStakingContract,
       setNotification,
-    ]
+    ],
   );
 
   // Generic unstake function for CST or RWLK
   const handleUnstakeAction = useCallback(
     async (actionIds: number | number[], isRwalk: boolean) => {
       try {
-        const stakingContract = isRwalk
-          ? rwlkStakingContract
-          : cstStakingContract;
+        const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
 
         // Check if contract is initialized
         if (!stakingContract) {
           setNotification({
             visible: true,
-            text: "Please connect your wallet and ensure you are on the correct network.",
-            type: "error",
+            text: 'Please connect your wallet and ensure you are on the correct network.',
+            type: 'error',
           });
           return;
         }
 
         // Unstake single or multiple
-        let res;
+        let hash;
         if (Array.isArray(actionIds)) {
-          res = await stakingContract
-            .unstakeMany(actionIds)
-            .then((tx: any) => tx.wait());
+          hash = await stakingContract.write.unstakeMany?.([actionIds]);
         } else {
-          res = await stakingContract
-            .unstake(actionIds)
-            .then((tx: any) => tx.wait());
+          hash = await stakingContract.write.unstake?.([actionIds]);
         }
+        const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
 
         setTimeout(async () => {
-          // Refresh data
           if (isRwalk) {
             await fetchRWLKData(account!);
           } else {
@@ -389,13 +399,13 @@ const MyStaking = () => {
           await fetchDashboardData();
 
           // Success notification
-          if (!res.code) {
+          if (res) {
             setNotification({
               visible: true,
               text: Array.isArray(actionIds)
-                ? "The selected tokens were unstaked successfully!"
-                : "You have successfully unstaked token!",
-              type: "success",
+                ? 'The selected tokens were unstaked successfully!'
+                : 'You have successfully unstaked token!',
+              type: 'success',
             });
           }
         }, 2000);
@@ -406,13 +416,7 @@ const MyStaking = () => {
         return err;
       }
     },
-    [
-      account,
-      handleError,
-      rwlkStakingContract,
-      cstStakingContract,
-      setNotification,
-    ]
+    [account, handleError, rwlkStakingContract, cstStakingContract, setNotification],
   );
 
   // Fetch dashboard data (global) + compute reward per CST
@@ -421,17 +425,16 @@ const MyStaking = () => {
       const data = await api.get_dashboard_info();
       setDashboardData(data);
 
-      const totalStakedCST =
-        data?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
+      const totalStakedCST = data?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
 
       if (totalStakedCST > 0) {
-        const rewardCST = data?.StakingAmountEth / totalStakedCST;
+        const rewardCST = (data?.StakingAmountEth ?? 0) / totalStakedCST;
         setRewardPerCST(rewardCST);
       } else {
         setRewardPerCST(0);
       }
     } catch (err) {
-      console.error("Failed to fetch dashboard data:", err);
+      console.error('Failed to fetch dashboard data:', err);
     }
   };
 
@@ -446,9 +449,7 @@ const MyStaking = () => {
       ]);
 
       setStakingCSTActions(cstActions);
-      setCSTokens(
-        cstUserTokens.filter((x: any) => !x.WasUnstaked) // only show tokens that are truly "unstaked"
-      );
+      setCSTokens(cstUserTokens.filter((x) => !x.WasUnstaked));
       setStakingRewards(cstUserRewards);
 
       // Refresh staked token context
@@ -478,16 +479,13 @@ const MyStaking = () => {
 
       // Filter user-owned token IDs that are not staked
       const stakedIds = stakedRWLKTokens.map((x) => x.StakedTokenId);
-      const userOwned = await rwalkContract.walletOfOwner(addr);
-      const rawIds = userOwned.map((t: any) => t.toNumber()).sort();
+      const userOwned = await rwalkContract!.read.walletOfOwner?.([addr]);
+      const rawIds = (userOwned as readonly bigint[]).map((t) => Number(t)).sort();
 
-      // Exclude tokens that are staked or in some partial action
       const filteredIds = rawIds.filter(
         (id) =>
           !stakedIds.includes(id) &&
-          !rwalkActions.some(
-            (action: any) => action.ActionType !== 1 && action.TokenId === id
-          )
+          !rwalkActions.some((action) => action.ActionType !== 1 && action.TokenId === id),
       );
       setRwlkTokens(filteredIds);
     } catch (err) {
@@ -498,7 +496,7 @@ const MyStaking = () => {
   };
 
   // Tab change handler
-  const handleTabChange = (_event: any, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setStakingTab(newValue);
   };
 
@@ -516,21 +514,13 @@ const MyStaking = () => {
   // ----------------------------------------------
   return (
     <MainWrapper>
-      <Typography
-        variant="h4"
-        color="primary"
-        gutterBottom
-        textAlign="center"
-        mb={8}
-      >
+      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={8}>
         My Staking
       </Typography>
 
       {!account ? (
         // User is not connected
-        <Typography variant="subtitle1">
-          Please login to Metamask to see your staking.
-        </Typography>
+        <Typography variant="subtitle1">Please login to Metamask to see your staking.</Typography>
       ) : loading ? (
         // Data is still loading
         <Typography variant="h6">Loading...</Typography>
@@ -538,7 +528,7 @@ const MyStaking = () => {
         // Main Staking UI
         <>
           {/* Global stats */}
-          <Box sx={{ display: "flex" }}>
+          <Box sx={{ display: 'flex' }}>
             <Typography variant="subtitle1" mr={1}>
               Number of globally staked CST tokens:
             </Typography>
@@ -546,41 +536,32 @@ const MyStaking = () => {
               {dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked}
             </Typography>
           </Box>
-          <Box sx={{ display: "flex" }}>
+          <Box sx={{ display: 'flex' }}>
             <Typography variant="subtitle1" mr={1}>
               Number of globally staked RandomWalk tokens:
             </Typography>
             <Typography variant="subtitle1">
-              {
-                dashboardData?.MainStats?.StakeStatisticsRWalk
-                  ?.TotalTokensStaked
-              }
+              {dashboardData?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked}
             </Typography>
           </Box>
 
           {/* Reward per CST token (if any) */}
           {rewardPerCST > 0 && (
-            <Box sx={{ display: "flex" }}>
+            <Box sx={{ display: 'flex' }}>
               <Typography variant="subtitle1" mr={1}>
                 Reward (as of now) for staking 1 CST token:
               </Typography>
-              <Typography variant="subtitle1">
-                {rewardPerCST.toFixed(6)}
-              </Typography>
+              <Typography variant="subtitle1">{rewardPerCST.toFixed(6)}</Typography>
             </Box>
           )}
 
           {/* Tabs */}
-          <Box sx={{ mt: 4, borderBottom: 1, borderColor: "divider" }}>
-            <Tabs
-              variant="fullWidth"
-              value={stakingTab}
-              onChange={handleTabChange}
-            >
+          <Box sx={{ mt: 4, borderBottom: 1, borderColor: 'divider' }}>
+            <Tabs variant="fullWidth" value={stakingTab} onChange={handleTabChange}>
               {/* CST Tab */}
               <Tab
                 label={
-                  <Box sx={{ display: "flex" }}>
+                  <Box sx={{ display: 'flex' }}>
                     <Image
                       src="/images/CosmicSignatureNFT.png"
                       width={94}
@@ -590,8 +571,8 @@ const MyStaking = () => {
                     <Typography
                       variant="h6"
                       sx={{
-                        whiteSpace: "nowrap",
-                        textTransform: "none",
+                        whiteSpace: 'nowrap',
+                        textTransform: 'none',
                         ml: 2,
                       }}
                     >
@@ -603,18 +584,13 @@ const MyStaking = () => {
               {/* RWLK Tab */}
               <Tab
                 label={
-                  <Box sx={{ display: "flex" }}>
-                    <Image
-                      src="/images/rwalk.jpg"
-                      width={94}
-                      height={60}
-                      alt="RandomWalk nft"
-                    />
+                  <Box sx={{ display: 'flex' }}>
+                    <Image src="/images/rwalk.jpg" width={94} height={60} alt="RandomWalk nft" />
                     <Typography
                       variant="h6"
                       sx={{
-                        whiteSpace: "nowrap",
-                        textTransform: "none",
+                        whiteSpace: 'nowrap',
+                        textTransform: 'none',
                         ml: 2,
                       }}
                     >
@@ -637,9 +613,7 @@ const MyStaking = () => {
               handleStake={(tokenId) => handleStakeAction(tokenId, false)}
               handleStakeMany={(tokenIds) => handleStakeAction(tokenIds, false)}
               handleUnstake={(actionId) => handleUnstakeAction(actionId, false)}
-              handleUnstakeMany={(actionIds) =>
-                handleUnstakeAction(actionIds, false)
-              }
+              handleUnstakeMany={(actionIds) => handleUnstakeAction(actionIds, false)}
             />
           </CustomTabPanel>
 
@@ -654,9 +628,7 @@ const MyStaking = () => {
               handleStake={(tokenId) => handleStakeAction(tokenId, true)}
               handleStakeMany={(tokenIds) => handleStakeAction(tokenIds, true)}
               handleUnstake={(actionId) => handleUnstakeAction(actionId, true)}
-              handleUnstakeMany={(actionIds) =>
-                handleUnstakeAction(actionIds, true)
-              }
+              handleUnstakeMany={(actionIds) => handleUnstakeAction(actionIds, true)}
             />
           </CustomTabPanel>
         </>
@@ -669,17 +641,17 @@ const MyStaking = () => {
 // getServerSideProps for SEO & Open Graph Data
 // ----------------------------------------------
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = "My Staking | Cosmic Signature";
+  const title = 'My Staking | Cosmic Signature';
   const description =
-    "Manage your staking with Cosmic Signature. View your staking status, rewards, and history. Maximize your earnings and participate in the growth of our blockchain ecosystem with ease.";
+    'Manage your staking with Cosmic Signature. View your staking status, rewards, and history. Maximize your earnings and participate in the growth of our blockchain ecosystem with ease.';
 
   const openGraphData = [
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
-    { property: "og:image", content: logoImgUrl },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
-    { name: "twitter:image", content: logoImgUrl },
+    { property: 'og:title', content: title },
+    { property: 'og:description', content: description },
+    { property: 'og:image', content: logoImgUrl },
+    { name: 'twitter:title', content: title },
+    { name: 'twitter:description', content: description },
+    { name: 'twitter:image', content: logoImgUrl },
   ];
 
   return { props: { title, description, openGraphData } };

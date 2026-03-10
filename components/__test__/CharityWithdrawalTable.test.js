@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import CharityWithdrawalTable from "../CharityWithdrawalTable";
+import CharityWithdrawalTable from "../tables/CharityWithdrawalTable";
 import "@testing-library/jest-dom";
 import { convertTimestampToDateTime } from "../../utils";
 
