@@ -69,7 +69,7 @@ const config = [
       "__mocks__/",
       "playwright-report/",
       "coverage/",
-      "commitlint.config.js",
+      "commitlint.config.mjs",
     ],
   },
 ];
