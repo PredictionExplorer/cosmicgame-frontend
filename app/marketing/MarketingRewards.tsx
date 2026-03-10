@@ -1,7 +1,5 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
-
 import { MainWrapper } from '@/components/styled';
 import {
   GlobalMarketingRewardsTable,
@@ -9,28 +7,25 @@ import {
 } from '@/components/tables/GlobalMarketingRewardsTable';
 import { useMarketingRewards } from '@/hooks/useApiQuery';
 
-// Main component for displaying marketing rewards
 const MarketingRewards = () => {
   const { data: marketingRewards = [], isLoading: loading } = useMarketingRewards();
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
-        Marketing Rewards
-      </Typography>
-      <Box mt={6}>
+      <h2 className="text-2xl font-bold text-primary text-center mb-2">Marketing Rewards</h2>
+      <div className="mt-12">
         {loading ? (
-          <Typography variant="h6">Loading...</Typography>
+          <p className="text-lg font-semibold">Loading...</p>
         ) : (
           <>
             <GlobalMarketingRewardsTable list={(marketingRewards ?? []) as MarketingReward[]} />
-            <Typography mt={4}>
+            <p className="mt-8">
               To earn marketing rewards by promoting our project online, please contact our
               marketing team.
-            </Typography>
+            </p>
           </>
         )}
-      </Box>
+      </div>
     </MainWrapper>
   );
 };

@@ -1,35 +1,29 @@
 import { useState } from 'react';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TextField,
-} from '@mui/material';
 
-// Props interface for TwitterPopup component
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+
 interface TwitterPopupProps {
-  open: boolean; // Controls whether the dialog is open
-  setOpen: (open: boolean) => void; // Function to update the open state
-  setTwitterHandle: (handle: string) => void; // Callback to set the confirmed handle
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  setTwitterHandle: (handle: string) => void;
 }
 
-/**
- * TwitterPopup Component
- * A modal dialog to collect and validate the user's Twitter handle.
- */
 const TwitterPopup = ({ open, setOpen, setTwitterHandle }: TwitterPopupProps) => {
-  // Local state for the user-inputted handle
   const [handle, setHandle] = useState<string>('');
 
-  // Closes the dialog without saving the input
   const handleClose = () => {
     setOpen(false);
   };
 
-  // Validates and confirms the handle, stripping any leading "@"
   const handleConfirm = () => {
     const formattedHandle = handle.startsWith('@') ? handle.slice(1) : handle;
     setTwitterHandle(formattedHandle);
@@ -37,36 +31,34 @@ const TwitterPopup = ({ open, setOpen, setTwitterHandle }: TwitterPopupProps) =>
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
-      <DialogTitle>What is your Twitter handle?</DialogTitle>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
-        <DialogContentText>
-          Please provide your Twitter handle. Ensure it has a blue checkmark to qualify.
-        </DialogContentText>
-        <DialogContentText>
-          Follow additional instructions on our Twitter page to be fully eligible.
-        </DialogContentText>
-        <TextField
+        <DialogHeader>
+          <DialogTitle>What is your Twitter handle?</DialogTitle>
+          <DialogDescription>
+            Please provide your Twitter handle. Ensure it has a blue checkmark to qualify.
+          </DialogDescription>
+          <DialogDescription>
+            Follow additional instructions on our Twitter page to be fully eligible.
+          </DialogDescription>
+        </DialogHeader>
+        <Input
           autoFocus
-          margin="dense"
           id="twitter_handle"
           name="twitter_handle"
-          label="Twitter Handle"
           placeholder="@userhandle"
-          fullWidth
-          variant="standard"
           value={handle}
           onChange={(e) => setHandle(e.target.value.trim())}
         />
+        <DialogFooter>
+          <Button onClick={handleConfirm} disabled={!handle.trim()}>
+            Ok
+          </Button>
+          <Button onClick={handleClose} variant="outline">
+            Cancel
+          </Button>
+        </DialogFooter>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleConfirm} disabled={!handle.trim()} variant="contained">
-          Ok
-        </Button>
-        <Button onClick={handleClose} variant="outlined">
-          Cancel
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };

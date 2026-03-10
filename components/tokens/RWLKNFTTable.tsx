@@ -1,8 +1,10 @@
-import { useEffect, useState, useMemo, type MouseEvent } from 'react';
-import { Box, Button, Checkbox, Menu, MenuItem, TableBody, Typography } from '@mui/material';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
+import { useEffect, useState, useMemo, useRef, type MouseEvent } from 'react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
+import { Tr } from 'react-super-responsive-table';
+
+import { cn } from '@/lib/utils';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -11,14 +13,17 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { Tr } from 'react-super-responsive-table';
-
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 
-// Reuse this constant to avoid re-declaring on each render
 const ITEMS_PER_PAGE = 5;
 
 interface RWLKRowProps {
@@ -29,11 +34,7 @@ interface RWLKRowProps {
   onStake: (tokenId: number) => void;
 }
 
-/* ------------------------------------------------------------------
-  Single Row Component: RWLKRow
------------------------------------------------------------------- */
 const RWLKRow = ({ tokenId, ownerAddress, onSelectToggle, isSelected, onStake }: RWLKRowProps) => {
-  // Handlers
   const handleRowClick = () => onSelectToggle(tokenId);
 
   const handleStakeClick = (e: MouseEvent) => {
@@ -45,26 +46,21 @@ const RWLKRow = ({ tokenId, ownerAddress, onSelectToggle, isSelected, onStake }:
     <TablePrimaryRow
       role="checkbox"
       tabIndex={-1}
-      selected={isSelected}
       onClick={handleRowClick}
-      sx={{ cursor: 'pointer' }}
+      className={cn('cursor-pointer', isSelected && 'bg-white/5')}
     >
-      {/* Checkbox */}
-      <TablePrimaryCell padding="checkbox">
-        <Checkbox color="primary" checked={isSelected} size="small" />
+      <TablePrimaryCell className="!px-3 !py-2">
+        <Checkbox checked={isSelected} readOnly className="h-4 w-4" />
       </TablePrimaryCell>
 
-      {/* Owner Address */}
       <TablePrimaryCell>
         <AddressLink address={ownerAddress} url={`/user/${ownerAddress}`} />
       </TablePrimaryCell>
 
-      {/* Token ID */}
       <TablePrimaryCell align="center">{tokenId}</TablePrimaryCell>
 
-      {/* Stake Action */}
       <TablePrimaryCell align="center">
-        <Button size="small" onClick={handleStakeClick}>
+        <Button size="sm" onClick={handleStakeClick}>
           Stake
         </Button>
       </TablePrimaryCell>
@@ -79,9 +75,6 @@ interface RWLKNFTTableProps {
   handleStakeMany: (tokenIds: number[], isRwlkFlags: boolean[]) => Promise<void>;
 }
 
-/* ------------------------------------------------------------------
-  Main Table Component: RWLKNFTTable
------------------------------------------------------------------- */
 export const RWLKNFTTable = ({
   list,
   ownerAddress,
@@ -89,27 +82,31 @@ export const RWLKNFTTable = ({
   handleStakeMany,
 }: RWLKNFTTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Menu anchor for "Select All / Current Page / None"
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  // Keep track of selected token IDs
+  const [menuOpen, setMenuOpen] = useState(false);
   const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
+  const headerCheckboxRef = useRef<HTMLInputElement>(null);
 
-  // Reset state when the list changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedTokenIds([]);
     setCurrentPage(1);
   }, [list]);
 
-  // Sliced data for the current page
+  const isIndeterminate = selectedTokenIds.length > 0 && selectedTokenIds.length < list.length;
+  const isAllSelected = list.length > 0 && selectedTokenIds.length === list.length;
+
+  useEffect(() => {
+    if (headerCheckboxRef.current) {
+      headerCheckboxRef.current.indeterminate = isIndeterminate;
+    }
+  }, [isIndeterminate]);
+
   const currentPageData = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = currentPage * ITEMS_PER_PAGE;
     return list.slice(startIndex, endIndex);
   }, [list, currentPage]);
 
-  // Selection Logic
   const isSelected = (id: number) => selectedTokenIds.includes(id);
 
   const handleSelectToggle = (id: number) => {
@@ -118,43 +115,30 @@ export const RWLKNFTTable = ({
     );
   };
 
-  // "Select All" tokens
   const handleSelectAll = () => {
     setSelectedTokenIds([...list]);
-    setAnchorEl(null);
   };
 
-  // "Select Current Page"
   const handleSelectCurrentPage = () => {
     setSelectedTokenIds([...currentPageData]);
-    setAnchorEl(null);
   };
 
-  // "Select None"
   const handleSelectNone = () => {
     setSelectedTokenIds([]);
-    setAnchorEl(null);
   };
 
-  // Single Stake
   const handleSingleStake = async (tokenId: number) => {
-    await handleStake(tokenId, true); // 'true' indicates RWLK
+    await handleStake(tokenId, true);
   };
 
-  // Many Stake
   const handleManyStake = async () => {
-    // Create an array of booleans for the second argument if needed
     await handleStakeMany(selectedTokenIds, Array(selectedTokenIds.length).fill(true));
   };
 
-  // If no tokens are in the list, show a message
   if (list.length === 0) {
-    return <Typography>No available tokens.</Typography>;
+    return <p>No available tokens.</p>;
   }
 
-  /* ------------------------------------------------------------------
-    Render
-  ------------------------------------------------------------------ */
   return (
     <>
       <TablePrimaryContainer>
@@ -168,44 +152,31 @@ export const RWLKNFTTable = ({
 
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell padding="checkbox" align="left">
-                <Box
-                  sx={{
-                    display: { md: 'flex', sm: 'flex', xs: 'none' },
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                  }}
-                  onClick={(e: MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget)}
-                >
-                  <Checkbox
-                    color="info"
-                    size="small"
-                    indeterminate={
-                      selectedTokenIds.length > 0 && selectedTokenIds.length < list.length
-                    }
-                    checked={list.length > 0 && selectedTokenIds.length === list.length}
-                  />
-                  {anchorEl ? <ExpandLess /> : <ExpandMore />}
-                </Box>
-                <Menu
-                  elevation={0}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={() => setAnchorEl(null)}
-                >
-                  <MenuItem style={{ minWidth: 166 }} onClick={handleSelectAll}>
-                    <Typography>Select All</Typography>
-                  </MenuItem>
-                  <MenuItem style={{ minWidth: 166 }} onClick={handleSelectCurrentPage}>
-                    <Typography>Select Current Page</Typography>
-                  </MenuItem>
-                  <MenuItem style={{ minWidth: 166 }} onClick={handleSelectNone}>
-                    <Typography>Select None</Typography>
-                  </MenuItem>
-                </Menu>
+              <TablePrimaryHeadCell align="left" className="!px-3 !py-2">
+                <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <div className="hidden sm:flex items-center cursor-pointer">
+                      <Checkbox
+                        ref={headerCheckboxRef}
+                        checked={isAllSelected}
+                        readOnly
+                        className="h-4 w-4"
+                      />
+                      {menuOpen ? (
+                        <ChevronUp className="h-5 w-5" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5" />
+                      )}
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="min-w-[166px]">
+                    <DropdownMenuItem onSelect={handleSelectAll}>Select All</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleSelectCurrentPage}>
+                      Select Current Page
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleSelectNone}>Select None</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Owner Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
@@ -213,8 +184,7 @@ export const RWLKNFTTable = ({
             </Tr>
           </TablePrimaryHead>
 
-          {/* Table Body */}
-          <TableBody>
+          <tbody>
             {currentPageData.map((tokenId) => (
               <RWLKRow
                 key={tokenId}
@@ -225,20 +195,18 @@ export const RWLKNFTTable = ({
                 onStake={handleSingleStake}
               />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Stake Many Button */}
       {selectedTokenIds.length > 1 && (
-        <Box display="flex" justifyContent="flex-end" mt={2}>
+        <div className="flex justify-end mt-4">
           <Button variant="text" onClick={handleManyStake}>
             Stake Many
           </Button>
-        </Box>
+        </div>
       )}
 
-      {/* Pagination */}
       <CustomPagination
         page={currentPage}
         setPage={setCurrentPage}

@@ -1,7 +1,10 @@
-import { render, screen } from '@/test-utils';
-import BiddingHistoryTable from '@/components/tables/BiddingHistoryTable';
 import '@testing-library/jest-dom';
+
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
+
+import BiddingHistoryTable from '@/components/tables/BiddingHistoryTable';
+
+import { render, screen } from '@/test-utils';
 
 describe('BiddingHistoryTable', () => {
   test('with no records', () => {

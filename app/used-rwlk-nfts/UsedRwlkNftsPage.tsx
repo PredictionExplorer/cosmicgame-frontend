@@ -1,7 +1,12 @@
 'use client';
 
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { useState } from 'react';
-import { Box, Link, TableBody, Typography } from '@mui/material';
+import Link from 'next/link';
+import { Tr } from 'react-super-responsive-table';
+
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import {
   MainWrapper,
@@ -12,12 +17,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 import { useUsedRWLKNFTs } from '@/hooks/useApiQuery';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { Tr } from 'react-super-responsive-table';
-
 import { CustomPagination } from '@/components/common/CustomPagination';
 
 interface UsedRwlkNftRecord {
@@ -30,58 +30,40 @@ interface UsedRwlkNftRecord {
 }
 
 const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
-  // If nft is null/undefined, render an empty row to avoid errors.
   if (!nft) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
-      {/* Datetime -> Arbiscan link */}
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', nft.TxHash)}
           target="_blank"
           rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(nft.TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
 
-      {/* Bidder Address -> User detail page */}
       <TablePrimaryCell align="center">
-        <Link
-          sx={{
-            color: 'inherit',
-            fontSize: 'inherit',
-            fontFamily: 'monospace',
-          }}
-          href={`/user/${nft.BidderAddr}`}
-        >
+        <Link href={`/user/${nft.BidderAddr}`} className="font-mono text-inherit">
           {nft.BidderAddr}
         </Link>
       </TablePrimaryCell>
 
-      {/* Round Number -> Prize detail page */}
       <TablePrimaryCell align="center">
-        <Link sx={{ color: 'inherit', fontSize: 'inherit' }} href={`/prize/${nft.RoundNum}`}>
+        <Link href={`/prize/${nft.RoundNum}`} className="text-inherit">
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      {/* RandomWalk Token ID */}
       <TablePrimaryCell align="center">{nft.RWalkTokenId}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-/* ------------------------------------------------------------------
-  Sub-Component: UsedRwlkNftsTable
-  A table wrapper that maps over a list of NFT objects and displays
-  each in a UsedRwlkNftRow.
------------------------------------------------------------------- */
 const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
   return (
     <TablePrimaryContainer>
@@ -94,46 +76,33 @@ const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
             <TablePrimaryHeadCell>Token Id</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
-        <TableBody>
+        <tbody>
           {list.map((nft, i: number) => (
             <UsedRwlkNftRow key={i} nft={nft} />
           ))}
-        </TableBody>
+        </tbody>
       </TablePrimary>
     </TablePrimaryContainer>
   );
 };
 
-/* ------------------------------------------------------------------
-  Main Page Component: UsedRwlkNftsPage
-  - Fetches the list of used RandomWalk NFTs on mount.
-  - Displays them in a paginated table.
-  - Renders appropriate messages for loading or empty states.
------------------------------------------------------------------- */
 const UsedRwlkNftsPage = () => {
   const perPage = 5;
   const [curPage, setCurPage] = useState(1);
   const { data: list = [], isLoading: loading } = useUsedRWLKNFTs();
 
-  // Rendering Logic:
-  // 1) Display loading message if data is still being fetched.
-  // 2) If no data exists, show "No NFTs yet."
-  // 3) Otherwise, slice the list for the current page and pass it to the table.
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
-        Used RandomWalk NFTs
-      </Typography>
+      <h2 className="mb-3 text-center text-2xl font-bold text-primary">Used RandomWalk NFTs</h2>
 
-      <Box mt={6}>
+      <div className="mt-12">
         {loading ? (
-          <Typography variant="h6">Loading...</Typography>
+          <p className="text-lg font-semibold">Loading...</p>
         ) : list.length > 0 ? (
           <>
             <UsedRwlkNftsTable
               list={list.slice((curPage - 1) * perPage, curPage * perPage) as UsedRwlkNftRecord[]}
             />
-            {/* Pagination Controls */}
             <CustomPagination
               page={curPage}
               setPage={setCurPage}
@@ -142,9 +111,9 @@ const UsedRwlkNftsPage = () => {
             />
           </>
         ) : (
-          <Typography variant="h6">No NFTs yet.</Typography>
+          <p className="text-lg font-semibold">No NFTs yet.</p>
         )}
-      </Box>
+      </div>
     </MainWrapper>
   );
 };

@@ -1,117 +1,77 @@
 'use client';
 
 import Image from 'next/image';
-import { Toolbar, Box, IconButton, Container, Typography, Link } from '@mui/material';
+import Link from 'next/link';
+import { Network } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
 import { FooterWrapper } from '@/components/styled';
+import { Button } from '@/components/ui/button';
 
-// Footer component displaying the company logo, links, and social media icons
 const Footer = () => (
-  <FooterWrapper position="relative" color="primary">
-    <Toolbar>
-      <Container maxWidth="lg">
-        <Box
-          py={3}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          flexDirection={{
-            xs: 'column',
-            sm: 'column',
-            md: 'column',
-            lg: 'row',
-          }}
-        >
-          {/* Company Logo */}
-          <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
+  <FooterWrapper>
+    <div className="mx-auto w-full max-w-7xl px-4">
+      <div className="flex flex-col items-center justify-between py-6 lg:flex-row">
+        <Image src="/images/logo2.svg" width={240} height={48} alt="logo" />
 
-          {/* Main content: Copyright, Terms, Privacy links, and Social Media icons */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: {
-                xs: 'column-reverse',
-                sm: 'column-reverse',
-                md: 'column-reverse',
-                lg: 'row',
-              },
-              alignItems: 'center',
-            }}
-          >
-            {/* Text and legal links section */}
-            <Box
-              sx={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
+        <div className="flex flex-col-reverse items-center lg:flex-row">
+          <div className="flex flex-wrap items-center justify-center">
+            <p className="w-full text-center text-sm leading-[4] text-muted-foreground lg:mr-20 lg:w-auto">
+              Copyright &copy; 2025 Cosmic Signature
+            </p>
+
+            <a
+              className="text-[13px] text-muted-foreground no-underline lg:mr-20"
+              target="_blank"
+              href="#"
+              rel="noreferrer"
             >
-              {/* Copyright Information */}
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                width={{ xs: '100%', lg: 'auto' }}
-                textAlign="center"
-                marginRight={{ lg: 10 }}
-                lineHeight={4}
-              >
-                Copyright © 2025 Cosmic Signature
-              </Typography>
+              Terms and conditions
+            </a>
 
-              {/* Terms and Conditions link */}
-              <Link
-                color="textSecondary"
-                target="_blank"
-                href="#"
-                sx={{
-                  fontSize: '13px',
-                  textDecoration: 'none',
-                  mr: { lg: 10 },
-                }}
-              >
-                Terms and conditions
+            <a
+              className="text-[13px] text-muted-foreground no-underline"
+              target="_blank"
+              href="#"
+              rel="noreferrer"
+            >
+              Privacy policy
+            </a>
+          </div>
+
+          <div className="lg:ml-12">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/site-map" aria-label="site-map">
+                <Network className="h-5 w-5 text-[#A9AAB5]" />
               </Link>
+            </Button>
 
-              {/* Privacy Policy link */}
-              <Link
-                color="textSecondary"
-                target="_blank"
-                href="#"
-                sx={{ fontSize: '13px', textDecoration: 'none' }}
-              >
-                Privacy policy
-              </Link>
-            </Box>
-
-            {/* Social Media Icons and Sitemap link */}
-            <Box ml={{ lg: 6 }}>
-              {/* Sitemap icon */}
-              <IconButton href="/site-map" aria-label="site-map">
-                <AccountTreeIcon sx={{ color: '#A9AAB5' }} />
-              </IconButton>
-
-              {/* Twitter icon */}
-              <IconButton
+            <Button variant="ghost" size="icon" asChild>
+              <a
                 href="https://x.com/CosmicSignatureNFT"
                 target="_blank"
+                rel="noreferrer"
                 aria-label="twitter"
               >
                 <FontAwesomeIcon icon={faTwitter} color="#A9AAB5" width={24} height={24} />
-              </IconButton>
+              </a>
+            </Button>
 
-              {/* Discord icon */}
-              <IconButton href="https://discord.gg/bGnPn96Qwt" target="_blank" aria-label="discord">
+            <Button variant="ghost" size="icon" asChild>
+              <a
+                href="https://discord.gg/bGnPn96Qwt"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="discord"
+              >
                 <FontAwesomeIcon icon={faDiscord} color="#A9AAB5" width={24} height={24} />
-              </IconButton>
-            </Box>
-          </Box>
-        </Box>
-      </Container>
-    </Toolbar>
+              </a>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
   </FooterWrapper>
 );
 

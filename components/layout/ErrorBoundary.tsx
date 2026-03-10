@@ -1,7 +1,8 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Box, Typography, Button } from '@mui/material';
+
+import { Button } from '@/components/ui/button';
 
 interface Props {
   children: ReactNode;
@@ -36,24 +37,15 @@ export default class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
 
       return (
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          minHeight="200px"
-          p={4}
-        >
-          <Typography variant="h5" gutterBottom>
-            Something went wrong
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <div className="flex min-h-[200px] flex-col items-center justify-center p-8">
+          <h5 className="mb-2 text-xl font-semibold text-foreground">Something went wrong</h5>
+          <p className="mb-4 text-sm text-muted-foreground">
             {this.state.error?.message || 'An unexpected error occurred.'}
-          </Typography>
-          <Button variant="outlined" onClick={this.handleReset}>
+          </p>
+          <Button variant="outline" onClick={this.handleReset}>
             Try Again
           </Button>
-        </Box>
+        </div>
       );
     }
 

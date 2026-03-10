@@ -1,5 +1,6 @@
-import { render, screen } from '@/test-utils';
 import { CSTokenDistributionTable } from '@/components/tokens/CSTokenDistributionTable';
+
+import { render, screen } from '@/test-utils';
 import '@testing-library/jest-dom';
 
 describe('CSTokenDistributionTable', () => {

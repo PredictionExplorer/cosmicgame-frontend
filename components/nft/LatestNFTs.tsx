@@ -1,9 +1,8 @@
 import Image from 'next/image';
-import { Box, Typography, Container, Grid, useTheme, useMediaQuery, Button } from '@mui/material';
 import { useSnapCarousel } from 'react-snap-carousel';
-import ArrowBack from '@mui/icons-material/ArrowBack';
-import ArrowForward from '@mui/icons-material/ArrowForward';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import { useCSTList } from '@/hooks/useApiQuery';
 
 import NFT from './NFT';
@@ -19,96 +18,60 @@ const LatestNFTs = () => {
   const { data: nfts = [] } = useCSTList();
   const nftData = [...nfts].sort((a, b) => Number(b.TokenId) - Number(a.TokenId)) as NFTData[];
 
-  // Material UI hooks for responsive design
-  const theme = useTheme();
-  const isDesktopView = useMediaQuery(theme.breakpoints.up('md'));
-
-  // Carousel hook for mobile view
   const { scrollRef, pages, activePageIndex, next, prev } = useSnapCarousel();
 
   return (
-    <Box sx={{ backgroundColor: '#101441' }}>
-      <Container sx={{ padding: isDesktopView ? '80px 10px 150px' : '80px 10px' }}>
-        <Box display="flex" alignItems="center" justifyContent="center" flexWrap="wrap">
-          <Typography variant="h4" component="span">
-            Latest NFT&apos;s
-          </Typography>
-        </Box>
-        <Box textAlign="center" marginBottom="56px">
+    <div className="bg-[#101441]">
+      <div className="container mx-auto px-2.5 py-20 md:pb-[150px]">
+        <div className="flex items-center justify-center flex-wrap">
+          <h4 className="text-2xl font-semibold text-foreground">Latest NFT&apos;s</h4>
+        </div>
+        <div className="text-center mb-14">
           <Image src="/images/divider.svg" width={93} height={3} alt="divider" />
-        </Box>
+        </div>
 
         {nftData.length > 0 ? (
           <>
-            {/* Grid layout for Desktop view */}
-            {isDesktopView && (
-              <Grid container spacing={2} marginTop="58px">
+            {/* Desktop grid */}
+            <div className="hidden md:grid md:grid-cols-3 gap-4 mt-[58px]">
+              {nftData.slice(0, 6).map((nft, index) => (
+                <div key={nft.TokenId || index}>
+                  <NFT
+                    nft={nft as unknown as { TokenId: string; Seed: string; TokenName: string }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile carousel */}
+            <div className="md:hidden">
+              <ul
+                ref={scrollRef}
+                className="list-none flex overflow-hidden snap-x snap-mandatory p-0"
+              >
                 {nftData.slice(0, 6).map((nft, index) => (
-                  <Grid key={nft.TokenId || index} size={{ xs: 12, sm: 12, md: 4, lg: 4 }}>
+                  <li key={nft.TokenId || index} className="w-full shrink-0 mr-2.5">
                     <NFT
                       nft={nft as unknown as { TokenId: string; Seed: string; TokenName: string }}
                     />
-                  </Grid>
+                  </li>
                 ))}
-              </Grid>
-            )}
-
-            {/* Carousel layout for Mobile view */}
-            {!isDesktopView && (
-              <Box>
-                <ul
-                  ref={scrollRef}
-                  style={{
-                    listStyle: 'none',
-                    display: 'flex',
-                    overflow: 'hidden',
-                    scrollSnapType: 'x mandatory',
-                    padding: 0,
-                  }}
-                >
-                  {nftData.slice(0, 6).map((nft, index) => (
-                    <li
-                      key={nft.TokenId || index}
-                      style={{
-                        width: '100%',
-                        flexShrink: 0,
-                        marginRight: '10px',
-                      }}
-                    >
-                      <NFT
-                        nft={nft as unknown as { TokenId: string; Seed: string; TokenName: string }}
-                      />
-                    </li>
-                  ))}
-                </ul>
-                <Box textAlign="center" mt={2}>
-                  <Button
-                    variant="contained"
-                    sx={{ mr: 1 }}
-                    onClick={() => prev()}
-                    disabled={activePageIndex === 0}
-                  >
-                    <ArrowBack fontSize="small" />
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={() => next()}
-                    disabled={activePageIndex === pages.length - 1}
-                  >
-                    <ArrowForward fontSize="small" />
-                  </Button>
-                </Box>
-              </Box>
-            )}
+              </ul>
+              <div className="text-center mt-4">
+                <Button className="mr-2" onClick={() => prev()} disabled={activePageIndex === 0}>
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <Button onClick={() => next()} disabled={activePageIndex === pages.length - 1}>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </>
         ) : (
-          // Display a friendly message if there are no NFTs
-          <Typography textAlign="center" mt={4}>
-            There is no NFT yet.
-          </Typography>
+          <p className="text-center mt-8 text-foreground">There is no NFT yet.</p>
         )}
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 };
 

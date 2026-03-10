@@ -1,19 +1,8 @@
-// CharityDepositTable.tsx
-// This file contains:
-// 1. DonationRow: A component for rendering an individual donation entry.
-// 2. CharityDepositTable: A component that displays donations in a paginated table.
-//
-// Usage:
-// <CharityDepositTable list={donationsList} />
-//
-// Dependencies:
-// - Material UI for styling (Link, Typography, etc.).
-// - React Super Responsive Table for responsive table layout.
-// - CustomPagination for paginated displays.
-// - AddressLink for linking to donor addresses.
-
 import { useState } from 'react';
-import { Link, TableBody, Typography } from '@mui/material';
+import { Tr } from 'react-super-responsive-table';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import {
   TablePrimary,
@@ -23,21 +12,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { Tr } from 'react-super-responsive-table';
-
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 
-//------------------------------------------------------------------------------
-// TypeScript Interfaces
-//------------------------------------------------------------------------------
-
-/**
- * Represents a single donation record.
- */
 export interface CharityDepositDonation {
   EvtLogId: number;
   TxHash: string;
@@ -47,96 +24,61 @@ export interface CharityDepositDonation {
   AmountEth: number;
 }
 
-/**
- * Props for the DonationRow component.
- */
 interface DonationRowProps {
   donation: CharityDepositDonation;
 }
 
-/**
- * Props for the CharityDepositTable component.
- */
 interface CharityDepositTableProps {
   list: CharityDepositDonation[];
 }
 
-//------------------------------------------------------------------------------
-// Components
-//------------------------------------------------------------------------------
-
-/**
- * DonationRow
- * Renders a single row in the donation table, including links to block explorers
- * and user profiles.
- */
 const DonationRow = ({ donation }: DonationRowProps) => {
-  // Fallback for undefined donation objects
   if (!donation) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
-      {/* Date & Tx Hash Link */}
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', donation.TxHash)}
           target="_blank"
           rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(donation.TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
-
-      {/* Round Number (conditionally linked) */}
       <TablePrimaryCell align="center">
         {donation.RoundNum < 0 ? (
-          ' ' // If RoundNum is negative, display a blank space
+          ' '
         ) : (
-          <Link
-            color="inherit"
-            fontSize="inherit"
+          <a
+            className="text-inherit"
             href={`/prize/${donation.RoundNum}`}
             target="_blank"
             rel="noopener noreferrer"
           >
             {donation.RoundNum}
-          </Link>
+          </a>
         )}
       </TablePrimaryCell>
-
-      {/* Donor Address */}
       <TablePrimaryCell align="center">
         <AddressLink address={donation.DonorAddr} url={`/user/${donation.DonorAddr}`} />
       </TablePrimaryCell>
-
-      {/* Donation Amount in ETH */}
       <TablePrimaryCell align="right">{donation.AmountEth.toFixed(6)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-/**
- * CharityDepositTable
- * Displays a paginated list of donation records.
- *
- * @param list An array of Donation objects to be displayed in the table.
- */
 export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
-  // Number of records to display per page.
   const perPage = 10;
-  // Current page for pagination.
   const [page, setPage] = useState(1);
 
-  // If no records exist, display a fallback message.
   if (list.length === 0) {
-    return <Typography>No deposits yet.</Typography>;
+    return <p>No deposits yet.</p>;
   }
 
-  // Calculate the slice of data to display for the current page.
   const currentData = list.slice((page - 1) * perPage, page * perPage);
 
   return (
@@ -151,15 +93,13 @@ export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
               <TablePrimaryHeadCell align="right">Donation amount (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-          <TableBody>
+          <tbody>
             {currentData.map((donation) => (
               <DonationRow donation={donation} key={donation.EvtLogId} />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
-
-      {/* Pagination Controls */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

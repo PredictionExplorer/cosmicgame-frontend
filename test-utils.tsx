@@ -1,11 +1,8 @@
 import { type ReactElement, type ReactNode } from 'react';
 import { render, type RenderOptions } from '@testing-library/react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-
-const theme = createTheme({ palette: { mode: 'dark' } });
 
 function AllProviders({ children }: { children: ReactNode }) {
-  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+  return <>{children}</>;
 }
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>

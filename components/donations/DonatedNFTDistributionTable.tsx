@@ -1,5 +1,7 @@
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { memo, useMemo, useState, type FC } from 'react';
-import { TableBody, Typography } from '@mui/material';
+import { Tr } from 'react-super-responsive-table';
 
 import {
   TablePrimary,
@@ -9,22 +11,10 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { Tr } from 'react-super-responsive-table';
-
 import { CustomPagination } from '@/components/common/CustomPagination';
 
-/** Number of rows to display per page */
 const PER_PAGE = 5;
 
-/* -------------------------------------------------------------------------- */
-/*                                Type Helpers                                */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Shape of each individual data record.
- */
 export interface NFTDistributionRowData {
   TokenAddr: string;
   NumDonations: number;
@@ -35,21 +25,10 @@ interface NFTDistributionRowProps {
 }
 
 interface NFTDistributionTableProps {
-  /**
-   * Complete list of distribution rows. Empty array ⇒ no donations yet.
-   */
   list: NFTDistributionRowData[];
 }
 
-/* -------------------------------------------------------------------------- */
-/*                               Row Component                                */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Render a single data row. Using `memo` so it re‑renders only if `rowData` changes.
- */
 const DonatedNFTDistributionRow: FC<NFTDistributionRowProps> = memo(({ rowData }) => {
-  // Guard: Defensive check — shouldn't happen if parent validates data
   if (!rowData) {
     return <TablePrimaryRow />;
   }
@@ -57,8 +36,7 @@ const DonatedNFTDistributionRow: FC<NFTDistributionRowProps> = memo(({ rowData }
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        {/* Use monospaced font for fixed‑width contract addresses */}
-        <Typography fontFamily="monospace">{rowData.TokenAddr}</Typography>
+        <span className="font-mono">{rowData.TokenAddr}</span>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">{rowData.NumDonations}</TablePrimaryCell>
     </TablePrimaryRow>
@@ -66,47 +44,36 @@ const DonatedNFTDistributionRow: FC<NFTDistributionRowProps> = memo(({ rowData }
 });
 DonatedNFTDistributionRow.displayName = 'DonatedNFTDistributionRow';
 
-/* -------------------------------------------------------------------------- */
-/*                              Table Component                               */
-/* -------------------------------------------------------------------------- */
-
 const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) => {
-  /* ------------------------------- State -------------------------------- */
   const [page, setPage] = useState(1);
 
-  /* ----------------------------- Memoized Data -------------------------- */
   const paginatedData = useMemo(
     () => list.slice((page - 1) * PER_PAGE, page * PER_PAGE),
     [list, page],
   );
 
-  /* ------------------------------ Render -------------------------------- */
   if (list.length === 0) {
-    return <Typography>No donated tokens yet.</Typography>;
+    return <p>No donated tokens yet.</p>;
   }
 
   return (
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          {/* ---------------------- Table Header ----------------------- */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Contract Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">Number of NFTs</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-
-          {/* ----------------------- Table Body ------------------------ */}
-          <TableBody>
+          <tbody>
             {paginatedData.map((row) => (
               <DonatedNFTDistributionRow key={row.TokenAddr} rowData={row} />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* ------------------------ Pagination ------------------------- */}
       <CustomPagination
         page={page}
         setPage={setPage}

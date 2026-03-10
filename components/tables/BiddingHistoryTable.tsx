@@ -1,10 +1,21 @@
 import { useEffect, useState } from 'react';
-import { Box, TableBody, Typography, Tooltip, Link } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Tr } from 'react-super-responsive-table';
 import { usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
+import {
+  shortenHex,
+  convertTimestampToDateTime,
+  formatSeconds,
+  getRWLKImageUrl,
+  getExplorerUrl,
+} from '@/utils';
+import ERC20_ABI from '@/contracts/CosmicToken.json';
+
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -13,23 +24,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimary,
 } from '@/components/styled';
-import {
-  shortenHex,
-  convertTimestampToDateTime,
-  formatSeconds,
-  getAssetsUrl,
-  getRWLKImageUrl,
-  getExplorerUrl,
-} from '@/utils';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import ERC20_ABI from '@/contracts/CosmicToken.json';
 import { useBannedBids } from '@/hooks/useApiQuery';
 
-//------------------------------------------------------------------------------
-// Types & Interfaces
-//------------------------------------------------------------------------------
 interface BidHistory {
   EvtLogId: number;
   TimeStamp: number;
@@ -65,32 +62,18 @@ interface BiddingHistoryTableProps {
   showRound?: boolean;
 }
 
-//------------------------------------------------------------------------------
-// Constants
-//------------------------------------------------------------------------------
-// Colors for row backgrounds depending on the bid type.
 const bidTypeStyles: Record<number, string> = {
-  2: 'rgba(0,128,128, 0.1)', // CST Bid
-  1: 'rgba(128,128,128, 0.1)', // RWLK Token Bid
-  0: 'rgba(0,0,0, 0.1)', // ETH Bid
+  2: 'rgba(0,128,128, 0.1)',
+  1: 'rgba(128,128,128, 0.1)',
+  0: 'rgba(0,0,0, 0.1)',
 };
 
-// Labels for displaying the bid type.
 const bidTypeLabels: Record<number, string> = {
   2: 'CST Bid',
   1: 'RWLK Token Bid',
   0: 'ETH Bid',
 };
 
-//------------------------------------------------------------------------------
-// Components
-//------------------------------------------------------------------------------
-
-/**
- * HistoryRow
- * Renders a single row within the bidding history table.
- * Includes information about bidder, bid price, timestamp, etc.
- */
 const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowProps) => {
   const router = useRouter();
   const publicClient = usePublicClient();
@@ -122,21 +105,15 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
     }
   }, [history.DonatedERC20TokenAddr, publicClient]);
 
-  /**
-   * Redirect the user to a page with more details about the specific bid.
-   */
   const handleRowClick = () => {
     router.push(`/bid/${history.EvtLogId}`);
   };
 
-  // If the history object is undefined or null, render an empty row.
   if (!history) return <TablePrimaryRow />;
 
-  // Determine the background color and label based on the bid type.
   const backgroundStyle = bidTypeStyles[history.BidType] || 'rgba(0,0,0,0.1)';
   const bidTypeLabel = bidTypeLabels[history.BidType] || 'Unknown Bid';
 
-  // Determine how to display the price.
   const price =
     history.BidType === 2
       ? `${
@@ -152,54 +129,42 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
 
   return (
     <TablePrimaryRow
-      sx={{
-        cursor: 'pointer',
-        background: backgroundStyle,
-      }}
+      className="cursor-pointer"
+      style={{ background: backgroundStyle }}
       onClick={handleRowClick}
     >
-      {/* Timestamp */}
-      <TablePrimaryCell sx={{ whiteSpace: 'nowrap' }}>
+      <TablePrimaryCell className="whitespace-nowrap">
         {convertTimestampToDateTime(history.TimeStamp, true)}
       </TablePrimaryCell>
-
-      {/* Bidder Address */}
       <TablePrimaryCell>
-        <Tooltip title={history.BidderAddr}>
-          <Typography sx={{ fontSize: 'inherit !important', fontFamily: 'monospace' }}>
-            {shortenHex(history.BidderAddr, 6)}
-          </Typography>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="font-mono">{shortenHex(history.BidderAddr, 6)}</span>
+            </TooltipTrigger>
+            <TooltipContent>{history.BidderAddr}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
-
-      {/* Price */}
       <TablePrimaryCell align="right">{price}</TablePrimaryCell>
-
-      {/* Round Number (optional) */}
       {showRound && <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>}
-
-      {/* Bid Type Label */}
       <TablePrimaryCell align="center">{bidTypeLabel}</TablePrimaryCell>
-
-      {/* Bid Duration */}
       <TablePrimaryCell align="center">{formatSeconds(bidDuration)}</TablePrimaryCell>
-
-      {/* Additional Bid Info (NFT, etc.) */}
       <TablePrimaryCell>
-        <Typography sx={{ wordBreak: 'break-all' }}>
-          {/* If the bid is in RWLK tokens, show the ID and a thumbnail */}
+        <span className="break-all">
           {history.BidType === 1 && history.RWalkNFTId && (
             <>
               {`Bid was made using RandomWalk Token (ID = ${history.RWalkNFTId})`}
-              <img
+              <Image
                 src={getRWLKImageUrl(history.RWalkNFTId.toString().padStart(6, '0'))}
-                width="32px"
-                style={{ verticalAlign: 'middle' }}
+                width={32}
+                height={32}
+                className="align-middle inline"
                 alt="RWLK Token"
+                unoptimized
               />
             </>
           )}
-          {/* If there was a donated token involved */}
           {(!!history.NFTDonationTokenAddr || !!history.DonatedERC20TokenAddr) && (
             <>
               {history.BidType === 2 && 'Bid was made using Cosmic Signature Tokens'}
@@ -212,59 +177,42 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
               {!!history.DonatedERC20TokenAddr && (
                 <>
                   {` and ${formatUnits(BigInt(history.DonatedERC20TokenAmount || '0'), decimals)}`}{' '}
-                  <Link
+                  <a
                     href={getExplorerUrl('token', history.DonatedERC20TokenAddr)}
                     target="_blank"
-                    color="inherit"
+                    className="text-inherit"
                   >
                     {symbol}
-                  </Link>
+                  </a>
                   {' was donated'}
                 </>
               )}
             </>
           )}{' '}
-        </Typography>
+        </span>
       </TablePrimaryCell>
-
-      {/* Message (hidden if banned) */}
       <TablePrimaryCell>
         {!isBanned && history.Message && (
-          <Tooltip title={history.Message}>
-            <Typography
-              sx={{
-                fontSize: 'inherit !important',
-                maxWidth: '180px',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
-                display: 'inline-block',
-                textOverflow: 'ellipsis',
-                lineHeight: 1,
-              }}
-            >
-              {history.Message}
-            </Typography>
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="max-w-[180px] overflow-hidden whitespace-nowrap inline-block text-ellipsis leading-none">
+                  {history.Message}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{history.Message}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}{' '}
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-/**
- * HistoryTable
- * Responsible for rendering the table structure along with banned status.
- * Fetches the list of banned bids on mount.
- * @param biddingHistory Array of bid history objects to display.
- * @param perPage Number of entries per page.
- * @param curPage Current page number.
- * @param showRound Whether to display the round number column.
- */
 const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }: HistoryTableProps) => {
   const { data: bannedBids } = useBannedBids();
   const bannedList = bannedBids?.map((x: { bid_id: number }) => x.bid_id) ?? [];
 
-  // Slice the bidding history to show only the current page entries.
   const displayedBids = biddingHistory.slice((curPage - 1) * perPage, curPage * perPage);
 
   return (
@@ -280,7 +228,6 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }: HistoryTa
           <col width="15%" />
           <col width="20%" />
         </colgroup>
-
         <TablePrimaryHead>
           <Tr>
             <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
@@ -293,9 +240,9 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }: HistoryTa
             <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
-        <TableBody>
+        {/* eslint-disable react-hooks/purity */}
+        <tbody>
           {displayedBids.map((history, index) => {
-            // Calculate the difference between the current and the next (or now) timestamp.
             const bidDuration =
               (curPage - 1) * perPage + index === 0
                 ? Date.now() / 1000 - history.TimeStamp
@@ -312,26 +259,19 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }: HistoryTa
               />
             );
           })}
-        </TableBody>
+        </tbody>
+        {/* eslint-enable react-hooks/purity */}
       </TablePrimary>
     </TablePrimaryContainer>
   );
 };
 
-/**
- * BiddingHistoryTable
- * Orchestrates displaying the bidding history, including pagination.
- * @param biddingHistory The complete list of bids.
- * @param showRound Whether to display the round column.
- */
 const BiddingHistoryTable = ({ biddingHistory, showRound = true }: BiddingHistoryTableProps) => {
-  // Items to show per page.
   const perPage = 5;
-  // Current pagination page.
   const [curPage, setCurrentPage] = useState(1);
 
   return (
-    <Box mt={2}>
+    <div className="mt-4">
       {biddingHistory.length > 0 ? (
         <>
           <HistoryTable
@@ -348,9 +288,9 @@ const BiddingHistoryTable = ({ biddingHistory, showRound = true }: BiddingHistor
           />
         </>
       ) : (
-        <Typography>No bid history yet.</Typography>
+        <p>No bid history yet.</p>
       )}
-    </Box>
+    </div>
   );
 };
 

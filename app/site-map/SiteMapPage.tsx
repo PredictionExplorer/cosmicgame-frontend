@@ -1,12 +1,9 @@
 'use client';
 
-import { Box, Link, Typography } from '@mui/material';
+import Link from 'next/link';
 
 import { MainWrapper } from '@/components/styled';
 
-/**
- * A list of links that provide per-user information routes.
- */
 const perUserLinks = [
   { href: '/my-tokens', label: 'My Tokens' },
   { href: '/my-winnings', label: 'My Unclaimed Winnings' },
@@ -14,9 +11,6 @@ const perUserLinks = [
   { href: '/my-staking', label: 'My Staking' },
 ];
 
-/**
- * A list of links that provide overall system information routes.
- */
 const systemLinks = [
   { href: '/gallery', label: 'CosmicSignature Gallery' },
   { href: '/prize', label: 'Rounds Played' },
@@ -27,46 +21,36 @@ const systemLinks = [
   { href: '/faq', label: 'FAQ' },
 ];
 
-/**
- * SiteMapPage: A page component displaying a list of internal links grouped into categories.
- */
 const SiteMapPage = () => {
   return (
     <MainWrapper>
-      {/* Page heading */}
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={6}>
-        Site Map
-      </Typography>
+      <h2 className="mb-12 text-center text-2xl font-bold text-primary">Site Map</h2>
 
-      {/* Section for per-user information */}
-      <Box>
-        <Typography variant="h5">Per-user information</Typography>
-        <Box ml={4}>
-          {/* Map over perUserLinks to render them dynamically */}
+      <div>
+        <h3 className="text-xl font-semibold">Per-user information</h3>
+        <div className="ml-8">
           {perUserLinks.map(({ href, label }) => (
-            <Typography variant="subtitle1" key={href}>
-              <Link href={href} sx={{ fontSize: 'inherit', color: 'inherit' }}>
+            <p className="text-base" key={href}>
+              <Link href={href} className="text-inherit">
                 {label}
               </Link>
-            </Typography>
+            </p>
           ))}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
-      {/* Section for overall system information */}
-      <Box mt={4}>
-        <Typography variant="h5">Overall system information</Typography>
-        <Box ml={4}>
-          {/* Map over systemLinks to render them dynamically */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold">Overall system information</h3>
+        <div className="ml-8">
           {systemLinks.map(({ href, label }) => (
-            <Typography variant="subtitle1" key={href}>
-              <Link href={href} sx={{ fontSize: 'inherit', color: 'inherit' }}>
+            <p className="text-base" key={href}>
+              <Link href={href} className="text-inherit">
                 {label}
               </Link>
-            </Typography>
+            </p>
           ))}
-        </Box>
-      </Box>
+        </div>
+      </div>
     </MainWrapper>
   );
 };

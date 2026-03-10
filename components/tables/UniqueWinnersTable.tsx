@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { TableBody, Typography } from '@mui/material';
+import { Tr } from 'react-super-responsive-table';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import {
   TablePrimary,
@@ -9,14 +10,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { Tr } from 'react-super-responsive-table';
-
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 
-// TypeScript types for better clarity and type-safety
 export interface Winner {
   WinnerAid: string;
   WinnerAddr: string;
@@ -29,14 +25,11 @@ interface UniqueWinnersRowProps {
   winner?: Winner;
 }
 
-// Component rendering a single row of winner data
 const UniqueWinnersRow = ({ winner }: UniqueWinnersRowProps) => {
   if (!winner) {
-    // Return empty row when winner data isn't available
     return <TablePrimaryRow />;
   }
 
-  // Render row with winner details
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
@@ -53,17 +46,12 @@ interface UniqueWinnersTableProps {
   list: Winner[];
 }
 
-// Component rendering a paginated table of winners
 export const UniqueWinnersTable = ({ list }: UniqueWinnersTableProps) => {
-  // Items per page constant
   const perPage = 5;
-
-  // State for current page
   const [page, setPage] = useState(1);
 
-  // Display message when there are no winners
   if (list.length === 0) {
-    return <Typography>No winners yet.</Typography>;
+    return <p>No winners yet.</p>;
   }
 
   return (
@@ -78,16 +66,13 @@ export const UniqueWinnersTable = ({ list }: UniqueWinnersTableProps) => {
               <TablePrimaryHeadCell align="right">Prizes Sum (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-
-          <TableBody>
+          <tbody>
             {list.slice((page - 1) * perPage, page * perPage).map((winner) => (
               <UniqueWinnersRow winner={winner} key={winner.WinnerAid} />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
-
-      {/* Pagination component to navigate between pages */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

@@ -1,9 +1,13 @@
 'use client';
 
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { useState, useEffect } from 'react';
-import { Box, Button, Link, TableBody, Typography } from '@mui/material';
+import Link from 'next/link';
 import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
+
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useApiData } from '@/contexts/ApiDataContext';
@@ -12,7 +16,6 @@ import { useNotification } from '@/contexts/NotificationContext';
 import api from '@/services/api';
 import getErrorMessage from '@/utils/alert';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 import {
   MainWrapper,
   TablePrimary,
@@ -22,13 +25,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
 import { CustomPagination } from '@/components/common/CustomPagination';
+import { Button } from '@/components/ui/button';
 
-/* ------------------------------------------------------------------
-  Types
------------------------------------------------------------------- */
 interface RaffleETHDeposit {
   EvtLogId: number;
   TxHash: string;
@@ -37,11 +36,6 @@ interface RaffleETHDeposit {
   Amount: number;
 }
 
-/* ------------------------------------------------------------------
-  Sub-Components
------------------------------------------------------------------- */
-
-/** Renders a single row (Raffle ETH deposit record) */
 const RaffleWinningsRow = ({ deposit }: { deposit: RaffleETHDeposit }) => {
   if (!deposit) return <TablePrimaryRow />;
 
@@ -49,21 +43,17 @@ const RaffleWinningsRow = ({ deposit }: { deposit: RaffleETHDeposit }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${RoundNum}`}
-          style={{ color: 'inherit', fontSize: 'inherit' }}
-          target="_blank"
-        >
+        <Link href={`/prize/${RoundNum}`} className="text-inherit" target="_blank">
           {RoundNum}
         </Link>
       </TablePrimaryCell>
@@ -72,13 +62,12 @@ const RaffleWinningsRow = ({ deposit }: { deposit: RaffleETHDeposit }) => {
   );
 };
 
-/** Renders the full table of Raffle ETH deposits (with pagination) */
 const RaffleWinningsTable = ({ list }: { list: RaffleETHDeposit[] }) => {
   const PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   if (list.length === 0) {
-    return <Typography>No Raffle ETH yet.</Typography>;
+    return <p>No Raffle ETH yet.</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -96,11 +85,11 @@ const RaffleWinningsTable = ({ list }: { list: RaffleETHDeposit[] }) => {
               <TablePrimaryHeadCell align="right">Amount (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-          <TableBody>
+          <tbody>
             {currentPageItems.map((deposit) => (
               <RaffleWinningsRow key={deposit.EvtLogId} deposit={deposit} />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
@@ -114,10 +103,6 @@ const RaffleWinningsTable = ({ list }: { list: RaffleETHDeposit[] }) => {
   );
 };
 
-/* ------------------------------------------------------------------
-  Custom Hook: useRaffleETHDeposits
-  Fetches and sorts a user's Raffle ETH deposits
------------------------------------------------------------------- */
 function useRaffleETHDeposits(address: string) {
   const [raffleETHToClaim, setRaffleETHToClaim] = useState<{
     data: RaffleETHDeposit[];
@@ -144,35 +129,27 @@ function useRaffleETHDeposits(address: string) {
   return { raffleETHToClaim, fetchRaffleETHDeposits };
 }
 
-/* ------------------------------------------------------------------
-  Main Component: UserRaffleETHPage
------------------------------------------------------------------- */
 const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
   const { account } = useActiveWeb3React();
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
   const raffleWalletContract = useRaffleWalletContract();
   const { setNotification } = useNotification();
 
-  // Validate and normalize address
   const validatedAddress =
     rawAddress && isAddress(rawAddress.toLowerCase())
       ? getAddress(rawAddress.toLowerCase())
       : 'Invalid Address';
 
-  // Data state
   const [invalidAddress, setInvalidAddress] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
 
-  // Custom Hook for fetching user deposits
   const { raffleETHToClaim, fetchRaffleETHDeposits } = useRaffleETHDeposits(validatedAddress);
 
-  // Handler: Claim all user Raffle ETH
   const handleAllETHClaim = async () => {
     try {
       setIsClaiming(true);
       await raffleWalletContract!.write.withdrawEth?.();
 
-      // Refresh data & statuses after short delay
       setTimeout(() => {
         fetchStatusData();
         fetchRaffleETHDeposits(false);
@@ -190,67 +167,52 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
     }
   };
 
-  // Fetch data on mount if address is valid
   useEffect(() => {
     if (!validatedAddress || validatedAddress === 'Invalid Address') {
       setInvalidAddress(true);
       return;
     }
     fetchRaffleETHDeposits();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validatedAddress]);
 
-  // If invalid address
   if (invalidAddress) {
     return (
       <MainWrapper>
-        <Typography variant="h6">Invalid Address</Typography>
+        <p className="text-lg font-semibold">Invalid Address</p>
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <Box mb={4}>
-        <Typography variant="h6" color="primary" component="span" mr={2}>
-          User
-        </Typography>
-        <Typography variant="h6" component="span" fontFamily="monospace">
-          {validatedAddress}
-        </Typography>
-      </Box>
+      <div className="mb-8">
+        <span className="mr-4 text-lg font-semibold text-primary">User</span>
+        <span className="font-mono text-lg font-semibold">{validatedAddress}</span>
+      </div>
 
-      {/* Raffle ETH Section */}
-      <Box mt={4}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            mb: 2,
-          }}
-        >
-          <Typography variant="h6" lineHeight={1}>
-            Raffle ETH User Won
-          </Typography>
+      <div className="mt-8">
+        <div className="mb-4 flex items-center justify-between">
+          <h4 className="text-lg font-semibold leading-none">Raffle ETH User Won</h4>
 
-          {/* Show "Claim All" only if user matches & has ETH to claim */}
           {status?.ETHRaffleToClaim > 0 && account === validatedAddress && (
-            <Box>
-              <Typography component="span" mr={2}>
+            <div className="flex items-center gap-4">
+              <span className="mr-4">
                 Your claimable winnings are {status.ETHRaffleToClaim.toFixed(6)} ETH
-              </Typography>
-              <Button onClick={handleAllETHClaim} variant="contained" disabled={isClaiming}>
+              </span>
+              <Button onClick={handleAllETHClaim} disabled={isClaiming}>
                 Claim All
               </Button>
-            </Box>
+            </div>
           )}
-        </Box>
+        </div>
 
         {raffleETHToClaim.loading ? (
-          <Typography variant="h6">Loading...</Typography>
+          <p className="text-lg font-semibold">Loading...</p>
         ) : (
           <RaffleWinningsTable list={raffleETHToClaim.data} />
         )}
-      </Box>
+      </div>
     </MainWrapper>
   );
 };

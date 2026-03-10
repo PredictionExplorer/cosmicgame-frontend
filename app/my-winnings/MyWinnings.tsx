@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Button, Link, TableBody, Tooltip, Typography } from '@mui/material';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Tr } from 'react-super-responsive-table';
+import { Tr, Tbody } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
-// Styled & Utilities
 import { parseUnits } from 'viem';
 
+import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
+
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   MainWrapper,
   TablePrimary,
@@ -18,21 +20,14 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import getErrorMessage from '@/utils/alert';
-
-// Hooks & Context
 import { useActiveWeb3React } from '@/hooks/web3';
 import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useNotification } from '@/contexts/NotificationContext';
-
-// Services
 import api from '@/services/api';
-
-// Components
 import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
 import { UncollectedCSTStakingRewardsTable } from '@/components/staking/UncollectedCSTStakingRewardsTable';
 import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
@@ -82,7 +77,6 @@ function useUnclaimedWinnings(account: string | null | undefined) {
         api.get_unclaimed_donated_nft_by_user(account!),
         api.get_unclaimed_raffle_deposits_by_user(account!),
       ]);
-      // Sort data for consistency
       setDonatedNFTs(
         (nfts as UnclaimedDonatedNFT[]).slice().sort((a, b) => a.TimeStamp - b.TimeStamp),
       );
@@ -101,6 +95,7 @@ function useUnclaimedWinnings(account: string | null | undefined) {
     if (account) {
       fetchUnclaimedData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
 
   return {
@@ -116,7 +111,6 @@ function useUnclaimedWinnings(account: string | null | undefined) {
   Sub-Components
 ------------------------------------------------------------------ */
 
-/** Table Row for a single raffle winning -- receives pre-fetched timeout */
 function RaffleWinningRow({
   winning,
   roundTimeout,
@@ -128,35 +122,37 @@ function RaffleWinningRow({
 
   if (!winning) return <TablePrimaryRow />;
 
+  /* eslint-disable react-hooks/purity */
   const isExpired = roundTimeout > 0 && roundTimeout < Date.now() / 1000;
 
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit text-[inherit]"
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
+          rel="noreferrer"
         >
           {convertTimestampToDateTime(TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${RoundNum}`}
-          style={{ color: 'inherit', fontSize: 'inherit' }}
-          target="_blank"
-        >
+        <Link href={`/prize/${RoundNum}`} className="text-inherit text-[inherit]" target="_blank">
           {RoundNum}
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Tooltip title={WinnerAddr}>
-          <Link href={`/user/${WinnerAddr}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
-            {shortenHex(WinnerAddr, 6)}
-          </Link>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href={`/user/${WinnerAddr}`} className="text-inherit text-[inherit]">
+                {shortenHex(WinnerAddr, 6)}
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>{WinnerAddr}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {roundTimeout ? (
@@ -174,12 +170,11 @@ function RaffleWinningRow({
       <TablePrimaryCell align="center">{Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
     </TablePrimaryRow>
   );
+  /* eslint-enable react-hooks/purity */
 }
 
-/** Table layout for raffle winnings -- fetches round timeouts once per unique round */
 function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
   const raffleWalletContract = useRaffleWalletContract();
-  // Map of roundNum -> timeout timestamp, fetched once per unique round
   const [roundTimeouts, setRoundTimeouts] = useState<Record<number, number>>({});
 
   useEffect(() => {
@@ -216,7 +211,7 @@ function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
             <TablePrimaryHeadCell>Claimed</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
-        <TableBody>
+        <Tbody>
           {list.map((winning) => (
             <RaffleWinningRow
               key={winning.EvtLogId}
@@ -224,7 +219,7 @@ function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
               roundTimeout={roundTimeouts[winning.RoundNum] ?? 0}
             />
           ))}
-        </TableBody>
+        </Tbody>
       </TablePrimary>
     </TablePrimaryContainer>
   );
@@ -240,10 +235,8 @@ export default function MyWinnings() {
   const router = useRouter();
 
   const { donatedNFTs, raffleETHWinnings, loading, error, refetch } = useUnclaimedWinnings(account);
-  // Smart contract hooks
   const raffleWalletContract = useRaffleWalletContract();
 
-  // Local UI states
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isClaiming, setIsClaiming] = useState({
     donatedNFT: false,
@@ -285,9 +278,9 @@ export default function MyWinnings() {
 
   useEffect(() => {
     fetchDonatedERC20Tokens();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
 
-  // Claim all ETH from raffle contract
   const handleAllETHClaim = async () => {
     if (!raffleWalletContract) {
       setNotification({ text: 'Wallet not connected', type: 'error', visible: true });
@@ -296,10 +289,8 @@ export default function MyWinnings() {
     setIsClaiming((prev) => ({ ...prev, raffleETH: true }));
     try {
       const roundNums = (raffleETHWinnings || []).filter((w) => !w.Claimed).map((w) => w.RoundNum);
-      // Use direct method name -- JSON ABI doesn't need string signature notation
       await raffleWalletContract.write.withdrawEverything?.([roundNums, [], []]);
 
-      // Refresh status and unclaimed data after short delay
       setTimeout(() => {
         fetchStatusData();
         refetch();
@@ -417,49 +408,37 @@ export default function MyWinnings() {
     Render
   ------------------------------------------------------------------ */
 
-  // If user is not connected
   if (!account) {
     return (
       <MainWrapper>
-        <Typography variant="h4" color="primary" gutterBottom textAlign="center">
-          Pending Winnings
-        </Typography>
-        <Typography variant="subtitle1" mt={4}>
-          Please login to Metamask to see your winnings.
-        </Typography>
+        <h4 className="text-2xl font-bold text-primary text-center mb-2">Pending Winnings</h4>
+        <p className="text-base mt-8">Please login to Metamask to see your winnings.</p>
       </MainWrapper>
     );
   }
 
-  // If there's an error loading data
   if (error) {
     return (
       <MainWrapper>
-        <Typography variant="h4" color="error" gutterBottom textAlign="center">
+        <h4 className="text-2xl font-bold text-destructive text-center mb-2">
           Something went wrong!
-        </Typography>
-        <Typography variant="body1" color="error">
-          {error}
-        </Typography>
+        </h4>
+        <p className="text-base text-destructive">{error}</p>
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
-        Pending Winnings
-      </Typography>
+      <h4 className="text-2xl font-bold text-primary text-center mb-2">Pending Winnings</h4>
 
       {/* Raffle ETH Section */}
-      <Box mt={6}>
-        <Typography variant="h5" mb={2}>
-          Claimable ETH Rewards
-        </Typography>
+      <div className="mt-12">
+        <h5 className="text-xl font-bold mb-4">Claimable ETH Rewards</h5>
         {loading && raffleETHWinnings === null ? (
-          <Typography>Loading...</Typography>
+          <p>Loading...</p>
         ) : !raffleETHWinnings || raffleETHWinnings.length === 0 ? (
-          <Typography>No winnings yet.</Typography>
+          <p>No winnings yet.</p>
         ) : (
           <>
             <RaffleWinningsTable
@@ -467,25 +446,14 @@ export default function MyWinnings() {
             />
 
             {status?.ETHRaffleToClaim > 0 && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'end',
-                  alignItems: 'center',
-                  mt: 2,
-                }}
-              >
-                <Typography mr={2}>
+              <div className="flex justify-end items-center mt-4">
+                <p className="mr-4">
                   Your claimable winnings are {`${status.ETHRaffleToClaim.toFixed(6)} ETH`}
-                </Typography>
-                <Button
-                  onClick={handleAllETHClaim}
-                  variant="contained"
-                  disabled={isClaiming.raffleETH}
-                >
+                </p>
+                <Button onClick={handleAllETHClaim} disabled={isClaiming.raffleETH}>
                   Claim All
                 </Button>
-              </Box>
+              </div>
             )}
 
             <CustomPagination
@@ -496,34 +464,28 @@ export default function MyWinnings() {
             />
           </>
         )}
-      </Box>
+      </div>
 
       {/* CST Staking Rewards Section */}
-      <Box mt={6}>
-        <Typography variant="h5" mb={2}>
-          Claimable CST Staking Rewards
-        </Typography>
+      <div className="mt-12">
+        <h5 className="text-xl font-bold mb-4">Claimable CST Staking Rewards</h5>
         <UncollectedCSTStakingRewardsTable user={account} />
-      </Box>
+      </div>
 
       {/* Donated NFTs Section */}
-      <Box mt={8}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <Typography variant="h5">Donated NFTs</Typography>
+      <div className="mt-16">
+        <div className="flex justify-between mb-4">
+          <h5 className="text-xl font-bold">Donated NFTs</h5>
           {status?.NumDonatedNFTToClaim > 0 && (
-            <Button
-              onClick={handleAllDonatedNFTsClaim}
-              variant="contained"
-              disabled={isClaiming.donatedNFT}
-            >
+            <Button onClick={handleAllDonatedNFTsClaim} disabled={isClaiming.donatedNFT}>
               Claim All
             </Button>
           )}
-        </Box>
+        </div>
         {loading && donatedNFTs === null ? (
-          <Typography>Loading...</Typography>
+          <p>Loading...</p>
         ) : !donatedNFTs || donatedNFTs.length === 0 ? (
-          <Typography>No NFTs yet.</Typography>
+          <p>No NFTs yet.</p>
         ) : (
           <DonatedNFTTable
             list={donatedNFTs}
@@ -531,39 +493,30 @@ export default function MyWinnings() {
             claimingTokens={claimingDonatedNFTs}
           />
         )}
-      </Box>
+      </div>
 
       {/* Donated ERC20 Section */}
-      <Box mt={8}>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 2,
-          }}
-        >
-          <Typography variant="h5">Donated ERC20 Tokens</Typography>
+      <div className="mt-16">
+        <div className="flex justify-between items-center mb-4">
+          <h5 className="text-xl font-bold">Donated ERC20 Tokens</h5>
           {donatedERC20Tokens.data.filter((x) => !x.Claimed).length > 0 && (
-            <Button onClick={handleAllDonatedERC20Claim} variant="contained">
-              Claim All
-            </Button>
+            <Button onClick={handleAllDonatedERC20Claim}>Claim All</Button>
           )}
-        </Box>
+        </div>
 
         {donatedERC20Tokens.loading ? (
-          <Typography variant="h6">Loading...</Typography>
+          <h6 className="text-lg font-semibold">Loading...</h6>
         ) : (
           <DonatedERC20Table list={donatedERC20Tokens.data} handleClaim={handleDonatedERC20Claim} />
         )}
-      </Box>
+      </div>
 
       {/* Bottom Link Section */}
-      <Box mt={6}>
-        <Button variant="outlined" onClick={() => router.push('/winning-history')}>
+      <div className="mt-12">
+        <Button variant="outline" onClick={() => router.push('/winning-history')}>
           Go to my winning history page.
         </Button>
-      </Box>
+      </div>
     </MainWrapper>
   );
 }

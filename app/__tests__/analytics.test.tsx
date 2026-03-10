@@ -25,6 +25,7 @@ jest.mock('next/navigation', () => ({
   useParams: () => ({}),
 }));
 
+// eslint-disable-next-line import/order -- must come after jest.mock
 import { Analytics } from '@/app/analytics';
 
 beforeEach(() => {

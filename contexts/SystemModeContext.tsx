@@ -30,7 +30,7 @@ export const SystemModeProvider = ({ children }: { children: ReactNode }) => {
   }, [cosmicGameContract]);
 
   useEffect(() => {
-    fetchData();
+    fetchData(); // eslint-disable-line react-hooks/set-state-in-effect
     const intervalId = setInterval(fetchData, POLL_INTERVAL_MS);
     return () => clearInterval(intervalId);
   }, [fetchData]);

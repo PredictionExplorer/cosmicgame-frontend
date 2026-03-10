@@ -1,9 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Typography, Box, Button, Link, Select, MenuItem } from '@mui/material';
 import { usePublicClient } from 'wagmi';
+import Link from 'next/link';
 
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { MainWrapper, CenterBox } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import useArtBlocksContract from '@/hooks/useArtBlocksContract';
@@ -55,65 +63,52 @@ const MintArtBlocks = () => {
     if (nftContract) {
       getCurrentTokenId();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nftContract]);
 
   return (
     <>
       <MainWrapper>
         <CenterBox>
-          <Typography variant="h4" component="span">
-            GET AN
-          </Typography>
-          <Typography variant="h4" component="span" color="primary" sx={{ ml: 1.5 }}>
-            ART BLOCKS
-          </Typography>
-          <Typography variant="h4" component="span" sx={{ ml: 1.5 }}>
-            NFT FOR
-          </Typography>
+          <span className="text-2xl font-bold">GET AN</span>
+          <span className="text-2xl font-bold text-primary ml-3">ART BLOCKS</span>
+          <span className="text-2xl font-bold ml-3">NFT FOR</span>
         </CenterBox>
-        <Box display="flex" my={8}>
-          <Select
-            value={count}
-            onChange={(e) => setCount(Number(e.target.value))}
-            sx={{ minWidth: '100px' }}
-          >
-            <MenuItem value={1}>1</MenuItem>
-            <MenuItem value={2}>2</MenuItem>
-            <MenuItem value={3}>3</MenuItem>
-            <MenuItem value={4}>4</MenuItem>
-            <MenuItem value={5}>5</MenuItem>
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={15}>15</MenuItem>
+        <div className="flex my-16">
+          <Select value={String(count)} onValueChange={(val) => setCount(Number(val))}>
+            <SelectTrigger className="min-w-[100px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">1</SelectItem>
+              <SelectItem value="2">2</SelectItem>
+              <SelectItem value="3">3</SelectItem>
+              <SelectItem value="4">4</SelectItem>
+              <SelectItem value="5">5</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="15">15</SelectItem>
+            </SelectContent>
           </Select>
-          <Button
-            variant="contained"
-            onClick={handleMint}
-            sx={{ ml: 1 }}
-            disabled={count < 1 || Number.isNaN(count)}
-          >
+          <Button onClick={handleMint} className="ml-2" disabled={count < 1 || Number.isNaN(count)}>
             Mint now
           </Button>
-        </Box>
-        <Box sx={{ display: 'flex' }}>
-          <Typography variant="subtitle1" mr={1}>
-            Current Token ID:{' '}
-          </Typography>
-          <Typography variant="subtitle1">{curTokenId}</Typography>
-        </Box>
+        </div>
+        <div className="flex">
+          <p className="text-base mr-2">Current Token ID: </p>
+          <p className="text-base">{curTokenId}</p>
+        </div>
         {mintedTokens.length > 0 && (
-          <Box mt={2}>
+          <div className="mt-4">
             {mintedTokens.map((tokenId) => (
               <Link
                 key={tokenId}
                 href={`/?donation=true&tokenId=${tokenId}`}
-                sx={{ mr: 2, color: 'inherit' }}
+                className="mr-4 text-inherit"
               >
-                <Typography variant="subtitle1" component="span">
-                  {tokenId}
-                </Typography>
+                <span className="text-base">{tokenId}</span>
               </Link>
             ))}
-          </Box>
+          </div>
         )}
       </MainWrapper>
     </>

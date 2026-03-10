@@ -1,30 +1,21 @@
 'use client';
 
-import { Typography } from '@mui/material';
-
 import { MainWrapper } from '@/components/styled';
 import CharityWithdrawalTable, {
   type CharityWithdrawal,
 } from '@/components/tables/CharityWithdrawalTable';
 import { useCharityWithdrawals } from '@/hooks/useApiQuery';
 
-/**
- * CharityWithdrawals:
- * - Fetches and displays a list of withdrawals from the charity wallet.
- */
 const CharityWithdrawals = () => {
   const { data: charityWithdrawals = [], isLoading: loading } = useCharityWithdrawals();
 
   return (
     <MainWrapper>
-      {/* Page Title */}
-      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
+      <h4 className="text-2xl font-bold text-primary text-center mb-8">
         Withdrawals from Charity Wallet
-      </Typography>
-
-      {/* Conditionally render a loading indicator or the table of withdrawals */}
+      </h4>
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
         <CharityWithdrawalTable list={charityWithdrawals as CharityWithdrawal[]} />
       )}

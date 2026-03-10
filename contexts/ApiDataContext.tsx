@@ -66,6 +66,7 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
   // Use a ref so fetchActionIds/fetchData never need it as a useCallback dep.
   // The ref is always up-to-date without causing reference churn.
   const stakedActionIdsRef = useRef<(number | string)[]>([]);
+  // eslint-disable-next-line react-hooks/refs
   stakedActionIdsRef.current = stakedTokens.flatMap((x) =>
     x.TokenInfo?.StakeActionId != null ? [x.TokenInfo.StakeActionId] : [],
   );

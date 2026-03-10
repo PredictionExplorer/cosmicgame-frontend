@@ -1,15 +1,10 @@
 'use client';
 
-import { Typography } from '@mui/material';
-
 import { MainWrapper } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import WinningHistoryTable from '@/components/tables/WinningHistoryTable';
 import { useClaimHistoryByUser } from '@/hooks/useApiQuery';
 
-/* ------------------------------------------------------------------
-  Main Component: WinningHistory
------------------------------------------------------------------- */
 function WinningHistory() {
   const { account } = useActiveWeb3React();
   const { data, isLoading: loading, error: queryError } = useClaimHistoryByUser(account);
@@ -19,32 +14,25 @@ function WinningHistory() {
       | null) ?? null;
   const error = queryError?.message ?? null;
 
-  // If user is not connected
   if (!account) {
     return (
       <MainWrapper>
-        <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          History of My Winnings
-        </Typography>
-        <Typography variant="subtitle1">Please login to Metamask to see your winnings.</Typography>
+        <h2 className="mb-8 text-center text-2xl font-bold text-primary">History of My Winnings</h2>
+        <p className="text-base">Please login to Metamask to see your winnings.</p>
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-        History of My Winnings
-      </Typography>
+      <h2 className="mb-8 text-center text-2xl font-bold text-primary">History of My Winnings</h2>
 
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <p className="text-lg font-semibold">Loading...</p>
       ) : error ? (
-        <Typography variant="h6" color="error">
-          {error}
-        </Typography>
+        <p className="text-lg font-semibold text-destructive">{error}</p>
       ) : !winningHistory || winningHistory.length === 0 ? (
-        <Typography variant="subtitle1">You currently have no recorded winnings.</Typography>
+        <p className="text-base">You currently have no recorded winnings.</p>
       ) : (
         <WinningHistoryTable
           winningHistory={winningHistory}

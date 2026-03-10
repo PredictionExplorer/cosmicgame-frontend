@@ -1,27 +1,18 @@
 'use client';
 
-import { Typography } from '@mui/material';
-
 import { MainWrapper } from '@/components/styled';
 import DonatedNFTTable, { type NFTRecord } from '@/components/donations/DonatedNFTTable';
 import { useDonationsNFTList } from '@/hooks/useApiQuery';
 
-/**
- * NFTDonationsPage: A page component that fetches and displays NFT donations.
- */
 const NFTDonationsPage = () => {
   const { data: nftDonations = null } = useDonationsNFTList();
 
   return (
     <MainWrapper>
-      {/* Page Title */}
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={4}>
-        NFT Donations
-      </Typography>
+      <h4 className="text-2xl font-bold text-primary text-center mb-8">NFT Donations</h4>
 
-      {/* Conditionally render loading text or the DonatedNFTTable */}
       {nftDonations === null ? (
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
         <DonatedNFTTable
           list={(nftDonations ?? []) as NFTRecord[]}

@@ -1,52 +1,41 @@
-import { Link, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { shortenHex } from '@/utils';
 
-import { shortenHex } from '@/utils'; // Utility function to shorten hex address
-import { MARKETING_WALLET_ADDRESS } from '@/config/networks'; // Marketing wallet address from config
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { MARKETING_WALLET_ADDRESS } from '@/config/networks';
 
-// AddressLink component to display a formatted link with address
 export const AddressLink = ({ address, url }: { address: string; url: string }) => {
-  const theme = useTheme();
-  const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
+  const displayText = address === MARKETING_WALLET_ADDRESS ? 'Marketing Wallet' : address;
+  const shortText =
+    address === MARKETING_WALLET_ADDRESS ? 'Marketing Wallet' : shortenHex(address, 6);
 
-  // Conditional rendering based on whether the user is on mobile or desktop
   return (
     <>
-      {isMobileView ? (
-        // If on mobile, show the address inside a tooltip for better UX
-        <Tooltip title={address}>
-          <Link
-            href={url} // The link directs to the provided URL
-            target="_blank" // Opens the link in a new tab
-            style={{
-              color: 'inherit', // Inherit text color
-              fontSize: 'inherit', // Inherit font size
-              fontFamily: 'monospace', // Monospace font for address appearance
-            }}
-          >
-            {/* Conditionally render 'Marketing Wallet' text for specific address */}
-            {address === MARKETING_WALLET_ADDRESS
-              ? 'Marketing Wallet' // Display 'Marketing Wallet' if it matches the marketing address
-              : shortenHex(address, 6)}
-            {/* Shorten address to first 6 characters */}
-          </Link>
-        </Tooltip>
-      ) : (
-        // If not on mobile, just display the full address as a link
-        <Link
-          href={url}
-          style={{
-            color: 'inherit', // Inherit text color
-            fontSize: 'inherit', // Inherit font size
-            fontFamily: 'monospace', // Monospace font for address appearance
-          }}
-        >
-          {/* Conditionally render 'Marketing Wallet' text or the full address */}
-          {address === MARKETING_WALLET_ADDRESS
-            ? 'Marketing Wallet' // Display 'Marketing Wallet' if it matches the marketing address
-            : address}
-          {/* Otherwise, display the full address */}
-        </Link>
-      )}
+      {/* Mobile: tooltip with shortened address */}
+      <span className="sm:hidden">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={url}
+                target="_blank"
+                className="font-mono [color:inherit] [font-size:inherit]"
+              >
+                {shortText}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{address}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </span>
+
+      {/* Desktop: full address */}
+      <a
+        href={url}
+        target="_blank"
+        className="hidden font-mono [color:inherit] [font-size:inherit] sm:inline"
+      >
+        {displayText}
+      </a>
     </>
   );
 };

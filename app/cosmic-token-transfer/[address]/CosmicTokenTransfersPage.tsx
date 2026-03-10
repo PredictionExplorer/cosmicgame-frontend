@@ -1,9 +1,12 @@
 'use client';
 
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { useState } from 'react';
-import { Link, TableBody, Tooltip, Typography } from '@mui/material';
 import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
+
+import { getExplorerUrl, convertTimestampToDateTime, isWalletAddress } from '@/utils';
 
 import {
   MainWrapper,
@@ -14,17 +17,11 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime, isWalletAddress } from '@/utils';
 import { useCTTransfers } from '@/hooks/useApiQuery';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 
-/* ------------------------------------------------------------------
-  Sub-Component: CosmicTokenTransferRow
-  Renders a single row in the transfer table.
------------------------------------------------------------------- */
 interface TokenTransferRow {
   EvtLogId: number;
   TxHash: string;
@@ -42,36 +39,36 @@ const CosmicTokenTransferRow = ({ row }: { row: TokenTransferRow }) => {
     return <TablePrimaryRow />;
   }
 
-  const rowStyle = (row.TransferType ?? 0) > 0 ? { background: 'rgba(255, 255, 255, 0.06)' } : {};
-
   return (
-    <TablePrimaryRow sx={rowStyle}>
+    <TablePrimaryRow className={(row.TransferType ?? 0) > 0 ? 'bg-white/[0.06]' : ''}>
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit text-[length:inherit]"
           href={getExplorerUrl('tx', row.TxHash)}
           target="_blank"
           rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(row.TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
         {isWalletAddress(row.FromAddr ?? '') !== '' ? (
-          <Tooltip title={row.FromAddr ?? ''}>
-            <Link
-              color="inherit"
-              fontSize="inherit"
-              fontFamily="monospace"
-              href={`/user/${row.FromAddr}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {isWalletAddress(row.FromAddr ?? '')}
-            </Link>
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  className="text-inherit text-[length:inherit] font-mono"
+                  href={`/user/${row.FromAddr}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {isWalletAddress(row.FromAddr ?? '')}
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>{row.FromAddr ?? ''}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ) : (
           <AddressLink address={row.FromAddr ?? ''} url={`/user/${row.FromAddr}`} />
         )}
@@ -79,18 +76,21 @@ const CosmicTokenTransferRow = ({ row }: { row: TokenTransferRow }) => {
 
       <TablePrimaryCell align="center">
         {isWalletAddress(row.ToAddr ?? '') !== '' ? (
-          <Tooltip title={row.ToAddr ?? ''}>
-            <Link
-              color="inherit"
-              fontSize="inherit"
-              fontFamily="monospace"
-              href={`/user/${row.ToAddr}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {isWalletAddress(row.ToAddr ?? '')}
-            </Link>
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  className="text-inherit text-[length:inherit] font-mono"
+                  href={`/user/${row.ToAddr}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {isWalletAddress(row.ToAddr ?? '')}
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>{row.ToAddr ?? ''}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         ) : (
           <AddressLink address={row.ToAddr ?? ''} url={`/user/${row.ToAddr}`} />
         )}
@@ -101,16 +101,12 @@ const CosmicTokenTransferRow = ({ row }: { row: TokenTransferRow }) => {
   );
 };
 
-/* ------------------------------------------------------------------
-  Sub-Component: CosmicTokenTransfersTable
-  Displays a paginated table of Cosmic Token transfers.
------------------------------------------------------------------- */
 const CosmicTokenTransfersTable = ({ list }: { list: TokenTransferRow[] }) => {
   const perPage = 10;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <Typography variant="h6">No transfers yet.</Typography>;
+    return <p className="text-lg font-semibold">No transfers yet.</p>;
   }
 
   const currentPageData = list.slice((page - 1) * perPage, page * perPage);
@@ -128,11 +124,11 @@ const CosmicTokenTransfersTable = ({ list }: { list: TokenTransferRow[] }) => {
             </Tr>
           </TablePrimaryHead>
 
-          <TableBody>
+          <tbody>
             {currentPageData.map((row) => (
               <CosmicTokenTransferRow key={row.EvtLogId} row={row} />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
@@ -141,9 +137,6 @@ const CosmicTokenTransfersTable = ({ list }: { list: TokenTransferRow[] }) => {
   );
 };
 
-/* ------------------------------------------------------------------
-  Main Page Component: CosmicTokenTransfersPage
------------------------------------------------------------------- */
 const CosmicTokenTransfersPage = ({ address: rawAddress }: { address: string }) => {
   let address = rawAddress;
 
@@ -157,12 +150,12 @@ const CosmicTokenTransfersPage = ({ address: rawAddress }: { address: string }) 
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
+      <h2 className="text-2xl font-bold text-primary text-center mb-8">
         Cosmic Signature Token Transfers
-      </Typography>
+      </h2>
 
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <p className="text-lg font-semibold">Loading...</p>
       ) : (
         <CosmicTokenTransfersTable list={(cosmicTokenTransfers ?? []) as TokenTransferRow[]} />
       )}

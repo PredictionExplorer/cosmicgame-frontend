@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { Badge } from '@mui/material';
 
 export interface NavDescriptor {
   title: string | ReactNode;
@@ -45,9 +44,12 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
   ) {
     NAVS.push({
       title: (
-        <Badge badgeContent="$" color="error">
+        <span className="relative inline-flex">
           Claim
-        </Badge>
+          <span className="absolute -top-2 -right-3 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+            $
+          </span>
+        </span>
       ),
       route: '/my-winnings',
     });

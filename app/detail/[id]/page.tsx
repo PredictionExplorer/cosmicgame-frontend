@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import axios from 'axios';
 
-import { cosmicGameBaseUrl } from '@/services/api';
 import { getAssetsUrl } from '@/utils';
+
+import { cosmicGameBaseUrl } from '@/services/api';
 import { createMetadata } from '@/utils/seo';
 
 import DetailPage from './DetailPage';

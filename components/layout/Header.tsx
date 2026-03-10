@@ -2,22 +2,11 @@
 
 import { useState, useEffect, useMemo, type FC } from 'react';
 import Image from 'next/image';
-import {
-  Toolbar,
-  IconButton,
-  Drawer,
-  ListItem,
-  Container,
-  Link,
-  Typography,
-  Box,
-  Divider,
-  Grid,
-  Badge,
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import Link from 'next/link';
+import { Menu } from 'lucide-react';
 import { formatEther } from 'viem';
 
+import { cn } from '@/lib/utils';
 import getNAVs from '@/config/nav';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { AppBarWrapper, DrawerList } from '@/components/styled';
@@ -29,10 +18,10 @@ import { useUserBalance, useUserInfo } from '@/hooks/useApiQuery';
 import { useStakedToken } from '@/contexts/StakedTokenContext';
 import { useSystemMode } from '@/contexts/SystemModeContext';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { Separator } from '@/components/ui/separator';
 
-/**
- * Interface representing the structure of a user’s balance.
- */
 interface Balance {
   CosmicToken: number;
   ETH: number;
@@ -40,32 +29,17 @@ interface Balance {
   RWLK: number;
 }
 
-/**
- * The Header component is responsible for displaying the top navigation bar,
- * handling both desktop and mobile viewports. It also fetches and displays
- * user balances, staked tokens, and system mode notifications.
- */
 const Header: FC = () => {
-  // State to check if the screen is in mobile view
   const [mobileView, setMobileView] = useState<boolean>(false);
-
-  // State to control the open/close status of the mobile drawer
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
-  // Pull in global API data from context
   const { apiData: status } = useApiData();
-
-  // Active Web3 account info
   const { account } = useActiveWeb3React();
-
-  // Contract to fetch user RWLK NFTs
   const nftContract = useRWLKNFTContract();
 
-  // User balance and info from React Query (with refetchInterval: 30s)
   const { data: userBalance, isLoading: isLoadingBalance } = useUserBalance(account);
   const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo(account);
 
-  // RWLK token count from NFT contract (not from API)
   const [rwlkCount, setRwlkCount] = useState<number>(0);
   useEffect(() => {
     if (!account || !nftContract) return;
@@ -84,7 +58,6 @@ const Header: FC = () => {
     return () => clearInterval(intervalId);
   }, [account, nftContract]);
 
-  // Derived balance from API data + contract
   const balance = useMemo<Balance>(
     () => ({
       CosmicToken: userBalance ? Number(formatEther(BigInt(userBalance.CosmicTokenBalance))) : 0,
@@ -97,22 +70,17 @@ const Header: FC = () => {
 
   const loading = (!!account && !!nftContract && (isLoadingBalance || isLoadingUserInfo)) || false;
 
-  // Staked tokens from context
   const { cstokens: stakedCSTokens, rwlktokens: stakedRWLKTokens } = useStakedToken();
 
-  // System mode data (e.g., maintenance)
   const systemModeCtx = useSystemMode();
   const systemMode = systemModeCtx?.data ?? 0;
 
-  /**
-   * Adjust mobileView based on window width changes.
-   */
   useEffect(() => {
     const handleWindowResize = () => {
       setMobileView(window.innerWidth < 1024);
     };
 
-    handleWindowResize(); // Initial check on mount
+    handleWindowResize();
 
     window.addEventListener('resize', handleWindowResize);
     return () => {
@@ -120,29 +88,20 @@ const Header: FC = () => {
     };
   }, []);
 
-  // Dynamically retrieve navigation links based on user status and account
   const navs = getNAVs(status, account);
 
-  // Handlers to open/close the mobile drawer
   const handleDrawerOpen = () => setDrawerOpen(true);
-  const handleDrawerClose = () => setDrawerOpen(false);
 
-  /**
-   * Renders the navigation bar for desktop view.
-   */
   const renderDesktop = () => (
-    <Toolbar disableGutters>
-      {/* Logo link */}
+    <nav className="flex items-center">
       <Link href="/">
         <Image src="/images/logo2.svg" width={48} height={48} alt="logo" />
       </Link>
 
-      {/* Navigation items */}
       {navs.map((nav, i) => (
         <ListNavItem key={i} nav={nav} />
       ))}
 
-      {/* Connect Wallet button (desktop) */}
       <ConnectWalletButton
         isMobileView={false}
         loading={loading}
@@ -152,14 +111,10 @@ const Header: FC = () => {
           rwalk: stakedRWLKTokens?.length,
         }}
       />
-    </Toolbar>
+    </nav>
   );
 
-  /**
-   * Renders the navigation bar for mobile view, including a drawer.
-   */
   const renderMobile = () => {
-    // Check if user has any claimable notifications
     const hasNotifications =
       account &&
       (status?.ETHRaffleToClaim > 0 ||
@@ -167,232 +122,156 @@ const Header: FC = () => {
         (status?.UnclaimedStakingReward > 0 && (status?.claimableActionIds?.length ?? 0) > 0));
 
     return (
-      <Toolbar>
-        {/* Mobile menu icon */}
-        <IconButton
+      <nav className="flex items-center">
+        <Button
+          variant="ghost"
+          size="icon"
           aria-label="menu"
           aria-haspopup="true"
-          edge="start"
-          color="inherit"
           onClick={handleDrawerOpen}
-          style={{ marginRight: '8px' }}
+          className="mr-2"
         >
           {hasNotifications ? (
-            <Badge variant="dot" color="error">
-              <MenuIcon />
-            </Badge>
+            <span className="relative inline-flex">
+              <Menu className="h-6 w-6" />
+              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-destructive" />
+            </span>
           ) : (
-            <MenuIcon />
+            <Menu className="h-6 w-6" />
           )}
-        </IconButton>
+        </Button>
 
-        {/* Logo link */}
         <Link href="/">
           <Image src="/images/logo2.svg" width={48} height={48} alt="logo" />
         </Link>
 
-        {/* Drawer for mobile navigation */}
-        <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerClose}>
-          <DrawerList>
-            <ListItem>
-              <ConnectWalletButton
-                isMobileView
-                balance={balance}
-                loading={loading}
-                stakedTokenCount={{
-                  cst: stakedCSTokens?.length,
-                  rwalk: stakedRWLKTokens?.length,
-                }}
-              />
-            </ListItem>
-
-            {/* Navigation items */}
-            {navs.map((nav, i) => (
-              <ListItemButton key={i} nav={nav} />
-            ))}
-
-            {/* Additional links and balance details if account is connected */}
-            {account && (
-              <>
-                <Divider />
-
-                <ListItemButton nav={{ title: 'My Statistics', route: '/my-statistics' }} />
-                <ListItemButton nav={{ title: 'My Tokens', route: '/my-tokens' }} />
-                <ListItemButton nav={{ title: 'My Staking', route: '/my-staking' }} />
-                <ListItemButton
-                  nav={{
-                    title: 'History of Winnings',
-                    route: '/winning-history',
+        <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <SheetContent side="left" className="w-[265px] p-0 sm:max-w-[265px]">
+            <SheetTitle className="sr-only">Navigation</SheetTitle>
+            <DrawerList>
+              <div className="px-4 py-2">
+                <ConnectWalletButton
+                  isMobileView
+                  balance={balance}
+                  loading={loading}
+                  stakedTokenCount={{
+                    cst: stakedCSTokens?.length,
+                    rwalk: stakedRWLKTokens?.length,
                   }}
                 />
+              </div>
 
-                <Divider />
+              {navs.map((nav, i) => (
+                <ListItemButton key={i} nav={nav} />
+              ))}
 
-                <ListItem sx={{ display: 'block' }}>
-                  <Typography sx={{ fontSize: 16 }}>BALANCE:</Typography>
-                  {loading ? (
-                    <Typography color="primary">Loading...</Typography>
-                  ) : (
-                    <>
-                      {/* ETH Balance */}
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          mt: 1,
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          color="secondary"
-                          sx={{ fontStyle: 'italic', fontWeight: 600 }}
-                        >
-                          ETH:
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="secondary"
-                          sx={{ fontStyle: 'italic', fontWeight: 600 }}
-                        >
-                          {balance.ETH.toFixed(2)}
-                        </Typography>
-                      </Box>
+              {account && (
+                <>
+                  <Separator />
 
-                      {/* CosmicToken (ERC20) Balance */}
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          mt: 1,
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          color="secondary"
-                          sx={{ fontStyle: 'italic', fontWeight: 600 }}
-                        >
-                          CST (ERC20):
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="secondary"
-                          sx={{ fontStyle: 'italic', fontWeight: 600 }}
-                        >
-                          {balance.CosmicToken.toFixed(2)}
-                        </Typography>
-                      </Box>
+                  <ListItemButton nav={{ title: 'My Statistics', route: '/my-statistics' }} />
+                  <ListItemButton nav={{ title: 'My Tokens', route: '/my-tokens' }} />
+                  <ListItemButton nav={{ title: 'My Staking', route: '/my-staking' }} />
+                  <ListItemButton
+                    nav={{
+                      title: 'History of Winnings',
+                      route: '/winning-history',
+                    }}
+                  />
 
-                      {/* CosmicSignature (ERC721) Balance */}
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          mt: 1,
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          color="secondary"
-                          sx={{ fontStyle: 'italic', fontWeight: 600 }}
-                        >
-                          CS NFT (ERC721):
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="secondary"
-                          sx={{ fontStyle: 'italic', fontWeight: 600 }}
-                        >
-                          {balance.CosmicSignature} tokens
-                        </Typography>
-                      </Box>
+                  <Separator />
 
-                      {/* RWLK (ERC721) Balance */}
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          mt: 1,
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          color="secondary"
-                          sx={{ fontStyle: 'italic', fontWeight: 600 }}
-                        >
-                          RWLK (ERC721):
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="secondary"
-                          sx={{ fontStyle: 'italic', fontWeight: 600 }}
-                        >
-                          {balance.RWLK} tokens
-                        </Typography>
-                      </Box>
-                    </>
-                  )}
-                </ListItem>
+                  <div className="block px-4 py-2">
+                    <p className="text-base text-foreground">BALANCE:</p>
+                    {loading ? (
+                      <p className="text-primary">Loading...</p>
+                    ) : (
+                      <>
+                        <div className="mt-2 flex justify-between">
+                          <span className="text-sm italic font-semibold text-secondary">ETH:</span>
+                          <span className="text-sm italic font-semibold text-secondary">
+                            {balance.ETH.toFixed(2)}
+                          </span>
+                        </div>
 
-                <Divider />
+                        <div className="mt-2 flex justify-between">
+                          <span className="text-sm italic font-semibold text-secondary">
+                            CST (ERC20):
+                          </span>
+                          <span className="text-sm italic font-semibold text-secondary">
+                            {balance.CosmicToken.toFixed(2)}
+                          </span>
+                        </div>
 
-                {/* Staked token counts */}
-                <ListItem sx={{ justifyContent: 'space-between' }}>
-                  <Typography sx={{ fontSize: 16 }}>STAKED CST NFT:</Typography>
-                  <Typography color="secondary" sx={{ fontSize: 16, fontWeight: 600 }}>
-                    {stakedCSTokens?.length}
-                  </Typography>
-                </ListItem>
-                <ListItem sx={{ justifyContent: 'space-between' }}>
-                  <Typography sx={{ fontSize: 16 }}>STAKED RWALK NFT:</Typography>
-                  <Typography color="secondary" sx={{ fontSize: 16, fontWeight: 600 }}>
-                    {stakedRWLKTokens?.length}
-                  </Typography>
-                </ListItem>
-              </>
-            )}
-          </DrawerList>
-        </Drawer>
-      </Toolbar>
+                        <div className="mt-2 flex justify-between">
+                          <span className="text-sm italic font-semibold text-secondary">
+                            CS NFT (ERC721):
+                          </span>
+                          <span className="text-sm italic font-semibold text-secondary">
+                            {balance.CosmicSignature} tokens
+                          </span>
+                        </div>
+
+                        <div className="mt-2 flex justify-between">
+                          <span className="text-sm italic font-semibold text-secondary">
+                            RWLK (ERC721):
+                          </span>
+                          <span className="text-sm italic font-semibold text-secondary">
+                            {balance.RWLK} tokens
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  <div className="flex items-center justify-between px-4 py-2">
+                    <p className="text-base text-foreground">STAKED CST NFT:</p>
+                    <p className="text-base font-semibold text-secondary">
+                      {stakedCSTokens?.length}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between px-4 py-2">
+                    <p className="text-base text-foreground">STAKED RWALK NFT:</p>
+                    <p className="text-base font-semibold text-secondary">
+                      {stakedRWLKTokens?.length}
+                    </p>
+                  </div>
+                </>
+              )}
+            </DrawerList>
+          </SheetContent>
+        </Sheet>
+      </nav>
     );
   };
 
   return (
-    <AppBarWrapper position="fixed">
-      <Container>
-        {/* Maintenance pending / active warning banner */}
+    <AppBarWrapper>
+      <div className="mx-auto w-full max-w-7xl px-4">
         {systemMode > 0 && (
-          <Box
-            sx={{
-              position: 'fixed',
-              top: mobileView ? '88px' : '96px',
-              left: 0,
-              right: 0,
-              background: '#F3D217',
-              color: '#000',
-              px: 4,
-              py: 1,
-            }}
+          <div
+            className={cn(
+              'fixed left-0 right-0 bg-[#F3D217] px-8 py-2 text-black',
+              mobileView ? 'top-[88px]' : 'top-[96px]',
+            )}
           >
-            <Grid container>
-              <Grid size={{ sm: 12, md: 8 }}>
-                <Typography variant="body1">
-                  {systemMode === 1
-                    ? 'The system will enter maintenance mode as soon as prize claim transaction is executed. The administrator will make adjustments to the parameters of the system and after that you will be able to play again.'
-                    : 'The system is in maintenance mode. The administrator will make adjustments to the parameters of the system and after that you will be able to play again.'}
-                </Typography>
-              </Grid>
-              <Grid size={{ sm: 12, md: 4 }} sx={{ alignSelf: 'center' }}>
-                <Typography variant="h5" textAlign="center">
-                  {systemMode === 1 ? 'MAINTENANCE PENDING' : 'MAINTENANCE MODE'}
-                </Typography>
-              </Grid>
-            </Grid>
-          </Box>
+            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr]">
+              <p className="text-base">
+                {systemMode === 1
+                  ? 'The system will enter maintenance mode as soon as prize claim transaction is executed. The administrator will make adjustments to the parameters of the system and after that you will be able to play again.'
+                  : 'The system is in maintenance mode. The administrator will make adjustments to the parameters of the system and after that you will be able to play again.'}
+              </p>
+              <h5 className="self-center text-center text-xl font-bold">
+                {systemMode === 1 ? 'MAINTENANCE PENDING' : 'MAINTENANCE MODE'}
+              </h5>
+            </div>
+          </div>
         )}
 
-        {/* Conditionally render desktop or mobile layout */}
         {mobileView ? renderMobile() : renderDesktop()}
-      </Container>
+      </div>
     </AppBarWrapper>
   );
 };

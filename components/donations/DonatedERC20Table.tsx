@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Button, Link, TableBody, Tooltip, Typography } from '@mui/material';
+import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
+
+import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
 
 import {
   TablePrimary,
@@ -10,7 +12,8 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
@@ -54,65 +57,64 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
 
   return (
     <TablePrimaryRow>
-      {/* Timestamp */}
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit text-[inherit]"
           href={getExplorerUrl('tx', token.TxHash)}
           target="_blank"
+          rel="noreferrer"
         >
           {convertTimestampToDateTime(token.TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
 
-      {/* Round Number */}
       <TablePrimaryCell align="center">
         <Link
           href={`/prize/${token.RoundNum}`}
-          style={{ color: 'inherit', fontSize: 'inherit' }}
+          className="text-inherit text-[inherit]"
           target="_blank"
         >
           {token.RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      {/* Token Address */}
       <TablePrimaryCell>
-        <Tooltip title={token.TokenAddr}>
-          <Link
-            href={getExplorerUrl('address', token.TokenAddr)}
-            style={{
-              color: 'inherit',
-              fontSize: 'inherit',
-              fontFamily: 'monospace',
-            }}
-            target="_blank"
-          >
-            {shortenHex(token.TokenAddr, 6)}
-          </Link>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={getExplorerUrl('address', token.TokenAddr)}
+                className="text-inherit text-[inherit] font-mono"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {shortenHex(token.TokenAddr, 6)}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{token.TokenAddr}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{token.AmountDonatedEth.toFixed(2)}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">{token.AmountClaimedEth.toFixed(2)}</TablePrimaryCell>
 
-      {/* Winner Address */}
       <TablePrimaryCell>
-        <Tooltip title={token.WinnerAddr}>
-          <Link
-            href={`/user/${token.WinnerAddr}`}
-            style={{
-              color: 'inherit',
-              fontSize: 'inherit',
-              fontFamily: 'monospace',
-            }}
-            target="_blank"
-          >
-            {shortenHex(token.WinnerAddr, 6)}
-          </Link>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href={`/user/${token.WinnerAddr}`}
+                className="text-inherit text-[inherit] font-mono"
+                target="_blank"
+              >
+                {shortenHex(token.WinnerAddr, 6)}
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>{token.WinnerAddr}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{token.Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
@@ -124,12 +126,10 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
           : `(${formatSeconds(roundTimeoutTimesToWithdrawPrizes - currentTime)} left)`}
       </TablePrimaryCell>
 
-      {/* Claim Button */}
       {handleClaim && roundTimeoutTimesToWithdrawPrizes < currentTime && (
         <TablePrimaryCell>
           {!token.Claimed && (
             <Button
-              variant="contained"
               onClick={() => handleClaim(token.RoundNum, token.TokenAddr, token.DonateClaimDiffEth)}
               data-testid="Claim Button"
             >
@@ -147,9 +147,6 @@ interface DonatedERC20TableProps {
   handleClaim: ((roundNum: number, tokenAddr: string, amount: string) => void) | null;
 }
 
-// ----------------------------
-// Main Table Component
-// ----------------------------
 const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
@@ -166,7 +163,7 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
   }, []);
 
   if (!list || list.length === 0) {
-    return <Typography>No donated ERC20 tokens yet.</Typography>;
+    return <p>No donated ERC20 tokens yet.</p>;
   }
 
   return (
@@ -186,7 +183,7 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
               {handleClaim && <TablePrimaryHeadCell></TablePrimaryHeadCell>}
             </Tr>
           </TablePrimaryHead>
-          <TableBody>
+          <tbody>
             {list.slice((page - 1) * perPage, page * perPage).map((token, i) => (
               <TokenRow
                 key={page * perPage + i}
@@ -195,11 +192,10 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
                 handleClaim={handleClaim}
               />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Pagination */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

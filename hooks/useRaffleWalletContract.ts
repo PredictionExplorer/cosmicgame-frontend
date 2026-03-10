@@ -1,5 +1,6 @@
-import { RAFFLE_WALLET_ADDRESS } from '@/config/networks';
 import { prizesWalletAbi } from '@/contracts/abis';
+
+import { RAFFLE_WALLET_ADDRESS } from '@/config/networks';
 
 import useContract from './useContract';
 

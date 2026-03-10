@@ -12,8 +12,9 @@ import {
 } from '@progress/kendo-react-charts';
 import '@progress/kendo-theme-default/dist/all.css';
 
-import { MARKETING_WALLET_ADDRESS } from '@/config/networks';
 import { shortenHex } from '@/utils';
+
+import { MARKETING_WALLET_ADDRESS } from '@/config/networks';
 
 /** Maximum number of individual addresses to highlight before grouping the rest */
 const DISPLAY_LIMIT = 9;

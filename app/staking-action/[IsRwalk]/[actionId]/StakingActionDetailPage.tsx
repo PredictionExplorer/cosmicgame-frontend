@@ -1,17 +1,14 @@
 'use client';
 
-import { Box, CardActionArea, Grid, Link, Typography } from '@mui/material';
+import Link from 'next/link';
+
+import { getExplorerUrl, getAssetsUrl, getRWLKImageUrl, convertTimestampToDateTime } from '@/utils';
 
 import { MainWrapper, StyledCard } from '@/components/styled';
 import type { StakingAction } from '@/services/api/types';
 import NFTImage from '@/components/nft/NFTImage';
-import { getExplorerUrl, getAssetsUrl, getRWLKImageUrl, convertTimestampToDateTime } from '@/utils';
 import { useStakingRWLKActionsInfo, useStakingCSTActionsInfo } from '@/hooks/useApiQuery';
 
-/* ------------------------------------------------------------------
-  Sub-Component: TokenInfoPanel
-  Renders the left side panel with token image and basic info
------------------------------------------------------------------- */
 interface TokenInfoPanelProps {
   isRwalk: boolean;
   actionId: number;
@@ -20,66 +17,49 @@ interface TokenInfoPanelProps {
 function TokenInfoPanel({ isRwalk, actionId, stake }: TokenInfoPanelProps) {
   const { TokenId, Seed, StakerAddr } = stake;
 
-  // Build image URL
   const tokenImageURL = isRwalk
     ? getRWLKImageUrl(TokenId.toString().padStart(6, '0'))
     : getAssetsUrl(`cosmicsignature/0x${Seed}.png`);
 
-  // Build link to NFT detail
   const tokenDetailHref = isRwalk
     ? `https://randomwalknft.com/detail/${TokenId}`
     : `/detail/${TokenId}`;
 
   return (
-    <Grid size={{ sm: 12, md: 6 }}>
-      <Box sx={{ maxWidth: '400px', mb: 2 }}>
+    <div className="w-full md:w-1/2">
+      <div className="mb-4 max-w-[400px]">
         <StyledCard>
-          <CardActionArea>
-            <Link href={tokenDetailHref} sx={{ display: 'block' }}>
-              <NFTImage src={tokenImageURL} />
-            </Link>
-          </CardActionArea>
+          <Link href={tokenDetailHref} className="block">
+            <NFTImage src={tokenImageURL} />
+          </Link>
         </StyledCard>
-      </Box>
+      </div>
 
-      {/* Basic Info */}
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Action Id:
-        </Typography>
+      <div className="mb-2">
+        <span className="text-primary">Action Id:</span>
         &nbsp;
-        <Typography component="span">{actionId}</Typography>
-      </Box>
+        <span>{actionId}</span>
+      </div>
 
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Staker Address:
-        </Typography>
+      <div className="mb-2">
+        <span className="text-primary">Staker Address:</span>
         &nbsp;
-        <Link href={`/user/${StakerAddr}`} style={{ color: 'inherit', wordBreak: 'break-all' }}>
-          <Typography component="span" fontFamily="monospace">
-            {StakerAddr}
-          </Typography>
+        <Link href={`/user/${StakerAddr}`} className="break-all text-inherit">
+          <span className="font-mono">{StakerAddr}</span>
         </Link>
-      </Box>
+      </div>
 
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Token Id:
-        </Typography>
+      <div className="mb-2">
+        <span className="text-primary">Token Id:</span>
         &nbsp;
-        <Link href={tokenDetailHref} style={{ color: 'inherit' }}>
-          <Typography component="span">{TokenId}</Typography>
+        <Link href={tokenDetailHref} className="text-inherit">
+          <span>{TokenId}</span>
         </Link>
-      </Box>
-    </Grid>
+      </div>
+    </div>
   );
 }
 
-/* ------------------------------------------------------------------
-  Sub-Component: StakeInfo
-  Renders the "Stake" section data
------------------------------------------------------------------- */
 interface StakeInfoProps {
   stake: StakingAction;
 }
@@ -87,77 +67,61 @@ function StakeInfo({ stake }: StakeInfoProps) {
   const { TxHash, TimeStamp, NumStakedNFTs } = stake;
 
   return (
-    <Box>
-      <Typography variant="h6">Stake</Typography>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Staked Datetime:
-        </Typography>
+    <div>
+      <h4 className="text-lg font-semibold">Stake</h4>
+      <div className="mb-2">
+        <span className="text-primary">Staked Datetime:</span>
         &nbsp;
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
+          rel="noopener noreferrer"
         >
-          <Typography component="span">{convertTimestampToDateTime(TimeStamp)}</Typography>
-        </Link>
-      </Box>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Number of Staked Tokens:
-        </Typography>
+          <span>{convertTimestampToDateTime(TimeStamp)}</span>
+        </a>
+      </div>
+      <div className="mb-2">
+        <span className="text-primary">Number of Staked Tokens:</span>
         &nbsp;
-        <Typography component="span">{NumStakedNFTs}</Typography>
-      </Box>
-    </Box>
+        <span>{NumStakedNFTs}</span>
+      </div>
+    </div>
   );
 }
 
-/* ------------------------------------------------------------------
-  Sub-Component: UnstakeInfo
-  Renders the "Unstake" section data (shown only if EvtLogId !== 0)
------------------------------------------------------------------- */
 interface UnstakeInfoProps {
   unstake: StakingAction;
 }
 function UnstakeInfo({ unstake }: UnstakeInfoProps) {
   const { EvtLogId, TxHash, TimeStamp, NumStakedNFTs } = unstake;
 
-  // If no EvtLog, means not unstaked yet
   if (!EvtLogId || EvtLogId === 0) return null;
 
   return (
-    <Box mt={2}>
-      <Typography variant="h6">Unstake</Typography>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Unstaked Datetime:
-        </Typography>
+    <div className="mt-4">
+      <h4 className="text-lg font-semibold">Unstake</h4>
+      <div className="mb-2">
+        <span className="text-primary">Unstaked Datetime:</span>
         &nbsp;
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
+          rel="noopener noreferrer"
         >
-          <Typography component="span">{convertTimestampToDateTime(TimeStamp)}</Typography>
-        </Link>
-      </Box>
-      <Box mb={1}>
-        <Typography color="primary" component="span">
-          Number of Staked Tokens:
-        </Typography>
+          <span>{convertTimestampToDateTime(TimeStamp)}</span>
+        </a>
+      </div>
+      <div className="mb-2">
+        <span className="text-primary">Number of Staked Tokens:</span>
         &nbsp;
-        <Typography component="span">{NumStakedNFTs}</Typography>
-      </Box>
-    </Box>
+        <span>{NumStakedNFTs}</span>
+      </div>
+    </div>
   );
 }
 
-/* ------------------------------------------------------------------
-  Main Component: StakingActionDetailPage
------------------------------------------------------------------- */
 function StakingActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; actionId: number }) {
   const isRwalk = Boolean(IsRwalk);
 
@@ -169,31 +133,27 @@ function StakingActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; actio
 
   return (
     <MainWrapper>
-      <Box mb={4}>
-        <Typography variant="h5" color="primary" component="span" mr={2}>
+      <div className="mb-8">
+        <span className="mr-4 text-xl font-semibold text-primary">
           {`Staking Action for ${isRwalk ? 'RandomWalk' : 'Cosmic Signature'} Token`}
-        </Typography>
-      </Box>
+        </span>
+      </div>
 
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <p className="text-lg font-semibold">Loading...</p>
       ) : error ? (
-        <Typography variant="h6" color="error">
-          {error}
-        </Typography>
+        <p className="text-lg font-semibold text-destructive">{error}</p>
       ) : actionInfo ? (
-        <Grid container spacing={4}>
-          {/* Left Panel: Token Info */}
+        <div className="flex flex-wrap gap-8">
           <TokenInfoPanel isRwalk={isRwalk} actionId={actionId} stake={actionInfo.Stake!} />
 
-          {/* Right Panel: Stake & Unstake Info */}
-          <Grid size={{ sm: 12, md: 6 }}>
+          <div className="w-full md:w-1/2">
             <StakeInfo stake={actionInfo.Stake!} />
             <UnstakeInfo unstake={actionInfo.Unstake!} />
-          </Grid>
-        </Grid>
+          </div>
+        </div>
       ) : (
-        <Typography>No data found for this staking action.</Typography>
+        <p>No data found for this staking action.</p>
       )}
     </MainWrapper>
   );

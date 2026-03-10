@@ -6,17 +6,13 @@ import type { ISourceOptions } from '@tsparticles/engine';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { CacheProvider } from '@emotion/react';
 import { CookiesProvider } from 'react-cookie';
+import { Toaster } from 'sonner';
 
 import { wagmiConfig } from '@/config/wagmi';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import createEmotionCache from '@/utils/createEmotionCache';
-import theme from '@/config/styles';
 import { StakedTokenProvider } from '@/contexts/StakedTokenContext';
 import { SystemModeProvider } from '@/contexts/SystemModeContext';
 import { ApiDataProvider } from '@/contexts/ApiDataContext';
@@ -27,7 +23,6 @@ const Particles = dynamic(
   { ssr: false },
 );
 
-const emotionCache = createEmotionCache();
 const queryClient = new QueryClient();
 
 const particleOptions = {
@@ -96,42 +91,44 @@ export function Providers({ children }: { children: ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={darkTheme()}>
-          <CacheProvider value={emotionCache}>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              {engineReady && (
-                <Particles
-                  id="tsparticles"
-                  options={particleOptions as unknown as ISourceOptions}
-                  style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    zIndex: 0,
-                  }}
-                  aria-hidden="true"
-                />
-              )}
-              <ErrorBoundary>
-                {/* @ts-expect-error TS2786 - react-cookie CookiesProvider has React 18 types incompatible with React 19 */}
-                <CookiesProvider>
-                  <StakedTokenProvider>
-                    <SystemModeProvider>
-                      <ApiDataProvider>
-                        <NotificationProvider>
-                          <Header />
-                          <ErrorBoundary>{children}</ErrorBoundary>
-                          <Footer />
-                        </NotificationProvider>
-                      </ApiDataProvider>
-                    </SystemModeProvider>
-                  </StakedTokenProvider>
-                </CookiesProvider>
-              </ErrorBoundary>
-            </ThemeProvider>
-          </CacheProvider>
+          {engineReady && (
+            <Particles
+              id="tsparticles"
+              options={particleOptions as unknown as ISourceOptions}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                zIndex: 0,
+              }}
+              aria-hidden="true"
+            />
+          )}
+          <ErrorBoundary>
+            {/* @ts-expect-error TS2786 - react-cookie CookiesProvider has React 18 types incompatible with React 19 */}
+            <CookiesProvider>
+              <StakedTokenProvider>
+                <SystemModeProvider>
+                  <ApiDataProvider>
+                    <NotificationProvider>
+                      <Header />
+                      <ErrorBoundary>{children}</ErrorBoundary>
+                      <Footer />
+                    </NotificationProvider>
+                  </ApiDataProvider>
+                </SystemModeProvider>
+              </StakedTokenProvider>
+            </CookiesProvider>
+          </ErrorBoundary>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 5000,
+              className: 'bg-card text-foreground border-border',
+            }}
+          />
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

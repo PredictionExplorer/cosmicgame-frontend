@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
-import { Box, Typography, AccordionSummary } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import { useEffect, useRef, useState } from 'react';
+import { Plus, Minus } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
 import { FaqAccordion, FaqAccordionDetails, QuestionIcon } from '@/components/styled';
 
 const FAQ = () => {
@@ -250,12 +249,12 @@ const FAQ = () => {
     {
       summary: 'Why is Cosmic Signature deployed on Arbitrum and not Ethereum?',
       detail:
-        'Our choice to deploy on Arbitrum was strategic. We believe that, in the long run, most activity on Ethereum will migrate to Layer 2 solutions like Arbitrum. This is due to Arbitrum’s significantly lower gas fees while maintaining the same level of security as Ethereum Layer 1.',
+        "Our choice to deploy on Arbitrum was strategic. We believe that, in the long run, most activity on Ethereum will migrate to Layer 2 solutions like Arbitrum. This is due to Arbitrum's significantly lower gas fees while maintaining the same level of security as Ethereum Layer 1.",
     },
     {
       summary: 'What makes Arbitrum as secure as Ethereum Layer 1?',
       detail:
-        'Arbitrum is not a sidechain; it is a rollup. This means it bundles, or "rolls up," multiple transfers into a single transaction, reducing transaction costs. Importantly, all its data and operations are still recorded on the Ethereum mainnet. This ensures that Arbitrum’s security is rooted in the Ethereum network, making it just as secure as Ethereum Layer 1.',
+        'Arbitrum is not a sidechain; it is a rollup. This means it bundles, or "rolls up," multiple transfers into a single transaction, reducing transaction costs. Importantly, all its data and operations are still recorded on the Ethereum mainnet. This ensures that Arbitrum\'s security is rooted in the Ethereum network, making it just as secure as Ethereum Layer 1.',
     },
     {
       summary: 'What makes Cosmic Signature NFTs unique?',
@@ -282,8 +281,8 @@ const FAQ = () => {
   const [expanded, setExpanded] = useState<number | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const handleChange = (index: number) => (_event: SyntheticEvent, isExpanded: boolean) => {
-    setExpanded(isExpanded ? index : -1);
+  const toggleItem = (index: number) => {
+    setExpanded((prev) => (prev === index ? -1 : index));
   };
 
   useEffect(() => {
@@ -302,13 +301,13 @@ const FAQ = () => {
           break;
       }
       if (index > 0) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setExpanded(index);
         setTimeout(() => {
           const el = itemRefs.current[index] as HTMLDivElement | null;
           if (el) {
             const yOffset = -100;
             const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
-
             window.scrollTo({ top: y, behavior: 'smooth' });
           }
         }, 300);
@@ -317,43 +316,53 @@ const FAQ = () => {
   }, []);
 
   return (
-    <Box mt={4}>
+    <div className="mt-8">
       {items.map(({ summary, detail }, i) => (
-        <FaqAccordion
+        <div
           key={i}
           ref={(el: HTMLDivElement | null) => {
             itemRefs.current[i] = el;
           }}
-          expanded={expanded === i}
-          onChange={handleChange(i)}
         >
-          <AccordionSummary
-            expandIcon={
-              expanded === i ? (
-                <RemoveIcon color="primary" fontSize="small" />
+          <FaqAccordion>
+            <button
+              className="flex w-full items-center justify-between py-2"
+              onClick={() => toggleItem(i)}
+              aria-expanded={expanded === i}
+            >
+              <div className="flex items-center">
+                <QuestionIcon src="images/question.svg" />
+                <span
+                  className={cn('text-base', expanded === i ? 'text-primary' : 'text-foreground')}
+                >
+                  {summary}
+                </span>
+              </div>
+              {expanded === i ? (
+                <Minus className="h-4 w-4 shrink-0 text-primary" />
               ) : (
-                <AddIcon color="primary" fontSize="small" />
-              )
-            }
-          >
-            <Box display="flex" alignItems="center">
-              <QuestionIcon src="images/question.svg" />
-              <Typography variant="subtitle1" color={expanded === i ? 'primary' : 'info'}>
-                {summary}
-              </Typography>
-            </Box>
-          </AccordionSummary>
-          <FaqAccordionDetails>
-            <Typography
-              variant="body1"
-              align="left"
-              color="rgba(255, 255, 255, 0.68)"
-              dangerouslySetInnerHTML={{ __html: detail }}
-            />
-          </FaqAccordionDetails>
-        </FaqAccordion>
+                <Plus className="h-4 w-4 shrink-0 text-primary" />
+              )}
+            </button>
+            <div
+              className={cn(
+                'grid transition-[grid-template-rows] duration-200',
+                expanded === i ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+              )}
+            >
+              <div className="overflow-hidden">
+                <FaqAccordionDetails>
+                  <p
+                    className="text-left text-muted-foreground"
+                    dangerouslySetInnerHTML={{ __html: detail }}
+                  />
+                </FaqAccordionDetails>
+              </div>
+            </div>
+          </FaqAccordion>
+        </div>
       ))}
-    </Box>
+    </div>
   );
 };
 

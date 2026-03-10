@@ -1,9 +1,11 @@
-import { render, screen, waitFor, fireEvent } from '@/test-utils';
-import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
 import '@testing-library/jest-dom';
+import axios from 'axios';
+
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import axios from 'axios';
+import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
+
+import { render, screen, waitFor, fireEvent } from '@/test-utils';
 
 jest.mock('axios');
 jest.mock('../../hooks/useRaffleWalletContract', () => ({

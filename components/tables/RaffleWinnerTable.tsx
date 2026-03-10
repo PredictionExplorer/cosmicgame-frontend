@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
-import { TableBody, Link, Typography, Tooltip } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -10,9 +13,7 @@ import {
   TablePrimary,
   TablePrimaryHeadCell,
 } from '@/components/styled';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
 import type { RaffleETHDeposit, RaffleNFTWinner } from '@/services/api';
 
@@ -25,8 +26,6 @@ type RaffleWinnerEntry = (RaffleETHDeposit | RaffleNFTWinner) & {
 };
 
 const WinnerRow = ({ winner }: { winner: RaffleWinnerEntry }) => {
-  // Destructure the winner object with default values or optional chaining
-  // to guard against missing fields.
   const {
     TxHash = '',
     TimeStamp = 0,
@@ -50,52 +49,42 @@ const WinnerRow = ({ winner }: { winner: RaffleWinnerEntry }) => {
     if (raffleWalletContract) {
       fetchRoundTimeoutTimesToWithdrawPrizes();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [raffleWalletContract]);
 
-  // If there is no winner data, return an empty table row to prevent errors.
   if (!winner) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
-      {/* Datetime Column - links to Arbiscan for the transaction */}
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
           rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
-
-      {/* Winner Address Column */}
       <TablePrimaryCell>
-        <Tooltip title={WinnerAddr}>
-          <Link
-            href={`/user/${WinnerAddr}`}
-            style={{
-              color: 'inherit',
-              fontSize: 'inherit',
-              fontFamily: 'monospace',
-            }}
-          >
-            {shortenHex(WinnerAddr, 6)}
-          </Link>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a href={`/user/${WinnerAddr}`} className="text-inherit font-mono">
+                {shortenHex(WinnerAddr, 6)}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{WinnerAddr}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
-
-      {/* Round Number Column */}
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+        <a href={`/prize/${RoundNum}`} className="text-inherit">
           {RoundNum}
-        </Link>
+        </a>
       </TablePrimaryCell>
-
-      {/* Type Column - different text based on whether the user is a staker, is Rwalk, etc. */}
       <TablePrimaryCell>
         {Amount
           ? 'ETH Deposit'
@@ -108,15 +97,12 @@ const WinnerRow = ({ winner }: { winner: RaffleWinnerEntry }) => {
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(roundTimeoutTimesToWithdrawPrizes)}
       </TablePrimaryCell>
-      {/* Amount Column (in ETH) - shown only if Amount is truthy */}
       <TablePrimaryCell align="right">{Amount ? `${Amount.toFixed(4)} ETH` : ' '}</TablePrimaryCell>
-
-      {/* Token ID Column - Link to detail page if TokenId exists */}
       <TablePrimaryCell align="center">
         {TokenId ? (
-          <Link href={`/detail/${TokenId}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+          <a href={`/detail/${TokenId}`} className="text-inherit">
             {TokenId}
-          </Link>
+          </a>
         ) : (
           ' '
         )}
@@ -125,14 +111,6 @@ const WinnerRow = ({ winner }: { winner: RaffleWinnerEntry }) => {
   );
 };
 
-/**
- * Renders a table of raffle winners (both ETH deposits and NFT winners).
- * Paginated to show a limited number of rows per page.
- *
- * @param {Object} props
- * @param {Array} props.RaffleETHDeposits - List of raffle winners who won ETH deposits.
- * @param {Array} props.RaffleNFTWinners  - List of raffle winners who won NFTs or tokens.
- */
 const RaffleWinnerTable = ({
   RaffleETHDeposits,
   RaffleNFTWinners,
@@ -140,19 +118,14 @@ const RaffleWinnerTable = ({
   RaffleETHDeposits: RaffleWinnerEntry[];
   RaffleNFTWinners: RaffleWinnerEntry[];
 }) => {
-  // Combine both arrays into a single list of winners.
   const depositsExcludingLast = RaffleETHDeposits.slice(0, -1);
   const list = [...depositsExcludingLast, ...RaffleNFTWinners];
 
-  // Number of rows to display per page.
   const perPage = 5;
-
-  // Tracks the current page in the pagination.
   const [page, setPage] = useState(1);
 
-  // If there are no winners to display, show a message and return early.
   if (list.length === 0) {
-    return <Typography>No winners yet.</Typography>;
+    return <p>No winners yet.</p>;
   }
 
   return (
@@ -168,8 +141,6 @@ const RaffleWinnerTable = ({
             <col width="13%" />
             <col width="10%" />
           </colgroup>
-
-          {/* Table Header */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
@@ -181,24 +152,13 @@ const RaffleWinnerTable = ({
               <TablePrimaryHeadCell align="center">Token ID</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-
-          {/* Table Body */}
-          <TableBody>
-            {/* 
-              Slice the list for pagination and map through each winner.
-              Using a unique key combination to identify each row.
-            */}
+          <tbody>
             {list.slice((page - 1) * perPage, page * perPage).map((winner) => (
               <WinnerRow key={winner.Tx?.EvtLogId ?? winner.EvtLogId} winner={winner} />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
-
-      {/* 
-        CustomPagination controls allow page navigation.
-        Pass page, setPage, totalLength of the list, and perPage to the pagination component.
-      */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

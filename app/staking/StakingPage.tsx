@@ -1,19 +1,13 @@
 'use client';
 
 import { type ComponentProps } from 'react';
-import { Box, Link, Typography } from '@mui/material';
+import Link from 'next/link';
 
 import { MainWrapper } from '@/components/styled';
 import { GlobalStakingRewardsTable } from '@/components/staking/GlobalStakingRewardsTable';
 import { RwalkStakingRewardMintsTable } from '@/components/staking/RwalkStakingRewardMintsTable';
 import { useStakingCSTRewards, useStakingRWLKMintsGlobal } from '@/hooks/useApiQuery';
 
-/**
- * Staking Component
- *
- * Displays the global staking rewards for the Cosmic Signature Token
- * and the RandomWalk NFT.
- */
 const StakingPage = () => {
   const {
     data: cosmicSignatureRewards,
@@ -31,29 +25,24 @@ const StakingPage = () => {
   if (error) {
     return (
       <MainWrapper>
-        <Typography variant="h4" color="error" textAlign="center" gutterBottom>
+        <h2 className="mb-3 text-center text-2xl font-bold text-destructive">
           Error loading staking data
-        </Typography>
-        <Typography variant="body1" color="error">
-          {error}
-        </Typography>
+        </h2>
+        <p className="text-base text-destructive">{error}</p>
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
+      <h2 className="mb-3 text-center text-2xl font-bold text-primary">
         Staking Rewards for All Stakers
-      </Typography>
+      </h2>
 
-      {/* Cosmic Signature Token Rewards */}
-      <Box>
-        <Typography variant="h6" mt={4}>
-          CosmicSignature Token
-        </Typography>
+      <div>
+        <h4 className="mt-8 text-lg font-semibold">CosmicSignature Token</h4>
         {loading ? (
-          <Typography variant="h6">Loading...</Typography>
+          <p className="text-lg font-semibold">Loading...</p>
         ) : (
           <GlobalStakingRewardsTable
             list={
@@ -63,15 +52,12 @@ const StakingPage = () => {
             }
           />
         )}
-      </Box>
+      </div>
 
-      {/* RandomWalk NFT Rewards */}
-      <Box>
-        <Typography variant="h6" mt={4}>
-          RandomWalk NFT
-        </Typography>
+      <div>
+        <h4 className="mt-8 text-lg font-semibold">RandomWalk NFT</h4>
         {loading ? (
-          <Typography variant="h6">Loading...</Typography>
+          <p className="text-lg font-semibold">Loading...</p>
         ) : (
           <RwalkStakingRewardMintsTable
             list={
@@ -81,16 +67,15 @@ const StakingPage = () => {
             }
           />
         )}
-      </Box>
+      </div>
 
-      {/* Link to "My Staking" Page */}
-      <Typography mt={6}>
+      <p className="mt-12">
         To participate in Staking, visit{' '}
-        <Link href="/my-staking" sx={{ color: 'inherit' }}>
+        <Link href="/my-staking" className="text-inherit">
           &quot;MY STAKING&quot;
         </Link>
         . (option available from the Account menu)
-      </Typography>
+      </p>
     </MainWrapper>
   );
 };

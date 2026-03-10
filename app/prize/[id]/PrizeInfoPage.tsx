@@ -1,20 +1,18 @@
 'use client';
 
 import { useEffect, useState, useMemo, type ComponentProps } from 'react';
-import { Box, Link, Typography } from '@mui/material';
 
-import { MainWrapper } from '@/components/styled';
-import api from '@/services/api';
-import { useNotification } from '@/contexts/NotificationContext';
 import {
   getExplorerUrl,
   convertTimestampToDateTime,
   formatEthValue,
   getEnduranceChampions,
 } from '@/utils';
-import { reportError } from '@/utils/errors';
 
-// Child Components
+import { MainWrapper } from '@/components/styled';
+import api from '@/services/api';
+import { useNotification } from '@/contexts/NotificationContext';
+import { reportError } from '@/utils/errors';
 import RaffleWinnerTable from '@/components/tables/RaffleWinnerTable';
 import BiddingHistoryTable from '@/components/tables/BiddingHistoryTable';
 import StakingWinnerTable from '@/components/tables/StakingWinnerTable';
@@ -24,7 +22,6 @@ import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
 
 /* ------------------------------------------------------------------
   Helper Sub-Component: InfoRow
-  Displays a single label-value pair (optionally linked)
 ------------------------------------------------------------------ */
 interface InfoRowProps {
   label: string;
@@ -34,35 +31,29 @@ interface InfoRowProps {
 }
 const InfoRow = ({ label, value, link, monospace = false }: InfoRowProps) => {
   return (
-    <Box mb={1}>
-      <Typography color="primary" component="span">
-        {label}
-      </Typography>
+    <div className="mb-2">
+      <span className="text-primary">{label}</span>
       &nbsp;
       {link ? (
-        <Typography component="span">
-          <Link
+        <span>
+          <a
             href={link}
-            color="inherit"
-            fontSize="inherit"
-            target={link.startsWith('http') ? '__blank' : undefined}
-            sx={monospace ? { fontFamily: 'monospace' } : {}}
+            className={`text-inherit text-[inherit] ${monospace ? 'font-mono' : ''}`}
+            target={link.startsWith('http') ? '_blank' : undefined}
+            rel={link.startsWith('http') ? 'noreferrer' : undefined}
           >
             {value}
-          </Link>
-        </Typography>
+          </a>
+        </span>
       ) : (
-        <Typography component="span" fontFamily={monospace ? 'monospace' : 'inherit'}>
-          {value}
-        </Typography>
+        <span className={monospace ? 'font-mono' : ''}>{value}</span>
       )}
-    </Box>
+    </div>
   );
 };
 
 /* ------------------------------------------------------------------
   Sub-Component: PrizeDetails
-  Renders the main "prize info" rows using `InfoRow`.
 ------------------------------------------------------------------ */
 interface PrizeDetailsProps {
   prizeInfo: import('@/services/api/types').RoundInfo;
@@ -149,39 +140,28 @@ const PrizeDetails = ({ prizeInfo, stakingRewards }: PrizeDetailsProps) => {
 };
 
 /* ------------------------------------------------------------------
-  Sub-Component: BiddingHistorySection
-  Renders the "Bid History" portion
+  Sub-Components for Sections
 ------------------------------------------------------------------ */
 interface BiddingHistorySectionProps {
   bidHistory: import('@/services/api/types').BidInfo[];
 }
 const BiddingHistorySection = ({ bidHistory }: BiddingHistorySectionProps) => (
-  <Box mt={4}>
-    <Typography variant="h6" lineHeight={1}>
-      Bid History
-    </Typography>
+  <div className="mt-8">
+    <h6 className="text-lg font-semibold leading-none">Bid History</h6>
     <BiddingHistoryTable biddingHistory={bidHistory} />
-  </Box>
+  </div>
 );
 
-/* ------------------------------------------------------------------
-  Sub-Component: EnduranceChampionsSection
-  Renders the "Endurance Champions" portion
------------------------------------------------------------------- */
 interface EnduranceChampionsSectionProps {
   championList: import('@/utils').EnduranceChampion[];
 }
 const EnduranceChampionsSection = ({ championList }: EnduranceChampionsSectionProps) => (
-  <Box mt={4}>
-    <Typography variant="h6">Endurance Champions</Typography>
+  <div className="mt-8">
+    <h6 className="text-lg font-semibold">Endurance Champions</h6>
     <EnduranceChampionsTable championList={championList} />
-  </Box>
+  </div>
 );
 
-/* ------------------------------------------------------------------
-  Sub-Component: RaffleWinnersSection
-  Renders the "Raffle Winners" portion
------------------------------------------------------------------- */
 interface RaffleWinnersSectionProps {
   RaffleETHDeposits: import('@/services/api/types').RaffleETHDeposit[];
   RaffleNFTWinners: import('@/services/api/types').RaffleNFTWinner[];
@@ -190,30 +170,22 @@ const RaffleWinnersSection = ({
   RaffleETHDeposits,
   RaffleNFTWinners,
 }: RaffleWinnersSectionProps) => (
-  <Box mt={4}>
-    <Typography variant="h6" mb={2}>
-      Raffle Rewards
-    </Typography>
+  <div className="mt-8">
+    <h6 className="text-lg font-semibold mb-4">Raffle Rewards</h6>
     <RaffleWinnerTable RaffleETHDeposits={RaffleETHDeposits} RaffleNFTWinners={RaffleNFTWinners} />
-  </Box>
+  </div>
 );
 
-/* ------------------------------------------------------------------
-  Sub-Component: StakingRewardsSection
-  Renders the "Staking Rewards" portion
------------------------------------------------------------------- */
 interface StakingRewardsSectionProps {
   stakingRewards: unknown[];
 }
 const StakingRewardsSection = ({ stakingRewards }: StakingRewardsSectionProps) => (
-  <Box mt={4}>
-    <Typography variant="h6" mb={2}>
-      Staking Rewards
-    </Typography>
+  <div className="mt-8">
+    <h6 className="text-lg font-semibold mb-4">Staking Rewards</h6>
     <StakingWinnerTable
       list={stakingRewards as ComponentProps<typeof StakingWinnerTable>['list']}
     />
-  </Box>
+  </div>
 );
 
 interface DonatedNFTsSectionProps {
@@ -221,12 +193,10 @@ interface DonatedNFTsSectionProps {
 }
 const DonatedNFTsSection = ({ nftDonations }: DonatedNFTsSectionProps) => {
   return (
-    <Box mt={8}>
-      <Typography variant="h6" mb={2}>
-        Donated NFTs
-      </Typography>
+    <div className="mt-16">
+      <h6 className="text-lg font-semibold mb-4">Donated NFTs</h6>
       <DonatedNFTTable list={nftDonations} handleClaim={undefined} claimingTokens={[]} />
-    </Box>
+    </div>
   );
 };
 
@@ -250,10 +220,6 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
   const [stakingRewards, setStakingRewards] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* ------------------------------------------------------------------
-    Data Fetching
-  ------------------------------------------------------------------ */
-
   const fetchDonatedERC20Tokens = async () => {
     try {
       const donatedERC20Tokens = await api.get_donations_erc20_by_round(roundNum);
@@ -270,7 +236,6 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
     }
   };
 
-  // Fetch main data for the selected round
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -301,9 +266,9 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
     };
     fetchData();
     fetchDonatedERC20Tokens();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundNum, setNotification]);
 
-  // Compute the champion list using memo
   const championList = useMemo(() => {
     if (bidHistory.length > 0 && prizeInfo) {
       const champions = getEnduranceChampions(bidHistory, prizeInfo.TimeStamp);
@@ -312,13 +277,10 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
     return [];
   }, [bidHistory, prizeInfo]);
 
-  /* ------------------------------------------------------------------
-    Render
-  ------------------------------------------------------------------ */
   if (roundNum < 0) {
     return (
       <MainWrapper>
-        <Typography variant="h6">Invalid Round Number</Typography>
+        <h6 className="text-lg font-semibold">Invalid Round Number</h6>
       </MainWrapper>
     );
   }
@@ -326,55 +288,42 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
   if (loading) {
     return (
       <MainWrapper>
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <Box mb={4}>
-        <Typography variant="h4" color="primary" component="span" mr={2}>
-          {`Round #${roundNum}`}
-        </Typography>
-        <Typography variant="h4" component="span">
-          Prize Information
-        </Typography>
-      </Box>
+      <div className="mb-8">
+        <span className="text-2xl font-bold text-primary mr-4">{`Round #${roundNum}`}</span>
+        <span className="text-2xl font-bold">Prize Information</span>
+      </div>
 
       {!prizeInfo ? (
-        <Typography>Prize data not found!</Typography>
+        <p>Prize data not found!</p>
       ) : (
-        <Box>
-          {/* Prize Details */}
+        <div>
           <PrizeDetails prizeInfo={prizeInfo} stakingRewards={stakingRewards} />
 
-          {/* Bid History */}
           <BiddingHistorySection bidHistory={bidHistory} />
 
-          {/* Endurance Champions */}
           <EnduranceChampionsSection championList={championList} />
 
-          {/* Raffle Winners */}
           <RaffleWinnersSection
             RaffleETHDeposits={prizeInfo.RaffleETHDeposits}
             RaffleNFTWinners={prizeInfo.RaffleNFTWinners}
           />
 
-          {/* Staking Rewards */}
           <StakingRewardsSection stakingRewards={stakingRewards} />
 
-          {/* Donated NFTs */}
           <DonatedNFTsSection nftDonations={nftDonations} />
 
-          {/* Donated ERC20 Tokens */}
-          <Box mt={8}>
-            <Typography variant="h6" mb={2}>
-              Donated ERC20 Tokens
-            </Typography>
+          <div className="mt-16">
+            <h6 className="text-lg font-semibold mb-4">Donated ERC20 Tokens</h6>
             <DonatedERC20Table list={donatedERC20Tokens} handleClaim={null} />
-          </Box>
-        </Box>
+          </div>
+        </div>
       )}
     </MainWrapper>
   );

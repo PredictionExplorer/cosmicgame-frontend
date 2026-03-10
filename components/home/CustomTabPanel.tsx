@@ -1,5 +1,3 @@
-import { Box } from '@mui/material';
-
 export interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -15,7 +13,7 @@ export function CustomTabPanel({ children, value, index, ...other }: TabPanelPro
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <div className="p-6">{children}</div>}
     </div>
   );
 }

@@ -1,7 +1,5 @@
 'use client';
 
-import { Typography } from '@mui/material';
-
 import { MainWrapper } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useSystemModelist, useSystemEvents } from '@/hooks/useApiQuery';
@@ -15,28 +13,20 @@ function ChangedParameters() {
   const { data: events = [], isLoading: isLoadingEvents } = useSystemEvents(startId, 9999999999);
   const loading = isLoadingModeList || isLoadingEvents;
 
-  // Render if no wallet is connected
   if (!account) {
     return (
       <MainWrapper>
-        <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-          Changed Parameters
-        </Typography>
-        <Typography variant="subtitle1">Please login to Metamask to see your winnings.</Typography>
+        <h4 className="text-2xl font-bold text-primary text-center mb-8">Changed Parameters</h4>
+        <p className="text-base font-medium">Please login to Metamask to see your winnings.</p>
       </MainWrapper>
     );
   }
 
-  // Render main content
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-        Changed Parameters
-      </Typography>
-
-      {/* Show loading message or data table */}
+      <h4 className="text-2xl font-bold text-primary text-center mb-8">Changed Parameters</h4>
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
         <AdminEventsTable list={events as AdminEventRow[]} />
       )}

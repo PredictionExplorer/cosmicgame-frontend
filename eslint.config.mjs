@@ -9,7 +9,7 @@ const reactHooksPlugin = nextCoreWebVitals.find(
   (c) => c.plugins?.["react-hooks"]
 )?.plugins?.["react-hooks"];
 
-export default [
+const config = [
   ...nextCoreWebVitals,
   {
     files: ["**/*.ts", "**/*.tsx"],
@@ -36,6 +36,19 @@ export default [
             "sibling",
             "index",
           ],
+          pathGroups: [
+            {
+              pattern: "@/{components,hooks,lib,utils,contexts,services,config}/**",
+              group: "internal",
+              position: "after",
+            },
+            {
+              pattern: "@/test-utils",
+              group: "internal",
+              position: "after",
+            },
+          ],
+          pathGroupsExcludedImportTypes: ["builtin"],
           "newlines-between": "always",
         },
       ],
@@ -54,6 +67,11 @@ export default [
       "contracts/types/",
       "public/paint-worklet.js",
       "__mocks__/",
+      "playwright-report/",
+      "coverage/",
+      "commitlint.config.js",
     ],
   },
 ];
+
+export default config;

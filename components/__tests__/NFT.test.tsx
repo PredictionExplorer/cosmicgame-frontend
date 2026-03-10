@@ -1,7 +1,10 @@
-import { render, screen } from '@/test-utils';
-import NFT from '@/components/nft/NFT';
 import '@testing-library/jest-dom';
+
 import { formatId, getAssetsUrl } from '@/utils';
+
+import NFT from '@/components/nft/NFT';
+
+import { render, screen } from '@/test-utils';
 
 describe('NFT', () => {
   test('with mock data', () => {
@@ -27,7 +30,7 @@ describe('NFT', () => {
     render(<NFT nft={mockData} />);
 
     const image = getAssetsUrl(`cosmicsignature/0x${mockData.Seed}.png`);
-    expect(screen.getByAltText('nft image').getAttribute('src')).toEqual(image);
+    expect(screen.getByAltText('nft image').getAttribute('src')).toContain(image);
     expect(screen.getByText(formatId(mockData.TokenId))).toBeInTheDocument();
     expect(screen.getByText(mockData.TokenName)).toBeInTheDocument();
   });

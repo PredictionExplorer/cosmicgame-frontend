@@ -1,5 +1,6 @@
-import { render, screen } from '@/test-utils';
 import { CTBalanceDistributionTable } from '@/components/tokens/CTBalanceDistributionTable';
+
+import { render, screen } from '@/test-utils';
 import '@testing-library/jest-dom';
 
 describe('CTBalanceDistributionTable', () => {

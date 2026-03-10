@@ -1,7 +1,9 @@
 import { useEffect, useState, type FC } from 'react';
 import axios from 'axios';
-import { Button, Link, TableBody, Tooltip, Typography } from '@mui/material';
+import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
+
+import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
 
 import {
   TablePrimary,
@@ -11,16 +13,14 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import NFTImage from '@/components/nft/NFTImage';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
 import { reportError } from '@/utils/errors';
 
-// ----------------------------
-// Type Definitions
-// ----------------------------
 export interface NFTRecord {
   RecordId: string | number;
   TxHash: string;
@@ -47,9 +47,6 @@ interface DonatedNFTTableProps {
   claimingTokens: number[];
 }
 
-// ----------------------------
-// NFT Row Component
-// ----------------------------
 const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
   const [tokenURI, setTokenURI] = useState<{ image?: string; external_url?: string } | null>(null);
 
@@ -87,101 +84,100 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
 
   return (
     <TablePrimaryRow>
-      {/* Timestamp */}
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit text-[inherit]"
           href={getExplorerUrl('tx', nft.TxHash)}
           target="_blank"
+          rel="noreferrer"
         >
           {convertTimestampToDateTime(nft.TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
 
-      {/* Donor Address */}
       <TablePrimaryCell>
-        <Tooltip title={nft.DonorAddr}>
-          <Link
-            href={`/user/${nft.DonorAddr}`}
-            style={{
-              color: 'inherit',
-              fontSize: 'inherit',
-              fontFamily: 'monospace',
-            }}
-            target="_blank"
-          >
-            {shortenHex(nft.DonorAddr, 6)}
-          </Link>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href={`/user/${nft.DonorAddr}`}
+                className="text-inherit text-[inherit] font-mono"
+                target="_blank"
+              >
+                {shortenHex(nft.DonorAddr, 6)}
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>{nft.DonorAddr}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
 
-      {/* Round Number */}
       <TablePrimaryCell align="center">
         <Link
           href={`/prize/${nft.RoundNum}`}
-          style={{ color: 'inherit', fontSize: 'inherit' }}
+          className="text-inherit text-[inherit]"
           target="_blank"
         >
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      {/* Token Address */}
       <TablePrimaryCell>
-        <Tooltip title={nft.TokenAddr}>
-          <Link
-            href={getExplorerUrl('address', nft.TokenAddr)}
-            style={{
-              color: 'inherit',
-              fontSize: 'inherit',
-              fontFamily: 'monospace',
-            }}
-            target="_blank"
-          >
-            {shortenHex(nft.TokenAddr, 6)}
-          </Link>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={getExplorerUrl('address', nft.TokenAddr)}
+                className="text-inherit text-[inherit] font-mono"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {shortenHex(nft.TokenAddr, 6)}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{nft.TokenAddr}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
 
-      {/* Token ID */}
       <TablePrimaryCell align="center">
         {tokenURI?.external_url ? (
-          <Link
+          <a
             href={tokenURI.external_url}
             target="_blank"
-            sx={{ fontSize: 'inherit', color: 'inherit' }}
+            rel="noreferrer"
+            className="text-inherit text-[inherit]"
           >
             {nft.NFTTokenId || nft.TokenId}
-          </Link>
+          </a>
         ) : (
           nft.NFTTokenId || nft.TokenId
         )}
       </TablePrimaryCell>
+
+      {/* eslint-disable react-hooks/purity */}
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(roundTimeoutTimesToWithdrawPrizes)}{' '}
         {roundTimeoutTimesToWithdrawPrizes < Date.now() / 1000
           ? '(Expired)'
           : `(${formatSeconds(roundTimeoutTimesToWithdrawPrizes - Math.ceil(Date.now() / 1000))})`}
       </TablePrimaryCell>
+      {/* eslint-enable react-hooks/purity */}
 
-      {/* Token Image */}
-      <TablePrimaryCell sx={{ width: '130px' }}>
+      <TablePrimaryCell className="w-[130px]">
         {tokenURI?.image ? (
-          <Link href={tokenURI.external_url} target="_blank">
+          <a href={tokenURI.external_url} target="_blank" rel="noreferrer">
             <NFTImage src={tokenURI.image} />
-          </Link>
+          </a>
         ) : (
-          <Typography variant="body2">Image not available</Typography>
+          <span className="text-sm text-muted-foreground">Image not available</span>
         )}
       </TablePrimaryCell>
 
-      {/* Claim Button */}
       {handleClaim && (
         <TablePrimaryCell>
           {!nft.WinnerAddr && (
             <Button
-              variant="contained"
               onClick={() => handleClaim(nft.Index)}
               disabled={isClaiming}
               data-testid="Claim Button"
@@ -195,15 +191,12 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
   );
 };
 
-// ----------------------------
-// Main Table Component
-// ----------------------------
 const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claimingTokens }) => {
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
 
   if (!list || list.length === 0) {
-    return <Typography>No donated NFTs yet.</Typography>;
+    return <p>No donated NFTs yet.</p>;
   }
 
   return (
@@ -222,7 +215,7 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
               {handleClaim && <TablePrimaryHeadCell></TablePrimaryHeadCell>}
             </Tr>
           </TablePrimaryHead>
-          <TableBody>
+          <tbody>
             {list.slice((page - 1) * perPage, page * perPage).map((nft, i) => (
               <NFTRow
                 key={page * perPage + i}
@@ -231,11 +224,10 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
                 claimingTokens={claimingTokens}
               />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Pagination */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

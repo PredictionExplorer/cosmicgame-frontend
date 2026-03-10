@@ -1,30 +1,35 @@
-import { type CSSProperties, type SyntheticEvent } from 'react';
-import styled from '@emotion/styled';
+import { type CSSProperties, useState } from 'react';
+import Image from 'next/image';
 
-const StyledImage = styled('img')`
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: contain;
-  vertical-align: middle;
-`;
+import { cn } from '@/lib/utils';
+
+const FALLBACK_SRC = '/images/qmark.png';
 
 interface NFTImageProps {
   src?: string;
   style?: CSSProperties;
-  sx?: Record<string, unknown>;
+  className?: string;
 }
 
-const NFTImage = (props: NFTImageProps) => {
-  const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.src = '/images/qmark.png';
-  };
+const NFTImage = ({ src, style, className }: NFTImageProps) => {
+  const [hasError, setHasError] = useState(false);
+  const [prevSrc, setPrevSrc] = useState(src);
+
+  if (prevSrc !== src) {
+    setPrevSrc(src);
+    if (hasError) setHasError(false);
+  }
 
   return (
-    <StyledImage
-      src={props.src || '/images/qmark.png'}
-      onError={handleImageError}
+    <Image
+      src={hasError ? FALLBACK_SRC : src || FALLBACK_SRC}
+      onError={() => setHasError(true)}
       alt="nft image"
-      style={props.style}
+      width={800}
+      height={450}
+      unoptimized
+      className={cn('w-full aspect-video object-contain align-middle', className)}
+      style={style}
     />
   );
 };

@@ -1,7 +1,7 @@
-import { Typography, CardActionArea, Card } from '@mui/material';
-
-import { useRWLKNFT } from '@/hooks/useRWLKNFT';
 import { formatId } from '@/utils';
+
+import { cn } from '@/lib/utils';
+import { useRWLKNFT } from '@/hooks/useRWLKNFT';
 import { NFTSkeleton, NFTInfoWrapper } from '@/components/styled';
 
 import NFTImage from './NFTImage';
@@ -16,26 +16,36 @@ const RandomWalkNFT = ({
   selectable?: boolean;
 }) => {
   const nft = useRWLKNFT(tokenId);
+
+  const content = (
+    <>
+      {!nft ? <NFTSkeleton /> : <NFTImage src={nft.black_image_thumb} />}
+      {nft && (
+        <NFTInfoWrapper>
+          <span className="text-[11px] text-foreground">{formatId(nft.id)}</span>
+        </NFTInfoWrapper>
+      )}
+    </>
+  );
+
   return (
-    <Card
-      sx={{
-        border: '1px solid',
-        borderColor: selected ? '#FFFFFF' : '#181F64',
-      }}
+    <div
+      className={cn(
+        'border rounded-lg overflow-hidden relative',
+        selected ? 'border-white' : 'border-[#181F64]',
+      )}
     >
-      <CardActionArea href={selectable ? '' : `https://www.randomwalknft.com/detail/${tokenId}`}>
-        {!nft ? (
-          <NFTSkeleton animation="wave" variant="rectangular" />
-        ) : (
-          <NFTImage src={nft.black_image_thumb} />
-        )}
-        {nft && (
-          <NFTInfoWrapper>
-            <Typography fontSize={11}>{formatId(nft.id)}</Typography>
-          </NFTInfoWrapper>
-        )}
-      </CardActionArea>
-    </Card>
+      {selectable ? (
+        <div className="cursor-pointer">{content}</div>
+      ) : (
+        <a
+          href={`https://www.randomwalknft.com/detail/${tokenId}`}
+          className="block cursor-pointer"
+        >
+          {content}
+        </a>
+      )}
+    </div>
   );
 };
 

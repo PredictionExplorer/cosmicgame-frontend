@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Link, TableBody, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime, getAssetsUrl, shortenHex } from '@/utils';
+
 import NFTImage from '@/components/nft/NFTImage';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import {
@@ -15,6 +16,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
@@ -41,25 +43,25 @@ function CSTRow({ nft }: { nft: CSTToken }) {
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell sx={{ width: '120px' }}>
-        <Link href={`/detail/${nft.TokenId}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+      <TablePrimaryCell className="w-[120px]">
+        <Link href={`/detail/${nft.TokenId}`} className="text-inherit">
           <NFTImage src={getTokenImageURL()} />
         </Link>
       </TablePrimaryCell>
 
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', nft.TxHash)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(nft.TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/detail/${nft.TokenId}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+        <Link href={`/detail/${nft.TokenId}`} className="text-inherit">
           {nft.TokenId}
         </Link>
       </TablePrimaryCell>
@@ -67,24 +69,22 @@ function CSTRow({ nft }: { nft: CSTToken }) {
       <TablePrimaryCell align="center">{nft.TokenName || ' '}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${nft.RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+        <Link href={`/prize/${nft.RoundNum}`} className="text-inherit">
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Tooltip title={nft.WinnerAddr}>
-          <Link
-            href={`/user/${nft.WinnerAddr}`}
-            style={{
-              color: 'inherit',
-              fontSize: 'inherit',
-              fontFamily: 'monospace',
-            }}
-          >
-            {shortenHex(nft.WinnerAddr, 6)}
-          </Link>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href={`/user/${nft.WinnerAddr}`} className="text-inherit font-mono">
+                {shortenHex(nft.WinnerAddr, 6)}
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>{nft.WinnerAddr}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{nft.Staked ? 'Yes' : 'No'}</TablePrimaryCell>
@@ -97,7 +97,7 @@ function CSTRow({ nft }: { nft: CSTToken }) {
         ) : nft.RecordType === 2 ? (
           'Staking RandomWalk NFT'
         ) : nft.RecordType === 3 ? (
-          <Link href={`/prize/${nft.RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+          <Link href={`/prize/${nft.RoundNum}`} className="text-inherit">
             Main Prize Winner (#{nft.RoundNum})
           </Link>
         ) : nft.RecordType === 4 ? (
@@ -113,13 +113,11 @@ function CSTRow({ nft }: { nft: CSTToken }) {
 }
 
 export function CSTTable({ list }: { list: CSTToken[] }) {
-  const theme = useTheme();
-  const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
   const [currentPage, setCurrentPage] = useState(1);
   const PER_PAGE = 5;
 
   if (list.length === 0) {
-    return <Typography>No tokens yet.</Typography>;
+    return <p>No tokens yet.</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -130,19 +128,17 @@ export function CSTTable({ list }: { list: CSTToken[] }) {
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          {!isMobileView && (
-            <colgroup>
-              <col width="10%" />
-              <col width="15%" />
-              <col width="9%" />
-              <col width="10%" />
-              <col width="8%" />
-              <col width="16%" />
-              <col width="8%" />
-              <col width="8%" />
-              <col width="16%" />
-            </colgroup>
-          )}
+          <colgroup>
+            <col width="10%" />
+            <col width="15%" />
+            <col width="9%" />
+            <col width="10%" />
+            <col width="8%" />
+            <col width="16%" />
+            <col width="8%" />
+            <col width="8%" />
+            <col width="16%" />
+          </colgroup>
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell />
@@ -156,11 +152,11 @@ export function CSTTable({ list }: { list: CSTToken[] }) {
               <TablePrimaryHeadCell align="right">Prize Type</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-          <TableBody>
+          <tbody>
             {currentItems.map((nft) => (
               <CSTRow key={nft.EvtLogId} nft={nft} />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 

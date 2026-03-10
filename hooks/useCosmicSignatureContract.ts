@@ -1,5 +1,6 @@
-import { COSMIC_SIGNATURE_ADDRESS } from '@/config/networks';
 import { cosmicSignatureAbi } from '@/contracts/abis';
+
+import { COSMIC_SIGNATURE_ADDRESS } from '@/config/networks';
 
 import useContract from './useContract';
 

@@ -1,5 +1,11 @@
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { useState } from 'react';
-import { Link, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Tbody, Tr } from 'react-super-responsive-table';
+
+import { convertTimestampToDateTime } from '@/utils';
 
 import {
   TablePrimary,
@@ -9,84 +15,59 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-
-import { Tbody, Tr } from 'react-super-responsive-table';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { useRouter } from 'next/navigation';
-
-import { convertTimestampToDateTime } from '@/utils';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import type { StakingAction } from '@/services/api';
 
 const StakingActionsRow = ({ row, IsRwalk }: { row: StakingAction; IsRwalk: boolean }) => {
   const router = useRouter();
 
-  // If no row data is provided, return an empty row
   if (!row) {
     return <TablePrimaryRow />;
   }
 
-  // Handle navigation on row click
   const handleRowClick = () => {
-    // Navigate to the staking action detail page
-    // The route differentiates RWLK actions (1) vs CST actions (0)
     router.push(`/staking-action/${IsRwalk ? 1 : 0}/${row.ActionId}`);
   };
 
   return (
-    <TablePrimaryRow sx={{ cursor: 'pointer' }} onClick={handleRowClick}>
-      {/* Datetime of the stake/unstake action */}
+    <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
       <TablePrimaryCell>{convertTimestampToDateTime(row.TimeStamp)}</TablePrimaryCell>
 
-      {/* Action type: 1 = Unstake, otherwise = Stake */}
       <TablePrimaryCell align="center">
         {row.ActionType === 1 ? 'Unstake' : 'Stake'}
       </TablePrimaryCell>
 
-      {/* Token ID with a link to detail page (or external site for RWLK) */}
       <TablePrimaryCell align="center">
-        <Link
-          href={
-            IsRwalk ? `https://randomwalknft.com/detail/${row.TokenId}` : `/detail/${row.TokenId}`
-          }
-          sx={{ color: 'inherit', fontSize: 'inherit' }}
-        >
-          {row.TokenId}
-        </Link>
+        {IsRwalk ? (
+          <a href={`https://randomwalknft.com/detail/${row.TokenId}`} className="text-inherit">
+            {row.TokenId}
+          </a>
+        ) : (
+          <Link href={`/detail/${row.TokenId}`} className="text-inherit">
+            {row.TokenId}
+          </Link>
+        )}
       </TablePrimaryCell>
 
-      {/* The total number of NFTs staked/un-staked in this action */}
       <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-/**
- * A table that displays the user's staking actions (stake/unstake).
- * Supports pagination and is responsive.
- * @param list - An array of staking actions
- * @param IsRwalk - A boolean indicating whether these actions are for Random Walk (RWLK) or CST
- */
 const StakingActionsTable = ({ list, IsRwalk }: { list: StakingAction[]; IsRwalk: boolean }) => {
-  // The number of rows to display per page
   const perPage = 5;
-
-  // Current page in pagination
   const [page, setPage] = useState(1);
 
-  // If the list is empty, show a fallback message
   if (list.length === 0) {
-    return <Typography>No actions yet.</Typography>;
+    return <p className="text-muted-foreground">No actions yet.</p>;
   }
 
-  // Compute the slice of data to display for the current page
   const startIndex = (page - 1) * perPage;
   const endIndex = page * perPage;
   const currentData = list.slice(startIndex, endIndex);
 
   return (
     <>
-      {/* Table container for responsive design */}
       <TablePrimaryContainer>
         <TablePrimary>
           <colgroup>
@@ -96,7 +77,6 @@ const StakingActionsTable = ({ list, IsRwalk }: { list: StakingAction[]; IsRwalk
             <col width="25%" />
           </colgroup>
 
-          {/* Table Header */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Stake Datetime</TablePrimaryHeadCell>
@@ -106,7 +86,6 @@ const StakingActionsTable = ({ list, IsRwalk }: { list: StakingAction[]; IsRwalk
             </Tr>
           </TablePrimaryHead>
 
-          {/* Table Body */}
           <Tbody>
             {currentData.map((row) => (
               <StakingActionsRow key={row.EvtLogId} row={row} IsRwalk={IsRwalk} />
@@ -115,7 +94,6 @@ const StakingActionsTable = ({ list, IsRwalk }: { list: StakingAction[]; IsRwalk
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Pagination Component */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

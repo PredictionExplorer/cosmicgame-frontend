@@ -1,11 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Box, Typography, Grid, Link } from '@mui/material';
 import { formatEther, zeroAddress } from 'viem';
 import Countdown from 'react-countdown';
 
+import { calculateTimeDiff, convertTimestampToDateTime } from '@/utils';
+
 import api from '@/services/api';
 import { reportError } from '@/utils/errors';
-import { calculateTimeDiff, convertTimestampToDateTime } from '@/utils';
 import { GradientText } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, BidInfo } from '@/services/api';
@@ -112,6 +112,7 @@ export const BiddingStatus = ({
     return () => {
       clearInterval(interval);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, account, curBidList]);
 
   useEffect(() => {
@@ -144,30 +145,28 @@ export const BiddingStatus = ({
       {!loading && (
         <>
           {activationTime > Date.now() / 1000 && data ? (
-            <Box mb={4}>
-              <Typography variant="subtitle1" textAlign="center" fontWeight={400}>
+            <div className="mb-8">
+              <p className="text-center text-base font-normal">
                 Round {data.CurRoundNum} becomes active at{' '}
                 {convertTimestampToDateTime(activationTime, true)}
-              </Typography>
+              </p>
               <Countdown
                 key={3}
                 date={activationTime * 1000}
                 renderer={Counter as unknown as (...args: unknown[]) => ReactNode}
               />
-            </Box>
+            </div>
           ) : data && data.TsRoundStart !== 0 ? (
-            <Grid container spacing={2} alignItems="center" mb={4}>
-              <Grid size={{ xs: 12, sm: 4, md: 4 }}>
-                <Typography variant="h5">Round #{data.CurRoundNum}</Typography>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 8, md: 8 }} sx={{ width: '100%' }}>
+            <div className="mb-8 grid grid-cols-12 items-center gap-4">
+              <div className="col-span-12 sm:col-span-4">
+                <h5 className="text-xl font-semibold">Round #{data.CurRoundNum}</h5>
+              </div>
+              <div className="col-span-12 w-full sm:col-span-8">
                 {data &&
                   data.LastBidderAddr !== zeroAddress &&
                   (prizeTime > Date.now() ? (
                     <>
-                      <Typography variant="subtitle1" textAlign="center" fontWeight={400}>
-                        Finishes In
-                      </Typography>
+                      <p className="text-center text-base font-normal">Finishes In</p>
                       <Countdown
                         key={0}
                         date={prizeTime}
@@ -176,144 +175,118 @@ export const BiddingStatus = ({
                     </>
                   ) : (
                     <>
-                      <Typography variant="h5" color="primary">
-                        Bids exhausted!
-                      </Typography>
-                      <Typography variant="subtitle2" color="primary">
+                      <h5 className="text-xl font-semibold text-primary">Bids exhausted!</h5>
+                      <p className="text-sm text-primary">
                         Waiting for the winner to claim the prize.
-                      </Typography>
+                      </p>
                     </>
                   ))}
                 {roundStarted !== '' && (
-                  <Typography sx={{ mt: 1 }}>(Round was started {roundStarted} ago.)</Typography>
+                  <p className="mt-2">(Round was started {roundStarted} ago.)</p>
                 )}
-                <Link href="/changed-parameters" color="inherit">
+                <a href="/changed-parameters" className="text-inherit">
                   Changed Parameters
-                </Link>
-              </Grid>
-            </Grid>
+                </a>
+              </div>
+            </div>
           ) : (
             <>
               {data && data.CurRoundNum > 0 ? (
-                <Typography variant="h4" mb={2}>
-                  Round {data.CurRoundNum} started
-                </Typography>
+                <h4 className="mb-4 text-2xl font-semibold">Round {data.CurRoundNum} started</h4>
               ) : (
-                <Typography variant="subtitle1">Start the game with your first bid!</Typography>
+                <p className="text-base">Start the game with your first bid!</p>
               )}
-              <Typography variant="subtitle1" mt={2} mb={2}>
+              <p className="mb-4 mt-4 text-base">
                 Dutch auction for the first bid in ETH has started. Make your bid.
-              </Typography>
+              </p>
             </>
           )}
           {data && data.LastBidderAddr !== zeroAddress && (
-            <Grid container spacing={2} mb={2} alignItems="center">
-              <Grid size={{ xs: 12, sm: 3, md: 4 }}>
-                <Typography variant="subtitle1">Bid Price</Typography>
-              </Grid>
-              <Grid size={{ xs: 8, sm: 5, md: 8 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 1,
-                  }}
-                >
-                  <Typography>Using Ether</Typography>
-                  <Typography>{(ethBidInfo?.ETHPrice ?? 0).toFixed(5)} ETH</Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 1,
-                  }}
-                >
-                  <Typography>Using RandomWalk</Typography>
-                  <Typography>{((ethBidInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH</Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 1,
-                  }}
-                >
-                  <Typography>Using CST</Typography>
+            <div className="mb-4 grid grid-cols-12 items-center gap-4">
+              <div className="col-span-12 sm:col-span-3 md:col-span-4">
+                <p className="text-base">Bid Price</p>
+              </div>
+              <div className="col-span-8 sm:col-span-5 md:col-span-8">
+                <div className="mb-2 flex justify-between">
+                  <p>Using Ether</p>
+                  <p>{(ethBidInfo?.ETHPrice ?? 0).toFixed(5)} ETH</p>
+                </div>
+                <div className="mb-2 flex justify-between">
+                  <p>Using RandomWalk</p>
+                  <p>{((ethBidInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH</p>
+                </div>
+                <div className="mb-2 flex justify-between">
+                  <p>Using CST</p>
                   {cstBidData?.CSTPrice > 0 ? (
-                    <Typography>{cstBidData?.CSTPrice.toFixed(5)} CST</Typography>
+                    <p>{cstBidData?.CSTPrice.toFixed(5)} CST</p>
                   ) : (
-                    <Typography color="#ff0">FREE</Typography>
+                    <p className="text-[#ff0]">FREE</p>
                   )}
-                </Box>
-              </Grid>
-            </Grid>
+                </div>
+              </div>
+            </div>
           )}
           {activationTime < Date.now() / 1000 && (
             <>
-              <Grid container spacing={2} mb={2} alignItems="center">
-                <Grid size={{ xs: 12, sm: 4, md: 4 }}>
-                  <Typography variant="subtitle1">Main Prize Reward</Typography>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 8, md: 8 }}>
-                  <GradientText variant="h6" sx={{ display: 'inline' }}>
+              <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                <div className="col-span-12 sm:col-span-4">
+                  <p className="text-base">Main Prize Reward</p>
+                </div>
+                <div className="col-span-12 sm:col-span-8">
+                  <GradientText className="inline text-lg font-medium">
                     {(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH
                   </GradientText>
-                </Grid>
-              </Grid>
-              <Grid container spacing={2} mb={2} alignItems="center">
-                <Grid size={{ xs: 12, sm: 4, md: 4 }}>
-                  <Typography variant="subtitle1">Last Bidder Address</Typography>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 8, md: 8 }}>
-                  <Typography>
+                </div>
+              </div>
+              <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                <div className="col-span-12 sm:col-span-4">
+                  <p className="text-base">Last Bidder Address</p>
+                </div>
+                <div className="col-span-12 sm:col-span-8">
+                  <p>
                     {data && data.LastBidderAddr === zeroAddress ? (
                       'There is no bidder yet.'
                     ) : (
                       <>
-                        <Link
+                        <a
                           href={`/user/${data!.LastBidderAddr}`}
-                          color="rgb(255, 255, 255)"
-                          fontSize="inherit"
-                          sx={{ wordBreak: 'break-all' }}
+                          className="break-all text-white [font-size:inherit]"
                         >
                           {data!.LastBidderAddr}
-                        </Link>{' '}
+                        </a>{' '}
                         {lastBidderElapsed !== '' && <>({lastBidderElapsed} Elapsed)</>}
                       </>
                     )}
-                  </Typography>
-                </Grid>
-              </Grid>
+                  </p>
+                </div>
+              </div>
               {!!(curBidList.length && curBidList[0]?.Message !== '') && (
-                <Grid container spacing={2} mb={2} alignItems="center">
-                  <Grid size={{ xs: 12, sm: 4, md: 4 }}>
-                    <Typography variant="subtitle1">Last Bidder Message</Typography>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 8, md: 8 }}>
-                    <Typography sx={{ wordWrap: 'break-word', color: '#ff0' }}>
-                      {curBidList[0]?.Message}
-                    </Typography>
-                  </Grid>
-                </Grid>
+                <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                  <div className="col-span-12 sm:col-span-4">
+                    <p className="text-base">Last Bidder Message</p>
+                  </div>
+                  <div className="col-span-12 sm:col-span-8">
+                    <p className="break-words text-[#ff0]">{curBidList[0]?.Message}</p>
+                  </div>
+                </div>
               )}
               {curBidList.length > 0 && winProbability && data && (
                 <>
-                  <Typography mt={4}>
+                  <p className="mt-8">
                     {data.LastBidderAddr === account
                       ? `You have 100.00% chance of winning the main prize (${(
                           data.PrizeAmountEth ?? 0
                         ).toFixed(4)}ETH).`
                       : "You're not the last bidder, so you can win the main prize in 24 hours if the last bidder doesn't take it."}
-                  </Typography>
-                  <Typography>
+                  </p>
+                  <p>
                     You have {winProbability.raffle.toFixed(2)}% chance of winning the raffle{' '}
                     {((data.RaffleAmountEth ?? 0) / (data.NumRaffleEthWinnersBidding ?? 1)).toFixed(
                       4,
                     )}{' '}
                     ETH, and {winProbability.nft.toFixed(2)}% chance of winning a Cosmic Signature
                     Token for now.
-                  </Typography>
+                  </p>
                 </>
               )}
             </>

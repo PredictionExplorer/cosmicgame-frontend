@@ -2,18 +2,17 @@
 COSMIC SIGNATURE FRONTEND — ROAD TO 10/10 IN EVERY CATEGORY
 ================================================================================
 
-Current overall score: 8/10
+Last audited: 2026-03-10
+Current overall score: 7.5/10
 Target: 10/10 in every category
 
-This file details exactly what remains for each category to reach world-class.
-
 
 ================================================================================
-1. TECHNOLOGY STACK — Currently 8/10
+1. TECHNOLOGY STACK — Currently 7/10
 ================================================================================
 
-1a. Remove unused dependencies from package.json
-    These packages have ZERO imports in the codebase:
+1a. [OPEN] Remove unused dependencies from package.json
+    These packages have ZERO imports anywhere in the codebase:
     - @radix-ui/react-accordion
     - @radix-ui/react-dialog
     - @radix-ui/react-dropdown-menu
@@ -27,171 +26,241 @@ This file details exactly what remains for each category to reach world-class.
     - @radix-ui/react-tooltip
     - lucide-react
     - class-variance-authority
-    Run: yarn remove <all of the above> --ignore-engines
+    Run: yarn remove @radix-ui/react-accordion @radix-ui/react-dialog \
+         @radix-ui/react-dropdown-menu @radix-ui/react-label \
+         @radix-ui/react-popover @radix-ui/react-select \
+         @radix-ui/react-separator @radix-ui/react-slot \
+         @radix-ui/react-switch @radix-ui/react-tabs \
+         @radix-ui/react-tooltip lucide-react class-variance-authority \
+         --ignore-engines
 
-1b. Regenerate yarn.lock to remove orphaned react-copy-to-clipboard
-    Run: yarn install --ignore-engines
-    Verify react-copy-to-clipboard is gone from yarn.lock.
-
-1c. Migrate to App Router
-    Next.js App Router is the modern standard. The current Pages Router works
-    but is considered legacy.
-
-1d. [DONE] Package manager is already Yarn Berry v4.13.0 — no action needed.
-
-
-================================================================================
-2. ARCHITECTURE — Currently 7.5/10
-================================================================================
-
-2a. Actually import config/constants.ts values where magic numbers are used
-    The constants file exists but is NEVER imported. Replace these literals:
-
-    File: pages/index.tsx line ~810
-      Replace: setInterval(fetchDataCollection, 12000)
-      With:    setInterval(fetchDataCollection, DATA_POLL_INTERVAL_MS)
-      Import:  import { DATA_POLL_INTERVAL_MS } from '../config/constants';
-
-    File: pages/index.tsx line ~463
-      Replace: gas: BigInt(30_000_000)
-      With:    gas: BID_GAS_LIMIT
-      Import:  import { BID_GAS_LIMIT } from '../config/constants';
-
-    File: pages/index.tsx line ~193
-      Replace: args: ['0x80ac58cd']
-      With:    args: [ERC721_INTERFACE_ID]
-      Import:  import { ERC721_INTERFACE_ID } from '../config/constants';
-
-    File: components/common/BiddingStatus.tsx line ~136
-      Replace: setInterval(fetchCSTBidData, 12000)
-      With:    setInterval(fetchCSTBidData, DATA_POLL_INTERVAL_MS)
-
-    File: pages/statistics.tsx line ~275 (uses 5000 — add a constant if needed)
-
-    File: components/layout/Header.tsx line ~83 (uses 30000 — add a constant)
-
-2b. Split pages/index.tsx further (currently 1,046 lines)
-    Extract these logical units into hooks and components:
-
-    Hooks to create:
-    - hooks/useBidForm.ts
-      State: bidType, message, rwlkId, bidPricePlus, nftDonateAddress, nftId,
-             tokenDonateAddress, tokenAmount, advancedExpanded
-      Handlers: onBid, onBidWithCST, withNftDonation, withTokenDonation,
-                validation functions (isContractAddress, isERC721,
-                ensureNftOwnership, ensureNftApprovalForAll, ensureErc20Allowance,
-                getErc20Decimals, hasEthBalance, hasCstBalance)
-
-    - hooks/usePrizeClaim.ts
-      State: isClaiming, timeoutClaimPrize, claimHistory, activationTime
-      Handlers: onClaimPrize, fetchClaimHistory, fetchActivationTime
-
-    - hooks/usePrizeNotification.ts
-      Logic: browser notification permission, 5-minute warning, playAudio
-
-    Components to create:
-    - components/home/BidForm.tsx — bid type selector, RWLK gallery, message
-      field, advanced options accordion
-    - components/home/AuctionInfo.tsx — ETH/CST auction display section
-
-    Target: pages/index.tsx should be under 300 lines after extraction.
-
-2c. Convert remaining 11 files from manual useEffect+api to React Query
-    These files still use useState + useEffect + api.get_* instead of the
-    React Query hooks in hooks/useApiQuery.ts:
-
-    - pages/index.tsx — fetchDataCollection (calls ~12 API functions)
-    - pages/statistics.tsx — fetchData, fetchCSTBidData
-    - pages/prize/[id].tsx — multiple api calls
-    - pages/eth-donation/index.tsx — fetchCharityDonations
-    - pages/system-event/[round]/[start]/[end].tsx — api.get_system_events
-    - pages/admin/admin.tsx — api.get_dashboard_info
-    - pages/admin/index.tsx — api.get_bid_list
-    - pages/rewards-by-token/[address]/[tokenId].tsx — fetchData
-    - contexts/StakedTokenContext.tsx — fetchData with polling
-    - components/donations/DonatedERC20Table.tsx — api.get_current_time
-    - hooks/useRWLKNFT.ts — api.get_info
-
-2d. Standardize all imports to use @/ path alias
-    tsconfig.json has "@/*": ["./*"] configured but no file uses it.
+1b. [OPEN] Remove unused Tailwind CSS installation
+    tailwindcss, @tailwindcss/postcss, and postcss.config.mjs are installed
+    but Tailwind is NEVER used:
+    - styles/global.css has no @import "tailwindcss" directive
+    - Zero Tailwind utility classes in any component or page
+    - The project uses MUI + Emotion for all styling
     Either:
-    - Convert all relative imports to @/ (preferred), OR
-    - Remove the alias from tsconfig to avoid confusion
+    - REMOVE Tailwind entirely (preferred if MUI is the chosen styling):
+      yarn remove tailwindcss @tailwindcss/postcss --ignore-engines
+      Delete postcss.config.mjs
+      Update README.md to remove Tailwind from Tech Stack
+    - OR properly adopt it: add @import "tailwindcss" to global.css and
+      start using utility classes
 
-2e. Export useApiQuery hooks from hooks/index.ts barrel
-    Currently useApiQuery hooks are imported directly from
-    'hooks/useApiQuery'. They should be re-exported from the barrel.
+1c. [OPEN] Migrate next.config.js to next.config.ts
+    next.config.js uses CommonJS (require / module.exports). Next.js 16
+    supports TypeScript config natively. Migrate to next.config.ts with
+    ESM imports for type safety and consistency.
+
+1d. [OPEN] Fix commitlint.config.js ESM syntax
+    The file uses `export default` (ESM) in a .js file without
+    "type": "module" in package.json. Node.js shows a deprecation warning
+    and will error in the future. Fix:
+    - Rename to commitlint.config.mjs, OR
+    - Rewrite as: module.exports = { extends: ['@commitlint/config-conventional'] };
+
+1e. [DONE] App Router migration — complete. No pages/ directory remains.
+1f. [DONE] Package manager is Yarn Berry v4.13.0.
+1g. [DONE] react-copy-to-clipboard removed from yarn.lock.
 
 
 ================================================================================
-3. CODE DUPLICATION — Currently 8.5/10
+2. ARCHITECTURE — Currently 7/10
 ================================================================================
 
-3a. Replace manual OG metadata in pages/_app.tsx
-    File: pages/_app.tsx (lines ~55-65)
-    The defaultOpenGraphData array is built manually. Replace with:
-      const { openGraphData: defaultOpenGraphData } =
-        createOpenGraphProps(defaultTitle, defaultDescription);
+2a. [OPEN] Import config/constants.ts values where magic numbers are used
+    The constants file exists with DATA_POLL_INTERVAL_MS, BID_GAS_LIMIT,
+    and ERC721_INTERFACE_ID, but is NEVER imported. Replace these literals:
 
-3b. Extract shared API error handler in services/api/
-    Every API function in services/api/*.ts has the same try/catch:
+    File: app/HomePage.tsx
+      - line ~187: '0x80ac58cd' → ERC721_INTERFACE_ID
+      - line ~457: 30_000_000 → BID_GAS_LIMIT
+      - line ~802: 12000 → DATA_POLL_INTERVAL_MS
+
+    File: components/common/BiddingStatus.tsx
+      - line ~135: 12000 → DATA_POLL_INTERVAL_MS
+
+    File: app/statistics/Statistics.tsx
+      - line ~275: 5000 → add STATS_POLL_INTERVAL_MS to constants
+
+    File: components/layout/Header.tsx
+      - line ~83: 30000 → add HEADER_POLL_INTERVAL_MS to constants
+
+    File: contexts/NotificationContext.tsx
+      - line ~67: 5000 → add NOTIFICATION_AUTO_HIDE_MS to constants
+
+2b. [OPEN] Split app/HomePage.tsx (currently 1,353 lines)
+    This is the single largest file and hurts readability. Extract into:
+
+    Hooks:
+    - hooks/useBidForm.ts — bid state, validation, submission handlers
+    - hooks/usePrizeClaim.ts — claim state, history, activation time
+    - hooks/usePrizeNotification.ts — browser notifications, audio
+
+    Components:
+    - components/home/BidForm.tsx — bid type selector, message, advanced
+    - components/home/AuctionInfo.tsx — ETH/CST auction display
+
+    Target: app/HomePage.tsx under 300 lines after extraction.
+
+    Other large files needing attention (>500 lines):
+    - components/UserStatisticsView.tsx (995 lines)
+    - app/statistics/Statistics.tsx (828 lines)
+    - components/nft/NFTTrait.tsx (717 lines)
+    - app/my-staking/MyStaking.tsx (640 lines)
+    - app/code/CodeViewer.tsx (590 lines)
+    - app/my-winnings/MyWinnings.tsx (569 lines)
+    - app/admin/admin/AdminSettingsPage.tsx (491 lines)
+
+2c. [OPEN] Convert remaining 35+ files from useState+useEffect to React Query
+    The hooks/useApiQuery.ts defines 93+ React Query hooks, but many files
+    still use manual fetching. Priority targets:
+
+    Pages:
+    - app/HomePage.tsx — fetchDataCollection (calls ~12 API functions)
+    - app/statistics/Statistics.tsx — fetchData, fetchCSTBidData
+    - app/prize/[id]/PrizeInfoPage.tsx — multiple api calls
+    - app/eth-donation/EthDonations.tsx — fetchCharityDonations
+    - app/system-event/.../SystemEventPage.tsx — api.get_system_events
+    - app/admin/admin/AdminSettingsPage.tsx — api.get_dashboard_info
+    - app/admin/AdminPage.tsx — api.get_bid_list
+    - app/rewards-by-token/.../RewardsByTokenPage.tsx — fetchData
+
+    Components (19+ files):
+    - BiddingHistoryTable, BiddingStatus, DonatedNFTTable, DonatedERC20Table,
+      DonatedNFT, RaffleWinnerTable, RaffleHolderTable, ETHSpentTable,
+      BanBidTable, StakedTokensTable, CSTokensTable, RWLKNFTTable,
+      UncollectedCSTStakingRewardsTable, PaginationGrid, PaginationRWLKGrid,
+      NFTTrait, UserStatisticsView, FAQ, ConnectWalletButton
+
+    Contexts:
+    - contexts/StakedTokenContext.tsx — fetchData with polling
+    - contexts/SystemModeContext.tsx
+
+    Hooks:
+    - hooks/useTokenPrice.ts, hooks/useRWLKNFT.ts
+
+    NOTE: README.md claims "TanStack React Query v5 for all data fetching"
+    but this is not yet true. Fix the README when this is done, or update
+    the README now to be accurate.
+
+2d. [OPEN] Export useApiQuery hooks from hooks/index.ts barrel
+    hooks/index.ts exports all contract hooks but NOT the 93 useApiQuery
+    hooks. Add: export * from './useApiQuery';
+
+2e. [DONE] @/ path alias is adopted consistently across 200+ files.
+
+
+================================================================================
+3. CODE DUPLICATION — Currently 8/10
+================================================================================
+
+3a. [OPEN] Extract shared API error handler in services/api/
+    Every API function in services/api/*.ts repeats this pattern (~95 times
+    across donations.ts, staking.ts, rounds.ts, tokens.ts, users.ts,
+    raffle.ts, system.ts, marketing.ts):
+
       try { ... } catch (err) {
         if (isAxiosError(err) && err.response?.status === 400) return [];
-        throw err;
+        throw new Error('Network response was not OK');
       }
-    Extract a shared helper, e.g.:
-      async function apiCall<T>(fn: () => Promise<T>, fallback: T): Promise<T>
+
+    Extract into services/api/client.ts:
+      export async function apiCall<T>(
+        fn: () => Promise<T>,
+        fallback: T,
+      ): Promise<T> {
+        try {
+          return await fn();
+        } catch (err: unknown) {
+          if (isAxiosError(err) && err.response?.status === 400) return fallback;
+          throw new Error('Network response was not OK');
+        }
+      }
+
+    This eliminates ~95 duplicated try/catch blocks.
+
+3b. [DONE] pages/_app.tsx OG metadata duplication — eliminated by App Router
+    migration. Metadata is now handled via Next.js Metadata API in layout.tsx.
 
 
 ================================================================================
-4. TYPESCRIPT QUALITY — Currently 9/10
+4. TYPESCRIPT QUALITY — Currently 8/10
 ================================================================================
 
-4a. Add generic types to useApiQuery hooks
-    The hooks in hooks/useApiQuery.ts return unknown[] in many cases,
-    requiring `as Type[]` casts at every call site. Instead, make the hooks
-    generic or type their return values properly. Example:
+4a. [OPEN] Add generic types to useApiQuery hooks
+    Many hooks return loosely-typed data requiring ~40 `as unknown as`
+    assertions at call sites across non-test code. Files with the most
+    assertions: app/HomePage.tsx (6), app/statistics/Statistics.tsx (3),
+    components/UserStatisticsView.tsx (2), components/nft/LatestNFTs.tsx (2),
+    components/common/BiddingStatus.tsx (2).
+
+    Make hooks generic or type return values properly:
       export function useCharityWithdrawals() {
         return useQuery<CharityWithdrawal[]>({ ... });
       }
-    This eliminates ~20 type assertions across the codebase.
+
+4b. [OPEN] Eliminate @ts-expect-error in app/providers.tsx
+    Line with @ts-expect-error for CookiesProvider React 18 vs 19 types.
+    Check if react-cookie has updated their types for React 19. If not,
+    create a typed wrapper.
 
 
 ================================================================================
 5. ERROR HANDLING — Currently 8.5/10
 ================================================================================
 
-5a. Fix silent catch in pages/system-event/[round]/[start]/[end].tsx
-    Around lines 164-166, the catch block only sets loading to false but
-    does not report the error. Add: reportError(error, 'fetch system events');
+5a. [OPEN] Fix silent catch in app/system-event/.../SystemEventPage.tsx
+    The catch block only sets loading to false but does not report the error.
+    Add: reportError(error, 'fetch system events');
 
-5b. Add rel="noopener noreferrer" to all remaining target="_blank" links
-    The __blank typo was fixed, but many target="_blank" links still lack
-    rel="noopener noreferrer". Search for target="_blank" without rel= and
-    add it. Affected files include:
-    - components/donations/DonatedNFTTable.tsx
-    - components/layout/Footer.tsx
-    - components/common/AddressLink.tsx
-    - components/common/Prize.tsx
-    - components/tables/BiddingHistoryTable.tsx
-    - And others
+5b. [OPEN] Add rel="noopener noreferrer" to target="_blank" links
+    49 total target="_blank" links in components/, but only 14 have
+    rel="noopener noreferrer". 35 links are missing it. Affected files:
+    - components/layout/Footer.tsx (4 links)
+    - components/donations/DonatedNFTTable.tsx (6 links)
+    - components/tables/WinningHistoryTable.tsx (6 links)
+    - components/donations/DonatedERC20Table.tsx (4 links)
+    - components/common/Prize.tsx (3 links)
+    - components/tokens/CSTokensTable.tsx (3 links)
+    - components/tables/EthDonationTable.tsx (2 links)
+    - components/tables/CharityDepositTable.tsx (2 links)
+    - components/tables/BanBidTable.tsx (2 links — already has rel on some)
+    - components/tables/AdminEventsTable.tsx (2 links)
+    - components/staking/StakedTokensTable.tsx (2 links)
+    - components/nft/NFTTrait.tsx (2 links — 1 has rel)
+    - And 13 more files with 1 link each
 
 
 ================================================================================
-6. TESTING — Currently 5.5/10 (BIGGEST GAP)
+6. TESTING — Currently 4/10 (BIGGEST GAP)
 ================================================================================
 
-This is the most critical area. Current coverage is ~26-30% but the
-threshold is set at 60%. Reaching 10/10 requires:
+Current state:
+- 33 unit test files, 11 E2E specs
+- Actual coverage: Statements 31%, Branches 27%, Lines 31%, Functions 22%
+- Coverage threshold in jest.config.js: 60% (would FAIL in CI)
+- 1 failing test: app/__tests__/proxy-route.test.ts POST handler
+- jest.config.js collectCoverageFrom does NOT include app/ directory
+- No accessibility testing (jest-axe not installed)
 
-6a. Lower coverage threshold temporarily
-    Change jest.config.js coverageThreshold to 30% so CI doesn't fail
-    while you ramp up. Increase by 5% each sprint until you reach 80%+.
+6a. [OPEN] Fix the failing test
+    app/__tests__/proxy-route.test.ts: POST proxy test expects status 201
+    but receives 500. Debug and fix.
 
-6b. Write tests for all untested hooks (12 files)
-    Priority order:
-    - hooks/useClipboard.ts (simple, quick win)
-    - hooks/useContractNoSigner.ts (mirrors useContract.test.ts)
+6b. [OPEN] Add app/ to coverage collection
+    jest.config.js collectCoverageFrom only covers components/, hooks/,
+    utils/, services/. Add: 'app/**/*.{ts,tsx}' to capture App Router
+    page components.
+
+6c. [OPEN] Lower coverage threshold to match reality
+    Change jest.config.js coverageThreshold to 30% so CI doesn't fail.
+    Increase by 5% each sprint until reaching 80%+.
+
+6d. [OPEN] Write tests for untested hooks (12 files)
+    - hooks/useClipboard.ts
+    - hooks/useContractNoSigner.ts
     - hooks/web3.ts (useActiveWeb3React)
     - hooks/useCosmicGameContract.ts
     - hooks/useCosmicSignatureContract.ts
@@ -201,15 +270,18 @@ threshold is set at 60%. Reaching 10/10 requires:
     - hooks/useStakingWalletCSTContract.ts
     - hooks/useStakingWalletRWLKContract.ts
     - hooks/useArtBlocksContract.ts
-    - hooks/useTokenPrice.ts (already tested)
+    - hooks/index.ts
 
-6c. Write tests for untested components (59 files)
-    Priority — high-value components first:
+6e. [OPEN] Write tests for untested components (58+ files)
+    Priority — high-value first:
     - components/layout/Footer.tsx
     - components/layout/ErrorBoundary.tsx
     - components/common/VideoPlayerDialog.tsx
     - components/common/BiddingStatus.tsx
     - components/common/AddressLink.tsx
+    - components/common/FAQ.tsx
+    - components/common/Counter.tsx
+    - components/common/Prize.tsx
     - components/home/DonatedTokensSection.tsx
     - components/home/WinningHistorySection.tsx
     - components/UserStatisticsView.tsx
@@ -217,19 +289,28 @@ threshold is set at 60%. Reaching 10/10 requires:
     - All remaining table components (10+ files)
     - All token/donation components
 
-6d. Write tests for untested API modules
-    - services/api/tokens.ts
-    - services/api/raffle.ts
+6f. [OPEN] Write tests for untested contexts (4 files)
+    - contexts/NotificationContext.tsx
+    - contexts/ApiDataContext.tsx
+    - contexts/SystemModeContext.tsx
+    - contexts/StakedTokenContext.tsx
 
-6e. Add interaction tests to existing component tests
-    Current tests only check "renders empty state" and "renders with data".
-    Add:
-    - Click handler tests (buttons, links)
+6g. [OPEN] Write tests for untested API modules and utils
+    API: services/api/tokens.ts, services/api/raffle.ts
+    Utils: utils/format.ts, utils/urls.ts, utils/wallet.ts,
+           utils/endurance.ts, utils/alert.ts, utils/metadata.ts,
+           utils/analytics.ts, utils/createEmotionCache.ts
+
+6h. [OPEN] Improve existing test quality
+    Current component tests mostly check "renders empty state" and
+    "renders with data". Add:
+    - Click handler / user interaction tests
     - Form submission tests
     - Loading state transitions
     - Error state rendering
+    - Edge cases and boundary conditions
 
-6f. Add accessibility testing
+6i. [OPEN] Add accessibility testing
     Install jest-axe:
       yarn add -D jest-axe @types/jest-axe --ignore-engines
     Add to component tests:
@@ -240,7 +321,7 @@ threshold is set at 60%. Reaching 10/10 requires:
         expect(await axe(container)).toHaveNoViolations();
       });
 
-6g. Add pre-push coverage check
+6j. [OPEN] Add pre-push coverage check
     Update .husky/pre-push from:
       yarn test
     To:
@@ -251,60 +332,65 @@ threshold is set at 60%. Reaching 10/10 requires:
 7. GIT HOOKS / CI — Currently 8.5/10
 ================================================================================
 
-7a. Fix coverage threshold so CI passes
-    Currently yarn test --coverage would FAIL because coverage (~26%) is
-    below the 60% threshold. Either:
-    - Lower threshold to 30% (realistic) and ramp up, OR
-    - Write enough tests to reach 60% before merging
+7a. [OPEN] Fix coverage threshold so CI passes
+    Currently yarn test --coverage FAILS because coverage (~31%) is below
+    the 60% threshold. Lower to 30% and ramp up (see 6c).
 
-7b. Add tsc --noEmit to pre-push hook (optional)
-    Currently only in CI. Adding it to pre-push catches type errors locally:
+7b. [OPEN] Add tsc --noEmit to pre-push hook
+    Currently only in pre-commit (via lint-staged). Adding to pre-push
+    catches type errors across the full project:
     .husky/pre-push:
       npx tsc --noEmit && yarn test
 
-7c. Migrate Husky to v10
-    Current setup uses v9 which has deprecation warnings.
-    Follow: https://typicode.github.io/husky/get-started.html
+7c. [NOT APPLICABLE] Husky v10 migration
+    Husky v10 does not exist. v9.1.7 (Nov 2024) is the latest release.
+    Current setup is correct for v9. No action needed.
 
 
 ================================================================================
-8. CONFIGURATION — Currently 9/10
+8. CONFIGURATION — Currently 8.5/10
 ================================================================================
 
-8a. Remove or use the @/ path alias
-    tsconfig.json defines "@/*": ["./*"] but it's never used.
-    Either adopt it everywhere or remove it to avoid confusion.
+8a. [OPEN] Verify ESLint import/order rule actually runs
+    eslint.config.mjs uses import/order but eslint-plugin-import is only
+    a transitive dependency of eslint-config-next. Confirm the rule fires
+    by deliberately misordering an import and running yarn lint.
 
-8b. Migrate Husky scripts to v10 format
-    Update .husky/ hook files to remove deprecated shell sourcing.
+8b. [OPEN] Verify eslint-config-prettier flattening
+    prettierConfig is added as a single element in the ESLint flat config
+    array. If it exports an array, it should be spread: ...prettierConfig.
+    Confirm by checking if Prettier-conflicting rules are properly disabled.
+
+8c. [DONE] @/ path alias is adopted and working across the codebase.
+8d. [DONE] Husky scripts are v9-compatible (no deprecated shell sourcing).
 
 
 ================================================================================
 9. COMMENTS / READABILITY — Currently 7/10
 ================================================================================
 
-9a. Add JSDoc to all service functions
+9a. [OPEN] Add JSDoc to all service functions
     Files: services/api/rounds.ts, tokens.ts, staking.ts, donations.ts,
            users.ts, raffle.ts, marketing.ts, system.ts
     Each exported function should have a 1-line JSDoc explaining what it
-    fetches and what it returns.
+    fetches and what it returns. ~95 functions total.
 
-9b. Add JSDoc to utils/metadata.ts
-    The getMetadata function only has a bare comment, not proper JSDoc.
+9b. [OPEN] Add JSDoc to utils/metadata.ts (getMetadata)
+    Only has a bare comment, not proper JSDoc.
 
-9c. Add JSDoc to all exported components
-    Focus on components that accept non-obvious props. At minimum:
+9c. [OPEN] Add JSDoc to exported components
+    Focus on components that accept non-obvious props:
     - All components in components/home/
     - components/common/VideoPlayerDialog.tsx
     - components/UserStatisticsView.tsx
-    - components/nft/NFTTrait.tsx (some already done, verify)
+    - components/nft/NFTTrait.tsx
 
-9d. Break up pages/index.tsx (see 2b above)
-    This is the biggest readability issue. A 1,046-line component is not
-    readable regardless of comments.
-
-9e. Fix typo in pages/faq.tsx line 96
+9d. [OPEN] Fix typo in app/faq/page.tsx line 9
     "Frequenly" should be "Frequently"
+
+9e. [OPEN] Break up large components (see 2b above)
+    HomePage.tsx at 1,353 lines and UserStatisticsView.tsx at 995 lines
+    are the biggest readability issues.
 
 
 ================================================================================
@@ -313,44 +399,89 @@ PRIORITY ORDER
 
 Phase 1 — Quick wins (can be done in a day):
   [1a] Remove unused deps (radix, lucide, cva)
+  [1b] Remove or adopt Tailwind CSS
+  [1d] Fix commitlint.config.js ESM issue
   [2a] Import config/constants.ts values
-  [3a] Fix _app.tsx OG metadata
-  [5a] Fix silent catch in system-event
+  [5a] Fix silent catch in SystemEventPage
   [5b] Add rel="noopener noreferrer" everywhere
-  [6a] Lower coverage threshold to 30%
-  [9e] Fix "Frequenly" typo
+  [6a] Fix failing proxy-route test
+  [6b] Add app/ to coverage collection
+  [6c] Lower coverage threshold to 30%
+  [9d] Fix "Frequenly" typo
 
-Phase 2 — Testing push (1-2 weeks):
-  [6b] Write hook tests (12 files)
-  [6c] Write component tests (start with 20 highest-value)
-  [6d] Write tokens.ts and raffle.ts API tests
-  [6e] Add interaction tests to existing tests
-  [6f] Add jest-axe accessibility testing
-  Ramp coverage threshold to 50%, then 60%
+Phase 2 — Testing push (2-3 weeks):
+  [6d] Write hook tests (12 files)
+  [6e] Write component tests (start with 20 highest-value)
+  [6f] Write context tests (4 files)
+  [6g] Write API and utils tests
+  [6h] Add interaction / error / loading tests
+  [6i] Add jest-axe accessibility testing
+  Ramp coverage threshold: 30% → 50% → 60% → 80%
 
-Phase 3 — Architecture cleanup (1 week):
-  [2b] Split pages/index.tsx into hooks and components
-  [2c] Convert remaining 11 files to React Query
-  [2d] Standardize imports to @/ alias
-  [2e] Export useApiQuery from barrel
-  [3b] Extract shared API error handler
+Phase 3 — Architecture cleanup (1-2 weeks):
+  [2b] Split HomePage.tsx and other large components
+  [2c] Convert remaining 35+ files to React Query
+  [2d] Export useApiQuery from barrel
+  [3a] Extract shared API error handler (~95 duplications)
   [4a] Add generic types to useApiQuery hooks
+  [4b] Eliminate @ts-expect-error in providers.tsx
 
 Phase 4 — Polish (2-3 days):
-  [7c] Migrate Husky to v10
-  [8a] Finalize path alias decision
-  [9a-d] Complete JSDoc coverage
-
-Phase 5 — Strategic (ongoing):
-  [1c] Incremental App Router migration
-  [1d] Package manager migration
+  [1c] Migrate next.config.js to next.config.ts
+  [7b] Add tsc --noEmit to pre-push
+  [8a] Verify ESLint import/order rule
+  [8b] Verify prettier config flattening
+  [9a-c] Complete JSDoc coverage
+  [6j] Add coverage check to pre-push
 
 
 ================================================================================
-SCORING TARGET
+COMPLETED ITEMS (for reference)
 ================================================================================
 
-After Phase 1:  8.5/10 overall
-After Phase 2:  9/10 overall (testing is the biggest lever)
-After Phase 3:  9.5/10 overall
-After Phase 4:  10/10 overall (excluding App Router migration)
+[1e] App Router migration — complete (no pages/ directory remains)
+[1f] Package manager — Yarn Berry v4.13.0
+[1g] react-copy-to-clipboard removed from yarn.lock
+[2e] @/ path alias adopted consistently across 200+ files
+[3b] _app.tsx OG metadata duplication eliminated by App Router migration
+[7c] Husky v9 is the latest — no v10 to migrate to
+[8c] Path alias adopted everywhere
+[8d] Husky scripts are v9-compatible
+
+
+================================================================================
+SCORING BREAKDOWN
+================================================================================
+
+| Category             | Current | After Ph1 | After Ph2 | After Ph3 | After Ph4 |
+|----------------------|---------|-----------|-----------|-----------|-----------|
+| 1. Tech Stack        |   7/10  |    8.5    |    8.5    |    9      |   9.5     |
+| 2. Architecture      |   7/10  |    7.5    |    7.5    |    9.5    |   9.5     |
+| 3. Code Duplication  |   8/10  |    8      |    8      |   10      |   10      |
+| 4. TypeScript        |   8/10  |    8      |    8      |    9.5    |   9.5     |
+| 5. Error Handling    | 8.5/10  |    9.5    |    9.5    |   10      |   10      |
+| 6. Testing           |   4/10  |    5      |    8      |    8.5    |    9      |
+| 7. Git Hooks / CI    | 8.5/10  |    9      |    9      |    9      |   10      |
+| 8. Configuration     | 8.5/10  |    9      |    9      |    9      |   10      |
+| 9. Readability       |   7/10  |    7.5    |    7.5    |    9      |   10      |
+|----------------------|---------|-----------|-----------|-----------|-----------|
+| OVERALL              | 7.5/10  |    8      |    8.5    |    9.5    |   10      |
+
+
+================================================================================
+WHAT "WORLD-CLASS" MEANS
+================================================================================
+
+A world-class repository would have:
+- Zero unused dependencies
+- Zero magic numbers (all configurable via constants)
+- No file over 300 lines
+- All data fetching through React Query (no manual useEffect fetching)
+- Shared API error handling (DRY)
+- Fully typed (zero `as unknown as` in production code)
+- 80%+ test coverage with meaningful tests
+- Interaction, error state, and accessibility tests
+- All external links secured with rel="noopener noreferrer"
+- Every exported function documented with JSDoc
+- TypeScript configuration files (next.config.ts)
+- CI that passes on every commit

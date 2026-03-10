@@ -1,5 +1,4 @@
 import { type FC } from 'react';
-import { Box, Typography, useTheme, useMediaQuery, TableBody, Link } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
 import {
@@ -10,7 +9,6 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { useTokenPrice } from '@/hooks/useTokenPrice';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 interface PrizeData {
@@ -29,33 +27,17 @@ interface PrizeProps {
   data: PrizeData | null;
 }
 
-// -----------------------------
-// Prize Component
-// -----------------------------
 const Prize: FC<PrizeProps> = ({ data }) => {
-  const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md')); // Check if screen size is medium or larger
-  const isMobileView = useMediaQuery(theme.breakpoints.down('sm'));
-  const ethPrice = useTokenPrice(); // Get current ETH price in USD
-
-  // Format the ETH prize display based on amount
-  const prizeAmount = data?.PrizeAmountEth ?? 0;
-  const formattedETH = prizeAmount < 1 ? prizeAmount.toFixed(5) : prizeAmount.toFixed(1);
-
-  const prizeInUSD = (ethPrice * prizeAmount).toFixed(2);
-
   return (
-    <Box mt={isDesktop ? '80px' : '50px'}>
-      <Typography variant="h6">LIST OF AVAILABLE PRIZES</Typography>
+    <div className="mt-[50px] md:mt-20">
+      <h6 className="text-lg font-medium">LIST OF AVAILABLE PRIZES</h6>
       <TablePrimaryContainer>
         <TablePrimary>
-          {!isMobileView && (
-            <colgroup>
-              <col width="33%" />
-              <col width="33%" />
-              <col width="33%" />
-            </colgroup>
-          )}
+          <colgroup>
+            <col width="33%" />
+            <col width="33%" />
+            <col width="33%" />
+          </colgroup>
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Prize Type</TablePrimaryHeadCell>
@@ -63,132 +45,132 @@ const Prize: FC<PrizeProps> = ({ data }) => {
               <TablePrimaryHeadCell>Number of Winners</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-          <TableBody>
+          <tbody>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Link
+                <a
                   href="/faq#main-prize"
-                  sx={{ color: 'inherit', fontSize: 'inherit' }}
                   target="_blank"
+                  className="[color:inherit] [font-size:inherit]"
                 >
                   Main Prize
-                </Link>
+                </a>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <Typography>{data?.PrizeAmountEth.toFixed(4)} ETH</Typography>
-                <Typography>1 Cosmic Signature NFT</Typography>
-                <Typography>Tokens donated during round, if any</Typography>
+                <p>{data?.PrizeAmountEth.toFixed(4)} ETH</p>
+                <p>1 Cosmic Signature NFT</p>
+                <p>Tokens donated during round, if any</p>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>1</Typography>
+                <p>1</p>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>Raffle ETH Bidder</Typography>
+                <p>Raffle ETH Bidder</p>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <Typography>
+                <p>
                   {((data?.RaffleAmountEth ?? 0) / (data?.NumRaffleEthWinnersBidding ?? 1)).toFixed(
                     4,
                   )}{' '}
                   ETH
-                </Typography>
+                </p>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>{data?.NumRaffleEthWinnersBidding}</Typography>
+                <p>{data?.NumRaffleEthWinnersBidding}</p>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>Raffle ETH Bidder</Typography>
+                <p>Raffle ETH Bidder</p>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <Typography>1 Cosmic Signature NFT</Typography>
+                <p>1 Cosmic Signature NFT</p>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>{data?.NumRaffleNFTWinnersBidding}</Typography>
+                <p>{data?.NumRaffleNFTWinnersBidding}</p>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>Random Walk NFT Staker</Typography>
+                <p>Random Walk NFT Staker</p>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <Typography>1 Cosmic Signature NFT</Typography>
+                <p>1 Cosmic Signature NFT</p>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>{data?.NumRaffleNFTWinnersStakingRWalk} or 0</Typography>
+                <p>{data?.NumRaffleNFTWinnersStakingRWalk} or 0</p>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>Cosmic Signature NFT Staker</Typography>
+                <p>Cosmic Signature NFT Staker</p>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <Typography>{data?.StakingAmountEth.toFixed(4)} ETH</Typography>
+                <p>{data?.StakingAmountEth.toFixed(4)} ETH</p>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>1</Typography>
+                <p>1</p>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Link
+                <a
                   href="/faq#chrono-warrior"
-                  sx={{ color: 'inherit', fontSize: 'inherit' }}
                   target="_blank"
+                  className="[color:inherit] [font-size:inherit]"
                 >
                   Chrono Warrior
-                </Link>
+                </a>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <Typography>
+                <p>
                   {(
                     ((data?.CosmicGameBalanceEth ?? 0) * (data?.ChronoWarriorPercentage ?? 0)) /
                     100
                   ).toFixed(4)}{' '}
                   ETH
-                </Typography>
+                </p>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>1</Typography>
+                <p>1</p>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Link
+                <a
                   href="/faq#endurance-champion"
-                  sx={{ color: 'inherit', fontSize: 'inherit' }}
                   target="_blank"
+                  className="[color:inherit] [font-size:inherit]"
                 >
                   Endurance Champion
-                </Link>
+                </a>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <Typography>{(data?.CurNumBids ?? 0) * 10} CST</Typography>
-                <Typography>1 Cosmic Signature NFT</Typography>
+                <p>{(data?.CurNumBids ?? 0) * 10} CST</p>
+                <p>1 Cosmic Signature NFT</p>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>1</Typography>
+                <p>1</p>
               </TablePrimaryCell>
             </TablePrimaryRow>
             <TablePrimaryRow>
               <TablePrimaryCell>
-                <Typography>Last CST Bidder</Typography>
+                <p>Last CST Bidder</p>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <Typography>{(data?.CurNumBids ?? 0) * 10} CST</Typography>
-                <Typography>1 Cosmic Signature NFT</Typography>
+                <p>{(data?.CurNumBids ?? 0) * 10} CST</p>
+                <p>1 Cosmic Signature NFT</p>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
-                <Typography>1 or 0</Typography>
+                <p>1 or 0</p>
               </TablePrimaryCell>
             </TablePrimaryRow>
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
-    </Box>
+    </div>
   );
 };
 

@@ -1,44 +1,37 @@
-import { Typography, CardActionArea, Link } from '@mui/material';
+import Link from 'next/link';
 
 import { formatId, getAssetsUrl } from '@/utils';
+
 import { NFTSkeleton, NFTInfoWrapper, StyledCard } from '@/components/styled';
 
 import NFTImage from './NFTImage';
 
-// NFT component that displays an individual NFT with its image, ID, and name
 const NFT = ({ nft }: { nft: { TokenId: string; Seed: string; TokenName: string } }) => {
-  // Generate the URL for the NFT's image based on the 'Seed' field
   const image = getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
 
   return (
     <StyledCard>
-      <CardActionArea>
-        {/* Show a skeleton loader if the 'nft' data is not yet available */}
+      <div className="cursor-pointer">
         {!nft ? (
-          <NFTSkeleton animation="wave" variant="rectangular" />
+          <NFTSkeleton />
         ) : (
-          // Display the NFT image as a clickable link, leading to the NFT detail page
-          <Link href={`/detail/${nft.TokenId}`} sx={{ display: 'block' }}>
+          <Link href={`/detail/${nft.TokenId}`} className="block">
             <NFTImage src={image} />
           </Link>
         )}
 
-        {/* Display the NFT Token ID if available */}
         {nft && (
           <NFTInfoWrapper>
-            <Typography variant="caption">{formatId(nft.TokenId)}</Typography>
+            <span className="text-xs text-foreground">{formatId(nft.TokenId)}</span>
           </NFTInfoWrapper>
         )}
 
-        {/* Display the NFT Token Name if it's not an empty string */}
         {nft.TokenName !== '' && (
-          <NFTInfoWrapper sx={{ width: 'calc(100% - 40px)' }}>
-            <Typography variant="subtitle1" sx={{ color: '#FFFFFF', textAlign: 'center' }}>
-              {nft.TokenName}
-            </Typography>
+          <NFTInfoWrapper className="w-[calc(100%-40px)]">
+            <p className="text-base text-white text-center">{nft.TokenName}</p>
           </NFTInfoWrapper>
         )}
-      </CardActionArea>
+      </div>
     </StyledCard>
   );
 };

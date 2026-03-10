@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@/test-utils';
 
 jest.mock('next/script', () => ({
   __esModule: true,
@@ -30,7 +29,9 @@ jest.mock('../../utils', () => ({
 }));
 
 import { metadata, viewport } from '@/app/layout';
+// eslint-disable-next-line import/order
 import RootLayout from '@/app/layout';
+import { render, screen } from '@/test-utils';
 
 describe('RootLayout metadata', () => {
   it('exports metadata with correct default title', () => {
@@ -78,7 +79,7 @@ describe('RootLayout viewport', () => {
 
 describe('RootLayout component', () => {
   it('renders children wrapped in Providers', () => {
-    const { container } = render(
+    render(
       <RootLayout>
         <div data-testid="child-content">Hello World</div>
       </RootLayout>,

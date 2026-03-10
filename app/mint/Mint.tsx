@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { formatEther, parseEther } from 'viem';
 import { usePublicClient } from 'wagmi';
-import { Typography, Box, Button, Link } from '@mui/material';
+import Link from 'next/link';
 
+import { parseBalance } from '@/utils';
+
+import { Button } from '@/components/ui/button';
 import { MainWrapper, CenterBox } from '@/components/styled';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
-import { parseBalance } from '@/utils';
 import { useActiveWeb3React } from '@/hooks/web3';
 import {
   isUserRejection,
@@ -78,53 +80,33 @@ const Mint = () => {
     <>
       <MainWrapper>
         <CenterBox>
-          <Typography variant="h4" component="span">
-            GET A
-          </Typography>
-          <Typography variant="h4" component="span" color="primary" sx={{ ml: 1.5 }}>
-            RANDOM WALK
-          </Typography>
-          <Typography variant="h4" component="span" sx={{ ml: 1.5 }}>
-            NFT FOR
-          </Typography>
-          <Typography variant="h4" component="span" color="primary" sx={{ ml: 1.5 }}>
-            {mintPrice}Ξ
-          </Typography>
+          <span className="text-2xl font-bold">GET A</span>
+          <span className="text-2xl font-bold text-primary ml-3">RANDOM WALK</span>
+          <span className="text-2xl font-bold ml-3">NFT FOR</span>
+          <span className="text-2xl font-bold text-primary ml-3">{mintPrice}Ξ</span>
         </CenterBox>
-        <Box mt={3}>
-          <Button variant="contained" onClick={handleMint}>
-            Mint now
-          </Button>
-        </Box>
+        <div className="mt-6">
+          <Button onClick={handleMint}>Mint now</Button>
+        </div>
         {/* My NFTs */}
-        <Box display="flex" justifyContent="center" alignItems="center" flexWrap="wrap" mt={4}>
-          <Typography variant="h4" component="span" color="secondary">
-            MY
-          </Typography>
-          <Typography variant="h4" component="span" sx={{ ml: 1.5 }}>
-            RANDOM
-          </Typography>
-          <Typography variant="h4" component="span" color="primary" sx={{ ml: 1.5 }}>
-            WALK
-          </Typography>
-          <Typography variant="h4" component="span" sx={{ ml: 1.5 }}>
-            NFTS
-          </Typography>
-        </Box>
+        <div className="flex justify-center items-center flex-wrap mt-8">
+          <span className="text-2xl font-bold text-secondary">MY</span>
+          <span className="text-2xl font-bold ml-3">RANDOM</span>
+          <span className="text-2xl font-bold text-primary ml-3">WALK</span>
+          <span className="text-2xl font-bold ml-3">NFTS</span>
+        </div>
         {nftIds.length > 0 && (
-          <Box mt={2}>
+          <div className="mt-4">
             {nftIds.map((tokenId) => (
               <Link
                 key={tokenId}
                 href={`/?randomwalk=true&tokenId=${tokenId}`}
-                sx={{ mr: 2, color: 'inherit' }}
+                className="mr-4 text-inherit"
               >
-                <Typography variant="subtitle1" component="span">
-                  {tokenId}
-                </Typography>
+                <span className="text-base">{tokenId}</span>
               </Link>
             ))}
-          </Box>
+          </div>
         )}
       </MainWrapper>
     </>

@@ -22,6 +22,7 @@ jest.mock('next/link', () => ({
   ),
 }));
 
+// eslint-disable-next-line import/order
 import NotFound from '@/app/not-found';
 
 describe('NotFound page', () => {

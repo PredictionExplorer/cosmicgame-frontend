@@ -1,73 +1,65 @@
 import { useState, type FC } from 'react';
-import { Collapse, List, ListItemButton } from '@mui/material';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
 import { NavLink } from '@/components/styled';
 import { NavDescriptor } from '@/config/nav';
 
-/** -----------------------------------------------------------------------
- * Type Definitions
- * ------------------------------------------------------------------------*/
-
-/** Re-use the same descriptor type we introduced in ListNavItem.tsx */
-
 interface NestedListItemProps {
-  /** Primary navigation entry with optional sub-items */
   nav: NavDescriptor;
 }
 
-/** -----------------------------------------------------------------------
- * Component
- * ------------------------------------------------------------------------*/
-
-/**
- * Recursively renders a sidebar/table-of-contents entry that can expand to
- * reveal nested links. Designed for mobile drawers or doc sidebars.
- */
 const NestedListItem: FC<NestedListItemProps> = ({ nav }) => {
-  /** Whether the submenu is expanded */
   const [open, setOpen] = useState(false);
 
-  /** Toggle handler for accordion behaviour */
   const handleToggle = () => setOpen((prev) => !prev);
-
-  /* -------------------------------------------------------------------- */
 
   return (
     <>
       {nav.children ? (
-        // ---------------------------------------------------------------
-        // Parent item that controls a collapsible submenu
-        // ---------------------------------------------------------------
-        <ListItemButton onClick={handleToggle} aria-expanded={open}>
-          <NavLink sx={{ display: 'flex', alignItems: 'center' }}>
+        <div
+          role="button"
+          tabIndex={0}
+          className="flex w-full cursor-pointer items-center px-4 py-2 transition-colors hover:bg-white/5"
+          onClick={handleToggle}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') handleToggle();
+          }}
+          aria-expanded={open}
+        >
+          <span className="flex w-full items-center text-base uppercase text-white">
             {nav.title}
-            {open ? <ExpandLess sx={{ ml: 'auto' }} /> : <ExpandMore sx={{ ml: 'auto' }} />}
-          </NavLink>
-        </ListItemButton>
+            {open ? (
+              <ChevronUp className="ml-auto h-4 w-4" />
+            ) : (
+              <ChevronDown className="ml-auto h-4 w-4" />
+            )}
+          </span>
+        </div>
       ) : (
-        // ---------------------------------------------------------------
-        // Leaf node — a normal link without submenu
-        // ---------------------------------------------------------------
-        <ListItemButton>
+        <div className="flex items-center px-4 py-2 transition-colors hover:bg-white/5">
           <NavLink href={nav.route}>{nav.title}</NavLink>
-        </ListItemButton>
+        </div>
       )}
 
-      {/* ---------------------------------------------------------------
-       * Collapsible children (if any)
-       * -------------------------------------------------------------*/}
       {nav.children && (
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
+        <div
+          className={cn(
+            'grid transition-[grid-template-rows] duration-200',
+            open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+          )}
+        >
+          <div className="overflow-hidden">
             {nav.children.map((child, i) => (
-              <ListItemButton key={i} sx={{ pl: 4 }}>
+              <div
+                key={i}
+                className="flex items-center py-2 pl-8 transition-colors hover:bg-white/5"
+              >
                 <NavLink href={child.route}>{child.title}</NavLink>
-              </ListItemButton>
+              </div>
             ))}
-          </List>
-        </Collapse>
+          </div>
+        </div>
       )}
     </>
   );

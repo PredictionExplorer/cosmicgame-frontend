@@ -1,12 +1,12 @@
-import { Box, Container, Typography } from '@mui/material';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
+
+import { getAssetsUrl } from '@/utils';
 
 import WinningHistoryTable from '@/components/tables/WinningHistoryTable';
 import type { WinningHistoryEntry } from '@/components/tables/WinningHistoryTable';
 import TwitterShareButton from '@/components/common/TwitterShareButton';
 import TwitterPopup from '@/components/common/TwitterPopup';
-import { getAssetsUrl } from '@/utils';
 
 interface WinningHistorySectionProps {
   claimHistory: WinningHistoryEntry[] | null;
@@ -34,24 +34,24 @@ export function WinningHistorySection({
 
   return (
     <>
-      <Container>
-        <Box margin="100px 0">
-          <Typography variant="h4" textAlign="center" mb={6}>
+      <div className="container mx-auto px-4">
+        <div className="my-[100px]">
+          <h4 className="text-2xl font-semibold text-center mb-12 text-foreground">
             History of Winnings
-          </Typography>
+          </h4>
           {claimHistory === null ? (
-            <Typography variant="h6">Loading...</Typography>
+            <h6 className="text-lg font-medium text-foreground">Loading...</h6>
           ) : (
             <WinningHistoryTable winningHistory={claimHistory} />
           )}
-        </Box>
-        <Box margin="100px 0">
-          <Typography variant="h4" textAlign="center" mb={6}>
+        </div>
+        <div className="my-[100px]">
+          <h4 className="text-2xl font-semibold text-center mb-12 text-foreground">
             Create a Twitter Post and Refer People
-          </Typography>
+          </h4>
           <TwitterShareButton />
-        </Box>
-      </Container>
+        </div>
+      </div>
       <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: imageSrc }]} />
       <TwitterPopup
         open={twitterPopupOpen}

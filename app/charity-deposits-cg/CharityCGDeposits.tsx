@@ -1,7 +1,5 @@
 'use client';
 
-import { Typography } from '@mui/material';
-
 import { MainWrapper } from '@/components/styled';
 import {
   CharityDepositTable,
@@ -9,19 +7,16 @@ import {
 } from '@/components/tables/CharityDepositTable';
 import { useCharityCGDeposits } from '@/hooks/useApiQuery';
 
-/**
- * Component for displaying Cosmic Game Charity Deposits.
- */
 const CharityCGDeposits = () => {
   const { data: charityCGDeposits = [], isLoading: loading } = useCharityCGDeposits();
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
+      <h4 className="text-2xl font-bold text-primary text-center mb-8">
         Cosmic Game Charity Deposits
-      </Typography>
+      </h4>
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
         <CharityDepositTable list={charityCGDeposits as CharityDepositDonation[]} />
       )}

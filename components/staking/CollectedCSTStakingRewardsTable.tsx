@@ -1,5 +1,10 @@
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { useState } from 'react';
-import { Link, TableBody, Typography } from '@mui/material';
+import Link from 'next/link';
+import { Tbody, Tr } from 'react-super-responsive-table';
+
+import { convertTimestampToDateTime } from '@/utils';
 
 import {
   TablePrimary,
@@ -9,11 +14,6 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { convertTimestampToDateTime } from '@/utils';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { Tr } from 'react-super-responsive-table';
-
 import { CustomPagination } from '@/components/common/CustomPagination';
 
 export interface CollectedReward {
@@ -38,7 +38,7 @@ const CollectedRewardsRow = ({ row }: { row: CollectedReward }) => {
       <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+        <Link href={`/prize/${RoundNum}`} className="text-inherit">
           {RoundNum}
         </Link>
       </TablePrimaryCell>
@@ -50,21 +50,14 @@ const CollectedRewardsRow = ({ row }: { row: CollectedReward }) => {
   );
 };
 
-/* ------------------------------------------------------------------
-  Main Component: CollectedCSTStakingRewardsTable
-  Displays a paginated list of previously collected staking rewards.
------------------------------------------------------------------- */
 export const CollectedCSTStakingRewardsTable = ({ list }: { list: CollectedReward[] }) => {
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const PER_PAGE = 5;
 
-  // Early return if no data
   if (!list || list.length === 0) {
-    return <Typography>No rewards yet.</Typography>;
+    return <p className="text-muted-foreground">No rewards yet.</p>;
   }
 
-  // Slice data for the current page
   const startIndex = (currentPage - 1) * PER_PAGE;
   const endIndex = currentPage * PER_PAGE;
   const currentData = list.slice(startIndex, endIndex);
@@ -81,7 +74,6 @@ export const CollectedCSTStakingRewardsTable = ({ list }: { list: CollectedRewar
             <col width="20%" />
           </colgroup>
 
-          {/* Table Header */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
@@ -92,16 +84,14 @@ export const CollectedCSTStakingRewardsTable = ({ list }: { list: CollectedRewar
             </Tr>
           </TablePrimaryHead>
 
-          {/* Table Body */}
-          <TableBody>
+          <Tbody>
             {currentData.map((row) => (
               <CollectedRewardsRow key={row.EvtLogId} row={row} />
             ))}
-          </TableBody>
+          </Tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Pagination */}
       <CustomPagination
         page={currentPage}
         setPage={setCurrentPage}

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Typography } from '@mui/material';
 
 import { MainWrapper } from '@/components/styled';
 import api from '@/services/api';
@@ -24,7 +23,7 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
         const sys_events = await api.get_system_events(start, end);
         setEvents(sys_events as AdminEventRow[]);
         setLoading(false);
-      } catch (err) {
+      } catch {
         setLoading(false);
       }
     };
@@ -34,16 +33,16 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
   return (
     <MainWrapper>
       {round > 0 ? (
-        <Typography variant="h4" color="primary" textAlign="center" mb={4} letterSpacing="1px">
+        <h2 className="mb-8 text-center text-2xl font-bold tracking-wide text-primary">
           System Configuration Made Before Round {round}
-        </Typography>
+        </h2>
       ) : (
-        <Typography variant="h4" color="primary" textAlign="center" mb={4} letterSpacing="1px">
+        <h2 className="mb-8 text-center text-2xl font-bold tracking-wide text-primary">
           System Configuration Made Before Deployment
-        </Typography>
+        </h2>
       )}
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <p className="text-lg font-semibold">Loading...</p>
       ) : (
         <AdminEventsTable list={events} />
       )}

@@ -1,18 +1,9 @@
-import { useEffect, useState, useMemo } from 'react';
-import {
-  Box,
-  Button,
-  Checkbox,
-  CircularProgress,
-  Link,
-  Menu,
-  MenuItem,
-  TableBody,
-  Typography,
-} from '@mui/material';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Tr } from 'react-super-responsive-table';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import Link from 'next/link';
+import { ChevronDown, Loader2 } from 'lucide-react';
+import { Tbody, Tr } from 'react-super-responsive-table';
+
+import { convertTimestampToDateTime, getAssetsUrl, getRWLKImageUrl } from '@/utils';
 
 import {
   TablePrimary,
@@ -22,7 +13,6 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { convertTimestampToDateTime, getAssetsUrl, getRWLKImageUrl } from '@/utils';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import api from '@/services/api';
@@ -30,8 +20,16 @@ import { reportError } from '@/utils/errors';
 import type { RewardsByToken } from '@/services/api/types';
 import NFTImage from '@/components/nft/NFTImage';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-// Types
 interface RandomWalkRow {
   StakeActionId: number;
   StakedTokenId: number;
@@ -51,7 +49,6 @@ interface CosmicSignatureRow {
 
 type StakedRow = RandomWalkRow | CosmicSignatureRow;
 
-// Custom Hook: useTokenName
 function useTokenName(
   isRandomWalk: boolean,
   randomWalkId?: number,
@@ -81,7 +78,6 @@ function useTokenName(
   return tokenName;
 }
 
-// StakedTokenRow
 interface StakedTokenRowProps {
   row: StakedRow;
   isRandomWalk: boolean;
@@ -115,7 +111,6 @@ const StakedTokenRow = ({
     ? (row as RandomWalkRow).StakeTimeStamp
     : (row as CosmicSignatureRow).StakeTimeStamp;
 
-  // Hook for token name
   const tokenName = useTokenName(
     isRandomWalk,
     isRandomWalk ? tokenId : undefined,
@@ -136,36 +131,33 @@ const StakedTokenRow = ({
       role="checkbox"
       aria-checked={isItemSelected}
       tabIndex={-1}
-      key={stakeActionId}
-      selected={isItemSelected}
+      className={cn('cursor-pointer', isItemSelected && 'bg-white/[0.08]')}
       onClick={() => onRowClick(stakeActionId)}
-      sx={{ cursor: 'pointer' }}
     >
-      <TablePrimaryCell padding="checkbox">
-        <Checkbox color="primary" checked={isItemSelected} size="small" />
+      <TablePrimaryCell className="p-2">
+        <Checkbox checked={isItemSelected} readOnly />
       </TablePrimaryCell>
 
-      <TablePrimaryCell sx={{ width: '120px' }}>
+      <TablePrimaryCell className="w-[120px]">
         <NFTImage src={tokenImageURL} />
-        <Typography variant="caption" mt={1} display="block">
-          {tokenName}
-        </Typography>
+        <span className="text-xs mt-2 block">{tokenName}</span>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link
+        <a
           href={isRandomWalk ? `https://randomwalknft.com/detail/${tokenId}` : `/detail/${tokenId}`}
-          sx={{ color: 'inherit', fontSize: 'inherit' }}
+          className="text-inherit"
           target="_blank"
+          rel="noopener noreferrer"
         >
           {tokenId}
-        </Link>
+        </a>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
         <Link
           href={`/staking-action/${isRandomWalk ? 1 : 0}/${stakeActionId}`}
-          sx={{ color: 'inherit', fontSize: 'inherit' }}
+          className="text-inherit"
           target="_blank"
         >
           {stakeActionId}
@@ -182,8 +174,9 @@ const StakedTokenRow = ({
 
       <TablePrimaryCell align="center">
         <Button
-          size="small"
-          sx={{ mr: 1 }}
+          size="sm"
+          variant="ghost"
+          className="mr-2"
           disabled={processing}
           onClick={async (e) => {
             e.stopPropagation();
@@ -196,10 +189,10 @@ const StakedTokenRow = ({
           }}
         >
           {processing ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <CircularProgress size={14} color="inherit" />
+            <span className="flex items-center gap-1">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
               Unstaking...
-            </Box>
+            </span>
           ) : (
             'Unstake'
           )}
@@ -209,7 +202,6 @@ const StakedTokenRow = ({
   );
 };
 
-// StakedTokensTable
 interface StakedTokensTableProps {
   list: StakedRow[];
   handleUnstake: (id: number, isRandomWalk?: boolean) => Promise<void>;
@@ -226,9 +218,9 @@ export const StakedTokensTable = ({
   const { account } = useActiveWeb3React();
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [processing, setProcessing] = useState(false);
+  const headerCheckboxRef = useRef<HTMLInputElement>(null);
 
   const [accumulatedRewardsByToken, setAccumulatedRewardsByToken] = useState<RewardsByToken[]>([]);
 
@@ -245,11 +237,17 @@ export const StakedTokensTable = ({
     }
   }, [account, IsRwalk]);
 
-  // Refresh selection and pagination when the list changes
   useEffect(() => {
     setSelectedIds([]);
     setPage(1);
   }, [list]);
+
+  useEffect(() => {
+    if (headerCheckboxRef.current) {
+      headerCheckboxRef.current.indeterminate =
+        selectedIds.length > 0 && selectedIds.length < list.length;
+    }
+  }, [selectedIds.length, list.length]);
 
   const sortedList = useMemo(() => {
     return [...list].sort((a, b) => {
@@ -263,17 +261,14 @@ export const StakedTokensTable = ({
     });
   }, [list, IsRwalk]);
 
-  // Check if ID is in selected array
   const isSelected = (id: number) => selectedIds.includes(id);
 
-  // Toggle selection for single row
   const handleRowClick = (id: number) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
     );
   };
 
-  // "Select All"
   const onSelectAllClick = () => {
     const newSelected = list.map((row) =>
       IsRwalk
@@ -281,10 +276,8 @@ export const StakedTokensTable = ({
         : (row as CosmicSignatureRow).TokenInfo.StakeActionId,
     );
     setSelectedIds(newSelected);
-    setAnchorEl(null);
   };
 
-  // "Select Current Page"
   const onSelectCurPgClick = () => {
     const newSelected = sortedList
       .slice((page - 1) * perPage, page * perPage)
@@ -294,16 +287,12 @@ export const StakedTokensTable = ({
           : (row as CosmicSignatureRow).TokenInfo.StakeActionId,
       );
     setSelectedIds(newSelected);
-    setAnchorEl(null);
   };
 
-  // "Select None"
   const onSelectNoneClick = () => {
     setSelectedIds([]);
-    setAnchorEl(null);
   };
 
-  // Unstake multiple tokens
   const onUnstakeManyClick = async () => {
     setProcessing(true);
     try {
@@ -313,15 +302,13 @@ export const StakedTokensTable = ({
     }
   };
 
-  // Unstake a single token
   const onUnstakeSingle = async (actionId: number) => {
     setSelectedIds([actionId]);
     await handleUnstake(actionId, IsRwalk);
   };
 
-  // If there's no staked tokens
   if (list.length === 0) {
-    return <Typography>No tokens yet.</Typography>;
+    return <p className="text-muted-foreground">No tokens yet.</p>;
   }
 
   return (
@@ -340,48 +327,30 @@ export const StakedTokensTable = ({
 
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell padding="checkbox" align="left">
-                <Box
-                  sx={{
-                    display: { md: 'flex', sm: 'flex', xs: 'none' },
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                  }}
-                  onClick={(e) => setAnchorEl(e.currentTarget)}
-                >
-                  <Checkbox
-                    color="info"
-                    size="small"
-                    indeterminate={selectedIds.length > 0 && selectedIds.length < list.length}
-                    checked={list.length > 0 && selectedIds.length === list.length}
-                  />
-                  {anchorEl ? <ExpandLess /> : <ExpandMore />}
-                </Box>
-                <Menu
-                  elevation={0}
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                  }}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                  }}
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={() => setAnchorEl(null)}
-                >
-                  <MenuItem style={{ minWidth: 166 }} onClick={onSelectAllClick}>
-                    <Typography>Select All</Typography>
-                  </MenuItem>
-                  <MenuItem style={{ minWidth: 166 }} onClick={onSelectCurPgClick}>
-                    <Typography>Select Current Page</Typography>
-                  </MenuItem>
-                  <MenuItem style={{ minWidth: 166 }} onClick={onSelectNoneClick}>
-                    <Typography>Select None</Typography>
-                  </MenuItem>
-                </Menu>
+              <TablePrimaryHeadCell className="p-2" align="left">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="hidden sm:flex items-center cursor-pointer">
+                      <Checkbox
+                        ref={headerCheckboxRef}
+                        checked={list.length > 0 && selectedIds.length === list.length}
+                        readOnly
+                      />
+                      <ChevronDown className="h-4 w-4 ml-0.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem className="min-w-[166px]" onClick={onSelectAllClick}>
+                      Select All
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="min-w-[166px]" onClick={onSelectCurPgClick}>
+                      Select Current Page
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="min-w-[166px]" onClick={onSelectNoneClick}>
+                      Select None
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TablePrimaryHeadCell>
 
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
@@ -393,7 +362,7 @@ export const StakedTokensTable = ({
             </Tr>
           </TablePrimaryHead>
 
-          <TableBody>
+          <Tbody>
             {sortedList.slice((page - 1) * perPage, page * perPage).map((row) => {
               const stakeActionId = IsRwalk
                 ? (row as RandomWalkRow).StakeActionId
@@ -417,23 +386,23 @@ export const StakedTokensTable = ({
                 />
               );
             })}
-          </TableBody>
+          </Tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
       {selectedIds.length > 1 && (
-        <Box display="flex" justifyContent="end" mt={2}>
+        <div className="flex justify-end mt-4">
           <Button variant="text" disabled={processing} onClick={onUnstakeManyClick}>
             {processing ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <CircularProgress size={14} color="inherit" />
+              <span className="flex items-center gap-1">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 Unstaking...
-              </Box>
+              </span>
             ) : (
               'Unstake Many'
             )}
           </Button>
-        </Box>
+        </div>
       )}
 
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />

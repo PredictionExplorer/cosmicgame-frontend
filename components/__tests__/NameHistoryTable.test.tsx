@@ -1,7 +1,10 @@
-import { render, screen } from '@/test-utils';
-import NameHistoryTable from '@/components/tables/NameHistoryTable';
 import '@testing-library/jest-dom';
+
 import { convertTimestampToDateTime } from '@/utils';
+
+import NameHistoryTable from '@/components/tables/NameHistoryTable';
+
+import { render, screen } from '@/test-utils';
 
 describe('NameHistoryTable', () => {
   test('with no records', () => {

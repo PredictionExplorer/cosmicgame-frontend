@@ -1,91 +1,105 @@
 import { useMemo, type ChangeEvent } from 'react';
-import { Box, Pagination, TextField, Typography } from '@mui/material';
 
-/**
- * Props for the {@link CustomPagination} component.
- */
+import { Input } from '@/components/ui/input';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+} from '@/components/ui/pagination';
+
 interface CustomPaginationProps {
-  /** Currently selected page (1‑based) */
   page: number;
-  /** Callback invoked when the page changes */
   setPage: (page: number) => void;
-  /** Total number of items in the dataset */
   totalLength: number;
-  /** Items shown per page */
   perPage: number;
 }
 
-/**
- * Displays a MUI {@link Pagination} control with an optional
- * "Go to page" numeric input when lots of pages are available.
- *
- * The numeric input appears only when the calculated `pageCount`
- * is **≥ 30**, to avoid visual clutter on small datasets.
- */
+function getVisiblePages(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const pages: (number | 'ellipsis')[] = [1];
+
+  if (current > 3) {
+    pages.push('ellipsis');
+  }
+
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  if (current < total - 2) {
+    pages.push('ellipsis');
+  }
+
+  pages.push(total);
+
+  return pages;
+}
+
 export const CustomPagination = ({
   page,
   setPage,
   totalLength,
   perPage,
 }: CustomPaginationProps) => {
-  /**
-   * Total number of pages — recomputed only when the
-   * length of the dataset or the page size changes.
-   */
   const pageCount = useMemo(
     () => Math.max(1, Math.ceil(totalLength / perPage)),
     [totalLength, perPage],
   );
 
-  /** Whether to show the "Go to page" numeric input. */
   const showGoToInput = pageCount >= 30;
 
-  /**
-   * Parses the value from the text field and clamps it
-   * between **1** and **pageCount** to avoid invalid pages.
-   */
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     if (Number.isNaN(value)) return;
 
-    // Clamp value to valid range
     const nextPage = Math.min(Math.max(value, 1), pageCount);
     setPage(nextPage);
   };
 
-  return (
-    <Box
-      display="flex"
-      justifyContent={showGoToInput ? 'end' : 'center'}
-      alignItems="center"
-      flexWrap="wrap"
-      mt={2}
-    >
-      {/* Standard pagination control */}
-      <Pagination
-        color="primary"
-        page={page}
-        onChange={(_, p) => setPage(p)}
-        count={pageCount}
-        hideNextButton
-        hidePrevButton
-        shape="rounded"
-      />
+  const visiblePages = getVisiblePages(page, pageCount);
 
-      {/* Direct page selector, shown only for large datasets */}
+  return (
+    <div
+      className={`mt-4 flex flex-wrap items-center ${showGoToInput ? 'justify-end' : 'justify-center'}`}
+    >
+      <Pagination>
+        <PaginationContent>
+          {visiblePages.map((item, i) => (
+            <PaginationItem key={i}>
+              {item === 'ellipsis' ? (
+                <PaginationEllipsis />
+              ) : (
+                <PaginationLink isActive={item === page} onClick={() => setPage(item)}>
+                  {item}
+                </PaginationLink>
+              )}
+            </PaginationItem>
+          ))}
+        </PaginationContent>
+      </Pagination>
+
       {showGoToInput && (
-        <Box sx={{ display: 'flex', alignItems: 'center', ml: 4, my: 1 }}>
-          <Typography sx={{ mr: 1 }}>Go to page:</Typography>
-          <TextField
+        <div className="my-1 ml-8 flex items-center">
+          <span className="mr-2 text-sm">Go to page:</span>
+          <Input
             type="number"
-            size="small"
+            className="max-w-[100px]"
             value={page}
-            sx={{ maxWidth: 100 }}
             onChange={handleInputChange}
-            inputProps={{ min: 1, max: pageCount, 'aria-label': 'go to page' }}
+            min={1}
+            max={pageCount}
+            aria-label="go to page"
           />
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };

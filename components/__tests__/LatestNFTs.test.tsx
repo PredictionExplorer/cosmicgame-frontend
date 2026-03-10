@@ -1,5 +1,6 @@
-import { render, screen, act } from '@/test-utils';
 import LatestNFTs from '@/components/nft/LatestNFTs';
+
+import { render, screen } from '@/test-utils';
 import '@testing-library/jest-dom';
 
 describe('LatestNFTs', () => {

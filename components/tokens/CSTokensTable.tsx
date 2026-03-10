@@ -1,19 +1,11 @@
-import { useEffect, useState, useMemo, type MouseEvent } from 'react';
-import {
-  Box,
-  Button,
-  Checkbox,
-  CircularProgress,
-  Link,
-  Menu,
-  MenuItem,
-  TableBody,
-  Typography,
-} from '@mui/material';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import { useEffect, useState, useMemo, useRef, type MouseEvent } from 'react';
+import Link from 'next/link';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import { Tr } from 'react-super-responsive-table';
 
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+
+import { cn } from '@/lib/utils';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -22,9 +14,17 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 import type { CSTTokenInfo } from '@/services/api';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Spinner } from '@/components/ui/spinner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 
@@ -35,17 +35,12 @@ interface CSTokenRowProps {
   isItemSelected: boolean;
 }
 
-/* ------------------------------------------------------------------
-  Sub-Component: CSTokenRow
-  Renders a single row (CSToken).
------------------------------------------------------------------- */
 const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTokenRowProps) => {
   const [processing, setProcessing] = useState(false);
   if (!row) return null;
 
   const { TokenId, TxHash, TimeStamp, TokenName, RoundNum, WinnerAddr, Staked } = row;
 
-  // Row-level click handlers
   const handleRowClick = () => onSelectToggle(TokenId);
 
   const handleStakeClick = async (e: MouseEvent) => {
@@ -62,66 +57,50 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
     <TablePrimaryRow
       role="checkbox"
       tabIndex={-1}
-      selected={isItemSelected}
       onClick={handleRowClick}
-      sx={{ cursor: 'pointer' }}
+      className={cn('cursor-pointer', isItemSelected && 'bg-white/5')}
     >
-      {/* Checkbox */}
-      <TablePrimaryCell padding="checkbox">
-        <Checkbox color="primary" checked={isItemSelected} size="small" />
+      <TablePrimaryCell className="!px-3 !py-2">
+        <Checkbox checked={isItemSelected} readOnly className="h-4 w-4" />
       </TablePrimaryCell>
 
-      {/* Mint Datetime */}
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
 
-      {/* Token ID */}
       <TablePrimaryCell align="center">
-        <Link
-          href={`/detail/${TokenId}`}
-          sx={{ color: 'inherit', fontSize: 'inherit' }}
-          target="_blank"
-        >
+        <Link href={`/detail/${TokenId}`} className="text-inherit" target="_blank">
           {TokenId}
         </Link>
       </TablePrimaryCell>
 
-      {/* Token Name */}
       <TablePrimaryCell align="center">{TokenName || ' '}</TablePrimaryCell>
 
-      {/* Round Number */}
       <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${RoundNum}`}
-          style={{ color: 'inherit', fontSize: 'inherit' }}
-          target="_blank"
-        >
+        <Link href={`/prize/${RoundNum}`} className="text-inherit" target="_blank">
           {RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      {/* Winner Address */}
       <TablePrimaryCell align="center">
         <AddressLink address={String(WinnerAddr ?? '')} url={`/user/${WinnerAddr ?? ''}`} />
       </TablePrimaryCell>
 
-      {/* Stake Button */}
       <TablePrimaryCell align="center">
         {!Staked && (
-          <Button size="small" disabled={processing} onClick={handleStakeClick}>
+          <Button size="sm" disabled={processing} onClick={handleStakeClick}>
             {processing ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <CircularProgress size={14} color="inherit" />
+              <span className="flex items-center gap-1">
+                <Spinner size="sm" />
                 Staking...
-              </Box>
+              </span>
             ) : (
               'Stake'
             )}
@@ -138,75 +117,59 @@ interface CSTokensTableProps {
   handleStakeMany: (ids: number[], isRwlkFlags: boolean[]) => Promise<void>;
 }
 
-/* ------------------------------------------------------------------
-  Main Component: CSTokensTable
-  Renders a paginated table of CSTokens with "stake" functionality.
------------------------------------------------------------------- */
 export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTableProps) => {
   const perPage = 5;
-
-  // Pagination
   const [page, setPage] = useState(1);
-
-  // Menu anchor (for "Select All / Current Page / None")
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
-  // Track selected Token IDs
+  const [menuOpen, setMenuOpen] = useState(false);
   const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
   const [processing, setProcessing] = useState(false);
+  const headerCheckboxRef = useRef<HTMLInputElement>(null);
 
-  // Refresh selection and pagination when the list changes
   useEffect(() => {
     setSelectedTokenIds([]);
     setPage(1);
   }, [list]);
 
-  // Slice the data for the current page
+  const isIndeterminate = selectedTokenIds.length > 0 && selectedTokenIds.length < list.length;
+  const isAllSelected = list.length > 0 && selectedTokenIds.length === list.length;
+
+  useEffect(() => {
+    if (headerCheckboxRef.current) {
+      headerCheckboxRef.current.indeterminate = isIndeterminate;
+    }
+  }, [isIndeterminate]);
+
   const pageItems = useMemo(() => {
     const startIndex = (page - 1) * perPage;
     const endIndex = page * perPage;
     return list.slice(startIndex, endIndex);
   }, [list, page]);
 
-  // Check if a token is selected
   const isSelected = (id: number) => selectedTokenIds.includes(id);
 
-  // Toggle selection of a single row
   const handleSelectToggle = (id: number) => {
     setSelectedTokenIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
-  // Close the select menu
-  const handleCloseMenu = () => setAnchorEl(null);
-
-  // "Select All" from the entire list
   const handleSelectAll = () => {
     setSelectedTokenIds(list.map((row) => row.TokenId));
-    handleCloseMenu();
   };
 
-  // "Select Current Page" only
   const handleSelectCurrentPage = () => {
     setSelectedTokenIds(pageItems.map((row) => row.TokenId));
-    handleCloseMenu();
   };
 
-  // "Select None"
   const handleSelectNone = () => {
     setSelectedTokenIds([]);
-    handleCloseMenu();
   };
 
-  // Single-stake
   const handleStakeSingle = async (id: number) => {
-    // Temporarily set only this ID as selected
     setSelectedTokenIds([id]);
     await handleStake(id, false);
   };
 
-  // Stake many tokens
   const handleStakeManySelected = async () => {
     setProcessing(true);
     try {
@@ -216,14 +179,10 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
     }
   };
 
-  // If the list is empty
   if (list.length === 0) {
-    return <Typography>No available tokens.</Typography>;
+    return <p>No available tokens.</p>;
   }
 
-  /* ------------------------------------------------------------------
-    Render
-  ------------------------------------------------------------------ */
   return (
     <>
       <TablePrimaryContainer>
@@ -240,45 +199,31 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
 
           <TablePrimaryHead>
             <Tr>
-              {/* Checkbox + Select Menu */}
-              <TablePrimaryHeadCell padding="checkbox" align="left">
-                <Box
-                  sx={{
-                    display: { md: 'flex', sm: 'flex', xs: 'none' },
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                  }}
-                  onClick={(e: MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget)}
-                >
-                  <Checkbox
-                    color="info"
-                    size="small"
-                    indeterminate={
-                      selectedTokenIds.length > 0 && selectedTokenIds.length < list.length
-                    }
-                    checked={list.length > 0 && selectedTokenIds.length === list.length}
-                  />
-                  {Boolean(anchorEl) ? <ExpandLess /> : <ExpandMore />}
-                </Box>
-                <Menu
-                  elevation={0}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={handleCloseMenu}
-                >
-                  <MenuItem style={{ minWidth: 166 }} onClick={handleSelectAll}>
-                    <Typography>Select All</Typography>
-                  </MenuItem>
-                  <MenuItem style={{ minWidth: 166 }} onClick={handleSelectCurrentPage}>
-                    <Typography>Select Current Page</Typography>
-                  </MenuItem>
-                  <MenuItem style={{ minWidth: 166 }} onClick={handleSelectNone}>
-                    <Typography>Select None</Typography>
-                  </MenuItem>
-                </Menu>
+              <TablePrimaryHeadCell align="left" className="!px-3 !py-2">
+                <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <div className="hidden sm:flex items-center cursor-pointer">
+                      <Checkbox
+                        ref={headerCheckboxRef}
+                        checked={isAllSelected}
+                        readOnly
+                        className="h-4 w-4"
+                      />
+                      {menuOpen ? (
+                        <ChevronUp className="h-5 w-5" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5" />
+                      )}
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="min-w-[166px]">
+                    <DropdownMenuItem onSelect={handleSelectAll}>Select All</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleSelectCurrentPage}>
+                      Select Current Page
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={handleSelectNone}>Select None</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TablePrimaryHeadCell>
 
               <TablePrimaryHeadCell align="left">Mint Datetime</TablePrimaryHeadCell>
@@ -290,8 +235,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
             </Tr>
           </TablePrimaryHead>
 
-          {/* Table Body */}
-          <TableBody>
+          <tbody>
             {pageItems.map((row) => (
               <CSTokenRow
                 key={row.EvtLogId}
@@ -301,27 +245,25 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
                 onStakeSingle={handleStakeSingle}
               />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Stake Many button */}
       {selectedTokenIds.length > 1 && (
-        <Box display="flex" justifyContent="end" mt={2}>
+        <div className="flex justify-end mt-4">
           <Button variant="text" disabled={processing} onClick={handleStakeManySelected}>
             {processing ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <CircularProgress size={14} color="inherit" />
+              <span className="flex items-center gap-1">
+                <Spinner size="sm" />
                 Staking...
-              </Box>
+              </span>
             ) : (
               'Stake Many'
             )}
           </Button>
-        </Box>
+        </div>
       )}
 
-      {/* Pagination */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

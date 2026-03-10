@@ -1,5 +1,11 @@
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { useState } from 'react';
-import { Box, Collapse, IconButton, Link, TableBody, Typography } from '@mui/material';
+import Link from 'next/link';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Tbody, Tr } from 'react-super-responsive-table';
+
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import {
   TablePrimary,
@@ -9,16 +15,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { Tr } from 'react-super-responsive-table';
-
 import { useStakingCSTRewardsByRound } from '@/hooks/useApiQuery';
-
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-
 import { CustomPagination } from '@/components/common/CustomPagination';
 import StakingWinnerTable from '@/components/tables/StakingWinnerTable';
 
@@ -46,91 +43,77 @@ const GlobalStakingRewardsRow = ({ row }: { row: GlobalStakingReward }) => {
 
   const { data: list = [] } = useStakingCSTRewardsByRound(row?.RoundNum);
 
-  // If row is undefined or null, return an empty row
   if (!row) {
     return <TablePrimaryRow />;
   }
 
   return (
     <>
-      {/* Main table row (collapsible) */}
-      <TablePrimaryRow sx={{ borderBottom: 0 }}>
-        <TablePrimaryCell sx={{ p: 0 }}>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+      <TablePrimaryRow className="border-b-0">
+        <TablePrimaryCell className="p-0">
+          <button
+            aria-label="expand row"
+            className="inline-flex items-center justify-center rounded-full p-1 hover:bg-white/10 transition-colors"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+          </button>
         </TablePrimaryCell>
 
-        {/* Deposit Datetime (linked to Arbiscan) */}
         <TablePrimaryCell>
-          <Link
-            color="inherit"
-            fontSize="inherit"
+          <a
             href={getExplorerUrl('tx', row.TxHash)}
             target="_blank"
             rel="noopener noreferrer"
+            className="text-inherit"
           >
             {convertTimestampToDateTime(row.TimeStamp)}
-          </Link>
+          </a>
         </TablePrimaryCell>
 
-        {/* Round Number (linked to /prize page) */}
         <TablePrimaryCell align="center">
-          <Link href={`/prize/${row.RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+          <Link href={`/prize/${row.RoundNum}`} className="text-inherit">
             {row.RoundNum}
           </Link>
         </TablePrimaryCell>
 
-        {/* Total Staked Tokens */}
         <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>
 
-        {/* Total Deposited (ETH) */}
         <TablePrimaryCell align="center">
           {(row.TotalDepositAmountEth ?? 0).toFixed(6)}
         </TablePrimaryCell>
 
-        {/* Fully Claimed? */}
         <TablePrimaryCell align="center">{row.FullyClaimed ? 'Yes' : 'No'}</TablePrimaryCell>
 
-        {/* Pending to Collect (ETH) */}
         <TablePrimaryCell align="right">
           {(row.PendingToCollectEth ?? 0).toFixed(6)}
         </TablePrimaryCell>
       </TablePrimaryRow>
 
-      {/* Expanded content (winner details) */}
-      <TablePrimaryRow sx={{ borderTop: 0 }}>
-        <TablePrimaryCell sx={{ py: 0 }} colSpan={8}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1, marginBottom: 4 }}>
-              <Typography variant="subtitle1" gutterBottom component="div">
+      <TablePrimaryRow className="border-t-0">
+        <TablePrimaryCell className="py-0" colSpan={8}>
+          {open && (
+            <div className="m-2 mb-8">
+              <h3 className="text-base font-medium mb-2">
                 CST Staking Rewards for Round {row.RoundNum}
-              </Typography>
+              </h3>
               <StakingWinnerTable list={list as StakingWinner[]} />
-            </Box>
-          </Collapse>
+            </div>
+          )}
         </TablePrimaryCell>
       </TablePrimaryRow>
     </>
   );
 };
 
-/**
- * Renders a paginated table showing all Global Staking Rewards.
- */
 export const GlobalStakingRewardsTable = ({ list }: { list: GlobalStakingReward[] }) => {
-  // Number of rows to display per page
   const perPage = 5;
-
-  // State for the current page number
   const [page, setPage] = useState(1);
 
-  // If there are no records, show a message
   if (list.length === 0) {
-    return <Typography>No rewards yet.</Typography>;
+    return <p className="text-muted-foreground">No rewards yet.</p>;
   }
 
-  // Calculate the subset of the data for the current page
   const displayedRows = list.slice((page - 1) * perPage, page * perPage);
 
   return (
@@ -139,7 +122,7 @@ export const GlobalStakingRewardsTable = ({ list }: { list: GlobalStakingReward[
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell sx={{ p: 0 }} />
+              <TablePrimaryHeadCell className="p-0" />
               <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
@@ -149,16 +132,14 @@ export const GlobalStakingRewardsTable = ({ list }: { list: GlobalStakingReward[
             </Tr>
           </TablePrimaryHead>
 
-          {/* Table body: Render rows for the current page */}
-          <TableBody>
+          <Tbody>
             {displayedRows.map((row, index) => (
               <GlobalStakingRewardsRow row={row} key={(page - 1) * perPage + index} />
             ))}
-          </TableBody>
+          </Tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Pagination Controls */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

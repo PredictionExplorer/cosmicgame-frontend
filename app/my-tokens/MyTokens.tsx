@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Box, Typography } from '@mui/material';
 
 import { MainWrapper } from '@/components/styled';
 import { reportError } from '@/utils/errors';
@@ -51,29 +50,26 @@ function MyWallet() {
     if (account) {
       refetch(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, account]);
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center">
+      <h4 className="text-2xl font-bold text-primary text-center mb-2">
         My Cosmic Signature (ERC721) Tokens
-      </Typography>
+      </h4>
 
       {!account ? (
-        <Typography variant="subtitle1">Please login to Metamask to see your tokens.</Typography>
+        <p className="text-base">Please login to Metamask to see your tokens.</p>
       ) : loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : error ? (
-        <Typography variant="h6" color="error">
-          {error}
-        </Typography>
+        <h6 className="text-lg font-semibold text-destructive">{error}</h6>
       ) : (
-        <Box mt={6}>
-          <Typography variant="h6" mb={2}>
-            Cosmic Signature Tokens I Own
-          </Typography>
+        <div className="mt-12">
+          <h6 className="text-lg font-semibold mb-4">Cosmic Signature Tokens I Own</h6>
           <CSTTable list={tokens} />
-        </Box>
+        </div>
       )}
     </MainWrapper>
   );

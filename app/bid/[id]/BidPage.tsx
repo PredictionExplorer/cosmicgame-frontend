@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Grid, Link, Typography } from '@mui/material';
+import Link from 'next/link';
 import axios from 'axios';
+
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import { MainWrapper } from '@/components/styled';
 import RandomWalkNFT from '@/components/nft/RandomWalkNFT';
 import NFTImage from '@/components/nft/NFTImage';
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 import { useBidInfo } from '@/hooks/useApiQuery';
 
 interface NFTTokenURI {
@@ -19,16 +20,6 @@ interface NFTTokenURI {
   [key: string]: unknown;
 }
 
-/* ------------------------------------------------------------------
-  Page Component: BidPage
-  Displays detailed information for a specific bid, including:
-    - Bid date/time
-    - Bidder address
-    - Round number
-    - Bid price (in ETH or CST)
-    - Optional: NFT donation info + metadata
-    - Optional: RandomWalk NFT rendering if used
------------------------------------------------------------------- */
 const BidPage = ({ bidId }: { bidId: number }) => {
   const { data: bidInfo = null, isLoading: loading } = useBidInfo(bidId);
 
@@ -43,65 +34,54 @@ const BidPage = ({ bidId }: { bidId: number }) => {
   if (bidId < 0) {
     return (
       <MainWrapper>
-        <Typography variant="h6">Invalid Bid Id</Typography>
+        <h6 className="text-lg font-semibold">Invalid Bid Id</h6>
       </MainWrapper>
     );
   }
 
-  // Render
   return (
     <MainWrapper>
-      {/* Page Title */}
-      <Typography variant="h4" color="primary" mb={4}>
-        Bid Information
-      </Typography>
+      <h4 className="text-2xl font-bold text-primary mb-8">Bid Information</h4>
 
-      {/* Loading State */}
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : !bidInfo ? (
-        <Typography variant="h6">No bid information found.</Typography>
+        <h6 className="text-lg font-semibold">No bid information found.</h6>
       ) : (
         <>
-          {/* Bid Datetime + link to Arbiscan transaction */}
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Bid Datetime:</Typography>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">Bid Datetime:</span>
             &nbsp;
-            <Link
+            <a
               href={getExplorerUrl('tx', bidInfo.TxHash)}
-              style={{ color: 'inherit' }}
+              className="text-inherit"
               target="_blank"
+              rel="noopener noreferrer"
             >
-              <Typography>{convertTimestampToDateTime(bidInfo.TimeStamp)}</Typography>
-            </Link>
-          </Box>
+              <span>{convertTimestampToDateTime(bidInfo.TimeStamp)}</span>
+            </a>
+          </div>
 
-          {/* Bidder address (linked to a user detail page) */}
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Bidder Address:</Typography>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">Bidder Address:</span>
             &nbsp;
-            <Link href={`/user/${bidInfo.BidderAddr}`} style={{ color: 'rgb(255, 255, 255)' }}>
-              <Typography fontFamily="monospace">{bidInfo.BidderAddr}</Typography>
+            <Link href={`/user/${bidInfo.BidderAddr}`} className="text-white">
+              <span className="font-mono">{bidInfo.BidderAddr}</span>
             </Link>
-          </Box>
+          </div>
 
-          {/* Round Number (linked to a prize detail page) */}
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Round Number:</Typography>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">Round Number:</span>
             &nbsp;
-            <Link
-              href={`/prize/${bidInfo.RoundNum}`}
-              sx={{ fontSize: 'inherit', color: 'inherit' }}
-            >
-              <Typography>{bidInfo.RoundNum}</Typography>
+            <Link href={`/prize/${bidInfo.RoundNum}`} className="text-inherit">
+              <span>{bidInfo.RoundNum}</span>
             </Link>
-          </Box>
+          </div>
 
-          {/* Bid Price (in CST or ETH). CST is indicated by 'BidType === 2' */}
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Bid Price:</Typography>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">Bid Price:</span>
             &nbsp;
-            <Typography>
+            <span>
               {bidInfo.BidType === 2
                 ? `${
                     (bidInfo.NumCSTTokensEth ?? 0) > 0 && (bidInfo.NumCSTTokensEth ?? 0) < 1
@@ -113,124 +93,113 @@ const BidPage = ({ bidId }: { bidId: number }) => {
                       ? (bidInfo.BidPriceEth ?? 0).toFixed(7)
                       : (bidInfo.BidPriceEth ?? 0).toFixed(2)
                   } ETH`}
-            </Typography>
-          </Box>
+            </span>
+          </div>
 
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">CST Reward Amount:</Typography>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">CST Reward Amount:</span>
             &nbsp;
-            <Typography>{bidInfo.ERC20RewardAmountEth.toFixed(2)} ETH</Typography>
-          </Box>
+            <span>{bidInfo.ERC20RewardAmountEth.toFixed(2)} ETH</span>
+          </div>
 
-          {/* Indicates whether the bid used a RandomWalkNFT */}
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Was bid with RandomWalkNFT:</Typography>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">Was bid with RandomWalkNFT:</span>
             &nbsp;
-            <Typography>{(bidInfo.RWalkNFTId ?? -1) < 0 ? 'No' : 'Yes'}</Typography>
-          </Box>
+            <span>{(bidInfo.RWalkNFTId ?? -1) < 0 ? 'No' : 'Yes'}</span>
+          </div>
 
-          {/* Indicates whether the bid used a Cosmic Signature Token (CST) */}
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Was bid with Cosmic Signature Token:</Typography>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">Was bid with Cosmic Signature Token:</span>
             &nbsp;
-            <Typography>{bidInfo.BidType === 2 ? 'Yes' : 'No'}</Typography>
-          </Box>
+            <span>{bidInfo.BidType === 2 ? 'Yes' : 'No'}</span>
+          </div>
 
-          {/* If the user actually used a RandomWalk NFT, display its ID */}
           {(bidInfo.RWalkNFTId ?? -1) >= 0 && (
-            <Box mb={1} display="flex" flexWrap="wrap">
-              <Typography color="primary">RandomWalkNFT ID:</Typography>
+            <div className="mb-2 flex flex-wrap">
+              <span className="text-primary">RandomWalkNFT ID:</span>
               &nbsp;
-              <Typography>{bidInfo.RWalkNFTId}</Typography>
-            </Box>
+              <span>{bidInfo.RWalkNFTId}</span>
+            </div>
           )}
 
           {bidInfo.DonatedERC20TokenAddr && (
             <>
-              <Box mb={1} display="flex" flexWrap="wrap">
-                <Typography color="primary">Donated ERC20 Token Address:</Typography>
+              <div className="mb-2 flex flex-wrap">
+                <span className="text-primary">Donated ERC20 Token Address:</span>
                 &nbsp;
-                <Typography>{bidInfo.DonatedERC20TokenAddr}</Typography>
-              </Box>
-              <Box mb={1} display="flex" flexWrap="wrap">
-                <Typography color="primary">Donated ERC20 Token Amount:</Typography>
+                <span>{bidInfo.DonatedERC20TokenAddr}</span>
+              </div>
+              <div className="mb-2 flex flex-wrap">
+                <span className="text-primary">Donated ERC20 Token Amount:</span>
                 &nbsp;
-                <Typography>{(bidInfo.DonatedERC20TokenAmountEth ?? 0).toFixed(2)}</Typography>
-              </Box>
+                <span>{(bidInfo.DonatedERC20TokenAmountEth ?? 0).toFixed(2)}</span>
+              </div>
             </>
           )}
 
-          {/*
-            If there's a donated NFT, show its contract address and TokenId
-            along with any metadata (image, name, description, etc.).
-          */}
           {bidInfo.NFTDonationTokenAddr !== '' && bidInfo.NFTDonationTokenId !== -1 && (
             <>
-              <Box mb={1} display="flex" flexWrap="wrap">
-                <Typography color="primary">Donated NFT Contract Address (aka Token):</Typography>
+              <div className="mb-2 flex flex-wrap">
+                <span className="text-primary">Donated NFT Contract Address (aka Token):</span>
                 &nbsp;
-                <Typography fontFamily="monospace">{bidInfo.NFTDonationTokenAddr}</Typography>
-              </Box>
+                <span className="font-mono">{bidInfo.NFTDonationTokenAddr}</span>
+              </div>
 
-              <Box mb={1} display="flex" flexWrap="wrap">
-                <Typography color="primary">Donated NFT Token Id:</Typography>
+              <div className="mb-2 flex flex-wrap">
+                <span className="text-primary">Donated NFT Token Id:</span>
                 &nbsp;
-                <Typography>{bidInfo.NFTDonationTokenId}</Typography>
-              </Box>
+                <span>{bidInfo.NFTDonationTokenId}</span>
+              </div>
 
-              <Box mb={1} display="flex" flexWrap="wrap">
-                <Typography color="primary">Donated NFT Token URI:</Typography>
+              <div className="mb-2 flex flex-wrap">
+                <span className="text-primary">Donated NFT Token URI:</span>
                 &nbsp;
-                <Typography>{bidInfo.NFTTokenURI}</Typography>
-              </Box>
+                <span>{bidInfo.NFTTokenURI}</span>
+              </div>
 
-              {/* NFT Metadata (if fetched from the tokenURI) */}
-              <Box mb={1} display="flex" flexWrap="wrap">
-                <Typography color="primary">Image:</Typography>
-                <Grid container spacing={4}>
-                  <Grid size={{ xs: 12, md: 4 }}>
-                    <NFTImage src={tokenURI?.image} sx={{ backgroundSize: 'contain' }} />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 8 }}>
-                    {/* Additional NFT info like collection name, artist, platform, etc. */}
-                    <Box mb={1} display="flex" flexWrap="wrap">
-                      <Typography color="primary">Collection Name:</Typography>
+              <div className="mb-2 flex flex-wrap">
+                <span className="text-primary">Image:</span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+                  <div>
+                    <NFTImage src={tokenURI?.image} className="bg-contain" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="mb-2 flex flex-wrap">
+                      <span className="text-primary">Collection Name:</span>
                       &nbsp;
-                      <Typography>{tokenURI?.collection_name}</Typography>
-                    </Box>
-                    <Box mb={1} display="flex" flexWrap="wrap">
-                      <Typography color="primary">Artist:</Typography>
+                      <span>{tokenURI?.collection_name}</span>
+                    </div>
+                    <div className="mb-2 flex flex-wrap">
+                      <span className="text-primary">Artist:</span>
                       &nbsp;
-                      <Typography>{tokenURI?.artist}</Typography>
-                    </Box>
-                    <Box mb={1} display="flex" flexWrap="wrap">
-                      <Typography color="primary">Platform:</Typography>
+                      <span>{tokenURI?.artist}</span>
+                    </div>
+                    <div className="mb-2 flex flex-wrap">
+                      <span className="text-primary">Platform:</span>
                       &nbsp;
-                      <Typography>{tokenURI?.platform}</Typography>
-                    </Box>
-                    <Box mb={1} display="flex" flexWrap="wrap">
-                      <Typography color="primary">Description:</Typography>
+                      <span>{tokenURI?.platform}</span>
+                    </div>
+                    <div className="mb-2 flex flex-wrap">
+                      <span className="text-primary">Description:</span>
                       &nbsp;
-                      <Typography>{tokenURI?.description}</Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Box>
+                      <span>{tokenURI?.description}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </>
           )}
 
-          {/* Message (if any) attached to the bid */}
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Message:</Typography>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">Message:</span>
             &nbsp;
-            <Typography>{bidInfo.Message}</Typography>
-          </Box>
+            <span>{bidInfo.Message}</span>
+          </div>
 
-          {/* If a RandomWalkNFT was used, display its visual representation */}
           {(bidInfo.RWalkNFTId ?? -1) >= 0 && (
-            <Box width="400px" mt={4}>
+            <div className="w-[400px] mt-8">
               <RandomWalkNFT tokenId={bidInfo.RWalkNFTId!} selectable={false} />
-            </Box>
+            </div>
           )}
         </>
       )}

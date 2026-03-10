@@ -1,60 +1,43 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Typography, List, ListItem, useTheme, useMediaQuery, Box } from '@mui/material';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { Copy } from 'lucide-react';
 import { formatEther } from 'viem';
+
+import { formatSeconds } from '@/utils';
+import {
+  charityWalletAbi as CHARITY_WALLET_ABI,
+  cosmicGameAbi as COSMICGAME_ABI,
+} from '@/contracts/abis';
 
 import { networkConfig } from '@/config/networks';
 import { MainWrapper } from '@/components/styled';
-import { formatSeconds } from '@/utils';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useClipboard } from '@/hooks/useClipboard';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
-import {
-  charityWalletAbi as CHARITY_WALLET_ABI,
-  cosmicGameAbi as COSMICGAME_ABI,
-} from '@/contracts/abis';
 import { CHARITY_WALLET_ADDRESS, COSMICGAME_ADDRESS } from '@/config/networks';
 
-/**
- * Defines the structure of props accepted by the ContractItem component.
- */
 interface ContractItemProps {
-  name: string; // Name/label of the item (e.g., "Cosmic Token Address")
+  name: string;
   value: string | number | undefined;
-  copyable?: boolean; // Whether the item is copyable to clipboard
+  copyable?: boolean;
 }
 
-/**
- * ContractItem: Renders a list item with an optional copy-to-clipboard functionality.
- */
 const ContractItem = ({ name, value, copyable = false }: ContractItemProps) => {
-  const theme = useTheme();
-  const md = useMediaQuery(theme.breakpoints.up('md'));
-  const sm = useMediaQuery(theme.breakpoints.up('sm'));
   const { setNotification } = useNotification();
   const { copy } = useClipboard();
 
   return (
-    <ListItem>
-      <Typography
-        color="primary"
-        sx={{
-          mr: 2,
-          minWidth: md ? '350px' : '150px',
-          maxWidth: md ? '350px' : '150px',
-        }}
-        variant={sm ? 'subtitle1' : 'body1'}
-      >
+    <li className="flex items-start py-2">
+      <span className="text-primary mr-4 min-w-[150px] max-w-[150px] md:min-w-[350px] md:max-w-[350px] text-sm sm:text-base font-medium">
         {name}:
-      </Typography>
+      </span>
 
       {copyable ? (
-        <Box
-          sx={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }}
+        <div
+          className="flex cursor-pointer items-center"
           onClick={() => {
             copy(value ? String(value) : '');
             setNotification({
@@ -64,32 +47,16 @@ const ContractItem = ({ name, value, copyable = false }: ContractItemProps) => {
             });
           }}
         >
-          <Typography
-            fontFamily="monospace"
-            variant={sm ? 'subtitle1' : 'body1'}
-            sx={{ wordBreak: 'break-all', mr: 1 }}
-          >
-            {value}
-          </Typography>
-          <ContentCopyIcon fontSize="inherit" />
-        </Box>
+          <span className="font-mono text-sm sm:text-base break-all mr-2">{value}</span>
+          <Copy className="h-4 w-4 shrink-0" />
+        </div>
       ) : (
-        <Typography
-          fontFamily="monospace"
-          variant={sm ? 'subtitle1' : 'body1'}
-          sx={{ wordBreak: 'break-all' }}
-        >
-          {value}
-        </Typography>
+        <span className="font-mono text-sm sm:text-base break-all">{value}</span>
       )}
-    </ListItem>
+    </li>
   );
 };
 
-/**
- * Defines the structure of the data returned by the API (simplified for demonstration).
- * Adjust the interface as needed based on your actual API response.
- */
 interface ContractAddresses {
   CosmicGameAddr: string;
   CosmicTokenAddr: string;
@@ -118,10 +85,6 @@ interface DashboardData {
   InitialSecondsUntilPrize: number;
 }
 
-/**
- * Contracts: Main component to display all contract-related information
- * and default settings fetched from the server and the CharityWallet contract.
- */
 const Contracts = () => {
   const { data: rawDashboard, isLoading: loading } = useDashboardInfo();
   const data = rawDashboard as unknown as DashboardData | null;
@@ -201,9 +164,6 @@ const Contracts = () => {
     }, 'cstDutchAuctionBeginningBidPriceMinLimit');
   }, [cosmicGameContract]);
 
-  /**
-   * If the CharityWallet contract is loaded, fetch the charity address on mount.
-   */
   useEffect(() => {
     if (!charityWalletContract) return;
     const fetchData = async () => {
@@ -217,9 +177,6 @@ const Contracts = () => {
     fetchData();
   }, [charityWalletContract]);
 
-  /**
-   * Contract Items: List of essential contracts or metadata to display in the first List.
-   */
   const contractItems = [
     { name: 'Network', value: networkConfig.chainName },
     { name: 'Chain ID', value: networkConfig.chainId },
@@ -275,9 +232,6 @@ const Contracts = () => {
     },
   ];
 
-  /**
-   * Configuration Items: List of additional contract configurations.
-   */
   const configItems = [
     { name: 'Price Increase', value: `${priceIncrease}%` },
     { name: 'Time Increase', value: `${timeIncrease}%` },
@@ -355,30 +309,26 @@ const Contracts = () => {
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" align="center">
-        Contract Addresses
-      </Typography>
+      <h4 className="text-2xl font-bold text-primary text-center">Contract Addresses</h4>
 
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
         <>
-          {/* List of essential contract addresses */}
-          <List sx={{ mt: 4 }}>
+          <ul className="mt-8 list-none p-0">
             {contractItems.map(({ name, value, copyable }) => (
               <ContractItem key={name} name={name} value={value} copyable={copyable} />
             ))}
-          </List>
+          </ul>
 
-          {/* List of additional contract configurations */}
-          <Typography variant="h6" mt={5} mb={3}>
+          <h6 className="text-lg font-semibold mt-10 mb-6">
             Current configuration of the contracts
-          </Typography>
-          <List>
+          </h6>
+          <ul className="list-none p-0">
             {configItems.map(({ name, value, copyable }) => (
               <ContractItem key={name} name={name} value={value} copyable={copyable} />
             ))}
-          </List>
+          </ul>
         </>
       )}
     </MainWrapper>

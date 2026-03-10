@@ -1,6 +1,5 @@
 'use client';
 
-import { Box, Link, Typography } from '@mui/material';
 import { getAddress, isAddress } from 'viem';
 
 import { MainWrapper } from '@/components/styled';
@@ -30,33 +29,21 @@ const MarketingRewardsPage = ({ address: rawAddress }: MarketingRewardsPageProps
   return (
     <MainWrapper>
       {invalidAddress ? (
-        <Typography variant="h6">Invalid Ethereum Address</Typography>
+        <p className="text-lg font-semibold">Invalid Ethereum Address</p>
       ) : (
         <>
-          <Box mb={4}>
-            <Typography variant="h6" color="primary" component="span" mr={1}>
+          <div className="mb-8">
+            <span className="text-lg font-semibold text-primary mr-2">
               Marketing Rewards for User
-            </Typography>
-            <Typography
-              variant="h6"
-              component="span"
-              fontFamily="monospace"
-              sx={{ wordBreak: 'break-all' }}
-            >
-              <Link
-                href={`/user/${address}`}
-                style={{
-                  color: 'inherit',
-                  fontSize: 'inherit',
-                  fontFamily: 'monospace',
-                }}
-              >
+            </span>
+            <span className="text-lg font-semibold font-mono break-all">
+              <a href={`/user/${address}`} className="text-inherit text-[length:inherit] font-mono">
                 {address}
-              </Link>
-            </Typography>
-          </Box>
+              </a>
+            </span>
+          </div>
           {loading ? (
-            <Typography variant="h6">Loading...</Typography>
+            <p className="text-lg font-semibold">Loading...</p>
           ) : (
             <MarketingRewardsTable list={(marketingRewards ?? []) as MarketingReward[]} />
           )}

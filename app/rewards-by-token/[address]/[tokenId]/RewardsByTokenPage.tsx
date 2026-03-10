@@ -1,13 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Box, Collapse, Grid, IconButton, Link, TableBody, Typography } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Tr } from 'react-super-responsive-table';
+import Link from 'next/link';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { Tr, Tbody } from 'react-super-responsive-table';
 
-import api from '@/services/api';
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+
+import { Button } from '@/components/ui/button';
+import api from '@/services/api';
 import { reportError } from '@/utils/errors';
 import {
   MainWrapper,
@@ -52,7 +53,6 @@ interface RewardsRowData {
 
 /* ------------------------------------------------------------------
   Custom Hook: useRewardsByTokenDetails
-  Fetches staking rewards data for a specific user & token.
 ------------------------------------------------------------------ */
 function useRewardsByTokenDetails(address: string, tokenId: number) {
   const [rewardsData, setRewardsData] = useState<RewardsRowData[]>([]);
@@ -63,8 +63,6 @@ function useRewardsByTokenDetails(address: string, tokenId: number) {
       setLoading(true);
       const response = await api.get_staking_rewards_by_user_by_token_details(address, tokenId);
 
-      // The API returns a map. Convert it to an array
-      // and sort if you need to. Example: sort by DepositIndex.
       const arrayData = Object.keys(response)
         .filter((key) => !isNaN(Number(key)))
         .map((key) => response[key]) as RewardsRowData[];
@@ -87,7 +85,6 @@ function useRewardsByTokenDetails(address: string, tokenId: number) {
 
 /* ------------------------------------------------------------------
   Sub-Component: RewardsDetailRow
-  Renders a single row (with a collapsible section) in the table.
 ------------------------------------------------------------------ */
 function RewardsDetailRow({ row }: { row: RewardsRowData }) {
   const [open, setOpen] = useState<boolean>(false);
@@ -98,12 +95,16 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
 
   return (
     <>
-      {/* Main Row */}
-      <TablePrimaryRow sx={{ borderBottom: 0 }}>
+      <TablePrimaryRow className="border-b-0">
         <TablePrimaryCell>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpen((prev) => !prev)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setOpen((prev) => !prev)}
+            aria-label="expand row"
+          >
+            {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
         </TablePrimaryCell>
 
         <TablePrimaryCell align="left">
@@ -111,7 +112,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
         </TablePrimaryCell>
 
         <TablePrimaryCell align="center">
-          <Link href={`/prize/${RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+          <Link href={`/prize/${RoundNum}`} className="text-inherit text-[inherit]">
             {RoundNum}
           </Link>
         </TablePrimaryCell>
@@ -121,88 +122,70 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
         <TablePrimaryCell align="right">{RewardEth.toFixed(6)}</TablePrimaryCell>
       </TablePrimaryRow>
 
-      {/* Collapsible Row */}
-      <TablePrimaryRow sx={{ borderTop: 0 }}>
-        <TablePrimaryCell sx={{ py: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Grid container spacing={4}>
+      {open && (
+        <TablePrimaryRow className="border-t-0">
+          <TablePrimaryCell className="!py-0" colSpan={6}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
               {/* Stake Section */}
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Typography variant="h6">Stake</Typography>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Staked Datetime:
-                  </Typography>
+              <div>
+                <h6 className="text-lg font-semibold">Stake</h6>
+                <div className="mb-2">
+                  <span className="text-primary">Staked Datetime:</span>
                   &nbsp;
-                  <Link
-                    color="inherit"
-                    fontSize="inherit"
+                  <a
+                    className="text-inherit text-[inherit]"
                     href={getExplorerUrl('tx', Stake.TxHash)}
                     target="_blank"
+                    rel="noreferrer"
                   >
-                    <Typography component="span">
-                      {convertTimestampToDateTime(Stake.TimeStamp)}
-                    </Typography>
-                  </Link>
-                </Box>
-                <Box mb={1}>
-                  <Typography color="primary" component="span">
-                    Number of Staked NFTs:
-                  </Typography>
+                    <span>{convertTimestampToDateTime(Stake.TimeStamp)}</span>
+                  </a>
+                </div>
+                <div className="mb-2">
+                  <span className="text-primary">Number of Staked NFTs:</span>
                   &nbsp;
-                  <Typography component="span">{Stake.NumStakedNFTs}</Typography>
-                </Box>
-              </Grid>
+                  <span>{Stake.NumStakedNFTs}</span>
+                </div>
+              </div>
 
-              {/* Unstake Section (only if EvtLogId != 0) */}
+              {/* Unstake Section */}
               {Unstake.EvtLogId !== 0 && (
-                <Grid size={{ xs: 12, md: 6 }}>
-                  <Typography variant="h6">Unstake</Typography>
-                  <Box mb={1}>
-                    <Typography color="primary" component="span">
-                      Unstake Datetime:
-                    </Typography>
+                <div>
+                  <h6 className="text-lg font-semibold">Unstake</h6>
+                  <div className="mb-2">
+                    <span className="text-primary">Unstake Datetime:</span>
                     &nbsp;
-                    <Link
-                      color="inherit"
-                      fontSize="inherit"
+                    <a
+                      className="text-inherit text-[inherit]"
                       href={getExplorerUrl('tx', Unstake.TxHash)}
                       target="_blank"
+                      rel="noreferrer"
                     >
-                      <Typography component="span">
-                        {convertTimestampToDateTime(Unstake.TimeStamp)}
-                      </Typography>
-                    </Link>
-                  </Box>
-                  <Box mb={1}>
-                    <Typography color="primary" component="span">
-                      Number of Staked NFTs:
-                    </Typography>
+                      <span>{convertTimestampToDateTime(Unstake.TimeStamp)}</span>
+                    </a>
+                  </div>
+                  <div className="mb-2">
+                    <span className="text-primary">Number of Staked NFTs:</span>
                     &nbsp;
-                    <Typography component="span">{Unstake.NumStakedNFTs}</Typography>
-                  </Box>
-                  <Box mb={1}>
-                    <Typography color="primary" component="span">
-                      Rewards:
-                    </Typography>
+                    <span>{Unstake.NumStakedNFTs}</span>
+                  </div>
+                  <div className="mb-2">
+                    <span className="text-primary">Rewards:</span>
                     &nbsp;
-                    <Typography component="span">
-                      {Unstake.RewardAmountEth.toFixed(6)} ETH
-                    </Typography>
-                  </Box>
-                </Grid>
+                    <span>{Unstake.RewardAmountEth.toFixed(6)} ETH</span>
+                  </div>
+                </div>
               )}
-            </Grid>
-          </Collapse>
-        </TablePrimaryCell>
-      </TablePrimaryRow>
+            </div>
+          </TablePrimaryCell>
+        </TablePrimaryRow>
+      )}
     </>
   );
 }
 
 /* ------------------------------------------------------------------
   Sub-Component: RewardsDetailTable
-  Renders the table of all reward items, with pagination.
 ------------------------------------------------------------------ */
 function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
   const PER_PAGE = 5;
@@ -224,11 +207,11 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
               <TablePrimaryHeadCell align="right">Reward (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-          <TableBody>
+          <Tbody>
             {paginatedData.map((row) => (
               <RewardsDetailRow key={row.DepositId} row={row} />
             ))}
-          </TableBody>
+          </Tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
@@ -250,11 +233,11 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={4}>
+      <h4 className="text-2xl font-bold text-primary text-center mb-8">
         Staking Rewards Details for Token {tokenId}
-      </Typography>
+      </h4>
 
-      {loading ? <Typography>Loading...</Typography> : <RewardsDetailTable list={rewardsData} />}
+      {loading ? <p>Loading...</p> : <RewardsDetailTable list={rewardsData} />}
     </MainWrapper>
   );
 }

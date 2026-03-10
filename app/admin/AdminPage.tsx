@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
 
 import { MainWrapper } from '@/components/styled';
 import api from '@/services/api';
@@ -22,19 +21,15 @@ const AdminPage = () => {
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" align="center" mb={4}>
-        Administrative methods
-      </Typography>
-      <Box>
-        <Typography variant="h5" mb={2}>
-          Bid List
-        </Typography>
+      <h4 className="text-2xl font-bold text-primary text-center mb-8">Administrative methods</h4>
+      <div>
+        <h5 className="text-xl font-semibold mb-4">Bid List</h5>
         {bidList === null ? (
-          <Typography variant="h6">Loading...</Typography>
+          <h6 className="text-lg font-semibold">Loading...</h6>
         ) : (
           <BanBidTable biddingHistory={bidList} />
         )}
-      </Box>
+      </div>
     </MainWrapper>
   );
 };

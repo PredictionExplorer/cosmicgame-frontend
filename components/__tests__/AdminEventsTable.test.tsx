@@ -1,9 +1,13 @@
-import { render, screen } from '@/test-utils';
 import '@testing-library/jest-dom';
+
 import { convertTimestampToDateTime } from '@/utils';
-import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
+
+import { render, screen } from '@/test-utils';
 
 jest.mock('react-super-responsive-table/dist/SuperResponsiveTableStyle.css', () => ({}));
+
+// eslint-disable-next-line import/order
+import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
 
 describe('AdminEventsTable', () => {
   test('with no records shows "No events yet."', () => {

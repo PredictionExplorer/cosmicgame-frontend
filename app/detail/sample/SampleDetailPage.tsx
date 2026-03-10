@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, MouseEvent } from 'react';
-import { Box, Button, CardActionArea, Container, Grid, Menu, Typography } from '@mui/material';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import { useState } from 'react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import Lightbox from 'yet-another-react-lightbox';
+
+import { getAssetsUrl, getOriginUrl } from '@/utils';
 
 import NFTImage from '@/components/nft/NFTImage';
 import {
@@ -14,128 +14,99 @@ import {
   SectionWrapper,
   StyledCard,
 } from '@/components/styled';
+import { Button } from '@/components/ui/button';
 import { useClipboard } from '@/hooks/useClipboard';
 import 'yet-another-react-lightbox/styles.css';
 import NFTVideo from '@/components/nft/NFTVideo';
 import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
-import { getAssetsUrl, getOriginUrl } from '@/utils';
 
 const SampleDetailPage = () => {
   const { copy } = useClipboard();
-  // State for modal video visibility
   const [isVideoOpen, setVideoOpen] = useState(false);
-  // State for image lightbox visibility
   const [isImageOpen, setImageOpen] = useState(false);
-  // State to hold currently selected video path
   const [videoPath, setVideoPath] = useState<string | null>(null);
-  // State for anchor element used in menu positioning
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const image = getAssetsUrl('cosmicsignature/sample.png');
   const video = getAssetsUrl('cosmicsignature/sample.mp4');
 
-  // Opens the video modal and sets video source
   const handlePlayVideo = (path: string) => {
     setVideoPath(path);
     setVideoOpen(true);
   };
 
-  // Opens dropdown menu
-  const handleMenuOpen = (e: MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  // Closes dropdown menu
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
   return (
-    <MainWrapper maxWidth={false} sx={{ px: 0 }}>
-      <Container>
+    <MainWrapper className="max-w-none px-0">
+      <div className="mx-auto w-full max-w-7xl px-4">
         <SectionWrapper>
-          <Grid container spacing={4} justifyContent="center">
-            <Grid size={{ xs: 12, sm: 8, md: 6 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
+            <div className="max-w-md mx-auto w-full md:max-w-none">
               <StyledCard>
-                <CardActionArea onClick={() => setImageOpen(true)}>
+                <div className="cursor-pointer" onClick={() => setImageOpen(true)}>
                   <NFTImage src={image} />
-                  <NFTInfoWrapper sx={{ width: 'calc(100% - 40px)' }}>
-                    <Typography variant="subtitle1" sx={{ color: '#FFFFFF', textAlign: 'center' }}>
-                      Sample NFT
-                    </Typography>
+                  <NFTInfoWrapper className="w-[calc(100%-40px)]">
+                    <p className="text-base text-white text-center">Sample NFT</p>
                   </NFTInfoWrapper>
-                </CardActionArea>
+                </div>
               </StyledCard>
 
-              <Box mt={2}>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 6 }}>
-                    <Button variant="text" fullWidth onClick={handleMenuOpen}>
-                      Copy link
-                      {anchorEl ? <ExpandLess /> : <ExpandMore />}
-                    </Button>
-                    <Menu
-                      elevation={0}
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center',
-                      }}
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center',
-                      }}
-                      anchorEl={anchorEl}
-                      keepMounted
-                      open={Boolean(anchorEl)}
-                      onClose={handleMenuClose}
+              <div className="mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="relative">
+                    <Button
+                      variant="text"
+                      className="w-full"
+                      onClick={() => setMenuOpen(!menuOpen)}
                     >
-                      {[
-                        { label: 'Video', link: getOriginUrl(video) },
-                        { label: 'Image', link: getOriginUrl(image) },
-                        { label: 'Detail Page', link: window.location.href },
-                      ].map(({ label, link }) => (
-                        <PrimaryMenuItem
-                          key={label}
-                          onClick={() => {
-                            copy(link);
-                            handleMenuClose();
-                          }}
-                        >
-                          <Typography>{label}</Typography>
-                        </PrimaryMenuItem>
-                      ))}
-                    </Menu>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Grid>
+                      Copy link
+                      {menuOpen ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      )}
+                    </Button>
+                    {menuOpen && (
+                      <div className="absolute left-1/2 z-10 -translate-x-1/2 mt-1 min-w-[140px] rounded border border-border bg-popover shadow-md">
+                        {[
+                          { label: 'Video', link: getOriginUrl(video) },
+                          { label: 'Image', link: getOriginUrl(image) },
+                          { label: 'Detail Page', link: window.location.href },
+                        ].map(({ label, link }) => (
+                          <PrimaryMenuItem
+                            key={label}
+                            onClick={() => {
+                              copy(link);
+                              setMenuOpen(false);
+                            }}
+                          >
+                            <span>{label}</span>
+                          </PrimaryMenuItem>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-            <Grid size={{ xs: 12, sm: 8, md: 6 }}>
-              <Box sx={{ mb: 1, display: 'flex' }}>
-                <Typography color="primary">Token Name:</Typography>&nbsp;
-                <Typography>Sample NFT</Typography>
-              </Box>
-              <Box sx={{ mb: 1, display: 'flex' }}>
-                <Typography color="primary">Seed:</Typography>&nbsp;
-                <Typography
-                  fontFamily="monospace"
-                  sx={{
-                    display: 'inline-block',
-                    wordWrap: 'break-word',
-                    width: '32ch',
-                  }}
-                >
+            <div className="max-w-md mx-auto w-full md:max-w-none">
+              <div className="mb-2 flex">
+                <span className="text-primary">Token Name:</span>&nbsp;
+                <span>Sample NFT</span>
+              </div>
+              <div className="mb-2 flex">
+                <span className="text-primary">Seed:</span>&nbsp;
+                <span className="font-mono inline-block break-words w-[32ch]">
                   3c8510e4cbe870a700d7c44b05f2cdf84824fcd8108aaaafd7952222590b31de
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
+                </span>
+              </div>
+            </div>
+          </div>
 
-          <Box mt="80px">
+          <div className="mt-20">
             <NFTVideo image_thumb={image} onClick={() => handlePlayVideo(video)} />
-          </Box>
+          </div>
 
-          {/* Image Lightbox */}
           <Lightbox
             open={isImageOpen}
             close={() => setImageOpen(false)}
@@ -151,7 +122,7 @@ const SampleDetailPage = () => {
             }}
           />
         </SectionWrapper>
-      </Container>
+      </div>
     </MainWrapper>
   );
 };

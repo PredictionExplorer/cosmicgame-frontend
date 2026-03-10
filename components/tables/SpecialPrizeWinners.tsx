@@ -1,6 +1,5 @@
-import { Grid, Link, Typography } from '@mui/material';
-
 import { formatSeconds } from '@/utils';
+
 import { useCurrentSpecialWinners } from '@/hooks/useApiQuery';
 
 interface SpecialWinners {
@@ -16,68 +15,65 @@ export const SpecialPrizeWinners = () => {
 
   return (
     <>
-      <Typography variant="subtitle1" color="primary" mt={4} mb={2}>
+      <h3 className="text-primary mt-8 mb-4 text-base font-medium">
         Potential winners of Special Prizes
-      </Typography>
-      <Grid container spacing={2} mb={2} alignItems="center">
-        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
-          <Typography>Endurance Champion</Typography>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 8, md: 8 }}>
-          <Typography>
-            <Link
+      </h3>
+
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-4 items-center">
+        <div className="sm:col-span-4">
+          <p>Endurance Champion</p>
+        </div>
+        <div className="sm:col-span-8">
+          <p>
+            <a
               href={`/user/${specialWinners?.EnduranceChampionAddress}`}
-              color="rgb(255, 255, 255)"
-              fontSize="inherit"
-              sx={{ wordBreak: 'break-all' }}
+              className="text-white break-all"
             >
               {specialWinners?.EnduranceChampionAddress}
-            </Link>
+            </a>
             {(specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
               <>{` (Lasted ${formatSeconds(specialWinners?.EnduranceChampionDuration ?? 0)})`}</>
             )}
-          </Typography>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} mb={2} alignItems="center">
-        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
-          <Typography>Chrono Warrior</Typography>
-        </Grid>
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-4 items-center">
+        <div className="sm:col-span-4">
+          <p>Chrono Warrior</p>
+        </div>
         {specialWinners?.EnduranceChampionAddress && (
-          <Grid size={{ xs: 12, sm: 8, md: 8 }}>
-            <Typography>
-              <Link
+          <div className="sm:col-span-8">
+            <p>
+              <a
                 href={`/user/${specialWinners?.EnduranceChampionAddress}`}
-                color="rgb(255, 255, 255)"
-                fontSize="inherit"
-                sx={{ wordBreak: 'break-all' }}
+                className="text-white break-all"
               >
                 {specialWinners?.EnduranceChampionAddress}
-              </Link>
+              </a>
               {(specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
                 <>{` (Lasted ${formatSeconds(specialWinners?.EnduranceChampionDuration ?? 0)})`}</>
               )}
-            </Typography>
-          </Grid>
+            </p>
+          </div>
         )}
-      </Grid>
-      <Grid container spacing={2} mb={2} alignItems="center">
-        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
-          <Typography>Last Cst Bidder</Typography>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 8, md: 8 }}>
-          <Typography>
-            <Link
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-4 mb-4 items-center">
+        <div className="sm:col-span-4">
+          <p>Last Cst Bidder</p>
+        </div>
+        <div className="sm:col-span-8">
+          <p>
+            <a
               href={`/user/${specialWinners?.LastCstBidderAddress}`}
-              color="rgb(255, 255, 255)"
-              fontSize="inherit"
-              sx={{ wordBreak: 'break-all' }}
+              className="text-white break-all"
             >
               {specialWinners?.LastCstBidderAddress}
-            </Link>
-          </Typography>
-        </Grid>
-      </Grid>
+            </a>
+          </p>
+        </div>
+      </div>
     </>
   );
 };

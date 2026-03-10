@@ -53,6 +53,7 @@ jest.mock('../../services/api', () => ({
   },
 }));
 
+// eslint-disable-next-line import/order
 import Header from '@/components/layout/Header';
 
 beforeEach(() => {

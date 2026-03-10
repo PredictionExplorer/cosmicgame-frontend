@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Link, TableBody, Typography } from '@mui/material';
+import Link from 'next/link';
 import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
 
-import api from '@/services/api';
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+
+import api from '@/services/api';
 import { reportError } from '@/utils/errors';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import {
@@ -21,9 +22,6 @@ import {
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-/* ------------------------------------------------------------------
-  Types
------------------------------------------------------------------- */
 interface RaffleNFTWinning {
   EvtLogId: number;
   TxHash: string;
@@ -34,10 +32,6 @@ interface RaffleNFTWinning {
   TokenId: number;
 }
 
-/* ------------------------------------------------------------------
-  Sub-Component: NFTWinningsRow
-  Renders a single row in the table for Raffle NFT winnings.
------------------------------------------------------------------- */
 function NFTWinningsRow({ row }: { row: RaffleNFTWinning }) {
   if (!row) return <TablePrimaryRow />;
 
@@ -46,26 +40,18 @@ function NFTWinningsRow({ row }: { row: RaffleNFTWinning }) {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${RoundNum}`}
-          style={{
-            color: 'inherit',
-            fontSize: 'inherit',
-            fontFamily: 'monospace',
-          }}
-          target="_blank"
-        >
+        <Link href={`/prize/${RoundNum}`} className="font-mono text-inherit" target="_blank">
           {RoundNum}
         </Link>
       </TablePrimaryCell>
@@ -74,14 +60,7 @@ function NFTWinningsRow({ row }: { row: RaffleNFTWinning }) {
       <TablePrimaryCell align="center">{IsStaker ? 'Yes' : 'No'}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link
-          href={`/detail/${TokenId}`}
-          style={{
-            color: 'inherit',
-            fontSize: 'inherit',
-            fontFamily: 'monospace',
-          }}
-        >
+        <Link href={`/detail/${TokenId}`} className="font-mono text-inherit">
           {TokenId}
         </Link>
       </TablePrimaryCell>
@@ -89,16 +68,12 @@ function NFTWinningsRow({ row }: { row: RaffleNFTWinning }) {
   );
 }
 
-/* ------------------------------------------------------------------
-  Sub-Component: NFTWinningsTable
-  Renders the entire table of Raffle NFT winnings, with pagination.
------------------------------------------------------------------- */
 function NFTWinningsTable({ list }: { list: RaffleNFTWinning[] }) {
   const PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   if (!list.length) {
-    return <Typography>No NFT winnings yet.</Typography>;
+    return <p>No NFT winnings yet.</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -118,11 +93,11 @@ function NFTWinningsTable({ list }: { list: RaffleNFTWinning[] }) {
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-          <TableBody>
+          <tbody>
             {currentItems.map((row) => (
               <NFTWinningsRow key={row.EvtLogId} row={row} />
             ))}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
@@ -136,10 +111,6 @@ function NFTWinningsTable({ list }: { list: RaffleNFTWinning[] }) {
   );
 }
 
-/* ------------------------------------------------------------------
-  Custom Hook: useRaffleNFTWinnings
-  Fetches and sorts the user's raffle NFT winnings.
------------------------------------------------------------------- */
 function useRaffleNFTWinnings(userAddress: string) {
   const [raffleNfts, setRaffleNfts] = useState<{
     data: RaffleNFTWinning[];
@@ -166,13 +137,9 @@ function useRaffleNFTWinnings(userAddress: string) {
   return { raffleNfts, fetchRaffleNFTWinnings };
 }
 
-/* ------------------------------------------------------------------
-  Main Component: UserRaffleNFTPage
------------------------------------------------------------------- */
 function UserRaffleNFTPage({ address: rawAddress }: { address: string }) {
   const [invalidAddress, setInvalidAddress] = useState(false);
 
-  // Validate and normalize address
   const validatedAddress =
     rawAddress && isAddress(rawAddress.toLowerCase())
       ? getAddress(rawAddress.toLowerCase())
@@ -180,45 +147,39 @@ function UserRaffleNFTPage({ address: rawAddress }: { address: string }) {
 
   const { raffleNfts, fetchRaffleNFTWinnings } = useRaffleNFTWinnings(validatedAddress);
 
-  // On mount / address changes
   useEffect(() => {
     if (!validatedAddress || validatedAddress === 'Invalid Address') {
       setInvalidAddress(true);
     } else {
       fetchRaffleNFTWinnings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [validatedAddress]);
 
   if (invalidAddress) {
     return (
       <MainWrapper>
-        <Typography variant="h6">Invalid Address</Typography>
+        <p className="text-lg font-semibold">Invalid Address</p>
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <Box mb={4}>
-        <Typography variant="h6" color="primary" component="span" mr={2}>
-          User
-        </Typography>
-        <Typography variant="h6" component="span" fontFamily="monospace">
-          {validatedAddress}
-        </Typography>
-      </Box>
+      <div className="mb-8">
+        <span className="mr-4 text-lg font-semibold text-primary">User</span>
+        <span className="font-mono text-lg font-semibold">{validatedAddress}</span>
+      </div>
 
-      <Box mt={4}>
-        <Typography variant="h6" lineHeight={1} mb={2}>
-          Raffle NFTs User Won
-        </Typography>
+      <div className="mt-8">
+        <h4 className="mb-4 text-lg font-semibold leading-none">Raffle NFTs User Won</h4>
 
         {raffleNfts.loading ? (
-          <Typography variant="h6">Loading...</Typography>
+          <p className="text-lg font-semibold">Loading...</p>
         ) : (
           <NFTWinningsTable list={raffleNfts.data} />
         )}
-      </Box>
+      </div>
     </MainWrapper>
   );
 }

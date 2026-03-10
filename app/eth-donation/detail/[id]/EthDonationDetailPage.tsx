@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Link, Typography } from '@mui/material';
+import Image from 'next/image';
+
+import { getExplorerUrl, convertTimestampToDateTime, getMetadata } from '@/utils';
 
 import { MainWrapper } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime, getMetadata } from '@/utils';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
 
 interface EthDonationDetailPageProps {
@@ -41,6 +42,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
 
     try {
       const jsonData = JSON.parse(String(donationInfo.DataJson));
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDataJson(jsonData);
       getMetadata(jsonData.url).then(setMetaData);
     } catch {
@@ -51,7 +53,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
   if (id < 0) {
     return (
       <MainWrapper>
-        <Typography variant="h6">Invalid Donation Id</Typography>
+        <p className="text-lg font-semibold">Invalid Donation Id</p>
       </MainWrapper>
     );
   }
@@ -59,7 +61,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
   if (loading) {
     return (
       <MainWrapper>
-        <Typography variant="h6">Loading...</Typography>
+        <p className="text-lg font-semibold">Loading...</p>
       </MainWrapper>
     );
   }
@@ -67,91 +69,94 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
   if (!donationInfo) {
     return (
       <MainWrapper>
-        <Typography variant="h6">Donation not found.</Typography>
+        <p className="text-lg font-semibold">Donation not found.</p>
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={4}>
+      <h2 className="text-2xl font-bold text-primary text-center mb-8">
         Direct (ETH) Donation Detail
-      </Typography>
+      </h2>
 
-      {/* Donation Date and Transaction Link */}
-      <Box mb={1} display="flex" flexWrap="wrap">
-        <Typography color="primary">Donate Datetime:</Typography>&nbsp;
-        <Link href={getExplorerUrl('tx', donationInfo.TxHash)} target="_blank" color="inherit">
-          <Typography>{convertTimestampToDateTime(donationInfo.TimeStamp)}</Typography>
-        </Link>
-      </Box>
+      <div className="mb-2 flex flex-wrap">
+        <span className="text-primary">Donate Datetime:</span>&nbsp;
+        <a
+          href={getExplorerUrl('tx', donationInfo.TxHash)}
+          target="_blank"
+          className="text-inherit"
+        >
+          <span>{convertTimestampToDateTime(donationInfo.TimeStamp)}</span>
+        </a>
+      </div>
 
-      {/* Donor Address */}
-      <Box mb={1} display="flex" flexWrap="wrap">
-        <Typography color="primary">Donor Address:</Typography>&nbsp;
-        <Link href={`/user/${donationInfo.DonorAddr}`} color="inherit">
-          <Typography fontFamily="monospace">{donationInfo.DonorAddr}</Typography>
-        </Link>
-      </Box>
+      <div className="mb-2 flex flex-wrap">
+        <span className="text-primary">Donor Address:</span>&nbsp;
+        <a href={`/user/${donationInfo.DonorAddr}`} className="text-inherit">
+          <span className="font-mono">{donationInfo.DonorAddr}</span>
+        </a>
+      </div>
 
-      {/* Round Number */}
-      <Box mb={1} display="flex" flexWrap="wrap">
-        <Typography color="primary">Round Number:</Typography>&nbsp;
-        <Link href={`/prize/${donationInfo.RoundNum}`} color="inherit">
-          <Typography>{donationInfo.RoundNum}</Typography>
-        </Link>
-      </Box>
+      <div className="mb-2 flex flex-wrap">
+        <span className="text-primary">Round Number:</span>&nbsp;
+        <a href={`/prize/${donationInfo.RoundNum}`} className="text-inherit">
+          <span>{donationInfo.RoundNum}</span>
+        </a>
+      </div>
 
-      {/* Donation Amount */}
-      <Box mb={1} display="flex" flexWrap="wrap">
-        <Typography color="primary">Amount:</Typography>&nbsp;
-        <Typography>{donationInfo.AmountEth.toFixed(2)} ETH</Typography>
-      </Box>
+      <div className="mb-2 flex flex-wrap">
+        <span className="text-primary">Amount:</span>&nbsp;
+        <span>{donationInfo.AmountEth.toFixed(2)} ETH</span>
+      </div>
 
-      {/* Additional JSON Data (if available) */}
       {dataJson && (
         <>
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Title:</Typography>&nbsp;
-            <Typography>{dataJson.title}</Typography>
-          </Box>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">Title:</span>&nbsp;
+            <span>{dataJson.title}</span>
+          </div>
 
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">Message:</Typography>&nbsp;
-            <Typography>{dataJson.message}</Typography>
-          </Box>
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">Message:</span>&nbsp;
+            <span>{dataJson.message}</span>
+          </div>
 
-          <Box mb={1} display="flex" flexWrap="wrap">
-            <Typography color="primary">URL:</Typography>&nbsp;
-            <Link href={dataJson.url} target="_blank" color="inherit">
+          <div className="mb-2 flex flex-wrap">
+            <span className="text-primary">URL:</span>&nbsp;
+            <a href={dataJson.url} target="_blank" className="text-inherit">
               {dataJson.url}
-            </Link>
-          </Box>
+            </a>
+          </div>
         </>
       )}
 
-      {/* Meta Data (if available) */}
       {metaData?.description && (
-        <Box mb={1} display="flex" flexWrap="wrap">
-          <Typography color="primary">Meta Description:</Typography>&nbsp;
-          <Typography>{metaData.description}</Typography>
-        </Box>
+        <div className="mb-2 flex flex-wrap">
+          <span className="text-primary">Meta Description:</span>&nbsp;
+          <span>{metaData.description}</span>
+        </div>
       )}
 
       {metaData?.Keywords && (
-        <Box mb={1} display="flex" flexWrap="wrap">
-          <Typography color="primary">Meta Keywords:</Typography>&nbsp;
-          <Typography>{metaData.Keywords}</Typography>
-        </Box>
+        <div className="mb-2 flex flex-wrap">
+          <span className="text-primary">Meta Keywords:</span>&nbsp;
+          <span>{metaData.Keywords}</span>
+        </div>
       )}
 
       {metaData?.image && (
-        <Box>
-          <Typography color="primary" mb={1}>
-            Meta Image:
-          </Typography>
-          <img src={metaData.image} width="100%" alt="Meta image" />
-        </Box>
+        <div>
+          <p className="text-primary mb-2">Meta Image:</p>
+          <Image
+            src={metaData.image}
+            width={1200}
+            height={675}
+            alt="Meta image"
+            style={{ width: '100%', height: 'auto' }}
+            unoptimized
+          />
+        </div>
       )}
     </MainWrapper>
   );

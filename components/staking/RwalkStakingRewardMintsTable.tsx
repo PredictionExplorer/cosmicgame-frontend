@@ -1,6 +1,10 @@
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { useState } from 'react';
-import { Link, Typography } from '@mui/material';
+import Link from 'next/link';
 import { Tbody, Tr } from 'react-super-responsive-table';
+
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import {
   TablePrimary,
@@ -10,57 +14,40 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 import type { StakingRewardMint } from '@/services/api';
 
-/**
- * Renders a single row for the RwalkStakingRewardMintsTable.
- * Each row displays:
- * - Datetime of mint (linked to Arbiscan)
- * - Winner's address (links to user info page)
- * - Round number (links to a prize page)
- * - Token ID (links to RandomWalk's detail page)
- */
 const StakingRewardMintsRow = ({ row }: { row: StakingRewardMint }) => {
-  // If there is no row data, return an empty row placeholder
   if (!row) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
-      {/* Datetime (links to Arbiscan transaction) */}
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
           href={getExplorerUrl('tx', row.TxHash)}
           target="_blank"
           rel="noopener noreferrer"
+          className="text-inherit"
         >
           {convertTimestampToDateTime(row.TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
 
-      {/* Winner's address (links to user info page) */}
       <TablePrimaryCell align="center">
         <AddressLink address={row.WinnerAddr} url={`/user/${row.WinnerAddr}`} />
       </TablePrimaryCell>
 
-      {/* Round number (links to a "prize" page for more info) */}
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${row.RoundNum}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+        <Link href={`/prize/${row.RoundNum}`} className="text-inherit">
           {row.RoundNum}
         </Link>
       </TablePrimaryCell>
 
-      {/* Token ID (links to RandomWalk's detail page) */}
       <TablePrimaryCell align="center">
-        <Link href={`/detail/${row.TokenId}`} style={{ color: 'inherit', fontSize: 'inherit' }}>
+        <Link href={`/detail/${row.TokenId}`} className="text-inherit">
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
@@ -68,29 +55,14 @@ const StakingRewardMintsRow = ({ row }: { row: StakingRewardMint }) => {
   );
 };
 
-/**
- * RwalkStakingRewardMintsTable displays a paginated list of staking reward mints.
- * Each row includes details such as:
- * - The mint's date/time and transaction link
- * - The winner's address
- * - The round number in which it was minted
- * - The minted Token ID with a link to its details
- *
- * @param list - An array of mint event objects containing TxHash, TimeStamp, WinnerAddr, RoundNum, and TokenId
- */
 export const RwalkStakingRewardMintsTable = ({ list }: { list: StakingRewardMint[] }) => {
-  // Number of rows to display per page
   const perPage = 5;
-
-  // Current page for pagination
   const [page, setPage] = useState(1);
 
-  // If there are no records, show a fallback message
   if (list.length === 0) {
-    return <Typography>No rewards yet.</Typography>;
+    return <p className="text-muted-foreground">No rewards yet.</p>;
   }
 
-  // Calculate which records to show for the current page
   const startIndex = (page - 1) * perPage;
   const endIndex = page * perPage;
   const currentData = list.slice(startIndex, endIndex);
@@ -99,7 +71,6 @@ export const RwalkStakingRewardMintsTable = ({ list }: { list: StakingRewardMint
     <>
       <TablePrimaryContainer>
         <TablePrimary>
-          {/* Table header defining the columns */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
@@ -109,7 +80,6 @@ export const RwalkStakingRewardMintsTable = ({ list }: { list: StakingRewardMint
             </Tr>
           </TablePrimaryHead>
 
-          {/* Table body rendering each row of mint info */}
           <Tbody>
             {currentData.map((row) => (
               <StakingRewardMintsRow key={row.EvtLogId} row={row} />
@@ -118,7 +88,6 @@ export const RwalkStakingRewardMintsTable = ({ list }: { list: StakingRewardMint
         </TablePrimary>
       </TablePrimaryContainer>
 
-      {/* Pagination component for navigating through multiple pages */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

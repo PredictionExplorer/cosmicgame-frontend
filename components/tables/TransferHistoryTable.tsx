@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import { Link, TableBody, Tooltip } from '@mui/material';
+import { Tr } from 'react-super-responsive-table';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -9,109 +13,74 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 import { ZERO_ADDRESS } from '@/config/misc';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { Tr } from 'react-super-responsive-table';
-
 import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '@/config/networks';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import type { CSTTransferRecord } from '@/services/api';
 
-/* ------------------------------------------------------------------
-  Sub-Component: TransferHistoryRow
-  Renders a single row in the transfer history table, displaying 
-  the transaction date/time and the "From" / "To" addresses.
-
-  If the record is null or the 'FromAddr' is the zero address, 
-  it returns null, effectively skipping the row.
------------------------------------------------------------------- */
 const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
-  // If there's no record or 'FromAddr' is zero, skip rendering this row.
   if (!record || record.FromAddr === ZERO_ADDRESS) {
     return null;
   }
 
-  // Destructure record fields for clarity.
   const { TxHash, TimeStamp, FromAddr, ToAddr } = record;
 
   return (
     <TablePrimaryRow>
-      {/* Date/Time cell linking to Arbiscan for transaction details */}
       <TablePrimaryCell>
-        <Link
-          color="inherit"
-          fontSize="inherit"
+        <a
+          className="text-inherit"
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
           rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(TimeStamp)}
-        </Link>
+        </a>
       </TablePrimaryCell>
-
-      {/* "From" Address cell with tooltip and optional staking wallet labels */}
       <TablePrimaryCell>
-        <Tooltip title={FromAddr}>
-          <Link
-            href={`/user/${FromAddr}`}
-            sx={{
-              color: 'inherit',
-              fontSize: 'inherit',
-              fontFamily: 'monospace',
-            }}
-          >
-            {FromAddr === STAKING_WALLET_CST_ADDRESS
-              ? 'StakingWallet CST'
-              : FromAddr === STAKING_WALLET_RWLK_ADDRESS
-                ? 'StakingWallet RandomWalk'
-                : shortenHex(FromAddr ?? '', 6)}
-          </Link>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a href={`/user/${FromAddr}`} className="text-inherit font-mono">
+                {FromAddr === STAKING_WALLET_CST_ADDRESS
+                  ? 'StakingWallet CST'
+                  : FromAddr === STAKING_WALLET_RWLK_ADDRESS
+                    ? 'StakingWallet RandomWalk'
+                    : shortenHex(FromAddr ?? '', 6)}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{FromAddr}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
-
-      {/* "To" Address cell with tooltip and optional staking wallet labels */}
       <TablePrimaryCell>
-        <Tooltip title={ToAddr ?? ''}>
-          <Link
-            href={`/user/${ToAddr}`}
-            sx={{
-              color: 'inherit',
-              fontSize: 'inherit',
-              fontFamily: 'monospace',
-            }}
-          >
-            {ToAddr === STAKING_WALLET_CST_ADDRESS
-              ? 'StakingWallet CST'
-              : ToAddr === STAKING_WALLET_RWLK_ADDRESS
-                ? 'StakingWallet RandomWalk'
-                : shortenHex(ToAddr ?? '', 6)}
-          </Link>
-        </Tooltip>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a href={`/user/${ToAddr}`} className="text-inherit font-mono">
+                {ToAddr === STAKING_WALLET_CST_ADDRESS
+                  ? 'StakingWallet CST'
+                  : ToAddr === STAKING_WALLET_RWLK_ADDRESS
+                    ? 'StakingWallet RandomWalk'
+                    : shortenHex(ToAddr ?? '', 6)}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{ToAddr ?? ''}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-/* ------------------------------------------------------------------
-  Main Component: TransferHistoryTable
-  Renders a paginated table of transfer records. Each page displays 
-  'perPage' items, and a custom pagination component lets users 
-  navigate between pages.
------------------------------------------------------------------- */
 export const TransferHistoryTable = ({ list }: { list: CSTTransferRecord[] }) => {
-  // Number of rows per page
   const perPage = 5;
-  // Track current page in state
   const [page, setPage] = useState(1);
 
   return (
     <>
-      {/* Table Container and the Table itself */}
       <TablePrimaryContainer>
         <TablePrimary>
-          {/* Table Header */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
@@ -119,21 +88,13 @@ export const TransferHistoryTable = ({ list }: { list: CSTTransferRecord[] }) =>
               <TablePrimaryHeadCell align="left">To</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-
-          {/* Table Body */}
-          <TableBody>
-            {list
-              // Slice the list to only show the current page items
-              .slice((page - 1) * perPage, page * perPage)
-              .map((record) => (
-                // Use 'EvtLogId' as the key, ensuring it's unique
-                <TransferHistoryRow record={record} key={record.EvtLogId} />
-              ))}
-          </TableBody>
+          <tbody>
+            {list.slice((page - 1) * perPage, page * perPage).map((record) => (
+              <TransferHistoryRow record={record} key={record.EvtLogId} />
+            ))}
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
-
-      {/* Pagination Controls */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

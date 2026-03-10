@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Box, Link, Typography } from '@mui/material';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Fireworks, { FireworksHandlers } from '@fireworks-js/react';
 
@@ -11,52 +11,30 @@ import { reportError } from '@/utils/errors';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-/* ------------------------------------------------------------------
-  Page Component: PrizeClaimedPage
-  This page shows details of a claimed prize for a specific round.
-  If a "message" search param is present, fireworks are displayed
-  until the user clicks to stop them.
-
-  - Search param "round" indicates the round number to fetch info for.
-  - "message" param triggers the fireworks display (for a congratulatory moment).
------------------------------------------------------------------- */
 const PrizeClaimedPage = () => {
   const searchParams = useSearchParams();
 
-  // Reference to the Fireworks component so we can stop it on click.
   const fireworksRef = useRef<FireworksHandlers>(null);
 
-  // Track whether the user has ended the fireworks show.
   const [finishFireworks, setFinishFireworks] = useState(false);
 
-  // Prize data fetched from the API.
   const [prizeInfo, setPrizeInfo] = useState<import('@/services/api/types').RoundInfo | null>(null);
 
-  // Loading state to show a spinner/message while data is being fetched.
   const [loading, setLoading] = useState(true);
 
-  /**
-   * Called when the Fireworks component is clicked.
-   * Stops the fireworks display and updates state to ensure they don't return.
-   */
   const handleFireworksClick = () => {
     fireworksRef.current?.stop();
     setFinishFireworks(true);
   };
 
-  /**
-   * Fetches the prize info from the API based on the "round" search param.
-   */
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
 
-        // Safely parse the "round" search parameter to a number.
         const roundStr = searchParams.get('round');
         const roundNum = parseInt(roundStr ?? '0');
 
-        // Fetch round/prize info from the API.
         const fetchedPrizeInfo = await api.get_round_info(roundNum);
         setPrizeInfo(fetchedPrizeInfo);
         setLoading(false);
@@ -66,30 +44,19 @@ const PrizeClaimedPage = () => {
       }
     };
 
-    // Only fetch if we indeed have a "round" in the search params.
     if (searchParams.get('round') !== null) {
       fetchData();
     }
   }, [searchParams]);
 
-  /**
-   * Page content rendering logic:
-   * - Show "Loading..." while fetching.
-   * - If no prize info, display "No prize information."
-   * - Otherwise, display fireworks (if "message" is in search params and fireworks aren't finished)
-   *   and the prize details (Round, Amount, associated tokens, links, etc.).
-   */
   return (
     <MainWrapper>
       {loading ? (
-        /* Loading state */
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : prizeInfo === null ? (
-        /* No prize found for the given round */
-        <Typography variant="h6">No prize information.</Typography>
+        <h6 className="text-lg font-semibold">No prize information.</h6>
       ) : (
         <>
-          {/* Fireworks if user navigated with a "message" search param AND haven't stopped them yet */}
           {searchParams.get('message') && !finishFireworks && (
             <Fireworks
               ref={fireworksRef}
@@ -106,49 +73,39 @@ const PrizeClaimedPage = () => {
             />
           )}
 
-          {/* Main Prize Info */}
-          <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={6}>
+          <h4 className="text-2xl font-bold text-primary text-center mb-12">
             {`Congratulations! You won Round ${prizeInfo.RoundNum}.`}
-          </Typography>
+          </h4>
 
-          <Typography variant="h5" mb={2}>
-            {`Round ${prizeInfo.RoundNum} rewards are:`}
-          </Typography>
-          <Box ml={4}>
-            {/* ETH Reward */}
-            <Typography variant="subtitle1">{prizeInfo?.AmountEth.toFixed(6)} ETH</Typography>
+          <h5 className="text-xl font-bold mb-4">{`Round ${prizeInfo.RoundNum} rewards are:`}</h5>
+          <div className="ml-8">
+            <p className="text-base">{prizeInfo?.AmountEth.toFixed(6)} ETH</p>
 
-            {/* Winning Token */}
-            <Typography variant="subtitle1">
+            <p className="text-base">
               Cosmic Signature Token Number{' '}
-              <Link
-                href={`/detail/${prizeInfo.TokenId}`}
-                sx={{ fontSize: 'inherit', color: 'inherit' }}
-              >
+              <Link href={`/detail/${prizeInfo.TokenId}`} className="text-inherit text-[inherit]">
                 {prizeInfo.TokenId}
               </Link>
-            </Typography>
+            </p>
 
-            {/* Donated NFTs, if any */}
             {!!(prizeInfo.RoundStats.TotalDonatedNFTs as number) && (
-              <Typography variant="subtitle1">
+              <p className="text-base">
                 {prizeInfo.RoundStats.TotalDonatedNFTs as ReactNode} donated tokens (ERC721)
-              </Typography>
+              </p>
             )}
-          </Box>
+          </div>
 
-          {/* Additional Info + Links to check other potential rewards */}
-          <Typography variant="subtitle2" mt={4}>
+          <p className="text-sm mt-8">
             There could also be random rewards from raffles. To check your winnings, go to{' '}
-            <Link href="/my-winnings" color="inherit">
+            <Link href="/my-winnings" className="text-inherit">
               My-Winnings
             </Link>{' '}
             page. For staking rewards, visit{' '}
-            <Link href="/my-staking" color="inherit">
+            <Link href="/my-staking" className="text-inherit">
               My-Staking
             </Link>{' '}
             page.
-          </Typography>
+          </p>
         </>
       )}
     </MainWrapper>

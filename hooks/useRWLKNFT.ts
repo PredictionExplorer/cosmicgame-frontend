@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 
-import api from '@/services/api';
 import { getRWLKImageUrl } from '@/utils';
+
+import api from '@/services/api';
 import { reportError } from '@/utils/errors';
 
 export interface RWLKNFTData {

@@ -1,17 +1,11 @@
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TableBody,
-  Typography,
-  Alert,
-} from '@mui/material';
+import { Loader2 } from 'lucide-react';
+import { usePublicClient } from 'wagmi';
+import { Tbody, Tr } from 'react-super-responsive-table';
+
+import { convertTimestampToDateTime } from '@/utils';
 
 import {
   TablePrimary,
@@ -21,15 +15,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { convertTimestampToDateTime, formatSeconds } from '@/utils';
-
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { Tr } from 'react-super-responsive-table';
-
 import { CustomPagination } from '@/components/common/CustomPagination';
-
-import { usePublicClient } from 'wagmi';
-
 import { useActiveWeb3React } from '@/hooks/web3';
 import api from '@/services/api';
 import useStakingWalletCSTContract from '@/hooks/useStakingWalletCSTContract';
@@ -37,6 +23,16 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { useApiData } from '@/contexts/ApiDataContext';
 import getErrorMessage from '@/utils/alert';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface UncollectedReward {
   EvtLogId: number;
@@ -51,10 +47,8 @@ interface UncollectedReward {
 }
 
 const UncollectedRewardsRow = ({ row }: { row: UncollectedReward }) => {
-  // Early return if no row data to avoid errors.
   if (!row) return <TablePrimaryRow />;
 
-  // Destructure row for clarity and fallback values if needed.
   const {
     DepositTimeStamp,
     DepositId,
@@ -64,39 +58,21 @@ const UncollectedRewardsRow = ({ row }: { row: UncollectedReward }) => {
     DepositAmountEth,
     YourRewardAmountEth,
     PendingToClaimEth,
-    // EvtLogId,  <-- Usually used as a key, so not needed here
   } = row;
 
   return (
     <TablePrimaryRow>
-      {/* Convert the timestamp to a readable date/time format */}
       <TablePrimaryCell>{convertTimestampToDateTime(DepositTimeStamp)}</TablePrimaryCell>
-
-      {/* Simple text display of the deposit's unique identifier */}
       <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
-
-      {/* Show how many tokens you have staked out of total staked */}
       <TablePrimaryCell align="center">{`${YourTokensStaked} / ${NumStakedNFTs}`}</TablePrimaryCell>
-
-      {/* Total unclaimed tokens for this deposit */}
       <TablePrimaryCell align="center">{NumUnclaimedTokens}</TablePrimaryCell>
-
-      {/* The ETH amount originally deposited, formatted to 6 decimal places */}
       <TablePrimaryCell align="center">{(DepositAmountEth ?? 0).toFixed(6)}</TablePrimaryCell>
-
-      {/* Your reward in ETH so far, formatted to 6 decimals */}
       <TablePrimaryCell align="center">{(YourRewardAmountEth ?? 0).toFixed(6)}</TablePrimaryCell>
-
-      {/* Pending reward in ETH that hasn't been collected yet */}
       <TablePrimaryCell align="center">{(PendingToClaimEth ?? 0).toFixed(6)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-/* ------------------------------------------------------------------
-  Main Component: UncollectedCSTStakingRewardsTable
-  Displays a paginated list of uncollected CST staking rewards.
------------------------------------------------------------------- */
 export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) => {
   const { account } = useActiveWeb3React();
   const {
@@ -105,8 +81,6 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
     unclaimedRewards: contextRewards,
   } = useApiData();
 
-  // Use context rewards when viewing own account — avoids a duplicate API call.
-  // Fall back to independent fetch only when viewing another user's profile.
   const isOwnAccount = user?.toLowerCase() === account?.toLowerCase();
 
   const [localList, setLocalList] = useState<UncollectedReward[] | null>(null);
@@ -163,7 +137,6 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
       }
       setTimeout(() => {
         if (isOwnAccount) {
-          // Context refetch updates both context rewards and status in one request
           refetchApiData();
         } else {
           fetchUncollectedCstStakingRewards();
@@ -184,23 +157,20 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
   };
 
   useEffect(() => {
-    // Only fetch independently when viewing another user's profile.
-    // Own account data comes from ApiDataContext.
     if (!isOwnAccount) {
       fetchUncollectedCstStakingRewards();
     }
     fetchCstWithRewards();
   }, [user, isOwnAccount, fetchUncollectedCstStakingRewards, fetchCstWithRewards]);
 
-  // Decide which list to display
   const list = isOwnAccount ? (contextRewards as unknown as UncollectedReward[]) : localList;
 
   if (list === null) {
-    return <Typography>Loading...</Typography>;
+    return <p className="text-muted-foreground">Loading...</p>;
   }
 
   if (list.length === 0) {
-    return <Typography>No rewards yet.</Typography>;
+    return <p className="text-muted-foreground">No rewards yet.</p>;
   }
 
   const currentPageData = list.slice(startIndex, endIndex);
@@ -219,7 +189,6 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
             <col width="25%" />
           </colgroup>
 
-          {/* Table Header */}
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
@@ -232,76 +201,71 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
             </Tr>
           </TablePrimaryHead>
 
-          {/* Table Body */}
-          <TableBody>
-            {/* Map over the current page of data to render each row */}
+          <Tbody>
             {currentPageData.map((row) => (
               <UncollectedRewardsRow key={row.EvtLogId} row={row} />
             ))}
-          </TableBody>
+          </Tbody>
         </TablePrimary>
       </TablePrimaryContainer>
 
       {isOwnAccount && (status?.UnclaimedStakingReward ?? 0) > 0 && (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'end',
-            alignItems: 'center',
-            mt: 2,
-          }}
-        >
-          <Typography mr={2}>
+        <div className="flex justify-end items-center mt-4">
+          <p className="mr-4">
             Your claimable rewards are {`${(status?.UnclaimedStakingReward ?? 0).toFixed(6)} ETH`}
-          </Typography>
-          <Button onClick={handleOpen} variant="contained" disabled={isUnstaking}>
+          </p>
+          <Button onClick={handleOpen} disabled={isUnstaking}>
             {isUnstaking ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CircularProgress size={16} color="inherit" />
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Processing...
-              </Box>
+              </span>
             ) : (
               'Unstake & Claim All'
             )}
           </Button>
-        </Box>
+        </div>
       )}
 
-      {/* Pagination Controls */}
       <CustomPagination
         page={currentPage}
         setPage={setCurrentPage}
         totalLength={list.length}
         perPage={PER_PAGE}
       />
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Unstake Tokens &amp; Claim Rewards</DialogTitle>
-        <DialogContent>
-          <DialogContentText mb={2}>
-            This will <strong>unstake all your CST tokens</strong> and pay out{' '}
-            <strong>{(status?.UnclaimedStakingReward ?? 0).toFixed(6)} ETH</strong> in accumulated
-            rewards to your wallet.
-          </DialogContentText>
-          <Alert severity="warning" variant="outlined">
-            <strong>Permanent action:</strong> Once unstaked, these tokens cannot be staked again.
-            Only proceed if you want to exit staking entirely.
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Unstake Tokens &amp; Claim Rewards</DialogTitle>
+            <DialogDescription>
+              This will <strong>unstake all your CST tokens</strong> and pay out{' '}
+              <strong>{(status?.UnclaimedStakingReward ?? 0).toFixed(6)} ETH</strong> in accumulated
+              rewards to your wallet.
+            </DialogDescription>
+          </DialogHeader>
+          <Alert variant="warning">
+            <AlertDescription>
+              <strong>Permanent action:</strong> Once unstaked, these tokens cannot be staked again.
+              Only proceed if you want to exit staking entirely.
+            </AlertDescription>
           </Alert>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={unstakeAllCST} disabled={isUnstaking}>
+              {isUnstaking ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Processing...
+                </span>
+              ) : (
+                'Unstake & Claim'
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-          <Button onClick={handleClose} variant="outlined">
-            Cancel
-          </Button>
-          <Button onClick={unstakeAllCST} variant="contained" color="error" disabled={isUnstaking}>
-            {isUnstaking ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <CircularProgress size={16} color="inherit" />
-                Processing...
-              </Box>
-            ) : (
-              'Unstake & Claim'
-            )}
-          </Button>
-        </DialogActions>
       </Dialog>
     </>
   );

@@ -1,7 +1,5 @@
 'use client';
 
-import { Typography } from '@mui/material';
-
 import { MainWrapper } from '@/components/styled';
 import EthDonationTable, { type EthDonation } from '@/components/tables/EthDonationTable';
 import { useDonationsBothByRound } from '@/hooks/useApiQuery';
@@ -16,19 +14,19 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
   if (round < 0) {
     return (
       <MainWrapper>
-        <Typography variant="h6">Invalid Round Number</Typography>
+        <p className="text-lg font-semibold">Invalid Round Number</p>
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={4}>
+      <h2 className="text-2xl font-bold text-primary text-center mb-8">
         Direct (ETH) Donations for Round {round}
-      </Typography>
+      </h2>
 
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <p className="text-lg font-semibold">Loading...</p>
       ) : (
         <EthDonationTable list={(donationInfo ?? []) as EthDonation[]} />
       )}

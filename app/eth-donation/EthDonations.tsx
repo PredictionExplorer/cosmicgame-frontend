@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Button, TextField, Typography } from '@mui/material';
 import { parseEther } from 'viem';
 
 import { MainWrapper } from '@/components/styled';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import api from '@/services/api';
 import EthDonationTable, { EthDonation } from '@/components/tables/EthDonationTable';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -13,7 +14,6 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { isUserRejection, reportError } from '@/utils/errors';
 
 const EthDonations = () => {
-  // State for donation data, amount, and donation information (JSON format)
   const [charityDonations, setCharityDonations] = useState<EthDonation[] | null>(null);
   const [donateAmount, setDonateAmount] = useState('');
   const [donateInformation, setDonationInformation] = useState('');
@@ -22,17 +22,15 @@ const EthDonations = () => {
   const { account } = useActiveWeb3React();
   const cosmicGameContract = useCosmicGameContract();
 
-  // Fetches the donation history
   const fetchCharityDonations = async () => {
     const donations = await api.get_donations_both();
     setCharityDonations(donations as EthDonation[]);
   };
 
   useEffect(() => {
-    fetchCharityDonations();
+    fetchCharityDonations(); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
 
-  // Handles basic ETH donation
   const handleDonate = async () => {
     try {
       await (
@@ -50,8 +48,6 @@ const EthDonations = () => {
       });
 
       setDonateAmount('');
-
-      // Refresh donations after 1 second
       setTimeout(fetchCharityDonations, 1000);
     } catch (error: unknown) {
       if (!isUserRejection(error)) {
@@ -81,7 +77,6 @@ const EthDonations = () => {
 
       setDonateAmount('');
       setDonationInformation('');
-
       setTimeout(fetchCharityDonations, 1000);
     } catch (error: unknown) {
       if (!isUserRejection(error)) {
@@ -97,62 +92,53 @@ const EthDonations = () => {
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" gutterBottom textAlign="center" mb={4}>
-        Direct (ETH) Donations
-      </Typography>
+      <h2 className="text-2xl font-bold text-primary text-center mb-8">Direct (ETH) Donations</h2>
 
       {charityDonations === null ? (
-        <Typography variant="h6">Loading...</Typography>
+        <p className="text-lg font-semibold">Loading...</p>
       ) : (
         <>
-          <Typography variant="h6">Donation History</Typography>
+          <h3 className="text-lg font-semibold">Donation History</h3>
           <EthDonationTable list={charityDonations} />
         </>
       )}
 
       {!!account && (
         <>
-          <Box mt={6}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <Typography mr={1}>Amount:</Typography>
-              <TextField
+          <div className="mt-12">
+            <div className="flex items-center mb-2">
+              <span className="mr-2">Amount:</span>
+              <Input
                 placeholder="Donation amount"
                 type="number"
                 value={donateAmount}
-                size="small"
-                sx={{ mr: 1 }}
+                className="mr-2 w-auto"
                 onChange={(e) => setDonateAmount(e.target.value)}
               />
-              <Typography>ETH</Typography>
-            </Box>
+              <span>ETH</span>
+            </div>
 
-            <TextField
+            <textarea
               value={donateInformation}
-              multiline
               rows={5}
-              fullWidth
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               placeholder="Donation information (JSON format)"
               onChange={(e) => setDonationInformation(e.target.value)}
             />
-          </Box>
+          </div>
 
-          <Box mt={1} mb={1}>
+          <div className="mt-2 mb-2">
             <Button
-              variant="contained"
               disabled={!donateAmount || donateAmount === '0'}
               onClick={handleDonate}
-              sx={{ mr: 1 }}
+              className="mr-2"
             >
               Donate
             </Button>
-            <Button
-              variant="contained"
-              disabled={!donateAmount || donateAmount === '0'}
-              onClick={handleDonateWithInfo}
-            >
+            <Button disabled={!donateAmount || donateAmount === '0'} onClick={handleDonateWithInfo}>
               Donate with Info
             </Button>
-          </Box>
+          </div>
         </>
       )}
     </MainWrapper>

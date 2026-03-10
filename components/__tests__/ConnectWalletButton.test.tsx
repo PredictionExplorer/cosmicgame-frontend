@@ -9,6 +9,7 @@ jest.mock('../../hooks/web3', () => ({
   useActiveWeb3React: () => mockUseActiveWeb3React(),
 }));
 
+// eslint-disable-next-line import/order
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 
 const defaultBalance = { ETH: 1.5, CosmicToken: 100, CosmicSignature: 3, RWLK: 2 };

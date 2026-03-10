@@ -1,6 +1,9 @@
-import { useState, useCallback } from 'react';
-import { Link, TableBody, Typography } from '@mui/material';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Tr } from 'react-super-responsive-table';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
+import { convertTimestampToDateTime } from '@/utils';
 
 import {
   TablePrimary,
@@ -10,14 +13,8 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { convertTimestampToDateTime } from '@/utils';
-
-import { useRouter } from 'next/navigation';
-
 import { CustomPagination } from '@/components/common/CustomPagination';
 
-// Define types for props
 export interface EventRow {
   RoundNum: number;
   EvtLogId: string | number;
@@ -34,7 +31,6 @@ interface SystemModesTableProps {
   list: EventRow[];
 }
 
-// Component to render each row in the system modes table
 const SystemModesRow = ({ row, prevRow }: SystemModesRowProps) => {
   const router = useRouter();
 
@@ -45,7 +41,7 @@ const SystemModesRow = ({ row, prevRow }: SystemModesRowProps) => {
   };
 
   return (
-    <TablePrimaryRow style={{ cursor: 'pointer' }} onClick={handleRowClick}>
+    <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
       <TablePrimaryCell align="center">
         {row.RoundNum ? row.RoundNum : 'Deployment'}
       </TablePrimaryCell>
@@ -59,17 +55,14 @@ const SystemModesRow = ({ row, prevRow }: SystemModesRowProps) => {
   );
 };
 
-// Main system modes table component
 export const SystemModesTable = ({ list }: SystemModesTableProps) => {
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
 
-  // Show fallback text when no rows are available
   if (list.length === 0) {
-    return <Typography>No mode changes yet.</Typography>;
+    return <p>No mode changes yet.</p>;
   }
 
-  // Paginate rows
   const paginatedList = list.slice((page - 1) * perPage, page * perPage);
 
   return (
@@ -88,18 +81,16 @@ export const SystemModesTable = ({ list }: SystemModesTableProps) => {
               <TablePrimaryHeadCell align="center">Ended</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
-          <TableBody>
+          <tbody>
             {paginatedList.map((row, i) => {
               const globalIndex = (page - 1) * perPage + i;
               const prevRow = globalIndex > 0 ? (list[globalIndex - 1] ?? null) : null;
 
               return <SystemModesRow key={row.EvtLogId} row={row} prevRow={prevRow} />;
             })}
-          </TableBody>
+          </tbody>
         </TablePrimary>
       </TablePrimaryContainer>
-
-      {/* Pagination controls */}
       <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
     </>
   );

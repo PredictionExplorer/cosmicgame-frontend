@@ -1,8 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Button, FormControl, MenuItem, Select, TextField, Typography } from '@mui/material';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { MainWrapper } from '@/components/styled';
 import api from '@/services/api';
 import type { DashboardInfo } from '@/services/api/types';
@@ -20,468 +28,351 @@ const AdminSettingsPage = () => {
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" align="center">
-        Administrative methods
-      </Typography>
+      <h4 className="text-2xl font-bold text-primary text-center">Administrative methods</h4>
       {data === null ? (
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
         <>
-          <Box mt={6}>
-            <Typography variant="h5">Cosmic Game Contract</Typography>
-            <Box ml={2}>
-              <Box mt={3}>
-                <Typography variant="subtitle1">
+          <div className="mt-12">
+            <h5 className="text-xl font-semibold">Cosmic Game Contract</h5>
+            <div className="ml-4">
+              <div className="mt-6">
+                <p className="text-base font-medium">
                   Cosmic Signature Token (ERC721) Contract Address
-                </Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    variant="filled"
-                    color="secondary"
+                </p>
+                <div className="flex mt-2">
+                  <Input
                     placeholder="Enter address here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.ContractAddrs?.CosmicSignatureAddr}
+                    className="flex-1"
+                    value={String(data?.ContractAddrs?.CosmicSignatureAddr ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set Address
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Cosmic Token (ERC20) Contract Address</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    variant="filled"
-                    color="secondary"
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Cosmic Token (ERC20) Contract Address</p>
+                <div className="flex mt-2">
+                  <Input
                     placeholder="Enter address here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.ContractAddrs?.CosmicTokenAddr}
+                    className="flex-1"
+                    value={String(data?.ContractAddrs?.CosmicTokenAddr ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set Address
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Charity Wallet Contract Address</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    variant="filled"
-                    color="secondary"
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Charity Wallet Contract Address</p>
+                <div className="flex mt-2">
+                  <Input
                     placeholder="Enter address here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.ContractAddrs?.CharityWalletAddr}
+                    className="flex-1"
+                    value={String(data?.ContractAddrs?.CharityWalletAddr ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set Address
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">RandomWalk NFT Contract Address</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    variant="filled"
-                    color="secondary"
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">RandomWalk NFT Contract Address</p>
+                <div className="flex mt-2">
+                  <Input
                     placeholder="Enter address here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.ContractAddrs?.RandomWalkAddr}
+                    className="flex-1"
+                    value={String(data?.ContractAddrs?.RandomWalkAddr ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set Address
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Raffle Wallet Contract Address</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    variant="filled"
-                    color="secondary"
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Raffle Wallet Contract Address</p>
+                <div className="flex mt-2">
+                  <Input
                     placeholder="Enter address here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.ContractAddrs?.RaffleWalletAddr}
+                    className="flex-1"
+                    value={String(data?.ContractAddrs?.RaffleWalletAddr ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set Address
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Staking Wallet Contract Address</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    variant="filled"
-                    color="secondary"
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Staking Wallet Contract Address</p>
+                <div className="flex mt-2">
+                  <Input
                     placeholder="Enter address here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.ContractAddrs?.StakingWalletAddr}
+                    className="flex-1"
+                    value={String(data?.ContractAddrs?.StakingWalletAddr ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set Address
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Marketing Wallet Contract Address</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    variant="filled"
-                    color="secondary"
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Marketing Wallet Contract Address</p>
+                <div className="flex mt-2">
+                  <Input
                     placeholder="Enter address here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.ContractAddrs?.MarketingWalletAddr}
+                    className="flex-1"
+                    value={String(data?.ContractAddrs?.MarketingWalletAddr ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set Address
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Business Logic Contract Address</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    variant="filled"
-                    color="secondary"
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Business Logic Contract Address</p>
+                <div className="flex mt-2">
+                  <Input
                     placeholder="Enter address here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.ContractAddrs?.BusinessLogicAddr}
+                    className="flex-1"
+                    value={String(data?.ContractAddrs?.BusinessLogicAddr ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set Address
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Number of Raffle Winners Per Round</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Number of Raffle Winners Per Round</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.NumRaffleEthWinners}
+                    className="flex-1"
+                    value={String(data?.NumRaffleEthWinners ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Number of Raffle NFT Winners Per Round</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Number of Raffle NFT Winners Per Round</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.NumRaffleNFTWinners}
+                    className="flex-1"
+                    value={String(data?.NumRaffleNFTWinners ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Number of NFT Holder Winners Per Round</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Number of NFT Holder Winners Per Round</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.NumHolderNFTWinners}
+                    className="flex-1"
+                    value={String(data?.NumHolderNFTWinners ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Prize Percentage</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Prize Percentage</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.PrizePercentage}
+                    className="flex-1"
+                    value={String(data?.PrizePercentage ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Charity Percentage</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Charity Percentage</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.CharityPercentage}
+                    className="flex-1"
+                    value={String(data?.CharityPercentage ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Raffle Percentage</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Raffle Percentage</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.RafflePercentage}
+                    className="flex-1"
+                    value={String(data?.RafflePercentage ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Staking Percentage</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Staking Percentage</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.StakingPercentage}
+                    className="flex-1"
+                    value={String(data?.StakingPercentage ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Time Increase</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Time Increase</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.TimeIncrease}
+                    className="flex-1"
+                    value={String(data?.TimeIncrease ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Timeout Claim Prize</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Timeout Claim Prize</p>
+                <div className="flex mt-2">
+                  <Input type="number" placeholder="Enter number here" className="flex-1" />
+                  <Button variant="secondary" className="ml-2">
+                    Set
+                  </Button>
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Price Increase</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    // value={data?.TimeIncrease}
+                    className="flex-1"
+                    value={String(data?.PriceIncrease ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Price Increase</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Nano Seconds Extra</p>
+                <div className="flex mt-2">
+                  <Input
                     type="number"
-                    variant="filled"
-                    color="secondary"
                     placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.PriceIncrease}
+                    className="flex-1"
+                    value={String(data?.NanosecondsExtra ?? '')}
+                    readOnly
                   />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Nano Seconds Extra</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    type="number"
-                    variant="filled"
-                    color="secondary"
-                    placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    value={data?.NanosecondsExtra}
-                  />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Initial Seconds Until Prize</p>
+                <div className="flex mt-2">
+                  <Input type="number" placeholder="Enter number here" className="flex-1" />
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Initial Seconds Until Prize</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    type="number"
-                    variant="filled"
-                    color="secondary"
-                    placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    // value={data?.NanosecondsExtra}
-                  />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Initial Bid Amount Fraction</p>
+                <div className="flex mt-2">
+                  <Input type="number" placeholder="Enter number here" className="flex-1" />
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Initial Bid Amount Fraction</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    type="number"
-                    variant="filled"
-                    color="secondary"
-                    placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    // value={data?.NanosecondsExtra}
-                  />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Activation Time</p>
+                <div className="flex mt-2">
+                  <Input type="number" placeholder="Enter number here" className="flex-1" />
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Activation Time</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    type="number"
-                    variant="filled"
-                    color="secondary"
-                    placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                    // value={data?.NanosecondsExtra}
-                  />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">ETH To CST Bid Ratio</p>
+                <div className="flex mt-2">
+                  <Input type="number" placeholder="Enter number here" className="flex-1" />
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">ETH To CST Bid Ratio</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    type="number"
-                    variant="filled"
-                    color="secondary"
-                    placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                  />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Round Start CST Auction Length</p>
+                <div className="flex mt-2">
+                  <Input type="number" placeholder="Enter number here" className="flex-1" />
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Round Start CST Auction Length</Typography>
-                <Box display="flex" mt={1}>
-                  <TextField
-                    type="number"
-                    variant="filled"
-                    color="secondary"
-                    placeholder="Enter number here"
-                    fullWidth
-                    size="small"
-                    sx={{ flex: 1 }}
-                  />
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
+                </div>
+              </div>
+              <div className="mt-8">
+                <p className="text-base font-medium">Switch Mode</p>
+                <div className="flex mt-2">
+                  <Select defaultValue="runtime">
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="runtime">Runtime Mode</SelectItem>
+                      <SelectItem value="maintenance">Maintenance Mode</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button variant="secondary" className="ml-2">
                     Set
                   </Button>
-                </Box>
-              </Box>
-              <Box mt={4}>
-                <Typography variant="subtitle1">Switch Mode</Typography>
-                <Box display="flex" mt={1}>
-                  <FormControl fullWidth>
-                    <Select value={'runtime'}>
-                      <MenuItem value={'runtime'}>Runtime Mode</MenuItem>
-                      <MenuItem value={'maintenance'}>Maintenance Mode</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <Button color="secondary" variant="contained" sx={{ ml: 1 }}>
-                    Set
-                  </Button>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-          {/* <Box mt={6}>
-              <Typography variant="h5">Cosmic DAO Contract</Typography>
-              <Box ml={2}></Box>
-            </Box>
-            <Typography variant="h5">
-              Cosmic Signature Token (ERC721) Contract
-            </Typography>
-            <Typography variant="h5">Cosmic Token (ERC20) Contract</Typography>
-            <Typography variant="h5">Staking Wallet Contract</Typography>
-            <Typography variant="h5">Raffle Wallet Contract</Typography>
-            <Typography variant="h5">Charity Wallet Contract</Typography>
-            <Typography variant="h5">Marketing Wallet Contract</Typography> */}
+                </div>
+              </div>
+            </div>
+          </div>
         </>
       )}
     </MainWrapper>

@@ -1,7 +1,5 @@
 'use client';
 
-import { Typography } from '@mui/material';
-
 import { MainWrapper } from '@/components/styled';
 import {
   CharityDepositTable,
@@ -9,22 +7,15 @@ import {
 } from '@/components/tables/CharityDepositTable';
 import { useCharityVoluntary } from '@/hooks/useApiQuery';
 
-/**
- * Page component for displaying voluntary deposits to the charity wallet.
- */
 const CharityDepositsVoluntary = () => {
   const { data: voluntaryDeposits = [], isLoading: loading } = useCharityVoluntary();
 
   return (
     <MainWrapper>
-      <Typography variant="h4" color="primary" textAlign="center" mb={4}>
-        Voluntary Deposits
-      </Typography>
-
+      <h4 className="text-2xl font-bold text-primary text-center mb-8">Voluntary Deposits</h4>
       {loading ? (
-        <Typography variant="h6">Loading...</Typography>
+        <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
-        // Pass the fetched voluntary deposits to the table component
         <CharityDepositTable list={voluntaryDeposits as CharityDepositDonation[]} />
       )}
     </MainWrapper>

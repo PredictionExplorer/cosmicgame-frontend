@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from '@/test-utils';
-import DonatedNFT from '@/components/donations/DonatedNFT';
-
 import '@testing-library/jest-dom';
 import axios from 'axios';
+
+import DonatedNFT from '@/components/donations/DonatedNFT';
+
+import { render, screen, waitFor } from '@/test-utils';
 
 jest.mock('axios');
 

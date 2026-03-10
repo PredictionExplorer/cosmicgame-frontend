@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Typography, CardActionArea, Box } from '@mui/material';
 import axios from 'axios';
 
 import { StyledCard } from '@/components/styled';
 import { reportError } from '@/utils/errors';
 import NFTImage from '@/components/nft/NFTImage';
 
-// Define the expected shape of the `nft` prop
 interface NFT {
   NFTTokenId?: number | string;
   NFTTokenURI?: string;
   [key: string]: unknown;
 }
 
-// Define the expected structure of the fetched tokenURI data
 interface TokenURI {
   image?: string;
   external_url?: string;
@@ -27,7 +24,6 @@ const DonatedNFT = ({ nft }: DonatedNFTProps) => {
   const [tokenURI, setTokenURI] = useState<TokenURI | null>(null);
 
   useEffect(() => {
-    // Fetch metadata from the provided NFT token URI
     const fetchTokenData = async () => {
       try {
         const { data } = await axios.get<TokenURI>(nft.NFTTokenURI!);
@@ -40,46 +36,31 @@ const DonatedNFT = ({ nft }: DonatedNFTProps) => {
     if (nft.NFTTokenURI) {
       fetchTokenData();
     }
-  }, [nft.NFTTokenURI]); // dependency ensures it refetches if the URI changes
+  }, [nft.NFTTokenURI]);
 
   return (
     <StyledCard>
-      {/* Clickable area that opens the NFT's external URL in a new tab */}
-      <CardActionArea
+      <button
+        type="button"
+        className="block w-full cursor-pointer bg-transparent border-0 p-0 text-left"
         onClick={() => {
           if (tokenURI?.external_url) {
             window.open(tokenURI.external_url, '_blank', 'noopener');
           }
         }}
       >
-        {/* Renders the NFT image */}
         <NFTImage src={tokenURI?.image} />
-      </CardActionArea>
+      </button>
 
-      {/* Overlay box for token ID and 'Donated' label */}
-      <Box
-        sx={{
-          display: 'flex',
-          position: 'absolute',
-          inset: '16px',
-          justifyContent: 'space-between',
-          pointerEvents: 'none', // ensures overlay doesn't interfere with clicks
-        }}
-      >
-        <Typography
-          variant="caption"
-          sx={(theme) => ({ textShadow: `0px 0px 8px ${theme.palette.background.default}` })}
+      <div className="flex absolute inset-4 justify-between pointer-events-none">
+        <span
+          className="text-xs [text-shadow:0px_0px_8px_var(--background)]"
           data-testid="NFTTokenId"
         >
           #{nft.NFTTokenId}
-        </Typography>
-        <Typography
-          color="primary"
-          sx={(theme) => ({ textShadow: `0px 0px 8px ${theme.palette.background.default}` })}
-        >
-          Donated
-        </Typography>
-      </Box>
+        </span>
+        <span className="text-primary [text-shadow:0px_0px_8px_var(--background)]">Donated</span>
+      </div>
     </StyledCard>
   );
 };

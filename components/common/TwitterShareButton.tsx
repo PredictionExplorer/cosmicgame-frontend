@@ -1,86 +1,65 @@
 import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogContentText,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
-  TextField,
-} from '@mui/material';
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
-/**
- * TwitterShareButton Component
- * Opens a dialog to collect a user's Twitter handle and then creates a pre-filled tweet with referral link.
- */
 const TwitterShareButton = () => {
-  const [handle, setHandle] = useState<string>(''); // User input for Twitter handle
-  const [open, setOpen] = useState<boolean>(false); // Controls the dialog open state
+  const [handle, setHandle] = useState<string>('');
+  const [open, setOpen] = useState<boolean>(false);
 
-  // Opens the dialog
-  const handleOpen = () => setOpen(true);
-
-  // Closes the dialog
-  const handleClose = () => setOpen(false);
-
-  // Triggered when user confirms the handle input
   const handleConfirm = () => {
-    // Remove '@' if user included it in the handle
     const formattedHandle = handle.startsWith('@') ? handle.slice(1) : handle;
 
-    // Construct the tweet content
     const tweetText = `I'm joining the @CosmicSignature test round on @arbitrum Sepolia for free! Over $60,000 in prizes up for grabs! https://x.com/CosmicSignature/status/1821607885819785412\nUse my referral link and you'll get an extra $100 if you win: https://cosmicsignature.com/?referred_by=${formattedHandle}`;
 
-    // Encode tweet for Twitter intent URL
     const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-
-    // Open Twitter sharing window
     window.open(twitterUrl, '_blank');
 
-    // Close the dialog
-    handleClose();
+    setOpen(false);
   };
 
   return (
-    <>
-      {/* Trigger Button */}
-      <Button variant="outlined" onClick={handleOpen}>
-        Share on Twitter
-      </Button>
-
-      {/* Dialog for Twitter handle input */}
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>What is your Twitter handle?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Share on Twitter</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>What is your Twitter handle?</DialogTitle>
+          <DialogDescription>
             Enter your Twitter handle below. Ensure your account has a blue checkmark.
-          </DialogContentText>
-          <DialogContentText>
+          </DialogDescription>
+          <DialogDescription>
             Follow additional instructions on our Twitter page to confirm eligibility.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="twitter_handle"
-            name="twitter_handle"
-            label="Twitter Handle"
-            placeholder="@userhandle"
-            fullWidth
-            variant="standard"
-            value={handle}
-            onChange={(e) => setHandle(e.target.value.trim())}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleConfirm} disabled={!handle.trim()} variant="contained">
+          </DialogDescription>
+        </DialogHeader>
+        <Input
+          autoFocus
+          id="twitter_handle"
+          name="twitter_handle"
+          placeholder="@userhandle"
+          value={handle}
+          onChange={(e) => setHandle(e.target.value.trim())}
+        />
+        <DialogFooter>
+          <Button onClick={handleConfirm} disabled={!handle.trim()}>
             Ok
           </Button>
-          <Button onClick={handleClose} variant="outlined">
+          <Button onClick={() => setOpen(false)} variant="outline">
             Cancel
           </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -2,8 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import { Suspense, type ReactNode } from 'react';
 import Script from 'next/script';
 
-import { GA_TRACKING_ID } from '@/utils/analytics';
 import { logoImgUrl } from '@/utils';
+
+import { GA_TRACKING_ID } from '@/utils/analytics';
 
 import { Providers } from './providers';
 import { Analytics } from './analytics';

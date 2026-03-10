@@ -1,37 +1,12 @@
-import { useEffect, useState, type ChangeEvent, type MouseEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  Box,
-  Typography,
-  CardActionArea,
-  Button,
-  TextField,
-  Grid,
-  Link,
-  Container,
-  Menu,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-} from '@mui/material';
-import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 
+import { useEffect, useState, type ChangeEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Lightbox from 'yet-another-react-lightbox';
 import { usePublicClient } from 'wagmi';
-import ArrowBack from '@mui/icons-material/ArrowBack';
-import ArrowForward from '@mui/icons-material/ArrowForward';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import { ArrowLeft, ArrowRight, ChevronUp, ChevronDown } from 'lucide-react';
 
-import NameHistoryTable from '@/components/tables/NameHistoryTable';
-import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
-import { useActiveWeb3React } from '@/hooks/web3';
-import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
-import { useNotification } from '@/contexts/NotificationContext';
-import api from '@/services/api';
-import type { CSTTokenInfo, CSTTransferRecord, NameHistoryRecord, MainStats } from '@/services/api';
 import {
   getExplorerUrl,
   convertTimestampToDateTime,
@@ -39,6 +14,37 @@ import {
   getAssetsUrl,
   getOriginUrl,
 } from '@/utils';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import NameHistoryTable from '@/components/tables/NameHistoryTable';
+import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
+import { useActiveWeb3React } from '@/hooks/web3';
+import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
+import { useNotification } from '@/contexts/NotificationContext';
+import api from '@/services/api';
+import type { CSTTokenInfo, CSTTransferRecord, NameHistoryRecord, MainStats } from '@/services/api';
+import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
+import { useClipboard } from '@/hooks/useClipboard';
+import { StyledCard, SectionWrapper, NFTInfoWrapper } from '@/components/styled';
+import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
+
+import NFTImage from './NFTImage';
+import NFTVideo from './NFTVideo';
 
 interface NFTDetailInfo extends CSTTokenInfo {
   WinnerAddr?: string;
@@ -50,27 +56,11 @@ interface DashboardDetail {
   MainStats: MainStats;
 }
 
-import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
-import { useClipboard } from '@/hooks/useClipboard';
-import { StyledCard, SectionWrapper, NFTInfoWrapper, PrimaryMenuItem } from '@/components/styled';
-import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
-
-import NFTImage from './NFTImage';
-import NFTVideo from './NFTVideo';
-
-/**
- * Props for the NFTTrait component.
- */
 interface NFTTraitProps {
   tokenId: number;
 }
 
-/**
- * Displays an NFT's details and functionalities such as viewing the image/video,
- * transferring ownership, renaming, and viewing historical information.
- */
 const NFTTrait = ({ tokenId }: NFTTraitProps) => {
-  // Local state for media display and modals
   const [image, setImage] = useState('/images/qmark.png');
   const [video, setVideo] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
@@ -78,12 +68,10 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const [imageOpen, setImageOpen] = useState(false);
   const [videoPath, setVideoPath] = useState<string | null>(null);
 
-  // Local state for transfer and renaming
   const [address, setAddress] = useState('');
   const [tokenName, setTokenName] = useState('');
 
-  // Local state for advanced data
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [nft, setNft] = useState<NFTDetailInfo | null>(null);
   const [dashboard, setDashboard] = useState<DashboardDetail | null>(null);
@@ -92,7 +80,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     (CSTTransferRecord & { TransferType?: number })[]
   >([]);
 
-  // Hooks for blockchain, notifications, and routing
   const router = useRouter();
   const nftContract = useCosmicSignatureContract();
   const { account } = useActiveWeb3React();
@@ -100,10 +87,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const { setNotification } = useNotification();
   const { copy } = useClipboard();
 
-  /**
-   * Checks if the destination address has any transactions.
-   * If not, opens a dialog to confirm transfer to a non-existing address.
-   */
   const handleClickTransfer = async () => {
     const { ethereum } = window as Window & {
       ethereum?: { request: (args: { method: string; params: unknown[] }) => Promise<unknown> };
@@ -115,7 +98,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         params: [address, 'latest'],
       });
 
-      // If the address is brand new (no transactions), prompt a warning dialog
       if (Number(txCount) === 0) {
         setOpenDialog(true);
       } else {
@@ -126,19 +108,10 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     }
   };
 
-  /**
-   * Closes the transfer confirmation dialog.
-   */
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
 
-  /**
-   * Confirms if the video is accessible. If it is, open it in a modal video player;
-   * otherwise, show a notification that the video is still being generated.
-   *
-   * @param videoUrl The URL of the video to be played.
-   */
   const handlePlay = async (videoUrl: string) => {
     try {
       const res = await fetch(videoUrl, { method: 'HEAD' });
@@ -152,7 +125,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           text: 'Video is being generated, come back later!',
         });
       }
-    } catch (error) {
+    } catch {
       setNotification({
         visible: true,
         type: 'info',
@@ -161,9 +134,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     }
   };
 
-  /**
-   * Transfers the NFT to the address stored in the "address" state.
-   */
   const handleTransfer = async () => {
     handleCloseDialog();
     if (!nftContract || !account) return;
@@ -171,7 +141,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       const hash = await nftContract.write.transferFrom?.([account, address, tokenId]);
       if (hash) await publicClient?.waitForTransactionReceipt({ hash });
 
-      // Re-fetch data after a successful transfer
       await Promise.all([fetchCSTInfo(), fetchTransferHistory()]);
       setAddress('');
     } catch (err) {
@@ -185,16 +154,12 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     }
   };
 
-  /**
-   * Sets or updates the name of the token via the smart contract.
-   */
   const handleSetTokenName = async () => {
     if (!nftContract) return;
     try {
       const hash = await nftContract.write.setNftName?.([tokenId, tokenName]);
       if (hash) await publicClient?.waitForTransactionReceipt({ hash });
 
-      // Re-fetch data after setting the name
       setTimeout(async () => {
         await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
       }, 3000);
@@ -212,16 +177,12 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     }
   };
 
-  /**
-   * Clears the name of the token via the smart contract.
-   */
   const handleClearName = async () => {
     if (!nftContract) return;
     try {
       const hash = await nftContract.write.setNftName?.([tokenId, '']);
       if (hash) await publicClient?.waitForTransactionReceipt({ hash });
 
-      // Re-fetch data after clearing the name
       setTimeout(async () => {
         await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
       }, 3000);
@@ -239,17 +200,12 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     }
   };
 
-  /**
-   * Restricts the length of the token name to 32 characters
-   * (multi-byte characters count more heavily).
-   */
   const handleChangeName = (e: ChangeEvent<HTMLInputElement>) => {
     const inputName = e.target.value;
     let len = 0;
     let i;
     for (i = 0; i < inputName.length; i++) {
       if (inputName.charCodeAt(i) > 255) {
-        // Multi-byte character
         len += 3;
       } else {
         len++;
@@ -262,37 +218,14 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     setTokenName(inputName.slice(0, i));
   };
 
-  /**
-   * Navigates to the previous NFT if it exists.
-   */
   const handlePrev = () => router.push(`/detail/${Math.max(tokenId - 1, 0)}`);
 
-  /**
-   * Navigates to the next NFT if it exists, based on the total supply.
-   */
   const handleNext = async () => {
     if (!nftContract) return;
     const totalSupply = await nftContract.read.totalSupply?.();
     router.push(`/detail/${Math.min(tokenId + 1, Number(totalSupply ?? 0) - 1)}`);
   };
 
-  /**
-   * Opens the copy link menu.
-   */
-  const handleMenuOpen = (e: MouseEvent<HTMLElement>) => {
-    setAnchorEl(e.currentTarget);
-  };
-
-  /**
-   * Closes the copy link menu.
-   */
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  /**
-   * Fetches the name history for the current token from the backend.
-   */
   const fetchNameHistory = async () => {
     try {
       const history = await api.get_name_history(tokenId);
@@ -302,9 +235,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     }
   };
 
-  /**
-   * Fetches the ownership transfer history for the current token.
-   */
   const fetchTransferHistory = async () => {
     try {
       const history = await api.get_ct_ownership_transfers(tokenId);
@@ -314,9 +244,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     }
   };
 
-  /**
-   * Fetches the main NFT information (like seed, image, video) from the backend.
-   */
   const fetchCSTInfo = async () => {
     try {
       const res = await api.get_cst_info(tokenId);
@@ -331,10 +258,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     }
   };
 
-  /**
-   * Fetches dashboard info and, if the tokenId is valid, fetches
-   * the NFT info, name history, and ownership transfer history.
-   */
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -342,7 +265,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         const dashboardData = await api.get_dashboard_info();
         setDashboard(dashboardData as DashboardDetail | null);
 
-        // Only fetch data if the token exists (tokenId < NumCSTokenMints)
         if (dashboardData && dashboardData.MainStats.NumCSTokenMints > tokenId) {
           await Promise.all([fetchCSTInfo(), fetchNameHistory(), fetchTransferHistory()]);
         }
@@ -353,190 +275,135 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenId]);
 
-  // Show a simple loading text while data is being fetched
   if (loading) {
     return (
-      <Container>
-        <Typography variant="h6">Loading...</Typography>
-      </Container>
+      <div className="container mx-auto px-4">
+        <h6 className="text-lg font-medium text-foreground">Loading...</h6>
+      </div>
     );
   }
 
   return (
-    <Container>
+    <div className="container mx-auto px-4">
       <SectionWrapper>
-        <Grid container spacing={4} justifyContent="center">
-          {/* Left column: NFT image and navigations */}
-          <Grid size={{ xs: 12, sm: 8, md: 6 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left column: NFT image and navigation */}
+          <div className="mx-auto w-full max-w-lg">
             <StyledCard>
-              <CardActionArea onClick={() => setImageOpen(true)}>
+              <div className="cursor-pointer" onClick={() => setImageOpen(true)}>
                 <NFTImage src={image} />
                 <NFTInfoWrapper>
-                  <Typography variant="body1" sx={{ color: '#FFFFFF' }}>
-                    {formatId(tokenId)}
-                  </Typography>
+                  <p className="text-base text-white">{formatId(tokenId)}</p>
                 </NFTInfoWrapper>
                 {nameHistory.length > 0 && (
-                  <NFTInfoWrapper sx={{ width: 'calc(100% - 40px)' }}>
-                    <Typography variant="subtitle1" sx={{ color: '#FFFFFF', textAlign: 'center' }}>
-                      {nameHistory[0]?.TokenName}
-                    </Typography>
+                  <NFTInfoWrapper className="w-[calc(100%-40px)]">
+                    <p className="text-base text-white text-center">{nameHistory[0]?.TokenName}</p>
                   </NFTInfoWrapper>
                 )}
-              </CardActionArea>
+              </div>
             </StyledCard>
-            <Box mt={2}>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 6 }}>
-                  <Button variant="text" fullWidth onClick={handleMenuOpen}>
-                    Copy link
-                    {anchorEl ? <ExpandLess /> : <ExpandMore />}
-                  </Button>
-
-                  <Menu
-                    elevation={0}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'center',
-                    }}
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                  >
-                    <PrimaryMenuItem
+            <div className="mt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="text" className="w-full">
+                      Copy link
+                      {menuOpen ? (
+                        <ChevronUp className="ml-1 h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center">
+                    <DropdownMenuItem
                       onClick={() => {
                         copy(getOriginUrl(video));
-                        handleMenuClose();
+                        setMenuOpen(false);
                       }}
                     >
-                      <Typography>Video</Typography>
-                    </PrimaryMenuItem>
-                    <PrimaryMenuItem
+                      Video
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={() => {
                         copy(getOriginUrl(image));
-                        handleMenuClose();
+                        setMenuOpen(false);
                       }}
                     >
-                      <Typography>Image</Typography>
-                    </PrimaryMenuItem>
-                    <PrimaryMenuItem
+                      Image
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
                       onClick={() => {
                         copy(window.location.href);
-                        handleMenuClose();
+                        setMenuOpen(false);
                       }}
                     >
-                      <Typography>Detail Page</Typography>
-                    </PrimaryMenuItem>
-                  </Menu>
-                </Grid>
-                <Grid size={{ xs: 6 }}>
-                  <Grid container spacing={2}>
-                    <Grid size={{ xs: 6 }}>
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        startIcon={<ArrowBack />}
-                        onClick={handlePrev}
-                        disabled={tokenId === 0}
-                      >
-                        Prev
-                      </Button>
-                    </Grid>
-                    <Grid size={{ xs: 6 }}>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        endIcon={<ArrowForward />}
-                        onClick={handleNext}
-                        disabled={
-                          dashboard != null && tokenId === dashboard.MainStats.NumCSTokenMints - 1
-                        }
-                      >
-                        Next
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Box>
-          </Grid>
+                      Detail Page
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button onClick={handlePrev} disabled={tokenId === 0}>
+                    <ArrowLeft className="h-4 w-4 mr-1" />
+                    Prev
+                  </Button>
+                  <Button
+                    onClick={handleNext}
+                    disabled={
+                      dashboard != null && tokenId === dashboard.MainStats.NumCSTokenMints - 1
+                    }
+                  >
+                    Next
+                    <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Right column: NFT metadata and actions */}
-          <Grid size={{ xs: 12, sm: 8, md: 6 }}>
+          <div>
             {nft?.TimeStamp && (
-              <Box mb={1}>
-                <Typography color="primary" component="span">
-                  Minted Date:
-                </Typography>
+              <div className="mb-2">
+                <span className="text-primary">Minted Date:</span>
                 &nbsp;
-                <Typography component="span">
-                  <Link
-                    color="inherit"
-                    fontSize="inherit"
-                    href={getExplorerUrl('tx', nft.TxHash)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {convertTimestampToDateTime(nft.TimeStamp)}
-                  </Link>
-                </Typography>
-              </Box>
+                <a
+                  className="text-foreground"
+                  href={getExplorerUrl('tx', nft.TxHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {convertTimestampToDateTime(nft.TimeStamp)}
+                </a>
+              </div>
             )}
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Winner:
-              </Typography>
+            <div className="mb-2">
+              <span className="text-primary">Winner:</span>
               &nbsp;
-              <Link style={{ color: '#fff' }} href={`/user/${nft?.WinnerAddr ?? ''}`}>
-                <Typography fontFamily="monospace" component="span">
-                  {nft?.WinnerAddr}
-                </Typography>
+              <Link href={`/user/${nft?.WinnerAddr ?? ''}`} className="text-white">
+                <span className="font-mono">{nft?.WinnerAddr}</span>
               </Link>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Owner:
-              </Typography>
+            </div>
+            <div className="mb-2">
+              <span className="text-primary">Owner:</span>
               &nbsp;
-              <Link style={{ color: '#fff' }} href={`/user/${nft?.CurOwnerAddr ?? ''}`}>
-                <Typography fontFamily="monospace" component="span">
-                  {nft?.CurOwnerAddr}
-                </Typography>
+              <Link href={`/user/${nft?.CurOwnerAddr ?? ''}`} className="text-white">
+                <span className="font-mono">{nft?.CurOwnerAddr}</span>
               </Link>
-            </Box>
-            <Box sx={{ mb: 1, display: 'flex' }}>
-              <Typography color="primary" component="span">
-                Seed:
-              </Typography>
+            </div>
+            <div className="mb-2 flex">
+              <span className="text-primary">Seed:</span>
               &nbsp;
-              <Typography
-                fontFamily="monospace"
-                component="span"
-                sx={{
-                  display: 'inline-block',
-                  wordWrap: 'break-word',
-                  width: '32ch',
-                }}
-              >
-                {nft?.Seed}
-              </Typography>
-            </Box>
-            <Box mb={1}>
-              <Typography color="primary" component="span">
-                Prize Type:
-              </Typography>
+              <span className="font-mono inline-block break-words w-[32ch]">{nft?.Seed}</span>
+            </div>
+            <div className="mb-2">
+              <span className="text-primary">Prize Type:</span>
               &nbsp;
-              <Typography component="span">
+              <span>
                 {(() => {
-                  // Mapping the record type to specific labels
                   switch (nft?.RecordType) {
                     case 1:
                       return 'Raffle Winner';
@@ -549,7 +416,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                           <Link
                             href={`/prize/${nft?.RoundNum ?? 0}`}
                             target="_blank"
-                            color="inherit"
+                            className="text-inherit"
                           >
                             Round #{nft?.RoundNum}
                           </Link>
@@ -562,125 +429,106 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                       return '';
                   }
                 })()}
-              </Typography>
-            </Box>
+              </span>
+            </div>
 
-            {/* Display staking eligibility */}
             {!nft?.Staked && !nft?.WasUnstaked ? (
-              <Typography sx={{ color: '#0f0' }}>The token is eligible for staking.</Typography>
+              <p className="text-[#0f0]">The token is eligible for staking.</p>
             ) : (
-              <Typography sx={{ color: '#f00' }}>
+              <p className="text-[#f00]">
                 The token has already been staked and cannot be staked again.
-              </Typography>
+              </p>
             )}
 
-            {/* Button to view round details */}
-            <Box mt={6}>
-              <Button
-                variant="outlined"
-                onClick={() => router.push(`/prize/${nft?.RoundNum ?? 0}`)}
-              >
+            <div className="mt-12">
+              <Button variant="outline" onClick={() => router.push(`/prize/${nft?.RoundNum ?? 0}`)}>
                 View Round Details
               </Button>
-            </Box>
+            </div>
 
-            {/* Transfer and rename controls (only visible to the owner) */}
             {account === nft?.CurOwnerAddr && (
               <>
-                <Box display="flex" mt={3}>
-                  <TextField
-                    variant="filled"
-                    color="secondary"
+                <div className="flex mt-6">
+                  <Input
                     placeholder="Enter address here"
-                    fullWidth
-                    size="small"
+                    className="flex-1"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                   />
                   <Button
-                    color="secondary"
-                    variant="contained"
+                    variant="secondary"
                     onClick={handleClickTransfer}
-                    endIcon={<ArrowForward />}
-                    sx={{ ml: 1 }}
+                    className="ml-2"
                     disabled={!address || address === account}
                   >
                     Transfer
+                    <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
-                </Box>
+                </div>
 
-                <Box mt={3}>
-                  <Typography variant="h6" align="left">
+                <div className="mt-6">
+                  <h6 className="text-lg font-medium text-left">
                     {nft?.TokenName ? 'Rename the token' : 'Set a name to the token'}
-                  </Typography>
-                  <Box display="flex">
-                    <TextField
-                      variant="filled"
-                      color="secondary"
+                  </h6>
+                  <div className="flex">
+                    <Input
                       placeholder="Enter token name here"
                       value={tokenName}
-                      size="small"
-                      fullWidth
-                      sx={{ flex: 1 }}
-                      inputProps={{ maxLength: 32 }}
+                      className="flex-1"
+                      maxLength={32}
                       onChange={handleChangeName}
                     />
                     <Button
-                      color="secondary"
-                      variant="contained"
+                      variant="secondary"
                       onClick={handleSetTokenName}
-                      sx={{ ml: 1, whiteSpace: 'nowrap' }}
+                      className="ml-2 whitespace-nowrap"
                       disabled={!tokenName}
                     >
                       {nft?.TokenName === '' ? 'Set Name' : 'Change Name'}
                     </Button>
                     {nameHistory.length > 0 && nameHistory[0]?.TokenName && (
                       <Button
-                        color="secondary"
-                        variant="contained"
+                        variant="secondary"
                         onClick={handleClearName}
-                        sx={{ ml: 1, whiteSpace: 'nowrap' }}
+                        className="ml-2 whitespace-nowrap"
                       >
                         Clear name
                       </Button>
                     )}
-                  </Box>
-                  <Typography variant="body2" mt={1} fontStyle="italic">
+                  </div>
+                  <p className="text-sm mt-2 italic">
                     There are {dashboard?.MainStats.TotalNamedTokens} tokens with a name, click{' '}
-                    <Link href="/named-nfts">here</Link> for a full list.
-                  </Typography>
-                </Box>
+                    <Link href="/named-nfts" className="text-primary hover:underline">
+                      here
+                    </Link>{' '}
+                    for a full list.
+                  </p>
+                </div>
               </>
             )}
-          </Grid>
-        </Grid>
+          </div>
+        </div>
 
-        {/* Name history table */}
         {nameHistory.length !== 0 && (
-          <Box mt="40px">
-            <Typography variant="h6" mb={2}>
-              History of Name Changes
-            </Typography>
+          <div className="mt-10">
+            <h6 className="text-lg font-medium mb-4 text-foreground">History of Name Changes</h6>
             <NameHistoryTable list={nameHistory} />
-          </Box>
+          </div>
         )}
 
-        {/* Transfer history table */}
         {transferHistory.length !== 0 && !transferHistory[0]?.TransferType && (
-          <Box mt="40px">
-            <Typography variant="h6" mb={2}>
+          <div className="mt-10">
+            <h6 className="text-lg font-medium mb-4 text-foreground">
               History of Ownership Changes
-            </Typography>
+            </h6>
             <TransferHistoryTable list={transferHistory} />
-          </Box>
+          </div>
         )}
 
-        {/* Video section */}
-        <Box mt="80px">
+        <div className="mt-20">
           <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
-        </Box>
+        </div>
 
-        {/* Lightbox for full-size image */}
         <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: image }]} />
 
         <VideoPlayerDialog
@@ -693,24 +541,25 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         />
       </SectionWrapper>
 
-      {/* Dialog for transfer confirmation to new address */}
-      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md">
-        <DialogTitle>
-          Are you sure you want to send the token to the destination address?
-        </DialogTitle>
+      <Dialog open={openDialog} onOpenChange={(open) => !open && handleCloseDialog()}>
         <DialogContent>
-          <DialogContentText>
-            The destination account doesn&#39;t exist. Please check the provided address.
-          </DialogContentText>
+          <DialogHeader>
+            <DialogTitle>
+              Are you sure you want to send the token to the destination address?
+            </DialogTitle>
+            <DialogDescription>
+              The destination account doesn&apos;t exist. Please check the provided address.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={handleTransfer}>Yes</Button>
+            <Button variant="outline" onClick={handleCloseDialog}>
+              No
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleTransfer} autoFocus>
-            Yes
-          </Button>
-          <Button onClick={handleCloseDialog}>No</Button>
-        </DialogActions>
       </Dialog>
-    </Container>
+    </div>
   );
 };
 

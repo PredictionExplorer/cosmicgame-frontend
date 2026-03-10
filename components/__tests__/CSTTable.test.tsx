@@ -1,9 +1,13 @@
-import { render, screen } from '@/test-utils';
 import '@testing-library/jest-dom';
+
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
-import { CSTTable, type CSTToken } from '@/components/tokens/CSTTable';
+
+import { render, screen } from '@/test-utils';
 
 jest.mock('react-super-responsive-table/dist/SuperResponsiveTableStyle.css', () => ({}));
+
+// eslint-disable-next-line import/order
+import { CSTTable, type CSTToken } from '@/components/tokens/CSTTable';
 
 describe('CSTTable', () => {
   test('with no records shows "No tokens yet."', () => {

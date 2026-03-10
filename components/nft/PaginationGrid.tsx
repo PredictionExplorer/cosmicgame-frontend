@@ -1,8 +1,16 @@
 import { useState, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Grid, Box, Typography, CardActionArea, Link } from '@mui/material';
-import Pagination from '@mui/material/Pagination';
+import Link from 'next/link';
 
+import { getAssetsUrl } from '@/utils';
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationEllipsis,
+} from '@/components/ui/pagination';
 import {
   SearchBox,
   SearchField,
@@ -11,7 +19,6 @@ import {
   NFTInfoWrapper,
 } from '@/components/styled';
 import api from '@/services/api';
-import { getAssetsUrl } from '@/utils';
 import type { CSTTokenInfo } from '@/services/api';
 
 import NFTImage from './NFTImage';
@@ -22,179 +29,120 @@ interface PaginationGridProps {
   loading: boolean;
 }
 
-/* ------------------------------------------------------------------
-  Component: PaginationGrid
-  Renders a grid of NFTs with search and pagination features.
-  
-  Props:
-    - data: An array of NFT objects. Each NFT has:
-        TokenId: number
-        ...other NFT properties...
-    - loading: A boolean indicating if data is still loading.
------------------------------------------------------------------- */
+function getPaginationRange(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | 'ellipsis')[] = [1];
+  if (current > 3) pages.push('ellipsis');
+  for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) {
+    pages.push(i);
+  }
+  if (current < total - 2) pages.push('ellipsis');
+  if (total > 1) pages.push(total);
+  return pages;
+}
+
 const PaginationGrid = ({ data, loading }: PaginationGridProps) => {
-  // Search input state.
   const [searchKey, setSearchKey] = useState('');
-  // NFTs to display (after filtering/search).
   const [collection, setCollection] = useState<CSTTokenInfo[]>([]);
-  // Number of NFTs to display per page.
   const [perPage] = useState(12);
-  // Current page in the pagination.
   const [curPage, setCurPage] = useState(1);
 
-  // Next.js router for handling query parameters (page).
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  /**
-   * Updates the URL query parameter 'page' and navigates to that page.
-   * @param {number} page - The page number to navigate to.
-   */
   const handleNextPage = (page: number) => {
-    // Update the 'page' query parameter and navigate.
     router.push(pathname + '?page=' + page);
   };
 
-  /**
-   * Handles changes in the search input field.
-   * Resets the collection to the original data if the search is cleared.
-   */
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSearchKey(value);
-
-    // If search field is empty, show the entire dataset again.
     if (!value) {
       setCollection(data);
     }
   };
 
-  /**
-   * Handles pressing 'Enter' in the search field.
-   * Triggers the search action if Enter is pressed.
-   */
-  const handleSearchKeyPress = (e: KeyboardEvent) => {
+  const handleSearchKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
   };
 
-  /**
-   * Utility function to check if a given string is numeric (integer).
-   * @param {string} value - The string to test.
-   * @returns {boolean} True if the string is purely digits, otherwise false.
-   */
   const isNumeric = (value: string) => {
     return /^\d+$/.test(value);
   };
 
-  /**
-   * Handles the search action. Searches by:
-   *  - NFT TokenId if the searchKey is numeric.
-   *  - NFT Name if the searchKey is non-numeric (via an API call).
-   */
   const handleSearch = async () => {
-    if (searchKey === '') return; // Do nothing if empty.
+    if (searchKey === '') return;
 
     let filtered = [];
 
-    // If the search key is numeric, filter by TokenId directly.
     if (isNumeric(searchKey)) {
       filtered = data.filter((nft) => nft.TokenId === Number(searchKey));
     } else {
-      // Else, fetch TokenId list by name via API, then filter local data.
       const res = await api.get_token_by_name(searchKey);
       const filteredIds = res.map((o: { TokenId: number }) => o.TokenId);
       filtered = data.filter((nft) => filteredIds.includes(nft.TokenId));
     }
 
     setCollection(filtered);
-
-    // Optionally reset page to 1 or remove page from router query
-    // if you want the user to see page 1 of the filtered result.
     router.push(pathname);
   };
 
-  /**
-   * Sync current page from router.query whenever the router updates.
-   * Defaults to 1 if not present or invalid.
-   */
   useEffect(() => {
     const page = parseInt(searchParams.get('page') ?? '1') || 1;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurPage(page);
   }, [searchParams]);
 
-  /**
-   * Whenever the original data changes (e.g., new props), reset the collection.
-   */
   useEffect(() => {
     if (data && data.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCollection(data);
     }
   }, [data]);
 
-  // Calculate start & end indices based on current page and items per page.
   const startIndex = (curPage - 1) * perPage;
   const endIndex = curPage * perPage;
-  // Slice the collection to only the NFTs for the current page.
   const visibleNFTs = collection.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(collection.length / perPage);
 
   return (
-    <Box mt={4}>
-      {/* Search Area */}
+    <div className="mt-8">
       <SearchBox>
         <SearchField
-          variant="filled"
           placeholder="Enter NFT ID or Name"
-          color="secondary"
           value={searchKey}
           onChange={handleSearchChange}
-          onKeyPress={handleSearchKeyPress}
+          onKeyDown={handleSearchKeyDown}
         />
-        <SearchButton
-          type="submit"
-          size="large"
-          variant="contained"
-          color="primary"
-          onClick={handleSearch}
-        >
+        <SearchButton type="submit" onClick={handleSearch}>
           Search
         </SearchButton>
       </SearchBox>
 
-      {/* If still loading, show a loading message. Otherwise, show the NFTs. */}
       {loading ? (
-        <Typography variant="h6" align="center">
-          Loading...
-        </Typography>
+        <h6 className="text-lg font-medium text-center text-foreground">Loading...</h6>
       ) : (
         <>
-          {/* Grid of NFTs */}
-          <Grid spacing={2} container>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {collection.length === 0 ? (
-              // If no results, display a "Sample NFT" placeholder.
-              <Grid size={{ xs: 6, sm: 6, md: 4 }}>
+              <div>
                 <StyledCard>
-                  <CardActionArea>
-                    <Link href="/detail/sample" sx={{ display: 'block' }}>
+                  <div className="cursor-pointer">
+                    <Link href="/detail/sample" className="block">
                       <NFTImage src={getAssetsUrl('cosmicsignature/sample.png')} />
                     </Link>
-                    <NFTInfoWrapper sx={{ width: 'calc(100% - 40px)' }}>
-                      <Typography
-                        variant="subtitle1"
-                        sx={{ color: '#FFFFFF', textAlign: 'center' }}
-                      >
-                        Sample NFT
-                      </Typography>
+                    <NFTInfoWrapper className="w-[calc(100%-40px)]">
+                      <p className="text-base text-white text-center">Sample NFT</p>
                     </NFTInfoWrapper>
-                  </CardActionArea>
+                  </div>
                 </StyledCard>
-              </Grid>
+              </div>
             ) : (
-              // Map each NFT in the current page to an NFT component.
               visibleNFTs.map((nft) => (
-                <Grid key={nft.TokenId} size={{ xs: 6, sm: 6, md: 4 }}>
+                <div key={nft.TokenId}>
                   <NFT
                     nft={{
                       TokenId: String(nft.TokenId),
@@ -202,28 +150,38 @@ const PaginationGrid = ({ data, loading }: PaginationGridProps) => {
                       TokenName: nft.TokenName ?? '',
                     }}
                   />
-                </Grid>
+                </div>
               ))
             )}
-          </Grid>
+          </div>
 
-          {/* Only show pagination if there's more than one page of items */}
           {collection.length > perPage && (
-            <Box display="flex" justifyContent="center" mt={4}>
-              <Pagination
-                color="primary"
-                page={curPage}
-                onChange={(_e, page) => handleNextPage(page)}
-                count={Math.ceil(collection.length / perPage)}
-                hideNextButton
-                hidePrevButton
-                shape="rounded"
-              />
-            </Box>
+            <div className="flex justify-center mt-8">
+              <Pagination>
+                <PaginationContent>
+                  {getPaginationRange(curPage, totalPages).map((item, idx) =>
+                    item === 'ellipsis' ? (
+                      <PaginationItem key={`ellipsis-${idx}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={item}>
+                        <PaginationLink
+                          isActive={item === curPage}
+                          onClick={() => handleNextPage(item)}
+                        >
+                          {item}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ),
+                  )}
+                </PaginationContent>
+              </Pagination>
+            </div>
           )}
         </>
       )}
-    </Box>
+    </div>
   );
 };
 
