@@ -3,7 +3,7 @@ import { getAddress, isAddress } from 'viem';
 import axios from 'axios';
 
 import UserStatisticsView from '../../components/UserStatisticsView';
-import { logoImgUrl } from '../../utils';
+import { createOpenGraphProps } from '../../utils/seo';
 import { cosmicGameBaseUrl } from '../../services/api';
 
 const UserPage = ({ address }: { address: string }) => {
@@ -31,17 +31,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const title = `Information for User ${address} | Cosmic Signature`;
   const description = `Information for User ${address}`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
   return {
-    props: { title, description, openGraphData, address },
+    props: { ...createOpenGraphProps(title, description), address },
   };
 }
 

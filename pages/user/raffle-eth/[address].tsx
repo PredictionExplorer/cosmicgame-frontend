@@ -10,7 +10,9 @@ import useRaffleWalletContract from '../../../hooks/useRaffleWalletContract';
 import { useNotification } from '../../../contexts/NotificationContext';
 import api from '../../../services/api';
 import getErrorMessage from '../../../utils/alert';
-import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from '../../../utils';
+import { isUserRejection, reportError, getEthErrorMessage } from '../../../utils/errors';
+import { getExplorerUrl, convertTimestampToDateTime } from '../../../utils';
+import { createOpenGraphProps } from '../../../utils/seo';
 import {
   MainWrapper,
   TablePrimary,
@@ -134,7 +136,7 @@ function useRaffleETHDeposits(address: string) {
       );
       setRaffleETHToClaim({ data: sorted, loading: false });
     } catch (err) {
-      console.error('Failed to fetch Raffle ETH deposits:', err);
+      reportError(err, 'fetch Raffle ETH deposits');
       setRaffleETHToClaim({ data: [], loading: false });
     }
   };
@@ -171,14 +173,11 @@ const UserRaffleETH = ({ address }: { address: string }) => {
         setIsClaiming(false);
       }, 2000);
     } catch (err: unknown) {
-      const ethErr = err as { code?: number; data?: { message?: string } };
-      if (ethErr?.code === 4001) {
-        // user rejected
-      } else {
-        console.error(err);
-        if (ethErr?.data?.message) {
-          const msg = getErrorMessage(ethErr.data.message);
-          setNotification({ text: msg, type: 'error', visible: true });
+      if (!isUserRejection(err)) {
+        reportError(err, 'claim raffle ETH');
+        const msg = getEthErrorMessage(err);
+        if (msg !== 'An error occurred') {
+          setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
         }
       }
       setIsClaiming(false);
@@ -267,17 +266,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const title = `Raffle ETH User(${address}) Won | Cosmic Signature`;
   const description = `Raffle ETH User(${address}) Won`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
   return {
-    props: { title, description, openGraphData, address },
+    props: { ...createOpenGraphProps(title, description), address },
   };
 }
 

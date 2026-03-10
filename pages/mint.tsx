@@ -7,6 +7,12 @@ import { MainWrapper, CenterBox } from '../components/styled';
 import useRWLKNFTContract from '../hooks/useRWLKNFTContract';
 import { parseBalance } from '../utils';
 import { useActiveWeb3React } from '../hooks/web3';
+import {
+  isUserRejection,
+  isEthProviderError,
+  reportError,
+  getEthErrorMessage,
+} from '../utils/errors';
 
 const Mint = () => {
   const [mintPrice, setMintPrice] = useState('0');
@@ -28,11 +34,10 @@ const Mint = () => {
         });
         await publicClient?.waitForTransactionReceipt({ hash });
       } catch (err: unknown) {
-        if (err instanceof Error && 'data' in err) {
-          const data = (err as { data?: { message?: string } }).data;
-          if (data?.message) {
-            alert(data.message);
-          }
+        if (isUserRejection(err)) return;
+        reportError(err, 'mint RWLK NFT');
+        if (isEthProviderError(err)) {
+          alert(getEthErrorMessage(err, 'Mint failed'));
         }
       }
     }
@@ -57,7 +62,9 @@ const Mint = () => {
           .sort()
           .reverse();
         setNftIds(nftIds);
-      } catch (err) {}
+      } catch (err) {
+        reportError(err, 'get user NFT tokens');
+      }
     };
 
     if (account && nftContract) {

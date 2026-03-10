@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Collapse, IconButton, Link, TableBody, Typography } from '@mui/material';
 
 import {
@@ -14,7 +14,7 @@ import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import api from '../../services/api';
+import { useStakingCSTRewardsByRound } from '../../hooks/useApiQuery';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -44,25 +44,7 @@ interface StakingWinner {
 const GlobalStakingRewardsRow = ({ row }: { row: GlobalStakingReward }) => {
   const [open, setOpen] = useState(false);
 
-  const [list, setList] = useState<StakingWinner[]>([]);
-
-  /**
-   * Fetch winner data for the round when this component mounts.
-   */
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await api.get_staking_cst_rewards_by_round(row.RoundNum);
-        setList(response as StakingWinner[]);
-      } catch (error) {
-        console.error('Error fetching CST rewards by round:', error);
-      }
-    };
-
-    if (row?.RoundNum) {
-      fetchData();
-    }
-  }, [row]);
+  const { data: list = [] } = useStakingCSTRewardsByRound(row?.RoundNum);
 
   // If row is undefined or null, return an empty row
   if (!row) {
@@ -85,7 +67,8 @@ const GlobalStakingRewardsRow = ({ row }: { row: GlobalStakingReward }) => {
             color="inherit"
             fontSize="inherit"
             href={getExplorerUrl('tx', row.TxHash)}
-            target="__blank"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {convertTimestampToDateTime(row.TimeStamp)}
           </Link>
@@ -123,7 +106,7 @@ const GlobalStakingRewardsRow = ({ row }: { row: GlobalStakingReward }) => {
               <Typography variant="subtitle1" gutterBottom component="div">
                 CST Staking Rewards for Round {row.RoundNum}
               </Typography>
-              <StakingWinnerTable list={list} />
+              <StakingWinnerTable list={list as StakingWinner[]} />
             </Box>
           </Collapse>
         </TablePrimaryCell>

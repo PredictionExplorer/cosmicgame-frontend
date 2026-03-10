@@ -34,8 +34,9 @@ import {
   formatCSTValue,
   formatEthValue,
   formatSeconds,
-  logoImgUrl,
 } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
+import { reportError } from '../utils/errors';
 
 // ------------------------------------------------------------------
 // Types & Interfaces
@@ -243,7 +244,7 @@ const Statistics = () => {
       setStakedRWLKTokens(stakedRWLKTokensData);
       setSystemModeChanges(sysChangesData as EventRow[]);
     } catch (err) {
-      console.error('Error fetching data:', err);
+      reportError(err, 'fetch statistics data');
       setFetchError('Failed to load statistics data. Please try again.');
     } finally {
       setLoading(false);
@@ -262,7 +263,7 @@ const Statistics = () => {
         });
       }
     } catch (err) {
-      console.error('Error fetching CST bid data:', err);
+      reportError(err, 'fetch CST bid data');
     }
   }, []);
 
@@ -827,21 +828,11 @@ const Statistics = () => {
 /* ------------------------------------------------------------------
   Server-Side Rendering (SSR) for SEO
 ------------------------------------------------------------------ */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Statistics | Cosmic Signature';
-  const description =
-    'Explore comprehensive statistics on Cosmic Signature. Access data on market trends, token performance, user activity, and more. Stay informed with real-time insights into our blockchain ecosystem.';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'Statistics | Cosmic Signature',
+    'Explore comprehensive statistics on Cosmic Signature. Access data on market trends, token performance, user activity, and more. Stay informed with real-time insights into our blockchain ecosystem.',
+  ),
+});
 
 export default Statistics;

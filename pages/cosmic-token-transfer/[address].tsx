@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, TableBody, Tooltip, Typography } from '@mui/material';
 import { getAddress, isAddress } from 'viem';
 import { GetServerSidePropsContext } from 'next';
@@ -13,13 +13,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '../../components/styled';
-import api from '../../services/api';
-import {
-  getExplorerUrl,
-  convertTimestampToDateTime,
-  isWalletAddress,
-  logoImgUrl,
-} from '../../utils';
+import { getExplorerUrl, convertTimestampToDateTime, isWalletAddress } from '../../utils';
+import { createOpenGraphProps } from '../../utils/seo';
+import { useCTTransfers } from '../../hooks/useApiQuery';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '../../components/common/CustomPagination';
@@ -63,7 +59,8 @@ const CosmicTokenTransferRow = ({ row }: { row: TokenTransferRow }) => {
           color="inherit"
           fontSize="inherit"
           href={getExplorerUrl('tx', row.TxHash)}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(row.TimeStamp)}
         </Link>
@@ -78,7 +75,8 @@ const CosmicTokenTransferRow = ({ row }: { row: TokenTransferRow }) => {
               fontSize="inherit"
               fontFamily="monospace"
               href={`/user/${row.FromAddr}`}
-              target="__blank"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               {isWalletAddress(row.FromAddr ?? '')}
             </Link>
@@ -96,7 +94,8 @@ const CosmicTokenTransferRow = ({ row }: { row: TokenTransferRow }) => {
               fontSize="inherit"
               fontFamily="monospace"
               href={`/user/${row.ToAddr}`}
-              target="__blank"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               {isWalletAddress(row.ToAddr ?? '')}
             </Link>
@@ -170,30 +169,7 @@ const CosmicTokenTransfersTable = ({ list }: { list: TokenTransferRow[] }) => {
   - Shows a loading state while data is being fetched.
 ------------------------------------------------------------------ */
 const CosmicTokenTransfers = ({ address }: { address: string }) => {
-  // Loading flag for data fetch
-  const [loading, setLoading] = useState(true);
-
-  // State holding all fetched transfers
-  const [cosmicTokenTransfers, setCosmicTokenTransfers] = useState<TokenTransferRow[]>([]);
-
-  /* 
-    useEffect: On component mount, fetch the transfers from the API.
-    If an error occurs, log it, but ensure loading is set to false.
-  */
-  useEffect(() => {
-    const fetchTransfers = async () => {
-      try {
-        setLoading(true);
-        const transfers = await api.get_ct_transfers(address);
-        setCosmicTokenTransfers(transfers as TokenTransferRow[]);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTransfers();
-  }, [address]);
+  const { data: cosmicTokenTransfers = [], isLoading: loading } = useCTTransfers(address);
 
   return (
     <MainWrapper>
@@ -206,7 +182,7 @@ const CosmicTokenTransfers = ({ address }: { address: string }) => {
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
-        <CosmicTokenTransfersTable list={cosmicTokenTransfers} />
+        <CosmicTokenTransfersTable list={(cosmicTokenTransfers ?? []) as TokenTransferRow[]} />
       )}
     </MainWrapper>
   );
@@ -231,21 +207,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     address = 'Invalid Address';
   }
 
-  // Build page title/description dynamically with the address
   const title = `Cosmic Signature Token Transfer History for ${address} | Cosmic Signature`;
   const description = `Cosmic Signature Token Transfer History for ${address}`;
 
-  // Set Open Graph and Twitter meta tags
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData, address } };
+  return { props: { ...createOpenGraphProps(title, description), address } };
 }
 
 export default CosmicTokenTransfers;

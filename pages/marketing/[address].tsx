@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, Link, Typography } from '@mui/material';
 import { GetServerSidePropsContext } from 'next';
 import { getAddress, isAddress } from 'viem';
 
 import { MainWrapper } from '../../components/styled';
-import api from '../../services/api';
 import MarketingRewardsTable, {
-  MarketingReward,
+  type MarketingReward,
 } from '../../components/tables/MarketingRewardsTable';
-import { logoImgUrl } from '../../utils';
+import { createOpenGraphProps } from '../../utils/seo';
+import { useMarketingRewardsByUser } from '../../hooks/useApiQuery';
 
 interface UserMarketingRewardsProps {
   address: string;
@@ -16,29 +16,10 @@ interface UserMarketingRewardsProps {
 
 // Component for displaying user's marketing rewards based on Ethereum address
 const UserMarketingRewards: React.FC<UserMarketingRewardsProps> = ({ address }) => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [invalidAddress, setInvalidAddress] = useState<boolean>(false);
-  const [marketingRewards, setMarketingRewards] = useState<MarketingReward[]>([]);
-
-  useEffect(() => {
-    const fetchRewards = async (userAddress: string) => {
-      setLoading(true);
-      try {
-        const rewards = await api.get_marketing_rewards_by_user(userAddress);
-        setMarketingRewards(rewards as MarketingReward[]);
-      } catch (error) {
-        console.error('Error fetching user marketing rewards:', error);
-      }
-      setLoading(false);
-    };
-
-    if (address === 'Invalid Address') {
-      setInvalidAddress(true);
-      setLoading(false);
-    } else if (address) {
-      fetchRewards(address);
-    }
-  }, [address]);
+  const invalidAddress = address === 'Invalid Address';
+  const { data: marketingRewards = [], isLoading: loading } = useMarketingRewardsByUser(
+    invalidAddress ? undefined : address,
+  );
 
   return (
     <MainWrapper>
@@ -71,7 +52,7 @@ const UserMarketingRewards: React.FC<UserMarketingRewardsProps> = ({ address }) 
           {loading ? (
             <Typography variant="h6">Loading...</Typography>
           ) : (
-            <MarketingRewardsTable list={marketingRewards} />
+            <MarketingRewardsTable list={(marketingRewards ?? []) as MarketingReward[]} />
           )}
         </>
       )}
@@ -93,16 +74,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const title = `Marketing Rewards for User ${address} | Cosmic Signature`;
   const description = `Marketing Rewards earned by User ${address}`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData, address } };
+  return { props: { ...createOpenGraphProps(title, description), address } };
 }
 
 export default UserMarketingRewards;

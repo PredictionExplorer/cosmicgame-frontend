@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Link, TableBody, Typography } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -11,8 +11,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '../components/styled';
-import { convertTimestampToDateTime, logoImgUrl } from '../utils';
-import api from '../services/api';
+import { convertTimestampToDateTime } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
+import { useNamedNFTs } from '../hooks/useApiQuery';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '../components/common/CustomPagination';
 
@@ -81,33 +82,9 @@ const NamedNFTsTable = ({ list }: { list: NamedNFTRecord[] }) => {
   - Shows loading and empty states.
 ------------------------------------------------------------------ */
 const NamedNFTs = () => {
-  // Current page in the pagination
   const [curPage, setCurPage] = useState(1);
-
-  // Number of items to show per page
   const perPage = 5;
-
-  // Loading state to display progress while fetching data
-  const [loading, setLoading] = useState(true);
-
-  // List of named NFTs fetched from the API
-  const [list, setList] = useState<NamedNFTRecord[]>([]);
-
-  // Fetch named NFTs from the API upon component mount
-  useEffect(() => {
-    const fetchNamedNFTs = async () => {
-      try {
-        setLoading(true);
-        const nfts = await api.get_named_nfts();
-        setList(nfts as unknown as NamedNFTRecord[]);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    };
-    fetchNamedNFTs();
-  }, []);
+  const { data: list = [], isLoading: loading } = useNamedNFTs();
 
   // Rendering logic:
   //  - If we're loading, show loading text
@@ -124,7 +101,14 @@ const NamedNFTs = () => {
           <Typography variant="h6">Loading...</Typography>
         ) : list.length > 0 ? (
           <>
-            <NamedNFTsTable list={list.slice((curPage - 1) * perPage, curPage * perPage)} />
+            <NamedNFTsTable
+              list={
+                list.slice(
+                  (curPage - 1) * perPage,
+                  curPage * perPage,
+                ) as unknown as NamedNFTRecord[]
+              }
+            />
             <CustomPagination
               page={curPage}
               setPage={setCurPage}
@@ -145,20 +129,11 @@ const NamedNFTs = () => {
   Provides server-side rendered meta tags for SEO (title, description, 
   and Open Graph data). This ensures correct social media previews.
 ------------------------------------------------------------------ */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Named Cosmic Signature Tokens | Cosmic Signature';
-  const description = 'Named Cosmic Signature Tokens';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'Named Cosmic Signature Tokens | Cosmic Signature',
+    'Named Cosmic Signature Tokens',
+  ),
+});
 
 export default NamedNFTs;

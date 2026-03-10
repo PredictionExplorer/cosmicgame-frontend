@@ -5,7 +5,9 @@ import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
 
 import api from '../../../services/api';
-import { getExplorerUrl, logoImgUrl, convertTimestampToDateTime } from '../../../utils';
+import { getExplorerUrl, convertTimestampToDateTime } from '../../../utils';
+import { createOpenGraphProps } from '../../../utils/seo';
+import { reportError } from '../../../utils/errors';
 import { CustomPagination } from '../../../components/common/CustomPagination';
 import {
   MainWrapper,
@@ -156,7 +158,7 @@ function useRaffleNFTWinnings(userAddress: string) {
       );
       setRaffleNfts({ data: sorted as RaffleNFTWinning[], loading: false });
     } catch (err) {
-      console.error('Error fetching raffle NFT winnings:', err);
+      reportError(err, 'fetch raffle NFT winnings');
       setRaffleNfts({ data: [], loading: false });
     }
   };
@@ -232,17 +234,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const title = `Raffle NFT User(${address}) Won | Cosmic Signature`;
   const description = `Raffle NFT User(${address}) Won`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
   return {
-    props: { title, description, openGraphData, address },
+    props: { ...createOpenGraphProps(title, description), address },
   };
 }
 

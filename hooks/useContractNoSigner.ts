@@ -1,19 +1,12 @@
 import { useMemo } from 'react';
 import { createPublicClient, getContract, http, type Abi } from 'viem';
-import { arbitrum, arbitrumSepolia, hardhat } from 'viem/chains';
 
 import { networkConfig } from '../config/networks';
-
-const chainMap = {
-  42161: arbitrum,
-  421614: arbitrumSepolia,
-  31337: hardhat,
-} as const;
-
-const chain = chainMap[networkConfig.chainId as keyof typeof chainMap] ?? arbitrumSepolia;
+import { activeChain } from '../config/chains';
+import { reportError } from '../utils/errors';
 
 const readOnlyClient = createPublicClient({
-  chain,
+  chain: activeChain,
   transport: http(networkConfig.rpcUrl),
 });
 
@@ -31,7 +24,7 @@ export default function useContractNoSigner<const TAbi extends Abi>(address: str
         client: readOnlyClient,
       });
     } catch (err) {
-      console.error('useContractNoSigner → contract init error:', err);
+      reportError(err, 'useContractNoSigner init');
       return null;
     }
   }, [address, abi]);

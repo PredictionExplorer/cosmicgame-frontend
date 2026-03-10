@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, List, ListItem, useTheme, useMediaQuery, Box } from '@mui/material';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { GetServerSideProps } from 'next';
 import { formatEther } from 'viem';
 
 import { networkConfig } from '../config/networks';
 import { MainWrapper } from '../components/styled';
-import api from '../services/api';
-import { formatSeconds, logoImgUrl } from '../utils';
+import { formatSeconds } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
 import { useNotification } from '../contexts/NotificationContext';
+import { useClipboard } from '../hooks/useClipboard';
+import { useDashboardInfo } from '../hooks/useApiQuery';
+import { reportError } from '../utils/errors';
 import useContractNoSigner from '../hooks/useContractNoSigner';
 import {
   charityWalletAbi as CHARITY_WALLET_ABI,
@@ -34,10 +36,10 @@ const ContractItem = ({ name, value, copyable = false }: ContractItemProps) => {
   const md = useMediaQuery(theme.breakpoints.up('md'));
   const sm = useMediaQuery(theme.breakpoints.up('sm'));
   const { setNotification } = useNotification();
+  const { copy } = useClipboard();
 
   return (
     <ListItem>
-      {/* Render the "name" or label of the contract property */}
       <Typography
         color="primary"
         sx={{
@@ -51,27 +53,26 @@ const ContractItem = ({ name, value, copyable = false }: ContractItemProps) => {
       </Typography>
 
       {copyable ? (
-        <CopyToClipboard text={value ? String(value) : ''}>
-          <Box
-            sx={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }}
-            onClick={() =>
-              setNotification({
-                text: 'Address copied!',
-                type: 'success',
-                visible: true,
-              })
-            }
+        <Box
+          sx={{ display: 'flex', cursor: 'pointer', alignItems: 'center' }}
+          onClick={() => {
+            copy(value ? String(value) : '');
+            setNotification({
+              text: 'Address copied!',
+              type: 'success',
+              visible: true,
+            });
+          }}
+        >
+          <Typography
+            fontFamily="monospace"
+            variant={sm ? 'subtitle1' : 'body1'}
+            sx={{ wordBreak: 'break-all', mr: 1 }}
           >
-            <Typography
-              fontFamily="monospace"
-              variant={sm ? 'subtitle1' : 'body1'}
-              sx={{ wordBreak: 'break-all', mr: 1 }}
-            >
-              {value}
-            </Typography>
-            <ContentCopyIcon fontSize="inherit" />
-          </Box>
-        </CopyToClipboard>
+            {value}
+          </Typography>
+          <ContentCopyIcon fontSize="inherit" />
+        </Box>
       ) : (
         <Typography
           fontFamily="monospace"
@@ -122,8 +123,8 @@ interface DashboardData {
  * and default settings fetched from the server and the CharityWallet contract.
  */
 const Contracts = () => {
-  const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: rawDashboard, isLoading: loading } = useDashboardInfo();
+  const data = rawDashboard as unknown as DashboardData | null;
   const [charityAddress, setCharityAddress] = useState('');
   const [priceIncrease, setPriceIncrease] = useState(0);
   const [timeIncrease, setTimeIncrease] = useState(0);
@@ -140,27 +141,8 @@ const Contracts = () => {
   const [cstDutchAuctionBeginningBidPriceMinLimit, setCstDutchAuctionBeginningBidPriceMinLimit] =
     useState(0);
 
-  // Use a read-only contract instance (without signer) for the Charity Wallet.
   const charityWalletContract = useContractNoSigner(CHARITY_WALLET_ADDRESS, CHARITY_WALLET_ABI);
   const cosmicGameContract = useContractNoSigner(COSMICGAME_ADDRESS, COSMICGAME_ABI);
-
-  /**
-   * Fetch initial dashboard data from the server via API.
-   */
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const newData = await api.get_dashboard_info();
-        setData(newData as unknown as DashboardData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
 
   useEffect(() => {
     if (!cosmicGameContract) return;
@@ -169,7 +151,7 @@ const Contracts = () => {
       try {
         await fn();
       } catch (e) {
-        console.error(`contracts.tsx: ${name} failed`, e);
+        reportError(e, `contracts read ${name}`);
       }
     };
 
@@ -229,7 +211,7 @@ const Contracts = () => {
         const addr = (await charityWalletContract.read.charityAddress?.()) as string;
         setCharityAddress(addr);
       } catch (e) {
-        console.error('contracts.tsx: charityAddress failed', e);
+        reportError(e, 'fetch charity address');
       }
     };
     fetchData();
@@ -406,22 +388,11 @@ const Contracts = () => {
 /**
  * getServerSideProps: Pre-renders the page with SEO data and social metadata.
  */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Contracts | Cosmic Signature';
-  const description =
-    "Get detailed information on Cosmic Signature's smart contracts, including addresses, default initial values, and more.";
-
-  // Open Graph and Twitter metadata
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'Contracts | Cosmic Signature',
+    "Get detailed information on Cosmic Signature's smart contracts, including addresses, default initial values, and more.",
+  ),
+});
 
 export default Contracts;

@@ -151,7 +151,7 @@ describe('client helper functions', () => {
   describe('normalizeFieldNamesArray', () => {
     it('normalizes each item in array', () => {
       const input = [{ TokenAddress: '0x1' }, { TokenAddress: '0x2' }];
-      const result = normalizeFieldNamesArray(input);
+      const result = normalizeFieldNamesArray(input) as Array<{ TokenAddr: string }>;
 
       expect(result).toHaveLength(2);
       expect(result[0]).toHaveProperty('TokenAddr', '0x1');

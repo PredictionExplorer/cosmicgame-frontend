@@ -8,7 +8,6 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Container,
   Grid,
   useTheme,
   useMediaQuery,
@@ -19,17 +18,15 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
-  Tabs,
-  Tab,
 } from '@mui/material';
 import { usePublicClient, useWalletClient } from 'wagmi';
 import { formatEther, isAddress, maxUint256, parseEther, parseUnits, zeroAddress } from 'viem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import Countdown from 'react-countdown';
-import Lightbox from 'react-awesome-lightbox';
 import { useRouter } from 'next/router';
 import { GetServerSideProps } from 'next';
+import axios from 'axios';
 
 import { CustomTextField, MainWrapper, StyledCard, StyledInput } from '../components/styled';
 import BiddingHistory from '../components/tables/BiddingHistoryTable';
@@ -43,16 +40,10 @@ import PaginationRWLKGrid from '../components/nft/PaginationRWLKGrid';
 import useCosmicSignatureContract from '../hooks/useCosmicSignatureContract';
 import Prize from '../components/common/Prize';
 import LatestNFTs from '../components/nft/LatestNFTs';
-import DonatedNFT from '../components/donations/DonatedNFT';
 import getErrorMessage from '../utils/alert';
 import NFTImage from '../components/nft/NFTImage';
-import {
-  formatSeconds,
-  getAssetsUrl,
-  getEnduranceChampions,
-  logoImgUrl,
-  EnduranceChampion,
-} from '../utils';
+import { formatSeconds, getAssetsUrl, getEnduranceChampions, EnduranceChampion } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
 import type {
   DashboardInfo,
   BidInfo,
@@ -60,28 +51,19 @@ import type {
   UsedRWLKNFT,
   TxInfo,
 } from '../services/api/types';
-import { isUserRejection, isEthProviderError } from '../utils/errors';
-import WinningHistoryTable from '../components/tables/WinningHistoryTable';
-
-import 'react-awesome-lightbox/build/style.css';
-
-import { CustomPagination } from '../components/common/CustomPagination';
+import { isUserRejection, isEthProviderError, reportError } from '../utils/errors';
 import { useNotification } from '../contexts/NotificationContext';
 import RaffleHolderTable from '../components/tables/RaffleHolderTable';
-import TwitterPopup from '../components/common/TwitterPopup';
-import TwitterShareButton from '../components/common/TwitterShareButton';
 import ETHSpentTable from '../components/tables/ETHSpentTable';
 import EnduranceChampionsTable from '../components/tables/EnduranceChampionsTable';
 import EthDonationTable from '../components/tables/EthDonationTable';
-
-import axios from 'axios';
-
-import DonatedERC20Table from '../components/donations/DonatedERC20Table';
 import ChartOrPie from '../components/tokens/ChartOrPie';
 import { SpecialPrizeWinners } from '../components/tables/SpecialPrizeWinners';
 import { BiddingStatus } from '../components/common/BiddingStatus';
+import { DonatedTokensSection } from '../components/home/DonatedTokensSection';
+import { WinningHistorySection } from '../components/home/WinningHistorySection';
 
-const NewHome = () => {
+const HomePage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DashboardInfo | null>(null);
@@ -146,32 +128,6 @@ const NewHome = () => {
   const GAS_FLOOR = BigInt(2_000_000);
   const GAS_BUFFER_BPS = BigInt(12000); // 120% (20% buffer)
 
-  interface TabPanelProps {
-    children?: React.ReactNode;
-    index: number;
-    value: number;
-  }
-  function CustomTabPanel({ children, value, index, ...other }: TabPanelProps) {
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`simple-tabpanel-${index}`}
-        aria-labelledby={`simple-tab-${index}`}
-        {...other}
-      >
-        {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-      </div>
-    );
-  }
-
-  const gridLayout =
-    donatedNFTs.length > 16
-      ? { xs: 6, sm: 3, md: 2, lg: 2 }
-      : donatedNFTs.length > 9
-        ? { xs: 6, sm: 4, md: 3, lg: 3 }
-        : { xs: 12, sm: 6, md: 4, lg: 4 };
-
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setDonatedTokensTab(newValue);
   };
@@ -185,7 +141,7 @@ const NewHome = () => {
     } else if (err instanceof Error) {
       notify('error', err.message);
     } else {
-      console.error(err);
+      reportError(err, 'ethers provider error');
       notify('error', 'Unexpected error. Please try again.');
     }
   };
@@ -201,7 +157,7 @@ const NewHome = () => {
       try {
         await fetchActivationTime();
       } catch (e) {
-        console.warn('fetchActivationTime failed:', e);
+        reportError(e, 'fetchActivationTime');
       }
     }, alsoFetchActivationMs);
   };
@@ -320,7 +276,7 @@ const NewHome = () => {
       const bal = await publicClient!.getBalance({ address: account as `0x${string}` });
       return bal >= amount;
     } catch (e) {
-      console.error(e);
+      reportError(e, 'check ETH balance');
       return false;
     }
   };
@@ -332,7 +288,7 @@ const NewHome = () => {
       const wallet = BigInt(bal.CosmicTokenBalance);
       return wallet >= amountWei;
     } catch (e) {
-      console.error(e);
+      reportError(e, 'check CST balance');
       return false;
     }
   };
@@ -638,7 +594,7 @@ const NewHome = () => {
       const audioElement = new Audio('/audio/notification.wav');
       await audioElement.play();
     } catch (error) {
-      console.error('Error requesting sound permission:', error);
+      reportError(error, 'play notification sound');
     }
   }, []);
 
@@ -654,7 +610,9 @@ const NewHome = () => {
           .reverse();
         setRwlknftIds(nftIds);
       }
-    } catch (e) {}
+    } catch (e) {
+      reportError(e, 'getRwlkNFTIds');
+    }
   }, [nftRWLKContract, account]);
 
   const fetchData = useCallback(async () => {
@@ -699,7 +657,7 @@ const NewHome = () => {
       });
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching data:', err);
+      reportError(err, 'fetch home page data');
     }
   }, [account, playAudio]);
 
@@ -710,7 +668,7 @@ const NewHome = () => {
       const diff = current * 1000 - Date.now();
       setPrizeTime(t * 1000 - diff);
     } catch (err) {
-      console.error('Error fetching prize time:', err);
+      reportError(err, 'fetch prize time');
     }
   };
 
@@ -721,7 +679,7 @@ const NewHome = () => {
         history as unknown as import('../components/tables/WinningHistoryTable').WinningHistoryEntry[],
       );
     } catch (err) {
-      console.error('Error fetching claim history:', err);
+      reportError(err, 'fetch claim history');
     }
   }, []);
 
@@ -736,7 +694,7 @@ const NewHome = () => {
         });
       }
     } catch (err) {
-      console.error('Error fetching CST bid data:', err);
+      reportError(err, 'fetch CST bid data');
     }
   }, []);
 
@@ -751,7 +709,7 @@ const NewHome = () => {
         });
       }
     } catch (err) {
-      console.error('Error fetching ETH bid info:', err);
+      reportError(err, 'fetch ETH bid info');
     }
   }, []);
 
@@ -759,7 +717,6 @@ const NewHome = () => {
     await Promise.all([
       getRwlkNFTIds(),
       fetchData(),
-      // fetchPrizeTime(),
       fetchClaimHistory(),
       fetchCSTBidData(),
       fetchEthBidInfo(),
@@ -1363,47 +1320,15 @@ const NewHome = () => {
             <EthDonationTable list={ethDonations} showType={false} />
           </Box>
         )}
-        <Box marginTop={10}>
-          <Typography variant="h6">DONATED TOKENS FOR CURRENT ROUND</Typography>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs variant="fullWidth" value={donatedTokensTab} onChange={handleTabChange}>
-              <Tab label="ERC721 Tokens" />
-              <Tab label="ERC20 Tokens" />
-            </Tabs>
-          </Box>
-          <CustomTabPanel value={donatedTokensTab} index={0}>
-            {donatedNFTs.length > 0 ? (
-              <>
-                <Grid container spacing={2} mt={2}>
-                  {donatedNFTs.map((nft) => (
-                    <Grid
-                      key={nft.RecordId}
-                      size={{
-                        xs: gridLayout.xs,
-                        sm: gridLayout.sm,
-                        md: gridLayout.md,
-                        lg: gridLayout.lg,
-                      }}
-                    >
-                      <DonatedNFT nft={nft} />
-                    </Grid>
-                  ))}
-                </Grid>
-                <CustomPagination
-                  page={curPage}
-                  setPage={setCurrentPage}
-                  totalLength={donatedNFTs.length}
-                  perPage={perPage}
-                />
-              </>
-            ) : (
-              <Typography>No ERC721 tokens were donated on this round.</Typography>
-            )}
-          </CustomTabPanel>
-          <CustomTabPanel value={donatedTokensTab} index={1}>
-            <DonatedERC20Table list={donatedERC20Tokens} handleClaim={null} />
-          </CustomTabPanel>
-        </Box>
+        <DonatedTokensSection
+          donatedNFTs={donatedNFTs}
+          donatedERC20Tokens={donatedERC20Tokens}
+          donatedTokensTab={donatedTokensTab}
+          onTabChange={handleTabChange}
+          curPage={curPage}
+          setCurPage={setCurrentPage}
+          perPage={perPage}
+        />
         <Box mt={10}>
           <Box>
             <Typography variant="h6" component="span">
@@ -1419,37 +1344,13 @@ const NewHome = () => {
 
       <LatestNFTs />
 
-      <Container>
-        <Box margin="100px 0">
-          <Typography variant="h4" textAlign="center" mb={6}>
-            History of Winnings
-          </Typography>
-          {claimHistory === null ? (
-            <Typography variant="h6">Loading...</Typography>
-          ) : (
-            <WinningHistoryTable winningHistory={claimHistory} />
-          )}
-        </Box>
-        <Box margin="100px 0">
-          <Typography variant="h4" textAlign="center" mb={6}>
-            Create a Twitter Post and Refer People
-          </Typography>
-          <TwitterShareButton />
-        </Box>
-      </Container>
-      {imageOpen && (
-        <Lightbox
-          image={
-            bannerToken.seed === ''
-              ? '/images/qmark.png'
-              : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
-          }
-          onClose={() => setImageOpen(false)}
-        />
-      )}
-      <TwitterPopup
-        open={twitterPopupOpen}
-        setOpen={setTwitterPopupOpen}
+      <WinningHistorySection
+        claimHistory={claimHistory}
+        imageOpen={imageOpen}
+        setImageOpen={setImageOpen}
+        bannerTokenSeed={bannerToken.seed}
+        twitterPopupOpen={twitterPopupOpen}
+        setTwitterPopupOpen={setTwitterPopupOpen}
         setTwitterHandle={setTwitterHandle}
       />
     </>
@@ -1457,7 +1358,6 @@ const NewHome = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Cosmic Signature';
   let prizeAmountStr = '';
   try {
     const { data } = await axios.get(cosmicGameBaseUrl + 'statistics/dashboard');
@@ -1467,17 +1367,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     // Non-critical: fallback to empty string if API is unavailable
   }
   const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${prizeAmountStr}prizes and Cosmic Signature NFTs.`;
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
+  return { props: createOpenGraphProps('Cosmic Signature', description) };
 };
 
-export default NewHome;
+export default HomePage;

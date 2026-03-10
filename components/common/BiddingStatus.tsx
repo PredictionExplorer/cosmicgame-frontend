@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Countdown from 'react-countdown';
 
 import api from '../../services/api';
+import { reportError } from '../../utils/errors';
 import { calculateTimeDiff, convertTimestampToDateTime } from '../../utils';
 import { GradientText } from '../styled';
 import { useActiveWeb3React } from '../../hooks/web3';
@@ -90,7 +91,7 @@ export const BiddingStatus: React.FC<BiddingStatusProps> = ({
         const diff = current * 1000 - Date.now();
         setOffset(diff);
       } catch (err) {
-        console.error('Error fetching prize time:', err);
+        reportError(err, 'fetch time offset');
       }
     };
 
@@ -126,7 +127,7 @@ export const BiddingStatus: React.FC<BiddingStatusProps> = ({
           });
         }
       } catch (err) {
-        console.error('Error fetching CST bid data:', err);
+        reportError(err, 'fetch CST bid data');
       }
     };
 

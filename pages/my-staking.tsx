@@ -14,13 +14,14 @@ import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '../conf
 import { useStakedToken } from '../contexts/StakedTokenContext';
 import useRWLKNFTContract from '../hooks/useRWLKNFTContract';
 import { useNotification } from '../contexts/NotificationContext';
+import { isUserRejection, reportError, getEthErrorMessage } from '../utils/errors';
 import StakingActionsTable from '../components/staking/StakingActionsTable';
 import { StakingRewardsTable } from '../components/staking/StakingRewardsTable';
 import { StakedTokensTable } from '../components/staking/StakedTokensTable';
 import { RWLKNFTTable } from '../components/tokens/RWLKNFTTable';
 import { RwalkStakingRewardMintsTable } from '../components/staking/RwalkStakingRewardMintsTable';
 import { CSTokensTable } from '../components/tokens/CSTokensTable';
-import { logoImgUrl } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
 import getErrorMessage from '../utils/alert';
 
 // ----------------------------------------------
@@ -270,13 +271,12 @@ const MyStaking = () => {
   // Displays a user-friendly error notification
   const handleError = useCallback(
     (err: unknown) => {
-      const ethErr = err as { code?: number; data?: { message?: string } };
-      if (ethErr?.data?.message) {
-        const msg = getErrorMessage(ethErr.data.message);
-        setNotification({ text: msg, type: 'error', visible: true });
-      }
-      if (ethErr?.code !== 4001) {
-        console.error(err);
+      if (!isUserRejection(err)) {
+        reportError(err, 'staking error');
+        const msg = getEthErrorMessage(err);
+        if (msg !== 'An error occurred') {
+          setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
+        }
       }
     },
     [setNotification],
@@ -434,7 +434,7 @@ const MyStaking = () => {
         setRewardPerCST(0);
       }
     } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
+      reportError(err, 'fetch staking dashboard data');
     }
   };
 
@@ -640,21 +640,11 @@ const MyStaking = () => {
 // ----------------------------------------------
 // getServerSideProps for SEO & Open Graph Data
 // ----------------------------------------------
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'My Staking | Cosmic Signature';
-  const description =
-    'Manage your staking with Cosmic Signature. View your staking status, rewards, and history. Maximize your earnings and participate in the growth of our blockchain ecosystem with ease.';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'My Staking | Cosmic Signature',
+    'Manage your staking with Cosmic Signature. View your staking status, rewards, and history. Maximize your earnings and participate in the growth of our blockchain ecosystem with ease.',
+  ),
+});
 
 export default MyStaking;

@@ -4,11 +4,11 @@ import { GetServerSidePropsContext } from 'next';
 import axios from 'axios';
 
 import { MainWrapper } from '../../components/styled';
-import api from '../../services/api';
-import type { BidInfo as BidInfoType } from '../../services/api/types';
 import RandomWalkNFT from '../../components/nft/RandomWalkNFT';
 import NFTImage from '../../components/nft/NFTImage';
-import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from '../../utils';
+import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
+import { createOpenGraphProps } from '../../utils/seo';
+import { useBidInfo } from '../../hooks/useApiQuery';
 
 interface NFTTokenURI {
   image?: string;
@@ -30,37 +30,15 @@ interface NFTTokenURI {
     - Optional: RandomWalk NFT rendering if used
 ------------------------------------------------------------------ */
 const BidInfo = ({ bidId }: { bidId: number }) => {
-  // Loading state to display while data is being fetched.
-  const [loading, setLoading] = useState(true);
-
-  // Main bid data fetched from the API.
-  const [bidInfo, setBidInfo] = useState<BidInfoType | null>(null);
+  const { data: bidInfo = null, isLoading: loading } = useBidInfo(bidId);
 
   const [tokenURI, setTokenURI] = useState<NFTTokenURI | null>(null);
 
-  /**
-   * Fetch the bid info from our API when the component mounts.
-   * Also fetch the NFT metadata (if available) via the tokenURI field.
-   */
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-
-      // 1) Fetch the main bid info using the provided bidId prop.
-      const fetchedBidInfo = await api.get_bid_info(bidId);
-      setBidInfo(fetchedBidInfo);
-
-      // 2) If there's an NFT donation with a valid TokenURI, fetch that metadata.
-      if (fetchedBidInfo?.NFTTokenURI) {
-        const { data } = await axios.get(fetchedBidInfo.NFTTokenURI);
-        setTokenURI(data);
-      }
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [bidId]);
+    if (bidInfo?.NFTTokenURI) {
+      axios.get(bidInfo.NFTTokenURI).then(({ data }) => setTokenURI(data));
+    }
+  }, [bidInfo]);
 
   if (bidId < 0) {
     return (
@@ -271,21 +249,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const params = context.params!.id;
   const id = Array.isArray(params) ? params[0] : params;
 
-  // Construct dynamic SEO metadata
   const title = 'Bid Information | Cosmic Signature';
   const description = `Bid Information for Bid Id=${id}`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  // Return the props, including the bid ID as a number
-  return { props: { title, description, openGraphData, bidId: parseInt(id as string) } };
+  return { props: { ...createOpenGraphProps(title, description), bidId: parseInt(id as string) } };
 }
 
 export default BidInfo;

@@ -1,43 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Typography } from '@mui/material';
 import { GetServerSideProps } from 'next';
 
 import { MainWrapper } from '../components/styled';
-import api from '../services/api';
 import {
   CharityDepositTable,
   type CharityDepositDonation,
 } from '../components/tables/CharityDepositTable';
-import { logoImgUrl } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
+import { useCharityCGDeposits } from '../hooks/useApiQuery';
 
 /**
  * Component for displaying Cosmic Game Charity Deposits.
  */
 const CharityCGDeposits = () => {
-  // Tracks whether the data is still being fetched.
-  const [loading, setLoading] = useState(true);
-
-  // Stores the array of CG deposit data.
-  const [charityCGDeposits, setCharityCGDeposits] = useState<CharityDepositDonation[]>([]);
-
-  /**
-   * Fetches the CG deposit data from the API on component mount.
-   */
-  useEffect(() => {
-    const fetchCharityDeposits = async () => {
-      try {
-        setLoading(true);
-        const cg_deposits = await api.get_charity_cg_deposits();
-        setCharityCGDeposits(cg_deposits as CharityDepositDonation[]);
-      } catch (error) {
-        console.error('Failed to fetch CG deposits:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCharityDeposits();
-  }, []);
+  const { data: charityCGDeposits = [], isLoading: loading } = useCharityCGDeposits();
 
   return (
     <MainWrapper>
@@ -47,7 +24,7 @@ const CharityCGDeposits = () => {
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
-        <CharityDepositTable list={charityCGDeposits} />
+        <CharityDepositTable list={charityCGDeposits as CharityDepositDonation[]} />
       )}
     </MainWrapper>
   );
@@ -57,22 +34,11 @@ const CharityCGDeposits = () => {
  * Retrieves SEO-related metadata for server-side rendering,
  * including open graph data for social media previews.
  */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Cosmic Game Charity Deposits | Cosmic Signature';
-  const description = 'Cosmic Game Charity Deposits';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return {
-    props: { title, description, openGraphData },
-  };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'Cosmic Game Charity Deposits | Cosmic Signature',
+    'Cosmic Game Charity Deposits',
+  ),
+});
 
 export default CharityCGDeposits;

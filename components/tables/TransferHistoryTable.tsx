@@ -44,7 +44,8 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           color="inherit"
           fontSize="inherit"
           href={getExplorerUrl('tx', TxHash)}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(TimeStamp)}
         </Link>

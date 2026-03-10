@@ -9,7 +9,8 @@ import EthDonationTable, { EthDonation } from '../../components/tables/EthDonati
 import { useNotification } from '../../contexts/NotificationContext';
 import { useActiveWeb3React } from '../../hooks/web3';
 import useCosmicGameContract from '../../hooks/useCosmicGameContract';
-import { logoImgUrl } from '../../utils';
+import { createOpenGraphProps } from '../../utils/seo';
+import { isUserRejection, reportError } from '../../utils/errors';
 
 const EthDonations = () => {
   // State for donation data, amount, and donation information (JSON format)
@@ -53,10 +54,8 @@ const EthDonations = () => {
       // Refresh donations after 1 second
       setTimeout(fetchCharityDonations, 1000);
     } catch (error: unknown) {
-      if (
-        !(error instanceof Error && 'code' in error && (error as { code: number }).code === 4001)
-      ) {
-        console.error('Donation error:', error);
+      if (!isUserRejection(error)) {
+        reportError(error, 'Donation error');
         setNotification({
           text: 'Donation failed, please try again.',
           type: 'error',
@@ -85,10 +84,8 @@ const EthDonations = () => {
 
       setTimeout(fetchCharityDonations, 1000);
     } catch (error: unknown) {
-      if (
-        !(error instanceof Error && 'code' in error && (error as { code: number }).code === 4001)
-      ) {
-        console.error('Donation with info error:', error);
+      if (!isUserRejection(error)) {
+        reportError(error, 'Donation with info error');
         setNotification({
           text: 'Donation with information failed, please check your input.',
           type: 'error',
@@ -162,20 +159,11 @@ const EthDonations = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Direct (ETH) Donations | Cosmic Signature';
-  const description = 'Direct (ETH) Donations';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'Direct (ETH) Donations | Cosmic Signature',
+    'Direct (ETH) Donations',
+  ),
+});
 
 export default EthDonations;

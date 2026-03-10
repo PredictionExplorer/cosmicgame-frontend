@@ -26,6 +26,7 @@ import { convertTimestampToDateTime, getAssetsUrl, getRWLKImageUrl } from '../..
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '../common/CustomPagination';
 import api from '../../services/api';
+import { reportError } from '../../utils/errors';
 import type { RewardsByToken } from '../../services/api/types';
 import NFTImage from '../nft/NFTImage';
 import { useActiveWeb3React } from '../../hooks/web3';
@@ -71,7 +72,7 @@ function useTokenName(
           }
         }
       } catch (err) {
-        console.error('Error fetching token name:', err);
+        reportError(err, 'fetch staked token name');
       }
     };
     fetchName();

@@ -17,6 +17,34 @@ import {
 import { styled } from '@mui/material/styles';
 import { Table, Thead, Tr, Th, Td } from 'react-super-responsive-table';
 
+const paintWorkletBorder = (
+  border: string,
+  radius: string,
+  path: string,
+  gradient: string,
+  beforeExtra?: Record<string, unknown>,
+) => ({
+  '@supports (background: paint(id))': {
+    border: 0,
+    borderRadius: 0,
+    '--border': border,
+    '--radius': radius,
+    '--t': 0,
+    '--path': path,
+    WebkitMask: 'paint(rounded-shape)',
+    background: 'transparent',
+    '&:before': {
+      content: '""',
+      position: 'absolute',
+      inset: 0,
+      background: gradient,
+      '--t': 1,
+      WebkitMask: 'paint(rounded-shape)',
+      ...beforeExtra,
+    },
+  },
+});
+
 export const StyledLink = styled(Link)({
   color: '#fff',
   textDecoration: 'underline',
@@ -35,29 +63,15 @@ export const StyledCard = styled(Card, {
     overflow: 'hidden',
     boxShadow:
       '0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)',
-    '@supports (background: paint(id))': {
-      border: 0,
-      borderRadius: 0,
-      '--border': '1px',
-      '--radius': '16px',
-      '--t': 0,
-      '--path':
-        variant === 'alt'
-          ? '0 0px,32px 0,100% 0,100% 55%,88% 100%,0 100%'
-          : '0 0px,32px 0,100% 0,100% 80%,75% 100%,0 100%',
-      WebkitMask: 'paint(rounded-shape)',
-      background: 'transparent',
-      '&:before': {
-        content: '""',
-        position: 'absolute',
-        inset: 0,
-        background: 'linear-gradient(-27.86deg, #15BFFD 9.96%, #9C37FD 100%)',
-        opacity: 0.7,
-        '--t': 1,
-        WebkitMask: 'paint(rounded-shape)',
-        pointerEvents: 'none',
-      },
-    },
+    ...paintWorkletBorder(
+      '1px',
+      '16px',
+      variant === 'alt'
+        ? '0 0px,32px 0,100% 0,100% 55%,88% 100%,0 100%'
+        : '0 0px,32px 0,100% 0,100% 80%,75% 100%,0 100%',
+      'linear-gradient(-27.86deg, #15BFFD 9.96%, #9C37FD 100%)',
+      { opacity: 0.7, pointerEvents: 'none' },
+    ),
   },
 }));
 
@@ -186,24 +200,12 @@ export const CounterItemWrapper = styled(Box)({
   border: '1px solid rgba(21, 191, 253, 0.5)',
   borderRadius: '4px',
   overflow: 'hidden',
-  '@supports (background: paint(id))': {
-    border: 0,
-    borderRadius: 0,
-    '--border': '1px',
-    '--radius': '4px',
-    '--t': 0,
-    '--path': '0 0,8px 0,100% 0,100% calc(100% - 14px),calc(100% - 16px) 100%,0 100%',
-    WebkitMask: 'paint(rounded-shape)',
-    background: 'transparent',
-    '&:before': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      background: 'linear-gradient(152.14deg, #15BFFD 9.96%, #9C37FD 100%)',
-      '--t': 1,
-      WebkitMask: 'paint(rounded-shape)',
-    },
-  },
+  ...paintWorkletBorder(
+    '1px',
+    '4px',
+    '0 0,8px 0,100% 0,100% calc(100% - 14px),calc(100% - 16px) 100%,0 100%',
+    'linear-gradient(152.14deg, #15BFFD 9.96%, #9C37FD 100%)',
+  ),
 });
 
 export const CounterItem = styled(Box)(({ theme }) => ({
@@ -265,24 +267,12 @@ export const NFTImageWrapper = styled(Box)({
   border: '1px solid rgba(21, 191, 253, 0.5)',
   borderRadius: '8px',
   overflow: 'hidden',
-  '@supports (background: paint(id))': {
-    border: 0,
-    borderRadius: 0,
-    '--border': '1px',
-    '--radius': '8px',
-    '--t': 0,
-    '--path': '0 0,16px 0,100% 0,100% calc(100% - 16px),100% 100%,0 100%',
-    WebkitMask: 'paint(rounded-shape)',
-    background: 'transparent',
-    '&:before': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      background: 'linear-gradient(152.14deg, #15BFFD 9.96%, #9C37FD 100%)',
-      '--t': 1,
-      WebkitMask: 'paint(rounded-shape)',
-    },
-  },
+  ...paintWorkletBorder(
+    '1px',
+    '8px',
+    '0 0,16px 0,100% 0,100% calc(100% - 16px),100% 100%,0 100%',
+    'linear-gradient(152.14deg, #15BFFD 9.96%, #9C37FD 100%)',
+  ),
 });
 
 export const NFTSkeleton = styled(Skeleton)({
@@ -357,25 +347,12 @@ export const GradientBorder = styled(Box)({
   border: '1px solid rgba(21, 191, 253, 0.5)',
   borderRadius: '16px',
   overflow: 'hidden',
-  '@supports (background: paint(id))': {
-    border: 0,
-    borderRadius: 0,
-    '--border': '1px',
-    '--radius': '16px',
-    '--t': 0,
-    '--path': '0 0,32px 0,100% 0,100% calc(100% - 32px),100% 100%,0 100%',
-    WebkitMask: 'paint(rounded-shape)',
-    background: 'transparent',
-    '&:before': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      background:
-        'linear-gradient(152.14deg, rgba(21, 191, 253, 0.7) 9.96%, rgba(156, 55, 253, 0.7) 100%)',
-      '--t': 1,
-      WebkitMask: 'paint(rounded-shape)',
-    },
-  },
+  ...paintWorkletBorder(
+    '1px',
+    '16px',
+    '0 0,32px 0,100% 0,100% calc(100% - 32px),100% 100%,0 100%',
+    'linear-gradient(152.14deg, rgba(21, 191, 253, 0.7) 9.96%, rgba(156, 55, 253, 0.7) 100%)',
+  ),
 });
 
 export const CodeWrapper = styled(Box)({
@@ -384,24 +361,12 @@ export const CodeWrapper = styled(Box)({
   borderRadius: '16px',
   overflow: 'hidden',
   background: 'rgba(255, 255, 255, 0.05)',
-  '@supports (background: paint(id))': {
-    border: 0,
-    borderRadius: 0,
-    '--border': '1px',
-    '--radius': '16px',
-    '--t': 0,
-    '--path': '0 0,32px 0,100% 0,100% 85%,80% 100%,0 100%',
-    WebkitMask: 'paint(rounded-shape)',
-    '&:before': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      background:
-        'linear-gradient(152.14deg, rgba(156, 55, 253, 0.7) 9.96%, rgba(21, 191, 253, 0.7) 100%)',
-      '--t': 1,
-      WebkitMask: 'paint(rounded-shape)',
-    },
-  },
+  ...paintWorkletBorder(
+    '1px',
+    '16px',
+    '0 0,32px 0,100% 0,100% 85%,80% 100%,0 100%',
+    'linear-gradient(152.14deg, rgba(156, 55, 253, 0.7) 9.96%, rgba(21, 191, 253, 0.7) 100%)',
+  ),
 });
 
 export const CustomTextField = styled(TextField)({

@@ -3,29 +3,27 @@ import { Box, Link, Typography } from '@mui/material';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 import { MainWrapper } from '../../../components/styled';
-import {
-  getExplorerUrl,
-  convertTimestampToDateTime,
-  getMetadata,
-  logoImgUrl,
-} from '../../../utils';
-import api from '../../../services/api';
+import { getExplorerUrl, convertTimestampToDateTime, getMetadata } from '../../../utils';
+import { createOpenGraphProps } from '../../../utils/seo';
+import { useDonationsWithInfoById } from '../../../hooks/useApiQuery';
 
 interface EthDonationDetailProps {
   id: number;
 }
 
 const EthDonationDetail = ({ id }: EthDonationDetailProps) => {
-  const [loading, setLoading] = useState(true);
-  const [donationInfo, setDonationInfo] = useState<{
-    TxHash: string;
-    TimeStamp: number;
-    DonorAddr: string;
-    RoundNum: number;
-    AmountEth: number;
-    DataJson?: string;
-    [key: string]: unknown;
-  } | null>(null);
+  const { data: rawDonationInfo, isLoading: loading } = useDonationsWithInfoById(id);
+  const donationInfo =
+    (rawDonationInfo as {
+      TxHash: string;
+      TimeStamp: number;
+      DonorAddr: string;
+      RoundNum: number;
+      AmountEth: number;
+      DataJson?: string;
+      [key: string]: unknown;
+    } | null) ?? null;
+
   const [dataJson, setDataJson] = useState<{
     title?: string;
     message?: string;
@@ -38,34 +36,17 @@ const EthDonationDetail = ({ id }: EthDonationDetailProps) => {
   } | null>(null);
 
   useEffect(() => {
-    const fetchDonationDetail = async () => {
-      setLoading(true);
-      try {
-        const info = await api.get_donations_with_info_by_id(id);
-        setDonationInfo(info as typeof donationInfo);
+    if (!donationInfo) return;
+    if (!donationInfo.DataJson) return;
 
-        if (
-          info &&
-          typeof info === 'object' &&
-          'DataJson' in info &&
-          (info as Record<string, string>).DataJson
-        ) {
-          const jsonData = JSON.parse(String((info as Record<string, string>).DataJson));
-          setDataJson(jsonData);
-
-          // Fetch metadata from provided URL in the donation info
-          const meta = await getMetadata(jsonData.url);
-          setMetaData(meta);
-        }
-      } catch (error) {
-        console.error('Failed to fetch donation details:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDonationDetail();
-  }, [id]);
+    try {
+      const jsonData = JSON.parse(String(donationInfo.DataJson));
+      setDataJson(jsonData);
+      getMetadata(jsonData.url).then(setMetaData);
+    } catch {
+      // JSON parse error – ignore
+    }
+  }, [donationInfo]);
 
   if (id < 0) {
     return (
@@ -183,16 +164,7 @@ export const getServerSideProps: GetServerSideProps = async (
   const title = 'Direct (ETH) Donation Detail | Cosmic Signature';
   const description = 'Direct (ETH) Donation Detail';
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData, id } };
+  return { props: { ...createOpenGraphProps(title, description), id } };
 };
 
 export default EthDonationDetail;

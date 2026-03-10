@@ -73,7 +73,8 @@ const CSTStakingRewardsByDepositRow = ({ row }: { row: CSTStakingRewardByDeposit
             color="inherit"
             fontSize="inherit"
             href={getExplorerUrl('tx', row.TxHash)}
-            target="__blank"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {convertTimestampToDateTime(row.TimeStamp)}
           </Link>

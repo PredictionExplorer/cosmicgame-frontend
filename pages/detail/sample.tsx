@@ -1,19 +1,8 @@
 import { useState, MouseEvent } from 'react';
-import {
-  Box,
-  Button,
-  CardActionArea,
-  Container,
-  Dialog,
-  DialogContent,
-  Grid,
-  Menu,
-  Typography,
-} from '@mui/material';
+import { Box, Button, CardActionArea, Container, Grid, Menu, Typography } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import Lightbox from 'react-awesome-lightbox';
+import Lightbox from 'yet-another-react-lightbox';
 
 import NFTImage from '../../components/nft/NFTImage';
 import {
@@ -23,11 +12,15 @@ import {
   SectionWrapper,
   StyledCard,
 } from '../../components/styled';
-import 'react-awesome-lightbox/build/style.css';
+import { useClipboard } from '../../hooks/useClipboard';
+import 'yet-another-react-lightbox/styles.css';
 import NFTVideo from '../../components/nft/NFTVideo';
+import VideoPlayerDialog from '../../components/common/VideoPlayerDialog';
 import { getAssetsUrl, getOriginUrl } from '../../utils';
+import { createOpenGraphProps } from '../../utils/seo';
 
 const SampleDetail = () => {
+  const { copy } = useClipboard();
   // State for modal video visibility
   const [isVideoOpen, setVideoOpen] = useState(false);
   // State for image lightbox visibility
@@ -100,11 +93,15 @@ const SampleDetail = () => {
                         { label: 'Image', link: getOriginUrl(image) },
                         { label: 'Detail Page', link: window.location.href },
                       ].map(({ label, link }) => (
-                        <CopyToClipboard key={label} text={link}>
-                          <PrimaryMenuItem onClick={handleMenuClose}>
-                            <Typography>{label}</Typography>
-                          </PrimaryMenuItem>
-                        </CopyToClipboard>
+                        <PrimaryMenuItem
+                          key={label}
+                          onClick={() => {
+                            copy(link);
+                            handleMenuClose();
+                          }}
+                        >
+                          <Typography>{label}</Typography>
+                        </PrimaryMenuItem>
                       ))}
                     </Menu>
                   </Grid>
@@ -138,47 +135,20 @@ const SampleDetail = () => {
           </Box>
 
           {/* Image Lightbox */}
-          {isImageOpen && <Lightbox image={image} onClose={() => setImageOpen(false)} />}
+          <Lightbox
+            open={isImageOpen}
+            close={() => setImageOpen(false)}
+            slides={[{ src: image }]}
+          />
 
-          {/* Video player dialog */}
-          <Dialog
+          <VideoPlayerDialog
             open={isVideoOpen}
+            videoPath={videoPath}
             onClose={() => {
               setVideoOpen(false);
               setVideoPath(null);
             }}
-            maxWidth="lg"
-            fullWidth
-            PaperProps={{ sx: { bgcolor: 'black', boxShadow: 'none' } }}
-          >
-            <DialogContent sx={{ p: 0, position: 'relative', lineHeight: 0 }}>
-              <Button
-                onClick={() => {
-                  setVideoOpen(false);
-                  setVideoPath(null);
-                }}
-                sx={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 8,
-                  color: 'white',
-                  zIndex: 1,
-                  minWidth: 'auto',
-                  fontSize: '1.5rem',
-                }}
-              >
-                ✕
-              </Button>
-              {videoPath && (
-                <video
-                  src={videoPath}
-                  controls
-                  autoPlay
-                  style={{ width: '100%', maxHeight: '80vh', display: 'block' }}
-                />
-              )}
-            </DialogContent>
-          </Dialog>
+          />
         </SectionWrapper>
       </Container>
     </MainWrapper>
@@ -192,16 +162,7 @@ export async function getServerSideProps() {
     'Discover the unique attributes and ownership history of Cosmic Signature Token, an exclusive digital collectible from the Cosmic Signature game.';
   const imageUrl = getAssetsUrl('cosmicsignature/sample.png');
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: imageUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: imageUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
+  return { props: createOpenGraphProps(title, description, imageUrl) };
 }
 
 export default SampleDetail;

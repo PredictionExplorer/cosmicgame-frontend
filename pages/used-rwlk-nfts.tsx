@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Link, TableBody, Typography } from '@mui/material';
 
 import {
@@ -10,8 +10,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '../components/styled';
-import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from '../utils';
-import api from '../services/api';
+import { getExplorerUrl, convertTimestampToDateTime } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
+import { useUsedRWLKNFTs } from '../hooks/useApiQuery';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
@@ -43,7 +44,8 @@ const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
           color="inherit"
           fontSize="inherit"
           href={getExplorerUrl('tx', nft.TxHash)}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(nft.TimeStamp)}
         </Link>
@@ -110,33 +112,9 @@ const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
   - Renders appropriate messages for loading or empty states.
 ------------------------------------------------------------------ */
 const UsedRwlkNfts = () => {
-  // Number of items to show per page.
   const perPage = 5;
-
-  // Current page in pagination.
   const [curPage, setCurPage] = useState(1);
-
-  // Loading state to handle asynchronous fetch.
-  const [loading, setLoading] = useState(true);
-
-  // The complete list of used RandomWalk NFTs.
-  const [list, setList] = useState<UsedRwlkNftRecord[]>([]);
-
-  // Fetch the used RandomWalk NFTs from the API upon component mount.
-  useEffect(() => {
-    const fetchUsedRwlkNFTs = async () => {
-      try {
-        setLoading(true);
-        const nfts = await api.get_used_rwlk_nfts();
-        setList(nfts as UsedRwlkNftRecord[]);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    };
-    fetchUsedRwlkNFTs();
-  }, []);
+  const { data: list = [], isLoading: loading } = useUsedRWLKNFTs();
 
   // Rendering Logic:
   // 1) Display loading message if data is still being fetched.
@@ -153,7 +131,9 @@ const UsedRwlkNfts = () => {
           <Typography variant="h6">Loading...</Typography>
         ) : list.length > 0 ? (
           <>
-            <UsedRwlkNftsTable list={list.slice((curPage - 1) * perPage, curPage * perPage)} />
+            <UsedRwlkNftsTable
+              list={list.slice((curPage - 1) * perPage, curPage * perPage) as UsedRwlkNftRecord[]}
+            />
             {/* Pagination Controls */}
             <CustomPagination
               page={curPage}
@@ -176,20 +156,11 @@ const UsedRwlkNfts = () => {
   and Open Graph data). This ensures social media previews are set 
   up correctly.
 ------------------------------------------------------------------ */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Used RandomWalk NFTs for Bid | Cosmic Signature';
-  const description = 'Used RandomWalk NFTs for Bid';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'Used RandomWalk NFTs for Bid | Cosmic Signature',
+    'Used RandomWalk NFTs for Bid',
+  ),
+});
 
 export default UsedRwlkNfts;

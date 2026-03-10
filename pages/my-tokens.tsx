@@ -4,13 +4,9 @@ import { GetServerSideProps } from 'next';
 import { Tr } from 'react-super-responsive-table';
 
 import { MainWrapper } from '../components/styled';
-import {
-  getExplorerUrl,
-  convertTimestampToDateTime,
-  getAssetsUrl,
-  logoImgUrl,
-  shortenHex,
-} from '../utils';
+import { getExplorerUrl, convertTimestampToDateTime, getAssetsUrl, shortenHex } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
+import { reportError } from '../utils/errors';
 import { useActiveWeb3React } from '../hooks/web3';
 import { useApiData } from '../contexts/ApiDataContext';
 import api from '../services/api';
@@ -63,7 +59,7 @@ function useUserCSTTokens(account: string | null | undefined) {
         const cstList = await api.get_cst_tokens_by_user(account);
         setTokens(cstList as unknown as CSTToken[]);
       } catch (err) {
-        console.error('Failed to fetch user CST tokens:', err);
+        reportError(err, 'fetch user CST tokens');
         setError('Failed to load CST tokens.');
         setTokens([]);
       } finally {
@@ -280,21 +276,11 @@ function MyWallet() {
 /* ------------------------------------------------------------------
   getServerSideProps (for SEO)
 ------------------------------------------------------------------ */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'My Tokens | Cosmic Signature';
-  const description =
-    'Manage your digital assets on the My Tokens page at Cosmic Signature. View your token balance, transaction history, and ownership details. Keep track of your NFTs and tokens effortlessly.';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'My Tokens | Cosmic Signature',
+    'Manage your digital assets on the My Tokens page at Cosmic Signature. View your token balance, transaction history, and ownership details. Keep track of your NFTs and tokens effortlessly.',
+  ),
+});
 
 export default MyWallet;

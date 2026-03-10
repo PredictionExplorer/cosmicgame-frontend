@@ -10,7 +10,8 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { GetServerSideProps } from 'next';
 
 import api from '../services/api';
-import { logoImgUrl } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
+import { reportError } from '../utils/errors';
 
 /* ------------------------------------------------------------------
   Page Component: PrizeClaimed
@@ -67,7 +68,7 @@ const PrizeClaimed = () => {
         setPrizeInfo(fetchedPrizeInfo);
         setLoading(false);
       } catch (error) {
-        console.error(error);
+        reportError(error, 'fetch prize claimed info');
         setLoading(false);
       }
     };
@@ -166,20 +167,8 @@ const PrizeClaimed = () => {
   Provides server-side rendered meta tags (title, description, 
   Open Graph data). This ensures proper SEO for social sharing.
 ------------------------------------------------------------------ */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Claimed Prize Rewards | Cosmic Signature';
-  const description = 'Claimed Prize Rewards';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps('Claimed Prize Rewards | Cosmic Signature', 'Claimed Prize Rewards'),
+});
 
 export default PrizeClaimed;

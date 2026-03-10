@@ -11,7 +11,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { GetStaticProps } from 'next';
 
 import { MainWrapper } from '../components/styled';
-import { logoImgUrl } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
 
 /**
  * HowToPlay: A guide explaining how to play the Cosmic Signature game,
@@ -273,21 +273,11 @@ const HowToPlay = () => {
  * getServerSideProps: Fetches the title, description, and Open Graph data
  * to be injected into the page for SEO purposes.
  */
-export const getStaticProps: GetStaticProps = async () => {
-  const title = 'How To Play Guide | Cosmic Signature';
-  const description =
-    'Learn how to play Cosmic Signature with our comprehensive guide. Discover game rules, strategies, and tips to enhance your gameplay experience. Start mastering the cosmic adventure today!';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getStaticProps: GetStaticProps = async () => ({
+  props: createOpenGraphProps(
+    'How To Play Guide | Cosmic Signature',
+    'Learn how to play Cosmic Signature with our comprehensive guide. Discover game rules, strategies, and tips to enhance your gameplay experience. Start mastering the cosmic adventure today!',
+  ),
+});
 
 export default HowToPlay;

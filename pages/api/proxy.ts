@@ -3,6 +3,8 @@ import { URL } from 'url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios, { Method, AxiosRequestConfig } from 'axios';
 
+import { reportError } from '../../utils/errors';
+
 export const config = {
   api: {
     responseLimit: false,
@@ -81,7 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     response.data.pipe(res);
   } catch (error: unknown) {
     const axiosErr = error as { message?: string; response?: { status?: number } };
-    console.error('Proxy request failed:', axiosErr.message);
+    reportError(error, 'proxy request');
     res.status(axiosErr.response?.status || 500).json({
       message: 'Proxy request failed',
       status: axiosErr.response?.status || 500,

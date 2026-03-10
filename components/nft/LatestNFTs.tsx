@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { Box, Typography, Container, Grid, useTheme, useMediaQuery, Button } from '@mui/material';
 import { useSnapCarousel } from 'react-snap-carousel';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 
-import api from '../../services/api';
+import { useCSTList } from '../../hooks/useApiQuery';
 
 import NFT from './NFT';
 
@@ -17,7 +17,8 @@ interface NFTData {
 }
 
 const LatestNFTs = () => {
-  const [nftData, setNftData] = useState<NFTData[]>([]);
+  const { data: nfts = [] } = useCSTList();
+  const nftData = [...nfts].sort((a, b) => Number(b.TokenId) - Number(a.TokenId)) as NFTData[];
 
   // Material UI hooks for responsive design
   const theme = useTheme();
@@ -25,20 +26,6 @@ const LatestNFTs = () => {
 
   // Carousel hook for mobile view
   const { scrollRef, pages, activePageIndex, next, prev } = useSnapCarousel();
-
-  // Fetch NFT data on component mount
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const nfts = await api.get_cst_list();
-        const sortedNfts = [...nfts].sort((a, b) => Number(b.TokenId) - Number(a.TokenId));
-        setNftData(sortedNfts as NFTData[]);
-      } catch (error) {
-        console.error('Failed to fetch NFTs', error);
-      }
-    };
-    fetchData();
-  }, []);
 
   return (
     <Box sx={{ backgroundColor: '#101441' }}>
@@ -99,14 +86,14 @@ const LatestNFTs = () => {
                   <Button
                     variant="contained"
                     sx={{ mr: 1 }}
-                    onClick={prev}
+                    onClick={() => prev()}
                     disabled={activePageIndex === 0}
                   >
                     <ArrowBack fontSize="small" />
                   </Button>
                   <Button
                     variant="contained"
-                    onClick={next}
+                    onClick={() => next()}
                     disabled={activePageIndex === pages.length - 1}
                   >
                     <ArrowForward fontSize="small" />

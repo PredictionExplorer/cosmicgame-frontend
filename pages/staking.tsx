@@ -1,49 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, Link, Typography } from '@mui/material';
 import { GetServerSideProps } from 'next';
 
 import { MainWrapper } from '../components/styled';
-import api from '../services/api';
 import { GlobalStakingRewardsTable } from '../components/staking/GlobalStakingRewardsTable';
 import { RwalkStakingRewardMintsTable } from '../components/staking/RwalkStakingRewardMintsTable';
-import { logoImgUrl } from '../utils';
-
-/**
- * Custom hook to fetch staking rewards data
- */
-const useStakingData = () => {
-  const [cosmicSignatureRewards, setCosmicSignatureRewards] = useState<
-    import('../services/api/types').StakingCSTReward[] | null
-  >(null);
-  const [randomWalkRewards, setRandomWalkRewards] = useState<
-    import('../services/api/types').StakingRewardMint[] | null
-  >(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchStakingRewards = async () => {
-      try {
-        const [cosmicData, randomWalkData] = await Promise.all([
-          api.get_staking_cst_rewards(),
-          api.get_staking_rwalk_mints_global(),
-        ]);
-
-        setCosmicSignatureRewards(cosmicData);
-        setRandomWalkRewards(randomWalkData);
-      } catch (err) {
-        console.error('Error fetching staking rewards:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch staking rewards');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStakingRewards();
-  }, []);
-
-  return { cosmicSignatureRewards, randomWalkRewards, loading, error };
-};
+import { createOpenGraphProps } from '../utils/seo';
+import { useStakingCSTRewards, useStakingRWLKMintsGlobal } from '../hooks/useApiQuery';
 
 /**
  * Staking Component
@@ -52,9 +15,19 @@ const useStakingData = () => {
  * and the RandomWalk NFT.
  */
 const Staking = () => {
-  const { cosmicSignatureRewards, randomWalkRewards, loading, error } = useStakingData();
+  const {
+    data: cosmicSignatureRewards,
+    isLoading: isLoadingCST,
+    error: cstError,
+  } = useStakingCSTRewards();
+  const {
+    data: randomWalkRewards,
+    isLoading: isLoadingRWLK,
+    error: rwlkError,
+  } = useStakingRWLKMintsGlobal();
+  const loading = isLoadingCST || isLoadingRWLK;
+  const error = cstError?.message || rwlkError?.message || null;
 
-  // Early return if there's an error
   if (error) {
     return (
       <MainWrapper>
@@ -126,20 +99,8 @@ const Staking = () => {
  * Server-Side Rendering (SSR) function
  * Provides metadata for SEO (Open Graph and Twitter cards).
  */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Staking | Cosmic Signature';
-  const description = 'Staking';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps('Staking | Cosmic Signature', 'Staking'),
+});
 
 export default Staking;

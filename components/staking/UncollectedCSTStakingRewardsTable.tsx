@@ -36,6 +36,7 @@ import useStakingWalletCSTContract from '../../hooks/useStakingWalletCSTContract
 import { useNotification } from '../../contexts/NotificationContext';
 import { useApiData } from '../../contexts/ApiDataContext';
 import getErrorMessage from '../../utils/alert';
+import { isUserRejection, reportError, getEthErrorMessage } from '../../utils/errors';
 
 interface UncollectedReward {
   EvtLogId: number;
@@ -134,7 +135,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
       const actionIds = actions.map((x) => x.Stake.ActionId);
       setCstWithRewards(actionIds);
     } catch (err) {
-      console.error(err);
+      reportError(err, 'fetch CST with rewards');
     }
   }, [user]);
 
@@ -143,7 +144,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
       const res = await api.get_staking_cst_rewards_to_claim_by_user(user);
       setLocalList(res as unknown as UncollectedReward[]);
     } catch (err) {
-      console.error(err);
+      reportError(err, 'fetch uncollected CST staking rewards');
     }
   }, [user]);
 
@@ -170,12 +171,11 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
         fetchCstWithRewards();
       }, 4000);
     } catch (err: unknown) {
-      const ethErr = err as { code?: number; data?: { message?: string } };
-      if (ethErr?.code !== 4001) {
-        console.error(err);
-        if (ethErr?.data?.message) {
-          const msg = getErrorMessage(ethErr.data.message);
-          setNotification({ visible: true, type: 'error', text: msg });
+      if (!isUserRejection(err)) {
+        reportError(err, 'unstaking CST');
+        const msg = getEthErrorMessage(err);
+        if (msg !== 'An error occurred') {
+          setNotification({ visible: true, type: 'error', text: getErrorMessage(msg) });
         }
       }
     } finally {

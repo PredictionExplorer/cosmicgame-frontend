@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 
 import useCosmicGameContract from '../hooks/useCosmicGameContract';
+import { reportError } from '../utils/errors';
 
 interface SystemModeContextValue {
   data: number;
@@ -9,24 +10,30 @@ interface SystemModeContextValue {
 
 const SystemModeContext = createContext<SystemModeContextValue | undefined>(undefined);
 
+const POLL_INTERVAL_MS = 12_000;
+
 export const SystemModeProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState(0);
   const cosmicGameContract = useCosmicGameContract();
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       if (cosmicGameContract) {
-        // const systemMode = await cosmicGameContract.systemMode();
-        // setData(Number(systemMode));
+        const systemMode = await cosmicGameContract.read.systemMode?.();
+        if (systemMode !== undefined) {
+          setData(Number(systemMode));
+        }
       }
-    } catch (error) {}
-  };
+    } catch (error) {
+      reportError(error, 'SystemModeContext.fetchData');
+    }
+  }, [cosmicGameContract]);
+
   useEffect(() => {
     fetchData();
-    const intervalId = setInterval(fetchData, 12000);
-
+    const intervalId = setInterval(fetchData, POLL_INTERVAL_MS);
     return () => clearInterval(intervalId);
-  }, [cosmicGameContract]);
+  }, [fetchData]);
 
   return (
     <SystemModeContext.Provider value={{ data, fetchData }}>{children}</SystemModeContext.Provider>

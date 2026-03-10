@@ -1,3 +1,7 @@
+/**
+ * React Query hooks that wrap the API layer. Each hook maps to a backend endpoint
+ * with appropriate stale times and refetch intervals for the Cosmic Signature app.
+ */
 import { useQuery } from '@tanstack/react-query';
 
 import api from '../services/api';

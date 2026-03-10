@@ -17,13 +17,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '../components/styled';
-import {
-  getExplorerUrl,
-  convertTimestampToDateTime,
-  formatSeconds,
-  logoImgUrl,
-  shortenHex,
-} from '../utils';
+import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
+import { isUserRejection, reportError, getEthErrorMessage } from '../utils/errors';
 import { CustomPagination } from '../components/common/CustomPagination';
 import getErrorMessage from '../utils/alert';
 
@@ -94,7 +90,7 @@ function useUnclaimedWinnings(account: string | null | undefined) {
         (deposits as RaffleWinning[]).slice().sort((a, b) => b.TimeStamp - a.TimeStamp),
       );
     } catch (err) {
-      console.error('Error fetching unclaimed data:', err);
+      reportError(err, 'fetch unclaimed winnings');
       setError('Failed to load unclaimed winnings data');
     } finally {
       setLoading(false);
@@ -276,7 +272,7 @@ export default function MyWinnings() {
         loading: false,
       });
     } catch (err) {
-      console.error(err);
+      reportError(err, 'fetch donated ERC20 tokens');
       setNotification({
         text: 'Failed to fetch donated NFTs',
         type: 'error',
@@ -308,10 +304,11 @@ export default function MyWinnings() {
         refetch();
       }, 3000);
     } catch (err: unknown) {
-      console.error(err);
-      const ethErr = err as { data?: { message?: string } };
-      if (ethErr?.data?.message) {
-        const msg = getErrorMessage(ethErr.data.message);
+      if (isUserRejection(err)) return;
+      reportError(err, 'claim all raffle ETH');
+      const rawMsg = getEthErrorMessage(err);
+      if (rawMsg) {
+        const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ text: msg, type: 'error', visible: true });
       }
     } finally {
@@ -333,10 +330,11 @@ export default function MyWinnings() {
         refetch();
       }, 3000);
     } catch (err: unknown) {
-      console.error(err);
-      const ethErr = err as { data?: { message?: string } };
-      if (ethErr?.data?.message) {
-        const msg = getErrorMessage(ethErr.data.message);
+      if (isUserRejection(err)) return;
+      reportError(err, 'claim donated NFT');
+      const rawMsg = getEthErrorMessage(err);
+      if (rawMsg) {
+        const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ text: msg, type: 'error', visible: true });
       }
     } finally {
@@ -361,10 +359,11 @@ export default function MyWinnings() {
         refetch();
       }, 3000);
     } catch (err: unknown) {
-      console.error(err);
-      const ethErr = err as { data?: { message?: string } };
-      if (ethErr?.data?.message) {
-        const msg = getErrorMessage(ethErr.data.message);
+      if (isUserRejection(err)) return;
+      reportError(err, 'claim all donated NFTs');
+      const rawMsg = getEthErrorMessage(err);
+      if (rawMsg) {
+        const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ text: msg, type: 'error', visible: true });
       }
     } finally {
@@ -383,11 +382,10 @@ export default function MyWinnings() {
         fetchDonatedERC20Tokens(false);
       }, 3000);
     } catch (err: unknown) {
-      console.error(err);
-      const ethErr = err as { data?: { message?: string } };
-      const msg = ethErr?.data?.message
-        ? getErrorMessage(ethErr.data.message)
-        : 'An error occurred';
+      if (isUserRejection(err)) return;
+      reportError(err, 'claim donated ERC20 token');
+      const rawMsg = getEthErrorMessage(err, 'An error occurred');
+      const msg = getErrorMessage(rawMsg) || rawMsg;
       setNotification({ text: msg, type: 'error', visible: true });
     }
   };
@@ -406,11 +404,10 @@ export default function MyWinnings() {
         fetchDonatedERC20Tokens(false);
       }, 3000);
     } catch (err: unknown) {
-      console.error(err);
-      const ethErr = err as { data?: { message?: string } };
-      const msg = ethErr?.data?.message
-        ? getErrorMessage(ethErr.data.message)
-        : 'An error occurred';
+      if (isUserRejection(err)) return;
+      reportError(err, 'claim all donated ERC20 tokens');
+      const rawMsg = getEthErrorMessage(err, 'An error occurred');
+      const msg = getErrorMessage(rawMsg) || rawMsg;
       setNotification({ text: msg, type: 'error', visible: true });
     }
   };
@@ -573,18 +570,6 @@ export default function MyWinnings() {
 /* ------------------------------------------------------------------
   getServerSideProps (SEO config)
 ------------------------------------------------------------------ */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Pending Winnings | Cosmic Signature';
-  const description = 'Pending Winnings';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps('Pending Winnings | Cosmic Signature', 'Pending Winnings'),
+});

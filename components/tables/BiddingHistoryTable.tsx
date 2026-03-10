@@ -24,8 +24,8 @@ import {
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '../common/CustomPagination';
-import api from '../../services/api';
 import ERC20_ABI from '../../contracts/CosmicToken.json';
+import { useBannedBids } from '../../hooks/useApiQuery';
 
 //------------------------------------------------------------------------------
 // Types & Interfaces
@@ -265,21 +265,8 @@ const HistoryTable: React.FC<HistoryTableProps> = ({
   curPage,
   showRound,
 }) => {
-  // Store list of banned bids.
-  const [bannedList, setBannedList] = useState<number[]>([]);
-
-  // Fetch banned bids on component mount.
-  useEffect(() => {
-    const getBannedList = async () => {
-      try {
-        const bids = await api.get_banned_bids();
-        setBannedList(bids.map((x: { bid_id: number }) => x.bid_id));
-      } catch (error) {
-        console.error('Error fetching banned bids:', error);
-      }
-    };
-    getBannedList();
-  }, []);
+  const { data: bannedBids } = useBannedBids();
+  const bannedList = bannedBids?.map((x: { bid_id: number }) => x.bid_id) ?? [];
 
   // Slice the bidding history to show only the current page entries.
   const displayedBids = biddingHistory.slice((curPage - 1) * perPage, curPage * perPage);

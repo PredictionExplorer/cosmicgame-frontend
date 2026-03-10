@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { usePublicClient, useWalletClient } from 'wagmi';
 import { getContract, type Abi } from 'viem';
 
+import { reportError } from '../utils/errors';
+
 /**
  * Generic contract hook that preserves viem's ABI-level type inference.
  * Each contract hook passes a `const`-asserted ABI, so the returned
@@ -20,7 +22,7 @@ export default function useContract<const TAbi extends Abi>(address: string, abi
         client: walletClient ? { public: publicClient, wallet: walletClient } : publicClient,
       });
     } catch (error) {
-      console.error('Failed to create contract instance:', error);
+      reportError(error, 'useContract init');
       return null;
     }
   }, [address, abi, publicClient, walletClient]);

@@ -10,8 +10,9 @@ import {
   convertTimestampToDateTime,
   formatEthValue,
   getEnduranceChampions,
-  logoImgUrl,
 } from '../../utils';
+import { createOpenGraphProps } from '../../utils/seo';
+import { reportError } from '../../utils/errors';
 
 // Child Components
 import RaffleWinnerTable from '../../components/tables/RaffleWinnerTable';
@@ -262,7 +263,7 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
         donatedERC20Tokens as import('../../components/donations/DonatedERC20Table').DonatedERC20Token[],
       );
     } catch (error) {
-      console.error('Error fetching donated ERC20 tokens:', error);
+      reportError(error, 'fetch donated ERC20 tokens');
       setNotification({
         text: 'Failed to load donated ERC20 tokens.',
         type: 'error',
@@ -290,7 +291,7 @@ const PrizeInfo: React.FC<PrizeInfoProps> = ({ roundNum }) => {
         setBidHistory(bidHistoryData);
         setStakingRewards(stakingRewardsData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        reportError(error, 'fetch prize round data');
         setNotification({
           text: 'Failed to load data. Please try again later.',
           type: 'error',
@@ -390,17 +391,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const title = `Prize Information for Round ${roundNum} | Cosmic Signature`;
   const description = `Prize Information for Round ${roundNum}`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
   return {
-    props: { title, description, openGraphData, roundNum },
+    props: { ...createOpenGraphProps(title, description), roundNum },
   };
 }
 

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Grid, Link, Typography } from '@mui/material';
 
 import { formatSeconds } from '../../utils';
-import api from '../../services/api';
+import { useCurrentSpecialWinners } from '../../hooks/useApiQuery';
 
 interface SpecialWinners {
   EnduranceChampionAddress?: string;
@@ -11,20 +11,9 @@ interface SpecialWinners {
 }
 
 export const SpecialPrizeWinners: React.FC = () => {
-  const [specialWinners, setSpecialWinners] = useState<SpecialWinners | null>(null);
-  useEffect(() => {
-    const fetchSpecialWinners = async () => {
-      const special = await api.get_current_special_winners();
-      setSpecialWinners(Array.isArray(special) ? null : (special as SpecialWinners | null));
-    };
-    fetchSpecialWinners();
-    const interval = setInterval(fetchSpecialWinners, 12000);
-
-    // Clean up the interval when the component is unmounted
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  const { data } = useCurrentSpecialWinners();
+  const specialWinners =
+    data != null && Array.isArray(data) ? null : (data as SpecialWinners | null);
 
   return (
     <>

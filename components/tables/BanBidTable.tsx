@@ -33,6 +33,7 @@ import api from '../../services/api';
 import { useActiveWeb3React } from '../../hooks/web3';
 import { useNotification } from '../../contexts/NotificationContext';
 import getErrorMessage from '../../utils/alert';
+import { reportError, getEthErrorMessage } from '../../utils/errors';
 
 //------------------------------------------------------------------------------
 // TypeScript Interfaces
@@ -101,12 +102,12 @@ const HistoryRow: React.FC<HistoryRowProps> = ({ history, isBanned, updateBanned
         text: 'Bid was banned successfully!',
       });
     } catch (e) {
-      const err = e as { data?: { message?: string } };
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err.data.message);
+      reportError(e, 'ban bid');
+      const rawMsg = getEthErrorMessage(e, 'An error occurred');
+      if (rawMsg) {
+        const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ visible: true, text: msg, type: 'error' });
       }
-      console.error(e);
     }
   };
 
@@ -123,12 +124,12 @@ const HistoryRow: React.FC<HistoryRowProps> = ({ history, isBanned, updateBanned
         text: 'Bid was unbanned successfully!',
       });
     } catch (e) {
-      const err = e as { data?: { message?: string } };
-      if (err?.data?.message) {
-        const msg = getErrorMessage(err.data.message);
+      reportError(e, 'unban bid');
+      const rawMsg = getEthErrorMessage(e, 'An error occurred');
+      if (rawMsg) {
+        const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ visible: true, text: msg, type: 'error' });
       }
-      console.error(e);
     }
   };
 
@@ -154,7 +155,8 @@ const HistoryRow: React.FC<HistoryRowProps> = ({ history, isBanned, updateBanned
           color="inherit"
           fontSize="inherit"
           href={getExplorerUrl('tx', history.TxHash)}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(history.TimeStamp)}
         </Link>
@@ -171,7 +173,8 @@ const HistoryRow: React.FC<HistoryRowProps> = ({ history, isBanned, updateBanned
           color="inherit"
           fontSize="inherit"
           href={`/prize/${history.RoundNum}`}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {history.RoundNum}
         </Link>

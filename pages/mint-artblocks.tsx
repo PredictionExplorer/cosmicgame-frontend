@@ -5,6 +5,12 @@ import { usePublicClient } from 'wagmi';
 import { MainWrapper, CenterBox } from '../components/styled';
 import { useActiveWeb3React } from '../hooks/web3';
 import useArtBlocksContract from '../hooks/useArtBlocksContract';
+import {
+  isUserRejection,
+  isEthProviderError,
+  reportError,
+  getEthErrorMessage,
+} from '../utils/errors';
 
 const MintArcBlocks = () => {
   const [count, setCount] = useState(1);
@@ -26,11 +32,10 @@ const MintArcBlocks = () => {
         setMintedTokens(tokenIds);
         getCurrentTokenId();
       } catch (err: unknown) {
-        if (err instanceof Error && 'data' in err) {
-          const data = (err as { data?: { message?: string } }).data;
-          if (data?.message) {
-            alert(data.message);
-          }
+        if (isUserRejection(err)) return;
+        reportError(err, 'mint Art Blocks NFT');
+        if (isEthProviderError(err)) {
+          alert(getEthErrorMessage(err, 'Mint failed'));
         }
       }
     }
@@ -40,7 +45,9 @@ const MintArcBlocks = () => {
     try {
       const curTokenId = await nftContract!.read.curTokenId?.();
       setCurTokenId(Number(curTokenId ?? 0));
-    } catch (err) {}
+    } catch (err) {
+      reportError(err, 'getCurrentTokenId');
+    }
   };
   useEffect(() => {
     if (nftContract) {

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Typography } from '@mui/material';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 import { MainWrapper } from '../../../components/styled';
-import api from '../../../services/api';
 import EthDonationTable, { type EthDonation } from '../../../components/tables/EthDonationTable';
-import { logoImgUrl } from '../../../utils';
+import { createOpenGraphProps } from '../../../utils/seo';
+import { useDonationsBothByRound } from '../../../hooks/useApiQuery';
 
 // Define TypeScript types for props
 interface EthDonationByRoundProps {
@@ -14,28 +14,7 @@ interface EthDonationByRoundProps {
 
 // Component to display Ethereum donations by specific round
 const EthDonationByRound: React.FC<EthDonationByRoundProps> = ({ round }) => {
-  // State for loading indicator
-  const [loading, setLoading] = useState<boolean>(true);
-  // State to hold fetched donation data
-  const [donationInfo, setDonationInfo] = useState<EthDonation[]>([]);
-
-  useEffect(() => {
-    // Async function to fetch donation data based on round number
-    const fetchDonationData = async () => {
-      try {
-        setLoading(true);
-        const donations = await api.get_donations_both_by_round(round);
-        setDonationInfo(donations as EthDonation[]);
-      } catch (error) {
-        console.error('Error fetching donation data:', error);
-        setDonationInfo([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDonationData();
-  }, [round]); // Added round as a dependency for better clarity
+  const { data: donationInfo = [], isLoading: loading } = useDonationsBothByRound(round);
 
   if (round < 0) {
     return (
@@ -54,7 +33,7 @@ const EthDonationByRound: React.FC<EthDonationByRoundProps> = ({ round }) => {
       {loading ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
-        <EthDonationTable list={donationInfo} />
+        <EthDonationTable list={(donationInfo ?? []) as EthDonation[]} />
       )}
     </MainWrapper>
   );
@@ -68,20 +47,10 @@ export const getServerSideProps: GetServerSideProps = async (
   const paramRound = context.params!.round;
   const round = Array.isArray(paramRound) ? paramRound[0] : paramRound;
 
-  // Page metadata setup
   const title = `Direct (ETH) Donations for Round ${round} | Cosmic Signature`;
   const description = `View Direct (ETH) Donations for Round ${round}`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData, round } };
+  return { props: { ...createOpenGraphProps(title, description), round } };
 };
 
 export default EthDonationByRound;

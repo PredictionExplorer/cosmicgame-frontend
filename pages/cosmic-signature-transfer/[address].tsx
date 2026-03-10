@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, TableBody, Tooltip, Typography } from '@mui/material';
 import { getAddress, isAddress } from 'viem';
 import { GetServerSidePropsContext } from 'next';
@@ -12,13 +12,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '../../components/styled';
-import api from '../../services/api';
-import {
-  getExplorerUrl,
-  convertTimestampToDateTime,
-  isWalletAddress,
-  logoImgUrl,
-} from '../../utils';
+import { getExplorerUrl, convertTimestampToDateTime, isWalletAddress } from '../../utils';
+import { createOpenGraphProps } from '../../utils/seo';
+import { useCSTTransfers } from '../../hooks/useApiQuery';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
@@ -60,7 +56,8 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
           color="inherit"
           fontSize="inherit"
           href={getExplorerUrl('tx', row.TxHash)}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(row.TimeStamp)}
         </Link>
@@ -75,7 +72,8 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
               fontSize="inherit"
               fontFamily="monospace"
               href={`/user/${row.FromAddr}`}
-              target="__blank"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               {isWalletAddress(row.FromAddr ?? '')}
             </Link>
@@ -93,7 +91,8 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
               fontSize="inherit"
               fontFamily="monospace"
               href={`/user/${row.ToAddr}`}
-              target="__blank"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               {isWalletAddress(row.ToAddr ?? '')}
             </Link>
@@ -105,7 +104,13 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
 
       {/* Token ID - link to token detail page */}
       <TablePrimaryCell align="center">
-        <Link color="inherit" fontSize="inherit" href={`/detail/${row.TokenId}`} target="__blank">
+        <Link
+          color="inherit"
+          fontSize="inherit"
+          href={`/detail/${row.TokenId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {row.TokenId}
         </Link>
       </TablePrimaryCell>
@@ -163,30 +168,7 @@ const CosmicTokenTransfersTable = ({ list }: { list: TransferRow[] }) => {
     and then renders the table or a fallback if no data is found.
 ------------------------------------------------------------------ */
 const CosmicSignatureTransfers = ({ address }: { address: string }) => {
-  // Loading state for asynchronous data fetch
-  const [loading, setLoading] = useState(true);
-
-  // CST transfer data
-  const [cosmicSignatureTransfers, setCosmicSignatureTransfers] = useState<CSTTransferRecord[]>([]);
-
-  /**
-   * Fetch transfers for the provided address on component mount.
-   * If there's an error, log it and turn off loading state.
-   */
-  useEffect(() => {
-    const fetchTransfers = async () => {
-      try {
-        setLoading(true);
-        const transfers = await api.get_cst_transfers(address);
-        setCosmicSignatureTransfers(transfers);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTransfers();
-  }, [address]);
+  const { data: cosmicSignatureTransfers = [], isLoading: loading } = useCSTTransfers(address);
 
   return (
     <MainWrapper>
@@ -223,21 +205,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     address = 'Invalid Address';
   }
 
-  // Construct dynamic page title and description
   const title = `Cosmic Signature Token Transfer History for ${address} | Cosmic Signature`;
   const description = `Cosmic Signature Token Transfer History for ${address}`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  // Return the updated props to the component
-  return { props: { title, description, openGraphData, address } };
+  return { props: { ...createOpenGraphProps(title, description), address } };
 }
 
 export default CosmicSignatureTransfers;

@@ -16,14 +16,14 @@ import {
   DialogContentText,
   DialogActions,
 } from '@mui/material';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import Lightbox from 'react-awesome-lightbox';
-import 'react-awesome-lightbox/build/style.css';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 
 import { usePublicClient } from 'wagmi';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
 
 import NameHistoryTable from '../tables/NameHistoryTable';
 import { TransferHistoryTable } from '../tables/TransferHistoryTable';
@@ -55,14 +55,10 @@ interface DashboardDetail {
   MainStats: MainStats;
 }
 
-interface EthProviderError {
-  code?: number;
-  data?: { message?: string };
-}
-
+import { isUserRejection, getEthErrorMessage, reportError } from '../../utils/errors';
+import { useClipboard } from '../../hooks/useClipboard';
 import { StyledCard, SectionWrapper, NFTInfoWrapper, PrimaryMenuItem } from '../styled';
-
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import VideoPlayerDialog from '../common/VideoPlayerDialog';
 
 import NFTImage from './NFTImage';
 import NFTVideo from './NFTVideo';
@@ -107,6 +103,7 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
   const { account } = useActiveWeb3React();
   const publicClient = usePublicClient();
   const { setNotification } = useNotification();
+  const { copy } = useClipboard();
 
   /**
    * Checks if the destination address has any transactions.
@@ -130,7 +127,7 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
         await handleTransfer();
       }
     } catch (err) {
-      console.error(err);
+      reportError(err, 'check transfer destination');
     }
   };
 
@@ -183,8 +180,7 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
       await Promise.all([fetchCSTInfo(), fetchTransferHistory()]);
       setAddress('');
     } catch (err) {
-      const ethErr = err as EthProviderError;
-      if (ethErr?.code !== 4001) {
+      if (!isUserRejection(err)) {
         setNotification({
           text: 'Please input a valid address for the token receiver!',
           type: 'error',
@@ -214,18 +210,9 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
         visible: true,
       });
     } catch (err) {
-      const ethErr = err as EthProviderError;
-      if (ethErr?.code === 4001) {
-        // Handle the case where the user denies the transaction signature
-      } else {
-        console.error(err);
-        // Handle other errors
-        const msg = ethErr?.data?.message || 'An error occurred while setting the token name.';
-        setNotification({
-          visible: true,
-          type: 'error',
-          text: msg,
-        });
+      if (!isUserRejection(err)) {
+        const msg = getEthErrorMessage(err, 'An error occurred while setting the token name.');
+        setNotification({ visible: true, type: 'error', text: msg });
       }
     }
   };
@@ -250,18 +237,9 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
         visible: true,
       });
     } catch (err) {
-      const ethErr = err as EthProviderError;
-      if (ethErr?.code === 4001) {
-        // Handle the case where the user denies the transaction signature
-      } else {
-        console.error(err);
-        // Handle other errors
-        const msg = ethErr?.data?.message || 'An error occurred while clearing the token name.';
-        setNotification({
-          visible: true,
-          type: 'error',
-          text: msg,
-        });
+      if (!isUserRejection(err)) {
+        const msg = getEthErrorMessage(err, 'An error occurred while clearing the token name.');
+        setNotification({ visible: true, type: 'error', text: msg });
       }
     }
   };
@@ -325,7 +303,7 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
       const history = await api.get_name_history(tokenId);
       setNameHistory(history);
     } catch (e) {
-      console.error(e);
+      reportError(e, 'fetch NFT name history');
     }
   };
 
@@ -337,7 +315,7 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
       const history = await api.get_ct_ownership_transfers(tokenId);
       setTransferHistory(history as (CSTTransferRecord & { TransferType?: number })[]);
     } catch (e) {
-      console.error(e);
+      reportError(e, 'fetch NFT transfer history');
     }
   };
 
@@ -354,7 +332,7 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
         setVideo(getAssetsUrl(`cosmicsignature/0x${seed}.mp4`));
       }
     } catch (e) {
-      console.error(e);
+      reportError(e, 'fetch CST info');
     }
   };
 
@@ -374,7 +352,7 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
           await Promise.all([fetchCSTInfo(), fetchNameHistory(), fetchTransferHistory()]);
         }
       } catch (error) {
-        console.error(error);
+        reportError(error, 'fetch NFT detail data');
       }
       setLoading(false);
     };
@@ -437,21 +415,30 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
                   >
-                    <CopyToClipboard text={getOriginUrl(video)}>
-                      <PrimaryMenuItem onClick={handleMenuClose}>
-                        <Typography>Video</Typography>
-                      </PrimaryMenuItem>
-                    </CopyToClipboard>
-                    <CopyToClipboard text={getOriginUrl(image)}>
-                      <PrimaryMenuItem onClick={handleMenuClose}>
-                        <Typography>Image</Typography>
-                      </PrimaryMenuItem>
-                    </CopyToClipboard>
-                    <CopyToClipboard text={window.location.href}>
-                      <PrimaryMenuItem onClick={handleMenuClose}>
-                        <Typography>Detail Page</Typography>
-                      </PrimaryMenuItem>
-                    </CopyToClipboard>
+                    <PrimaryMenuItem
+                      onClick={() => {
+                        copy(getOriginUrl(video));
+                        handleMenuClose();
+                      }}
+                    >
+                      <Typography>Video</Typography>
+                    </PrimaryMenuItem>
+                    <PrimaryMenuItem
+                      onClick={() => {
+                        copy(getOriginUrl(image));
+                        handleMenuClose();
+                      }}
+                    >
+                      <Typography>Image</Typography>
+                    </PrimaryMenuItem>
+                    <PrimaryMenuItem
+                      onClick={() => {
+                        copy(window.location.href);
+                        handleMenuClose();
+                      }}
+                    >
+                      <Typography>Detail Page</Typography>
+                    </PrimaryMenuItem>
                   </Menu>
                 </Grid>
                 <Grid size={{ xs: 6 }}>
@@ -500,7 +487,8 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
                     color="inherit"
                     fontSize="inherit"
                     href={getExplorerUrl('tx', nft.TxHash)}
-                    target="__blank"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     {convertTimestampToDateTime(nft.TimeStamp)}
                   </Link>
@@ -698,47 +686,16 @@ const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
         </Box>
 
         {/* Lightbox for full-size image */}
-        {imageOpen && <Lightbox image={image} onClose={() => setImageOpen(false)} />}
+        <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: image }]} />
 
-        {/* Video player dialog — uses native <video> to avoid iframe + proxy issues in Chrome */}
-        <Dialog
+        <VideoPlayerDialog
           open={openVideo}
+          videoPath={videoPath}
           onClose={() => {
             setOpenVideo(false);
             setVideoPath(null);
           }}
-          maxWidth="lg"
-          fullWidth
-          PaperProps={{ sx: { bgcolor: 'black', boxShadow: 'none' } }}
-        >
-          <DialogContent sx={{ p: 0, position: 'relative', lineHeight: 0 }}>
-            <Button
-              onClick={() => {
-                setOpenVideo(false);
-                setVideoPath(null);
-              }}
-              sx={{
-                position: 'absolute',
-                top: 8,
-                right: 8,
-                color: 'white',
-                zIndex: 1,
-                minWidth: 'auto',
-                fontSize: '1.5rem',
-              }}
-            >
-              ✕
-            </Button>
-            {videoPath && (
-              <video
-                src={videoPath}
-                controls
-                autoPlay
-                style={{ width: '100%', maxHeight: '80vh', display: 'block' }}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
+        />
       </SectionWrapper>
 
       {/* Dialog for transfer confirmation to new address */}

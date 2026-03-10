@@ -1,52 +1,18 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { Box, CardActionArea, Grid, Link, Typography } from '@mui/material';
 import { GetServerSidePropsContext } from 'next';
 
 import { MainWrapper, StyledCard } from '../../../components/styled';
-import api from '../../../services/api';
-import type { CombinedStakingRecordInfo, StakingAction } from '../../../services/api/types';
+import type { StakingAction } from '../../../services/api/types';
 import NFTImage from '../../../components/nft/NFTImage';
 import {
   getExplorerUrl,
   getAssetsUrl,
   getRWLKImageUrl,
   convertTimestampToDateTime,
-  logoImgUrl,
 } from '../../../utils';
-
-/* ------------------------------------------------------------------
-  Custom Hook: useStakingActionDetail
-  Handles data fetching & loading states for a single staking action.
------------------------------------------------------------------- */
-function useStakingActionDetail(actionId: number, isRwalk: boolean) {
-  const [actionInfo, setActionInfo] = useState<CombinedStakingRecordInfo | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchStakingAction = useCallback(async () => {
-    try {
-      setLoading(true);
-      let info;
-      if (isRwalk) {
-        info = await api.get_staking_rwalk_actions_info(actionId);
-      } else {
-        info = await api.get_staking_cst_actions_info(actionId);
-      }
-      setActionInfo(info);
-    } catch (e) {
-      console.error('Error fetching staking action info:', e);
-      setError('Failed to load staking action info.');
-    } finally {
-      setLoading(false);
-    }
-  }, [actionId, isRwalk]);
-
-  useEffect(() => {
-    fetchStakingAction();
-  }, [fetchStakingAction]);
-
-  return { actionInfo, loading, error };
-}
+import { createOpenGraphProps } from '../../../utils/seo';
+import { useStakingRWLKActionsInfo, useStakingCSTActionsInfo } from '../../../hooks/useApiQuery';
 
 /* ------------------------------------------------------------------
   Sub-Component: TokenInfoPanel
@@ -201,8 +167,11 @@ function UnstakeInfo({ unstake }: UnstakeInfoProps) {
 function StakingActionDetail({ IsRwalk, actionId }: { IsRwalk: number; actionId: number }) {
   const isRwalk = Boolean(IsRwalk);
 
-  // Use the custom hook
-  const { actionInfo, loading, error } = useStakingActionDetail(actionId, isRwalk);
+  const rwlkQuery = useStakingRWLKActionsInfo(isRwalk ? actionId : null);
+  const cstQuery = useStakingCSTActionsInfo(!isRwalk ? actionId : null);
+  const activeQuery = isRwalk ? rwlkQuery : cstQuery;
+  const { data: actionInfo = null, isLoading: loading } = activeQuery;
+  const error = activeQuery.error?.message ?? null;
 
   return (
     <MainWrapper>
@@ -252,20 +221,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     parsedIsRwalk ? 'RandomWalk NFT' : 'Cosmic Signature Token'
   } Staking Action Id = ${parsedActionId}`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
   return {
     props: {
-      title,
-      description,
-      openGraphData,
+      ...createOpenGraphProps(title, description),
       actionId: parsedActionId,
       IsRwalk: parsedIsRwalk,
     },

@@ -1,0 +1,88 @@
+import '@testing-library/jest-dom';
+import { render, screen } from '../../test-utils';
+
+jest.mock('@rainbow-me/rainbowkit');
+jest.mock('wagmi');
+jest.mock('viem');
+
+jest.mock('next/router', () => ({
+  useRouter: () => ({ pathname: '/', push: jest.fn(), asPath: '/' }),
+}));
+
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props: Record<string, unknown>) => {
+    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+    return <img {...props} />;
+  },
+}));
+
+jest.mock('../../hooks/web3', () => ({
+  useActiveWeb3React: () => ({ account: null, chainId: 421614, active: false }),
+}));
+
+jest.mock('../../contexts/ApiDataContext', () => ({
+  useApiData: () => ({
+    apiData: {
+      ETHRaffleToClaim: 0,
+      ETHRaffleToClaimWei: 0,
+      NumDonatedNFTToClaim: 0,
+      UnclaimedStakingReward: 0,
+      unstakeableActionIds: [],
+    },
+    setApiData: jest.fn(),
+    fetchData: jest.fn(),
+    unclaimedRewards: [],
+  }),
+}));
+
+jest.mock('../../contexts/StakedTokenContext', () => ({
+  useStakedToken: () => ({ cstokens: [], rwlktokens: [], fetchData: jest.fn() }),
+}));
+
+jest.mock('../../contexts/SystemModeContext', () => ({
+  useSystemMode: () => ({ data: 0, fetchData: jest.fn() }),
+}));
+
+jest.mock('../../hooks/useRWLKNFTContract', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock('../../services/api', () => ({
+  __esModule: true,
+  default: {
+    get_user_balance: jest.fn(),
+    get_user_info: jest.fn(),
+  },
+}));
+
+import Header from '../layout/Header';
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1200 });
+});
+
+describe('Header', () => {
+  it('renders the logo', () => {
+    render(<Header />);
+    const logo = screen.getByAltText('logo');
+    expect(logo).toBeInTheDocument();
+    expect(logo).toHaveAttribute('src', '/images/logo2.svg');
+  });
+
+  it('renders navigation links', () => {
+    render(<Header />);
+    expect(screen.getByText('Gallery')).toBeInTheDocument();
+    expect(screen.getByText('Contracts')).toBeInTheDocument();
+    expect(screen.getByText('Statistics')).toBeInTheDocument();
+    expect(screen.getByText('Rewards')).toBeInTheDocument();
+    expect(screen.getByText('Help')).toBeInTheDocument();
+  });
+
+  it('does not render a maintenance banner when systemMode is 0', () => {
+    render(<Header />);
+    expect(screen.queryByText(/MAINTENANCE/)).not.toBeInTheDocument();
+  });
+});

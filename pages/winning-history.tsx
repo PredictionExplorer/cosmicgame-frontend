@@ -1,54 +1,24 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { Typography } from '@mui/material';
 import { GetServerSideProps } from 'next';
 
 import { MainWrapper } from '../components/styled';
 import { useActiveWeb3React } from '../hooks/web3';
 import WinningHistoryTable from '../components/tables/WinningHistoryTable';
-import type { WinningHistoryEntry } from '../services/api/types';
-import api from '../services/api';
-import { logoImgUrl } from '../utils';
-
-/* ------------------------------------------------------------------
-  Custom Hook: useUserWinningHistory
-  Handles fetching and storing the user's winning history (claim history).
------------------------------------------------------------------- */
-function useUserWinningHistory(account: string | null | undefined) {
-  const [winningHistory, setWinningHistory] = useState<WinningHistoryEntry[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchWinningHistory = useCallback(async () => {
-    if (!account) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const history = await api.get_claim_history_by_user(account);
-      setWinningHistory(
-        history as unknown as import('../components/tables/WinningHistoryTable').WinningHistoryEntry[],
-      );
-    } catch (err) {
-      console.error('Failed to fetch winning history:', err);
-      setError('Failed to load your winning history.');
-      setWinningHistory([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [account]);
-
-  useEffect(() => {
-    fetchWinningHistory();
-  }, [fetchWinningHistory]);
-
-  return { winningHistory, loading, error };
-}
+import { createOpenGraphProps } from '../utils/seo';
+import { useClaimHistoryByUser } from '../hooks/useApiQuery';
 
 /* ------------------------------------------------------------------
   Main Component: WinningHistory
 ------------------------------------------------------------------ */
 function WinningHistory() {
   const { account } = useActiveWeb3React();
-  const { winningHistory, loading, error } = useUserWinningHistory(account);
+  const { data, isLoading: loading, error: queryError } = useClaimHistoryByUser(account);
+  const winningHistory =
+    (data as unknown as
+      | import('../components/tables/WinningHistoryTable').WinningHistoryEntry[]
+      | null) ?? null;
+  const error = queryError?.message ?? null;
 
   // If user is not connected
   if (!account) {
@@ -90,20 +60,11 @@ function WinningHistory() {
 /* ------------------------------------------------------------------
   getServerSideProps (SEO Config)
 ------------------------------------------------------------------ */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'History of My Winnings | Cosmic Signature';
-  const description = 'History of My Winnings';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'History of My Winnings | Cosmic Signature',
+    'History of My Winnings',
+  ),
+});
 
 export default WinningHistory;

@@ -84,7 +84,8 @@ const DonationRow: React.FC<DonationRowProps> = ({ donation }) => {
           color="inherit"
           fontSize="inherit"
           href={getExplorerUrl('tx', donation.TxHash)}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(donation.TimeStamp)}
         </Link>
@@ -99,7 +100,8 @@ const DonationRow: React.FC<DonationRowProps> = ({ donation }) => {
             color="inherit"
             fontSize="inherit"
             href={`/prize/${donation.RoundNum}`}
-            target="__blank"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {donation.RoundNum}
           </Link>

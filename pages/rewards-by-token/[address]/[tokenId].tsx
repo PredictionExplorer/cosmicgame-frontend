@@ -6,7 +6,9 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Tr } from 'react-super-responsive-table';
 
 import api from '../../../services/api';
-import { getExplorerUrl, convertTimestampToDateTime, logoImgUrl } from '../../../utils';
+import { getExplorerUrl, convertTimestampToDateTime } from '../../../utils';
+import { createOpenGraphProps } from '../../../utils/seo';
+import { reportError } from '../../../utils/errors';
 import {
   MainWrapper,
   TablePrimary,
@@ -69,7 +71,7 @@ function useRewardsByTokenDetails(address: string, tokenId: number) {
 
       setRewardsData(arrayData);
     } catch (err) {
-      console.error('Error fetching token details:', err);
+      reportError(err, 'fetch staking rewards by token');
       setRewardsData([]);
     } finally {
       setLoading(false);
@@ -274,17 +276,8 @@ export const getServerSideProps: GetServerSideProps = async (
   const title = 'Rewards Details By Token | Cosmic Signature';
   const description = 'Rewards Details By Token';
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
   return {
-    props: { title, description, openGraphData, address, tokenId },
+    props: { ...createOpenGraphProps(title, description), address, tokenId },
   };
 };
 

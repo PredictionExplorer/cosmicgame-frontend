@@ -3,6 +3,7 @@ import { Typography, CardActionArea, Box } from '@mui/material';
 import axios from 'axios';
 
 import { StyledCard } from '../styled';
+import { reportError } from '../../utils/errors';
 import NFTImage from '../nft/NFTImage';
 
 // Define the expected shape of the `nft` prop
@@ -32,7 +33,7 @@ const DonatedNFT: React.FC<DonatedNFTProps> = ({ nft }) => {
         const { data } = await axios.get<TokenURI>(nft.NFTTokenURI!);
         setTokenURI(data);
       } catch (error) {
-        console.error('Failed to fetch token URI data:', error);
+        reportError(error, 'fetch donated NFT token URI');
       }
     };
 

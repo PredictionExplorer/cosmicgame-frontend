@@ -32,7 +32,6 @@
     "*.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "utils/analytics.js",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

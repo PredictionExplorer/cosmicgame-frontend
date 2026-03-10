@@ -5,7 +5,7 @@ import { GetStaticProps } from 'next';
 
 import { MainWrapper } from '../components/styled';
 import FAQ from '../components/common/FAQ';
-import { logoImgUrl } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
 
 /**
  * Conditionally styled Paper component.
@@ -92,21 +92,8 @@ const FAQPage = () => {
 /**
  * getServerSideProps: Pre-renders the FAQ page with SEO meta tags for social sharing.
  */
-export const getStaticProps: GetStaticProps = async () => {
-  const title = 'FAQ | Cosmic Signature';
-  const description = 'Frequenly Asked Questions (FAQ)';
-
-  // Open Graph and Twitter meta data
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getStaticProps: GetStaticProps = async () => ({
+  props: createOpenGraphProps('FAQ | Cosmic Signature', 'Frequenly Asked Questions (FAQ)'),
+});
 
 export default FAQPage;

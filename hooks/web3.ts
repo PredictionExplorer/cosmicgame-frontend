@@ -16,9 +16,3 @@ export function useActiveWeb3React() {
     active: isConnected,
   };
 }
-
-export function useEagerConnect() {
-  return true;
-}
-
-export function useInactiveListener(_suppress = false) {}

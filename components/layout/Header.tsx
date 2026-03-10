@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useState, useEffect, useCallback } from 'react';
+import React, { FC, useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import {
   Toolbar,
@@ -25,7 +25,7 @@ import ListNavItem from '../common/ListNavItem';
 import ListItemButton from '../common/ListItemButton';
 import { useApiData } from '../../contexts/ApiDataContext';
 import { useActiveWeb3React } from '../../hooks/web3';
-import api from '../../services/api';
+import { useUserBalance, useUserInfo } from '../../hooks/useApiQuery';
 import { useStakedToken } from '../../contexts/StakedTokenContext';
 import { useSystemMode } from '../../contexts/SystemModeContext';
 import useRWLKNFTContract from '../../hooks/useRWLKNFTContract';
@@ -58,16 +58,44 @@ const Header: FC = () => {
   // Active Web3 account info
   const { account } = useActiveWeb3React();
 
-  // Loading state used for async data fetch calls
-  const [loading, setLoading] = useState<boolean>(true);
+  // Contract to fetch user RWLK NFTs
+  const nftContract = useRWLKNFTContract();
 
-  // Track the user's balances (ERC20, ETH, etc.)
-  const [balance, setBalance] = useState<Balance>({
-    CosmicToken: 0,
-    ETH: 0,
-    CosmicSignature: 0,
-    RWLK: 0,
-  });
+  // User balance and info from React Query (with refetchInterval: 30s)
+  const { data: userBalance, isLoading: isLoadingBalance } = useUserBalance(account);
+  const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo(account);
+
+  // RWLK token count from NFT contract (not from API)
+  const [rwlkCount, setRwlkCount] = useState<number>(0);
+  useEffect(() => {
+    if (!account || !nftContract) return;
+    const fetchRwlk = async () => {
+      try {
+        const tokens = (await nftContract.read.walletOfOwner?.([account as `0x${string}`])) as
+          | readonly bigint[]
+          | undefined;
+        setRwlkCount(tokens?.length ?? 0);
+      } catch {
+        setRwlkCount(0);
+      }
+    };
+    fetchRwlk();
+    const intervalId = setInterval(fetchRwlk, 30000);
+    return () => clearInterval(intervalId);
+  }, [account, nftContract]);
+
+  // Derived balance from API data + contract
+  const balance = useMemo<Balance>(
+    () => ({
+      CosmicToken: userBalance ? Number(formatEther(BigInt(userBalance.CosmicTokenBalance))) : 0,
+      ETH: userBalance ? Number(formatEther(BigInt(userBalance.ETH_Balance))) : 0,
+      CosmicSignature: userInfo?.UserInfo?.TotalCSTokensWon ?? 0,
+      RWLK: rwlkCount,
+    }),
+    [userBalance, userInfo, rwlkCount],
+  );
+
+  const loading = (!!account && !!nftContract && (isLoadingBalance || isLoadingUserInfo)) || false;
 
   // Staked tokens from context
   const { cstokens: stakedCSTokens, rwlktokens: stakedRWLKTokens } = useStakedToken();
@@ -75,9 +103,6 @@ const Header: FC = () => {
   // System mode data (e.g., maintenance)
   const systemModeCtx = useSystemMode();
   const systemMode = systemModeCtx?.data ?? 0;
-
-  // Contract to fetch user RWLK NFTs
-  const nftContract = useRWLKNFTContract();
 
   /**
    * Adjust mobileView based on window width changes.
@@ -94,71 +119,6 @@ const Header: FC = () => {
       window.removeEventListener('resize', handleWindowResize);
     };
   }, []);
-
-  /**
-   * Fetch and set user balance data from the API and NFT contract.
-   *
-   * @param showLoading - Whether to toggle the loading state while fetching.
-   */
-  const fetchData = useCallback(
-    async (showLoading: boolean = true) => {
-      if (showLoading) setLoading(true);
-      try {
-        // Check if contract is initialized
-        if (!nftContract) {
-          if (showLoading) setLoading(false);
-          return;
-        }
-
-        // Fetch user balances for account
-        const userBalance = await api.get_user_balance(account!);
-        // Fetch user info
-        const userInfoData = await api.get_user_info(account!);
-
-        // Fetch RWLK tokens from the NFT contract
-        const rwlkTokens = (await nftContract.read.walletOfOwner?.([
-          account! as `0x${string}`,
-        ])) as readonly bigint[];
-
-        // Update the local state with fetched balance data
-        if (userBalance) {
-          setBalance({
-            CosmicToken: Number(formatEther(BigInt(userBalance.CosmicTokenBalance))),
-            ETH: Number(formatEther(BigInt(userBalance.ETH_Balance))),
-            CosmicSignature: userInfoData?.UserInfo?.TotalCSTokensWon ?? 0,
-            RWLK: rwlkTokens.length,
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [account, nftContract],
-  );
-
-  /**
-   * Effect to fetch balance data periodically (every 30s) when user is connected.
-   */
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
-
-    if (account && nftContract) {
-      // Initial fetch when component mounts
-      fetchData(true);
-
-      // Periodically update data
-      intervalId = setInterval(() => {
-        fetchData(false);
-      }, 30000);
-    }
-
-    // Cleanup interval on unmount
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [account, nftContract, fetchData]);
 
   // Dynamically retrieve navigation links based on user status and account
   const navs = getNAVs(status, account);

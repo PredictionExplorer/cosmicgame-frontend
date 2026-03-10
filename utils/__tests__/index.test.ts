@@ -29,8 +29,8 @@ describe('shortenHex', () => {
   });
 
   it('returns empty string for null-like inputs', () => {
-    expect(shortenHex(null, 4)).toBe('');
-    expect(shortenHex(undefined, 4)).toBe('');
+    expect(shortenHex(null as unknown as string, 4)).toBe('');
+    expect(shortenHex(undefined as unknown as string, 4)).toBe('');
   });
 
   it('handles very short strings', () => {
@@ -76,15 +76,16 @@ describe('formatId', () => {
 
 describe('convertTimestampToDateTime', () => {
   it('converts a Unix timestamp to a date string', () => {
-    const result = convertTimestampToDateTime(1704067200);
-    expect(typeof result).toBe('string');
-    expect(result.length).toBeGreaterThan(5);
+    // 1609459200 = 2021-01-01 00:00 UTC; output varies by timezone (e.g. Jan 01 or Dec 31)
+    const result = convertTimestampToDateTime(1609459200);
+    expect(result).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}:\d{2}$/);
   });
 
   it('includes seconds when flag is set', () => {
-    const withSeconds = convertTimestampToDateTime(1704067200, true);
-    const without = convertTimestampToDateTime(1704067200, false);
-    expect(withSeconds.length).toBeGreaterThanOrEqual(without.length);
+    const withSeconds = convertTimestampToDateTime(1609459200, true);
+    const without = convertTimestampToDateTime(1609459200, false);
+    expect(withSeconds).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}:\d{2}:\d{2}$/);
+    expect(without).toMatch(/^[A-Za-z]{3} \d{2}, \d{2}:\d{2}$/);
   });
 });
 
@@ -124,9 +125,16 @@ describe('formatEthValue', () => {
 });
 
 describe('formatCSTValue', () => {
-  it('formats a CST value', () => {
-    const result = formatCSTValue(1234.5678);
-    expect(result).toContain('CST');
+  it('formats small values with 4 decimals', () => {
+    expect(formatCSTValue(5)).toBe('5.0000 CST');
+  });
+
+  it('formats larger values with 2 decimals', () => {
+    expect(formatCSTValue(15)).toBe('15.00 CST');
+  });
+
+  it('formats zero', () => {
+    expect(formatCSTValue(0)).toBe('0 CST');
   });
 });
 
@@ -138,6 +146,16 @@ describe('isWalletAddress', () => {
 
   it('returns empty string for unknown addresses', () => {
     const result = isWalletAddress('0x1111111111111111111111111111111111111111');
+    expect(result).toBe('');
+  });
+
+  it('returns empty string for a random non-wallet address', () => {
+    const result = isWalletAddress('0xabcdef1234567890abcdef1234567890abcdef12');
+    expect(result).toBe('');
+  });
+
+  it('returns empty string for address 0x1234567890abcdef1234567890abcdef12345678', () => {
+    const result = isWalletAddress('0x1234567890abcdef1234567890abcdef12345678');
     expect(result).toBe('');
   });
 });
@@ -207,7 +225,9 @@ describe('getEnduranceChampions', () => {
   });
 
   it('returns empty array for null bid list', () => {
-    expect(getEnduranceChampions(null)).toEqual([]);
+    expect(
+      getEnduranceChampions(null as unknown as Parameters<typeof getEnduranceChampions>[0]),
+    ).toEqual([]);
   });
 
   it('returns single champion for single bid with explicit roundEndTimeStamp', () => {

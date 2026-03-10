@@ -1,41 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Typography } from '@mui/material';
 import { GetServerSideProps } from 'next';
 
 import { MainWrapper } from '../components/styled';
-import api from '../services/api';
 import {
   CharityDepositTable,
   type CharityDepositDonation,
 } from '../components/tables/CharityDepositTable';
-import { logoImgUrl } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
+import { useCharityVoluntary } from '../hooks/useApiQuery';
 
 /**
  * Page component for displaying voluntary deposits to the charity wallet.
  */
 const CharityDepositsVoluntary = () => {
-  // Track the loading state to conditionally render a loading message or the table
-  const [loading, setLoading] = useState(true);
-
-  // Store the list of voluntary deposits fetched from the API
-  const [voluntaryDeposits, setVoluntaryDeposits] = useState<CharityDepositDonation[]>([]);
-
-  // Fetch voluntary deposits from the API on component mount
-  useEffect(() => {
-    const fetchCharityDeposits = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get_charity_voluntary();
-        setVoluntaryDeposits(response as CharityDepositDonation[]);
-      } catch (err) {
-        console.error('Failed to fetch charity voluntary deposits:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCharityDeposits();
-  }, []);
+  const { data: voluntaryDeposits = [], isLoading: loading } = useCharityVoluntary();
 
   return (
     <MainWrapper>
@@ -47,7 +26,7 @@ const CharityDepositsVoluntary = () => {
         <Typography variant="h6">Loading...</Typography>
       ) : (
         // Pass the fetched voluntary deposits to the table component
-        <CharityDepositTable list={voluntaryDeposits} />
+        <CharityDepositTable list={voluntaryDeposits as CharityDepositDonation[]} />
       )}
     </MainWrapper>
   );
@@ -57,22 +36,11 @@ const CharityDepositsVoluntary = () => {
  * Fetches metadata for server-side rendering, including title, description,
  * and open graph data for social sharing.
  */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Deposits To Charity Wallet | Cosmic Signature';
-  const description = 'Deposits To Charity Wallet';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return {
-    props: { title, description, openGraphData },
-  };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps(
+    'Deposits To Charity Wallet | Cosmic Signature',
+    'Deposits To Charity Wallet',
+  ),
+});
 
 export default CharityDepositsVoluntary;

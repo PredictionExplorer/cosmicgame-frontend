@@ -16,6 +16,7 @@ import NFTImage from '../nft/NFTImage';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '../common/CustomPagination';
 import useRaffleWalletContract from '../../hooks/useRaffleWalletContract';
+import { reportError } from '../../utils/errors';
 
 // ----------------------------
 // Type Definitions
@@ -71,7 +72,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         const { data } = await axios.get(nft.NFTTokenURI!);
         setTokenURI(data);
       } catch (error) {
-        console.error('Error fetching token URI:', error);
+        reportError(error, 'fetch donated NFT token URI');
       }
     };
 

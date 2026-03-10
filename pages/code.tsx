@@ -8,7 +8,7 @@ const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false }
 import { GetServerSideProps } from 'next';
 
 import { CodeWrapper, MainWrapper, StyledLink } from '../components/styled';
-import { logoImgUrl } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
 
 const myTheme = createTheme({
   theme: 'light',
@@ -312,7 +312,6 @@ fn plot_positions(
         }
 
         let mut blurred_img = imageproc::filter::gaussian_blur_f32(&img, 6.0);
-        //let mut blurred_img = img.clone();
         for body_idx in 0..positions.len() {
             if hide[body_idx] {
                 continue;
@@ -556,10 +555,7 @@ fn main() {
     println!("done simulating");
     
     let snake_len = byte_stream.gen_range(0.2, 2.0);
-    //let snake_len = 0.5;
     let init_len: usize = 0;
-    //let hide_2 = byte_stream.gen_range(0.0, 1.0) < 0.5;
-    //let hide_3 = byte_stream.gen_range(0.0, 1.0) < 0.5;
     let hide_2 = true;
     let hide_3 = true;
     let hide = vec![false, hide_2, hide_3];
@@ -593,20 +589,8 @@ fn main() {
   </MainWrapper>
 );
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'Code | Cosmic Signature';
-  const description = 'Code';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps('Code | Cosmic Signature', 'Code'),
+});
 
 export default CodeViewer;

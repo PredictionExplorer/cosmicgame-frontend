@@ -36,7 +36,8 @@ const WinnerRow = ({ winner }: { winner: StakingWinner }) => {
           color="inherit"
           fontSize="inherit"
           href={getExplorerUrl('tx', winner.TxHash)}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(winner.TimeStamp)}
         </Link>

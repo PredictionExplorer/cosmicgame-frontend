@@ -40,7 +40,8 @@ const GlobalMarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
           color="inherit"
           fontSize="inherit"
           href={getExplorerUrl('tx', row.TxHash)}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {/* Display formatted timestamp */}
           {convertTimestampToDateTime(row.TimeStamp)}

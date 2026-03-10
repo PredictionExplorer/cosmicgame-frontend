@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 import api from '../services/api';
 import { getRWLKImageUrl } from '../utils';
+import { reportError } from '../utils/errors';
 
 export interface RWLKNFTData {
   id: number;
@@ -44,7 +45,7 @@ export const useRWLKNFT = (tokenId: number | string | null) => {
           black_triple_video: getRWLKImageUrl(fileName, 'black_triple.mp4'),
         });
       } catch (err) {
-        console.error('useRWLKNFT: failed to fetch token info', err);
+        reportError(err, 'fetch RWLK NFT info');
       }
     };
 

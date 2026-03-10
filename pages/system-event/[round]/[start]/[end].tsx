@@ -19,12 +19,8 @@ import {
   TablePrimaryRow,
 } from '../../../../components/styled';
 import api from '../../../../services/api';
-import {
-  getExplorerUrl,
-  convertTimestampToDateTime,
-  formatSeconds,
-  logoImgUrl,
-} from '../../../../utils';
+import { getExplorerUrl, convertTimestampToDateTime, formatSeconds } from '../../../../utils';
+import { createOpenGraphProps } from '../../../../utils/seo';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { ADMIN_EVENTS } from '../../../../config/misc';
@@ -66,7 +62,8 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
           color="inherit"
           fontSize="inherit"
           href={getExplorerUrl('tx', row.TxHash)}
-          target="__blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(row.TimeStamp)}
         </Link>
@@ -85,7 +82,7 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
         ) : ADMIN_EVENTS[row.RecordType]?.type === 'address' ? (
           <Typography fontFamily="monospace">{row.AddressValue}</Typography>
         ) : (
-          <Link href={row.StringValue} target="_blank">
+          <Link href={row.StringValue} target="_blank" rel="noopener noreferrer">
             {row.StringValue}
           </Link>
         )}
@@ -201,20 +198,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const title = `Admin Events | Cosmic Signature`;
   const description = `Admin Events`;
 
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
   return {
     props: {
-      title,
-      description,
-      openGraphData,
+      ...createOpenGraphProps(title, description),
       start,
       end,
       round,

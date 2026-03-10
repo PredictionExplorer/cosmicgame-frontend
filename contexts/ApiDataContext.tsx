@@ -11,6 +11,7 @@ import React, {
 import { useActiveWeb3React } from '../hooks/web3';
 import api from '../services/api';
 import type { StakingCSTReward } from '../services/api/types';
+import { reportError } from '../utils/errors';
 
 import { useStakedToken } from './StakedTokenContext';
 
@@ -88,7 +89,7 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
             unstakeableActionIds.push(item.StakeActionId);
           }
         } catch (error) {
-          console.error(error);
+          reportError(error, 'process staking reward item');
         }
       }
 
@@ -150,10 +151,12 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
         });
       }
     } catch (error) {
-      console.error('ApiDataContext fetchData failed:', error);
+      reportError(error, 'ApiDataContext fetchData');
     }
     // Stable deps: only account and fetchActionIds (which only changes when account changes)
   }, [account, fetchActionIds]);
+
+  const POLLING_INTERVAL_MS = 30_000;
 
   useEffect(() => {
     let cancelled = false;
@@ -161,8 +164,10 @@ export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) =>
       if (!cancelled) await fetchData();
     };
     run();
+    const intervalId = setInterval(run, POLLING_INTERVAL_MS);
     return () => {
       cancelled = true;
+      clearInterval(intervalId);
     };
   }, [fetchData]);
 

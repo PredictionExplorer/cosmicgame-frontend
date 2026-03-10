@@ -1,34 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Typography } from '@mui/material';
 import { GetServerSideProps } from 'next';
 
 import { MainWrapper } from '../components/styled';
-import api from '../services/api';
-import DonatedNFTTable from '../components/donations/DonatedNFTTable';
-import { logoImgUrl } from '../utils';
+import DonatedNFTTable, { type NFTRecord } from '../components/donations/DonatedNFTTable';
+import { createOpenGraphProps } from '../utils/seo';
+import { useDonationsNFTList } from '../hooks/useApiQuery';
 
 /**
  * NFTDonations: A page component that fetches and displays NFT donations.
  */
 const NFTDonations = () => {
-  // State to hold the list of NFT donations. We initialize with null
-  // to distinguish between "not yet fetched" and an empty array of results.
-  const [nftDonations, setNftDonations] = useState<
-    import('../components/donations/DonatedNFTTable').NFTRecord[] | null
-  >(null);
-
-  useEffect(() => {
-    const fetchNftDonations = async () => {
-      try {
-        const list = await api.get_donations_nft_list();
-        setNftDonations(list as import('../components/donations/DonatedNFTTable').NFTRecord[]);
-      } catch (error) {
-        console.error('Error fetching NFT donations:', error);
-        setNftDonations([]);
-      }
-    };
-    fetchNftDonations();
-  }, []);
+  const { data: nftDonations = null } = useDonationsNFTList();
 
   return (
     <MainWrapper>
@@ -41,7 +24,11 @@ const NFTDonations = () => {
       {nftDonations === null ? (
         <Typography variant="h6">Loading...</Typography>
       ) : (
-        <DonatedNFTTable list={nftDonations} handleClaim={undefined} claimingTokens={[]} />
+        <DonatedNFTTable
+          list={(nftDonations ?? []) as NFTRecord[]}
+          handleClaim={undefined}
+          claimingTokens={[]}
+        />
       )}
     </MainWrapper>
   );
@@ -50,20 +37,8 @@ const NFTDonations = () => {
 /**
  * getServerSideProps: Adds SEO metadata for the NFT Donations page.
  */
-export const getServerSideProps: GetServerSideProps = async () => {
-  const title = 'NFT Donations | Cosmic Signature';
-  const description = 'NFT Donations';
-
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  props: createOpenGraphProps('NFT Donations | Cosmic Signature', 'NFT Donations'),
+});
 
 export default NFTDonations;

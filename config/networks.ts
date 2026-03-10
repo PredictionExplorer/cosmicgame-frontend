@@ -1,3 +1,7 @@
+/**
+ * Network configuration for Cosmic Signature. Exposes chain params, RPC, explorer,
+ * API URLs, and contract addresses per environment (local, sepolia, mainnet).
+ */
 export type NetworkName = 'local' | 'sepolia' | 'mainnet';
 
 interface NetworkConfig {

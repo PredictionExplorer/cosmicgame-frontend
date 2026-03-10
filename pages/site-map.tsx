@@ -2,7 +2,7 @@ import { Box, Link, Typography } from '@mui/material';
 import { GetStaticProps } from 'next';
 
 import { MainWrapper } from '../components/styled';
-import { logoImgUrl } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
 
 /**
  * A list of links that provide per-user information routes.
@@ -75,21 +75,8 @@ const SiteMap = () => {
  * getServerSideProps: Fetches and sets metadata (e.g., for SEO and social sharing)
  * before rendering the SiteMap page on the server side.
  */
-export const getStaticProps: GetStaticProps = async () => {
-  const title = 'Site Map | Cosmic Signature';
-  const description = 'Site Map';
-
-  // Open Graph and Twitter meta data
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  return { props: { title, description, openGraphData } };
-};
+export const getStaticProps: GetStaticProps = async () => ({
+  props: createOpenGraphProps('Site Map | Cosmic Signature', 'Site Map'),
+});
 
 export default SiteMap;

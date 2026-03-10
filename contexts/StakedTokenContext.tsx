@@ -10,6 +10,7 @@ import React, {
 import api from '../services/api';
 import { useActiveWeb3React } from '../hooks/web3';
 import type { StakedTokenInfo } from '../services/api/types';
+import { reportError } from '../utils/errors';
 
 /**
  * Describes the shape of the StakedTokenContext value.
@@ -55,7 +56,7 @@ export const StakedTokenProvider: React.FC<StakedTokenProviderProps> = ({ childr
       setCsTokens(cst ?? []);
       setRwlkTokens(rwlk ?? []);
     } catch (error) {
-      console.error('Error fetching staked token data:', error);
+      reportError(error, 'fetch staked token data');
     }
   }, [account]);
 

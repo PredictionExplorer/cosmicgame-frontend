@@ -6,7 +6,7 @@ import PaginationGrid from '../components/nft/PaginationGrid';
 import { MainWrapper } from '../components/styled';
 import api from '../services/api';
 import type { CSTTokenInfo } from '../services/api/types';
-import { logoImgUrl } from '../utils';
+import { createOpenGraphProps } from '../utils/seo';
 
 /* ------------------------------------------------------------------
   Page Component: Gallery
@@ -74,26 +74,12 @@ const Gallery = () => {
   Provides server-side rendering for meta tags (title, description, 
   and Open Graph data), ensuring proper SEO for social sharing.
 ------------------------------------------------------------------ */
-export const getStaticProps: GetStaticProps = async () => {
-  // SEO title for the page
-  const title = 'Gallery | Cosmic Signature';
-
-  // Meta description for search engines and social media
-  const description =
-    'Explore the Cosmic Signature NFT Gallery and discover a unique collection of digital art. Immerse yourself in vibrant, one-of-a-kind NFTs, each telling a cosmic story. Start your journey into the digital universe today!';
-
-  // Open Graph and Twitter meta tags
-  const openGraphData = [
-    { property: 'og:title', content: title },
-    { property: 'og:description', content: description },
-    { property: 'og:image', content: logoImgUrl },
-    { name: 'twitter:title', content: title },
-    { name: 'twitter:description', content: description },
-    { name: 'twitter:image', content: logoImgUrl },
-  ];
-
-  // Return these props to the page component
-  return { props: { title, description, openGraphData }, revalidate: 60 };
-};
+export const getStaticProps: GetStaticProps = async () => ({
+  props: createOpenGraphProps(
+    'Gallery | Cosmic Signature',
+    'Explore the Cosmic Signature NFT Gallery and discover a unique collection of digital art. Immerse yourself in vibrant, one-of-a-kind NFTs, each telling a cosmic story. Start your journey into the digital universe today!',
+  ),
+  revalidate: 60,
+});
 
 export default Gallery;

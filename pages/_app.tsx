@@ -4,21 +4,19 @@ import dynamic from 'next/dynamic';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CacheProvider, EmotionCache } from '@emotion/react';
-import { useState, useEffect, useCallback } from 'react';
-import type { Engine } from 'tsparticles-engine';
-import { loadSlim } from 'tsparticles-slim';
+import { useState, useEffect } from 'react';
 
 const Particles = dynamic(
-  () => import('react-tsparticles').then((mod) => ({ default: mod.default })),
+  () => import('@tsparticles/react').then((mod) => ({ default: mod.default })),
   { ssr: false },
 );
+import type { ISourceOptions } from '@tsparticles/engine';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 
 import { wagmiConfig } from '../config/wagmi';
-// import { inter, clashDisplay } from '../config/fonts';
 import ErrorBoundary from '../components/layout/ErrorBoundary';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
@@ -30,7 +28,6 @@ import { useRouter } from 'next/router';
 
 import * as ga from '../utils/analytics';
 import { ApiDataProvider } from '../contexts/ApiDataContext';
-import ApiDataFetcher from '../contexts/ApiDataFetcher';
 
 import { CookiesProvider } from 'react-cookie';
 
@@ -130,11 +127,18 @@ function MyApp(props: MyAppProps) {
     };
   }, [router.events]);
 
-  const particlesInit = useCallback(async (engine: Engine) => {
-    await loadSlim(engine);
-  }, []);
+  const [engineReady, setEngineReady] = useState(false);
 
-  const particlesLoaded = useCallback(async () => {}, []);
+  useEffect(() => {
+    (async () => {
+      const { initParticlesEngine } = await import('@tsparticles/react');
+      const { loadSlim } = await import('@tsparticles/slim');
+      await initParticlesEngine(async (engine) => {
+        await loadSlim(engine);
+      });
+      setEngineReady(true);
+    })();
+  }, []);
 
   return (
     <>
@@ -157,24 +161,23 @@ function MyApp(props: MyAppProps) {
             <CacheProvider value={emotionCache}>
               <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <Particles
-                  id="tsparticles"
-                  init={particlesInit}
-                  loaded={particlesLoaded}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- tsparticles ISourceOptions type is incompatible with react-tsparticles prop types
-                  options={particleOptions as any}
-                  style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    zIndex: 0,
-                  }}
-                  aria-hidden="true"
-                />
+                {engineReady && (
+                  <Particles
+                    id="tsparticles"
+                    options={particleOptions as unknown as ISourceOptions}
+                    style={{
+                      position: 'fixed',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: '100%',
+                      zIndex: 0,
+                    }}
+                    aria-hidden="true"
+                  />
+                )}
                 <ErrorBoundary>
-                  {/* @ts-expect-error React types version mismatch */}
+                  {/* @ts-expect-error TS2786 - react-cookie CookiesProvider has React 18 types incompatible with React 19 */}
                   <CookiesProvider>
                     <StakedTokenProvider>
                       <SystemModeProvider>
@@ -185,7 +188,6 @@ function MyApp(props: MyAppProps) {
                               <Component {...pageProps} />
                             </ErrorBoundary>
                             <Footer />
-                            <ApiDataFetcher interval={30000} />
                           </NotificationProvider>
                         </ApiDataProvider>
                       </SystemModeProvider>

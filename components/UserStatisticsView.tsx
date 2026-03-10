@@ -19,6 +19,7 @@ import type {
 import type { CSTToken } from '../pages/my-tokens';
 import { formatEthValue } from '../utils';
 import getErrorMessage from '../utils/alert';
+import { isUserRejection, reportError, getEthErrorMessage } from '../utils/errors';
 import { CSTTable } from '../pages/my-tokens';
 
 import type { WinningHistoryEntry } from './tables/WinningHistoryTable';
@@ -561,7 +562,7 @@ const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnP
         fetchStakedTokens();
         fetchStatusData();
       } catch (err) {
-        console.error(err);
+        reportError(err, 'fetch user statistics');
         setNotification({
           text: 'Failed to fetch data',
           type: 'error',
@@ -593,7 +594,7 @@ const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnP
           loading: false,
         });
       } catch (err) {
-        console.error(err);
+        reportError(err, 'fetch donated NFTs');
         setNotification({
           text: 'Failed to fetch donated NFTs',
           type: 'error',
@@ -617,7 +618,7 @@ const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnP
           loading: false,
         });
       } catch (err) {
-        console.error(err);
+        reportError(err, 'fetch donated ERC20 tokens');
         setNotification({
           text: 'Failed to fetch donated ERC20 tokens',
           type: 'error',
@@ -660,7 +661,7 @@ const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnP
         }
       }
     } catch (err) {
-      console.error(err);
+      reportError(err, 'calculate win probability');
     }
   }, [address]);
 
@@ -680,13 +681,10 @@ const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnP
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      const ethErr = err as { code?: number; data?: { message?: string } };
-      if (ethErr?.code !== 4001) {
-        console.error(err);
-        const msg = ethErr?.data?.message
-          ? getErrorMessage(ethErr.data.message)
-          : 'An error occurred';
-        setNotification({ text: msg, type: 'error', visible: true });
+      if (!isUserRejection(err)) {
+        reportError(err, 'claim donated NFT');
+        const msg = getEthErrorMessage(err, 'An error occurred');
+        setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
       }
       setIsClaiming(false);
     } finally {
@@ -706,13 +704,10 @@ const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnP
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      const ethErr = err as { code?: number; data?: { message?: string } };
-      if (ethErr?.code !== 4001) {
-        console.error(err);
-        const msg = ethErr?.data?.message
-          ? getErrorMessage(ethErr.data.message)
-          : 'An error occurred while claiming donated NFTs!';
-        setNotification({ text: msg, type: 'error', visible: true });
+      if (!isUserRejection(err)) {
+        reportError(err, 'claim all donated NFTs');
+        const msg = getEthErrorMessage(err, 'An error occurred while claiming donated NFTs!');
+        setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
       }
       setIsClaiming(false);
     }
@@ -726,11 +721,10 @@ const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnP
         fetchDonatedERC20Tokens(false);
       }, 3000);
     } catch (err) {
-      console.error(err);
-      const ethErr = err as { data?: { message?: string } };
-      const msg = ethErr?.data?.message
-        ? getErrorMessage(ethErr.data.message)
-        : 'An error occurred';
+      if (isUserRejection(err)) return;
+      reportError(err, 'claim donated ERC20 token');
+      const rawMsg = getEthErrorMessage(err, 'An error occurred');
+      const msg = getErrorMessage(rawMsg) || rawMsg;
       setNotification({ text: msg, type: 'error', visible: true });
     }
   };
@@ -750,11 +744,10 @@ const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnP
         fetchDonatedERC20Tokens(false);
       }, 3000);
     } catch (err) {
-      console.error(err);
-      const ethErr = err as { data?: { message?: string } };
-      const msg = ethErr?.data?.message
-        ? getErrorMessage(ethErr.data.message)
-        : 'An error occurred';
+      if (isUserRejection(err)) return;
+      reportError(err, 'claim all donated ERC20 tokens');
+      const rawMsg = getEthErrorMessage(err, 'An error occurred');
+      const msg = getErrorMessage(rawMsg) || rawMsg;
       setNotification({ text: msg, type: 'error', visible: true });
     }
   };
