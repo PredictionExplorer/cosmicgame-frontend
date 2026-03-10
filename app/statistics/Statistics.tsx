@@ -30,6 +30,7 @@ import { CTBalanceDistributionChart } from '@/components/tokens/CTBalanceDistrib
 import { UniqueEthDonorsTable, UniqueEthDonor } from '@/components/tables/UniqueEthDonorsTable';
 import { ZERO_ADDRESS } from '@/config/misc';
 import { reportError } from '@/utils/errors';
+import { STATS_POLL_INTERVAL_MS } from '@/config/constants';
 
 interface StatisticsItemProps {
   title: string;
@@ -200,7 +201,7 @@ const Statistics = () => {
     fetchData();
     fetchCSTBidData();
 
-    const interval = setInterval(fetchCSTBidData, 5000);
+    const interval = setInterval(fetchCSTBidData, STATS_POLL_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [fetchCSTBidData]);
 

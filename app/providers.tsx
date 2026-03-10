@@ -10,6 +10,7 @@ import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
 
 import { wagmiConfig } from '@/config/wagmi';
+import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -125,7 +126,7 @@ export function Providers({ children }: { children: ReactNode }) {
           <Toaster
             position="top-right"
             toastOptions={{
-              duration: 5000,
+              duration: NOTIFICATION_AUTO_HIDE_MS,
               className: 'bg-card text-foreground border-border',
             }}
           />

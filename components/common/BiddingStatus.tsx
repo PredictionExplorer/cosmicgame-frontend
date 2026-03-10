@@ -6,6 +6,7 @@ import { calculateTimeDiff, convertTimestampToDateTime } from '@/utils';
 
 import api from '@/services/api';
 import { reportError } from '@/utils/errors';
+import { DATA_POLL_INTERVAL_MS } from '@/config/constants';
 import { GradientText } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, BidInfo } from '@/services/api';
@@ -133,7 +134,7 @@ export const BiddingStatus = ({
 
     fetchCSTBidData();
 
-    const interval = setInterval(fetchCSTBidData, 12000);
+    const interval = setInterval(fetchCSTBidData, DATA_POLL_INTERVAL_MS);
 
     return () => {
       clearInterval(interval);

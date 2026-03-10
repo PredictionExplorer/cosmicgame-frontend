@@ -28,6 +28,7 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { ART_BLOCKS_ADDRESS, RAFFLE_WALLET_ADDRESS } from '@/config/networks';
+import { ERC721_INTERFACE_ID, BID_GAS_LIMIT, DATA_POLL_INTERVAL_MS } from '@/config/constants';
 import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import Prize from '@/components/common/Prize';
@@ -169,7 +170,7 @@ const HomePage = () => {
         address: nftAddress as `0x${string}`,
         abi: NFT_ABI,
         functionName: 'supportsInterface',
-        args: ['0x80ac58cd'],
+        args: [ERC721_INTERFACE_ID],
       });
     } catch {
       return false;
@@ -424,7 +425,7 @@ const HomePage = () => {
             cosmicGameContract.write.bidWithEth as unknown as (
               ...a: unknown[]
             ) => Promise<`0x${string}`>
-          )([rwlkId, message], { value: ethBidPrice, gas: BigInt(30_000_000) }),
+          )([rwlkId, message], { value: ethBidPrice, gas: BID_GAS_LIMIT }),
         );
         await withPostTxRefresh();
         setIsBidding(false);
@@ -767,7 +768,7 @@ const HomePage = () => {
     fetchDataCollection();
     fetchEthBidInfo();
 
-    const interval = setInterval(fetchDataCollection, 12000);
+    const interval = setInterval(fetchDataCollection, DATA_POLL_INTERVAL_MS);
 
     return () => {
       clearInterval(interval);

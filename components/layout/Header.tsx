@@ -18,6 +18,7 @@ import { useUserBalance, useUserInfo } from '@/hooks/useApiQuery';
 import { useStakedToken } from '@/contexts/StakedTokenContext';
 import { useSystemMode } from '@/contexts/SystemModeContext';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
+import { HEADER_POLL_INTERVAL_MS } from '@/config/constants';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
@@ -54,7 +55,7 @@ const Header: FC = () => {
       }
     };
     fetchRwlk();
-    const intervalId = setInterval(fetchRwlk, 30000);
+    const intervalId = setInterval(fetchRwlk, HEADER_POLL_INTERVAL_MS);
     return () => clearInterval(intervalId);
   }, [account, nftContract]);
 
