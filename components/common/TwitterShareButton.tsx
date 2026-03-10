@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Button,
   Dialog,
@@ -13,7 +13,7 @@ import {
  * TwitterShareButton Component
  * Opens a dialog to collect a user's Twitter handle and then creates a pre-filled tweet with referral link.
  */
-const TwitterShareButton: React.FC = () => {
+const TwitterShareButton = () => {
   const [handle, setHandle] = useState<string>(''); // User input for Twitter handle
   const [open, setOpen] = useState<boolean>(false); // Controls the dialog open state
 

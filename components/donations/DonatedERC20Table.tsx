@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Link, TableBody, Tooltip, Typography } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,12 +9,12 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '../../utils';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
-import useRaffleWalletContract from '../../hooks/useRaffleWalletContract';
-import api from '../../services/api';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
+import api from '@/services/api';
 
 export interface DonatedERC20Token {
   RoundNum: number;
@@ -36,7 +36,7 @@ interface TokenRowProps {
   handleClaim: ((roundNum: number, tokenAddr: string, amount: string) => void) | null;
 }
 
-const TokenRow: React.FC<TokenRowProps> = ({ currentTime, token, handleClaim }) => {
+const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
   const [roundTimeoutTimesToWithdrawPrizes, setRoundTimeoutTimesToWithdrawPrizes] = useState(0);
   const raffleWalletContract = useRaffleWalletContract();
 
@@ -150,7 +150,7 @@ interface DonatedERC20TableProps {
 // ----------------------------
 // Main Table Component
 // ----------------------------
-const DonatedERC20Table: React.FC<DonatedERC20TableProps> = ({ list, handleClaim }) => {
+const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
   const [currentTime, setCurrentTime] = useState(0);

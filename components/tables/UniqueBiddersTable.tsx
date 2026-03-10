@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Box, TableBody, Typography } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,10 +9,10 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
 
 // Types for bidder information
 export interface Bidder {
@@ -27,7 +27,7 @@ interface UniqueBiddersRowProps {
 }
 
 // Component rendering a single row for a bidder
-const UniqueBiddersRow: React.FC<UniqueBiddersRowProps> = ({ bidder }) => {
+const UniqueBiddersRow = ({ bidder }: UniqueBiddersRowProps) => {
   if (!bidder) {
     // Return empty row if no bidder data
     return <TablePrimaryRow />;
@@ -52,7 +52,7 @@ interface UniqueBiddersTableProps {
 }
 
 // Main component displaying paginated table of unique bidders
-export const UniqueBiddersTable: React.FC<UniqueBiddersTableProps> = ({ list }) => {
+export const UniqueBiddersTable = ({ list }: UniqueBiddersTableProps) => {
   const perPage = 5; // Bidders displayed per page
   const [page, setPage] = useState(1); // Current pagination page
 

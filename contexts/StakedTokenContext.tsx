@@ -1,16 +1,9 @@
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 
-import api from '../services/api';
-import { useActiveWeb3React } from '../hooks/web3';
-import type { StakedTokenInfo } from '../services/api/types';
-import { reportError } from '../utils/errors';
+import api from '@/services/api';
+import { useActiveWeb3React } from '@/hooks/web3';
+import type { StakedTokenInfo } from '@/services/api/types';
+import { reportError } from '@/utils/errors';
 
 /**
  * Describes the shape of the StakedTokenContext value.
@@ -38,7 +31,7 @@ interface StakedTokenProviderProps {
  * Provider component responsible for fetching and storing
  * the user's staked tokens (CST and RWALK).
  */
-export const StakedTokenProvider: React.FC<StakedTokenProviderProps> = ({ children }) => {
+export const StakedTokenProvider = ({ children }: StakedTokenProviderProps) => {
   const [cstokens, setCsTokens] = useState<StakedTokenInfo[]>([]);
   const [rwlktokens, setRwlkTokens] = useState<StakedTokenInfo[]>([]);
   const { account } = useActiveWeb3React();

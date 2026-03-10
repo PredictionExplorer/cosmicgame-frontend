@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, type FC } from 'react';
 import Image from 'next/image';
 import {
   Toolbar,
@@ -18,17 +18,17 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import { formatEther } from 'viem';
 
-import getNAVs from '../../config/nav';
-import ConnectWalletButton from '../common/ConnectWalletButton';
-import { AppBarWrapper, DrawerList } from '../styled';
-import ListNavItem from '../common/ListNavItem';
-import ListItemButton from '../common/ListItemButton';
-import { useApiData } from '../../contexts/ApiDataContext';
-import { useActiveWeb3React } from '../../hooks/web3';
-import { useUserBalance, useUserInfo } from '../../hooks/useApiQuery';
-import { useStakedToken } from '../../contexts/StakedTokenContext';
-import { useSystemMode } from '../../contexts/SystemModeContext';
-import useRWLKNFTContract from '../../hooks/useRWLKNFTContract';
+import getNAVs from '@/config/nav';
+import ConnectWalletButton from '@/components/common/ConnectWalletButton';
+import { AppBarWrapper, DrawerList } from '@/components/styled';
+import ListNavItem from '@/components/common/ListNavItem';
+import ListItemButton from '@/components/common/ListItemButton';
+import { useApiData } from '@/contexts/ApiDataContext';
+import { useActiveWeb3React } from '@/hooks/web3';
+import { useUserBalance, useUserInfo } from '@/hooks/useApiQuery';
+import { useStakedToken } from '@/contexts/StakedTokenContext';
+import { useSystemMode } from '@/contexts/SystemModeContext';
+import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 
 /**
  * Interface representing the structure of a user’s balance.

@@ -1,12 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useState, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Grid, Box, Typography, CardActionArea, Link } from '@mui/material';
 import Pagination from '@mui/material/Pagination';
 
-import { SearchBox, SearchField, SearchButton, StyledCard, NFTInfoWrapper } from '../styled';
-import api from '../../services/api';
-import { getAssetsUrl } from '../../utils';
-import type { CSTTokenInfo } from '../../services/api';
+import {
+  SearchBox,
+  SearchField,
+  SearchButton,
+  StyledCard,
+  NFTInfoWrapper,
+} from '@/components/styled';
+import api from '@/services/api';
+import { getAssetsUrl } from '@/utils';
+import type { CSTTokenInfo } from '@/services/api';
 
 import NFTImage from './NFTImage';
 import NFT from './NFT';
@@ -26,7 +32,7 @@ interface PaginationGridProps {
         ...other NFT properties...
     - loading: A boolean indicating if data is still loading.
 ------------------------------------------------------------------ */
-const PaginationGrid: React.FC<PaginationGridProps> = ({ data, loading }) => {
+const PaginationGrid = ({ data, loading }: PaginationGridProps) => {
   // Search input state.
   const [searchKey, setSearchKey] = useState('');
   // NFTs to display (after filtering/search).
@@ -38,6 +44,8 @@ const PaginationGrid: React.FC<PaginationGridProps> = ({ data, loading }) => {
 
   // Next.js router for handling query parameters (page).
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   /**
    * Updates the URL query parameter 'page' and navigates to that page.
@@ -45,15 +53,14 @@ const PaginationGrid: React.FC<PaginationGridProps> = ({ data, loading }) => {
    */
   const handleNextPage = (page: number) => {
     // Update the 'page' query parameter and navigate.
-    router.query.page = String(page);
-    router.push({ pathname: router.pathname, query: router.query });
+    router.push(pathname + '?page=' + page);
   };
 
   /**
    * Handles changes in the search input field.
    * Resets the collection to the original data if the search is cleared.
    */
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSearchKey(value);
 
@@ -67,7 +74,7 @@ const PaginationGrid: React.FC<PaginationGridProps> = ({ data, loading }) => {
    * Handles pressing 'Enter' in the search field.
    * Triggers the search action if Enter is pressed.
    */
-  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+  const handleSearchKeyPress = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
@@ -106,7 +113,7 @@ const PaginationGrid: React.FC<PaginationGridProps> = ({ data, loading }) => {
 
     // Optionally reset page to 1 or remove page from router query
     // if you want the user to see page 1 of the filtered result.
-    router.push({ pathname: router.pathname });
+    router.push(pathname);
   };
 
   /**
@@ -114,9 +121,9 @@ const PaginationGrid: React.FC<PaginationGridProps> = ({ data, loading }) => {
    * Defaults to 1 if not present or invalid.
    */
   useEffect(() => {
-    const page = parseInt(String(router.query['page'] ?? 1)) || 1;
+    const page = parseInt(searchParams.get('page') ?? '1') || 1;
     setCurPage(page);
-  }, [router]);
+  }, [searchParams]);
 
   /**
    * Whenever the original data changes (e.g., new props), reset the collection.

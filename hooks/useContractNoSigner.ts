@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { createPublicClient, getContract, http, type Abi } from 'viem';
 
-import { networkConfig } from '../config/networks';
-import { activeChain } from '../config/chains';
-import { reportError } from '../utils/errors';
+import { networkConfig } from '@/config/networks';
+import { activeChain } from '@/config/chains';
+import { reportError } from '@/utils/errors';
 
 const readOnlyClient = createPublicClient({
   chain: activeChain,

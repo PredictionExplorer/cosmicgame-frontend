@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -21,15 +21,15 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { convertTimestampToDateTime, getAssetsUrl, getRWLKImageUrl } from '../../utils';
+} from '@/components/styled';
+import { convertTimestampToDateTime, getAssetsUrl, getRWLKImageUrl } from '@/utils';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
-import api from '../../services/api';
-import { reportError } from '../../utils/errors';
-import type { RewardsByToken } from '../../services/api/types';
-import NFTImage from '../nft/NFTImage';
-import { useActiveWeb3React } from '../../hooks/web3';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import api from '@/services/api';
+import { reportError } from '@/utils/errors';
+import type { RewardsByToken } from '@/services/api/types';
+import NFTImage from '@/components/nft/NFTImage';
+import { useActiveWeb3React } from '@/hooks/web3';
 
 // Types
 interface RandomWalkRow {
@@ -91,14 +91,14 @@ interface StakedTokenRowProps {
   onUnstakeSingle: (id: number) => void;
 }
 
-const StakedTokenRow: React.FC<StakedTokenRowProps> = ({
+const StakedTokenRow = ({
   row,
   isRandomWalk,
   isItemSelected,
   accumulatedRewards,
   onRowClick,
   onUnstakeSingle,
-}) => {
+}: StakedTokenRowProps) => {
   const [processing, setProcessing] = useState(false);
   const stakeActionId = isRandomWalk
     ? (row as RandomWalkRow).StakeActionId
@@ -217,12 +217,12 @@ interface StakedTokensTableProps {
   IsRwalk: boolean;
 }
 
-export const StakedTokensTable: React.FC<StakedTokensTableProps> = ({
+export const StakedTokensTable = ({
   list,
   handleUnstake,
   handleUnstakeMany,
   IsRwalk,
-}) => {
+}: StakedTokensTableProps) => {
   const { account } = useActiveWeb3React();
   const perPage = 5;
   const [page, setPage] = useState<number>(1);

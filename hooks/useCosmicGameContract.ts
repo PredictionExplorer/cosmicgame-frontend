@@ -1,5 +1,5 @@
-import { COSMICGAME_ADDRESS } from '../config/networks';
-import { cosmicGameAbi } from '../contracts/abis';
+import { COSMICGAME_ADDRESS } from '@/config/networks';
+import { cosmicGameAbi } from '@/contracts/abis';
 
 import useContract from './useContract';
 

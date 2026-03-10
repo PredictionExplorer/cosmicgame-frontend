@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import { useState, type FC } from 'react';
 import { Link, TableBody, Typography } from '@mui/material';
 
 import {
@@ -8,16 +8,16 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
 
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 
 /**
  * Data shape for each donation record.
@@ -49,6 +49,8 @@ interface EthDonationRowProps {
  * Clicking on a row (when applicable) navigates to the donation detail page.
  */
 const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
+  const router = useRouter();
+
   if (!row) {
     // If no row data is provided, return an empty table row (optional case).
     return <TablePrimaryRow />;

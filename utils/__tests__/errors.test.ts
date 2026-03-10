@@ -1,6 +1,11 @@
 import * as Sentry from '@sentry/nextjs';
 
-import { isEthProviderError, isUserRejection, getEthErrorMessage, reportError } from '../errors';
+import {
+  isEthProviderError,
+  isUserRejection,
+  getEthErrorMessage,
+  reportError,
+} from '@/utils/errors';
 
 jest.mock('@sentry/nextjs', () => ({
   captureException: jest.fn(),

@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type SyntheticEvent } from 'react';
 import { Box, Typography, AccordionSummary } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
-import { FaqAccordion, FaqAccordionDetails, QuestionIcon } from '../styled';
+import { FaqAccordion, FaqAccordionDetails, QuestionIcon } from '@/components/styled';
 
 const FAQ = () => {
   const items = [
@@ -282,7 +282,7 @@ const FAQ = () => {
   const [expanded, setExpanded] = useState<number | null>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const handleChange = (index: number) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+  const handleChange = (index: number) => (_event: SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? index : -1);
   };
 

@@ -1,5 +1,5 @@
-import { render, screen } from '../../test-utils';
-import DonatedNFTDistributionTable from '../donations/DonatedNFTDistributionTable';
+import { render, screen } from '@/test-utils';
+import DonatedNFTDistributionTable from '@/components/donations/DonatedNFTDistributionTable';
 import '@testing-library/jest-dom';
 
 describe('DonatedNFTDistributionTable', () => {

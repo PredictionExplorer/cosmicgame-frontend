@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { get_current_time, get_system_modelist, get_system_events } from '../system';
+import { get_current_time, get_system_modelist, get_system_events } from '@/services/api/system';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');

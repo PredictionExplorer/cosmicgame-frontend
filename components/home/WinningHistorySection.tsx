@@ -2,11 +2,11 @@ import { Box, Container, Typography } from '@mui/material';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 
-import WinningHistoryTable from '../tables/WinningHistoryTable';
-import type { WinningHistoryEntry } from '../tables/WinningHistoryTable';
-import TwitterShareButton from '../common/TwitterShareButton';
-import TwitterPopup from '../common/TwitterPopup';
-import { getAssetsUrl } from '../../utils';
+import WinningHistoryTable from '@/components/tables/WinningHistoryTable';
+import type { WinningHistoryEntry } from '@/components/tables/WinningHistoryTable';
+import TwitterShareButton from '@/components/common/TwitterShareButton';
+import TwitterPopup from '@/components/common/TwitterPopup';
+import { getAssetsUrl } from '@/utils';
 
 interface WinningHistorySectionProps {
   claimHistory: WinningHistoryEntry[] | null;

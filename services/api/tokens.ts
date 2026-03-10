@@ -183,7 +183,7 @@ export async function create(token_id: number, count: number) {
       count,
     });
     return data?.task_id || -1;
-  } catch (_err: unknown) {
+  } catch {
     throw new Error('Network response was not OK');
   }
 }

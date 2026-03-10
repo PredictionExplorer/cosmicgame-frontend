@@ -1,11 +1,10 @@
-import React from 'react';
 import Image from 'next/image';
 import { Box, Typography, Container, Grid, useTheme, useMediaQuery, Button } from '@mui/material';
 import { useSnapCarousel } from 'react-snap-carousel';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 
-import { useCSTList } from '../../hooks/useApiQuery';
+import { useCSTList } from '@/hooks/useApiQuery';
 
 import NFT from './NFT';
 

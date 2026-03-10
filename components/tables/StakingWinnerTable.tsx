@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TableBody, Link, Typography, Tooltip } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,10 +9,10 @@ import {
   TablePrimaryRow,
   TablePrimaryHeadCell,
   TablePrimary,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '../../utils';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
+import { CustomPagination } from '@/components/common/CustomPagination';
 
 interface StakingWinner {
   TxHash: string;

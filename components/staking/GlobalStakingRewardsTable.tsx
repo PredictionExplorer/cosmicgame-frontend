@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Collapse, IconButton, Link, TableBody, Typography } from '@mui/material';
 
 import {
@@ -8,19 +8,19 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { useStakingCSTRewardsByRound } from '../../hooks/useApiQuery';
+import { useStakingCSTRewardsByRound } from '@/hooks/useApiQuery';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-import { CustomPagination } from '../common/CustomPagination';
-import StakingWinnerTable from '../tables/StakingWinnerTable';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import StakingWinnerTable from '@/components/tables/StakingWinnerTable';
 
 interface GlobalStakingReward {
   EvtLogId: number;

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Dialog, DialogContent, Button } from '@mui/material';
 
 interface VideoPlayerDialogProps {
@@ -11,7 +10,7 @@ interface VideoPlayerDialogProps {
  * Full-width dialog for playing NFT videos using native <video>
  * to avoid iframe/proxy issues in Chrome.
  */
-const VideoPlayerDialog: React.FC<VideoPlayerDialogProps> = ({ open, videoPath, onClose }) => (
+const VideoPlayerDialog = ({ open, videoPath, onClose }: VideoPlayerDialogProps) => (
   <Dialog
     open={open}
     onClose={onClose}

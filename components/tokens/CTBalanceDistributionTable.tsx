@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import { memo, useMemo, useState, type FC } from 'react';
 import { TableBody, Typography } from '@mui/material';
 
 import {
@@ -8,13 +8,13 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
 
 /** -----------------------------------------------------------------------
  * Type Definitions
@@ -41,7 +41,7 @@ export interface BalanceRow {
  * Extracted into its own.memoised component to avoid unnecessary rerenders
  * when pagination switches pages.
  */
-const CTBalanceDistributionRow: FC<{ row?: BalanceRow }> = React.memo(({ row }) => {
+const CTBalanceDistributionRow: FC<{ row?: BalanceRow }> = memo(({ row }) => {
   // When `row` is undefined (e.g. while loading), render an empty <tr>
   if (!row) return <TablePrimaryRow />;
 

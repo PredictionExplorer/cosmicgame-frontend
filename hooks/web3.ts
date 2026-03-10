@@ -1,6 +1,6 @@
 import { useAccount, useChainId } from 'wagmi';
 
-import { networkConfig } from '../config/networks';
+import { networkConfig } from '@/config/networks';
 
 /**
  * Provides wallet connection state using native wagmi hooks.

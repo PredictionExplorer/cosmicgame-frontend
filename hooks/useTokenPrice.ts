@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-import { reportError } from '../utils/errors';
+import { reportError } from '@/utils/errors';
 
 /**
  * Fetches token USD price from CoinGecko. Use for ETH or other supported token IDs.

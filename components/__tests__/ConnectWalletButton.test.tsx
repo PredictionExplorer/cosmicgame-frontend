@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '../../test-utils';
+import { render, screen } from '@/test-utils';
 
 jest.mock('@rainbow-me/rainbowkit');
 jest.mock('wagmi');
@@ -9,7 +9,7 @@ jest.mock('../../hooks/web3', () => ({
   useActiveWeb3React: () => mockUseActiveWeb3React(),
 }));
 
-import ConnectWalletButton from '../common/ConnectWalletButton';
+import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 
 const defaultBalance = { ETH: 1.5, CosmicToken: 100, CosmicSignature: 3, RWLK: 2 };
 const defaultStaked = { cst: 1, rwalk: 0 };

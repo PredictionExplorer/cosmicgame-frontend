@@ -1,13 +1,12 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
 import { Toolbar, Box, IconButton, Container, Typography, Link } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 
-import { FooterWrapper } from '../styled';
+import { FooterWrapper } from '@/components/styled';
 
 // Footer component displaying the company logo, links, and social media icons
 const Footer = () => (

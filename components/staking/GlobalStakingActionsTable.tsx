@@ -1,4 +1,4 @@
-import React, { useState, FC } from 'react';
+import { useState, type FC } from 'react';
 import { Link, TableBody, Tooltip, Typography } from '@mui/material';
 
 import {
@@ -8,14 +8,14 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { convertTimestampToDateTime, shortenHex } from '../../utils';
+} from '@/components/styled';
+import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
-import { CustomPagination } from '../common/CustomPagination';
+import { CustomPagination } from '@/components/common/CustomPagination';
 
 /**
  * Interface representing the structure of each row's data.

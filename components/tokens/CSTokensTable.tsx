@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, type MouseEvent } from 'react';
 import {
   Box,
   Button,
@@ -21,12 +21,12 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
-import type { CSTTokenInfo } from '../../services/api';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import type { CSTTokenInfo } from '@/services/api';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
 
 interface CSTokenRowProps {
   row: CSTTokenInfo & { Staked?: boolean };
@@ -39,12 +39,7 @@ interface CSTokenRowProps {
   Sub-Component: CSTokenRow
   Renders a single row (CSToken).
 ------------------------------------------------------------------ */
-const CSTokenRow: React.FC<CSTokenRowProps> = ({
-  row,
-  onSelectToggle,
-  onStakeSingle,
-  isItemSelected,
-}) => {
+const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTokenRowProps) => {
   const [processing, setProcessing] = useState(false);
   if (!row) return null;
 
@@ -53,7 +48,7 @@ const CSTokenRow: React.FC<CSTokenRowProps> = ({
   // Row-level click handlers
   const handleRowClick = () => onSelectToggle(TokenId);
 
-  const handleStakeClick = async (e: React.MouseEvent) => {
+  const handleStakeClick = async (e: MouseEvent) => {
     e.stopPropagation();
     setProcessing(true);
     try {
@@ -147,11 +142,7 @@ interface CSTokensTableProps {
   Main Component: CSTokensTable
   Renders a paginated table of CSTokens with "stake" functionality.
 ------------------------------------------------------------------ */
-export const CSTokensTable: React.FC<CSTokensTableProps> = ({
-  list,
-  handleStake,
-  handleStakeMany,
-}) => {
+export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTableProps) => {
   const perPage = 5;
 
   // Pagination
@@ -257,7 +248,7 @@ export const CSTokensTable: React.FC<CSTokensTableProps> = ({
                     alignItems: 'center',
                     cursor: 'pointer',
                   }}
-                  onClick={(e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget)}
+                  onClick={(e: MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget)}
                 >
                   <Checkbox
                     color="info"

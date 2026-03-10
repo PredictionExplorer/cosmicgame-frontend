@@ -12,7 +12,7 @@
 // - CustomPagination for paginated displays.
 // - AddressLink for linking to donor addresses.
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, TableBody, Typography } from '@mui/material';
 
 import {
@@ -22,14 +22,14 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
 
 //------------------------------------------------------------------------------
 // TypeScript Interfaces
@@ -70,7 +70,7 @@ interface CharityDepositTableProps {
  * Renders a single row in the donation table, including links to block explorers
  * and user profiles.
  */
-const DonationRow: React.FC<DonationRowProps> = ({ donation }) => {
+const DonationRow = ({ donation }: DonationRowProps) => {
   // Fallback for undefined donation objects
   if (!donation) {
     return <TablePrimaryRow />;
@@ -125,7 +125,7 @@ const DonationRow: React.FC<DonationRowProps> = ({ donation }) => {
  *
  * @param list An array of Donation objects to be displayed in the table.
  */
-export const CharityDepositTable: React.FC<CharityDepositTableProps> = ({ list }) => {
+export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
   // Number of records to display per page.
   const perPage = 10;
   // Current page for pagination.

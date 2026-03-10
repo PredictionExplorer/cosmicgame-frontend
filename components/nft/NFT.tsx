@@ -1,8 +1,7 @@
-import React from 'react';
 import { Typography, CardActionArea, Link } from '@mui/material';
 
-import { formatId, getAssetsUrl } from '../../utils';
-import { NFTSkeleton, NFTInfoWrapper, StyledCard } from '../styled';
+import { formatId, getAssetsUrl } from '@/utils';
+import { NFTSkeleton, NFTInfoWrapper, StyledCard } from '@/components/styled';
 
 import NFTImage from './NFTImage';
 

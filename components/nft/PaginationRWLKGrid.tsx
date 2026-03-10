@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC, ChangeEvent } from 'react';
+import { useState, useEffect, type FC, type ChangeEvent } from 'react';
 import Image from 'next/image';
 import { Grid, Box, CircularProgress, Typography, TextField, InputAdornment } from '@mui/material';
 import Pagination from '@mui/material/Pagination';

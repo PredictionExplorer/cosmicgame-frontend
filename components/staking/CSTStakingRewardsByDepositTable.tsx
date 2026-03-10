@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { IconButton, Link, TableBody, Typography } from '@mui/material';
 
 import {
@@ -8,13 +8,13 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
+import { CustomPagination } from '@/components/common/CustomPagination';
 
 export interface CSTStakingRewardByDeposit {
   EvtLogId: number;

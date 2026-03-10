@@ -1,27 +1,26 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode, type SyntheticEvent } from 'react';
 import Image from 'next/image';
 import { Box, Button, Link, Tab, Tabs, Typography } from '@mui/material';
 import { formatEther } from 'viem';
 
-import { useActiveWeb3React } from '../hooks/web3';
-import useRaffleWalletContract from '../hooks/useRaffleWalletContract';
-import { useStakedToken } from '../contexts/StakedTokenContext';
-import { useApiData } from '../contexts/ApiDataContext';
-import { useNotification } from '../contexts/NotificationContext';
-import api from '../services/api';
+import { useActiveWeb3React } from '@/hooks/web3';
+import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
+import { useStakedToken } from '@/contexts/StakedTokenContext';
+import { useApiData } from '@/contexts/ApiDataContext';
+import { useNotification } from '@/contexts/NotificationContext';
+import api from '@/services/api';
 import type {
   DashboardInfo,
   BidInfo,
   StakingAction,
   StakingRewardMint,
   UserInfo,
-} from '../services/api';
-import type { CSTToken } from '../pages/my-tokens';
-import { formatEthValue } from '../utils';
-import getErrorMessage from '../utils/alert';
-import { isUserRejection, reportError, getEthErrorMessage } from '../utils/errors';
-import { CSTTable } from '../pages/my-tokens';
+} from '@/services/api';
+import { formatEthValue } from '@/utils';
+import getErrorMessage from '@/utils/alert';
+import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 
+import { CSTTable, type CSTToken } from './tokens/CSTTable';
 import type { WinningHistoryEntry } from './tables/WinningHistoryTable';
 import type { MarketingReward } from './tables/MarketingRewardsTable';
 import type { CSTStakingRewardByDeposit } from './staking/CSTStakingRewardsByDepositTable';
@@ -81,7 +80,7 @@ interface UserStatisticsViewProps {
 }
 
 interface TabPanelProps {
-  children?: React.ReactNode;
+  children?: ReactNode;
   index: number;
   value: number;
 }
@@ -452,7 +451,7 @@ function RWLKStakingTab({
    Main Component
 ------------------------------------------------------------------ */
 
-const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnProfile }) => {
+const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) => {
   const { account } = useActiveWeb3React();
   const prizeWalletContract = useRaffleWalletContract();
   const { fetchData: fetchStakedTokens } = useStakedToken();
@@ -756,7 +755,7 @@ const UserStatisticsView: React.FC<UserStatisticsViewProps> = ({ address, isOwnP
      Tab Handling
   -------------------------------------------------- */
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setStakingTab(newValue);
   };
 

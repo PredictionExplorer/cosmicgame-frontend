@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { TableBody, Typography } from '@mui/material';
 
 import {
@@ -8,14 +8,14 @@ import {
   TablePrimaryRow,
   TablePrimary,
   TablePrimaryHeadCell,
-} from '../styled';
+} from '@/components/styled';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
-import { useActiveWeb3React } from '../../hooks/web3';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
+import { useActiveWeb3React } from '@/hooks/web3';
 
 /**
  * Represents a single bid event record in the original list.

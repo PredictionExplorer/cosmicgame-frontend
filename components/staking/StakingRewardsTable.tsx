@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Typography } from '@mui/material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import {
@@ -10,11 +10,11 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { CustomPagination } from '../common/CustomPagination';
-import type { RewardsByToken } from '../../services/api';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import type { RewardsByToken } from '@/services/api';
 
 interface StakingReward extends RewardsByToken {
   RewardCollectedEth?: number;

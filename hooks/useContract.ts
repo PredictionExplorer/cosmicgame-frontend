@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { usePublicClient, useWalletClient } from 'wagmi';
 import { getContract, type Abi } from 'viem';
 
-import { reportError } from '../utils/errors';
+import { reportError } from '@/utils/errors';
 
 /**
  * Generic contract hook that preserves viem's ABI-level type inference.

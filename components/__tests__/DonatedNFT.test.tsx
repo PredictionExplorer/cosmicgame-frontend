@@ -1,5 +1,5 @@
-import { render, screen, waitFor } from '../../test-utils';
-import DonatedNFT from '../donations/DonatedNFT';
+import { render, screen, waitFor } from '@/test-utils';
+import DonatedNFT from '@/components/donations/DonatedNFT';
 
 import '@testing-library/jest-dom';
 import axios from 'axios';

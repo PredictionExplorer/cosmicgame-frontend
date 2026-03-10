@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, Typography } from '@mui/material';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
@@ -9,13 +9,13 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
-import type { StakingRewardMint } from '../../services/api';
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
+import type { StakingRewardMint } from '@/services/api';
 
 /**
  * Renders a single row for the RwalkStakingRewardMintsTable.

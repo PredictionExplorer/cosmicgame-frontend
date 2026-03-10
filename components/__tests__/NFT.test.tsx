@@ -1,7 +1,7 @@
-import { render, screen } from '../../test-utils';
-import NFT from '../nft/NFT';
+import { render, screen } from '@/test-utils';
+import NFT from '@/components/nft/NFT';
 import '@testing-library/jest-dom';
-import { formatId, getAssetsUrl } from '../../utils';
+import { formatId, getAssetsUrl } from '@/utils';
 
 describe('NFT', () => {
   test('with mock data', () => {

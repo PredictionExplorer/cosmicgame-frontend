@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TableBody, Typography } from '@mui/material';
 
-import type { BidInfo } from '../../services/api';
+import type { BidInfo } from '@/services/api';
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -9,14 +9,14 @@ import {
   TablePrimaryRow,
   TablePrimary,
   TablePrimaryHeadCell,
-} from '../styled';
+} from '@/components/styled';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
-import { useActiveWeb3React } from '../../hooks/web3';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
+import { useActiveWeb3React } from '@/hooks/web3';
 
 interface HolderRowProps {
   holder: {
@@ -32,7 +32,7 @@ interface HolderRowProps {
   Renders a single row for a raffle holder. Highlights the row if 
   the current user's address matches the holder's address.
 ------------------------------------------------------------------ */
-const HolderRow: React.FC<HolderRowProps> = ({ holder }) => {
+const HolderRow = ({ holder }: HolderRowProps) => {
   // Destructure the active account from context (e.g., Metamask).
   const { account } = useActiveWeb3React();
 
@@ -87,11 +87,11 @@ interface RaffleHolderTableProps {
     - numRaffleEthWinner: number of ETH winners in the raffle
     - numRaffleNFTWinner: number of NFT winners in the raffle
 ------------------------------------------------------------------ */
-const RaffleHolderTable: React.FC<RaffleHolderTableProps> = ({
+const RaffleHolderTable = ({
   list,
   numRaffleEthWinner,
   numRaffleNFTWinner,
-}) => {
+}: RaffleHolderTableProps) => {
   // Number of rows to display per page.
   const perPage = 5;
   // Current page in pagination.

@@ -4,7 +4,7 @@ import {
   RAFFLE_WALLET_ADDRESS,
   STAKING_WALLET_CST_ADDRESS,
   STAKING_WALLET_RWLK_ADDRESS,
-} from '../config/networks';
+} from '@/config/networks';
 
 /** Returns a human-readable label for known system wallets (staking, charity, etc.), or empty string. */
 export const isWalletAddress = (address: string): string => {

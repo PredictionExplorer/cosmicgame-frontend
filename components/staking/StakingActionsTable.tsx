@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, Typography } from '@mui/material';
 
 import {
@@ -8,15 +8,15 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 
 import { Tbody, Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
-import { convertTimestampToDateTime } from '../../utils';
-import { CustomPagination } from '../common/CustomPagination';
-import type { StakingAction } from '../../services/api';
+import { convertTimestampToDateTime } from '@/utils';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import type { StakingAction } from '@/services/api';
 
 const StakingActionsRow = ({ row, IsRwalk }: { row: StakingAction; IsRwalk: boolean }) => {
   const router = useRouter();

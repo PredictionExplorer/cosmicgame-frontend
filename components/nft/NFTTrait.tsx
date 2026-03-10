@@ -1,5 +1,5 @@
-import React, { useEffect, useState, ChangeEvent, MouseEvent } from 'react';
-import { useRouter } from 'next/router';
+import { useEffect, useState, type ChangeEvent, type MouseEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Typography,
@@ -25,25 +25,20 @@ import ArrowForward from '@mui/icons-material/ArrowForward';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
-import NameHistoryTable from '../tables/NameHistoryTable';
-import { TransferHistoryTable } from '../tables/TransferHistoryTable';
-import { useActiveWeb3React } from '../../hooks/web3';
-import useCosmicSignatureContract from '../../hooks/useCosmicSignatureContract';
-import { useNotification } from '../../contexts/NotificationContext';
-import api from '../../services/api';
-import type {
-  CSTTokenInfo,
-  CSTTransferRecord,
-  NameHistoryRecord,
-  MainStats,
-} from '../../services/api';
+import NameHistoryTable from '@/components/tables/NameHistoryTable';
+import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
+import { useActiveWeb3React } from '@/hooks/web3';
+import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
+import { useNotification } from '@/contexts/NotificationContext';
+import api from '@/services/api';
+import type { CSTTokenInfo, CSTTransferRecord, NameHistoryRecord, MainStats } from '@/services/api';
 import {
   getExplorerUrl,
   convertTimestampToDateTime,
   formatId,
   getAssetsUrl,
   getOriginUrl,
-} from '../../utils';
+} from '@/utils';
 
 interface NFTDetailInfo extends CSTTokenInfo {
   WinnerAddr?: string;
@@ -55,10 +50,10 @@ interface DashboardDetail {
   MainStats: MainStats;
 }
 
-import { isUserRejection, getEthErrorMessage, reportError } from '../../utils/errors';
-import { useClipboard } from '../../hooks/useClipboard';
-import { StyledCard, SectionWrapper, NFTInfoWrapper, PrimaryMenuItem } from '../styled';
-import VideoPlayerDialog from '../common/VideoPlayerDialog';
+import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
+import { useClipboard } from '@/hooks/useClipboard';
+import { StyledCard, SectionWrapper, NFTInfoWrapper, PrimaryMenuItem } from '@/components/styled';
+import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
 
 import NFTImage from './NFTImage';
 import NFTVideo from './NFTVideo';
@@ -74,7 +69,7 @@ interface NFTTraitProps {
  * Displays an NFT's details and functionalities such as viewing the image/video,
  * transferring ownership, renaming, and viewing historical information.
  */
-const NFTTrait: React.FC<NFTTraitProps> = ({ tokenId }) => {
+const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   // Local state for media display and modals
   const [image, setImage] = useState('/images/qmark.png');
   const [video, setVideo] = useState('');

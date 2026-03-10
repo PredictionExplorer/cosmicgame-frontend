@@ -1,5 +1,5 @@
-import { networkConfig } from '../config/networks';
-import { proxyUrl } from '../services/api/client';
+import { networkConfig } from '@/config/networks';
+import { proxyUrl } from '@/services/api/client';
 
 const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
 

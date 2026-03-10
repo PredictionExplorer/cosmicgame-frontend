@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { get_dashboard_info, get_round_list, get_bid_list } from '../rounds';
+import { get_dashboard_info, get_round_list, get_bid_list } from '@/services/api/rounds';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');

@@ -1,10 +1,10 @@
-import React, { FC, useState, MouseEvent } from 'react';
+import { useState, type FC, type MouseEvent } from 'react';
 import { Menu, MenuItem, Box } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 
-import { NavLink } from '../styled';
-import { NavDescriptor } from '../../config/nav';
+import { NavLink } from '@/components/styled';
+import { NavDescriptor } from '@/config/nav';
 
 /** -----------------------------------------------------------------------
  * Type Definitions

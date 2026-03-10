@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { get_marketing_rewards, get_marketing_rewards_by_user } from '../marketing';
+import { get_marketing_rewards, get_marketing_rewards_by_user } from '@/services/api/marketing';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');

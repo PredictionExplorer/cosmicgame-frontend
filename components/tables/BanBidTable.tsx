@@ -13,7 +13,7 @@
 // - CustomPagination for paginated displays.
 // - Utility functions and API calls for retrieving and updating banned bids.
 
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Box, TableBody, Link, Typography, Tooltip, Button } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -24,16 +24,16 @@ import {
   TablePrimaryRow,
   TablePrimaryHeadCell,
   TablePrimary,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
-import api from '../../services/api';
-import { useActiveWeb3React } from '../../hooks/web3';
-import { useNotification } from '../../contexts/NotificationContext';
-import getErrorMessage from '../../utils/alert';
-import { reportError, getEthErrorMessage } from '../../utils/errors';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
+import api from '@/services/api';
+import { useActiveWeb3React } from '@/hooks/web3';
+import { useNotification } from '@/contexts/NotificationContext';
+import getErrorMessage from '@/utils/alert';
+import { reportError, getEthErrorMessage } from '@/utils/errors';
 
 //------------------------------------------------------------------------------
 // TypeScript Interfaces
@@ -85,7 +85,7 @@ interface BanBidTableProps {
  * HistoryRow
  * Renders a single bid record in the table, including Ban/Unban functionality.
  */
-const HistoryRow: React.FC<HistoryRowProps> = ({ history, isBanned, updateBannedList }) => {
+const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) => {
   const { account } = useActiveWeb3React(); // Returns the current user’s connected wallet info.
   const { setNotification } = useNotification(); // For showing success/error messages.
 
@@ -224,7 +224,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({ history, isBanned, updateBanned
  * HistoryTable
  * Displays a table of bidding history items with pagination and ban status.
  */
-const HistoryTable: React.FC<HistoryTableProps> = ({ biddingHistory, perPage, curPage }) => {
+const HistoryTable = ({ biddingHistory, perPage, curPage }: HistoryTableProps) => {
   // Tracks which bids are banned, fetched from the API.
   const [bannedList, setBannedList] = useState<number[]>([]);
 
@@ -276,7 +276,7 @@ const HistoryTable: React.FC<HistoryTableProps> = ({ biddingHistory, perPage, cu
  * The main component that provides pagination for the bidding history.
  * @param biddingHistory The array of bid entries to display.
  */
-const BanBidTable: React.FC<BanBidTableProps> = ({ biddingHistory }) => {
+const BanBidTable = ({ biddingHistory }: BanBidTableProps) => {
   // Show 200 items per page.
   const perPage = 200;
   // Current page state.

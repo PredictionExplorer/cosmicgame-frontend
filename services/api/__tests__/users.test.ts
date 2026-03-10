@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { get_user_info, get_user_balance, get_unique_bidders } from '../users';
+import { get_user_info, get_user_balance, get_unique_bidders } from '@/services/api/users';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');

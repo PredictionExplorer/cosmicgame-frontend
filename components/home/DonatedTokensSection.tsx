@@ -1,10 +1,10 @@
 import { Box, Grid, Tabs, Tab, Typography } from '@mui/material';
 
-import DonatedNFT from '../donations/DonatedNFT';
-import DonatedERC20Table from '../donations/DonatedERC20Table';
-import { CustomPagination } from '../common/CustomPagination';
-import type { DonatedNFT as DonatedNFTType } from '../../services/api/types';
-import type { DonatedERC20Token } from '../donations/DonatedERC20Table';
+import DonatedNFT from '@/components/donations/DonatedNFT';
+import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import type { DonatedNFT as DonatedNFTType } from '@/services/api/types';
+import type { DonatedERC20Token } from '@/components/donations/DonatedERC20Table';
 
 import { CustomTabPanel } from './CustomTabPanel';
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TableBody, Link, Typography, Tooltip } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,12 +9,12 @@ import {
   TablePrimaryRow,
   TablePrimary,
   TablePrimaryHeadCell,
-} from '../styled';
+} from '@/components/styled';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '../../utils';
-import useRaffleWalletContract from '../../hooks/useRaffleWalletContract';
-import type { RaffleETHDeposit, RaffleNFTWinner } from '../../services/api';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
+import type { RaffleETHDeposit, RaffleNFTWinner } from '@/services/api';
 
 type RaffleWinnerEntry = (RaffleETHDeposit | RaffleNFTWinner) & {
   IsStaker?: boolean;

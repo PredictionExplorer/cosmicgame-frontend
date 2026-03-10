@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import { useState, type FC } from 'react';
 import { Link, TableBody, Typography } from '@mui/material';
 
 import {
@@ -8,14 +8,14 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { convertTimestampToDateTime } from '../../utils';
+} from '@/components/styled';
+import { convertTimestampToDateTime } from '@/utils';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
 
 /**
  * Describes the shape of each token row in the table.

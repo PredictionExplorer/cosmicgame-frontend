@@ -1,7 +1,7 @@
-import { render, screen } from '../../test-utils';
-import CharityWithdrawalTable from '../tables/CharityWithdrawalTable';
+import { render, screen } from '@/test-utils';
+import CharityWithdrawalTable from '@/components/tables/CharityWithdrawalTable';
 import '@testing-library/jest-dom';
-import { convertTimestampToDateTime } from '../../utils';
+import { convertTimestampToDateTime } from '@/utils';
 
 describe('CharityWithdrawalTable', () => {
   test('with no records', () => {

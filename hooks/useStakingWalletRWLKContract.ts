@@ -1,5 +1,5 @@
-import { STAKING_WALLET_RWLK_ADDRESS } from '../config/networks';
-import { stakingWalletRwlkAbi } from '../contracts/abis';
+import { STAKING_WALLET_RWLK_ADDRESS } from '@/config/networks';
+import { stakingWalletRwlkAbi } from '@/contracts/abis';
 
 import useContract from './useContract';
 

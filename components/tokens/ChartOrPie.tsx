@@ -27,7 +27,7 @@ const clamp = (n: number | undefined, min = 0, max = 100) => {
 
 const fmtEth = (eth: number) => (Number.isFinite(eth) ? eth.toFixed(4) : '0.0000');
 
-const ChartOrPie: React.FC<{ data?: DistData }> = ({ data }) => {
+const ChartOrPie = ({ data }: { data?: DistData }) => {
   // normalize and guard values
   const prize = clamp(data?.PrizePercentage);
   const raffle = clamp(data?.RafflePercentage);

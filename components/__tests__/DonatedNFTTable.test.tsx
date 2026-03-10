@@ -1,7 +1,7 @@
-import { render, screen, waitFor, fireEvent } from '../../test-utils';
-import DonatedNFTTable from '../donations/DonatedNFTTable';
+import { render, screen, waitFor, fireEvent } from '@/test-utils';
+import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
 import '@testing-library/jest-dom';
-import { convertTimestampToDateTime, shortenHex } from '../../utils';
+import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import axios from 'axios';
 

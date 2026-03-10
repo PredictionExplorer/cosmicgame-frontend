@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from 'axios';
 
-import { networkConfig } from '../../config/networks';
+import { networkConfig } from '@/config/networks';
 
 import type { RoundInfo } from './types';
 

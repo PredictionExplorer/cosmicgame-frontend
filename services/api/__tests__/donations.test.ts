@@ -23,7 +23,7 @@ import {
   get_unclaimed_donated_nft_by_user,
   get_donations_erc20_by_round,
   get_donations_erc20_by_user,
-} from '../donations';
+} from '@/services/api/donations';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');

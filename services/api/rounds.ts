@@ -178,7 +178,7 @@ export async function ban_bid(bid_id: number, user_addr: string) {
       user_addr,
     });
     return data;
-  } catch (_err: unknown) {
+  } catch {
     throw new Error('Network response was not OK');
   }
 }
@@ -187,7 +187,7 @@ export async function unban_bid(bid_id: number) {
   try {
     const { data } = await axios.post(getMainAPIUrl('unban_bid'), { bid_id });
     return data;
-  } catch (_err: unknown) {
+  } catch {
     throw new Error('Network response was not OK');
   }
 }

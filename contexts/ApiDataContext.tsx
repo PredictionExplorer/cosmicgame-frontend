@@ -1,17 +1,19 @@
-import React, {
+import {
   createContext,
   useContext,
   useState,
   useCallback,
   useRef,
-  ReactNode,
   useEffect,
+  type Dispatch,
+  type SetStateAction,
+  type ReactNode,
 } from 'react';
 
-import { useActiveWeb3React } from '../hooks/web3';
-import api from '../services/api';
-import type { StakingCSTReward } from '../services/api/types';
-import { reportError } from '../utils/errors';
+import { useActiveWeb3React } from '@/hooks/web3';
+import api from '@/services/api';
+import type { StakingCSTReward } from '@/services/api/types';
+import { reportError } from '@/utils/errors';
 
 import { useStakedToken } from './StakedTokenContext';
 
@@ -38,7 +40,7 @@ interface ApiDataProviderProps {
 
 interface ApiDataContextValue {
   apiData: ApiData;
-  setApiData: React.Dispatch<React.SetStateAction<ApiData>>;
+  setApiData: Dispatch<SetStateAction<ApiData>>;
   fetchData: () => Promise<void>;
   /** Raw unclaimed staking rewards — shared so consumers don't re-fetch */
   unclaimedRewards: StakingCSTReward[];
@@ -54,7 +56,7 @@ export const useApiData = (): ApiDataContextValue => {
   return context;
 };
 
-export const ApiDataProvider: React.FC<ApiDataProviderProps> = ({ children }) => {
+export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
   const [apiData, setApiData] = useState<ApiData>(initialApiData);
   const [unclaimedRewards, setUnclaimedRewards] = useState<StakingCSTReward[]>([]);
 

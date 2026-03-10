@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 
-import { CounterWrapper, CounterItem, GradientText, CounterItemWrapper } from '../styled';
+import { CounterWrapper, CounterItem, GradientText, CounterItemWrapper } from '@/components/styled';
 
 /**
  * Interface defining the props for the Counter component
@@ -24,7 +24,7 @@ interface TimeUnit {
  * Counter component displays a countdown timer with days, hours, minutes, and seconds
  * Each time unit is displayed with a gradient text effect and a label below
  */
-const Counter: React.FC<CounterProps> = ({ days, hours, minutes, seconds }) => {
+const Counter = ({ days, hours, minutes, seconds }: CounterProps) => {
   // Helper function to pad single digits with leading zero
   const padZero = (value: number): string => value.toString().padStart(2, '0');
 

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, TableBody, Typography, Tooltip, Link } from '@mui/material';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 import { Tr } from 'react-super-responsive-table';
 import { usePublicClient } from 'wagmi';
 import { formatUnits } from 'viem';
@@ -12,7 +12,7 @@ import {
   TablePrimaryRow,
   TablePrimaryHeadCell,
   TablePrimary,
-} from '../styled';
+} from '@/components/styled';
 import {
   shortenHex,
   convertTimestampToDateTime,
@@ -20,12 +20,12 @@ import {
   getAssetsUrl,
   getRWLKImageUrl,
   getExplorerUrl,
-} from '../../utils';
+} from '@/utils';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
-import ERC20_ABI from '../../contracts/CosmicToken.json';
-import { useBannedBids } from '../../hooks/useApiQuery';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import ERC20_ABI from '@/contracts/CosmicToken.json';
+import { useBannedBids } from '@/hooks/useApiQuery';
 
 //------------------------------------------------------------------------------
 // Types & Interfaces
@@ -91,7 +91,8 @@ const bidTypeLabels: Record<number, string> = {
  * Renders a single row within the bidding history table.
  * Includes information about bidder, bid price, timestamp, etc.
  */
-const HistoryRow: React.FC<HistoryRowProps> = ({ history, isBanned, showRound, bidDuration }) => {
+const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowProps) => {
+  const router = useRouter();
   const publicClient = usePublicClient();
   const [symbol, setSymbol] = useState('');
   const [decimals, setDecimals] = useState(18);
@@ -259,12 +260,7 @@ const HistoryRow: React.FC<HistoryRowProps> = ({ history, isBanned, showRound, b
  * @param curPage Current page number.
  * @param showRound Whether to display the round number column.
  */
-const HistoryTable: React.FC<HistoryTableProps> = ({
-  biddingHistory,
-  perPage,
-  curPage,
-  showRound,
-}) => {
+const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }: HistoryTableProps) => {
   const { data: bannedBids } = useBannedBids();
   const bannedList = bannedBids?.map((x: { bid_id: number }) => x.bid_id) ?? [];
 
@@ -328,10 +324,7 @@ const HistoryTable: React.FC<HistoryTableProps> = ({
  * @param biddingHistory The complete list of bids.
  * @param showRound Whether to display the round column.
  */
-const BiddingHistoryTable: React.FC<BiddingHistoryTableProps> = ({
-  biddingHistory,
-  showRound = true,
-}) => {
+const BiddingHistoryTable = ({ biddingHistory, showRound = true }: BiddingHistoryTableProps) => {
   // Items to show per page.
   const perPage = 5;
   // Current pagination page.

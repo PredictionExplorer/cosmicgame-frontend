@@ -1,11 +1,17 @@
-import React, { useState, MouseEvent } from 'react';
+import { useState, type MouseEvent } from 'react';
 import { Box, Divider, Menu, MenuItem, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 
-import { MobileWallet, Wallet, ConnectButton, MobileConnectButton, NavLink } from '../styled';
-import { useActiveWeb3React } from '../../hooks/web3';
-import { shortenHex } from '../../utils';
+import {
+  MobileWallet,
+  Wallet,
+  ConnectButton,
+  MobileConnectButton,
+  NavLink,
+} from '@/components/styled';
+import { useActiveWeb3React } from '@/hooks/web3';
+import { shortenHex } from '@/utils';
 
 // Define the shape of the balance and staked token count
 interface Balance {
@@ -37,12 +43,12 @@ interface ConnectWalletButtonProps {
  * the user’s wallet address, token balances, and staked token
  * information once connected.
  */
-const ConnectWalletButton: React.FC<ConnectWalletButtonProps> = ({
+const ConnectWalletButton = ({
   isMobileView,
   loading,
   balance,
   stakedTokenCount,
-}) => {
+}: ConnectWalletButtonProps) => {
   const { account } = useActiveWeb3React();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { usePublicClient, useWalletClient } from 'wagmi';
 import { getContract, type Abi } from 'viem';
 
-import useContract from '../useContract';
+import useContract from '@/hooks/useContract';
 
 jest.mock('wagmi', () => ({
   usePublicClient: jest.fn(),

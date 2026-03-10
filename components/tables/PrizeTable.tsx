@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { TableBody, Tooltip, Typography } from '@mui/material';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import {
   TablePrimary,
@@ -9,14 +9,14 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { convertTimestampToDateTime, shortenHex } from '../../utils';
+} from '@/components/styled';
+import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
-import type { RoundInfo } from '../../services/api';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import type { RoundInfo } from '@/services/api';
 
 /* ------------------------------------------------------------------
   Sub-Component: PrizeRow

@@ -1,15 +1,14 @@
-import React from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Box, Typography, Grid, Link } from '@mui/material';
 import { formatEther, zeroAddress } from 'viem';
-import { useEffect, useState } from 'react';
 import Countdown from 'react-countdown';
 
-import api from '../../services/api';
-import { reportError } from '../../utils/errors';
-import { calculateTimeDiff, convertTimestampToDateTime } from '../../utils';
-import { GradientText } from '../styled';
-import { useActiveWeb3React } from '../../hooks/web3';
-import type { DashboardInfo, BidInfo } from '../../services/api';
+import api from '@/services/api';
+import { reportError } from '@/utils/errors';
+import { calculateTimeDiff, convertTimestampToDateTime } from '@/utils';
+import { GradientText } from '@/components/styled';
+import { useActiveWeb3React } from '@/hooks/web3';
+import type { DashboardInfo, BidInfo } from '@/services/api';
 
 import Counter from './Counter';
 
@@ -33,14 +32,14 @@ interface BiddingStatusProps {
   prizeTime: number;
 }
 
-export const BiddingStatus: React.FC<BiddingStatusProps> = ({
+export const BiddingStatus = ({
   data,
   loading,
   activationTime,
   curBidList,
   ethBidInfo,
   prizeTime,
-}) => {
+}: BiddingStatusProps) => {
   const [winProbability, setWinProbability] = useState<{
     raffle: number;
     nft: number;
@@ -153,7 +152,7 @@ export const BiddingStatus: React.FC<BiddingStatusProps> = ({
               <Countdown
                 key={3}
                 date={activationTime * 1000}
-                renderer={Counter as unknown as (...args: unknown[]) => React.ReactNode}
+                renderer={Counter as unknown as (...args: unknown[]) => ReactNode}
               />
             </Box>
           ) : data && data.TsRoundStart !== 0 ? (
@@ -172,7 +171,7 @@ export const BiddingStatus: React.FC<BiddingStatusProps> = ({
                       <Countdown
                         key={0}
                         date={prizeTime}
-                        renderer={Counter as unknown as (...args: unknown[]) => React.ReactNode}
+                        renderer={Counter as unknown as (...args: unknown[]) => ReactNode}
                       />
                     </>
                   ) : (

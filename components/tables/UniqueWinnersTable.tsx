@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TableBody, Typography } from '@mui/material';
 
 import {
@@ -8,13 +8,13 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
 
 // TypeScript types for better clarity and type-safety
 export interface Winner {
@@ -30,7 +30,7 @@ interface UniqueWinnersRowProps {
 }
 
 // Component rendering a single row of winner data
-const UniqueWinnersRow: React.FC<UniqueWinnersRowProps> = ({ winner }) => {
+const UniqueWinnersRow = ({ winner }: UniqueWinnersRowProps) => {
   if (!winner) {
     // Return empty row when winner data isn't available
     return <TablePrimaryRow />;
@@ -54,7 +54,7 @@ interface UniqueWinnersTableProps {
 }
 
 // Component rendering a paginated table of winners
-export const UniqueWinnersTable: React.FC<UniqueWinnersTableProps> = ({ list }) => {
+export const UniqueWinnersTable = ({ list }: UniqueWinnersTableProps) => {
   // Items per page constant
   const perPage = 5;
 

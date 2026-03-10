@@ -22,7 +22,7 @@ import {
   get_staking_rwalk_mints_by_user,
   get_staked_rwalk_tokens,
   get_staked_rwalk_tokens_by_user,
-} from '../staking';
+} from '@/services/api/staking';
 
 jest.mock('axios', () => {
   const actual = jest.requireActual<typeof import('axios')>('axios');

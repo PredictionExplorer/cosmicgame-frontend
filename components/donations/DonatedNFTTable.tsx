@@ -1,4 +1,4 @@
-import React, { useEffect, useState, FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import axios from 'axios';
 import { Button, Link, TableBody, Tooltip, Typography } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
@@ -10,13 +10,13 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '../../utils';
-import NFTImage from '../nft/NFTImage';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
+import NFTImage from '@/components/nft/NFTImage';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
-import useRaffleWalletContract from '../../hooks/useRaffleWalletContract';
-import { reportError } from '../../utils/errors';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
+import { reportError } from '@/utils/errors';
 
 // ----------------------------
 // Type Definitions

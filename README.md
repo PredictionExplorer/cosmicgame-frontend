@@ -4,7 +4,7 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 
 ## Tech Stack
 
-- **Framework:** Next.js 16 (Pages Router) with TypeScript 5.9
+- **Framework:** Next.js 16 (App Router) with TypeScript 5.9
 - **UI:** React 19, MUI 7, Tailwind CSS v4
 - **Web3:** wagmi v3, viem v2, RainbowKit v2, Porto (WebAuthn account abstraction)
 - **Data:** TanStack React Query v5 for all data fetching, Axios via API proxy
@@ -81,6 +81,7 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 ## Project Structure
 
 ```
+├── app/              Next.js App Router pages, layouts, and API routes
 ├── components/
 │   ├── common/       Shared UI components (VideoPlayerDialog, BiddingStatus, etc.)
 │   ├── donations/    Donation-related components
@@ -96,7 +97,6 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 ├── contracts/        Solidity ABI JSON files and typed ABI barrel
 ├── e2e/              Playwright end-to-end test specs
 ├── hooks/            Custom React hooks (contract interactions, Web3, React Query API hooks)
-├── pages/            Next.js file-based routes + API routes
 ├── public/           Static assets (fonts, images)
 ├── services/api/     API client with typed domain modules (rounds, tokens, staking, etc.)
 ├── styles/           Global CSS
@@ -107,7 +107,7 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 
 - **Data Fetching:** All API calls go through React Query hooks defined in `hooks/useApiQuery.ts`, providing automatic caching, background refetching, and deduplication. The API layer in `services/api/` handles HTTP requests via Axios.
 - **Error Handling:** All errors are reported to Sentry via `utils/errors.ts`. Wallet errors use `isUserRejection()` to silently handle user-cancelled transactions.
-- **SEO:** OpenGraph metadata is generated per-page using `createOpenGraphProps()` from `utils/seo.ts`.
+- **SEO:** OpenGraph metadata is generated per-page using `createMetadata()` from `utils/seo.ts`.
 - **State:** Wallet state via wagmi, server state via React Query, shared app state via React contexts.
 
 ## Networks

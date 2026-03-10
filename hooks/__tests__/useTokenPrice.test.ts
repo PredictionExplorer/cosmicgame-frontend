@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import axios from 'axios';
 
-import { useTokenPrice } from '../useTokenPrice';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 
 jest.mock('axios', () => ({
   __esModule: true,

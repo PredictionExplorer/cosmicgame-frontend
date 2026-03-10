@@ -3,7 +3,7 @@ import {
   flattenTxArray,
   normalizeFieldNames,
   normalizeFieldNamesArray,
-} from '../client';
+} from '@/services/api/client';
 
 describe('client helper functions', () => {
   describe('flattenTx', () => {

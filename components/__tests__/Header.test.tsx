@@ -1,13 +1,9 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '../../test-utils';
+import { render, screen } from '@/test-utils';
 
 jest.mock('@rainbow-me/rainbowkit');
 jest.mock('wagmi');
 jest.mock('viem');
-
-jest.mock('next/router', () => ({
-  useRouter: () => ({ pathname: '/', push: jest.fn(), asPath: '/' }),
-}));
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -57,7 +53,7 @@ jest.mock('../../services/api', () => ({
   },
 }));
 
-import Header from '../layout/Header';
+import Header from '@/components/layout/Header';
 
 beforeEach(() => {
   jest.clearAllMocks();

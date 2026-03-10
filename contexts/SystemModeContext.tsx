@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 
-import useCosmicGameContract from '../hooks/useCosmicGameContract';
-import { reportError } from '../utils/errors';
+import useCosmicGameContract from '@/hooks/useCosmicGameContract';
+import { reportError } from '@/utils/errors';
 
 interface SystemModeContextValue {
   data: number;

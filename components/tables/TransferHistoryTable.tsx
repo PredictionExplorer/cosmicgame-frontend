@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, TableBody, Tooltip } from '@mui/material';
 
 import {
@@ -8,16 +8,16 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '../../utils';
-import { ZERO_ADDRESS } from '../../config/misc';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+import { ZERO_ADDRESS } from '@/config/misc';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '../../config/networks';
-import { CustomPagination } from '../common/CustomPagination';
-import type { CSTTransferRecord } from '../../services/api';
+import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '@/config/networks';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import type { CSTTransferRecord } from '@/services/api';
 
 /* ------------------------------------------------------------------
   Sub-Component: TransferHistoryRow

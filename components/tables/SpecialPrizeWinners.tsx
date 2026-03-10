@@ -1,8 +1,7 @@
-import React from 'react';
 import { Grid, Link, Typography } from '@mui/material';
 
-import { formatSeconds } from '../../utils';
-import { useCurrentSpecialWinners } from '../../hooks/useApiQuery';
+import { formatSeconds } from '@/utils';
+import { useCurrentSpecialWinners } from '@/hooks/useApiQuery';
 
 interface SpecialWinners {
   EnduranceChampionAddress?: string;
@@ -10,7 +9,7 @@ interface SpecialWinners {
   LastCstBidderAddress?: string;
 }
 
-export const SpecialPrizeWinners: React.FC = () => {
+export const SpecialPrizeWinners = () => {
   const { data } = useCurrentSpecialWinners();
   const specialWinners =
     data != null && Array.isArray(data) ? null : (data as SpecialWinners | null);

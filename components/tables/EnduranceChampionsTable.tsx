@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from 'react';
+import { useMemo, useState, type FC } from 'react';
 import { TableBody, TableSortLabel, Typography } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,10 +9,10 @@ import {
   TablePrimaryRow,
   TablePrimary,
   TablePrimaryHeadCell,
-} from '../styled';
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
-import { formatSeconds } from '../../utils';
+} from '@/components/styled';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
+import { formatSeconds } from '@/utils';
 
 /**
  * Defines the shape of a single champion data object.

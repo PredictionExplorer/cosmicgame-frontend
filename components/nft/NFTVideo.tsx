@@ -1,7 +1,6 @@
-import React from 'react';
 import Image from 'next/image';
 
-import { VideoCard, NFTImageWrapper } from '../styled';
+import { VideoCard, NFTImageWrapper } from '@/components/styled';
 
 import NFTImage from './NFTImage';
 

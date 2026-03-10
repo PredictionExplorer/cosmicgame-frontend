@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, type MouseEvent } from 'react';
 import { Box, Button, Checkbox, Menu, MenuItem, TableBody, Typography } from '@mui/material';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -10,13 +10,13 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
-import { AddressLink } from '../common/AddressLink';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { AddressLink } from '@/components/common/AddressLink';
 
 // Reuse this constant to avoid re-declaring on each render
 const ITEMS_PER_PAGE = 5;
@@ -32,17 +32,11 @@ interface RWLKRowProps {
 /* ------------------------------------------------------------------
   Single Row Component: RWLKRow
 ------------------------------------------------------------------ */
-const RWLKRow: React.FC<RWLKRowProps> = ({
-  tokenId,
-  ownerAddress,
-  onSelectToggle,
-  isSelected,
-  onStake,
-}) => {
+const RWLKRow = ({ tokenId, ownerAddress, onSelectToggle, isSelected, onStake }: RWLKRowProps) => {
   // Handlers
   const handleRowClick = () => onSelectToggle(tokenId);
 
-  const handleStakeClick = (e: React.MouseEvent) => {
+  const handleStakeClick = (e: MouseEvent) => {
     e.stopPropagation();
     onStake(tokenId);
   };
@@ -88,12 +82,12 @@ interface RWLKNFTTableProps {
 /* ------------------------------------------------------------------
   Main Table Component: RWLKNFTTable
 ------------------------------------------------------------------ */
-export const RWLKNFTTable: React.FC<RWLKNFTTableProps> = ({
+export const RWLKNFTTable = ({
   list,
   ownerAddress,
   handleStake,
   handleStakeMany,
-}) => {
+}: RWLKNFTTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Menu anchor for "Select All / Current Page / None"
@@ -181,7 +175,7 @@ export const RWLKNFTTable: React.FC<RWLKNFTTableProps> = ({
                     alignItems: 'center',
                     cursor: 'pointer',
                   }}
-                  onClick={(e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget)}
+                  onClick={(e: MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget)}
                 >
                   <Checkbox
                     color="info"

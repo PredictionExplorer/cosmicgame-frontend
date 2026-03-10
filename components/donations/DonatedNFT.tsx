@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Typography, CardActionArea, Box } from '@mui/material';
 import axios from 'axios';
 
-import { StyledCard } from '../styled';
-import { reportError } from '../../utils/errors';
-import NFTImage from '../nft/NFTImage';
+import { StyledCard } from '@/components/styled';
+import { reportError } from '@/utils/errors';
+import NFTImage from '@/components/nft/NFTImage';
 
 // Define the expected shape of the `nft` prop
 interface NFT {
@@ -23,7 +23,7 @@ interface DonatedNFTProps {
   nft: NFT;
 }
 
-const DonatedNFT: React.FC<DonatedNFTProps> = ({ nft }) => {
+const DonatedNFT = ({ nft }: DonatedNFTProps) => {
   const [tokenURI, setTokenURI] = useState<TokenURI | null>(null);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useMemo, ChangeEvent } from 'react';
+import { useMemo, type ChangeEvent } from 'react';
 import { Box, Pagination, TextField, Typography } from '@mui/material';
 
 /**
@@ -22,12 +22,12 @@ interface CustomPaginationProps {
  * The numeric input appears only when the calculated `pageCount`
  * is **≥ 30**, to avoid visual clutter on small datasets.
  */
-export const CustomPagination: React.FC<CustomPaginationProps> = ({
+export const CustomPagination = ({
   page,
   setPage,
   totalLength,
   perPage,
-}) => {
+}: CustomPaginationProps) => {
   /**
    * Total number of pages — recomputed only when the
    * length of the dataset or the page size changes.

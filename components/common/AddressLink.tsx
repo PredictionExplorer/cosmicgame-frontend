@@ -1,7 +1,7 @@
 import { Link, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 
-import { shortenHex } from '../../utils'; // Utility function to shorten hex address
-import { MARKETING_WALLET_ADDRESS } from '../../config/networks'; // Marketing wallet address from config
+import { shortenHex } from '@/utils'; // Utility function to shorten hex address
+import { MARKETING_WALLET_ADDRESS } from '@/config/networks'; // Marketing wallet address from config
 
 // AddressLink component to display a formatted link with address
 export const AddressLink = ({ address, url }: { address: string; url: string }) => {

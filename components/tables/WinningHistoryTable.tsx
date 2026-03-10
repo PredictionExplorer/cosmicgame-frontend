@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Box, TableBody, Typography, Link, Tooltip, IconButton } from '@mui/material';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -9,8 +9,8 @@ import TokenIcon from '@mui/icons-material/Token';
 import { Tr } from 'react-super-responsive-table';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { CustomPagination } from '../common/CustomPagination';
-import { COSMIC_SIGNATURE_TOKEN_ADDRESS } from '../../config/networks';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { COSMIC_SIGNATURE_TOKEN_ADDRESS } from '@/config/networks';
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -18,12 +18,12 @@ import {
   TablePrimaryRow,
   TablePrimaryHeadCell,
   TablePrimary,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '../../utils';
-import type { WinningHistoryEntry } from '../../services/api/types';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
+import type { WinningHistoryEntry } from '@/services/api/types';
 export type { WinningHistoryEntry };
 
-const RECORD_TYPE_MAP: Record<number, { icon: React.ReactNode; text: string }> = {
+const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; text: string }> = {
   0: { icon: <ConfirmationNumberIcon />, text: 'Main Prize ETH' },
   1: { icon: <TokenIcon />, text: 'Main Prize CST (ERC20)' },
   2: { icon: <VolunteerActivismIcon />, text: 'Main Prize CS NFT' },

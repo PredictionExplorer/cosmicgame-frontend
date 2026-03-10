@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import { useMemo, type FC } from 'react';
 import {
   Chart,
   ChartArea,
@@ -12,8 +12,8 @@ import {
 } from '@progress/kendo-react-charts';
 import '@progress/kendo-theme-default/dist/all.css';
 
-import { MARKETING_WALLET_ADDRESS } from '../../config/networks';
-import { shortenHex } from '../../utils';
+import { MARKETING_WALLET_ADDRESS } from '@/config/networks';
+import { shortenHex } from '@/utils';
 
 /** Maximum number of individual addresses to highlight before grouping the rest */
 const DISPLAY_LIMIT = 9;

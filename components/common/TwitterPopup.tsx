@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Button,
   Dialog,
@@ -20,7 +20,7 @@ interface TwitterPopupProps {
  * TwitterPopup Component
  * A modal dialog to collect and validate the user's Twitter handle.
  */
-const TwitterPopup: React.FC<TwitterPopupProps> = ({ open, setOpen, setTwitterHandle }) => {
+const TwitterPopup = ({ open, setOpen, setTwitterHandle }: TwitterPopupProps) => {
   // Local state for the user-inputted handle
   const [handle, setHandle] = useState<string>('');
 

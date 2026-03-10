@@ -17,7 +17,7 @@ import {
   useStakedCSTTokensByUser,
   useDonationsNFTList,
   useCurrentTime,
-} from '../useApiQuery';
+} from '@/hooks/useApiQuery';
 
 jest.mock('@tanstack/react-query', () => ({
   useQuery: jest.fn(() => ({ data: undefined, isLoading: false, error: null })),

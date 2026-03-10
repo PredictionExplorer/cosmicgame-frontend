@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, TableBody, Typography } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,9 +9,9 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
-import { CustomPagination } from '../common/CustomPagination';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { CustomPagination } from '@/components/common/CustomPagination';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 export interface MarketingReward {

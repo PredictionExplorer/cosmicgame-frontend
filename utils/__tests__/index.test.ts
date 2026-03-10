@@ -11,7 +11,7 @@ import {
   getAssetsUrl,
   getRWLKImageUrl,
   getEnduranceChampions,
-} from '../index';
+} from '@/utils/index';
 
 describe('shortenHex', () => {
   it('shortens a standard Ethereum address', () => {

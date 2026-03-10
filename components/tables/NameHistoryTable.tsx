@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, TableBody } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,11 +9,11 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { getExplorerUrl, convertTimestampToDateTime } from '../../utils';
-import { CustomPagination } from '../common/CustomPagination';
+} from '@/components/styled';
+import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { CustomPagination } from '@/components/common/CustomPagination';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import type { NameHistoryRecord } from '../../services/api';
+import type { NameHistoryRecord } from '@/services/api';
 
 // Component to render each row in the name history table
 const NameHistoryRow = ({ record }: { record: NameHistoryRecord }) => {

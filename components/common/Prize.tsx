@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import { type FC } from 'react';
 import { Box, Typography, useTheme, useMediaQuery, TableBody, Link } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,8 +9,8 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { useTokenPrice } from '../../hooks/useTokenPrice';
+} from '@/components/styled';
+import { useTokenPrice } from '@/hooks/useTokenPrice';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 interface PrizeData {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, TableBody, Tooltip, Typography } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,10 +9,10 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { shortenHex } from '../../utils';
-import { CustomPagination } from '../common/CustomPagination';
+import { shortenHex } from '@/utils';
+import { CustomPagination } from '@/components/common/CustomPagination';
 
 export interface UniqueStakerCST {
   StakerAid: string | number;

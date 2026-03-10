@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from '../../test-utils';
-import NFTImage from '../nft/NFTImage';
-import { getAssetsUrl } from '../../utils';
+import { render, screen, fireEvent } from '@/test-utils';
+import NFTImage from '@/components/nft/NFTImage';
+import { getAssetsUrl } from '@/utils';
 import '@testing-library/jest-dom';
 
 describe('NFTImage', () => {

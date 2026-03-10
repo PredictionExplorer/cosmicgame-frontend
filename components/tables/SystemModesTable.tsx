@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Link, TableBody, Typography } from '@mui/material';
 import { Tr } from 'react-super-responsive-table';
 
@@ -9,13 +9,13 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
+} from '@/components/styled';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
-import { convertTimestampToDateTime } from '../../utils';
+import { convertTimestampToDateTime } from '@/utils';
 
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 
-import { CustomPagination } from '../common/CustomPagination';
+import { CustomPagination } from '@/components/common/CustomPagination';
 
 // Define types for props
 export interface EventRow {
@@ -35,7 +35,9 @@ interface SystemModesTableProps {
 }
 
 // Component to render each row in the system modes table
-const SystemModesRow: React.FC<SystemModesRowProps> = ({ row, prevRow }) => {
+const SystemModesRow = ({ row, prevRow }: SystemModesRowProps) => {
+  const router = useRouter();
+
   if (!row) return <TablePrimaryRow />;
 
   const handleRowClick = () => {
@@ -58,7 +60,7 @@ const SystemModesRow: React.FC<SystemModesRowProps> = ({ row, prevRow }) => {
 };
 
 // Main system modes table component
-export const SystemModesTable: React.FC<SystemModesTableProps> = ({ list }) => {
+export const SystemModesTable = ({ list }: SystemModesTableProps) => {
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
 

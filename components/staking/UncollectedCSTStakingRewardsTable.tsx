@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -20,23 +20,23 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-} from '../styled';
-import { convertTimestampToDateTime, formatSeconds } from '../../utils';
+} from '@/components/styled';
+import { convertTimestampToDateTime, formatSeconds } from '@/utils';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { Tr } from 'react-super-responsive-table';
 
-import { CustomPagination } from '../common/CustomPagination';
+import { CustomPagination } from '@/components/common/CustomPagination';
 
 import { usePublicClient } from 'wagmi';
 
-import { useActiveWeb3React } from '../../hooks/web3';
-import api from '../../services/api';
-import useStakingWalletCSTContract from '../../hooks/useStakingWalletCSTContract';
-import { useNotification } from '../../contexts/NotificationContext';
-import { useApiData } from '../../contexts/ApiDataContext';
-import getErrorMessage from '../../utils/alert';
-import { isUserRejection, reportError, getEthErrorMessage } from '../../utils/errors';
+import { useActiveWeb3React } from '@/hooks/web3';
+import api from '@/services/api';
+import useStakingWalletCSTContract from '@/hooks/useStakingWalletCSTContract';
+import { useNotification } from '@/contexts/NotificationContext';
+import { useApiData } from '@/contexts/ApiDataContext';
+import getErrorMessage from '@/utils/alert';
+import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 
 interface UncollectedReward {
   EvtLogId: number;

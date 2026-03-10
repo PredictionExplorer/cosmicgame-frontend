@@ -1,4 +1,4 @@
-import React from 'react';
+import { type CSSProperties, type SyntheticEvent } from 'react';
 import styled from '@emotion/styled';
 
 const StyledImage = styled('img')`
@@ -10,12 +10,12 @@ const StyledImage = styled('img')`
 
 interface NFTImageProps {
   src?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   sx?: Record<string, unknown>;
 }
 
 const NFTImage = (props: NFTImageProps) => {
-  const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+  const handleImageError = (event: SyntheticEvent<HTMLImageElement>) => {
     event.currentTarget.src = '/images/qmark.png';
   };
 

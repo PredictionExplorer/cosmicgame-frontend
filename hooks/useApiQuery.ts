@@ -4,7 +4,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import api from '../services/api';
+import api from '@/services/api';
 import type {
   BidInfo,
   CombinedStakingRecordInfo,
@@ -24,7 +24,7 @@ import type {
   UsedRWLKNFT,
   UserBalance,
   UserInfoWithLists,
-} from '../services/api';
+} from '@/services/api';
 
 // ---------------------------------------------------------------------------
 // Rounds & Bidding
