@@ -1,8 +1,7 @@
-// @ts-check
-const { withSentryConfig } = require('@sentry/nextjs');
+import type { NextConfig } from 'next';
+import { withSentryConfig } from '@sentry/nextjs';
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
@@ -39,10 +38,8 @@ const nextConfig = {
   },
 };
 
-module.exports = withSentryConfig(nextConfig, {
+export default withSentryConfig(nextConfig, {
   silent: true,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
-  disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
-  disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
 });

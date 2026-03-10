@@ -25,8 +25,8 @@ function createMockNextRequest(
     nextUrl: parsedUrl,
     headers: new Map<string, string>([['host', parsedUrl.host]]),
     arrayBuffer: async (): Promise<ArrayBuffer> => {
-      const encoded = new TextEncoder().encode(options.body || '');
-      return encoded.buffer as ArrayBuffer;
+      const buf = Buffer.from(options.body || '');
+      return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
     },
   };
 }
