@@ -319,7 +319,7 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 189 unit test files (2,729 tests), 11 E2E specs
+- 190 unit test files (2,738 tests), 11 E2E specs
 - Actual coverage: Statements ~77.1%, Branches ~65.0%, Lines ~78.6%, Functions ~72.3%
 - Coverage threshold in jest.config.js: branches 63%, functions 71%, lines 78%, statements 76%
 - Accessibility testing: jest-axe installed, 134 a11y tests across all component files
@@ -931,8 +931,22 @@ Current state:
     All 2,729 tests pass. tsc --noEmit passes with zero type errors.
     Coverage thresholds pass.
 
-9d. [OPEN] Fix typo in app/faq/page.tsx line 9
-    "Frequenly" should be "Frequently"
+9d. [DONE] Fix typo in app/faq/page.tsx line 9
+    Fixed "Frequenly" → "Frequently" in the metadata description passed to
+    createMetadata. Added comprehensive test file for the previously untested
+    page.tsx metadata wrapper.
+
+    Changes:
+    - app/faq/page.tsx: fixed typo in description string
+
+    Tests added (9 new tests, 2,738 total across 190 suites):
+    - app/faq/__tests__/page.test.tsx:
+      - Metadata: correct title, correct description, no "Frequenly" typo
+        regression, openGraph title/description/images, twitter card metadata,
+        twitter and openGraph share same default image (7 tests)
+      - Page component: renders FAQPage, no accessibility violations (2 tests)
+
+    All 2,738 tests pass. tsc --noEmit passes with zero type errors.
 
 9e. [PARTIAL] Break up large components (see 2b above)
     HomePage.tsx split done (298 lines). Remaining:

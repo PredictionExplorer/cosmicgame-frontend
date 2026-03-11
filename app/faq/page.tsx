@@ -6,7 +6,7 @@ import FAQPage from './FAQPage';
 
 export const metadata: Metadata = createMetadata(
   'FAQ | Cosmic Signature',
-  'Frequenly Asked Questions (FAQ)',
+  'Frequently Asked Questions (FAQ)',
 );
 
 export default function Page() {
