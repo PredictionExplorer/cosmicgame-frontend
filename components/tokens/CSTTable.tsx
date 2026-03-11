@@ -17,25 +17,12 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { CSTTokenInfo } from '@/services/api';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-export interface CSTToken {
-  EvtLogId: number;
-  TxHash: string;
-  TimeStamp: number;
-  Seed: string;
-  TokenId: number;
-  TokenName: string | null;
-  RoundNum: number;
-  WinnerAddr: string;
-  Staked: boolean;
-  WasUnstaked: boolean;
-  RecordType: number;
-}
-
-function CSTRow({ nft }: { nft: CSTToken }) {
-  const getTokenImageURL = () => getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
+function CSTRow({ nft }: { nft: CSTTokenInfo }) {
+  const getTokenImageURL = () => getAssetsUrl(`cosmicsignature/0x${nft.Seed ?? ''}.png`);
 
   if (!nft) {
     return <TablePrimaryRow />;
@@ -79,7 +66,7 @@ function CSTRow({ nft }: { nft: CSTToken }) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link href={`/user/${nft.WinnerAddr}`} className="text-inherit font-mono">
-                {shortenHex(nft.WinnerAddr, 6)}
+                {shortenHex(nft.WinnerAddr ?? '', 6)}
               </Link>
             </TooltipTrigger>
             <TooltipContent>{nft.WinnerAddr}</TooltipContent>
@@ -112,7 +99,7 @@ function CSTRow({ nft }: { nft: CSTToken }) {
   );
 }
 
-export function CSTTable({ list }: { list: CSTToken[] }) {
+export function CSTTable({ list }: { list: CSTTokenInfo[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const PER_PAGE = 5;
 

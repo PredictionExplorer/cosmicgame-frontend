@@ -8,6 +8,9 @@ import { render, screen } from '@/test-utils';
 import StakingWinnerTable from '@/components/tables/StakingWinnerTable';
 
 const createWinner = (overrides = {}) => ({
+  EvtLogId: 1,
+  RoundNum: 1,
+  TokenId: 0,
   TxHash: '0xabc123def456abc123def456abc123def456abc123def456abc123def456abc1',
   TimeStamp: 1701346718,
   StakerAddr: '0x1234567890abcdef1234567890abcdef12345678',

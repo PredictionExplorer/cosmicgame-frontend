@@ -1,18 +1,13 @@
-import { CounterWrapper, CounterItem, GradientText, CounterItemWrapper } from '@/components/styled';
+import type { CountdownRenderProps } from 'react-countdown';
 
-interface CounterProps {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
+import { CounterWrapper, CounterItem, GradientText, CounterItemWrapper } from '@/components/styled';
 
 interface TimeUnit {
   value: number;
   label: string;
 }
 
-const Counter = ({ days, hours, minutes, seconds }: CounterProps) => {
+const Counter = ({ days, hours, minutes, seconds }: CountdownRenderProps) => {
   const padZero = (value: number): string => value.toString().padStart(2, '0');
 
   let timeUnits: TimeUnit[] = [

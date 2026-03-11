@@ -3,12 +3,12 @@
 import { MainWrapper } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useCSTTokensByUser } from '@/hooks/useApiQuery';
-import { CSTTable, type CSTToken } from '@/components/tokens/CSTTable';
+import { CSTTable } from '@/components/tokens/CSTTable';
 
 function MyWallet() {
   const { account } = useActiveWeb3React();
   const { data: tokensRaw, isLoading: loading, isError: hasError } = useCSTTokensByUser(account);
-  const tokens = (tokensRaw ?? []) as unknown as CSTToken[];
+  const tokens = tokensRaw ?? [];
   const error = hasError ? 'Failed to load CST tokens.' : null;
 
   return (

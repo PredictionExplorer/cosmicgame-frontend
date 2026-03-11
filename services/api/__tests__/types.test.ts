@@ -287,6 +287,125 @@ describe('API types', () => {
     });
   });
 
+  describe('StakedTokenInfo — new fields (4c)', () => {
+    it('accepts UserAddr and StakeEvtLogId', () => {
+      const info: StakedTokenInfo = {
+        StakeActionId: 1,
+        StakedTokenId: 42,
+        StakeTimeStamp: 1700000000,
+        UserAddr: '0xuser',
+        StakeEvtLogId: 99,
+      };
+      expect(info.UserAddr).toBe('0xuser');
+      expect(info.StakeEvtLogId).toBe(99);
+    });
+
+    it('UserAddr and StakeEvtLogId are optional', () => {
+      const info: StakedTokenInfo = {
+        StakeActionId: 1,
+        StakedTokenId: 42,
+        StakeTimeStamp: 1700000000,
+      };
+      expect(info.UserAddr).toBeUndefined();
+      expect(info.StakeEvtLogId).toBeUndefined();
+    });
+  });
+
+  describe('StakingCSTReward — new fields (4c)', () => {
+    it('accepts deposit/collection fields', () => {
+      const reward: StakingCSTReward = {
+        EvtLogId: 1,
+        RoundNum: 5,
+        TokenId: 0,
+        TotalDepositAmountEth: 1.5,
+        PendingToCollectEth: 0.3,
+        DepositTimeStamp: 1700000000,
+        YourCollectedAmountEth: 0.8,
+        NumUnclaimedTokens: 2,
+        YourRewardAmountEth: 0.1,
+        PendingToClaimEth: 0.05,
+      };
+      expect(reward.TotalDepositAmountEth).toBe(1.5);
+      expect(reward.PendingToCollectEth).toBe(0.3);
+      expect(reward.DepositTimeStamp).toBe(1700000000);
+      expect(reward.YourCollectedAmountEth).toBe(0.8);
+      expect(reward.NumUnclaimedTokens).toBe(2);
+      expect(reward.YourRewardAmountEth).toBe(0.1);
+      expect(reward.PendingToClaimEth).toBe(0.05);
+    });
+
+    it('new fields are optional', () => {
+      const reward: StakingCSTReward = { EvtLogId: 1, RoundNum: 1, TokenId: 0 };
+      expect(reward.TotalDepositAmountEth).toBeUndefined();
+      expect(reward.PendingToCollectEth).toBeUndefined();
+      expect(reward.DepositTimeStamp).toBeUndefined();
+      expect(reward.YourCollectedAmountEth).toBeUndefined();
+    });
+  });
+
+  describe('CSTTokenInfo — new fields (4c)', () => {
+    it('accepts MintTimeStamp, WinnerAddr, Staked, RecordType', () => {
+      const token: CSTTokenInfo = {
+        EvtLogId: 1,
+        BlockNum: 100,
+        TxId: 1,
+        TxHash: '0xabc',
+        TimeStamp: 1700000000,
+        DateTime: '2024-01-01',
+        TokenId: 42,
+        MintTimeStamp: 1700000000,
+        WinnerAddr: '0xwinner',
+        Staked: true,
+        RecordType: 3,
+      };
+      expect(token.MintTimeStamp).toBe(1700000000);
+      expect(token.WinnerAddr).toBe('0xwinner');
+      expect(token.Staked).toBe(true);
+      expect(token.RecordType).toBe(3);
+    });
+
+    it('Seed accepts both string and number', () => {
+      const strSeed: CSTTokenInfo = {
+        EvtLogId: 1,
+        BlockNum: 0,
+        TxId: 0,
+        TxHash: '',
+        TimeStamp: 0,
+        DateTime: '',
+        TokenId: 1,
+        Seed: 'deadbeef',
+      };
+      const numSeed: CSTTokenInfo = {
+        EvtLogId: 1,
+        BlockNum: 0,
+        TxId: 0,
+        TxHash: '',
+        TimeStamp: 0,
+        DateTime: '',
+        TokenId: 2,
+        Seed: 12345,
+      };
+      expect(strSeed.Seed).toBe('deadbeef');
+      expect(numSeed.Seed).toBe(12345);
+    });
+
+    it('new fields are optional', () => {
+      const token: CSTTokenInfo = {
+        EvtLogId: 1,
+        BlockNum: 0,
+        TxId: 0,
+        TxHash: '',
+        TimeStamp: 0,
+        DateTime: '',
+        TokenId: 1,
+      };
+      expect(token.MintTimeStamp).toBeUndefined();
+      expect(token.WinnerAddr).toBeUndefined();
+      expect(token.Staked).toBeUndefined();
+      expect(token.RecordType).toBeUndefined();
+    });
+  });
+
   describe('DonatedERC20Token', () => {
     it('satisfies the DonatedERC20Token contract with TxInfo base', () => {
       const token: DonatedERC20Token = {

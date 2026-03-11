@@ -14,16 +14,9 @@ import {
   TablePrimary,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import type { StakingCSTReward } from '@/services/api';
 
-interface StakingWinner {
-  TxHash: string;
-  TimeStamp: number;
-  StakerAddr: string;
-  StakerNumStakedNFTs: number;
-  StakerAmountEth: number;
-}
-
-const WinnerRow = ({ winner }: { winner: StakingWinner }) => {
+const WinnerRow = ({ winner }: { winner: StakingCSTReward }) => {
   if (!winner) {
     return <TablePrimaryRow />;
   }
@@ -33,11 +26,11 @@ const WinnerRow = ({ winner }: { winner: StakingWinner }) => {
       <TablePrimaryCell>
         <a
           className="text-inherit"
-          href={getExplorerUrl('tx', winner.TxHash)}
+          href={getExplorerUrl('tx', winner.TxHash ?? '')}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(winner.TimeStamp)}
+          {convertTimestampToDateTime(winner.TimeStamp ?? 0)}
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="left">
@@ -45,7 +38,7 @@ const WinnerRow = ({ winner }: { winner: StakingWinner }) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <a href={`/user/${winner.StakerAddr}`} className="text-inherit font-mono">
-                {shortenHex(winner.StakerAddr, 6)}
+                {shortenHex(winner.StakerAddr ?? '', 6)}
               </a>
             </TooltipTrigger>
             <TooltipContent>{winner.StakerAddr}</TooltipContent>
@@ -53,12 +46,12 @@ const WinnerRow = ({ winner }: { winner: StakingWinner }) => {
         </TooltipProvider>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{winner.StakerNumStakedNFTs}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{winner.StakerAmountEth.toFixed(4)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{(winner.StakerAmountEth ?? 0).toFixed(4)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-const StakingWinnerTable = ({ list }: { list: StakingWinner[] }) => {
+const StakingWinnerTable = ({ list }: { list: StakingCSTReward[] }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
 

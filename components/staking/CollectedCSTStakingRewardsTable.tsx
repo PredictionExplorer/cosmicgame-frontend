@@ -15,21 +15,18 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import type { StakingCSTReward } from '@/services/api';
 
-export interface CollectedReward {
-  EvtLogId: number;
-  DepositTimeStamp: number;
-  DepositId: number;
-  RoundNum: number;
-  TotalDepositAmountEth: number;
-  YourCollectedAmountEth: number;
-}
-
-const CollectedRewardsRow = ({ row }: { row: CollectedReward }) => {
+const CollectedRewardsRow = ({ row }: { row: StakingCSTReward }) => {
   if (!row) return null;
 
-  const { DepositTimeStamp, DepositId, RoundNum, TotalDepositAmountEth, YourCollectedAmountEth } =
-    row;
+  const {
+    DepositTimeStamp = 0,
+    DepositId,
+    RoundNum,
+    TotalDepositAmountEth,
+    YourCollectedAmountEth,
+  } = row;
 
   return (
     <TablePrimaryRow>
@@ -50,7 +47,7 @@ const CollectedRewardsRow = ({ row }: { row: CollectedReward }) => {
   );
 };
 
-export const CollectedCSTStakingRewardsTable = ({ list }: { list: CollectedReward[] }) => {
+export const CollectedCSTStakingRewardsTable = ({ list }: { list: StakingCSTReward[] }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const PER_PAGE = 5;
 

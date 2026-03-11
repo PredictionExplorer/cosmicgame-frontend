@@ -1,6 +1,5 @@
 'use client';
 
-import { type ComponentProps } from 'react';
 import Link from 'next/link';
 
 import { MainWrapper } from '@/components/styled';
@@ -44,13 +43,7 @@ const StakingPage = () => {
         {loading ? (
           <p className="text-lg font-semibold">Loading...</p>
         ) : (
-          <GlobalStakingRewardsTable
-            list={
-              (cosmicSignatureRewards ?? []) as unknown as ComponentProps<
-                typeof GlobalStakingRewardsTable
-              >['list']
-            }
-          />
+          <GlobalStakingRewardsTable list={cosmicSignatureRewards ?? []} />
         )}
       </div>
 
@@ -59,13 +52,7 @@ const StakingPage = () => {
         {loading ? (
           <p className="text-lg font-semibold">Loading...</p>
         ) : (
-          <RwalkStakingRewardMintsTable
-            list={
-              (randomWalkRewards ?? []) as unknown as ComponentProps<
-                typeof RwalkStakingRewardMintsTable
-              >['list']
-            }
-          />
+          <RwalkStakingRewardMintsTable list={randomWalkRewards ?? []} />
         )}
       </div>
 

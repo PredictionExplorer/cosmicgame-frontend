@@ -10,6 +10,7 @@ import { useDonationsBoth } from '@/hooks/useApiQuery';
 import EthDonationTable, { EthDonation } from '@/components/tables/EthDonationTable';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { asWriteFn } from '@/utils/contractWrite';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { isUserRejection, reportError } from '@/utils/errors';
 
@@ -25,11 +26,7 @@ const EthDonations = () => {
 
   const handleDonate = async () => {
     try {
-      await (
-        cosmicGameContract!.write.donateEth as unknown as (
-          ...a: unknown[]
-        ) => Promise<`0x${string}`>
-      )([], {
+      await asWriteFn(cosmicGameContract!.write.donateEth)([], {
         value: parseEther(donateAmount),
       });
 
@@ -55,11 +52,9 @@ const EthDonations = () => {
 
   const handleDonateWithInfo = async () => {
     try {
-      await (
-        cosmicGameContract!.write.donateEthWithInfo as unknown as (
-          ...a: unknown[]
-        ) => Promise<`0x${string}`>
-      )([donateInformation], { value: parseEther(donateAmount) });
+      await asWriteFn(cosmicGameContract!.write.donateEthWithInfo)([donateInformation], {
+        value: parseEther(donateAmount),
+      });
 
       setNotification({
         text: `${donateAmount} ETH with information was donated successfully!`,

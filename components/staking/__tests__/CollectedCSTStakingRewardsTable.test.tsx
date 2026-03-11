@@ -11,6 +11,7 @@ const createRow = (overrides = {}) => ({
   DepositTimeStamp: 1701346718,
   DepositId: 5,
   RoundNum: 10,
+  TokenId: 0,
   TotalDepositAmountEth: 1.234567,
   YourCollectedAmountEth: 0.567891,
   ...overrides,

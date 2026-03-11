@@ -26,7 +26,7 @@ const Particles = dynamic(
 
 const queryClient = new QueryClient();
 
-const particleOptions = {
+const particleOptions: ISourceOptions = {
   background: { color: { value: 'transparent' } },
   fpsLimit: 60,
   interactivity: {
@@ -60,15 +60,15 @@ const particleOptions = {
       speed: 0.5,
       straight: false,
     },
-    number: { density: { enable: true, area: 1000 }, value: 30 },
+    number: { density: { enable: true, width: 1000, height: 1000 }, value: 30 },
     opacity: {
       value: { min: 0.1, max: 0.4 },
-      animation: { enable: true, speed: 0.5, minimumValue: 0.05, sync: false },
+      animation: { enable: true, speed: 0.5, startValue: 'min', sync: false },
     },
     shape: { type: 'circle' },
     size: {
       value: { min: 1, max: 3 },
-      animation: { enable: true, speed: 2, minimumValue: 0.5, sync: false },
+      animation: { enable: true, speed: 2, startValue: 'min', sync: false },
     },
   },
   detectRetina: true,
@@ -95,7 +95,7 @@ export function Providers({ children }: { children: ReactNode }) {
           {engineReady && (
             <Particles
               id="tsparticles"
-              options={particleOptions as unknown as ISourceOptions}
+              options={particleOptions}
               style={{
                 position: 'fixed',
                 top: 0,

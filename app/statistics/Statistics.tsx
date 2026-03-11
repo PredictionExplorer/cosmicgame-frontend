@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, type ReactNode, type ComponentProps } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import Link from 'next/link';
 import Countdown from 'react-countdown';
 import { formatEther } from 'viem';
@@ -131,8 +131,7 @@ const Statistics = () => {
   const uniqueCSTStakers = (uniqueCSTStakersData ?? []) as UniqueStakerCST[];
   const uniqueRWLKStakers = (uniqueRWLKStakersData ?? []) as UniqueStakerRWLK[];
   const uniqueDonors = (uniqueDonorsData ?? []) as UniqueEthDonor[];
-  const nftDonations = (nftDonationsData ??
-    []) as unknown as import('@/services/api/types').DonatedNFT[];
+  const nftDonations = nftDonationsData ?? [];
   const cstDistribution = (cstDistributionData ??
     []) as import('@/services/api/types').TokenDistribution[];
   const ctBalanceDistribution = (ctBalanceDistributionData ??
@@ -526,14 +525,7 @@ const Statistics = () => {
             {stakedCSTokens === null ? (
               <p className="text-lg font-semibold">Loading...</p>
             ) : (
-              <GlobalStakedTokensTable
-                list={
-                  (stakedCSTokens ?? []) as unknown as ComponentProps<
-                    typeof GlobalStakedTokensTable
-                  >['list']
-                }
-                IsRWLK={false}
-              />
+              <GlobalStakedTokensTable list={stakedCSTokens ?? []} IsRWLK={false} />
             )}
           </div>
 
@@ -572,14 +564,7 @@ const Statistics = () => {
             {stakedRWLKTokens === null ? (
               <p className="text-lg font-semibold">Loading...</p>
             ) : (
-              <GlobalStakedTokensTable
-                list={
-                  (stakedRWLKTokens ?? []) as unknown as ComponentProps<
-                    typeof GlobalStakedTokensTable
-                  >['list']
-                }
-                IsRWLK={true}
-              />
+              <GlobalStakedTokensTable list={stakedRWLKTokens ?? []} IsRWLK={true} />
             )}
           </div>
 

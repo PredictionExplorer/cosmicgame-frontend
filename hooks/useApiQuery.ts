@@ -46,6 +46,7 @@ import type {
   UserBalance,
   UserInfoWithLists,
   Winner,
+  WinningHistoryEntry,
 } from '@/services/api';
 
 // ---------------------------------------------------------------------------
@@ -100,7 +101,7 @@ export function useClaimHistory() {
 }
 
 export function useClaimHistoryByUser(address: string | null | undefined) {
-  return useQuery<TxInfo[] | null>({
+  return useQuery<WinningHistoryEntry[] | null>({
     queryKey: ['claimHistoryByUser', address],
     queryFn: () => api.get_claim_history_by_user(address!),
     enabled: !!address,

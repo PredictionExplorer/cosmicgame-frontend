@@ -6,8 +6,15 @@ import { NFTSkeleton, NFTInfoWrapper, StyledCard } from '@/components/styled';
 
 import NFTImage from './NFTImage';
 
-const NFT = ({ nft }: { nft: { TokenId: string; Seed: string; TokenName: string } }) => {
-  const image = getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
+interface NFTProps {
+  TokenId: number | string;
+  Seed?: number | string;
+  TokenName?: string;
+  [key: string]: unknown;
+}
+
+const NFT = ({ nft }: { nft: NFTProps }) => {
+  const image = getAssetsUrl(`cosmicsignature/0x${nft.Seed ?? ''}.png`);
 
   return (
     <StyledCard>
@@ -26,7 +33,7 @@ const NFT = ({ nft }: { nft: { TokenId: string; Seed: string; TokenName: string 
           </NFTInfoWrapper>
         )}
 
-        {nft.TokenName !== '' && (
+        {nft.TokenName && nft.TokenName !== '' && (
           <NFTInfoWrapper className="w-[calc(100%-40px)]">
             <p className="text-base text-white text-center">{nft.TokenName}</p>
           </NFTInfoWrapper>

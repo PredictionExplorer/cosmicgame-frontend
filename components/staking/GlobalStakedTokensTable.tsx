@@ -16,20 +16,10 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
-
-interface GlobalStakedToken {
-  StakeEvtLogId: string | number;
-  StakeTimeStamp: number;
-  StakeActionId: string | number;
-  StakedTokenId?: string | number;
-  UserAddr: string;
-  TokenInfo?: {
-    TokenId: string | number;
-  };
-}
+import type { StakedTokenInfo } from '@/services/api';
 
 interface GlobalStakedTokensRowProps {
-  row: GlobalStakedToken;
+  row: StakedTokenInfo;
   IsRWLK: boolean;
 }
 
@@ -67,14 +57,14 @@ const GlobalStakedTokensRow: FC<GlobalStakedTokensRowProps> = ({ row, IsRWLK }) 
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <AddressLink address={row.UserAddr} url={`/user/${row.UserAddr}`} />
+        <AddressLink address={row.UserAddr ?? ''} url={`/user/${row.UserAddr}`} />
       </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
 interface GlobalStakedTokensTableProps {
-  list: GlobalStakedToken[];
+  list: StakedTokenInfo[];
   IsRWLK: boolean;
 }
 

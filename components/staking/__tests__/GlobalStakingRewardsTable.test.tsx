@@ -8,7 +8,6 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useStakingCSTRewardsByRound: () => ({ data: [] }),
 }));
 
- 
 import { GlobalStakingRewardsTable } from '../GlobalStakingRewardsTable';
 
 const createRow = (overrides = {}) => ({
@@ -16,6 +15,7 @@ const createRow = (overrides = {}) => ({
   TxHash: '0xabc123def456abc123def456abc123def456abc123def456abc123def456abc1',
   TimeStamp: 1701346718,
   RoundNum: 10,
+  TokenId: 0,
   NumStakedNFTs: 5,
   TotalDepositAmountEth: 1.234567,
   FullyClaimed: false,

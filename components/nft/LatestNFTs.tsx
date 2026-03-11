@@ -7,16 +7,9 @@ import { useCSTList } from '@/hooks/useApiQuery';
 
 import NFT from './NFT';
 
-interface NFTData {
-  TokenId: number | string;
-  Seed: number | string;
-  TokenName?: string;
-  [key: string]: unknown;
-}
-
 const LatestNFTs = () => {
   const { data: nfts = [] } = useCSTList();
-  const nftData = [...nfts].sort((a, b) => Number(b.TokenId) - Number(a.TokenId)) as NFTData[];
+  const nftData = [...nfts].sort((a, b) => Number(b.TokenId) - Number(a.TokenId));
 
   const { scrollRef, pages, activePageIndex, next, prev } = useSnapCarousel();
 
@@ -36,9 +29,7 @@ const LatestNFTs = () => {
             <div className="hidden md:grid md:grid-cols-3 gap-4 mt-[58px]">
               {nftData.slice(0, 6).map((nft, index) => (
                 <div key={nft.TokenId || index}>
-                  <NFT
-                    nft={nft as unknown as { TokenId: string; Seed: string; TokenName: string }}
-                  />
+                  <NFT nft={nft} />
                 </div>
               ))}
             </div>
@@ -51,9 +42,7 @@ const LatestNFTs = () => {
               >
                 {nftData.slice(0, 6).map((nft, index) => (
                   <li key={nft.TokenId || index} className="w-full shrink-0 mr-2.5">
-                    <NFT
-                      nft={nft as unknown as { TokenId: string; Seed: string; TokenName: string }}
-                    />
+                    <NFT nft={nft} />
                   </li>
                 ))}
               </ul>

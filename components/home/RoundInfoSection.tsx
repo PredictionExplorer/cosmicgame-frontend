@@ -81,7 +81,7 @@ export function RoundInfoSection({
         <ChartOrPie data={data ?? undefined} />
       </div>
 
-      {data && <Prize data={data as unknown as ComponentProps<typeof Prize>['data']} />}
+      {data && <Prize data={data} />}
 
       <div className="mt-20">
         <h6 className="text-lg font-semibold">TOP RAFFLE TICKETS HOLDERS</h6>

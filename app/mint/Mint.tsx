@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { MainWrapper, CenterBox } from '@/components/styled';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
+import { asWriteFn } from '@/utils/contractWrite';
 import {
   isUserRejection,
   isEthProviderError,
@@ -31,9 +32,7 @@ const Mint = () => {
         const mintPrice = (await nftContract.read.getMintPrice?.()) as bigint;
         const newPrice = parseFloat(formatEther(mintPrice)) * 1.01;
 
-        const hash = await (
-          nftContract.write.mint as unknown as (...a: unknown[]) => Promise<`0x${string}`>
-        )({
+        const hash = await asWriteFn(nftContract.write.mint)({
           value: parseEther(newPrice.toFixed(6)),
         });
         await publicClient?.waitForTransactionReceipt({ hash });

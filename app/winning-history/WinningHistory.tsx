@@ -8,10 +8,7 @@ import { useClaimHistoryByUser } from '@/hooks/useApiQuery';
 function WinningHistory() {
   const { account } = useActiveWeb3React();
   const { data, isLoading: loading, error: queryError } = useClaimHistoryByUser(account);
-  const winningHistory =
-    (data as unknown as
-      | import('@/components/tables/WinningHistoryTable').WinningHistoryEntry[]
-      | null) ?? null;
+  const winningHistory = data ?? null;
   const error = queryError?.message ?? null;
 
   if (!account) {

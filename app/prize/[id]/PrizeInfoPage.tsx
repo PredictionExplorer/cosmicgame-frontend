@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, type ComponentProps } from 'react';
+import { useMemo } from 'react';
 
 import {
   getExplorerUrl,
@@ -61,7 +61,7 @@ const InfoRow = ({ label, value, link, monospace = false }: InfoRowProps) => {
 ------------------------------------------------------------------ */
 interface PrizeDetailsProps {
   prizeInfo: import('@/services/api/types').RoundInfo;
-  stakingRewards: unknown[];
+  stakingRewards: import('@/services/api/types').StakingCSTReward[];
 }
 const PrizeDetails = ({ prizeInfo, stakingRewards }: PrizeDetailsProps) => {
   return (
@@ -181,14 +181,12 @@ const RaffleWinnersSection = ({
 );
 
 interface StakingRewardsSectionProps {
-  stakingRewards: unknown[];
+  stakingRewards: import('@/services/api/types').StakingCSTReward[];
 }
 const StakingRewardsSection = ({ stakingRewards }: StakingRewardsSectionProps) => (
   <div className="mt-8">
     <h6 className="text-lg font-semibold mb-4">Staking Rewards</h6>
-    <StakingWinnerTable
-      list={stakingRewards as ComponentProps<typeof StakingWinnerTable>['list']}
-    />
+    <StakingWinnerTable list={stakingRewards} />
   </div>
 );
 
@@ -221,7 +219,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
 
   const nftDonations =
     nftDonationsRaw as import('@/components/donations/DonatedNFTTable').NFTRecord[];
-  const stakingRewards = stakingRewardsRaw as unknown[];
+  const stakingRewards = stakingRewardsRaw;
   const donatedERC20Tokens =
     donatedERC20Raw as import('@/components/donations/DonatedERC20Table').DonatedERC20Token[];
   const loading = loadingRound || loadingBids || loadingNFT || loadingStaking || loadingERC20;

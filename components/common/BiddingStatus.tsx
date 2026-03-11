@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, type ReactNode } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { formatEther, zeroAddress } from 'viem';
 import Countdown from 'react-countdown';
 
@@ -102,11 +102,7 @@ export const BiddingStatus = ({
                 Round {data.CurRoundNum} becomes active at{' '}
                 {convertTimestampToDateTime(activationTime, true)}
               </p>
-              <Countdown
-                key={3}
-                date={activationTime * 1000}
-                renderer={Counter as unknown as (...args: unknown[]) => ReactNode}
-              />
+              <Countdown key={3} date={activationTime * 1000} renderer={Counter} />
             </div>
           ) : data && data.TsRoundStart !== 0 ? (
             <div className="mb-8 grid grid-cols-12 items-center gap-4">
@@ -119,11 +115,7 @@ export const BiddingStatus = ({
                   (prizeTime > Date.now() ? (
                     <>
                       <p className="text-center text-base font-normal">Finishes In</p>
-                      <Countdown
-                        key={0}
-                        date={prizeTime}
-                        renderer={Counter as unknown as (...args: unknown[]) => ReactNode}
-                      />
+                      <Countdown key={0} date={prizeTime} renderer={Counter} />
                     </>
                   ) : (
                     <>

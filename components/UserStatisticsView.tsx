@@ -35,11 +35,10 @@ import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { CSTTable, type CSTToken } from './tokens/CSTTable';
+import { CSTTable } from './tokens/CSTTable';
 import type { WinningHistoryEntry } from './tables/WinningHistoryTable';
 import type { MarketingReward } from './tables/MarketingRewardsTable';
 import type { CSTStakingRewardByDeposit } from './staking/CSTStakingRewardsByDepositTable';
-import type { CollectedReward } from './staking/CollectedCSTStakingRewardsTable';
 import type { NFTRecord } from './donations/DonatedNFTTable';
 import type { DonatedERC20Token } from './donations/DonatedERC20Table';
 import BiddingHistoryTable from './tables/BiddingHistoryTable';
@@ -215,7 +214,7 @@ function CSTStakingTab({
   stakingActions: StakingAction[];
   cstStakingRewards: StakingRewardRow[];
   cstStakingRewardsByDeposit: CSTStakingRewardByDeposit[];
-  collectedCstStakingRewards: CollectedReward[];
+  collectedCstStakingRewards: import('@/services/api/types').StakingCSTReward[];
   address: string;
 }) {
   const totalStakeActions = stakingActions.filter((a) => a.ActionType !== 1).length;
@@ -350,10 +349,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const userInfo = (userInfoObj as UserProfileInfo) ?? null;
   const claimHistory = (claimHistoryRaw as WinningHistoryEntry[] | null) ?? null;
   const marketingRewards = (marketingRewardsRaw ?? []) as MarketingReward[];
-  const cstList = (cstListRaw ?? []) as unknown as CSTToken[];
+  const cstList = cstListRaw ?? [];
   const cstStakingRewards = (cstStakingRewardsRaw ?? []) as StakingRewardRow[];
-  const collectedCstStakingRewards = (collectedCstStakingRewardsRaw ??
-    []) as unknown as CollectedReward[];
+  const collectedCstStakingRewards = collectedCstStakingRewardsRaw ?? [];
   const cstStakingRewardsByDeposit = (cstStakingRewardsByDepositRaw ??
     []) as CSTStakingRewardByDeposit[];
   const claimedDonatedNFTsList = Array.isArray(claimedNFTsRaw)

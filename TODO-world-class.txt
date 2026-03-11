@@ -188,46 +188,57 @@ All items complete. No remaining issues.
         particles shown after init, aria-hidden on particles,
         initParticlesEngine called on mount, loadSlim called (15 tests)
 
-4c. [OPEN] Eliminate remaining `as unknown as` casts in production code
-    27 casts across production files. Target: zero. Grouped by root cause:
+4c. [DONE] Eliminate remaining `as unknown as` casts in production code
+    Removed all 18 `as unknown as` casts and 1 `@ts-expect-error` from
+    production code. Zero casts remain. 34 files changed, 21 new tests.
 
-    API data → component type mismatches (~10 casts):
-    - app/statistics/Statistics.tsx (3 casts — DonatedNFT[], ComponentProps)
-    - app/staking/StakingPage.tsx (2 — ComponentProps)
-    - components/UserStatisticsView.tsx (2 — CSTToken[], CollectedReward[])
-    - app/winning-history/WinningHistory.tsx (1)
-    - app/named-nfts/NamedNFTsPage.tsx (1 — NamedNFTRecord[])
-    - app/prize/[id]/PrizeInfoPage.tsx (1 — stakingRewards)
-    - app/my-tokens/MyTokens.tsx (1 — CSTToken[])
-    - app/contracts/Contracts.tsx (1 — DashboardData)
-    - components/home/RoundInfoSection.tsx (1 — ComponentProps<Prize>)
-    Fix: ensure React Query hooks return properly typed data that
-    component props accept without casting.
+    API types extended (services/api/types.ts):
+    - StakedTokenInfo: added UserAddr?, StakeEvtLogId?
+    - StakingCSTReward: added TotalDepositAmountEth?, PendingToCollectEth?,
+      DepositTimeStamp?, YourCollectedAmountEth?, NumUnclaimedTokens?,
+      YourRewardAmountEth?, PendingToClaimEth?
+    - CSTTokenInfo: added MintTimeStamp?, WinnerAddr?, Staked?, RecordType?,
+      changed Seed to string | number
 
-    Contract write function casts (~7 casts):
-    - hooks/useBidForm.ts (3 — bidWithEth, bidWithEthAndDonateNft,
-      bidWithEthAndDonateToken)
-    - hooks/usePrizeClaim.ts (1 — claimMainPrize)
-    - app/mint/Mint.tsx (1 — nftContract.write.mint)
-    - app/eth-donation/EthDonations.tsx (2 — donateEth, donateEthWithInfo)
-    Fix: create typed contract wrapper functions with proper ABI-derived
-    signatures, or use wagmi's useWriteContract with typed ABI.
+    Hook return type fixed (hooks/useApiQuery.ts):
+    - useClaimHistoryByUser: TxInfo[] → WinningHistoryEntry[]
 
-    Component type mismatches (~4 casts):
-    - components/nft/LatestNFTs.tsx (2 — NFT data shape)
-    - components/common/BiddingStatus.tsx (2 — Counter renderer type)
-    - components/staking/UncollectedCSTStakingRewardsTable.tsx (2 —
-      UncollectedReward[])
-    Fix: align component prop types with the data shapes they receive,
-    or add proper generics.
+    Contract write utility (utils/contractWrite.ts):
+    - Created asWriteFn() — single typed assertion for viem contract writes
+    - Replaced 7 casts across useBidForm.ts (3), usePrizeClaim.ts (1),
+      Mint.tsx (1), EthDonations.tsx (2)
 
-    Misc (2 casts + 1 @ts-expect-error):
-    - app/providers.tsx (1 — particleOptions as unknown as ISourceOptions)
-      Fix: type the particleOptions literal to satisfy ISourceOptions.
-    - components/styled/index.tsx (1 — @ts-expect-error for CSS custom
-      properties on style objects)
-      Fix: extend CSSProperties via module augmentation or use a typed
-      style helper.
+    Component types aligned with API types (10 local types removed):
+    - GlobalStakedTokensTable: GlobalStakedToken → StakedTokenInfo
+    - GlobalStakingRewardsTable: GlobalStakingReward → StakingCSTReward
+    - CollectedCSTStakingRewardsTable: CollectedReward → StakingCSTReward
+    - UncollectedCSTStakingRewardsTable: UncollectedReward → StakingCSTReward
+    - StakingWinnerTable: StakingWinner → StakingCSTReward
+    - CSTTable: CSTToken → CSTTokenInfo
+    - NamedNFTsPage: NamedNFTRecord → CSTTokenInfo
+    - Contracts.tsx: DashboardData → DashboardInfo
+    - Prize.tsx: PrizeData fields made optional
+    - PrizeInfoPage: stakingRewards typed as StakingCSTReward[]
+
+    Component type mismatches fixed:
+    - NFT.tsx: props accept number | string for TokenId/Seed
+    - Counter.tsx: accepts CountdownRenderProps from react-countdown
+    - BiddingStatus.tsx: Counter passed directly as renderer
+    - LatestNFTs.tsx: passes CSTTokenInfo[] directly to NFT
+
+    Misc fixes:
+    - providers.tsx: particleOptions annotated as ISourceOptions
+    - styled/index.tsx: @ts-expect-error removed via CSS module augmentation
+    - types/css-custom-properties.d.ts: React.CSSProperties extended for
+      --prefixed custom properties
+
+    Tests added (21 new, 2,121 total across 185 suites):
+    - utils/__tests__/contractWrite.test.ts (9 tests)
+    - types/__tests__/css-custom-properties.test.ts (5 tests)
+    - services/api/__tests__/types.test.ts (+7 tests for new fields)
+    - Existing test files updated for new types (5 files)
+
+    All 2,121 tests pass. tsc --noEmit passes with zero type errors.
 
 
 ================================================================================

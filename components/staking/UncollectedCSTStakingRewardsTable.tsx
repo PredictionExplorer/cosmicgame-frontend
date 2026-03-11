@@ -33,24 +33,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import type { StakingCSTReward } from '@/services/api';
 
-interface UncollectedReward {
-  EvtLogId: number;
-  DepositTimeStamp: number;
-  DepositId: number;
-  YourTokensStaked: number;
-  NumStakedNFTs: number;
-  NumUnclaimedTokens: number;
-  DepositAmountEth: number;
-  YourRewardAmountEth: number;
-  PendingToClaimEth: number;
-}
-
-const UncollectedRewardsRow = ({ row }: { row: UncollectedReward }) => {
+const UncollectedRewardsRow = ({ row }: { row: StakingCSTReward }) => {
   if (!row) return <TablePrimaryRow />;
 
   const {
-    DepositTimeStamp,
+    DepositTimeStamp = 0,
     DepositId,
     YourTokensStaked,
     NumStakedNFTs,
@@ -83,7 +72,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
 
   const isOwnAccount = user?.toLowerCase() === account?.toLowerCase();
 
-  const [localList, setLocalList] = useState<UncollectedReward[] | null>(null);
+  const [localList, setLocalList] = useState<StakingCSTReward[] | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isUnstaking, setIsUnstaking] = useState(false);
   const [cstWithRewards, setCstWithRewards] = useState<number[]>([]);
@@ -116,7 +105,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
   const fetchUncollectedCstStakingRewards = useCallback(async () => {
     try {
       const res = await api.get_staking_cst_rewards_to_claim_by_user(user);
-      setLocalList(res as unknown as UncollectedReward[]);
+      setLocalList(res);
     } catch (err) {
       reportError(err, 'fetch uncollected CST staking rewards');
     }
@@ -163,7 +152,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
     fetchCstWithRewards();
   }, [user, isOwnAccount, fetchUncollectedCstStakingRewards, fetchCstWithRewards]);
 
-  const list = isOwnAccount ? (contextRewards as unknown as UncollectedReward[]) : localList;
+  const list = isOwnAccount ? contextRewards : localList;
 
   if (list === null) {
     return <p className="text-muted-foreground">Loading...</p>;

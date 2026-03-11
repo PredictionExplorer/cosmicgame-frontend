@@ -279,8 +279,12 @@ export interface CSTTokenInfo extends TxInfo {
   OwnerAddr?: string;
   CurOwnerAddr?: string;
   RoundNum?: number;
-  Seed?: number;
+  Seed?: string | number;
   WasUnstaked?: boolean;
+  MintTimeStamp?: number;
+  WinnerAddr?: string;
+  Staked?: boolean;
+  RecordType?: number;
   [key: string]: unknown;
 }
 
@@ -341,6 +345,8 @@ export interface StakedTokenInfo {
   };
   StakeTimeStamp: number;
   IsRWLK?: boolean;
+  UserAddr?: string;
+  StakeEvtLogId?: number;
   [key: string]: unknown;
 }
 
@@ -363,6 +369,13 @@ export interface StakingCSTReward {
   NumStakedNFTs?: number;
   NumTokensCollected?: number;
   YourTokensStaked?: number;
+  TotalDepositAmountEth?: number;
+  PendingToCollectEth?: number;
+  DepositTimeStamp?: number;
+  YourCollectedAmountEth?: number;
+  NumUnclaimedTokens?: number;
+  YourRewardAmountEth?: number;
+  PendingToClaimEth?: number;
   [key: string]: unknown;
 }
 

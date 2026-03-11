@@ -16,35 +16,31 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { useNamedNFTs } from '@/hooks/useApiQuery';
+import type { CSTTokenInfo } from '@/services/api';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 
-interface NamedNFTRecord {
-  MintTimeStamp: number;
-  TokenId: number;
-  TokenName: string;
-  [key: string]: unknown;
-}
-
-const NamedNFTRow = ({ nft }: { nft: NamedNFTRecord }) => {
+const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
   if (!nft) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
-      <TablePrimaryCell>{convertTimestampToDateTime(nft.MintTimeStamp)}</TablePrimaryCell>
+      <TablePrimaryCell>
+        {convertTimestampToDateTime(nft.MintTimeStamp ?? nft.TimeStamp)}
+      </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link href={`/detail/${nft.TokenId}`} className="text-inherit text-[inherit]">
           {nft.TokenId}
         </Link>
       </TablePrimaryCell>
-      <TablePrimaryCell>{nft.TokenName}</TablePrimaryCell>
+      <TablePrimaryCell>{nft.TokenName ?? ''}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
 
-const NamedNFTsTable = ({ list }: { list: NamedNFTRecord[] }) => {
+const NamedNFTsTable = ({ list }: { list: CSTTokenInfo[] }) => {
   return (
     <TablePrimaryContainer>
       <TablePrimary>
@@ -81,14 +77,7 @@ const NamedNFTsPage = () => {
           <h6 className="text-lg font-semibold">Loading...</h6>
         ) : list.length > 0 ? (
           <>
-            <NamedNFTsTable
-              list={
-                list.slice(
-                  (curPage - 1) * perPage,
-                  curPage * perPage,
-                ) as unknown as NamedNFTRecord[]
-              }
-            />
+            <NamedNFTsTable list={list.slice((curPage - 1) * perPage, curPage * perPage)} />
             <CustomPagination
               page={curPage}
               setPage={setCurPage}

@@ -18,27 +18,9 @@ import {
 import { useStakingCSTRewardsByRound } from '@/hooks/useApiQuery';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import StakingWinnerTable from '@/components/tables/StakingWinnerTable';
+import type { StakingCSTReward } from '@/services/api';
 
-interface GlobalStakingReward {
-  EvtLogId: number;
-  TxHash: string;
-  TimeStamp: number;
-  RoundNum: number;
-  NumStakedNFTs: number;
-  TotalDepositAmountEth: number;
-  FullyClaimed: boolean;
-  PendingToCollectEth: number;
-}
-
-interface StakingWinner {
-  TxHash: string;
-  TimeStamp: number;
-  StakerAddr: string;
-  StakerNumStakedNFTs: number;
-  StakerAmountEth: number;
-}
-
-const GlobalStakingRewardsRow = ({ row }: { row: GlobalStakingReward }) => {
+const GlobalStakingRewardsRow = ({ row }: { row: StakingCSTReward }) => {
   const [open, setOpen] = useState(false);
 
   const { data: list = [] } = useStakingCSTRewardsByRound(row?.RoundNum);
@@ -62,12 +44,12 @@ const GlobalStakingRewardsRow = ({ row }: { row: GlobalStakingReward }) => {
 
         <TablePrimaryCell>
           <a
-            href={getExplorerUrl('tx', row.TxHash)}
+            href={getExplorerUrl('tx', row.TxHash ?? '')}
             target="_blank"
             rel="noopener noreferrer"
             className="text-inherit"
           >
-            {convertTimestampToDateTime(row.TimeStamp)}
+            {convertTimestampToDateTime(row.TimeStamp ?? 0)}
           </a>
         </TablePrimaryCell>
 
@@ -97,7 +79,7 @@ const GlobalStakingRewardsRow = ({ row }: { row: GlobalStakingReward }) => {
               <h3 className="text-base font-medium mb-2">
                 CST Staking Rewards for Round {row.RoundNum}
               </h3>
-              <StakingWinnerTable list={list as StakingWinner[]} />
+              <StakingWinnerTable list={list} />
             </div>
           )}
         </TablePrimaryCell>
@@ -106,7 +88,7 @@ const GlobalStakingRewardsRow = ({ row }: { row: GlobalStakingReward }) => {
   );
 };
 
-export const GlobalStakingRewardsTable = ({ list }: { list: GlobalStakingReward[] }) => {
+export const GlobalStakingRewardsTable = ({ list }: { list: StakingCSTReward[] }) => {
   const perPage = 5;
   const [page, setPage] = useState(1);
 

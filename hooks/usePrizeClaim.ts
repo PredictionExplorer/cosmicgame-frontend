@@ -7,6 +7,7 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import type { DashboardInfo } from '@/services/api/types';
 import { isUserRejection } from '@/utils/errors';
+import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
 import { usePrizeTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
 
@@ -69,13 +70,7 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
       const estimate = await cosmicGameContract.estimateGas.claimMainPrize?.({});
       const gasLimit = estimate ? minGasWithBuffer(estimate) : GAS_FLOOR;
 
-      await handleTx(
-        (
-          cosmicGameContract.write.claimMainPrize as unknown as (
-            ...a: unknown[]
-          ) => Promise<`0x${string}`>
-        )({ gas: gasLimit }),
-      );
+      await handleTx(asWriteFn(cosmicGameContract.write.claimMainPrize)({ gas: gasLimit }));
 
       if (!cosmicSignatureContract) {
         notify('error', 'Unable to complete post-claim actions. Please refresh the page.');

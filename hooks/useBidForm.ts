@@ -11,6 +11,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { RAFFLE_WALLET_ADDRESS } from '@/config/networks';
 import { ERC721_INTERFACE_ID, BID_GAS_LIMIT } from '@/config/constants';
 import { isUserRejection, isEthProviderError, reportError } from '@/utils/errors';
+import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
 import { useCTPrice, useBidEthPrice, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 
@@ -289,11 +290,10 @@ export function useBidForm() {
 
       if (noDonation || !donationType) {
         await handleTx(
-          (
-            cosmicGameContract.write.bidWithEth as unknown as (
-              ...a: unknown[]
-            ) => Promise<`0x${string}`>
-          )([rwlkId, message], { value: ethBidPrice, gas: BID_GAS_LIMIT }),
+          asWriteFn(cosmicGameContract.write.bidWithEth)([rwlkId, message], {
+            value: ethBidPrice,
+            gas: BID_GAS_LIMIT,
+          }),
         );
         return true;
       }
@@ -303,11 +303,10 @@ export function useBidForm() {
         const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
         if (!ok) return false;
         await handleTx(
-          (
-            cosmicGameContract.write.bidWithEthAndDonateNft as unknown as (
-              ...a: unknown[]
-            ) => Promise<`0x${string}`>
-          )([rwlkId, message, nftDonateAddress, nftIdNum], { value: ethBidPrice }),
+          asWriteFn(cosmicGameContract.write.bidWithEthAndDonateNft)(
+            [rwlkId, message, nftDonateAddress, nftIdNum],
+            { value: ethBidPrice },
+          ),
         );
         setNftId('');
         setNftDonateAddress('');
@@ -315,11 +314,10 @@ export function useBidForm() {
         const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
         if (!res.ok) return false;
         await handleTx(
-          (
-            cosmicGameContract.write.bidWithEthAndDonateToken as unknown as (
-              ...a: unknown[]
-            ) => Promise<`0x${string}`>
-          )([rwlkId, message, tokenDonateAddress, res.amountWei], { value: ethBidPrice }),
+          asWriteFn(cosmicGameContract.write.bidWithEthAndDonateToken)(
+            [rwlkId, message, tokenDonateAddress, res.amountWei],
+            { value: ethBidPrice },
+          ),
         );
         setTokenAmount('');
         setTokenDonateAddress('');

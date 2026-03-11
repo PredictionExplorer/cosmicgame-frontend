@@ -57,37 +57,8 @@ const ContractItem = ({ name, value, copyable = false }: ContractItemProps) => {
   );
 };
 
-interface ContractAddresses {
-  CosmicGameAddr: string;
-  CosmicTokenAddr: string;
-  CosmicSignatureAddr: string;
-  RandomWalkAddr: string;
-  CosmicDaoAddr: string;
-  CharityWalletAddr: string;
-  MarketingWalletAddr: string;
-  PrizesWalletAddr: string;
-  StakingWalletCSTAddr: string;
-  StakingWalletRWalkAddr: string;
-}
-
-interface DashboardData {
-  ContractAddrs: ContractAddresses;
-  PrizePercentage: number;
-  ChronoWarriorPercentage: number;
-  RafflePercentage: number;
-  StakingPercentage: number;
-  NumRaffleEthWinnersBidding: number;
-  NumRaffleNFTWinnersBidding: number;
-  NumRaffleNFTWinnersStakingRWalk: number;
-  CharityPercentage: number;
-  RoundStartCSTAuctionLength: number;
-  TimeoutClaimPrize: number;
-  InitialSecondsUntilPrize: number;
-}
-
 const Contracts = () => {
-  const { data: rawDashboard, isLoading: loading } = useDashboardInfo();
-  const data = rawDashboard as unknown as DashboardData | null;
+  const { data, isLoading: loading } = useDashboardInfo();
   const [charityAddress, setCharityAddress] = useState('');
   const [priceIncrease, setPriceIncrease] = useState(0);
   const [timeIncrease, setTimeIncrease] = useState(0);
@@ -182,52 +153,52 @@ const Contracts = () => {
     { name: 'Chain ID', value: networkConfig.chainId },
     {
       name: 'Cosmic Game Address',
-      value: data?.ContractAddrs.CosmicGameAddr,
+      value: data?.ContractAddrs?.CosmicGameAddr,
       copyable: true,
     },
     {
       name: 'Cosmic Signature Token Address',
-      value: data?.ContractAddrs.CosmicTokenAddr,
+      value: data?.ContractAddrs?.CosmicTokenAddr,
       copyable: true,
     },
     {
       name: 'Cosmic Signature Address',
-      value: data?.ContractAddrs.CosmicSignatureAddr,
+      value: data?.ContractAddrs?.CosmicSignatureAddr,
       copyable: true,
     },
     {
       name: 'RandomWalk Address',
-      value: data?.ContractAddrs.RandomWalkAddr,
+      value: data?.ContractAddrs?.RandomWalkAddr,
       copyable: true,
     },
     {
       name: 'Cosmic DAO Address',
-      value: data?.ContractAddrs.CosmicDaoAddr,
+      value: data?.ContractAddrs?.CosmicDaoAddr,
       copyable: true,
     },
     {
       name: 'Charity Wallet Address',
-      value: data?.ContractAddrs.CharityWalletAddr,
+      value: data?.ContractAddrs?.CharityWalletAddr,
       copyable: true,
     },
     {
       name: 'Marketing Wallet Address',
-      value: data?.ContractAddrs.MarketingWalletAddr,
+      value: data?.ContractAddrs?.MarketingWalletAddr,
       copyable: true,
     },
     {
       name: 'Prizes Wallet Address',
-      value: data?.ContractAddrs.PrizesWalletAddr,
+      value: data?.ContractAddrs?.PrizesWalletAddr,
       copyable: true,
     },
     {
       name: 'Cosmic Signature Staking Wallet Address',
-      value: data?.ContractAddrs.StakingWalletCSTAddr,
+      value: data?.ContractAddrs?.StakingWalletCSTAddr,
       copyable: true,
     },
     {
       name: 'Random Walk Staking Wallet Address',
-      value: data?.ContractAddrs.StakingWalletRWalkAddr,
+      value: data?.ContractAddrs?.StakingWalletRWalkAddr,
       copyable: true,
     },
   ];
@@ -294,12 +265,12 @@ const Contracts = () => {
     },
     {
       name: 'Timeout to claim prize',
-      value: data ? formatSeconds(data.TimeoutClaimPrize) : '--',
+      value: data ? formatSeconds(data.TimeoutClaimPrize ?? 0) : '--',
     },
     { name: 'Maximum message length', value: Number(msgMaxLen) },
     {
       name: 'Initial increment first bid',
-      value: data ? formatSeconds(data.InitialSecondsUntilPrize) : '--',
+      value: data ? formatSeconds(data.InitialSecondsUntilPrize ?? 0) : '--',
     },
     {
       name: 'CST dutch auction beginning bid price',

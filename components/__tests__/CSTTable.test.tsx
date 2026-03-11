@@ -2,12 +2,14 @@ import '@testing-library/jest-dom';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
+import type { CSTTokenInfo } from '@/services/api';
+
 import { render, screen } from '@/test-utils';
 
 jest.mock('react-super-responsive-table/dist/SuperResponsiveTableStyle.css', () => ({}));
 
 // eslint-disable-next-line import/order
-import { CSTTable, type CSTToken } from '@/components/tokens/CSTTable';
+import { CSTTable } from '@/components/tokens/CSTTable';
 
 describe('CSTTable', () => {
   test('with no records shows "No tokens yet."', () => {
@@ -16,11 +18,14 @@ describe('CSTTable', () => {
   });
 
   test('with mock data renders token rows', () => {
-    const mockData: CSTToken[] = [
+    const mockData: CSTTokenInfo[] = [
       {
         EvtLogId: 100,
+        BlockNum: 0,
+        TxId: 0,
         TxHash: '0xabc123def456789',
         TimeStamp: 1701346718,
+        DateTime: '',
         Seed: 'deadbeef',
         TokenId: 42,
         TokenName: 'CosmicToken#42',
@@ -40,18 +45,21 @@ describe('CSTTable', () => {
     expect(screen.getByText(String(mockData[0]!.TokenId))).toBeInTheDocument();
     expect(screen.getByText(mockData[0]!.TokenName!)).toBeInTheDocument();
     expect(screen.getByText(String(mockData[0]!.RoundNum))).toBeInTheDocument();
-    expect(screen.getByText(shortenHex(mockData[0]!.WinnerAddr, 6))).toBeInTheDocument();
+    expect(screen.getByText(shortenHex(mockData[0]!.WinnerAddr ?? '', 6))).toBeInTheDocument();
   });
 
   test('renders staked status correctly', () => {
-    const mockData: CSTToken[] = [
+    const mockData: CSTTokenInfo[] = [
       {
         EvtLogId: 101,
+        BlockNum: 0,
+        TxId: 0,
         TxHash: '0xdef',
         TimeStamp: 1701346718,
+        DateTime: '',
         Seed: 'cafebabe',
         TokenId: 43,
-        TokenName: null,
+        TokenName: undefined,
         RoundNum: 6,
         WinnerAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
         Staked: false,
@@ -70,14 +78,17 @@ describe('CSTTable', () => {
   });
 
   test('renders RecordType labels', () => {
-    const mockData: CSTToken[] = [
+    const mockData: CSTTokenInfo[] = [
       {
         EvtLogId: 102,
+        BlockNum: 0,
+        TxId: 0,
         TxHash: '0x111',
         TimeStamp: 1701346718,
+        DateTime: '',
         Seed: 'aaa',
         TokenId: 44,
-        TokenName: null,
+        TokenName: undefined,
         RoundNum: 7,
         WinnerAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
         Staked: false,
@@ -92,14 +103,17 @@ describe('CSTTable', () => {
   });
 
   test('renders table headers', () => {
-    const mockData: CSTToken[] = [
+    const mockData: CSTTokenInfo[] = [
       {
         EvtLogId: 103,
+        BlockNum: 0,
+        TxId: 0,
         TxHash: '0x222',
         TimeStamp: 1701346718,
+        DateTime: '',
         Seed: 'bbb',
         TokenId: 45,
-        TokenName: null,
+        TokenName: undefined,
         RoundNum: 8,
         WinnerAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
         Staked: false,

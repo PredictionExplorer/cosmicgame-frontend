@@ -13,7 +13,6 @@ const paintWorkletBorder = (
 ): React.CSSProperties => ({
   border: 0,
   borderRadius: 0,
-  // @ts-expect-error CSS custom properties
   '--border': border,
   '--radius': radius,
   '--t': 0,

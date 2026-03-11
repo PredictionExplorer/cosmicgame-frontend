@@ -12,15 +12,16 @@ import {
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 interface PrizeData {
-  PrizeAmountEth: number;
-  RaffleAmountEth: number;
-  NumRaffleEthWinnersBidding: number;
-  NumRaffleNFTWinnersBidding: number;
-  NumRaffleNFTWinnersStakingRWalk: number;
-  StakingAmountEth: number;
-  CosmicGameBalanceEth: number;
-  ChronoWarriorPercentage: number;
-  CurNumBids: number;
+  PrizeAmountEth?: number;
+  RaffleAmountEth?: number;
+  NumRaffleEthWinnersBidding?: number;
+  NumRaffleNFTWinnersBidding?: number;
+  NumRaffleNFTWinnersStakingRWalk?: number;
+  StakingAmountEth?: number;
+  CosmicGameBalanceEth?: number;
+  ChronoWarriorPercentage?: number;
+  CurNumBids?: number;
+  [key: string]: unknown;
 }
 
 interface PrizeProps {
@@ -58,7 +59,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                 </a>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <p>{data?.PrizeAmountEth.toFixed(4)} ETH</p>
+                <p>{(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH</p>
                 <p>1 Cosmic Signature NFT</p>
                 <p>Tokens donated during round, if any</p>
               </TablePrimaryCell>
@@ -109,7 +110,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                 <p>Cosmic Signature NFT Staker</p>
               </TablePrimaryCell>
               <TablePrimaryCell>
-                <p>{data?.StakingAmountEth.toFixed(4)} ETH</p>
+                <p>{(data?.StakingAmountEth ?? 0).toFixed(4)} ETH</p>
               </TablePrimaryCell>
               <TablePrimaryCell align="center">
                 <p>1</p>
