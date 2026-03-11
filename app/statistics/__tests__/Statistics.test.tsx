@@ -98,14 +98,30 @@ jest.mock('../../../components/tokens/CTBalanceDistributionTable', () => ({
 jest.mock('../../../components/tokens/CTBalanceDistributionChart', () => ({
   CTBalanceDistributionChart: () => <div data-testid="ct-balance-distribution-chart" />,
 }));
-jest.mock('../../../components/staking/GlobalStakingActionsTable', () => ({
-  GlobalStakingActionsTable: () => <div data-testid="global-staking-actions-table" />,
+jest.mock('../../../components/statistics/StatisticsItem', () => ({
+  StatisticsItem: ({ title, value }: { title: string; value: React.ReactNode }) => (
+    <div data-testid="statistics-item">
+      <span>{title}</span>
+      <span>{value}</span>
+    </div>
+  ),
+  CountdownRenderer: () => <span data-testid="countdown-renderer" />,
 }));
-jest.mock('../../../components/staking/GlobalStakedTokensTable', () => ({
-  GlobalStakedTokensTable: () => <div data-testid="global-staked-tokens-table" />,
+jest.mock('../../../components/statistics/StakingSection', () => ({
+  StakingSection: () => (
+    <div data-testid="staking-section">
+      <span>CosmicSignature Token</span>
+      <span>RandomWalk Token</span>
+      <span>Number of Active Stakers</span>
+    </div>
+  ),
 }));
-jest.mock('../../../components/common/CustomPagination', () => ({
-  CustomPagination: () => <div data-testid="custom-pagination" />,
+jest.mock('../../../components/statistics/DonatedNFTsGrid', () => ({
+  DonatedNFTsGrid: ({ nftDonations }: { nftDonations: unknown[] }) => (
+    <div data-testid="donated-nfts-grid">
+      {nftDonations.length === 0 && <p>No ERC721 tokens were donated on this round.</p>}
+    </div>
+  ),
 }));
 jest.mock('../../../config/misc', () => ({
   ZERO_ADDRESS: '0x0000000000000000000000000000000000000000',

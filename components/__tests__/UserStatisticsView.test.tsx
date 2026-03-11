@@ -87,13 +87,37 @@ jest.mock('next/link', () => ({
   ),
 }));
 
+jest.mock('../user-statistics/UserStatsSection', () => ({
+  UserStatsSection: ({ userInfo }: { userInfo: { NumBids: number } }) => (
+    <div data-testid="user-stats-section">bids: {userInfo?.NumBids}</div>
+  ),
+  StatRow: ({ label, children }: { label: string; children: React.ReactNode }) => (
+    <div>
+      <span>{label}</span>
+      <span>{children}</span>
+    </div>
+  ),
+}));
+jest.mock('../user-statistics/UserStakingSection', () => ({
+  UserStakingSection: () => (
+    <div data-testid="user-staking-section">
+      <div data-testid="staking-actions-table" />
+      <div data-testid="staking-rewards-table" />
+    </div>
+  ),
+}));
+jest.mock('../user-statistics/DonatedAssetsSection', () => ({
+  DonatedAssetsSection: () => (
+    <div data-testid="donated-assets-section">
+      <div data-testid="donated-nft-table" />
+      <div data-testid="donated-erc20-table" />
+    </div>
+  ),
+}));
+
 jest.mock('../tables/BiddingHistoryTable', () => ({
   __esModule: true,
   default: () => <div data-testid="bidding-history-table" />,
-}));
-jest.mock('../staking/StakingActionsTable', () => ({
-  __esModule: true,
-  default: () => <div data-testid="staking-actions-table" />,
 }));
 jest.mock('../tables/WinningHistoryTable', () => ({
   __esModule: true,
@@ -103,31 +127,8 @@ jest.mock('../tables/MarketingRewardsTable', () => ({
   __esModule: true,
   default: () => <div data-testid="marketing-rewards-table" />,
 }));
-jest.mock('../donations/DonatedNFTTable', () => ({
-  __esModule: true,
-  default: () => <div data-testid="donated-nft-table" />,
-}));
-jest.mock('../staking/StakingRewardsTable', () => ({
-  StakingRewardsTable: () => <div data-testid="staking-rewards-table" />,
-}));
-jest.mock('../staking/CSTStakingRewardsByDepositTable', () => ({
-  CSTStakingRewardsByDepositTable: () => <div data-testid="cst-deposit-table" />,
-}));
-jest.mock('../staking/CollectedCSTStakingRewardsTable', () => ({
-  CollectedCSTStakingRewardsTable: () => <div data-testid="collected-rewards-table" />,
-}));
-jest.mock('../staking/UncollectedCSTStakingRewardsTable', () => ({
-  UncollectedCSTStakingRewardsTable: () => <div data-testid="uncollected-rewards-table" />,
-}));
-jest.mock('../staking/RwalkStakingRewardMintsTable', () => ({
-  RwalkStakingRewardMintsTable: () => <div data-testid="rwlk-mints-table" />,
-}));
 jest.mock('../tokens/CSTTable', () => ({
   CSTTable: () => <div data-testid="cst-table" />,
-}));
-jest.mock('../donations/DonatedERC20Table', () => ({
-  __esModule: true,
-  default: () => <div data-testid="donated-erc20-table" />,
 }));
 
 beforeEach(() => jest.clearAllMocks());
@@ -188,12 +189,11 @@ describe('UserStatisticsView', () => {
     });
     render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
 
-    expect(screen.getByText(/Number of Bids:/)).toBeInTheDocument();
-    expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByTestId('user-stats-section')).toHaveTextContent('bids: 5');
     expect(screen.getByTestId('bidding-history-table')).toBeInTheDocument();
     expect(screen.getByTestId('cst-table')).toBeInTheDocument();
     expect(screen.getByTestId('winning-history-table')).toBeInTheDocument();
-    expect(screen.getByTestId('donated-nft-table')).toBeInTheDocument();
+    expect(screen.getByTestId('donated-assets-section')).toBeInTheDocument();
   });
 
   it('shows "My Statistics" heading for own profile', () => {

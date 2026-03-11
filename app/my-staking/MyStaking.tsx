@@ -24,148 +24,10 @@ import { useStakedToken } from '@/contexts/StakedTokenContext';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useNotification } from '@/contexts/NotificationContext';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
-import StakingActionsTable from '@/components/staking/StakingActionsTable';
-import { StakingRewardsTable } from '@/components/staking/StakingRewardsTable';
-import { StakedTokensTable } from '@/components/staking/StakedTokensTable';
-import { RWLKNFTTable } from '@/components/tokens/RWLKNFTTable';
-import { RwalkStakingRewardMintsTable } from '@/components/staking/RwalkStakingRewardMintsTable';
-import { CSTokensTable } from '@/components/tokens/CSTokensTable';
+import { CSTStakingPanel } from '@/components/staking/CSTStakingPanel';
+import { RWLKStakingPanel } from '@/components/staking/RWLKStakingPanel';
 import getErrorMessage from '@/utils/alert';
 
-// ----------------------------------------------
-// Sub-Components
-// ----------------------------------------------
-
-function CSTStakingPanel({
-  account,
-  stakingActions,
-  userTokens,
-  stakedTokens,
-  stakingRewards,
-  handleStake,
-  handleStakeMany,
-  handleUnstake,
-  handleUnstakeMany,
-}: {
-  account: string;
-  stakingActions: import('@/services/api/types').StakingAction[];
-  userTokens: import('@/services/api/types').CSTTokenInfo[];
-  stakedTokens: import('@/services/api/types').StakedTokenInfo[];
-  stakingRewards: import('@/services/api/types').RewardsByToken[];
-  handleStake: (tokenId: number) => Promise<unknown>;
-  handleStakeMany: (tokenIds: number[]) => Promise<unknown>;
-  handleUnstake: (actionId: number) => Promise<unknown>;
-  handleUnstakeMany: (actionIds: number[]) => Promise<unknown>;
-}) {
-  return (
-    <>
-      <div>
-        <p className="text-base leading-none mb-4">Staking Rewards by Token</p>
-        <StakingRewardsTable list={stakingRewards} address={account} />
-      </div>
-
-      <div>
-        <p className="text-base leading-none mt-16 mb-4">Stake / Unstake Actions</p>
-        <StakingActionsTable list={stakingActions} IsRwalk={false} />
-      </div>
-
-      <div>
-        <p className="text-base leading-none mt-16 mb-4">Tokens Available for Staking</p>
-        <CSTokensTable
-          list={userTokens}
-          handleStake={async (tokenId) => {
-            await handleStake(tokenId);
-          }}
-          handleStakeMany={async (tokenIds) => {
-            await handleStakeMany(tokenIds);
-          }}
-        />
-      </div>
-
-      <div>
-        <p className="text-base leading-none mt-16 mb-4">Staked Tokens</p>
-        <StakedTokensTable
-          list={stakedTokens}
-          handleUnstake={async (actionId) => {
-            await handleUnstake(actionId);
-          }}
-          handleUnstakeMany={async (actionIds) => {
-            await handleUnstakeMany(actionIds);
-          }}
-          IsRwalk={false}
-        />
-      </div>
-    </>
-  );
-}
-
-function RWLKStakingPanel({
-  account,
-  stakingActions,
-  rwlkMints,
-  userTokens,
-  stakedTokens,
-  handleStake,
-  handleStakeMany,
-  handleUnstake,
-  handleUnstakeMany,
-}: {
-  account: string;
-  stakingActions: import('@/services/api/types').StakingAction[];
-  rwlkMints: import('@/services/api/types').StakingRewardMint[];
-  userTokens: number[];
-  stakedTokens: import('@/services/api/types').StakedTokenInfo[];
-  handleStake: (tokenId: number) => Promise<unknown>;
-  handleStakeMany: (tokenIds: number[]) => Promise<unknown>;
-  handleUnstake: (actionId: number) => Promise<unknown>;
-  handleUnstakeMany: (actionIds: number[]) => Promise<unknown>;
-}) {
-  return (
-    <>
-      <div>
-        <p className="text-base leading-none mb-4">Staking Reward Tokens</p>
-        <RwalkStakingRewardMintsTable list={rwlkMints} />
-      </div>
-
-      <div>
-        <p className="text-base leading-none mt-16 mb-4">Stake / Unstake Actions</p>
-        <StakingActionsTable list={stakingActions} IsRwalk={true} />
-      </div>
-
-      <div>
-        <p className="text-base leading-none mt-16 mb-4">Tokens Available for Staking</p>
-        <RWLKNFTTable
-          list={userTokens}
-          ownerAddress={account}
-          handleStake={async (tokenId) => {
-            await handleStake(tokenId);
-          }}
-          handleStakeMany={async (tokenIds) => {
-            await handleStakeMany(tokenIds);
-          }}
-        />
-      </div>
-
-      <div>
-        <p className="text-base leading-none mt-16 mb-4">Staked Tokens</p>
-        <StakedTokensTable
-          list={stakedTokens}
-          handleUnstake={async (actionId) => {
-            await handleUnstake(actionId);
-          }}
-          handleUnstakeMany={async (actionIds) => {
-            await handleUnstakeMany(actionIds);
-          }}
-          IsRwalk={true}
-        />
-      </div>
-    </>
-  );
-}
-
-// ----------------------------------------------
-// Main Component
-// ----------------------------------------------
 const MyStaking = () => {
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
@@ -279,10 +141,10 @@ const MyStaking = () => {
           if (res) {
             setNotification({
               visible: true,
+              type: 'success',
               text: Array.isArray(tokenIds)
                 ? 'The selected tokens were staked successfully!'
                 : `You have successfully staked token ${tokenIds}!`,
-              type: 'success',
             });
           }
         }, 2000);
@@ -339,10 +201,10 @@ const MyStaking = () => {
           if (res) {
             setNotification({
               visible: true,
+              type: 'success',
               text: Array.isArray(actionIds)
                 ? 'The selected tokens were unstaked successfully!'
                 : 'You have successfully unstaked token!',
-              type: 'success',
             });
           }
         }, 2000);

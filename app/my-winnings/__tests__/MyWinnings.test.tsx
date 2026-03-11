@@ -63,6 +63,12 @@ jest.mock('../../../hooks/useRaffleWalletContract', () => ({
   }),
 }));
 
+jest.mock('../../../components/winnings/RaffleWinningsTable', () => ({
+  RaffleWinningsTable: ({ list }: { list: unknown[] }) => (
+    <div data-testid="raffle-winnings-table">rows: {list.length}</div>
+  ),
+}));
+
 jest.mock('../../../components/donations/DonatedNFTTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (

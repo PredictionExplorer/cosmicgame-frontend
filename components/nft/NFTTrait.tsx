@@ -2,21 +2,13 @@ import 'yet-another-react-lightbox/styles.css';
 
 import { useState, useMemo, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Lightbox from 'yet-another-react-lightbox';
 import { usePublicClient } from 'wagmi';
 import { ArrowLeft, ArrowRight, ChevronUp, ChevronDown } from 'lucide-react';
 
-import {
-  getExplorerUrl,
-  convertTimestampToDateTime,
-  formatId,
-  getAssetsUrl,
-  getOriginUrl,
-} from '@/utils';
+import { formatId, getAssetsUrl, getOriginUrl } from '@/utils';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -50,6 +42,8 @@ import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
 
 import NFTImage from './NFTImage';
 import NFTVideo from './NFTVideo';
+import { NFTMetadata } from './NFTMetadata';
+import { NFTOwnerActions } from './NFTOwnerActions';
 
 interface NFTDetailInfo extends CSTTokenInfo {
   WinnerAddr?: string;
@@ -67,10 +61,8 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const [openVideo, setOpenVideo] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
   const [videoPath, setVideoPath] = useState<string | null>(null);
-
   const [address, setAddress] = useState('');
   const [tokenName, setTokenName] = useState('');
-
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { data: dashboard, isLoading: loadingDashboard } = useDashboardInfo();
@@ -118,7 +110,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         method: 'eth_getTransactionCount',
         params: [address, 'latest'],
       });
-
       if (Number(txCount) === 0) {
         setOpenDialog(true);
       } else {
@@ -129,9 +120,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     }
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
+  const handleCloseDialog = () => setOpenDialog(false);
 
   const handlePlay = async (videoUrl: string) => {
     try {
@@ -161,7 +150,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     try {
       const hash = await nftContract.write.transferFrom?.([account, address, tokenId]);
       if (hash) await publicClient?.waitForTransactionReceipt({ hash });
-
       await Promise.all([refetchCSTInfo(), refetchTransferHistory()]);
       setAddress('');
     } catch (err) {
@@ -180,7 +168,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     try {
       const hash = await nftContract.write.setNftName?.([tokenId, tokenName]);
       if (hash) await publicClient?.waitForTransactionReceipt({ hash });
-
       setTimeout(async () => {
         await Promise.all([refetchCSTInfo(), refetchNameHistory()]);
       }, 3000);
@@ -203,7 +190,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     try {
       const hash = await nftContract.write.setNftName?.([tokenId, '']);
       if (hash) await publicClient?.waitForTransactionReceipt({ hash });
-
       setTimeout(async () => {
         await Promise.all([refetchCSTInfo(), refetchNameHistory()]);
       }, 3000);
@@ -259,7 +245,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     <div className="container mx-auto px-4">
       <SectionWrapper>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left column: NFT image and navigation */}
           <div className="mx-auto w-full max-w-lg">
             <StyledCard>
               <div className="cursor-pointer" onClick={() => setImageOpen(true)}>
@@ -333,82 +318,8 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
             </div>
           </div>
 
-          {/* Right column: NFT metadata and actions */}
           <div>
-            {nft?.TimeStamp && (
-              <div className="mb-2">
-                <span className="text-primary">Minted Date:</span>
-                &nbsp;
-                <a
-                  className="text-foreground"
-                  href={getExplorerUrl('tx', nft.TxHash)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {convertTimestampToDateTime(nft.TimeStamp)}
-                </a>
-              </div>
-            )}
-            <div className="mb-2">
-              <span className="text-primary">Winner:</span>
-              &nbsp;
-              <Link href={`/user/${nft?.WinnerAddr ?? ''}`} className="text-white">
-                <span className="font-mono">{nft?.WinnerAddr}</span>
-              </Link>
-            </div>
-            <div className="mb-2">
-              <span className="text-primary">Owner:</span>
-              &nbsp;
-              <Link href={`/user/${nft?.CurOwnerAddr ?? ''}`} className="text-white">
-                <span className="font-mono">{nft?.CurOwnerAddr}</span>
-              </Link>
-            </div>
-            <div className="mb-2 flex">
-              <span className="text-primary">Seed:</span>
-              &nbsp;
-              <span className="font-mono inline-block break-words w-[32ch]">{nft?.Seed}</span>
-            </div>
-            <div className="mb-2">
-              <span className="text-primary">Prize Type:</span>
-              &nbsp;
-              <span>
-                {(() => {
-                  switch (nft?.RecordType) {
-                    case 1:
-                      return 'Raffle Winner';
-                    case 2:
-                      return 'Staking Winner';
-                    case 3:
-                      return (
-                        <>
-                          Round Winner (
-                          <Link
-                            href={`/prize/${nft?.RoundNum ?? 0}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-inherit"
-                          >
-                            Round #{nft?.RoundNum}
-                          </Link>
-                          )
-                        </>
-                      );
-                    case 4:
-                      return 'Endurance Champion NFT Winner';
-                    default:
-                      return '';
-                  }
-                })()}
-              </span>
-            </div>
-
-            {!nft?.Staked && !nft?.WasUnstaked ? (
-              <p className="text-[#0f0]">The token is eligible for staking.</p>
-            ) : (
-              <p className="text-[#f00]">
-                The token has already been staked and cannot be staked again.
-              </p>
-            )}
+            <NFTMetadata nft={nft} />
 
             <div className="mt-12">
               <Button variant="outline" onClick={() => router.push(`/prize/${nft?.RoundNum ?? 0}`)}>
@@ -417,64 +328,20 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
             </div>
 
             {account === nft?.CurOwnerAddr && (
-              <>
-                <div className="flex mt-6">
-                  <Input
-                    placeholder="Enter address here"
-                    className="flex-1"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                  />
-                  <Button
-                    variant="secondary"
-                    onClick={handleClickTransfer}
-                    className="ml-2"
-                    disabled={!address || address === account}
-                  >
-                    Transfer
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Button>
-                </div>
-
-                <div className="mt-6">
-                  <h6 className="text-lg font-medium text-left">
-                    {nft?.TokenName ? 'Rename the token' : 'Set a name to the token'}
-                  </h6>
-                  <div className="flex">
-                    <Input
-                      placeholder="Enter token name here"
-                      value={tokenName}
-                      className="flex-1"
-                      maxLength={32}
-                      onChange={handleChangeName}
-                    />
-                    <Button
-                      variant="secondary"
-                      onClick={handleSetTokenName}
-                      className="ml-2 whitespace-nowrap"
-                      disabled={!tokenName}
-                    >
-                      {nft?.TokenName === '' ? 'Set Name' : 'Change Name'}
-                    </Button>
-                    {nameHistory.length > 0 && nameHistory[0]?.TokenName && (
-                      <Button
-                        variant="secondary"
-                        onClick={handleClearName}
-                        className="ml-2 whitespace-nowrap"
-                      >
-                        Clear name
-                      </Button>
-                    )}
-                  </div>
-                  <p className="text-sm mt-2 italic">
-                    There are {dashboard?.MainStats.TotalNamedTokens} tokens with a name, click{' '}
-                    <Link href="/named-nfts" className="text-primary hover:underline">
-                      here
-                    </Link>{' '}
-                    for a full list.
-                  </p>
-                </div>
-              </>
+              <NFTOwnerActions
+                address={address}
+                tokenName={tokenName}
+                nftTokenName={nft?.TokenName ?? ''}
+                nameHistoryCount={nameHistory.length}
+                currentName={nameHistory[0]?.TokenName ?? ''}
+                totalNamedTokens={dashboard?.MainStats.TotalNamedTokens ?? 0}
+                disabled={!address || address === account}
+                onAddressChange={setAddress}
+                onTokenNameChange={handleChangeName}
+                onTransfer={handleClickTransfer}
+                onSetName={handleSetTokenName}
+                onClearName={handleClearName}
+              />
             )}
           </div>
         </div>
@@ -500,7 +367,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         </div>
 
         <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: image }]} />
-
         <VideoPlayerDialog
           open={openVideo}
           videoPath={videoPath}

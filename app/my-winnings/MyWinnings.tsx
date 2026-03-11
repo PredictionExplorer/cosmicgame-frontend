@@ -1,25 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Tr, Tbody } from 'react-super-responsive-table';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { parseUnits } from 'viem';
 
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
-
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import {
-  MainWrapper,
-  TablePrimary,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
+import { MainWrapper } from '@/components/styled';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import getErrorMessage from '@/utils/alert';
@@ -35,10 +21,8 @@ import {
 import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
 import { UncollectedCSTStakingRewardsTable } from '@/components/staking/UncollectedCSTStakingRewardsTable';
 import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
+import { RaffleWinningsTable, type RaffleWinning } from '@/components/winnings/RaffleWinningsTable';
 
-/* ------------------------------------------------------------------
-  Types
------------------------------------------------------------------- */
 interface UnclaimedDonatedNFT {
   Index: number;
   RecordId: string | number;
@@ -53,145 +37,6 @@ interface UnclaimedDonatedNFT {
   [key: string]: unknown;
 }
 
-interface RaffleWinning {
-  EvtLogId: number;
-  TxHash: string;
-  TimeStamp: number;
-  RoundNum: number;
-  Amount: number;
-  WinnerAddr: string;
-  Claimed: boolean;
-}
-
-/* ------------------------------------------------------------------
-  Custom Hook: useUnclaimedWinnings
------------------------------------------------------------------- */
-/* ------------------------------------------------------------------
-  Sub-Components
------------------------------------------------------------------- */
-
-function RaffleWinningRow({
-  winning,
-  roundTimeout,
-}: {
-  winning: RaffleWinning;
-  roundTimeout: number;
-}) {
-  const { TxHash, TimeStamp, RoundNum, Amount, WinnerAddr, Claimed } = winning;
-
-  if (!winning) return <TablePrimaryRow />;
-
-  /* eslint-disable react-hooks/purity */
-  const isExpired = roundTimeout > 0 && roundTimeout < Date.now() / 1000;
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell>
-        <a
-          className="text-inherit text-[inherit]"
-          href={getExplorerUrl('tx', TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {convertTimestampToDateTime(TimeStamp)}
-        </a>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        <Link
-          href={`/prize/${RoundNum}`}
-          className="text-inherit text-[inherit]"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {RoundNum}
-        </Link>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/user/${WinnerAddr}`} className="text-inherit text-[inherit]">
-                {shortenHex(WinnerAddr, 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{WinnerAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">
-        {roundTimeout ? (
-          <>
-            {convertTimestampToDateTime(roundTimeout)}{' '}
-            {isExpired
-              ? '(Expired)'
-              : `(${formatSeconds(roundTimeout - Math.ceil(Date.now() / 1000))})`}
-          </>
-        ) : (
-          ' '
-        )}
-      </TablePrimaryCell>
-      <TablePrimaryCell align="center">{Amount.toFixed(7)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-  /* eslint-enable react-hooks/purity */
-}
-
-function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
-  const raffleWalletContract = useRaffleWalletContract();
-  const [roundTimeouts, setRoundTimeouts] = useState<Record<number, number>>({});
-
-  useEffect(() => {
-    if (!raffleWalletContract || list.length === 0) return;
-
-    const uniqueRounds = Array.from(new Set(list.map((w) => w.RoundNum)));
-
-    const fetchTimeouts = async () => {
-      const results = await Promise.allSettled(
-        uniqueRounds.map((r) => raffleWalletContract.read.roundTimeoutTimesToWithdrawPrizes?.([r])),
-      );
-      const map: Record<number, number> = {};
-      results.forEach((res, i) => {
-        if (res.status === 'fulfilled') {
-          map[uniqueRounds[i]!] = Number(res.value);
-        }
-      });
-      setRoundTimeouts(map);
-    };
-
-    fetchTimeouts();
-  }, [raffleWalletContract, list]);
-
-  return (
-    <TablePrimaryContainer>
-      <TablePrimary>
-        <TablePrimaryHead>
-          <Tr>
-            <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Amount (ETH)</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Claimed</TablePrimaryHeadCell>
-          </Tr>
-        </TablePrimaryHead>
-        <Tbody>
-          {list.map((winning) => (
-            <RaffleWinningRow
-              key={winning.EvtLogId}
-              winning={winning}
-              roundTimeout={roundTimeouts[winning.RoundNum] ?? 0}
-            />
-          ))}
-        </Tbody>
-      </TablePrimary>
-    </TablePrimaryContainer>
-  );
-}
-
-/* ------------------------------------------------------------------
-  Main Component: MyWinnings
------------------------------------------------------------------- */
 export default function MyWinnings() {
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
@@ -249,10 +94,6 @@ export default function MyWinnings() {
   });
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
   const perPage = 5;
-
-  /* ------------------------------------------------------------------
-    Handlers
-  ------------------------------------------------------------------ */
 
   const handleAllETHClaim = async () => {
     if (!raffleWalletContract) {
@@ -377,10 +218,6 @@ export default function MyWinnings() {
     }
   };
 
-  /* ------------------------------------------------------------------
-    Render
-  ------------------------------------------------------------------ */
-
   if (!account) {
     return (
       <MainWrapper>
@@ -405,7 +242,6 @@ export default function MyWinnings() {
     <MainWrapper>
       <h4 className="text-2xl font-bold text-primary text-center mb-2">Pending Winnings</h4>
 
-      {/* Raffle ETH Section */}
       <div className="mt-12">
         <h5 className="text-xl font-bold mb-4">Claimable ETH Rewards</h5>
         {loading && raffleETHWinnings === null ? (
@@ -417,7 +253,6 @@ export default function MyWinnings() {
             <RaffleWinningsTable
               list={raffleETHWinnings.slice((currentPage - 1) * perPage, currentPage * perPage)}
             />
-
             {status?.ETHRaffleToClaim > 0 && (
               <div className="flex justify-end items-center mt-4">
                 <p className="mr-4">
@@ -428,7 +263,6 @@ export default function MyWinnings() {
                 </Button>
               </div>
             )}
-
             <CustomPagination
               page={currentPage}
               setPage={setCurrentPage}
@@ -439,13 +273,11 @@ export default function MyWinnings() {
         )}
       </div>
 
-      {/* CST Staking Rewards Section */}
       <div className="mt-12">
         <h5 className="text-xl font-bold mb-4">Claimable CST Staking Rewards</h5>
         <UncollectedCSTStakingRewardsTable user={account} />
       </div>
 
-      {/* Donated NFTs Section */}
       <div className="mt-16">
         <div className="flex justify-between mb-4">
           <h5 className="text-xl font-bold">Donated NFTs</h5>
@@ -468,7 +300,6 @@ export default function MyWinnings() {
         )}
       </div>
 
-      {/* Donated ERC20 Section */}
       <div className="mt-16">
         <div className="flex justify-between items-center mb-4">
           <h5 className="text-xl font-bold">Donated ERC20 Tokens</h5>
@@ -476,7 +307,6 @@ export default function MyWinnings() {
             <Button onClick={handleAllDonatedERC20Claim}>Claim All</Button>
           )}
         </div>
-
         {erc20Loading ? (
           <h6 className="text-lg font-semibold">Loading...</h6>
         ) : (
@@ -484,7 +314,6 @@ export default function MyWinnings() {
         )}
       </div>
 
-      {/* Bottom Link Section */}
       <div className="mt-12">
         <Button variant="outline" onClick={() => router.push('/winning-history')}>
           Go to my winning history page.

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import Link from 'next/link';
 import Countdown from 'react-countdown';
 import { formatEther } from 'viem';
@@ -8,24 +8,14 @@ import { formatEther } from 'viem';
 import { convertTimestampToDateTime, formatCSTValue, formatEthValue, formatSeconds } from '@/utils';
 
 import { MainWrapper } from '@/components/styled';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import BiddingHistoryTable from '@/components/tables/BiddingHistoryTable';
 import { UniqueBiddersTable, Bidder } from '@/components/tables/UniqueBiddersTable';
 import { UniqueWinnersTable, Winner } from '@/components/tables/UniqueWinnersTable';
-import DonatedNFT from '@/components/donations/DonatedNFT';
 import DonatedNFTDistributionTable from '@/components/donations/DonatedNFTDistributionTable';
 import { CSTokenDistributionTable } from '@/components/tokens/CSTokenDistributionTable';
 import { CTBalanceDistributionTable } from '@/components/tokens/CTBalanceDistributionTable';
-import { UniqueStakersCSTTable, UniqueStakerCST } from '@/components/tables/UniqueStakersCSTTable';
-import { GlobalStakingActionsTable } from '@/components/staking/GlobalStakingActionsTable';
-import { GlobalStakedTokensTable } from '@/components/staking/GlobalStakedTokensTable';
-import { SystemModesTable, EventRow } from '@/components/tables/SystemModesTable';
-import {
-  UniqueStakersRWLKTable,
-  UniqueStakerRWLK,
-} from '@/components/tables/UniqueStakersRWLKTable';
-import { CustomPagination } from '@/components/common/CustomPagination';
 import { CTBalanceDistributionChart } from '@/components/tokens/CTBalanceDistributionChart';
+import { SystemModesTable, EventRow } from '@/components/tables/SystemModesTable';
 import { UniqueEthDonorsTable, UniqueEthDonor } from '@/components/tables/UniqueEthDonorsTable';
 import { ZERO_ADDRESS } from '@/config/misc';
 import {
@@ -46,11 +36,11 @@ import {
   useSystemModelist,
   useCTPrice,
 } from '@/hooks/useApiQuery';
-
-interface StatisticsItemProps {
-  title: string;
-  value: ReactNode;
-}
+import { StatisticsItem, CountdownRenderer } from '@/components/statistics/StatisticsItem';
+import { StakingSection } from '@/components/statistics/StakingSection';
+import { DonatedNFTsGrid } from '@/components/statistics/DonatedNFTsGrid';
+import type { UniqueStakerCST } from '@/components/tables/UniqueStakersCSTTable';
+import type { UniqueStakerRWLK } from '@/components/tables/UniqueStakersRWLKTable';
 
 interface CSTBidData {
   AuctionDuration: number;
@@ -58,37 +48,7 @@ interface CSTBidData {
   SecondsElapsed: number;
 }
 
-const StatisticsItem = ({ title, value }: StatisticsItemProps) => (
-  <div className="my-2 flex flex-wrap">
-    <p className="mr-4 w-[200px] font-medium text-primary md:w-[400px]">{title}</p>
-    <p className="flex-1 break-all">{value}</p>
-  </div>
-);
-
-const CountdownRenderer = ({
-  days,
-  hours,
-  minutes,
-  seconds,
-}: {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-}) => {
-  let result = '';
-  if (days) result += `${days}d `;
-  if (hours || result) result += `${hours}h `;
-  if (minutes || result) result += `${minutes}m `;
-  if (seconds || result) result += `${seconds}s`;
-  if (result !== '') result += ' left';
-  return result !== '' ? <p>{result}</p> : null;
-};
-
 const Statistics = () => {
-  const ITEMS_PER_PAGE = 12;
-  const [currentNFTPage, setNFTPage] = useState(1);
-
   const { data: dashboardData, isLoading: dashboardLoading, isError } = useDashboardInfo();
   const round = dashboardData?.CurRoundNum ?? -1;
 
@@ -109,7 +69,6 @@ const Statistics = () => {
   const { data: ctPriceData } = useCTPrice();
 
   const data = dashboardData ?? null;
-  const loading = dashboardLoading;
 
   const cstBidData = useMemo<CSTBidData>(() => {
     if (!ctPriceData) return { AuctionDuration: 0, CSTPrice: 0, SecondsElapsed: 0 };
@@ -119,8 +78,6 @@ const Statistics = () => {
       SecondsElapsed: parseInt(ctPriceData.SecondsElapsed, 10),
     };
   }, [ctPriceData]);
-
-  const currentRoundBidHistory = bidListData ?? [];
 
   const uniqueBidders = useMemo(() => {
     if (!uniqueBiddersData) return [];
@@ -142,21 +99,7 @@ const Statistics = () => {
   const stakedRWLKTokens = stakedRWLKTokensData ?? null;
   const systemModeChanges = (systemModeChangesData as EventRow[] | undefined) ?? null;
 
-  const renderCountdown = () => {
-    if (!data) return null;
-    if (data.PrizeClaimTs <= Date.now() / 1000) return null;
-
-    return (
-      <div className="my-2 flex">
-        <p className="mr-4 w-[200px] font-medium text-primary md:w-[400px]">Time Left</p>
-        <div className="flex-1">
-          <Countdown date={data.PrizeClaimTs * 1000} renderer={CountdownRenderer} />
-        </div>
-      </div>
-    );
-  };
-
-  if (loading) {
+  if (dashboardLoading) {
     return (
       <MainWrapper>
         <p className="text-lg font-semibold">Loading...</p>
@@ -184,27 +127,15 @@ const Statistics = () => {
           : convertTimestampToDateTime(data.TsRoundStart),
     },
     { title: 'Current Bid Price', value: formatEthValue(data.BidPriceEth) },
-    {
-      title: 'Current Bid Price using RandomWalk',
-      value: formatEthValue(data.BidPriceEth / 2),
-    },
+    { title: 'Current Bid Price using RandomWalk', value: formatEthValue(data.BidPriceEth / 2) },
     {
       title: 'Current Bid Price using CST',
       value: cstBidData?.CSTPrice > 0 ? formatCSTValue(cstBidData.CSTPrice) : 'FREE',
     },
-    {
-      title: 'CST Auction Elapsed Time',
-      value: formatSeconds(cstBidData.SecondsElapsed),
-    },
-    {
-      title: 'CST Auction Duration',
-      value: formatSeconds(cstBidData.AuctionDuration),
-    },
+    { title: 'CST Auction Elapsed Time', value: formatSeconds(cstBidData.SecondsElapsed) },
+    { title: 'CST Auction Duration', value: formatSeconds(cstBidData.AuctionDuration) },
     { title: 'Number of Bids Since Round Start', value: data.CurNumBids },
-    {
-      title: 'Total Donated NFTs',
-      value: data.CurRoundStats?.TotalDonatedNFTs ?? 0,
-    },
+    { title: 'Total Donated NFTs', value: data.CurRoundStats?.TotalDonatedNFTs ?? 0 },
     {
       title: 'Total Donated ETH',
       value: (
@@ -218,10 +149,7 @@ const Statistics = () => {
         </Link>
       ),
     },
-    {
-      title: 'Prize Amount',
-      value: formatEthValue(data.PrizeAmountEth ?? 0),
-    },
+    { title: 'Prize Amount', value: formatEthValue(data.PrizeAmountEth ?? 0) },
     {
       title: 'Prize Claim Date',
       value:
@@ -242,7 +170,7 @@ const Statistics = () => {
     },
   ];
 
-  const overallStats = [
+  const overallStats: { title: string; value: ReactNode }[] = [
     {
       title: 'CosmicGame contract balance',
       value: `${(data.CosmicGameBalanceEth ?? 0).toFixed(4)} ETH`,
@@ -271,10 +199,7 @@ const Statistics = () => {
       title: 'Total Amount Paid in ETH Raffles',
       value: formatEthValue(data.MainStats.TotalRaffleEthDeposits),
     },
-    {
-      title: 'Total CST Consumed',
-      value: formatCSTValue(data.MainStats.TotalCSTConsumedEth),
-    },
+    { title: 'Total CST Consumed', value: formatCSTValue(data.MainStats.TotalCSTConsumedEth) },
     {
       title: 'Total Reward Paid to Marketing Agents with CST',
       value: formatCSTValue(data.MainStats.TotalMktRewardsEth),
@@ -299,26 +224,11 @@ const Statistics = () => {
         </Link>
       ),
     },
-    {
-      title: 'Charity Balance',
-      value: formatEthValue(Number(data.CharityBalanceEth) || 0),
-    },
-    {
-      title: 'Number of Bids with CST',
-      value: data.MainStats.NumBidsCST,
-    },
-    {
-      title: 'Number of Unique Bidders',
-      value: data.MainStats.NumUniqueBidders,
-    },
-    {
-      title: 'Number of Unique Winners',
-      value: data.MainStats.NumUniqueWinners,
-    },
-    {
-      title: 'Number of Unique ETH Donors',
-      value: data.MainStats.NumUniqueDonors,
-    },
+    { title: 'Charity Balance', value: formatEthValue(Number(data.CharityBalanceEth) || 0) },
+    { title: 'Number of Bids with CST', value: data.MainStats.NumBidsCST },
+    { title: 'Number of Unique Bidders', value: data.MainStats.NumUniqueBidders },
+    { title: 'Number of Unique Winners', value: data.MainStats.NumUniqueWinners },
+    { title: 'Number of Unique ETH Donors', value: data.MainStats.NumUniqueDonors },
     {
       title: 'Number of Donated NFTs',
       value: (
@@ -335,14 +245,8 @@ const Statistics = () => {
         </Link>
       ),
     },
-    {
-      title: 'Number of Unique CST Stakers',
-      value: data.MainStats.NumUniqueStakersCST,
-    },
-    {
-      title: 'Number of Unique Random Walk Stakers',
-      value: data.MainStats.NumUniqueStakersRWalk,
-    },
+    { title: 'Number of Unique CST Stakers', value: data.MainStats.NumUniqueStakersCST },
+    { title: 'Number of Unique Random Walk Stakers', value: data.MainStats.NumUniqueStakersRWalk },
   ];
 
   return (
@@ -352,12 +256,19 @@ const Statistics = () => {
         {currentRoundStats.map((item) => (
           <StatisticsItem key={item.title} title={item.title} value={item.value} />
         ))}
-        {renderCountdown()}
+        {data.PrizeClaimTs > Date.now() / 1000 && (
+          <div className="my-2 flex">
+            <p className="mr-4 w-[200px] font-medium text-primary md:w-[400px]">Time Left</p>
+            <div className="flex-1">
+              <Countdown date={data.PrizeClaimTs * 1000} renderer={CountdownRenderer} />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="my-8">
         <h4 className="text-lg font-semibold">BID HISTORY FOR CURRENT ROUND</h4>
-        <BiddingHistoryTable biddingHistory={currentRoundBidHistory} showRound={false} />
+        <BiddingHistoryTable biddingHistory={bidListData ?? []} showRound={false} />
       </div>
 
       <h3 className="text-xl font-semibold">Overall Statistics</h3>
@@ -366,14 +277,7 @@ const Statistics = () => {
           <StatisticsItem key={item.title} title={item.title} value={item.value} />
         ))}
         {(data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0) > 0 && (
-          <p className="text-primary">
-            {`${
-              data.MainStats.NumWinnersWithPendingRaffleWithdrawal
-            } winners are yet to withdraw funds
-              totaling ${formatEthValue(
-                data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn,
-              )} ETH`}
-          </p>
+          <p className="text-primary">{`${data.MainStats.NumWinnersWithPendingRaffleWithdrawal} winners are yet to withdraw funds totaling ${formatEthValue(data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn)} ETH`}</p>
         )}
         {(data.MainStats.NumCosmicGameDonations ?? 0) > 0 && (
           <>
@@ -399,11 +303,10 @@ const Statistics = () => {
           <StatisticsItem
             title="Voluntary Donations Received"
             value={
-              <Link className="text-inherit" href="/charity-deposits-voluntary">
-                {`${
-                  data.NumVoluntaryDonations
-                } totaling ${(Number(data.SumVoluntaryDonationsEth) || 0).toFixed(4)} ETH`}
-              </Link>
+              <Link
+                className="text-inherit"
+                href="/charity-deposits-voluntary"
+              >{`${data.NumVoluntaryDonations} totaling ${(Number(data.SumVoluntaryDonationsEth) || 0).toFixed(4)} ETH`}</Link>
             }
           />
         )}
@@ -440,29 +343,24 @@ const Statistics = () => {
         <h4 className="mb-4 text-lg font-semibold">Unique Bidders</h4>
         <UniqueBiddersTable list={uniqueBidders} />
       </div>
-
       <div className="mt-8">
         <h4 className="mb-4 text-lg font-semibold">Unique Winners</h4>
         <UniqueWinnersTable list={uniqueWinners} />
       </div>
-
       <div className="mt-8">
         <h4 className="mb-4 text-lg font-semibold">Unique Eth Donors</h4>
         <UniqueEthDonorsTable list={uniqueDonors} />
       </div>
-
       <div className="mt-8">
         <h4 className="mb-4 text-lg font-semibold">
           Donated Token Distribution per Contract Address
         </h4>
         <DonatedNFTDistributionTable list={data.MainStats.DonatedTokenDistribution ?? []} />
       </div>
-
       <div className="mt-8">
         <h4 className="mb-4 text-lg font-semibold">Cosmic Signature Token (ERC721) Distribution</h4>
         <CSTokenDistributionTable list={cstDistribution} />
       </div>
-
       <div className="mt-8">
         <h4 className="mb-4 text-lg font-semibold">
           Cosmic Signature Token (ERC20) Balance Distribution
@@ -473,133 +371,19 @@ const Statistics = () => {
         <CTBalanceDistributionTable list={ctBalanceDistribution.slice(0, 20)} />
       </div>
 
-      {/* Staking Tabs */}
-      <Tabs defaultValue="cst" className="mt-8">
-        <TabsList>
-          <TabsTrigger value="cst" className="text-lg font-semibold">
-            CosmicSignature Token
-          </TabsTrigger>
-          <TabsTrigger value="rwlk" className="text-lg font-semibold">
-            RandomWalk Token
-          </TabsTrigger>
-        </TabsList>
+      <StakingSection
+        cstStats={data.MainStats.StakeStatisticsCST}
+        rwlkStats={data.MainStats.StakeStatisticsRWalk}
+        stakingCSTActions={stakingCSTActions}
+        stakingRWLKActions={stakingRWLKActions}
+        stakedCSTokens={stakedCSTokens}
+        stakedRWLKTokens={stakedRWLKTokens}
+        uniqueCSTStakers={uniqueCSTStakers}
+        uniqueRWLKStakers={uniqueRWLKStakers}
+      />
 
-        {/* CST Staking */}
-        <TabsContent value="cst" className="p-6">
-          <StatisticsItem
-            title="Number of Active Stakers"
-            value={data.MainStats.StakeStatisticsCST.NumActiveStakers}
-          />
-          <StatisticsItem
-            title="Number of Staking Rewards Deposits"
-            value={data.MainStats.StakeStatisticsCST.NumDeposits}
-          />
-          <StatisticsItem
-            title="Total Staking Rewards"
-            value={`${(data.MainStats?.StakeStatisticsCST?.TotalRewardEth ?? 0).toFixed(4)} ETH`}
-          />
-          <StatisticsItem
-            title="Total Tokens Minted"
-            value={data.MainStats.StakeStatisticsCST.TotalTokensMinted}
-          />
-          <StatisticsItem
-            title="Total Tokens Staked"
-            value={data.MainStats.StakeStatisticsCST.TotalTokensStaked}
-          />
-          <StatisticsItem
-            title="Unclaimed Staking Rewards"
-            value={`${(data.MainStats?.StakeStatisticsCST?.UnclaimedRewardEth ?? 0).toFixed(4)} ETH`}
-          />
+      <DonatedNFTsGrid nftDonations={nftDonations} />
 
-          <div>
-            <p className="mb-4 mt-4 text-base font-medium">Stake / Unstake Actions</p>
-            {stakingCSTActions === null ? (
-              <p className="text-lg font-semibold">Loading...</p>
-            ) : (
-              <GlobalStakingActionsTable list={stakingCSTActions} IsRWLK={false} />
-            )}
-          </div>
-
-          <div className="mt-8">
-            <p className="mb-4 text-base font-medium">Staked Tokens</p>
-            {stakedCSTokens === null ? (
-              <p className="text-lg font-semibold">Loading...</p>
-            ) : (
-              <GlobalStakedTokensTable list={stakedCSTokens ?? []} IsRWLK={false} />
-            )}
-          </div>
-
-          <div className="mt-8">
-            <p className="mb-4 text-base font-medium">Unique Stakers</p>
-            <UniqueStakersCSTTable list={uniqueCSTStakers} />
-          </div>
-        </TabsContent>
-
-        {/* RWLK Staking */}
-        <TabsContent value="rwlk" className="p-6">
-          <StatisticsItem
-            title="Number of Active Stakers"
-            value={data.MainStats.StakeStatisticsRWalk.NumActiveStakers}
-          />
-          <StatisticsItem
-            title="Total Tokens Minted"
-            value={data.MainStats.StakeStatisticsRWalk.TotalTokensMinted}
-          />
-          <StatisticsItem
-            title="Total Tokens Staked"
-            value={data.MainStats.StakeStatisticsRWalk.TotalTokensStaked}
-          />
-
-          <div>
-            <p className="mb-4 mt-4 text-base font-medium">Stake / Unstake Actions</p>
-            {stakingRWLKActions === null ? (
-              <p className="text-lg font-semibold">Loading...</p>
-            ) : (
-              <GlobalStakingActionsTable list={stakingRWLKActions} IsRWLK={true} />
-            )}
-          </div>
-
-          <div className="mt-8">
-            <p className="mb-4 text-base font-medium">Staked Tokens</p>
-            {stakedRWLKTokens === null ? (
-              <p className="text-lg font-semibold">Loading...</p>
-            ) : (
-              <GlobalStakedTokensTable list={stakedRWLKTokens ?? []} IsRWLK={true} />
-            )}
-          </div>
-
-          <div className="mt-8">
-            <p className="mb-4 text-base font-medium">Unique Stakers</p>
-            <UniqueStakersRWLKTable list={uniqueRWLKStakers} />
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Donated NFTs */}
-      <div className="mt-8">
-        <h4 className="mb-4 text-lg font-semibold">Donated NFTs</h4>
-        {nftDonations.length > 0 ? (
-          <>
-            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-              {nftDonations
-                .slice((currentNFTPage - 1) * ITEMS_PER_PAGE, currentNFTPage * ITEMS_PER_PAGE)
-                .map((nft) => (
-                  <DonatedNFT key={nft.RecordId} nft={nft} />
-                ))}
-            </div>
-            <CustomPagination
-              page={currentNFTPage}
-              setPage={setNFTPage}
-              totalLength={nftDonations.length}
-              perPage={ITEMS_PER_PAGE}
-            />
-          </>
-        ) : (
-          <p className="mt-4">No ERC721 tokens were donated on this round.</p>
-        )}
-      </div>
-
-      {/* Round Activations */}
       <div>
         <h4 className="mb-4 mt-16 text-lg font-semibold">Round Activations</h4>
         {systemModeChanges === null ? (

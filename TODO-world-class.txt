@@ -319,7 +319,7 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 190 unit test files (2,738 tests), 11 E2E specs
+- 202 unit test files (2,818 tests), 11 E2E specs
 - Actual coverage: Statements ~77.1%, Branches ~65.0%, Lines ~78.6%, Functions ~72.3%
 - Coverage threshold in jest.config.js: branches 63%, functions 71%, lines 78%, statements 76%
 - Accessibility testing: jest-axe installed, 134 a11y tests across all component files
@@ -948,9 +948,66 @@ Current state:
 
     All 2,738 tests pass. tsc --noEmit passes with zero type errors.
 
-9e. [PARTIAL] Break up large components (see 2b above)
-    HomePage.tsx split done (298 lines). Remaining:
-    UserStatisticsView.tsx at 770 lines is the biggest readability issue.
+9e. [DONE] Break up large components (see 2b above)
+    All 6 files over 300 lines split into smaller, focused components.
+    12 new component files created, 13 new test files with 80 new tests.
+    All 2,818 tests pass across 202 suites. tsc --noEmit passes with zero
+    type errors. Coverage thresholds pass.
+
+    Files split (before -> after):
+    - app/code/CodeViewer.tsx: 587 -> 55 lines
+      Extracted: cosmicSignatureCode.ts (Rust code string constant)
+
+    - app/my-staking/MyStaking.tsx: 469 -> 288 lines
+      Extracted: CSTStakingPanel.tsx, RWLKStakingPanel.tsx
+
+    - app/my-winnings/MyWinnings.tsx: 495 -> 296 lines
+      Extracted: RaffleWinningsTable.tsx (with RaffleWinningRow)
+
+    - components/nft/NFTTrait.tsx: 536 -> 299 lines
+      Extracted: NFTMetadata.tsx, NFTOwnerActions.tsx
+
+    - app/statistics/Statistics.tsx: 615 -> 203 lines
+      Extracted: StatisticsItem.tsx, StakingSection.tsx, DonatedNFTsGrid.tsx
+
+    - components/UserStatisticsView.tsx: 675 -> 218 lines
+      Extracted: UserStatsSection.tsx (with StatRow), UserStakingSection.tsx,
+      DonatedAssetsSection.tsx
+
+    New component files (12):
+    - app/code/cosmicSignatureCode.ts
+    - components/staking/CSTStakingPanel.tsx (72 lines)
+    - components/staking/RWLKStakingPanel.tsx (73 lines)
+    - components/winnings/RaffleWinningsTable.tsx (148 lines)
+    - components/nft/NFTMetadata.tsx (100 lines)
+    - components/nft/NFTOwnerActions.tsx (90 lines)
+    - components/statistics/StatisticsItem.tsx (36 lines)
+    - components/statistics/StakingSection.tsx (118 lines)
+    - components/statistics/DonatedNFTsGrid.tsx (41 lines)
+    - components/user-statistics/UserStatsSection.tsx (107 lines)
+    - components/user-statistics/UserStakingSection.tsx (119 lines)
+    - components/user-statistics/DonatedAssetsSection.tsx (76 lines)
+
+    New test files (13, 80 tests):
+    - app/code/__tests__/cosmicSignatureCode.test.ts (6 tests)
+    - components/staking/__tests__/CSTStakingPanel.test.tsx (5 tests)
+    - components/staking/__tests__/RWLKStakingPanel.test.tsx (5 tests)
+    - components/winnings/__tests__/RaffleWinningsTable.test.tsx (7 tests)
+    - components/nft/__tests__/NFTMetadata.test.tsx (10 tests)
+    - components/nft/__tests__/NFTOwnerActions.test.tsx (9 tests)
+    - components/statistics/__tests__/StatisticsItem.test.tsx (8 tests)
+    - components/statistics/__tests__/StakingSection.test.tsx (5 tests)
+    - components/statistics/__tests__/DonatedNFTsGrid.test.tsx (5 tests)
+    - components/user-statistics/__tests__/UserStatsSection.test.tsx (8 tests)
+    - components/user-statistics/__tests__/UserStakingSection.test.tsx (5 tests)
+    - components/user-statistics/__tests__/DonatedAssetsSection.test.tsx (7 tests)
+
+    Existing test files updated (6): mocked extracted children in parent tests
+    - app/my-staking/__tests__/MyStaking.test.tsx
+    - app/my-winnings/__tests__/MyWinnings.test.tsx
+    - app/statistics/__tests__/Statistics.test.tsx
+    - components/__tests__/UserStatisticsView.test.tsx
+    (NFTTrait and CodeViewer tests unchanged — still pass)
 
 
 ================================================================================

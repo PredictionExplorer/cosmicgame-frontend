@@ -71,24 +71,16 @@ jest.mock('next/image', () => ({
   default: (props: Record<string, unknown>) => <img {...props} />,
 }));
 
-jest.mock('../../../components/staking/StakingActionsTable', () => ({
-  __esModule: true,
-  default: () => <div data-testid="staking-actions-table" />,
+jest.mock('../../../components/staking/CSTStakingPanel', () => ({
+  CSTStakingPanel: () => (
+    <div data-testid="cst-staking-panel">
+      <div data-testid="staking-rewards-table" />
+      <div data-testid="staking-actions-table" />
+    </div>
+  ),
 }));
-jest.mock('../../../components/staking/StakingRewardsTable', () => ({
-  StakingRewardsTable: () => <div data-testid="staking-rewards-table" />,
-}));
-jest.mock('../../../components/staking/StakedTokensTable', () => ({
-  StakedTokensTable: () => <div data-testid="staked-tokens-table" />,
-}));
-jest.mock('../../../components/tokens/RWLKNFTTable', () => ({
-  RWLKNFTTable: () => <div data-testid="rwlk-nft-table" />,
-}));
-jest.mock('../../../components/staking/RwalkStakingRewardMintsTable', () => ({
-  RwalkStakingRewardMintsTable: () => <div data-testid="rwlk-mints-table" />,
-}));
-jest.mock('../../../components/tokens/CSTokensTable', () => ({
-  CSTokensTable: () => <div data-testid="cs-tokens-table" />,
+jest.mock('../../../components/staking/RWLKStakingPanel', () => ({
+  RWLKStakingPanel: () => <div data-testid="rwlk-staking-panel" />,
 }));
 
 beforeEach(() => {
