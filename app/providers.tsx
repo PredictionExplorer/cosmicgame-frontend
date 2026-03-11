@@ -18,6 +18,8 @@ import { StakedTokenProvider } from '@/contexts/StakedTokenContext';
 import { SystemModeProvider } from '@/contexts/SystemModeContext';
 import { ApiDataProvider } from '@/contexts/ApiDataContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
+import { reportError } from '@/utils/errors';
+import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
 const Particles = dynamic(
   () => import('@tsparticles/react').then((mod) => ({ default: mod.default })),
@@ -78,13 +80,21 @@ export function Providers({ children }: { children: ReactNode }) {
   const [engineReady, setEngineReady] = useState(false);
 
   useEffect(() => {
+    installGlobalErrorHandlers();
+  }, []);
+
+  useEffect(() => {
     (async () => {
-      const { initParticlesEngine } = await import('@tsparticles/react');
-      const { loadSlim } = await import('@tsparticles/slim');
-      await initParticlesEngine(async (engine) => {
-        await loadSlim(engine);
-      });
-      setEngineReady(true);
+      try {
+        const { initParticlesEngine } = await import('@tsparticles/react');
+        const { loadSlim } = await import('@tsparticles/slim');
+        await initParticlesEngine(async (engine) => {
+          await loadSlim(engine);
+        });
+        setEngineReady(true);
+      } catch (err) {
+        reportError(err, 'particlesInit');
+      }
     })();
   }, []);
 

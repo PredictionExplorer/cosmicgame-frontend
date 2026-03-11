@@ -66,7 +66,10 @@ export function get_claim_history(): Promise<TxInfo[]> {
 export function get_claim_history_by_user(address: string): Promise<WinningHistoryEntry[] | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`prizes/history/by_user/${address}/0/1000000`));
-    return flattenTxArray<WinningHistoryEntry>(data.USerPrizeHistory);
+    // Backend uses `USerPrizeHistory` (typo); accept the corrected key as well.
+    return flattenTxArray<WinningHistoryEntry>(
+      data.UserPrizeHistory ?? data.USerPrizeHistory,
+    );
   }, null);
 }
 
