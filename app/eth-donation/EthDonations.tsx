@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { parseEther } from 'viem';
 
 import { MainWrapper } from '@/components/styled';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import api from '@/services/api';
+import { useDonationsBoth } from '@/hooks/useApiQuery';
 import EthDonationTable, { EthDonation } from '@/components/tables/EthDonationTable';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useActiveWeb3React } from '@/hooks/web3';
@@ -14,22 +14,14 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { isUserRejection, reportError } from '@/utils/errors';
 
 const EthDonations = () => {
-  const [charityDonations, setCharityDonations] = useState<EthDonation[] | null>(null);
   const [donateAmount, setDonateAmount] = useState('');
   const [donateInformation, setDonationInformation] = useState('');
 
   const { setNotification } = useNotification();
   const { account } = useActiveWeb3React();
   const cosmicGameContract = useCosmicGameContract();
-
-  const fetchCharityDonations = async () => {
-    const donations = await api.get_donations_both();
-    setCharityDonations(donations as EthDonation[]);
-  };
-
-  useEffect(() => {
-    fetchCharityDonations(); // eslint-disable-line react-hooks/set-state-in-effect
-  }, []);
+  const { data: donationsRaw, isLoading, refetch: refetchDonations } = useDonationsBoth();
+  const charityDonations = (donationsRaw as EthDonation[] | undefined) ?? null;
 
   const handleDonate = async () => {
     try {
@@ -48,7 +40,7 @@ const EthDonations = () => {
       });
 
       setDonateAmount('');
-      setTimeout(fetchCharityDonations, 1000);
+      refetchDonations();
     } catch (error: unknown) {
       if (!isUserRejection(error)) {
         reportError(error, 'Donation error');
@@ -77,7 +69,7 @@ const EthDonations = () => {
 
       setDonateAmount('');
       setDonationInformation('');
-      setTimeout(fetchCharityDonations, 1000);
+      refetchDonations();
     } catch (error: unknown) {
       if (!isUserRejection(error)) {
         reportError(error, 'Donation with info error');
@@ -94,7 +86,7 @@ const EthDonations = () => {
     <MainWrapper>
       <h2 className="text-2xl font-bold text-primary text-center mb-8">Direct (ETH) Donations</h2>
 
-      {charityDonations === null ? (
+      {isLoading || charityDonations === null ? (
         <p className="text-lg font-semibold">Loading...</p>
       ) : (
         <>

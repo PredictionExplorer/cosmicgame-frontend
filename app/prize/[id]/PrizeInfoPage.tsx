@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo, type ComponentProps } from 'react';
+import { useMemo, type ComponentProps } from 'react';
 
 import {
   getExplorerUrl,
@@ -10,9 +10,13 @@ import {
 } from '@/utils';
 
 import { MainWrapper } from '@/components/styled';
-import api from '@/services/api';
-import { useNotification } from '@/contexts/NotificationContext';
-import { reportError } from '@/utils/errors';
+import {
+  useRoundInfo,
+  useBidListByRound,
+  useDonationsNFTByRound,
+  useStakingCSTRewardsByRound,
+  useDonationsERC20ByRound,
+} from '@/hooks/useApiQuery';
 import RaffleWinnerTable from '@/components/tables/RaffleWinnerTable';
 import BiddingHistoryTable from '@/components/tables/BiddingHistoryTable';
 import StakingWinnerTable from '@/components/tables/StakingWinnerTable';
@@ -207,67 +211,20 @@ interface PrizeInfoPageProps {
   roundNum: number;
 }
 const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
-  const { setNotification } = useNotification();
+  const { data: prizeInfo, isLoading: loadingRound } = useRoundInfo(roundNum);
+  const { data: bidHistory = [], isLoading: loadingBids } = useBidListByRound(roundNum, 'desc');
+  const { data: nftDonationsRaw = [], isLoading: loadingNFT } = useDonationsNFTByRound(roundNum);
+  const { data: stakingRewardsRaw = [], isLoading: loadingStaking } =
+    useStakingCSTRewardsByRound(roundNum);
+  const { data: donatedERC20Raw = [], isLoading: loadingERC20 } =
+    useDonationsERC20ByRound(roundNum);
 
-  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState<
-    import('@/components/donations/DonatedERC20Table').DonatedERC20Token[]
-  >([]);
-  const [bidHistory, setBidHistory] = useState<import('@/services/api/types').BidInfo[]>([]);
-  const [nftDonations, setNftDonations] = useState<
-    import('@/components/donations/DonatedNFTTable').NFTRecord[]
-  >([]);
-  const [prizeInfo, setPrizeInfo] = useState<import('@/services/api/types').RoundInfo | null>(null);
-  const [stakingRewards, setStakingRewards] = useState<unknown[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchDonatedERC20Tokens = async () => {
-    try {
-      const donatedERC20Tokens = await api.get_donations_erc20_by_round(roundNum);
-      setDonatedERC20Tokens(
-        donatedERC20Tokens as import('@/components/donations/DonatedERC20Table').DonatedERC20Token[],
-      );
-    } catch (error) {
-      reportError(error, 'fetch donated ERC20 tokens');
-      setNotification({
-        text: 'Failed to load donated ERC20 tokens.',
-        type: 'error',
-        visible: true,
-      });
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [nftDonationsData, prizeInfoData, bidHistoryData, stakingRewardsData] =
-          await Promise.all([
-            api.get_donations_nft_by_round(roundNum),
-            api.get_round_info(roundNum),
-            api.get_bid_list_by_round(roundNum, 'desc'),
-            api.get_staking_cst_rewards_by_round(roundNum),
-          ]);
-        setNftDonations(
-          nftDonationsData as import('@/components/donations/DonatedNFTTable').NFTRecord[],
-        );
-        setPrizeInfo(prizeInfoData);
-        setBidHistory(bidHistoryData);
-        setStakingRewards(stakingRewardsData);
-      } catch (error) {
-        reportError(error, 'fetch prize round data');
-        setNotification({
-          text: 'Failed to load data. Please try again later.',
-          type: 'error',
-          visible: true,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-    fetchDonatedERC20Tokens();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roundNum, setNotification]);
+  const nftDonations =
+    nftDonationsRaw as import('@/components/donations/DonatedNFTTable').NFTRecord[];
+  const stakingRewards = stakingRewardsRaw as unknown[];
+  const donatedERC20Tokens =
+    donatedERC20Raw as import('@/components/donations/DonatedERC20Table').DonatedERC20Token[];
+  const loading = loadingRound || loadingBids || loadingNFT || loadingStaking || loadingERC20;
 
   const championList = useMemo(() => {
     if (bidHistory.length > 0 && prizeInfo) {

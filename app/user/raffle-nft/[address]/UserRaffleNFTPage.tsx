@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
-import api from '@/services/api';
-import { reportError } from '@/utils/errors';
+import { useRaffleNFTWinningsByUser } from '@/hooks/useApiQuery';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import {
   MainWrapper,
@@ -111,50 +110,27 @@ function NFTWinningsTable({ list }: { list: RaffleNFTWinning[] }) {
   );
 }
 
-function useRaffleNFTWinnings(userAddress: string) {
-  const [raffleNfts, setRaffleNfts] = useState<{
-    data: RaffleNFTWinning[];
-    loading: boolean;
-  }>({
-    data: [],
-    loading: false,
-  });
-
-  const fetchRaffleNFTWinnings = async () => {
-    setRaffleNfts((prev) => ({ ...prev, loading: true }));
-    try {
-      const response = await api.get_raffle_nft_winnings_by_user(userAddress);
-      const sorted = (response as RaffleNFTWinning[]).sort(
-        (a: RaffleNFTWinning, b: RaffleNFTWinning) => b.TimeStamp - a.TimeStamp,
-      );
-      setRaffleNfts({ data: sorted as RaffleNFTWinning[], loading: false });
-    } catch (err) {
-      reportError(err, 'fetch raffle NFT winnings');
-      setRaffleNfts({ data: [], loading: false });
-    }
-  };
-
-  return { raffleNfts, fetchRaffleNFTWinnings };
-}
-
 function UserRaffleNFTPage({ address: rawAddress }: { address: string }) {
-  const [invalidAddress, setInvalidAddress] = useState(false);
-
   const validatedAddress =
     rawAddress && isAddress(rawAddress.toLowerCase())
       ? getAddress(rawAddress.toLowerCase())
       : 'Invalid Address';
 
-  const { raffleNfts, fetchRaffleNFTWinnings } = useRaffleNFTWinnings(validatedAddress);
+  const invalidAddress = !validatedAddress || validatedAddress === 'Invalid Address';
 
-  useEffect(() => {
-    if (!validatedAddress || validatedAddress === 'Invalid Address') {
-      setInvalidAddress(true);
-    } else {
-      fetchRaffleNFTWinnings();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [validatedAddress]);
+  const { data: winningsRaw, isLoading } = useRaffleNFTWinningsByUser(
+    invalidAddress ? null : validatedAddress,
+  );
+
+  const raffleNfts = useMemo(
+    () => ({
+      data: [...((winningsRaw as RaffleNFTWinning[] | undefined) ?? [])].sort(
+        (a, b) => b.TimeStamp - a.TimeStamp,
+      ),
+      loading: isLoading,
+    }),
+    [winningsRaw, isLoading],
+  );
 
   if (invalidAddress) {
     return (

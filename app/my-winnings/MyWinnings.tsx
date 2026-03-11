@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Tr, Tbody } from 'react-super-responsive-table';
@@ -27,7 +27,11 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useNotification } from '@/contexts/NotificationContext';
-import api from '@/services/api';
+import {
+  useUnclaimedDonatedNFTByUser,
+  useUnclaimedRaffleDepositsByUser,
+  useDonationsERC20ByUser,
+} from '@/hooks/useApiQuery';
 import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
 import { UncollectedCSTStakingRewardsTable } from '@/components/staking/UncollectedCSTStakingRewardsTable';
 import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
@@ -62,51 +66,6 @@ interface RaffleWinning {
 /* ------------------------------------------------------------------
   Custom Hook: useUnclaimedWinnings
 ------------------------------------------------------------------ */
-function useUnclaimedWinnings(account: string | null | undefined) {
-  const [donatedNFTs, setDonatedNFTs] = useState<UnclaimedDonatedNFT[] | null>(null);
-  const [raffleETHWinnings, setRaffleETHWinnings] = useState<RaffleWinning[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchUnclaimedData = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const [nfts, deposits] = await Promise.all([
-        api.get_unclaimed_donated_nft_by_user(account!),
-        api.get_unclaimed_raffle_deposits_by_user(account!),
-      ]);
-      setDonatedNFTs(
-        (nfts as UnclaimedDonatedNFT[]).slice().sort((a, b) => a.TimeStamp - b.TimeStamp),
-      );
-      setRaffleETHWinnings(
-        (deposits as RaffleWinning[]).slice().sort((a, b) => b.TimeStamp - a.TimeStamp),
-      );
-    } catch (err) {
-      reportError(err, 'fetch unclaimed winnings');
-      setError('Failed to load unclaimed winnings data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (account) {
-      fetchUnclaimedData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account]);
-
-  return {
-    donatedNFTs,
-    raffleETHWinnings,
-    loading,
-    error,
-    refetch: fetchUnclaimedData,
-  };
-}
-
 /* ------------------------------------------------------------------
   Sub-Components
 ------------------------------------------------------------------ */
@@ -234,7 +193,48 @@ export default function MyWinnings() {
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
   const router = useRouter();
 
-  const { donatedNFTs, raffleETHWinnings, loading, error, refetch } = useUnclaimedWinnings(account);
+  const {
+    data: nftsRaw,
+    isLoading: loadingNFTs,
+    isError: nftError,
+    refetch: refetchNFTs,
+  } = useUnclaimedDonatedNFTByUser(account);
+  const {
+    data: raffleRaw,
+    isLoading: loadingRaffle,
+    isError: raffleError,
+    refetch: refetchRaffle,
+  } = useUnclaimedRaffleDepositsByUser(account);
+  const {
+    data: erc20Raw,
+    isLoading: erc20Loading,
+    refetch: refetchERC20,
+  } = useDonationsERC20ByUser(account);
+
+  const donatedNFTs = useMemo(
+    () =>
+      nftsRaw
+        ? (nftsRaw as UnclaimedDonatedNFT[]).slice().sort((a, b) => a.TimeStamp - b.TimeStamp)
+        : null,
+    [nftsRaw],
+  );
+  const raffleETHWinnings = useMemo(
+    () =>
+      raffleRaw
+        ? (raffleRaw as RaffleWinning[]).slice().sort((a, b) => b.TimeStamp - a.TimeStamp)
+        : null,
+    [raffleRaw],
+  );
+  const donatedERC20Data = (erc20Raw ??
+    []) as import('@/components/donations/DonatedERC20Table').DonatedERC20Token[];
+
+  const loading = loadingNFTs || loadingRaffle;
+  const error = nftError || raffleError ? 'Failed to load unclaimed winnings data' : null;
+  const refetch = () => {
+    refetchNFTs();
+    refetchRaffle();
+  };
+
   const raffleWalletContract = useRaffleWalletContract();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -243,43 +243,11 @@ export default function MyWinnings() {
     raffleETH: false,
   });
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
-  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState<{
-    data: import('@/components/donations/DonatedERC20Table').DonatedERC20Token[];
-    loading: boolean;
-  }>({
-    data: [],
-    loading: false,
-  });
   const perPage = 5;
 
   /* ------------------------------------------------------------------
     Handlers
   ------------------------------------------------------------------ */
-
-  const fetchDonatedERC20Tokens = async (reload = true) => {
-    if (!account) return;
-    setDonatedERC20Tokens((prev) => ({ ...prev, loading: reload }));
-    try {
-      const donatedERC20Tokens = await api.get_donations_erc20_by_user(account!);
-      setDonatedERC20Tokens({
-        data: donatedERC20Tokens as import('@/components/donations/DonatedERC20Table').DonatedERC20Token[],
-        loading: false,
-      });
-    } catch (err) {
-      reportError(err, 'fetch donated ERC20 tokens');
-      setNotification({
-        text: 'Failed to fetch donated NFTs',
-        type: 'error',
-        visible: true,
-      });
-      setDonatedERC20Tokens((prev) => ({ ...prev, loading: false }));
-    }
-  };
-
-  useEffect(() => {
-    fetchDonatedERC20Tokens();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account]);
 
   const handleAllETHClaim = async () => {
     if (!raffleWalletContract) {
@@ -371,7 +339,7 @@ export default function MyWinnings() {
         parseUnits(amount.toString(), 18),
       ]);
       setTimeout(() => {
-        fetchDonatedERC20Tokens(false);
+        refetchERC20();
       }, 3000);
     } catch (err: unknown) {
       if (isUserRejection(err)) return;
@@ -384,7 +352,7 @@ export default function MyWinnings() {
 
   const handleAllDonatedERC20Claim = async () => {
     try {
-      const donatedTokensToClaim = donatedERC20Tokens.data
+      const donatedTokensToClaim = donatedERC20Data
         .filter((x) => !x.Claimed)
         .map((x) => ({
           roundNum: x.RoundNum,
@@ -393,7 +361,7 @@ export default function MyWinnings() {
         }));
       await raffleWalletContract!.write.claimManyDonatedTokens?.([donatedTokensToClaim]);
       setTimeout(() => {
-        fetchDonatedERC20Tokens(false);
+        refetchERC20();
       }, 3000);
     } catch (err: unknown) {
       if (isUserRejection(err)) return;
@@ -499,15 +467,15 @@ export default function MyWinnings() {
       <div className="mt-16">
         <div className="flex justify-between items-center mb-4">
           <h5 className="text-xl font-bold">Donated ERC20 Tokens</h5>
-          {donatedERC20Tokens.data.filter((x) => !x.Claimed).length > 0 && (
+          {donatedERC20Data.filter((x) => !x.Claimed).length > 0 && (
             <Button onClick={handleAllDonatedERC20Claim}>Claim All</Button>
           )}
         </div>
 
-        {donatedERC20Tokens.loading ? (
+        {erc20Loading ? (
           <h6 className="text-lg font-semibold">Loading...</h6>
         ) : (
-          <DonatedERC20Table list={donatedERC20Tokens.data} handleClaim={handleDonatedERC20Claim} />
+          <DonatedERC20Table list={donatedERC20Data} handleClaim={handleDonatedERC20Claim} />
         )}
       </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Tr, Tbody } from 'react-super-responsive-table';
@@ -8,8 +8,7 @@ import { Tr, Tbody } from 'react-super-responsive-table';
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import { Button } from '@/components/ui/button';
-import api from '@/services/api';
-import { reportError } from '@/utils/errors';
+import { useStakingRewardsByUserByTokenDetails } from '@/hooks/useApiQuery';
 import {
   MainWrapper,
   TablePrimary,
@@ -49,38 +48,6 @@ interface RewardsRowData {
   RewardEth: number;
   Stake: StakeInfo;
   Unstake: UnstakeInfo;
-}
-
-/* ------------------------------------------------------------------
-  Custom Hook: useRewardsByTokenDetails
------------------------------------------------------------------- */
-function useRewardsByTokenDetails(address: string, tokenId: number) {
-  const [rewardsData, setRewardsData] = useState<RewardsRowData[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await api.get_staking_rewards_by_user_by_token_details(address, tokenId);
-
-      const arrayData = Object.keys(response)
-        .filter((key) => !isNaN(Number(key)))
-        .map((key) => response[key]) as RewardsRowData[];
-
-      setRewardsData(arrayData);
-    } catch (err) {
-      reportError(err, 'fetch staking rewards by token');
-      setRewardsData([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [address, tokenId]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  return { rewardsData, loading };
 }
 
 /* ------------------------------------------------------------------
@@ -229,7 +196,16 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
   Main Component: RewardsByTokenPage
 ------------------------------------------------------------------ */
 function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: number }) {
-  const { rewardsData, loading } = useRewardsByTokenDetails(address, tokenId);
+  const { data: rawResponse, isLoading: loading } = useStakingRewardsByUserByTokenDetails(
+    address,
+    tokenId,
+  );
+  const rewardsData = useMemo(() => {
+    if (!rawResponse) return [];
+    return Object.keys(rawResponse)
+      .filter((key) => !isNaN(Number(key)))
+      .map((key) => (rawResponse as Record<string, unknown>)[key]) as RewardsRowData[];
+  }, [rawResponse]);
 
   return (
     <MainWrapper>

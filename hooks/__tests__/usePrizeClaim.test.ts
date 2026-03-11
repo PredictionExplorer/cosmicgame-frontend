@@ -42,12 +42,15 @@ jest.mock('../../hooks/useCosmicSignatureContract', () => ({
   })),
 }));
 
+jest.mock('../useApiQuery', () => ({
+  usePrizeTime: jest.fn(() => ({ data: 1000 })),
+  useCurrentTime: jest.fn(() => ({ data: Math.floor(Date.now() / 1000) })),
+  useClaimHistory: jest.fn(() => ({ data: [{ round: 1, prize: '1.0' }] })),
+}));
+
 jest.mock('../../services/api', () => ({
   __esModule: true,
   default: {
-    get_prize_time: jest.fn().mockResolvedValue(1000),
-    get_current_time: jest.fn().mockResolvedValue(Math.floor(Date.now() / 1000)),
-    get_claim_history: jest.fn().mockResolvedValue([{ round: 1, prize: '1.0' }]),
     create: jest.fn().mockResolvedValue(undefined),
   },
 }));
@@ -84,14 +87,10 @@ describe('usePrizeClaim', () => {
   it('initializes with correct default state', () => {
     const { result } = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
 
-    expect(result.current.prizeTime).toBe(0);
+    expect(result.current.prizeTime).toBeGreaterThan(0);
     expect(result.current.timeoutClaimPrize).toBe(0);
     expect(result.current.isClaiming).toBe(false);
-    expect(result.current.claimHistory).toBeNull();
-    expect(result.current.activationTime).toBe(0);
     expect(typeof result.current.onClaimPrize).toBe('function');
-    expect(typeof result.current.fetchPrizeTime).toBe('function');
-    expect(typeof result.current.fetchClaimHistory).toBe('function');
     expect(typeof result.current.fetchActivationTime).toBe('function');
   });
 
@@ -160,26 +159,13 @@ describe('usePrizeClaim', () => {
     );
   });
 
-  it('fetchClaimHistory fetches and sets history', async () => {
+  it('claimHistory is derived from useClaimHistory hook', () => {
     const { result } = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
-
-    await act(async () => {
-      await result.current.fetchClaimHistory();
-    });
-
-    expect(mockApi.get_claim_history).toHaveBeenCalled();
     expect(result.current.claimHistory).toEqual([{ round: 1, prize: '1.0' }]);
   });
 
-  it('fetchPrizeTime calculates adjusted prize time', async () => {
+  it('prizeTime is derived from usePrizeTime and useCurrentTime hooks', () => {
     const { result } = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
-
-    await act(async () => {
-      await result.current.fetchPrizeTime();
-    });
-
-    expect(mockApi.get_prize_time).toHaveBeenCalled();
-    expect(mockApi.get_current_time).toHaveBeenCalled();
     expect(result.current.prizeTime).toBeGreaterThan(0);
   });
 

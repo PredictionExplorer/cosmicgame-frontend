@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, type ReactNode, type ComponentProps } from 'react';
+import { useState, useMemo, type ReactNode, type ComponentProps } from 'react';
 import Link from 'next/link';
 import Countdown from 'react-countdown';
 import { formatEther } from 'viem';
@@ -8,7 +8,6 @@ import { formatEther } from 'viem';
 import { convertTimestampToDateTime, formatCSTValue, formatEthValue, formatSeconds } from '@/utils';
 
 import { MainWrapper } from '@/components/styled';
-import api from '@/services/api';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import BiddingHistoryTable from '@/components/tables/BiddingHistoryTable';
 import { UniqueBiddersTable, Bidder } from '@/components/tables/UniqueBiddersTable';
@@ -29,8 +28,24 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import { CTBalanceDistributionChart } from '@/components/tokens/CTBalanceDistributionChart';
 import { UniqueEthDonorsTable, UniqueEthDonor } from '@/components/tables/UniqueEthDonorsTable';
 import { ZERO_ADDRESS } from '@/config/misc';
-import { reportError } from '@/utils/errors';
-import { STATS_POLL_INTERVAL_MS } from '@/config/constants';
+import {
+  useDashboardInfo,
+  useBidListByRound,
+  useUniqueBidders,
+  useUniqueWinners,
+  useUniqueCSTStakers,
+  useUniqueRWLKStakers,
+  useUniqueDonors,
+  useDonationsNFTList,
+  useCSTDistribution,
+  useCTBalancesDistribution,
+  useStakingCSTActions,
+  useStakingRWLKActions,
+  useStakedCSTTokensGlobal,
+  useStakedRWLKTokensGlobal,
+  useSystemModelist,
+  useCTPrice,
+} from '@/hooks/useApiQuery';
 
 interface StatisticsItemProps {
   title: string;
@@ -72,138 +87,61 @@ const CountdownRenderer = ({
 
 const Statistics = () => {
   const ITEMS_PER_PAGE = 12;
-
   const [currentNFTPage, setNFTPage] = useState(1);
 
-  const [data, setData] = useState<import('@/services/api/types').DashboardInfo | null>(null);
+  const { data: dashboardData, isLoading: dashboardLoading, isError } = useDashboardInfo();
+  const round = dashboardData?.CurRoundNum ?? -1;
 
-  const [cstBidData, setCSTBidData] = useState<CSTBidData>({
-    AuctionDuration: 0,
-    CSTPrice: 0,
-    SecondsElapsed: 0,
-  });
+  const { data: bidListData } = useBidListByRound(round, 'desc');
+  const { data: uniqueBiddersData } = useUniqueBidders();
+  const { data: uniqueWinnersData } = useUniqueWinners();
+  const { data: uniqueCSTStakersData } = useUniqueCSTStakers();
+  const { data: uniqueRWLKStakersData } = useUniqueRWLKStakers();
+  const { data: uniqueDonorsData } = useUniqueDonors();
+  const { data: nftDonationsData } = useDonationsNFTList();
+  const { data: cstDistributionData } = useCSTDistribution();
+  const { data: ctBalanceDistributionData } = useCTBalancesDistribution();
+  const { data: stakingCSTActionsData } = useStakingCSTActions();
+  const { data: stakingRWLKActionsData } = useStakingRWLKActions();
+  const { data: stakedCSTokensData } = useStakedCSTTokensGlobal();
+  const { data: stakedRWLKTokensData } = useStakedRWLKTokensGlobal();
+  const { data: systemModeChangesData } = useSystemModelist();
+  const { data: ctPriceData } = useCTPrice();
 
-  const [currentRoundBidHistory, setCurrentRoundBidHistory] = useState<
-    import('@/services/api/types').BidInfo[]
-  >([]);
-  const [uniqueBidders, setUniqueBidders] = useState<Bidder[]>([]);
-  const [uniqueWinners, setUniqueWinners] = useState<Winner[]>([]);
-  const [uniqueCSTStakers, setUniqueCSTStakers] = useState<UniqueStakerCST[]>([]);
-  const [uniqueRWLKStakers, setUniqueRWLKStakers] = useState<UniqueStakerRWLK[]>([]);
-  const [uniqueDonors, setUniqueDonors] = useState<UniqueEthDonor[]>([]);
-  const [nftDonations, setNftDonations] = useState<import('@/services/api/types').DonatedNFT[]>([]);
-  const [cstDistribution, setCSTDistribution] = useState<
-    import('@/services/api/types').TokenDistribution[]
-  >([]);
-  const [ctBalanceDistribution, setCTBalanceDistribution] = useState<
-    import('@/services/api/types').CTBalanceDistribution[]
-  >([]);
-  const [stakingCSTActions, setStakingCSTActions] = useState<
-    import('@/services/api/types').StakingAction[] | null
-  >(null);
-  const [stakingRWLKActions, setStakingRWLKActions] = useState<
-    import('@/services/api/types').StakingAction[] | null
-  >(null);
-  const [stakedCSTokens, setStakedCSTokens] = useState<
-    import('@/services/api/types').StakedTokenInfo[] | null
-  >(null);
-  const [stakedRWLKTokens, setStakedRWLKTokens] = useState<
-    import('@/services/api/types').StakedTokenInfo[] | null
-  >(null);
-  const [systemModeChanges, setSystemModeChanges] = useState<EventRow[] | null>(null);
+  const data = dashboardData ?? null;
+  const loading = dashboardLoading;
 
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
+  const cstBidData = useMemo<CSTBidData>(() => {
+    if (!ctPriceData) return { AuctionDuration: 0, CSTPrice: 0, SecondsElapsed: 0 };
+    return {
+      AuctionDuration: parseInt(ctPriceData.AuctionDuration, 10),
+      CSTPrice: parseFloat(formatEther(BigInt(ctPriceData.CSTPrice))),
+      SecondsElapsed: parseInt(ctPriceData.SecondsElapsed, 10),
+    };
+  }, [ctPriceData]);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const dashboardData = await api.get_dashboard_info();
-      setData(dashboardData);
+  const currentRoundBidHistory = bidListData ?? [];
 
-      const curRoundBidHistoryPromise = api.get_bid_list_by_round(
-        dashboardData?.CurRoundNum!,
-        'desc',
-      );
+  const uniqueBidders = useMemo(() => {
+    if (!uniqueBiddersData) return [];
+    return [...uniqueBiddersData].sort((a: Bidder, b: Bidder) => b.NumBids - a.NumBids);
+  }, [uniqueBiddersData]);
 
-      const [
-        uniqueBiddersData,
-        uniqueWinnersData,
-        uniqueCSTStakersData,
-        uniqueRWLKStakersData,
-        uniqueDonorsData,
-        nftDonationsData,
-        cstDistributionData,
-        ctbDistributionData,
-        stakingCSTActionsData,
-        stakingRWLKActionsData,
-        stakedCSTokensData,
-        stakedRWLKTokensData,
-        sysChangesData,
-      ] = await Promise.all([
-        api.get_unique_bidders(),
-        api.get_unique_winners(),
-        api.get_unique_cst_stakers(),
-        api.get_unique_rwalk_stakers(),
-        api.get_unique_donors(),
-        api.get_donations_nft_list(),
-        api.get_cst_distribution(),
-        api.get_ct_balances_distribution(),
-        api.get_staking_cst_actions(),
-        api.get_staking_rwalk_actions(),
-        api.get_staked_cst_tokens(),
-        api.get_staked_rwalk_tokens(),
-        api.get_system_modelist(),
-      ]);
-
-      const curRoundBidHistory = await curRoundBidHistoryPromise;
-
-      setCurrentRoundBidHistory(curRoundBidHistory);
-      setUniqueBidders(
-        [...uniqueBiddersData].sort((a: Bidder, b: Bidder) => b.NumBids - a.NumBids),
-      );
-      setUniqueWinners(uniqueWinnersData);
-      setUniqueCSTStakers(uniqueCSTStakersData);
-      setUniqueRWLKStakers(uniqueRWLKStakersData);
-      setUniqueDonors(uniqueDonorsData);
-      setNftDonations(nftDonationsData as unknown as import('@/services/api/types').DonatedNFT[]);
-      setCSTDistribution(cstDistributionData);
-      setCTBalanceDistribution(ctbDistributionData);
-      setStakingCSTActions(stakingCSTActionsData);
-      setStakingRWLKActions(stakingRWLKActionsData);
-      setStakedCSTokens(stakedCSTokensData);
-      setStakedRWLKTokens(stakedRWLKTokensData);
-      setSystemModeChanges(sysChangesData as EventRow[]);
-    } catch (err) {
-      reportError(err, 'fetch statistics data');
-      setFetchError('Failed to load statistics data. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCSTBidData = useCallback(async () => {
-    try {
-      const ctData = await api.get_ct_price();
-      if (ctData) {
-        setCSTBidData({
-          AuctionDuration: parseInt(ctData.AuctionDuration, 10),
-          CSTPrice: parseFloat(formatEther(BigInt(ctData.CSTPrice))),
-          SecondsElapsed: parseInt(ctData.SecondsElapsed, 10),
-        });
-      }
-    } catch (err) {
-      reportError(err, 'fetch CST bid data');
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchData();
-    fetchCSTBidData();
-
-    const interval = setInterval(fetchCSTBidData, STATS_POLL_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [fetchCSTBidData]);
+  const uniqueWinners = (uniqueWinnersData ?? []) as Winner[];
+  const uniqueCSTStakers = (uniqueCSTStakersData ?? []) as UniqueStakerCST[];
+  const uniqueRWLKStakers = (uniqueRWLKStakersData ?? []) as UniqueStakerRWLK[];
+  const uniqueDonors = (uniqueDonorsData ?? []) as UniqueEthDonor[];
+  const nftDonations = (nftDonationsData ??
+    []) as unknown as import('@/services/api/types').DonatedNFT[];
+  const cstDistribution = (cstDistributionData ??
+    []) as import('@/services/api/types').TokenDistribution[];
+  const ctBalanceDistribution = (ctBalanceDistributionData ??
+    []) as import('@/services/api/types').CTBalanceDistribution[];
+  const stakingCSTActions = stakingCSTActionsData ?? null;
+  const stakingRWLKActions = stakingRWLKActionsData ?? null;
+  const stakedCSTokens = stakedCSTokensData ?? null;
+  const stakedRWLKTokens = stakedRWLKTokensData ?? null;
+  const systemModeChanges = (systemModeChangesData as EventRow[] | undefined) ?? null;
 
   const renderCountdown = () => {
     if (!data) return null;
@@ -227,11 +165,11 @@ const Statistics = () => {
     );
   }
 
-  if (fetchError || !data) {
+  if (isError || !data) {
     return (
       <MainWrapper>
         <p className="text-lg font-semibold text-destructive">
-          {fetchError || 'Failed to load statistics. Please refresh the page.'}
+          Failed to load statistics. Please refresh the page.
         </p>
       </MainWrapper>
     );

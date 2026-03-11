@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import Fireworks, { FireworksHandlers } from '@fireworks-js/react';
 
 import { MainWrapper } from '@/components/styled';
-import api from '@/services/api';
-import { reportError } from '@/utils/errors';
+import { useRoundInfo } from '@/hooks/useApiQuery';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
@@ -18,42 +17,21 @@ const PrizeClaimedPage = () => {
 
   const [finishFireworks, setFinishFireworks] = useState(false);
 
-  const [prizeInfo, setPrizeInfo] = useState<import('@/services/api/types').RoundInfo | null>(null);
+  const roundStr = searchParams.get('round');
+  const roundNum = parseInt(roundStr ?? '0');
 
-  const [loading, setLoading] = useState(true);
+  const { data: prizeInfo, isLoading: loading } = useRoundInfo(roundNum);
 
   const handleFireworksClick = () => {
     fireworksRef.current?.stop();
     setFinishFireworks(true);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-
-        const roundStr = searchParams.get('round');
-        const roundNum = parseInt(roundStr ?? '0');
-
-        const fetchedPrizeInfo = await api.get_round_info(roundNum);
-        setPrizeInfo(fetchedPrizeInfo);
-        setLoading(false);
-      } catch (error) {
-        reportError(error, 'fetch prize claimed info');
-        setLoading(false);
-      }
-    };
-
-    if (searchParams.get('round') !== null) {
-      fetchData();
-    }
-  }, [searchParams]);
-
   return (
     <MainWrapper>
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>
-      ) : prizeInfo === null ? (
+      ) : !prizeInfo ? (
         <h6 className="text-lg font-semibold">No prize information.</h6>
       ) : (
         <>

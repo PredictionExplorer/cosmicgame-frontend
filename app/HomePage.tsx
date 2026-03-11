@@ -1,24 +1,23 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { zeroAddress } from 'viem';
 import { ArrowRight } from 'lucide-react';
 import Countdown from 'react-countdown';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { getAssetsUrl, getEnduranceChampions, type EnduranceChampion } from '@/utils';
+import { getAssetsUrl, getEnduranceChampions } from '@/utils';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { MainWrapper, StyledCard } from '@/components/styled';
-import api from '@/services/api';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { ART_BLOCKS_ADDRESS } from '@/config/networks';
-import { DATA_POLL_INTERVAL_MS } from '@/config/constants';
 import LatestNFTs from '@/components/nft/LatestNFTs';
 import NFTImage from '@/components/nft/NFTImage';
-import type { DashboardInfo, BidInfo, DonatedNFT as DonatedNFTType } from '@/services/api/types';
+import type { DonatedNFT as DonatedNFTType } from '@/services/api/types';
 import { reportError } from '@/utils/errors';
 import { SpecialPrizeWinners } from '@/components/tables/SpecialPrizeWinners';
 import { BiddingStatus } from '@/components/common/BiddingStatus';
@@ -28,22 +27,52 @@ import { RoundInfoSection } from '@/components/home/RoundInfoSection';
 import { useBidForm } from '@/hooks/useBidForm';
 import { usePrizeClaim } from '@/hooks/usePrizeClaim';
 import { usePrizeNotification } from '@/hooks/usePrizeNotification';
+import {
+  useDashboardInfo,
+  useBidListByRound,
+  useDonationsNFTByRound,
+  useDonationsCGWithInfoByRound,
+  useDonationsERC20ByRound,
+  useCurrentTime,
+  useCSTInfo,
+} from '@/hooks/useApiQuery';
 
 const HomePage = () => {
   const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
+  const queryClient = useQueryClient();
 
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<DashboardInfo | null>(null);
-  const [curBidList, setCurBidList] = useState<BidInfo[]>([]);
-  const [donatedNFTs, setDonatedNFTs] = useState<DonatedNFTType[]>([]);
+  const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo();
+  const { data: currentTimeData } = useCurrentTime();
+
+  const round = dashboardData?.CurRoundNum ?? -1;
+  const { data: bidListData } = useBidListByRound(round, 'desc');
+  const { data: nftDonationsData } = useDonationsNFTByRound(round);
+  const { data: ethDonationsRawData } = useDonationsCGWithInfoByRound(round);
+  const { data: erc20DonationsData } = useDonationsERC20ByRound(round);
+
   type EthDonation = import('@/components/tables/EthDonationTable').EthDonation;
   type DonatedERC20 = import('@/components/donations/DonatedERC20Table').DonatedERC20Token;
-  const [ethDonations, setEthDonations] = useState<EthDonation[]>([]);
-  const [championList, setChampionList] = useState<EnduranceChampion[] | null>(null);
-  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState<DonatedERC20[]>([]);
-  const [bannerToken, setBannerToken] = useState({ seed: '', id: -1 });
-  const [offset, setOffset] = useState(0);
+
+  const data = dashboardData ?? null;
+  const loading = dashboardLoading;
+  const curBidList = bidListData ?? [];
+  const donatedNFTs = (nftDonationsData ?? []) as DonatedNFTType[];
+  const ethDonations = (ethDonationsRawData ?? []) as EthDonation[];
+  const donatedERC20Tokens = (erc20DonationsData ?? []) as DonatedERC20[];
+
+  const offset = useMemo(() => {
+    if (currentTimeData == null) return 0;
+    return currentTimeData * 1000 - Date.now();
+  }, [currentTimeData]);
+
+  const championList = useMemo(() => {
+    if (!bidListData) return null;
+    const champions = getEnduranceChampions(bidListData);
+    return [...champions].sort((a, b) => b.chronoWarrior - a.chronoWarrior);
+  }, [bidListData]);
+
+  const [bannerTokenId, setBannerTokenId] = useState<number | null>(null);
   const [curPage, setCurrentPage] = useState(1);
   const [imageOpen, setImageOpen] = useState(false);
   const [twitterPopupOpen, setTwitterPopupOpen] = useState(false);
@@ -51,66 +80,48 @@ const HomePage = () => {
   const [donatedTokensTab, setDonatedTokensTab] = useState(0);
   const perPage = 12;
 
+  useEffect(() => {
+    if (dashboardData && bannerTokenId === null) {
+      const count = dashboardData.MainStats.NumCSTokenMints;
+      if (count > 0) {
+        setBannerTokenId(Math.floor(Math.random() * count));
+      } else {
+        setBannerTokenId(-1);
+      }
+    }
+  }, [dashboardData, bannerTokenId]);
+
+  const { data: bannerCSTInfo } = useCSTInfo(bannerTokenId);
+
+  const bannerToken = useMemo(() => {
+    if (bannerTokenId === -1) return { seed: 'sample', id: -1 };
+    if (bannerCSTInfo) return { seed: `0x${bannerCSTInfo.Seed}`, id: bannerTokenId! };
+    return { seed: '', id: -1 };
+  }, [bannerTokenId, bannerCSTInfo]);
+
   const bidForm = useBidForm();
   const prizeClaim = usePrizeClaim({ data, offset });
   const { playAudio, requestNotificationPermission } = usePrizeNotification({
     prizeTime: prizeClaim.prizeTime,
   });
 
-  const fetchData = useCallback(async () => {
-    try {
-      const newData = await api.get_dashboard_info();
-      if (newData) {
-        const round = newData.CurRoundNum;
-        const [newBidData, nftData, championsData, ethDonationsData, erc20Data] = await Promise.all(
-          [
-            api.get_bid_list_by_round(round, 'desc'),
-            api.get_donations_nft_by_round(round),
-            (async () => {
-              const bids = await api.get_bid_list_by_round(round, 'desc');
-              const champions = getEnduranceChampions(bids);
-              return [...champions].sort((a, b) => b.chronoWarrior - a.chronoWarrior);
-            })(),
-            api.get_donations_cg_with_info_by_round(round),
-            api.get_donations_erc20_by_round(round),
-          ],
-        );
-        setCurBidList(newBidData);
-        setDonatedNFTs(nftData as DonatedNFTType[]);
-        setChampionList(championsData);
-        setEthDonations(ethDonationsData as typeof ethDonations);
-        setDonatedERC20Tokens(erc20Data as typeof donatedERC20Tokens);
+  const prevBidCountRef = useRef<number>(0);
+  useEffect(() => {
+    if (dashboardData && prevBidCountRef.current > 0) {
+      if (
+        account !== dashboardData.LastBidderAddr &&
+        dashboardData.CurNumBids > prevBidCountRef.current
+      ) {
+        playAudio();
       }
-      setData((prevData: DashboardInfo | null) => {
-        if (
-          account !== newData?.LastBidderAddr &&
-          prevData &&
-          prevData.CurNumBids < (newData?.CurNumBids ?? 0)
-        ) {
-          playAudio();
-        }
-        return newData;
-      });
-      setLoading(false);
-    } catch (err) {
-      reportError(err, 'fetch home page data');
     }
-  }, [account, playAudio]);
+    if (dashboardData) {
+      prevBidCountRef.current = dashboardData.CurNumBids;
+    }
+  }, [dashboardData, account, playAudio]);
 
+  const { bidType, ethBidInfo, cstBidData, isBidding, rwlkId, bidPricePlus } = bidForm;
   const {
-    getRwlkNFTIds,
-    fetchCSTBidData,
-    fetchEthBidInfo,
-    bidType,
-    ethBidInfo,
-    cstBidData,
-    isBidding,
-    rwlkId,
-    bidPricePlus,
-  } = bidForm;
-  const {
-    fetchClaimHistory,
-    fetchPrizeTime,
     fetchActivationTime,
     prizeTime,
     timeoutClaimPrize,
@@ -118,21 +129,10 @@ const HomePage = () => {
     activationTime,
     claimHistory,
   } = prizeClaim;
-  const fetchDataCollection = useCallback(
-    () =>
-      Promise.all([
-        getRwlkNFTIds(),
-        fetchData(),
-        fetchClaimHistory(),
-        fetchCSTBidData(),
-        fetchEthBidInfo(),
-      ]),
-    [getRwlkNFTIds, fetchData, fetchClaimHistory, fetchCSTBidData, fetchEthBidInfo],
-  );
 
   const withPostTxRefresh = (afterMs = 1500, activationMs = 3000) => {
     setTimeout(() => {
-      fetchDataCollection();
+      queryClient.invalidateQueries();
       bidForm.setMessage('');
     }, afterMs);
     setTimeout(() => {
@@ -160,32 +160,14 @@ const HomePage = () => {
       bidForm.setAdvancedExpanded(true);
     }
     if (searchParams?.get('referred_by')) setTwitterPopupOpen(true);
-
-    api.get_current_time().then((current) => setOffset(current * 1000 - Date.now()));
-    fetchDataCollection();
-    fetchEthBidInfo();
-    const interval = setInterval(fetchDataCollection, DATA_POLL_INTERVAL_MS);
-    return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, requestNotificationPermission, fetchDataCollection, fetchEthBidInfo]);
+  }, [searchParams, requestNotificationPermission]);
 
   useEffect(() => {
     if (twitterHandle)
       bidForm.setMessage(`@${twitterHandle} referred by @${searchParams.get('referred_by')}.`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [twitterHandle]);
-
-  useEffect(() => {
-    if (data && bannerToken.seed === '') {
-      const count = data.MainStats.NumCSTokenMints;
-      if (count > 0) {
-        const id = Math.floor(Math.random() * count);
-        api.get_cst_info(id).then((res) => setBannerToken({ seed: `0x${res!.Seed}`, id }));
-      } else setBannerToken({ seed: 'sample', id: -1 });
-    }
-    const interval = setInterval(() => fetchPrizeTime(), 1000);
-    return () => clearInterval(interval);
-  }, [data, offset, curBidList, bannerToken.seed, fetchPrizeTime]);
 
   const getBidLabel = () => {
     const adj = (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100);

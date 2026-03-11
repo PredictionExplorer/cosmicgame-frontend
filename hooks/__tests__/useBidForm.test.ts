@@ -18,7 +18,7 @@ jest.mock('../../hooks/useNotify', () => ({
 /* ────────────────────────────────────────────────────────────────── */
 
 jest.mock('../../hooks/web3', () => ({
-  useActiveWeb3React: jest.fn(() => ({ account: '0xUser', chainId: 1, active: true })),
+  useActiveWeb3React: jest.fn().mockReturnValue({ account: '0xUser', chainId: 1, active: true }),
 }));
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -92,25 +92,42 @@ jest.mock('../../hooks/useRWLKNFTContract', () => ({
 }));
 
 /* ────────────────────────────────────────────────────────────────── */
+/*  useApiQuery                                                      */
+/* ────────────────────────────────────────────────────────────────── */
+
+const mockUseCTPrice = jest.fn().mockReturnValue({
+  data: {
+    AuctionDuration: '3600',
+    CSTPrice: '1000000000000000000',
+    SecondsElapsed: '1800',
+  },
+});
+const mockUseBidEthPrice = jest.fn().mockReturnValue({
+  data: {
+    AuctionDuration: '3600',
+    ETHPrice: '10000000000000000',
+    SecondsElapsed: '1800',
+  },
+});
+const mockUseUsedRWLKNFTs = jest.fn().mockReturnValue({
+  data: [{ RWalkTokenId: 2 }],
+});
+
+jest.mock('../../hooks/useApiQuery', () => ({
+  useCTPrice: (...args: unknown[]) => mockUseCTPrice(...args),
+  useBidEthPrice: (...args: unknown[]) => mockUseBidEthPrice(...args),
+  useUsedRWLKNFTs: (...args: unknown[]) => mockUseUsedRWLKNFTs(...args),
+}));
+
+/* ────────────────────────────────────────────────────────────────── */
 /*  API                                                              */
 /* ────────────────────────────────────────────────────────────────── */
 
 jest.mock('../../services/api', () => ({
   __esModule: true,
   default: {
-    get_used_rwlk_nfts: jest.fn().mockResolvedValue([{ RWalkTokenId: 2 }]),
     get_user_balance: jest.fn().mockResolvedValue({
       CosmicTokenBalance: '1000000000000000000000',
-    }),
-    get_ct_price: jest.fn().mockResolvedValue({
-      AuctionDuration: '3600',
-      CSTPrice: '1000000000000000000',
-      SecondsElapsed: '1800',
-    }),
-    get_bid_eth_price: jest.fn().mockResolvedValue({
-      AuctionDuration: '3600',
-      ETHPrice: '10000000000000000',
-      SecondsElapsed: '1800',
     }),
   },
 }));
@@ -122,7 +139,7 @@ jest.mock('../../services/api', () => ({
 jest.mock('viem', () => ({
   ...jest.requireActual('../../__mocks__/viem.js'),
   formatEther: jest.fn((v: bigint) => (Number(v) / 1e18).toString()),
-  isAddress: jest.fn(() => true),
+  isAddress: jest.fn().mockReturnValue(true),
   parseEther: jest.fn((v: string) => BigInt(Math.round(Number(v) * 1e18))),
   parseUnits: jest.fn((v: string, d: number) => BigInt(Math.round(Number(v) * 10 ** d))),
   maxUint256: BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
@@ -197,6 +214,24 @@ beforeEach(() => {
 
   mockRWLKContract.read.walletOfOwner.mockResolvedValue([BigInt(1), BigInt(2), BigInt(3)]);
 
+  mockUseCTPrice.mockReturnValue({
+    data: {
+      AuctionDuration: '3600',
+      CSTPrice: '1000000000000000000',
+      SecondsElapsed: '1800',
+    },
+  });
+  mockUseBidEthPrice.mockReturnValue({
+    data: {
+      AuctionDuration: '3600',
+      ETHPrice: '10000000000000000',
+      SecondsElapsed: '1800',
+    },
+  });
+  mockUseUsedRWLKNFTs.mockReturnValue({
+    data: [{ RWalkTokenId: 2 }],
+  });
+
   jest.spyOn(console, 'error').mockImplementation(() => {});
   jest.spyOn(console, 'warn').mockImplementation(() => {});
 });
@@ -226,19 +261,19 @@ describe('useBidForm', () => {
     expect(result.current.advancedExpanded).toBe(false);
     expect(result.current.rwlknftIds).toEqual([]);
     expect(result.current.cstBidData).toEqual({
-      AuctionDuration: 0,
-      CSTPrice: 0,
-      SecondsElapsed: 0,
+      AuctionDuration: 3600,
+      CSTPrice: 1,
+      SecondsElapsed: 1800,
     });
-    expect(result.current.ethBidInfo).toBeNull();
+    expect(result.current.ethBidInfo).toEqual({
+      AuctionDuration: 3600,
+      ETHPrice: 0.01,
+      SecondsElapsed: 1800,
+    });
   });
 
-  it('fetchCSTBidData fetches and parses CST auction data', async () => {
+  it('derives cstBidData from useCTPrice query', () => {
     const { result } = renderHook(() => useBidForm());
-
-    await act(async () => {
-      await result.current.fetchCSTBidData();
-    });
 
     expect(result.current.cstBidData).toEqual({
       AuctionDuration: 3600,
@@ -247,12 +282,8 @@ describe('useBidForm', () => {
     });
   });
 
-  it('fetchEthBidInfo fetches and parses ETH bid info', async () => {
+  it('derives ethBidInfo from useBidEthPrice query', () => {
     const { result } = renderHook(() => useBidForm());
-
-    await act(async () => {
-      await result.current.fetchEthBidInfo();
-    });
 
     expect(result.current.ethBidInfo).toEqual({
       AuctionDuration: 3600,
@@ -261,12 +292,29 @@ describe('useBidForm', () => {
     });
   });
 
-  it('getRwlkNFTIds loads and filters RWLK NFTs', async () => {
+  it('returns empty cstBidData when useCTPrice returns no data', () => {
+    mockUseCTPrice.mockReturnValue({ data: undefined });
     const { result } = renderHook(() => useBidForm());
 
-    await act(async () => {
-      await result.current.getRwlkNFTIds();
+    expect(result.current.cstBidData).toEqual({
+      AuctionDuration: 0,
+      CSTPrice: 0,
+      SecondsElapsed: 0,
     });
+  });
+
+  it('returns null ethBidInfo when useBidEthPrice returns no data', () => {
+    mockUseBidEthPrice.mockReturnValue({ data: undefined });
+    const { result } = renderHook(() => useBidForm());
+
+    expect(result.current.ethBidInfo).toBeNull();
+  });
+
+  it('filters RWLK NFTs using useUsedRWLKNFTs data', async () => {
+    const { result } = renderHook(() => useBidForm());
+
+    // The useEffect runs asynchronously using usedRWLKData from the query hook
+    await act(async () => {});
 
     // Wallet owns [1,2,3]; token 2 is already used → available [1,3] reversed → [3,1]
     expect(result.current.rwlknftIds).toEqual([3, 1]);
@@ -342,10 +390,9 @@ describe('useBidForm', () => {
 
   it('onBidWithCST succeeds and returns true', async () => {
     const { result } = renderHook(() => useBidForm());
+    await act(async () => {});
 
-    await act(async () => {
-      await result.current.fetchCSTBidData();
-    });
+    expect(result.current.cstBidData.CSTPrice).toBe(1);
 
     let success!: boolean;
     await act(async () => {
@@ -359,6 +406,7 @@ describe('useBidForm', () => {
   });
 
   it('onBidWithCST handles free bid when auction ended', async () => {
+    mockUseCTPrice.mockReturnValue({ data: undefined });
     const { result } = renderHook(() => useBidForm());
     await act(async () => {});
 
@@ -394,10 +442,9 @@ describe('useBidForm', () => {
     mockApiGetUserBalance.mockResolvedValue({ CosmicTokenBalance: '0' });
 
     const { result } = renderHook(() => useBidForm());
+    await act(async () => {});
 
-    await act(async () => {
-      await result.current.fetchCSTBidData();
-    });
+    expect(result.current.cstBidData.CSTPrice).toBe(1);
 
     let success!: boolean;
     await act(async () => {

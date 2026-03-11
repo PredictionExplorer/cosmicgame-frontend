@@ -1,6 +1,6 @@
 import 'yet-another-react-lightbox/styles.css';
 
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useState, useMemo, type ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Lightbox from 'yet-another-react-lightbox';
@@ -36,9 +36,14 @@ import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 import { useActiveWeb3React } from '@/hooks/web3';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import { useNotification } from '@/contexts/NotificationContext';
-import api from '@/services/api';
-import type { CSTTokenInfo, CSTTransferRecord, NameHistoryRecord, MainStats } from '@/services/api';
+import type { CSTTokenInfo, CSTTransferRecord } from '@/services/api';
 import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
+import {
+  useDashboardInfo,
+  useCSTInfo,
+  useNameHistory,
+  useCTOwnershipTransfers,
+} from '@/hooks/useApiQuery';
 import { useClipboard } from '@/hooks/useClipboard';
 import { StyledCard, SectionWrapper, NFTInfoWrapper } from '@/components/styled';
 import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
@@ -52,17 +57,11 @@ interface NFTDetailInfo extends CSTTokenInfo {
   Staked?: boolean;
 }
 
-interface DashboardDetail {
-  MainStats: MainStats;
-}
-
 interface NFTTraitProps {
   tokenId: number;
 }
 
 const NFTTrait = ({ tokenId }: NFTTraitProps) => {
-  const [image, setImage] = useState('/images/qmark.png');
-  const [video, setVideo] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [openVideo, setOpenVideo] = useState(false);
   const [imageOpen, setImageOpen] = useState(false);
@@ -72,13 +71,34 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const [tokenName, setTokenName] = useState('');
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [nft, setNft] = useState<NFTDetailInfo | null>(null);
-  const [dashboard, setDashboard] = useState<DashboardDetail | null>(null);
-  const [nameHistory, setNameHistory] = useState<NameHistoryRecord[]>([]);
-  const [transferHistory, setTransferHistory] = useState<
-    (CSTTransferRecord & { TransferType?: number })[]
-  >([]);
+
+  const { data: dashboard, isLoading: loadingDashboard } = useDashboardInfo();
+  const { data: nftRaw, isLoading: loadingNFT, refetch: refetchCSTInfo } = useCSTInfo(tokenId);
+  const {
+    data: nameHistory = [],
+    isLoading: loadingNames,
+    refetch: refetchNameHistory,
+  } = useNameHistory(tokenId);
+  const {
+    data: transferHistoryRaw = [],
+    isLoading: loadingTransfers,
+    refetch: refetchTransferHistory,
+  } = useCTOwnershipTransfers(tokenId);
+
+  const nft = (nftRaw as NFTDetailInfo | null) ?? null;
+  const transferHistory = transferHistoryRaw as (CSTTransferRecord & { TransferType?: number })[];
+
+  const image = useMemo(() => {
+    if (!nft?.Seed) return '/images/qmark.png';
+    return getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
+  }, [nft]);
+
+  const video = useMemo(() => {
+    if (!nft?.Seed) return '';
+    return getAssetsUrl(`cosmicsignature/0x${nft.Seed}.mp4`);
+  }, [nft]);
+
+  const loading = loadingDashboard || loadingNFT || loadingNames || loadingTransfers;
 
   const router = useRouter();
   const nftContract = useCosmicSignatureContract();
@@ -141,7 +161,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       const hash = await nftContract.write.transferFrom?.([account, address, tokenId]);
       if (hash) await publicClient?.waitForTransactionReceipt({ hash });
 
-      await Promise.all([fetchCSTInfo(), fetchTransferHistory()]);
+      await Promise.all([refetchCSTInfo(), refetchTransferHistory()]);
       setAddress('');
     } catch (err) {
       if (!isUserRejection(err)) {
@@ -161,7 +181,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       if (hash) await publicClient?.waitForTransactionReceipt({ hash });
 
       setTimeout(async () => {
-        await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
+        await Promise.all([refetchCSTInfo(), refetchNameHistory()]);
       }, 3000);
       setTokenName('');
       setNotification({
@@ -184,7 +204,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       if (hash) await publicClient?.waitForTransactionReceipt({ hash });
 
       setTimeout(async () => {
-        await Promise.all([fetchCSTInfo(), fetchNameHistory()]);
+        await Promise.all([refetchCSTInfo(), refetchNameHistory()]);
       }, 3000);
       setTokenName('');
       setNotification({
@@ -225,58 +245,6 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
     const totalSupply = await nftContract.read.totalSupply?.();
     router.push(`/detail/${Math.min(tokenId + 1, Number(totalSupply ?? 0) - 1)}`);
   };
-
-  const fetchNameHistory = async () => {
-    try {
-      const history = await api.get_name_history(tokenId);
-      setNameHistory(history);
-    } catch (e) {
-      reportError(e, 'fetch NFT name history');
-    }
-  };
-
-  const fetchTransferHistory = async () => {
-    try {
-      const history = await api.get_ct_ownership_transfers(tokenId);
-      setTransferHistory(history as (CSTTransferRecord & { TransferType?: number })[]);
-    } catch (e) {
-      reportError(e, 'fetch NFT transfer history');
-    }
-  };
-
-  const fetchCSTInfo = async () => {
-    try {
-      const res = await api.get_cst_info(tokenId);
-      if (res) {
-        setNft(res as NFTDetailInfo);
-        const seed = String(res.Seed ?? '');
-        setImage(getAssetsUrl(`cosmicsignature/0x${seed}.png`));
-        setVideo(getAssetsUrl(`cosmicsignature/0x${seed}.mp4`));
-      }
-    } catch (e) {
-      reportError(e, 'fetch CST info');
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const dashboardData = await api.get_dashboard_info();
-        setDashboard(dashboardData as DashboardDetail | null);
-
-        if (dashboardData && dashboardData.MainStats.NumCSTokenMints > tokenId) {
-          await Promise.all([fetchCSTInfo(), fetchNameHistory(), fetchTransferHistory()]);
-        }
-      } catch (error) {
-        reportError(error, 'fetch NFT detail data');
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokenId]);
 
   if (loading) {
     return (

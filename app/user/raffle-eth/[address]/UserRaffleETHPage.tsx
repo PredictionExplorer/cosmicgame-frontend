@@ -2,7 +2,7 @@
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { getAddress, isAddress } from 'viem';
 import { Tr } from 'react-super-responsive-table';
@@ -13,7 +13,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { useApiData } from '@/contexts/ApiDataContext';
 import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
 import { useNotification } from '@/contexts/NotificationContext';
-import api from '@/services/api';
+import { useRaffleDepositsByUser } from '@/hooks/useApiQuery';
 import getErrorMessage from '@/utils/alert';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import {
@@ -103,32 +103,6 @@ const RaffleWinningsTable = ({ list }: { list: RaffleETHDeposit[] }) => {
   );
 };
 
-function useRaffleETHDeposits(address: string) {
-  const [raffleETHToClaim, setRaffleETHToClaim] = useState<{
-    data: RaffleETHDeposit[];
-    loading: boolean;
-  }>({
-    data: [],
-    loading: false,
-  });
-
-  const fetchRaffleETHDeposits = async (reload = true) => {
-    setRaffleETHToClaim((prev) => ({ ...prev, loading: reload }));
-    try {
-      const deposits = await api.get_raffle_deposits_by_user(address);
-      const sorted = (deposits as RaffleETHDeposit[]).sort(
-        (a: RaffleETHDeposit, b: RaffleETHDeposit) => b.TimeStamp - a.TimeStamp,
-      );
-      setRaffleETHToClaim({ data: sorted, loading: false });
-    } catch (err) {
-      reportError(err, 'fetch Raffle ETH deposits');
-      setRaffleETHToClaim({ data: [], loading: false });
-    }
-  };
-
-  return { raffleETHToClaim, fetchRaffleETHDeposits };
-}
-
 const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
   const { account } = useActiveWeb3React();
   const { apiData: status, fetchData: fetchStatusData } = useApiData();
@@ -140,10 +114,24 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
       ? getAddress(rawAddress.toLowerCase())
       : 'Invalid Address';
 
-  const [invalidAddress, setInvalidAddress] = useState(false);
+  const invalidAddress = !validatedAddress || validatedAddress === 'Invalid Address';
   const [isClaiming, setIsClaiming] = useState(false);
 
-  const { raffleETHToClaim, fetchRaffleETHDeposits } = useRaffleETHDeposits(validatedAddress);
+  const {
+    data: depositsRaw,
+    isLoading: depositsLoading,
+    refetch: refetchDeposits,
+  } = useRaffleDepositsByUser(invalidAddress ? null : validatedAddress);
+
+  const raffleETHToClaim = useMemo(
+    () => ({
+      data: [...((depositsRaw as RaffleETHDeposit[] | undefined) ?? [])].sort(
+        (a, b) => b.TimeStamp - a.TimeStamp,
+      ),
+      loading: depositsLoading,
+    }),
+    [depositsRaw, depositsLoading],
+  );
 
   const handleAllETHClaim = async () => {
     try {
@@ -152,7 +140,7 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
 
       setTimeout(() => {
         fetchStatusData();
-        fetchRaffleETHDeposits(false);
+        refetchDeposits();
         setIsClaiming(false);
       }, 2000);
     } catch (err: unknown) {
@@ -166,15 +154,6 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
       setIsClaiming(false);
     }
   };
-
-  useEffect(() => {
-    if (!validatedAddress || validatedAddress === 'Invalid Address') {
-      setInvalidAddress(true);
-      return;
-    }
-    fetchRaffleETHDeposits();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [validatedAddress]);
 
   if (invalidAddress) {
     return (

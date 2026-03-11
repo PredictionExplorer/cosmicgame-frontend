@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,24 +10,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MainWrapper } from '@/components/styled';
-import api from '@/services/api';
-import type { DashboardInfo } from '@/services/api/types';
+import { useDashboardInfo } from '@/hooks/useApiQuery';
 
 const AdminSettingsPage = () => {
-  const [data, setData] = useState<DashboardInfo | null>(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const newData = await api.get_dashboard_info();
-      setData(newData);
-    };
-    fetchData();
-  }, []);
+  const { data, isLoading } = useDashboardInfo();
 
   return (
     <MainWrapper>
       <h4 className="text-2xl font-bold text-primary text-center">Administrative methods</h4>
-      {data === null ? (
+      {isLoading || !data ? (
         <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
         <>

@@ -1,15 +1,13 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import { formatEther, zeroAddress } from 'viem';
 import Countdown from 'react-countdown';
 
 import { calculateTimeDiff, convertTimestampToDateTime } from '@/utils';
 
-import api from '@/services/api';
-import { reportError } from '@/utils/errors';
-import { DATA_POLL_INTERVAL_MS } from '@/config/constants';
 import { GradientText } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, BidInfo } from '@/services/api';
+import { useCurrentTime, useUserInfo, useCTPrice } from '@/hooks/useApiQuery';
 
 import Counter from './Counter';
 
@@ -41,65 +39,44 @@ export const BiddingStatus = ({
   ethBidInfo,
   prizeTime,
 }: BiddingStatusProps) => {
-  const [winProbability, setWinProbability] = useState<{
-    raffle: number;
-    nft: number;
-  } | null>(null);
-  const [offset, setOffset] = useState(0);
   const [roundStarted, setRoundStarted] = useState('');
   const [lastBidderElapsed, setLastBidderElapsed] = useState('');
-  const [cstBidData, setCSTBidData] = useState({
-    AuctionDuration: 0,
-    CSTPrice: 0,
-    SecondsElapsed: 0,
-  });
 
   const { account } = useActiveWeb3React();
+  const { data: currentTimeRaw } = useCurrentTime();
+  const { data: userInfoRaw } = useUserInfo(account);
+  const { data: ctPriceRaw } = useCTPrice();
+
+  const offset = useMemo(() => {
+    if (currentTimeRaw == null) return 0;
+    return currentTimeRaw * 1000 - Date.now();
+  }, [currentTimeRaw]);
+
+  const winProbability = useMemo(() => {
+    if (!account || !data || !curBidList.length) return null;
+    const Bids = (userInfoRaw?.Bids as BidInfo[] | undefined) || [];
+    if (!Bids.length) return null;
+    const curRoundBids = Bids.filter((bid) => bid.RoundNum === data.CurRoundNum);
+    const pSelect = (total: number, chosen: number, yours: number) =>
+      1 - Math.pow((total - yours) / total, chosen);
+    return {
+      raffle:
+        pSelect(curBidList.length, data.NumRaffleEthWinnersBidding ?? 1, curRoundBids.length) * 100,
+      nft:
+        pSelect(curBidList.length, data.NumRaffleNFTWinnersBidding ?? 1, curRoundBids.length) * 100,
+    };
+  }, [account, data, userInfoRaw, curBidList]);
+
+  const cstBidData = useMemo(() => {
+    if (!ctPriceRaw) return { AuctionDuration: 0, CSTPrice: 0, SecondsElapsed: 0 };
+    return {
+      AuctionDuration: parseInt(String(ctPriceRaw.AuctionDuration)),
+      CSTPrice: parseFloat(formatEther(BigInt(ctPriceRaw.CSTPrice))),
+      SecondsElapsed: parseInt(String(ctPriceRaw.SecondsElapsed)),
+    };
+  }, [ctPriceRaw]);
 
   useEffect(() => {
-    const probabilityOfSelection = (totalBids: number, chosenBids: number, yourBids: number) => {
-      const probability = 1 - Math.pow((totalBids - yourBids) / totalBids, chosenBids);
-      return probability;
-    };
-    const calculateProbability = async () => {
-      if (!account) return;
-      const userInfo = await api.get_user_info(account);
-      const Bids = userInfo?.Bids || [];
-      if (Bids.length && data) {
-        const curRoundBids = Bids.filter((bid: BidInfo) => bid.RoundNum === data.CurRoundNum);
-        const raffle =
-          probabilityOfSelection(
-            curBidList.length,
-            data?.NumRaffleEthWinnersBidding ?? 1,
-            curRoundBids.length,
-          ) * 100;
-        const nft =
-          probabilityOfSelection(
-            curBidList.length,
-            data?.NumRaffleNFTWinnersBidding ?? 1,
-            curRoundBids.length,
-          ) * 100;
-        setWinProbability({
-          raffle: raffle,
-          nft: nft,
-        });
-      }
-    };
-    const fetchTimeOffset = async () => {
-      try {
-        const current = await api.get_current_time();
-        const diff = current * 1000 - Date.now();
-        setOffset(diff);
-      } catch (err) {
-        reportError(err, 'fetch time offset');
-      }
-    };
-
-    if (data && account && curBidList.length) {
-      calculateProbability();
-    }
-
-    fetchTimeOffset();
     const interval = setInterval(() => {
       if (data != null) {
         setRoundStarted(calculateTimeDiff(data.TsRoundStart - offset / 1000));
@@ -113,33 +90,7 @@ export const BiddingStatus = ({
     return () => {
       clearInterval(interval);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, account, curBidList]);
-
-  useEffect(() => {
-    const fetchCSTBidData = async () => {
-      try {
-        const ctData = await api.get_ct_price();
-        if (ctData) {
-          setCSTBidData({
-            AuctionDuration: parseInt(String(ctData.AuctionDuration)),
-            CSTPrice: parseFloat(formatEther(BigInt(ctData.CSTPrice))),
-            SecondsElapsed: parseInt(String(ctData.SecondsElapsed)),
-          });
-        }
-      } catch (err) {
-        reportError(err, 'fetch CST bid data');
-      }
-    };
-
-    fetchCSTBidData();
-
-    const interval = setInterval(fetchCSTBidData, DATA_POLL_INTERVAL_MS);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  }, [data, curBidList, offset]);
 
   return (
     <>

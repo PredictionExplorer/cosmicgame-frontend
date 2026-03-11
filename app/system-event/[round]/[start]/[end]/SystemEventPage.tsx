@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import { MainWrapper } from '@/components/styled';
-import api from '@/services/api';
+import { useSystemEvents } from '@/hooks/useApiQuery';
 import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
 
 interface SystemEventPageProps {
@@ -13,22 +11,8 @@ interface SystemEventPageProps {
 }
 
 const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
-  const [loading, setLoading] = useState(true);
-  const [events, setEvents] = useState<AdminEventRow[]>([]);
-
-  useEffect(() => {
-    const fetchTransfers = async () => {
-      try {
-        setLoading(true);
-        const sys_events = await api.get_system_events(start, end);
-        setEvents(sys_events as AdminEventRow[]);
-        setLoading(false);
-      } catch {
-        setLoading(false);
-      }
-    };
-    fetchTransfers();
-  }, [start, end]);
+  const { data: eventsRaw, isLoading: loading } = useSystemEvents(start, end);
+  const events = (eventsRaw ?? []) as AdminEventRow[];
 
   return (
     <MainWrapper>

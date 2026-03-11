@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { usePublicClient, useWalletClient } from 'wagmi';
 import { formatEther, isAddress, maxUint256, parseEther, parseUnits } from 'viem';
 
@@ -10,9 +10,9 @@ import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { RAFFLE_WALLET_ADDRESS } from '@/config/networks';
 import { ERC721_INTERFACE_ID, BID_GAS_LIMIT } from '@/config/constants';
-import type { UsedRWLKNFT } from '@/services/api/types';
 import { isUserRejection, isEthProviderError, reportError } from '@/utils/errors';
 import { useNotify } from '@/hooks/useNotify';
+import { useCTPrice, useBidEthPrice, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 
 export interface CSTBidData {
   AuctionDuration: number;
@@ -34,14 +34,12 @@ export function useBidForm() {
   const nftRWLKContract = useRWLKNFTContract();
   const { notify, notifyErrorFromEthers } = useNotify();
 
+  const { data: ctPriceData } = useCTPrice();
+  const { data: bidEthPriceData } = useBidEthPrice();
+  const { data: usedRWLKData } = useUsedRWLKNFTs();
+
   const [bidType, setBidType] = useState('ETH');
   const [donationType, setDonationType] = useState('NFT');
-  const [cstBidData, setCSTBidData] = useState<CSTBidData>({
-    AuctionDuration: 0,
-    CSTPrice: 0,
-    SecondsElapsed: 0,
-  });
-  const [ethBidInfo, setEthBidInfo] = useState<EthBidInfo | null>(null);
   const [message, setMessage] = useState('');
   const [nftDonateAddress, setNftDonateAddress] = useState('');
   const [nftId, setNftId] = useState('');
@@ -52,6 +50,24 @@ export function useBidForm() {
   const [isBidding, setIsBidding] = useState(false);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const [rwlknftIds, setRwlknftIds] = useState<number[]>([]);
+
+  const cstBidData = useMemo<CSTBidData>(() => {
+    if (!ctPriceData) return { AuctionDuration: 0, CSTPrice: 0, SecondsElapsed: 0 };
+    return {
+      AuctionDuration: parseInt(ctPriceData.AuctionDuration),
+      CSTPrice: parseFloat(formatEther(BigInt(ctPriceData.CSTPrice))),
+      SecondsElapsed: parseInt(ctPriceData.SecondsElapsed),
+    };
+  }, [ctPriceData]);
+
+  const ethBidInfo = useMemo<EthBidInfo | null>(() => {
+    if (!bidEthPriceData) return null;
+    return {
+      AuctionDuration: parseInt(bidEthPriceData.AuctionDuration),
+      ETHPrice: parseFloat(formatEther(BigInt(bidEthPriceData.ETHPrice))),
+      SecondsElapsed: parseInt(bidEthPriceData.SecondsElapsed),
+    };
+  }, [bidEthPriceData]);
 
   const handleTx = async (hashPromise: Promise<`0x${string}`>) => {
     const hash = await hashPromise;
@@ -398,59 +414,19 @@ export function useBidForm() {
     }
   };
 
-  const getRwlkNFTIds = useCallback(async () => {
-    try {
-      if (nftRWLKContract && account) {
-        const used_rwalk = await api.get_used_rwlk_nfts();
-        const biddedRWLKIds = used_rwalk.map((x: UsedRWLKNFT) => x.RWalkTokenId);
-        const tokens = (await nftRWLKContract.read.walletOfOwner?.([account])) as readonly bigint[];
+  useEffect(() => {
+    if (!nftRWLKContract || !account || !usedRWLKData) return;
+    const biddedRWLKIds = usedRWLKData.map((x) => x.RWalkTokenId);
+    (nftRWLKContract.read.walletOfOwner?.([account]) as Promise<readonly bigint[]>)
+      .then((tokens) => {
         const nftIds = tokens
           .map((t) => Number(t))
           .filter((t: number) => !biddedRWLKIds.includes(t))
           .reverse();
         setRwlknftIds(nftIds);
-      }
-    } catch (e) {
-      reportError(e, 'getRwlkNFTIds');
-    }
-  }, [nftRWLKContract, account]);
-
-  const fetchCSTBidData = useCallback(async () => {
-    try {
-      const ctData = await api.get_ct_price();
-      if (ctData) {
-        setCSTBidData({
-          AuctionDuration: parseInt(ctData.AuctionDuration),
-          CSTPrice: parseFloat(formatEther(BigInt(ctData.CSTPrice))),
-          SecondsElapsed: parseInt(ctData.SecondsElapsed),
-        });
-      }
-    } catch (err) {
-      reportError(err, 'fetch CST bid data');
-    }
-  }, []);
-
-  const fetchEthBidInfo = useCallback(async () => {
-    try {
-      const info = await api.get_bid_eth_price();
-      if (info) {
-        setEthBidInfo({
-          AuctionDuration: parseInt(info.AuctionDuration),
-          ETHPrice: parseFloat(formatEther(BigInt(info.ETHPrice))),
-          SecondsElapsed: parseInt(info.SecondsElapsed),
-        });
-      }
-    } catch (err) {
-      reportError(err, 'fetch ETH bid info');
-    }
-  }, []);
-
-  useEffect(() => {
-    if (nftRWLKContract && account) {
-      getRwlkNFTIds();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nftRWLKContract, account]);
+      })
+      .catch((e) => reportError(e, 'getRwlkNFTIds'));
+  }, [nftRWLKContract, account, usedRWLKData]);
 
   return {
     bidType,
@@ -479,8 +455,5 @@ export function useBidForm() {
     rwlknftIds,
     onBid,
     onBidWithCST,
-    getRwlkNFTIds,
-    fetchCSTBidData,
-    fetchEthBidInfo,
   } as const;
 }

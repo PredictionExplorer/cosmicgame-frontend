@@ -1,13 +1,21 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import { usePublicClient } from 'wagmi';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { MainWrapper } from '@/components/styled';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useActiveWeb3React } from '@/hooks/web3';
-import api from '@/services/api';
+import {
+  useDashboardInfo,
+  useStakingCSTActionsByUser,
+  useCSTTokensByUser,
+  useStakingRewardsByUser,
+  useStakingRWLKActionsByUser,
+  useStakingRWLKMintsByUser,
+} from '@/hooks/useApiQuery';
 import useStakingWalletCSTContract from '@/hooks/useStakingWalletCSTContract';
 import useStakingWalletRWLKContract from '@/hooks/useStakingWalletRWLKContract';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
@@ -162,34 +170,41 @@ const MyStaking = () => {
   const { account } = useActiveWeb3React();
   const { setNotification } = useNotification();
   const publicClient = usePublicClient();
+  const queryClient = useQueryClient();
 
   const cosmicSignatureContract = useCosmicSignatureContract();
   const rwalkContract = useRWLKNFTContract();
   const cstStakingContract = useStakingWalletCSTContract();
   const rwlkStakingContract = useStakingWalletRWLKContract();
 
-  const [dashboardData, setDashboardData] = useState<
-    import('@/services/api/types').DashboardInfo | null
-  >(null);
-  const [rewardPerCST, setRewardPerCST] = useState(0);
+  const { data: dashboardData, isLoading: loadingDashboard } = useDashboardInfo();
+  const { data: stakingCSTActions = [], isLoading: loadingCSTActions } =
+    useStakingCSTActionsByUser(account);
+  const { data: cstTokensRaw = [], isLoading: loadingCST } = useCSTTokensByUser(account);
+  const { data: stakingRewards = [], isLoading: loadingRewards } = useStakingRewardsByUser(account);
+  const { data: stakingRWLKActions = [], isLoading: loadingRWLK } =
+    useStakingRWLKActionsByUser(account);
+  const { data: rwlkMints = [], isLoading: loadingMints } = useStakingRWLKMintsByUser(account);
 
-  const [loading, setLoading] = useState(true);
+  const CSTokens = useMemo(() => cstTokensRaw.filter((x) => !x.WasUnstaked), [cstTokensRaw]);
 
-  const [stakingCSTActions, setStakingCSTActions] = useState<
-    import('@/services/api/types').StakingAction[]
-  >([]);
-  const [CSTokens, setCSTokens] = useState<import('@/services/api/types').CSTTokenInfo[]>([]);
-  const [stakingRewards, setStakingRewards] = useState<
-    import('@/services/api/types').RewardsByToken[]
-  >([]);
+  const rewardPerCST = useMemo(() => {
+    const totalStakedCST = dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
+    if (totalStakedCST > 0) {
+      return (dashboardData?.StakingAmountEth ?? 0) / totalStakedCST;
+    }
+    return 0;
+  }, [dashboardData]);
 
-  const [stakingRWLKActions, setStakingRWLKActions] = useState<
-    import('@/services/api/types').StakingAction[]
-  >([]);
+  const loading =
+    loadingDashboard ||
+    loadingCSTActions ||
+    loadingCST ||
+    loadingRewards ||
+    loadingRWLK ||
+    loadingMints;
+
   const [rwlkTokens, setRwlkTokens] = useState<number[]>([]);
-  const [rwlkMints, setRwlkMints] = useState<import('@/services/api/types').StakingRewardMint[]>(
-    [],
-  );
 
   const {
     cstokens: stakedCSTokens,
@@ -253,12 +268,13 @@ const MyStaking = () => {
         const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
 
         setTimeout(async () => {
-          if (isRwalk) {
-            await fetchRWLKData(account!);
-          } else {
-            await fetchCSTData(account!);
-          }
-          await fetchDashboardData();
+          queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] });
+          queryClient.invalidateQueries({ queryKey: ['stakingCSTActionsByUser'] });
+          queryClient.invalidateQueries({ queryKey: ['cstTokensByUser'] });
+          queryClient.invalidateQueries({ queryKey: ['stakingRewardsByUser'] });
+          queryClient.invalidateQueries({ queryKey: ['stakingRWLKActionsByUser'] });
+          queryClient.invalidateQueries({ queryKey: ['stakingRWLKMintsByUser'] });
+          fetchStakedTokens();
 
           if (res) {
             setNotification({
@@ -312,12 +328,13 @@ const MyStaking = () => {
         const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
 
         setTimeout(async () => {
-          if (isRwalk) {
-            await fetchRWLKData(account!);
-          } else {
-            await fetchCSTData(account!);
-          }
-          await fetchDashboardData();
+          queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] });
+          queryClient.invalidateQueries({ queryKey: ['stakingCSTActionsByUser'] });
+          queryClient.invalidateQueries({ queryKey: ['cstTokensByUser'] });
+          queryClient.invalidateQueries({ queryKey: ['stakingRewardsByUser'] });
+          queryClient.invalidateQueries({ queryKey: ['stakingRWLKActionsByUser'] });
+          queryClient.invalidateQueries({ queryKey: ['stakingRWLKMintsByUser'] });
+          fetchStakedTokens();
 
           if (res) {
             setNotification({
@@ -340,83 +357,25 @@ const MyStaking = () => {
     [account, handleError, rwlkStakingContract, cstStakingContract, setNotification],
   );
 
-  const fetchDashboardData = async () => {
-    try {
-      const data = await api.get_dashboard_info();
-      setDashboardData(data);
-
-      const totalStakedCST = data?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
-
-      if (totalStakedCST > 0) {
-        const rewardCST = (data?.StakingAmountEth ?? 0) / totalStakedCST;
-        setRewardPerCST(rewardCST);
-      } else {
-        setRewardPerCST(0);
-      }
-    } catch (err) {
-      reportError(err, 'fetch staking dashboard data');
-    }
-  };
-
-  const fetchCSTData = async (addr: string, refresh: boolean = false) => {
-    setLoading(refresh);
-    try {
-      const [cstActions, cstUserTokens, cstUserRewards] = await Promise.all([
-        api.get_staking_cst_actions_by_user(addr),
-        api.get_cst_tokens_by_user(addr),
-        api.get_staking_rewards_by_user(addr),
-      ]);
-
-      setStakingCSTActions(cstActions);
-      setCSTokens(cstUserTokens.filter((x) => !x.WasUnstaked));
-      setStakingRewards(cstUserRewards);
-
-      fetchStakedTokens();
-    } catch (err) {
-      handleError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchRWLKData = async (addr: string, refresh: boolean = false) => {
-    try {
-      setLoading(refresh);
-
-      const [rwalkActions, rwalkMintEvents] = await Promise.all([
-        api.get_staking_rwalk_actions_by_user(addr),
-        api.get_staking_rwalk_mints_by_user(addr),
-      ]);
-      setStakingRWLKActions(rwalkActions);
-      setRwlkMints(rwalkMintEvents);
-
-      fetchStakedTokens();
-
-      const stakedIds = stakedRWLKTokens.map((x) => x.StakedTokenId);
-      const userOwned = await rwalkContract!.read.walletOfOwner?.([addr]);
-      const rawIds = (userOwned as readonly bigint[]).map((t) => Number(t)).sort();
-
-      const filteredIds = rawIds.filter(
-        (id) =>
-          !stakedIds.includes(id) &&
-          !rwalkActions.some((action) => action.ActionType !== 1 && action.TokenId === id),
-      );
-      setRwlkTokens(filteredIds);
-    } catch (err) {
-      handleError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (account && rwalkContract) {
-      fetchCSTData(account, true);
-      fetchRWLKData(account, true);
-      fetchDashboardData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, rwalkContract]);
+    const fetchRWLKTokens = async () => {
+      if (!account || !rwalkContract) return;
+      try {
+        const stakedIds = stakedRWLKTokens.map((x) => x.StakedTokenId);
+        const userOwned = await rwalkContract.read.walletOfOwner?.([account]);
+        const rawIds = (userOwned as readonly bigint[]).map((t) => Number(t)).sort();
+        const filteredIds = rawIds.filter(
+          (id) =>
+            !stakedIds.includes(id) &&
+            !stakingRWLKActions.some((action) => action.ActionType !== 1 && action.TokenId === id),
+        );
+        setRwlkTokens(filteredIds);
+      } catch (err) {
+        handleError(err);
+      }
+    };
+    fetchRWLKTokens();
+  }, [account, rwalkContract, stakedRWLKTokens, stakingRWLKActions, handleError]);
 
   return (
     <MainWrapper>

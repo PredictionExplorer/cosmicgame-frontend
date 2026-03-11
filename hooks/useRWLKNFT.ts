@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 
 import { getRWLKImageUrl } from '@/utils';
 
-import api from '@/services/api';
-import { reportError } from '@/utils/errors';
+import { useTokenInfo } from '@/hooks/useApiQuery';
 
 export interface RWLKNFTData {
   id: number;
@@ -21,39 +20,24 @@ export interface RWLKNFTData {
 }
 
 export const useRWLKNFT = (tokenId: number | string | null) => {
-  const [nft, setNft] = useState<RWLKNFTData | null>(null);
+  const { data: info } = useTokenInfo(tokenId);
 
-  useEffect(() => {
-    if (tokenId == null) return;
-    const id = tokenId;
-    const getNFT = async () => {
-      try {
-        const info = await api.get_info(id);
-        const fileName = id.toString().padStart(6, '0');
-
-        setNft({
-          id: parseInt(id.toString(), 10),
-          name: info?.CurName || '',
-          owner: info?.CurOwnerAddr || '',
-          seed: info?.SeedHex || '',
-          white_image: getRWLKImageUrl(fileName, 'white.png'),
-          white_image_thumb: getRWLKImageUrl(fileName, 'white_thumb.jpg'),
-          white_single_video: getRWLKImageUrl(fileName, 'white_single.mp4'),
-          white_triple_video: getRWLKImageUrl(fileName, 'white_triple.mp4'),
-          black_image: getRWLKImageUrl(fileName, 'black.png'),
-          black_image_thumb: getRWLKImageUrl(fileName, 'black_thumb.jpg'),
-          black_single_video: getRWLKImageUrl(fileName, 'black_single.mp4'),
-          black_triple_video: getRWLKImageUrl(fileName, 'black_triple.mp4'),
-        });
-      } catch (err) {
-        reportError(err, 'fetch RWLK NFT info');
-      }
+  return useMemo<RWLKNFTData | null>(() => {
+    if (tokenId == null || !info) return null;
+    const fileName = tokenId.toString().padStart(6, '0');
+    return {
+      id: parseInt(tokenId.toString(), 10),
+      name: info?.CurName || '',
+      owner: info?.CurOwnerAddr || '',
+      seed: info?.SeedHex || '',
+      white_image: getRWLKImageUrl(fileName, 'white.png'),
+      white_image_thumb: getRWLKImageUrl(fileName, 'white_thumb.jpg'),
+      white_single_video: getRWLKImageUrl(fileName, 'white_single.mp4'),
+      white_triple_video: getRWLKImageUrl(fileName, 'white_triple.mp4'),
+      black_image: getRWLKImageUrl(fileName, 'black.png'),
+      black_image_thumb: getRWLKImageUrl(fileName, 'black_thumb.jpg'),
+      black_single_video: getRWLKImageUrl(fileName, 'black_single.mp4'),
+      black_triple_video: getRWLKImageUrl(fileName, 'black_triple.mp4'),
     };
-
-    if (tokenId != null) {
-      getNFT();
-    }
-  }, [tokenId]);
-
-  return nft;
+  }, [tokenId, info]);
 };

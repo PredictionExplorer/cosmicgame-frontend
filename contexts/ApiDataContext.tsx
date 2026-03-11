@@ -3,6 +3,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useMemo,
   useRef,
   useEffect,
   type Dispatch,
@@ -13,6 +14,7 @@ import {
 import { useActiveWeb3React } from '@/hooks/web3';
 import api from '@/services/api';
 import type { StakingCSTReward } from '@/services/api/types';
+import { useNotifyRedBox, useStakingCSTRewardsToClaimByUser } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
 
 import { useStakedToken } from './StakedTokenContext';
@@ -42,7 +44,6 @@ interface ApiDataContextValue {
   apiData: ApiData;
   setApiData: Dispatch<SetStateAction<ApiData>>;
   fetchData: () => Promise<void>;
-  /** Raw unclaimed staking rewards — shared so consumers don't re-fetch */
   unclaimedRewards: StakingCSTReward[];
 }
 
@@ -58,13 +59,15 @@ export const useApiData = (): ApiDataContextValue => {
 
 export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
   const [apiData, setApiData] = useState<ApiData>(initialApiData);
-  const [unclaimedRewards, setUnclaimedRewards] = useState<StakingCSTReward[]>([]);
 
   const { cstokens: stakedTokens } = useStakedToken();
   const { account } = useActiveWeb3React();
 
-  // Use a ref so fetchActionIds/fetchData never need it as a useCallback dep.
-  // The ref is always up-to-date without causing reference churn.
+  const { data: redBoxData, refetch: refetchRedBox } = useNotifyRedBox(account);
+  const { data: rewardsData, refetch: refetchRewards } = useStakingCSTRewardsToClaimByUser(account);
+
+  const unclaimedRewards = useMemo(() => rewardsData ?? [], [rewardsData]);
+
   const stakedActionIdsRef = useRef<(number | string)[]>([]);
   // eslint-disable-next-line react-hooks/refs
   stakedActionIdsRef.current = stakedTokens.flatMap((x) =>
@@ -98,7 +101,6 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
 
       return { unstakeableActionIds, claimableActionIds };
     },
-    // Only depends on account — stakedActionIds is read from ref
     [account],
   );
 
@@ -124,55 +126,48 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
 
       return { unstakeableActionIds: us_actionIds, claimableActionIds: cl_actionIds };
     },
-    // Stable: fetchInfo only changes when account changes
     [fetchInfo],
   );
 
-  const fetchData = useCallback(async (): Promise<void> => {
-    if (!account) return;
-
-    try {
-      const [newData, rewards] = await Promise.all([
-        api.notify_red_box(account),
-        api.get_staking_cst_rewards_to_claim_by_user(account),
-      ]);
-
-      const rewardList = rewards ?? [];
-      setUnclaimedRewards(rewardList);
-
-      const hasUnclaimed = rewardList.length > 0 && (newData?.UnclaimedStakingReward ?? 0) > 0;
-
-      if (hasUnclaimed) {
-        const actionIds = await fetchActionIds(rewardList);
-        setApiData({ ...initialApiData, ...newData, ...actionIds });
-      } else {
-        setApiData({
-          ...initialApiData,
-          ...newData,
-          unstakeableActionIds: [],
-          claimableActionIds: [],
-        });
-      }
-    } catch (error) {
-      reportError(error, 'ApiDataContext fetchData');
-    }
-    // Stable deps: only account and fetchActionIds (which only changes when account changes)
-  }, [account, fetchActionIds]);
-
-  const POLLING_INTERVAL_MS = 30_000;
-
   useEffect(() => {
     let cancelled = false;
-    const run = async () => {
-      if (!cancelled) await fetchData();
+
+    const processData = async () => {
+      if (!account || !redBoxData) return;
+
+      try {
+        const rewardList = unclaimedRewards;
+        const hasUnclaimed = rewardList.length > 0 && (redBoxData?.UnclaimedStakingReward ?? 0) > 0;
+
+        if (hasUnclaimed) {
+          const actionIds = await fetchActionIds(rewardList);
+          if (!cancelled) {
+            setApiData({ ...initialApiData, ...redBoxData, ...actionIds });
+          }
+        } else {
+          if (!cancelled) {
+            setApiData({
+              ...initialApiData,
+              ...redBoxData,
+              unstakeableActionIds: [],
+              claimableActionIds: [],
+            });
+          }
+        }
+      } catch (error) {
+        reportError(error, 'ApiDataContext processData');
+      }
     };
-    run();
-    const intervalId = setInterval(run, POLLING_INTERVAL_MS);
+
+    processData();
     return () => {
       cancelled = true;
-      clearInterval(intervalId);
     };
-  }, [fetchData]);
+  }, [account, redBoxData, unclaimedRewards, fetchActionIds]);
+
+  const fetchData = useCallback(async () => {
+    await Promise.all([refetchRedBox(), refetchRewards()]);
+  }, [refetchRedBox, refetchRewards]);
 
   return (
     <ApiDataContext.Provider value={{ apiData, setApiData, fetchData, unclaimedRewards }}>

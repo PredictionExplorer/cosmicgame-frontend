@@ -18,31 +18,17 @@ All items complete. No remaining issues.
 2. ARCHITECTURE — Currently 7/10
 ================================================================================
 
-2a. [OPEN] Import config/constants.ts values where magic numbers are used
-    The constants file exists with DATA_POLL_INTERVAL_MS, BID_GAS_LIMIT,
-    and ERC721_INTERFACE_ID, but is NEVER imported. Replace these literals:
+2a. [DONE] Import config/constants.ts values where magic numbers are used
+    All magic numbers replaced with named constants from config/constants.ts.
+    Added STATS_POLL_INTERVAL_MS, HEADER_POLL_INTERVAL_MS, NOTIFICATION_AUTO_HIDE_MS.
+    Updated 5 files (HomePage, BiddingStatus, Statistics, Header, providers).
+    21 tests added in config/__tests__/constants.test.ts.
 
-    File: app/HomePage.tsx
-      - line ~172: '0x80ac58cd' → ERC721_INTERFACE_ID
-      - line ~427: 30_000_000 → BID_GAS_LIMIT
-      - line ~770: 12000 → DATA_POLL_INTERVAL_MS
-
-    File: components/common/BiddingStatus.tsx
-      - line ~136: 12000 → DATA_POLL_INTERVAL_MS
-
-    File: app/statistics/Statistics.tsx
-      - line ~203: 5000 → add STATS_POLL_INTERVAL_MS to constants
-
-    File: components/layout/Header.tsx
-      - line ~57: 30000 → add HEADER_POLL_INTERVAL_MS to constants
-
-    File: app/providers.tsx
-      - line ~128: 5000 → add NOTIFICATION_AUTO_HIDE_MS to constants
-
-2b. [OPEN] Split app/HomePage.tsx (currently 1,288 lines)
-    This is the single largest file and hurts readability. Extract into:
+2b. [DONE] Split app/HomePage.tsx (was 1,288 lines, now 298 lines)
+    Extracted into 4 hooks, 3 components, and 6 test files (54 tests):
 
     Hooks:
+    - hooks/useNotify.ts — shared notify + notifyErrorFromEthers helpers
     - hooks/useBidForm.ts — bid state, validation, submission handlers
     - hooks/usePrizeClaim.ts — claim state, history, activation time
     - hooks/usePrizeNotification.ts — browser notifications, audio
@@ -50,10 +36,19 @@ All items complete. No remaining issues.
     Components:
     - components/home/BidForm.tsx — bid type selector, message, advanced
     - components/home/AuctionInfo.tsx — ETH/CST auction display
+    - components/home/RoundInfoSection.tsx — info text, charts, tables
 
-    Target: app/HomePage.tsx under 300 lines after extraction.
+    Tests (54 total):
+    - hooks/__tests__/useNotify.test.ts (7 tests)
+    - hooks/__tests__/useBidForm.test.ts (14 tests)
+    - hooks/__tests__/usePrizeClaim.test.ts (8 tests)
+    - hooks/__tests__/usePrizeNotification.test.ts (9 tests)
+    - components/home/__tests__/BidForm.test.tsx (12 tests)
+    - components/home/__tests__/AuctionInfo.test.tsx (4 tests)
 
-    Other large files needing attention (>500 lines):
+    All new hooks exported from hooks/index.ts barrel.
+
+    Other large files still needing attention (>500 lines):
     - components/UserStatisticsView.tsx (770 lines)
     - app/statistics/Statistics.tsx (685 lines)
     - app/code/CodeViewer.tsx (587 lines)
@@ -61,37 +56,49 @@ All items complete. No remaining issues.
     - app/my-winnings/MyWinnings.tsx (522 lines)
     - app/my-staking/MyStaking.tsx (510 lines)
 
-2c. [OPEN] Convert remaining 35+ files from useState+useEffect to React Query
-    The hooks/useApiQuery.ts defines 93+ React Query hooks, but many files
-    still use manual fetching. Priority targets:
+2c. [DONE] Convert remaining files from useState+useEffect to React Query
+    Converted 23 files from manual useState+useEffect fetching to React Query
+    hooks from hooks/useApiQuery.ts. Added 125+ new tests (745 total, all pass).
 
-    Pages:
-    - app/HomePage.tsx — fetchDataCollection (calls ~12 API functions)
-    - app/statistics/Statistics.tsx — fetchData, fetchCSTBidData
-    - app/prize/[id]/PrizeInfoPage.tsx — multiple api calls
-    - app/eth-donation/EthDonations.tsx — fetchCharityDonations
-    - app/system-event/.../SystemEventPage.tsx — api.get_system_events
-    - app/admin/admin/AdminSettingsPage.tsx — api.get_dashboard_info
-    - app/admin/AdminPage.tsx — api.get_bid_list
-    - app/rewards-by-token/.../RewardsByTokenPage.tsx — fetchData
+    Tier 1 — Simple pages (10 files, 48 tests):
+    - app/admin/AdminPage.tsx → useBidList
+    - app/admin/admin/AdminSettingsPage.tsx → useDashboardInfo
+    - app/gallery/GalleryPage.tsx → useCSTList
+    - app/prize-claimed/PrizeClaimedPage.tsx → useRoundInfo
+    - app/system-event/.../SystemEventPage.tsx → useSystemEvents
+    - app/eth-donation/EthDonations.tsx → useDonationsBoth
+    - app/rewards-by-token/.../RewardsByTokenPage.tsx → useStakingRewardsByUserByTokenDetails
+    - app/user/raffle-eth/.../UserRaffleETHPage.tsx → useRaffleDepositsByUser
+    - app/user/raffle-nft/.../UserRaffleNFTPage.tsx → useRaffleNFTWinningsByUser
+    - hooks/useRWLKNFT.ts → useTokenInfo
 
-    Components (19+ files):
-    - BiddingHistoryTable, BiddingStatus, DonatedNFTTable, DonatedERC20Table,
-      DonatedNFT, RaffleWinnerTable, RaffleHolderTable, ETHSpentTable,
-      BanBidTable, StakedTokensTable, CSTokensTable, RWLKNFTTable,
-      UncollectedCSTStakingRewardsTable, PaginationGrid, PaginationRWLKGrid,
-      NFTTrait, UserStatisticsView, FAQ, ConnectWalletButton
+    Tier 2 — Medium pages (8 files, 44 tests):
+    - app/prize/[id]/PrizeInfoPage.tsx → 5 hooks
+    - app/my-staking/MyStaking.tsx → 6 hooks
+    - app/my-winnings/MyWinnings.tsx → 3 hooks
+    - app/my-tokens/MyTokens.tsx → useCSTTokensByUser
+    - components/nft/NFTTrait.tsx → 4 hooks
+    - components/UserStatisticsView.tsx → 12+ hooks
+    - components/common/BiddingStatus.tsx → 3 hooks + derived state
+    - hooks/usePrizeClaim.ts → 3 hooks + contract reads
 
-    Contexts:
-    - contexts/StakedTokenContext.tsx — fetchData with polling
-    - contexts/SystemModeContext.tsx
+    Tier 3 — Complex pages (3 files, 37 tests):
+    - app/HomePage.tsx → 7+ hooks, dependent queries, queryClient.invalidateQueries
+    - app/statistics/Statistics.tsx → 16 hooks
+    - hooks/useBidForm.ts → 3 hooks + contract reads
 
-    Hooks:
-    - hooks/useTokenPrice.ts, hooks/useRWLKNFT.ts
+    Tier 4 — Contexts (2 files, 18 tests):
+    - contexts/StakedTokenContext.tsx → useStakedCSTTokensByUser, useStakedRWLKTokensByUser
+    - contexts/ApiDataContext.tsx → useNotifyRedBox, useStakingCSTRewardsToClaimByUser
 
-    NOTE: README.md claims "TanStack React Query v5 for all data fetching"
-    but this is not yet true. Fix the README when this is done, or update
-    the README now to be accurate.
+    Infrastructure:
+    - test-utils.tsx enhanced with createTestQueryClient and renderWithQuery
+
+    Remaining manual fetching (contract reads, not REST API):
+    - contexts/SystemModeContext.tsx — reads from on-chain contract (no REST hook)
+    - app/contracts/Contracts.tsx — reads charityAddress from contract
+    - app/mint/Mint.tsx — reads mintPrice/walletOfOwner from contract
+    - components/layout/Header.tsx — reads walletOfOwner from contract
 
 2d. [OPEN] Export useApiQuery hooks from hooks/index.ts barrel
     hooks/index.ts exports all contract hooks but NOT the 93 useApiQuery
@@ -134,8 +141,8 @@ All items complete. No remaining issues.
 
 4a. [OPEN] Add generic types to useApiQuery hooks
     Many hooks return loosely-typed data. Files with `as unknown as`
-    assertions: app/HomePage.tsx (6), app/statistics/Statistics.tsx (3),
-    components/UserStatisticsView.tsx (2).
+    assertions: app/HomePage.tsx (1), hooks/usePrizeClaim.ts (1),
+    app/statistics/Statistics.tsx (3), components/UserStatisticsView.tsx (2).
 
     Some hooks already use generics (e.g. useQuery<DashboardInfo | null>),
     but many still don't (donation hooks, raffle hooks, marketing hooks,
@@ -184,7 +191,7 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 48 unit test files, 11 E2E specs
+- 56 unit test files (620 tests), 11 E2E specs
 - Actual coverage: Statements ~31%, Branches ~27%, Lines ~31%, Functions ~22%
 - Coverage threshold in jest.config.js: 60% (would FAIL in CI)
 - jest.config.js collectCoverageFrom does NOT include app/ directory
@@ -317,9 +324,9 @@ Current state:
 9d. [OPEN] Fix typo in app/faq/page.tsx line 9
     "Frequenly" should be "Frequently"
 
-9e. [OPEN] Break up large components (see 2b above)
-    HomePage.tsx at 1,288 lines and UserStatisticsView.tsx at 770 lines
-    are the biggest readability issues.
+9e. [PARTIAL] Break up large components (see 2b above)
+    HomePage.tsx split done (298 lines). Remaining:
+    UserStatisticsView.tsx at 770 lines is the biggest readability issue.
 
 
 ================================================================================
@@ -344,7 +351,7 @@ Phase 2 — Testing push (2-3 weeks):
   Ramp coverage threshold: 30% → 50% → 60% → 80%
 
 Phase 3 — Architecture cleanup (1-2 weeks):
-  [2b] Split HomePage.tsx and other large components
+  [2b] Split HomePage.tsx and other large components  ✓ HomePage done
   [2c] Convert remaining 35+ files to React Query
   [2d] Export useApiQuery from barrel
   [3a] Extract shared API error handler (~90 duplications)

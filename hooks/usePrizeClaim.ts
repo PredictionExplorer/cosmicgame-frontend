@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { usePublicClient } from 'wagmi';
 import { useRouter } from 'next/navigation';
 
@@ -6,8 +6,9 @@ import api from '@/services/api';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import type { DashboardInfo } from '@/services/api/types';
-import { isUserRejection, reportError } from '@/utils/errors';
+import { isUserRejection } from '@/utils/errors';
 import { useNotify } from '@/hooks/useNotify';
+import { usePrizeTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
 
 const GAS_FLOOR = BigInt(2_000_000);
 const GAS_BUFFER_BPS = BigInt(12_000);
@@ -24,12 +25,23 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
   const cosmicSignatureContract = useCosmicSignatureContract();
   const { notify, notifyErrorFromEthers } = useNotify();
 
-  const [prizeTime, setPrizeTime] = useState(0);
+  const { data: prizeTimeRaw } = usePrizeTime();
+  const { data: currentTimeRaw } = useCurrentTime();
+  const { data: claimHistoryRaw } = useClaimHistory();
+
+  const prizeTime = useMemo(() => {
+    if (prizeTimeRaw == null || currentTimeRaw == null) return 0;
+    const diff = currentTimeRaw * 1000 - Date.now();
+    return prizeTimeRaw * 1000 - diff;
+  }, [prizeTimeRaw, currentTimeRaw]);
+
+  const claimHistory =
+    (claimHistoryRaw as
+      | import('@/components/tables/WinningHistoryTable').WinningHistoryEntry[]
+      | null) ?? null;
+
   const [timeoutClaimPrize, setTimeoutClaimPrize] = useState(0);
   const [isClaiming, setIsClaiming] = useState(false);
-  const [claimHistory, setClaimHistory] = useState<
-    import('@/components/tables/WinningHistoryTable').WinningHistoryEntry[] | null
-  >(null);
   const [activationTime, setActivationTime] = useState(0);
 
   const handleTx = async (hashPromise: Promise<`0x${string}`>) => {
@@ -95,28 +107,6 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
     }
   };
 
-  const fetchPrizeTime = useCallback(async () => {
-    try {
-      const t = await api.get_prize_time();
-      const current = await api.get_current_time();
-      const diff = current * 1000 - Date.now();
-      setPrizeTime(t * 1000 - diff);
-    } catch (err) {
-      reportError(err, 'fetch prize time');
-    }
-  }, []);
-
-  const fetchClaimHistory = useCallback(async () => {
-    try {
-      const history = await api.get_claim_history();
-      setClaimHistory(
-        history as unknown as import('@/components/tables/WinningHistoryTable').WinningHistoryEntry[],
-      );
-    } catch (err) {
-      reportError(err, 'fetch claim history');
-    }
-  }, []);
-
   const fetchActivationTime = useCallback(async () => {
     if (!cosmicGameContract) return;
     const time = await cosmicGameContract.read.roundActivationTime?.();
@@ -144,8 +134,6 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
     claimHistory,
     activationTime,
     onClaimPrize,
-    fetchPrizeTime,
-    fetchClaimHistory,
     fetchActivationTime,
   } as const;
 }

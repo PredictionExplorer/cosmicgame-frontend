@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatEther } from 'viem';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { formatEthValue } from '@/utils';
 
@@ -10,8 +11,25 @@ import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
 import { useStakedToken } from '@/contexts/StakedTokenContext';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useNotification } from '@/contexts/NotificationContext';
-import api from '@/services/api';
 import type { DashboardInfo, BidInfo, StakingAction, StakingRewardMint } from '@/services/api';
+import {
+  useDashboardInfo,
+  useClaimHistoryByUser,
+  useUserInfo,
+  useUserBalance,
+  useStakingCSTActionsByUser,
+  useStakingRWLKActionsByUser,
+  useMarketingRewardsByUser,
+  useCSTTokensByUser,
+  useStakingRewardsByUser,
+  useStakingCSTRewardsCollectedByUser,
+  useStakingCSTByUserByDepositRewards,
+  useStakingRWLKMintsByUser,
+  useClaimedDonatedNFTByUser,
+  useUnclaimedDonatedNFTByUser,
+  useDonationsERC20ByUser,
+  useBidListByRound,
+} from '@/hooks/useApiQuery';
 import getErrorMessage from '@/utils/alert';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import { Button } from '@/components/ui/button';
@@ -292,210 +310,108 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const { fetchData: fetchStakedTokens } = useStakedToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
+  const queryClient = useQueryClient();
 
   const canClaim =
     isOwnProfile || (!!account && !!address && account.toLowerCase() === address.toLowerCase());
 
-  const [loading, setLoading] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
-
-  const [data, setData] = useState<DashboardInfo | null>(null);
-  const [userInfo, setUserInfo] = useState<UserProfileInfo | null>(null);
-  const [balance, setBalance] = useState({ CosmicToken: 0, ETH: 0 });
-
-  const [raffleETHProbability, setRaffleETHProbability] = useState(-1);
-  const [raffleNFTProbability, setRaffleNFTProbability] = useState(-1);
-
-  const [bidHistory, setBidHistory] = useState<BidInfo[]>([]);
-  const [claimHistory, setClaimHistory] = useState<WinningHistoryEntry[] | null>(null);
-  const [marketingRewards, setMarketingRewards] = useState<MarketingReward[]>([]);
-
-  const [stakingCSTActions, setStakingCSTActions] = useState<StakingAction[]>([]);
-  const [cstStakingRewards, setCstStakingRewards] = useState<StakingRewardRow[]>([]);
-  const [collectedCstStakingRewards, setCollectedCstStakingRewards] = useState<CollectedReward[]>(
-    [],
-  );
-  const [cstStakingRewardsByDeposit, setCstStakingRewardsByDeposit] = useState<
-    CSTStakingRewardByDeposit[]
-  >([]);
-  const [cstList, setCSTList] = useState<CSTToken[]>([]);
-
-  const [stakingRWLKActions, setStakingRWLKActions] = useState<StakingAction[]>([]);
-  const [rwlkMints, setRWLKMints] = useState<StakingRewardMint[]>([]);
-
-  const [claimedDonatedNFTs, setClaimedDonatedNFTs] = useState({
-    data: [] as NFTRecord[],
-    loading: false,
-  });
-  const [unclaimedDonatedNFTs, setUnclaimedDonatedNFTs] = useState({
-    data: [] as NFTRecord[],
-    loading: false,
-  });
   const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
-  const [donatedERC20Tokens, setDonatedERC20Tokens] = useState({
-    data: [] as DonatedERC20Token[],
-    loading: false,
-  });
 
-  /* --------------------------------------------------
-     Data Fetching
-  -------------------------------------------------- */
+  const { data: dashboardData, isLoading: loadingDashboard } = useDashboardInfo();
+  const { data: claimHistoryRaw, isLoading: loadingClaims } = useClaimHistoryByUser(address);
+  const { data: userInfoRaw, isLoading: loadingUserInfo } = useUserInfo(address);
+  const { data: balanceData, isLoading: loadingBalance } = useUserBalance(address);
+  const { data: stakingCSTActions = [], isLoading: loadingCSTActions } =
+    useStakingCSTActionsByUser(address);
+  const { data: stakingRWLKActions = [], isLoading: loadingRWLKActions } =
+    useStakingRWLKActionsByUser(address);
+  const { data: marketingRewardsRaw = [], isLoading: loadingMarketing } =
+    useMarketingRewardsByUser(address);
+  const { data: cstListRaw = [], isLoading: loadingCST } = useCSTTokensByUser(address);
+  const { data: cstStakingRewardsRaw = [], isLoading: loadingStakingRewards } =
+    useStakingRewardsByUser(address);
+  const { data: collectedCstStakingRewardsRaw = [], isLoading: loadingCollected } =
+    useStakingCSTRewardsCollectedByUser(address);
+  const { data: cstStakingRewardsByDepositRaw = [], isLoading: loadingByDeposit } =
+    useStakingCSTByUserByDepositRewards(address);
+  const { data: rwlkMints = [], isLoading: loadingMints } = useStakingRWLKMintsByUser(address);
+  const { data: claimedNFTsRaw = [], isLoading: loadingClaimedNFTs } =
+    useClaimedDonatedNFTByUser(address);
+  const { data: unclaimedNFTsRaw = [], isLoading: loadingUnclaimedNFTs } =
+    useUnclaimedDonatedNFTByUser(address);
+  const { data: erc20Raw = [], isLoading: loadingERC20 } = useDonationsERC20ByUser(address);
 
-  const fetchUserData = useCallback(
-    async (addr: string, reload: boolean = true) => {
-      if (reload) setLoading(true);
-      try {
-        const [
-          claimHist,
-          userInfoData,
-          balanceData,
-          cstActions,
-          rwalkActions,
-          mRewards,
-          userCstList,
-          stakingRewards,
-          collectedRewards,
-          rewardsByDeposit,
-          rwalkMinted,
-        ] = await Promise.all([
-          api.get_claim_history_by_user(addr),
-          api.get_user_info(addr),
-          api.get_user_balance(addr),
-          api.get_staking_cst_actions_by_user(addr),
-          api.get_staking_rwalk_actions_by_user(addr),
-          api.get_marketing_rewards_by_user(addr),
-          api.get_cst_tokens_by_user(addr),
-          api.get_staking_rewards_by_user(addr),
-          api.get_staking_cst_rewards_collected_by_user(addr),
-          api.get_staking_cst_by_user_by_deposit_rewards(addr),
-          api.get_staking_rwalk_mints_by_user(addr),
-        ]);
+  const curRoundNum = dashboardData?.CurRoundNum ?? -1;
+  const { data: bidListForProb = [] } = useBidListByRound(curRoundNum, 'desc');
 
-        const { Bids, UserInfo } = userInfoData ?? {};
-        setClaimHistory(claimHist as WinningHistoryEntry[] | null);
-        setBidHistory(Bids ?? []);
-        setUserInfo((UserInfo as UserProfileInfo) ?? null);
-        if (balanceData) {
-          setBalance({
-            CosmicToken: Number(formatEther(BigInt(balanceData.CosmicTokenBalance || 0))),
-            ETH: Number(formatEther(BigInt(balanceData.ETH_Balance || 0))),
-          });
-        }
+  const data = dashboardData ?? null;
+  const { Bids: bidHistory = [], UserInfo: userInfoObj } = userInfoRaw ?? {};
+  const userInfo = (userInfoObj as UserProfileInfo) ?? null;
+  const claimHistory = (claimHistoryRaw as WinningHistoryEntry[] | null) ?? null;
+  const marketingRewards = (marketingRewardsRaw ?? []) as MarketingReward[];
+  const cstList = (cstListRaw ?? []) as unknown as CSTToken[];
+  const cstStakingRewards = (cstStakingRewardsRaw ?? []) as StakingRewardRow[];
+  const collectedCstStakingRewards = (collectedCstStakingRewardsRaw ??
+    []) as unknown as CollectedReward[];
+  const cstStakingRewardsByDeposit = (cstStakingRewardsByDepositRaw ??
+    []) as CSTStakingRewardByDeposit[];
+  const claimedDonatedNFTsList = Array.isArray(claimedNFTsRaw)
+    ? (claimedNFTsRaw as NFTRecord[])
+    : [];
+  const unclaimedDonatedNFTsList = Array.isArray(unclaimedNFTsRaw)
+    ? (unclaimedNFTsRaw as NFTRecord[])
+    : [];
+  const donatedERC20List = (erc20Raw ?? []) as DonatedERC20Token[];
 
-        setStakingCSTActions(Array.isArray(cstActions) ? (cstActions as StakingAction[]) : []);
-        setStakingRWLKActions(Array.isArray(rwalkActions) ? (rwalkActions as StakingAction[]) : []);
-        setMarketingRewards((mRewards ?? []) as MarketingReward[]);
-        setCSTList((userCstList ?? []) as unknown as CSTToken[]);
-        setCstStakingRewards((stakingRewards ?? []) as StakingRewardRow[]);
-        setCollectedCstStakingRewards((collectedRewards ?? []) as unknown as CollectedReward[]);
-        setCstStakingRewardsByDeposit((rewardsByDeposit ?? []) as CSTStakingRewardByDeposit[]);
-        setRWLKMints(rwalkMinted ?? []);
+  const balance = useMemo(() => {
+    if (!balanceData) return { CosmicToken: 0, ETH: 0 };
+    return {
+      CosmicToken: Number(formatEther(BigInt(balanceData.CosmicTokenBalance || 0))),
+      ETH: Number(formatEther(BigInt(balanceData.ETH_Balance || 0))),
+    };
+  }, [balanceData]);
 
-        fetchStakedTokens();
-        fetchStatusData();
-      } catch (err) {
-        reportError(err, 'fetch user statistics');
-        setNotification({
-          text: 'Failed to fetch data',
-          type: 'error',
-          visible: true,
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    [fetchStakedTokens, fetchStatusData, setNotification],
-  );
-
-  const fetchDonatedNFTs = useCallback(
-    async (reload: boolean = true) => {
-      if (!address) return;
-      setClaimedDonatedNFTs((prev) => ({ ...prev, loading: reload }));
-      setUnclaimedDonatedNFTs((prev) => ({ ...prev, loading: reload }));
-      try {
-        const [claimed, unclaimed] = await Promise.all([
-          api.get_claimed_donated_nft_by_user(address),
-          api.get_unclaimed_donated_nft_by_user(address),
-        ]);
-        setClaimedDonatedNFTs({
-          data: Array.isArray(claimed) ? (claimed as NFTRecord[]) : [],
-          loading: false,
-        });
-        setUnclaimedDonatedNFTs({
-          data: Array.isArray(unclaimed) ? (unclaimed as NFTRecord[]) : [],
-          loading: false,
-        });
-      } catch (err) {
-        reportError(err, 'fetch donated NFTs');
-        setNotification({
-          text: 'Failed to fetch donated NFTs',
-          type: 'error',
-          visible: true,
-        });
-        setClaimedDonatedNFTs((prev) => ({ ...prev, loading: false }));
-        setUnclaimedDonatedNFTs((prev) => ({ ...prev, loading: false }));
-      }
-    },
-    [address, setNotification],
-  );
-
-  const fetchDonatedERC20Tokens = useCallback(
-    async (reload: boolean = true) => {
-      if (!address) return;
-      setDonatedERC20Tokens((prev) => ({ ...prev, loading: reload }));
-      try {
-        const tokens = await api.get_donations_erc20_by_user(address);
-        setDonatedERC20Tokens({
-          data: Array.isArray(tokens) ? (tokens as DonatedERC20Token[]) : [],
-          loading: false,
-        });
-      } catch (err) {
-        reportError(err, 'fetch donated ERC20 tokens');
-        setNotification({
-          text: 'Failed to fetch donated ERC20 tokens',
-          type: 'error',
-          visible: true,
-        });
-        setDonatedERC20Tokens((prev) => ({ ...prev, loading: false }));
-      }
-    },
-    [address, setNotification],
-  );
-
-  const calculateProbability = useCallback(async () => {
-    if (!address) return;
-    try {
-      const newData = await api.get_dashboard_info();
-      setData(newData);
-
-      if (newData) {
-        const {
-          CurRoundNum,
-          NumRaffleEthWinnersBidding = 1,
-          NumRaffleNFTWinnersBidding = 1,
-        } = newData;
-        const bidList = await api.get_bid_list_by_round(CurRoundNum, 'desc');
-        const totalBids = bidList.length;
-        const userBids = bidList.filter(
-          (bid: BidInfo) => bid.BidderAddr?.toLowerCase() === address?.toLowerCase(),
-        ).length;
-
-        if (totalBids > 0) {
-          setRaffleETHProbability(
-            1 - Math.pow((totalBids - userBids) / totalBids, NumRaffleEthWinnersBidding),
-          );
-          setRaffleNFTProbability(
-            1 - Math.pow((totalBids - userBids) / totalBids, NumRaffleNFTWinnersBidding),
-          );
-        } else {
-          setRaffleETHProbability(-1);
-          setRaffleNFTProbability(-1);
-        }
-      }
-    } catch (err) {
-      reportError(err, 'calculate win probability');
+  const { raffleETHProbability, raffleNFTProbability } = useMemo(() => {
+    if (!address || !dashboardData || !bidListForProb.length) {
+      return { raffleETHProbability: -1, raffleNFTProbability: -1 };
     }
-  }, [address]);
+    const totalBids = bidListForProb.length;
+    const userBids = bidListForProb.filter(
+      (bid: BidInfo) => bid.BidderAddr?.toLowerCase() === address?.toLowerCase(),
+    ).length;
+    if (totalBids > 0) {
+      return {
+        raffleETHProbability:
+          1 -
+          Math.pow(
+            (totalBids - userBids) / totalBids,
+            dashboardData.NumRaffleEthWinnersBidding ?? 1,
+          ),
+        raffleNFTProbability:
+          1 -
+          Math.pow(
+            (totalBids - userBids) / totalBids,
+            dashboardData.NumRaffleNFTWinnersBidding ?? 1,
+          ),
+      };
+    }
+    return { raffleETHProbability: -1, raffleNFTProbability: -1 };
+  }, [address, dashboardData, bidListForProb]);
+
+  const loading =
+    loadingDashboard ||
+    loadingClaims ||
+    loadingUserInfo ||
+    loadingBalance ||
+    loadingCSTActions ||
+    loadingRWLKActions ||
+    loadingMarketing ||
+    loadingCST ||
+    loadingStakingRewards ||
+    loadingCollected ||
+    loadingByDeposit ||
+    loadingMints;
 
   /* --------------------------------------------------
      Claim Handlers
@@ -508,8 +424,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     try {
       await prizeWalletContract.write.claimDonatedNft?.([tokenID]);
       setTimeout(() => {
-        fetchUserData(address!, false);
-        fetchDonatedNFTs(false);
+        queryClient.invalidateQueries();
+        fetchStakedTokens();
+        fetchStatusData();
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
@@ -525,14 +442,15 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   };
 
   const handleAllDonatedNFTsClaim = async () => {
-    if (!unclaimedDonatedNFTs.data.length || !prizeWalletContract) return;
+    if (!unclaimedDonatedNFTsList.length || !prizeWalletContract) return;
     setIsClaiming(true);
     try {
-      const indexList = unclaimedDonatedNFTs.data.map((item: { Index: number }) => item.Index);
+      const indexList = unclaimedDonatedNFTsList.map((item: { Index: number }) => item.Index);
       await prizeWalletContract.write.claimManyDonatedNfts?.([indexList]);
       setTimeout(() => {
-        fetchUserData(address!, false);
-        fetchDonatedNFTs(false);
+        queryClient.invalidateQueries();
+        fetchStakedTokens();
+        fetchStatusData();
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
@@ -550,7 +468,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     try {
       await prizeWalletContract.write.claimDonatedToken?.([roundNum, tokenAddr, amount]);
       setTimeout(() => {
-        fetchDonatedERC20Tokens(false);
+        queryClient.invalidateQueries({ queryKey: ['donationsERC20ByUser'] });
       }, 3000);
     } catch (err) {
       if (isUserRejection(err)) return;
@@ -564,7 +482,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const handleAllDonatedERC20Claim = async () => {
     if (!prizeWalletContract) return;
     try {
-      const donatedTokensToClaim = donatedERC20Tokens.data
+      const donatedTokensToClaim = donatedERC20List
         .filter((x) => !x.Claimed)
         .map((x) => ({
           roundNum: x.RoundNum,
@@ -573,7 +491,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         }));
       await prizeWalletContract.write.claimManyDonatedTokens?.([donatedTokensToClaim]);
       setTimeout(() => {
-        fetchDonatedERC20Tokens(false);
+        queryClient.invalidateQueries({ queryKey: ['donationsERC20ByUser'] });
       }, 3000);
     } catch (err) {
       if (isUserRejection(err)) return;
@@ -583,18 +501,6 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       setNotification({ text: msg, type: 'error', visible: true });
     }
   };
-
-  /* --------------------------------------------------
-     Effects
-  -------------------------------------------------- */
-
-  useEffect(() => {
-    if (!address || address === 'Invalid Address') return;
-    fetchUserData(address);
-    fetchDonatedNFTs();
-    fetchDonatedERC20Tokens();
-    calculateProbability();
-  }, [address, fetchUserData, fetchDonatedNFTs, fetchDonatedERC20Tokens, calculateProbability]);
 
   /* --------------------------------------------------
      Render
@@ -725,18 +631,18 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           <div className="mt-16">
             <div className="flex justify-between items-center mb-4">
               <h6 className="text-xl font-medium">Donated NFTs User Won</h6>
-              {unclaimedDonatedNFTs.data.length > 0 && canClaim && (
+              {unclaimedDonatedNFTsList.length > 0 && canClaim && (
                 <Button onClick={handleAllDonatedNFTsClaim} disabled={isClaiming}>
                   Claim All
                 </Button>
               )}
             </div>
 
-            {unclaimedDonatedNFTs.loading || claimedDonatedNFTs.loading ? (
+            {loadingUnclaimedNFTs || loadingClaimedNFTs ? (
               <h6 className="text-xl font-medium">Loading...</h6>
             ) : (
               <DonatedNFTTable
-                list={[...unclaimedDonatedNFTs.data, ...claimedDonatedNFTs.data]}
+                list={[...unclaimedDonatedNFTsList, ...claimedDonatedNFTsList]}
                 handleClaim={canClaim ? handleDonatedNFTsClaim : undefined}
                 claimingTokens={claimingDonatedNFTs}
               />
@@ -747,16 +653,16 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           <div className="mt-16">
             <div className="flex justify-between items-center mb-4">
               <h6 className="text-xl font-medium">Donated ERC20 Tokens</h6>
-              {donatedERC20Tokens.data.filter((x) => !x.Claimed).length > 0 && canClaim && (
+              {donatedERC20List.filter((x) => !x.Claimed).length > 0 && canClaim && (
                 <Button onClick={handleAllDonatedERC20Claim}>Claim All</Button>
               )}
             </div>
 
-            {donatedERC20Tokens.loading ? (
+            {loadingERC20 ? (
               <h6 className="text-xl font-medium">Loading...</h6>
             ) : (
               <DonatedERC20Table
-                list={donatedERC20Tokens.data}
+                list={donatedERC20List}
                 handleClaim={canClaim ? handleDonatedERC20Claim : null}
               />
             )}
