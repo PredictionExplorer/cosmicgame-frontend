@@ -9,6 +9,7 @@ import type {
   StakingRewardMint,
 } from './types';
 
+/** Fetches unclaimed CST staking rewards (ETH deposits) for a wallet address. */
 export function get_staking_cst_rewards_to_claim_by_user(
   address: string,
 ): Promise<StakingCSTReward[]> {
@@ -18,6 +19,7 @@ export function get_staking_cst_rewards_to_claim_by_user(
   }, []);
 }
 
+/** Fetches already-collected CST staking rewards for a wallet address. */
 export function get_staking_cst_rewards_collected_by_user(
   address: string,
 ): Promise<StakingCSTReward[]> {
@@ -29,6 +31,7 @@ export function get_staking_cst_rewards_collected_by_user(
   }, []);
 }
 
+/** Fetches Cosmic Signature Tokens currently staked by a wallet address. */
 export function get_staked_cst_tokens_by_user(address: string): Promise<StakedTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/cst/staked_tokens/by_user/${address}`));
@@ -36,6 +39,7 @@ export function get_staked_cst_tokens_by_user(address: string): Promise<StakedTo
   }, []);
 }
 
+/** Fetches staking action IDs with claim status for a user's deposit. */
 export function get_cst_action_ids_by_deposit_id(
   user_addr: string,
   deposit_id: number,
@@ -48,6 +52,7 @@ export function get_cst_action_ids_by_deposit_id(
   }, null);
 }
 
+/** Fetches CST stake/unstake actions performed by a wallet address. */
 export function get_staking_cst_actions_by_user(address: string): Promise<StakingAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/cst/actions/by_user/${address}/0/1000000`));
@@ -55,6 +60,7 @@ export function get_staking_cst_actions_by_user(address: string): Promise<Stakin
   }, []);
 }
 
+/** Fetches all CST stake/unstake actions globally. */
 export function get_staking_cst_actions(): Promise<StakingAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/cst/actions/global/0/1000000'));
@@ -62,6 +68,7 @@ export function get_staking_cst_actions(): Promise<StakingAction[]> {
   }, []);
 }
 
+/** Fetches combined stake + unstake record details for a CST staking action. */
 export function get_staking_cst_actions_info(
   actionId: number,
 ): Promise<CombinedStakingRecordInfo | null> {
@@ -77,6 +84,7 @@ export function get_staking_cst_actions_info(
   }, null);
 }
 
+/** Fetches all CST staking rewards globally. */
 export function get_staking_cst_rewards(): Promise<StakingCSTReward[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/cst/rewards/global'));
@@ -84,6 +92,7 @@ export function get_staking_cst_rewards(): Promise<StakingCSTReward[]> {
   }, []);
 }
 
+/** Fetches CST staking rewards distributed in a specific round. */
 export function get_staking_cst_rewards_by_round(round: number): Promise<StakingCSTReward[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/by_round/${round}`));
@@ -91,6 +100,7 @@ export function get_staking_cst_rewards_by_round(round: number): Promise<Staking
   }, []);
 }
 
+/** Fetches CST staking reward-paid records for a wallet address. */
 export function get_staking_cst_reward_paid_records_by_user(
   address: string,
 ): Promise<StakingCSTReward[]> {
@@ -100,6 +110,7 @@ export function get_staking_cst_reward_paid_records_by_user(
   }, []);
 }
 
+/** Fetches all currently staked Cosmic Signature Tokens globally. */
 export function get_staked_cst_tokens(): Promise<StakedTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/cst/staked_tokens/all'));
@@ -107,6 +118,7 @@ export function get_staked_cst_tokens(): Promise<StakedTokenInfo[]> {
   }, []);
 }
 
+/** Fetches a per-token summary of staking rewards for a wallet address. */
 export function get_staking_rewards_by_user(address: string): Promise<RewardsByToken[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
@@ -116,6 +128,7 @@ export function get_staking_rewards_by_user(address: string): Promise<RewardsByT
   }, []);
 }
 
+/** Fetches detailed staking reward breakdown for a specific user + token pair, with flattened stake/unstake tx fields. */
 export function get_staking_rewards_by_user_by_token_details(
   address: string,
   tokenId: number,
@@ -163,6 +176,7 @@ export function get_staking_rewards_by_user_by_token_details(
   }, null);
 }
 
+/** Fetches CST staking rewards grouped by deposit for a wallet address. */
 export function get_staking_cst_by_user_by_deposit_rewards(
   address: string,
 ): Promise<StakingCSTReward[]> {
@@ -174,6 +188,7 @@ export function get_staking_cst_by_user_by_deposit_rewards(
   }, []);
 }
 
+/** Fetches combined stake + unstake record details for a RandomWalk staking action. */
 export function get_staking_rwalk_actions_info(
   actionId: number,
 ): Promise<CombinedStakingRecordInfo | null> {
@@ -189,6 +204,7 @@ export function get_staking_rwalk_actions_info(
   }, null);
 }
 
+/** Fetches all RandomWalk stake/unstake actions globally. */
 export function get_staking_rwalk_actions(): Promise<StakingAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/rwalk/actions/global/0/1000000'));
@@ -196,6 +212,7 @@ export function get_staking_rwalk_actions(): Promise<StakingAction[]> {
   }, []);
 }
 
+/** Fetches RandomWalk stake/unstake actions performed by a wallet address. */
 export function get_staking_rwalk_actions_by_user(address: string): Promise<StakingAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
@@ -205,6 +222,7 @@ export function get_staking_rwalk_actions_by_user(address: string): Promise<Stak
   }, []);
 }
 
+/** Fetches all RandomWalk staking reward mint records globally. */
 export function get_staking_rwalk_mints_global(): Promise<StakingRewardMint[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/rwalk/mints/global/0/1000000'));
@@ -212,6 +230,7 @@ export function get_staking_rwalk_mints_global(): Promise<StakingRewardMint[]> {
   }, []);
 }
 
+/** Fetches RandomWalk staking reward mint records for a wallet address. */
 export function get_staking_rwalk_mints_by_user(address: string): Promise<StakingRewardMint[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/rwalk/mints/by_user/${address}`));
@@ -219,6 +238,7 @@ export function get_staking_rwalk_mints_by_user(address: string): Promise<Stakin
   }, []);
 }
 
+/** Fetches all currently staked RandomWalk NFTs globally. */
 export function get_staked_rwalk_tokens(): Promise<StakedTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/rwalk/staked_tokens/all'));
@@ -226,6 +246,7 @@ export function get_staked_rwalk_tokens(): Promise<StakedTokenInfo[]> {
   }, []);
 }
 
+/** Fetches RandomWalk NFTs currently staked by a wallet address. */
 export function get_staked_rwalk_tokens_by_user(address: string): Promise<StakedTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/rwalk/staked_tokens/by_user/${address}`));

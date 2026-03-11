@@ -19,6 +19,7 @@ import type {
   BidEthPriceInfo,
 } from './types';
 
+/** Fetches the global dashboard statistics (current round, prize pool, bid count, etc.). */
 export function get_dashboard_info(): Promise<DashboardInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/dashboard'));
@@ -26,6 +27,7 @@ export function get_dashboard_info(): Promise<DashboardInfo | null> {
   }, null);
 }
 
+/** Fetches all rounds with flattened prize, charity, and staking fields. */
 export function get_round_list(): Promise<RoundInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('rounds/list/0/1000000'));
@@ -35,6 +37,7 @@ export function get_round_list(): Promise<RoundInfo[]> {
   }, []);
 }
 
+/** Fetches detailed info for a single round, clamping negative values to 0. */
 export function get_round_info(roundNum: number): Promise<RoundInfo | null> {
   const id = roundNum < 0 ? 0 : roundNum;
   return apiCall(async () => {
@@ -43,6 +46,7 @@ export function get_round_info(roundNum: number): Promise<RoundInfo | null> {
   }, null);
 }
 
+/** Fetches the prize-claim timestamp for the current round. */
 export function get_prize_time(): Promise<number> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('rounds/current/time'));
@@ -50,6 +54,7 @@ export function get_prize_time(): Promise<number> {
   }, 0);
 }
 
+/** Fetches the global prize-claim history with flattened transaction fields. */
 export function get_claim_history(): Promise<TxInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('prizes/history/global/0/1000000'));
@@ -57,6 +62,7 @@ export function get_claim_history(): Promise<TxInfo[]> {
   }, []);
 }
 
+/** Fetches prize-claim history for a specific wallet address. */
 export function get_claim_history_by_user(address: string): Promise<WinningHistoryEntry[] | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`prizes/history/by_user/${address}/0/1000000`));
@@ -64,6 +70,7 @@ export function get_claim_history_by_user(address: string): Promise<WinningHisto
   }, null);
 }
 
+/** Fetches all bids across all rounds with flattened transaction fields. */
 export function get_bid_list(): Promise<BidInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('bid/list/all/0/1000000'));
@@ -71,6 +78,7 @@ export function get_bid_list(): Promise<BidInfo[]> {
   }, []);
 }
 
+/** Fetches a single bid by its event-log ID. */
 export function get_bid_info(evtLogID: number): Promise<BidInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`bid/info/${evtLogID}`));
@@ -78,6 +86,7 @@ export function get_bid_info(evtLogID: number): Promise<BidInfo | null> {
   }, null);
 }
 
+/** Fetches bids for a given round, sorted by the specified direction (`"asc"` or `"desc"`). */
 export function get_bid_list_by_round(round: number, sortDir: string): Promise<BidInfo[]> {
   return apiCall(async () => {
     const dir = sortDir === 'asc' ? 0 : 1;
@@ -86,6 +95,7 @@ export function get_bid_list_by_round(round: number, sortDir: string): Promise<B
   }, []);
 }
 
+/** Fetches the current round's special-prize winners (endurance champion, last CST bidder, chrono warrior). */
 export function get_current_special_winners(): Promise<SpecialWinners | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('bid/current_special_winners'));
@@ -93,6 +103,7 @@ export function get_current_special_winners(): Promise<SpecialWinners | null> {
   }, null);
 }
 
+/** Fetches all raffle ETH deposits across all rounds. */
 export function get_prize_deposits_list(): Promise<TxInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('raffle/deposits/list/0/1000000'));
@@ -100,6 +111,7 @@ export function get_prize_deposits_list(): Promise<TxInfo[]> {
   }, []);
 }
 
+/** Fetches raffle ETH deposits for a specific round. */
 export function get_prize_deposits_by_round(round: number): Promise<TxInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`raffle/deposits/by_round/${round}`));
@@ -107,6 +119,7 @@ export function get_prize_deposits_by_round(round: number): Promise<TxInfo[]> {
   }, []);
 }
 
+/** Fetches the list of administratively banned bids. */
 export function get_banned_bids(): Promise<BannedBid[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getMainAPIUrl('get_banned_bids'));
@@ -114,6 +127,7 @@ export function get_banned_bids(): Promise<BannedBid[]> {
   }, []);
 }
 
+/** Bans a bid by its ID and the bidder's address (admin action). */
 export function ban_bid(bid_id: number, user_addr: string) {
   return apiPost(async () => {
     const { data } = await axios.post(getMainAPIUrl('ban_bid'), {
@@ -124,6 +138,7 @@ export function ban_bid(bid_id: number, user_addr: string) {
   });
 }
 
+/** Unbans a previously banned bid (admin action). */
 export function unban_bid(bid_id: number) {
   return apiPost(async () => {
     const { data } = await axios.post(getMainAPIUrl('unban_bid'), { bid_id });
@@ -131,6 +146,7 @@ export function unban_bid(bid_id: number) {
   });
 }
 
+/** Fetches the current bid price in ETH and related pricing info. */
 export function get_bid_eth_price(): Promise<BidEthPriceInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`bid/eth_price`));
@@ -138,6 +154,7 @@ export function get_bid_eth_price(): Promise<BidEthPriceInfo | null> {
   }, null);
 }
 
+/** Fetches the number of seconds remaining until the next prize can be claimed. */
 export function get_time_until_prize(): Promise<number> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('time/until_prize'));

@@ -6,18 +6,24 @@ import type { RoundInfo } from './types';
 
 export { axios, isAxiosError };
 
+/** Base URL for the main NFT/token API. */
 export const baseUrl = networkConfig.nftApiUrl;
+/** Local proxy path prepended to external API URLs to avoid CORS. */
 export const proxyUrl = '/api/proxy?url=';
+/** Base URL for the Cosmic Game statistics API. */
 export const cosmicGameBaseUrl = networkConfig.apiUrl;
 
+/** Builds a proxied URL targeting the Cosmic Game API. */
 export const getAPIUrl = (url: string) => {
   return `${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl + url)}`;
 };
 
+/** Builds a proxied URL targeting the main NFT/token API. */
 export const getMainAPIUrl = (url: string) => {
   return `${proxyUrl}${encodeURIComponent(baseUrl + url)}`;
 };
 
+/** Hoists nested `Tx` fields (EvtLogId, BlockNum, TxHash, etc.) to the top level of a record. */
 export const flattenTx = (item: unknown) => {
   if (!item || typeof item !== 'object') return item;
   const obj = item as Record<string, unknown>;
@@ -37,11 +43,13 @@ export const flattenTx = (item: unknown) => {
   return item;
 };
 
+/** Applies {@link flattenTx} to every element of an array, returning `[]` for non-array input. */
 export const flattenTxArray = <T>(items: unknown): T[] => {
   if (!Array.isArray(items)) return [] as T[];
   return items.map((item) => flattenTx(item)) as T[];
 };
 
+/** Flattens a raw round response into a single {@link RoundInfo} by extracting nested prize, charity, staking, and tx fields. */
 export const flattenRoundInfo = (roundInfo: unknown) => {
   if (!roundInfo || typeof roundInfo !== 'object') return null;
   const round = roundInfo as Record<string, unknown>;
@@ -107,6 +115,7 @@ export const flattenRoundInfo = (roundInfo: unknown) => {
   } as RoundInfo;
 };
 
+/** Normalizes API field-name variants (e.g. `TokenAddress` → `TokenAddr`) for consistency. */
 export const normalizeFieldNames = (item: unknown) => {
   if (!item || typeof item !== 'object') return item;
   const normalized = { ...(item as Record<string, unknown>) };
@@ -118,6 +127,7 @@ export const normalizeFieldNames = (item: unknown) => {
   return normalized;
 };
 
+/** Applies {@link normalizeFieldNames} to every element of an array. */
 export const normalizeFieldNamesArray = (items: unknown) => {
   if (!Array.isArray(items)) return items;
   return items.map((item) => normalizeFieldNames(item));

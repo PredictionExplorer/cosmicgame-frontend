@@ -1,6 +1,7 @@
 import { axios, getAPIUrl, apiCall, flattenTxArray } from './client';
 import type { RaffleETHDeposit, RaffleNFTWinner } from './types';
 
+/** Fetches raffle ETH deposits made by a specific wallet address. */
 export function get_raffle_deposits_by_user(address: string): Promise<RaffleETHDeposit[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`prizes/deposits/raffle/by_user/${address}`));
@@ -8,6 +9,7 @@ export function get_raffle_deposits_by_user(address: string): Promise<RaffleETHD
   }, []);
 }
 
+/** Fetches Chrono Warrior prize deposits for a specific wallet address. */
 export function get_chrono_warrior_deposits_by_user(address: string): Promise<RaffleETHDeposit[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
@@ -17,6 +19,7 @@ export function get_chrono_warrior_deposits_by_user(address: string): Promise<Ra
   }, []);
 }
 
+/** Fetches unclaimed raffle deposits available for withdrawal by a wallet address. */
 export function get_unclaimed_raffle_deposits_by_user(
   address: string,
 ): Promise<RaffleETHDeposit[]> {
@@ -28,6 +31,7 @@ export function get_unclaimed_raffle_deposits_by_user(
   }, []);
 }
 
+/** Fetches all raffle NFT winners across all rounds. */
 export function get_raffle_nft_winners_list(): Promise<RaffleNFTWinner[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('raffle/nft/all/list/0/1000000'));
@@ -35,6 +39,7 @@ export function get_raffle_nft_winners_list(): Promise<RaffleNFTWinner[]> {
   }, []);
 }
 
+/** Fetches raffle NFT winners for a specific round. */
 export function get_raffle_nft_winners_by_round(round: number): Promise<RaffleNFTWinner[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`raffle/nft/by_round/${round}`));
@@ -42,6 +47,7 @@ export function get_raffle_nft_winners_by_round(round: number): Promise<RaffleNF
   }, []);
 }
 
+/** Fetches raffle NFT winnings for a specific wallet address. */
 export function get_raffle_nft_winnings_by_user(address: string): Promise<RaffleNFTWinner[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`raffle/nft/by_user/${address}`));

@@ -319,7 +319,7 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 185 unit test files (2,373 tests), 11 E2E specs
+- 187 unit test files (2,628 tests), 11 E2E specs
 - Actual coverage: Statements ~77.1%, Branches ~65.0%, Lines ~78.6%, Functions ~72.3%
 - Coverage threshold in jest.config.js: branches 63%, functions 71%, lines 78%, statements 76%
 - Accessibility testing: jest-axe installed, 134 a11y tests across all component files
@@ -810,24 +810,65 @@ Current state:
 
 
 ================================================================================
-8. CONFIGURATION — Currently 9/10
+8. CONFIGURATION — 10/10
 ================================================================================
 
-8a. [OPEN] Verify eslint-config-prettier flattening
-    prettierConfig is added as a single element in the ESLint flat config
-    array. If it exports an array, it should be spread: ...prettierConfig.
-    Confirm by checking if Prettier-conflicting rules are properly disabled.
+8a. [DONE] Verify eslint-config-prettier flattening
+    Verified that eslint-config-prettier v10.1.8 exports a single object
+    (not an array), so no spreading is needed. Switched import from
+    "eslint-config-prettier" to "eslint-config-prettier/flat" which adds
+    a name property ("config-prettier") for flat config debugging.
+    Confirmed all 18 key Prettier-conflicting rules (indent, quotes, semi,
+    comma-dangle, arrow-parens, max-len, brace-style, comma-spacing,
+    object-curly-spacing, and their @typescript-eslint variants) are
+    properly disabled ("off" or 0). Non-formatting rules (no-console,
+    no-loss-of-precision, react-hooks/exhaustive-deps) are not overridden.
+
+    Changes:
+    - eslint.config.mjs: import from "eslint-config-prettier/flat"
+
+    Tests added (31 new tests, 2,404 total across 186 suites):
+    - __tests__/eslint-config.test.ts:
+      - Config file structure: ESM export, /flat import, single element
+        (not spread), positioned after rules block, nextCoreWebVitals
+        spread at start (5 tests)
+      - Export shape: plain object, name "config-prettier", rules object,
+        all values "off" or 0 (4 tests)
+      - Prettier-conflicting rules disabled: 18 rules verified via it.each
+      - Non-formatting rules not overridden: 3 rules verified
+      - Integration: ESLint loads flat config without errors (1 test)
 
 
 ================================================================================
 9. COMMENTS / READABILITY — Currently 7/10
 ================================================================================
 
-9a. [OPEN] Add JSDoc to all service functions
-    Files: services/api/rounds.ts, tokens.ts, staking.ts, donations.ts,
-           users.ts, raffle.ts, marketing.ts, system.ts
-    Each exported function should have a 1-line JSDoc explaining what it
-    fetches and what it returns. ~95 functions total.
+9a. [DONE] Add JSDoc to all service functions
+    Added JSDoc comments to all 107 exported functions and constants across
+    9 API service files. Every export now has a concise 1-line JSDoc
+    explaining what it fetches/does. Also documented 3 module-level
+    constants (baseUrl, proxyUrl, cosmicGameBaseUrl) in client.ts.
+
+    Files documented (107 exports total):
+    - services/api/client.ts (12 exports: 3 constants, 7 helpers, 2 wrappers)
+    - services/api/rounds.ts (17 functions)
+    - services/api/tokens.ts (15 functions)
+    - services/api/staking.ts (21 functions)
+    - services/api/donations.ts (22 functions)
+    - services/api/users.ts (9 functions)
+    - services/api/raffle.ts (6 functions)
+    - services/api/marketing.ts (2 functions)
+    - services/api/system.ts (3 functions)
+
+    Tests added (224 new tests, 2,628 total across 187 suites):
+    - services/api/__tests__/jsdoc.test.ts:
+      - Every exported function has JSDoc (107 tests)
+      - Per-file export count matches expectations (9 tests)
+      - Total export count is 107 (1 test)
+      - JSDoc body is non-empty for every export (107 tests)
+
+    All 2,628 tests pass. tsc --noEmit passes with zero type errors.
+    Coverage thresholds pass.
 
 9b. [OPEN] Add JSDoc to utils/metadata.ts (getMetadata)
     Only has a bare comment, not proper JSDoc.

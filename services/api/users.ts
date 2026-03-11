@@ -10,6 +10,7 @@ import type {
   UniqueStakerRWLK,
 } from './types';
 
+/** Fetches comprehensive user profile including flattened bids, prizes, tokens, staking, and donation lists. */
 export function get_user_info(address: string): Promise<UserInfoWithLists | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`user/info/${address}`));
@@ -37,6 +38,7 @@ export function get_user_info(address: string): Promise<UserInfoWithLists | null
   }, null);
 }
 
+/** Fetches ETH and token balances for a wallet address. */
 export function get_user_balance(address: string): Promise<UserBalance | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`user/balances/${address}`));
@@ -44,6 +46,7 @@ export function get_user_balance(address: string): Promise<UserBalance | null> {
   }, null);
 }
 
+/** Fetches red-box notification data (unclaimed winnings) for a wallet address. */
 export function notify_red_box(address: string): Promise<NotifyRedBoxResult | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`user/notif_red_box/${address}`));
@@ -51,6 +54,7 @@ export function notify_red_box(address: string): Promise<NotifyRedBoxResult | nu
   }, null);
 }
 
+/** Fetches the list of unique bidder addresses with bid counts and totals. */
 export function get_unique_bidders(): Promise<Bidder[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/bidders'));
@@ -58,6 +62,7 @@ export function get_unique_bidders(): Promise<Bidder[]> {
   }, []);
 }
 
+/** Fetches the list of unique prize-winner addresses with win counts. */
 export function get_unique_winners(): Promise<Winner[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/winners'));
@@ -65,6 +70,7 @@ export function get_unique_winners(): Promise<Winner[]> {
   }, []);
 }
 
+/** Fetches the list of unique ETH donor addresses with donation totals. */
 export function get_unique_donors(): Promise<UniqueEthDonor[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/donors'));
@@ -72,6 +78,7 @@ export function get_unique_donors(): Promise<UniqueEthDonor[]> {
   }, []);
 }
 
+/** Fetches the list of unique CST staker addresses with staking stats. */
 export function get_unique_cst_stakers(): Promise<UniqueStakerCST[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/cst'));
@@ -79,6 +86,7 @@ export function get_unique_cst_stakers(): Promise<UniqueStakerCST[]> {
   }, []);
 }
 
+/** Fetches the list of unique RandomWalk staker addresses with staking stats. */
 export function get_unique_rwalk_stakers(): Promise<UniqueStakerRWLK[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/rwalk'));
@@ -86,6 +94,7 @@ export function get_unique_rwalk_stakers(): Promise<UniqueStakerRWLK[]> {
   }, []);
 }
 
+/** Fetches addresses that have staked both CST and RandomWalk tokens. */
 export function get_unique_both_stakers(): Promise<UniqueStakerRWLK[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/both'));

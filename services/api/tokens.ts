@@ -19,6 +19,7 @@ import type {
   TokenMintInfo,
 } from './types';
 
+/** Fetches all Cosmic Signature Tokens with flattened transaction fields. */
 export function get_cst_list(): Promise<CSTTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('cst/list/all/0/1000000'));
@@ -26,6 +27,7 @@ export function get_cst_list(): Promise<CSTTokenInfo[]> {
   }, []);
 }
 
+/** Fetches Cosmic Signature Tokens owned by a specific wallet address. */
 export function get_cst_tokens_by_user(address: string): Promise<CSTTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`cst/list/by_user/${address}/0/1000000`));
@@ -33,6 +35,7 @@ export function get_cst_tokens_by_user(address: string): Promise<CSTTokenInfo[]>
   }, []);
 }
 
+/** Fetches detailed info for a single Cosmic Signature Token by its ID. */
 export function get_cst_info(tokenId: number): Promise<CSTTokenInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`cst/info/${tokenId}`));
@@ -40,6 +43,7 @@ export function get_cst_info(tokenId: number): Promise<CSTTokenInfo | null> {
   }, null);
 }
 
+/** Fetches the naming history for a Cosmic Signature Token. */
 export function get_name_history(token_id: number): Promise<NameHistoryRecord[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`cst/names/history/${token_id}`));
@@ -47,6 +51,7 @@ export function get_name_history(token_id: number): Promise<NameHistoryRecord[]>
   }, []);
 }
 
+/** Searches Cosmic Signature Tokens by name, returning all matches. */
 export function get_token_by_name(token_name: string): Promise<CSTTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`cst/names/search/${token_name}`));
@@ -54,6 +59,7 @@ export function get_token_by_name(token_name: string): Promise<CSTTokenInfo[]> {
   }, []);
 }
 
+/** Fetches only Cosmic Signature Tokens that have been given a custom name. */
 export function get_named_nfts(): Promise<CSTTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('cst/names/named_only'));
@@ -61,6 +67,7 @@ export function get_named_nfts(): Promise<CSTTokenInfo[]> {
   }, []);
 }
 
+/** Fetches Cosmic Signature Token transfer history for a wallet address. */
 export function get_cst_transfers(address: string): Promise<CSTTransferRecord[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`cst/transfers/by_user/${address}/0/1000000`));
@@ -68,6 +75,7 @@ export function get_cst_transfers(address: string): Promise<CSTTransferRecord[]>
   }, []);
 }
 
+/** Fetches the distribution of Cosmic Signature Token ownership across wallets. */
 export function get_cst_distribution(): Promise<TokenDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('cst/distribution'));
@@ -75,6 +83,7 @@ export function get_cst_distribution(): Promise<TokenDistribution[]> {
   }, []);
 }
 
+/** Fetches the Cosmic Token (ERC-20) balance distribution across wallets. */
 export function get_ct_balances_distribution(): Promise<CTBalanceDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('ct/balances'));
@@ -82,6 +91,7 @@ export function get_ct_balances_distribution(): Promise<CTBalanceDistribution[]>
   }, []);
 }
 
+/** Fetches Cosmic Token (ERC-20) transfer history for a wallet address. */
 export function get_ct_transfers(address: string): Promise<TxInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`ct/transfers/by_user/${address}/0/1000000`));
@@ -89,6 +99,7 @@ export function get_ct_transfers(address: string): Promise<TxInfo[]> {
   }, []);
 }
 
+/** Fetches the full ownership-transfer history for a single Cosmic Signature Token. */
 export function get_ct_ownership_transfers(token_id: number): Promise<CSTTransferRecord[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`cst/transfers/all/${token_id}/0/1000000`));
@@ -96,6 +107,7 @@ export function get_ct_ownership_transfers(token_id: number): Promise<CSTTransfe
   }, []);
 }
 
+/** Fetches the current Cosmic Signature Token price info (CST bid price). */
 export function get_ct_price(): Promise<CTPriceInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('bid/cst_price'));
@@ -103,6 +115,7 @@ export function get_ct_price(): Promise<CTPriceInfo | null> {
   }, null);
 }
 
+/** Fetches mint metadata (image, seed, owner) for a token from the main API. */
 export function get_info(token_id: number | string): Promise<TokenMintInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getMainAPIUrl(`token_info/${token_id}`));
@@ -110,6 +123,7 @@ export function get_info(token_id: number | string): Promise<TokenMintInfo | nul
   }, null);
 }
 
+/** Fetches RandomWalk NFTs that have been used for discounted bids. */
 export function get_used_rwlk_nfts(): Promise<UsedRWLKNFT[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('bid/used_rwalk_nfts'));
@@ -117,6 +131,7 @@ export function get_used_rwlk_nfts(): Promise<UsedRWLKNFT[]> {
   }, []);
 }
 
+/** Triggers server-side token minting, returning the background task ID. */
 export function create(token_id: number, count: number) {
   return apiPost(async () => {
     const { data } = await axios.post(getMainAPIUrl('cosmicgame_tokens'), {
