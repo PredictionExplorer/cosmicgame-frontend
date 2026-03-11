@@ -162,4 +162,24 @@ describe('hooks barrel (hooks/index.ts)', () => {
       expect(existingSet.has(name)).toBe(false);
     }
   });
+
+  it('every export is a function', () => {
+    const allExports = barrel as Record<string, unknown>;
+    for (const [name, value] of Object.entries(allExports)) {
+      expect(typeof value).toBe('function');
+      if (typeof value !== 'function') {
+        throw new Error(`Export "${name}" is ${typeof value}, expected function`);
+      }
+    }
+  });
+
+  it('no export is undefined', () => {
+    const allExports = barrel as Record<string, unknown>;
+    for (const [name, value] of Object.entries(allExports)) {
+      expect(value).toBeDefined();
+      if (value === undefined) {
+        throw new Error(`Export "${name}" is undefined — likely a broken re-export`);
+      }
+    }
+  });
 });

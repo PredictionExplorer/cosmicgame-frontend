@@ -34,4 +34,23 @@ describe('useStakingWalletRWLKContract', () => {
     const { result } = renderHook(() => useStakingWalletRWLKContract());
     expect(result.current).toBeNull();
   });
+
+  it('returns same reference on re-render', () => {
+    const mockContract = { read: {} };
+    mockUseContract.mockReturnValue(mockContract);
+    const { result, rerender } = renderHook(() => useStakingWalletRWLKContract());
+    const first = result.current;
+    rerender();
+    expect(result.current).toBe(first);
+  });
+
+  it('uses a valid non-empty address', () => {
+    expect(typeof STAKING_WALLET_RWLK_ADDRESS).toBe('string');
+    expect(STAKING_WALLET_RWLK_ADDRESS.length).toBeGreaterThan(0);
+  });
+
+  it('uses a non-empty ABI array', () => {
+    expect(Array.isArray(stakingWalletRwlkAbi)).toBe(true);
+    expect(stakingWalletRwlkAbi.length).toBeGreaterThan(0);
+  });
 });

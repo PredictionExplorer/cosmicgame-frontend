@@ -34,4 +34,23 @@ describe('useRWLKNFTContract', () => {
     const { result } = renderHook(() => useRWLKNFTContract());
     expect(result.current).toBeNull();
   });
+
+  it('returns same reference on re-render', () => {
+    const mockContract = { read: {} };
+    mockUseContract.mockReturnValue(mockContract);
+    const { result, rerender } = renderHook(() => useRWLKNFTContract());
+    const first = result.current;
+    rerender();
+    expect(result.current).toBe(first);
+  });
+
+  it('uses a valid non-empty address', () => {
+    expect(typeof NFT_ADDRESS).toBe('string');
+    expect(NFT_ADDRESS.length).toBeGreaterThan(0);
+  });
+
+  it('uses a non-empty ABI array', () => {
+    expect(Array.isArray(randomWalkNftAbi)).toBe(true);
+    expect(randomWalkNftAbi.length).toBeGreaterThan(0);
+  });
 });

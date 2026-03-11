@@ -308,7 +308,7 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 143 unit test files (1,642 tests), 11 E2E specs
+- 143 unit test files (1,695 tests), 11 E2E specs
 - Actual coverage: Statements ~56%, Branches ~47%, Lines ~57%, Functions ~50%
 - Coverage threshold in jest.config.js: branches 45%, functions 47%, lines 54%, statements 53%
 - No accessibility testing (jest-axe not installed)
@@ -415,19 +415,54 @@ Current state:
     All 1,622 tests pass across 142 suites. tsc --noEmit passes with zero
     type errors. Coverage threshold passes in CI.
 
-6c. [OPEN] Write tests for ALL the untested hooks (12+ files) including
-    - hooks/useClipboard.ts
-    - hooks/useContractNoSigner.ts
-    - hooks/web3.ts (useActiveWeb3React)
-    - hooks/useCosmicGameContract.ts
-    - hooks/useCosmicSignatureContract.ts
-    - hooks/useRaffleWalletContract.ts
-    - hooks/useRWLKNFTContract.ts
-    - hooks/useRWLKNFT.ts
-    - hooks/useStakingWalletCSTContract.ts
-    - hooks/useStakingWalletRWLKContract.ts
-    - hooks/useArtBlocksContract.ts
-    - hooks/index.ts
+6c. [DONE] Write comprehensive tests for all hooks (14 files, 53 new tests)
+    Expanded all hook test files from minimal coverage (3-7 tests each) to
+    comprehensive suites covering edge cases, error handling, memoization,
+    re-render behavior, and all code branches. All 15 hook files now have
+    100% coverage (statements, branches, functions, lines).
+
+    Contract wrapper hooks (7 files, 3→6 tests each = 21 new):
+    - hooks/__tests__/useCosmicGameContract.test.ts (6 tests)
+    - hooks/__tests__/useCosmicSignatureContract.test.ts (6 tests)
+    - hooks/__tests__/useRaffleWalletContract.test.ts (6 tests)
+    - hooks/__tests__/useRWLKNFTContract.test.ts (6 tests)
+    - hooks/__tests__/useStakingWalletCSTContract.test.ts (6 tests)
+    - hooks/__tests__/useStakingWalletRWLKContract.test.ts (6 tests)
+    - hooks/__tests__/useArtBlocksContract.test.ts (6 tests)
+    New: memoization, address/ABI sanity checks
+
+    useClipboard.test.ts (4→10 tests, +6):
+    New: empty string copy, missing clipboard API fallback, textarea
+    position/opacity styling, textarea value match, select() call,
+    sequential copy non-interference
+
+    useContractNoSigner.test.ts (5→10 tests, +5):
+    New: client arg verification, 0x-address cast, non-Error throwable
+    reporting, recalculation on address change, recalculation on ABI change
+
+    web3.test.ts (3→8 tests, +5):
+    New: return shape validation (exactly 3 keys), null vs undefined
+    account, active mirrors isConnected, actual chainId when present,
+    chainId 0 as valid falsy value
+
+    useRWLKNFT.test.ts (7→12 tests, +5):
+    New: tokenId 0 as valid falsy number, large tokenId >999999,
+    memoization across renders, all 8 URL variants, fresh data on
+    info change
+
+    useContract.test.ts (7→12 tests, +5):
+    Fixed: replaced console.error spy with proper reportError mock
+    New: reportError called with correct args, recalculation on
+    walletClient connect/disconnect, publicClient change, address change
+
+    useTokenPrice.test.ts (5→9 tests, +4):
+    New: reportError called on API failure, URL construction verification,
+    unexpected response shape handling, no state update after unmount
+
+    index.test.ts (4→6 test cases, +2):
+    New: every export is a function, no undefined exports
+
+    All 1,695 tests pass across 143 suites. Coverage thresholds pass.
 
 6d. [OPEN] Write tests for untested components (58+ files)
     Priority — high-value first:

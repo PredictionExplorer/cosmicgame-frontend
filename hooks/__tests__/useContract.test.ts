@@ -2,6 +2,7 @@ import { renderHook } from '@testing-library/react';
 import { usePublicClient, useWalletClient } from 'wagmi';
 import { getContract, type Abi } from 'viem';
 
+import { reportError } from '@/utils/errors';
 import useContract from '@/hooks/useContract';
 
 jest.mock('wagmi', () => ({
@@ -14,9 +15,14 @@ jest.mock('viem', () => ({
   getContract: jest.fn(),
 }));
 
+jest.mock('../../utils/errors', () => ({
+  reportError: jest.fn(),
+}));
+
 const mockUsePublicClient = usePublicClient as jest.Mock;
 const mockUseWalletClient = useWalletClient as jest.Mock;
 const mockGetContract = getContract as unknown as jest.Mock;
+const mockReportError = reportError as jest.Mock;
 
 const TEST_ABI = [
   {
@@ -115,22 +121,98 @@ describe('useContract', () => {
     });
   });
 
+  describe('dependency recalculation', () => {
+    const mockPublicClient1 = { chain: { id: 1 }, request: jest.fn() };
+    const mockPublicClient2 = { chain: { id: 2 }, request: jest.fn() };
+    const contract1 = { read: {}, id: 1 };
+    const contract2 = { read: {}, id: 2 };
+
+    it('recalculates when walletClient connects', () => {
+      mockUsePublicClient.mockReturnValue(mockPublicClient1);
+      mockUseWalletClient.mockReturnValue({ data: undefined });
+      mockGetContract.mockReturnValueOnce(contract1).mockReturnValueOnce(contract2);
+
+      const { result, rerender } = renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
+      expect(result.current).toBe(contract1);
+
+      const mockWalletClient = { account: { address: TEST_ADDRESS } };
+      mockUseWalletClient.mockReturnValue({ data: mockWalletClient });
+      rerender();
+
+      expect(result.current).toBe(contract2);
+      expect(mockGetContract).toHaveBeenCalledTimes(2);
+    });
+
+    it('recalculates when walletClient disconnects', () => {
+      const mockWalletClient = { account: { address: TEST_ADDRESS } };
+      mockUsePublicClient.mockReturnValue(mockPublicClient1);
+      mockUseWalletClient.mockReturnValue({ data: mockWalletClient });
+      mockGetContract.mockReturnValueOnce(contract1).mockReturnValueOnce(contract2);
+
+      const { result, rerender } = renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
+      expect(result.current).toBe(contract1);
+
+      mockUseWalletClient.mockReturnValue({ data: undefined });
+      rerender();
+
+      expect(result.current).toBe(contract2);
+      expect(mockGetContract).toHaveBeenCalledTimes(2);
+    });
+
+    it('recalculates when publicClient changes', () => {
+      mockUsePublicClient.mockReturnValue(mockPublicClient1);
+      mockUseWalletClient.mockReturnValue({ data: undefined });
+      mockGetContract.mockReturnValueOnce(contract1).mockReturnValueOnce(contract2);
+
+      const { result, rerender } = renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
+      expect(result.current).toBe(contract1);
+
+      mockUsePublicClient.mockReturnValue(mockPublicClient2);
+      rerender();
+
+      expect(result.current).toBe(contract2);
+      expect(mockGetContract).toHaveBeenCalledTimes(2);
+    });
+
+    it('recalculates when address changes', () => {
+      const OTHER_ADDRESS = '0x0000000000000000000000000000000000000001';
+      mockUsePublicClient.mockReturnValue(mockPublicClient1);
+      mockUseWalletClient.mockReturnValue({ data: undefined });
+      mockGetContract.mockReturnValueOnce(contract1).mockReturnValueOnce(contract2);
+
+      const { result, rerender } = renderHook(({ addr }) => useContract(addr, TEST_ABI), {
+        initialProps: { addr: TEST_ADDRESS },
+      });
+      expect(result.current).toBe(contract1);
+
+      rerender({ addr: OTHER_ADDRESS });
+      expect(result.current).toBe(contract2);
+    });
+  });
+
   describe('error handling', () => {
-    it('returns null and logs error when getContract throws', () => {
+    it('returns null and calls reportError when getContract throws', () => {
       const mockPublicClient = { chain: { id: 1 } };
       mockUsePublicClient.mockReturnValue(mockPublicClient);
+      const error = new Error('Invalid ABI');
       mockGetContract.mockImplementation(() => {
-        throw new Error('Invalid ABI');
+        throw error;
       });
-
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       const { result } = renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
 
       expect(result.current).toBeNull();
-      expect(consoleSpy).toHaveBeenCalledWith('[useContract init]', expect.any(Error));
+      expect(mockReportError).toHaveBeenCalledWith(error, 'useContract init');
+    });
 
-      consoleSpy.mockRestore();
+    it('does not call reportError when no error occurs', () => {
+      const mockPublicClient = { chain: { id: 1 } };
+      mockUsePublicClient.mockReturnValue(mockPublicClient);
+      mockGetContract.mockReturnValue({ read: {} });
+
+      renderHook(() => useContract(TEST_ADDRESS, TEST_ABI));
+
+      expect(mockReportError).not.toHaveBeenCalled();
     });
   });
 });

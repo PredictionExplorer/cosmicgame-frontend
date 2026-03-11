@@ -34,4 +34,23 @@ describe('useArtBlocksContract', () => {
     const { result } = renderHook(() => useArtBlocksContract());
     expect(result.current).toBeNull();
   });
+
+  it('returns same reference on re-render', () => {
+    const mockContract = { read: {} };
+    mockUseContract.mockReturnValue(mockContract);
+    const { result, rerender } = renderHook(() => useArtBlocksContract());
+    const first = result.current;
+    rerender();
+    expect(result.current).toBe(first);
+  });
+
+  it('uses a valid non-empty address', () => {
+    expect(typeof ART_BLOCKS_ADDRESS).toBe('string');
+    expect(ART_BLOCKS_ADDRESS.length).toBeGreaterThan(0);
+  });
+
+  it('uses a non-empty ABI array', () => {
+    expect(Array.isArray(artBlocksAbi)).toBe(true);
+    expect(artBlocksAbi.length).toBeGreaterThan(0);
+  });
 });

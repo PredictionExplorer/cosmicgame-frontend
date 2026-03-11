@@ -72,6 +72,26 @@ describe('useContractNoSigner', () => {
     );
   });
 
+  it('passes a client object to getContract', () => {
+    mockGetContract.mockReturnValue({ read: {} });
+
+    renderHook(() => useContractNoSigner(TEST_ADDRESS, TEST_ABI));
+
+    expect(mockGetContract).toHaveBeenCalledWith(
+      expect.objectContaining({ client: expect.anything() }),
+    );
+  });
+
+  it('casts address to 0x-prefixed string', () => {
+    mockGetContract.mockReturnValue({ read: {} });
+
+    renderHook(() => useContractNoSigner(TEST_ADDRESS, TEST_ABI));
+
+    const callArgs = mockGetContract.mock.calls[0][0];
+    expect(callArgs.address).toBe(TEST_ADDRESS);
+    expect(callArgs.address).toMatch(/^0x/);
+  });
+
   it('returns null and calls reportError when getContract throws', () => {
     const error = new Error('bad abi');
     mockGetContract.mockImplementation(() => {
@@ -82,6 +102,17 @@ describe('useContractNoSigner', () => {
 
     expect(result.current).toBeNull();
     expect(mockedReportError).toHaveBeenCalledWith(error, 'useContractNoSigner init');
+  });
+
+  it('calls reportError for non-Error throwables', () => {
+    mockGetContract.mockImplementation(() => {
+      throw 'string error';  
+    });
+
+    const { result } = renderHook(() => useContractNoSigner(TEST_ADDRESS, TEST_ABI));
+
+    expect(result.current).toBeNull();
+    expect(mockedReportError).toHaveBeenCalledWith('string error', 'useContractNoSigner init');
   });
 
   it('memoises across re-renders with same inputs', () => {
@@ -95,5 +126,53 @@ describe('useContractNoSigner', () => {
 
     expect(result.current).toBe(first);
     expect(mockGetContract).toHaveBeenCalledTimes(1);
+  });
+
+  it('recalculates when address changes', () => {
+    const contract1 = { read: {}, id: 1 };
+    const contract2 = { read: {}, id: 2 };
+    mockGetContract.mockReturnValueOnce(contract1).mockReturnValueOnce(contract2);
+
+    const OTHER_ADDRESS = '0x0000000000000000000000000000000000000001';
+
+    const { result, rerender } = renderHook(({ addr }) => useContractNoSigner(addr, TEST_ABI), {
+      initialProps: { addr: TEST_ADDRESS },
+    });
+
+    expect(result.current).toBe(contract1);
+
+    rerender({ addr: OTHER_ADDRESS });
+
+    expect(result.current).toBe(contract2);
+    expect(mockGetContract).toHaveBeenCalledTimes(2);
+  });
+
+  it('recalculates when abi changes', () => {
+    const contract1 = { read: {}, id: 1 };
+    const contract2 = { read: {}, id: 2 };
+    mockGetContract.mockReturnValueOnce(contract1).mockReturnValueOnce(contract2);
+
+    const OTHER_ABI = [
+      {
+        type: 'function' as const,
+        name: 'totalSupply',
+        inputs: [] as const,
+        outputs: [{ name: '', type: 'uint256' }] as const,
+        stateMutability: 'view' as const,
+      },
+    ] as const;
+
+    const { result, rerender } = renderHook(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ({ abi }: { abi: any }) => useContractNoSigner(TEST_ADDRESS, abi),
+      { initialProps: { abi: TEST_ABI as typeof TEST_ABI | typeof OTHER_ABI } },
+    );
+
+    expect(result.current).toBe(contract1);
+
+    rerender({ abi: OTHER_ABI });
+
+    expect(result.current).toBe(contract2);
+    expect(mockGetContract).toHaveBeenCalledTimes(2);
   });
 });

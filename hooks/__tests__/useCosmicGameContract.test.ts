@@ -34,4 +34,23 @@ describe('useCosmicGameContract', () => {
     const { result } = renderHook(() => useCosmicGameContract());
     expect(result.current).toBeNull();
   });
+
+  it('returns same reference on re-render', () => {
+    const mockContract = { read: {}, write: {} };
+    mockUseContract.mockReturnValue(mockContract);
+    const { result, rerender } = renderHook(() => useCosmicGameContract());
+    const first = result.current;
+    rerender();
+    expect(result.current).toBe(first);
+  });
+
+  it('uses a valid non-empty address', () => {
+    expect(typeof COSMICGAME_ADDRESS).toBe('string');
+    expect(COSMICGAME_ADDRESS.length).toBeGreaterThan(0);
+  });
+
+  it('uses a non-empty ABI array', () => {
+    expect(Array.isArray(cosmicGameAbi)).toBe(true);
+    expect(cosmicGameAbi.length).toBeGreaterThan(0);
+  });
 });

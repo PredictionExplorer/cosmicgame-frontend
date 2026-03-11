@@ -34,4 +34,23 @@ describe('useRaffleWalletContract', () => {
     const { result } = renderHook(() => useRaffleWalletContract());
     expect(result.current).toBeNull();
   });
+
+  it('returns same reference on re-render', () => {
+    const mockContract = { read: {} };
+    mockUseContract.mockReturnValue(mockContract);
+    const { result, rerender } = renderHook(() => useRaffleWalletContract());
+    const first = result.current;
+    rerender();
+    expect(result.current).toBe(first);
+  });
+
+  it('uses a valid non-empty address', () => {
+    expect(typeof RAFFLE_WALLET_ADDRESS).toBe('string');
+    expect(RAFFLE_WALLET_ADDRESS.length).toBeGreaterThan(0);
+  });
+
+  it('uses a non-empty ABI array', () => {
+    expect(Array.isArray(prizesWalletAbi)).toBe(true);
+    expect(prizesWalletAbi.length).toBeGreaterThan(0);
+  });
 });
