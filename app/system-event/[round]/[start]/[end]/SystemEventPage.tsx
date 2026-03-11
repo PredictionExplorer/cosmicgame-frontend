@@ -1,8 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { MainWrapper } from '@/components/styled';
 import { useSystemEvents } from '@/hooks/useApiQuery';
 import { AdminEventsTable } from '@/components/tables/AdminEventsTable';
+import { reportError } from '@/utils/errors';
 
 interface SystemEventPageProps {
   start: number;
@@ -11,8 +14,14 @@ interface SystemEventPageProps {
 }
 
 const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
-  const { data: eventsRaw, isLoading: loading } = useSystemEvents(start, end);
+  const { data: eventsRaw, isLoading: loading, error } = useSystemEvents(start, end);
   const events = eventsRaw ?? [];
+
+  useEffect(() => {
+    if (error) {
+      reportError(error, 'fetch system events');
+    }
+  }, [error]);
 
   return (
     <MainWrapper>
@@ -27,6 +36,10 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
       )}
       {loading ? (
         <p className="text-lg font-semibold">Loading...</p>
+      ) : error ? (
+        <p className="text-lg font-semibold text-destructive">
+          {error.message || 'Failed to load system events'}
+        </p>
       ) : (
         <AdminEventsTable list={events} />
       )}

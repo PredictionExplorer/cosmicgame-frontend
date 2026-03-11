@@ -188,14 +188,72 @@ All items complete. No remaining issues.
         particles shown after init, aria-hidden on particles,
         initParticlesEngine called on mount, loadSlim called (15 tests)
 
+4c. [OPEN] Eliminate remaining `as unknown as` casts in production code
+    27 casts across production files. Target: zero. Grouped by root cause:
+
+    API data → component type mismatches (~10 casts):
+    - app/statistics/Statistics.tsx (3 casts — DonatedNFT[], ComponentProps)
+    - app/staking/StakingPage.tsx (2 — ComponentProps)
+    - components/UserStatisticsView.tsx (2 — CSTToken[], CollectedReward[])
+    - app/winning-history/WinningHistory.tsx (1)
+    - app/named-nfts/NamedNFTsPage.tsx (1 — NamedNFTRecord[])
+    - app/prize/[id]/PrizeInfoPage.tsx (1 — stakingRewards)
+    - app/my-tokens/MyTokens.tsx (1 — CSTToken[])
+    - app/contracts/Contracts.tsx (1 — DashboardData)
+    - components/home/RoundInfoSection.tsx (1 — ComponentProps<Prize>)
+    Fix: ensure React Query hooks return properly typed data that
+    component props accept without casting.
+
+    Contract write function casts (~7 casts):
+    - hooks/useBidForm.ts (3 — bidWithEth, bidWithEthAndDonateNft,
+      bidWithEthAndDonateToken)
+    - hooks/usePrizeClaim.ts (1 — claimMainPrize)
+    - app/mint/Mint.tsx (1 — nftContract.write.mint)
+    - app/eth-donation/EthDonations.tsx (2 — donateEth, donateEthWithInfo)
+    Fix: create typed contract wrapper functions with proper ABI-derived
+    signatures, or use wagmi's useWriteContract with typed ABI.
+
+    Component type mismatches (~4 casts):
+    - components/nft/LatestNFTs.tsx (2 — NFT data shape)
+    - components/common/BiddingStatus.tsx (2 — Counter renderer type)
+    - components/staking/UncollectedCSTStakingRewardsTable.tsx (2 —
+      UncollectedReward[])
+    Fix: align component prop types with the data shapes they receive,
+    or add proper generics.
+
+    Misc (2 casts + 1 @ts-expect-error):
+    - app/providers.tsx (1 — particleOptions as unknown as ISourceOptions)
+      Fix: type the particleOptions literal to satisfy ISourceOptions.
+    - components/styled/index.tsx (1 — @ts-expect-error for CSS custom
+      properties on style objects)
+      Fix: extend CSSProperties via module augmentation or use a typed
+      style helper.
+
 
 ================================================================================
 5. ERROR HANDLING — Currently 8.5/10
 ================================================================================
 
-5a. [OPEN] Fix silent catch in app/system-event/.../SystemEventPage.tsx
-    The catch block (lines 25-27) only sets loading to false but does not
-    report the error. Add: reportError(error, 'fetch system events');
+5a. [DONE] Fix silent catch in app/system-event/.../SystemEventPage.tsx
+    Added error handling to SystemEventPage (already on React Query via 2c).
+    - Destructured `error` from useSystemEvents hook
+    - Added useEffect that calls reportError(error, 'fetch system events')
+      for Sentry tracking when the query fails
+    - Added error UI with text-destructive styling, matching the pattern
+      used in StakingPage, WinningHistory, and StakingActionDetailPage
+    - Falls back to generic "Failed to load system events" when error.message
+      is empty
+    - Title heading still renders correctly in error state
+
+    Tests added (11 new tests, 1,263 total across 83 suites):
+    - app/system-event/__tests__/SystemEventPage.test.tsx expanded from
+      5 tests to 16 tests:
+      - Error rendering: error message, generic fallback, no loading in
+        error state, no table in error state, round title preserved,
+        deployment title preserved, text-destructive styling
+      - reportError integration: called with correct args, not called
+        without error, called again when error changes
+      - Recovery: table renders again when error clears
 
 5b. [OPEN] Add rel="noopener noreferrer" to target="_blank" links
     Many target="_blank" links are missing proper rel attributes. Some files
@@ -221,7 +279,7 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 82 unit test files (1,235 tests), 11 E2E specs
+- 83 unit test files (1,263 tests), 11 E2E specs
 - Actual coverage: Statements ~31%, Branches ~27%, Lines ~31%, Functions ~22%
 - Coverage threshold in jest.config.js: 60% (would FAIL in CI)
 - jest.config.js collectCoverageFrom does NOT include app/ directory
