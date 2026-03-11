@@ -108,7 +108,6 @@ export function Providers({ children }: { children: ReactNode }) {
             />
           )}
           <ErrorBoundary>
-            {/* @ts-expect-error TS2786 - react-cookie CookiesProvider has React 18 types incompatible with React 19 */}
             <CookiesProvider>
               <StakedTokenProvider>
                 <SystemModeProvider>
