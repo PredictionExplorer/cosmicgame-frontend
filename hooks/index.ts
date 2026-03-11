@@ -13,3 +13,4 @@ export { useNotify } from './useNotify';
 export { useBidForm } from './useBidForm';
 export { usePrizeClaim } from './usePrizeClaim';
 export { usePrizeNotification } from './usePrizeNotification';
+export * from './useApiQuery';
