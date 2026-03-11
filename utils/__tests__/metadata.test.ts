@@ -87,4 +87,34 @@ describe('getMetadata', () => {
     expect(result).toBeNull();
     expect(mockedReportError).toHaveBeenCalledWith('string error', 'fetch page metadata');
   });
+
+  it('returns empty title for empty title tags', async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: '<html><head><title></title></head></html>',
+    });
+
+    const result = await getMetadata('https://empty-title.com');
+
+    expect(result?.title).toBe('');
+  });
+
+  it('extracts description using single-quoted attributes', async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: `<html><head><meta name='description' content='single quoted'></head></html>`,
+    });
+
+    const result = await getMetadata('https://single-quote.com');
+
+    expect(result?.description).toBe('single quoted');
+  });
+
+  it('does not pick up property="description" (only name="description")', async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: `<html><head><meta property="description" content="wrong attr"></head></html>`,
+    });
+
+    const result = await getMetadata('https://property-desc.com');
+
+    expect(result?.description).toBe('');
+  });
 });

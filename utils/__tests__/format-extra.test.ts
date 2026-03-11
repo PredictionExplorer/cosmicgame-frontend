@@ -1,4 +1,26 @@
-import { calculateTimeDiff, formatEthValue, formatCSTValue } from '../format';
+import { formatSeconds, calculateTimeDiff, formatEthValue, formatCSTValue } from '../format';
+
+describe('formatSeconds edge cases', () => {
+  it('returns "1m " for exactly 60 seconds', () => {
+    expect(formatSeconds(60)).toBe('1m ');
+  });
+
+  it('returns "1h " for exactly 3600 seconds', () => {
+    expect(formatSeconds(3600)).toBe('1h ');
+  });
+
+  it('returns full breakdown for days+hours+minutes+seconds', () => {
+    expect(formatSeconds(90061)).toBe('1d 1h 1m 1s');
+  });
+
+  it('truncates fractional seconds', () => {
+    expect(formatSeconds(1.9)).toBe('1s');
+  });
+
+  it('returns "0s" for very small positive value', () => {
+    expect(formatSeconds(0.1)).toBe('0s');
+  });
+});
 
 describe('calculateTimeDiff', () => {
   beforeEach(() => {
@@ -27,6 +49,11 @@ describe('calculateTimeDiff', () => {
   it('returns days for large differences', () => {
     const oneDayAgo = 1_700_000_000 - 86400;
     expect(calculateTimeDiff(oneDayAgo)).toBe('1d ');
+  });
+
+  it('returns multi-day difference with hours', () => {
+    const threeDaysAgo = 1_700_000_000 - 3 * 86400 - 7200;
+    expect(calculateTimeDiff(threeDaysAgo)).toBe('3d 2h ');
   });
 });
 

@@ -1,4 +1,11 @@
-import { getProxiedUrl, getOriginUrl, getAssetsUrl, getRWLKImageUrl, logoImgUrl } from '../urls';
+import {
+  getExplorerUrl,
+  getProxiedUrl,
+  getOriginUrl,
+  getAssetsUrl,
+  getRWLKImageUrl,
+  logoImgUrl,
+} from '../urls';
 
 describe('getProxiedUrl', () => {
   it('prepends the proxy path and encodes the URL', () => {
@@ -56,5 +63,45 @@ describe('logoImgUrl', () => {
   it('is a non-empty string', () => {
     expect(typeof logoImgUrl).toBe('string');
     expect(logoImgUrl.length).toBeGreaterThan(0);
+  });
+});
+
+describe('getProxiedUrl edge cases', () => {
+  it('encodes URLs with spaces', () => {
+    const result = getProxiedUrl('https://example.com/path with spaces');
+    expect(result).toContain(encodeURIComponent('https://example.com/path with spaces'));
+  });
+
+  it('encodes URLs with ampersands and query params', () => {
+    const result = getProxiedUrl('https://api.example.com?a=1&b=2&c=3');
+    expect(decodeURIComponent(result.replace('/api/proxy?url=', ''))).toBe(
+      'https://api.example.com?a=1&b=2&c=3',
+    );
+  });
+});
+
+describe('getOriginUrl edge cases', () => {
+  it('returns the same URL if no proxy prefix present', () => {
+    expect(getOriginUrl('https://direct.com/page')).toBe('https://direct.com/page');
+  });
+
+  it('decodes a double-encoded URL correctly', () => {
+    const inner = encodeURIComponent('https://example.com');
+    const proxied = `/api/proxy?url=${inner}`;
+    expect(getOriginUrl(proxied)).toBe('https://example.com');
+  });
+});
+
+describe('getExplorerUrl edge cases', () => {
+  it('does not have a trailing slash before the type', () => {
+    const result = getExplorerUrl('tx', '0xhash');
+    expect(result).not.toMatch(/\/\/tx\//);
+  });
+
+  it('produces different URLs for different types', () => {
+    const tx = getExplorerUrl('tx', '0x1');
+    const addr = getExplorerUrl('address', '0x1');
+    const token = getExplorerUrl('token', '0x1');
+    expect(new Set([tx, addr, token]).size).toBe(3);
   });
 });

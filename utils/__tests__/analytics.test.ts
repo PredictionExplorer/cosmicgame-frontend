@@ -69,4 +69,38 @@ describe('event', () => {
     delete w.gtag;
     expect(() => event({ action: 'click', category: 'button', label: 'submit' })).not.toThrow();
   });
+
+  it('passes value=0 (falsy but valid) through to gtag', () => {
+    const mockGtag = jest.fn();
+    w.gtag = mockGtag;
+
+    event({ action: 'purchase', category: 'shop', label: 'free_item', value: 0 });
+
+    expect(mockGtag).toHaveBeenCalledWith('event', 'purchase', {
+      event_category: 'shop',
+      event_label: 'free_item',
+      value: 0,
+    });
+  });
+});
+
+describe('pageview sequential calls', () => {
+  const w = window as unknown as Record<string, unknown>;
+  const originalGtag = w.gtag;
+
+  afterEach(() => {
+    w.gtag = originalGtag;
+  });
+
+  it('tracks multiple sequential pageviews correctly', () => {
+    const mockGtag = jest.fn();
+    w.gtag = mockGtag;
+
+    pageview('/page1');
+    pageview('/page2');
+
+    expect(mockGtag).toHaveBeenCalledTimes(2);
+    expect(mockGtag).toHaveBeenNthCalledWith(1, 'config', GA_TRACKING_ID, { page_path: '/page1' });
+    expect(mockGtag).toHaveBeenNthCalledWith(2, 'config', GA_TRACKING_ID, { page_path: '/page2' });
+  });
 });

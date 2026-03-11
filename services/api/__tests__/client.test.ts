@@ -3,8 +3,14 @@ import { AxiosError } from 'axios';
 import {
   flattenTx,
   flattenTxArray,
+  flattenRoundInfo,
   normalizeFieldNames,
   normalizeFieldNamesArray,
+  getAPIUrl,
+  getMainAPIUrl,
+  proxyUrl,
+  cosmicGameBaseUrl,
+  baseUrl,
   apiCall,
   apiPost,
 } from '@/services/api/client';
@@ -310,6 +316,173 @@ describe('client helper functions', () => {
 
     it('returns empty array for empty array', () => {
       expect(normalizeFieldNamesArray([])).toEqual([]);
+    });
+  });
+
+  describe('getAPIUrl', () => {
+    it('returns proxy URL with encoded cosmicGame base + path', () => {
+      const result = getAPIUrl('rounds/list/0/100');
+
+      expect(result).toContain(proxyUrl);
+      expect(result).toContain(encodeURIComponent(cosmicGameBaseUrl + 'rounds/list/0/100'));
+    });
+
+    it('encodes special characters in the path', () => {
+      const result = getAPIUrl('search?q=hello world&limit=10');
+
+      expect(decodeURIComponent(result.replace(proxyUrl, ''))).toBe(
+        cosmicGameBaseUrl + 'search?q=hello world&limit=10',
+      );
+    });
+
+    it('handles empty path', () => {
+      const result = getAPIUrl('');
+
+      expect(result).toBe(`${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl)}`);
+    });
+  });
+
+  describe('getMainAPIUrl', () => {
+    it('returns proxy URL with encoded main base + path', () => {
+      const result = getMainAPIUrl('get_banned_bids');
+
+      expect(result).toContain(proxyUrl);
+      expect(result).toContain(encodeURIComponent(baseUrl + 'get_banned_bids'));
+    });
+
+    it('encodes special characters in the path', () => {
+      const result = getMainAPIUrl('action?id=42&type=ban');
+
+      expect(decodeURIComponent(result.replace(proxyUrl, ''))).toBe(
+        baseUrl + 'action?id=42&type=ban',
+      );
+    });
+
+    it('handles empty path', () => {
+      const result = getMainAPIUrl('');
+
+      expect(result).toBe(`${proxyUrl}${encodeURIComponent(baseUrl)}`);
+    });
+  });
+
+  describe('flattenRoundInfo', () => {
+    const fullRound = {
+      RoundNum: 5,
+      ClaimPrizeTx: {
+        Tx: {
+          EvtLogId: 10,
+          BlockNum: 200,
+          TxId: 10,
+          TxHash: '0xclaimhash',
+          TimeStamp: 1700000000,
+          DateTime: '2023-11-14',
+        },
+      },
+      MainPrize: {
+        WinnerAddr: '0xwinner',
+        EthAmountEth: 1.5,
+        NftTokenId: 42,
+        CstAmountEth: 10,
+      },
+      CharityDeposit: {
+        CharityAddress: '0xcharity',
+        CharityAmountETH: 0.5,
+      },
+      StakingDeposit: {
+        StakingDepositAmountEth: 0.3,
+        StakingPerTokenEth: 0.01,
+        StakingNumStakedTokens: 30,
+      },
+      EnduranceChampion: {
+        WinnerAddr: '0xendurance',
+        NftTokenId: 7,
+        CstAmountEth: 5,
+      },
+      LastCstBidder: {
+        WinnerAddr: '0xlast',
+        NftTokenId: 8,
+        CstAmountEth: 3,
+      },
+      ChronoWarrior: {
+        WinnerAddr: '0xchrono',
+        EthAmountEth: 0.2,
+        CstAmountEth: 1,
+        NftTokenId: 9,
+      },
+      RoundStats: { TotalBids: 100 },
+      RaffleNFTWinners: [{ Addr: '0xr1' }],
+      StakingNFTWinners: [{ Addr: '0xs1' }],
+      RaffleETHDeposits: [{ Amount: 0.1 }],
+      AllPrizes: [{ PrizeType: 'main' }],
+    };
+
+    it('flattens a complete round with all nested objects', () => {
+      const result = flattenRoundInfo(fullRound) as Record<string, unknown>;
+
+      expect(result).toHaveProperty('RoundNum', 5);
+      expect(result).toHaveProperty('TxHash', '0xclaimhash');
+      expect(result).toHaveProperty('EvtLogId', 10);
+      expect(result).toHaveProperty('BlockNum', 200);
+      expect(result).toHaveProperty('WinnerAddr', '0xwinner');
+      expect(result).toHaveProperty('AmountEth', 1.5);
+      expect(result).toHaveProperty('TokenId', 42);
+      expect(result).toHaveProperty('CharityAddress', '0xcharity');
+      expect(result).toHaveProperty('CharityAmountETH', 0.5);
+      expect(result).toHaveProperty('StakingDepositAmountEth', 0.3);
+      expect(result).toHaveProperty('EnduranceWinnerAddr', '0xendurance');
+      expect(result).toHaveProperty('LastCstBidderAddr', '0xlast');
+      expect(result).toHaveProperty('ChronoWarriorAddr', '0xchrono');
+      expect(result.RoundStats).toEqual({ TotalBids: 100 });
+      expect(result.RaffleNFTWinners).toEqual([{ Addr: '0xr1' }]);
+    });
+
+    it('returns null for null input', () => {
+      expect(flattenRoundInfo(null)).toBeNull();
+    });
+
+    it('returns null for undefined input', () => {
+      expect(flattenRoundInfo(undefined)).toBeNull();
+    });
+
+    it('returns null for non-object input', () => {
+      expect(flattenRoundInfo('string')).toBeNull();
+      expect(flattenRoundInfo(42)).toBeNull();
+    });
+
+    it('defaults missing nested objects to empty values', () => {
+      const result = flattenRoundInfo({ RoundNum: 1 }) as Record<string, unknown>;
+
+      expect(result).toHaveProperty('WinnerAddr', '');
+      expect(result).toHaveProperty('AmountEth', 0);
+      expect(result).toHaveProperty('TokenId', -1);
+      expect(result).toHaveProperty('CharityAddress', '');
+      expect(result).toHaveProperty('StakingDepositAmountEth', 0);
+      expect(result).toHaveProperty('EnduranceWinnerAddr', '');
+      expect(result).toHaveProperty('LastCstBidderAddr', '');
+      expect(result).toHaveProperty('ChronoWarriorAddr', '');
+      expect(result.RoundStats).toEqual({});
+      expect(result.RaffleNFTWinners).toEqual([]);
+      expect(result.StakingNFTWinners).toEqual([]);
+      expect(result.RaffleETHDeposits).toEqual([]);
+      expect(result.AllPrizes).toEqual([]);
+    });
+
+    it('handles ClaimPrizeTx without nested Tx', () => {
+      const result = flattenRoundInfo({
+        RoundNum: 2,
+        ClaimPrizeTx: { SomeField: 'value' },
+      }) as Record<string, unknown>;
+
+      expect(result.EvtLogId).toBeUndefined();
+      expect(result.TxHash).toBeUndefined();
+    });
+
+    it('uses NftTokenId ?? -1 so 0 is preserved', () => {
+      const result = flattenRoundInfo({
+        MainPrize: { NftTokenId: 0 },
+      }) as Record<string, unknown>;
+
+      expect(result).toHaveProperty('TokenId', 0);
     });
   });
 });

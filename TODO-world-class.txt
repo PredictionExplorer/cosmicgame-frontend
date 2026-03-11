@@ -308,9 +308,9 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 182 unit test files (1,967 tests), 11 E2E specs
-- Actual coverage: Statements ~73.5%, Branches ~61.7%, Lines ~75%, Functions ~64.7%
-- Coverage threshold in jest.config.js: branches 60%, functions 63%, lines 73%, statements 72%
+- 183 unit test files (2,100 tests), 11 E2E specs
+- Actual coverage: Statements ~75.1%, Branches ~62.6%, Lines ~76.7%, Functions ~68.6%
+- Coverage threshold in jest.config.js: branches 62%, functions 68%, lines 76%, statements 74%
 - No accessibility testing (jest-axe not installed)
 
 6a. [DONE] Add app/ to coverage collection
@@ -526,17 +526,109 @@ Current state:
     FAQ component (1 file, 8 tests):
     - components/common/__tests__/FAQ.test.tsx (8 tests)
 
-6e. [OPEN] Write tests for untested contexts (4 files)
-    - contexts/NotificationContext.tsx
-    - contexts/ApiDataContext.tsx
-    - contexts/SystemModeContext.tsx
-    - contexts/StakedTokenContext.tsx
+6e. [DONE] Write comprehensive tests for all contexts (4 files, 35 new tests)
+    Added 35 new tests across 4 context test files (25 existing -> 60 total).
+    Added 'contexts/**/*.{ts,tsx}' to jest.config.js collectCoverageFrom.
+    Coverage: NotificationContext 100%, StakedTokenContext 100%,
+    SystemModeContext 100%, ApiDataContext 98.6%. All 2,002 tests pass
+    across 183 suites. Coverage thresholds bumped.
 
-6f. [OPEN] Write tests for untested API modules and utils
-    API: services/api/tokens.ts, services/api/raffle.ts
-    Utils: utils/format.ts, utils/urls.ts, utils/wallet.ts,
-           utils/endurance.ts, utils/alert.ts, utils/metadata.ts,
-           utils/analytics.ts, utils/createEmotionCache.ts
+    Coverage improvement (before -> after):
+    - Statements: 73.52% -> 74.01%
+    - Branches:   61.70% -> 62.19%
+    - Functions:  64.72% -> 65.44%
+    - Lines:      74.97% -> 75.51%
+
+    Coverage thresholds bumped in jest.config.js:
+    - branches: 60 -> 61, functions: 63 -> 64, lines: 73 -> 74, statements: 72 -> 73
+
+    New file — contexts/__tests__/NotificationContext.test.tsx (15 tests):
+    - Provider: renders children, setNotification function, memoization
+    - Toast dispatch: success, info, warning, error, default branch
+    - Visibility gate: visible=false suppresses toast
+    - Function updater: receives default state, visible=true shows toast,
+      visible=false suppresses toast
+    - Integration: correct message text, multiple sequential notifications,
+      empty string message
+    - Hook: throws outside provider
+
+    Expanded — contexts/__tests__/SystemModeContext.test.tsx (7 -> 13 tests):
+    - Manual fetchData triggers contract read
+    - systemMode=undefined keeps data at 0
+    - BigInt conversion via Number()
+    - Optional chaining when read.systemMode is undefined
+    - Interval cleanup on unmount (clearInterval)
+    - Data updates across polls
+
+    Expanded — contexts/__tests__/StakedTokenContext.test.tsx (9 -> 14 tests):
+    - Context value has exactly 3 properties
+    - fetchData is stable reference across renders (useMemo)
+    - Multiple tokens in both CST and RWLK arrays
+    - Undefined data fallback (data ?? [])
+    - Error message text verification
+
+    Expanded — contexts/__tests__/ApiDataContext.test.tsx (9 -> 18 tests):
+    - Filters out rewards without DepositId
+    - Deduplicates unstakeableActionIds across deposits
+    - reportError called on processData exception
+    - Empty action IDs when API returns null
+    - No claimable IDs when all items Claimed
+    - Multiple deposits with different DepositIds
+    - Skips action ID processing when UnclaimedStakingReward=0
+    - Cancellation on unmount (cancelled flag)
+    - fetchData runs both refetches concurrently
+
+6f. [DONE] Write tests for untested API modules and utils
+    Wrote 98 new tests across 8 test files covering all previously untested
+    API service functions and expanding utils edge-case coverage.
+    All 2,100 tests pass across 183 suites. Coverage thresholds bumped.
+
+    Coverage improvement (before -> after):
+    - Statements: 74.01% -> 75.14%
+    - Branches:   62.19% -> 62.58%
+    - Functions:  65.44% -> 68.56%
+    - Lines:      75.51% -> 76.68%
+
+    Coverage thresholds bumped in jest.config.js:
+    - branches: 61 -> 62, functions: 64 -> 68, lines: 74 -> 76, statements: 73 -> 74
+
+    API tests — rounds.ts (47 new tests, 11 -> 58 total):
+    - services/api/__tests__/rounds.test.ts: added tests for 14 functions
+      (get_round_info, get_prize_time, get_claim_history,
+      get_claim_history_by_user, get_bid_info, get_bid_list_by_round,
+      get_current_special_winners, get_prize_deposits_list,
+      get_prize_deposits_by_round, get_banned_bids, ban_bid, unban_bid,
+      get_bid_eth_price, get_time_until_prize)
+    - Each function: success, 400 fallback, network error + edge cases
+      (negative roundNum clamping, asc/desc sort mapping, POST body verification)
+
+    API tests — users.ts (18 new tests, 10 -> 28 total):
+    - services/api/__tests__/users.test.ts: added tests for 6 functions
+      (notify_red_box, get_unique_winners, get_unique_donors,
+      get_unique_cst_stakers, get_unique_rwalk_stakers,
+      get_unique_both_stakers)
+
+    API tests — client.ts (13 new tests, 35 -> 48 total):
+    - services/api/__tests__/client.test.ts: added tests for 3 helpers
+      (getAPIUrl, getMainAPIUrl, flattenRoundInfo)
+    - flattenRoundInfo: full round with all nested objects, null/undefined/
+      non-object inputs, missing nested defaults, ClaimPrizeTx without Tx,
+      NftTokenId 0 preserved via nullish coalescing
+
+    Utils edge cases (20 new tests across 5 files):
+    - utils/__tests__/format-extra.test.ts (+6): formatSeconds 60s/3600s/
+      90061s/fractional/small-positive, calculateTimeDiff multi-day
+    - utils/__tests__/urls-extra.test.ts (+6): getProxiedUrl special chars,
+      getOriginUrl edge cases, getExplorerUrl no double-slash/unique types
+    - utils/__tests__/alert.test.ts (+3): nested quotes, empty quotes,
+      trailing colon
+    - utils/__tests__/analytics.test.ts (+2): value=0 preserved,
+      sequential pageview calls
+    - utils/__tests__/metadata.test.ts (+3): empty title tags,
+      single-quoted attributes, property vs name attr
+
+    Note: tokens.ts and raffle.ts were already tested (46 + 18 tests
+    from task 3a). createEmotionCache.ts does not exist in utils/.
 
 6g. [OPEN] Improve existing test quality
     Current component tests mostly check "renders empty state" and

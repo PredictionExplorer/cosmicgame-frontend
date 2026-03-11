@@ -36,4 +36,16 @@ describe('getErrorMessage', () => {
   it('handles message with only a colon prefix', () => {
     expect(getErrorMessage('Error:')).toBe('');
   });
+
+  it('extracts text from nested quotes (first match wins)', () => {
+    expect(getErrorMessage('outer "inner "nested""')).toBe('inner ');
+  });
+
+  it('returns empty for a message that is only double quotes', () => {
+    expect(getErrorMessage('""')).toBe('');
+  });
+
+  it('handles colon at the very end of the message', () => {
+    expect(getErrorMessage('trailing colon:')).toBe('');
+  });
 });

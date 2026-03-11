@@ -32,7 +32,7 @@ const config = {
     '!**/node_modules/**',
   ],
   coverageThreshold: {
-    global: { branches: 61, functions: 64, lines: 74, statements: 73 },
+    global: { branches: 62, functions: 68, lines: 76, statements: 74 },
   },
 };
 
