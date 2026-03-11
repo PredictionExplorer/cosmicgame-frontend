@@ -319,10 +319,11 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 185 unit test files (2,354 tests), 11 E2E specs
+- 185 unit test files (2,373 tests), 11 E2E specs
 - Actual coverage: Statements ~77.1%, Branches ~65.0%, Lines ~78.6%, Functions ~72.3%
 - Coverage threshold in jest.config.js: branches 63%, functions 71%, lines 78%, statements 76%
 - Accessibility testing: jest-axe installed, 134 a11y tests across all component files
+- Pre-push hook enforces coverage thresholds on every push
 
 6a. [DONE] Add app/ to coverage collection
     Added 'app/**/*.{ts,tsx}' to jest.config.js collectCoverageFrom.
@@ -755,11 +756,28 @@ Current state:
     - app/ (pages): 45 files
     - contexts/__tests__/: 4 files
 
-6i. [OPEN] Add pre-push coverage check
-    Update .husky/pre-push from:
-      yarn test
-    To:
-      yarn test --coverage
+6i. [DONE] Add pre-push coverage check
+    Updated .husky/pre-push from `yarn type-check && yarn test` to
+    `yarn type-check && yarn test --coverage`. Coverage thresholds
+    (branches 63%, functions 71%, lines 78%, statements 76%) are now
+    enforced on every push — if coverage drops below thresholds, the
+    push is rejected via fail-fast &&.
+
+    Changes:
+    - .husky/pre-push: added --coverage flag to yarn test command
+
+    Tests added (19 new tests, 2,373 total across 185 suites):
+    - __tests__/git-hooks.test.ts expanded from 20 to 39 tests:
+      - Pre-push hook: runs tests with coverage collection,
+        --coverage flag on test command, no bare yarn test without
+        coverage (3 new)
+      - Package.json scripts: has test:coverage script,
+        test:coverage invokes jest --coverage (2 new)
+      - Coverage enforcement pipeline (new describe, 14 tests):
+        coverageThreshold defined, branch/function/line/statement
+        thresholds >= minimum, collectCoverageFrom includes all 6
+        source directories, excludes .d.ts and node_modules,
+        hook+config integration check
 
 
 ================================================================================

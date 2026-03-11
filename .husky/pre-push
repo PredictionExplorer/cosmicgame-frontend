@@ -1,1 +1,1 @@
-yarn type-check && yarn test
+yarn type-check && yarn test --coverage
