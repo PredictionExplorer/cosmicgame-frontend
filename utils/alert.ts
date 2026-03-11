@@ -1,3 +1,4 @@
+/** Extracts a user-facing error message from a raw error string by pulling quoted text or text after the first colon. */
 export default function getErrorMessage(message: string): string {
   const regex = /"([^"]*)"/;
 

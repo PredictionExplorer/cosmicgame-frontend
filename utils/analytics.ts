@@ -1,5 +1,7 @@
+/** Google Analytics 4 measurement ID from environment. */
 export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
 
+/** Sends a pageview event to Google Analytics. */
 export const pageview = (url: string): void => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('config', GA_TRACKING_ID, {
@@ -15,6 +17,7 @@ interface GtagEvent {
   value?: number;
 }
 
+/** Sends a custom event to Google Analytics. */
 export const event = ({ action, category, label, value }: GtagEvent): void => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', action, {

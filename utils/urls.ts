@@ -30,5 +30,5 @@ export const getOriginUrl = (url: string): string => {
   return decodeURIComponent(strippedUrl);
 };
 
-// Logo image URL
+/** Proxied URL to the Cosmic Signature site logo image. */
 export const logoImgUrl = getAssetsUrl('cosmicsignature/logo.png');

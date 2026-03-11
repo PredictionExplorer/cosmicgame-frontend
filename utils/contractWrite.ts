@@ -10,6 +10,7 @@
 
 type ContractWriteFn = (...args: unknown[]) => Promise<`0x${string}`>;
 
+/** Casts an untyped contract write reference to `ContractWriteFn`. */
 export function asWriteFn(fn: unknown): ContractWriteFn {
   return fn as ContractWriteFn;
 }

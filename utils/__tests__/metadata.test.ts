@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { getMetadata } from '../metadata';
+import { getMetadata, PageMetadata } from '../metadata';
 import { reportError } from '../errors';
 
 jest.mock('axios');
@@ -116,5 +116,68 @@ describe('getMetadata', () => {
     const result = await getMetadata('https://property-desc.com');
 
     expect(result?.description).toBe('');
+  });
+
+  it('result has exactly the four PageMetadata keys', async () => {
+    mockedAxios.get.mockResolvedValue({ data: fullHtml });
+
+    const result = await getMetadata('https://example.com');
+
+    expect(Object.keys(result!).sort()).toEqual(['description', 'image', 'keywords', 'title']);
+  });
+
+  it('PageMetadata type is assignable from a successful result', async () => {
+    mockedAxios.get.mockResolvedValue({ data: fullHtml });
+
+    const result = await getMetadata('https://example.com');
+    const typed: PageMetadata = result!;
+
+    expect(typeof typed.title).toBe('string');
+    expect(typeof typed.description).toBe('string');
+    expect(typeof typed.keywords).toBe('string');
+    expect(typeof typed.image).toBe('string');
+  });
+
+  it('does not match reversed attribute order (content before name)', async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: '<html><head><meta content="reversed" name="description"></head></html>',
+    });
+
+    const result = await getMetadata('https://reversed.com');
+
+    expect(result?.description).toBe('');
+  });
+
+  it('returns empty title when title spans multiple lines', async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: '<html><head><title>Line1\nLine2</title></head></html>',
+    });
+
+    const result = await getMetadata('https://multiline-title.com');
+
+    expect(result?.title).toBe('');
+  });
+
+  it('returns only the first og:image when multiple are present', async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: `<html><head>
+        <meta property="og:image" content="https://first.com/a.png">
+        <meta property="og:image" content="https://second.com/b.png">
+      </head></html>`,
+    });
+
+    const result = await getMetadata('https://multi-og.com');
+
+    expect(result?.image).toBe('https://first.com/a.png');
+  });
+
+  it('preserves whitespace inside meta content values', async () => {
+    mockedAxios.get.mockResolvedValue({
+      data: '<html><head><meta name="description" content=" spaced value "></head></html>',
+    });
+
+    const result = await getMetadata('https://spaced.com');
+
+    expect(result?.description).toBe(' spaced value ');
   });
 });

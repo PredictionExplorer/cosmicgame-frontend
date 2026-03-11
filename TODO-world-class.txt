@@ -319,7 +319,7 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 187 unit test files (2,628 tests), 11 E2E specs
+- 188 unit test files (2,699 tests), 11 E2E specs
 - Actual coverage: Statements ~77.1%, Branches ~65.0%, Lines ~78.6%, Functions ~72.3%
 - Coverage threshold in jest.config.js: branches 63%, functions 71%, lines 78%, statements 76%
 - Accessibility testing: jest-axe installed, 134 a11y tests across all component files
@@ -870,8 +870,39 @@ Current state:
     All 2,628 tests pass. tsc --noEmit passes with zero type errors.
     Coverage thresholds pass.
 
-9b. [OPEN] Add JSDoc to utils/metadata.ts (getMetadata)
-    Only has a bare comment, not proper JSDoc.
+9b. [DONE] Add JSDoc to utils/metadata.ts and complete utils/ JSDoc coverage
+    Added proper JSDoc to all 27 exported functions/constants across 10 util
+    files. Defined a named PageMetadata interface with explicit return type
+    for getMetadata. Every utils/ export now has a non-empty /** */ comment.
+
+    Core change — utils/metadata.ts:
+    - Exported PageMetadata interface (title, description, keywords, image)
+    - Replaced bare // comment with full JSDoc (@param, @returns)
+    - Added explicit return type: Promise<PageMetadata | null>
+    - Removed redundant inline comment
+
+    Additional JSDoc added (4 files, 6 exports):
+    - utils/alert.ts: getErrorMessage (default export)
+    - utils/analytics.ts: GA_TRACKING_ID, pageview, event
+    - utils/contractWrite.ts: asWriteFn (had file-level only)
+    - utils/urls.ts: logoImgUrl (was bare // comment)
+
+    Tests added (71 new tests, 2,699 total across 188 suites):
+    - utils/__tests__/jsdoc.test.ts (65 tests — new):
+      - Every export has JSDoc (27 tests)
+      - Per-file export count matches expectations (10 tests)
+      - Total export count is 27 (1 test)
+      - JSDoc body is non-empty for every export (27 tests)
+    - utils/__tests__/metadata.test.ts expanded from 9 to 15 tests (+6):
+      - Return type shape: exactly 4 PageMetadata keys
+      - PageMetadata type assignability from result
+      - Reversed attribute order (content before name) not matched
+      - Multiline title returns empty string
+      - Multiple og:image tags returns first match only
+      - Whitespace in meta content preserved
+
+    All 2,699 tests pass. tsc --noEmit passes with zero type errors.
+    Coverage thresholds pass.
 
 9c. [OPEN] Add JSDoc to exported components
     Focus on components that accept non-obvious props:
