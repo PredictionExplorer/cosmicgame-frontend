@@ -9,3 +9,7 @@ export { default as useStakingWalletRWLKContract } from './useStakingWalletRWLKC
 export { default as useContractNoSigner } from './useContractNoSigner';
 export { default as useArtBlocksContract } from './useArtBlocksContract';
 export { useTokenPrice } from './useTokenPrice';
+export { useNotify } from './useNotify';
+export { useBidForm } from './useBidForm';
+export { usePrizeClaim } from './usePrizeClaim';
+export { usePrizeNotification } from './usePrizeNotification';
