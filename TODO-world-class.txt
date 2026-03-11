@@ -231,7 +231,7 @@ All items complete. No remaining issues.
 
 
 ================================================================================
-5. ERROR HANDLING — Currently 8.5/10
+5. ERROR HANDLING — Currently 9.5/10
 ================================================================================
 
 5a. [DONE] Fix silent catch in app/system-event/.../SystemEventPage.tsx
@@ -255,23 +255,52 @@ All items complete. No remaining issues.
         without error, called again when error changes
       - Recovery: table renders again when error clears
 
-5b. [OPEN] Add rel="noopener noreferrer" to target="_blank" links
-    Many target="_blank" links are missing proper rel attributes. Some files
-    have rel="noreferrer" (missing noopener), others have no rel at all.
-    Affected files include:
-    - components/layout/Footer.tsx (4 links — have rel="noreferrer" only)
-    - components/donations/DonatedNFTTable.tsx (6 links — partial)
-    - components/tables/WinningHistoryTable.tsx (6 links — no rel)
-    - components/donations/DonatedERC20Table.tsx (4 links)
+5b. [DONE] Add rel="noopener noreferrer" to target="_blank" links
+    Fixed all target="_blank" links across 26 files (20 components + 6 pages)
+    to include rel="noopener noreferrer", preventing reverse tabnapping via
+    window.opener. Added react/jsx-no-target-blank ESLint rule to prevent
+    future regressions.
+
+    Files fixed — no rel at all (added rel="noopener noreferrer"):
+    - components/common/AddressLink.tsx (2 links)
     - components/common/Prize.tsx (3 links)
-    - components/tokens/CSTokensTable.tsx (3 links)
+    - components/tables/WinningHistoryTable.tsx (6 links)
+    - components/tables/BiddingHistoryTable.tsx (1 link)
+    - components/tables/MarketingRewardsTable.tsx (1 link)
+    - components/tables/NameHistoryTable.tsx (1 link)
+    - components/tables/CharityWithdrawalTable.tsx (1 link)
     - components/tables/EthDonationTable.tsx (2 links)
-    - components/tables/CharityDepositTable.tsx (2 links)
-    - components/tables/BanBidTable.tsx (2 links)
-    - components/tables/AdminEventsTable.tsx (2 links)
-    - components/staking/StakedTokensTable.tsx (2 links)
-    - components/nft/NFTTrait.tsx (2 links)
-    - And 13 more files with 1 link each
+    - app/eth-donation/detail/[id]/EthDonationDetailPage.tsx (2 links)
+    - app/statistics/Statistics.tsx (2 links)
+
+    Files fixed — rel="noreferrer" upgraded to rel="noopener noreferrer":
+    - components/layout/Footer.tsx (4 links)
+    - components/donations/DonatedNFTTable.tsx (4 <a> + 2 <Link>)
+    - components/donations/DonatedERC20Table.tsx (2 <a> + 2 <Link>)
+    - app/my-winnings/MyWinnings.tsx (1 <a> + 1 <Link>)
+    - app/rewards-by-token/[address]/[tokenId]/RewardsByTokenPage.tsx (2 links)
+
+    Files fixed — <Link> missing rel (added rel="noopener noreferrer"):
+    - components/tokens/CSTokensTable.tsx (2 links)
+    - components/staking/StakedTokensTable.tsx (1 link)
+    - components/nft/NFTTrait.tsx (1 link)
+    - app/user/raffle-eth/[address]/UserRaffleETHPage.tsx (1 link)
+    - app/user/raffle-nft/[address]/UserRaffleNFTPage.tsx (1 link)
+
+    ESLint rule added:
+    - eslint.config.mjs: "react/jsx-no-target-blank": ["error", { allowReferrer: false }]
+
+    Tests added/updated (51 new tests, 1,314 total across 88 suites):
+    - components/common/__tests__/AddressLink.test.tsx (7 tests — new)
+    - components/common/__tests__/Prize.test.tsx (11 tests — new)
+    - components/__tests__/WinningHistoryTable.test.tsx (10 tests — new)
+    - components/__tests__/MarketingRewardsTable.test.tsx (7 tests — new)
+    - components/__tests__/EthDonationTable.test.tsx (11 tests — new)
+    - components/__tests__/Footer.test.tsx (+3 rel assertions)
+    - components/__tests__/DonatedNFTTable.test.tsx (+1 rel test)
+    - components/__tests__/AdminEventsTable.test.tsx (+1 rel test)
+    - components/__tests__/CharityWithdrawalTable.test.tsx (+1 rel test)
+    - components/__tests__/NameHistoryTable.test.tsx (+1 rel test)
 
 
 ================================================================================
@@ -279,22 +308,64 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 83 unit test files (1,263 tests), 11 E2E specs
-- Actual coverage: Statements ~31%, Branches ~27%, Lines ~31%, Functions ~22%
+- 116 unit test files (1,478 tests), 11 E2E specs
+- Actual coverage: Statements ~52%, Branches ~45%, Lines ~53%, Functions ~46%
 - Coverage threshold in jest.config.js: 60% (would FAIL in CI)
-- jest.config.js collectCoverageFrom does NOT include app/ directory
 - No accessibility testing (jest-axe not installed)
 
-6a. [OPEN] Add app/ to coverage collection
-    jest.config.js collectCoverageFrom only covers components/, hooks/,
-    utils/, services/. Add: 'app/**/*.{ts,tsx}' to capture App Router
-    page components.
+6a. [DONE] Add app/ to coverage collection
+    Added 'app/**/*.{ts,tsx}' to jest.config.js collectCoverageFrom.
+    Wrote 164 new tests across 28 new test files covering all previously
+    untested app/ page components. All 1,478 tests pass across 116 suites.
+
+    Config change:
+    - jest.config.js: added 'app/**/*.{ts,tsx}' to collectCoverageFrom
+
+    Tests added (28 new files, 164 tests):
+
+    Tier 1 — Static pages (8 files, 39 tests):
+    - app/faq/__tests__/FAQPage.test.tsx (5 tests)
+    - app/site-map/__tests__/SiteMapPage.test.tsx (6 tests)
+    - app/how-to-play/__tests__/HowToPlayPage.test.tsx (10 tests)
+    - app/code/__tests__/CodeViewer.test.tsx (4 tests)
+    - app/detail/__tests__/DetailPage.test.tsx (4 tests)
+    - app/detail/sample/__tests__/SampleDetailPage.test.tsx (5 tests)
+    - app/user/__tests__/UserPage.test.tsx (2 tests)
+    - app/my-statistics/__tests__/MyStatistics.test.tsx (3 tests)
+
+    Tier 2 — Simple data-fetching pages (9 files, 43 tests):
+    - app/charity-deposits-cg/__tests__/CharityCGDeposits.test.tsx (4 tests)
+    - app/charity-deposits-voluntary/__tests__/CharityDepositsVoluntary.test.tsx (4 tests)
+    - app/charity-withdrawals/__tests__/CharityWithdrawals.test.tsx (4 tests)
+    - app/marketing/__tests__/MarketingRewards.test.tsx (5 tests)
+    - app/nft-donations/__tests__/NFTDonationsPage.test.tsx (5 tests)
+    - app/prize/__tests__/PrizeWinnersPage.test.tsx (4 tests)
+    - app/named-nfts/__tests__/NamedNFTsPage.test.tsx (6 tests)
+    - app/used-rwlk-nfts/__tests__/UsedRwlkNftsPage.test.tsx (6 tests)
+    - app/eth-donation/round/__tests__/EthDonationByRoundPage.test.tsx (5 tests)
+
+    Tier 3 — Address-validation pages (3 files, 19 tests):
+    - app/marketing/[address]/__tests__/MarketingRewardsPage.test.tsx (7 tests)
+    - app/cosmic-signature-transfer/__tests__/CosmicSignatureTransfersPage.test.tsx (6 tests)
+    - app/cosmic-token-transfer/__tests__/CosmicTokenTransfersPage.test.tsx (6 tests)
+
+    Tier 4 — Medium complexity pages (6 files, 49 tests):
+    - app/bid/__tests__/BidPage.test.tsx (12 tests)
+    - app/staking/__tests__/StakingPage.test.tsx (8 tests)
+    - app/changed-parameters/__tests__/ChangedParameters.test.tsx (6 tests)
+    - app/winning-history/__tests__/WinningHistory.test.tsx (7 tests)
+    - app/eth-donation/detail/__tests__/EthDonationDetailPage.test.tsx (8 tests)
+    - app/staking-action/__tests__/StakingActionDetailPage.test.tsx (8 tests)
+
+    Tier 5 — Contract-interaction pages (2 files, 14 tests):
+    - app/mint/__tests__/Mint.test.tsx (7 tests)
+    - app/mint-artblocks/__tests__/MintArtBlocks.test.tsx (7 tests)
 
 6b. [OPEN] Lower coverage threshold to match reality
     Change jest.config.js coverageThreshold to 30% so CI doesn't fail.
-    Increase by 5% each sprint until reaching 80%+.
+    Increase by 5% each git commit until reaching 95%+.
 
-6c. [OPEN] Write tests for untested hooks (12 files)
+6c. [OPEN] Write tests for ALL the untested hooks (12+ files) including
     - hooks/useClipboard.ts
     - hooks/useContractNoSigner.ts
     - hooks/web3.ts (useActiveWeb3React)
