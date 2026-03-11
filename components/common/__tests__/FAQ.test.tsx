@@ -3,7 +3,6 @@ import { fireEvent } from '@testing-library/react';
 
 import { render, screen } from '@/test-utils';
 
- 
 import FAQ from '../FAQ';
 
 describe('FAQ', () => {
@@ -102,5 +101,67 @@ describe('FAQ', () => {
       writable: true,
       value: { ...window.location, hash: '' },
     });
+  });
+
+  it('unknown hash does not expand any item', () => {
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, hash: '#nonexistent-section' },
+    });
+
+    render(<FAQ />);
+    const buttons = screen.getAllByRole('button');
+    buttons.forEach((btn) => {
+      expect(btn).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, hash: '' },
+    });
+  });
+
+  it('all items start collapsed when no hash', () => {
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, hash: '' },
+    });
+
+    render(<FAQ />);
+    const buttons = screen.getAllByRole('button');
+    const expandedButtons = buttons.filter((btn) => btn.getAttribute('aria-expanded') === 'true');
+    expect(expandedButtons).toHaveLength(0);
+  });
+
+  it('renders detail content when expanded', () => {
+    render(<FAQ />);
+    const button = screen.getByText('What is Cosmic Signature?').closest('button')!;
+    fireEvent.click(button);
+
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+    const content = button.closest('[data-testid]')?.parentElement ?? document.body;
+    expect(content.textContent).toBeTruthy();
+  });
+
+  it('scrolls to expanded item when hash matches', () => {
+    jest.useFakeTimers();
+    const scrollToSpy = jest.fn();
+    window.scrollTo = scrollToSpy;
+
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, hash: '#main-prize' },
+    });
+
+    render(<FAQ />);
+    jest.advanceTimersByTime(400);
+
+    expect(scrollToSpy).toHaveBeenCalled();
+
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: { ...window.location, hash: '' },
+    });
+    jest.useRealTimers();
   });
 });

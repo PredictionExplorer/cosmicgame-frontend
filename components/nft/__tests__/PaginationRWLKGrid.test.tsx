@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, fireEvent } from '@/test-utils';
 
 jest.mock(
   'next/image',
@@ -23,7 +23,6 @@ jest.mock(
     },
 );
 
- 
 import PaginationRWLKGrid from '../PaginationRWLKGrid';
 
 describe('PaginationRWLKGrid', () => {
@@ -62,5 +61,94 @@ describe('PaginationRWLKGrid', () => {
     render(<PaginationRWLKGrid loading={false} data={[10, 20]} selectedToken={20} />);
     const cards = screen.getAllByTestId('rwlk-card');
     expect(cards[1]).toHaveAttribute('data-selected', 'true');
+  });
+
+  it('card click calls setSelectedToken with token id', () => {
+    const setSelected = jest.fn();
+    render(
+      <PaginationRWLKGrid
+        loading={false}
+        data={[10, 20]}
+        selectedToken={-1}
+        setSelectedToken={setSelected}
+      />,
+    );
+    fireEvent.click(screen.getAllByTestId('rwlk-card')[0]!.closest('[class*="cursor"]')!);
+    expect(setSelected).toHaveBeenCalledWith(10);
+  });
+
+  it('card click deselects by passing -1 when already selected', () => {
+    const setSelected = jest.fn();
+    render(
+      <PaginationRWLKGrid
+        loading={false}
+        data={[10, 20]}
+        selectedToken={10}
+        setSelectedToken={setSelected}
+      />,
+    );
+    fireEvent.click(screen.getAllByTestId('rwlk-card')[0]!.closest('[class*="cursor"]')!);
+    expect(setSelected).toHaveBeenCalledWith(-1);
+  });
+
+  it('card click is no-op when setSelectedToken is not provided', () => {
+    render(<PaginationRWLKGrid loading={false} data={[10]} />);
+    expect(() =>
+      fireEvent.click(screen.getByTestId('rwlk-card').closest('[class*="cursor"]')!),
+    ).not.toThrow();
+  });
+
+  it('search input filters displayed items', () => {
+    render(<PaginationRWLKGrid loading={false} data={[10, 20, 30]} />);
+
+    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID'), {
+      target: { value: '20' },
+    });
+
+    const cards = screen.getAllByTestId('rwlk-card');
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toHaveTextContent('20');
+  });
+
+  it('search resets to page 1', () => {
+    const data = Array.from({ length: 9 }, (_, i) => i + 1);
+    render(<PaginationRWLKGrid loading={false} data={data} />);
+
+    expect(screen.getAllByTestId('rwlk-card')).toHaveLength(6);
+
+    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID'), {
+      target: { value: '3' },
+    });
+
+    const cards = screen.getAllByTestId('rwlk-card');
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toHaveTextContent('3');
+  });
+
+  it('pagination page click updates visible items', () => {
+    const data = Array.from({ length: 9 }, (_, i) => (i + 1) * 100);
+    render(<PaginationRWLKGrid loading={false} data={data} />);
+
+    expect(screen.getAllByTestId('rwlk-card')).toHaveLength(6);
+
+    const nav = screen.getByRole('navigation');
+    const page2 = nav.querySelector('a:not([aria-current])');
+    fireEvent.click(page2!);
+
+    expect(screen.getAllByTestId('rwlk-card')).toHaveLength(3);
+  });
+
+  it('clearing search restores all items', () => {
+    render(<PaginationRWLKGrid loading={false} data={[10, 20, 30]} />);
+
+    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID'), {
+      target: { value: '20' },
+    });
+    expect(screen.getAllByTestId('rwlk-card')).toHaveLength(1);
+
+    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID'), {
+      target: { value: '' },
+    });
+    expect(screen.getAllByTestId('rwlk-card')).toHaveLength(3);
   });
 });

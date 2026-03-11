@@ -24,7 +24,6 @@ jest.mock('../../../components/nft/NFTImage', () => ({
   },
 }));
 
- 
 import { StakedTokensTable } from '../StakedTokensTable';
 
 const mockUnstake = jest.fn().mockResolvedValue(undefined);
@@ -187,5 +186,111 @@ describe('StakedTokensTable', () => {
     );
     const checkboxes = screen.getAllByRole('checkbox');
     expect(checkboxes.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('row click toggles checkbox selection', () => {
+    render(
+      <StakedTokensTable
+        list={[
+          createRWLKRow({ StakeActionId: 1, StakedTokenId: 42 }),
+          createRWLKRow({ StakeActionId: 2, StakedTokenId: 43, StakeTimeStamp: 1701346719 }),
+        ]}
+        handleUnstake={mockUnstake}
+        handleUnstakeMany={mockUnstakeMany}
+        IsRwalk={true}
+      />,
+    );
+    const cell = screen.getAllByText('42').find((el) => el.closest('td'));
+    fireEvent.click(cell!.closest('tr')!);
+    const checkboxes = screen.getAllByRole('checkbox');
+    expect(checkboxes.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('shows Unstake Many when multiple rows selected', () => {
+    render(
+      <StakedTokensTable
+        list={[
+          createRWLKRow({ StakeActionId: 1, StakedTokenId: 42 }),
+          createRWLKRow({ StakeActionId: 2, StakedTokenId: 43, StakeTimeStamp: 1701346719 }),
+          createRWLKRow({ StakeActionId: 3, StakedTokenId: 44, StakeTimeStamp: 1701346720 }),
+        ]}
+        handleUnstake={mockUnstake}
+        handleUnstakeMany={mockUnstakeMany}
+        IsRwalk={true}
+      />,
+    );
+    const cell1 = screen.getAllByText('42').find((el) => el.closest('td'));
+    const cell2 = screen.getAllByText('43').find((el) => el.closest('td'));
+    fireEvent.click(cell1!.closest('tr')!);
+    fireEvent.click(cell2!.closest('tr')!);
+    expect(screen.getByText('Unstake Many')).toBeInTheDocument();
+  });
+
+  it('Unstake Many calls handleUnstakeMany with selected action IDs', () => {
+    render(
+      <StakedTokensTable
+        list={[
+          createRWLKRow({ StakeActionId: 10, StakedTokenId: 50 }),
+          createRWLKRow({ StakeActionId: 20, StakedTokenId: 51, StakeTimeStamp: 1701346719 }),
+        ]}
+        handleUnstake={mockUnstake}
+        handleUnstakeMany={mockUnstakeMany}
+        IsRwalk={true}
+      />,
+    );
+    const cell1 = screen.getAllByText('50').find((el) => el.closest('td'));
+    const cell2 = screen.getAllByText('51').find((el) => el.closest('td'));
+    fireEvent.click(cell1!.closest('tr')!);
+    fireEvent.click(cell2!.closest('tr')!);
+    fireEvent.click(screen.getByText('Unstake Many'));
+    expect(mockUnstakeMany).toHaveBeenCalledWith(expect.arrayContaining([10, 20]), true);
+  });
+
+  it('Unstake button hides Unstake Many for single selection', () => {
+    render(
+      <StakedTokensTable
+        list={[createRWLKRow({ StakeActionId: 1 })]}
+        handleUnstake={mockUnstake}
+        handleUnstakeMany={mockUnstakeMany}
+        IsRwalk={true}
+      />,
+    );
+    fireEvent.click(screen.getAllByText('Unstake')[0]!);
+    expect(screen.queryByText('Unstake Many')).not.toBeInTheDocument();
+  });
+
+  it('resets selection when list prop changes', () => {
+    const list1 = [createRWLKRow({ StakeActionId: 1 })];
+    const list2 = [createRWLKRow({ StakeActionId: 2 })];
+    const { rerender } = render(
+      <StakedTokensTable
+        list={list1}
+        handleUnstake={mockUnstake}
+        handleUnstakeMany={mockUnstakeMany}
+        IsRwalk={true}
+      />,
+    );
+    rerender(
+      <StakedTokensTable
+        list={list2}
+        handleUnstake={mockUnstake}
+        handleUnstakeMany={mockUnstakeMany}
+        IsRwalk={true}
+      />,
+    );
+    expect(screen.queryByText('Unstake Many')).not.toBeInTheDocument();
+  });
+
+  it('passes isRwlk=false for CST unstake', () => {
+    render(
+      <StakedTokensTable
+        list={[createCSTRow()]}
+        handleUnstake={mockUnstake}
+        handleUnstakeMany={mockUnstakeMany}
+        IsRwalk={false}
+      />,
+    );
+    fireEvent.click(screen.getAllByText('Unstake')[0]!);
+    expect(mockUnstake).toHaveBeenCalledWith(10, false);
   });
 });

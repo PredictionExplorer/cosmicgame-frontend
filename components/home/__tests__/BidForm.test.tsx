@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
 jest.mock('viem', () => ({
   ...jest.requireActual('../../../__mocks__/viem.js'),
@@ -129,5 +130,107 @@ describe('BidForm', () => {
   it('Bid price collision prevention section shows for non-CST bid types', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} bidType="ETH" />);
     expect(screen.getByText('Bid price collision prevention')).toBeInTheDocument();
+  });
+
+  it('clicking RandomWalk radio calls setBidType and resets rwlkId', async () => {
+    const user = userEvent.setup();
+    render(<BidForm {...defaultProps} bidType="ETH" />);
+
+    await user.click(screen.getByText('RandomWalk'));
+
+    expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
+    expect(defaultProps.setBidType).toHaveBeenCalledWith('RandomWalk');
+  });
+
+  it('clicking CST radio calls setBidType and resets rwlkId', async () => {
+    const user = userEvent.setup();
+    render(<BidForm {...defaultProps} bidType="ETH" />);
+
+    await user.click(screen.getByText('CST(Cosmic Token)'));
+
+    expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
+    expect(defaultProps.setBidType).toHaveBeenCalledWith('CST');
+  });
+
+  it('switching donation type calls setDonationType and resets rwlkId', async () => {
+    const user = userEvent.setup();
+    render(<BidForm {...defaultProps} advancedExpanded={true} donationType="NFT" />);
+
+    await user.click(screen.getByText('Token'));
+
+    expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
+    expect(defaultProps.setDonationType).toHaveBeenCalledWith('Token');
+  });
+
+  it('NFT donation address input calls setNftDonateAddress', () => {
+    render(<BidForm {...defaultProps} advancedExpanded={true} donationType="NFT" />);
+    const input = screen.getByPlaceholderText('NFT contract address');
+    fireEvent.change(input, { target: { value: '0xNFTContract' } });
+    expect(defaultProps.setNftDonateAddress).toHaveBeenCalledWith('0xNFTContract');
+  });
+
+  it('NFT number input calls setNftId', () => {
+    render(<BidForm {...defaultProps} advancedExpanded={true} donationType="NFT" />);
+    const input = screen.getByPlaceholderText('NFT number');
+    fireEvent.change(input, { target: { value: '42' } });
+    expect(defaultProps.setNftId).toHaveBeenCalledWith('42');
+  });
+
+  it('Token Contract Address input calls setTokenDonateAddress', () => {
+    render(<BidForm {...defaultProps} advancedExpanded={true} donationType="Token" />);
+    const input = screen.getByPlaceholderText('Token Contract Address');
+    fireEvent.change(input, { target: { value: '0xTokenAddr' } });
+    expect(defaultProps.setTokenDonateAddress).toHaveBeenCalledWith('0xTokenAddr');
+  });
+
+  it('Token Amount input calls setTokenAmount', () => {
+    render(<BidForm {...defaultProps} advancedExpanded={true} donationType="Token" />);
+    const input = screen.getByPlaceholderText('Token Amount');
+    fireEvent.change(input, { target: { value: '100' } });
+    expect(defaultProps.setTokenAmount).toHaveBeenCalledWith('100');
+  });
+
+  it('bid price plus input calls setBidPricePlus for values <= 50', () => {
+    render(<BidForm {...defaultProps} advancedExpanded={true} bidType="ETH" />);
+    const input = screen.getByPlaceholderText('Bid Price Plus');
+    fireEvent.change(input, { target: { value: '10' } });
+    expect(defaultProps.setBidPricePlus).toHaveBeenCalledWith(10);
+  });
+
+  it('bid price plus input rejects values > 50', () => {
+    render(<BidForm {...defaultProps} advancedExpanded={true} bidType="ETH" />);
+    const input = screen.getByPlaceholderText('Bid Price Plus');
+    fireEvent.change(input, { target: { value: '51' } });
+    expect(defaultProps.setBidPricePlus).not.toHaveBeenCalled();
+  });
+
+  it('computed bid price shows ETH amount with bidPricePlus applied', () => {
+    render(<BidForm {...defaultProps} advancedExpanded={true} bidType="ETH" bidPricePlus={10} />);
+    const expectedPrice = (0.01 * (1 + 10 / 100) * 1).toFixed(6);
+    expect(screen.getByText(`${expectedPrice} ETH`)).toBeInTheDocument();
+  });
+
+  it('computed bid price applies 50% discount for RandomWalk', () => {
+    render(
+      <BidForm {...defaultProps} advancedExpanded={true} bidType="RandomWalk" bidPricePlus={0} />,
+    );
+    const expectedPrice = (0.01 * 1 * 0.5).toFixed(6);
+    expect(screen.getByText(`${expectedPrice} ETH`)).toBeInTheDocument();
+  });
+
+  it('hides bid price collision prevention for CST bid type', () => {
+    render(<BidForm {...defaultProps} advancedExpanded={true} bidType="CST" />);
+    expect(screen.queryByText('Bid price collision prevention')).not.toBeInTheDocument();
+  });
+
+  it('shows AuctionInfo with endedMessage for CST when auction ended', () => {
+    render(
+      <BidForm
+        {...defaultProps}
+        bidType="CST"
+        cstBidData={{ AuctionDuration: 3600, CSTPrice: 1.5, SecondsElapsed: 4000 }}
+      />,
+    );
+    expect(screen.getByText('Auction ended, you can bid for free.')).toBeInTheDocument();
   });
 });

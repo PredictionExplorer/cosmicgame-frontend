@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, fireEvent, waitFor } from '@/test-utils';
 
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
@@ -29,7 +29,6 @@ jest.mock('../../../services/api', () => ({
   default: { get_token_by_name: jest.fn().mockResolvedValue([]) },
 }));
 
- 
 import PaginationGrid from '../PaginationGrid';
 
 const createToken = (overrides = {}) => ({
@@ -85,5 +84,104 @@ describe('PaginationGrid', () => {
     render(<PaginationGrid data={data} loading={false} />);
     const cards = screen.getAllByTestId('nft-card');
     expect(cards).toHaveLength(12);
+  });
+
+  it('search input updates value', () => {
+    render(<PaginationGrid data={[]} loading={false} />);
+    const input = screen.getByPlaceholderText('Enter NFT ID or Name');
+    fireEvent.change(input, { target: { value: '5' } });
+    expect(input).toHaveValue('5');
+  });
+
+  it('numeric search filters by TokenId', async () => {
+    const data = [
+      createToken({ TokenId: 5, EvtLogId: 1 }),
+      createToken({ TokenId: 10, EvtLogId: 2 }),
+    ];
+    render(<PaginationGrid data={data} loading={false} />);
+
+    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID or Name'), {
+      target: { value: '5' },
+    });
+    fireEvent.click(screen.getByText('Search'));
+
+    await waitFor(() => {
+      const cards = screen.getAllByTestId('nft-card');
+      expect(cards).toHaveLength(1);
+      expect(cards[0]).toHaveTextContent('5');
+    });
+  });
+
+  it('non-numeric search calls api.get_token_by_name', async () => {
+    const mockApi = jest.requireMock('../../../services/api').default;
+    mockApi.get_token_by_name.mockResolvedValueOnce([{ TokenId: 1 }]);
+    const data = [
+      createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
+      createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
+    ];
+    render(<PaginationGrid data={data} loading={false} />);
+
+    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID or Name'), {
+      target: { value: 'Alpha' },
+    });
+    fireEvent.click(screen.getByText('Search'));
+
+    await waitFor(() => {
+      expect(mockApi.get_token_by_name).toHaveBeenCalledWith('Alpha');
+    });
+  });
+
+  it('Enter key triggers search', async () => {
+    const data = [
+      createToken({ TokenId: 7, EvtLogId: 1 }),
+      createToken({ TokenId: 8, EvtLogId: 2 }),
+    ];
+    render(<PaginationGrid data={data} loading={false} />);
+
+    const input = screen.getByPlaceholderText('Enter NFT ID or Name');
+    fireEvent.change(input, { target: { value: '7' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    await waitFor(() => {
+      const cards = screen.getAllByTestId('nft-card');
+      expect(cards).toHaveLength(1);
+      expect(cards[0]).toHaveTextContent('7');
+    });
+  });
+
+  it('search clears page param via router.push', async () => {
+    const data = [createToken({ TokenId: 3, EvtLogId: 1 })];
+    render(<PaginationGrid data={data} loading={false} />);
+
+    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID or Name'), {
+      target: { value: '3' },
+    });
+    fireEvent.click(screen.getByText('Search'));
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/gallery');
+    });
+  });
+
+  it('clearing search input restores full collection', () => {
+    const data = [
+      createToken({ TokenId: 1, EvtLogId: 1 }),
+      createToken({ TokenId: 2, EvtLogId: 2 }),
+    ];
+    render(<PaginationGrid data={data} loading={false} />);
+
+    const input = screen.getByPlaceholderText('Enter NFT ID or Name');
+    fireEvent.change(input, { target: { value: 'test' } });
+    fireEvent.change(input, { target: { value: '' } });
+
+    const cards = screen.getAllByTestId('nft-card');
+    expect(cards).toHaveLength(2);
+  });
+
+  it('renders link to /detail/sample when collection is empty', () => {
+    render(<PaginationGrid data={[]} loading={false} />);
+    const links = screen.getAllByRole('link');
+    const sampleLink = links.find((l) => l.getAttribute('href') === '/detail/sample');
+    expect(sampleLink).toBeInTheDocument();
   });
 });

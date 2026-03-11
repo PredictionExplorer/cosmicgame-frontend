@@ -1,28 +1,38 @@
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, waitFor } from '@/test-utils';
+
+const mockSetNotification = jest.fn();
+const mockFetchData = jest.fn();
+const mockUnstakeMany = jest.fn();
+const mockWaitForTxReceipt = jest.fn().mockResolvedValue({ status: 'success' });
+const mockAccount = { current: null as string | null };
 
 jest.mock('../../../hooks/web3', () => ({
-  useActiveWeb3React: () => ({ account: null }),
+  useActiveWeb3React: () => ({ account: mockAccount.current }),
 }));
 
 jest.mock('../../../contexts/NotificationContext', () => ({
-  useNotification: () => ({ setNotification: jest.fn() }),
+  useNotification: () => ({ setNotification: mockSetNotification }),
 }));
+
+const mockContextRewards = { current: null as unknown[] | null };
+const mockUnclaimedStakingReward = { current: 0 };
 
 jest.mock('../../../contexts/ApiDataContext', () => ({
   useApiData: () => ({
-    apiData: { UnclaimedStakingReward: 0 },
-    fetchData: jest.fn(),
-    unclaimedRewards: null,
+    apiData: { UnclaimedStakingReward: mockUnclaimedStakingReward.current },
+    fetchData: mockFetchData,
+    unclaimedRewards: mockContextRewards.current,
   }),
 }));
 
 jest.mock('../../../hooks/useStakingWalletCSTContract', () => ({
   __esModule: true,
-  default: () => ({ write: { unstakeMany: jest.fn() } }),
+  default: () => ({ write: { unstakeMany: mockUnstakeMany } }),
 }));
 
 jest.mock('../../../services/api', () => ({
@@ -34,10 +44,20 @@ jest.mock('../../../services/api', () => ({
 }));
 
 jest.mock('wagmi', () => ({
-  usePublicClient: () => ({ waitForTransactionReceipt: jest.fn() }),
+  usePublicClient: () => ({ waitForTransactionReceipt: mockWaitForTxReceipt }),
 }));
 
- 
+jest.mock('../../../utils/errors', () => ({
+  isUserRejection: jest.fn(() => false),
+  reportError: jest.fn(),
+  getEthErrorMessage: jest.fn(() => 'An error occurred'),
+}));
+
+jest.mock('../../../utils/alert', () => ({
+  __esModule: true,
+  default: jest.fn((msg: string) => msg),
+}));
+
 import { UncollectedCSTStakingRewardsTable } from '../UncollectedCSTStakingRewardsTable';
 
 const createRow = (overrides = {}) => ({
@@ -57,6 +77,9 @@ const mockApi = jest.requireMock('../../../services/api').default;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockAccount.current = null;
+  mockContextRewards.current = null;
+  mockUnclaimedStakingReward.current = 0;
 });
 
 describe('UncollectedCSTStakingRewardsTable', () => {
@@ -129,5 +152,91 @@ describe('UncollectedCSTStakingRewardsTable', () => {
   it('calls API to fetch uncollected rewards on mount', () => {
     render(<UncollectedCSTStakingRewardsTable user="0xSomeUser" />);
     expect(mockApi.get_staking_cst_rewards_to_claim_by_user).toHaveBeenCalledWith('0xSomeUser');
+  });
+
+  it('shows Unstake & Claim All for own account with unclaimed rewards', () => {
+    mockAccount.current = '0xOwner';
+    mockUnclaimedStakingReward.current = 1.5;
+    mockContextRewards.current = [createRow()];
+    render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
+
+    expect(screen.getByRole('button', { name: 'Unstake & Claim All' })).toBeInTheDocument();
+  });
+
+  it('own account uses context rewards without API fetch', () => {
+    mockAccount.current = '0xowner';
+    mockContextRewards.current = [createRow()];
+    render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
+
+    expect(mockApi.get_staking_cst_rewards_to_claim_by_user).not.toHaveBeenCalled();
+  });
+
+  it('displays claimable reward amount for own account', () => {
+    mockAccount.current = '0xOwner';
+    mockUnclaimedStakingReward.current = 2.345;
+    mockContextRewards.current = [createRow()];
+    render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
+
+    expect(screen.getByText(/2\.345000 ETH/)).toBeInTheDocument();
+  });
+
+  it('Unstake & Claim All opens confirmation dialog', async () => {
+    const user = userEvent.setup();
+    mockAccount.current = '0xOwner';
+    mockUnclaimedStakingReward.current = 1.0;
+    mockContextRewards.current = [createRow()];
+    render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
+
+    await user.click(screen.getByRole('button', { name: 'Unstake & Claim All' }));
+
+    expect(screen.getByText('Unstake Tokens & Claim Rewards')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Unstake & Claim' })).toBeInTheDocument();
+  });
+
+  it('Cancel button closes dialog without unstaking', async () => {
+    const user = userEvent.setup();
+    mockAccount.current = '0xOwner';
+    mockUnclaimedStakingReward.current = 1.0;
+    mockContextRewards.current = [createRow()];
+    render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
+
+    await user.click(screen.getByRole('button', { name: 'Unstake & Claim All' }));
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(mockUnstakeMany).not.toHaveBeenCalled();
+  });
+
+  it('Unstake & Claim calls unstakeMany and shows success notification', async () => {
+    const user = userEvent.setup();
+    mockAccount.current = '0xOwner';
+    mockUnclaimedStakingReward.current = 1.0;
+    mockContextRewards.current = [createRow()];
+    mockUnstakeMany.mockResolvedValueOnce('0xTxHash');
+    mockApi.get_staking_cst_by_user_by_deposit_rewards.mockResolvedValue([
+      { Actions: [{ Claimed: false, Stake: { ActionId: 99 } }] },
+    ]);
+    render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
+
+    await user.click(screen.getByRole('button', { name: 'Unstake & Claim All' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Unstake & Claim' })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Unstake & Claim' }));
+
+    await waitFor(() => {
+      expect(mockUnstakeMany).toHaveBeenCalled();
+    });
+  });
+
+  it('hides Unstake button when UnclaimedStakingReward is 0', () => {
+    mockAccount.current = '0xOwner';
+    mockUnclaimedStakingReward.current = 0;
+    mockContextRewards.current = [createRow()];
+    render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
+
+    expect(screen.queryByText('Unstake & Claim All')).not.toBeInTheDocument();
   });
 });

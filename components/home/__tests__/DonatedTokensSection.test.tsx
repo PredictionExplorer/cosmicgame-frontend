@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import userEvent from '@testing-library/user-event';
 
 import type { DonatedNFT, DonatedERC20Token } from '@/services/api/types';
 
@@ -22,7 +23,6 @@ jest.mock('../../../components/common/CustomPagination', () => ({
   CustomPagination: () => <div data-testid="pagination" />,
 }));
 
- 
 import { DonatedTokensSection } from '../DonatedTokensSection';
 
 const createNFT = (overrides = {}) => ({
@@ -105,5 +105,50 @@ describe('DonatedTokensSection', () => {
       />,
     );
     expect(screen.getByTestId('erc20-table')).toHaveTextContent('1 tokens');
+  });
+
+  it('clicking ERC20 tab calls onTabChange with index 1', async () => {
+    const user = userEvent.setup();
+    render(<DonatedTokensSection {...defaultProps} donatedTokensTab={0} />);
+
+    await user.click(screen.getByText('ERC20 Tokens'));
+
+    expect(defaultProps.onTabChange).toHaveBeenCalled();
+    const callArgs = defaultProps.onTabChange.mock.calls[0];
+    expect(callArgs[1]).toBe(1);
+  });
+
+  it('clicking ERC721 tab calls onTabChange with index 0', async () => {
+    const onTabChange = jest.fn();
+    const user = userEvent.setup();
+    render(
+      <DonatedTokensSection {...defaultProps} donatedTokensTab={1} onTabChange={onTabChange} />,
+    );
+
+    await user.click(screen.getByText('ERC721 Tokens'));
+
+    expect(onTabChange).toHaveBeenCalled();
+    const callArgs = onTabChange.mock.calls[0];
+    expect(callArgs[1]).toBe(0);
+  });
+
+  it('does not render pagination when no NFTs', () => {
+    render(<DonatedTokensSection {...defaultProps} donatedNFTs={[]} donatedTokensTab={0} />);
+    expect(screen.queryByTestId('pagination')).not.toBeInTheDocument();
+  });
+
+  it('does not render pagination in ERC20 tab', () => {
+    render(
+      <DonatedTokensSection {...defaultProps} donatedNFTs={[createNFT()]} donatedTokensTab={1} />,
+    );
+    expect(screen.queryByTestId('pagination')).not.toBeInTheDocument();
+  });
+
+  it('renders correct number of NFT cards for multiple NFTs', () => {
+    const nfts = Array.from({ length: 5 }, (_, i) =>
+      createNFT({ RecordId: i + 1, EvtLogId: i + 1 }),
+    );
+    render(<DonatedTokensSection {...defaultProps} donatedNFTs={nfts} donatedTokensTab={0} />);
+    expect(screen.getAllByTestId('nft')).toHaveLength(5);
   });
 });

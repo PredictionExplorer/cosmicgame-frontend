@@ -319,9 +319,9 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 183 unit test files (2,100 tests), 11 E2E specs
-- Actual coverage: Statements ~75.1%, Branches ~62.6%, Lines ~76.7%, Functions ~68.6%
-- Coverage threshold in jest.config.js: branches 62%, functions 68%, lines 76%, statements 74%
+- 185 unit test files (2,220 tests), 11 E2E specs
+- Actual coverage: Statements ~77.1%, Branches ~64.2%, Lines ~78.6%, Functions ~72.3%
+- Coverage threshold in jest.config.js: branches 63%, functions 71%, lines 78%, statements 76%
 - No accessibility testing (jest-axe not installed)
 
 6a. [DONE] Add app/ to coverage collection
@@ -641,14 +641,79 @@ Current state:
     Note: tokens.ts and raffle.ts were already tested (46 + 18 tests
     from task 3a). createEmotionCache.ts does not exist in utils/.
 
-6g. [OPEN] Improve existing test quality
-    Current component tests mostly check "renders empty state" and
-    "renders with data". Add:
-    - Click handler / user interaction tests
-    - Form submission tests
-    - Loading state transitions
-    - Error state rendering
-    - Edge cases and boundary conditions
+6g. [DONE] Improve existing test quality
+    Upgraded 16 shallow test files to comprehensive suites with user
+    interactions, form submissions, loading/error state transitions, and
+    edge cases. Added 99 new tests (2,121 -> 2,220 total). All pass.
+
+    Coverage improvement (before -> after):
+    - Statements: 75.14% -> 77.11%
+    - Branches:   62.58% -> 64.16%
+    - Functions:  68.56% -> 72.33%
+    - Lines:      76.68% -> 78.60%
+
+    Coverage thresholds bumped in jest.config.js:
+    - branches: 62 -> 63, functions: 68 -> 71, lines: 76 -> 78, statements: 74 -> 76
+
+    Tier 1 — Forms & Action Buttons (16 files, 38 tests):
+    - components/home/__tests__/BidForm.test.tsx (+13): radio clicks call
+      setBidType/setRwlkId, donation type switch, NFT/token input onChange,
+      bid price plus clamping at 50, computed price with 50% RandomWalk
+      discount, no collision prevention for CST, AuctionInfo endedMessage
+    - app/mint/__tests__/Mint.test.tsx (+8): mint button calls mint with
+      1.01x price, waitForTransactionReceipt, user rejection skips reportError,
+      error path calls reportError+alert, NFT links sorted descending with
+      correct href, no walletOfOwner when disconnected
+    - components/tables/__tests__/BanBidTable.test.tsx (+7): ban/unban API
+      calls with correct params, success/error notifications, banned row
+      shows Unban, get_banned_bids on mount
+    - components/staking/__tests__/UncollectedCSTStakingRewardsTable.test.tsx (+7):
+      own-account context rewards, Unstake button visibility, dialog
+      open/cancel/confirm flow, unstakeMany call, claimable reward display
+    - components/common/__tests__/VideoPlayerDialog.test.tsx (+3): close
+      button calls onClose, exact src attribute, DialogContent on null path
+
+    Tier 2 — Selection & Staking Tables (4 files, 23 tests):
+    - components/tokens/__tests__/RWLKNFTTable.test.tsx (+6): row click
+      toggles selection, Stake calls handleStake(id, true), Stake Many
+      with isRwlk flags, deselect hides Stake Many, list change resets
+    - components/tokens/__tests__/CSTokensTable.test.tsx (+8): row click
+      toggle, Stake calls handleStake(id, false), Stake Many with isRwlk
+      flags, single stake sets selectedTokenIds, list change reset,
+      Token ID links to /detail, Round links to /prize
+    - components/staking/__tests__/StakedTokensTable.test.tsx (+6): row click
+      toggle, Unstake Many visible, handleUnstakeMany with IDs, single
+      Unstake hides Unstake Many, list change reset, isRwlk=false for CST
+    - components/tables/__tests__/EnduranceChampionsTable.test.tsx (+3):
+      pagination changes visible rows, AddressLink href, sort reset on
+      column switch
+
+    Tier 3 — Search & Pagination (4 files, 24 tests):
+    - components/nft/__tests__/PaginationGrid.test.tsx (+7): search input
+      update, numeric search filters by TokenId, name search calls API,
+      Enter key triggers search, router.push on search, clearing restores
+      collection, link to /detail/sample
+    - components/nft/__tests__/PaginationRWLKGrid.test.tsx (+7): card click
+      calls setSelectedToken, deselect sends -1, no-op without setter,
+      search filters items, search resets page, pagination updates items,
+      clearing restores all
+    - components/home/__tests__/DonatedTokensSection.test.tsx (+5): tab
+      click calls onTabChange(0/1), no pagination when empty, no pagination
+      in ERC20 tab, correct NFT count
+    - components/__tests__/ConnectWalletButton.test.tsx (+5): dropdown
+      trigger, balance after open, Loading in dropdown, staked counts,
+      nav links with correct hrefs
+
+    Tier 4 — Edge Cases & State Transitions (3 files, 14 tests):
+    - app/__tests__/HomePage.test.tsx (+6): no BidForm when account null,
+      SpecialPrizeWinners when TsRoundStart nonzero, bid button present,
+      claim button present, previous round link with correct number, loading
+      hides BidForm
+    - components/common/__tests__/FAQ.test.tsx (+4): unknown hash no expand,
+      all items start collapsed, detail content rendered, scrollTo on hash
+    - components/home/__tests__/WinningHistorySection.test.tsx (+4): empty
+      array renders table, lightbox with empty/set seed, no loading for
+      array claimHistory
 
 6h. [OPEN] Add accessibility testing
     Install jest-axe:

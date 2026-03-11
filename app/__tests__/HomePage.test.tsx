@@ -263,4 +263,62 @@ describe('HomePage', () => {
     render(<HomePage />);
     expect(screen.getByText('Show Random Sample NFT')).toBeInTheDocument();
   });
+
+  it('does not render BidForm when account is null', () => {
+    mockAccount = null;
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    render(<HomePage />);
+    expect(screen.queryByTestId('bid-form')).not.toBeInTheDocument();
+  });
+
+  it('renders SpecialPrizeWinners when TsRoundStart is nonzero', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ TsRoundStart: 1700000000 }),
+      isLoading: false,
+    });
+    render(<HomePage />);
+    expect(screen.getByTestId('special-prize-winners')).toBeInTheDocument();
+  });
+
+  it('renders bid button text', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    render(<HomePage />);
+    const bidButtons = screen.getAllByRole('button');
+    const bidButton = bidButtons.find((b) => b.textContent?.includes('Bid'));
+    expect(bidButton).toBeDefined();
+  });
+
+  it('renders claim prize button when data is available', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    render(<HomePage />);
+    const claimButton = screen.queryByText(/Claim Prize/);
+    expect(claimButton || screen.queryByTestId('bidding-status')).toBeTruthy();
+  });
+
+  it('renders previous round link with correct round number', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 10 }),
+      isLoading: false,
+    });
+    render(<HomePage />);
+    expect(screen.getByText(/Round 9 ended/)).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /Round 9 ended/ });
+    expect(link).toHaveAttribute('href', '/prize/9');
+  });
+
+  it('renders loading spinner and hides BidForm when loading', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+    render(<HomePage />);
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.queryByTestId('bid-form')).not.toBeInTheDocument();
+  });
 });

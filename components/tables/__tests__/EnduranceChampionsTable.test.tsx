@@ -97,4 +97,54 @@ describe('EnduranceChampionsTable', () => {
     render(<EnduranceChampionsTable championList={list} />);
     expect(screen.getByRole('navigation')).toBeInTheDocument();
   });
+
+  it('pagination click changes visible rows', () => {
+    const list = Array.from({ length: 8 }, (_, i) =>
+      createChampion({
+        bidder: `0x${String(i).padStart(40, '0')}`,
+        championTime: (i + 1) * 1000,
+      }),
+    );
+    render(<EnduranceChampionsTable championList={list} />);
+
+    const rowsBefore = screen.getAllByRole('row').filter((r) => r.querySelector('td'));
+    expect(rowsBefore.length).toBe(5);
+
+    const page2Link = screen.getByText('2');
+    fireEvent.click(page2Link);
+
+    const rowsAfter = screen.getAllByRole('row').filter((r) => r.querySelector('td'));
+    expect(rowsAfter.length).toBe(3);
+  });
+
+  it('renders AddressLink with correct href', () => {
+    const addr = '0x1234567890abcdef1234567890abcdef12345678';
+    render(<EnduranceChampionsTable championList={[createChampion({ bidder: addr })]} />);
+    const links = screen.getAllByRole('link');
+    const userLink = links.find((l) => l.getAttribute('href') === `/user/${addr}`);
+    expect(userLink).toBeInTheDocument();
+  });
+
+  it('sort resets to desc when switching columns', () => {
+    const list = [
+      createChampion({ bidder: '0x' + '1'.repeat(40), championTime: 100, chronoWarrior: 50 }),
+      createChampion({ bidder: '0x' + '2'.repeat(40), championTime: 200, chronoWarrior: 300 }),
+    ];
+    render(<EnduranceChampionsTable championList={list} />);
+
+    const championBtn =
+      screen.getAllByText('Champion Time').find((el) => el.tagName === 'BUTTON') ??
+      screen.getByText('Champion Time');
+    fireEvent.click(championBtn);
+
+    const chronoBtn =
+      screen.getAllByText('Chrono Warrior').find((el) => el.tagName === 'BUTTON') ??
+      screen.getByText('Chrono Warrior');
+    fireEvent.click(chronoBtn);
+
+    const rows = screen.getAllByRole('row');
+    const dataRows = rows.filter((r) => r.querySelector('td'));
+    const firstRowText = dataRows[0]?.textContent ?? '';
+    expect(firstRowText).toContain(formatSeconds(300));
+  });
 });

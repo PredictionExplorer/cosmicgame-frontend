@@ -33,7 +33,6 @@ jest.mock(
     },
 );
 
- 
 import { WinningHistorySection } from '../WinningHistorySection';
 
 const defaultProps = {
@@ -99,5 +98,39 @@ describe('WinningHistorySection', () => {
   it('does not render twitter popup when closed', () => {
     render(<WinningHistorySection {...defaultProps} twitterPopupOpen={false} />);
     expect(screen.queryByTestId('twitter-popup')).not.toBeInTheDocument();
+  });
+
+  it('renders empty table when claimHistory is empty array', () => {
+    render(<WinningHistorySection {...defaultProps} claimHistory={[]} />);
+    expect(screen.getByTestId('winning-table')).toHaveTextContent('0 entries');
+  });
+
+  it('shows lightbox with fallback image when bannerTokenSeed is empty', () => {
+    render(
+      <WinningHistorySection
+        {...defaultProps}
+        bannerTokenSeed=""
+        imageOpen={true}
+        claimHistory={[]}
+      />,
+    );
+    expect(screen.getByTestId('lightbox')).toBeInTheDocument();
+  });
+
+  it('shows lightbox when bannerTokenSeed is set', () => {
+    render(
+      <WinningHistorySection
+        {...defaultProps}
+        bannerTokenSeed="abc123"
+        imageOpen={true}
+        claimHistory={[]}
+      />,
+    );
+    expect(screen.getByTestId('lightbox')).toBeInTheDocument();
+  });
+
+  it('does not show loading when claimHistory is an array', () => {
+    render(<WinningHistorySection {...defaultProps} claimHistory={[]} />);
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
   });
 });
