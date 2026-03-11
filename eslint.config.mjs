@@ -1,5 +1,5 @@
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
-import prettierConfig from "eslint-config-prettier";
+import prettierConfig from "eslint-config-prettier/flat";
 
 const tsPlugin = nextCoreWebVitals.find(
   (c) => c.name === "next/typescript"
