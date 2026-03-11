@@ -308,7 +308,7 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 142 unit test files (1,622 tests), 11 E2E specs
+- 143 unit test files (1,642 tests), 11 E2E specs
 - Actual coverage: Statements ~56%, Branches ~47%, Lines ~57%, Functions ~50%
 - Coverage threshold in jest.config.js: branches 45%, functions 47%, lines 54%, statements 53%
 - No accessibility testing (jest-axe not installed)
@@ -486,18 +486,32 @@ Current state:
 
 
 ================================================================================
-7. GIT HOOKS / CI — Currently 9/10
+7. GIT HOOKS / CI — Currently 9.5/10
 ================================================================================
 
 7a. [DONE] Fix coverage threshold so CI passes
     Resolved via 6b. Coverage threshold lowered to per-metric values that
     match achieved coverage. CI now passes with yarn test --coverage.
 
-7b. [OPEN] Add tsc --noEmit to pre-push hook
-    Currently only in pre-commit (via lint-staged). Adding to pre-push
-    catches type errors across the full project:
-    .husky/pre-push:
-      npx tsc --noEmit && yarn test
+7b. [DONE] Add tsc --noEmit to pre-push hook
+    Added full-project type-checking to pre-push hook so type errors
+    across file boundaries are caught before pushing to remote.
+
+    Changes:
+    - package.json: added "type-check": "tsc --noEmit" script
+    - .husky/pre-push: changed from `yarn test` to
+      `yarn type-check && yarn test` (fail-fast with &&)
+
+    Tests added (20 new tests, 1,642 total across 143 suites):
+    - __tests__/git-hooks.test.ts:
+      - Hook file structure: all 3 hooks exist (3 tests)
+      - pre-push: runs type-check, runs tests, fail-fast order,
+        not bare yarn test, single-line script (5 tests)
+      - pre-commit: runs lint-staged, uses npx, single-line (3 tests)
+      - commit-msg: runs commitlint, --edit $1 flag, single-line (3 tests)
+      - package.json scripts: has type-check, invokes tsc --noEmit,
+        test invokes jest (3 tests)
+      - lint-staged config: tsc --noEmit, prettier, eslint (3 tests)
 
 
 ================================================================================

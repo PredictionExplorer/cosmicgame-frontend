@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "type-check": "tsc --noEmit",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
