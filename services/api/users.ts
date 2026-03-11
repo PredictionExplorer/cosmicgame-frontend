@@ -1,8 +1,8 @@
-import { axios, isAxiosError, getAPIUrl, flattenTxArray } from './client';
+import { axios, getAPIUrl, apiCall, flattenTxArray } from './client';
 import type { UserInfoWithLists, UserBalance } from './types';
 
-export async function get_user_info(address: string): Promise<UserInfoWithLists | null> {
-  try {
+export function get_user_info(address: string): Promise<UserInfoWithLists | null> {
+  return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`user/info/${address}`));
 
     if (data) {
@@ -25,106 +25,61 @@ export async function get_user_info(address: string): Promise<UserInfoWithLists 
     }
 
     return data;
-  } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) {
-      return null;
-    }
-    throw new Error('Network response was not OK');
-  }
+  }, null);
 }
 
-export async function get_user_balance(address: string): Promise<UserBalance | null> {
-  try {
+export function get_user_balance(address: string): Promise<UserBalance | null> {
+  return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`user/balances/${address}`));
     return data;
-  } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) {
-      return null;
-    }
-    throw new Error('Network response was not OK');
-  }
+  }, null);
 }
 
-export async function notify_red_box(address: string) {
-  try {
+export function notify_red_box(address: string) {
+  return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`user/notif_red_box/${address}`));
     return data.Winnings;
-  } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) {
-      return null;
-    }
-    throw new Error('Network response was not OK');
-  }
+  }, null);
 }
 
-export async function get_unique_bidders() {
-  try {
+export function get_unique_bidders() {
+  return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/bidders'));
     return data.UniqueBidders;
-  } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) {
-      return [];
-    }
-    throw new Error('Network response was not OK');
-  }
+  }, []);
 }
 
-export async function get_unique_winners() {
-  try {
+export function get_unique_winners() {
+  return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/winners'));
     return data.UniqueWinners;
-  } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) {
-      return [];
-    }
-    throw new Error('Network response was not OK');
-  }
+  }, []);
 }
 
-export async function get_unique_donors() {
-  try {
+export function get_unique_donors() {
+  return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/donors'));
     return data.UniqueDonors;
-  } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) {
-      return [];
-    }
-    throw new Error('Network response was not OK');
-  }
+  }, []);
 }
 
-export async function get_unique_cst_stakers() {
-  try {
+export function get_unique_cst_stakers() {
+  return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/cst'));
     return data.UniqueStakersCST;
-  } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) {
-      return [];
-    }
-    throw new Error('Network response was not OK');
-  }
+  }, []);
 }
 
-export async function get_unique_rwalk_stakers() {
-  try {
+export function get_unique_rwalk_stakers() {
+  return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/rwalk'));
     return data.UniqueStakersRWalk;
-  } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) {
-      return [];
-    }
-    throw new Error('Network response was not OK');
-  }
+  }, []);
 }
 
-export async function get_unique_both_stakers() {
-  try {
+export function get_unique_both_stakers() {
+  return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/both'));
     return data.UniqueStakersBoth;
-  } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) {
-      return [];
-    }
-    throw new Error('Network response was not OK');
-  }
+  }, []);
 }

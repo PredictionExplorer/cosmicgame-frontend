@@ -122,3 +122,22 @@ export const normalizeFieldNamesArray = (items: unknown) => {
   if (!Array.isArray(items)) return items;
   return items.map((item) => normalizeFieldNames(item));
 };
+
+/** Wraps an API call with standard 400-fallback error handling. */
+export async function apiCall<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await fn();
+  } catch (err: unknown) {
+    if (isAxiosError(err) && err.response?.status === 400) return fallback;
+    throw new Error('Network response was not OK');
+  }
+}
+
+/** Wraps a POST/write API call that should throw on any error. */
+export async function apiPost<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch {
+    throw new Error('Network response was not OK');
+  }
+}

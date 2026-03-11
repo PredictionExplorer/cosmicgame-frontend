@@ -1,9 +1,153 @@
+import { AxiosError } from 'axios';
+
 import {
   flattenTx,
   flattenTxArray,
   normalizeFieldNames,
   normalizeFieldNamesArray,
+  apiCall,
+  apiPost,
 } from '@/services/api/client';
+
+const makeAxios400 = (): AxiosError => {
+  const err = new AxiosError('Bad Request', 'ERR_BAD_REQUEST', undefined, undefined, {
+    status: 400,
+    statusText: 'Bad Request',
+    headers: {},
+    config: {} as never,
+    data: {},
+  });
+  return err;
+};
+
+const makeAxios500 = (): AxiosError => {
+  const err = new AxiosError('Server Error', 'ERR_BAD_RESPONSE', undefined, undefined, {
+    status: 500,
+    statusText: 'Internal Server Error',
+    headers: {},
+    config: {} as never,
+    data: {},
+  });
+  return err;
+};
+
+const makeAxiosNoResponse = (): AxiosError => {
+  return new AxiosError('Network Error', 'ERR_NETWORK');
+};
+
+describe('apiCall', () => {
+  it('returns fn() result on success', async () => {
+    const result = await apiCall(async () => [1, 2, 3], []);
+    expect(result).toEqual([1, 2, 3]);
+  });
+
+  it('returns [] fallback on Axios 400', async () => {
+    const result = await apiCall(async () => {
+      throw makeAxios400();
+    }, [] as number[]);
+    expect(result).toEqual([]);
+  });
+
+  it('returns null fallback on Axios 400', async () => {
+    const result = await apiCall(async (): Promise<string | null> => {
+      throw makeAxios400();
+    }, null);
+    expect(result).toBeNull();
+  });
+
+  it('returns 0 fallback on Axios 400', async () => {
+    const result = await apiCall(async () => {
+      throw makeAxios400();
+    }, 0);
+    expect(result).toBe(0);
+  });
+
+  it('throws for non-Axios errors', async () => {
+    await expect(
+      apiCall(async () => {
+        throw new Error('random failure');
+      }, []),
+    ).rejects.toThrow('Network response was not OK');
+  });
+
+  it('throws for Axios 500 errors', async () => {
+    await expect(
+      apiCall(async () => {
+        throw makeAxios500();
+      }, []),
+    ).rejects.toThrow('Network response was not OK');
+  });
+
+  it('throws for Axios errors with no response', async () => {
+    await expect(
+      apiCall(async () => {
+        throw makeAxiosNoResponse();
+      }, []),
+    ).rejects.toThrow('Network response was not OK');
+  });
+
+  it('throws for non-400 Axios status codes', async () => {
+    const err = new AxiosError('Not Found', 'ERR_BAD_REQUEST', undefined, undefined, {
+      status: 404,
+      statusText: 'Not Found',
+      headers: {},
+      config: {} as never,
+      data: {},
+    });
+    await expect(
+      apiCall(async () => {
+        throw err;
+      }, []),
+    ).rejects.toThrow('Network response was not OK');
+  });
+
+  it('preserves the shape of the returned data', async () => {
+    const result = await apiCall(async () => ({ id: 1, name: 'test' }), null);
+    expect(result).toEqual({ id: 1, name: 'test' });
+  });
+
+  it('does not swallow non-Error throwables', async () => {
+    await expect(
+      apiCall(async () => {
+        throw 'string error';
+      }, []),
+    ).rejects.toThrow('Network response was not OK');
+  });
+});
+
+describe('apiPost', () => {
+  it('returns fn() result on success', async () => {
+    const result = await apiPost(async () => ({ task_id: 42 }));
+    expect(result).toEqual({ task_id: 42 });
+  });
+
+  it('throws on Axios 400 (does not fallback)', async () => {
+    await expect(
+      apiPost(async () => {
+        throw makeAxios400();
+      }),
+    ).rejects.toThrow('Network response was not OK');
+  });
+
+  it('throws on network error', async () => {
+    await expect(
+      apiPost(async () => {
+        throw new Error('Network Error');
+      }),
+    ).rejects.toThrow('Network response was not OK');
+  });
+
+  it('throws with exact error message', async () => {
+    try {
+      await apiPost(async () => {
+        throw new Error('something');
+      });
+      fail('should have thrown');
+    } catch (err) {
+      expect((err as Error).message).toBe('Network response was not OK');
+    }
+  });
+});
 
 describe('client helper functions', () => {
   describe('flattenTx', () => {

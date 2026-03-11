@@ -119,30 +119,24 @@ All items complete. No remaining issues.
 3. CODE DUPLICATION — Currently 8/10
 ================================================================================
 
-3a. [OPEN] Extract shared API error handler in services/api/
-    Every API function in services/api/*.ts repeats this pattern (~90 times
-    across donations.ts, staking.ts, rounds.ts, tokens.ts, users.ts,
-    raffle.ts, system.ts, marketing.ts):
+3a. [DONE] Extract shared API error handler in services/api/
+    Added apiCall<T>(fn, fallback) and apiPost<T>(fn) helpers to
+    services/api/client.ts. Refactored all 8 API service files:
+    - 94 standard try/catch blocks replaced with apiCall (fallbacks: [] x72, null x20, 0 x3)
+    - 3 bare-catch POST functions replaced with apiPost (ban_bid, unban_bid, create)
+    - isAxiosError import removed from all 8 service files (now internal to client.ts)
 
-      try { ... } catch (err) {
-        if (isAxiosError(err) && err.response?.status === 400) return [];
-        throw new Error('Network response was not OK');
-      }
+    Files refactored (97 try/catch blocks eliminated):
+    - donations.ts (22 functions), staking.ts (23), rounds.ts (16),
+      tokens.ts (16), users.ts (9), raffle.ts (6), system.ts (3),
+      marketing.ts (2)
 
-    Extract into services/api/client.ts:
-      export async function apiCall<T>(
-        fn: () => Promise<T>,
-        fallback: T,
-      ): Promise<T> {
-        try {
-          return await fn();
-        } catch (err: unknown) {
-          if (isAxiosError(err) && err.response?.status === 400) return fallback;
-          throw new Error('Network response was not OK');
-        }
-      }
-
-    This eliminates ~90 duplicated try/catch blocks.
+    Tests added (78 new tests, 1113 total across 80 suites):
+    - services/api/__tests__/client.test.ts — 14 tests for apiCall/apiPost
+      (success, 400 fallback with [], null, 0, Axios 500/404/no-response,
+      non-Axios errors, non-Error throwables, shape preservation)
+    - services/api/__tests__/tokens.test.ts — 46 tests for all 16 functions
+    - services/api/__tests__/raffle.test.ts — 18 tests for all 6 functions
 
 
 ================================================================================
