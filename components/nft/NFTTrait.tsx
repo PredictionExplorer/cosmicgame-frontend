@@ -61,6 +61,7 @@ interface NFTTraitProps {
   tokenId: number;
 }
 
+/** Full detail page for a Cosmic Signature NFT, showing metadata, image/video, naming, transfer, and ownership history. */
 const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openVideo, setOpenVideo] = useState(false);

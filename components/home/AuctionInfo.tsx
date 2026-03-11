@@ -6,6 +6,7 @@ interface AuctionInfoProps {
   endedMessage?: string;
 }
 
+/** Displays elapsed auction time and duration, or an ended message when the auction exceeds its duration. */
 export function AuctionInfo({
   secondsElapsed,
   auctionDuration,

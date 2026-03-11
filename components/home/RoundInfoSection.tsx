@@ -26,6 +26,7 @@ interface RoundInfoSectionProps {
   perPage: number;
 }
 
+/** Displays full round details: prize info, bid history, endurance champions, ETH donations, donated tokens, and charts. */
 export function RoundInfoSection({
   data,
   curBidList,

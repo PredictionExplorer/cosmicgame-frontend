@@ -16,6 +16,7 @@ interface DonatedTokensSectionProps {
   perPage: number;
 }
 
+/** Tabbed display of donated NFTs (grid) and ERC-20 tokens (table) for the current round, with pagination. */
 export function DonatedTokensSection({
   donatedNFTs,
   donatedERC20Tokens,

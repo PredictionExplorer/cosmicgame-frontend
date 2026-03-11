@@ -319,7 +319,7 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 188 unit test files (2,699 tests), 11 E2E specs
+- 189 unit test files (2,729 tests), 11 E2E specs
 - Actual coverage: Statements ~77.1%, Branches ~65.0%, Lines ~78.6%, Functions ~72.3%
 - Coverage threshold in jest.config.js: branches 63%, functions 71%, lines 78%, statements 76%
 - Accessibility testing: jest-axe installed, 134 a11y tests across all component files
@@ -904,12 +904,32 @@ Current state:
     All 2,699 tests pass. tsc --noEmit passes with zero type errors.
     Coverage thresholds pass.
 
-9c. [OPEN] Add JSDoc to exported components
-    Focus on components that accept non-obvious props:
-    - All components in components/home/
-    - components/common/VideoPlayerDialog.tsx
-    - components/UserStatisticsView.tsx
-    - components/nft/NFTTrait.tsx
+9c. [DONE] Add JSDoc to exported components
+    Added JSDoc to all 10 exported symbols across 9 component files.
+    Every export now has a concise 1-line JSDoc comment.
+
+    components/home/ (6 files, 7 exports — all named exports):
+    - AuctionInfo.tsx: AuctionInfo
+    - BidForm.tsx: BidForm
+    - CustomTabPanel.tsx: TabPanelProps, CustomTabPanel
+    - DonatedTokensSection.tsx: DonatedTokensSection
+    - RoundInfoSection.tsx: RoundInfoSection
+    - WinningHistorySection.tsx: WinningHistorySection
+
+    Other (3 files, 3 exports — default exports):
+    - components/common/VideoPlayerDialog.tsx: VideoPlayerDialog
+    - components/UserStatisticsView.tsx: UserStatisticsView
+    - components/nft/NFTTrait.tsx: NFTTrait
+
+    Tests added (30 new tests, 2,729 total across 189 suites):
+    - components/__tests__/jsdoc.test.ts:
+      - Every exported component/interface has JSDoc (10 tests)
+      - Per-file export counts match expectations (9 tests)
+      - Total exported symbols is 10 (1 test)
+      - JSDoc body is non-empty for every export (10 tests)
+
+    All 2,729 tests pass. tsc --noEmit passes with zero type errors.
+    Coverage thresholds pass.
 
 9d. [OPEN] Fix typo in app/faq/page.tsx line 9
     "Frequenly" should be "Frequently"

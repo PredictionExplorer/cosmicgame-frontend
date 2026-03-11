@@ -303,6 +303,7 @@ function RWLKStakingTab({
    Main Component
 ------------------------------------------------------------------ */
 
+/** Comprehensive user profile view with bidding stats, winning history, staking actions, token holdings, and raffle claims. */
 const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) => {
   const { account } = useActiveWeb3React();
   const prizeWalletContract = useRaffleWalletContract();

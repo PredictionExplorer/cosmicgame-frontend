@@ -18,6 +18,7 @@ interface WinningHistorySectionProps {
   setTwitterHandle: (handle: string) => void;
 }
 
+/** Shows the winning history table with a lightbox for the latest NFT and Twitter sharing controls. */
 export function WinningHistorySection({
   claimHistory,
   imageOpen,

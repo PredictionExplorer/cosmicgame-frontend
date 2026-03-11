@@ -41,6 +41,7 @@ interface BidFormProps {
   ethBidInfo: EthBidInfo | null;
 }
 
+/** Form for placing ETH or CST bids with optional NFT/token donation fields and RandomWalk discount. */
 export function BidForm({
   data,
   bidType,

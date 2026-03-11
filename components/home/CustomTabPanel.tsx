@@ -1,9 +1,11 @@
+/** Props for the {@link CustomTabPanel} component. */
 export interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
   value: number;
 }
 
+/** Accessible tab panel that renders children only when its index matches the active tab value. */
 export function CustomTabPanel({ children, value, index, ...other }: TabPanelProps) {
   return (
     <div
