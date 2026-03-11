@@ -67,6 +67,10 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-inter), Inter, sans-serif;
@@ -119,23 +123,35 @@
 @media screen and (max-width: 40em) {
   .responsiveTable tbody tr {
     border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 8px;
+    margin-bottom: 8px;
     padding: 0 !important;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
   }
   .responsiveTable td.pivoted {
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 110px !important;
     font-weight: 400;
-    font-size: 12px;
+    font-size: 13px;
     width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   }
   .responsiveTable td .tdBefore {
     top: 0;
     left: 0 !important;
     bottom: 0;
-    background-color: #15bffd;
-    color: #000;
-    font-weight: 400 !important;
-    padding: 8px;
+    width: 100px !important;
+    background-color: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500 !important;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 8px;
+    display: flex;
+    align-items: center;
   }
 }
 

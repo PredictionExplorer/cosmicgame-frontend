@@ -17,6 +17,7 @@ import {
   useStakingCSTRewardsByRound,
   useDonationsERC20ByRound,
 } from '@/hooks/useApiQuery';
+import { Spinner } from '@/components/ui/spinner';
 import RaffleWinnerTable from '@/components/tables/RaffleWinnerTable';
 import BiddingHistoryTable from '@/components/tables/BiddingHistoryTable';
 import StakingWinnerTable from '@/components/tables/StakingWinnerTable';
@@ -243,7 +244,9 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
   if (loading) {
     return (
       <MainWrapper>
-        <h6 className="text-lg font-semibold">Loading...</h6>
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
       </MainWrapper>
     );
   }

@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
 import { formatEther, zeroAddress } from 'viem';
 import Countdown from 'react-countdown';
+import { Timer, Trophy, Coins, User, MessageSquare } from 'lucide-react';
 
-import { calculateTimeDiff, convertTimestampToDateTime } from '@/utils';
+import { calculateTimeDiff, convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import { GradientText } from '@/components/styled';
+import { StatCard } from '@/components/ui/stat-card';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, BidInfo } from '@/services/api';
 import { useCurrentTime, useUserInfo, useCTPrice } from '@/hooks/useApiQuery';
@@ -95,147 +96,166 @@ export const BiddingStatus = ({
   return (
     <>
       {!loading && (
-        <>
+        <div className="space-y-6">
           {activationTime > Date.now() / 1000 && data ? (
-            <div className="mb-8">
-              <p className="text-center text-base font-normal">
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 text-center">
+              <p className="text-sm text-muted-foreground">
                 Round {data.CurRoundNum} becomes active at{' '}
                 {convertTimestampToDateTime(activationTime, true)}
               </p>
               <Countdown key={3} date={activationTime * 1000} renderer={Counter} />
             </div>
           ) : data && data.TsRoundStart !== 0 ? (
-            <div className="mb-8 grid grid-cols-12 items-center gap-4">
-              <div className="col-span-12 sm:col-span-4">
-                <h5 className="text-xl font-semibold">Round #{data.CurRoundNum}</h5>
-              </div>
-              <div className="col-span-12 w-full sm:col-span-8">
-                {data &&
-                  data.LastBidderAddr !== zeroAddress &&
-                  (prizeTime > Date.now() ? (
-                    <>
-                      <p className="text-center text-base font-normal">Finishes In</p>
-                      <Countdown key={0} date={prizeTime} renderer={Counter} />
-                    </>
-                  ) : (
-                    <>
-                      <h5 className="text-xl font-semibold text-primary">Bids exhausted!</h5>
-                      <p className="text-sm text-primary">
-                        Waiting for the winner to claim the prize.
-                      </p>
-                    </>
-                  ))}
-                {roundStarted !== '' && (
-                  <p className="mt-2">(Round was started {roundStarted} ago.)</p>
-                )}
-                <a href="/changed-parameters" className="text-inherit">
-                  Changed Parameters
+            <>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                    <Timer className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="font-display text-2xl font-bold">Round #{data.CurRoundNum}</h2>
+                    {roundStarted !== '' && (
+                      <p className="text-xs text-muted-foreground">Started {roundStarted} ago</p>
+                    )}
+                  </div>
+                </div>
+                <a
+                  href="/changed-parameters"
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Parameters
                 </a>
               </div>
-            </div>
+
+              {data.LastBidderAddr !== zeroAddress &&
+                (prizeTime > Date.now() ? (
+                  <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-5 text-center">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
+                      Prize Claim In
+                    </p>
+                    <Countdown key={0} date={prizeTime} renderer={Counter} />
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-primary/30 bg-primary/[0.06] p-5 text-center">
+                    <h5 className="text-xl font-bold text-primary">Bids Exhausted!</h5>
+                    <p className="mt-1 text-sm text-primary/80">
+                      Waiting for the winner to claim the prize.
+                    </p>
+                  </div>
+                ))}
+            </>
           ) : (
-            <>
+            <div className="rounded-xl border border-primary/20 bg-primary/[0.04] p-6 text-center">
               {data && data.CurRoundNum > 0 ? (
-                <h4 className="mb-4 text-2xl font-semibold">Round {data.CurRoundNum} started</h4>
+                <h4 className="font-display text-2xl font-bold">Round {data.CurRoundNum}</h4>
               ) : (
-                <p className="text-base">Start the game with your first bid!</p>
+                <h4 className="font-display text-2xl font-bold">Start the Game</h4>
               )}
-              <p className="mb-4 mt-4 text-base">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Dutch auction for the first bid in ETH has started. Make your bid.
               </p>
-            </>
-          )}
-          {data && data.LastBidderAddr !== zeroAddress && (
-            <div className="mb-4 grid grid-cols-12 items-center gap-4">
-              <div className="col-span-12 sm:col-span-3 md:col-span-4">
-                <p className="text-base">Bid Price</p>
-              </div>
-              <div className="col-span-8 sm:col-span-5 md:col-span-8">
-                <div className="mb-2 flex justify-between">
-                  <p>Using Ether</p>
-                  <p>{(ethBidInfo?.ETHPrice ?? 0).toFixed(5)} ETH</p>
-                </div>
-                <div className="mb-2 flex justify-between">
-                  <p>Using RandomWalk</p>
-                  <p>{((ethBidInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH</p>
-                </div>
-                <div className="mb-2 flex justify-between">
-                  <p>Using CST</p>
-                  {cstBidData?.CSTPrice > 0 ? (
-                    <p>{cstBidData?.CSTPrice.toFixed(5)} CST</p>
-                  ) : (
-                    <p className="text-[#ff0]">FREE</p>
-                  )}
-                </div>
-              </div>
             </div>
           )}
+
           {activationTime < Date.now() / 1000 && (
             <>
-              <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                <div className="col-span-12 sm:col-span-4">
-                  <p className="text-base">Main Prize Reward</p>
-                </div>
-                <div className="col-span-12 sm:col-span-8">
-                  <GradientText className="inline text-lg font-medium">
-                    {(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH
-                  </GradientText>
-                </div>
-              </div>
-              <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                <div className="col-span-12 sm:col-span-4">
-                  <p className="text-base">Last Bidder Address</p>
-                </div>
-                <div className="col-span-12 sm:col-span-8">
-                  <p>
-                    {data && data.LastBidderAddr === zeroAddress ? (
-                      'There is no bidder yet.'
-                    ) : (
-                      <>
-                        <a
-                          href={`/user/${data!.LastBidderAddr}`}
-                          className="break-all text-white [font-size:inherit]"
-                        >
-                          {data!.LastBidderAddr}
-                        </a>{' '}
-                        {lastBidderElapsed !== '' && <>({lastBidderElapsed} Elapsed)</>}
-                      </>
-                    )}
-                  </p>
-                </div>
-              </div>
-              {!!(curBidList.length && curBidList[0]?.Message !== '') && (
-                <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                  <div className="col-span-12 sm:col-span-4">
-                    <p className="text-base">Last Bidder Message</p>
-                  </div>
-                  <div className="col-span-12 sm:col-span-8">
-                    <p className="break-words text-[#ff0]">{curBidList[0]?.Message}</p>
-                  </div>
+              <StatCard
+                label="Main Prize"
+                value={`${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`}
+                icon={<Trophy className="h-5 w-5" />}
+                gradient
+                tooltip="The amount you win if you're the last bidder when time runs out"
+              />
+
+              {data && data.LastBidderAddr !== zeroAddress && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <StatCard
+                    label="ETH Bid"
+                    value={`${(ethBidInfo?.ETHPrice ?? 0).toFixed(5)} ETH`}
+                    icon={<Coins className="h-4 w-4" />}
+                  />
+                  <StatCard
+                    label="RandomWalk Bid"
+                    value={`${((ethBidInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH`}
+                    tooltip="50% discount when using a RandomWalk NFT"
+                  />
+                  <StatCard
+                    label="CST Bid"
+                    value={
+                      cstBidData?.CSTPrice > 0 ? `${cstBidData.CSTPrice.toFixed(4)} CST` : 'FREE'
+                    }
+                  />
                 </div>
               )}
+
+              {data && data.LastBidderAddr !== zeroAddress && (
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10">
+                      <User className="h-4 w-4 text-accent" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                        Last Bidder
+                      </p>
+                      <a
+                        href={`/user/${data.LastBidderAddr}`}
+                        className="text-sm font-mono text-white hover:text-primary transition-colors truncate block"
+                      >
+                        {shortenHex(data.LastBidderAddr, 8)}
+                      </a>
+                    </div>
+                    {lastBidderElapsed !== '' && (
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {lastBidderElapsed} ago
+                      </span>
+                    )}
+                  </div>
+                  {!!(curBidList.length && curBidList[0]?.Message !== '') && (
+                    <div className="mt-3 flex items-start gap-2 rounded-lg bg-white/[0.03] p-3">
+                      <MessageSquare className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/50 shrink-0" />
+                      <p className="break-words text-sm text-amber-300/90">
+                        {curBidList[0]?.Message}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {curBidList.length > 0 && winProbability && data && (
-                <>
-                  <p className="mt-8">
-                    {data.LastBidderAddr === account
-                      ? `You have 100.00% chance of winning the main prize (${(
-                          data.PrizeAmountEth ?? 0
-                        ).toFixed(4)}ETH).`
-                      : "You're not the last bidder, so you can win the main prize in 24 hours if the last bidder doesn't take it."}
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 space-y-2">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Your Chances
                   </p>
-                  <p>
-                    You have {winProbability.raffle.toFixed(2)}% chance of winning the raffle{' '}
-                    {((data.RaffleAmountEth ?? 0) / (data.NumRaffleEthWinnersBidding ?? 1)).toFixed(
-                      4,
-                    )}{' '}
-                    ETH, and {winProbability.nft.toFixed(2)}% chance of winning a Cosmic Signature
-                    Token for now.
-                  </p>
-                </>
+                  {data.LastBidderAddr === account ? (
+                    <p className="text-sm text-emerald-400">
+                      You have 100% chance of winning the main prize (
+                      {(data.PrizeAmountEth ?? 0).toFixed(4)} ETH)
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      Not the last bidder &mdash; you can win if unclaimed after 24h.
+                    </p>
+                  )}
+                  <div className="flex gap-4 text-sm">
+                    <span>
+                      Raffle:{' '}
+                      <span className="font-medium text-primary">
+                        {winProbability.raffle.toFixed(2)}%
+                      </span>
+                    </span>
+                    <span>
+                      NFT:{' '}
+                      <span className="font-medium text-accent">
+                        {winProbability.nft.toFixed(2)}%
+                      </span>
+                    </span>
+                  </div>
+                </div>
               )}
             </>
           )}
-        </>
+        </div>
       )}
     </>
   );

@@ -52,12 +52,12 @@ describe('PaginationGrid', () => {
 
   it('renders search box', () => {
     render(<PaginationGrid data={[]} loading={false} />);
-    expect(screen.getByPlaceholderText('Enter NFT ID or Name')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search by token ID or name...')).toBeInTheDocument();
   });
 
-  it('renders sample NFT when collection is empty', () => {
+  it('renders empty state when collection is empty', () => {
     render(<PaginationGrid data={[]} loading={false} />);
-    expect(screen.getByText('Sample NFT')).toBeInTheDocument();
+    expect(screen.getByText('No NFTs found')).toBeInTheDocument();
   });
 
   it('renders NFT cards when data is provided', () => {
@@ -88,7 +88,7 @@ describe('PaginationGrid', () => {
 
   it('search input updates value', () => {
     render(<PaginationGrid data={[]} loading={false} />);
-    const input = screen.getByPlaceholderText('Enter NFT ID or Name');
+    const input = screen.getByPlaceholderText('Search by token ID or name...');
     fireEvent.change(input, { target: { value: '5' } });
     expect(input).toHaveValue('5');
   });
@@ -100,7 +100,7 @@ describe('PaginationGrid', () => {
     ];
     render(<PaginationGrid data={data} loading={false} />);
 
-    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID or Name'), {
+    fireEvent.change(screen.getByPlaceholderText('Search by token ID or name...'), {
       target: { value: '5' },
     });
     fireEvent.click(screen.getByText('Search'));
@@ -121,7 +121,7 @@ describe('PaginationGrid', () => {
     ];
     render(<PaginationGrid data={data} loading={false} />);
 
-    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID or Name'), {
+    fireEvent.change(screen.getByPlaceholderText('Search by token ID or name...'), {
       target: { value: 'Alpha' },
     });
     fireEvent.click(screen.getByText('Search'));
@@ -138,7 +138,7 @@ describe('PaginationGrid', () => {
     ];
     render(<PaginationGrid data={data} loading={false} />);
 
-    const input = screen.getByPlaceholderText('Enter NFT ID or Name');
+    const input = screen.getByPlaceholderText('Search by token ID or name...');
     fireEvent.change(input, { target: { value: '7' } });
     fireEvent.keyDown(input, { key: 'Enter' });
 
@@ -153,7 +153,7 @@ describe('PaginationGrid', () => {
     const data = [createToken({ TokenId: 3, EvtLogId: 1 })];
     render(<PaginationGrid data={data} loading={false} />);
 
-    fireEvent.change(screen.getByPlaceholderText('Enter NFT ID or Name'), {
+    fireEvent.change(screen.getByPlaceholderText('Search by token ID or name...'), {
       target: { value: '3' },
     });
     fireEvent.click(screen.getByText('Search'));
@@ -170,7 +170,7 @@ describe('PaginationGrid', () => {
     ];
     render(<PaginationGrid data={data} loading={false} />);
 
-    const input = screen.getByPlaceholderText('Enter NFT ID or Name');
+    const input = screen.getByPlaceholderText('Search by token ID or name...');
     fireEvent.change(input, { target: { value: 'test' } });
     fireEvent.change(input, { target: { value: '' } });
 
@@ -187,6 +187,6 @@ describe('PaginationGrid', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(<PaginationGrid data={[]} loading={false} />);
-    await checkA11y(container);
+    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

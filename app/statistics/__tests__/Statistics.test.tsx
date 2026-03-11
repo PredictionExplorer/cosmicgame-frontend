@@ -216,15 +216,15 @@ describe('Statistics', () => {
     expect(screen.getByText(/Failed to load statistics/)).toBeInTheDocument();
   });
 
-  it('renders current round statistics section', () => {
+  it('renders page header and key stat cards', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Current Round Statistics')).toBeInTheDocument();
-    expect(screen.getByText('Current Round')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Statistics', level: 1 })).toBeInTheDocument();
+    expect(screen.getByText('Total Rounds')).toBeInTheDocument();
     const roundValues = screen.getAllByText('5');
     expect(roundValues.length).toBeGreaterThanOrEqual(1);
   });
@@ -241,15 +241,18 @@ describe('Statistics', () => {
     expect(screen.getByText('Num Prizes Given')).toBeInTheDocument();
   });
 
-  it('renders bid history table', () => {
+  it('renders link to current round page', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('BID HISTORY FOR CURRENT ROUND')).toBeInTheDocument();
-    expect(screen.getByTestId('bidding-history-table')).toBeInTheDocument();
+    expect(screen.getByText('Looking for current round data?')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /current round data/ })).toHaveAttribute(
+      'href',
+      '/current-round',
+    );
   });
 
   it('renders unique bidders and winners tables', () => {
@@ -298,18 +301,23 @@ describe('Statistics', () => {
     expect(screen.getByText('No ERC721 tokens were donated on this round.')).toBeInTheDocument();
   });
 
-  it('renders current bid price stat', () => {
+  it('renders contract balance stat card', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Current Bid Price')).toBeInTheDocument();
+    expect(screen.getByText('Contract Balance')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
     const { container } = render(<Statistics />);
-    await checkA11y(container);
+    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

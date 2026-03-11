@@ -29,8 +29,8 @@ const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>
 const renderWithQuery = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
   render(ui, { wrapper: QueryWrapper, ...options });
 
-export async function checkA11y(container: HTMLElement) {
-  const results = await axe(container);
+export async function checkA11y(container: HTMLElement, axeOptions?: Parameters<typeof axe>[1]) {
+  const results = await axe(container, axeOptions);
   expect(results).toHaveNoViolations();
 }
 

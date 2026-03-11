@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 
 import PaginationGrid from '@/components/nft/PaginationGrid';
 import { MainWrapper } from '@/components/styled';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { useCSTList } from '@/hooks/useApiQuery';
 
 const GalleryPage = () => {
@@ -16,11 +17,10 @@ const GalleryPage = () => {
 
   return (
     <MainWrapper>
-      <div className="flex justify-center items-center flex-wrap">
-        <h2 className="text-2xl font-bold text-primary">CosmicSignature</h2>
-        &nbsp;
-        <h2 className="text-2xl font-bold">NFT Gallery</h2>
-      </div>
+      <PageHeader
+        title="NFT Gallery"
+        subtitle="Browse all Cosmic Signature NFTs minted across every round"
+      />
 
       <PaginationGrid data={collection} loading={isLoading} />
     </MainWrapper>

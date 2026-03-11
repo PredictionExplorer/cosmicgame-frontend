@@ -56,7 +56,7 @@ describe('BidForm', () => {
   it('renders bid type selector with ETH option', () => {
     render(<BidForm {...defaultProps} />);
     expect(screen.getByText('ETH')).toBeInTheDocument();
-    expect(screen.getByText('Make your bid with:')).toBeInTheDocument();
+    expect(screen.getByText('Bid Method')).toBeInTheDocument();
   });
 
   it('hides RandomWalk/CST when LastBidderAddr is zeroAddress', () => {
@@ -72,13 +72,13 @@ describe('BidForm', () => {
     );
     expect(screen.getByText('ETH')).toBeInTheDocument();
     expect(screen.queryByText('RandomWalk')).not.toBeInTheDocument();
-    expect(screen.queryByText('CST(Cosmic Token)')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cosmic Token')).not.toBeInTheDocument();
   });
 
   it('shows RandomWalk/CST when LastBidderAddr is not zero', () => {
     render(<BidForm {...defaultProps} />);
     expect(screen.getByText('RandomWalk')).toBeInTheDocument();
-    expect(screen.getByText('CST(Cosmic Token)')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Token')).toBeInTheDocument();
   });
 
   it('ETH selection renders correctly', () => {
@@ -89,7 +89,7 @@ describe('BidForm', () => {
 
   it('RandomWalk selection shows NFT gallery', () => {
     render(<BidForm {...defaultProps} bidType="RandomWalk" />);
-    expect(screen.getByText('Random Walk NFT Gallery')).toBeInTheDocument();
+    expect(screen.getByText('Your Random Walk NFTs')).toBeInTheDocument();
     expect(screen.getByTestId('rwlk-grid')).toHaveTextContent('3 NFTs');
   });
 
@@ -100,7 +100,7 @@ describe('BidForm', () => {
 
   it('Message textarea accepts input', () => {
     render(<BidForm {...defaultProps} />);
-    const textarea = screen.getByPlaceholderText('Message (280 characters, optional)');
+    const textarea = screen.getByPlaceholderText('Leave a message with your bid...');
     fireEvent.change(textarea, { target: { value: 'hello world' } });
     expect(defaultProps.setMessage).toHaveBeenCalledWith('hello world');
   });
@@ -110,26 +110,24 @@ describe('BidForm', () => {
     expect(screen.getByText('Advanced Options')).toBeInTheDocument();
 
     rerender(<BidForm {...defaultProps} advancedExpanded={true} />);
-    expect(
-      screen.getByText(/If you want to donate tokens or one of your NFTs/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Donate tokens or NFTs while bidding/)).toBeInTheDocument();
   });
 
   it('NFT donation form renders with advancedExpanded=true, donationType=NFT', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} donationType="NFT" />);
-    expect(screen.getByPlaceholderText('NFT contract address')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('NFT number')).toBeInTheDocument();
+    expect(screen.getByText('NFT Contract Address')).toBeInTheDocument();
+    expect(screen.getByText('Token ID')).toBeInTheDocument();
   });
 
   it('Token donation form renders with advancedExpanded=true, donationType=Token', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} donationType="Token" />);
-    expect(screen.getByPlaceholderText('Token Contract Address')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Token Amount')).toBeInTheDocument();
+    expect(screen.getByText('Contract Address')).toBeInTheDocument();
+    expect(screen.getByText('Amount')).toBeInTheDocument();
   });
 
   it('Bid price collision prevention section shows for non-CST bid types', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} bidType="ETH" />);
-    expect(screen.getByText('Bid price collision prevention')).toBeInTheDocument();
+    expect(screen.getByText('Collision Prevention')).toBeInTheDocument();
   });
 
   it('clicking RandomWalk radio calls setBidType and resets rwlkId', async () => {
@@ -146,7 +144,7 @@ describe('BidForm', () => {
     const user = userEvent.setup();
     render(<BidForm {...defaultProps} bidType="ETH" />);
 
-    await user.click(screen.getByText('CST(Cosmic Token)'));
+    await user.click(screen.getByText('Cosmic Token'));
 
     expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
     expect(defaultProps.setBidType).toHaveBeenCalledWith('CST');
@@ -156,7 +154,7 @@ describe('BidForm', () => {
     const user = userEvent.setup();
     render(<BidForm {...defaultProps} advancedExpanded={true} donationType="NFT" />);
 
-    await user.click(screen.getByText('Token'));
+    await user.click(screen.getByText('Donate Token'));
 
     expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
     expect(defaultProps.setDonationType).toHaveBeenCalledWith('Token');
@@ -164,42 +162,42 @@ describe('BidForm', () => {
 
   it('NFT donation address input calls setNftDonateAddress', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} donationType="NFT" />);
-    const input = screen.getByPlaceholderText('NFT contract address');
-    fireEvent.change(input, { target: { value: '0xNFTContract' } });
+    const inputs = screen.getAllByPlaceholderText('0x...');
+    fireEvent.change(inputs[0]!, { target: { value: '0xNFTContract' } });
     expect(defaultProps.setNftDonateAddress).toHaveBeenCalledWith('0xNFTContract');
   });
 
   it('NFT number input calls setNftId', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} donationType="NFT" />);
-    const input = screen.getByPlaceholderText('NFT number');
+    const input = screen.getByPlaceholderText('Token ID');
     fireEvent.change(input, { target: { value: '42' } });
     expect(defaultProps.setNftId).toHaveBeenCalledWith('42');
   });
 
   it('Token Contract Address input calls setTokenDonateAddress', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} donationType="Token" />);
-    const input = screen.getByPlaceholderText('Token Contract Address');
+    const input = screen.getByPlaceholderText('0x...');
     fireEvent.change(input, { target: { value: '0xTokenAddr' } });
     expect(defaultProps.setTokenDonateAddress).toHaveBeenCalledWith('0xTokenAddr');
   });
 
   it('Token Amount input calls setTokenAmount', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} donationType="Token" />);
-    const input = screen.getByPlaceholderText('Token Amount');
+    const input = screen.getByPlaceholderText('0.0');
     fireEvent.change(input, { target: { value: '100' } });
     expect(defaultProps.setTokenAmount).toHaveBeenCalledWith('100');
   });
 
   it('bid price plus input calls setBidPricePlus for values <= 50', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} bidType="ETH" />);
-    const input = screen.getByPlaceholderText('Bid Price Plus');
+    const input = screen.getByPlaceholderText('0');
     fireEvent.change(input, { target: { value: '10' } });
     expect(defaultProps.setBidPricePlus).toHaveBeenCalledWith(10);
   });
 
   it('bid price plus input rejects values > 50', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} bidType="ETH" />);
-    const input = screen.getByPlaceholderText('Bid Price Plus');
+    const input = screen.getByPlaceholderText('0');
     fireEvent.change(input, { target: { value: '51' } });
     expect(defaultProps.setBidPricePlus).not.toHaveBeenCalled();
   });
@@ -220,7 +218,7 @@ describe('BidForm', () => {
 
   it('hides bid price collision prevention for CST bid type', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} bidType="CST" />);
-    expect(screen.queryByText('Bid price collision prevention')).not.toBeInTheDocument();
+    expect(screen.queryByText('Collision Prevention')).not.toBeInTheDocument();
   });
 
   it('shows AuctionInfo with endedMessage for CST when auction ended', () => {

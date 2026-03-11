@@ -1,47 +1,49 @@
 'use client';
 
-import Image from 'next/image';
+import { MessageCircle } from 'lucide-react';
 
 import { MainWrapper } from '@/components/styled';
+import { PageHeader } from '@/components/layout/PageHeader';
 import FAQ from '@/components/common/FAQ';
 
 const FAQPage = () => {
   return (
     <MainWrapper>
-      <h2 className="text-2xl font-bold text-primary text-center mb-2">FAQ</h2>
+      <PageHeader
+        title="Frequently Asked Questions"
+        subtitle="Everything you need to know about Cosmic Signature"
+      />
 
-      <div className="mt-8">
+      <div className="space-y-12">
         <FAQ />
 
-        <div className="flex items-center rounded-2xl p-5 sm:px-[120px] sm:py-5 sm:[@supports(background:paint(rounded-shape))]:border-0 sm:[@supports(background:paint(rounded-shape))]:[-webkit-mask:paint(rounded-shape)] sm:[@supports(background:paint(rounded-shape))]:bg-[linear-gradient(90deg,rgba(21,191,253,0.7)_0%,rgba(156,55,253,0.7)_70%)] sm:[@supports(background:paint(rounded-shape))]:[--border:1px] sm:[@supports(background:paint(rounded-shape))]:[--radius:16px] sm:[@supports(background:paint(rounded-shape))]:[--t:0] sm:[@supports(background:paint(rounded-shape))]:[--path:0_0,32px_0,100%_0,100%_calc(100%-32px),100%_100%,120px_100%,0_calc(100%-70px)] bg-card border border-border rounded-2xl">
+        <div className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.06] to-accent/[0.04] p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+            <MessageCircle className="h-7 w-7 text-primary" />
+          </div>
           <div>
-            <h2 className="text-2xl font-bold">Have a question?</h2>
-            <div className="mb-4">
-              <Image src="/images/divider.svg" width={93} height={3} alt="divider" />
-            </div>
-            <p className="text-[19px]">
-              For any other questions, reach out to us on&nbsp;
+            <h2 className="text-xl font-bold">Still have a question?</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Reach out to us on{' '}
               <a
-                className="no-underline font-extrabold text-white"
+                className="no-underline font-semibold text-white hover:text-primary transition-colors"
                 href="https://x.com/RandomWalkNFT"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Twitter
-              </a>
-              &nbsp;or&nbsp;
+              </a>{' '}
+              or{' '}
               <a
-                className="no-underline font-extrabold text-white"
+                className="no-underline font-semibold text-white hover:text-primary transition-colors"
                 href="https://discord.gg/bGnPn96Qwt"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Discord
-              </a>
+              </a>{' '}
+              and we&apos;ll be happy to help.
             </p>
-          </div>
-          <div className="ml-[60px]">
-            <Image src="/images/question2.png" width={215} height={269} alt="questions" />
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
 import {
   CharityDepositTable,
@@ -12,9 +13,10 @@ const CharityCGDeposits = () => {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-8">
-        Cosmic Game Charity Deposits
-      </h4>
+      <PageHeader
+        title="Charity Deposits"
+        subtitle="Deposits made to charity from the Cosmic Game"
+      />
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (

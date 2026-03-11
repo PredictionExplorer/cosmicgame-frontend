@@ -64,7 +64,7 @@ describe('AdminPage', () => {
   it('renders the page title', () => {
     mockUseBidList.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<AdminPage />);
-    expect(screen.getByText('Administrative methods')).toBeInTheDocument();
+    expect(screen.getByText('Admin')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

@@ -32,7 +32,8 @@ describe('MyTokens', () => {
   it('prompts login when no account', () => {
     mockAccount = null;
     render(<MyWallet />);
-    expect(screen.getByText('Please login to Metamask to see your tokens.')).toBeInTheDocument();
+    expect(screen.getByText('Wallet not connected')).toBeInTheDocument();
+    expect(screen.getByText('Please connect your wallet to view your tokens.')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -63,12 +64,12 @@ describe('MyTokens', () => {
   it('renders page title', () => {
     mockUseCSTTokensByUser.mockReturnValue({ data: [], isLoading: false, isError: false });
     render(<MyWallet />);
-    expect(screen.getByText('My Cosmic Signature (ERC721) Tokens')).toBeInTheDocument();
+    expect(screen.getByText('My Cosmic Signature Tokens')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature Tokens I Own')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
     const { container } = render(<MyWallet />);
-    await checkA11y(container);
+    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

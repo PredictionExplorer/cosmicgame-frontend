@@ -10,6 +10,7 @@ import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable
 import EthDonationTable from '@/components/tables/EthDonationTable';
 import ChartOrPie from '@/components/tokens/ChartOrPie';
 import { DonatedTokensSection } from '@/components/home/DonatedTokensSection';
+import { SectionDivider } from '@/components/ui/section-divider';
 import type { DashboardInfo, BidInfo, DonatedNFT } from '@/services/api/types';
 
 interface RoundInfoSectionProps {
@@ -41,71 +42,63 @@ export function RoundInfoSection({
   perPage,
 }: RoundInfoSectionProps) {
   return (
-    <>
-      <div>
-        <p className="text-sm mt-8">
-          When you bid, you will get 100 Cosmic Tokens as a reward. These tokens allow you to
-          participate in the DAO.
+    <div className="space-y-16">
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-5 text-sm text-muted-foreground space-y-3">
+        <p>
+          When you bid, you receive{' '}
+          <span className="text-white font-medium">100 Cosmic Tokens</span> as a reward, enabling
+          DAO participation.
         </p>
-        <div className="mt-4">
-          <span className="text-sm text-primary">*</span>
-          <span className="text-sm">
-            When you bid, you are also buying a raffle ticket. {data?.NumRaffleEthWinnersBidding}{' '}
-            raffle tickets will be chosen and these people will win {data?.RafflePercentage}% of the
-            pot. Also, {data?.NumRaffleNFTWinnersBidding} additional winners and{' '}
-            {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers will be chosen which
-            will receive a Cosmic Signature NFT.
-          </span>
-        </div>
-        <p className="text-sm mt-4">
-          When this round ends, Ethereum Protocol Guild (
-          <a
-            href="https://protocol-guild.readthedocs.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-inherit"
-          >
-            https://protocol-guild.readthedocs.io
-          </a>
-          ) will receive {data?.CharityPercentage ?? 0}% of the prize pool (at least{' '}
+        <p>
+          Each bid is also a raffle ticket. {data?.NumRaffleEthWinnersBidding} tickets win{' '}
+          {data?.RafflePercentage}% of the pot. {data?.NumRaffleNFTWinnersBidding} additional
+          winners and {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT stakers receive a
+          Cosmic Signature NFT.
+        </p>
+        <p>
+          Ethereum Protocol Guild receives {data?.CharityPercentage ?? 0}% of the prize pool (at
+          least{' '}
           {(
             (Number(data?.CosmicGameBalanceEth) || 0) *
             ((data?.CharityPercentage ?? 0) / 100)
           ).toFixed(4)}{' '}
-          ETH).
+          ETH) each round.
         </p>
       </div>
-      <div className="mt-12">
-        <p className="text-base font-medium text-primary text-center">
-          Distribution of funds on each round
-        </p>
+
+      <div>
+        <SectionDivider title="Fund Distribution" className="mb-6" />
         <ChartOrPie data={data ?? undefined} />
       </div>
 
       {data && <Prize data={data} />}
 
-      <div className="mt-20">
-        <h6 className="text-lg font-semibold">TOP RAFFLE TICKETS HOLDERS</h6>
+      <div>
+        <SectionDivider title="Raffle Ticket Holders" className="mb-6" />
         <RaffleHolderTable
           list={curBidList}
           numRaffleEthWinner={data?.NumRaffleEthWinnersBidding}
           numRaffleNFTWinner={data?.NumRaffleNFTWinnersBidding}
         />
       </div>
-      <div className="mt-20">
-        <h6 className="text-lg font-semibold">TOP ETH SPENDERS FOR BID</h6>
+
+      <div>
+        <SectionDivider title="Top ETH Spenders" className="mb-6" />
         <ETHSpentTable list={curBidList as ComponentProps<typeof ETHSpentTable>['list']} />
       </div>
-      <div className="mt-20">
-        <h6 className="text-lg font-semibold">ENDURANCE CHAMPIONS FOR CURRENT ROUND</h6>
+
+      <div>
+        <SectionDivider title="Endurance Champions" className="mb-6" />
         <EnduranceChampionsTable championList={championList} />
       </div>
+
       {ethDonations.length > 0 && (
-        <div className="mt-20">
-          <h6 className="text-lg font-semibold">ETH DONATIONS FOR CURRENT ROUND</h6>
+        <div>
+          <SectionDivider title="ETH Donations" className="mb-6" />
           <EthDonationTable list={ethDonations} showType={false} />
         </div>
       )}
+
       <DonatedTokensSection
         donatedNFTs={donatedNFTs}
         donatedERC20Tokens={donatedERC20Tokens}
@@ -115,15 +108,11 @@ export function RoundInfoSection({
         setCurPage={setCurPage}
         perPage={perPage}
       />
-      <div className="mt-20">
-        <div>
-          <span className="text-lg font-semibold">CURRENT ROUND BID HISTORY</span>
-          <span className="text-lg font-semibold text-primary ml-2">
-            (ROUND {data?.CurRoundNum})
-          </span>
-        </div>
+
+      <div>
+        <SectionDivider title={`Bid History — Round ${data?.CurRoundNum ?? ''}`} className="mb-6" />
         <BiddingHistory biddingHistory={curBidList} showRound={false} />
       </div>
-    </>
+    </div>
   );
 }

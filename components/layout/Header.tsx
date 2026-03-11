@@ -93,6 +93,13 @@ const Header: FC = () => {
 
   const handleDrawerOpen = () => setDrawerOpen(true);
 
+  const hasUnclaimedRewards = !!(
+    account &&
+    ((status?.ETHRaffleToClaim ?? 0) > 0 ||
+      (status?.NumDonatedNFTToClaim ?? 0) > 0 ||
+      ((status?.UnclaimedStakingReward ?? 0) > 0 && (status?.claimableActionIds?.length ?? 0) > 0))
+  );
+
   const renderDesktop = () => (
     <nav className="flex items-center">
       <Link href="/">
@@ -111,17 +118,12 @@ const Header: FC = () => {
           cst: stakedCSTokens?.length,
           rwalk: stakedRWLKTokens?.length,
         }}
+        hasUnclaimedRewards={hasUnclaimedRewards}
       />
     </nav>
   );
 
   const renderMobile = () => {
-    const hasNotifications =
-      account &&
-      (status?.ETHRaffleToClaim > 0 ||
-        status?.NumDonatedNFTToClaim > 0 ||
-        (status?.UnclaimedStakingReward > 0 && (status?.claimableActionIds?.length ?? 0) > 0));
-
     return (
       <nav className="flex items-center">
         <Button
@@ -132,10 +134,10 @@ const Header: FC = () => {
           onClick={handleDrawerOpen}
           className="mr-2"
         >
-          {hasNotifications ? (
+          {hasUnclaimedRewards ? (
             <span className="relative inline-flex">
               <Menu className="h-6 w-6" />
-              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-destructive" />
+              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-400" />
             </span>
           ) : (
             <Menu className="h-6 w-6" />
@@ -147,10 +149,10 @@ const Header: FC = () => {
         </Link>
 
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <SheetContent side="left" className="w-[265px] p-0 sm:max-w-[265px]">
+          <SheetContent side="left" className="w-[280px] p-0 sm:max-w-[280px]">
             <SheetTitle className="sr-only">Navigation</SheetTitle>
             <DrawerList>
-              <div className="px-4 py-2">
+              <div className="px-4 py-3">
                 <ConnectWalletButton
                   isMobileView
                   balance={balance}
@@ -162,82 +164,106 @@ const Header: FC = () => {
                 />
               </div>
 
-              {navs.map((nav, i) => (
-                <ListItemButton key={i} nav={nav} />
-              ))}
+              <Separator />
+
+              {/* Game */}
+              <p className="px-4 pt-4 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
+                Game
+              </p>
+              <ListItemButton nav={{ title: 'Play', route: '/' }} />
+              <ListItemButton nav={{ title: 'Gallery', route: '/gallery' }} />
+
+              <Separator className="my-2" />
+
+              {/* Explore */}
+              <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
+                Explore
+              </p>
+              <ListItemButton nav={{ title: 'Current Round', route: '/current-round' }} />
+              <ListItemButton nav={{ title: 'Prize Winners', route: '/prize' }} />
+              <ListItemButton nav={{ title: 'Staking Rewards', route: '/staking' }} />
+              <ListItemButton nav={{ title: 'Marketing Rewards', route: '/marketing' }} />
+              <ListItemButton nav={{ title: 'Statistics', route: '/statistics' }} />
+              <ListItemButton nav={{ title: 'Contracts', route: '/contracts' }} />
+
+              <Separator className="my-2" />
+
+              {/* Help */}
+              <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
+                Help
+              </p>
+              <ListItemButton nav={{ title: 'How to Play', route: '/how-to-play' }} />
+              <ListItemButton nav={{ title: 'FAQ', route: '/faq' }} />
 
               {account && (
                 <>
-                  <Separator />
+                  <Separator className="my-2" />
 
-                  <ListItemButton nav={{ title: 'My Statistics', route: '/my-statistics' }} />
-                  <ListItemButton nav={{ title: 'My Tokens', route: '/my-tokens' }} />
-                  <ListItemButton nav={{ title: 'My Staking', route: '/my-staking' }} />
+                  {/* My Account */}
+                  <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
+                    My Account
+                  </p>
+                  <ListItemButton nav={{ title: 'My Dashboard', route: '/my-statistics' }} />
                   <ListItemButton
                     nav={{
-                      title: 'History of Winnings',
-                      route: '/winning-history',
+                      title: hasUnclaimedRewards ? (
+                        <span className="flex items-center gap-2">
+                          My Rewards
+                          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                        </span>
+                      ) : (
+                        'My Rewards'
+                      ),
+                      route: '/my-winnings',
                     }}
                   />
+                  <ListItemButton nav={{ title: 'My Tokens', route: '/my-tokens' }} />
+                  <ListItemButton nav={{ title: 'My Staking', route: '/my-staking' }} />
+                  <ListItemButton nav={{ title: 'Winning History', route: '/winning-history' }} />
 
-                  <Separator />
+                  <Separator className="my-2" />
 
-                  <div className="block px-4 py-2">
-                    <p className="text-base text-foreground">BALANCE:</p>
+                  {/* Balances */}
+                  <div className="px-4 py-2 space-y-1.5">
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
+                      Balances
+                    </p>
                     {loading ? (
-                      <p className="text-primary">Loading...</p>
+                      <p className="text-xs text-primary">Loading...</p>
                     ) : (
                       <>
-                        <div className="mt-2 flex justify-between">
-                          <span className="text-sm italic font-semibold text-secondary">ETH:</span>
-                          <span className="text-sm italic font-semibold text-secondary">
-                            {balance.ETH.toFixed(2)}
-                          </span>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">ETH</span>
+                          <span className="font-medium">{balance.ETH.toFixed(4)}</span>
                         </div>
-
-                        <div className="mt-2 flex justify-between">
-                          <span className="text-sm italic font-semibold text-secondary">
-                            CST (ERC20):
-                          </span>
-                          <span className="text-sm italic font-semibold text-secondary">
-                            {balance.CosmicToken.toFixed(2)}
-                          </span>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">CST</span>
+                          <span className="font-medium">{balance.CosmicToken.toFixed(2)}</span>
                         </div>
-
-                        <div className="mt-2 flex justify-between">
-                          <span className="text-sm italic font-semibold text-secondary">
-                            CS NFT (ERC721):
-                          </span>
-                          <span className="text-sm italic font-semibold text-secondary">
-                            {balance.CosmicSignature} tokens
-                          </span>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">CS NFTs</span>
+                          <span className="font-medium">{balance.CosmicSignature}</span>
                         </div>
-
-                        <div className="mt-2 flex justify-between">
-                          <span className="text-sm italic font-semibold text-secondary">
-                            RWLK (ERC721):
-                          </span>
-                          <span className="text-sm italic font-semibold text-secondary">
-                            {balance.RWLK} tokens
-                          </span>
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">RWLK NFTs</span>
+                          <span className="font-medium">{balance.RWLK}</span>
                         </div>
                       </>
                     )}
                   </div>
 
-                  <Separator />
-
-                  <div className="flex items-center justify-between px-4 py-2">
-                    <p className="text-base text-foreground">STAKED CST NFT:</p>
-                    <p className="text-base font-semibold text-secondary">
-                      {stakedCSTokens?.length}
+                  <div className="px-4 py-2 space-y-1.5">
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
+                      Staked
                     </p>
-                  </div>
-                  <div className="flex items-center justify-between px-4 py-2">
-                    <p className="text-base text-foreground">STAKED RWALK NFT:</p>
-                    <p className="text-base font-semibold text-secondary">
-                      {stakedRWLKTokens?.length}
-                    </p>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">CST NFTs</span>
+                      <span className="font-medium text-primary">{stakedCSTokens?.length}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">RWLK NFTs</span>
+                      <span className="font-medium text-primary">{stakedRWLKTokens?.length}</span>
+                    </div>
                   </div>
                 </>
               )}
@@ -254,19 +280,19 @@ const Header: FC = () => {
         {systemMode > 0 && (
           <div
             className={cn(
-              'fixed left-0 right-0 bg-[#F3D217] px-8 py-2 text-black',
+              'fixed left-0 right-0 bg-amber-500/95 backdrop-blur-sm px-6 py-2.5 text-black z-40',
               mobileView ? 'top-[88px]' : 'top-[96px]',
             )}
           >
-            <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr]">
-              <p className="text-base">
+            <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
+              <p className="text-sm">
                 {systemMode === 1
-                  ? 'The system will enter maintenance mode as soon as prize claim transaction is executed. The administrator will make adjustments to the parameters of the system and after that you will be able to play again.'
-                  : 'The system is in maintenance mode. The administrator will make adjustments to the parameters of the system and after that you will be able to play again.'}
+                  ? 'Maintenance mode will activate after the current prize claim. You can play again once adjustments are complete.'
+                  : 'System is in maintenance mode. You can play again once parameter adjustments are complete.'}
               </p>
-              <h5 className="self-center text-center text-xl font-bold">
-                {systemMode === 1 ? 'MAINTENANCE PENDING' : 'MAINTENANCE MODE'}
-              </h5>
+              <span className="shrink-0 rounded-full bg-black/10 px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                {systemMode === 1 ? 'Pending' : 'Maintenance'}
+              </span>
             </div>
           </div>
         )}

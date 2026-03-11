@@ -6,6 +6,10 @@ import { MainWrapper } from '@/components/styled';
 import { GlobalStakingRewardsTable } from '@/components/staking/GlobalStakingRewardsTable';
 import { RwalkStakingRewardMintsTable } from '@/components/staking/RwalkStakingRewardMintsTable';
 import { useStakingCSTRewards, useStakingRWLKMintsGlobal } from '@/hooks/useApiQuery';
+import { Spinner } from '@/components/ui/spinner';
+import { ErrorState } from '@/components/ui/error-state';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { SectionDivider } from '@/components/ui/section-divider';
 
 const StakingPage = () => {
   const {
@@ -24,33 +28,35 @@ const StakingPage = () => {
   if (error) {
     return (
       <MainWrapper>
-        <h2 className="mb-3 text-center text-2xl font-bold text-destructive">
-          Error loading staking data
-        </h2>
-        <p className="text-base text-destructive">{error}</p>
+        <ErrorState title="Error loading staking data" message={error} />
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <h2 className="mb-3 text-center text-2xl font-bold text-primary">
-        Staking Rewards for All Stakers
-      </h2>
+      <PageHeader
+        title="Staking Rewards"
+        subtitle="Rewards earned by all stakers across token types"
+      />
 
       <div>
-        <h3 className="mt-8 text-lg font-semibold">CosmicSignature Token</h3>
+        <SectionDivider title="CosmicSignature Token" />
         {loading ? (
-          <p className="text-lg font-semibold">Loading...</p>
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
         ) : (
           <GlobalStakingRewardsTable list={cosmicSignatureRewards ?? []} />
         )}
       </div>
 
       <div>
-        <h3 className="mt-8 text-lg font-semibold">RandomWalk NFT</h3>
+        <SectionDivider title="RandomWalk NFT" />
         {loading ? (
-          <p className="text-lg font-semibold">Loading...</p>
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
         ) : (
           <RwalkStakingRewardMintsTable list={randomWalkRewards ?? []} />
         )}

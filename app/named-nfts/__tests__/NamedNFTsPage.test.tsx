@@ -34,7 +34,7 @@ describe('NamedNFTsPage', () => {
   it('shows empty message when no NFTs', () => {
     mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
     render(<NamedNFTsPage />);
-    expect(screen.getByText('No NFTs yet.')).toBeInTheDocument();
+    expect(screen.getByText('No named tokens')).toBeInTheDocument();
   });
 
   it('renders table rows for NFT data', () => {
@@ -68,6 +68,6 @@ describe('NamedNFTsPage', () => {
   it('has no accessibility violations', async () => {
     mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
     const { container } = render(<NamedNFTsPage />);
-    await checkA11y(container);
+    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

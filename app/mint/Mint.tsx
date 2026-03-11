@@ -4,11 +4,14 @@ import { useState, useEffect } from 'react';
 import { formatEther, parseEther } from 'viem';
 import { usePublicClient } from 'wagmi';
 import Link from 'next/link';
+import { Sparkles } from 'lucide-react';
 
 import { parseBalance } from '@/utils';
 
 import { Button } from '@/components/ui/button';
-import { MainWrapper, CenterBox } from '@/components/styled';
+import { MainWrapper } from '@/components/styled';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { SectionDivider } from '@/components/ui/section-divider';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { asWriteFn } from '@/utils/contractWrite';
@@ -76,39 +79,44 @@ const Mint = () => {
   }, [nftContract, account]);
 
   return (
-    <>
-      <MainWrapper>
-        <CenterBox>
-          <span className="text-2xl font-bold">GET A</span>
-          <span className="text-2xl font-bold text-primary ml-3">RANDOM WALK</span>
-          <span className="text-2xl font-bold ml-3">NFT FOR</span>
-          <span className="text-2xl font-bold text-primary ml-3">{mintPrice}Ξ</span>
-        </CenterBox>
-        <div className="mt-6">
-          <Button onClick={handleMint}>Mint now</Button>
+    <MainWrapper>
+      <PageHeader
+        title="Mint Random Walk NFT"
+        subtitle="Own a Random Walk NFT and get 50% discount on your bids"
+      />
+
+      <div className="flex flex-col items-center">
+        <div className="rounded-2xl border border-primary/20 bg-gradient-to-b from-primary/[0.06] to-transparent p-8 text-center max-w-md w-full">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mx-auto mb-4">
+            <Sparkles className="h-8 w-8 text-primary" />
+          </div>
+          <p className="text-3xl font-bold font-display">
+            {mintPrice} <span className="text-primary">ETH</span>
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">Current mint price</p>
+          <Button size="lg" onClick={handleMint} className="w-full mt-6">
+            Mint Now
+          </Button>
         </div>
-        {/* My NFTs */}
-        <div className="flex justify-center items-center flex-wrap mt-8">
-          <span className="text-2xl font-bold text-secondary">MY</span>
-          <span className="text-2xl font-bold ml-3">RANDOM</span>
-          <span className="text-2xl font-bold text-primary ml-3">WALK</span>
-          <span className="text-2xl font-bold ml-3">NFTS</span>
-        </div>
-        {nftIds.length > 0 && (
-          <div className="mt-4">
+      </div>
+
+      {nftIds.length > 0 && (
+        <div className="mt-16">
+          <SectionDivider title="My Random Walk NFTs" className="mb-6" />
+          <div className="flex flex-wrap gap-2">
             {nftIds.map((tokenId) => (
               <Link
                 key={tokenId}
                 href={`/?randomwalk=true&tokenId=${tokenId}`}
-                className="mr-4 text-inherit"
+                className="inline-flex items-center rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-sm font-mono hover:bg-white/[0.06] transition-colors"
               >
-                <span className="text-base">{tokenId}</span>
+                #{tokenId}
               </Link>
             ))}
           </div>
-        )}
-      </MainWrapper>
-    </>
+        </div>
+      )}
+    </MainWrapper>
   );
 };
 

@@ -23,7 +23,7 @@ describe('UsedRwlkNftsPage', () => {
   it('renders the heading', () => {
     mockUseUsedRWLKNFTs.mockReturnValue({ data: [], isLoading: false });
     render(<UsedRwlkNftsPage />);
-    expect(screen.getByText('Used RandomWalk NFTs')).toBeInTheDocument();
+    expect(screen.getByText('Used Random Walk NFTs')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {

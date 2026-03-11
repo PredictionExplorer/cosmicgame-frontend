@@ -13,26 +13,27 @@ interface ClaimStatus {
 }
 
 const getNAVs = (status: ClaimStatus | null, account: string | null) => {
-  let NAVS: NavDescriptor[] = [
+  const NAVS: NavDescriptor[] = [
+    { title: 'Play', route: '/' },
     { title: 'Gallery', route: '/gallery' },
     {
-      title: 'Rewards',
+      title: 'Explore',
       route: '#',
       children: [
-        { title: 'Prizes', route: '/prize' },
+        { title: 'Current Round', route: '/current-round' },
+        { title: 'Prize Winners', route: '/prize' },
         { title: 'Staking Rewards', route: '/staking' },
         { title: 'Marketing Rewards', route: '/marketing' },
+        { title: 'Statistics', route: '/statistics' },
+        { title: 'Contracts', route: '/contracts' },
       ],
     },
-    { title: 'Contracts', route: '/contracts' },
-    { title: 'Statistics', route: '/statistics' },
     {
       title: 'Help',
       route: '#',
       children: [
-        { title: 'How-to-Play', route: '/how-to-play' },
+        { title: 'How to Play', route: '/how-to-play' },
         { title: 'FAQ', route: '/faq' },
-        { title: 'Site-Map', route: '/site-map' },
       ],
     },
   ];
@@ -44,11 +45,9 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
   ) {
     NAVS.push({
       title: (
-        <span className="relative inline-flex">
-          Claim
-          <span className="absolute -top-2 -right-3 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-            $
-          </span>
+        <span className="relative inline-flex items-center gap-1.5">
+          My Rewards
+          <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
         </span>
       ),
       route: '/my-winnings',

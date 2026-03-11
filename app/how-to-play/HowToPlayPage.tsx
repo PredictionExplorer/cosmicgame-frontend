@@ -3,6 +3,7 @@
 import Image from 'next/image';
 
 import { MainWrapper } from '@/components/styled';
+import { PageHeader } from '@/components/layout/PageHeader';
 import {
   Accordion,
   AccordionContent,
@@ -10,21 +11,34 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
+function StepBadge({ step }: { step: number }) {
+  return (
+    <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm mr-3">
+      {step}
+    </span>
+  );
+}
+
 const HowToPlayPage = () => {
   return (
     <MainWrapper>
-      <h2 className="text-2xl font-bold text-primary text-center mb-8">How To Play Guide</h2>
+      <PageHeader
+        title="How to Play"
+        subtitle="A step-by-step guide to the Cosmic Signature bidding game"
+      />
 
-      <p className="mb-4">
-        Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid
-        against other players and against time to win exciting $ETH prizes and Cosmic Signature
-        NFTs.
-      </p>
-      <p className="mb-8">Here are the exact steps to play the Cosmic Signature game.</p>
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 mb-12">
+        <p className="text-muted-foreground">
+          Cosmic Signature is a strategy bidding game. Players bid against each other and against
+          time to win exciting ETH prizes and Cosmic Signature NFTs.
+        </p>
+      </div>
 
       {/* Step 1 */}
-      <div className="mt-16">
-        <h3 className="text-xl font-semibold mb-8">Step 1: Connect Your Wallet.</h3>
+      <div className="mt-12">
+        <h3 className="text-xl font-semibold mb-8 flex items-center">
+          <StepBadge step={1} /> Connect Your Wallet
+        </h3>
         <p className="mb-4">
           When you land on the Cosmic Signature website (
           <a
@@ -42,7 +56,7 @@ const HowToPlayPage = () => {
           screen.
         </p>
 
-        <div className="mb-8">
+        <div className="mb-8 rounded-xl border border-white/[0.06] overflow-hidden">
           <Image
             src="/images/screenshot1.png"
             width={1200}
@@ -67,8 +81,10 @@ const HowToPlayPage = () => {
       </div>
 
       {/* Step 2 */}
-      <div className="mt-16">
-        <h3 className="text-xl font-semibold mb-8">Step#2: Check The Bid Price!</h3>
+      <div className="mt-12">
+        <h3 className="text-xl font-semibold mb-8 flex items-center">
+          <StepBadge step={2} /> Check The Bid Price
+        </h3>
         <p className="mb-4">
           Before you place a bid, you want to start by checking the round details.
         </p>
@@ -81,7 +97,7 @@ const HowToPlayPage = () => {
           out wins the game.
         </p>
 
-        <div className="mb-8">
+        <div className="mb-8 rounded-xl border border-white/[0.06] overflow-hidden">
           <Image
             src="/images/screenshot2.png"
             width={1200}
@@ -101,7 +117,7 @@ const HowToPlayPage = () => {
           be wise about using it.
         </p>
 
-        <div className="mb-8">
+        <div className="mb-8 rounded-xl border border-white/[0.06] overflow-hidden">
           <Image
             src="/images/screenshot3.png"
             width={1200}
@@ -115,7 +131,7 @@ const HowToPlayPage = () => {
           3. <b>[Main Prize Reward]:</b> The Main Prize Reward displays the amount you will get if
           you win the round.
         </p>
-        <div className="mb-8">
+        <div className="mb-8 rounded-xl border border-white/[0.06] overflow-hidden">
           <Image
             src="/images/screenshot4.png"
             width={1200}
@@ -135,8 +151,10 @@ const HowToPlayPage = () => {
       </div>
 
       {/* Step 3 */}
-      <div className="mt-16">
-        <h3 className="text-xl font-semibold mb-8">Step#3: Make A Bid!</h3>
+      <div className="mt-12">
+        <h3 className="text-xl font-semibold mb-8 flex items-center">
+          <StepBadge step={3} /> Make A Bid
+        </h3>
         <p className="mb-4">
           Once you have successfully connected your wallet, choose your method of bidding from $ETH
           or $CST.
@@ -221,28 +239,30 @@ const HowToPlayPage = () => {
       </div>
 
       {/* Closing Notes */}
-      <p className="mt-16">
-        If you have any questions or confusion, feel free to ask them in the{' '}
-        <a
-          href="https://discord.com/channels/1258032742084509779/1258691600951935056"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary hover:underline"
-        >
-          #cosmic-gameroom
-        </a>{' '}
-        channel inside our Discord, or{' '}
-        <a
-          href="https://x.com/CosmicSignatureNFT"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary hover:underline"
-        >
-          write us a message on Twitter/X
-        </a>
-        .
-      </p>
-      <p className="italic mt-4">Happy bidding!</p>
+      <div className="mt-16 rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 text-center">
+        <p className="text-muted-foreground">
+          Have questions? Ask in the{' '}
+          <a
+            href="https://discord.com/channels/1258032742084509779/1258691600951935056"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            #cosmic-gameroom
+          </a>{' '}
+          Discord channel or{' '}
+          <a
+            href="https://x.com/CosmicSignatureNFT"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            message us on Twitter/X
+          </a>
+          .
+        </p>
+        <p className="mt-2 text-lg font-display font-semibold">Happy bidding!</p>
+      </div>
     </MainWrapper>
   );
 };

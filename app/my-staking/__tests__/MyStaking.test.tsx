@@ -92,7 +92,9 @@ describe('MyStaking', () => {
   it('prompts login when no account is connected', () => {
     mockAccount = null;
     render(<MyStaking />);
-    expect(screen.getByText('Please login to Metamask to see your staking.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Please connect your wallet to manage your staking.'),
+    ).toBeInTheDocument();
   });
 
   it('shows loading state', () => {

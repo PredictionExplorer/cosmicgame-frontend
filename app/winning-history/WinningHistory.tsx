@@ -4,6 +4,10 @@ import { MainWrapper } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import WinningHistoryTable from '@/components/tables/WinningHistoryTable';
 import { useClaimHistoryByUser } from '@/hooks/useApiQuery';
+import { Spinner } from '@/components/ui/spinner';
+import { ErrorState } from '@/components/ui/error-state';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 function WinningHistory() {
   const { account } = useActiveWeb3React();
@@ -14,22 +18,36 @@ function WinningHistory() {
   if (!account) {
     return (
       <MainWrapper>
-        <h2 className="mb-8 text-center text-2xl font-bold text-primary">History of My Winnings</h2>
-        <p className="text-base">Please login to Metamask to see your winnings.</p>
+        <PageHeader
+          title="History of My Winnings"
+          subtitle="View your past prize claims and rewards"
+        />
+        <EmptyState
+          title="Wallet not connected"
+          description="Please connect your wallet to see your winnings."
+        />
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <h2 className="mb-8 text-center text-2xl font-bold text-primary">History of My Winnings</h2>
+      <PageHeader
+        title="History of My Winnings"
+        subtitle="View your past prize claims and rewards"
+      />
 
       {loading ? (
-        <p className="text-lg font-semibold">Loading...</p>
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
       ) : error ? (
-        <p className="text-lg font-semibold text-destructive">{error}</p>
+        <ErrorState title="Failed to load winnings" message={error} />
       ) : !winningHistory || winningHistory.length === 0 ? (
-        <p className="text-base">You currently have no recorded winnings.</p>
+        <EmptyState
+          title="No winnings yet"
+          description="You currently have no recorded winnings."
+        />
       ) : (
         <WinningHistoryTable
           winningHistory={winningHistory}

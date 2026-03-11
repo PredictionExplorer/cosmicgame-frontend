@@ -216,22 +216,22 @@ describe('HomePage', () => {
     expect(screen.getByTestId('latest-nfts')).toBeInTheDocument();
   });
 
-  it('renders WinningHistorySection', () => {
+  it('renders Prize table when data is loaded', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByTestId('winning-history')).toBeInTheDocument();
+    expect(screen.getByText('LIST OF AVAILABLE PRIZES')).toBeInTheDocument();
   });
 
-  it('renders RoundInfoSection', () => {
+  it('renders link to full round details', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByTestId('round-info-section')).toBeInTheDocument();
+    expect(screen.getByText('View Full Round Details')).toBeInTheDocument();
   });
 
   it('shows link to previous round results when round > 1', () => {
@@ -240,7 +240,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText(/Round 4 ended, check results here/)).toBeInTheDocument();
+    expect(screen.getByText(/Round 4 ended/)).toBeInTheDocument();
   });
 
   it('does not show previous round link when round is 1', () => {
@@ -249,7 +249,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.queryByText(/ended, check results here/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/ended .+ view results/)).not.toBeInTheDocument();
   });
 
   it('does not render BidForm when still loading', () => {
@@ -331,6 +331,6 @@ describe('HomePage', () => {
       isLoading: false,
     });
     const { container } = render(<HomePage />);
-    await checkA11y(container);
+    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

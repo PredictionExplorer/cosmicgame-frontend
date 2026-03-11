@@ -47,7 +47,6 @@ describe('GalleryPage', () => {
   it('renders the page title', () => {
     mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByText('CosmicSignature')).toBeInTheDocument();
     expect(screen.getByText('NFT Gallery')).toBeInTheDocument();
   });
 

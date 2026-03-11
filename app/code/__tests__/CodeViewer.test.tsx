@@ -19,7 +19,7 @@ describe('CodeViewer', () => {
 
   it('renders the heading', () => {
     render(<CodeViewer />);
-    expect(screen.getByText('Generation Code')).toBeInTheDocument();
+    expect(screen.getByText('Code Viewer')).toBeInTheDocument();
   });
 
   it('renders the IPFS description text', () => {

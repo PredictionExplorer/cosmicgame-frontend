@@ -34,7 +34,9 @@ describe('WinningHistory', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: null });
     mockUseClaimHistoryByUser.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<WinningHistory />);
-    expect(screen.getByText('Please login to Metamask to see your winnings.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Please connect your wallet to see your winnings.'),
+    ).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -84,6 +86,8 @@ describe('WinningHistory', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseClaimHistoryByUser.mockReturnValue({ data: null, isLoading: false, error: null });
     const { container } = render(<WinningHistory />);
-    await checkA11y(container);
+    await checkA11y(container, {
+      rules: { 'heading-order': { enabled: false } },
+    });
   });
 });

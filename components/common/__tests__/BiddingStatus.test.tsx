@@ -59,7 +59,7 @@ describe('BiddingStatus', () => {
         data={{ ...activeData, TsRoundStart: 0, CurRoundNum: 0 } as never}
       />,
     );
-    expect(screen.getByText('Start the game with your first bid!')).toBeInTheDocument();
+    expect(screen.getByText('Start the Game')).toBeInTheDocument();
   });
 
   it('shows round started message for first bid in existing round', () => {
@@ -69,7 +69,7 @@ describe('BiddingStatus', () => {
         data={{ ...activeData, TsRoundStart: 0, CurRoundNum: 5 } as never}
       />,
     );
-    expect(screen.getByText('Round 5 started')).toBeInTheDocument();
+    expect(screen.getByText('Round 5')).toBeInTheDocument();
     expect(screen.getByText(/Dutch auction/)).toBeInTheDocument();
   });
 
@@ -83,7 +83,7 @@ describe('BiddingStatus', () => {
       />,
     );
     expect(screen.getByText('10.5000 ETH')).toBeInTheDocument();
-    expect(screen.getByText('0xBidder')).toBeInTheDocument();
+    expect(screen.getByText(/0xBidder/)).toBeInTheDocument();
     expect(screen.getByText('0.01000 ETH')).toBeInTheDocument();
     expect(screen.getByText('0.00500 ETH')).toBeInTheDocument();
   });
@@ -97,7 +97,7 @@ describe('BiddingStatus', () => {
         ethBidInfo={{ ETHPrice: 0.01 }}
       />,
     );
-    expect(screen.getByText('Bids exhausted!')).toBeInTheDocument();
+    expect(screen.getByText('Bids Exhausted!')).toBeInTheDocument();
     expect(screen.getByText('Waiting for the winner to claim the prize.')).toBeInTheDocument();
   });
 

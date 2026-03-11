@@ -18,6 +18,9 @@ import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
 import { CHARITY_WALLET_ADDRESS, COSMICGAME_ADDRESS } from '@/config/networks';
+import { Spinner } from '@/components/ui/spinner';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { SectionDivider } from '@/components/ui/section-divider';
 
 interface ContractItemProps {
   name: string;
@@ -280,10 +283,15 @@ const Contracts = () => {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center">Contract Addresses</h4>
+      <PageHeader
+        title="Contract Addresses"
+        subtitle="On-chain addresses and configuration for the Cosmic Game"
+      />
 
       {loading ? (
-        <h6 className="text-lg font-semibold">Loading...</h6>
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
       ) : (
         <>
           <ul className="mt-8 list-none p-0">
@@ -292,9 +300,7 @@ const Contracts = () => {
             ))}
           </ul>
 
-          <h6 className="text-lg font-semibold mt-10 mb-6">
-            Current configuration of the contracts
-          </h6>
+          <SectionDivider title="Current configuration of the contracts" />
           <ul className="list-none p-0">
             {configItems.map(({ name, value, copyable }) => (
               <ContractItem key={name} name={name} value={value} copyable={copyable} />

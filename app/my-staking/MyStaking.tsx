@@ -27,6 +27,9 @@ import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors
 import { CSTStakingPanel } from '@/components/staking/CSTStakingPanel';
 import { RWLKStakingPanel } from '@/components/staking/RWLKStakingPanel';
 import getErrorMessage from '@/utils/alert';
+import { Spinner } from '@/components/ui/spinner';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const MyStaking = () => {
   const { account } = useActiveWeb3React();
@@ -241,12 +244,17 @@ const MyStaking = () => {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-16">My Staking</h4>
+      <PageHeader title="My Staking" subtitle="Manage your staked tokens and view rewards" />
 
       {!account ? (
-        <p className="text-base">Please login to Metamask to see your staking.</p>
+        <EmptyState
+          title="Wallet not connected"
+          description="Please connect your wallet to manage your staking."
+        />
       ) : loading ? (
-        <h6 className="text-lg font-semibold">Loading...</h6>
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
       ) : (
         <>
           <div className="flex">

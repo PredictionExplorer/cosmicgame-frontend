@@ -1,8 +1,10 @@
 import { useState, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
 
 import { getAssetsUrl } from '@/utils';
+
 
 import {
   Pagination,
@@ -11,13 +13,9 @@ import {
   PaginationLink,
   PaginationEllipsis,
 } from '@/components/ui/pagination';
-import {
-  SearchBox,
-  SearchField,
-  SearchButton,
-  StyledCard,
-  NFTInfoWrapper,
-} from '@/components/styled';
+import { Spinner } from '@/components/ui/spinner';
+import { EmptyState } from '@/components/ui/empty-state';
+import { StyledCard, NFTInfoWrapper } from '@/components/styled';
 import api from '@/services/api';
 import type { CSTTokenInfo } from '@/services/api';
 
@@ -110,53 +108,62 @@ const PaginationGrid = ({ data, loading }: PaginationGridProps) => {
 
   return (
     <div className="mt-8">
-      <SearchBox>
-        <SearchField
-          placeholder="Enter NFT ID or Name"
-          value={searchKey}
-          onChange={handleSearchChange}
-          onKeyDown={handleSearchKeyDown}
-        />
-        <SearchButton type="submit" onClick={handleSearch}>
+      {/* Search */}
+      <div className="flex items-center gap-2 mb-8 max-w-lg mx-auto">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+          <input
+            placeholder="Search by token ID or name..."
+            value={searchKey}
+            onChange={handleSearchChange}
+            onKeyDown={handleSearchKeyDown}
+            className="w-full h-10 rounded-lg border border-white/[0.06] bg-white/[0.03] pl-9 pr-3 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={handleSearch}
+          className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 transition-opacity"
+        >
           Search
-        </SearchButton>
-      </SearchBox>
+        </button>
+      </div>
 
       {loading ? (
-        <p className="text-lg font-medium text-center text-foreground">Loading...</p>
+        <div className="flex justify-center py-16">
+          <Spinner size="lg" />
+        </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {collection.length === 0 ? (
-              <div>
-                <StyledCard>
-                  <div className="cursor-pointer">
-                    <Link href="/detail/sample" className="block">
-                      <NFTImage src={getAssetsUrl('cosmicsignature/sample.png')} alt="Sample NFT" />
+              <div className="col-span-full">
+                <EmptyState
+                  title="No NFTs found"
+                  description="Try a different search or check out the sample NFT."
+                  action={
+                    <Link href="/detail/sample" className="text-sm text-primary hover:underline">
+                      View Sample NFT
                     </Link>
-                    <NFTInfoWrapper className="w-[calc(100%-40px)]">
-                      <p className="text-base text-white text-center">Sample NFT</p>
-                    </NFTInfoWrapper>
-                  </div>
-                </StyledCard>
+                  }
+                />
               </div>
             ) : (
               visibleNFTs.map((nft) => (
-                <div key={nft.TokenId}>
-                  <NFT
-                    nft={{
-                      TokenId: String(nft.TokenId),
-                      Seed: String(nft.Seed ?? ''),
-                      TokenName: nft.TokenName ?? '',
-                    }}
-                  />
-                </div>
+                <NFT
+                  key={nft.TokenId}
+                  nft={{
+                    TokenId: String(nft.TokenId),
+                    Seed: String(nft.Seed ?? ''),
+                    TokenName: nft.TokenName ?? '',
+                  }}
+                />
               ))
             )}
           </div>
 
           {collection.length > perPage && (
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-10">
               <Pagination>
                 <PaginationContent>
                   {getPaginationRange(curPage, totalPages).map((item, idx) =>

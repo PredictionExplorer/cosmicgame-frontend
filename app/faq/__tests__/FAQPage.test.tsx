@@ -17,7 +17,7 @@ describe('FAQPage', () => {
 
   it('renders the FAQ heading', () => {
     render(<FAQPage />);
-    expect(screen.getByText('FAQ')).toBeInTheDocument();
+    expect(screen.getByText('Frequently Asked Questions')).toBeInTheDocument();
   });
 
   it('renders the FAQ component', () => {
@@ -25,9 +25,9 @@ describe('FAQPage', () => {
     expect(screen.getByTestId('faq-component')).toBeInTheDocument();
   });
 
-  it('renders the "Have a question?" section', () => {
+  it('renders the "Still have a question?" section', () => {
     render(<FAQPage />);
-    expect(screen.getByText('Have a question?')).toBeInTheDocument();
+    expect(screen.getByText('Still have a question?')).toBeInTheDocument();
   });
 
   it('renders the Twitter link with correct href and rel', () => {

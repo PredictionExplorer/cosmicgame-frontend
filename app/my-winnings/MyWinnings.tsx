@@ -3,9 +3,15 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { parseUnits } from 'viem';
+import { Wallet, Trophy, Gift, Coins } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { MainWrapper } from '@/components/styled';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { SectionDivider } from '@/components/ui/section-divider';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ErrorState } from '@/components/ui/error-state';
+import { Spinner } from '@/components/ui/spinner';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import getErrorMessage from '@/utils/alert';
@@ -221,8 +227,12 @@ export default function MyWinnings() {
   if (!account) {
     return (
       <MainWrapper>
-        <h4 className="text-2xl font-bold text-primary text-center mb-2">Pending Winnings</h4>
-        <p className="text-base mt-8">Please login to Metamask to see your winnings.</p>
+        <PageHeader title="My Rewards" />
+        <EmptyState
+          icon={<Wallet className="h-8 w-8 text-muted-foreground/50" />}
+          title="Wallet not connected"
+          description="Connect your wallet to view and claim your winnings."
+        />
       </MainWrapper>
     );
   }
@@ -230,94 +240,140 @@ export default function MyWinnings() {
   if (error) {
     return (
       <MainWrapper>
-        <h4 className="text-2xl font-bold text-destructive text-center mb-2">
-          Something went wrong!
-        </h4>
-        <p className="text-base text-destructive">{error}</p>
+        <PageHeader title="My Rewards" />
+        <ErrorState title="Failed to load" message={error} onRetry={() => refetch()} />
       </MainWrapper>
     );
   }
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-2">Pending Winnings</h4>
+      <PageHeader title="My Rewards" subtitle="View and claim all your pending winnings" />
 
-      <div className="mt-12">
-        <h5 className="text-xl font-bold mb-4">Claimable ETH Rewards</h5>
-        {loading && raffleETHWinnings === null ? (
-          <p>Loading...</p>
-        ) : !raffleETHWinnings || raffleETHWinnings.length === 0 ? (
-          <p>No winnings yet.</p>
-        ) : (
-          <>
-            <RaffleWinningsTable
-              list={raffleETHWinnings.slice((currentPage - 1) * perPage, currentPage * perPage)}
+      <div className="space-y-12">
+        {/* ETH Rewards */}
+        <section>
+          <SectionDivider title="Claimable ETH Rewards" className="mb-6" />
+          {loading && raffleETHWinnings === null ? (
+            <div className="flex justify-center py-8">
+              <Spinner />
+            </div>
+          ) : !raffleETHWinnings || raffleETHWinnings.length === 0 ? (
+            <EmptyState
+              icon={<Trophy className="h-8 w-8 text-muted-foreground/50" />}
+              title="No ETH rewards yet"
+              description="Win raffles by placing bids to earn ETH rewards."
             />
-            {status?.ETHRaffleToClaim > 0 && (
-              <div className="flex justify-end items-center mt-4">
-                <p className="mr-4">
-                  Your claimable winnings are {`${status.ETHRaffleToClaim.toFixed(6)} ETH`}
-                </p>
-                <Button onClick={handleAllETHClaim} disabled={isClaiming.raffleETH}>
-                  Claim All
-                </Button>
-              </div>
+          ) : (
+            <>
+              <RaffleWinningsTable
+                list={raffleETHWinnings.slice((currentPage - 1) * perPage, currentPage * perPage)}
+              />
+              {status?.ETHRaffleToClaim > 0 && (
+                <div className="flex justify-end items-center mt-4 gap-4">
+                  <p className="text-sm text-muted-foreground">
+                    Claimable:{' '}
+                    <span className="text-white font-medium">
+                      {status.ETHRaffleToClaim.toFixed(6)} ETH
+                    </span>
+                  </p>
+                  <Button onClick={handleAllETHClaim} disabled={isClaiming.raffleETH} size="sm">
+                    {isClaiming.raffleETH ? (
+                      <>
+                        <Spinner size="sm" /> Claiming...
+                      </>
+                    ) : (
+                      'Claim All'
+                    )}
+                  </Button>
+                </div>
+              )}
+              <CustomPagination
+                page={currentPage}
+                setPage={setCurrentPage}
+                totalLength={raffleETHWinnings.length}
+                perPage={perPage}
+              />
+            </>
+          )}
+        </section>
+
+        {/* CST Staking */}
+        <section>
+          <SectionDivider title="CST Staking Rewards" className="mb-6" />
+          <UncollectedCSTStakingRewardsTable user={account} />
+        </section>
+
+        {/* Donated NFTs */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <SectionDivider title="Donated NFTs" className="flex-1" />
+            {status?.NumDonatedNFTToClaim > 0 && (
+              <Button
+                onClick={handleAllDonatedNFTsClaim}
+                disabled={isClaiming.donatedNFT}
+                size="sm"
+                className="ml-4"
+              >
+                {isClaiming.donatedNFT ? (
+                  <>
+                    <Spinner size="sm" /> Claiming...
+                  </>
+                ) : (
+                  'Claim All'
+                )}
+              </Button>
             )}
-            <CustomPagination
-              page={currentPage}
-              setPage={setCurrentPage}
-              totalLength={raffleETHWinnings.length}
-              perPage={perPage}
+          </div>
+          {loading && donatedNFTs === null ? (
+            <div className="flex justify-center py-8">
+              <Spinner />
+            </div>
+          ) : !donatedNFTs || donatedNFTs.length === 0 ? (
+            <EmptyState
+              icon={<Gift className="h-8 w-8 text-muted-foreground/50" />}
+              title="No donated NFTs"
+              description="NFTs donated during bidding rounds will appear here."
             />
-          </>
-        )}
-      </div>
-
-      <div className="mt-12">
-        <h5 className="text-xl font-bold mb-4">Claimable CST Staking Rewards</h5>
-        <UncollectedCSTStakingRewardsTable user={account} />
-      </div>
-
-      <div className="mt-16">
-        <div className="flex justify-between mb-4">
-          <h5 className="text-xl font-bold">Donated NFTs</h5>
-          {status?.NumDonatedNFTToClaim > 0 && (
-            <Button onClick={handleAllDonatedNFTsClaim} disabled={isClaiming.donatedNFT}>
-              Claim All
-            </Button>
+          ) : (
+            <DonatedNFTTable
+              list={donatedNFTs}
+              handleClaim={handleDonatedNFTsClaim}
+              claimingTokens={claimingDonatedNFTs}
+            />
           )}
-        </div>
-        {loading && donatedNFTs === null ? (
-          <p>Loading...</p>
-        ) : !donatedNFTs || donatedNFTs.length === 0 ? (
-          <p>No NFTs yet.</p>
-        ) : (
-          <DonatedNFTTable
-            list={donatedNFTs}
-            handleClaim={handleDonatedNFTsClaim}
-            claimingTokens={claimingDonatedNFTs}
-          />
-        )}
-      </div>
+        </section>
 
-      <div className="mt-16">
-        <div className="flex justify-between items-center mb-4">
-          <h5 className="text-xl font-bold">Donated ERC20 Tokens</h5>
-          {donatedERC20Data.filter((x) => !x.Claimed).length > 0 && (
-            <Button onClick={handleAllDonatedERC20Claim}>Claim All</Button>
+        {/* Donated ERC20 */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <SectionDivider title="Donated ERC20 Tokens" className="flex-1" />
+            {donatedERC20Data.filter((x) => !x.Claimed).length > 0 && (
+              <Button onClick={handleAllDonatedERC20Claim} size="sm" className="ml-4">
+                Claim All
+              </Button>
+            )}
+          </div>
+          {erc20Loading ? (
+            <div className="flex justify-center py-8">
+              <Spinner />
+            </div>
+          ) : donatedERC20Data.length === 0 ? (
+            <EmptyState
+              icon={<Coins className="h-8 w-8 text-muted-foreground/50" />}
+              title="No donated tokens"
+              description="ERC20 tokens donated during bidding rounds will appear here."
+            />
+          ) : (
+            <DonatedERC20Table list={donatedERC20Data} handleClaim={handleDonatedERC20Claim} />
           )}
-        </div>
-        {erc20Loading ? (
-          <h6 className="text-lg font-semibold">Loading...</h6>
-        ) : (
-          <DonatedERC20Table list={donatedERC20Data} handleClaim={handleDonatedERC20Claim} />
-        )}
-      </div>
+        </section>
 
-      <div className="mt-12">
-        <Button variant="outline" onClick={() => router.push('/winning-history')}>
-          Go to my winning history page.
-        </Button>
+        <div>
+          <Button variant="outline" onClick={() => router.push('/winning-history')}>
+            View Winning History
+          </Button>
+        </div>
       </div>
     </MainWrapper>
   );

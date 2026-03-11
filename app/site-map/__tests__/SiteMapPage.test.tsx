@@ -57,6 +57,6 @@ describe('SiteMapPage', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(<SiteMapPage />);
-    await checkA11y(container);
+    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

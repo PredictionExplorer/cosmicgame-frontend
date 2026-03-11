@@ -42,22 +42,30 @@ export function TablePrimaryContainer({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('bg-white/[0.02]', className)} {...props} />;
+  return (
+    <div
+      className={cn(
+        'rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden',
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 export function TablePrimary({ className, ...props }: ComponentPropsWithoutRef<typeof Table>) {
-  return <Table className={cn('border-collapse', className)} {...props} />;
+  return <Table className={cn('border-collapse w-full', className)} {...props} />;
 }
 
 export function TablePrimaryHead({ className, ...props }: ComponentPropsWithoutRef<typeof Thead>) {
-  return <Thead className={cn('bg-primary', className)} {...props} />;
+  return <Thead className={cn('bg-muted/60 sticky top-0 z-[1]', className)} {...props} />;
 }
 
 export function TablePrimaryHeadCell({ className, ...props }: ComponentPropsWithoutRef<typeof Th>) {
   return (
     <Th
       className={cn(
-        'text-black font-normal leading-[1.43] border-b border-white/20 p-4 text-base max-sm:text-xs',
+        'text-muted-foreground font-medium text-xs uppercase tracking-wider leading-[1.43] border-b border-white/[0.06] px-4 py-3 max-sm:text-[10px]',
         className,
       )}
       {...props}
@@ -69,7 +77,7 @@ export function TablePrimaryCell({ className, ...props }: ComponentPropsWithoutR
   return (
     <Td
       className={cn(
-        'font-normal text-muted-foreground leading-[1.43] border-b-0 p-4 text-base max-sm:text-sm',
+        'font-normal text-muted-foreground leading-[1.43] border-b border-white/[0.03] px-4 py-3.5 text-sm max-sm:text-xs',
         className,
       )}
       {...props}
@@ -78,7 +86,15 @@ export function TablePrimaryCell({ className, ...props }: ComponentPropsWithoutR
 }
 
 export function TablePrimaryRow({ className, ...props }: ComponentPropsWithoutRef<typeof Tr>) {
-  return <Tr className={cn('border border-white/[0.06]', className)} {...props} />;
+  return (
+    <Tr
+      className={cn(
+        'border-0 transition-colors hover:bg-white/[0.04] even:bg-white/[0.015]',
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 export function NavLink({ className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
@@ -97,7 +113,10 @@ export function AppBarWrapper({
 }: React.HTMLAttributes<HTMLElement>) {
   return (
     <header
-      className={cn('fixed top-0 left-0 right-0 z-50 bg-background py-4', className)}
+      className={cn(
+        'fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/[0.06] py-4',
+        className,
+      )}
       {...props}
     >
       {children}

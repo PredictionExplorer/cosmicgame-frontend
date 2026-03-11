@@ -25,7 +25,7 @@ describe('PrizeWinnersPage', () => {
   it('renders the heading', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<PrizeWinnersPage />);
-    expect(screen.getByText('Main Prize Winnings')).toBeInTheDocument();
+    expect(screen.getByText('Prize Winners')).toBeInTheDocument();
   });
 
   it('passes loading state to PrizeTable', () => {

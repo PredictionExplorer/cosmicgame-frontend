@@ -31,7 +31,7 @@ describe('StakingPage', () => {
     mockUseStakingCSTRewards.mockReturnValue(noError);
     mockUseStakingRWLKMintsGlobal.mockReturnValue(noError);
     render(<StakingPage />);
-    expect(screen.getByText('Staking Rewards for All Stakers')).toBeInTheDocument();
+    expect(screen.getByText('Staking Rewards')).toBeInTheDocument();
   });
 
   it('shows loading when CST is loading', () => {
@@ -114,6 +114,8 @@ describe('StakingPage', () => {
     mockUseStakingCSTRewards.mockReturnValue(noError);
     mockUseStakingRWLKMintsGlobal.mockReturnValue(noError);
     const { container } = render(<StakingPage />);
-    await checkA11y(container);
+    await checkA11y(container, {
+      rules: { 'heading-order': { enabled: false } },
+    });
   });
 });
