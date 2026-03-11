@@ -19,17 +19,9 @@ import {
 import { ADMIN_EVENTS } from '@/config/misc';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { cn } from '@/lib/utils';
+import type { AdminEventRow } from '@/services/api/types';
 
-export interface AdminEventRow {
-  EvtLogId: string;
-  RecordType: number;
-  TransferType: number;
-  TimeStamp: number;
-  TxHash: string;
-  IntegerValue: number;
-  AddressValue: string;
-  StringValue: string;
-}
+export type { AdminEventRow };
 
 const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
   if (!row) {

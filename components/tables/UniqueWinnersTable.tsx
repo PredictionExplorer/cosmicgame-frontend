@@ -12,14 +12,9 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import type { Winner } from '@/services/api/types';
 
-export interface Winner {
-  WinnerAid: string;
-  WinnerAddr: string;
-  PrizesCount: number;
-  MaxWinAmountEth: number;
-  PrizesSum: number;
-}
+export type { Winner };
 
 interface UniqueWinnersRowProps {
   winner?: Winner;

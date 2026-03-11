@@ -12,13 +12,9 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import type { Bidder } from '@/services/api/types';
 
-export interface Bidder {
-  BidderAid: string;
-  BidderAddr: string;
-  NumBids: number;
-  MaxBidAmountEth: number;
-}
+export type { Bidder };
 
 interface UniqueBiddersRowProps {
   bidder?: Bidder;

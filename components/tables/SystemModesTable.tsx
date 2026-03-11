@@ -14,13 +14,10 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import type { SystemModeChangeEvent } from '@/services/api/types';
 
-export interface EventRow {
-  RoundNum: number;
-  EvtLogId: string | number;
-  NextEvtLogId: string | number;
-  TimeStamp: number;
-}
+type EventRow = SystemModeChangeEvent;
+export type { EventRow };
 
 interface SystemModesRowProps {
   row: EventRow;

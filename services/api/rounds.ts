@@ -8,7 +8,16 @@ import {
   flattenTxArray,
   flattenRoundInfo,
 } from './client';
-import type { DashboardInfo, RoundInfo, BidInfo, TxInfo, WinningHistoryEntry } from './types';
+import type {
+  DashboardInfo,
+  RoundInfo,
+  BidInfo,
+  TxInfo,
+  WinningHistoryEntry,
+  SpecialWinners,
+  BannedBid,
+  BidEthPriceInfo,
+} from './types';
 
 export function get_dashboard_info(): Promise<DashboardInfo | null> {
   return apiCall(async () => {
@@ -34,7 +43,7 @@ export function get_round_info(roundNum: number): Promise<RoundInfo | null> {
   }, null);
 }
 
-export function get_prize_time() {
+export function get_prize_time(): Promise<number> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('rounds/current/time'));
     return data.CurRoundPrizeTime;
@@ -77,11 +86,11 @@ export function get_bid_list_by_round(round: number, sortDir: string): Promise<B
   }, []);
 }
 
-export function get_current_special_winners() {
+export function get_current_special_winners(): Promise<SpecialWinners | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('bid/current_special_winners'));
-    return data;
-  }, []);
+    return data as SpecialWinners;
+  }, null);
 }
 
 export function get_prize_deposits_list(): Promise<TxInfo[]> {
@@ -98,10 +107,10 @@ export function get_prize_deposits_by_round(round: number): Promise<TxInfo[]> {
   }, []);
 }
 
-export function get_banned_bids() {
+export function get_banned_bids(): Promise<BannedBid[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getMainAPIUrl('get_banned_bids'));
-    return data;
+    return data as BannedBid[];
   }, []);
 }
 
@@ -122,14 +131,14 @@ export function unban_bid(bid_id: number) {
   });
 }
 
-export function get_bid_eth_price() {
+export function get_bid_eth_price(): Promise<BidEthPriceInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`bid/eth_price`));
-    return data;
+    return data as BidEthPriceInfo;
   }, null);
 }
 
-export function get_time_until_prize() {
+export function get_time_until_prize(): Promise<number> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('time/until_prize'));
     return data.TimeUntilPrize;

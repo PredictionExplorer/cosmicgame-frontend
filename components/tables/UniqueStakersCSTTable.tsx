@@ -14,17 +14,9 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import type { UniqueStakerCST } from '@/services/api/types';
 
-export interface UniqueStakerCST {
-  StakerAid: string | number;
-  StakerAddr: string;
-  NumStakeActions: number;
-  NumUnstakeActions: number;
-  TotalTokensMinted: number;
-  TotalTokensStaked: number;
-  TotalRewardEth: number;
-  UnclaimedRewardEth: number;
-}
+export type { UniqueStakerCST };
 
 const UniqueStakersCSTRow = ({ row }: { row: UniqueStakerCST }) => {
   if (!row) {

@@ -14,6 +14,9 @@ import type {
   CTBalanceDistribution,
   NameHistoryRecord,
   UsedRWLKNFT,
+  TxInfo,
+  CTPriceInfo,
+  TokenMintInfo,
 } from './types';
 
 export function get_cst_list(): Promise<CSTTokenInfo[]> {
@@ -79,31 +82,31 @@ export function get_ct_balances_distribution(): Promise<CTBalanceDistribution[]>
   }, []);
 }
 
-export function get_ct_transfers(address: string) {
+export function get_ct_transfers(address: string): Promise<TxInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`ct/transfers/by_user/${address}/0/1000000`));
-    return flattenTxArray(data.CosmicTokenTransfers);
+    return flattenTxArray<TxInfo>(data.CosmicTokenTransfers);
   }, []);
 }
 
-export function get_ct_ownership_transfers(token_id: number) {
+export function get_ct_ownership_transfers(token_id: number): Promise<CSTTransferRecord[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`cst/transfers/all/${token_id}/0/1000000`));
-    return flattenTxArray(data.TokenTransfers);
+    return flattenTxArray<CSTTransferRecord>(data.TokenTransfers);
   }, []);
 }
 
-export function get_ct_price() {
+export function get_ct_price(): Promise<CTPriceInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('bid/cst_price'));
-    return data;
+    return data as CTPriceInfo;
   }, null);
 }
 
-export function get_info(token_id: number | string) {
+export function get_info(token_id: number | string): Promise<TokenMintInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getMainAPIUrl(`token_info/${token_id}`));
-    return data.TokenInfo;
+    return data.TokenInfo as TokenMintInfo | null;
   }, null);
 }
 

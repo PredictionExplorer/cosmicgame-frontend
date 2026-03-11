@@ -2,7 +2,7 @@
 
 import { MainWrapper } from '@/components/styled';
 import { useSystemEvents } from '@/hooks/useApiQuery';
-import { AdminEventsTable, type AdminEventRow } from '@/components/tables/AdminEventsTable';
+import { AdminEventsTable } from '@/components/tables/AdminEventsTable';
 
 interface SystemEventPageProps {
   start: number;
@@ -12,7 +12,7 @@ interface SystemEventPageProps {
 
 const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
   const { data: eventsRaw, isLoading: loading } = useSystemEvents(start, end);
-  const events = (eventsRaw ?? []) as AdminEventRow[];
+  const events = eventsRaw ?? [];
 
   return (
     <MainWrapper>

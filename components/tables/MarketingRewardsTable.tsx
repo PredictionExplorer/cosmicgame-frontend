@@ -13,13 +13,9 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import type { MarketingReward } from '@/services/api/types';
 
-export interface MarketingReward {
-  EvtLogId: number;
-  TxHash: string;
-  TimeStamp: number;
-  AmountEth: number;
-}
+export type { MarketingReward };
 
 const MarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
   if (!row) {

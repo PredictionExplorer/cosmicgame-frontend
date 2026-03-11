@@ -1,5 +1,6 @@
 import { axios, getAPIUrl, apiCall, flattenTx, flattenTxArray } from './client';
 import type {
+  ActionIdWithClaimInfo,
   StakingCSTReward,
   StakingAction,
   StakedTokenInfo,
@@ -35,12 +36,15 @@ export function get_staked_cst_tokens_by_user(address: string): Promise<StakedTo
   }, []);
 }
 
-export function get_cst_action_ids_by_deposit_id(user_addr: string, deposit_id: number) {
+export function get_cst_action_ids_by_deposit_id(
+  user_addr: string,
+  deposit_id: number,
+): Promise<ActionIdWithClaimInfo[] | null> {
   return apiCall(async () => {
     const { data } = await axios.get(
       getAPIUrl(`staking/cst/rewards/action_ids_by_deposit/${user_addr}/${deposit_id}`),
     );
-    return data.ActionIdsWithClaimInfo;
+    return data.ActionIdsWithClaimInfo as ActionIdWithClaimInfo[];
   }, null);
 }
 
@@ -80,17 +84,19 @@ export function get_staking_cst_rewards(): Promise<StakingCSTReward[]> {
   }, []);
 }
 
-export function get_staking_cst_rewards_by_round(round: number) {
+export function get_staking_cst_rewards_by_round(round: number): Promise<StakingCSTReward[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/by_round/${round}`));
-    return flattenTxArray(data.Rewards);
+    return flattenTxArray<StakingCSTReward>(data.Rewards);
   }, []);
 }
 
-export function get_staking_cst_reward_paid_records_by_user(address: string) {
+export function get_staking_cst_reward_paid_records_by_user(
+  address: string,
+): Promise<StakingCSTReward[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/paid/by_user/${address}`));
-    return flattenTxArray(data.RewardPaidRecords);
+    return flattenTxArray<StakingCSTReward>(data.RewardPaidRecords);
   }, []);
 }
 
@@ -110,7 +116,10 @@ export function get_staking_rewards_by_user(address: string): Promise<RewardsByT
   }, []);
 }
 
-export function get_staking_rewards_by_user_by_token_details(address: string, tokenId: number) {
+export function get_staking_rewards_by_user_by_token_details(
+  address: string,
+  tokenId: number,
+): Promise<Record<string, unknown> | null> {
   return apiCall(async () => {
     const { data } = await axios.get(
       getAPIUrl(`staking/cst/rewards/by_user/by_token/details/${address}/${tokenId}`),
@@ -154,12 +163,14 @@ export function get_staking_rewards_by_user_by_token_details(address: string, to
   }, null);
 }
 
-export function get_staking_cst_by_user_by_deposit_rewards(address: string) {
+export function get_staking_cst_by_user_by_deposit_rewards(
+  address: string,
+): Promise<StakingCSTReward[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
       getAPIUrl(`staking/cst/rewards/by_user/by_deposit/${address}`),
     );
-    return flattenTxArray(data.RewardsByDeposit);
+    return flattenTxArray<StakingCSTReward>(data.RewardsByDeposit);
   }, []);
 }
 

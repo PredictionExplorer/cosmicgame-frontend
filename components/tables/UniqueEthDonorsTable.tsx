@@ -12,13 +12,9 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import type { UniqueEthDonor } from '@/services/api/types';
 
-export interface UniqueEthDonor {
-  DonorAid: string | number;
-  DonorAddr: string;
-  CountDonations: number;
-  TotalDonatedEth: number;
-}
+export type { UniqueEthDonor };
 
 const UniqueEthDonorsRow = ({ row }: { row: UniqueEthDonor }) => {
   if (!row) {

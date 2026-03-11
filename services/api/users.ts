@@ -1,5 +1,14 @@
 import { axios, getAPIUrl, apiCall, flattenTxArray } from './client';
-import type { UserInfoWithLists, UserBalance } from './types';
+import type {
+  UserInfoWithLists,
+  UserBalance,
+  NotifyRedBoxResult,
+  Bidder,
+  Winner,
+  UniqueEthDonor,
+  UniqueStakerCST,
+  UniqueStakerRWLK,
+} from './types';
 
 export function get_user_info(address: string): Promise<UserInfoWithLists | null> {
   return apiCall(async () => {
@@ -35,51 +44,51 @@ export function get_user_balance(address: string): Promise<UserBalance | null> {
   }, null);
 }
 
-export function notify_red_box(address: string) {
+export function notify_red_box(address: string): Promise<NotifyRedBoxResult | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`user/notif_red_box/${address}`));
-    return data.Winnings;
+    return data.Winnings as NotifyRedBoxResult;
   }, null);
 }
 
-export function get_unique_bidders() {
+export function get_unique_bidders(): Promise<Bidder[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/bidders'));
-    return data.UniqueBidders;
+    return data.UniqueBidders as Bidder[];
   }, []);
 }
 
-export function get_unique_winners() {
+export function get_unique_winners(): Promise<Winner[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/winners'));
-    return data.UniqueWinners;
+    return data.UniqueWinners as Winner[];
   }, []);
 }
 
-export function get_unique_donors() {
+export function get_unique_donors(): Promise<UniqueEthDonor[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/donors'));
-    return data.UniqueDonors;
+    return data.UniqueDonors as UniqueEthDonor[];
   }, []);
 }
 
-export function get_unique_cst_stakers() {
+export function get_unique_cst_stakers(): Promise<UniqueStakerCST[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/cst'));
-    return data.UniqueStakersCST;
+    return data.UniqueStakersCST as UniqueStakerCST[];
   }, []);
 }
 
-export function get_unique_rwalk_stakers() {
+export function get_unique_rwalk_stakers(): Promise<UniqueStakerRWLK[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/rwalk'));
-    return data.UniqueStakersRWalk;
+    return data.UniqueStakersRWalk as UniqueStakerRWLK[];
   }, []);
 }
 
-export function get_unique_both_stakers() {
+export function get_unique_both_stakers(): Promise<UniqueStakerRWLK[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/both'));
-    return data.UniqueStakersBoth;
+    return data.UniqueStakersBoth as UniqueStakerRWLK[];
   }, []);
 }

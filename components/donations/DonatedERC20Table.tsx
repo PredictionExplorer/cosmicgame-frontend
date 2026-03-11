@@ -18,20 +18,9 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
 import api from '@/services/api';
+import type { DonatedERC20Token } from '@/services/api/types';
 
-export interface DonatedERC20Token {
-  RoundNum: number;
-  TxHash: string;
-  TimeStamp: number;
-  TokenAddr: string;
-  AmountDonatedEth: number;
-  AmountClaimedEth: number;
-  AmountEth?: number;
-  WinnerAddr: string;
-  Claimed: boolean;
-  DonateClaimDiffEth: string;
-  [key: string]: unknown;
-}
+export type { DonatedERC20Token };
 
 interface TokenRowProps {
   currentTime: number;
@@ -130,7 +119,9 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
         <TablePrimaryCell>
           {!token.Claimed && (
             <Button
-              onClick={() => handleClaim(token.RoundNum, token.TokenAddr, token.DonateClaimDiffEth)}
+              onClick={() =>
+                handleClaim(token.RoundNum, token.TokenAddr, token.DonateClaimDiffEth ?? '0')
+              }
               data-testid="Claim Button"
             >
               Claim

@@ -14,6 +14,7 @@ export interface TxInfo {
   TxHash: string;
   TimeStamp: number;
   DateTime: string;
+  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------
@@ -348,8 +349,20 @@ export interface StakingCSTReward {
   RoundNum: number;
   TokenId: number;
   AmountEth?: number;
+  TxHash?: string;
+  TimeStamp?: number;
   DepositRoundNum?: number;
   DepositId?: number;
+  DepositAmountEth?: number;
+  ClaimedAmountEth?: number;
+  YourClaimableAmountEth?: number;
+  StakerAddr?: string;
+  StakerNumStakedNFTs?: number;
+  StakerAmountEth?: number;
+  FullyClaimed?: boolean;
+  NumStakedNFTs?: number;
+  NumTokensCollected?: number;
+  YourTokensStaked?: number;
   [key: string]: unknown;
 }
 
@@ -382,14 +395,15 @@ export interface StakingRewardMint {
 // ---------------------------------------------------------------------------
 
 export interface DonatedNFT extends TxInfo {
-  RecordId?: number;
+  RecordId?: number | string;
   RoundNum: number;
   DonorAddr: string;
   TokenAddr: string;
-  TokenId?: number;
-  NFTTokenId?: number;
+  TokenId?: number | string;
+  NFTTokenId?: number | string;
   NFTTokenURI?: string;
   TokenAddress?: string;
+  Index?: number;
   [key: string]: unknown;
 }
 
@@ -397,5 +411,206 @@ export interface ETHDonation extends TxInfo {
   RoundNum: number;
   DonorAddr: string;
   AmountEth: number;
+  RecordType?: number;
+  CGRecordId?: string | number;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Special Winners
+// ---------------------------------------------------------------------------
+
+export interface CharityWithdrawal {
+  EvtLogId: string | number;
+  TxHash: string;
+  TimeStamp: number;
+  DestinationAddr: string;
+  AmountEth: number;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Special Winners
+// ---------------------------------------------------------------------------
+
+export interface SpecialWinners {
+  EnduranceChampionAddress?: string;
+  EnduranceChampionDuration?: number;
+  LastCstBidderAddress?: string;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Banned Bids
+// ---------------------------------------------------------------------------
+
+export interface BannedBid {
+  bid_id: number;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Price Info
+// ---------------------------------------------------------------------------
+
+export interface BidEthPriceInfo {
+  AuctionDuration: string;
+  ETHPrice: string;
+  SecondsElapsed: string;
+  [key: string]: unknown;
+}
+
+export interface CTPriceInfo {
+  AuctionDuration: string;
+  CSTPrice: string;
+  SecondsElapsed: string;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Token Mint Info (from main API token_info endpoint)
+// ---------------------------------------------------------------------------
+
+export interface TokenMintInfo {
+  CurName?: string;
+  CurOwnerAddr?: string;
+  SeedHex?: string;
+  TokenId?: number;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Unique Address Statistics
+// ---------------------------------------------------------------------------
+
+export interface Bidder {
+  BidderAid: string;
+  BidderAddr: string;
+  NumBids: number;
+  MaxBidAmountEth: number;
+  [key: string]: unknown;
+}
+
+export interface Winner {
+  WinnerAid: string;
+  WinnerAddr: string;
+  PrizesCount: number;
+  MaxWinAmountEth: number;
+  PrizesSum: number;
+  [key: string]: unknown;
+}
+
+export interface UniqueStakerCST {
+  StakerAid: string | number;
+  StakerAddr: string;
+  NumStakeActions: number;
+  NumUnstakeActions: number;
+  TotalTokensMinted: number;
+  TotalTokensStaked: number;
+  TotalRewardEth: number;
+  UnclaimedRewardEth: number;
+  [key: string]: unknown;
+}
+
+export interface UniqueStakerRWLK {
+  StakerAid: string | number;
+  StakerAddr: string;
+  NumStakeActions: number;
+  NumUnstakeActions: number;
+  TotalTokensStaked: number;
+  TotalTokensMinted: number;
+  [key: string]: unknown;
+}
+
+export interface UniqueEthDonor {
+  DonorAid: string | number;
+  DonorAddr: string;
+  CountDonations: number;
+  TotalDonatedEth: number;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Notify Red Box
+// ---------------------------------------------------------------------------
+
+export interface NotifyRedBoxResult {
+  ETHRaffleToClaim: number;
+  ETHRaffleToClaimWei: number;
+  NumDonatedNFTToClaim: number;
+  UnclaimedStakingReward: number;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Marketing
+// ---------------------------------------------------------------------------
+
+export interface MarketingReward {
+  EvtLogId: number;
+  TxHash: string;
+  TimeStamp: number;
+  MarketerAddr: string;
+  AmountEth: number;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// System
+// ---------------------------------------------------------------------------
+
+export interface SystemModeChangeEvent {
+  RoundNum: number;
+  EvtLogId: string | number;
+  NextEvtLogId?: string | number;
+  TimeStamp: number;
+  [key: string]: unknown;
+}
+
+export interface AdminEventRow {
+  EvtLogId: string | number;
+  RecordType: number;
+  TransferType: number;
+  TimeStamp: number;
+  TxHash: string;
+  IntegerValue: number;
+  AddressValue: string;
+  StringValue: string;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Donated ERC20 Tokens
+// ---------------------------------------------------------------------------
+
+export interface DonatedERC20Token extends TxInfo {
+  RoundNum: number;
+  TokenAddr: string;
+  AmountDonatedEth: number;
+  AmountClaimedEth: number;
+  AmountEth?: number;
+  WinnerAddr: string;
+  DonorAddr?: string;
+  Claimed?: boolean;
+  DonateClaimDiffEth?: string;
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// NFT Donation Stats
+// ---------------------------------------------------------------------------
+
+export interface NFTDonationStatsEntry {
+  [key: string]: unknown;
+}
+
+// ---------------------------------------------------------------------------
+// Staking Action IDs with Claim Info
+// ---------------------------------------------------------------------------
+
+export interface ActionIdWithClaimInfo {
+  DepositId: number;
+  StakeActionId: number;
+  Claimed: boolean;
   [key: string]: unknown;
 }

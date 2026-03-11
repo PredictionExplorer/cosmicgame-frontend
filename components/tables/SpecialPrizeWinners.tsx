@@ -2,16 +2,8 @@ import { formatSeconds } from '@/utils';
 
 import { useCurrentSpecialWinners } from '@/hooks/useApiQuery';
 
-interface SpecialWinners {
-  EnduranceChampionAddress?: string;
-  EnduranceChampionDuration?: number;
-  LastCstBidderAddress?: string;
-}
-
 export const SpecialPrizeWinners = () => {
-  const { data } = useCurrentSpecialWinners();
-  const specialWinners =
-    data != null && Array.isArray(data) ? null : (data as SpecialWinners | null);
+  const { data: specialWinners } = useCurrentSpecialWinners();
 
   return (
     <>

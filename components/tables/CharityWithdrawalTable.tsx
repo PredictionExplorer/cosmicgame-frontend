@@ -14,14 +14,9 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import type { CharityWithdrawal } from '@/services/api/types';
 
-export interface CharityWithdrawal {
-  TxHash: string;
-  TimeStamp: number;
-  DestinationAddr: string;
-  AmountEth: number;
-  EvtLogId: string;
-}
+export type { CharityWithdrawal };
 
 interface WithdrawalRowProps {
   withdrawal?: CharityWithdrawal;

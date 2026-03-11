@@ -12,15 +12,9 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import type { UniqueStakerRWLK } from '@/services/api/types';
 
-export interface UniqueStakerRWLK {
-  StakerAid: string | number;
-  StakerAddr: string;
-  NumStakeActions: number;
-  NumUnstakeActions: number;
-  TotalTokensStaked: number;
-  TotalTokensMinted: number;
-}
+export type { UniqueStakerRWLK };
 
 const UniqueStakersRWLKRow = ({ row }: { row: UniqueStakerRWLK }) => {
   if (!row) {

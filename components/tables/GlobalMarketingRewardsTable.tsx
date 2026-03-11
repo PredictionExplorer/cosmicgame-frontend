@@ -14,14 +14,9 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import type { MarketingReward } from '@/services/api/types';
 
-export interface MarketingReward {
-  EvtLogId: number;
-  TxHash: string;
-  TimeStamp: number;
-  MarketerAddr: string;
-  AmountEth: number;
-}
+export type { MarketingReward };
 
 const GlobalMarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
   if (!row) {
