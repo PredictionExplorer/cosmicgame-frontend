@@ -304,13 +304,13 @@ All items complete. No remaining issues.
 
 
 ================================================================================
-6. TESTING — Currently 5/10 (BIGGEST GAP)
+6. TESTING — Currently 6/10 (BIGGEST GAP)
 ================================================================================
 
 Current state:
-- 116 unit test files (1,478 tests), 11 E2E specs
-- Actual coverage: Statements ~52%, Branches ~45%, Lines ~53%, Functions ~46%
-- Coverage threshold in jest.config.js: 60% (would FAIL in CI)
+- 142 unit test files (1,622 tests), 11 E2E specs
+- Actual coverage: Statements ~56%, Branches ~47%, Lines ~57%, Functions ~50%
+- Coverage threshold in jest.config.js: branches 45%, functions 47%, lines 54%, statements 53%
 - No accessibility testing (jest-axe not installed)
 
 6a. [DONE] Add app/ to coverage collection
@@ -361,9 +361,59 @@ Current state:
     - app/mint/__tests__/Mint.test.tsx (7 tests)
     - app/mint-artblocks/__tests__/MintArtBlocks.test.tsx (7 tests)
 
-6b. [OPEN] Lower coverage threshold to match reality
-    Change jest.config.js coverageThreshold to 30% so CI doesn't fail.
-    Increase by 5% each git commit until reaching 95%+.
+6b. [DONE] Lower coverage threshold to match reality, then push it up
+    Lowered jest.config.js coverageThreshold from 60% (which FAILED CI) to
+    per-metric values matching achieved coverage: branches 45%, functions 47%,
+    lines 54%, statements 53%. Wrote 144 new tests across 26 new test files
+    to push coverage from baseline (52%/45%/53%/46%) to (56%/47%/57%/50%).
+    Installed @testing-library/user-event for interaction tests.
+
+    Coverage improvement (baseline -> after):
+    - Statements: 52.36% -> 55.85%
+    - Branches:   44.77% -> 47.43%
+    - Functions:  46.49% -> 49.84%
+    - Lines:      53.43% -> 56.84%
+
+    Config change:
+    - jest.config.js: coverageThreshold set to per-metric values
+      { branches: 45, functions: 47, lines: 54, statements: 53 }
+
+    Utility tests added (7 files, 60 tests):
+    - utils/__tests__/alert.test.ts (9 tests)
+    - utils/__tests__/analytics.test.ts (7 tests)
+    - utils/__tests__/metadata.test.ts (6 tests)
+    - utils/__tests__/wallet.test.ts (8 tests)
+    - utils/__tests__/endurance.test.ts (12 tests)
+    - utils/__tests__/format-extra.test.ts (11 tests)
+    - utils/__tests__/urls-extra.test.ts (7 tests)
+
+    Hook tests added (10 files, 33 tests):
+    - hooks/__tests__/useClipboard.test.ts (4 tests)
+    - hooks/__tests__/useContractNoSigner.test.ts (5 tests)
+    - hooks/__tests__/web3.test.ts (3 tests)
+    - hooks/__tests__/useCosmicGameContract.test.ts (3 tests)
+    - hooks/__tests__/useCosmicSignatureContract.test.ts (3 tests)
+    - hooks/__tests__/useRaffleWalletContract.test.ts (3 tests)
+    - hooks/__tests__/useRWLKNFTContract.test.ts (3 tests)
+    - hooks/__tests__/useStakingWalletCSTContract.test.ts (3 tests)
+    - hooks/__tests__/useStakingWalletRWLKContract.test.ts (3 tests)
+    - hooks/__tests__/useArtBlocksContract.test.ts (3 tests)
+
+    Component tests added (8 files, 44 tests):
+    - components/common/__tests__/Counter.test.tsx (6 tests)
+    - components/common/__tests__/VideoPlayerDialog.test.tsx (4 tests)
+    - components/common/__tests__/TwitterPopup.test.tsx (8 tests)
+    - components/common/__tests__/CustomPagination.test.tsx (7 tests)
+    - components/common/__tests__/ListNavItem.test.tsx (3 tests)
+    - components/common/__tests__/ListItemButton.test.tsx (6 tests)
+    - components/common/__tests__/TwitterShareButton.test.tsx (5 tests)
+    - components/home/__tests__/CustomTabPanel.test.tsx (5 tests)
+
+    Context tests added (1 file, 7 tests):
+    - contexts/__tests__/SystemModeContext.test.tsx (7 tests)
+
+    All 1,622 tests pass across 142 suites. tsc --noEmit passes with zero
+    type errors. Coverage threshold passes in CI.
 
 6c. [OPEN] Write tests for ALL the untested hooks (12+ files) including
     - hooks/useClipboard.ts
@@ -436,12 +486,12 @@ Current state:
 
 
 ================================================================================
-7. GIT HOOKS / CI — Currently 8.5/10
+7. GIT HOOKS / CI — Currently 9/10
 ================================================================================
 
-7a. [OPEN] Fix coverage threshold so CI passes
-    Currently yarn test --coverage FAILS because coverage (~31%) is below
-    the 60% threshold. Lower to 30% and ramp up (see 6b).
+7a. [DONE] Fix coverage threshold so CI passes
+    Resolved via 6b. Coverage threshold lowered to per-metric values that
+    match achieved coverage. CI now passes with yarn test --coverage.
 
 7b. [OPEN] Add tsc --noEmit to pre-push hook
     Currently only in pre-commit (via lint-staged). Adding to pre-push
@@ -535,8 +585,8 @@ SCORING BREAKDOWN
 | 3. Code Duplication  |   8/10  |    8      |    8      |   10      |   10      |
 | 4. TypeScript        |   9/10  |    9      |    9      |    9.5    |   9.5     |
 | 5. Error Handling    | 8.5/10  |    9.5    |    9.5    |   10      |   10      |
-| 6. Testing           |   5/10  |    5.5    |    8      |    8.5    |    9      |
-| 7. Git Hooks / CI    | 8.5/10  |    9      |    9      |    9      |   10      |
+| 6. Testing           |   6/10  |    6      |    8      |    8.5    |    9      |
+| 7. Git Hooks / CI    |   9/10  |    9      |    9      |    9      |   10      |
 | 8. Configuration     |   9/10  |    9      |    9      |    9      |   10      |
 | 9. Readability       |   7/10  |    7.5    |    7.5    |    9      |   10      |
 |----------------------|---------|-----------|-----------|-----------|-----------|
