@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
-import Statistics from './Statistics';
+import StatisticsLoader from './StatisticsLoader';
 
 export const metadata: Metadata = createMetadata(
   'Statistics | Cosmic Signature',
@@ -10,5 +10,5 @@ export const metadata: Metadata = createMetadata(
 );
 
 export default function Page() {
-  return <Statistics />;
+  return <StatisticsLoader />;
 }

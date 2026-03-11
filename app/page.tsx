@@ -5,7 +5,7 @@ import axios from 'axios';
 import { cosmicGameBaseUrl } from '@/services/api';
 import { createMetadata } from '@/utils/seo';
 
-import HomePage from './HomePage';
+import HomePageLoader from './HomePageLoader';
 
 export async function generateMetadata(): Promise<Metadata> {
   let prizeAmountStr = '';
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Page() {
   return (
     <Suspense>
-      <HomePage />
+      <HomePageLoader />
     </Suspense>
   );
 }
