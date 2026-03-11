@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import { CSTStakingRewardsByDepositTable } from '../CSTStakingRewardsByDepositTable';
 
@@ -92,5 +92,10 @@ describe('CSTStakingRewardsByDepositTable', () => {
     render(<CSTStakingRewardsByDepositTable list={list} />);
     expect(screen.getByText('104')).toBeInTheDocument();
     expect(screen.queryByText('105')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<CSTStakingRewardsByDepositTable list={[]} />);
+    await checkA11y(container);
   });
 });

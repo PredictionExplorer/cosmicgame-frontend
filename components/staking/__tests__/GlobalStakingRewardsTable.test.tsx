@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useStakingCSTRewardsByRound: () => ({ data: [] }),
@@ -78,5 +78,10 @@ describe('GlobalStakingRewardsTable', () => {
     render(<GlobalStakingRewardsTable list={list} />);
     expect(screen.getByText('104')).toBeInTheDocument();
     expect(screen.queryByText('105')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<GlobalStakingRewardsTable list={[]} />);
+    await checkA11y(container);
   });
 });

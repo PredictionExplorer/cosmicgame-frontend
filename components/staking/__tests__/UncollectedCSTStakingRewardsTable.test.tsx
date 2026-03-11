@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import { render, screen, waitFor } from '@/test-utils';
+import { render, screen, waitFor, checkA11y } from '@/test-utils';
 
 const mockSetNotification = jest.fn();
 const mockFetchData = jest.fn();
@@ -238,5 +238,10 @@ describe('UncollectedCSTStakingRewardsTable', () => {
     render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
 
     expect(screen.queryByText('Unstake & Claim All')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<UncollectedCSTStakingRewardsTable user="0xOtherUser" />);
+    await checkA11y(container);
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import MyWallet from '../MyTokens';
 
@@ -65,5 +65,10 @@ describe('MyTokens', () => {
     render(<MyWallet />);
     expect(screen.getByText('My Cosmic Signature (ERC721) Tokens')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature Tokens I Own')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<MyWallet />);
+    await checkA11y(container);
   });
 });

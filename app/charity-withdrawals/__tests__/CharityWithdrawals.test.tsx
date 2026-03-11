@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import CharityWithdrawals from '../CharityWithdrawals';
 
@@ -43,5 +43,11 @@ describe('CharityWithdrawals', () => {
     mockUseCharityWithdrawals.mockReturnValue({ data: [], isLoading: false });
     render(<CharityWithdrawals />);
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseCharityWithdrawals.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<CharityWithdrawals />);
+    await checkA11y(container);
   });
 });

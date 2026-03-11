@@ -4,7 +4,7 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import { CharityDepositTable } from '@/components/tables/CharityDepositTable';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const createDonation = (overrides = {}) => ({
   EvtLogId: 1,
@@ -71,5 +71,10 @@ describe('CharityDepositTable', () => {
         expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       }
     }
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<CharityDepositTable list={[]} />);
+    await checkA11y(container);
   });
 });

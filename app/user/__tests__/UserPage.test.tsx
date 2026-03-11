@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import UserPage from '../[address]/UserPage';
 
@@ -20,5 +20,10 @@ describe('UserPage', () => {
   it('passes isOwnProfile=false to UserStatisticsView', () => {
     render(<UserPage address="0xABC123" />);
     expect(screen.getByTestId('user-stats')).toHaveTextContent('own=false');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<UserPage address="0xABC123" />);
+    await checkA11y(container);
   });
 });

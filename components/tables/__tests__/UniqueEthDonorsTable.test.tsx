@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import { UniqueEthDonorsTable } from '@/components/tables/UniqueEthDonorsTable';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const createDonor = (overrides = {}) => ({
   DonorAid: 1,
@@ -48,5 +48,10 @@ describe('UniqueEthDonorsTable', () => {
     render(<UniqueEthDonorsTable list={list} />);
     expect(screen.getByText('5')).toBeInTheDocument();
     expect(screen.queryByText('6')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<UniqueEthDonorsTable list={[]} />);
+    await checkA11y(container);
   });
 });

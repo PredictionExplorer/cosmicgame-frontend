@@ -359,7 +359,9 @@ export const StakedTokensTable = ({
               <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Stake Datetime</TablePrimaryHeadCell>
               {!IsRwalk && <TablePrimaryHeadCell>Accumulated Rewards</TablePrimaryHeadCell>}
-              <TablePrimaryHeadCell />
+              <TablePrimaryHeadCell>
+                <span className="sr-only">Actions</span>
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

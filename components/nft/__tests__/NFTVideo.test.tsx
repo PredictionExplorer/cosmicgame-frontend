@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock(
   'next/image',
@@ -21,7 +21,6 @@ jest.mock(
     },
 );
 
- 
 import NFTVideo from '../NFTVideo';
 
 describe('NFTVideo', () => {
@@ -54,5 +53,10 @@ describe('NFTVideo', () => {
     render(<NFTVideo {...defaultProps} />);
     const img = screen.getByTestId('nft-image');
     expect(img).toHaveStyle({ opacity: 0.55 });
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<NFTVideo {...defaultProps} />);
+    await checkA11y(container);
   });
 });

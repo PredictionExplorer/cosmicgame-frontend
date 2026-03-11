@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('@progress/kendo-react-charts', () => ({
   Chart: function MockChart({ children }: { children?: React.ReactNode }) {
@@ -36,7 +36,6 @@ jest.mock('@progress/kendo-react-charts', () => ({
   ChartValueAxisItem: () => null,
 }));
 
- 
 import ChartOrPie from '../ChartOrPie';
 
 describe('ChartOrPie', () => {
@@ -90,5 +89,10 @@ describe('ChartOrPie', () => {
     render(<ChartOrPie data={createData({ PrizePercentage: -10, RafflePercentage: 200 })} />);
     expect(screen.getByText(/Prize: 0/)).toBeInTheDocument();
     expect(screen.getByText(/Raffle: 100/)).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<ChartOrPie />);
+    await checkA11y(container);
   });
 });

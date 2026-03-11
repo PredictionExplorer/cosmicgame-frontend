@@ -3,7 +3,7 @@ import type React from 'react';
 
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 
-import { render, screen, fireEvent } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
 const originalError = console.error;
 beforeAll(() => {
@@ -97,5 +97,14 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     );
     expect(console.error).toHaveBeenCalled();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <ErrorBoundary>
+        <div>Child content</div>
+      </ErrorBoundary>,
+    );
+    await checkA11y(container);
   });
 });

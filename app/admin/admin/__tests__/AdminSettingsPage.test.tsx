@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import AdminSettingsPage from '../AdminSettingsPage';
 
@@ -82,5 +82,11 @@ describe('AdminSettingsPage', () => {
     mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<AdminSettingsPage />);
     expect(screen.getByText('Administrative methods')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: [], isLoading: false, error: null });
+    const { container } = render(<AdminSettingsPage />);
+    await checkA11y(container);
   });
 });

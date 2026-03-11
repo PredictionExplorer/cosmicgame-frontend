@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import PrizeClaimedPage from '../PrizeClaimedPage';
 
@@ -71,5 +71,10 @@ describe('PrizeClaimedPage', () => {
     });
     render(<PrizeClaimedPage />);
     expect(screen.getByText(/7 donated tokens/)).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<PrizeClaimedPage />);
+    await checkA11y(container);
   });
 });

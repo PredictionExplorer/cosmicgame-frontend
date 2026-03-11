@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import FAQ from '../FAQ';
 
@@ -163,5 +163,10 @@ describe('FAQ', () => {
       value: { ...window.location, hash: '' },
     });
     jest.useRealTimers();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<FAQ />);
+    await checkA11y(container);
   });
 });

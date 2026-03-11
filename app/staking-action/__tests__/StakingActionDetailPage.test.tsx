@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import StakingActionDetailPage from '../[IsRwalk]/[actionId]/StakingActionDetailPage';
 
@@ -19,7 +19,10 @@ jest.mock('../../../utils', () => ({
 
 jest.mock('../../../components/nft/NFTImage', () => ({
   __esModule: true,
-  default: ({ src }: { src: string }) => <img data-testid="nft-image" src={src} />,
+  default: ({ src, alt = 'NFT' }: { src: string; alt?: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img data-testid="nft-image" src={src} alt={alt} />
+  ),
 }));
 
 beforeEach(() => jest.clearAllMocks());
@@ -113,5 +116,12 @@ describe('StakingActionDetailPage', () => {
     render(<StakingActionDetailPage IsRwalk={0} actionId={7} />);
     expect(mockUseStakingRWLKActionsInfo).toHaveBeenCalledWith(null);
     expect(mockUseStakingCSTActionsInfo).toHaveBeenCalledWith(7);
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseStakingRWLKActionsInfo.mockReturnValue(noData);
+    mockUseStakingCSTActionsInfo.mockReturnValue(noData);
+    const { container } = render(<StakingActionDetailPage IsRwalk={0} actionId={5} />);
+    await checkA11y(container);
   });
 });

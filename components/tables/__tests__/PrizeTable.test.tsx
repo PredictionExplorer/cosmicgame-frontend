@@ -3,7 +3,7 @@ import { fireEvent } from '@testing-library/react';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
@@ -123,5 +123,10 @@ describe('PrizeTable', () => {
     render(<PrizeTable list={list} loading={false} />);
     expect(screen.getByText('10')).toBeInTheDocument();
     expect(screen.queryByText('11')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<PrizeTable list={[]} loading={false} />);
+    await checkA11y(container);
   });
 });

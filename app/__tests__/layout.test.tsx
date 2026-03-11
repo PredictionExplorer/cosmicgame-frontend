@@ -31,7 +31,7 @@ jest.mock('../../utils', () => ({
 import { metadata, viewport } from '@/app/layout';
 // eslint-disable-next-line import/order
 import RootLayout from '@/app/layout';
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('RootLayout metadata', () => {
   it('exports metadata with correct default title', () => {
@@ -99,5 +99,14 @@ describe('RootLayout component', () => {
 
     const providers = screen.getByTestId('providers');
     expect(providers).toContainHTML('Nested');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <RootLayout>
+        <div>Test content</div>
+      </RootLayout>,
+    );
+    await checkA11y(container);
   });
 });

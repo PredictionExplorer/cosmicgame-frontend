@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import MyStaking from '../MyStaking';
 
@@ -149,5 +149,10 @@ describe('MyStaking', () => {
     mockAccount = null;
     render(<MyStaking />);
     expect(screen.getByText('My Staking')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<MyStaking />);
+    await checkA11y(container);
   });
 });

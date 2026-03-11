@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import PrizeInfoPage from '../[id]/PrizeInfoPage';
 
@@ -116,5 +116,10 @@ describe('PrizeInfoPage', () => {
     mockUseDonationsNFTByRound.mockReturnValue({ data: [], isLoading: true });
     render(<PrizeInfoPage roundNum={1} />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<PrizeInfoPage roundNum={1} />);
+    await checkA11y(container);
   });
 });

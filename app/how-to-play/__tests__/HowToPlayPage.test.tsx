@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import HowToPlayPage from '../HowToPlayPage';
 
@@ -67,5 +67,10 @@ describe('HowToPlayPage', () => {
   it('renders "Happy bidding!" closing text', () => {
     render(<HowToPlayPage />);
     expect(screen.getByText('Happy bidding!')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<HowToPlayPage />);
+    await checkA11y(container);
   });
 });

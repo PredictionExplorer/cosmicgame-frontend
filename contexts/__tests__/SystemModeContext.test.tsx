@@ -1,6 +1,8 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { type ReactNode } from 'react';
 
+import { render, checkA11y } from '@/test-utils';
+
 import { SystemModeProvider, useSystemMode } from '../SystemModeContext';
 
 const mockSystemMode = jest.fn();
@@ -181,6 +183,17 @@ describe('SystemModeProvider', () => {
     await waitFor(() => {
       expect(result.current!.data).toBe(4);
     });
+  });
+
+  it('has no accessibility violations', async () => {
+    jest.useRealTimers();
+    const { container } = render(
+      <SystemModeProvider>
+        <div>Test</div>
+      </SystemModeProvider>,
+    );
+    await checkA11y(container);
+    jest.useFakeTimers();
   });
 });
 

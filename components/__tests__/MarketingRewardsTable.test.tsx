@@ -5,7 +5,7 @@ import { convertTimestampToDateTime } from '@/utils';
 import MarketingRewardsTable from '@/components/tables/MarketingRewardsTable';
 import type { MarketingReward } from '@/services/api/types';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 const createReward = (overrides: Partial<MarketingReward> = {}): MarketingReward => ({
   EvtLogId: 1,
@@ -67,5 +67,10 @@ describe('MarketingRewardsTable', () => {
     render(<MarketingRewardsTable list={rewards} />);
     expect(screen.getByText('10.00')).toBeInTheDocument();
     expect(screen.getByText('20.00')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<MarketingRewardsTable list={[]} />);
+    await checkA11y(container);
   });
 });

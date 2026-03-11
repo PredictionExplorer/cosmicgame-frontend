@@ -93,6 +93,8 @@ jest.mock('../../components/layout/ErrorBoundary', () => ({
 import { render, screen, waitFor } from '@testing-library/react';
 import { CookiesProvider } from 'react-cookie';
 
+import { checkA11y } from '@/test-utils';
+
 import { Providers } from '../providers';
 import { NOTIFICATION_AUTO_HIDE_MS } from '../../config/constants';
 
@@ -308,5 +310,14 @@ describe('Providers', () => {
     await waitFor(() => {
       expect(mockLoadSlim).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <Providers>
+        <div>Content</div>
+      </Providers>,
+    );
+    await checkA11y(container);
   });
 });

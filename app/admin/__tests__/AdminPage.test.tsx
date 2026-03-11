@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import AdminPage from '../AdminPage';
 
@@ -65,5 +65,11 @@ describe('AdminPage', () => {
     mockUseBidList.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<AdminPage />);
     expect(screen.getByText('Administrative methods')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseBidList.mockReturnValue({ data: [], isLoading: false, error: null });
+    const { container } = render(<AdminPage />);
+    await checkA11y(container);
   });
 });

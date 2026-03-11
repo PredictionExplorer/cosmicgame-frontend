@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import FAQPage from '../FAQPage';
 
@@ -44,5 +44,10 @@ describe('FAQPage', () => {
     expect(discordLink).toHaveAttribute('href', 'https://discord.gg/bGnPn96Qwt');
     expect(discordLink).toHaveAttribute('rel', 'noopener noreferrer');
     expect(discordLink).toHaveAttribute('target', '_blank');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<FAQPage />);
+    await checkA11y(container);
   });
 });

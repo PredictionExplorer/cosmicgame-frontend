@@ -95,7 +95,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
               {/* Stake Section */}
               <div>
-                <h6 className="text-lg font-semibold">Stake</h6>
+                <p className="text-lg font-semibold">Stake</p>
                 <div className="mb-2">
                   <span className="text-primary">Staked Datetime:</span>
                   &nbsp;
@@ -118,7 +118,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
               {/* Unstake Section */}
               {Unstake.EvtLogId !== 0 && (
                 <div>
-                  <h6 className="text-lg font-semibold">Unstake</h6>
+                  <p className="text-lg font-semibold">Unstake</p>
                   <div className="mb-2">
                     <span className="text-primary">Unstake Datetime:</span>
                     &nbsp;
@@ -166,7 +166,9 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell />
+              <TablePrimaryHeadCell>
+                <span className="sr-only">Details</span>
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>

@@ -1,6 +1,6 @@
 import type { CountdownRenderProps } from 'react-countdown';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import Counter from '../Counter';
 
@@ -54,5 +54,12 @@ describe('Counter', () => {
     render(<Counter {...baseProps} days={0} hours={0} minutes={0} seconds={0} />);
     expect(screen.getByText('MIN')).toBeInTheDocument();
     expect(screen.getByText('SEC')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <Counter {...baseProps} days={1} hours={2} minutes={30} seconds={45} />,
+    );
+    await checkA11y(container);
   });
 });

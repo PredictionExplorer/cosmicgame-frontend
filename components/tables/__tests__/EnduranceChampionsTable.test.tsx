@@ -5,7 +5,7 @@ import { formatSeconds } from '@/utils';
 
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const createChampion = (overrides = {}) => ({
   bidder: '0x1234567890abcdef1234567890abcdef12345678',
@@ -146,5 +146,10 @@ describe('EnduranceChampionsTable', () => {
     const dataRows = rows.filter((r) => r.querySelector('td'));
     const firstRowText = dataRows[0]?.textContent ?? '';
     expect(firstRowText).toContain(formatSeconds(300));
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<EnduranceChampionsTable championList={[]} />);
+    await checkA11y(container);
   });
 });

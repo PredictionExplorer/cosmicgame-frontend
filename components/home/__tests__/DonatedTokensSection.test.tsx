@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import type { DonatedNFT, DonatedERC20Token } from '@/services/api/types';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock(
   '../../../components/donations/DonatedNFT',
@@ -150,5 +150,10 @@ describe('DonatedTokensSection', () => {
     );
     render(<DonatedTokensSection {...defaultProps} donatedNFTs={nfts} donatedTokensTab={0} />);
     expect(screen.getAllByTestId('nft')).toHaveLength(5);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<DonatedTokensSection {...defaultProps} />);
+    await checkA11y(container);
   });
 });

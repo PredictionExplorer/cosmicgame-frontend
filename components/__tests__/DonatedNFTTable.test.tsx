@@ -5,7 +5,7 @@ import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
 
-import { render, screen, waitFor, fireEvent } from '@/test-utils';
+import { render, screen, waitFor, fireEvent, checkA11y } from '@/test-utils';
 
 jest.mock('axios');
 jest.mock('../../hooks/useRaffleWalletContract', () => ({
@@ -63,7 +63,7 @@ describe('DonatedNFTTable', () => {
     expect(screen.getByText(String(mockData[0]!.NFTTokenId))).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByAltText('nft image').getAttribute('src')).toEqual(mockImageUrl);
+      expect(screen.getByAltText('NFT').getAttribute('src')).toEqual(mockImageUrl);
     });
 
     expect(screen.getByTestId('Claim Button').textContent).toEqual('Claim');
@@ -142,5 +142,10 @@ describe('DonatedNFTTable', () => {
 
     fireEvent.click(screen.getByTestId('Claim Button'));
     expect(mockHandleClaim).toHaveBeenCalledWith(0);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<DonatedNFTTable list={[]} claimingTokens={[]} />);
+    await checkA11y(container);
   });
 });

@@ -4,7 +4,7 @@ import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import BiddingHistoryTable from '@/components/tables/BiddingHistoryTable';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('BiddingHistoryTable', () => {
   test('with no records', () => {
@@ -47,5 +47,10 @@ describe('BiddingHistoryTable', () => {
     expect(screen.getByText(`${mockData[0]!.EthPriceEth.toFixed(7)} ETH`)).toBeInTheDocument();
     expect(screen.getByText(mockData[0]!.RoundNum)).toBeInTheDocument();
     expect(screen.getByText(mockData[0]!.Message)).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<BiddingHistoryTable biddingHistory={[]} />);
+    await checkA11y(container);
   });
 });

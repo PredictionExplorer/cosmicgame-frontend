@@ -1,6 +1,6 @@
 import DonatedNFTDistributionTable from '@/components/donations/DonatedNFTDistributionTable';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 import '@testing-library/jest-dom';
 
 describe('DonatedNFTDistributionTable', () => {
@@ -23,5 +23,10 @@ describe('DonatedNFTDistributionTable', () => {
     render(<DonatedNFTDistributionTable list={mockData} />);
     expect(screen.getByText(mockData[0]!.TokenAddr)).toBeInTheDocument();
     expect(screen.getByText(mockData[0]!.NumDonations)).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<DonatedNFTDistributionTable list={[]} />);
+    await checkA11y(container);
   });
 });

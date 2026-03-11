@@ -1,6 +1,8 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { type ReactNode } from 'react';
 
+import { render, checkA11y } from '@/test-utils';
+
 import { ApiDataProvider, useApiData } from '../ApiDataContext';
 
 const mockRefetchRedBox = jest.fn().mockResolvedValue({ data: {} });
@@ -470,5 +472,14 @@ describe('ApiDataContext', () => {
 
     expect(order).toContain('redbox');
     expect(order).toContain('rewards');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <ApiDataProvider>
+        <div>Test</div>
+      </ApiDataProvider>,
+    );
+    await checkA11y(container);
   });
 });

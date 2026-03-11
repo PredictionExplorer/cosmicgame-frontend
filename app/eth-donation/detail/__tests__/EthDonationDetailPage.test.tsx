@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import EthDonationDetailPage from '../[id]/EthDonationDetailPage';
 
@@ -76,5 +76,11 @@ describe('EthDonationDetailPage', () => {
     mockUseDonationsWithInfoById.mockReturnValue({ data: null, isLoading: false });
     render(<EthDonationDetailPage id={42} />);
     expect(mockUseDonationsWithInfoById).toHaveBeenCalledWith(42);
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
+    const { container } = render(<EthDonationDetailPage id={1} />);
+    await checkA11y(container);
   });
 });

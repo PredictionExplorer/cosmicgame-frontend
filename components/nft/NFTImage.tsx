@@ -7,11 +7,12 @@ const FALLBACK_SRC = '/images/qmark.png';
 
 interface NFTImageProps {
   src?: string;
+  alt?: string;
   style?: CSSProperties;
   className?: string;
 }
 
-const NFTImage = ({ src, style, className }: NFTImageProps) => {
+const NFTImage = ({ src, alt = 'NFT', style, className }: NFTImageProps) => {
   const [hasError, setHasError] = useState(false);
   const [prevSrc, setPrevSrc] = useState(src);
 
@@ -24,7 +25,7 @@ const NFTImage = ({ src, style, className }: NFTImageProps) => {
     <Image
       src={hasError ? FALLBACK_SRC : src || FALLBACK_SRC}
       onError={() => setHasError(true)}
-      alt="nft image"
+      alt={alt}
       width={800}
       height={450}
       unoptimized

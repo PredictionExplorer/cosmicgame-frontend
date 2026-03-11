@@ -4,7 +4,7 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import { GlobalMarketingRewardsTable } from '@/components/tables/GlobalMarketingRewardsTable';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const createReward = (overrides = {}) => ({
   EvtLogId: 1,
@@ -58,5 +58,10 @@ describe('GlobalMarketingRewardsTable', () => {
     render(<GlobalMarketingRewardsTable list={list} />);
     expect(screen.getByText('500.00 CST')).toBeInTheDocument();
     expect(screen.queryByText('600.00 CST')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<GlobalMarketingRewardsTable list={[]} />);
+    await checkA11y(container);
   });
 });

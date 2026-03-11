@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import UserStatisticsView from '../UserStatisticsView';
 
@@ -209,5 +209,12 @@ describe('UserStatisticsView', () => {
     render(<UserStatisticsView address="0xOther" isOwnProfile={false} />);
     expect(screen.getByText('User')).toBeInTheDocument();
     expect(screen.getByText('0xOther')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
+    mockUseUserInfo.mockReturnValue({ data: null, isLoading: false });
+    const { container } = render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
+    await checkA11y(container);
   });
 });

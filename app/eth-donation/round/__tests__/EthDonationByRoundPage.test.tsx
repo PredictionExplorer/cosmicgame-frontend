@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import EthDonationByRoundPage from '../[round]/EthDonationByRoundPage';
 
@@ -49,5 +49,11 @@ describe('EthDonationByRoundPage', () => {
     mockUseDonationsBothByRound.mockReturnValue({ data: [], isLoading: false });
     render(<EthDonationByRoundPage round={-1} />);
     expect(screen.queryByTestId('donation-table')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseDonationsBothByRound.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<EthDonationByRoundPage round={7} />);
+    await checkA11y(container);
   });
 });

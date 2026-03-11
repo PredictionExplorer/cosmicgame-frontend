@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('../../../config/networks', () => ({
   __esModule: true,
@@ -53,7 +53,6 @@ jest.mock('@progress/kendo-react-charts', () => ({
   ChartValueAxisItem: () => null,
 }));
 
- 
 import { CTBalanceDistributionChart } from '../CTBalanceDistributionChart';
 
 const createEntry = (addr: string, balance: number) => ({
@@ -104,5 +103,11 @@ describe('CTBalanceDistributionChart', () => {
     const list = [createEntry('0x1234567890abcdef1234567890abcdef12345678', 100)];
     render(<CTBalanceDistributionChart list={list} />);
     expect(screen.getByText(/0x1234/)).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const list = [createEntry('0xAddr1', 100)];
+    const { container } = render(<CTBalanceDistributionChart list={list} />);
+    await checkA11y(container);
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import MarketingRewardsPage from '../MarketingRewardsPage';
 
@@ -65,5 +65,11 @@ describe('MarketingRewardsPage', () => {
     render(<MarketingRewardsPage address={VALID_ADDRESS} />);
     const link = screen.getByRole('link');
     expect(link).toHaveAttribute('href', expect.stringContaining('/user/'));
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseMarketingRewardsByUser.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<MarketingRewardsPage address={VALID_ADDRESS} />);
+    await checkA11y(container);
   });
 });

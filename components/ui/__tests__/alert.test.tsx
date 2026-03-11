@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('Alert', () => {
   it('renders with default variant', () => {
@@ -37,5 +37,15 @@ describe('Alert', () => {
   it('has role="alert"', () => {
     render(<Alert>Accessible alert</Alert>);
     expect(screen.getByRole('alert')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <Alert>
+        <AlertTitle>Title</AlertTitle>
+        <AlertDescription>Description</AlertDescription>
+      </Alert>,
+    );
+    await checkA11y(container);
   });
 });

@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('react-super-responsive-table/dist/SuperResponsiveTableStyle.css', () => ({}));
 
@@ -85,5 +85,10 @@ describe('AdminEventsTable', () => {
     expect(datetimeHeaders.length).toBeGreaterThanOrEqual(1);
     const newValueHeaders = screen.getAllByText('New Value');
     expect(newValueHeaders.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<AdminEventsTable list={[]} />);
+    await checkA11y(container);
   });
 });

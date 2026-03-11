@@ -241,7 +241,9 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
               <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell />
+              <TablePrimaryHeadCell>
+                <span className="sr-only">Actions</span>
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

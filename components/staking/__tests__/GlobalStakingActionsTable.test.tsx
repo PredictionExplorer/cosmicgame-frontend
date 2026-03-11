@@ -3,14 +3,13 @@ import { fireEvent } from '@testing-library/react';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, prefetch: jest.fn() }),
 }));
 
- 
 import { GlobalStakingActionsTable } from '../GlobalStakingActionsTable';
 
 const createRow = (overrides = {}) => ({
@@ -92,5 +91,10 @@ describe('GlobalStakingActionsTable', () => {
     const row = screen.getAllByText('Stake')[0]!.closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/staking-action/1/3');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<GlobalStakingActionsTable list={[]} IsRWLK={false} />);
+    await checkA11y(container);
   });
 });

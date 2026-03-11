@@ -5,7 +5,7 @@ import { convertTimestampToDateTime } from '@/utils';
 import WinningHistoryTable from '@/components/tables/WinningHistoryTable';
 import type { WinningHistoryEntry } from '@/services/api/types';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 const createEntry = (overrides: Partial<WinningHistoryEntry> = {}): WinningHistoryEntry => ({
   EvtLogId: 1,
@@ -99,5 +99,10 @@ describe('WinningHistoryTable', () => {
     render(<WinningHistoryTable winningHistory={[entry]} />);
     const tokenLink = screen.getByText('10');
     expect(tokenLink.closest('a')).toHaveAttribute('href', '/detail/10');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<WinningHistoryTable winningHistory={[]} />);
+    await checkA11y(container);
   });
 });

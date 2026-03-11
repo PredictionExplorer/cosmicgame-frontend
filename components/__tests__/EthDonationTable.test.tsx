@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -88,5 +88,10 @@ describe('EthDonationTable', () => {
     expect(roundLink.closest('a')).toHaveAttribute('href', '/prize/5');
     expect(roundLink.closest('a')).toHaveAttribute('target', '_blank');
     expect(roundLink.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<EthDonationTable list={[]} />);
+    await checkA11y(container);
   });
 });

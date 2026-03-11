@@ -74,7 +74,7 @@ const NamedNFTsPage = () => {
 
       <div className="mt-12">
         {loading ? (
-          <h6 className="text-lg font-semibold">Loading...</h6>
+          <p className="text-lg font-semibold">Loading...</p>
         ) : list.length > 0 ? (
           <>
             <NamedNFTsTable list={list.slice((curPage - 1) * perPage, curPage * perPage)} />
@@ -86,7 +86,7 @@ const NamedNFTsPage = () => {
             />
           </>
         ) : (
-          <h6 className="text-lg font-semibold">No NFTs yet.</h6>
+          <p className="text-lg font-semibold">No NFTs yet.</p>
         )}
       </div>
     </MainWrapper>

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('../../../hooks/useRWLKNFT', () => ({
   useRWLKNFT: (tokenId: number | string) => ({
@@ -18,7 +18,6 @@ jest.mock(
     },
 );
 
- 
 import RandomWalkNFT from '../RandomWalkNFT';
 
 describe('RandomWalkNFT', () => {
@@ -53,5 +52,10 @@ describe('RandomWalkNFT', () => {
   it('applies default border style when not selected', () => {
     const { container } = render(<RandomWalkNFT tokenId={1} selected={false} />);
     expect(container.firstChild).toHaveClass('border-[#181F64]');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<RandomWalkNFT tokenId={42} />);
+    await checkA11y(container);
   });
 });

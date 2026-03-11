@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('@rainbow-me/rainbowkit');
 jest.mock('wagmi');
@@ -81,5 +81,10 @@ describe('Header', () => {
   it('does not render a maintenance banner when systemMode is 0', () => {
     render(<Header />);
     expect(screen.queryByText(/MAINTENANCE/)).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Header />);
+    await checkA11y(container);
   });
 });

@@ -19,7 +19,7 @@ import {
 } from '@/components/styled';
 import { Spinner } from '@/components/ui/spinner';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('MainWrapper', () => {
   it('renders its children', () => {
@@ -286,5 +286,25 @@ describe('SearchButton', () => {
   it('has gradient background classes', () => {
     render(<SearchButton>Go</SearchButton>);
     expect(screen.getByText('Go')).toHaveClass('bg-gradient-to-r');
+  });
+});
+
+describe('Accessibility', () => {
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <MainWrapper>
+        <SectionWrapper>
+          <GradientText>Title</GradientText>
+          <SearchBox>
+            <SearchField placeholder="Search..." />
+            <SearchButton>Go</SearchButton>
+          </SearchBox>
+          <StyledLink href="/test">Link</StyledLink>
+          <StyledCard>Card</StyledCard>
+          <CenterBox>Centered</CenterBox>
+        </SectionWrapper>
+      </MainWrapper>,
+    );
+    await checkA11y(container);
   });
 });

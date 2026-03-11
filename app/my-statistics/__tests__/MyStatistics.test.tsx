@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import MyStatistics from '../MyStatistics';
 
@@ -36,5 +36,11 @@ describe('MyStatistics', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: '0xDEADBEEF' });
     render(<MyStatistics />);
     expect(screen.getByTestId('user-stats')).toHaveTextContent('own=true');
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseActiveWeb3React.mockReturnValue({ account: '0xDEADBEEF' });
+    const { container } = render(<MyStatistics />);
+    await checkA11y(container);
   });
 });

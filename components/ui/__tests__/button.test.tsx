@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { Button } from '@/components/ui/button';
 
-import { render, screen, fireEvent } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
 describe('Button', () => {
   it('renders with default variant', () => {
@@ -51,5 +51,10 @@ describe('Button', () => {
   it('applies custom className', () => {
     render(<Button className="custom-class">Styled</Button>);
     expect(screen.getByRole('button', { name: /styled/i })).toHaveClass('custom-class');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Button>Accessible Button</Button>);
+    await checkA11y(container);
   });
 });

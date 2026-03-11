@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import CosmicSignatureTransfersPage from '../[address]/CosmicSignatureTransfersPage';
 
@@ -86,5 +86,11 @@ describe('CosmicSignatureTransfersPage', () => {
     render(<CosmicSignatureTransfersPage address={VALID_ADDRESS} />);
     const arg = mockUseCSTTransfers.mock.calls[0][0];
     expect(arg).toMatch(/^0x[0-9a-fA-F]{40}$/);
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseCSTTransfers.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<CosmicSignatureTransfersPage address={VALID_ADDRESS} />);
+    await checkA11y(container);
   });
 });

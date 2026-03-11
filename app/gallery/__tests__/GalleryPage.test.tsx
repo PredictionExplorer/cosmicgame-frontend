@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import GalleryPage from '../GalleryPage';
 
@@ -49,5 +49,11 @@ describe('GalleryPage', () => {
     render(<GalleryPage />);
     expect(screen.getByText('CosmicSignature')).toBeInTheDocument();
     expect(screen.getByText('NFT Gallery')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
+    const { container } = render(<GalleryPage />);
+    await checkA11y(container);
   });
 });

@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import TwitterPopup from '../TwitterPopup';
 
@@ -71,5 +71,10 @@ describe('TwitterPopup', () => {
   it('does not render when open is false', () => {
     render(<TwitterPopup {...defaultProps} open={false} />);
     expect(screen.queryByText('What is your Twitter handle?')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<TwitterPopup {...defaultProps} />);
+    await checkA11y(container);
   });
 });

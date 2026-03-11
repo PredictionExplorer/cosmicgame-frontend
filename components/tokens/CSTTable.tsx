@@ -128,7 +128,9 @@ export function CSTTable({ list }: { list: CSTTokenInfo[] }) {
           </colgroup>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell />
+              <TablePrimaryHeadCell>
+                <span className="sr-only">Details</span>
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>

@@ -1,6 +1,8 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { type ReactNode } from 'react';
 
+import { render, checkA11y } from '@/test-utils';
+
 import { StakedTokenProvider, useStakedToken } from '../StakedTokenContext';
 
 const mockRefetchCST = jest.fn().mockResolvedValue({ data: [] });
@@ -193,5 +195,14 @@ describe('StakedTokenContext', () => {
       );
     }
     consoleSpy.mockRestore();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <StakedTokenProvider>
+        <div>Test</div>
+      </StakedTokenProvider>,
+    );
+    await checkA11y(container);
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import DetailPage from '../[id]/DetailPage';
 
@@ -28,5 +28,10 @@ describe('DetailPage', () => {
   it('renders NFTTrait for tokenId 0', () => {
     render(<DetailPage tokenId={0} />);
     expect(screen.getByTestId('nft-trait')).toHaveTextContent('Token: 0');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<DetailPage tokenId={42} />);
+    await checkA11y(container);
   });
 });

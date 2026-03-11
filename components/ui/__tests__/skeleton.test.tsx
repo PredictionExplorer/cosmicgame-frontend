@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('Skeleton', () => {
   it('renders with animate-pulse class', () => {
@@ -14,5 +14,10 @@ describe('Skeleton', () => {
     const el = screen.getByTestId('skeleton');
     expect(el).toHaveClass('h-12', 'w-12');
     expect(el).toHaveClass('animate-pulse');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Skeleton className="h-12 w-12" />);
+    await checkA11y(container);
   });
 });

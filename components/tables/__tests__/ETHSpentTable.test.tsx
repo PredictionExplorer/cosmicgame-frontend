@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const mockUseActiveWeb3React = jest.fn(() => ({ account: null as string | null }));
 jest.mock('../../../hooks/web3', () => ({
@@ -60,5 +60,10 @@ describe('ETHSpentTable', () => {
   it('formats amount to 4 decimal places', () => {
     render(<ETHSpentTable list={[createBid({ EthPriceEth: 0.1 })]} />);
     expect(screen.getByText('0.1000 ETH')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<ETHSpentTable list={[]} />);
+    await checkA11y(container);
   });
 });

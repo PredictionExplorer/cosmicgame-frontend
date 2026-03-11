@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import UsedRwlkNftsPage from '../UsedRwlkNftsPage';
 
@@ -77,5 +77,11 @@ describe('UsedRwlkNftsPage', () => {
     mockUseUsedRWLKNFTs.mockReturnValue({ data: [], isLoading: false });
     render(<UsedRwlkNftsPage />);
     expect(screen.queryByTestId('pagination')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseUsedRWLKNFTs.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<UsedRwlkNftsPage />);
+    await checkA11y(container);
   });
 });

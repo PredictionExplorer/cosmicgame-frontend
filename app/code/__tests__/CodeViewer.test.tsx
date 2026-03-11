@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import CodeViewer from '../CodeViewer';
 
@@ -41,5 +41,10 @@ describe('CodeViewer', () => {
     const codeMirror = screen.getByTestId('codemirror');
     expect(codeMirror).toBeInTheDocument();
     expect(codeMirror.textContent).toContain('extern crate nalgebra');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<CodeViewer />);
+    await checkA11y(container);
   });
 });

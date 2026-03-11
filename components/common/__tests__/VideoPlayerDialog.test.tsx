@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import VideoPlayerDialog from '../VideoPlayerDialog';
 
@@ -56,4 +56,11 @@ describe('VideoPlayerDialog', () => {
     render(<VideoPlayerDialog open={true} videoPath={null} onClose={jest.fn()} />);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <VideoPlayerDialog open={true} videoPath="/video.mp4" onClose={jest.fn()} />,
+    );
+    await checkA11y(container);
+  }, 15_000);
 });

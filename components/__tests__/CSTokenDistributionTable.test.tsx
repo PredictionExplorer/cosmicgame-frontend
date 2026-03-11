@@ -1,6 +1,6 @@
 import { CSTokenDistributionTable } from '@/components/tokens/CSTokenDistributionTable';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 import '@testing-library/jest-dom';
 
 describe('CSTokenDistributionTable', () => {
@@ -24,5 +24,10 @@ describe('CSTokenDistributionTable', () => {
     expect(addressEl).toBeTruthy();
     expect(addressEl).toBeInTheDocument();
     expect(screen.getByText(mockData[0]!.NumTokens)).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<CSTokenDistributionTable list={[]} />);
+    await checkA11y(container);
   });
 });

@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 import { NotificationProvider, useNotification } from '@/contexts/NotificationContext';
 
-import { render, screen, fireEvent } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
 jest.mock('sonner', () => ({
   toast: Object.assign(jest.fn(), {
@@ -134,5 +134,14 @@ describe('NotificationContext', () => {
       'useNotification must be used within a NotificationProvider',
     );
     console.error = originalError;
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <NotificationProvider>
+        <TestConsumer />
+      </NotificationProvider>,
+    );
+    await checkA11y(container);
   });
 });

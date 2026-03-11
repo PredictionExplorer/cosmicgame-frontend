@@ -173,7 +173,11 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
               <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Claimed</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
-              {handleClaim && <TablePrimaryHeadCell></TablePrimaryHeadCell>}
+              {handleClaim && (
+                <TablePrimaryHeadCell>
+                  <span className="sr-only">Actions</span>
+                </TablePrimaryHeadCell>
+              )}
             </Tr>
           </TablePrimaryHead>
           <tbody>

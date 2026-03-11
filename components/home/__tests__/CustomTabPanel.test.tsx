@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import { CustomTabPanel } from '../CustomTabPanel';
 
@@ -49,5 +49,14 @@ describe('CustomTabPanel', () => {
     );
     const panel = container.querySelector('[role="tabpanel"]');
     expect(panel).toHaveAttribute('hidden');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <CustomTabPanel value={0} index={0}>
+        Content
+      </CustomTabPanel>,
+    );
+    await checkA11y(container);
   });
 });

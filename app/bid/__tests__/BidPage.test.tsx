@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import BidPage from '../[id]/BidPage';
 
@@ -24,7 +24,10 @@ jest.mock('../../../components/nft/RandomWalkNFT', () => ({
 
 jest.mock('../../../components/nft/NFTImage', () => ({
   __esModule: true,
-  default: ({ src }: { src?: string }) => <img data-testid="nft-image" src={src} />,
+  default: ({ src, alt = 'NFT' }: { src?: string; alt?: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img data-testid="nft-image" src={src} alt={alt} />
+  ),
 }));
 
 beforeEach(() => jest.clearAllMocks());
@@ -136,5 +139,11 @@ describe('BidPage', () => {
     render(<BidPage bidId={1} />);
     expect(screen.getByText('Donated ERC20 Token Address:')).toBeInTheDocument();
     expect(screen.getByText('0xToken')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseBidInfo.mockReturnValue({ data: baseBidInfo, isLoading: false });
+    const { container } = render(<BidPage bidId={1} />);
+    await checkA11y(container);
   });
 });

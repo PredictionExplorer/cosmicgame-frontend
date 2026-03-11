@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import NestedListItem from '../ListItemButton';
 
@@ -81,5 +81,15 @@ describe('NestedListItem', () => {
     render(<NestedListItem nav={nav} />);
     expect(screen.getByText('Prizes')).toBeInTheDocument();
     expect(screen.getByText('Staking')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const nav = {
+      title: 'Rewards',
+      route: '#',
+      children: [{ title: 'Prizes', route: '/prize' }],
+    };
+    const { container } = render(<NestedListItem nav={nav} />);
+    await checkA11y(container);
   });
 });

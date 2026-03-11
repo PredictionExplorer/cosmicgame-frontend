@@ -4,7 +4,7 @@ import { shortenHex } from '@/utils';
 
 import { UniqueStakersCSTTable } from '@/components/tables/UniqueStakersCSTTable';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const createStaker = (overrides = {}) => ({
   StakerAid: 1,
@@ -69,5 +69,10 @@ describe('UniqueStakersCSTTable', () => {
     render(<UniqueStakersCSTTable list={list} />);
     expect(screen.getByText('104')).toBeInTheDocument();
     expect(screen.queryByText('105')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<UniqueStakersCSTTable list={[]} />);
+    await checkA11y(container);
   });
 });

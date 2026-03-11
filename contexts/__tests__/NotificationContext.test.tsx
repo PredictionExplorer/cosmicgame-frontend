@@ -1,6 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 import { type ReactNode } from 'react';
 
+import { render, checkA11y } from '@/test-utils';
+
 import { NotificationProvider, useNotification } from '../NotificationContext';
 
 const mockToast = jest.fn();
@@ -37,6 +39,15 @@ describe('NotificationProvider', () => {
     const first = result.current.setNotification;
     rerender();
     expect(result.current.setNotification).toBe(first);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <NotificationProvider>
+        <div>Test</div>
+      </NotificationProvider>,
+    );
+    await checkA11y(container);
   });
 });
 

@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import CharityDepositsVoluntary from '../CharityDepositsVoluntary';
 
@@ -42,5 +42,11 @@ describe('CharityDepositsVoluntary', () => {
     mockUseCharityVoluntary.mockReturnValue({ data: [], isLoading: false });
     render(<CharityDepositsVoluntary />);
     expect(screen.getByTestId('deposit-table')).toHaveTextContent('rows: 0');
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseCharityVoluntary.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<CharityDepositsVoluntary />);
+    await checkA11y(container);
   });
 });

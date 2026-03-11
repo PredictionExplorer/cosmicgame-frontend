@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import UserRaffleNFTPage from '../raffle-nft/[address]/UserRaffleNFTPage';
 
@@ -103,5 +103,12 @@ describe('UserRaffleNFTPage', () => {
     });
     render(<UserRaffleNFTPage address={validAddr} />);
     expect(screen.getByText('Raffle NFTs User Won')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <UserRaffleNFTPage address="0x1234567890123456789012345678901234567890" />,
+    );
+    await checkA11y(container);
   });
 });

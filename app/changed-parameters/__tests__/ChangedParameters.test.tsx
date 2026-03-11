@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import ChangedParameters from '../ChangedParameters';
 
@@ -79,5 +79,13 @@ describe('ChangedParameters', () => {
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
     render(<ChangedParameters />);
     expect(mockUseSystemEvents).toHaveBeenCalledWith(-1, 9999999999);
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
+    mockUseSystemModelist.mockReturnValue({ data: [{ EvtLogId: 1 }], isLoading: false });
+    mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<ChangedParameters />);
+    await checkA11y(container);
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import NFTDonationsPage from '../NFTDonationsPage';
 
@@ -48,5 +48,11 @@ describe('NFTDonationsPage', () => {
     mockUseDonationsNFTList.mockReturnValue({ data: [] });
     render(<NFTDonationsPage />);
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseDonationsNFTList.mockReturnValue({ data: [] });
+    const { container } = render(<NFTDonationsPage />);
+    await checkA11y(container);
   });
 });

@@ -8,7 +8,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('Card', () => {
   it('renders all card sub-components', () => {
@@ -83,5 +83,19 @@ describe('Card', () => {
       </CardFooter>,
     );
     expect(screen.getByTestId('footer')).toHaveClass('custom-footer');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <Card>
+        <CardHeader>
+          <CardTitle>Title</CardTitle>
+          <CardDescription>Description</CardDescription>
+        </CardHeader>
+        <CardContent>Content</CardContent>
+        <CardFooter>Footer</CardFooter>
+      </Card>,
+    );
+    await checkA11y(container);
   });
 });

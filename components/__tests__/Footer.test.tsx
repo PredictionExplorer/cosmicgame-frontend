@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -92,5 +92,9 @@ describe('Footer', () => {
   it('wraps content in a footer element', () => {
     const footer = document.querySelector('footer');
     expect(footer).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    await checkA11y(document.body);
   });
 });

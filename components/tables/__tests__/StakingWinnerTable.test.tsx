@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 // eslint-disable-next-line import/order
 import StakingWinnerTable from '@/components/tables/StakingWinnerTable';
@@ -76,5 +76,10 @@ describe('StakingWinnerTable', () => {
     render(<StakingWinnerTable list={list} />);
     expect(screen.getByText('104')).toBeInTheDocument();
     expect(screen.queryByText('105')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<StakingWinnerTable list={[]} />);
+    await checkA11y(container);
   });
 });

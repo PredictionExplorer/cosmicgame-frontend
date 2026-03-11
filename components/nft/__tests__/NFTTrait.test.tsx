@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import NFTTrait from '../NFTTrait';
 
@@ -166,5 +166,11 @@ describe('NFTTrait', () => {
     });
     render(<NFTTrait tokenId={5} />);
     expect(screen.getByTestId('name-history-table')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+    const { container } = render(<NFTTrait tokenId={5} />);
+    await checkA11y(container);
   });
 });

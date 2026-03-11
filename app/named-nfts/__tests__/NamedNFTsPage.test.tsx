@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import NamedNFTsPage from '../NamedNFTsPage';
 
@@ -63,5 +63,11 @@ describe('NamedNFTsPage', () => {
     mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
     render(<NamedNFTsPage />);
     expect(screen.queryByTestId('pagination')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<NamedNFTsPage />);
+    await checkA11y(container);
   });
 });

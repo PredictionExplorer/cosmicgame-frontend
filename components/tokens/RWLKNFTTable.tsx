@@ -180,7 +180,9 @@ export const RWLKNFTTable = ({
               </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Owner Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell />
+              <TablePrimaryHeadCell>
+                <span className="sr-only">Actions</span>
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

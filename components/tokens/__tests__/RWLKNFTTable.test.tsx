@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, waitFor, fireEvent } from '@/test-utils';
+import { render, screen, waitFor, fireEvent, checkA11y } from '@/test-utils';
 
 import { RWLKNFTTable } from '../RWLKNFTTable';
 
@@ -120,5 +120,10 @@ describe('RWLKNFTTable', () => {
     const { rerender } = render(<RWLKNFTTable {...defaultProps} list={[1, 2]} />);
     rerender(<RWLKNFTTable {...defaultProps} list={[3, 4]} />);
     expect(screen.queryByText('Stake Many')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<RWLKNFTTable {...defaultProps} />);
+    await checkA11y(container);
   });
 });

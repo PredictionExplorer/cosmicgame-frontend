@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import { UniqueStakersRWLKTable } from '@/components/tables/UniqueStakersRWLKTable';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const createStaker = (overrides = {}) => ({
   StakerAid: 1,
@@ -52,5 +52,10 @@ describe('UniqueStakersRWLKTable', () => {
     const links = screen.getAllByRole('link');
     const userLink = links.find((l) => l.getAttribute('href')?.startsWith('/user/'));
     expect(userLink).toHaveAttribute('href', `/user/${addr}`);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<UniqueStakersRWLKTable list={[]} />);
+    await checkA11y(container);
   });
 });

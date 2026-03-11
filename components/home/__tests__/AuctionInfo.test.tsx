@@ -4,7 +4,7 @@ jest.mock('../../../utils', () => ({
   formatSeconds: jest.fn((s: number) => `${s}s`),
 }));
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import { AuctionInfo } from '../AuctionInfo';
 
@@ -44,5 +44,10 @@ describe('AuctionInfo', () => {
 
     expect(screen.getByText('Auction ended, you can bid for free.')).toBeInTheDocument();
     expect(screen.queryByText('Auction ended.')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<AuctionInfo secondsElapsed={900} auctionDuration={3600} />);
+    await checkA11y(container);
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import Statistics from '../Statistics';
 
@@ -290,5 +290,10 @@ describe('Statistics', () => {
     });
     render(<Statistics />);
     expect(screen.getByText('Current Bid Price')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Statistics />);
+    await checkA11y(container);
   });
 });

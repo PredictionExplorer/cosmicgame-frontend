@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import { BiddingStatus } from '../BiddingStatus';
 
@@ -99,5 +99,17 @@ describe('BiddingStatus', () => {
     );
     expect(screen.getByText('Bids exhausted!')).toBeInTheDocument();
     expect(screen.getByText('Waiting for the winner to claim the prize.')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <BiddingStatus
+        {...baseProps}
+        data={activeData as never}
+        prizeTime={Date.now() + 60000}
+        ethBidInfo={{ ETHPrice: 0.01 }}
+      />,
+    );
+    await checkA11y(container);
   });
 });

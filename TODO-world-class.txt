@@ -319,10 +319,10 @@ All items complete. No remaining issues.
 ================================================================================
 
 Current state:
-- 185 unit test files (2,220 tests), 11 E2E specs
-- Actual coverage: Statements ~77.1%, Branches ~64.2%, Lines ~78.6%, Functions ~72.3%
+- 185 unit test files (2,354 tests), 11 E2E specs
+- Actual coverage: Statements ~77.1%, Branches ~65.0%, Lines ~78.6%, Functions ~72.3%
 - Coverage threshold in jest.config.js: branches 63%, functions 71%, lines 78%, statements 76%
-- No accessibility testing (jest-axe not installed)
+- Accessibility testing: jest-axe installed, 134 a11y tests across all component files
 
 6a. [DONE] Add app/ to coverage collection
     Added 'app/**/*.{ts,tsx}' to jest.config.js collectCoverageFrom.
@@ -715,16 +715,45 @@ Current state:
       array renders table, lightbox with empty/set seed, no loading for
       array claimHistory
 
-6h. [OPEN] Add accessibility testing
-    Install jest-axe:
-      yarn add -D jest-axe @types/jest-axe --ignore-engines
-    Add to component tests:
-      import { axe, toHaveNoViolations } from 'jest-axe';
-      expect.extend(toHaveNoViolations);
-      test('has no accessibility violations', async () => {
-        const { container } = render(<Component />);
-        expect(await axe(container)).toHaveNoViolations();
-      });
+6h. [DONE] Add accessibility testing
+    Installed jest-axe and @types/jest-axe. Added toHaveNoViolations matcher
+    globally in jest.setup.js. Added checkA11y helper to test-utils.tsx.
+    Added 134 accessibility tests across 134 component test files.
+    All 2,354 tests pass across 185 suites. tsc --noEmit passes.
+
+    Infrastructure:
+    - jest.setup.js: added expect.extend(toHaveNoViolations) globally
+    - test-utils.tsx: added checkA11y(container) helper (axe + assertion)
+    - package.json: jest-axe@10.0.0, @types/jest-axe@3.5.9
+
+    Accessibility violations fixed in source components (16 files):
+    - components/nft/NFTImage.tsx: added alt prop (default "NFT")
+    - components/nft/PaginationGrid.tsx: h6→p for loading state, added
+      alt="Sample NFT" to link-wrapped image
+    - components/home/WinningHistorySection.tsx: h6→p for loading state
+    - components/tables/SpecialPrizeWinners.tsx: guard empty links when
+      addresses undefined, render "N/A" fallback
+    - app/staking/StakingPage.tsx: h4→h3 to fix heading hierarchy (h2→h4)
+    - app/my-tokens/MyTokens.tsx: h6→h5/p for heading hierarchy
+    - app/named-nfts/NamedNFTsPage.tsx: h6→p for loading/empty states
+    - app/rewards-by-token/.../RewardsByTokenPage.tsx: h6→p, empty th→sr-only
+    - app/mint-artblocks/MintArtBlocks.tsx: added aria-label to SelectTrigger
+    - 7 table components: empty <th>→sr-only text (StakedTokensTable,
+      RWLKNFTTable, CSTTable, CSTokensTable, BanBidTable, DonatedERC20Table,
+      DonatedNFTTable)
+
+    Test files updated (134 files, 134 new tests):
+    - components/ui/__tests__/: 9 files
+    - components/common/__tests__/: 11 files
+    - components/__tests__/: 23 files
+    - components/tables/__tests__/: 17 files
+    - components/home/__tests__/: 5 files
+    - components/staking/__tests__/: 10 files
+    - components/nft/__tests__/: 5 files
+    - components/tokens/__tests__/: 4 files
+    - components/donations/__tests__/: 1 file
+    - app/ (pages): 45 files
+    - contexts/__tests__/: 4 files
 
 6i. [OPEN] Add pre-push coverage check
     Update .husky/pre-push from:

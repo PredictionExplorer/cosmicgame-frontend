@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { Separator } from '@/components/ui/separator';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('Separator', () => {
   it('renders horizontal by default', () => {
@@ -19,5 +19,10 @@ describe('Separator', () => {
   it('applies custom className', () => {
     render(<Separator className="my-sep" data-testid="sep" />);
     expect(screen.getByTestId('sep')).toHaveClass('my-sep');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Separator />);
+    await checkA11y(container);
   });
 });

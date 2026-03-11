@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import DonatedNFT from '@/components/donations/DonatedNFT';
 
-import { render, screen, waitFor } from '@/test-utils';
+import { render, screen, waitFor, checkA11y } from '@/test-utils';
 
 jest.mock('axios');
 
@@ -39,7 +39,33 @@ describe('DonatedNFT', () => {
     expect(screen.getByTestId('NFTTokenId')).toHaveTextContent(String(mockData.NFTTokenId));
 
     await waitFor(() => {
-      expect(screen.getByAltText('nft image').getAttribute('src')).toEqual(mockImageUrl);
+      expect(screen.getByAltText('NFT').getAttribute('src')).toEqual(mockImageUrl);
     });
+  });
+
+  it('has no accessibility violations', async () => {
+    (axios.get as jest.Mock).mockResolvedValue({
+      data: { image: 'https://example.com/nft.png', external_url: 'https://example.com' },
+    });
+
+    const mockData = {
+      RecordId: 1,
+      EvtLogId: 1,
+      BlockNum: 1,
+      TxId: 1,
+      TxHash: '0xabc',
+      TimeStamp: 1701346718,
+      DateTime: '2023-11-30T12:18:38Z',
+      RoundNum: 1,
+      DonorAid: 1,
+      DonorAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+      TokenAddressId: 1,
+      TokenAddr: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
+      NFTTokenId: 1,
+      NFTTokenURI: 'https://token.artblocks.io/1',
+      Index: 0,
+    };
+    const { container } = render(<DonatedNFT nft={mockData} />);
+    await checkA11y(container);
   });
 });

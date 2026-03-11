@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('../../components/styled', () => ({
   MainWrapper: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -41,5 +41,10 @@ describe('NotFound page', () => {
     render(<NotFound />);
     const link = screen.getByText('Return Home').closest('a');
     expect(link).toHaveAttribute('href', '/');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<NotFound />);
+    await checkA11y(container);
   });
 });

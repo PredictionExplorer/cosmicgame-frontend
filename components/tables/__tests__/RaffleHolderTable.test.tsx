@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const mockUseActiveWeb3React = jest.fn(() => ({ account: null as string | null }));
 jest.mock('../../../hooks/web3', () => ({
@@ -71,5 +71,10 @@ describe('RaffleHolderTable', () => {
     ];
     render(<RaffleHolderTable list={list} numRaffleEthWinner={1} numRaffleNFTWinner={1} />);
     expect(screen.getAllByText('3').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<RaffleHolderTable list={[]} />);
+    await checkA11y(container);
   });
 });

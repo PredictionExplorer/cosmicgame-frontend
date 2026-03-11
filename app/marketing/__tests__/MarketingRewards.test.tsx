@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import MarketingRewards from '../MarketingRewards';
 
@@ -48,5 +48,11 @@ describe('MarketingRewards', () => {
     mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: true });
     render(<MarketingRewards />);
     expect(screen.queryByText(/please contact our marketing team/)).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseMarketingRewards.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<MarketingRewards />);
+    await checkA11y(container);
   });
 });

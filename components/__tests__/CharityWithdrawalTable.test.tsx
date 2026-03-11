@@ -4,7 +4,7 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import CharityWithdrawalTable from '@/components/tables/CharityWithdrawalTable';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('CharityWithdrawalTable', () => {
   test('with no records', () => {
@@ -53,5 +53,10 @@ describe('CharityWithdrawalTable', () => {
         expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       }
     }
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<CharityWithdrawalTable list={[]} />);
+    await checkA11y(container);
   });
 });

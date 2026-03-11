@@ -2,8 +2,7 @@ import '@testing-library/jest-dom';
 
 import Prize from '@/components/common/Prize';
 
-import { render, screen } from '@/test-utils';
-
+import { checkA11y, render, screen } from '@/test-utils';
 
 const mockData = {
   PrizeAmountEth: 1.5,
@@ -86,5 +85,10 @@ describe('Prize', () => {
   it('renders with null data without crashing', () => {
     render(<Prize data={null} />);
     expect(screen.getByText('LIST OF AVAILABLE PRIZES')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Prize data={mockData} />);
+    await checkA11y(container);
   });
 });

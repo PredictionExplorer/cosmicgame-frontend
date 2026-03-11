@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { Spinner } from '@/components/ui/spinner';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('Spinner', () => {
   it('renders with default (md) size', () => {
@@ -30,5 +30,10 @@ describe('Spinner', () => {
   it('has sr-only loading text', () => {
     render(<Spinner />);
     expect(screen.getByText('Loading...')).toHaveClass('sr-only');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Spinner />);
+    await checkA11y(container);
   });
 });

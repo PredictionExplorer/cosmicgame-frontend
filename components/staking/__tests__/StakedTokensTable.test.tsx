@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: '0xUser123' }),
@@ -292,5 +292,17 @@ describe('StakedTokensTable', () => {
     );
     fireEvent.click(screen.getAllByText('Unstake')[0]!);
     expect(mockUnstake).toHaveBeenCalledWith(10, false);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <StakedTokensTable
+        list={[]}
+        handleUnstake={mockUnstake}
+        handleUnstakeMany={mockUnstakeMany}
+        IsRwalk={false}
+      />,
+    );
+    await checkA11y(container);
   });
 });

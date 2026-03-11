@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import HomePage from '../HomePage';
 
@@ -137,7 +137,10 @@ jest.mock('../../components/nft/LatestNFTs', () => ({
 
 jest.mock('../../components/nft/NFTImage', () => ({
   __esModule: true,
-  default: ({ src }: { src: string }) => <img data-testid="nft-image" src={src} />,
+  default: ({ src, alt = 'NFT' }: { src: string; alt?: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img data-testid="nft-image" src={src} alt={alt} />
+  ),
 }));
 
 jest.mock('../../components/tables/SpecialPrizeWinners', () => ({
@@ -320,5 +323,14 @@ describe('HomePage', () => {
     render(<HomePage />);
     expect(screen.getByRole('status')).toBeInTheDocument();
     expect(screen.queryByTestId('bid-form')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    const { container } = render(<HomePage />);
+    await checkA11y(container);
   });
 });

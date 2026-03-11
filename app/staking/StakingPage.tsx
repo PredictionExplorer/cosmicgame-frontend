@@ -39,7 +39,7 @@ const StakingPage = () => {
       </h2>
 
       <div>
-        <h4 className="mt-8 text-lg font-semibold">CosmicSignature Token</h4>
+        <h3 className="mt-8 text-lg font-semibold">CosmicSignature Token</h3>
         {loading ? (
           <p className="text-lg font-semibold">Loading...</p>
         ) : (
@@ -48,7 +48,7 @@ const StakingPage = () => {
       </div>
 
       <div>
-        <h4 className="mt-8 text-lg font-semibold">RandomWalk NFT</h4>
+        <h3 className="mt-8 text-lg font-semibold">RandomWalk NFT</h3>
         {loading ? (
           <p className="text-lg font-semibold">Loading...</p>
         ) : (

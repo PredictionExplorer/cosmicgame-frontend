@@ -1,10 +1,9 @@
 import '@testing-library/jest-dom';
 
-
 import { AddressLink } from '@/components/common/AddressLink';
 import { MARKETING_WALLET_ADDRESS } from '@/config/networks';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 describe('AddressLink', () => {
   const address = '0x1234567890abcdef1234567890abcdef12345678';
@@ -58,5 +57,10 @@ describe('AddressLink', () => {
   it('shows tooltip content with full address', () => {
     render(<AddressLink address={address} url={url} />);
     expect(screen.getByText(address)).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<AddressLink address={address} url={url} />);
+    await checkA11y(container);
   });
 });

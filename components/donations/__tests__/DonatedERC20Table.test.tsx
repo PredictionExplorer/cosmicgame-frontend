@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('../../../hooks/useRaffleWalletContract', () => ({
   __esModule: true,
@@ -11,7 +11,6 @@ jest.mock('../../../services/api', () => ({
   default: { get_current_time: jest.fn().mockResolvedValue(1700000000) },
 }));
 
- 
 import DonatedERC20Table from '../DonatedERC20Table';
 
 const createToken = (overrides = {}) => ({
@@ -77,5 +76,10 @@ describe('DonatedERC20Table', () => {
     );
     render(<DonatedERC20Table list={list} handleClaim={null} />);
     expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<DonatedERC20Table list={[]} handleClaim={null} />);
+    await checkA11y(container);
   });
 });

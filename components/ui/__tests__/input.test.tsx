@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { Input } from '@/components/ui/input';
 
-import { render, screen, fireEvent } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
 describe('Input', () => {
   it('renders with default styling', () => {
@@ -36,5 +36,15 @@ describe('Input', () => {
   it('handles disabled state', () => {
     render(<Input disabled data-testid="input" />);
     expect(screen.getByTestId('input')).toBeDisabled();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <label>
+        Email
+        <Input type="email" />
+      </label>,
+    );
+    await checkA11y(container);
   });
 });

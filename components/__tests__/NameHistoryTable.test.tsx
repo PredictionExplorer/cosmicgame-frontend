@@ -4,7 +4,7 @@ import { convertTimestampToDateTime } from '@/utils';
 
 import NameHistoryTable from '@/components/tables/NameHistoryTable';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('NameHistoryTable', () => {
   test('with no records', () => {
@@ -73,5 +73,10 @@ describe('NameHistoryTable', () => {
       screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
     ).toBeInTheDocument();
     expect(screen.getByText('Token name was removed.')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<NameHistoryTable list={[]} />);
+    await checkA11y(container);
   });
 });

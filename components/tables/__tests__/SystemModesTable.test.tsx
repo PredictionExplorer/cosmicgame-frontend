@@ -3,7 +3,7 @@ import { fireEvent } from '@testing-library/react';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
@@ -72,5 +72,10 @@ describe('SystemModesTable', () => {
     render(<SystemModesTable list={list} />);
     expect(screen.getByText('5')).toBeInTheDocument();
     expect(screen.queryByText('6')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<SystemModesTable list={[]} />);
+    await checkA11y(container);
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import UserRaffleETHPage from '../raffle-eth/[address]/UserRaffleETHPage';
 
@@ -78,5 +78,12 @@ describe('UserRaffleETHPage', () => {
     });
     render(<UserRaffleETHPage address={validAddr} />);
     expect(screen.getByText('No Raffle ETH yet.')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <UserRaffleETHPage address="0x1234567890123456789012345678901234567890" />,
+    );
+    await checkA11y(container);
   });
 });

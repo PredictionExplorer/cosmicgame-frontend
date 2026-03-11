@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import ListNavItem from '../ListNavItem';
 
@@ -40,5 +40,11 @@ describe('ListNavItem', () => {
 
     expect(screen.getByText('Prizes')).toBeInTheDocument();
     expect(screen.getByText('Staking')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const nav = { title: 'Gallery', route: '/gallery' };
+    const { container } = render(<ListNavItem nav={nav} />);
+    await checkA11y(container);
   });
 });

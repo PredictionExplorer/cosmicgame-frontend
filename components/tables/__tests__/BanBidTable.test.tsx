@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, waitFor } from '@/test-utils';
+import { checkA11y, render, screen, waitFor } from '@/test-utils';
 
 const mockSetNotification = jest.fn();
 const mockBanBid = jest.fn().mockResolvedValue(undefined);
@@ -179,5 +179,10 @@ describe('BanBidTable', () => {
     await waitFor(() => {
       expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<BanBidTable biddingHistory={[]} />);
+    await checkA11y(container);
   });
 });

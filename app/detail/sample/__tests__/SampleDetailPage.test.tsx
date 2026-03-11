@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 import SampleDetailPage from '../SampleDetailPage';
 
@@ -16,7 +16,10 @@ jest.mock('yet-another-react-lightbox', () => ({
 
 jest.mock('../../../../components/nft/NFTImage', () => ({
   __esModule: true,
-  default: ({ src }: { src: string }) => <img data-testid="nft-image" src={src} />,
+  default: ({ src, alt = 'NFT' }: { src: string; alt?: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img data-testid="nft-image" src={src} alt={alt} />
+  ),
 }));
 
 jest.mock('../../../../components/nft/NFTVideo', () => ({
@@ -61,5 +64,10 @@ describe('SampleDetailPage', () => {
   it('renders the "Copy link" button', () => {
     render(<SampleDetailPage />);
     expect(screen.getByText('Copy link')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<SampleDetailPage />);
+    await checkA11y(container);
   });
 });

@@ -123,7 +123,7 @@ const PaginationGrid = ({ data, loading }: PaginationGridProps) => {
       </SearchBox>
 
       {loading ? (
-        <h6 className="text-lg font-medium text-center text-foreground">Loading...</h6>
+        <p className="text-lg font-medium text-center text-foreground">Loading...</p>
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -132,7 +132,7 @@ const PaginationGrid = ({ data, loading }: PaginationGridProps) => {
                 <StyledCard>
                   <div className="cursor-pointer">
                     <Link href="/detail/sample" className="block">
-                      <NFTImage src={getAssetsUrl('cosmicsignature/sample.png')} />
+                      <NFTImage src={getAssetsUrl('cosmicsignature/sample.png')} alt="Sample NFT" />
                     </Link>
                     <NFTInfoWrapper className="w-[calc(100%-40px)]">
                       <p className="text-base text-white text-center">Sample NFT</p>

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
 import EthDonations from '../EthDonations';
 
@@ -99,5 +99,16 @@ describe('EthDonations', () => {
     const input = screen.getByPlaceholderText('Donation amount');
     fireEvent.change(input, { target: { value: '1.5' } });
     expect(input).toHaveValue(1.5);
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseDonationsBoth.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      refetch: mockRefetch,
+    });
+    const { container } = render(<EthDonations />);
+    await checkA11y(container);
   });
 });

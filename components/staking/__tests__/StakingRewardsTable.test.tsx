@@ -1,14 +1,13 @@
 import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, prefetch: jest.fn() }),
 }));
 
- 
 import { StakingRewardsTable } from '../StakingRewardsTable';
 
 const ADDRESS = '0x1234567890abcdef1234567890abcdef12345678';
@@ -69,5 +68,10 @@ describe('StakingRewardsTable', () => {
     const row = screen.getByText('42').closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith(`/rewards-by-token/${ADDRESS}/42`);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<StakingRewardsTable list={[]} address={ADDRESS} />);
+    await checkA11y(container);
   });
 });

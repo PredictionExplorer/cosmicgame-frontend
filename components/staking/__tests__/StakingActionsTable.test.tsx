@@ -3,14 +3,13 @@ import { fireEvent } from '@testing-library/react';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, prefetch: jest.fn() }),
 }));
 
- 
 import StakingActionsTable from '../StakingActionsTable';
 
 const createRow = (overrides = {}) => ({
@@ -86,5 +85,10 @@ describe('StakingActionsTable', () => {
     render(<StakingActionsTable list={[createRow({ TokenId: 99 })]} IsRwalk={true} />);
     const link = screen.getByText('99').closest('a');
     expect(link).toHaveAttribute('href', 'https://randomwalknft.com/detail/99');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<StakingActionsTable list={[]} IsRwalk={false} />);
+    await checkA11y(container);
   });
 });

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import type { CSTTokenInfo } from '@/services/api/types';
 
-import { render, screen, waitFor, fireEvent } from '@/test-utils';
+import { render, screen, waitFor, fireEvent, checkA11y } from '@/test-utils';
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn(), prefetch: jest.fn() }),
@@ -179,5 +179,10 @@ describe('CSTokensTable', () => {
     render(<CSTokensTable {...defaultProps} list={[token]} />);
     const link = screen.getAllByRole('link').find((l) => l.getAttribute('href') === '/prize/7');
     expect(link).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<CSTokensTable {...defaultProps} />);
+    await checkA11y(container);
   });
 });

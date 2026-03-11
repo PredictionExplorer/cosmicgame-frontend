@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import RewardsByTokenPage from '../[address]/[tokenId]/RewardsByTokenPage';
 
@@ -72,5 +72,10 @@ describe('RewardsByTokenPage', () => {
     });
     render(<RewardsByTokenPage address="0xUser" tokenId={42} />);
     expect(screen.getByText('Staking Rewards Details for Token 42')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<RewardsByTokenPage address="0xUser" tokenId={42} />);
+    await checkA11y(container);
   });
 });

@@ -17,12 +17,16 @@ export const SpecialPrizeWinners = () => {
         </div>
         <div className="sm:col-span-8">
           <p>
-            <a
-              href={`/user/${specialWinners?.EnduranceChampionAddress}`}
-              className="text-white break-all"
-            >
-              {specialWinners?.EnduranceChampionAddress}
-            </a>
+            {specialWinners?.EnduranceChampionAddress ? (
+              <a
+                href={`/user/${specialWinners.EnduranceChampionAddress}`}
+                className="text-white break-all"
+              >
+                {specialWinners.EnduranceChampionAddress}
+              </a>
+            ) : (
+              <span className="text-muted-foreground">N/A</span>
+            )}
             {(specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
               <>{` (Lasted ${formatSeconds(specialWinners?.EnduranceChampionDuration ?? 0)})`}</>
             )}
@@ -38,10 +42,10 @@ export const SpecialPrizeWinners = () => {
           <div className="sm:col-span-8">
             <p>
               <a
-                href={`/user/${specialWinners?.EnduranceChampionAddress}`}
+                href={`/user/${specialWinners.EnduranceChampionAddress}`}
                 className="text-white break-all"
               >
-                {specialWinners?.EnduranceChampionAddress}
+                {specialWinners.EnduranceChampionAddress}
               </a>
               {(specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
                 <>{` (Lasted ${formatSeconds(specialWinners?.EnduranceChampionDuration ?? 0)})`}</>
@@ -57,12 +61,16 @@ export const SpecialPrizeWinners = () => {
         </div>
         <div className="sm:col-span-8">
           <p>
-            <a
-              href={`/user/${specialWinners?.LastCstBidderAddress}`}
-              className="text-white break-all"
-            >
-              {specialWinners?.LastCstBidderAddress}
-            </a>
+            {specialWinners?.LastCstBidderAddress ? (
+              <a
+                href={`/user/${specialWinners.LastCstBidderAddress}`}
+                className="text-white break-all"
+              >
+                {specialWinners.LastCstBidderAddress}
+              </a>
+            ) : (
+              <span className="text-muted-foreground">N/A</span>
+            )}
           </p>
         </div>
       </div>

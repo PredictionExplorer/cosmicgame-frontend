@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import PrizeWinnersPage from '../PrizeWinnersPage';
 
@@ -55,5 +55,11 @@ describe('PrizeWinnersPage', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<PrizeWinnersPage />);
     expect(screen.getByTestId('prize-table')).toHaveTextContent('rows: 0');
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
+    const { container } = render(<PrizeWinnersPage />);
+    await checkA11y(container);
   });
 });

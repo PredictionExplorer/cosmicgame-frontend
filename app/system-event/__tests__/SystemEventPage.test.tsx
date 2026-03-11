@@ -1,6 +1,6 @@
 import { reportError } from '@/utils/errors';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import SystemEventPage from '../[round]/[start]/[end]/SystemEventPage';
 
@@ -198,5 +198,11 @@ describe('SystemEventPage', () => {
       expect(screen.queryByText('temporary failure')).not.toBeInTheDocument();
       expect(screen.getByTestId('events-table')).toHaveTextContent('events: 1');
     });
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false, error: null });
+    const { container } = render(<SystemEventPage start={0} end={100} round={1} />);
+    await checkA11y(container);
   });
 });

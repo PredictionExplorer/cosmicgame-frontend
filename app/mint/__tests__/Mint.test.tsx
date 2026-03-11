@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, waitFor } from '@/test-utils';
+import { checkA11y, render, screen, waitFor } from '@/test-utils';
 
 import Mint from '../Mint';
 
@@ -203,5 +203,10 @@ describe('Mint', () => {
     mockWalletOfOwner.mockClear();
     render(<Mint />);
     expect(mockWalletOfOwner).not.toHaveBeenCalled();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Mint />);
+    await checkA11y(container);
   });
 });

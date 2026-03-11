@@ -76,7 +76,7 @@ const MintArtBlocks = () => {
         </CenterBox>
         <div className="flex my-16">
           <Select value={String(count)} onValueChange={(val) => setCount(Number(val))}>
-            <SelectTrigger className="min-w-[100px]">
+            <SelectTrigger className="min-w-[100px]" aria-label="Select quantity">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import WinningHistory from '../WinningHistory';
 
@@ -78,5 +78,12 @@ describe('WinningHistory', () => {
     mockUseClaimHistoryByUser.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<WinningHistory />);
     expect(mockUseClaimHistoryByUser).toHaveBeenCalledWith('0xMYACCOUNT');
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
+    mockUseClaimHistoryByUser.mockReturnValue({ data: null, isLoading: false, error: null });
+    const { container } = render(<WinningHistory />);
+    await checkA11y(container);
   });
 });

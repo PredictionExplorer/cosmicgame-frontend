@@ -180,7 +180,9 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }: HistoryTableProps) =
             <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Bid Type</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell />
+            <TablePrimaryHeadCell>
+              <span className="sr-only">Actions</span>
+            </TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
         <tbody>

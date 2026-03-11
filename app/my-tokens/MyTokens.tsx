@@ -20,12 +20,12 @@ function MyWallet() {
       {!account ? (
         <p className="text-base">Please login to Metamask to see your tokens.</p>
       ) : loading ? (
-        <h6 className="text-lg font-semibold">Loading...</h6>
+        <p className="text-lg font-semibold">Loading...</p>
       ) : error ? (
-        <h6 className="text-lg font-semibold text-destructive">{error}</h6>
+        <p className="text-lg font-semibold text-destructive">{error}</p>
       ) : (
         <div className="mt-12">
-          <h6 className="text-lg font-semibold mb-4">Cosmic Signature Tokens I Own</h6>
+          <h5 className="text-lg font-semibold mb-4">Cosmic Signature Tokens I Own</h5>
           <CSTTable list={tokens} />
         </div>
       )}

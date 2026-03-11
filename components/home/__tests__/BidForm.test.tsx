@@ -17,7 +17,7 @@ jest.mock('../../nft/PaginationRWLKGrid', () => ({
 
 import type { DashboardInfo } from '@/services/api/types';
 
-import { render, screen, fireEvent } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
 import { BidForm } from '../BidForm';
 
@@ -232,5 +232,10 @@ describe('BidForm', () => {
       />,
     );
     expect(screen.getByText('Auction ended, you can bid for free.')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<BidForm {...defaultProps} />);
+    await checkA11y(container);
   });
 });

@@ -8,7 +8,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 describe('Dialog', () => {
   it('renders DialogContent when open', () => {
@@ -60,5 +60,20 @@ describe('Dialog', () => {
     );
     expect(screen.getByTestId('dialog-header')).toHaveTextContent('Header content');
     expect(screen.getByTestId('dialog-footer')).toHaveTextContent('Footer content');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <Dialog open>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Accessible Dialog</DialogTitle>
+            <DialogDescription>Dialog description for screen readers</DialogDescription>
+          </DialogHeader>
+          <p>Body content</p>
+        </DialogContent>
+      </Dialog>,
+    );
+    await checkA11y(container);
   });
 });

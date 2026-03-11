@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import MyWinnings from '../MyWinnings';
 
@@ -165,5 +165,10 @@ describe('MyWinnings', () => {
     expect(screen.getByText('Donated NFTs')).toBeInTheDocument();
     expect(screen.getByTestId('donated-nft-table')).toHaveTextContent('nfts: 1');
     expect(screen.getByTestId('uncollected-rewards')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<MyWinnings />);
+    await checkA11y(container);
   });
 });

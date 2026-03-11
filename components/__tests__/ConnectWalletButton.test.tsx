@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('@rainbow-me/rainbowkit');
 jest.mock('wagmi');
@@ -185,5 +185,17 @@ describe('ConnectWalletButton', () => {
 
     const statLink = screen.getByText('MY STATISTICS').closest('a');
     expect(statLink).toHaveAttribute('href', '/my-statistics');
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <ConnectWalletButton
+        isMobileView={false}
+        loading={false}
+        balance={defaultBalance}
+        stakedTokenCount={defaultStaked}
+      />,
+    );
+    await checkA11y(container);
   });
 });

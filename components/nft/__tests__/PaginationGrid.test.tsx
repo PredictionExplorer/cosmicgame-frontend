@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen, fireEvent, waitFor } from '@/test-utils';
+import { render, screen, fireEvent, waitFor, checkA11y } from '@/test-utils';
 
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
@@ -183,5 +183,10 @@ describe('PaginationGrid', () => {
     const links = screen.getAllByRole('link');
     const sampleLink = links.find((l) => l.getAttribute('href') === '/detail/sample');
     expect(sampleLink).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<PaginationGrid data={[]} loading={false} />);
+    await checkA11y(container);
   });
 });

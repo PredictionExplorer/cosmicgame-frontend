@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 jest.mock('../../../hooks/useRaffleWalletContract', () => ({
   __esModule: true,
@@ -116,5 +116,12 @@ describe('RaffleWinnerTable', () => {
     render(<RaffleWinnerTable RaffleETHDeposits={deposits} RaffleNFTWinners={[]} />);
     expect(screen.getByText('0.5000 ETH')).toBeInTheDocument();
     expect(screen.queryByText('0.3000 ETH')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <RaffleWinnerTable RaffleETHDeposits={[]} RaffleNFTWinners={[]} />,
+    );
+    await checkA11y(container);
   });
 });

@@ -1,6 +1,6 @@
 import { CTBalanceDistributionTable } from '@/components/tokens/CTBalanceDistributionTable';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 import '@testing-library/jest-dom';
 
 describe('CTBalanceDistributionTable', () => {
@@ -24,5 +24,10 @@ describe('CTBalanceDistributionTable', () => {
     expect(addressEl).toBeInTheDocument();
     // Component displays balance with toFixed(6)
     expect(screen.getByText(mockData[0]!.BalanceFloat.toFixed(6))).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<CTBalanceDistributionTable list={[]} />);
+    await checkA11y(container);
   });
 });

@@ -214,7 +214,11 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
-              {handleClaim && <TablePrimaryHeadCell></TablePrimaryHeadCell>}
+              {handleClaim && (
+                <TablePrimaryHeadCell>
+                  <span className="sr-only">Actions</span>
+                </TablePrimaryHeadCell>
+              )}
             </Tr>
           </TablePrimaryHead>
           <tbody>

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen, fireEvent } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
 jest.mock(
   'next/image',
@@ -150,5 +150,10 @@ describe('PaginationRWLKGrid', () => {
       target: { value: '' },
     });
     expect(screen.getAllByTestId('rwlk-card')).toHaveLength(3);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<PaginationRWLKGrid loading={false} data={[]} />);
+    await checkA11y(container);
   });
 });

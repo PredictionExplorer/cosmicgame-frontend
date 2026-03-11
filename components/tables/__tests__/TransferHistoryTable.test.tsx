@@ -6,7 +6,7 @@ import { ZERO_ADDRESS } from '@/config/misc';
 import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '@/config/networks';
 import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const createRecord = (overrides = {}) => ({
   EvtLogId: 1,
@@ -88,5 +88,10 @@ describe('TransferHistoryTable', () => {
     expect(
       screen.queryByText(convertTimestampToDateTime(list[5]!.TimeStamp)),
     ).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<TransferHistoryTable list={[]} />);
+    await checkA11y(container);
   });
 });

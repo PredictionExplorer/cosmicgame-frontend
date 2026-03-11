@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import type { WinningHistoryEntry } from '@/services/api/types';
 
-import { render, screen } from '@/test-utils';
+import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock(
   '../../../components/tables/WinningHistoryTable',
@@ -132,5 +132,10 @@ describe('WinningHistorySection', () => {
   it('does not show loading when claimHistory is an array', () => {
     render(<WinningHistorySection {...defaultProps} claimHistory={[]} />);
     expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<WinningHistorySection {...defaultProps} />);
+    await checkA11y(container);
   });
 });

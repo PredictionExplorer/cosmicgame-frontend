@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, fireEvent } from '@/test-utils';
+import { checkA11y, render, screen, fireEvent } from '@/test-utils';
 
 import { CustomPagination } from '../CustomPagination';
 
@@ -60,5 +60,10 @@ describe('CustomPagination', () => {
     fireEvent.change(input, { target: { value: '999' } });
 
     expect(defaultProps.setPage).toHaveBeenCalledWith(30);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<CustomPagination {...defaultProps} />);
+    await checkA11y(container);
   });
 });

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const mockSpecialWinners = {
   EnduranceChampionAddress: '0x1111111111111111111111111111111111111111',
@@ -61,5 +61,10 @@ describe('SpecialPrizeWinners', () => {
     mockUseCurrentSpecialWinners.mockReturnValue({ data: undefined });
     render(<SpecialPrizeWinners />);
     expect(screen.getByText('Potential winners of Special Prizes')).toBeInTheDocument();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<SpecialPrizeWinners />);
+    await checkA11y(container);
   });
 });

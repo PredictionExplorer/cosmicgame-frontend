@@ -40,7 +40,7 @@ export function WinningHistorySection({
             History of Winnings
           </h4>
           {claimHistory === null ? (
-            <h6 className="text-lg font-medium text-foreground">Loading...</h6>
+            <p className="text-lg font-medium text-foreground">Loading...</p>
           ) : (
             <WinningHistoryTable winningHistory={claimHistory} />
           )}

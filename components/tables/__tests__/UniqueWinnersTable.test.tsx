@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import { UniqueWinnersTable } from '@/components/tables/UniqueWinnersTable';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 const createWinner = (overrides = {}) => ({
   WinnerAid: '1',
@@ -55,5 +55,10 @@ describe('UniqueWinnersTable', () => {
     const links = screen.getAllByRole('link');
     const userLink = links.find((l) => l.getAttribute('href')?.startsWith('/user/'));
     expect(userLink).toHaveAttribute('href', `/user/${addr}`);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<UniqueWinnersTable list={[]} />);
+    await checkA11y(container);
   });
 });

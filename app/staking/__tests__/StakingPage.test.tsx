@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import StakingPage from '../StakingPage';
 
@@ -108,5 +108,12 @@ describe('StakingPage', () => {
     render(<StakingPage />);
     const link = screen.getByRole('link', { name: '"MY STAKING"' });
     expect(link).toHaveAttribute('href', '/my-staking');
+  });
+
+  it('has no accessibility violations', async () => {
+    mockUseStakingCSTRewards.mockReturnValue(noError);
+    mockUseStakingRWLKMintsGlobal.mockReturnValue(noError);
+    const { container } = render(<StakingPage />);
+    await checkA11y(container);
   });
 });

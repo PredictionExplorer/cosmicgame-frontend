@@ -1,4 +1,4 @@
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import MintArtBlocks from '../MintArtBlocks';
 
@@ -72,5 +72,10 @@ describe('MintArtBlocks', () => {
   it('Mint button is not disabled by default', () => {
     render(<MintArtBlocks />);
     expect(screen.getByRole('button', { name: 'Mint now' })).not.toBeDisabled();
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<MintArtBlocks />);
+    await checkA11y(container);
   });
 });
