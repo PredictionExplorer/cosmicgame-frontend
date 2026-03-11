@@ -53,7 +53,12 @@ const RaffleWinningsRow = ({ deposit }: { deposit: RaffleETHDeposit }) => {
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${RoundNum}`} className="text-inherit" target="_blank">
+        <Link
+          href={`/prize/${RoundNum}`}
+          className="text-inherit"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {RoundNum}
         </Link>
       </TablePrimaryCell>

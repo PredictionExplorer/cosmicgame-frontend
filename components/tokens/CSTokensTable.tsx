@@ -76,7 +76,12 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/detail/${TokenId}`} className="text-inherit" target="_blank">
+        <Link
+          href={`/detail/${TokenId}`}
+          className="text-inherit"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {TokenId}
         </Link>
       </TablePrimaryCell>
@@ -84,7 +89,12 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
       <TablePrimaryCell align="center">{TokenName || ' '}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${RoundNum}`} className="text-inherit" target="_blank">
+        <Link
+          href={`/prize/${RoundNum}`}
+          className="text-inherit"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {RoundNum}
         </Link>
       </TablePrimaryCell>

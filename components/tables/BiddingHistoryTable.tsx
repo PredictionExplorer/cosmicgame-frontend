@@ -180,6 +180,7 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
                   <a
                     href={getExplorerUrl('token', history.DonatedERC20TokenAddr)}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="text-inherit"
                   >
                     {symbol}

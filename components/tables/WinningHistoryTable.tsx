@@ -75,7 +75,12 @@ const WinningHistoryRow = ({
         </div>
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <a href={getExplorerUrl('tx', history.TxHash)} target="_blank" className="text-inherit">
+        <a
+          href={getExplorerUrl('tx', history.TxHash)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-inherit"
+        >
           {convertTimestampToDateTime(history.TimeStamp)}
         </a>
       </TablePrimaryCell>
@@ -88,6 +93,7 @@ const WinningHistoryRow = ({
                   <a
                     href={`/user/${history.WinnerAddr}`}
                     target="_blank"
+                    rel="noopener noreferrer"
                     className="font-mono text-inherit"
                   >
                     {shortenHex(history.WinnerAddr, 6)}
@@ -102,7 +108,12 @@ const WinningHistoryRow = ({
         </TablePrimaryCell>
       )}
       <TablePrimaryCell align="center">
-        <a href={`/prize/${history.RoundNum}`} target="_blank" className="text-inherit">
+        <a
+          href={`/prize/${history.RoundNum}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-inherit"
+        >
           {history.RoundNum}
         </a>
       </TablePrimaryCell>
@@ -121,6 +132,7 @@ const WinningHistoryRow = ({
                 <a
                   href={getExplorerUrl('address', COSMIC_SIGNATURE_TOKEN_ADDRESS)}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-inherit"
                 >
                   {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS, 6)}
@@ -136,6 +148,7 @@ const WinningHistoryRow = ({
                 <a
                   href={getExplorerUrl('address', history.TokenAddress)}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="text-inherit"
                 >
                   {shortenHex(history.TokenAddress, 6)}
@@ -150,7 +163,12 @@ const WinningHistoryRow = ({
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {(history.TokenId ?? -1) >= 0 ? (
-          <a href={`/detail/${history.TokenId}`} target="_blank" className="text-inherit">
+          <a
+            href={`/detail/${history.TokenId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-inherit"
+          >
             {history.TokenId}
           </a>
         ) : (

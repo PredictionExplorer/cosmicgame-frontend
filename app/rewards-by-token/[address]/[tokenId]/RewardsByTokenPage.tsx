@@ -103,7 +103,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                     className="text-inherit text-[inherit]"
                     href={getExplorerUrl('tx', Stake.TxHash)}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                   >
                     <span>{convertTimestampToDateTime(Stake.TimeStamp)}</span>
                   </a>
@@ -126,7 +126,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                       className="text-inherit text-[inherit]"
                       href={getExplorerUrl('tx', Unstake.TxHash)}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                     >
                       <span>{convertTimestampToDateTime(Unstake.TimeStamp)}</span>
                     </a>

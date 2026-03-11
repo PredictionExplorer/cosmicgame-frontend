@@ -51,7 +51,7 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
           className="text-inherit text-[inherit]"
           href={getExplorerUrl('tx', token.TxHash)}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(token.TimeStamp)}
         </a>
@@ -62,6 +62,7 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
           href={`/prize/${token.RoundNum}`}
           className="text-inherit text-[inherit]"
           target="_blank"
+          rel="noopener noreferrer"
         >
           {token.RoundNum}
         </Link>
@@ -75,7 +76,7 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
                 href={getExplorerUrl('address', token.TokenAddr)}
                 className="text-inherit text-[inherit] font-mono"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
               >
                 {shortenHex(token.TokenAddr, 6)}
               </a>
@@ -97,6 +98,7 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
                 href={`/user/${token.WinnerAddr}`}
                 className="text-inherit text-[inherit] font-mono"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 {shortenHex(token.WinnerAddr, 6)}
               </Link>

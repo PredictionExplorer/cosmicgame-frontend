@@ -52,6 +52,7 @@ const config = [
           "newlines-between": "always",
         },
       ],
+      "react/jsx-no-target-blank": ["error", { allowReferrer: false }],
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-unused-vars": [
         "warn",

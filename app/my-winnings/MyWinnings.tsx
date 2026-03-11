@@ -91,13 +91,18 @@ function RaffleWinningRow({
           className="text-inherit text-[inherit]"
           href={getExplorerUrl('tx', TxHash)}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(TimeStamp)}
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${RoundNum}`} className="text-inherit text-[inherit]" target="_blank">
+        <Link
+          href={`/prize/${RoundNum}`}
+          className="text-inherit text-[inherit]"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {RoundNum}
         </Link>
       </TablePrimaryCell>

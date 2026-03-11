@@ -26,7 +26,7 @@ const NameHistoryRow = ({ record }: { record: NameHistoryRecord }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <a href={txUrl} className="text-inherit" target="_blank">
+        <a href={txUrl} className="text-inherit" target="_blank" rel="noopener noreferrer">
           {convertTimestampToDateTime(record.TimeStamp)}
         </a>
       </TablePrimaryCell>

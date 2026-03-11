@@ -30,7 +30,12 @@ const WithdrawalRow: FC<WithdrawalRowProps> = ({ withdrawal }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <a className="text-inherit" href={getExplorerUrl('tx', withdrawal.TxHash)} target="_blank">
+        <a
+          className="text-inherit"
+          href={getExplorerUrl('tx', withdrawal.TxHash)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {convertTimestampToDateTime(withdrawal.TimeStamp)}
         </a>
       </TablePrimaryCell>

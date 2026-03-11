@@ -384,6 +384,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                           <Link
                             href={`/prize/${nft?.RoundNum ?? 0}`}
                             target="_blank"
+                            rel="noopener noreferrer"
                             className="text-inherit"
                           >
                             Round #{nft?.RoundNum}

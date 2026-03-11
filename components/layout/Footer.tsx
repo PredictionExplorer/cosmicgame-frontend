@@ -25,7 +25,7 @@ const Footer = () => (
               className="text-[13px] text-muted-foreground no-underline lg:mr-20"
               target="_blank"
               href="#"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Terms and conditions
             </a>
@@ -34,7 +34,7 @@ const Footer = () => (
               className="text-[13px] text-muted-foreground no-underline"
               target="_blank"
               href="#"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Privacy policy
             </a>
@@ -51,7 +51,7 @@ const Footer = () => (
               <a
                 href="https://x.com/CosmicSignatureNFT"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label="twitter"
               >
                 <FontAwesomeIcon icon={faTwitter} color="#A9AAB5" width={24} height={24} />
@@ -62,7 +62,7 @@ const Footer = () => (
               <a
                 href="https://discord.gg/bGnPn96Qwt"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label="discord"
               >
                 <FontAwesomeIcon icon={faDiscord} color="#A9AAB5" width={24} height={24} />

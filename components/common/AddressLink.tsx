@@ -18,6 +18,7 @@ export const AddressLink = ({ address, url }: { address: string; url: string }) 
               <a
                 href={url}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="font-mono [color:inherit] [font-size:inherit]"
               >
                 {shortText}
@@ -32,6 +33,7 @@ export const AddressLink = ({ address, url }: { address: string; url: string }) 
       <a
         href={url}
         target="_blank"
+        rel="noopener noreferrer"
         className="hidden font-mono [color:inherit] [font-size:inherit] sm:inline"
       >
         {displayText}

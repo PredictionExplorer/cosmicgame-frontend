@@ -49,14 +49,14 @@ describe('Footer', () => {
     const termsLink = screen.getByText('Terms and conditions');
     expect(termsLink).toBeInTheDocument();
     expect(termsLink).toHaveAttribute('target', '_blank');
-    expect(termsLink).toHaveAttribute('rel', 'noreferrer');
+    expect(termsLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('renders the privacy policy link', () => {
     const privacyLink = screen.getByText('Privacy policy');
     expect(privacyLink).toBeInTheDocument();
     expect(privacyLink).toHaveAttribute('target', '_blank');
-    expect(privacyLink).toHaveAttribute('rel', 'noreferrer');
+    expect(privacyLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('renders the twitter link pointing to the correct URL', () => {
@@ -64,6 +64,7 @@ describe('Footer', () => {
     expect(twitterLink).toBeInTheDocument();
     expect(twitterLink).toHaveAttribute('href', 'https://x.com/CosmicSignatureNFT');
     expect(twitterLink).toHaveAttribute('target', '_blank');
+    expect(twitterLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('renders the discord link pointing to the correct URL', () => {
@@ -71,6 +72,15 @@ describe('Footer', () => {
     expect(discordLink).toBeInTheDocument();
     expect(discordLink).toHaveAttribute('href', 'https://discord.gg/bGnPn96Qwt');
     expect(discordLink).toHaveAttribute('target', '_blank');
+    expect(discordLink).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('sets rel="noopener noreferrer" on every target="_blank" link', () => {
+    const links = document.querySelectorAll('a[target="_blank"]');
+    expect(links.length).toBe(4);
+    links.forEach((link) => {
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    });
   });
 
   it('renders the site-map link', () => {

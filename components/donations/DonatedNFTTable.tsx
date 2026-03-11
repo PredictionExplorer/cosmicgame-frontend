@@ -89,7 +89,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
           className="text-inherit text-[inherit]"
           href={getExplorerUrl('tx', nft.TxHash)}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
         >
           {convertTimestampToDateTime(nft.TimeStamp)}
         </a>
@@ -103,6 +103,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
                 href={`/user/${nft.DonorAddr}`}
                 className="text-inherit text-[inherit] font-mono"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 {shortenHex(nft.DonorAddr, 6)}
               </Link>
@@ -117,6 +118,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
           href={`/prize/${nft.RoundNum}`}
           className="text-inherit text-[inherit]"
           target="_blank"
+          rel="noopener noreferrer"
         >
           {nft.RoundNum}
         </Link>
@@ -130,7 +132,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
                 href={getExplorerUrl('address', nft.TokenAddr)}
                 className="text-inherit text-[inherit] font-mono"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
               >
                 {shortenHex(nft.TokenAddr, 6)}
               </a>
@@ -145,7 +147,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
           <a
             href={tokenURI.external_url}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="text-inherit text-[inherit]"
           >
             {nft.NFTTokenId || nft.TokenId}
@@ -166,7 +168,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
 
       <TablePrimaryCell className="w-[130px]">
         {tokenURI?.image ? (
-          <a href={tokenURI.external_url} target="_blank" rel="noreferrer">
+          <a href={tokenURI.external_url} target="_blank" rel="noopener noreferrer">
             <NFTImage src={tokenURI.image} />
           </a>
         ) : (

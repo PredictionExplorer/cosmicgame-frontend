@@ -53,7 +53,12 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
       onClick={clickable ? handleRowClick : undefined}
     >
       <TablePrimaryCell>
-        <a className="text-inherit" href={getExplorerUrl('tx', row.TxHash)} target="_blank">
+        <a
+          className="text-inherit"
+          href={getExplorerUrl('tx', row.TxHash)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {convertTimestampToDateTime(row.TimeStamp)}
         </a>
       </TablePrimaryCell>
@@ -63,7 +68,12 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
         </TablePrimaryCell>
       )}
       <TablePrimaryCell align="center">
-        <a className="text-inherit" href={`/prize/${row.RoundNum}`} target="_blank">
+        <a
+          className="text-inherit"
+          href={`/prize/${row.RoundNum}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {row.RoundNum}
         </a>
       </TablePrimaryCell>

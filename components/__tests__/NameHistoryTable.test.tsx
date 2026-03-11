@@ -33,6 +33,28 @@ describe('NameHistoryTable', () => {
     expect(screen.getByText(mockData[0]!.TokenName)).toBeInTheDocument();
   });
 
+  test('external links have rel="noopener noreferrer"', () => {
+    const mockData = [
+      {
+        EvtLogId: 8638,
+        BlockNum: 113431,
+        TxId: 2621,
+        TxHash: '0x0f3956591792f76e2878e7aa57829899296ac84a96e0597425c94dbef34afb32',
+        TimeStamp: 1699452241,
+        DateTime: '2023-11-08T14:04:01Z',
+        TokenId: 240,
+        TokenName: '12345',
+      },
+    ];
+    render(<NameHistoryTable list={mockData} />);
+    const links = screen.getAllByRole('link');
+    for (const link of links) {
+      if (link.getAttribute('target') === '_blank') {
+        expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      }
+    }
+  });
+
   test('with no token name', async () => {
     const mockData = [
       {

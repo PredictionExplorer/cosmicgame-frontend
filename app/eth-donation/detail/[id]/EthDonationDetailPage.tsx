@@ -85,6 +85,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
         <a
           href={getExplorerUrl('tx', donationInfo.TxHash)}
           target="_blank"
+          rel="noopener noreferrer"
           className="text-inherit"
         >
           <span>{convertTimestampToDateTime(donationInfo.TimeStamp)}</span>
@@ -124,7 +125,12 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
 
           <div className="mb-2 flex flex-wrap">
             <span className="text-primary">URL:</span>&nbsp;
-            <a href={dataJson.url} target="_blank" className="text-inherit">
+            <a
+              href={dataJson.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-inherit"
+            >
               {dataJson.url}
             </a>
           </div>

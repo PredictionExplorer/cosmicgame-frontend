@@ -213,6 +213,7 @@ const Statistics = () => {
           className="font-mono text-inherit"
           href={`/eth-donation/round/${data.CurRoundNum}`}
           target="_blank"
+          rel="noopener noreferrer"
         >
           {formatEthValue(data.CurRoundStats?.TotalDonatedAmountEth ?? 0)}
         </Link>
@@ -424,7 +425,12 @@ const Statistics = () => {
         <StatisticsItem
           title="Total Donated ETH"
           value={
-            <Link className="text-inherit" href="/eth-donation" target="_blank">
+            <Link
+              className="text-inherit"
+              href="/eth-donation"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {formatEthValue(data.MainStats.TotalEthDonatedAmountEth ?? 0)}
             </Link>
           }

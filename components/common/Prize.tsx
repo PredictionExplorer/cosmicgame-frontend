@@ -51,6 +51,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                 <a
                   href="/faq#main-prize"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="[color:inherit] [font-size:inherit]"
                 >
                   Main Prize
@@ -119,6 +120,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                 <a
                   href="/faq#chrono-warrior"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="[color:inherit] [font-size:inherit]"
                 >
                   Chrono Warrior
@@ -142,6 +144,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                 <a
                   href="/faq#endurance-champion"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="[color:inherit] [font-size:inherit]"
                 >
                   Endurance Champion

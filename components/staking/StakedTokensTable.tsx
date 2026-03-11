@@ -159,6 +159,7 @@ const StakedTokenRow = ({
           href={`/staking-action/${isRandomWalk ? 1 : 0}/${stakeActionId}`}
           className="text-inherit"
           target="_blank"
+          rel="noopener noreferrer"
         >
           {stakeActionId}
         </Link>

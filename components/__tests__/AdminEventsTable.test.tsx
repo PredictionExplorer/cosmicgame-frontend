@@ -39,6 +39,28 @@ describe('AdminEventsTable', () => {
     expect(screen.getByText('25%')).toBeInTheDocument();
   });
 
+  test('external links have rel="noopener noreferrer"', () => {
+    const mockData: AdminEventRow[] = [
+      {
+        EvtLogId: '1',
+        RecordType: 1,
+        TransferType: 0,
+        TimeStamp: 1701346718,
+        TxHash: '0xabc123def456',
+        IntegerValue: 25,
+        AddressValue: '',
+        StringValue: '',
+      },
+    ];
+    render(<AdminEventsTable list={mockData} />);
+    const links = screen.getAllByRole('link');
+    for (const link of links) {
+      if (link.getAttribute('target') === '_blank') {
+        expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      }
+    }
+  });
+
   test('renders table headers', () => {
     const mockData: AdminEventRow[] = [
       {

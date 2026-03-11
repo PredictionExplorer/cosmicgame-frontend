@@ -27,7 +27,7 @@ const MarketingRewardsRow = ({ row }: { row: MarketingReward }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <a className="text-inherit" href={transactionUrl} target="_blank">
+        <a className="text-inherit" href={transactionUrl} target="_blank" rel="noopener noreferrer">
           {convertTimestampToDateTime(row.TimeStamp)}
         </a>
       </TablePrimaryCell>

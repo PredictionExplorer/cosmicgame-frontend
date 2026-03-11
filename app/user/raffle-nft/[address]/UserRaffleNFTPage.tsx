@@ -50,7 +50,12 @@ function NFTWinningsRow({ row }: { row: RaffleNFTWinning }) {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${RoundNum}`} className="font-mono text-inherit" target="_blank">
+        <Link
+          href={`/prize/${RoundNum}`}
+          className="font-mono text-inherit"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {RoundNum}
         </Link>
       </TablePrimaryCell>
