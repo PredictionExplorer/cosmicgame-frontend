@@ -136,4 +136,62 @@ describe('StakedTokenContext', () => {
     expect(result.current.rwlktokens).toEqual(rwlkData);
     expect(typeof result.current.fetchData).toBe('function');
   });
+
+  it('context value has exactly three properties', () => {
+    const { result } = renderHook(() => useStakedToken(), { wrapper });
+    const keys = Object.keys(result.current);
+    expect(keys).toHaveLength(3);
+    expect(keys).toContain('cstokens');
+    expect(keys).toContain('rwlktokens');
+    expect(keys).toContain('fetchData');
+  });
+
+  it('fetchData is a stable reference across re-renders', () => {
+    const { result, rerender } = renderHook(() => useStakedToken(), { wrapper });
+    const first = result.current.fetchData;
+    rerender();
+    expect(result.current.fetchData).toBe(first);
+  });
+
+  it('handles multiple tokens in both CST and RWLK arrays', () => {
+    const cstData = [
+      { StakeActionId: 1, StakedTokenId: 10, StakeTimeStamp: 100 },
+      { StakeActionId: 2, StakedTokenId: 11, StakeTimeStamp: 101 },
+      { StakeActionId: 3, StakedTokenId: 12, StakeTimeStamp: 102 },
+    ];
+    const rwlkData = [
+      { StakeActionId: 4, StakedTokenId: 20, StakeTimeStamp: 200 },
+      { StakeActionId: 5, StakedTokenId: 21, StakeTimeStamp: 201 },
+      { StakeActionId: 6, StakedTokenId: 22, StakeTimeStamp: 202 },
+    ];
+    mockUseStakedCSTTokensByUser.mockReturnValue({ data: cstData, refetch: mockRefetchCST });
+    mockUseStakedRWLKTokensByUser.mockReturnValue({ data: rwlkData, refetch: mockRefetchRWLK });
+
+    const { result } = renderHook(() => useStakedToken(), { wrapper });
+    expect(result.current.cstokens).toHaveLength(3);
+    expect(result.current.rwlktokens).toHaveLength(3);
+  });
+
+  it('falls back to empty array when hook data is explicitly undefined', () => {
+    mockUseStakedCSTTokensByUser.mockReturnValue({ data: undefined, refetch: mockRefetchCST });
+    mockUseStakedRWLKTokensByUser.mockReturnValue({ data: undefined, refetch: mockRefetchRWLK });
+
+    const { result } = renderHook(() => useStakedToken(), { wrapper });
+    expect(result.current.cstokens).toEqual([]);
+    expect(result.current.rwlktokens).toEqual([]);
+    expect(Array.isArray(result.current.cstokens)).toBe(true);
+    expect(Array.isArray(result.current.rwlktokens)).toBe(true);
+  });
+
+  it('error message includes the exact hook name', () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      renderHook(() => useStakedToken());
+    } catch (error) {
+      expect((error as Error).message).toBe(
+        'useStakedToken must be used within a StakedTokenProvider',
+      );
+    }
+    consoleSpy.mockRestore();
+  });
 });

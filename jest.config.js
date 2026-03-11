@@ -24,6 +24,7 @@ const config = {
   collectCoverageFrom: [
     'app/**/*.{ts,tsx}',
     'components/**/*.{ts,tsx}',
+    'contexts/**/*.{ts,tsx}',
     'hooks/**/*.{ts,tsx}',
     'utils/**/*.{ts,tsx}',
     'services/**/*.{ts,tsx}',
@@ -31,7 +32,7 @@ const config = {
     '!**/node_modules/**',
   ],
   coverageThreshold: {
-    global: { branches: 60, functions: 63, lines: 73, statements: 72 },
+    global: { branches: 61, functions: 64, lines: 74, statements: 73 },
   },
 };
 

@@ -39,8 +39,9 @@ jest.mock('../../services/api', () => ({
   },
 }));
 
+const mockReportError = jest.fn();
 jest.mock('../../utils/errors', () => ({
-  reportError: jest.fn(),
+  reportError: (...args: unknown[]) => mockReportError(...args),
 }));
 
 beforeEach(() => {
@@ -192,5 +193,282 @@ describe('ApiDataContext', () => {
     });
 
     expect(result.current.apiData.ETHRaffleToClaim).toBe(99);
+  });
+
+  it('filters out rewards without DepositId', async () => {
+    const redBox = {
+      ETHRaffleToClaim: 1,
+      ETHRaffleToClaimWei: 100,
+      NumDonatedNFTToClaim: 0,
+      UnclaimedStakingReward: 2,
+    };
+    const rewards = [
+      { EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 },
+      { EvtLogId: 2, RoundNum: 2, TokenId: 11 },
+      { EvtLogId: 3, RoundNum: 3, TokenId: 12, DepositId: null },
+    ];
+
+    mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
+    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+      data: rewards,
+      refetch: mockRefetchRewards,
+    });
+    mockGetCstActionIds.mockResolvedValue([{ DepositId: 5, StakeActionId: 300, Claimed: false }]);
+
+    const { result } = renderHook(() => useApiData(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.apiData.claimableActionIds).toEqual([
+        { DepositId: 5, StakeActionId: 300 },
+      ]);
+    });
+    expect(mockGetCstActionIds).toHaveBeenCalledTimes(1);
+    expect(mockGetCstActionIds).toHaveBeenCalledWith('0xUser', 5);
+  });
+
+  it('deduplicates unstakeableActionIds across multiple deposits', async () => {
+    const redBox = {
+      ETHRaffleToClaim: 0,
+      ETHRaffleToClaimWei: 0,
+      NumDonatedNFTToClaim: 0,
+      UnclaimedStakingReward: 5,
+    };
+    const rewards = [
+      { EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 },
+      { EvtLogId: 2, RoundNum: 2, TokenId: 11, DepositId: 6 },
+    ];
+
+    mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
+    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+      data: rewards,
+      refetch: mockRefetchRewards,
+    });
+    mockStakedTokens.mockReturnValue([
+      {
+        StakeActionId: 100,
+        StakedTokenId: 10,
+        StakeTimeStamp: 1,
+        TokenInfo: { TokenId: 10, StakeActionId: 100 },
+      },
+    ]);
+    mockGetCstActionIds.mockResolvedValue([{ DepositId: 5, StakeActionId: 100, Claimed: false }]);
+
+    const { result } = renderHook(() => useApiData(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.apiData.unstakeableActionIds).toEqual([100]);
+    });
+    expect(mockGetCstActionIds).toHaveBeenCalledTimes(2);
+  });
+
+  it('calls reportError when processData throws', async () => {
+    const error = new Error('fetchActionIds boom');
+    const redBox = {
+      ETHRaffleToClaim: 1,
+      ETHRaffleToClaimWei: 100,
+      NumDonatedNFTToClaim: 0,
+      UnclaimedStakingReward: 2,
+    };
+    const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
+
+    mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
+    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+      data: rewards,
+      refetch: mockRefetchRewards,
+    });
+    mockGetCstActionIds.mockRejectedValue(error);
+
+    renderHook(() => useApiData(), { wrapper });
+
+    await waitFor(() => {
+      expect(mockReportError).toHaveBeenCalledWith(error, 'ApiDataContext processData');
+    });
+  });
+
+  it('returns empty action IDs when API returns null', async () => {
+    const redBox = {
+      ETHRaffleToClaim: 1,
+      ETHRaffleToClaimWei: 100,
+      NumDonatedNFTToClaim: 0,
+      UnclaimedStakingReward: 1,
+    };
+    const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
+
+    mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
+    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+      data: rewards,
+      refetch: mockRefetchRewards,
+    });
+    mockStakedTokens.mockReturnValue([
+      {
+        StakeActionId: 100,
+        StakedTokenId: 10,
+        StakeTimeStamp: 1,
+        TokenInfo: { TokenId: 10, StakeActionId: 100 },
+      },
+    ]);
+    mockGetCstActionIds.mockResolvedValue(null);
+
+    const { result } = renderHook(() => useApiData(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.apiData.ETHRaffleToClaim).toBe(1);
+    });
+    expect(result.current.apiData.unstakeableActionIds).toEqual([]);
+    expect(result.current.apiData.claimableActionIds).toEqual([]);
+  });
+
+  it('produces no claimable IDs when all items are Claimed', async () => {
+    const redBox = {
+      ETHRaffleToClaim: 1,
+      ETHRaffleToClaimWei: 100,
+      NumDonatedNFTToClaim: 0,
+      UnclaimedStakingReward: 1,
+    };
+    const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
+
+    mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
+    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+      data: rewards,
+      refetch: mockRefetchRewards,
+    });
+    mockGetCstActionIds.mockResolvedValue([
+      { DepositId: 5, StakeActionId: 100, Claimed: true },
+      { DepositId: 5, StakeActionId: 200, Claimed: true },
+    ]);
+
+    const { result } = renderHook(() => useApiData(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.apiData.ETHRaffleToClaim).toBe(1);
+    });
+    expect(result.current.apiData.claimableActionIds).toEqual([]);
+  });
+
+  it('processes multiple deposits with different DepositIds', async () => {
+    const redBox = {
+      ETHRaffleToClaim: 1,
+      ETHRaffleToClaimWei: 100,
+      NumDonatedNFTToClaim: 0,
+      UnclaimedStakingReward: 3,
+    };
+    const rewards = [
+      { EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 },
+      { EvtLogId: 2, RoundNum: 2, TokenId: 11, DepositId: 7 },
+    ];
+
+    mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
+    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+      data: rewards,
+      refetch: mockRefetchRewards,
+    });
+    mockGetCstActionIds
+      .mockResolvedValueOnce([{ DepositId: 5, StakeActionId: 300, Claimed: false }])
+      .mockResolvedValueOnce([{ DepositId: 7, StakeActionId: 400, Claimed: false }]);
+
+    const { result } = renderHook(() => useApiData(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.apiData.claimableActionIds).toHaveLength(2);
+    });
+    expect(result.current.apiData.claimableActionIds).toEqual(
+      expect.arrayContaining([
+        { DepositId: 5, StakeActionId: 300 },
+        { DepositId: 7, StakeActionId: 400 },
+      ]),
+    );
+    expect(mockGetCstActionIds).toHaveBeenCalledWith('0xUser', 5);
+    expect(mockGetCstActionIds).toHaveBeenCalledWith('0xUser', 7);
+  });
+
+  it('skips action ID processing when UnclaimedStakingReward is 0', async () => {
+    const redBox = {
+      ETHRaffleToClaim: 3,
+      ETHRaffleToClaimWei: 3000,
+      NumDonatedNFTToClaim: 1,
+      UnclaimedStakingReward: 0,
+    };
+    const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
+
+    mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
+    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+      data: rewards,
+      refetch: mockRefetchRewards,
+    });
+
+    const { result } = renderHook(() => useApiData(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.apiData.ETHRaffleToClaim).toBe(3);
+    });
+    expect(mockGetCstActionIds).not.toHaveBeenCalled();
+    expect(result.current.apiData.unstakeableActionIds).toEqual([]);
+    expect(result.current.apiData.claimableActionIds).toEqual([]);
+  });
+
+  it('does not update state after unmount (cancellation)', async () => {
+    let resolveApi!: (value: unknown) => void;
+    const apiPromise = new Promise((r) => {
+      resolveApi = r;
+    });
+
+    const redBox = {
+      ETHRaffleToClaim: 99,
+      ETHRaffleToClaimWei: 9900,
+      NumDonatedNFTToClaim: 0,
+      UnclaimedStakingReward: 1,
+    };
+    const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
+
+    mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
+    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+      data: rewards,
+      refetch: mockRefetchRewards,
+    });
+    mockGetCstActionIds.mockReturnValue(apiPromise);
+
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const { result, unmount } = renderHook(() => useApiData(), { wrapper });
+
+    unmount();
+
+    await act(async () => {
+      resolveApi([{ DepositId: 5, StakeActionId: 100, Claimed: false }]);
+      await new Promise((r) => setTimeout(r, 50));
+    });
+
+    expect(result.current.apiData.ETHRaffleToClaim).toBe(0);
+    consoleSpy.mockRestore();
+  });
+
+  it('fetchData runs both refetches concurrently', async () => {
+    const order: string[] = [];
+    mockRefetchRedBox.mockImplementation(
+      () =>
+        new Promise((r) =>
+          setTimeout(() => {
+            order.push('redbox');
+            r({ data: {} });
+          }, 10),
+        ),
+    );
+    mockRefetchRewards.mockImplementation(
+      () =>
+        new Promise((r) =>
+          setTimeout(() => {
+            order.push('rewards');
+            r({ data: [] });
+          }, 5),
+        ),
+    );
+
+    const { result } = renderHook(() => useApiData(), { wrapper });
+
+    await act(async () => {
+      await result.current.fetchData();
+    });
+
+    expect(order).toContain('redbox');
+    expect(order).toContain('rewards');
   });
 });
