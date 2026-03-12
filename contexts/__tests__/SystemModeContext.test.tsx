@@ -18,6 +18,8 @@ jest.mock('../../hooks/useCosmicGameContract', () => ({
 const mockReportError = jest.fn();
 jest.mock('../../utils/errors', () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
+  isContractRevertError: (err: unknown) =>
+    err instanceof Error && err.name === 'ContractFunctionExecutionError',
 }));
 
 const useCosmicGameContract = require('../../hooks/useCosmicGameContract').default as jest.Mock;
@@ -318,6 +320,49 @@ describe('SystemModeProvider', () => {
 
     expect(mockReportError).toHaveBeenCalledTimes(MAX_CONSECUTIVE_FAILURES);
     expect(result.current!.data).toBe(0);
+  });
+
+  it('logs a warning instead of reportError for ContractFunctionExecutionError', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const revertError = new Error('The contract function "systemMode" reverted.');
+    revertError.name = 'ContractFunctionExecutionError';
+    mockSystemMode.mockRejectedValue(revertError);
+
+    const { result } = renderHook(() => useSystemMode(), { wrapper });
+
+    await waitFor(() => {
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[SystemModeContext] systemMode() reverted — contract may not be available on this network',
+      );
+    });
+
+    expect(mockReportError).not.toHaveBeenCalled();
+    expect(result.current!.data).toBe(0);
+    warnSpy.mockRestore();
+  });
+
+  it('still stops polling after MAX_CONSECUTIVE_FAILURES for revert errors', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const revertError = new Error('The contract function "systemMode" reverted.');
+    revertError.name = 'ContractFunctionExecutionError';
+    mockSystemMode.mockRejectedValue(revertError);
+
+    renderHook(() => useSystemMode(), { wrapper });
+
+    await waitFor(() => {
+      expect(mockSystemMode).toHaveBeenCalledTimes(1);
+    });
+
+    for (let i = 0; i < MAX_CONSECUTIVE_FAILURES + 2; i++) {
+      await act(async () => {
+        jest.advanceTimersByTime(12_000);
+      });
+    }
+
+    expect(mockSystemMode).toHaveBeenCalledTimes(MAX_CONSECUTIVE_FAILURES);
+    expect(warnSpy).toHaveBeenCalledTimes(MAX_CONSECUTIVE_FAILURES);
+    expect(mockReportError).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 
   it('has no accessibility violations', async () => {

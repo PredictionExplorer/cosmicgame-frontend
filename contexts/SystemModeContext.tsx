@@ -9,7 +9,7 @@ import {
 } from 'react';
 
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
-import { reportError } from '@/utils/errors';
+import { reportError, isContractRevertError } from '@/utils/errors';
 
 interface SystemModeContextValue {
   data: number;
@@ -38,7 +38,13 @@ export const SystemModeProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       failCountRef.current += 1;
       if (failCountRef.current <= MAX_CONSECUTIVE_FAILURES) {
-        reportError(error, 'SystemModeContext.fetchData');
+        if (isContractRevertError(error)) {
+          console.warn(
+            '[SystemModeContext] systemMode() reverted — contract may not be available on this network',
+          );
+        } else {
+          reportError(error, 'SystemModeContext.fetchData');
+        }
       }
     }
   }, [cosmicGameContract]);
