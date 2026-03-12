@@ -24,14 +24,12 @@ describe('StatisticsGroup', () => {
   });
 
   it('renders an icon when provided', () => {
-    const { container } = render(
+    render(
       <StatisticsGroup title="Group" icon={<Trophy data-testid="icon" className="h-4 w-4" />}>
         <p>Content</p>
       </StatisticsGroup>,
     );
     expect(screen.getByTestId('icon')).toBeInTheDocument();
-    const iconWrapper = container.querySelector('.bg-primary\\/10');
-    expect(iconWrapper).toBeInTheDocument();
   });
 
   it('does not render icon wrapper when no icon is provided', () => {
@@ -40,7 +38,32 @@ describe('StatisticsGroup', () => {
         <p>Content</p>
       </StatisticsGroup>,
     );
-    expect(container.querySelector('.bg-primary\\/10')).not.toBeInTheDocument();
+    const iconWrappers = container.querySelectorAll('svg');
+    expect(iconWrappers.length).toBe(0);
+  });
+
+  it('applies accentColor left border', () => {
+    const { container } = render(
+      <StatisticsGroup title="Prizes" accentColor="blue">
+        <p>Content</p>
+      </StatisticsGroup>,
+    );
+    expect(container.firstChild).toHaveClass('border-l-2');
+  });
+
+  it('uses accent icon background when accentColor is set', () => {
+    const { container } = render(
+      <StatisticsGroup
+        title="Tokens"
+        icon={<Trophy data-testid="icon" className="h-4 w-4" />}
+        accentColor="purple"
+      >
+        <p>Content</p>
+      </StatisticsGroup>,
+    );
+    expect(screen.getByTestId('icon')).toBeInTheDocument();
+    const wrapper = screen.getByTestId('icon').parentElement;
+    expect(wrapper).toHaveClass('bg-[#AC56FF]/10');
   });
 
   it('applies custom className', () => {

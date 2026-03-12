@@ -60,7 +60,7 @@ export function StakingSection({
       </TabsList>
 
       <TabsContent value="cst" className="space-y-6 pt-4">
-        <StatisticsGroup title="CST Staking Overview">
+        <StatisticsGroup title="CST Staking Overview" accentColor="blue">
           <StatisticsItem
             title="Number of Active Stakers"
             value={cstStats.NumActiveStakers}
@@ -111,7 +111,7 @@ export function StakingSection({
       </TabsContent>
 
       <TabsContent value="rwlk" className="space-y-6 pt-4">
-        <StatisticsGroup title="RWLK Staking Overview">
+        <StatisticsGroup title="RWLK Staking Overview" accentColor="purple">
           <StatisticsItem
             title="Number of Active Stakers"
             value={rwlkStats.NumActiveStakers}

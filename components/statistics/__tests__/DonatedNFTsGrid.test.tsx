@@ -19,9 +19,12 @@ describe('DonatedNFTsGrid', () => {
     expect(screen.getByText('Donated NFTs')).toBeInTheDocument();
   });
 
-  it('shows empty message when no donations', () => {
-    render(<DonatedNFTsGrid nftDonations={[]} />);
-    expect(screen.getByText('No ERC721 tokens were donated on this round.')).toBeInTheDocument();
+  it('shows styled empty state when no donations', () => {
+    const { container } = render(<DonatedNFTsGrid nftDonations={[]} />);
+    expect(screen.getByText('No NFTs have been donated yet.')).toBeInTheDocument();
+    expect(screen.getByText('Donated NFTs from all rounds will appear here.')).toBeInTheDocument();
+    const svg = container.querySelector('svg');
+    expect(svg).toBeInTheDocument();
   });
 
   it('renders donated NFTs when list is non-empty', () => {

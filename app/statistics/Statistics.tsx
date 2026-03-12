@@ -14,6 +14,8 @@ import {
   TrendingUp,
   Gift,
   Layers,
+  Lock,
+  Activity,
 } from 'lucide-react';
 
 import { formatCSTValue, formatEthValue } from '@/utils';
@@ -127,7 +129,7 @@ const Statistics = () => {
       {/* Link to current round */}
       <Link
         href="/current-round"
-        className="mb-12 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/[0.04] p-4 group hover:bg-primary/[0.06] transition-colors"
+        className="gradient-border-card mb-12 flex items-center justify-between rounded-xl border border-primary/20 bg-gradient-to-r from-primary/[0.06] via-accent/[0.04] to-primary/[0.06] p-4 group hover:from-primary/[0.08] hover:to-primary/[0.08] transition-all"
       >
         <div>
           <p className="text-sm font-medium text-white">Looking for current round data?</p>
@@ -173,7 +175,11 @@ const Statistics = () => {
           <SectionDivider title="Financial Overview" className="mb-6" />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* Prize Economy */}
-            <StatisticsGroup title="Prize Economy" icon={<Trophy className="h-4 w-4" />}>
+            <StatisticsGroup
+              title="Prize Economy"
+              icon={<Trophy className="h-4 w-4" />}
+              accentColor="blue"
+            >
               <StatisticsItem
                 title="Num Prizes Given"
                 value={
@@ -204,7 +210,11 @@ const Statistics = () => {
             </StatisticsGroup>
 
             {/* Token Economy */}
-            <StatisticsGroup title="Token Economy" icon={<Coins className="h-4 w-4" />}>
+            <StatisticsGroup
+              title="Token Economy"
+              icon={<Coins className="h-4 w-4" />}
+              accentColor="purple"
+            >
               <StatisticsItem
                 title="CST Minted"
                 value={
@@ -258,7 +268,11 @@ const Statistics = () => {
             </StatisticsGroup>
 
             {/* Charity & Donations */}
-            <StatisticsGroup title="Charity & Donations" icon={<Heart className="h-4 w-4" />}>
+            <StatisticsGroup
+              title="Charity & Donations"
+              icon={<Heart className="h-4 w-4" />}
+              accentColor="emerald"
+            >
               <StatisticsItem
                 title="Charity Balance"
                 value={formatEthValue(Number(data.CharityBalanceEth) || 0)}
@@ -389,14 +403,48 @@ const Statistics = () => {
         {/* 4 ── Token Distribution ────────────────────────────────── */}
         <div>
           <SectionDivider title="Token Distribution" className="mb-6" />
+
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            <StatCard
+              label="CST Holders"
+              value={cstDistribution.length}
+              icon={<Users className="h-4 w-4" />}
+              tooltip="Unique wallet addresses holding Cosmic Signature Tokens (ERC-721)"
+              featured
+            />
+            <StatCard
+              label="CST (ERC-20) Holders"
+              value={ctBalanceDistribution.length}
+              icon={<Coins className="h-4 w-4" />}
+              tooltip="Unique wallet addresses holding CST tokens (ERC-20)"
+            />
+            <StatCard
+              label="Donated NFTs"
+              value={data.NumDonatedNFTs as ReactNode}
+              icon={<Gift className="h-4 w-4" />}
+              tooltip="Total ERC-721 tokens donated to the game by community members"
+              featured
+            />
+          </div>
+
           <div className="space-y-8">
-            <CollapsibleSection title="Donated Token Distribution" defaultOpen={false}>
+            <CollapsibleSection
+              title="Donated Token Distribution"
+              defaultOpen={false}
+              icon={<Gift className="h-3.5 w-3.5" />}
+            >
               <DonatedNFTDistributionTable list={data.MainStats.DonatedTokenDistribution ?? []} />
             </CollapsibleSection>
-            <CollapsibleSection title="Cosmic Signature Token (ERC-721)">
+            <CollapsibleSection
+              title="Cosmic Signature Token (ERC-721)"
+              icon={<Layers className="h-3.5 w-3.5" />}
+            >
               <CSTokenDistributionTable list={cstDistribution} />
             </CollapsibleSection>
-            <CollapsibleSection title="Cosmic Token (ERC-20) Balance">
+            <CollapsibleSection
+              title="CST (ERC-20) Balance Distribution"
+              icon={<Coins className="h-3.5 w-3.5" />}
+            >
               <CTBalanceDistributionChart list={ctBalanceDistribution} />
               <div className="mt-4">
                 <CTBalanceDistributionTable list={ctBalanceDistribution.slice(0, 20)} />
@@ -408,23 +456,57 @@ const Statistics = () => {
         {/* 5 ── Staking ──────────────────────────────────────────── */}
         <div>
           <SectionDivider title="Staking" className="mb-6" />
-          <StakingSection
-            cstStats={data.MainStats.StakeStatisticsCST}
-            rwlkStats={data.MainStats.StakeStatisticsRWalk}
-            stakingCSTActions={stakingCSTActions}
-            stakingRWLKActions={stakingRWLKActions}
-            stakedCSTokens={stakedCSTokens}
-            stakedRWLKTokens={stakedRWLKTokens}
-            uniqueCSTStakers={uniqueCSTStakers}
-            uniqueRWLKStakers={uniqueRWLKStakers}
-          />
+
+          <div className="grid grid-cols-3 gap-3 mb-8">
+            <StatCard
+              label="Active CST Stakers"
+              value={data.MainStats.StakeStatisticsCST.NumActiveStakers}
+              icon={<Lock className="h-4 w-4" />}
+              tooltip="Wallets currently staking at least one Cosmic Signature Token"
+              featured
+            />
+            <StatCard
+              label="Active RWLK Stakers"
+              value={data.MainStats.StakeStatisticsRWalk.NumActiveStakers}
+              icon={<Activity className="h-4 w-4" />}
+              tooltip="Wallets currently staking at least one RandomWalk Token"
+              featured
+            />
+            <StatCard
+              label="Total Staking Rewards"
+              value={formatEthValue(data.MainStats.StakeStatisticsCST.TotalRewardEth ?? 0)}
+              icon={<TrendingUp className="h-4 w-4" />}
+              tooltip="Total ETH distributed as staking rewards to CST stakers"
+              gradient
+            />
+          </div>
+
+          <div className="gradient-border-card rounded-xl bg-white/[0.02] p-1">
+            <StakingSection
+              cstStats={data.MainStats.StakeStatisticsCST}
+              rwlkStats={data.MainStats.StakeStatisticsRWalk}
+              stakingCSTActions={stakingCSTActions}
+              stakingRWLKActions={stakingRWLKActions}
+              stakedCSTokens={stakedCSTokens}
+              stakedRWLKTokens={stakedRWLKTokens}
+              uniqueCSTStakers={uniqueCSTStakers}
+              uniqueRWLKStakers={uniqueRWLKStakers}
+            />
+          </div>
         </div>
 
         {/* 6 ── Donated NFTs Grid ────────────────────────────────── */}
         <DonatedNFTsGrid nftDonations={nftDonations} />
 
         {/* 7 ── Round Activations ────────────────────────────────── */}
-        <CollapsibleSection title="Round Activations" defaultOpen={false}>
+        <div>
+          <SectionDivider title="System Events" className="mb-6" />
+        </div>
+        <CollapsibleSection
+          title="Round Activations"
+          defaultOpen={false}
+          icon={<Activity className="h-3.5 w-3.5" />}
+        >
           {systemModeChanges === null ? (
             <div className="flex justify-center py-8">
               <Spinner />

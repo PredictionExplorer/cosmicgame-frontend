@@ -128,7 +128,7 @@ jest.mock('../../../components/statistics/StakingSection', () => ({
 jest.mock('../../../components/statistics/DonatedNFTsGrid', () => ({
   DonatedNFTsGrid: ({ nftDonations }: { nftDonations: unknown[] }) => (
     <div data-testid="donated-nfts-grid">
-      {nftDonations.length === 0 && <p>No ERC721 tokens were donated on this round.</p>}
+      {nftDonations.length === 0 && <p>No NFTs have been donated yet.</p>}
     </div>
   ),
 }));
@@ -337,7 +337,7 @@ describe('Statistics', () => {
     });
     mockUseDonationsNFTList.mockReturnValue({ data: [] });
     render(<Statistics />);
-    expect(screen.getByText('No ERC721 tokens were donated on this round.')).toBeInTheDocument();
+    expect(screen.getByText('No NFTs have been donated yet.')).toBeInTheDocument();
   });
 
   it('renders contract balance stat card', () => {
@@ -361,7 +361,7 @@ describe('Statistics', () => {
     expect(tooltips.length).toBeGreaterThan(0);
   });
 
-  it('renders token distribution section', () => {
+  it('renders token distribution section with stat cards', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -369,7 +369,31 @@ describe('Statistics', () => {
     });
     render(<Statistics />);
     expect(screen.getByText('Token Distribution')).toBeInTheDocument();
+    expect(screen.getByText('CST Holders')).toBeInTheDocument();
+    expect(screen.getByText('CST (ERC-20) Holders')).toBeInTheDocument();
     expect(screen.getByText('Donated Token Distribution')).toBeInTheDocument();
+  });
+
+  it('renders staking section with stat cards', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('Active CST Stakers')).toBeInTheDocument();
+    expect(screen.getByText('Active RWLK Stakers')).toBeInTheDocument();
+    expect(screen.getByText('Total Staking Rewards')).toBeInTheDocument();
+  });
+
+  it('renders system events section divider', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('System Events')).toBeInTheDocument();
   });
 
   it('renders round activations collapsible section', () => {

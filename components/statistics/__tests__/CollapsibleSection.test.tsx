@@ -122,6 +122,27 @@ describe('CollapsibleSection', () => {
     expect(svg).toBeInTheDocument();
   });
 
+  it('renders an icon when provided', () => {
+    render(
+      <CollapsibleSection
+        title="With Section Icon"
+        icon={<span data-testid="section-icon">IC</span>}
+      >
+        <p>Content</p>
+      </CollapsibleSection>,
+    );
+    expect(screen.getByTestId('section-icon')).toBeInTheDocument();
+  });
+
+  it('does not render icon wrapper when no icon provided', () => {
+    const { container } = render(
+      <CollapsibleSection title="No Icon">
+        <p>Content</p>
+      </CollapsibleSection>,
+    );
+    expect(container.querySelector('.bg-primary\\/10')).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations when open', async () => {
     const { container } = render(
       <CollapsibleSection title="A11y Open" defaultOpen>
