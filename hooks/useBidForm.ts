@@ -2,15 +2,19 @@ import { useState, useEffect, useMemo } from 'react';
 import { usePublicClient, useWalletClient } from 'wagmi';
 import { formatEther, isAddress, maxUint256, parseEther, parseUnits } from 'viem';
 
-import { randomWalkNftAbi as NFT_ABI, cosmicTokenAbi as ERC20_ABI } from '@/contracts/abis';
+import {
+  randomWalkNftAbi as NFT_ABI,
+  cosmicTokenAbi as ERC20_ABI,
+  cosmicGameAbi,
+} from '@/contracts/abis';
 
 import api from '@/services/api';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { RAFFLE_WALLET_ADDRESS } from '@/config/networks';
+import { COSMICGAME_ADDRESS, RAFFLE_WALLET_ADDRESS } from '@/config/networks';
 import { ERC721_INTERFACE_ID, BID_GAS_LIMIT } from '@/config/constants';
-import { isUserRejection, isEthProviderError, reportError } from '@/utils/errors';
+import { isUserRejection, reportError, getBidErrorMessage } from '@/utils/errors';
 import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
 import { useCTPrice, useBidEthPrice, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
@@ -265,6 +269,26 @@ export function useBidForm() {
     return { ok: true as const, amountWei, decimals };
   };
 
+  const estimateDonationGas = async (
+    fnName: string,
+    args: unknown[],
+    value: bigint,
+  ): Promise<bigint> => {
+    try {
+      const estimate = await publicClient!.estimateContractGas({
+        address: COSMICGAME_ADDRESS as `0x${string}`,
+        abi: cosmicGameAbi,
+        functionName: fnName,
+        args,
+        value,
+        account: account as `0x${string}`,
+      });
+      return estimate * 2n;
+    } catch {
+      return BID_GAS_LIMIT;
+    }
+  };
+
   /**
    * Submit an ETH bid (with optional NFT/token donation).
    * Returns `true` on success so the caller can trigger a post-tx refresh.
@@ -302,22 +326,34 @@ export function useBidForm() {
         const nftIdNum = Number(nftId);
         const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
         if (!ok) return false;
+        const donateArgs = [rwlkId, message, nftDonateAddress, nftIdNum];
+        const gas = await estimateDonationGas(
+          'bidWithEthAndDonateNft',
+          donateArgs,
+          ethBidPrice,
+        );
         await handleTx(
-          asWriteFn(cosmicGameContract.write.bidWithEthAndDonateNft)(
-            [rwlkId, message, nftDonateAddress, nftIdNum],
-            { value: ethBidPrice },
-          ),
+          asWriteFn(cosmicGameContract.write.bidWithEthAndDonateNft)(donateArgs, {
+            value: ethBidPrice,
+            gas,
+          }),
         );
         setNftId('');
         setNftDonateAddress('');
       } else {
         const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
         if (!res.ok) return false;
+        const donateArgs = [rwlkId, message, tokenDonateAddress, res.amountWei];
+        const gas = await estimateDonationGas(
+          'bidWithEthAndDonateToken',
+          donateArgs,
+          ethBidPrice,
+        );
         await handleTx(
-          asWriteFn(cosmicGameContract.write.bidWithEthAndDonateToken)(
-            [rwlkId, message, tokenDonateAddress, res.amountWei],
-            { value: ethBidPrice },
-          ),
+          asWriteFn(cosmicGameContract.write.bidWithEthAndDonateToken)(donateArgs, {
+            value: ethBidPrice,
+            gas,
+          }),
         );
         setTokenAmount('');
         setTokenDonateAddress('');
@@ -326,7 +362,13 @@ export function useBidForm() {
       return true;
     } catch (err: unknown) {
       if (!isUserRejection(err)) {
-        notifyErrorFromEthers(err);
+        reportError(err, 'bid-eth');
+        const msg = getBidErrorMessage(err, ethBidInfo?.ETHPrice);
+        if (msg) {
+          notify('error', msg);
+        } else {
+          notifyErrorFromEthers(err);
+        }
       }
       return false;
     } finally {
@@ -400,8 +442,10 @@ export function useBidForm() {
       return true;
     } catch (err: unknown) {
       if (!isUserRejection(err)) {
-        if (isEthProviderError(err) && err.data?.message) {
-          notify('error', err.data.message);
+        reportError(err, 'bid-cst');
+        const msg = getBidErrorMessage(err);
+        if (msg) {
+          notify('error', msg);
         } else {
           notifyErrorFromEthers(err);
         }
