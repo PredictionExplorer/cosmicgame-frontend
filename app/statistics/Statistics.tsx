@@ -2,7 +2,19 @@
 
 import { useMemo, type ReactNode } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import {
+  ArrowRight,
+  Trophy,
+  Coins,
+  Hash,
+  Wallet,
+  Users,
+  Award,
+  Heart,
+  TrendingUp,
+  Gift,
+  Layers,
+} from 'lucide-react';
 
 import { formatCSTValue, formatEthValue } from '@/utils';
 
@@ -37,6 +49,8 @@ import {
   useSystemModelist,
 } from '@/hooks/useApiQuery';
 import { StatisticsItem } from '@/components/statistics/StatisticsItem';
+import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
+import { CollapsibleSection } from '@/components/statistics/CollapsibleSection';
 import { StakingSection } from '@/components/statistics/StakingSection';
 import { DonatedNFTsGrid } from '@/components/statistics/DonatedNFTsGrid';
 import type { UniqueStakerCST } from '@/components/tables/UniqueStakersCSTTable';
@@ -103,85 +117,6 @@ const Statistics = () => {
     );
   }
 
-  const overallStats: { title: string; value: ReactNode }[] = [
-    {
-      title: 'CosmicGame contract balance',
-      value: `${(data.CosmicGameBalanceEth ?? 0).toFixed(4)} ETH`,
-    },
-    {
-      title: 'Num Prizes Given',
-      value: (
-        <Link href="/prize" className="text-inherit">
-          {data.TotalPrizes as ReactNode}
-        </Link>
-      ),
-    },
-    {
-      title: 'Total Cosmic Signature Tokens minted',
-      value: (
-        <Link href="/gallery" className="text-inherit">
-          {data.MainStats.NumCSTokenMints}
-        </Link>
-      ),
-    },
-    {
-      title: 'Total Amount Paid in Main Prizes',
-      value: formatEthValue(Number(data.TotalPrizesPaidAmountEth) || 0),
-    },
-    {
-      title: 'Total Amount Paid in ETH Raffles',
-      value: formatEthValue(data.MainStats.TotalRaffleEthDeposits),
-    },
-    { title: 'Total CST Consumed', value: formatCSTValue(data.MainStats.TotalCSTConsumedEth) },
-    {
-      title: 'Total Reward Paid to Marketing Agents with CST',
-      value: formatCSTValue(data.MainStats.TotalMktRewardsEth),
-    },
-    {
-      title: 'Number of Marketing Reward Transactions',
-      value: (
-        <Link className="text-inherit" href="/marketing">
-          {data.MainStats.NumMktRewards}
-        </Link>
-      ),
-    },
-    {
-      title: 'Amount of ETH collected by the winners from raffles',
-      value: formatEthValue(data.MainStats.TotalRaffleEthWithdrawn),
-    },
-    {
-      title: 'RandomWalk Tokens Used',
-      value: (
-        <Link className="text-inherit" href="/used-rwlk-nfts">
-          {data.NumRwalkTokensUsed as ReactNode}
-        </Link>
-      ),
-    },
-    { title: 'Charity Balance', value: formatEthValue(Number(data.CharityBalanceEth) || 0) },
-    { title: 'Number of Bids with CST', value: data.MainStats.NumBidsCST },
-    { title: 'Number of Unique Bidders', value: data.MainStats.NumUniqueBidders },
-    { title: 'Number of Unique Winners', value: data.MainStats.NumUniqueWinners },
-    { title: 'Number of Unique ETH Donors', value: data.MainStats.NumUniqueDonors },
-    {
-      title: 'Number of Donated NFTs',
-      value: (
-        <Link className="text-inherit" href="/nft-donations">
-          {data.NumDonatedNFTs as ReactNode}
-        </Link>
-      ),
-    },
-    {
-      title: 'Amount of Cosmic Signature Tokens with assigned name',
-      value: (
-        <Link className="text-inherit" href="/named-nfts">
-          {data.MainStats.TotalNamedTokens}
-        </Link>
-      ),
-    },
-    { title: 'Number of Unique CST Stakers', value: data.MainStats.NumUniqueStakersCST },
-    { title: 'Number of Unique Random Walk Stakers', value: data.MainStats.NumUniqueStakersRWalk },
-  ];
-
   return (
     <MainWrapper>
       <PageHeader
@@ -203,143 +138,274 @@ const Statistics = () => {
         <ArrowRight className="h-5 w-5 text-primary group-hover:translate-x-0.5 transition-transform" />
       </Link>
 
-      {/* Key overall metrics */}
+      {/* 1 ── Hero Stat Cards ────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12">
-        <StatCard label="Total Rounds" value={data.CurRoundNum} />
-        <StatCard label="Prizes Given" value={data.TotalPrizes as ReactNode} />
-        <StatCard label="NFTs Minted" value={data.MainStats.NumCSTokenMints} />
+        <StatCard
+          label="Total Rounds"
+          value={data.CurRoundNum}
+          icon={<Hash className="h-4 w-4" />}
+          tooltip="Total number of game rounds played since launch"
+        />
+        <StatCard
+          label="Prizes Given"
+          value={data.TotalPrizes as ReactNode}
+          icon={<Trophy className="h-4 w-4" />}
+          tooltip="Total number of main prizes awarded to round winners"
+        />
+        <StatCard
+          label="NFTs Minted"
+          value={data.MainStats.NumCSTokenMints}
+          icon={<Layers className="h-4 w-4" />}
+          tooltip="Total Cosmic Signature Tokens (ERC-721) minted across all rounds"
+        />
         <StatCard
           label="Contract Balance"
           value={formatEthValue(data.CosmicGameBalanceEth ?? 0)}
+          icon={<Wallet className="h-4 w-4" />}
+          tooltip="ETH held by the CosmicGame smart contract, used to fund prizes and raffles"
           gradient
         />
       </div>
 
       <section className="space-y-12">
-        {/* Overall Stats */}
+        {/* 2 ── Financial Overview ────────────────────────────────── */}
         <div>
-          <SectionDivider title="Overall Statistics" className="mb-6" />
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-            {overallStats.map((item) => (
-              <StatisticsItem key={item.title} title={item.title} value={item.value} />
-            ))}
-            {(data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0) > 0 && (
-              <p className="text-sm text-primary mt-2">{`${data.MainStats.NumWinnersWithPendingRaffleWithdrawal} winners are yet to withdraw funds totaling ${formatEthValue(data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn)} ETH`}</p>
-            )}
-            {(data.MainStats.NumCosmicGameDonations ?? 0) > 0 && (
-              <>
-                <StatisticsItem
-                  title="Number of Cosmic Game Donations"
-                  value={
-                    <Link className="text-inherit" href="/charity-deposits-cg">
-                      {data.MainStats.NumCosmicGameDonations}
-                    </Link>
-                  }
-                />
-                <StatisticsItem
-                  title="Sum of Cosmic Game Donations"
-                  value={
-                    <Link className="text-inherit" href="/charity-deposits-cg">
-                      {formatEthValue(data.MainStats.SumCosmicGameDonationsEth ?? 0)}
-                    </Link>
-                  }
-                />
-              </>
-            )}
-            {(Number(data.SumVoluntaryDonationsEth) || 0) > 0 && (
+          <SectionDivider title="Financial Overview" className="mb-6" />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {/* Prize Economy */}
+            <StatisticsGroup title="Prize Economy" icon={<Trophy className="h-4 w-4" />}>
               <StatisticsItem
-                title="Voluntary Donations Received"
+                title="Num Prizes Given"
                 value={
-                  <Link className="text-inherit" href="/charity-deposits-voluntary">
-                    {`${data.NumVoluntaryDonations} totaling ${(Number(data.SumVoluntaryDonationsEth) || 0).toFixed(4)} ETH`}
+                  <Link href="/prize" className="text-inherit">
+                    {data.TotalPrizes as ReactNode}
+                  </Link>
+                }
+                tooltip="Number of main prizes awarded to round winners"
+              />
+              <StatisticsItem
+                title="Total Main Prizes Paid"
+                value={formatEthValue(Number(data.TotalPrizesPaidAmountEth) || 0)}
+                tooltip="Total ETH paid out as main prizes to round winners"
+              />
+              <StatisticsItem
+                title="Raffle ETH Deposited"
+                value={formatEthValue(data.MainStats.TotalRaffleEthDeposits)}
+                tooltip="Total ETH deposited into raffle pools across all rounds"
+              />
+              <StatisticsItem
+                title="Raffle ETH Withdrawn"
+                value={formatEthValue(data.MainStats.TotalRaffleEthWithdrawn)}
+                tooltip="Total ETH collected by winners from raffle pools"
+              />
+              {(data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0) > 0 && (
+                <p className="text-sm text-primary mt-2">{`${data.MainStats.NumWinnersWithPendingRaffleWithdrawal} winners are yet to withdraw funds totaling ${formatEthValue(data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn)} ETH`}</p>
+              )}
+            </StatisticsGroup>
+
+            {/* Token Economy */}
+            <StatisticsGroup title="Token Economy" icon={<Coins className="h-4 w-4" />}>
+              <StatisticsItem
+                title="CST Minted"
+                value={
+                  <Link href="/gallery" className="text-inherit">
+                    {data.MainStats.NumCSTokenMints}
+                  </Link>
+                }
+                tooltip="Total Cosmic Signature Tokens (ERC-721) minted"
+              />
+              <StatisticsItem
+                title="Total CST Consumed"
+                value={formatCSTValue(data.MainStats.TotalCSTConsumedEth)}
+                tooltip="Cosmic Signature Tokens burned by players when placing bids with CST"
+              />
+              <StatisticsItem
+                title="Bids with CST"
+                value={data.MainStats.NumBidsCST}
+                tooltip="Number of bids placed using Cosmic Signature Tokens instead of ETH"
+              />
+              <StatisticsItem
+                title="Marketing Rewards"
+                value={formatCSTValue(data.MainStats.TotalMktRewardsEth)}
+                tooltip="CST paid to marketing agents who help promote the game"
+              />
+              <StatisticsItem
+                title="Marketing Transactions"
+                value={
+                  <Link className="text-inherit" href="/marketing">
+                    {data.MainStats.NumMktRewards}
                   </Link>
                 }
               />
-            )}
-            {(data.MainStats.NumWithdrawals ?? 0) > 0 && (
               <StatisticsItem
-                title="Withdrawals from Charity Wallet"
+                title="RandomWalk Tokens Used"
                 value={
-                  <Link className="text-inherit" href="/charity-withdrawals">
-                    {data.MainStats.NumWithdrawals}
+                  <Link className="text-inherit" href="/used-rwlk-nfts">
+                    {data.NumRwalkTokensUsed as ReactNode}
                   </Link>
                 }
+                tooltip="RandomWalk NFTs used as free bids in the game"
               />
-            )}
-            <StatisticsItem
-              title="Total amount withdrawn from Charity Wallet"
-              value={formatEthValue(data.MainStats.SumWithdrawals ?? 0)}
-            />
-            <StatisticsItem
-              title="Total Donated ETH"
-              value={
-                <Link
-                  className="text-inherit"
-                  href="/eth-donation"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {formatEthValue(data.MainStats.TotalEthDonatedAmountEth ?? 0)}
-                </Link>
-              }
-            />
+              <StatisticsItem
+                title="Named Tokens"
+                value={
+                  <Link className="text-inherit" href="/named-nfts">
+                    {data.MainStats.TotalNamedTokens}
+                  </Link>
+                }
+                tooltip="Cosmic Signature Tokens that have been given a custom name by their owner"
+              />
+            </StatisticsGroup>
+
+            {/* Charity & Donations */}
+            <StatisticsGroup title="Charity & Donations" icon={<Heart className="h-4 w-4" />}>
+              <StatisticsItem
+                title="Charity Balance"
+                value={formatEthValue(Number(data.CharityBalanceEth) || 0)}
+                tooltip="ETH allocated for charity, accumulated from game proceeds"
+              />
+              <StatisticsItem
+                title="CosmicGame Contract Balance"
+                value={`${(data.CosmicGameBalanceEth ?? 0).toFixed(4)} ETH`}
+                tooltip="ETH held by the CosmicGame smart contract"
+              />
+              <StatisticsItem
+                title="Donated NFTs"
+                value={
+                  <Link className="text-inherit" href="/nft-donations">
+                    {data.NumDonatedNFTs as ReactNode}
+                  </Link>
+                }
+                tooltip="ERC-721 tokens donated to the game by community members"
+              />
+              <StatisticsItem
+                title="Total Donated ETH"
+                value={
+                  <Link
+                    className="text-inherit"
+                    href="/eth-donation"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {formatEthValue(data.MainStats.TotalEthDonatedAmountEth ?? 0)}
+                  </Link>
+                }
+                tooltip="Total ETH donated to the game across all rounds"
+              />
+              {(data.MainStats.NumCosmicGameDonations ?? 0) > 0 && (
+                <>
+                  <StatisticsItem
+                    title="Cosmic Game Donations"
+                    value={
+                      <Link className="text-inherit" href="/charity-deposits-cg">
+                        {data.MainStats.NumCosmicGameDonations}
+                      </Link>
+                    }
+                  />
+                  <StatisticsItem
+                    title="CG Donations Sum"
+                    value={
+                      <Link className="text-inherit" href="/charity-deposits-cg">
+                        {formatEthValue(data.MainStats.SumCosmicGameDonationsEth ?? 0)}
+                      </Link>
+                    }
+                  />
+                </>
+              )}
+              {(Number(data.SumVoluntaryDonationsEth) || 0) > 0 && (
+                <StatisticsItem
+                  title="Voluntary Donations"
+                  value={
+                    <Link className="text-inherit" href="/charity-deposits-voluntary">
+                      {`${data.NumVoluntaryDonations} totaling ${(Number(data.SumVoluntaryDonationsEth) || 0).toFixed(4)} ETH`}
+                    </Link>
+                  }
+                  tooltip="Donations made voluntarily by community members"
+                />
+              )}
+              {(data.MainStats.NumWithdrawals ?? 0) > 0 && (
+                <StatisticsItem
+                  title="Charity Withdrawals"
+                  value={
+                    <Link className="text-inherit" href="/charity-withdrawals">
+                      {data.MainStats.NumWithdrawals}
+                    </Link>
+                  }
+                />
+              )}
+              <StatisticsItem
+                title="Total Charity Withdrawn"
+                value={formatEthValue(data.MainStats.SumWithdrawals ?? 0)}
+                tooltip="Total ETH withdrawn from the charity wallet"
+              />
+            </StatisticsGroup>
           </div>
         </div>
 
-        {/* Participants */}
+        {/* 3 ── Community & Participation ─────────────────────────── */}
         <div>
-          <SectionDivider title="Participants" className="mb-6" />
+          <SectionDivider title="Community & Participation" className="mb-6" />
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            <StatCard
+              label="Unique Bidders"
+              value={data.MainStats.NumUniqueBidders}
+              icon={<Users className="h-4 w-4" />}
+              tooltip="Total unique wallet addresses that have placed at least one bid"
+            />
+            <StatCard
+              label="Unique Winners"
+              value={data.MainStats.NumUniqueWinners}
+              icon={<Award className="h-4 w-4" />}
+              tooltip="Total unique wallet addresses that have won at least one round"
+            />
+            <StatCard
+              label="Unique ETH Donors"
+              value={data.MainStats.NumUniqueDonors}
+              icon={<Gift className="h-4 w-4" />}
+              tooltip="Unique addresses that have donated ETH to the game"
+            />
+            <StatCard
+              label="Unique Stakers"
+              value={data.MainStats.NumUniqueStakersCST + data.MainStats.NumUniqueStakersRWalk}
+              icon={<TrendingUp className="h-4 w-4" />}
+              tooltip="Combined unique CST and RandomWalk token stakers"
+            />
+          </div>
+
           <div className="space-y-8">
-            <div>
-              <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                Unique Bidders
-              </h4>
+            <CollapsibleSection title="Unique Bidders" defaultOpen>
               <UniqueBiddersTable list={uniqueBidders} />
-            </div>
-            <div>
-              <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                Unique Winners
-              </h4>
+            </CollapsibleSection>
+            <CollapsibleSection title="Unique Winners" defaultOpen>
               <UniqueWinnersTable list={uniqueWinners} />
-            </div>
-            <div>
-              <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                Unique ETH Donors
-              </h4>
+            </CollapsibleSection>
+            <CollapsibleSection title="Unique ETH Donors" defaultOpen>
               <UniqueEthDonorsTable list={uniqueDonors} />
-            </div>
+            </CollapsibleSection>
           </div>
         </div>
 
-        {/* Token Distribution */}
+        {/* 4 ── Token Distribution ────────────────────────────────── */}
         <div>
           <SectionDivider title="Token Distribution" className="mb-6" />
           <div className="space-y-8">
-            <div>
-              <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                Donated Token Distribution
-              </h4>
+            <CollapsibleSection title="Donated Token Distribution" defaultOpen={false}>
               <DonatedNFTDistributionTable list={data.MainStats.DonatedTokenDistribution ?? []} />
-            </div>
-            <div>
-              <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                Cosmic Signature Token (ERC721)
-              </h4>
+            </CollapsibleSection>
+            <CollapsibleSection title="Cosmic Signature Token (ERC-721)">
               <CSTokenDistributionTable list={cstDistribution} />
-            </div>
-            <div>
-              <h4 className="mb-3 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                Cosmic Token (ERC20) Balance
-              </h4>
+            </CollapsibleSection>
+            <CollapsibleSection title="Cosmic Token (ERC-20) Balance">
               <CTBalanceDistributionChart list={ctBalanceDistribution} />
               <div className="mt-4">
                 <CTBalanceDistributionTable list={ctBalanceDistribution.slice(0, 20)} />
               </div>
-            </div>
+            </CollapsibleSection>
           </div>
         </div>
 
-        {/* Staking */}
+        {/* 5 ── Staking ──────────────────────────────────────────── */}
         <div>
           <SectionDivider title="Staking" className="mb-6" />
           <StakingSection
@@ -354,10 +420,11 @@ const Statistics = () => {
           />
         </div>
 
+        {/* 6 ── Donated NFTs Grid ────────────────────────────────── */}
         <DonatedNFTsGrid nftDonations={nftDonations} />
 
-        <div>
-          <SectionDivider title="Round Activations" className="mb-6" />
+        {/* 7 ── Round Activations ────────────────────────────────── */}
+        <CollapsibleSection title="Round Activations" defaultOpen={false}>
           {systemModeChanges === null ? (
             <div className="flex justify-center py-8">
               <Spinner />
@@ -365,7 +432,7 @@ const Statistics = () => {
           ) : (
             <SystemModesTable list={systemModeChanges ?? []} />
           )}
-        </div>
+        </CollapsibleSection>
       </section>
     </MainWrapper>
   );
