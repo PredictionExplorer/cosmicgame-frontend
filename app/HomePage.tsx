@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { zeroAddress } from 'viem';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Radio } from 'lucide-react';
 import Countdown from 'react-countdown';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 
 import { getAssetsUrl } from '@/utils';
 
@@ -32,6 +33,11 @@ import {
   useCSTInfo,
 } from '@/hooks/useApiQuery';
 
+const sectionFade = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
+};
+
 const HomePage = () => {
   const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
@@ -53,7 +59,6 @@ const HomePage = () => {
   }, [currentTimeData]);
 
   const [bannerTokenId, setBannerTokenId] = useState<number | null>(null);
-  const [imageOpen, setImageOpen] = useState(false);
 
   useEffect(() => {
     if (dashboardData && bannerTokenId === null) {
@@ -156,49 +161,117 @@ const HomePage = () => {
           </div>
         )}
 
-        {/* Hero */}
-        <div className="text-center mb-12">
-          <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl">
-            <span className="bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent">
-              Cosmic Signature
-            </span>
-          </h1>
-          <p className="mt-3 text-base text-muted-foreground max-w-xl mx-auto">
-            A strategy bidding game &mdash; bid against other players and time to win ETH prizes and
-            unique NFTs.
-          </p>
-          {(data?.CurRoundNum ?? 0) > 1 && (
-            <Link
-              href={`/prize/${(data?.CurRoundNum ?? 0) - 1}`}
-              className="mt-3 inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+        {/* ===== LIVE ROUND BAR ===== */}
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-3.5 backdrop-blur-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <Radio className="h-4 w-4 text-primary" />
+              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-live-dot" />
+            </div>
+            {data && (
+              <div>
+                <h1 className="font-display text-lg font-bold tracking-tight sm:text-xl">
+                  Round #{data.CurRoundNum}
+                </h1>
+                <p className="text-[11px] text-muted-foreground">
+                  {data.CurNumBids} bid{data.CurNumBids !== 1 ? 's' : ''} placed
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-4">
+            {(data?.CurRoundNum ?? 0) > 1 && (
+              <Link
+                href={`/prize/${(data?.CurRoundNum ?? 0) - 1}`}
+                className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                Round {(data?.CurRoundNum ?? 0) - 1} results
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            )}
+            <a
+              href="/changed-parameters"
+              className="text-xs text-muted-foreground/60 hover:text-primary transition-colors"
             >
-              Round {(data?.CurRoundNum ?? 0) - 1} ended &mdash; view results
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          )}
-        </div>
+              Parameters
+            </a>
+          </div>
+        </motion.div>
 
-        {/* Main two-column */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-16">
-          {/* Left: Status + Form */}
-          <div className="lg:col-span-3">
-            <BiddingStatus
-              data={data}
-              loading={loading}
-              activationTime={activationTime}
-              curBidList={curBidList}
-              ethBidInfo={ethBidInfo}
-              prizeTime={prizeTime}
-            />
-            {!loading && isActive && <BidForm {...bidForm} data={data} />}
+        {/* ===== BIDDING STATUS (countdown + stats) ===== */}
+        <BiddingStatus
+          data={data}
+          loading={loading}
+          activationTime={activationTime}
+          curBidList={curBidList}
+          ethBidInfo={ethBidInfo}
+          prizeTime={prizeTime}
+        />
 
-            {isActive && (
+        {/* ===== SPECIAL PRIZE LEADERS + NFT PREVIEW ===== */}
+        {data?.TsRoundStart !== 0 && (
+          <motion.div
+            variants={sectionFade}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.2 }}
+            className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6"
+          >
+            <div className="lg:col-span-2">
+              <SpecialPrizeWinners />
+            </div>
+            <div className="hidden lg:block">
+              <Link
+                href={bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample'}
+                className="block group"
+              >
+                <StyledCard className="overflow-hidden rounded-xl border border-white/[0.06]">
+                  <div className="transition-transform duration-300 group-hover:scale-[1.02]">
+                    <NFTImage
+                      src={
+                        bannerToken.seed === ''
+                          ? '/images/qmark.png'
+                          : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
+                      }
+                    />
+                  </div>
+                  <div className="p-3 text-center">
+                    <p className="text-xs text-muted-foreground">Sample Cosmic Signature NFT</p>
+                  </div>
+                </StyledCard>
+              </Link>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ===== BID ACTION AREA ===== */}
+        {!loading && isActive && (
+          <motion.div
+            variants={sectionFade}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.3 }}
+            className="mt-10"
+          >
+            <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
+              <h2 className="font-display text-xl font-bold tracking-tight mb-1">Place Your Bid</h2>
+              <p className="text-sm text-muted-foreground mb-6">
+                Choose your bid method and enter the game.
+              </p>
+
+              <BidForm {...bidForm} data={data} />
+
               <div className="mt-6 space-y-4">
-                {canBid && !loading && (
+                {canBid && (
                   <Button
                     size="lg"
                     onClick={handleBid}
-                    className="w-full"
+                    className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
                     disabled={
                       isBidding || (bidType === 'RandomWalk' && rwlkId === -1) || bidType === ''
                     }
@@ -219,7 +292,7 @@ const HomePage = () => {
                     <Button
                       size="lg"
                       onClick={handleClaimPrize}
-                      className="w-full"
+                      className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
                       disabled={
                         isClaiming || (data?.LastBidderAddr !== account && claimWait > Date.now())
                       }
@@ -252,58 +325,42 @@ const HomePage = () => {
                   </>
                 )}
               </div>
-            )}
-          </div>
-
-          {/* Right: NFT + Special prizes */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="hidden md:block">
-              <Link
-                href={bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample'}
-                className="block group"
-              >
-                <StyledCard className="overflow-hidden rounded-xl border border-white/[0.06]">
-                  <div className="transition-transform duration-300 group-hover:scale-[1.02]">
-                    <NFTImage
-                      src={
-                        bannerToken.seed === ''
-                          ? '/images/qmark.png'
-                          : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
-                      }
-                    />
-                  </div>
-                </StyledCard>
-              </Link>
             </div>
-            {data?.TsRoundStart !== 0 && <SpecialPrizeWinners />}
-            <div className="block md:hidden">
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full"
-                onClick={() => setImageOpen(true)}
-              >
-                Show Random Sample NFT
-              </Button>
-            </div>
-          </div>
-        </div>
+          </motion.div>
+        )}
 
-        {data && <Prize data={data} />}
+        {/* ===== PRIZE BREAKDOWN ===== */}
+        {data && (
+          <motion.div
+            variants={sectionFade}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.4 }}
+          >
+            <Prize data={data} />
+          </motion.div>
+        )}
 
-        {/* Link to full round details */}
-        <Link
-          href="/current-round"
-          className="mt-12 flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.03] p-5 group hover:bg-white/[0.05] transition-colors"
+        {/* ===== FULL ROUND DETAILS LINK ===== */}
+        <motion.div
+          variants={sectionFade}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
         >
-          <div>
-            <p className="text-sm font-medium text-white">View Full Round Details</p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Bid history, leaderboards, donations, and fund distribution
-            </p>
-          </div>
-          <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-        </Link>
+          <Link
+            href="/current-round"
+            className="mt-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 group hover:bg-white/[0.04] transition-all duration-300"
+          >
+            <div>
+              <p className="text-sm font-medium text-white">View Full Round Details</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Bid history, leaderboards, donations, and fund distribution
+              </p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+          </Link>
+        </motion.div>
       </MainWrapper>
 
       <LatestNFTs />

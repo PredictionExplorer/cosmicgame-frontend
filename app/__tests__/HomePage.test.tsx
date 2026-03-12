@@ -216,13 +216,13 @@ describe('HomePage', () => {
     expect(screen.getByTestId('latest-nfts')).toBeInTheDocument();
   });
 
-  it('renders Prize table when data is loaded', () => {
+  it('renders Prize breakdown when data is loaded', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText('LIST OF AVAILABLE PRIZES')).toBeInTheDocument();
+    expect(screen.getByText('Prize Breakdown')).toBeInTheDocument();
   });
 
   it('renders link to full round details', () => {
@@ -240,7 +240,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText(/Round 4 ended/)).toBeInTheDocument();
+    expect(screen.getByText(/Round 4 results/)).toBeInTheDocument();
   });
 
   it('does not show previous round link when round is 1', () => {
@@ -249,22 +249,13 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.queryByText(/ended .+ view results/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Round \d+ results/)).not.toBeInTheDocument();
   });
 
   it('does not render BidForm when still loading', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<HomePage />);
     expect(screen.queryByTestId('bid-form')).not.toBeInTheDocument();
-  });
-
-  it('shows Show Random Sample NFT button on mobile layout', () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData(),
-      isLoading: false,
-    });
-    render(<HomePage />);
-    expect(screen.getByText('Show Random Sample NFT')).toBeInTheDocument();
   });
 
   it('does not render BidForm when account is null', () => {
@@ -313,8 +304,8 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText(/Round 9 ended/)).toBeInTheDocument();
-    const link = screen.getByRole('link', { name: /Round 9 ended/ });
+    expect(screen.getByText(/Round 9 results/)).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /Round 9 results/ });
     expect(link).toHaveAttribute('href', '/prize/9');
   });
 
