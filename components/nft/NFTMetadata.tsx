@@ -1,8 +1,16 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
+import { Calendar, Trophy, Award, User, Copy, Check } from 'lucide-react';
 
-import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
+import { getExplorerUrl, convertTimestampToDateTime, getRelativeTime } from '@/utils';
 
-/** Props for the NFT metadata display. */
+import { StatCard } from '@/components/ui/stat-card';
+import { AddressChip } from '@/components/ui/address-chip';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { SectionDivider } from '@/components/ui/section-divider';
+
 export interface NFTMetadataProps {
   nft: {
     TimeStamp?: number;
@@ -17,82 +25,130 @@ export interface NFTMetadataProps {
   } | null;
 }
 
-/** Displays NFT metadata: minted date, winner, owner, seed, prize type, and staking eligibility. */
-export function NFTMetadata({ nft }: NFTMetadataProps) {
+function getPrizeLabel(recordType?: number): string {
+  switch (recordType) {
+    case 1:
+      return 'Raffle Winner';
+    case 2:
+      return 'Staking Winner';
+    case 3:
+      return 'Round Winner';
+    case 4:
+      return 'Endurance Champion';
+    default:
+      return 'Unknown';
+  }
+}
+
+function SeedBlock({ seed }: { seed?: string | number }) {
+  const [copied, setCopied] = useState(false);
+  const seedStr = String(seed ?? '');
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(seedStr);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!seed) return null;
+
   return (
-    <>
-      {nft?.TimeStamp && (
-        <div className="mb-2">
-          <span className="text-primary">Minted Date:</span>
-          &nbsp;
-          <a
-            className="text-foreground"
-            href={getExplorerUrl('tx', nft.TxHash!)}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {convertTimestampToDateTime(nft.TimeStamp)}
-          </a>
+    <div className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            Seed
+          </span>
+          <InfoTooltip content="The unique random seed used to generate this token's artwork and traits." />
         </div>
-      )}
-      <div className="mb-2">
-        <span className="text-primary">Winner:</span>
-        &nbsp;
-        <Link href={`/user/${nft?.WinnerAddr ?? ''}`} className="text-white">
-          <span className="font-mono">{nft?.WinnerAddr}</span>
-        </Link>
+        <p
+          className="font-mono text-sm text-foreground break-all leading-relaxed"
+          data-testid="seed-value"
+        >
+          {seedStr}
+        </p>
       </div>
-      <div className="mb-2">
-        <span className="text-primary">Owner:</span>
-        &nbsp;
-        <Link href={`/user/${nft?.CurOwnerAddr ?? ''}`} className="text-white">
-          <span className="font-mono">{nft?.CurOwnerAddr}</span>
-        </Link>
-      </div>
-      <div className="mb-2 flex">
-        <span className="text-primary">Seed:</span>
-        &nbsp;
-        <span className="font-mono inline-block break-words w-[32ch]">{nft?.Seed}</span>
-      </div>
-      <div className="mb-2">
-        <span className="text-primary">Prize Type:</span>
-        &nbsp;
-        <span>
-          {(() => {
-            switch (nft?.RecordType) {
-              case 1:
-                return 'Raffle Winner';
-              case 2:
-                return 'Staking Winner';
-              case 3:
-                return (
-                  <>
-                    Round Winner (
-                    <Link
-                      href={`/prize/${nft?.RoundNum ?? 0}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-inherit"
-                    >
-                      Round #{nft?.RoundNum}
-                    </Link>
-                    )
-                  </>
-                );
-              case 4:
-                return 'Endurance Champion NFT Winner';
-              default:
-                return '';
-            }
-          })()}
-        </span>
+      <button
+        onClick={handleCopy}
+        className="shrink-0 rounded-md p-2 text-muted-foreground/50 hover:text-primary hover:bg-white/[0.04] transition-colors"
+        aria-label="Copy seed"
+        data-testid="copy-seed-button"
+      >
+        {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+}
+
+export function NFTMetadata({ nft }: NFTMetadataProps) {
+  const mintedRelative = nft?.TimeStamp ? getRelativeTime(nft.TimeStamp) : undefined;
+  const mintedAbsolute = nft?.TimeStamp ? convertTimestampToDateTime(nft.TimeStamp) : undefined;
+  const mintedDisplay =
+    mintedRelative && mintedAbsolute
+      ? `${mintedRelative} (${mintedAbsolute})`
+      : (mintedAbsolute ?? '—');
+
+  const roundDisplay =
+    nft?.RoundNum != null ? (
+      <Link
+        href={`/prize/${nft.RoundNum}`}
+        className="text-inherit hover:text-primary transition-colors no-underline"
+      >
+        Round #{nft.RoundNum}
+      </Link>
+    ) : (
+      '—'
+    );
+
+  const winnerDisplay = nft?.WinnerAddr ? <AddressChip address={nft.WinnerAddr} /> : '—';
+
+  const ownerDisplay = nft?.CurOwnerAddr ? <AddressChip address={nft.CurOwnerAddr} /> : '—';
+
+  return (
+    <div data-testid="nft-metadata">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label="Minted"
+          value={
+            nft?.TimeStamp ? (
+              <a
+                href={getExplorerUrl('tx', nft.TxHash!)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-inherit hover:text-primary transition-colors no-underline"
+              >
+                {mintedDisplay}
+              </a>
+            ) : (
+              '—'
+            )
+          }
+          icon={<Calendar className="h-4 w-4" />}
+          tooltip="When this token was minted on-chain. Click to view the transaction."
+        />
+        <StatCard
+          label="Round"
+          value={roundDisplay}
+          icon={<Trophy className="h-4 w-4" />}
+          tooltip="The game round in which this token was won. Click to view round details."
+        />
+        <StatCard
+          label="Winner"
+          value={winnerDisplay}
+          icon={<Award className="h-4 w-4" />}
+          tooltip="The address that originally won this token during the game round."
+        />
+        <StatCard
+          label="Owner"
+          value={ownerDisplay}
+          icon={<User className="h-4 w-4" />}
+          tooltip="The current holder of this token. May differ from the winner if the token was transferred."
+        />
       </div>
 
-      {!nft?.Staked && !nft?.WasUnstaked ? (
-        <p className="text-[#0f0]">The token is eligible for staking.</p>
-      ) : (
-        <p className="text-[#f00]">The token has already been staked and cannot be staked again.</p>
-      )}
-    </>
+      <SectionDivider className="my-6" />
+
+      <SeedBlock seed={nft?.Seed} />
+    </div>
   );
 }
