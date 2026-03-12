@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Copy } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { formatEther } from 'viem';
 
 import { formatSeconds } from '@/utils';
@@ -10,58 +10,95 @@ import {
   cosmicGameAbi as COSMICGAME_ABI,
 } from '@/contracts/abis';
 
-import { networkConfig } from '@/config/networks';
+import { networkConfig, CHARITY_WALLET_ADDRESS, COSMICGAME_ADDRESS } from '@/config/networks';
 import { MainWrapper } from '@/components/styled';
-import { useNotification } from '@/contexts/NotificationContext';
-import { useClipboard } from '@/hooks/useClipboard';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
-import { CHARITY_WALLET_ADDRESS, COSMICGAME_ADDRESS } from '@/config/networks';
-import { Spinner } from '@/components/ui/spinner';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
 
-interface ContractItemProps {
-  name: string;
-  value: string | number | undefined;
-  copyable?: boolean;
-}
+import { NetworkBadge } from './components/NetworkBadge';
+import { FundDistribution } from './components/FundDistribution';
+import { GameConfiguration } from './components/GameConfiguration';
+import { ContractAddressGrid, type ContractEntry } from './components/ContractAddressGrid';
+import { AuctionParameters } from './components/AuctionParameters';
 
-const ContractItem = ({ name, value, copyable = false }: ContractItemProps) => {
-  const { setNotification } = useNotification();
-  const { copy } = useClipboard();
-
-  return (
-    <li className="flex items-start py-2">
-      <span className="text-primary mr-4 min-w-[150px] max-w-[150px] md:min-w-[350px] md:max-w-[350px] text-sm sm:text-base font-medium">
-        {name}:
-      </span>
-
-      {copyable ? (
-        <div
-          className="flex cursor-pointer items-center"
-          onClick={() => {
-            copy(value ? String(value) : '');
-            setNotification({
-              text: 'Address copied!',
-              type: 'success',
-              visible: true,
-            });
-          }}
-        >
-          <span className="font-mono text-sm sm:text-base break-all mr-2">{value}</span>
-          <Copy className="h-4 w-4 shrink-0" />
-        </div>
-      ) : (
-        <span className="font-mono text-sm sm:text-base break-all">{value}</span>
-      )}
-    </li>
-  );
+const sectionFade = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
+
+function buildContracts(addrs: Record<string, string | undefined> | undefined): ContractEntry[] {
+  if (!addrs) return [];
+  return [
+    {
+      name: 'Cosmic Game',
+      address: addrs.CosmicGameAddr ?? '',
+      description: 'The main game contract that manages rounds, bids, and prize distribution',
+      category: 'core',
+    },
+    {
+      name: 'Cosmic Signature Token',
+      address: addrs.CosmicTokenAddr ?? '',
+      description: 'ERC-20 token (CST) earned by bidding and used for governance',
+      category: 'core',
+    },
+    {
+      name: 'Cosmic Signature',
+      address: addrs.CosmicSignatureAddr ?? '',
+      description: 'ERC-721 NFT collection minted as prizes for round winners',
+      category: 'core',
+    },
+    {
+      name: 'RandomWalk',
+      address: addrs.RandomWalkAddr ?? '',
+      description: 'RandomWalk NFT collection that can be staked for raffle entries',
+      category: 'core',
+    },
+    {
+      name: 'Cosmic DAO',
+      address: addrs.CosmicDaoAddr ?? '',
+      description: 'Decentralized governance contract for community proposals',
+      category: 'core',
+    },
+    {
+      name: 'Charity Wallet',
+      address: addrs.CharityWalletAddr ?? '',
+      description: "Receives the charity percentage from each round's prize pool",
+      category: 'wallet',
+    },
+    {
+      name: 'Marketing Wallet',
+      address: addrs.MarketingWalletAddr ?? '',
+      description: 'Funds allocated for marketing rewards and referrals',
+      category: 'wallet',
+    },
+    {
+      name: 'Prizes Wallet',
+      address: addrs.PrizesWalletAddr ?? '',
+      description: 'Escrow contract holding unclaimed prizes',
+      category: 'wallet',
+    },
+    {
+      name: 'CST Staking Wallet',
+      address: addrs.StakingWalletCSTAddr ?? '',
+      description: 'Staking contract for Cosmic Signature Tokens',
+      category: 'staking',
+    },
+    {
+      name: 'RWLK Staking Wallet',
+      address: addrs.StakingWalletRWalkAddr ?? '',
+      description: 'Staking contract for RandomWalk NFTs',
+      category: 'staking',
+    },
+  ].filter((c) => c.address) as ContractEntry[];
+}
 
 const Contracts = () => {
   const { data, isLoading: loading } = useDashboardInfo();
+
+  const [searchTerm, setSearchTerm] = useState('');
   const [charityAddress, setCharityAddress] = useState('');
   const [priceIncrease, setPriceIncrease] = useState(0);
   const [timeIncrease, setTimeIncrease] = useState(0);
@@ -151,163 +188,89 @@ const Contracts = () => {
     fetchData();
   }, [charityWalletContract]);
 
-  const contractItems = [
-    { name: 'Network', value: networkConfig.chainName },
-    { name: 'Chain ID', value: networkConfig.chainId },
-    {
-      name: 'Cosmic Game Address',
-      value: data?.ContractAddrs?.CosmicGameAddr,
-      copyable: true,
-    },
-    {
-      name: 'Cosmic Signature Token Address',
-      value: data?.ContractAddrs?.CosmicTokenAddr,
-      copyable: true,
-    },
-    {
-      name: 'Cosmic Signature Address',
-      value: data?.ContractAddrs?.CosmicSignatureAddr,
-      copyable: true,
-    },
-    {
-      name: 'RandomWalk Address',
-      value: data?.ContractAddrs?.RandomWalkAddr,
-      copyable: true,
-    },
-    {
-      name: 'Cosmic DAO Address',
-      value: data?.ContractAddrs?.CosmicDaoAddr,
-      copyable: true,
-    },
-    {
-      name: 'Charity Wallet Address',
-      value: data?.ContractAddrs?.CharityWalletAddr,
-      copyable: true,
-    },
-    {
-      name: 'Marketing Wallet Address',
-      value: data?.ContractAddrs?.MarketingWalletAddr,
-      copyable: true,
-    },
-    {
-      name: 'Prizes Wallet Address',
-      value: data?.ContractAddrs?.PrizesWalletAddr,
-      copyable: true,
-    },
-    {
-      name: 'Cosmic Signature Staking Wallet Address',
-      value: data?.ContractAddrs?.StakingWalletCSTAddr,
-      copyable: true,
-    },
-    {
-      name: 'Random Walk Staking Wallet Address',
-      value: data?.ContractAddrs?.StakingWalletRWalkAddr,
-      copyable: true,
-    },
-  ];
-
-  const configItems = [
-    { name: 'Price Increase', value: `${priceIncrease}%` },
-    { name: 'Time Increase', value: `${timeIncrease}%` },
-    {
-      name: 'Prize Percentage',
-      value: data ? `${data.PrizePercentage}%` : '--',
-    },
-    {
-      name: 'Chrono Warrior Percentage',
-      value: data ? `${data.ChronoWarriorPercentage}%` : '--',
-    },
-    {
-      name: 'Raffle Percentage',
-      value: data ? `${data.RafflePercentage}%` : '--',
-    },
-    {
-      name: 'Staking Percentage',
-      value: data ? `${data.StakingPercentage}%` : '--',
-    },
-    {
-      name: 'Raffle ETH Winners for Bidding',
-      value: data?.NumRaffleEthWinnersBidding,
-    },
-    {
-      name: 'Raffle NFT Winners for Bidding',
-      value: data?.NumRaffleNFTWinnersBidding,
-    },
-    {
-      name: 'Raffle NFT Winners for Staking Random Walk',
-      value: data?.NumRaffleNFTWinnersStakingRWalk,
-    },
-    {
-      name: 'Charity Address',
-      value: charityAddress,
-      copyable: true,
-    },
-    {
-      name: 'Charity Percentage',
-      value: data ? `${data.CharityPercentage}%` : '--',
-    },
-    {
-      name: 'Amount of CosmicTokens earned per bid',
-      value: `${Number(cstRewardAmountForBidding)} CST`,
-    },
-    {
-      name: 'CST Dutch Auction Duration',
-      value: data ? formatSeconds(cstDutchAuctionDurations.AuctionDuration) : '--',
-    },
-    {
-      name: 'CST Dutch Auction Elapsed Duration',
-      value: data ? formatSeconds(cstDutchAuctionDurations.ElapsedDuration) : '--',
-    },
-    {
-      name: 'ETH Dutch Auction Duration',
-      value: data ? formatSeconds(ethDutchAuctionDurations.AuctionDuration) : '--',
-    },
-    {
-      name: 'ETH Dutch Auction Elapsed Duration',
-      value: data ? formatSeconds(ethDutchAuctionDurations.ElapsedDuration) : '--',
-    },
-    {
-      name: 'Timeout to claim prize',
-      value: data ? formatSeconds(data.TimeoutClaimPrize ?? 0) : '--',
-    },
-    { name: 'Maximum message length', value: Number(msgMaxLen) },
-    {
-      name: 'Initial increment first bid',
-      value: data ? formatSeconds(data.InitialSecondsUntilPrize ?? 0) : '--',
-    },
-    {
-      name: 'CST dutch auction beginning bid price',
-      value: `${Number(cstDutchAuctionBeginningBidPriceMinLimit)} CST`,
-    },
-  ];
+  const contracts = buildContracts(data?.ContractAddrs);
 
   return (
     <MainWrapper>
       <PageHeader
         title="Contract Addresses"
         subtitle="On-chain addresses and configuration for the Cosmic Game"
-      />
+      >
+        <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
+      </PageHeader>
 
-      {loading ? (
-        <div className="flex justify-center py-8">
-          <Spinner />
-        </div>
-      ) : (
-        <>
-          <ul className="mt-8 list-none p-0">
-            {contractItems.map(({ name, value, copyable }) => (
-              <ContractItem key={name} name={name} value={value} copyable={copyable} />
-            ))}
-          </ul>
+      <div className="space-y-10">
+        <motion.section
+          variants={sectionFade}
+          initial="hidden"
+          animate="visible"
+          aria-label="Fund Distribution"
+        >
+          <FundDistribution
+            prizePercentage={data?.PrizePercentage}
+            chronoWarriorPercentage={data?.ChronoWarriorPercentage}
+            rafflePercentage={data?.RafflePercentage}
+            stakingPercentage={data?.StakingPercentage}
+            charityPercentage={data?.CharityPercentage}
+            loading={loading}
+          />
+        </motion.section>
 
-          <SectionDivider title="Current configuration of the contracts" />
-          <ul className="list-none p-0">
-            {configItems.map(({ name, value, copyable }) => (
-              <ContractItem key={name} name={name} value={value} copyable={copyable} />
-            ))}
-          </ul>
-        </>
-      )}
+        <motion.section
+          variants={sectionFade}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.15 }}
+          aria-label="Game Configuration"
+        >
+          <GameConfiguration
+            priceIncrease={priceIncrease}
+            timeIncrease={timeIncrease}
+            cstRewardPerBid={cstRewardAmountForBidding}
+            maxMessageLength={msgMaxLen}
+            claimTimeout={data?.TimeoutClaimPrize ?? 0}
+            initialIncrement={data?.InitialSecondsUntilPrize ?? 0}
+            loading={loading}
+          />
+        </motion.section>
+
+        <motion.section
+          variants={sectionFade}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.3 }}
+          aria-label="Contract Addresses"
+        >
+          <SectionDivider title="Contract Addresses" className="mb-4" />
+          <ContractAddressGrid
+            contracts={contracts}
+            explorerUrl={networkConfig.explorerUrl}
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
+        </motion.section>
+
+        <motion.section
+          variants={sectionFade}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.45 }}
+          aria-label="Auction and Raffle Parameters"
+        >
+          <AuctionParameters
+            cstDurations={cstDutchAuctionDurations}
+            ethDurations={ethDutchAuctionDurations}
+            cstBeginningBidPrice={cstDutchAuctionBeginningBidPriceMinLimit}
+            charityAddress={charityAddress}
+            charityPercentage={data?.CharityPercentage}
+            explorerUrl={networkConfig.explorerUrl}
+            raffleEthWinners={data?.NumRaffleEthWinnersBidding}
+            raffleNftWinnersBidding={data?.NumRaffleNFTWinnersBidding}
+            raffleNftWinnersStaking={data?.NumRaffleNFTWinnersStakingRWalk}
+            loading={loading}
+          />
+        </motion.section>
+      </div>
     </MainWrapper>
   );
 };

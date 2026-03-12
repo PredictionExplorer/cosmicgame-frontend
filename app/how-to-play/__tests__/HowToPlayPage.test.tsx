@@ -2,71 +2,102 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import HowToPlayPage from '../HowToPlayPage';
 
-jest.mock('next/image', () => ({
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  const cache: Record<string, React.ForwardRefExoticComponent<unknown>> = {};
+  return {
+    motion: new Proxy(
+      {},
+      {
+        get: (_target: unknown, prop: string) => {
+          if (!cache[prop]) {
+            const Comp = React.forwardRef(function MotionProxy(
+              props: Record<string, unknown>,
+              ref: React.Ref<HTMLElement>,
+            ) {
+              const {
+                initial: _i,
+                animate: _a,
+                whileInView: _w,
+                viewport: _v,
+                transition: _t,
+                variants: _va,
+                ...rest
+              } = props;
+              return React.createElement(prop, { ...rest, ref });
+            });
+            Comp.displayName = `motion.${prop}`;
+            cache[prop] = Comp;
+          }
+          return cache[prop];
+        },
+      },
+    ),
+  };
+});
+
+jest.mock('next/link', () => ({
   __esModule: true,
-  default: (props: Record<string, unknown>) => <img {...props} />,
+  default: ({ children, ...props }: { children: React.ReactNode; href: string }) => (
+    <a {...props}>{children}</a>
+  ),
 }));
 
 describe('HowToPlayPage', () => {
-  beforeEach(() => jest.clearAllMocks());
-
-  it('renders the page heading', () => {
+  it('renders the hero section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByText('How to Play')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Bid. Compete. Win Big.');
   });
 
-  it('renders step 1 heading', () => {
+  it('renders the game overview section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByText(/Connect Your Wallet/)).toBeInTheDocument();
+    expect(screen.getByText('How It Works')).toBeInTheDocument();
   });
 
-  it('renders step 2 heading', () => {
+  it('renders the reward breakdown section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByText(/Check The Bid Price/)).toBeInTheDocument();
+    expect(screen.getByText('Every Bid Earns You')).toBeInTheDocument();
   });
 
-  it('renders step 3 heading', () => {
+  it('renders the game cycle section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByText(/Make A Bid/)).toBeInTheDocument();
+    expect(screen.getByText('Lifecycle of a Round')).toBeInTheDocument();
   });
 
-  it('renders the cosmicsignature.com link with rel attrs', () => {
+  it('renders the step-by-step section', () => {
     render(<HowToPlayPage />);
-    const link = screen.getByRole('link', { name: 'www.cosmicsignature.com' });
-    expect(link).toHaveAttribute('href', 'https://www.cosmicsignature.com');
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(screen.getByText('Getting Started')).toBeInTheDocument();
   });
 
-  it('renders accordion trigger for rewards', () => {
+  it('renders the pro tips section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByText('How To Claim My Rewards?')).toBeInTheDocument();
+    expect(screen.getByText('Pro Tips & Strategy')).toBeInTheDocument();
   });
 
-  it('renders accordion trigger for tips', () => {
+  it('renders the FAQ callout section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByText('Things To Keep In Mind:')).toBeInTheDocument();
+    expect(screen.getByText('Have Questions?')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Browse FAQ/i })).toHaveAttribute('href', '/faq');
   });
 
-  it('renders the Discord closing link', () => {
+  it('renders the CTA section', () => {
     render(<HowToPlayPage />);
-    const link = screen.getByRole('link', { name: '#cosmic-gameroom' });
-    expect(link).toHaveAttribute(
-      'href',
-      'https://discord.com/channels/1258032742084509779/1258691600951935056',
-    );
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(screen.getByText('Ready to Start Bidding?')).toBeInTheDocument();
   });
 
-  it('renders the Twitter/X closing link', () => {
+  it('has correct heading hierarchy with all section headings', () => {
     render(<HowToPlayPage />);
-    const link = screen.getByRole('link', { name: 'message us on Twitter/X' });
-    expect(link).toHaveAttribute('href', 'https://x.com/CosmicSignatureNFT');
-    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    const h1 = screen.getByRole('heading', { level: 1 });
+    expect(h1).toBeInTheDocument();
+
+    const h2s = screen.getAllByRole('heading', { level: 2 });
+    expect(h2s.length).toBeGreaterThanOrEqual(7);
   });
 
-  it('renders "Happy bidding!" closing text', () => {
-    render(<HowToPlayPage />);
-    expect(screen.getByText('Happy bidding!')).toBeInTheDocument();
+  it('renders section dividers between sections', () => {
+    const { container } = render(<HowToPlayPage />);
+    const dividers = container.querySelectorAll('[class*="bg-gradient-to-r"]');
+    expect(dividers.length).toBeGreaterThan(0);
   });
 
   it('has no accessibility violations', async () => {
