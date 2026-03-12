@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, checkA11y } from '@/test-utils';
+import { render, screen, waitFor, checkA11y } from '@/test-utils';
 
 import { RaffleWinningsTable, type RaffleWinning } from '../RaffleWinningsTable';
 

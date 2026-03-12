@@ -1,6 +1,6 @@
 'use client';
 
-import { type SyntheticEvent, type ComponentProps, useMemo } from 'react';
+import { type SyntheticEvent, type ComponentProps, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Wallet, Clock, Users } from 'lucide-react';
 
@@ -66,11 +66,13 @@ export function RoundInfoSection({
     return addrs.size;
   }, [curBidList]);
 
+  const [mountTimeSec] = useState(() => Math.floor(Date.now() / 1000));
+
   const roundDuration = useMemo(() => {
     if (!data?.TsRoundStart) return '';
-    const elapsed = Math.floor(Date.now() / 1000) - data.TsRoundStart;
+    const elapsed = mountTimeSec - data.TsRoundStart;
     return elapsed > 0 ? formatSeconds(elapsed) : '';
-  }, [data?.TsRoundStart]);
+  }, [data, mountTimeSec]);
 
   return (
     <div className="space-y-16">

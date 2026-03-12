@@ -25,7 +25,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, _errorInfo: ErrorInfo) {
+  override componentDidCatch(error: Error, _errorInfo: ErrorInfo) {
     reportError(error, 'ErrorBoundary');
   }
 
@@ -33,7 +33,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     this.setState({ hasError: false, error: null });
   };
 
-  render() {
+  override render() {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
 

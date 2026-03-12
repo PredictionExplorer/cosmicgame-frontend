@@ -1,4 +1,4 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { type ReactNode } from 'react';
 
 import { render, checkA11y } from '@/test-utils';

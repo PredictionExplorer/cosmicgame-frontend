@@ -20,7 +20,6 @@ jest.mock(
   '../NFTImage',
   () =>
     function MockNFTImage({ src }: { src: string }) {
-      // eslint-disable-next-line @next/next/no-img-element
       return <img data-testid="nft-image" src={src} alt="nft" />;
     },
 );

@@ -1,6 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 
 import { useBidForm } from '../useBidForm';
+import useCosmicGameContract from '../../hooks/useCosmicGameContract';
+import api from '../../services/api';
 
 /* ────────────────────────────────────────────────────────────────── */
 /*  Notification                                                     */
@@ -176,9 +178,6 @@ jest.mock('../../utils/errors', () => ({
 /* ────────────────────────────────────────────────────────────────── */
 /*  Typed references for per-test overrides                          */
 /* ────────────────────────────────────────────────────────────────── */
-
-import useCosmicGameContract from '../../hooks/useCosmicGameContract';
-import api from '../../services/api';
 
 const mockUseCosmicGameContract = useCosmicGameContract as jest.Mock;
 const mockApiGetUserBalance = api.get_user_balance as jest.Mock;

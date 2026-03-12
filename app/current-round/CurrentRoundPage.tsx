@@ -12,7 +12,7 @@ import {
   Shuffle,
   Heart,
   Coins,
-  Image,
+  ImageIcon,
   Radio,
   User,
   MessageSquare,
@@ -28,7 +28,6 @@ import {
   shortenHex,
 } from '@/utils';
 
-import { cn } from '@/lib/utils';
 import { MainWrapper } from '@/components/styled';
 import { StatCard } from '@/components/ui/stat-card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -73,16 +72,18 @@ const CurrentRoundPage = () => {
   const { data: erc20DonationsData } = useDonationsERC20ByRound(round);
 
   const data = dashboardData ?? null;
-  const curBidList = bidListData ?? [];
+  const curBidList = useMemo(() => bidListData ?? [], [bidListData]);
   const donatedNFTs = (nftDonationsData ?? []) as DonatedNFTType[];
   const ethDonations = (ethDonationsRawData ?? []) as EthDonation[];
   const donatedERC20Tokens = (erc20DonationsData ?? []) as DonatedERC20[];
 
+  const [mountTime] = useState(() => Date.now());
+
   const prizeTime = useMemo(() => {
     if (prizeTimeRaw == null || currentTimeRaw == null) return 0;
-    const diff = currentTimeRaw * 1000 - Date.now();
+    const diff = currentTimeRaw * 1000 - mountTime;
     return prizeTimeRaw * 1000 - diff;
-  }, [prizeTimeRaw, currentTimeRaw]);
+  }, [prizeTimeRaw, currentTimeRaw, mountTime]);
 
   const championList = useMemo(() => {
     if (!bidListData) return null;
@@ -94,8 +95,8 @@ const CurrentRoundPage = () => {
 
   const offset = useMemo(() => {
     if (currentTimeRaw == null) return 0;
-    return currentTimeRaw * 1000 - Date.now();
-  }, [currentTimeRaw]);
+    return currentTimeRaw * 1000 - mountTime;
+  }, [currentTimeRaw, mountTime]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -139,8 +140,8 @@ const CurrentRoundPage = () => {
 
   const hasStarted = data.TsRoundStart !== 0;
   const hasLastBidder = data.LastBidderAddr !== zeroAddress;
-  const isCountdownActive = hasLastBidder && prizeTime > Date.now();
-  const isBidsExhausted = hasLastBidder && prizeTime > 0 && prizeTime <= Date.now();
+  const isCountdownActive = hasLastBidder && prizeTime > mountTime;
+  const isBidsExhausted = hasLastBidder && prizeTime > 0 && prizeTime <= mountTime;
 
   const charityAmount =
     (Number(data.CosmicGameBalanceEth) || 0) * ((data.CharityPercentage ?? 0) / 100);
@@ -314,7 +315,7 @@ const CurrentRoundPage = () => {
         <StatCard
           label="Donated NFTs"
           value={data.CurRoundStats?.TotalDonatedNFTs ?? 0}
-          icon={<Image className="h-4 w-4" />}
+          icon={<ImageIcon className="h-4 w-4" />}
           tooltip="NFTs donated to the prize pool by the community."
         />
       </motion.div>

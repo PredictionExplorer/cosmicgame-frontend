@@ -7,7 +7,7 @@ jest.mock('framer-motion', () => ({
     div: ({
       children,
       className,
-      ...rest
+      ..._rest
     }: React.HTMLAttributes<HTMLDivElement> & {
       variants?: unknown;
       initial?: unknown;

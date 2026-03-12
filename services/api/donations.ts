@@ -10,7 +10,6 @@ import {
 import type {
   CharityWithdrawal,
   ETHDonation,
-  TxInfo,
   DonatedNFT,
   DonatedERC20Token,
   NFTDonationStatsEntry,

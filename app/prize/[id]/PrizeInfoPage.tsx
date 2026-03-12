@@ -15,7 +15,7 @@ import {
   Heart,
   Landmark,
   BarChart3,
-  Image,
+  ImageIcon,
   Gift,
   Share2,
   Layers,
@@ -841,7 +841,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             <div className="space-y-8">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Image className="h-4 w-4 text-muted-foreground" />
+                  <ImageIcon className="h-4 w-4 text-muted-foreground" />
                   <h3 className="text-sm font-semibold">Donated NFTs</h3>
                   <InfoTooltip content="NFTs donated by participants during this round, awarded to the main prize winner." />
                 </div>

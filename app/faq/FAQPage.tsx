@@ -59,10 +59,10 @@ const FAQPage = () => {
     const result = findItemByHash(window.location.hash);
     if (!result) return;
 
-    setExpandedItems([result.item.id]);
-    setActiveCategory(result.category.id);
-
     requestAnimationFrame(() => {
+      setExpandedItems([result.item.id]);
+      setActiveCategory(result.category.id);
+
       setTimeout(() => {
         const anchor = result.item.hashAnchor || result.item.id;
         const el = document.getElementById(anchor);

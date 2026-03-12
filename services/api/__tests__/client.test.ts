@@ -13,7 +13,20 @@ import {
   baseUrl,
   apiCall,
   apiPost,
+  assertApiEnvelope,
 } from '@/services/api/client';
+
+import { reportError } from '../../../utils/errors';
+
+jest.mock('../../../utils/errors', () => ({
+  reportError: jest.fn(),
+}));
+
+const mockReportError = reportError as jest.MockedFunction<typeof reportError>;
+
+beforeEach(() => {
+  mockReportError.mockClear();
+});
 
 const makeAxios400 = (): AxiosError => {
   const err = new AxiosError('Bad Request', 'ERR_BAD_REQUEST', undefined, undefined, {
@@ -68,28 +81,34 @@ describe('apiCall', () => {
     expect(result).toBe(0);
   });
 
-  it('throws for non-Axios errors', async () => {
+  it('throws for non-Axios errors and reports to Sentry', async () => {
+    const original = new Error('random failure');
     await expect(
       apiCall(async () => {
-        throw new Error('random failure');
+        throw original;
       }, []),
     ).rejects.toThrow('Network response was not OK');
+    expect(mockReportError).toHaveBeenCalledWith(original, 'apiCall');
   });
 
-  it('throws for Axios 500 errors', async () => {
+  it('throws for Axios 500 errors and reports to Sentry', async () => {
+    const original = makeAxios500();
     await expect(
       apiCall(async () => {
-        throw makeAxios500();
+        throw original;
       }, []),
     ).rejects.toThrow('Network response was not OK');
+    expect(mockReportError).toHaveBeenCalledWith(original, 'apiCall');
   });
 
   it('throws for Axios errors with no response', async () => {
+    const original = makeAxiosNoResponse();
     await expect(
       apiCall(async () => {
-        throw makeAxiosNoResponse();
+        throw original;
       }, []),
     ).rejects.toThrow('Network response was not OK');
+    expect(mockReportError).toHaveBeenCalledWith(original, 'apiCall');
   });
 
   it('throws for non-400 Axios status codes', async () => {
@@ -105,11 +124,13 @@ describe('apiCall', () => {
         throw err;
       }, []),
     ).rejects.toThrow('Network response was not OK');
+    expect(mockReportError).toHaveBeenCalledWith(err, 'apiCall');
   });
 
   it('preserves the shape of the returned data', async () => {
     const result = await apiCall(async () => ({ id: 1, name: 'test' }), null);
     expect(result).toEqual({ id: 1, name: 'test' });
+    expect(mockReportError).not.toHaveBeenCalled();
   });
 
   it('does not swallow non-Error throwables', async () => {
@@ -118,6 +139,14 @@ describe('apiCall', () => {
         throw 'string error';
       }, []),
     ).rejects.toThrow('Network response was not OK');
+    expect(mockReportError).toHaveBeenCalledWith('string error', 'apiCall');
+  });
+
+  it('does not report 400 errors to Sentry', async () => {
+    await apiCall(async () => {
+      throw makeAxios400();
+    }, []);
+    expect(mockReportError).not.toHaveBeenCalled();
   });
 });
 
@@ -125,33 +154,40 @@ describe('apiPost', () => {
   it('returns fn() result on success', async () => {
     const result = await apiPost(async () => ({ task_id: 42 }));
     expect(result).toEqual({ task_id: 42 });
+    expect(mockReportError).not.toHaveBeenCalled();
   });
 
-  it('throws on Axios 400 (does not fallback)', async () => {
+  it('throws on Axios 400 and reports to Sentry', async () => {
+    const original = makeAxios400();
     await expect(
       apiPost(async () => {
-        throw makeAxios400();
+        throw original;
       }),
     ).rejects.toThrow('Network response was not OK');
+    expect(mockReportError).toHaveBeenCalledWith(original, 'apiPost');
   });
 
-  it('throws on network error', async () => {
+  it('throws on network error and reports to Sentry', async () => {
+    const original = new Error('Network Error');
     await expect(
       apiPost(async () => {
-        throw new Error('Network Error');
+        throw original;
       }),
     ).rejects.toThrow('Network response was not OK');
+    expect(mockReportError).toHaveBeenCalledWith(original, 'apiPost');
   });
 
   it('throws with exact error message', async () => {
+    const original = new Error('something');
     try {
       await apiPost(async () => {
-        throw new Error('something');
+        throw original;
       });
       fail('should have thrown');
     } catch (err) {
       expect((err as Error).message).toBe('Network response was not OK');
     }
+    expect(mockReportError).toHaveBeenCalledWith(original, 'apiPost');
   });
 });
 
@@ -484,5 +520,53 @@ describe('client helper functions', () => {
 
       expect(result).toHaveProperty('TokenId', 0);
     });
+  });
+});
+
+describe('assertApiEnvelope', () => {
+  const wrap = (data: unknown) => ({ data }) as import('axios').AxiosResponse;
+
+  it('passes through when status is 1 (success)', () => {
+    expect(() => assertApiEnvelope(wrap({ status: 1, error: '' }))).not.toThrow();
+  });
+
+  it('throws with backend message when status is 0', () => {
+    expect(() => assertApiEnvelope(wrap({ status: 0, error: 'bad input' }))).toThrow('bad input');
+  });
+
+  it('throws generic message when status is 0 and error is empty', () => {
+    expect(() => assertApiEnvelope(wrap({ status: 0, error: '' }))).toThrow(
+      'API returned an error',
+    );
+  });
+
+  it('throws when error field is present without status field', () => {
+    expect(() => assertApiEnvelope(wrap({ error: 'something went wrong' }))).toThrow(
+      'something went wrong',
+    );
+  });
+
+  it('does not throw for empty error string without status', () => {
+    expect(() => assertApiEnvelope(wrap({ error: '' }))).not.toThrow();
+  });
+
+  it('passes through array responses', () => {
+    expect(() => assertApiEnvelope(wrap([1, 2, 3]))).not.toThrow();
+  });
+
+  it('passes through null data', () => {
+    expect(() => assertApiEnvelope(wrap(null))).not.toThrow();
+  });
+
+  it('passes through string data', () => {
+    expect(() => assertApiEnvelope(wrap('ok'))).not.toThrow();
+  });
+
+  it('passes through objects without status or error fields', () => {
+    expect(() => assertApiEnvelope(wrap({ data: [1, 2] }))).not.toThrow();
+  });
+
+  it('throws for non-1 numeric status (e.g. 2)', () => {
+    expect(() => assertApiEnvelope(wrap({ status: 2 }))).toThrow('API returned an error');
   });
 });

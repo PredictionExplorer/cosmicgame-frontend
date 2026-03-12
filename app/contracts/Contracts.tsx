@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { formatEther } from 'viem';
 
-import { formatSeconds } from '@/utils';
 import {
   charityWalletAbi as CHARITY_WALLET_ABI,
   cosmicGameAbi as COSMICGAME_ABI,

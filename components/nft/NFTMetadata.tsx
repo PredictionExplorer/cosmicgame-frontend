@@ -25,21 +25,6 @@ export interface NFTMetadataProps {
   } | null;
 }
 
-function getPrizeLabel(recordType?: number): string {
-  switch (recordType) {
-    case 1:
-      return 'Raffle Winner';
-    case 2:
-      return 'Staking Winner';
-    case 3:
-      return 'Round Winner';
-    case 4:
-      return 'Endurance Champion';
-    default:
-      return 'Unknown';
-  }
-}
-
 function SeedBlock({ seed }: { seed?: string | number }) {
   const [copied, setCopied] = useState(false);
   const seedStr = String(seed ?? '');

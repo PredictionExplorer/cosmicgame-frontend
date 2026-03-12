@@ -2,9 +2,8 @@
 
 import { forwardRef, Fragment, useCallback, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronDown, ChevronsUpDown, Link2 } from 'lucide-react';
+import { ChevronsUpDown, Link2 } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
 import {
   Accordion,
   AccordionContent,

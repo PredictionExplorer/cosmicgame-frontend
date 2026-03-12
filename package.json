@@ -16,7 +16,7 @@
     "test:e2e:headed": "playwright test --headed",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings 0",
     "prepare": "husky"
   },
   "dependencies": {
@@ -127,6 +127,10 @@
       "prettier --write",
       "eslint --fix",
       "bash -c 'tsc --noEmit'"
+    ],
+    "*.{js,mjs}": [
+      "prettier --write",
+      "eslint --fix"
     ],
     "*.{json,css,md}": [
       "prettier --write"

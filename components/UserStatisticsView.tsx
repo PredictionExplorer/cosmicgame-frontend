@@ -134,7 +134,10 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const claimHistory = (claimHistoryRaw as WinningHistoryEntry[] | null) ?? null;
   const marketingRewards = (marketingRewardsRaw ?? []) as MarketingReward[];
   const cstList = cstListRaw ?? [];
-  const cstStakingRewards = (cstStakingRewardsRaw ?? []) as StakingRewardRow[];
+  const cstStakingRewards = useMemo(
+    () => (cstStakingRewardsRaw ?? []) as StakingRewardRow[],
+    [cstStakingRewardsRaw],
+  );
   const collectedCstStakingRewards = collectedCstStakingRewardsRaw ?? [];
   const cstStakingRewardsByDeposit = (cstStakingRewardsByDepositRaw ??
     []) as CSTStakingRewardByDeposit[];

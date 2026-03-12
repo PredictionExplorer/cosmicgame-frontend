@@ -5,6 +5,7 @@ import { UniqueStakersCSTTable } from '@/components/tables/UniqueStakersCSTTable
 import { UniqueStakersRWLKTable } from '@/components/tables/UniqueStakersRWLKTable';
 import type { UniqueStakerCST } from '@/components/tables/UniqueStakersCSTTable';
 import type { UniqueStakerRWLK } from '@/components/tables/UniqueStakersRWLKTable';
+import type { StakingAction, StakedTokenInfo } from '@/services/api';
 
 import { StatisticsItem } from './StatisticsItem';
 import { StatisticsGroup } from './StatisticsGroup';
@@ -25,14 +26,10 @@ export interface StakingSectionProps {
     TotalTokensMinted: number;
     TotalTokensStaked: number;
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stakingCSTActions: any[] | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stakingRWLKActions: any[] | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stakedCSTokens: any[] | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stakedRWLKTokens: any[] | null;
+  stakingCSTActions: StakingAction[] | null;
+  stakingRWLKActions: StakingAction[] | null;
+  stakedCSTokens: StakedTokenInfo[] | null;
+  stakedRWLKTokens: StakedTokenInfo[] | null;
   uniqueCSTStakers: UniqueStakerCST[];
   uniqueRWLKStakers: UniqueStakerRWLK[];
 }

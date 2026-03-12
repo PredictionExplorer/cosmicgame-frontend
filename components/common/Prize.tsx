@@ -1,7 +1,7 @@
 'use client';
 
 import { type FC } from 'react';
-import { Trophy, Shuffle, Image, Layers, Swords, Crown, Coins, Users } from 'lucide-react';
+import { Trophy, Shuffle, ImageIcon, Layers, Swords, Crown, Coins, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
@@ -68,7 +68,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
       winners: `${data?.NumRaffleEthWinnersBidding}`,
     },
     {
-      icon: <Image className="h-5 w-5" />,
+      icon: <ImageIcon className="h-5 w-5" />,
       name: 'Raffle NFT',
       tooltip: 'Random bidders win Cosmic Signature NFTs from the raffle.',
       amounts: ['1 Cosmic Signature NFT each'],

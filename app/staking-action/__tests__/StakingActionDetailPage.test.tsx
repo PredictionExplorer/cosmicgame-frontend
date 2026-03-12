@@ -20,7 +20,6 @@ jest.mock('../../../utils', () => ({
 jest.mock('../../../components/nft/NFTImage', () => ({
   __esModule: true,
   default: ({ src, alt = 'NFT' }: { src: string; alt?: string }) => (
-    // eslint-disable-next-line @next/next/no-img-element
     <img data-testid="nft-image" src={src} alt={alt} />
   ),
 }));

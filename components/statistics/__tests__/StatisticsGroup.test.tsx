@@ -52,7 +52,7 @@ describe('StatisticsGroup', () => {
   });
 
   it('uses accent icon background when accentColor is set', () => {
-    const { container } = render(
+    render(
       <StatisticsGroup
         title="Tokens"
         icon={<Trophy data-testid="icon" className="h-4 w-4" />}

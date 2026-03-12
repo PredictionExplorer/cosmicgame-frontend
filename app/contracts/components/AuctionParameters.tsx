@@ -6,7 +6,6 @@ import { Copy, Check, ExternalLink, Gavel, Timer } from 'lucide-react';
 
 import { formatSeconds } from '@/utils';
 
-import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { SectionDivider } from '@/components/ui/section-divider';

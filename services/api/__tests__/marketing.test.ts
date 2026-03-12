@@ -17,6 +17,7 @@ jest.mock('axios', () => {
     isAxiosError: actual.isAxiosError,
   };
 });
+jest.mock('../../../utils/errors', () => ({ reportError: jest.fn() }));
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const make400 = () =>

@@ -3,9 +3,6 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
 
-import { getAssetsUrl } from '@/utils';
-
-
 import {
   Pagination,
   PaginationContent,
@@ -15,11 +12,9 @@ import {
 } from '@/components/ui/pagination';
 import { Spinner } from '@/components/ui/spinner';
 import { EmptyState } from '@/components/ui/empty-state';
-import { StyledCard, NFTInfoWrapper } from '@/components/styled';
 import api from '@/services/api';
 import type { CSTTokenInfo } from '@/services/api';
 
-import NFTImage from './NFTImage';
 import NFT from './NFT';
 
 interface PaginationGridProps {

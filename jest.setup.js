@@ -1,12 +1,16 @@
-require("@testing-library/jest-dom");
+require('@testing-library/jest-dom');
 
 const { toHaveNoViolations } = require('jest-axe');
 expect.extend(toHaveNoViolations);
 
 // Provide IntersectionObserver for jsdom (used by Next.js Link prefetching)
 class MockIntersectionObserver {
-  constructor(cb) { this._cb = cb; }
-  observe() { this._cb([{ isIntersecting: false, target: document.createElement('div') }], this); }
+  constructor(cb) {
+    this._cb = cb;
+  }
+  observe() {
+    this._cb([{ isIntersecting: false, target: document.createElement('div') }], this);
+  }
   unobserve() {}
   disconnect() {}
 }
@@ -21,8 +25,6 @@ const ALLOWED_PATTERNS = [
   'Preload assets timed out',
   'load preload assets',
   'Missing `Description` or `aria-describedby',
-  '[apiCall]',
-  '[apiPost]',
 ];
 
 function isAllowed(msg) {

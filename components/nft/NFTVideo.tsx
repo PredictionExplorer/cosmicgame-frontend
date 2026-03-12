@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Play } from 'lucide-react';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';

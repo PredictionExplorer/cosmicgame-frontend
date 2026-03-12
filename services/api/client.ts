@@ -145,7 +145,7 @@ export const normalizeFieldNamesArray = (items: unknown) => {
  * `{ status: 0, error: "..." }` on logical failure (still HTTP 200).
  * Throws with the backend message when the response signals failure.
  */
-function assertApiEnvelope(response: AxiosResponse): void {
+export function assertApiEnvelope(response: AxiosResponse): void {
   const body = response.data;
   if (body && typeof body === 'object' && !Array.isArray(body)) {
     if ('status' in body && body.status !== undefined && Number(body.status) !== 1) {

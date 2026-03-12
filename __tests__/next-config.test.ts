@@ -1,12 +1,9 @@
 import type { NextConfig } from 'next';
-
-jest.mock('@sentry/nextjs');
-
- 
 import { withSentryConfig } from '@sentry/nextjs';
 
- 
 import config from '@/next.config';
+
+jest.mock('@sentry/nextjs');
 
 describe('next.config', () => {
   it('enables React strict mode', () => {
