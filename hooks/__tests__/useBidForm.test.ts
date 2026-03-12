@@ -171,12 +171,12 @@ jest.mock('../../contracts/abis', () => ({
 
 const mockIsUserRejection = jest.fn().mockReturnValue(false);
 const mockReportError = jest.fn();
-const mockGetBidErrorMessage = jest.fn().mockReturnValue(null);
+const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
 
 jest.mock('../../utils/errors', () => ({
   isUserRejection: (...args: unknown[]) => mockIsUserRejection(...args),
   reportError: (...args: unknown[]) => mockReportError(...args),
-  getBidErrorMessage: (...args: unknown[]) => mockGetBidErrorMessage(...args),
+  getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
 }));
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -209,7 +209,7 @@ beforeEach(() => {
   mockWriteContract.mockResolvedValue('0xhash');
   mockWaitForTransactionReceipt.mockResolvedValue({});
   mockIsUserRejection.mockReturnValue(false);
-  mockGetBidErrorMessage.mockReturnValue(null);
+  mockGetContractErrorMessage.mockReturnValue(null);
   mockEstimateContractGas.mockResolvedValue(BigInt(500_000));
   mockUseCosmicGameContract.mockReturnValue(mockContractObj);
   mockApiGetUserBalance.mockResolvedValue({

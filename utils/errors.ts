@@ -46,6 +46,9 @@ const CUSTOM_ERROR_MESSAGES: Record<string, string> = {
   TooLongBidMessage: 'Your bid message is too long.',
   WrongBidType: 'Wrong bid type selected.',
   FundTransferFailed: 'Fund transfer failed.',
+  MainPrizeEarlyClaim: 'Not enough time has elapsed to claim the prize.',
+  MainPrizeClaimDenied: 'Only the last bidder is permitted to claim the main prize.',
+  NoBidsPlacedInCurrentRound: 'There have been no bids in the current round yet.',
 };
 
 /**
@@ -75,15 +78,16 @@ function extractContractErrorName(err: unknown): string | null {
 }
 
 /**
- * Returns a user-friendly error message for bid failures.
+ * Returns a user-friendly error message for contract revert failures.
  * Decodes known contract custom errors and detects bid-price-rose scenarios.
  *
  * @param err - The caught error
  * @param displayedEthPrice - The ETH price (in ETH, not wei) shown to the user
- *   before submitting; used to compute the price-rose delta.
+ *   before submitting; used to compute the price-rose delta for
+ *   `InsufficientReceivedBidAmount`.
  * @returns A friendly message string, or `null` to fall back to generic handling.
  */
-export function getBidErrorMessage(err: unknown, displayedEthPrice?: number): string | null {
+export function getContractErrorMessage(err: unknown, displayedEthPrice?: number): string | null {
   const errorName = extractContractErrorName(err);
   if (!errorName) return null;
 
