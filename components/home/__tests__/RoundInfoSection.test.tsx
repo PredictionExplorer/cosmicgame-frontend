@@ -130,16 +130,41 @@ describe('RoundInfoSection', () => {
     expect(screen.queryByTestId('eth-donation-table')).not.toBeInTheDocument();
   });
 
-  it('renders Round Rules section at the bottom', () => {
+  it('renders collapsible Round Rules section', () => {
     render(<RoundInfoSection {...defaultProps} />);
     expect(screen.getByText('How it works')).toBeInTheDocument();
-    expect(screen.getByText(/100 Cosmic Tokens/)).toBeInTheDocument();
+    expect(screen.getByText('Round Rules')).toBeInTheDocument();
   });
 
-  it('renders rules with correct percentage values', () => {
+  it('hides rules content when collapsed (default state)', () => {
     render(<RoundInfoSection {...defaultProps} />);
-    expect(screen.getByText(/10% of the prize pool/)).toBeInTheDocument();
-    expect(screen.getByText(/15% of the pot/)).toBeInTheDocument();
+    expect(screen.queryByText(/100 Cosmic Tokens/)).not.toBeInTheDocument();
+  });
+
+  it('renders round summary footer strip', () => {
+    render(<RoundInfoSection {...defaultProps} />);
+    expect(screen.getByTestId('round-summary-footer')).toBeInTheDocument();
+    expect(screen.getByText('Contract Balance')).toBeInTheDocument();
+    expect(screen.getByText('Round Duration')).toBeInTheDocument();
+    expect(screen.getByText('Unique Bidders')).toBeInTheDocument();
+  });
+
+  it('displays formatted contract balance in footer', () => {
+    render(<RoundInfoSection {...defaultProps} />);
+    expect(screen.getByText('20.00 ETH')).toBeInTheDocument();
+  });
+
+  it('displays unique bidder count in footer', () => {
+    const propsWithBids = {
+      ...defaultProps,
+      curBidList: [
+        { BidderAddr: '0xA', TimeStamp: 1 },
+        { BidderAddr: '0xB', TimeStamp: 2 },
+        { BidderAddr: '0xA', TimeStamp: 3 },
+      ] as never[],
+    };
+    render(<RoundInfoSection {...propsWithBids} />);
+    expect(screen.getByText('2')).toBeInTheDocument();
   });
 
   it('renders all section titles', () => {

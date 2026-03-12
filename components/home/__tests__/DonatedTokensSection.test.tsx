@@ -50,9 +50,15 @@ const defaultProps = {
 };
 
 describe('DonatedTokensSection', () => {
-  it('renders heading', () => {
+  it('renders SectionDivider heading', () => {
     render(<DonatedTokensSection {...defaultProps} />);
-    expect(screen.getByText('DONATED TOKENS FOR CURRENT ROUND')).toBeInTheDocument();
+    expect(screen.getByText('Donated Tokens')).toBeInTheDocument();
+  });
+
+  it('renders InfoTooltip for donated tokens', () => {
+    const { container } = render(<DonatedTokensSection {...defaultProps} />);
+    const tooltipTriggers = container.querySelectorAll('[data-state="closed"]');
+    expect(tooltipTriggers.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders both tab labels', () => {
@@ -63,7 +69,7 @@ describe('DonatedTokensSection', () => {
 
   it('shows empty state for ERC721 when no NFTs', () => {
     render(<DonatedTokensSection {...defaultProps} donatedTokensTab={0} />);
-    expect(screen.getByText('No ERC721 tokens were donated on this round.')).toBeInTheDocument();
+    expect(screen.getByText('No ERC721 tokens were donated this round.')).toBeInTheDocument();
   });
 
   it('renders NFT grid when NFTs are provided', () => {
