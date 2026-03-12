@@ -11,6 +11,10 @@ const ALLOWED_HOSTS = new Set(
 );
 
 ALLOWED_HOSTS.add('nfts.cosmicsignature.com');
+// Allow the known Cosmic Game API hosts so the proxy works without extra env config.
+ALLOWED_HOSTS.add('127.0.0.1');
+ALLOWED_HOSTS.add('api-sepolia.cosmicsignature.com');
+ALLOWED_HOSTS.add('api.cosmicsignature.com');
 
 function isAllowedUrl(raw: string): URL | null {
   try {
