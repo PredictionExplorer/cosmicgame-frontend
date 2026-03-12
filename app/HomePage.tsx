@@ -43,7 +43,7 @@ const HomePage = () => {
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
 
-  const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo();
+  const { data: dashboardData, isLoading: dashboardLoading, isError: dashboardError } = useDashboardInfo();
   const { data: currentTimeData } = useCurrentTime();
 
   const round = dashboardData?.CurRoundNum ?? -1;
@@ -156,8 +156,19 @@ const HomePage = () => {
     <>
       <MainWrapper>
         {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <Spinner size="lg" className="text-white" />
+          <div className="flex items-center justify-center py-20">
+            <Spinner size="lg" className="text-primary" />
+          </div>
+        )}
+
+        {!loading && (dashboardError || !data) && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <p className="text-lg font-medium text-muted-foreground">
+              Unable to load game data.
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground/70">
+              The game API may be temporarily unavailable. Please try refreshing the page.
+            </p>
           </div>
         )}
 
