@@ -78,7 +78,7 @@ const tableHeaders = [
   {
     label: 'Prize Amount',
     width: '15%',
-    align: 'center',
+    align: 'center' as const,
     tooltip: 'The total ETH awarded as the main prize for this round.',
   },
   {
@@ -94,13 +94,13 @@ const tableHeaders = [
   {
     label: 'Raffle Deposits',
     width: '12%',
-    align: 'center',
+    align: 'center' as const,
     tooltip: 'Total ETH deposited into the raffle pool by participants.',
   },
   {
     label: 'Staking Deposit',
     width: '11%',
-    align: 'center',
+    align: 'center' as const,
     tooltip: 'Total ETH deposited into the staking pool, distributed among NFT stakers.',
   },
   {

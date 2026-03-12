@@ -103,7 +103,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:^7.18.5, @babel/core@npm:^7.24.4":
+"@babel/core@npm:^7.18.5, @babel/core@npm:^7.24.4, @babel/core@npm:^7.8.0":
   version: 7.29.0
   resolution: "@babel/core@npm:7.29.0"
   dependencies:
@@ -555,6 +555,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.11.0, @babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.25.0, @babel/runtime@npm:^7.26.0, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.7":
+  version: 7.28.6
+  resolution: "@babel/runtime@npm:7.28.6"
+  checksum: 10c0/358cf2429992ac1c466df1a21c1601d595c46930a13c1d4662fde908d44ee78ec3c183aaff513ecb01ef8c55c3624afe0309eeeb34715672dbfadb7feedb2c0d
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.12.5":
   version: 7.23.5
   resolution: "@babel/runtime@npm:7.23.5"
@@ -570,13 +577,6 @@ __metadata:
   dependencies:
     regenerator-runtime: "npm:^0.13.11"
   checksum: 10c0/c704c36bf1c7f948b1d404e3ad3b00897f6dbaf8bb9455b0a78f96ed0e2f24599f89fd3950a277566be6694ab8814a47bec743e98dd7c7f57e9f0fedc6c6c32f
-  languageName: node
-  linkType: hard
-
-"@babel/runtime@npm:^7.21.0, @babel/runtime@npm:^7.25.0, @babel/runtime@npm:^7.26.0":
-  version: 7.28.6
-  resolution: "@babel/runtime@npm:7.28.6"
-  checksum: 10c0/358cf2429992ac1c466df1a21c1601d595c46930a13c1d4662fde908d44ee78ec3c183aaff513ecb01ef8c55c3624afe0309eeeb34715672dbfadb7feedb2c0d
   languageName: node
   linkType: hard
 
@@ -2868,12 +2868,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@progress/kendo-charts@npm:^1.28.0":
-  version: 1.29.0
-  resolution: "@progress/kendo-charts@npm:1.29.0"
+"@progress/kendo-charts@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@progress/kendo-charts@npm:2.9.0"
   peerDependencies:
-    "@progress/kendo-drawing": ^1.0.0
-  checksum: 10c0/7877b1133969e29181491842e7cdd698b00b2214646824772efa1b9ffa84f6f10da3a698c21f6c914e671cd447e83514d71a7c36fbf85eb76c1000256f362e56
+    "@progress/kendo-drawing": ^1.21.0
+  checksum: 10c0/d18ca6e4ce4c85998be007fe47ac27386839a64140aaca9aed9add5c385c7d9b6c61558488ccad9206e4dfee21039a566354db16e953e9af6c4dbedd2238c62b
+  languageName: node
+  linkType: hard
+
+"@progress/kendo-common@npm:^1.0.1":
+  version: 1.0.2
+  resolution: "@progress/kendo-common@npm:1.0.2"
+  dependencies:
+    tslib: "npm:^1.7.0"
+  checksum: 10c0/7c5980bc05d72d69c92fd6b83701c2b4453ff24402a984e282d4f31fd464ffff56824c54de6068a2f1e9772b30a5e1b169415c077bec8f040e79391d75927896
   languageName: node
   linkType: hard
 
@@ -2886,12 +2895,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@progress/kendo-drawing@npm:^1.17.5":
-  version: 1.17.5
-  resolution: "@progress/kendo-drawing@npm:1.17.5"
+"@progress/kendo-drawing@npm:^1.21.2":
+  version: 1.24.0
+  resolution: "@progress/kendo-drawing@npm:1.24.0"
   dependencies:
+    "@progress/kendo-common": "npm:^1.0.1"
     "@progress/pako-esm": "npm:^1.0.1"
-  checksum: 10c0/53b89e858292fb640f6aed1468fd34cf6e9b64c20f5ca7b68df60c8241e69f9c33fc55c9ee9184ea6533331ebe2aff817c6f417419aba3f500b84018e5077271
+  checksum: 10c0/1bd1409a53a11e1965c2e1b311e8a0fa1a3cf082941ab32efd3c41056fce4868bb7d38901d357384e60cef602f95b1a2a677d63557c5d9e41d8fb9a074d19e99
   languageName: node
   linkType: hard
 
@@ -2902,91 +2912,179 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@progress/kendo-intl@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "@progress/kendo-intl@npm:3.1.1"
-  checksum: 10c0/9cd9eba7cb499030fce5d62454cc9893232da184521c8410bc4dc45a2dcd81846d640fe4f98608a7a40e4030a500c91219cb7b24aba48235d7fddff7eaae4837
+"@progress/kendo-intl@npm:^3.2.1":
+  version: 3.2.1
+  resolution: "@progress/kendo-intl@npm:3.2.1"
+  checksum: 10c0/6849c401b814105f6737a9148ed5b56f48f2ab0443fdd02f5d171bb1be09d0066a7bf6c96e03fb322789007654a314800a2436f48563a4f5ebaae2cdace1149c
   languageName: node
   linkType: hard
 
-"@progress/kendo-licensing@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "@progress/kendo-licensing@npm:1.3.0"
+"@progress/kendo-licensing@npm:^1.7.2":
+  version: 1.10.1
+  resolution: "@progress/kendo-licensing@npm:1.10.1"
   dependencies:
-    jsonwebtoken: "npm:^9.0.0"
+    glob: "npm:^13.0.1"
+    jsonwebtoken: "npm:^9.0.3"
+    yargs: "npm:^17.7.2"
   bin:
     kendo-ui-license: bin/kendo-ui-license.js
-  checksum: 10c0/bbfaf5d4d437bd2bd65b75f458c97d5a835d4a121074756a9e3d82a9bc7a8bf0dcb48690247b4b4286bb34a1deede7c9fe649d6ff3f1dce2770d8ba75140e48b
+  checksum: 10c0/4395dc4fd707c24ab6f78e1facb94fd9f8190d6798a9a5d14bedd8372178877e57e2bdd6ad794fe9430346b966108f9220d05fb13c9a558c832a7fe06afca0d8
   languageName: node
   linkType: hard
 
-"@progress/kendo-popup-common@npm:1.9.0":
-  version: 1.9.0
-  resolution: "@progress/kendo-popup-common@npm:1.9.0"
-  checksum: 10c0/6360c94256fb73fdbfc109f5956bf9b896f2813a3b43ccbad50cbca4b96c72cbf6b7b972dae51c9dd51d97d4b4907d003779d86905590e7a08e13ec649a2fd96
+"@progress/kendo-popup-common@npm:^1.9.5":
+  version: 1.9.5
+  resolution: "@progress/kendo-popup-common@npm:1.9.5"
+  checksum: 10c0/da2d37bf3a3b169cc020410fee824e1b791a5ef3ba29b61cac07ef19376464a1c262a0e28307e357d1ff9daddb780ac36a68afcb25def3cf494a553ab4c3914e
   languageName: node
   linkType: hard
 
-"@progress/kendo-react-charts@npm:^5.13.1":
-  version: 5.13.1
-  resolution: "@progress/kendo-react-charts@npm:5.13.1"
+"@progress/kendo-react-animation@npm:14.2.1":
+  version: 14.2.1
+  resolution: "@progress/kendo-react-animation@npm:14.2.1"
   dependencies:
-    "@progress/kendo-charts": "npm:^1.28.0"
-    "@progress/kendo-react-common": "npm:5.13.1"
-    "@progress/kendo-react-popup": "npm:5.13.1"
     prop-types: "npm:^15.6.0"
   peerDependencies:
-    "@progress/kendo-drawing": ^1.17.2
-    "@progress/kendo-licensing": ^1.3.0
-    "@progress/kendo-react-intl": ^5.0.0
-    hammerjs: ^2.0.0
-    react: ^16.8.2 || ^17.0.0 || ^18.0.0
-    react-dom: ^16.8.2 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/007ac9903737d44c76238643930ba7fdda86ab7586aa14b3575f5ad1e17ac32684b051c213c89c53d5011eb4497b9aee825df2c755b07cff39e5448bbd01ab05
+    "@progress/kendo-licensing": ^1.7.2
+    "@progress/kendo-react-common": 14.2.1
+    "@progress/kendo-svg-icons": ^4.0.0
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+    react-transition-group: ^4.4.2
+  checksum: 10c0/bca9a5465d7dcf7cb547bca2805c6a192b1761b78e197e5a2c302128150daed52e47f43dd433ebf1331815a87d94e819f8ba3d782c599eb984337084a38cbeed
   languageName: node
   linkType: hard
 
-"@progress/kendo-react-common@npm:5.13.1":
-  version: 5.13.1
-  resolution: "@progress/kendo-react-common@npm:5.13.1"
+"@progress/kendo-react-buttons@npm:14.2.1":
+  version: 14.2.1
+  resolution: "@progress/kendo-react-buttons@npm:14.2.1"
+  dependencies:
+    prop-types: "npm:^15.6.0"
+  peerDependencies:
+    "@progress/kendo-licensing": ^1.7.2
+    "@progress/kendo-react-common": 14.2.1
+    "@progress/kendo-react-intl": 14.2.1
+    "@progress/kendo-react-popup": 14.2.1
+    "@progress/kendo-smartpaste-common": 1.0.0
+    "@progress/kendo-svg-icons": ^4.8.0
+    "@progress/kendo-webspeech-common": ^1.0.1
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/60e71521c51913afb5d18a19ba3964ab7b724a818ec4c3791c6ff9a61eeab3f8ccd443616a3f2b3c06de959f07ea80144693a83f0fcc598a6ec6faef712c1a4f
+  languageName: node
+  linkType: hard
+
+"@progress/kendo-react-charts@npm:^14.2.1":
+  version: 14.2.1
+  resolution: "@progress/kendo-react-charts@npm:14.2.1"
+  dependencies:
+    "@progress/kendo-charts": "npm:2.9.0"
+    prop-types: "npm:^15.6.0"
+  peerDependencies:
+    "@progress/kendo-drawing": ^1.21.2
+    "@progress/kendo-licensing": ^1.7.2
+    "@progress/kendo-react-common": 14.2.1
+    "@progress/kendo-react-intl": 14.2.1
+    "@progress/kendo-react-layout": 14.2.1
+    "@progress/kendo-react-popup": 14.2.1
+    "@progress/kendo-svg-icons": ^4.0.0
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/5e827bde0da270d0b27ff2483e4157464d36281769cfa9e19b2b018e9849bd39ba81b287fa01a697150f22efdb1656a2c0d9963fe3c162c71ca5015c23891677
+  languageName: node
+  linkType: hard
+
+"@progress/kendo-react-common@npm:14.2.1":
+  version: 14.2.1
+  resolution: "@progress/kendo-react-common@npm:14.2.1"
   dependencies:
     "@progress/kendo-draggable-common": "npm:^0.2.3"
     prop-types: "npm:^15.6.0"
   peerDependencies:
-    "@progress/kendo-licensing": ^1.3.0
-    "@progress/kendo-svg-icons": ^1.0.0
-    react: ^16.8.2 || ^17.0.0 || ^18.0.0
-    react-dom: ^16.8.2 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/5abfb3416664514ca1d9c6ee2f9953931663c17d4f5845388aca6316f174d5f8152732d9867799155e39caf1daf2d26710e8e71ea41a3155c5c3be1181029022
+    "@progress/kendo-licensing": ^1.7.2
+    "@progress/kendo-svg-icons": ^4.0.0
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/73f8e7a362c824920e1b25b965bbee6e2e84122a9ea315515891dd37bd3ce78760f213c2689e1b4bad91bed9bd14fc9e8ec7dec2d4877447ec9993bce4f746d5
   languageName: node
   linkType: hard
 
-"@progress/kendo-react-intl@npm:^5.13.1":
-  version: 5.13.1
-  resolution: "@progress/kendo-react-intl@npm:5.13.1"
+"@progress/kendo-react-intl@npm:14.2.1":
+  version: 14.2.1
+  resolution: "@progress/kendo-react-intl@npm:14.2.1"
   dependencies:
-    "@progress/kendo-intl": "npm:^3.1.1"
     prop-types: "npm:^15.6.0"
   peerDependencies:
-    "@progress/kendo-licensing": ^1.3.0
-    react: ^16.8.2 || ^17.0.0 || ^18.0.0
-    react-dom: ^16.8.2 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/a3bc375ddddf76db4bc305335cbc96dfc0523acf82b3d86da185f2b27cef86568918b04caa7dfd79713fc4487ea08c705d1929789e905e4a8382da3b05b3aa5e
+    "@progress/kendo-intl": ^3.2.1
+    "@progress/kendo-licensing": ^1.7.2
+    "@progress/kendo-react-common": 14.2.1
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/32f423b35cf6f909005dbdeb628ce489b1c2a7fe42f35e042f909fdd42aca46ba4365790eb6335c8b3165aa3bb2cb077c044cd69ba33909773133554161424b6
   languageName: node
   linkType: hard
 
-"@progress/kendo-react-popup@npm:5.13.1":
-  version: 5.13.1
-  resolution: "@progress/kendo-react-popup@npm:5.13.1"
+"@progress/kendo-react-layout@npm:14.2.1":
+  version: 14.2.1
+  resolution: "@progress/kendo-react-layout@npm:14.2.1"
   dependencies:
-    "@progress/kendo-popup-common": "npm:1.9.0"
-    "@progress/kendo-react-common": "npm:5.13.1"
     prop-types: "npm:^15.6.0"
   peerDependencies:
-    "@progress/kendo-licensing": ^1.3.0
-    react: ^16.8.2 || ^17.0.0 || ^18.0.0
-    react-dom: ^16.8.2 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/2acd347617db1ba80c426c5b5687c150f949afb1df56da73b81c0f68ff29f57c24451461a03b1344e92265da8e3ec8c083d399798e089a15413f49a3b32bd620
+    "@progress/kendo-licensing": ^1.7.2
+    "@progress/kendo-react-animation": 14.2.1
+    "@progress/kendo-react-buttons": 14.2.1
+    "@progress/kendo-react-common": 14.2.1
+    "@progress/kendo-react-intl": 14.2.1
+    "@progress/kendo-react-popup": 14.2.1
+    "@progress/kendo-react-progressbars": 14.2.1
+    "@progress/kendo-svg-icons": ^4.0.0
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/54019c7c9837cfe3ba6952bb31dc6f3d2cf5f452b1082df5a0659fd295416e898c79c5c0ad7afb9623ac6ae3b3f32088e6f1f2656bdf3926aba866bdeac7e705
+  languageName: node
+  linkType: hard
+
+"@progress/kendo-react-popup@npm:14.2.1":
+  version: 14.2.1
+  resolution: "@progress/kendo-react-popup@npm:14.2.1"
+  dependencies:
+    prop-types: "npm:^15.6.0"
+  peerDependencies:
+    "@progress/kendo-licensing": ^1.7.2
+    "@progress/kendo-popup-common": ^1.9.5
+    "@progress/kendo-react-common": 14.2.1
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/7ee4c7b3ef7bcf672fe639e3b52bc43ffc5fe7480d0f500a46db1980220b00a580dba18190dbc1d35f7aa219431256c2cf33366832224bbe67b73812a4fbb539
+  languageName: node
+  linkType: hard
+
+"@progress/kendo-react-progressbars@npm:14.2.1":
+  version: 14.2.1
+  resolution: "@progress/kendo-react-progressbars@npm:14.2.1"
+  dependencies:
+    prop-types: "npm:^15.6.0"
+  peerDependencies:
+    "@progress/kendo-licensing": ^1.7.2
+    "@progress/kendo-react-animation": 14.2.1
+    "@progress/kendo-react-common": 14.2.1
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  checksum: 10c0/b2d6c0ffe275c959f58340ffad3dc1a3933d0e5cc43ceadfedfa654bf70962b31beb8c68a93ce82f96f6099a3a07c1719b468e772241eea0468689e69a4a639b
+  languageName: node
+  linkType: hard
+
+"@progress/kendo-smartpaste-common@npm:1.0.0":
+  version: 1.0.0
+  resolution: "@progress/kendo-smartpaste-common@npm:1.0.0"
+  checksum: 10c0/7f67fd1f0aad651daca400bd99ada9ecf2094a3d72887bee34f86082ca60a1803e47d32dc95c1664bb35c45e93845b530fea081b9d5c35504ef13292fb9f6fa0
+  languageName: node
+  linkType: hard
+
+"@progress/kendo-svg-icons@npm:^4.8.0":
+  version: 4.8.0
+  resolution: "@progress/kendo-svg-icons@npm:4.8.0"
+  checksum: 10c0/5ac68c17c855d31e7abaa579d2f936d3acaab8d6c986321228b8c6b86a3c0b856e453fe23b1f121196a9b6eb02b97a2c591485daea8a09f066d046ae16b664b5
   languageName: node
   linkType: hard
 
@@ -3014,6 +3112,13 @@ __metadata:
   dependencies:
     "@progress/kendo-theme-core": "npm:6.4.0"
   checksum: 10c0/71ba81eb69c750f367968a769f4a37fda1b225c77fe0233cc8110e834a58e9496f8bb9d7c21fae0356780cfa4f5995a3027b7381b435e09701349c8b2218adf7
+  languageName: node
+  linkType: hard
+
+"@progress/kendo-webspeech-common@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@progress/kendo-webspeech-common@npm:1.0.1"
+  checksum: 10c0/333a833f466fecb0be783ed286b39905ad3d7a4aca182085292c8b11c19777b25b166ed95f3cee2ce6709a4b7329a164fc4a2b6172be15a56052a51e914756c5
   languageName: node
   linkType: hard
 
@@ -5730,7 +5835,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tsparticles/engine@npm:3.9.1":
+"@tsparticles/engine@npm:3.9.1, @tsparticles/engine@npm:^3.0.2":
   version: 3.9.1
   resolution: "@tsparticles/engine@npm:3.9.1"
   checksum: 10c0/85106d28e9a9f5b019e80c8767376319e6fe6873af4b773727ce48edf13b964d0d1c9ca7faff9f9edd1410e001455fdf789d956b55b94f35fdf3e41fa9f0507a
@@ -8166,7 +8271,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buffer-equal-constant-time@npm:1.0.1":
+"buffer-equal-constant-time@npm:^1.0.1":
   version: 1.0.1
   resolution: "buffer-equal-constant-time@npm:1.0.1"
   checksum: 10c0/fb2294e64d23c573d0dd1f1e7a466c3e978fe94a4e0f8183937912ca374619773bef8e2aceb854129d2efecbbc515bbd0cc78d2734a3e3031edb0888531bbc8e
@@ -8637,6 +8742,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "cosmic-signature-frontend@workspace:."
   dependencies:
+    "@babel/core": "npm:^7.8.0"
+    "@babel/runtime": "npm:^7.11.0"
+    "@codemirror/autocomplete": "npm:^6.0.0"
+    "@codemirror/language": "npm:^6.0.0"
+    "@codemirror/lint": "npm:^6.0.0"
+    "@codemirror/search": "npm:^6.0.0"
+    "@codemirror/state": "npm:^6.0.0"
+    "@codemirror/theme-one-dark": "npm:^6.0.0"
+    "@codemirror/view": "npm:^6.0.0"
     "@coinbase/wallet-sdk": "npm:^4.3.7"
     "@commitlint/cli": "npm:^20.4.3"
     "@commitlint/config-conventional": "npm:^20.4.3"
@@ -8646,11 +8760,22 @@ __metadata:
     "@fortawesome/react-fontawesome": "npm:^3.2.0"
     "@metamask/sdk": "npm:^0.34.0"
     "@playwright/test": "npm:^1.58.2"
-    "@progress/kendo-drawing": "npm:^1.17.5"
-    "@progress/kendo-licensing": "npm:^1.3.0"
-    "@progress/kendo-react-charts": "npm:^5.13.1"
-    "@progress/kendo-react-intl": "npm:^5.13.1"
+    "@progress/kendo-drawing": "npm:^1.21.2"
+    "@progress/kendo-intl": "npm:^3.2.1"
+    "@progress/kendo-licensing": "npm:^1.7.2"
+    "@progress/kendo-popup-common": "npm:^1.9.5"
+    "@progress/kendo-react-animation": "npm:14.2.1"
+    "@progress/kendo-react-buttons": "npm:14.2.1"
+    "@progress/kendo-react-charts": "npm:^14.2.1"
+    "@progress/kendo-react-common": "npm:14.2.1"
+    "@progress/kendo-react-intl": "npm:14.2.1"
+    "@progress/kendo-react-layout": "npm:14.2.1"
+    "@progress/kendo-react-popup": "npm:14.2.1"
+    "@progress/kendo-react-progressbars": "npm:14.2.1"
+    "@progress/kendo-smartpaste-common": "npm:1.0.0"
+    "@progress/kendo-svg-icons": "npm:^4.8.0"
     "@progress/kendo-theme-default": "npm:^6.4.0"
+    "@progress/kendo-webspeech-common": "npm:^1.0.1"
     "@radix-ui/react-accordion": "npm:^1.2.12"
     "@radix-ui/react-dialog": "npm:^1.1.15"
     "@radix-ui/react-dropdown-menu": "npm:^2.1.16"
@@ -8672,6 +8797,7 @@ __metadata:
     "@testing-library/jest-dom": "npm:^6.9.1"
     "@testing-library/react": "npm:^16.3.2"
     "@testing-library/user-event": "npm:^14.6.1"
+    "@tsparticles/engine": "npm:^3.0.2"
     "@tsparticles/react": "npm:^3.0.0"
     "@tsparticles/slim": "npm:^3.9.1"
     "@types/jest": "npm:^29.5.10"
@@ -8687,6 +8813,7 @@ __metadata:
     babel-jest: "npm:^29.7.0"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
+    codemirror: "npm:^6.0.0"
     dayjs: "npm:^1.11.7"
     eslint: "npm:^9.28.0"
     eslint-config-next: "npm:^16.1.6"
@@ -8699,14 +8826,14 @@ __metadata:
     lint-staged: "npm:^16.3.2"
     lucide-react: "npm:^0.577.0"
     next: "npm:^16.1.6"
-    porto: "npm:^0.2.37"
     prettier: "npm:^3.8.1"
     react: "npm:^19.1.0"
     react-cookie: "npm:^8.0.1"
     react-countdown: "npm:^2.3.2"
     react-dom: "npm:^19.1.0"
     react-snap-carousel: "npm:^0.5.1"
-    react-super-responsive-table: "npm:^5.2.2"
+    react-super-responsive-table: "npm:^6.0.0"
+    react-transition-group: "npm:^4.4.2"
     sonner: "npm:^2.0.7"
     tailwind-merge: "npm:^3.5.0"
     tailwindcss: "npm:^4.2.1"
@@ -8882,7 +9009,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csstype@npm:^3.0.7, csstype@npm:^3.2.2":
+"csstype@npm:^3.0.2, csstype@npm:^3.0.7, csstype@npm:^3.2.2":
   version: 3.2.3
   resolution: "csstype@npm:3.2.3"
   checksum: 10c0/cd29c51e70fa822f1cecd8641a1445bed7063697469d35633b516e60fe8c1bde04b08f6c5b6022136bb669b64c63d4173af54864510fbb4ee23281801841a3ce
@@ -9229,6 +9356,16 @@ __metadata:
   version: 0.6.3
   resolution: "dom-accessibility-api@npm:0.6.3"
   checksum: 10c0/10bee5aa514b2a9a37c87cd81268db607a2e933a050074abc2f6fa3da9080ebed206a320cbc123567f2c3087d22292853bdfdceaffdd4334ffe2af9510b29360
+  languageName: node
+  linkType: hard
+
+"dom-helpers@npm:^5.0.1":
+  version: 5.2.1
+  resolution: "dom-helpers@npm:5.2.1"
+  dependencies:
+    "@babel/runtime": "npm:^7.8.7"
+    csstype: "npm:^3.0.2"
+  checksum: 10c0/f735074d66dd759b36b158fa26e9d00c9388ee0e8c9b16af941c38f014a37fc80782de83afefd621681b19ac0501034b4f1c4a3bff5caa1b8667f0212b5e124c
   languageName: node
   linkType: hard
 
@@ -10619,7 +10756,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^13.0.0, glob@npm:^13.0.6":
+"glob@npm:^13.0.0, glob@npm:^13.0.1, glob@npm:^13.0.6":
   version: 13.0.6
   resolution: "glob@npm:13.0.6"
   dependencies:
@@ -10895,13 +11032,6 @@ __metadata:
   dependencies:
     react-is: "npm:^16.7.0"
   checksum: 10c0/fe0889169e845d738b59b64badf5e55fa3cf20454f9203d1eb088df322d49d4318df774828e789898dcb280e8a5521bb59b3203385662ca5e9218a6ca5820e74
-  languageName: node
-  linkType: hard
-
-"hono@npm:^4.10.3":
-  version: 4.12.5
-  resolution: "hono@npm:4.12.5"
-  checksum: 10c0/a8cf0c988e84b370978b57d941fc543b93994b7b01c847611ec73be8e8c9fda5baeac8be08a44eaefdf215381fea2620ccb742ff5c4eaeecb35b92f6a75832c6
   languageName: node
   linkType: hard
 
@@ -12467,15 +12597,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonwebtoken@npm:^9.0.0":
-  version: 9.0.0
-  resolution: "jsonwebtoken@npm:9.0.0"
+"jsonwebtoken@npm:^9.0.3":
+  version: 9.0.3
+  resolution: "jsonwebtoken@npm:9.0.3"
   dependencies:
-    jws: "npm:^3.2.2"
-    lodash: "npm:^4.17.21"
+    jws: "npm:^4.0.1"
+    lodash.includes: "npm:^4.3.0"
+    lodash.isboolean: "npm:^3.0.3"
+    lodash.isinteger: "npm:^4.0.4"
+    lodash.isnumber: "npm:^3.0.3"
+    lodash.isplainobject: "npm:^4.0.6"
+    lodash.isstring: "npm:^4.0.1"
+    lodash.once: "npm:^4.0.0"
     ms: "npm:^2.1.1"
-    semver: "npm:^7.3.8"
-  checksum: 10c0/60c30d90d8a69b8e7148306e0c299ac120dbde9c032add48d26df928fe349e952cf4b09f12d7942257681a936e3374e4d49280ab20f8a4578688c7f08d87f9bc
+    semver: "npm:^7.5.4"
+  checksum: 10c0/6ca7f1e54886ea3bde7146a5a22b53847c46e25453c7f7307a69818b9a6ad48c390b2e59d5690fcfd03c529b01960060cc4bb0c686991d6edae2285dfd30f4ba
   languageName: node
   linkType: hard
 
@@ -12501,24 +12637,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jwa@npm:^1.4.1":
-  version: 1.4.1
-  resolution: "jwa@npm:1.4.1"
+"jwa@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "jwa@npm:2.0.1"
   dependencies:
-    buffer-equal-constant-time: "npm:1.0.1"
+    buffer-equal-constant-time: "npm:^1.0.1"
     ecdsa-sig-formatter: "npm:1.0.11"
     safe-buffer: "npm:^5.0.1"
-  checksum: 10c0/5c533540bf38702e73cf14765805a94027c66a0aa8b16bc3e89d8d905e61a4ce2791e87e21be97d1293a5ee9d4f3e5e47737e671768265ca4f25706db551d5e9
+  checksum: 10c0/ab3ebc6598e10dc11419d4ed675c9ca714a387481466b10e8a6f3f65d8d9c9237e2826f2505280a739cf4cbcf511cb288eeec22b5c9c63286fc5a2e4f97e78cf
   languageName: node
   linkType: hard
 
-"jws@npm:^3.2.2":
-  version: 3.2.2
-  resolution: "jws@npm:3.2.2"
+"jws@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "jws@npm:4.0.1"
   dependencies:
-    jwa: "npm:^1.4.1"
+    jwa: "npm:^2.0.1"
     safe-buffer: "npm:^5.0.1"
-  checksum: 10c0/e770704533d92df358adad7d1261fdecad4d7b66fa153ba80d047e03ca0f1f73007ce5ed3fbc04d2eba09ba6e7e6e645f351e08e5ab51614df1b0aa4f384dfff
+  checksum: 10c0/6be1ed93023aef570ccc5ea8d162b065840f3ef12f0d1bb3114cade844de7a357d5dc558201d9a65101e70885a6fa56b17462f520e6b0d426195510618a154d0
   languageName: node
   linkType: hard
 
@@ -12802,6 +12938,48 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.includes@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "lodash.includes@npm:4.3.0"
+  checksum: 10c0/7ca498b9b75bf602d04e48c0adb842dfc7d90f77bcb2a91a2b2be34a723ad24bc1c8b3683ec6b2552a90f216c723cdea530ddb11a3320e08fa38265703978f4b
+  languageName: node
+  linkType: hard
+
+"lodash.isboolean@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "lodash.isboolean@npm:3.0.3"
+  checksum: 10c0/0aac604c1ef7e72f9a6b798e5b676606042401dd58e49f051df3cc1e3adb497b3d7695635a5cbec4ae5f66456b951fdabe7d6b387055f13267cde521f10ec7f7
+  languageName: node
+  linkType: hard
+
+"lodash.isinteger@npm:^4.0.4":
+  version: 4.0.4
+  resolution: "lodash.isinteger@npm:4.0.4"
+  checksum: 10c0/4c3e023a2373bf65bf366d3b8605b97ec830bca702a926939bcaa53f8e02789b6a176e7f166b082f9365bfec4121bfeb52e86e9040cb8d450e64c858583f61b7
+  languageName: node
+  linkType: hard
+
+"lodash.isnumber@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "lodash.isnumber@npm:3.0.3"
+  checksum: 10c0/2d01530513a1ee4f72dd79528444db4e6360588adcb0e2ff663db2b3f642d4bb3d687051ae1115751ca9082db4fdef675160071226ca6bbf5f0c123dbf0aa12d
+  languageName: node
+  linkType: hard
+
+"lodash.isplainobject@npm:^4.0.6":
+  version: 4.0.6
+  resolution: "lodash.isplainobject@npm:4.0.6"
+  checksum: 10c0/afd70b5c450d1e09f32a737bed06ff85b873ecd3d3d3400458725283e3f2e0bb6bf48e67dbe7a309eb371a822b16a26cca4a63c8c52db3fc7dc9d5f9dd324cbb
+  languageName: node
+  linkType: hard
+
+"lodash.isstring@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "lodash.isstring@npm:4.0.1"
+  checksum: 10c0/09eaf980a283f9eef58ef95b30ec7fee61df4d6bf4aba3b5f096869cc58f24c9da17900febc8ffd67819b4e29de29793190e88dc96983db92d84c95fa85d1c92
+  languageName: node
+  linkType: hard
+
 "lodash.kebabcase@npm:^4.1.1":
   version: 4.1.1
   resolution: "lodash.kebabcase@npm:4.1.1"
@@ -12823,6 +13001,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.once@npm:^4.0.0":
+  version: 4.1.1
+  resolution: "lodash.once@npm:4.1.1"
+  checksum: 10c0/46a9a0a66c45dd812fcc016e46605d85ad599fe87d71a02f6736220554b52ffbe82e79a483ad40f52a8a95755b0d1077fba259da8bfb6694a7abbf4a48f1fc04
+  languageName: node
+  linkType: hard
+
 "lodash.snakecase@npm:^4.1.1":
   version: 4.1.1
   resolution: "lodash.snakecase@npm:4.1.1"
@@ -12841,13 +13026,6 @@ __metadata:
   version: 4.3.1
   resolution: "lodash.upperfirst@npm:4.3.1"
   checksum: 10c0/435625da4b3ee74e7a1367a780d9107ab0b13ef4359fc074b2a1a40458eb8d91b655af62f6795b7138d493303a98c0285340160341561d6896e4947e077fa975
-  languageName: node
-  linkType: hard
-
-"lodash@npm:^4.17.21":
-  version: 4.17.21
-  resolution: "lodash@npm:4.17.21"
-  checksum: 10c0/d8cbea072bb08655bb4c989da418994b073a608dffa608b09ac04b43a791b12aeae7cd7ad919aa4c925f33b48490b5cfe6c1f71d827956071dae2e7bb3a6b74c
   languageName: node
   linkType: hard
 
@@ -13223,7 +13401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mipd@npm:0.0.7, mipd@npm:^0.0.7":
+"mipd@npm:0.0.7":
   version: 0.0.7
   resolution: "mipd@npm:0.0.7"
   peerDependencies:
@@ -13776,27 +13954,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ox@npm:^0.9.6":
-  version: 0.9.17
-  resolution: "ox@npm:0.9.17"
-  dependencies:
-    "@adraffy/ens-normalize": "npm:^1.11.0"
-    "@noble/ciphers": "npm:^1.3.0"
-    "@noble/curves": "npm:1.9.1"
-    "@noble/hashes": "npm:^1.8.0"
-    "@scure/bip32": "npm:^1.7.0"
-    "@scure/bip39": "npm:^1.6.0"
-    abitype: "npm:^1.0.9"
-    eventemitter3: "npm:5.0.1"
-  peerDependencies:
-    typescript: ">=5.4.0"
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 10c0/082b1a568cabbc1a7eea2b724d90ec0289fa3519cdcbad975122caa175cde68284174c2df8f497fb6e64445143c1ba689ddbdde089898f5c83f5506d1e1ea6c0
-  languageName: node
-  linkType: hard
-
 "p-limit@npm:^2.2.0":
   version: 2.3.0
   resolution: "p-limit@npm:2.3.0"
@@ -14068,50 +14225,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"porto@npm:^0.2.37":
-  version: 0.2.37
-  resolution: "porto@npm:0.2.37"
-  dependencies:
-    hono: "npm:^4.10.3"
-    idb-keyval: "npm:^6.2.1"
-    mipd: "npm:^0.0.7"
-    ox: "npm:^0.9.6"
-    zod: "npm:^4.1.5"
-    zustand: "npm:^5.0.1"
-  peerDependencies:
-    "@tanstack/react-query": ">=5.59.0"
-    "@wagmi/core": ">=2.16.3"
-    expo-auth-session: ">=7.0.8"
-    expo-crypto: ">=15.0.7"
-    expo-web-browser: ">=15.0.8"
-    react: ">=18"
-    react-native: ">=0.81.4"
-    typescript: ">=5.4.0"
-    viem: ">=2.37.0"
-    wagmi: ">=2.0.0"
-  peerDependenciesMeta:
-    "@tanstack/react-query":
-      optional: true
-    expo-auth-session:
-      optional: true
-    expo-crypto:
-      optional: true
-    expo-web-browser:
-      optional: true
-    react:
-      optional: true
-    react-native:
-      optional: true
-    typescript:
-      optional: true
-    wagmi:
-      optional: true
-  bin:
-    porto: dist/cli/bin/index.js
-  checksum: 10c0/6f816313cdd46b357d4c6f8e4ca0b0bd6d2876a4825cd213c059ee0cff4dc1f7097afa14c8e6a02b8042d3416ea548f742eb3a9dfae5d771e3e139f8432320ef
-  languageName: node
-  linkType: hard
-
 "possible-typed-array-names@npm:^1.0.0":
   version: 1.1.0
   resolution: "possible-typed-array-names@npm:1.1.0"
@@ -14279,7 +14392,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.0, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.6.0, prop-types@npm:^15.6.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -14545,14 +14658,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-super-responsive-table@npm:^5.2.2":
-  version: 5.2.2
-  resolution: "react-super-responsive-table@npm:5.2.2"
+"react-super-responsive-table@npm:^6.0.0":
+  version: 6.0.2
+  resolution: "react-super-responsive-table@npm:6.0.2"
   peerDependencies:
-    prop-types: ">= 15"
     react: ">=16.9.0"
     react-dom: ">=16.9.0"
-  checksum: 10c0/58dcc49d209020b5eb85ef007557882bb9736363a3dc2b0e7cb37e94797f3be4aa15a15e8238928416ea2a0128f388e8a2728ec0aa2480a3e63e9e7e20fa4f64
+  checksum: 10c0/8893e9a09c5eeb79001cf5194ce3a3537443172446cc74cb86f75e93d4138fe43ac0644f73a4981244b6841ae328435ce99cf24969c523f1984a456d20da2390
+  languageName: node
+  linkType: hard
+
+"react-transition-group@npm:^4.4.2":
+  version: 4.4.5
+  resolution: "react-transition-group@npm:4.4.5"
+  dependencies:
+    "@babel/runtime": "npm:^7.5.5"
+    dom-helpers: "npm:^5.0.1"
+    loose-envify: "npm:^1.4.0"
+    prop-types: "npm:^15.6.2"
+  peerDependencies:
+    react: ">=16.6.0"
+    react-dom: ">=16.6.0"
+  checksum: 10c0/2ba754ba748faefa15f87c96dfa700d5525054a0141de8c75763aae6734af0740e77e11261a1e8f4ffc08fd9ab78510122e05c21c2d79066c38bb6861a886c82
   languageName: node
   linkType: hard
 
@@ -15077,17 +15204,6 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 10c0/5215ad0234e2845d4ea5bb9d836d42b03499546ddafb12075566899fc617f68794bb6f146076b6881d755de17d6c6cc73372555879ec7dce2c2feee947866ad2
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.3.8":
-  version: 7.5.1
-  resolution: "semver@npm:7.5.1"
-  dependencies:
-    lru-cache: "npm:^6.0.0"
-  bin:
-    semver: bin/semver.js
-  checksum: 10c0/ae6aca3cfba9b4d0e0a8fa789c7fa4a8412e39f24ecc19500db291a0a31bb43c151021e4fdbb68a85dcd06c1297f6daeeb09647cea4253eba0ccc0106eb7cd67
   languageName: node
   linkType: hard
 
@@ -17010,7 +17126,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^17.0.0, yargs@npm:^17.3.1":
+"yargs@npm:^17.0.0, yargs@npm:^17.3.1, yargs@npm:^17.7.2":
   version: 17.7.2
   resolution: "yargs@npm:17.7.2"
   dependencies:
@@ -17072,7 +17188,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.25.0 || ^4.0.0, zod@npm:^4.1.5":
+"zod@npm:^3.25.0 || ^4.0.0":
   version: 4.3.6
   resolution: "zod@npm:4.3.6"
   checksum: 10c0/860d25a81ab41d33aa25f8d0d07b091a04acb426e605f396227a796e9e800c44723ed96d0f53a512b57be3d1520f45bf69c0cb3b378a232a00787a2609625307
@@ -17118,26 +17234,5 @@ __metadata:
     use-sync-external-store:
       optional: true
   checksum: 10c0/dad96c6c123fda088c583d5df6692e9245cd207583078dc15f93d255a67b0f346bad4535545c98852ecde93d254812a0c799579dfde2ab595016b99fbe20e4d5
-  languageName: node
-  linkType: hard
-
-"zustand@npm:^5.0.1":
-  version: 5.0.11
-  resolution: "zustand@npm:5.0.11"
-  peerDependencies:
-    "@types/react": ">=18.0.0"
-    immer: ">=9.0.6"
-    react: ">=18.0.0"
-    use-sync-external-store: ">=1.2.0"
-  peerDependenciesMeta:
-    "@types/react":
-      optional: true
-    immer:
-      optional: true
-    react:
-      optional: true
-    use-sync-external-store:
-      optional: true
-  checksum: 10c0/61836b48dac5978c9d1b8289d5162a151bee77828371b9aba6431a079b77faca0635ba53da3f7b331295fbc4e78318a109a4527f7a051cb63abfe79b69ccbecf
   languageName: node
   linkType: hard
