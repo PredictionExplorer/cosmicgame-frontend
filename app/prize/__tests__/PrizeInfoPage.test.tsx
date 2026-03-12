@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { checkA11y, render, screen, waitFor } from '@/test-utils';
+import { checkA11y, render, screen, waitFor, within } from '@/test-utils';
 
 import PrizeInfoPage from '../[id]/PrizeInfoPage';
 
@@ -144,23 +144,73 @@ describe('PrizeInfoPage', () => {
       expect(skeletons.length).toBeGreaterThan(0);
     });
 
+    it('shows loading when staking query is still loading', () => {
+      mockUseRoundInfo.mockReturnValue({ data: basePrizeInfo, isLoading: false });
+      mockUseStakingCSTRewardsByRound.mockReturnValue({ data: [], isLoading: true });
+      const { container } = render(<PrizeInfoPage roundNum={1} />);
+      const skeletons = container.querySelectorAll('.animate-pulse');
+      expect(skeletons.length).toBeGreaterThan(0);
+    });
+
+    it('shows loading when ERC20 query is still loading', () => {
+      mockUseRoundInfo.mockReturnValue({ data: basePrizeInfo, isLoading: false });
+      mockUseDonationsERC20ByRound.mockReturnValue({ data: [], isLoading: true });
+      const { container } = render(<PrizeInfoPage roundNum={1} />);
+      const skeletons = container.querySelectorAll('.animate-pulse');
+      expect(skeletons.length).toBeGreaterThan(0);
+    });
+
     it('shows not found when prizeInfo is null after loading', () => {
       mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false });
       render(<PrizeInfoPage roundNum={1} />);
       expect(screen.getByText('Prize Data Not Found')).toBeInTheDocument();
       expect(screen.getByText(/Back to Prize Winners/i)).toBeInTheDocument();
     });
+
+    it('not found message includes the round number', () => {
+      mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false });
+      render(<PrizeInfoPage roundNum={99} />);
+      expect(screen.getByText(/round #99/i)).toBeInTheDocument();
+    });
   });
 
-  describe('hero / round header', () => {
-    it('renders round number and breadcrumbs', () => {
-      renderWithData(1);
-      expect(screen.getByText('Round #1')).toBeInTheDocument();
-      expect(screen.getByText('Prize Winners')).toBeInTheDocument();
-      expect(screen.getByText('Round 1')).toBeInTheDocument();
+  describe('hero banner', () => {
+    it('renders round number as heading', () => {
+      renderWithData(4);
+      expect(screen.getByText('Round #4')).toBeInTheDocument();
     });
 
-    it('renders finalized timestamp in subtitle', () => {
+    it('renders breadcrumbs with Prize Winners link', () => {
+      renderWithData(1);
+      const breadcrumbLink = screen.getByText('Prize Winners');
+      expect(breadcrumbLink).toBeInTheDocument();
+      expect(breadcrumbLink.closest('a')).toHaveAttribute('href', '/prize');
+    });
+
+    it('renders current round in breadcrumbs', () => {
+      renderWithData(3);
+      expect(screen.getByText('Round 3')).toBeInTheDocument();
+    });
+
+    it('displays large hero prize amount', () => {
+      renderWithData(1);
+      const heroAmount = screen.getByTestId('hero-prize-amount');
+      expect(heroAmount).toHaveTextContent('1.5000 ETH');
+    });
+
+    it('displays winner address in hero section', () => {
+      renderWithData(1);
+      const heroSection = screen.getByLabelText('Round Hero');
+      expect(within(heroSection).getByText(/0xWinn/)).toBeInTheDocument();
+    });
+
+    it('renders NFT token link in hero', () => {
+      renderWithData(1);
+      const heroSection = screen.getByLabelText('Round Hero');
+      expect(within(heroSection).getByText('Cosmic Signature #42')).toBeInTheDocument();
+    });
+
+    it('renders finalized timestamp', () => {
       renderWithData(1);
       expect(screen.getByText(/Finalized/i)).toBeInTheDocument();
     });
@@ -168,6 +218,56 @@ describe('PrizeInfoPage', () => {
     it('renders explorer transaction link', () => {
       renderWithData(1);
       expect(screen.getByText('View transaction')).toBeInTheDocument();
+    });
+
+    it('does not show NFT link when tokenId is 0', () => {
+      renderWithData(1, { TokenId: 0 });
+      const heroSection = screen.getByLabelText('Round Hero');
+      expect(within(heroSection).queryByText(/Cosmic Signature #/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe('share round button', () => {
+    it('renders share button', () => {
+      renderWithData(1);
+      expect(screen.getByTestId('share-round-button')).toBeInTheDocument();
+    });
+
+    it('copies round summary to clipboard when clicked', async () => {
+      const user = userEvent.setup();
+      renderWithData(1);
+      await user.click(screen.getByTestId('share-round-button'));
+      await waitFor(() => {
+        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('Round #1'));
+      });
+    });
+
+    it('share summary includes prize amount', async () => {
+      const user = userEvent.setup();
+      renderWithData(1);
+      await user.click(screen.getByTestId('share-round-button'));
+      await waitFor(() => {
+        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('1.5000 ETH'));
+      });
+    });
+
+    it('share summary includes winner address', async () => {
+      const user = userEvent.setup();
+      renderWithData(1);
+      await user.click(screen.getByTestId('share-round-button'));
+      await waitFor(() => {
+        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('Winner:'));
+      });
+    });
+
+    it('shows success toast after sharing', async () => {
+      const { toast } = jest.requireMock('sonner');
+      const user = userEvent.setup();
+      renderWithData(1);
+      await user.click(screen.getByTestId('share-round-button'));
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Round summary copied to clipboard');
+      });
     });
   });
 
@@ -195,68 +295,143 @@ describe('PrizeInfoPage', () => {
       expect(screen.getByLabelText('Previous round')).toBeInTheDocument();
       expect(screen.queryByLabelText('Next round')).not.toBeInTheDocument();
     });
-  });
 
-  describe('winner spotlight cards', () => {
-    it('renders all three spotlight cards', () => {
-      renderWithData(1);
-      expect(screen.getByText('Winner Spotlight')).toBeInTheDocument();
-      expect(screen.getByTestId('winner-spotlight-main-prize-winner')).toBeInTheDocument();
-      expect(screen.getByTestId('winner-spotlight-chrono-warrior')).toBeInTheDocument();
-      expect(screen.getByTestId('winner-spotlight-endurance-champion')).toBeInTheDocument();
+    it('previous link points to correct round', () => {
+      renderWithData(2);
+      const prev = screen.getByLabelText('Previous round');
+      expect(prev).toHaveAttribute('href', '/prize/1');
     });
 
-    it('displays main prize amount in spotlight and stats', () => {
+    it('next link points to correct round', () => {
+      renderWithData(1);
+      const next = screen.getByLabelText('Next round');
+      expect(next).toHaveAttribute('href', '/prize/2');
+    });
+  });
+
+  describe('round winners section', () => {
+    it('renders section heading', () => {
+      renderWithData(1);
+      expect(screen.getByText('Round Winners')).toBeInTheDocument();
+    });
+
+    it('renders all four winner cards', () => {
+      renderWithData(1);
+      expect(screen.getByTestId('winner-card-main-prize-winner')).toBeInTheDocument();
+      expect(screen.getByTestId('winner-card-chrono-warrior')).toBeInTheDocument();
+      expect(screen.getByTestId('winner-card-endurance-champion')).toBeInTheDocument();
+      expect(screen.getByTestId('winner-card-last-cst-bidder')).toBeInTheDocument();
+    });
+
+    it('displays main prize ETH amount', () => {
       renderWithData(1);
       const elements = screen.getAllByText('1.5000 ETH');
       expect(elements.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('displays chrono warrior amount in spotlight and details', () => {
+    it('displays chrono warrior ETH amount', () => {
       renderWithData(1);
       const elements = screen.getAllByText('0.0200 ETH');
       expect(elements.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('displays endurance champion CST amount in spotlight and details', () => {
+    it('displays endurance champion CST amount', () => {
       renderWithData(1);
       const elements = screen.getAllByText('0.0500 CST');
       expect(elements.length).toBeGreaterThanOrEqual(1);
     });
 
+    it('displays last CST bidder amount', () => {
+      renderWithData(1);
+      const card = screen.getByTestId('winner-card-last-cst-bidder');
+      expect(card).toHaveTextContent('0.0300 CST');
+    });
+
     it('shows token links for NFT rewards', () => {
       renderWithData(1);
       expect(screen.getByText('Token #42')).toBeInTheDocument();
+      expect(screen.getByText('Token #15')).toBeInTheDocument();
       expect(screen.getByText('Token #10')).toBeInTheDocument();
+      expect(screen.getByText('Token #11')).toBeInTheDocument();
+    });
+
+    it('shows "None" when a winner address is empty', () => {
+      renderWithData(1, { EnduranceWinnerAddr: '' });
+      const card = screen.getByTestId('winner-card-endurance-champion');
+      expect(within(card).getByText('None')).toBeInTheDocument();
+    });
+
+    it('does not show token link when tokenId is 0', () => {
+      renderWithData(1, { ChronoWarriorNftTokenId: 0 });
+      const card = screen.getByTestId('winner-card-chrono-warrior');
+      expect(within(card).queryByText(/Token #/)).not.toBeInTheDocument();
     });
   });
 
-  describe('stat cards', () => {
-    it('renders all 6 stat cards', () => {
+  describe('prize distribution bar', () => {
+    it('renders distribution bar', () => {
+      renderWithData(1);
+      expect(screen.getByTestId('prize-distribution-bar')).toBeInTheDocument();
+    });
+
+    it('renders all four distribution segments', () => {
+      renderWithData(1);
+      expect(screen.getByTestId('distribution-segment-main-prize')).toBeInTheDocument();
+      expect(screen.getByTestId('distribution-segment-charity')).toBeInTheDocument();
+      expect(screen.getByTestId('distribution-segment-staking')).toBeInTheDocument();
+      expect(screen.getByTestId('distribution-segment-raffle')).toBeInTheDocument();
+    });
+
+    it('displays distribution labels', () => {
+      renderWithData(1);
+      const bar = screen.getByTestId('prize-distribution-bar');
+      expect(within(bar).getByText('Main Prize')).toBeInTheDocument();
+      expect(within(bar).getByText('Charity')).toBeInTheDocument();
+      expect(within(bar).getByText('Staking')).toBeInTheDocument();
+      expect(within(bar).getByText('Raffle')).toBeInTheDocument();
+    });
+
+    it('displays percentage values', () => {
+      renderWithData(1);
+      const bar = screen.getByTestId('prize-distribution-bar');
+      const pctElements = within(bar).getAllByText(/%$/);
+      expect(pctElements.length).toBe(4);
+    });
+
+    it('renders section heading with tooltip', () => {
+      renderWithData(1);
+      expect(screen.getByText('Prize Distribution')).toBeInTheDocument();
+    });
+  });
+
+  describe('round statistics', () => {
+    it('renders section heading', () => {
       renderWithData(1);
       expect(screen.getByText('Round Statistics')).toBeInTheDocument();
-      expect(screen.getByTestId('stat-card-prize-pool')).toBeInTheDocument();
-      expect(screen.getByTestId('stat-card-charity')).toBeInTheDocument();
-      expect(screen.getByTestId('stat-card-staking-deposit')).toBeInTheDocument();
-      expect(screen.getByTestId('stat-card-raffle-deposits')).toBeInTheDocument();
-      expect(screen.getByTestId('stat-card-total-bids')).toBeInTheDocument();
-      expect(screen.getByTestId('stat-card-donated-nfts')).toBeInTheDocument();
     });
 
-    it('displays correct stat values', () => {
+    it('renders all 9 stat cards', () => {
       renderWithData(1);
-      expect(screen.getByTestId('stat-card-total-bids')).toHaveTextContent('50');
-      expect(screen.getByTestId('stat-card-donated-nfts')).toHaveTextContent('3');
+      const statsSection = screen.getByLabelText('Round Statistics');
+      expect(within(statsSection).getByText('Prize Pool')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Charity')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Staking Deposit')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Raffle Deposits')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Total Bids')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Donated NFTs')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Staked Tokens')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Unique Stakers')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Total Donated')).toBeInTheDocument();
     });
-  });
 
-  describe('special prize recipients', () => {
-    it('renders all three special prize cards', () => {
+    it('displays correct bid count', () => {
       renderWithData(1);
-      expect(screen.getByText('Special Prize Recipients')).toBeInTheDocument();
-      expect(screen.getByTestId('special-prize-endurance-champion')).toBeInTheDocument();
-      expect(screen.getByTestId('special-prize-chrono-warrior')).toBeInTheDocument();
-      expect(screen.getByTestId('special-prize-last-cst-bidder')).toBeInTheDocument();
+      expect(screen.getByText('50')).toBeInTheDocument();
+    });
+
+    it('displays correct donated NFT count', () => {
+      renderWithData(1);
+      expect(screen.getByText('3')).toBeInTheDocument();
     });
 
     it('displays staked tokens count', () => {
@@ -264,11 +439,28 @@ describe('PrizeInfoPage', () => {
       expect(screen.getByText('100')).toBeInTheDocument();
     });
 
-    it('renders additional details row', () => {
+    it('displays unique stakers count', () => {
       renderWithData(1);
-      expect(screen.getByText('Staked Tokens')).toBeInTheDocument();
-      expect(screen.getByText('Number of Stakers')).toBeInTheDocument();
-      expect(screen.getByText('Total Donated')).toBeInTheDocument();
+      const statsSection = screen.getByLabelText('Round Statistics');
+      expect(within(statsSection).getByText('0')).toBeInTheDocument();
+    });
+
+    it('displays total donated value', () => {
+      renderWithData(1);
+      expect(screen.getByText('2.0000 ETH')).toBeInTheDocument();
+    });
+
+    it('displays staking deposit amount', () => {
+      renderWithData(1);
+      const statsSection = screen.getByLabelText('Round Statistics');
+      expect(within(statsSection).getByText('0.5000 ETH')).toBeInTheDocument();
+    });
+  });
+
+  describe('section divider', () => {
+    it('renders detailed data section divider', () => {
+      renderWithData(1);
+      expect(screen.getByText('Detailed Data')).toBeInTheDocument();
     });
   });
 
@@ -333,6 +525,17 @@ describe('PrizeInfoPage', () => {
         expect(screen.getByTestId('donated-erc20-table')).toBeInTheDocument();
       });
     });
+
+    it('shows donated NFT and ERC20 headings in donations tab', async () => {
+      const user = userEvent.setup();
+      renderWithData(1);
+      await user.click(screen.getByRole('tab', { name: /Donations/i }));
+      await waitFor(() => {
+        const headings = screen.getAllByText('Donated NFTs');
+        expect(headings.length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('Donated ERC20 Tokens')).toBeInTheDocument();
+      });
+    });
   });
 
   describe('empty states', () => {
@@ -360,6 +563,44 @@ describe('PrizeInfoPage', () => {
         expect(screen.getByText('No raffle rewards for this round.')).toBeInTheDocument();
       });
     });
+
+    it('shows empty state for endurance when no champion data', async () => {
+      const user = userEvent.setup();
+      mockUseRoundInfo.mockReturnValue({ data: basePrizeInfo, isLoading: false });
+      mockUseBidListByRound.mockReturnValue({ data: [], isLoading: false });
+      render(<PrizeInfoPage roundNum={1} />);
+      await user.click(screen.getByRole('tab', { name: /Endurance Champions/i }));
+      await waitFor(() => {
+        expect(
+          screen.getByText('No endurance champion data available for this round.'),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('shows empty state for staking rewards', async () => {
+      const user = userEvent.setup();
+      mockUseRoundInfo.mockReturnValue({ data: basePrizeInfo, isLoading: false });
+      mockUseBidListByRound.mockReturnValue({ data: [], isLoading: false });
+      render(<PrizeInfoPage roundNum={1} />);
+      await user.click(screen.getByRole('tab', { name: /Staking Rewards/i }));
+      await waitFor(() => {
+        expect(
+          screen.getByText('No staking rewards distributed in this round.'),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it('shows empty states for NFT and ERC20 donations when none exist', async () => {
+      const user = userEvent.setup();
+      mockUseRoundInfo.mockReturnValue({ data: basePrizeInfo, isLoading: false });
+      mockUseBidListByRound.mockReturnValue({ data: [], isLoading: false });
+      render(<PrizeInfoPage roundNum={1} />);
+      await user.click(screen.getByRole('tab', { name: /Donations/i }));
+      await waitFor(() => {
+        expect(screen.getByText('No NFTs were donated in this round.')).toBeInTheDocument();
+        expect(screen.getByText('No ERC20 tokens were donated in this round.')).toBeInTheDocument();
+      });
+    });
   });
 
   describe('copy address', () => {
@@ -373,6 +614,23 @@ describe('PrizeInfoPage', () => {
         expect(mockCopy).toHaveBeenCalled();
       });
     });
+
+    it('shows toast on address copy', async () => {
+      const { toast } = jest.requireMock('sonner');
+      const user = userEvent.setup();
+      renderWithData(1);
+      const copyButtons = screen.getAllByLabelText(/Copy address/i);
+      await user.click(copyButtons[0]!);
+      await waitFor(() => {
+        expect(toast.success).toHaveBeenCalledWith('Address copied to clipboard');
+      });
+    });
+
+    it('renders copy buttons for all winner addresses', () => {
+      renderWithData(1);
+      const copyButtons = screen.getAllByLabelText(/Copy address/i);
+      expect(copyButtons.length).toBeGreaterThanOrEqual(4);
+    });
   });
 
   describe('tab badges', () => {
@@ -380,6 +638,53 @@ describe('PrizeInfoPage', () => {
       renderWithData(1);
       const bidsTab = screen.getByRole('tab', { name: /Bid History/i });
       expect(bidsTab).toHaveTextContent('1');
+    });
+
+    it('shows raffle count badge', () => {
+      renderWithData(1);
+      const raffleTab = screen.getByRole('tab', { name: /Raffle Rewards/i });
+      expect(raffleTab).toHaveTextContent('2');
+    });
+
+    it('shows donations count badge', () => {
+      mockUseDonationsNFTByRound.mockReturnValue({
+        data: [{ id: 1 }, { id: 2 }],
+        isLoading: false,
+      });
+      mockUseDonationsERC20ByRound.mockReturnValue({
+        data: [{ id: 1 }],
+        isLoading: false,
+      });
+      renderWithData(1);
+      const donationsTab = screen.getByRole('tab', { name: /Donations/i });
+      expect(donationsTab).toHaveTextContent('3');
+    });
+  });
+
+  describe('data fetching', () => {
+    it('passes roundNum to useRoundInfo', () => {
+      render(<PrizeInfoPage roundNum={5} />);
+      expect(mockUseRoundInfo).toHaveBeenCalledWith(5);
+    });
+
+    it('passes roundNum and sort direction to useBidListByRound', () => {
+      render(<PrizeInfoPage roundNum={5} />);
+      expect(mockUseBidListByRound).toHaveBeenCalledWith(5, 'desc');
+    });
+
+    it('passes roundNum to useDonationsNFTByRound', () => {
+      render(<PrizeInfoPage roundNum={5} />);
+      expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(5);
+    });
+
+    it('passes roundNum to useStakingCSTRewardsByRound', () => {
+      render(<PrizeInfoPage roundNum={5} />);
+      expect(mockUseStakingCSTRewardsByRound).toHaveBeenCalledWith(5);
+    });
+
+    it('passes roundNum to useDonationsERC20ByRound', () => {
+      render(<PrizeInfoPage roundNum={5} />);
+      expect(mockUseDonationsERC20ByRound).toHaveBeenCalledWith(5);
     });
   });
 
@@ -402,10 +707,30 @@ describe('PrizeInfoPage', () => {
 
     it('sections have aria labels', () => {
       renderWithData(1);
-      expect(screen.getByLabelText('Winner Spotlight')).toBeInTheDocument();
+      expect(screen.getByLabelText('Round Hero')).toBeInTheDocument();
+      expect(screen.getByLabelText('Round Winners')).toBeInTheDocument();
+      expect(screen.getByLabelText('Prize Distribution')).toBeInTheDocument();
       expect(screen.getByLabelText('Round Statistics')).toBeInTheDocument();
-      expect(screen.getByLabelText('Special Prize Recipients')).toBeInTheDocument();
       expect(screen.getByLabelText('Round Data')).toBeInTheDocument();
+    });
+
+    it('share button has accessible label', () => {
+      renderWithData(1);
+      expect(screen.getByLabelText('Share round summary')).toBeInTheDocument();
+    });
+
+    it('navigation links have accessible labels', () => {
+      renderWithData(1);
+      expect(screen.getByLabelText('Previous round')).toBeInTheDocument();
+      expect(screen.getByLabelText('Next round')).toBeInTheDocument();
+    });
+
+    it('copy buttons have accessible labels', () => {
+      renderWithData(1);
+      const copyButtons = screen.getAllByLabelText(/Copy address/i);
+      copyButtons.forEach((button) => {
+        expect(button).toHaveAttribute('aria-label');
+      });
     });
   });
 });

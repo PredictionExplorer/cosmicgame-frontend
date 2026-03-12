@@ -11,13 +11,16 @@ import {
   ChevronRight,
   ExternalLink,
   Copy,
-  Check,
   Gavel,
   Heart,
   Landmark,
   BarChart3,
   Image,
   Gift,
+  Share2,
+  Layers,
+  Users,
+  Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -41,9 +44,11 @@ import {
   useRoundList,
 } from '@/hooks/useApiQuery';
 import { useClipboard } from '@/hooks/useClipboard';
-import { PageHeader } from '@/components/layout/PageHeader';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
+import { StatCard } from '@/components/ui/stat-card';
+import { EmptyState } from '@/components/ui/empty-state';
+import { SectionDivider } from '@/components/ui/section-divider';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import RaffleWinnerTable from '@/components/tables/RaffleWinnerTable';
 import BiddingHistoryTable from '@/components/tables/BiddingHistoryTable';
@@ -52,13 +57,26 @@ import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number) => ({
+const sectionFade = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.06, duration: 0.35, ease: 'easeOut' as const },
-  }),
+    transition: { duration: 0.5, ease: 'easeOut' as const },
+  },
+};
+
+const stagger = {
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+const cardFade = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: 'easeOut' as const },
+  },
 };
 
 function CopyableAddress({
@@ -107,22 +125,37 @@ function CopyableAddress({
 function LoadingSkeleton() {
   return (
     <MainWrapper>
-      <div className="mb-8 space-y-3">
-        <Skeleton className="h-5 w-48" />
-        <Skeleton className="h-10 w-80" />
-        <Skeleton className="h-5 w-64" />
+      <div className="mb-12">
+        <Skeleton className="h-4 w-48 mb-6" />
+        <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 md:p-10">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="space-y-4 flex-1">
+              <Skeleton className="h-10 w-64" />
+              <Skeleton className="h-12 w-80" />
+              <Skeleton className="h-5 w-56" />
+              <Skeleton className="h-5 w-40" />
+            </div>
+            <div className="flex gap-3">
+              <Skeleton className="h-9 w-28 rounded-lg" />
+              <Skeleton className="h-9 w-28 rounded-lg" />
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-40 rounded-xl" />
+      <Skeleton className="h-5 w-40 mb-5" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-48 rounded-xl" />
         ))}
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
-        {Array.from({ length: 6 }).map((_, i) => (
+      <Skeleton className="h-5 w-48 mb-5" />
+      <Skeleton className="h-16 rounded-xl mb-12" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-12">
+        {Array.from({ length: 9 }).map((_, i) => (
           <Skeleton key={i} className="h-24 rounded-xl" />
         ))}
       </div>
-      <Skeleton className="h-10 w-full max-w-md mb-4" />
+      <Skeleton className="h-10 w-full max-w-2xl mb-4" />
       <Skeleton className="h-64 rounded-xl" />
     </MainWrapper>
   );
@@ -162,59 +195,61 @@ function RoundNavigation({ roundNum, maxRound }: { roundNum: number; maxRound: n
   );
 }
 
-function WinnerSpotlightCard({
+function WinnerCard({
   icon,
   title,
   tooltip,
   address,
-  amounts,
+  rewards,
   tokenId,
   tokenLabel,
-  index,
   featured,
 }: {
   icon: React.ReactNode;
   title: string;
   tooltip: string;
   address: string;
-  amounts: string[];
+  rewards: { label: string; value: string }[];
   tokenId?: number;
   tokenLabel?: string;
-  index: number;
   featured?: boolean;
 }) {
   return (
     <motion.div
-      custom={index}
-      variants={fadeUp}
-      initial="hidden"
-      animate="visible"
+      variants={cardFade}
       className={cn(
-        'gradient-border-card rounded-xl p-5 transition-all duration-300 hover:bg-white/[0.04]',
-        featured ? 'gradient-border-card-accent bg-white/[0.03]' : 'bg-white/[0.02]',
+        'group relative rounded-xl p-5 transition-all duration-300',
+        featured
+          ? 'gradient-border-card gradient-border-card-accent bg-white/[0.04] hover:bg-white/[0.06]'
+          : 'gradient-border-card bg-white/[0.02] hover:bg-white/[0.04]',
       )}
-      data-testid={`winner-spotlight-${title.toLowerCase().replace(/\s+/g, '-')}`}
+      data-testid={`winner-card-${title.toLowerCase().replace(/\s+/g, '-')}`}
     >
       <div className="flex items-center gap-2.5 mb-4">
         <div
           className={cn(
             'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
             featured
-              ? 'bg-gradient-to-br from-primary/20 to-accent/20 text-primary'
+              ? 'bg-gradient-to-br from-primary/25 to-accent/25 text-primary'
               : 'bg-white/[0.06] text-muted-foreground',
           )}
         >
           {icon}
         </div>
-        <div className="flex items-center gap-1.5">
-          <h3 className={cn('text-sm font-semibold', featured ? 'text-white' : 'text-white/90')}>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <h3
+            className={cn(
+              'text-sm font-semibold truncate',
+              featured ? 'text-white' : 'text-white/90',
+            )}
+          >
             {title}
           </h3>
           <InfoTooltip content={tooltip} />
         </div>
       </div>
 
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         <div>
           <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
             Winner
@@ -228,19 +263,23 @@ function WinnerSpotlightCard({
           </div>
         </div>
 
-        <div className="space-y-0.5">
-          {amounts.map((amount) => (
-            <p
-              key={amount}
-              className={cn(
-                'text-sm',
-                featured
-                  ? 'font-medium bg-gradient-to-r from-[#35C9FF] to-[#AC56FF] bg-clip-text text-transparent'
-                  : 'text-muted-foreground',
-              )}
-            >
-              {amount}
-            </p>
+        <div className="space-y-1">
+          {rewards.map((r) => (
+            <div key={r.label} className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
+                {r.label}
+              </span>
+              <span
+                className={cn(
+                  'text-sm font-medium tabular-nums',
+                  featured
+                    ? 'bg-gradient-to-r from-[#35C9FF] to-[#AC56FF] bg-clip-text text-transparent'
+                    : 'text-white/80',
+                )}
+              >
+                {r.value}
+              </span>
+            </div>
           ))}
         </div>
 
@@ -262,110 +301,53 @@ function WinnerSpotlightCard({
   );
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-  tooltip,
-  index,
-}: {
-  icon: React.ReactNode;
+interface DistributionSegment {
   label: string;
-  value: string | number;
+  value: number;
+  color: string;
   tooltip: string;
-  index: number;
-}) {
-  return (
-    <motion.div
-      custom={index}
-      variants={fadeUp}
-      initial="hidden"
-      animate="visible"
-      className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-all hover:bg-white/[0.04]"
-      data-testid={`stat-card-${label.toLowerCase().replace(/\s+/g, '-')}`}
-    >
-      <div className="flex items-center gap-1.5 mb-2">
-        <div className="text-muted-foreground/60">{icon}</div>
-        <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/60">
-          {label}
-        </span>
-        <InfoTooltip content={tooltip} />
-      </div>
-      <p className="text-lg font-semibold text-white tabular-nums">{value}</p>
-    </motion.div>
-  );
 }
 
-function SpecialPrizeCard({
-  icon,
-  title,
-  tooltip,
-  address,
-  rewards,
-  index,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  tooltip: string;
-  address: string;
-  rewards: { label: string; value: string; href?: string }[];
-  index: number;
-}) {
-  return (
-    <motion.div
-      custom={index}
-      variants={fadeUp}
-      initial="hidden"
-      animate="visible"
-      className="gradient-border-card rounded-xl bg-white/[0.02] p-4"
-      data-testid={`special-prize-${title.toLowerCase().replace(/\s+/g, '-')}`}
-    >
-      <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] text-muted-foreground">
-          {icon}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {title}
-            </span>
-            <InfoTooltip content={tooltip} />
-          </div>
-          {address ? (
-            <CopyableAddress address={address} href={`/user/${address}`} />
-          ) : (
-            <p className="text-sm text-muted-foreground/50 italic">No recipient</p>
-          )}
-          <div className="mt-3 space-y-1.5">
-            {rewards.map((r) => (
-              <div key={r.label} className="flex items-center gap-2 text-sm">
-                <span className="text-muted-foreground/60">{r.label}:</span>
-                {r.href ? (
-                  <Link href={r.href} className="text-primary hover:underline">
-                    {r.value}
-                  </Link>
-                ) : (
-                  <span className="text-white/80 tabular-nums">{r.value}</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+function PrizeDistributionBar({ segments }: { segments: DistributionSegment[] }) {
+  const total = segments.reduce((sum, s) => sum + s.value, 0);
+  if (total === 0) return null;
 
-function EmptyState({ message }: { message: string }) {
   return (
-    <div
-      className="flex flex-col items-center justify-center py-12 text-center"
-      data-testid="empty-state"
-    >
-      <div className="rounded-full bg-white/[0.04] p-4 mb-4">
-        <BarChart3 className="h-8 w-8 text-muted-foreground/30" />
+    <div data-testid="prize-distribution-bar">
+      <motion.div
+        className="flex h-3 rounded-full overflow-hidden bg-white/[0.04]"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        style={{ transformOrigin: 'left' }}
+      >
+        {segments.map((seg) => {
+          const pct = (seg.value / total) * 100;
+          if (pct < 0.5) return null;
+          return (
+            <div
+              key={seg.label}
+              className={cn('relative transition-all duration-300', seg.color)}
+              style={{ width: `${pct}%` }}
+              title={seg.tooltip}
+              data-testid={`distribution-segment-${seg.label.toLowerCase().replace(/\s+/g, '-')}`}
+            />
+          );
+        })}
+      </motion.div>
+      <div className="flex flex-wrap gap-x-5 gap-y-2 mt-3">
+        {segments.map((seg) => {
+          const pct = total > 0 ? ((seg.value / total) * 100).toFixed(1) : '0.0';
+          return (
+            <div key={seg.label} className="flex items-center gap-2 text-xs">
+              <span className={cn('h-2.5 w-2.5 rounded-full', seg.color)} />
+              <span className="text-muted-foreground">{seg.label}</span>
+              <span className="text-white/80 font-medium tabular-nums">{pct}%</span>
+              <InfoTooltip content={seg.tooltip} />
+            </div>
+          );
+        })}
       </div>
-      <p className="text-sm text-muted-foreground/60">{message}</p>
     </div>
   );
 }
@@ -392,6 +374,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
   const { data: donatedERC20Raw = [], isLoading: loadingERC20 } =
     useDonationsERC20ByRound(roundNum);
   const { data: roundList = [] } = useRoundList();
+  const { copy } = useClipboard();
 
   const nftDonations =
     nftDonationsRaw as import('@/components/donations/DonatedNFTTable').NFTRecord[];
@@ -412,6 +395,19 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
     }
     return [];
   }, [bidHistory, prizeInfo]);
+
+  const handleShareRound = async () => {
+    if (!prizeInfo) return;
+    const summary = [
+      `Round #${roundNum} — Cosmic Signature`,
+      `Prize: ${prizeInfo.AmountEth.toFixed(4)} ETH`,
+      `Winner: ${shortenHex(prizeInfo.WinnerAddr, 6)}`,
+      `Bids: ${prizeInfo.RoundStats.TotalBids}`,
+      `${typeof window !== 'undefined' ? window.location.href : ''}`,
+    ].join('\n');
+    await copy(summary);
+    toast.success('Round summary copied to clipboard');
+  };
 
   if (roundNum < 0) {
     return (
@@ -455,42 +451,87 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
     );
   }
 
+  const distributionSegments: DistributionSegment[] = [
+    {
+      label: 'Main Prize',
+      value: prizeInfo.AmountEth,
+      color: 'bg-[#15BFFD]',
+      tooltip: `${prizeInfo.AmountEth.toFixed(4)} ETH awarded to the main prize winner.`,
+    },
+    {
+      label: 'Charity',
+      value: prizeInfo.CharityAmountETH,
+      color: 'bg-emerald-500',
+      tooltip: `${prizeInfo.CharityAmountETH.toFixed(4)} ETH donated to charity.`,
+    },
+    {
+      label: 'Staking',
+      value: prizeInfo.StakingDepositAmountEth,
+      color: 'bg-[#9C37FD]',
+      tooltip: `${prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH distributed to NFT stakers.`,
+    },
+    {
+      label: 'Raffle',
+      value: prizeInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0,
+      color: 'bg-[#5B8DEF]',
+      tooltip: `${(prizeInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4)} ETH in raffle deposits.`,
+    },
+  ];
+
   const stats = [
     {
-      icon: <Trophy className="h-4 w-4" />,
+      icon: <Trophy className="h-3.5 w-3.5" />,
       label: 'Prize Pool',
       value: `${prizeInfo.AmountEth.toFixed(4)} ETH`,
       tooltip: 'The total ETH awarded to the main prize winner for this round.',
     },
     {
-      icon: <Heart className="h-4 w-4" />,
+      icon: <Heart className="h-3.5 w-3.5" />,
       label: 'Charity',
       value: `${prizeInfo.CharityAmountETH.toFixed(4)} ETH`,
       tooltip: 'The amount donated to charity from this round.',
     },
     {
-      icon: <Landmark className="h-4 w-4" />,
+      icon: <Landmark className="h-3.5 w-3.5" />,
       label: 'Staking Deposit',
       value: `${prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH`,
       tooltip: 'Total ETH deposited into the staking pool, distributed among NFT stakers.',
     },
     {
-      icon: <BarChart3 className="h-4 w-4" />,
+      icon: <BarChart3 className="h-3.5 w-3.5" />,
       label: 'Raffle Deposits',
       value: `${(prizeInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4)} ETH`,
       tooltip: 'Total ETH deposited into the raffle pool by participants.',
     },
     {
-      icon: <Gavel className="h-4 w-4" />,
+      icon: <Gavel className="h-3.5 w-3.5" />,
       label: 'Total Bids',
       value: prizeInfo.RoundStats.TotalBids,
       tooltip: 'The total number of bids placed during this round.',
     },
     {
-      icon: <Gift className="h-4 w-4" />,
+      icon: <Gift className="h-3.5 w-3.5" />,
       label: 'Donated NFTs',
       value: prizeInfo.RoundStats.TotalDonatedNFTs ?? 0,
       tooltip: 'Number of NFTs donated by participants during this round.',
+    },
+    {
+      icon: <Layers className="h-3.5 w-3.5" />,
+      label: 'Staked Tokens',
+      value: prizeInfo.StakingNumStakedTokens,
+      tooltip: 'Number of NFT tokens staked during this round, earning staking rewards.',
+    },
+    {
+      icon: <Users className="h-3.5 w-3.5" />,
+      label: 'Unique Stakers',
+      value: stakingRewards.length,
+      tooltip: 'How many unique addresses had tokens staked in this round.',
+    },
+    {
+      icon: <Sparkles className="h-3.5 w-3.5" />,
+      label: 'Total Donated',
+      value: formatEthValue(prizeInfo.RoundStats.TotalDonatedAmountEth ?? 0),
+      tooltip: 'Combined value of all ERC20 token donations during this round.',
     },
   ];
 
@@ -498,115 +539,137 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
 
   return (
     <MainWrapper>
-      {/* Hero / Round Header */}
-      <div className="mb-10">
-        <PageHeader
-          title={`Round #${roundNum}`}
-          subtitle={`Finalized ${convertTimestampToDateTime(prizeInfo.TimeStamp)}`}
-          align="left"
-          breadcrumbs={[{ label: 'Prize Winners', href: '/prize' }, { label: `Round ${roundNum}` }]}
-        >
-          <div className="flex items-center gap-3 mt-4">
-            <a
-              href={getExplorerUrl('tx', prizeInfo.TxHash)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
-            >
-              View transaction <ExternalLink className="h-3 w-3" />
-            </a>
-          </div>
-        </PageHeader>
-        <div className="mt-6">
-          <RoundNavigation roundNum={roundNum} maxRound={maxRound} />
-        </div>
-      </div>
+      {/* Breadcrumbs */}
+      <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
+        <Link href="/prize" className="hover:text-primary transition-colors">
+          Prize Winners
+        </Link>
+        <ChevronRight className="h-3.5 w-3.5" />
+        <span className="text-foreground">Round {roundNum}</span>
+      </nav>
 
-      {/* Winner Spotlight Cards */}
-      <section className="mb-10" aria-label="Winner Spotlight">
-        <div className="flex items-center gap-2 mb-5">
-          <h2 className="font-display text-lg font-semibold tracking-tight">Winner Spotlight</h2>
-          <InfoTooltip content="The three headline prize winners for this round." />
+      {/* Hero Banner */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={sectionFade}
+        className="mb-12"
+        aria-label="Round Hero"
+      >
+        <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.04] via-white/[0.02] to-transparent p-6 md:p-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.04] via-transparent to-accent/[0.04] pointer-events-none" />
+
+          <div className="relative flex flex-col gap-6">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+              <div className="space-y-4 min-w-0 flex-1">
+                <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-white">
+                  Round #{roundNum}
+                </h1>
+
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <p
+                    className="text-3xl md:text-5xl font-bold tabular-nums bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent"
+                    style={{ textShadow: '0 0 40px rgba(21, 191, 253, 0.2)' }}
+                    data-testid="hero-prize-amount"
+                  >
+                    {prizeInfo.AmountEth.toFixed(4)} ETH
+                  </p>
+                  <InfoTooltip
+                    content="Total ETH awarded to the last bidder when the countdown reached zero."
+                    iconClassName="h-4 w-4"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
+                      Winner
+                    </span>
+                    <CopyableAddress
+                      address={prizeInfo.WinnerAddr}
+                      href={`/user/${prizeInfo.WinnerAddr}`}
+                    />
+                  </div>
+
+                  {prizeInfo.TokenId > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
+                        NFT
+                      </span>
+                      <Link
+                        href={`/detail/${prizeInfo.TokenId}`}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Cosmic Signature #{prizeInfo.TokenId}
+                      </Link>
+                      <InfoTooltip content="View this Cosmic Signature NFT in the gallery." />
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span>Finalized {convertTimestampToDateTime(prizeInfo.TimeStamp)}</span>
+                    <span className="text-white/10">|</span>
+                    <a
+                      href={getExplorerUrl('tx', prizeInfo.TxHash)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 hover:text-primary transition-colors"
+                    >
+                      View transaction <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  onClick={handleShareRound}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all"
+                  aria-label="Share round summary"
+                  data-testid="share-round-button"
+                >
+                  <Share2 className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Share</span>
+                </button>
+                <RoundNavigation roundNum={roundNum} maxRound={maxRound} />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <WinnerSpotlightCard
+      </motion.section>
+
+      {/* Round Winners */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={sectionFade}
+        className="mb-12"
+        aria-label="Round Winners"
+      >
+        <div className="flex items-center gap-2 mb-5">
+          <h2 className="font-display text-lg font-semibold tracking-tight">Round Winners</h2>
+          <InfoTooltip content="All prize recipients for this round. The main winner gets the ETH jackpot; special roles earn additional rewards." />
+        </div>
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+        >
+          <WinnerCard
             icon={<Trophy className="h-5 w-5" />}
             title="Main Prize Winner"
             tooltip="The last bidder when the countdown reached zero. Wins the main ETH prize and a Cosmic Signature NFT."
             address={prizeInfo.WinnerAddr}
-            amounts={[`${prizeInfo.AmountEth.toFixed(4)} ETH`]}
+            rewards={[{ label: 'ETH Prize', value: `${prizeInfo.AmountEth.toFixed(4)} ETH` }]}
             tokenId={prizeInfo.TokenId}
             tokenLabel="Cosmic Signature NFT"
-            index={0}
             featured
           />
-          <WinnerSpotlightCard
+          <WinnerCard
             icon={<Swords className="h-5 w-5" />}
             title="Chrono Warrior"
-            tooltip="The bidder who held the Endurance Champion title for the longest consecutive period. Wins a percentage of the total contract balance."
-            address={prizeInfo.ChronoWarriorAddr}
-            amounts={[`${prizeInfo.ChronoWarriorAmountEth.toFixed(4)} ETH`]}
-            tokenId={prizeInfo.ChronoWarriorNftTokenId}
-            tokenLabel="NFT Reward"
-            index={1}
-          />
-          <WinnerSpotlightCard
-            icon={<Crown className="h-5 w-5" />}
-            title="Endurance Champion"
-            tooltip="The bidder who remained the last bidder for the longest consecutive period. Wins CST tokens and a Cosmic Signature NFT."
-            address={prizeInfo.EnduranceWinnerAddr}
-            amounts={[`${(prizeInfo.EnduranceERC20AmountEth ?? 0).toFixed(4)} CST`]}
-            tokenId={prizeInfo.EnduranceERC721TokenId}
-            tokenLabel="Cosmic Signature NFT"
-            index={2}
-          />
-        </div>
-      </section>
-
-      {/* Prize Distribution Summary */}
-      <section className="mb-10" aria-label="Round Statistics">
-        <div className="flex items-center gap-2 mb-5">
-          <h2 className="font-display text-lg font-semibold tracking-tight">Round Statistics</h2>
-          <InfoTooltip content="Key metrics summarizing this round's activity and prize distribution." />
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {stats.map((stat, i) => (
-            <StatCard key={stat.label} {...stat} index={i} />
-          ))}
-        </div>
-      </section>
-
-      {/* Special Prize Recipients */}
-      <section className="mb-10" aria-label="Special Prize Recipients">
-        <div className="flex items-center gap-2 mb-5">
-          <h2 className="font-display text-lg font-semibold tracking-tight">
-            Special Prize Recipients
-          </h2>
-          <InfoTooltip content="Detailed breakdown of all special prize categories and their recipients for this round." />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <SpecialPrizeCard
-            icon={<Crown className="h-5 w-5" />}
-            title="Endurance Champion"
-            tooltip="The bidder who held the last-bidder position for the longest uninterrupted streak. Receives CST tokens and a Cosmic Signature NFT."
-            address={prizeInfo.EnduranceWinnerAddr}
-            rewards={[
-              {
-                label: 'CST Reward',
-                value: `${(prizeInfo.EnduranceERC20AmountEth ?? 0).toFixed(4)} CST`,
-              },
-              {
-                label: 'NFT Token',
-                value: `#${prizeInfo.EnduranceERC721TokenId}`,
-                href: `/detail/${prizeInfo.EnduranceERC721TokenId}`,
-              },
-            ]}
-            index={0}
-          />
-          <SpecialPrizeCard
-            icon={<Swords className="h-5 w-5" />}
-            title="Chrono Warrior"
-            tooltip="Awarded to the bidder who accumulated the longest total time holding the Endurance Champion title. Wins ETH from the contract balance."
+            tooltip="The bidder who accumulated the longest total time as Endurance Champion. Wins ETH from the contract balance and an NFT."
             address={prizeInfo.ChronoWarriorAddr}
             rewards={[
               {
@@ -614,62 +677,100 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                 value: `${prizeInfo.ChronoWarriorAmountEth.toFixed(4)} ETH`,
               },
             ]}
-            index={1}
+            tokenId={prizeInfo.ChronoWarriorNftTokenId}
+            tokenLabel="NFT Reward"
           />
-          <SpecialPrizeCard
+          <WinnerCard
+            icon={<Crown className="h-5 w-5" />}
+            title="Endurance Champion"
+            tooltip="The bidder who held the last-bidder position for the longest uninterrupted streak. Wins CST tokens and a Cosmic Signature NFT."
+            address={prizeInfo.EnduranceWinnerAddr}
+            rewards={[
+              {
+                label: 'CST Reward',
+                value: `${(prizeInfo.EnduranceERC20AmountEth ?? 0).toFixed(4)} CST`,
+              },
+            ]}
+            tokenId={prizeInfo.EnduranceERC721TokenId}
+            tokenLabel="Cosmic Signature NFT"
+          />
+          <WinnerCard
             icon={<Coins className="h-5 w-5" />}
             title="Last CST Bidder"
-            tooltip="The last person to place a bid using CST tokens. Receives CST tokens and a Cosmic Signature NFT as a reward."
+            tooltip="The last person to place a bid using CST tokens. Receives CST tokens and a Cosmic Signature NFT."
             address={prizeInfo.LastCstBidderAddr}
             rewards={[
               {
                 label: 'CST Reward',
                 value: `${(prizeInfo.LastCstBidderERC20AmountEth ?? 0).toFixed(4)} CST`,
               },
-              {
-                label: 'NFT Token',
-                value: `#${prizeInfo.LastCstBidderERC721TokenId}`,
-                href: `/detail/${prizeInfo.LastCstBidderERC721TokenId}`,
-              },
             ]}
-            index={2}
+            tokenId={prizeInfo.LastCstBidderERC721TokenId}
+            tokenLabel="Cosmic Signature NFT"
           />
-        </div>
+        </motion.div>
+      </motion.section>
 
-        {/* Additional details row */}
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground/60">Staked Tokens</span>
-              <InfoTooltip content="Number of NFT tokens staked during this round, earning staking rewards." />
-            </div>
-            <p className="text-sm font-semibold text-white mt-1 tabular-nums">
-              {prizeInfo.StakingNumStakedTokens}
-            </p>
-          </div>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground/60">Number of Stakers</span>
-              <InfoTooltip content="How many unique addresses had tokens staked in this round." />
-            </div>
-            <p className="text-sm font-semibold text-white mt-1 tabular-nums">
-              {stakingRewards.length}
-            </p>
-          </div>
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground/60">Total Donated</span>
-              <InfoTooltip content="Combined value of all ERC20 token donations during this round." />
-            </div>
-            <p className="text-sm font-semibold text-white mt-1 tabular-nums">
-              {formatEthValue(prizeInfo.RoundStats.TotalDonatedAmountEth ?? 0)}
-            </p>
-          </div>
+      {/* Prize Distribution */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={sectionFade}
+        className="mb-12"
+        aria-label="Prize Distribution"
+      >
+        <div className="flex items-center gap-2 mb-5">
+          <h2 className="font-display text-lg font-semibold tracking-tight">Prize Distribution</h2>
+          <InfoTooltip content="Visual breakdown of how the round's funds were allocated across prize categories." />
         </div>
-      </section>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+          <PrizeDistributionBar segments={distributionSegments} />
+        </div>
+      </motion.section>
+
+      {/* Round Statistics */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={sectionFade}
+        className="mb-12"
+        aria-label="Round Statistics"
+      >
+        <div className="flex items-center gap-2 mb-5">
+          <h2 className="font-display text-lg font-semibold tracking-tight">Round Statistics</h2>
+          <InfoTooltip content="Key metrics summarizing this round's activity and prize distribution." />
+        </div>
+        <motion.div
+          className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+        >
+          {stats.map((stat, i) => (
+            <motion.div key={stat.label} variants={cardFade}>
+              <StatCard
+                label={stat.label}
+                value={stat.value}
+                icon={stat.icon}
+                tooltip={stat.tooltip}
+                featured={i === 0}
+                gradient={i === 0}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.section>
+
+      {/* Section Divider */}
+      <SectionDivider title="Detailed Data" className="mb-10" />
 
       {/* Tabbed Data Sections */}
-      <section aria-label="Round Data">
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={sectionFade}
+        aria-label="Round Data"
+      >
         <Tabs defaultValue="bids" className="w-full">
           <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-white/[0.03] p-1.5 rounded-xl">
             <TabsTrigger value="bids" className="flex-1 min-w-[100px]">
@@ -703,7 +804,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             {bidHistory.length > 0 ? (
               <BiddingHistoryTable biddingHistory={bidHistory} />
             ) : (
-              <EmptyState message="No bids were placed in this round." />
+              <EmptyState title="No bids were placed in this round." />
             )}
           </TabsContent>
 
@@ -711,7 +812,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             {championList.length > 0 ? (
               <EnduranceChampionsTable championList={championList} />
             ) : (
-              <EmptyState message="No endurance champion data available for this round." />
+              <EmptyState title="No endurance champion data available for this round." />
             )}
           </TabsContent>
 
@@ -724,7 +825,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                 RaffleNFTWinners={prizeInfo.RaffleNFTWinners}
               />
             ) : (
-              <EmptyState message="No raffle rewards for this round." />
+              <EmptyState title="No raffle rewards for this round." />
             )}
           </TabsContent>
 
@@ -732,7 +833,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             {stakingRewards.length > 0 ? (
               <StakingWinnerTable list={stakingRewards} />
             ) : (
-              <EmptyState message="No staking rewards distributed in this round." />
+              <EmptyState title="No staking rewards distributed in this round." />
             )}
           </TabsContent>
 
@@ -751,7 +852,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                     claimingTokens={[]}
                   />
                 ) : (
-                  <EmptyState message="No NFTs were donated in this round." />
+                  <EmptyState title="No NFTs were donated in this round." />
                 )}
               </div>
               <div>
@@ -763,13 +864,13 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                 {donatedERC20Tokens.length > 0 ? (
                   <DonatedERC20Table list={donatedERC20Tokens} handleClaim={null} />
                 ) : (
-                  <EmptyState message="No ERC20 tokens were donated in this round." />
+                  <EmptyState title="No ERC20 tokens were donated in this round." />
                 )}
               </div>
             </div>
           </TabsContent>
         </Tabs>
-      </section>
+      </motion.section>
     </MainWrapper>
   );
 };
