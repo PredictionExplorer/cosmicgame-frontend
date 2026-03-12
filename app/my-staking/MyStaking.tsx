@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
-import { usePublicClient } from 'wagmi';
-import { useQueryClient } from '@tanstack/react-query';
 import { Layers, TrendingUp, Gift } from 'lucide-react';
 
 import { MainWrapper } from '@/components/styled';
@@ -17,19 +15,12 @@ import {
   useStakingRWLKActionsByUser,
   useStakingRWLKMintsByUser,
 } from '@/hooks/useApiQuery';
-import useStakingWalletCSTContract from '@/hooks/useStakingWalletCSTContract';
-import useStakingWalletRWLKContract from '@/hooks/useStakingWalletRWLKContract';
-import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
-import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '@/config/networks';
 import { useStakedToken } from '@/contexts/StakedTokenContext';
-import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
-import { useNotification } from '@/contexts/NotificationContext';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
+import { useStakingActions } from '@/hooks/useStakingActions';
 import { CSTStakingPanel } from '@/components/staking/CSTStakingPanel';
 import { RWLKStakingPanel } from '@/components/staking/RWLKStakingPanel';
 import { StakingHeroStats } from '@/components/staking/StakingHeroStats';
 import type { StakingStatItem } from '@/components/staking/StakingHeroStats';
-import getErrorMessage from '@/utils/alert';
 import { StatCardSkeleton } from '@/components/ui/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -37,14 +28,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 
 const MyStaking = () => {
   const { account } = useActiveWeb3React();
-  const { setNotification } = useNotification();
-  const publicClient = usePublicClient();
-  const queryClient = useQueryClient();
-
-  const cosmicSignatureContract = useCosmicSignatureContract();
-  const rwalkContract = useRWLKNFTContract();
-  const cstStakingContract = useStakingWalletCSTContract();
-  const rwlkStakingContract = useStakingWalletRWLKContract();
+  const { stake, unstake, handleError, rwalkContract } = useStakingActions();
 
   const { data: dashboardData, isLoading: loadingDashboard } = useDashboardInfo();
   const { data: stakingCSTActions = [], isLoading: loadingCSTActions } =
@@ -75,11 +59,7 @@ const MyStaking = () => {
 
   const [rwlkTokens, setRwlkTokens] = useState<number[]>([]);
 
-  const {
-    cstokens: stakedCSTokens,
-    rwlktokens: stakedRWLKTokens,
-    fetchData: fetchStakedTokens,
-  } = useStakedToken();
+  const { cstokens: stakedCSTokens, rwlktokens: stakedRWLKTokens } = useStakedToken();
 
   const unclaimedRewardEth = useMemo(() => {
     return stakingRewards.reduce((sum, r) => sum + (r.RewardToCollectEth ?? 0), 0);
@@ -119,151 +99,6 @@ const MyStaking = () => {
       },
     ],
     [stakedCSTokens, stakedRWLKTokens, unclaimedRewardEth, rewardPerCST],
-  );
-
-  const handleError = useCallback(
-    (err: unknown) => {
-      if (!isUserRejection(err)) {
-        reportError(err, 'staking error');
-        const msg = getEthErrorMessage(err);
-        if (msg !== 'An error occurred') {
-          setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
-        }
-      }
-    },
-    [setNotification],
-  );
-
-  const approveIfNeeded = async (
-    nftContract: NonNullable<typeof cosmicSignatureContract | typeof rwalkContract>,
-    walletAddress: string,
-  ) => {
-    if (!nftContract) {
-      throw new Error('Contract not initialized');
-    }
-    const isApprovedForAll = await nftContract.read.isApprovedForAll?.([account, walletAddress]);
-    if (!isApprovedForAll) {
-      const hash = await nftContract.write.setApprovalForAll?.([walletAddress, true]);
-      if (hash) await publicClient?.waitForTransactionReceipt({ hash });
-    }
-  };
-
-  const handleStakeAction = useCallback(
-    async (tokenIds: number | number[], isRwalk: boolean) => {
-      try {
-        const nftContract = isRwalk ? rwalkContract : cosmicSignatureContract;
-        const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
-        const STAKING_WALLET_ADDRESS = isRwalk
-          ? STAKING_WALLET_RWLK_ADDRESS
-          : STAKING_WALLET_CST_ADDRESS;
-
-        if (!nftContract || !stakingContract) {
-          setNotification({
-            visible: true,
-            text: 'Please connect your wallet and ensure you are on the correct network.',
-            type: 'error',
-          });
-          return;
-        }
-
-        await approveIfNeeded(nftContract, STAKING_WALLET_ADDRESS);
-
-        let hash;
-        if (Array.isArray(tokenIds)) {
-          hash = await stakingContract.write.stakeMany?.([tokenIds]);
-        } else {
-          hash = await stakingContract.write.stake?.([tokenIds]);
-        }
-        const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
-
-        setTimeout(async () => {
-          queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] });
-          queryClient.invalidateQueries({ queryKey: ['stakingCSTActionsByUser'] });
-          queryClient.invalidateQueries({ queryKey: ['cstTokensByUser'] });
-          queryClient.invalidateQueries({ queryKey: ['stakingRewardsByUser'] });
-          queryClient.invalidateQueries({ queryKey: ['stakingRWLKActionsByUser'] });
-          queryClient.invalidateQueries({ queryKey: ['stakingRWLKMintsByUser'] });
-          fetchStakedTokens();
-
-          if (res) {
-            setNotification({
-              visible: true,
-              type: 'success',
-              text: Array.isArray(tokenIds)
-                ? 'The selected tokens were staked successfully!'
-                : `You have successfully staked token ${tokenIds}!`,
-            });
-          }
-        }, 2000);
-
-        return res;
-      } catch (err) {
-        handleError(err);
-        return err;
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      account,
-      handleError,
-      rwalkContract,
-      cosmicSignatureContract,
-      rwlkStakingContract,
-      cstStakingContract,
-      setNotification,
-    ],
-  );
-
-  const handleUnstakeAction = useCallback(
-    async (actionIds: number | number[], isRwalk: boolean) => {
-      try {
-        const stakingContract = isRwalk ? rwlkStakingContract : cstStakingContract;
-
-        if (!stakingContract) {
-          setNotification({
-            visible: true,
-            text: 'Please connect your wallet and ensure you are on the correct network.',
-            type: 'error',
-          });
-          return;
-        }
-
-        let hash;
-        if (Array.isArray(actionIds)) {
-          hash = await stakingContract.write.unstakeMany?.([actionIds]);
-        } else {
-          hash = await stakingContract.write.unstake?.([actionIds]);
-        }
-        const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
-
-        setTimeout(async () => {
-          queryClient.invalidateQueries({ queryKey: ['dashboardInfo'] });
-          queryClient.invalidateQueries({ queryKey: ['stakingCSTActionsByUser'] });
-          queryClient.invalidateQueries({ queryKey: ['cstTokensByUser'] });
-          queryClient.invalidateQueries({ queryKey: ['stakingRewardsByUser'] });
-          queryClient.invalidateQueries({ queryKey: ['stakingRWLKActionsByUser'] });
-          queryClient.invalidateQueries({ queryKey: ['stakingRWLKMintsByUser'] });
-          fetchStakedTokens();
-
-          if (res) {
-            setNotification({
-              visible: true,
-              type: 'success',
-              text: Array.isArray(actionIds)
-                ? 'The selected tokens were unstaked successfully!'
-                : 'You have successfully unstaked token!',
-            });
-          }
-        }, 2000);
-
-        return res;
-      } catch (err) {
-        handleError(err);
-        return err;
-      }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [account, handleError, rwlkStakingContract, cstStakingContract, setNotification],
   );
 
   useEffect(() => {
@@ -343,10 +178,10 @@ const MyStaking = () => {
                 userTokens={CSTokens}
                 stakedTokens={stakedCSTokens}
                 stakingRewards={stakingRewards}
-                handleStake={(tokenId) => handleStakeAction(tokenId, false)}
-                handleStakeMany={(tokenIds) => handleStakeAction(tokenIds, false)}
-                handleUnstake={(actionId) => handleUnstakeAction(actionId, false)}
-                handleUnstakeMany={(actionIds) => handleUnstakeAction(actionIds, false)}
+                handleStake={(tokenId) => stake(tokenId, false)}
+                handleStakeMany={(tokenIds) => stake(tokenIds, false)}
+                handleUnstake={(actionId) => unstake(actionId, false)}
+                handleUnstakeMany={(actionIds) => unstake(actionIds, false)}
               />
             </TabsContent>
 
@@ -357,10 +192,10 @@ const MyStaking = () => {
                 rwlkMints={rwlkMints}
                 userTokens={rwlkTokens}
                 stakedTokens={stakedRWLKTokens}
-                handleStake={(tokenId) => handleStakeAction(tokenId, true)}
-                handleStakeMany={(tokenIds) => handleStakeAction(tokenIds, true)}
-                handleUnstake={(actionId) => handleUnstakeAction(actionId, true)}
-                handleUnstakeMany={(actionIds) => handleUnstakeAction(actionIds, true)}
+                handleStake={(tokenId) => stake(tokenId, true)}
+                handleStakeMany={(tokenIds) => stake(tokenIds, true)}
+                handleUnstake={(actionId) => unstake(actionId, true)}
+                handleUnstakeMany={(actionIds) => unstake(actionIds, true)}
               />
             </TabsContent>
           </Tabs>
