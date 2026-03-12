@@ -149,7 +149,8 @@ function assertApiEnvelope(response: AxiosResponse): void {
   const body = response.data;
   if (body && typeof body === 'object' && !Array.isArray(body)) {
     if ('status' in body && body.status !== undefined && Number(body.status) !== 1) {
-      const msg = typeof body.error === 'string' && body.error ? body.error : 'API returned an error';
+      const msg =
+        typeof body.error === 'string' && body.error ? body.error : 'API returned an error';
       throw new Error(msg);
     }
     if ('error' in body && typeof body.error === 'string' && body.error) {
@@ -165,9 +166,7 @@ export async function apiCall<T>(fn: () => Promise<T>, fallback: T): Promise<T> 
   } catch (err: unknown) {
     if (isAxiosError(err) && err.response?.status === 400) return fallback;
     reportError(err, 'apiCall');
-    const message =
-      err instanceof Error ? err.message : 'Network response was not OK';
-    throw new Error(message);
+    throw new Error('Network response was not OK');
   }
 }
 
@@ -177,8 +176,6 @@ export async function apiPost<T>(fn: () => Promise<T>): Promise<T> {
     return await fn();
   } catch (err: unknown) {
     reportError(err, 'apiPost');
-    const message =
-      err instanceof Error ? err.message : 'Network response was not OK';
-    throw new Error(message);
+    throw new Error('Network response was not OK');
   }
 }
