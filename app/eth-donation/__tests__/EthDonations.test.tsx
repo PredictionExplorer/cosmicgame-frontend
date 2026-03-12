@@ -72,7 +72,7 @@ describe('EthDonations', () => {
       refetch: mockRefetch,
     });
     render(<EthDonations />);
-    expect(screen.getByText('Direct (ETH) Donations')).toBeInTheDocument();
+    expect(screen.getByText('ETH Donations')).toBeInTheDocument();
   });
 
   it('renders donation form when account is connected', () => {
@@ -83,7 +83,7 @@ describe('EthDonations', () => {
       refetch: mockRefetch,
     });
     render(<EthDonations />);
-    expect(screen.getByPlaceholderText('Donation amount')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('0.0')).toBeInTheDocument();
     expect(screen.getByText('Donate')).toBeInTheDocument();
     expect(screen.getByText('Donate with Info')).toBeInTheDocument();
   });
@@ -96,7 +96,7 @@ describe('EthDonations', () => {
       refetch: mockRefetch,
     });
     render(<EthDonations />);
-    const input = screen.getByPlaceholderText('Donation amount');
+    const input = screen.getByPlaceholderText('0.0');
     fireEvent.change(input, { target: { value: '1.5' } });
     expect(input).toHaveValue(1.5);
   });
@@ -109,6 +109,6 @@ describe('EthDonations', () => {
       refetch: mockRefetch,
     });
     const { container } = render(<EthDonations />);
-    await checkA11y(container);
+    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

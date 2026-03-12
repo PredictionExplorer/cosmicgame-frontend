@@ -3,16 +3,23 @@
 import { MainWrapper } from '@/components/styled';
 import DonatedNFTTable, { type NFTRecord } from '@/components/donations/DonatedNFTTable';
 import { useDonationsNFTList } from '@/hooks/useApiQuery';
+import { Spinner } from '@/components/ui/spinner';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const NFTDonationsPage = () => {
   const { data: nftDonations = null } = useDonationsNFTList();
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-8">NFT Donations</h4>
+      <PageHeader
+        title="NFT Donations"
+        subtitle="NFTs donated to the prize pool by community members"
+      />
 
       {nftDonations === null ? (
-        <h6 className="text-lg font-semibold">Loading...</h6>
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
       ) : (
         <DonatedNFTTable
           list={(nftDonations ?? []) as NFTRecord[]}

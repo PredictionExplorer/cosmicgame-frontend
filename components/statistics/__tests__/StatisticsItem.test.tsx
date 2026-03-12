@@ -2,6 +2,12 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import { StatisticsItem, CountdownRenderer } from '../StatisticsItem';
 
+jest.mock('../../ui/info-tooltip', () => ({
+  InfoTooltip: ({ content }: { content: string }) => (
+    <span data-testid="info-tooltip">{content}</span>
+  ),
+}));
+
 describe('StatisticsItem', () => {
   it('renders title and value', () => {
     render(<StatisticsItem title="My Title" value="My Value" />);
@@ -19,8 +25,26 @@ describe('StatisticsItem', () => {
     expect(screen.getByText('42')).toBeInTheDocument();
   });
 
+  it('renders tooltip when provided', () => {
+    render(<StatisticsItem title="Balance" value="1.5 ETH" tooltip="Total ETH in contract" />);
+    expect(screen.getByTestId('info-tooltip')).toBeInTheDocument();
+    expect(screen.getByText('Total ETH in contract')).toBeInTheDocument();
+  });
+
+  it('does not render tooltip when not provided', () => {
+    render(<StatisticsItem title="Count" value={42} />);
+    expect(screen.queryByTestId('info-tooltip')).not.toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<StatisticsItem title="Test" value="val" />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations with tooltip', async () => {
+    const { container } = render(
+      <StatisticsItem title="Test" value="val" tooltip="Helpful info" />,
+    );
     await checkA11y(container);
   });
 });

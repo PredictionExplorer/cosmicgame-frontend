@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { zeroAddress } from 'viem';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Radio } from 'lucide-react';
 import Countdown from 'react-countdown';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 
-import { getAssetsUrl, getEnduranceChampions } from '@/utils';
+import { getAssetsUrl } from '@/utils';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -17,25 +18,25 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { ART_BLOCKS_ADDRESS } from '@/config/networks';
 import LatestNFTs from '@/components/nft/LatestNFTs';
 import NFTImage from '@/components/nft/NFTImage';
-import type { DonatedNFT as DonatedNFTType } from '@/services/api/types';
 import { reportError } from '@/utils/errors';
 import { SpecialPrizeWinners } from '@/components/tables/SpecialPrizeWinners';
 import { BiddingStatus } from '@/components/common/BiddingStatus';
-import { WinningHistorySection } from '@/components/home/WinningHistorySection';
 import { BidForm } from '@/components/home/BidForm';
-import { RoundInfoSection } from '@/components/home/RoundInfoSection';
+import Prize from '@/components/common/Prize';
 import { useBidForm } from '@/hooks/useBidForm';
 import { usePrizeClaim } from '@/hooks/usePrizeClaim';
 import { usePrizeNotification } from '@/hooks/usePrizeNotification';
 import {
   useDashboardInfo,
   useBidListByRound,
-  useDonationsNFTByRound,
-  useDonationsCGWithInfoByRound,
-  useDonationsERC20ByRound,
   useCurrentTime,
   useCSTInfo,
 } from '@/hooks/useApiQuery';
+
+const sectionFade = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
+};
 
 const HomePage = () => {
   const searchParams = useSearchParams();
@@ -47,38 +48,17 @@ const HomePage = () => {
 
   const round = dashboardData?.CurRoundNum ?? -1;
   const { data: bidListData } = useBidListByRound(round, 'desc');
-  const { data: nftDonationsData } = useDonationsNFTByRound(round);
-  const { data: ethDonationsRawData } = useDonationsCGWithInfoByRound(round);
-  const { data: erc20DonationsData } = useDonationsERC20ByRound(round);
-
-  type EthDonation = import('@/components/tables/EthDonationTable').EthDonation;
-  type DonatedERC20 = import('@/components/donations/DonatedERC20Table').DonatedERC20Token;
 
   const data = dashboardData ?? null;
   const loading = dashboardLoading;
   const curBidList = bidListData ?? [];
-  const donatedNFTs = (nftDonationsData ?? []) as DonatedNFTType[];
-  const ethDonations = (ethDonationsRawData ?? []) as EthDonation[];
-  const donatedERC20Tokens = (erc20DonationsData ?? []) as DonatedERC20[];
 
   const offset = useMemo(() => {
     if (currentTimeData == null) return 0;
     return currentTimeData * 1000 - Date.now();
   }, [currentTimeData]);
 
-  const championList = useMemo(() => {
-    if (!bidListData) return null;
-    const champions = getEnduranceChampions(bidListData);
-    return [...champions].sort((a, b) => b.chronoWarrior - a.chronoWarrior);
-  }, [bidListData]);
-
   const [bannerTokenId, setBannerTokenId] = useState<number | null>(null);
-  const [curPage, setCurrentPage] = useState(1);
-  const [imageOpen, setImageOpen] = useState(false);
-  const [twitterPopupOpen, setTwitterPopupOpen] = useState(false);
-  const [twitterHandle, setTwitterHandle] = useState('');
-  const [donatedTokensTab, setDonatedTokensTab] = useState(0);
-  const perPage = 12;
 
   useEffect(() => {
     if (dashboardData && bannerTokenId === null) {
@@ -121,14 +101,8 @@ const HomePage = () => {
   }, [dashboardData, account, playAudio]);
 
   const { bidType, ethBidInfo, cstBidData, isBidding, rwlkId, bidPricePlus } = bidForm;
-  const {
-    fetchActivationTime,
-    prizeTime,
-    timeoutClaimPrize,
-    isClaiming,
-    activationTime,
-    claimHistory,
-  } = prizeClaim;
+  const { fetchActivationTime, prizeTime, timeoutClaimPrize, isClaiming, activationTime } =
+    prizeClaim;
 
   const withPostTxRefresh = (afterMs = 1500, activationMs = 3000) => {
     setTimeout(() => {
@@ -159,15 +133,8 @@ const HomePage = () => {
       bidForm.setBidType('ETH');
       bidForm.setAdvancedExpanded(true);
     }
-    if (searchParams?.get('referred_by')) setTwitterPopupOpen(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, requestNotificationPermission]);
-
-  useEffect(() => {
-    if (twitterHandle)
-      bidForm.setMessage(`@${twitterHandle} referred by @${searchParams.get('referred_by')}.`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [twitterHandle]);
 
   const getBidLabel = () => {
     const adj = (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100);
@@ -189,53 +156,122 @@ const HomePage = () => {
     <>
       <MainWrapper>
         {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <Spinner size="lg" className="text-white" />
           </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 lg:gap-16 mb-8">
-          <div>
-            <BiddingStatus
-              data={data}
-              loading={loading}
-              activationTime={activationTime}
-              curBidList={curBidList}
-              ethBidInfo={ethBidInfo}
-              prizeTime={prizeTime}
-            />
-            {!loading && isActive && <BidForm {...bidForm} data={data} />}
+
+        {/* ===== LIVE ROUND BAR ===== */}
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-3.5 backdrop-blur-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <Radio className="h-4 w-4 text-primary" />
+              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-live-dot" />
+            </div>
+            {data && (
+              <div>
+                <h1 className="font-display text-lg font-bold tracking-tight sm:text-xl">
+                  Round #{data.CurRoundNum}
+                </h1>
+                <p className="text-[11px] text-muted-foreground">
+                  {data.CurNumBids} bid{data.CurNumBids !== 1 ? 's' : ''} placed
+                </p>
+              </div>
+            )}
           </div>
-          <div>
+          <div className="flex items-center gap-4">
             {(data?.CurRoundNum ?? 0) > 1 && (
-              <Link href={`/prize/${(data?.CurRoundNum ?? 0) - 1}`} className="text-inherit">
-                Round {(data?.CurRoundNum ?? 0) - 1} ended, check results here
+              <Link
+                href={`/prize/${(data?.CurRoundNum ?? 0) - 1}`}
+                className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                Round {(data?.CurRoundNum ?? 0) - 1} results
+                <ArrowRight className="h-3 w-3" />
               </Link>
             )}
-            <div className="hidden md:block">
-              <StyledCard className="mt-2">
-                <Link
-                  href={bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample'}
-                  className="block"
-                >
-                  <NFTImage
-                    src={
-                      bannerToken.seed === ''
-                        ? '/images/qmark.png'
-                        : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
-                    }
-                  />
-                </Link>
-              </StyledCard>
+            <a
+              href="/changed-parameters"
+              className="text-xs text-muted-foreground/60 hover:text-primary transition-colors"
+            >
+              Parameters
+            </a>
+          </div>
+        </motion.div>
+
+        {/* ===== BIDDING STATUS (countdown + stats) ===== */}
+        <BiddingStatus
+          data={data}
+          loading={loading}
+          activationTime={activationTime}
+          curBidList={curBidList}
+          ethBidInfo={ethBidInfo}
+          prizeTime={prizeTime}
+        />
+
+        {/* ===== SPECIAL PRIZE LEADERS + NFT PREVIEW ===== */}
+        {data?.TsRoundStart !== 0 && (
+          <motion.div
+            variants={sectionFade}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.2 }}
+            className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6"
+          >
+            <div className="lg:col-span-2">
+              <SpecialPrizeWinners />
             </div>
-            {data?.TsRoundStart !== 0 && <SpecialPrizeWinners />}
-            {isActive && (
-              <>
-                {canBid && !loading && (
+            <div className="hidden lg:block">
+              <Link
+                href={bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample'}
+                className="block group"
+              >
+                <StyledCard className="overflow-hidden rounded-xl border border-white/[0.06]">
+                  <div className="transition-transform duration-300 group-hover:scale-[1.02]">
+                    <NFTImage
+                      src={
+                        bannerToken.seed === ''
+                          ? '/images/qmark.png'
+                          : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
+                      }
+                    />
+                  </div>
+                  <div className="p-3 text-center">
+                    <p className="text-xs text-muted-foreground">Sample Cosmic Signature NFT</p>
+                  </div>
+                </StyledCard>
+              </Link>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ===== BID ACTION AREA ===== */}
+        {!loading && isActive && (
+          <motion.div
+            variants={sectionFade}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.3 }}
+            className="mt-10"
+          >
+            <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
+              <h2 className="font-display text-xl font-bold tracking-tight mb-1">Place Your Bid</h2>
+              <p className="text-sm text-muted-foreground mb-6">
+                Choose your bid method and enter the game.
+              </p>
+
+              <BidForm {...bidForm} data={data} />
+
+              <div className="mt-6 space-y-4">
+                {canBid && (
                   <Button
-                    variant="outline"
                     size="lg"
                     onClick={handleBid}
-                    className="w-full mt-6"
+                    className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
                     disabled={
                       isBidding || (bidType === 'RandomWalk' && rwlkId === -1) || bidType === ''
                     }
@@ -256,7 +292,7 @@ const HomePage = () => {
                     <Button
                       size="lg"
                       onClick={handleClaimPrize}
-                      className="w-full mt-6"
+                      className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
                       disabled={
                         isClaiming || (data?.LastBidderAddr !== account && claimWait > Date.now())
                       }
@@ -282,52 +318,52 @@ const HomePage = () => {
                       )}
                     </Button>
                     {data?.LastBidderAddr !== account && claimWait > Date.now() && (
-                      <p className="text-sm italic text-right text-primary mt-4">
+                      <p className="text-sm italic text-right text-primary">
                         Please wait until the last bidder claims the prize.
                       </p>
                     )}
                   </>
                 )}
-              </>
-            )}
-            <div className="block md:hidden">
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full mt-6"
-                onClick={() => setImageOpen(true)}
-              >
-                Show Random Sample NFT
-              </Button>
+              </div>
             </div>
-          </div>
-        </div>
-        <RoundInfoSection
-          data={data}
-          curBidList={curBidList}
-          championList={championList}
-          ethDonations={ethDonations}
-          donatedNFTs={donatedNFTs}
-          donatedERC20Tokens={donatedERC20Tokens}
-          donatedTokensTab={donatedTokensTab}
-          onTabChange={(_e, v) => setDonatedTokensTab(v)}
-          curPage={curPage}
-          setCurPage={setCurrentPage}
-          perPage={perPage}
-        />
+          </motion.div>
+        )}
+
+        {/* ===== PRIZE BREAKDOWN ===== */}
+        {data && (
+          <motion.div
+            variants={sectionFade}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.4 }}
+          >
+            <Prize data={data} />
+          </motion.div>
+        )}
+
+        {/* ===== FULL ROUND DETAILS LINK ===== */}
+        <motion.div
+          variants={sectionFade}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
+        >
+          <Link
+            href="/current-round"
+            className="mt-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 group hover:bg-white/[0.04] transition-all duration-300"
+          >
+            <div>
+              <p className="text-sm font-medium text-white">View Full Round Details</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Bid history, leaderboards, donations, and fund distribution
+              </p>
+            </div>
+            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+          </Link>
+        </motion.div>
       </MainWrapper>
 
       <LatestNFTs />
-
-      <WinningHistorySection
-        claimHistory={claimHistory}
-        imageOpen={imageOpen}
-        setImageOpen={setImageOpen}
-        bannerTokenSeed={bannerToken.seed}
-        twitterPopupOpen={twitterPopupOpen}
-        setTwitterPopupOpen={setTwitterPopupOpen}
-        setTwitterHandle={setTwitterHandle}
-      />
     </>
   );
 };

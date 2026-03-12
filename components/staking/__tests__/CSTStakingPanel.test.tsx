@@ -37,12 +37,36 @@ const defaultProps: CSTStakingPanelProps = {
 };
 
 describe('CSTStakingPanel', () => {
-  it('renders all four sections', () => {
+  it('renders all four section headers', () => {
     render(<CSTStakingPanel {...defaultProps} />);
-    expect(screen.getByText('Staking Rewards by Token')).toBeInTheDocument();
-    expect(screen.getByText('Stake / Unstake Actions')).toBeInTheDocument();
-    expect(screen.getByText('Tokens Available for Staking')).toBeInTheDocument();
     expect(screen.getByText('Staked Tokens')).toBeInTheDocument();
+    expect(screen.getByText('Available for Staking')).toBeInTheDocument();
+    expect(screen.getByText('Staking Rewards')).toBeInTheDocument();
+    expect(screen.getByText('Stake / Unstake History')).toBeInTheDocument();
+  });
+
+  it('renders Staked Tokens section first', () => {
+    render(<CSTStakingPanel {...defaultProps} />);
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[0]).toHaveTextContent('Staked Tokens');
+  });
+
+  it('renders Available for Staking section second', () => {
+    render(<CSTStakingPanel {...defaultProps} />);
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[1]).toHaveTextContent('Available for Staking');
+  });
+
+  it('renders Staking Rewards section third', () => {
+    render(<CSTStakingPanel {...defaultProps} />);
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[2]).toHaveTextContent('Staking Rewards');
+  });
+
+  it('renders Stake / Unstake History section last', () => {
+    render(<CSTStakingPanel {...defaultProps} />);
+    const headings = screen.getAllByRole('heading', { level: 3 });
+    expect(headings[3]).toHaveTextContent('Stake / Unstake History');
   });
 
   it('passes account to StakingRewardsTable', () => {

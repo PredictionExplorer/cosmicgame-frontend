@@ -4,6 +4,10 @@ import { MainWrapper } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useCSTTokensByUser } from '@/hooks/useApiQuery';
 import { CSTTable } from '@/components/tokens/CSTTable';
+import { Spinner } from '@/components/ui/spinner';
+import { ErrorState } from '@/components/ui/error-state';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 function MyWallet() {
   const { account } = useActiveWeb3React();
@@ -13,16 +17,22 @@ function MyWallet() {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-2">
-        My Cosmic Signature (ERC721) Tokens
-      </h4>
+      <PageHeader
+        title="My Cosmic Signature Tokens"
+        subtitle="ERC721 tokens in your connected wallet"
+      />
 
       {!account ? (
-        <p className="text-base">Please login to Metamask to see your tokens.</p>
+        <EmptyState
+          title="Wallet not connected"
+          description="Please connect your wallet to view your tokens."
+        />
       ) : loading ? (
-        <p className="text-lg font-semibold">Loading...</p>
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
       ) : error ? (
-        <p className="text-lg font-semibold text-destructive">{error}</p>
+        <ErrorState title="Failed to load tokens" message={error} />
       ) : (
         <div className="mt-12">
           <h5 className="text-lg font-semibold mb-4">Cosmic Signature Tokens I Own</h5>

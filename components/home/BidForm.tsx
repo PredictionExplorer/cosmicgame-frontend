@@ -1,6 +1,9 @@
 import { zeroAddress } from 'viem';
+import { Settings2, Info } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Accordion,
   AccordionContent,
@@ -8,6 +11,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CustomTextField } from '@/components/styled';
 import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
 import type { DashboardInfo } from '@/services/api/types';
@@ -41,6 +45,12 @@ interface BidFormProps {
   ethBidInfo: EthBidInfo | null;
 }
 
+const bidOptions = [
+  { value: 'ETH', label: 'ETH', desc: 'Pay with Ether' },
+  { value: 'RandomWalk', label: 'RandomWalk', desc: '50% discount' },
+  { value: 'CST', label: 'CST', desc: 'Cosmic Token' },
+];
+
 /** Form for placing ETH or CST bids with optional NFT/token donation fields and RandomWalk discount. */
 export function BidForm({
   data,
@@ -68,34 +78,37 @@ export function BidForm({
   cstBidData,
   ethBidInfo,
 }: BidFormProps) {
+  const showAll = data?.LastBidderAddr !== zeroAddress;
+  const visibleOptions = showAll ? bidOptions : bidOptions.filter((o) => o.value === 'ETH');
+
   return (
-    <>
-      <p className="mb-2 mt-8">Make your bid with:</p>
-      <RadioGroup
-        value={bidType}
-        onValueChange={(value) => {
-          setRwlkId(-1);
-          setBidType(value);
-        }}
-        className="flex flex-row flex-wrap gap-4 mb-4"
-      >
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <RadioGroupItem value="ETH" />
-          <span className="text-sm">ETH</span>
-        </label>
-        {data?.LastBidderAddr !== zeroAddress && (
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="RandomWalk" />
-            <span className="text-sm">RandomWalk</span>
-          </label>
-        )}
-        {data?.LastBidderAddr !== zeroAddress && (
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <RadioGroupItem value="CST" />
-            <span className="text-sm">CST(Cosmic Token)</span>
-          </label>
-        )}
-      </RadioGroup>
+    <div className="mt-8 space-y-5">
+      <div>
+        <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3 block">
+          Bid Method
+        </Label>
+        <div className="flex gap-2">
+          {visibleOptions.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => {
+                setRwlkId(-1);
+                setBidType(opt.value);
+              }}
+              className={cn(
+                'flex-1 rounded-lg border px-3 py-2.5 text-center transition-all',
+                bidType === opt.value
+                  ? 'border-primary/50 bg-primary/10 text-white'
+                  : 'border-white/[0.06] bg-white/[0.02] text-muted-foreground hover:bg-white/[0.04] hover:text-white',
+              )}
+            >
+              <span className="block text-sm font-medium">{opt.label}</span>
+              <span className="block text-[10px] mt-0.5 opacity-60">{opt.desc}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {bidType === 'ETH' && data?.LastBidderAddr === zeroAddress && (
         <AuctionInfo
@@ -105,12 +118,23 @@ export function BidForm({
       )}
 
       {bidType === 'RandomWalk' && (
-        <div className="mb-8 mx-4">
-          <h6 className="text-lg font-semibold">Random Walk NFT Gallery</h6>
-          <p className="text-sm">
-            If you own some RandomWalkNFTs and one of them is used when bidding, you can get a 50%
-            discount!
-          </p>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <h6 className="text-sm font-semibold">Your Random Walk NFTs</h6>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Info className="h-3.5 w-3.5 text-muted-foreground/50" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-[200px]">
+                    Select a RandomWalk NFT to get a 50% discount on your bid. Each NFT can only be
+                    used once.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
           <PaginationRWLKGrid
             loading={false}
             data={rwlknftIds}
@@ -128,14 +152,20 @@ export function BidForm({
         />
       )}
 
-      <textarea
-        placeholder="Message (280 characters, optional)"
-        value={message}
-        maxLength={280}
-        rows={4}
-        className="w-full mb-4 flex min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        onChange={(e) => setMessage(e.target.value)}
-      />
+      <div>
+        <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2 block">
+          Message{' '}
+          <span className="normal-case tracking-normal opacity-50">(optional, 280 chars)</span>
+        </Label>
+        <textarea
+          placeholder="Leave a message with your bid..."
+          value={message}
+          maxLength={280}
+          rows={3}
+          className="w-full flex min-h-[72px] rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
+          onChange={(e) => setMessage(e.target.value)}
+        />
+      </div>
 
       <Accordion
         type="single"
@@ -143,109 +173,125 @@ export function BidForm({
         value={advancedExpanded ? 'advanced' : ''}
         onValueChange={(val) => setAdvancedExpanded(val === 'advanced')}
       >
-        <AccordionItem value="advanced">
-          <AccordionTrigger>Advanced Options</AccordionTrigger>
+        <AccordionItem value="advanced" className="border-white/[0.06]">
+          <AccordionTrigger className="text-sm text-muted-foreground hover:text-white">
+            <span className="flex items-center gap-2">
+              <Settings2 className="h-4 w-4" />
+              Advanced Options
+            </span>
+          </AccordionTrigger>
           <AccordionContent>
-            <p className="text-sm">
-              If you want to donate tokens or one of your NFTs while bidding, you can put the
-              contract address, NFT id, and comment here.
-            </p>
-            <RadioGroup
-              value={donationType}
-              onValueChange={(value) => {
-                setRwlkId(-1);
-                setDonationType(value);
-              }}
-              className="flex flex-row gap-4 mt-4"
-            >
-              <label className="flex items-center gap-1.5 cursor-pointer">
-                <RadioGroupItem value="NFT" />
-                <span className="text-sm">NFT</span>
-              </label>
-              <label className="flex items-center gap-1.5 cursor-pointer">
-                <RadioGroupItem value="Token" />
-                <span className="text-sm">Token</span>
-              </label>
-            </RadioGroup>
-            {donationType === 'Token' && (
-              <>
-                <Input
-                  placeholder="Token Contract Address"
-                  value={tokenDonateAddress}
-                  className="mt-2"
-                  onChange={(e) => setTokenDonateAddress(e.target.value)}
-                />
-                <Input
-                  placeholder="Token Amount"
-                  type="number"
-                  value={tokenAmount}
-                  className="mt-4"
-                  onChange={(e) => setTokenAmount(e.target.value)}
-                />
-              </>
-            )}
-            {donationType === 'NFT' && (
-              <>
-                <Input
-                  placeholder="NFT contract address"
-                  value={nftDonateAddress}
-                  className="mt-2"
-                  onChange={(e) => setNftDonateAddress(e.target.value)}
-                />
-                <Input
-                  placeholder="NFT number"
-                  type="number"
-                  value={nftId}
-                  className="mt-4"
-                  onChange={(e) => setNftId(e.target.value)}
-                />
-              </>
-            )}
-            {bidType !== 'CST' && (
-              <div className="border border-[#444] rounded p-4 mt-4">
-                <p className="text-sm font-medium">Bid price collision prevention</p>
-                <div className="flex mt-4 items-center">
-                  <span className="whitespace-nowrap text-white/70 mr-4">Rise bid price by</span>
-                  <div className="relative flex-1">
-                    <CustomTextField
-                      type="number"
-                      placeholder="Bid Price Plus"
-                      value={bidPricePlus}
-                      min={0}
-                      max={50}
-                      onChange={(e) => {
-                        const value = Number(e.target.value);
-                        if (value <= 50) {
-                          setBidPricePlus(value);
-                        }
-                      }}
+            <div className="space-y-4 pt-2">
+              <p className="text-xs text-muted-foreground">
+                Donate tokens or NFTs while bidding, or adjust bid collision prevention.
+              </p>
+              <RadioGroup
+                value={donationType}
+                onValueChange={(value) => {
+                  setRwlkId(-1);
+                  setDonationType(value);
+                }}
+                className="flex flex-row gap-4"
+              >
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <RadioGroupItem value="NFT" />
+                  <span className="text-sm">Donate NFT</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <RadioGroupItem value="Token" />
+                  <span className="text-sm">Donate Token</span>
+                </label>
+              </RadioGroup>
+              {donationType === 'Token' && (
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">
+                      Contract Address
+                    </Label>
+                    <Input
+                      placeholder="0x..."
+                      value={tokenDonateAddress}
+                      onChange={(e) => setTokenDonateAddress(e.target.value)}
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-                      %
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">Amount</Label>
+                    <Input
+                      placeholder="0.0"
+                      type="number"
+                      value={tokenAmount}
+                      onChange={(e) => setTokenAmount(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+              {donationType === 'NFT' && (
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">
+                      NFT Contract Address
+                    </Label>
+                    <Input
+                      placeholder="0x..."
+                      value={nftDonateAddress}
+                      onChange={(e) => setNftDonateAddress(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">Token ID</Label>
+                    <Input
+                      placeholder="Token ID"
+                      type="number"
+                      value={nftId}
+                      onChange={(e) => setNftId(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+              {bidType !== 'CST' && (
+                <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Collision Prevention
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <span className="whitespace-nowrap text-sm text-muted-foreground">
+                      Raise by
+                    </span>
+                    <div className="relative flex-1">
+                      <CustomTextField
+                        type="number"
+                        placeholder="0"
+                        value={bidPricePlus}
+                        min={0}
+                        max={50}
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          if (value <= 50) setBidPricePlus(value);
+                        }}
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-sm">
+                        %
+                      </span>
+                    </div>
+                    <span className="whitespace-nowrap text-sm font-mono text-muted-foreground">
+                      {(
+                        (ethBidInfo?.ETHPrice ?? 0) *
+                        (1 + bidPricePlus / 100) *
+                        (bidType === 'RandomWalk' ? 0.5 : 1)
+                      ).toFixed(6)}{' '}
+                      ETH
                     </span>
                   </div>
-                  <span className="whitespace-nowrap text-white/70 ml-4">
-                    {(
-                      (ethBidInfo?.ETHPrice ?? 0) *
-                      (1 + bidPricePlus / 100) *
-                      (bidType === 'RandomWalk' ? 0.5 : 1)
-                    ).toFixed(6)}{' '}
-                    ETH
-                  </span>
+                  <p className="text-xs text-muted-foreground">
+                    Bumps bid price by {bidPricePlus}% to avoid collision when two bids land in the
+                    same block. Does not permanently raise the price.
+                  </p>
                 </div>
-                <p className="text-sm mt-4">
-                  The bid price is bumped {bidPricePlus}% to prevent bidding collision.
-                </p>
-                <p className="text-sm">
-                  This percentage won&apos;t rise the bid price arbitrarily after your bid, it is
-                  only meant for allowing both bid transactions to pass through in case two
-                  simultaneous bids occur within the same block.
-                </p>
-              </div>
-            )}
+              )}
+            </div>
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-    </>
+    </div>
   );
 }

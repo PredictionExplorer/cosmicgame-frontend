@@ -19,6 +19,9 @@ import { useNamedNFTs } from '@/hooks/useApiQuery';
 import type { CSTTokenInfo } from '@/services/api';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import { Spinner } from '@/components/ui/spinner';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
   if (!nft) {
@@ -68,13 +71,16 @@ const NamedNFTsPage = () => {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-2">
-        Named Cosmic Signature Tokens
-      </h4>
+      <PageHeader
+        title="Named Cosmic Signature Tokens"
+        subtitle="Browse tokens that have been given custom names"
+      />
 
       <div className="mt-12">
         {loading ? (
-          <p className="text-lg font-semibold">Loading...</p>
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
         ) : list.length > 0 ? (
           <>
             <NamedNFTsTable list={list.slice((curPage - 1) * perPage, curPage * perPage)} />
@@ -86,7 +92,10 @@ const NamedNFTsPage = () => {
             />
           </>
         ) : (
-          <p className="text-lg font-semibold">No NFTs yet.</p>
+          <EmptyState
+            title="No named tokens"
+            description="No Cosmic Signature tokens have been named yet."
+          />
         )}
       </div>
     </MainWrapper>

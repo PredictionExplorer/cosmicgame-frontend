@@ -3,7 +3,7 @@ import { type ReactNode } from 'react';
 
 import { render, checkA11y } from '@/test-utils';
 
-import { SystemModeProvider, useSystemMode } from '../SystemModeContext';
+import { SystemModeProvider, useSystemMode, MAX_CONSECUTIVE_FAILURES } from '../SystemModeContext';
 
 const mockSystemMode = jest.fn();
 const mockContract = {
@@ -18,6 +18,8 @@ jest.mock('../../hooks/useCosmicGameContract', () => ({
 const mockReportError = jest.fn();
 jest.mock('../../utils/errors', () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
+  isContractRevertError: (err: unknown) =>
+    err instanceof Error && err.name === 'ContractFunctionExecutionError',
 }));
 
 const useCosmicGameContract = require('../../hooks/useCosmicGameContract').default as jest.Mock;
@@ -183,6 +185,184 @@ describe('SystemModeProvider', () => {
     await waitFor(() => {
       expect(result.current!.data).toBe(4);
     });
+  });
+
+  it('stops polling after MAX_CONSECUTIVE_FAILURES consecutive failures', async () => {
+    mockSystemMode.mockRejectedValue(new Error('always fails'));
+
+    renderHook(() => useSystemMode(), { wrapper });
+
+    await waitFor(() => {
+      expect(mockSystemMode).toHaveBeenCalledTimes(1);
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(mockSystemMode).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(mockSystemMode).toHaveBeenCalledTimes(MAX_CONSECUTIVE_FAILURES);
+
+    await act(async () => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(mockSystemMode).toHaveBeenCalledTimes(MAX_CONSECUTIVE_FAILURES);
+  });
+
+  it('resets failure counter on success after prior failures', async () => {
+    let callCount = 0;
+    mockSystemMode.mockImplementation(() => {
+      callCount += 1;
+      if (callCount <= 2) return Promise.reject(new Error('transient'));
+      if (callCount === 3) return Promise.resolve(5);
+      return Promise.reject(new Error('transient again'));
+    });
+
+    renderHook(() => useSystemMode(), { wrapper });
+
+    await waitFor(() => {
+      expect(mockSystemMode).toHaveBeenCalledTimes(1);
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(mockSystemMode).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(mockSystemMode).toHaveBeenCalledTimes(3);
+
+    await act(async () => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(mockSystemMode).toHaveBeenCalledTimes(4);
+
+    await act(async () => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(mockSystemMode).toHaveBeenCalledTimes(5);
+  });
+
+  it('limits error reporting to MAX_CONSECUTIVE_FAILURES calls', async () => {
+    mockSystemMode.mockRejectedValue(new Error('persistent'));
+
+    renderHook(() => useSystemMode(), { wrapper });
+
+    for (let i = 0; i < MAX_CONSECUTIVE_FAILURES + 2; i++) {
+      await act(async () => {
+        jest.advanceTimersByTime(12_000);
+      });
+    }
+
+    expect(mockReportError).toHaveBeenCalledTimes(MAX_CONSECUTIVE_FAILURES);
+  });
+
+  it('resumes polling when contract ref changes after failures', async () => {
+    mockSystemMode.mockRejectedValue(new Error('fail'));
+
+    const { rerender } = renderHook(() => useSystemMode(), { wrapper });
+
+    for (let i = 0; i < MAX_CONSECUTIVE_FAILURES; i++) {
+      await act(async () => {
+        jest.advanceTimersByTime(12_000);
+      });
+    }
+
+    const callsBeforeReconnect = mockSystemMode.mock.calls.length;
+
+    await act(async () => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(mockSystemMode).toHaveBeenCalledTimes(callsBeforeReconnect);
+
+    const newMockSystemMode = jest.fn().mockResolvedValue(2);
+    const newContract = { read: { systemMode: newMockSystemMode } };
+    useCosmicGameContract.mockReturnValue(newContract);
+
+    rerender();
+
+    await waitFor(() => {
+      expect(newMockSystemMode).toHaveBeenCalled();
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(newMockSystemMode.mock.calls.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('handles AbiFunctionNotFoundError gracefully without crashing', async () => {
+    const abiError = new Error(
+      'Function "systemMode" not found on ABI.\n' +
+        'Make sure you are using the correct ABI and that the function exists on it.',
+    );
+    abiError.name = 'AbiFunctionNotFoundError';
+    mockSystemMode.mockRejectedValue(abiError);
+
+    const { result } = renderHook(() => useSystemMode(), { wrapper });
+
+    await waitFor(() => {
+      expect(mockReportError).toHaveBeenCalledWith(abiError, 'SystemModeContext.fetchData');
+    });
+
+    expect(result.current!.data).toBe(0);
+
+    for (let i = 0; i < MAX_CONSECUTIVE_FAILURES + 2; i++) {
+      await act(async () => {
+        jest.advanceTimersByTime(12_000);
+      });
+    }
+
+    expect(mockReportError).toHaveBeenCalledTimes(MAX_CONSECUTIVE_FAILURES);
+    expect(result.current!.data).toBe(0);
+  });
+
+  it('logs a warning instead of reportError for ContractFunctionExecutionError', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const revertError = new Error('The contract function "systemMode" reverted.');
+    revertError.name = 'ContractFunctionExecutionError';
+    mockSystemMode.mockRejectedValue(revertError);
+
+    const { result } = renderHook(() => useSystemMode(), { wrapper });
+
+    await waitFor(() => {
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[SystemModeContext] systemMode() reverted — contract may not be available on this network',
+      );
+    });
+
+    expect(mockReportError).not.toHaveBeenCalled();
+    expect(result.current!.data).toBe(0);
+    warnSpy.mockRestore();
+  });
+
+  it('still stops polling after MAX_CONSECUTIVE_FAILURES for revert errors', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    const revertError = new Error('The contract function "systemMode" reverted.');
+    revertError.name = 'ContractFunctionExecutionError';
+    mockSystemMode.mockRejectedValue(revertError);
+
+    renderHook(() => useSystemMode(), { wrapper });
+
+    await waitFor(() => {
+      expect(mockSystemMode).toHaveBeenCalledTimes(1);
+    });
+
+    for (let i = 0; i < MAX_CONSECUTIVE_FAILURES + 2; i++) {
+      await act(async () => {
+        jest.advanceTimersByTime(12_000);
+      });
+    }
+
+    expect(mockSystemMode).toHaveBeenCalledTimes(MAX_CONSECUTIVE_FAILURES);
+    expect(warnSpy).toHaveBeenCalledTimes(MAX_CONSECUTIVE_FAILURES);
+    expect(mockReportError).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 
   it('has no accessibility violations', async () => {

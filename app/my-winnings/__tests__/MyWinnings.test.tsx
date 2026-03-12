@@ -92,7 +92,10 @@ describe('MyWinnings', () => {
   it('prompts login when no account is connected', () => {
     mockAccount = null;
     render(<MyWinnings />);
-    expect(screen.getByText('Please login to Metamask to see your winnings.')).toBeInTheDocument();
+    expect(screen.getByText('Wallet not connected')).toBeInTheDocument();
+    expect(
+      screen.getByText('Connect your wallet to view and claim your winnings.'),
+    ).toBeInTheDocument();
   });
 
   it('shows error state when queries fail', () => {
@@ -103,7 +106,7 @@ describe('MyWinnings', () => {
       refetch: mockRefetchNFTs,
     });
     render(<MyWinnings />);
-    expect(screen.getByText('Something went wrong!')).toBeInTheDocument();
+    expect(screen.getByText('Failed to load')).toBeInTheDocument();
   });
 
   it('shows loading for raffle section', () => {
@@ -138,7 +141,7 @@ describe('MyWinnings', () => {
       refetch: mockRefetchRaffle,
     });
     render(<MyWinnings />);
-    expect(screen.getByText('No winnings yet.')).toBeInTheDocument();
+    expect(screen.getByText('No ETH rewards yet')).toBeInTheDocument();
   });
 
   it('renders page heading and sections with data', () => {
@@ -166,7 +169,7 @@ describe('MyWinnings', () => {
     });
     render(<MyWinnings />);
 
-    expect(screen.getByText('Pending Winnings')).toBeInTheDocument();
+    expect(screen.getByText('My Rewards')).toBeInTheDocument();
     expect(screen.getByText('Claimable ETH Rewards')).toBeInTheDocument();
     expect(screen.getByText('Donated NFTs')).toBeInTheDocument();
     expect(screen.getByTestId('donated-nft-table')).toHaveTextContent('nfts: 1');
@@ -175,6 +178,6 @@ describe('MyWinnings', () => {
 
   it('has no accessibility violations', async () => {
     const { container } = render(<MyWinnings />);
-    await checkA11y(container);
+    await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

@@ -4,8 +4,12 @@ import { useState } from 'react';
 import { parseEther } from 'viem';
 
 import { MainWrapper } from '@/components/styled';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { SectionDivider } from '@/components/ui/section-divider';
+import { Spinner } from '@/components/ui/spinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useDonationsBoth } from '@/hooks/useApiQuery';
 import EthDonationTable, { EthDonation } from '@/components/tables/EthDonationTable';
 import { useNotification } from '@/contexts/NotificationContext';
@@ -79,54 +83,63 @@ const EthDonations = () => {
 
   return (
     <MainWrapper>
-      <h2 className="text-2xl font-bold text-primary text-center mb-8">Direct (ETH) Donations</h2>
-
-      {isLoading || charityDonations === null ? (
-        <p className="text-lg font-semibold">Loading...</p>
-      ) : (
-        <>
-          <h3 className="text-lg font-semibold">Donation History</h3>
-          <EthDonationTable list={charityDonations} />
-        </>
-      )}
+      <PageHeader
+        title="ETH Donations"
+        subtitle="Donate ETH directly to the Cosmic Signature charity pool"
+      />
 
       {!!account && (
-        <>
-          <div className="mt-12">
-            <div className="flex items-center mb-2">
-              <span className="mr-2">Amount:</span>
+        <div className="mb-12 rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 space-y-4">
+          <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+            Make a Donation
+          </h3>
+          <div>
+            <Label className="text-xs text-muted-foreground mb-1.5 block">Amount (ETH)</Label>
+            <div className="flex items-center gap-2">
               <Input
-                placeholder="Donation amount"
+                placeholder="0.0"
                 type="number"
                 value={donateAmount}
-                className="mr-2 w-auto"
+                className="max-w-xs"
                 onChange={(e) => setDonateAmount(e.target.value)}
               />
-              <span>ETH</span>
+              <span className="text-sm text-muted-foreground">ETH</span>
             </div>
-
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground mb-1.5 block">
+              Information <span className="opacity-50">(optional, JSON)</span>
+            </Label>
             <textarea
               value={donateInformation}
-              rows={5}
-              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-[15px] ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              placeholder="Donation information (JSON format)"
+              rows={3}
+              className="flex w-full rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
+              placeholder='{"name": "Your Name", "message": "..."}'
               onChange={(e) => setDonationInformation(e.target.value)}
             />
           </div>
-
-          <div className="mt-2 mb-2">
-            <Button
-              disabled={!donateAmount || donateAmount === '0'}
-              onClick={handleDonate}
-              className="mr-2"
-            >
+          <div className="flex gap-2 pt-2">
+            <Button disabled={!donateAmount || donateAmount === '0'} onClick={handleDonate}>
               Donate
             </Button>
-            <Button disabled={!donateAmount || donateAmount === '0'} onClick={handleDonateWithInfo}>
+            <Button
+              variant="outline"
+              disabled={!donateAmount || donateAmount === '0'}
+              onClick={handleDonateWithInfo}
+            >
               Donate with Info
             </Button>
           </div>
-        </>
+        </div>
+      )}
+
+      <SectionDivider title="Donation History" className="mb-6" />
+      {isLoading || charityDonations === null ? (
+        <div className="flex justify-center py-8">
+          <Spinner />
+        </div>
+      ) : (
+        <EthDonationTable list={charityDonations} />
       )}
     </MainWrapper>
   );

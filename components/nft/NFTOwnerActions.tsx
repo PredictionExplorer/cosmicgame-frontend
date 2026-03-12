@@ -1,11 +1,12 @@
 import { type ChangeEvent } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Pen, Send } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { SectionDivider } from '@/components/ui/section-divider';
 
-/** Props for the NFT owner actions panel. */
 export interface NFTOwnerActionsProps {
   address: string;
   tokenName: string;
@@ -21,7 +22,6 @@ export interface NFTOwnerActionsProps {
   onClearName: () => void;
 }
 
-/** Transfer and rename controls shown only to the token's current owner. */
 export function NFTOwnerActions({
   address,
   tokenName,
@@ -37,27 +37,52 @@ export function NFTOwnerActions({
   onClearName,
 }: NFTOwnerActionsProps) {
   return (
-    <>
-      <div className="flex mt-6">
-        <Input
-          placeholder="Enter address here"
-          className="flex-1"
-          value={address}
-          onChange={(e) => onAddressChange(e.target.value)}
-        />
-        <Button variant="secondary" onClick={onTransfer} className="ml-2" disabled={disabled}>
-          Transfer
-          <ArrowRight className="ml-1 h-4 w-4" />
-        </Button>
+    <div
+      className="gradient-border-card rounded-xl bg-white/[0.02] p-6"
+      data-testid="owner-actions"
+    >
+      <div className="flex items-center gap-2 mb-6">
+        <h3 className="text-lg font-semibold text-foreground">Manage Your Token</h3>
+        <InfoTooltip content="As the current owner, you can transfer this token to another address or set a custom name for it." />
       </div>
 
-      <div className="mt-6">
-        <h6 className="text-lg font-medium text-left">
-          {nftTokenName ? 'Rename the token' : 'Set a name to the token'}
-        </h6>
-        <div className="flex">
+      {/* Transfer section */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Send className="h-4 w-4 text-primary/70" />
+          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            Transfer
+          </h4>
+          <InfoTooltip content="Send this token to another Ethereum address. Double-check the address before confirming — transfers are irreversible." />
+        </div>
+        <div className="flex gap-2">
           <Input
-            placeholder="Enter token name here"
+            placeholder="Recipient address (0x...)"
+            className="flex-1 font-mono text-sm"
+            value={address}
+            onChange={(e) => onAddressChange(e.target.value)}
+          />
+          <Button variant="secondary" onClick={onTransfer} disabled={disabled}>
+            Transfer
+            <ArrowRight className="ml-1.5 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <SectionDivider className="my-6" />
+
+      {/* Rename section */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <Pen className="h-4 w-4 text-primary/70" />
+          <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+            {nftTokenName ? 'Rename Token' : 'Name Token'}
+          </h4>
+          <InfoTooltip content="Give your token a custom name (max 32 bytes). Named tokens appear on the Named NFTs page." />
+        </div>
+        <div className="flex gap-2">
+          <Input
+            placeholder="Enter token name"
             value={tokenName}
             className="flex-1"
             maxLength={32}
@@ -66,25 +91,24 @@ export function NFTOwnerActions({
           <Button
             variant="secondary"
             onClick={onSetName}
-            className="ml-2 whitespace-nowrap"
+            className="whitespace-nowrap"
             disabled={!tokenName}
           >
             {nftTokenName === '' ? 'Set Name' : 'Change Name'}
           </Button>
           {nameHistoryCount > 0 && currentName && (
-            <Button variant="secondary" onClick={onClearName} className="ml-2 whitespace-nowrap">
-              Clear name
+            <Button variant="outline" onClick={onClearName} className="whitespace-nowrap">
+              Clear
             </Button>
           )}
         </div>
-        <p className="text-sm mt-2 italic">
-          There are {totalNamedTokens} tokens with a name, click{' '}
+        <p className="text-xs text-muted-foreground mt-3">
+          There are {totalNamedTokens} tokens with a name.{' '}
           <Link href="/named-nfts" className="text-primary hover:underline">
-            here
-          </Link>{' '}
-          for a full list.
+            View all named tokens
+          </Link>
         </p>
       </div>
-    </>
+    </div>
   );
 }

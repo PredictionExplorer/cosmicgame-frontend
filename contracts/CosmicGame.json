@@ -2414,6 +2414,18 @@
     ]
   },
   {
+    "name": "systemMode",
+    "type": "function",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "uint256",
+        "name": "param0"
+      }
+    ]
+  },
+  {
     "name": "timeoutDurationToClaimMainPrize",
     "type": "function",
     "stateMutability": "view",

@@ -8,6 +8,7 @@ import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
+import { PageHeader } from '@/components/layout/PageHeader';
 import {
   MainWrapper,
   TablePrimary,
@@ -93,7 +94,10 @@ const UsedRwlkNftsPage = () => {
 
   return (
     <MainWrapper>
-      <h2 className="mb-3 text-center text-2xl font-bold text-primary">Used RandomWalk NFTs</h2>
+      <PageHeader
+        title="Used Random Walk NFTs"
+        subtitle="Random Walk NFTs that have been used for bidding"
+      />
 
       <div className="mt-12">
         {loading ? (

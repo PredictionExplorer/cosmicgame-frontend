@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 
+import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
 import { useBidList } from '@/hooks/useApiQuery';
 import BanBidTable from '@/components/tables/BanBidTable';
@@ -13,11 +14,13 @@ const AdminPage = () => {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-8">Administrative methods</h4>
+      <PageHeader title="Admin" subtitle="Manage bids and system administration" />
       <div>
-        <h5 className="text-xl font-semibold mb-4">Bid List</h5>
+        <h2 className="text-xl font-semibold mb-4">Bid List</h2>
         {isLoading || bidList === null ? (
-          <h6 className="text-lg font-semibold">Loading...</h6>
+          <p className="text-lg font-semibold" role="status">
+            Loading...
+          </p>
         ) : (
           <BanBidTable biddingHistory={bidList} />
         )}

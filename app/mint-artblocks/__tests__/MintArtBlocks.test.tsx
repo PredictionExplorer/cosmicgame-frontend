@@ -1,4 +1,4 @@
-import { checkA11y, render, screen } from '@/test-utils';
+import { act, checkA11y, render, screen } from '@/test-utils';
 
 import MintArtBlocks from '../MintArtBlocks';
 
@@ -36,25 +36,33 @@ jest.mock('../../../utils/errors', () => ({
 beforeEach(() => jest.clearAllMocks());
 
 describe('MintArtBlocks', () => {
-  it('renders the "GET AN ART BLOCKS NFT FOR" text', () => {
-    render(<MintArtBlocks />);
+  it('renders the "GET AN ART BLOCKS NFT FOR" text', async () => {
+    await act(async () => {
+      render(<MintArtBlocks />);
+    });
     expect(screen.getByText('GET AN')).toBeInTheDocument();
     expect(screen.getByText('ART BLOCKS')).toBeInTheDocument();
     expect(screen.getByText('NFT FOR')).toBeInTheDocument();
   });
 
-  it('renders the Mint now button', () => {
-    render(<MintArtBlocks />);
+  it('renders the Mint now button', async () => {
+    await act(async () => {
+      render(<MintArtBlocks />);
+    });
     expect(screen.getByRole('button', { name: 'Mint now' })).toBeInTheDocument();
   });
 
-  it('renders "Current Token ID" label', () => {
-    render(<MintArtBlocks />);
+  it('renders "Current Token ID" label', async () => {
+    await act(async () => {
+      render(<MintArtBlocks />);
+    });
     expect(screen.getByText(/Current Token ID/)).toBeInTheDocument();
   });
 
-  it('calls curTokenId on mount', () => {
-    render(<MintArtBlocks />);
+  it('calls curTokenId on mount', async () => {
+    await act(async () => {
+      render(<MintArtBlocks />);
+    });
     expect(mockCurTokenId).toHaveBeenCalled();
   });
 
@@ -64,18 +72,26 @@ describe('MintArtBlocks', () => {
     expect(tokenIdEl).toBeInTheDocument();
   });
 
-  it('renders the count selector', () => {
-    render(<MintArtBlocks />);
+  it('renders the count selector', async () => {
+    await act(async () => {
+      render(<MintArtBlocks />);
+    });
     expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 
-  it('Mint button is not disabled by default', () => {
-    render(<MintArtBlocks />);
+  it('Mint button is not disabled by default', async () => {
+    await act(async () => {
+      render(<MintArtBlocks />);
+    });
     expect(screen.getByRole('button', { name: 'Mint now' })).not.toBeDisabled();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<MintArtBlocks />);
-    await checkA11y(container);
+    let container: HTMLElement;
+    await act(async () => {
+      const result = render(<MintArtBlocks />);
+      container = result.container;
+    });
+    await checkA11y(container!);
   });
 });

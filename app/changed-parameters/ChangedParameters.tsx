@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useSystemModelist, useSystemEvents } from '@/hooks/useApiQuery';
@@ -16,7 +17,10 @@ function ChangedParameters() {
   if (!account) {
     return (
       <MainWrapper>
-        <h4 className="text-2xl font-bold text-primary text-center mb-8">Changed Parameters</h4>
+        <PageHeader
+          title="Changed Parameters"
+          subtitle="History of system parameter changes and admin events"
+        />
         <p className="text-base font-medium">Please login to Metamask to see your winnings.</p>
       </MainWrapper>
     );
@@ -24,7 +28,10 @@ function ChangedParameters() {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-8">Changed Parameters</h4>
+      <PageHeader
+        title="Changed Parameters"
+        subtitle="History of system parameter changes and admin events"
+      />
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (

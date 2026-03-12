@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 
+import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
 
 const perUserLinks = [
@@ -24,7 +25,7 @@ const systemLinks = [
 const SiteMapPage = () => {
   return (
     <MainWrapper>
-      <h2 className="mb-12 text-center text-2xl font-bold text-primary">Site Map</h2>
+      <PageHeader title="Site Map" subtitle="Navigate to all sections of the Cosmic Game" />
 
       <div>
         <h3 className="text-xl font-semibold">Per-user information</h3>

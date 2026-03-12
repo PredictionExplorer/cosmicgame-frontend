@@ -1,16 +1,22 @@
 import type { ReactNode } from 'react';
 
+import { InfoTooltip } from '@/components/ui/info-tooltip';
+
 /** Props for a single statistics label/value row. */
 export interface StatisticsItemProps {
   title: string;
   value: ReactNode;
+  tooltip?: string;
 }
 
-/** Displays a single statistics metric as a label/value row. */
-export const StatisticsItem = ({ title, value }: StatisticsItemProps) => (
-  <div className="my-2 flex flex-wrap">
-    <p className="mr-4 w-[200px] font-medium text-primary md:w-[400px]">{title}</p>
-    <p className="flex-1 break-all">{value}</p>
+/** Displays a single statistics metric as a stacked label/value block. */
+export const StatisticsItem = ({ title, value, tooltip }: StatisticsItemProps) => (
+  <div className="rounded-lg px-3 py-2.5 transition-colors hover:bg-white/[0.03]">
+    <p className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+      <span>{title}</span>
+      {tooltip && <InfoTooltip content={tooltip} />}
+    </p>
+    <p className="text-sm font-semibold">{value}</p>
   </div>
 );
 
@@ -32,5 +38,5 @@ export const CountdownRenderer = ({
   if (minutes || result) result += `${minutes}m `;
   if (seconds || result) result += `${seconds}s`;
   if (result !== '') result += ' left';
-  return result !== '' ? <p>{result}</p> : null;
+  return result !== '' ? <p className="text-primary font-medium">{result}</p> : null;
 };

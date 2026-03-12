@@ -1,16 +1,26 @@
 import { render, screen, checkA11y } from '@/test-utils';
 
-import { StatRow, UserStatsSection, type UserProfileInfo } from '../UserStatsSection';
+import {
+  UserStatsSection,
+  type UserStatsSectionProps,
+  type UserProfileInfo,
+} from '../UserStatsSection';
 
-jest.mock('next/link', () => ({
-  __esModule: true,
-  default: ({ children, ...props }: { children: React.ReactNode; href: string }) => (
-    <a {...props}>{children}</a>
+jest.mock('../HeroStats', () => ({
+  HeroStats: (props: { userInfo: UserProfileInfo }) => (
+    <div data-testid="hero-stats">bids: {props.userInfo?.NumBids}</div>
   ),
 }));
-
-jest.mock('../../../utils', () => ({
-  formatEthValue: (v: number) => `${v.toFixed(4)} ETH`,
+jest.mock('../ActivitySummary', () => ({
+  ActivitySummary: () => <div data-testid="activity-summary" />,
+}));
+jest.mock('../QuickActions', () => ({
+  QuickActions: ({ address }: { address: string }) => (
+    <div data-testid="quick-actions">{address}</div>
+  ),
+}));
+jest.mock('../RafflePerformance', () => ({
+  RafflePerformance: () => <div data-testid="raffle-performance" />,
 }));
 
 const userInfo: UserProfileInfo = {
@@ -29,53 +39,53 @@ const userInfo: UserProfileInfo = {
   RewardNFTsCount: 7,
 };
 
-describe('StatRow', () => {
-  it('renders label and children', () => {
-    render(<StatRow label="My Label:">My Value</StatRow>);
-    expect(screen.getByText('My Label:')).toBeInTheDocument();
-    expect(screen.getByText('My Value')).toBeInTheDocument();
-  });
-});
+const defaultProps: UserStatsSectionProps = {
+  userInfo,
+  balanceETH: 1.5,
+  balanceCST: 100,
+  raffleETHProbability: 0.25,
+  raffleNFTProbability: 0.1,
+  data: null,
+  isOwnProfile: false,
+  totalStakeRewardEth: 0,
+};
 
 describe('UserStatsSection', () => {
-  const defaultProps = {
-    userInfo,
-    balanceETH: 1.5,
-    balanceCST: 100,
-    raffleETHProbability: 0.25,
-    raffleNFTProbability: 0.1,
-    data: null,
-  };
-
-  it('renders number of bids', () => {
+  it('renders HeroStats with user info', () => {
     render(<UserStatsSection {...defaultProps} />);
-    expect(screen.getByText('10')).toBeInTheDocument();
+    expect(screen.getByTestId('hero-stats')).toHaveTextContent('bids: 10');
   });
 
-  it('renders ETH balance when non-zero', () => {
+  it('renders ActivitySummary', () => {
     render(<UserStatsSection {...defaultProps} />);
-    expect(screen.getByText('ETH Balance:')).toBeInTheDocument();
+    expect(screen.getByTestId('activity-summary')).toBeInTheDocument();
   });
 
-  it('hides ETH balance when zero', () => {
-    render(<UserStatsSection {...defaultProps} balanceETH={0} />);
-    expect(screen.queryByText('ETH Balance:')).not.toBeInTheDocument();
-  });
-
-  it('renders raffle probabilities', () => {
+  it('renders RafflePerformance', () => {
     render(<UserStatsSection {...defaultProps} />);
-    expect(screen.getByText('25.00%')).toBeInTheDocument();
-    expect(screen.getByText('10.00%')).toBeInTheDocument();
+    expect(screen.getByTestId('raffle-performance')).toBeInTheDocument();
   });
 
-  it('hides probabilities when negative', () => {
-    render(<UserStatsSection {...defaultProps} raffleETHProbability={-1} />);
-    expect(screen.queryByText('Probability of Winning ETH:')).not.toBeInTheDocument();
+  it('renders QuickActions for own profile', () => {
+    render(<UserStatsSection {...defaultProps} isOwnProfile={true} />);
+    expect(screen.getByTestId('quick-actions')).toHaveTextContent('0xUser');
   });
 
-  it('renders transfer links', () => {
+  it('hides QuickActions for other profiles', () => {
+    render(<UserStatsSection {...defaultProps} isOwnProfile={false} />);
+    expect(screen.queryByTestId('quick-actions')).not.toBeInTheDocument();
+  });
+
+  it('renders the user-stats-section container', () => {
     render(<UserStatsSection {...defaultProps} />);
-    expect(screen.getByText(/CosmicSignature \(ERC721\) transfers/)).toBeInTheDocument();
+    expect(screen.getByTestId('user-stats-section')).toBeInTheDocument();
+  });
+
+  it('returns null when userInfo is falsy', () => {
+    const { container } = render(
+      <UserStatsSection {...defaultProps} userInfo={null as unknown as UserProfileInfo} />,
+    );
+    expect(container.innerHTML).toBe('');
   });
 
   it('has no accessibility violations', async () => {

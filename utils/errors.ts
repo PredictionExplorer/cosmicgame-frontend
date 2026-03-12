@@ -31,6 +31,11 @@ export function getEthErrorMessage(err: unknown, fallback = 'An error occurred')
   return fallback;
 }
 
+/** Detects viem's `ContractFunctionExecutionError` (on-chain revert) by error name. */
+export function isContractRevertError(err: unknown): boolean {
+  return err instanceof Error && err.name === 'ContractFunctionExecutionError';
+}
+
 /**
  * Reports an error to Sentry (if configured) and logs it to the console.
  * Use this instead of bare `console.error` throughout the codebase.

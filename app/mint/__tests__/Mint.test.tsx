@@ -60,40 +60,51 @@ jest.mock('../../../utils/contractWrite', () => ({
 
 beforeEach(() => jest.clearAllMocks());
 
+async function renderMint(overrides?: { account?: string | null; tokens?: readonly bigint[] }) {
+  if (overrides?.account !== undefined) {
+    mockUseActiveWeb3React.mockReturnValueOnce({ account: overrides.account });
+  }
+  if (overrides?.tokens) {
+    mockWalletOfOwner.mockResolvedValueOnce(overrides.tokens);
+  }
+  const result = render(<Mint />);
+  await waitFor(() => {
+    expect(mockGetMintPrice).toHaveBeenCalled();
+  }).catch(() => {});
+  await waitFor(() => {}).catch(() => {});
+  return result;
+}
+
 describe('Mint', () => {
-  it('renders the "GET A RANDOM WALK NFT FOR" text', () => {
-    render(<Mint />);
-    expect(screen.getByText('GET A')).toBeInTheDocument();
-    expect(screen.getByText('RANDOM WALK')).toBeInTheDocument();
-    expect(screen.getByText('NFT FOR')).toBeInTheDocument();
+  it('renders the page header', async () => {
+    await renderMint();
+    expect(screen.getByText('Mint Random Walk NFT')).toBeInTheDocument();
   });
 
-  it('renders the Mint now button', () => {
-    render(<Mint />);
-    expect(screen.getByRole('button', { name: 'Mint now' })).toBeInTheDocument();
+  it('renders the Mint now button', async () => {
+    await renderMint();
+    expect(screen.getByRole('button', { name: 'Mint Now' })).toBeInTheDocument();
   });
 
-  it('renders the MY RANDOM WALK NFTS section', () => {
+  it('renders the My Random Walk NFTs section when tokens exist', async () => {
+    mockWalletOfOwner.mockResolvedValueOnce([BigInt(1)] as readonly bigint[]);
     render(<Mint />);
-    expect(screen.getByText('MY')).toBeInTheDocument();
-    expect(screen.getByText('RANDOM')).toBeInTheDocument();
-    expect(screen.getByText('WALK')).toBeInTheDocument();
-    expect(screen.getByText('NFTS')).toBeInTheDocument();
+    expect(await screen.findByText('My Random Walk NFTs')).toBeInTheDocument();
   });
 
-  it('displays mint price with ETH symbol', async () => {
-    render(<Mint />);
-    const priceEl = await screen.findByText(/Ξ/);
-    expect(priceEl).toBeInTheDocument();
+  it('displays mint price with ETH label', async () => {
+    await renderMint();
+    expect(screen.getByText('ETH')).toBeInTheDocument();
+    expect(screen.getByText('Current mint price')).toBeInTheDocument();
   });
 
-  it('calls getMintPrice on mount', () => {
-    render(<Mint />);
+  it('calls getMintPrice on mount', async () => {
+    await renderMint();
     expect(mockGetMintPrice).toHaveBeenCalled();
   });
 
-  it('calls walletOfOwner with account on mount', () => {
-    render(<Mint />);
+  it('calls walletOfOwner with account on mount', async () => {
+    await renderMint();
     expect(mockWalletOfOwner).toHaveBeenCalledWith(['0xUser']);
   });
 
@@ -101,7 +112,7 @@ describe('Mint', () => {
     const tokens: readonly bigint[] = [BigInt(3), BigInt(1), BigInt(2)];
     mockWalletOfOwner.mockResolvedValueOnce(tokens);
     render(<Mint />);
-    const link = await screen.findByText('3');
+    const link = await screen.findByText('#3');
     expect(link).toBeInTheDocument();
   });
 
@@ -110,7 +121,7 @@ describe('Mint', () => {
     mockMint.mockResolvedValueOnce('0xTxHash');
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint now' }));
+    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
 
     await waitFor(() => {
       expect(mockMint).toHaveBeenCalledWith(expect.objectContaining({ value: expect.anything() }));
@@ -122,7 +133,7 @@ describe('Mint', () => {
     mockMint.mockResolvedValueOnce('0xTxHash');
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint now' }));
+    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
 
     await waitFor(() => {
       expect(mockWaitForTxReceipt).toHaveBeenCalledWith({ hash: '0xTxHash' });
@@ -136,7 +147,7 @@ describe('Mint', () => {
     mockIsUserRejection.mockReturnValueOnce(true);
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint now' }));
+    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
 
     await waitFor(() => {
       expect(mockIsUserRejection).toHaveBeenCalledWith(rejectionErr);
@@ -152,7 +163,7 @@ describe('Mint', () => {
     mockIsEthProviderError.mockReturnValueOnce(false);
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint now' }));
+    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
 
     await waitFor(() => {
       expect(mockReportError).toHaveBeenCalledWith(mintErr, 'mint RWLK NFT');
@@ -169,7 +180,7 @@ describe('Mint', () => {
     const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint now' }));
+    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
 
     await waitFor(() => {
       expect(alertSpy).toHaveBeenCalledWith('Insufficient funds');
@@ -182,11 +193,11 @@ describe('Mint', () => {
     mockWalletOfOwner.mockResolvedValueOnce(tokens);
     render(<Mint />);
 
-    await screen.findByText('5');
+    await screen.findByText('#5');
     const links = screen.getAllByRole('link');
     const nftLinks = links.filter((l) => l.getAttribute('href')?.includes('randomwalk'));
     const ids = nftLinks.map((l) => l.textContent);
-    expect(ids).toEqual(['5', '3', '1']);
+    expect(ids).toEqual(['#5', '#3', '#1']);
   });
 
   it('NFT links have correct href format', async () => {
@@ -194,19 +205,21 @@ describe('Mint', () => {
     mockWalletOfOwner.mockResolvedValueOnce(tokens);
     render(<Mint />);
 
-    const link = await screen.findByText('7');
+    const link = await screen.findByText('#7');
     expect(link.closest('a')).toHaveAttribute('href', '/?randomwalk=true&tokenId=7');
   });
 
-  it('does not call walletOfOwner when account is null', () => {
-    mockUseActiveWeb3React.mockReturnValueOnce({ account: null });
+  it('does not call walletOfOwner when account is null', async () => {
+    mockUseActiveWeb3React.mockReturnValue({ account: null });
     mockWalletOfOwner.mockClear();
     render(<Mint />);
+    await waitFor(() => expect(mockGetMintPrice).toHaveBeenCalled());
     expect(mockWalletOfOwner).not.toHaveBeenCalled();
+    mockUseActiveWeb3React.mockReturnValue({ account: '0xUser' });
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<Mint />);
+    const { container } = await renderMint();
     await checkA11y(container);
   });
 });

@@ -112,8 +112,8 @@ describe('ConnectWalletButton', () => {
 
     await user.click(screen.getByText(/0x1234\.{4}5678/));
 
-    expect(screen.getByText('BALANCE:')).toBeInTheDocument();
-    expect(screen.getByText('2.50')).toBeInTheDocument();
+    expect(screen.getByText('Balances')).toBeInTheDocument();
+    expect(screen.getByText('2.5000')).toBeInTheDocument();
   });
 
   it('shows "Loading..." in dropdown when loading is true', async () => {
@@ -157,7 +157,7 @@ describe('ConnectWalletButton', () => {
 
     await user.click(screen.getByText(/0x1234\.{4}5678/));
 
-    expect(screen.getByText('STAKED CST NFT:')).toBeInTheDocument();
+    expect(screen.getByText('CST NFTs')).toBeInTheDocument();
     expect(screen.getByText('7')).toBeInTheDocument();
   });
 
@@ -180,10 +180,10 @@ describe('ConnectWalletButton', () => {
 
     await user.click(screen.getByText(/0x1234\.{4}5678/));
 
-    expect(screen.getByText('MY STATISTICS')).toBeInTheDocument();
-    expect(screen.getByText('MY TOKENS')).toBeInTheDocument();
+    expect(screen.getByText('My Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('My Tokens')).toBeInTheDocument();
 
-    const statLink = screen.getByText('MY STATISTICS').closest('a');
+    const statLink = screen.getByText('My Dashboard').closest('a');
     expect(statLink).toHaveAttribute('href', '/my-statistics');
   });
 

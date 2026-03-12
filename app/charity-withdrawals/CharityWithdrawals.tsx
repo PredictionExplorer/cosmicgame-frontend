@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
 import CharityWithdrawalTable, {
   type CharityWithdrawal,
@@ -11,9 +12,7 @@ const CharityWithdrawals = () => {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-8">
-        Withdrawals from Charity Wallet
-      </h4>
+      <PageHeader title="Charity Withdrawals" subtitle="Funds withdrawn from the charity wallet" />
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (

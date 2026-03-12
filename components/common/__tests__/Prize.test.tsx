@@ -17,9 +17,9 @@ const mockData = {
 };
 
 describe('Prize', () => {
-  it('renders table heading', () => {
+  it('renders section heading', () => {
     render(<Prize data={mockData} />);
-    expect(screen.getByText('LIST OF AVAILABLE PRIZES')).toBeInTheDocument();
+    expect(screen.getByText('Prize Breakdown')).toBeInTheDocument();
   });
 
   it('renders Main Prize link', () => {
@@ -40,7 +40,7 @@ describe('Prize', () => {
     expect(endurance.closest('a')).toHaveAttribute('href', '/faq#endurance-champion');
   });
 
-  it('sets target="_blank" on all external links', () => {
+  it('sets target="_blank" on all FAQ links', () => {
     render(<Prize data={mockData} />);
     const links = screen.getAllByRole('link');
     expect(links.length).toBe(3);
@@ -65,9 +65,9 @@ describe('Prize', () => {
 
   it('displays raffle winner counts', () => {
     render(<Prize data={mockData} />);
-    expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText('2 or 0')).toBeInTheDocument();
+    expect(screen.getByText('5 winners')).toBeInTheDocument();
+    expect(screen.getByText('3 winners')).toBeInTheDocument();
+    expect(screen.getByText('2 or 0 winners')).toBeInTheDocument();
   });
 
   it('calculates Chrono Warrior ETH correctly', () => {
@@ -84,7 +84,7 @@ describe('Prize', () => {
 
   it('renders with null data without crashing', () => {
     render(<Prize data={null} />);
-    expect(screen.getByText('LIST OF AVAILABLE PRIZES')).toBeInTheDocument();
+    expect(screen.getByText('Prize Breakdown')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

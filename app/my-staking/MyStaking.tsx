@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import { usePublicClient } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
+import { Layers, TrendingUp, Gift } from 'lucide-react';
 
 import { MainWrapper } from '@/components/styled';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,7 +27,13 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import { CSTStakingPanel } from '@/components/staking/CSTStakingPanel';
 import { RWLKStakingPanel } from '@/components/staking/RWLKStakingPanel';
+import { StakingHeroStats } from '@/components/staking/StakingHeroStats';
+import type { StakingStatItem } from '@/components/staking/StakingHeroStats';
 import getErrorMessage from '@/utils/alert';
+import { StatCardSkeleton } from '@/components/ui/stat-card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PageHeader } from '@/components/layout/PageHeader';
 
 const MyStaking = () => {
   const { account } = useActiveWeb3React();
@@ -73,6 +80,46 @@ const MyStaking = () => {
     rwlktokens: stakedRWLKTokens,
     fetchData: fetchStakedTokens,
   } = useStakedToken();
+
+  const unclaimedRewardEth = useMemo(() => {
+    return stakingRewards.reduce((sum, r) => sum + (r.RewardToCollectEth ?? 0), 0);
+  }, [stakingRewards]);
+
+  const heroStats: StakingStatItem[] = useMemo(
+    () => [
+      {
+        label: 'Your Staked CST',
+        value: stakedCSTokens.length.toLocaleString(),
+        tooltip:
+          'Number of CosmicSignature NFTs you currently have staked. Staking more tokens increases your share of reward distributions.',
+        icon: <Layers className="h-4 w-4" />,
+      },
+      {
+        label: 'Your Staked RWLK',
+        value: stakedRWLKTokens.length.toLocaleString(),
+        tooltip:
+          'Number of RandomWalk NFTs you currently have staked. Each staked RWLK has a chance to receive a reward mint.',
+        icon: <Layers className="h-4 w-4" />,
+      },
+      {
+        label: 'Unclaimed Rewards',
+        value: unclaimedRewardEth > 0 ? `${unclaimedRewardEth.toFixed(4)} ETH` : '0 ETH',
+        tooltip:
+          'ETH rewards that have been earned by your staked CST tokens but not yet collected. Unstaking a token automatically claims its accumulated rewards.',
+        icon: <Gift className="h-4 w-4" />,
+        featured: true,
+        gradient: true,
+      },
+      {
+        label: 'Reward per CST',
+        value: rewardPerCST > 0 ? `${rewardPerCST.toFixed(6)} ETH` : '--',
+        tooltip:
+          'Current ETH reward earned per staked CST token, calculated as the total staking pool divided by the number of staked tokens.',
+        icon: <TrendingUp className="h-4 w-4" />,
+      },
+    ],
+    [stakedCSTokens, stakedRWLKTokens, unclaimedRewardEth, rewardPerCST],
+  );
 
   const handleError = useCallback(
     (err: unknown) => {
@@ -241,35 +288,30 @@ const MyStaking = () => {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-16">My Staking</h4>
+      <PageHeader title="My Staking" subtitle="Manage your staked tokens and view rewards" />
 
       {!account ? (
-        <p className="text-base">Please login to Metamask to see your staking.</p>
+        <EmptyState
+          title="Wallet not connected"
+          description="Please connect your wallet to manage your staking."
+        />
       ) : loading ? (
-        <h6 className="text-lg font-semibold">Loading...</h6>
+        <div data-testid="my-staking-skeleton">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <StatCardSkeleton key={i} />
+            ))}
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-64 w-full" />
+          </div>
+        </div>
       ) : (
         <>
-          <div className="flex">
-            <p className="text-base mr-2">Number of globally staked CST tokens:</p>
-            <p className="text-base">
-              {dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked}
-            </p>
-          </div>
-          <div className="flex">
-            <p className="text-base mr-2">Number of globally staked RandomWalk tokens:</p>
-            <p className="text-base">
-              {dashboardData?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked}
-            </p>
-          </div>
+          <StakingHeroStats stats={heroStats} className="mb-10" />
 
-          {rewardPerCST > 0 && (
-            <div className="flex">
-              <p className="text-base mr-2">Reward (as of now) for staking 1 CST token:</p>
-              <p className="text-base">{rewardPerCST.toFixed(6)}</p>
-            </div>
-          )}
-
-          <Tabs defaultValue="cst" className="mt-8">
+          <Tabs defaultValue="cst" className="mt-0">
             <TabsList className="w-full h-auto">
               <TabsTrigger value="cst" className="flex-1 py-3">
                 <div className="flex items-center">

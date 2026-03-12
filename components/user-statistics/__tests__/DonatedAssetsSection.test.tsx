@@ -35,42 +35,75 @@ const defaultProps: DonatedAssetsSectionProps = {
 describe('DonatedAssetsSection', () => {
   it('renders both section headings', () => {
     render(<DonatedAssetsSection {...defaultProps} />);
-    expect(screen.getByText('Donated NFTs User Won')).toBeInTheDocument();
+    expect(screen.getByText('Donated NFTs Won')).toBeInTheDocument();
     expect(screen.getByText('Donated ERC20 Tokens')).toBeInTheDocument();
   });
 
-  it('shows NFT loading state', () => {
+  it('shows skeleton loading for NFTs', () => {
     render(<DonatedAssetsSection {...defaultProps} loadingNFTs={true} />);
-    expect(screen.getAllByText('Loading...').length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId('table-skeleton').length).toBeGreaterThan(0);
   });
 
-  it('shows ERC20 loading state', () => {
+  it('shows skeleton loading for ERC20', () => {
     render(<DonatedAssetsSection {...defaultProps} loadingERC20={true} />);
-    expect(screen.getAllByText('Loading...').length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId('table-skeleton').length).toBeGreaterThan(0);
   });
 
-  it('renders Claim All button when unclaimed NFTs exist', () => {
+  it('shows empty state when no donated NFTs', () => {
+    render(<DonatedAssetsSection {...defaultProps} />);
+    expect(screen.getByText('No donated NFTs')).toBeInTheDocument();
+  });
+
+  it('shows empty state when no donated ERC20 tokens', () => {
+    render(<DonatedAssetsSection {...defaultProps} />);
+    expect(screen.getByText('No donated tokens')).toBeInTheDocument();
+  });
+
+  it('renders Claim All NFTs button when unclaimed NFTs exist', () => {
     const nft = {
       Index: 0,
       RecordId: '1',
     } as unknown as DonatedAssetsSectionProps['unclaimedNFTs'][0];
     render(<DonatedAssetsSection {...defaultProps} unclaimedNFTs={[nft]} />);
-    expect(screen.getByText('Claim All')).toBeInTheDocument();
+    expect(screen.getByText('Claim All NFTs')).toBeInTheDocument();
   });
 
-  it('hides Claim All when canClaim is false', () => {
+  it('renders unclaimed badge for NFTs', () => {
+    const nft = {
+      Index: 0,
+      RecordId: '1',
+    } as unknown as DonatedAssetsSectionProps['unclaimedNFTs'][0];
+    render(<DonatedAssetsSection {...defaultProps} unclaimedNFTs={[nft]} />);
+    expect(screen.getByText('1 unclaimed')).toBeInTheDocument();
+  });
+
+  it('renders Claim All Tokens button when unclaimed ERC20 exist', () => {
+    const token = {
+      RoundNum: 1,
+      TokenAddr: '0x123',
+      AmountDonatedEth: '1.0',
+      Claimed: false,
+    } as unknown as DonatedAssetsSectionProps['donatedERC20'][0];
+    render(<DonatedAssetsSection {...defaultProps} donatedERC20={[token]} />);
+    expect(screen.getByText('Claim All Tokens')).toBeInTheDocument();
+  });
+
+  it('hides claim buttons when canClaim is false', () => {
     const nft = {
       Index: 0,
       RecordId: '1',
     } as unknown as DonatedAssetsSectionProps['unclaimedNFTs'][0];
     render(<DonatedAssetsSection {...defaultProps} unclaimedNFTs={[nft]} canClaim={false} />);
-    expect(screen.queryByText('Claim All')).not.toBeInTheDocument();
+    expect(screen.queryByText('Claim All NFTs')).not.toBeInTheDocument();
   });
 
   it('renders tables with combined NFT data', () => {
-    render(<DonatedAssetsSection {...defaultProps} />);
-    expect(screen.getByTestId('donated-nft-table')).toHaveTextContent('nfts: 0');
-    expect(screen.getByTestId('donated-erc20-table')).toHaveTextContent('tokens: 0');
+    const nft = {
+      Index: 0,
+      RecordId: '1',
+    } as unknown as DonatedAssetsSectionProps['unclaimedNFTs'][0];
+    render(<DonatedAssetsSection {...defaultProps} unclaimedNFTs={[nft]} />);
+    expect(screen.getByTestId('donated-nft-table')).toHaveTextContent('nfts: 1');
   });
 
   it('has no accessibility violations', async () => {

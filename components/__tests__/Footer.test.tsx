@@ -35,32 +35,30 @@ describe('Footer', () => {
   });
 
   it('renders the logo', () => {
-    const logo = screen.getByAltText('logo');
+    const logo = screen.getByAltText('Cosmic Signature');
     expect(logo).toBeInTheDocument();
     expect(logo).toHaveAttribute('src', '/images/logo2.svg');
   });
 
   it('renders copyright text', () => {
-    expect(screen.getByText(/Copyright/)).toBeInTheDocument();
-    expect(screen.getByText(/2025 Cosmic Signature/)).toBeInTheDocument();
+    expect(screen.getByText(/Cosmic Signature\. All rights reserved\./)).toBeInTheDocument();
+    expect(screen.getByText(/\d{4} Cosmic Signature/)).toBeInTheDocument();
   });
 
-  it('renders the terms and conditions link', () => {
-    const termsLink = screen.getByText('Terms and conditions');
+  it('renders the terms link', () => {
+    const termsLink = screen.getByText('Terms');
     expect(termsLink).toBeInTheDocument();
-    expect(termsLink).toHaveAttribute('target', '_blank');
-    expect(termsLink).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(termsLink.tagName).toBe('A');
   });
 
-  it('renders the privacy policy link', () => {
-    const privacyLink = screen.getByText('Privacy policy');
+  it('renders the privacy link', () => {
+    const privacyLink = screen.getByText('Privacy');
     expect(privacyLink).toBeInTheDocument();
-    expect(privacyLink).toHaveAttribute('target', '_blank');
-    expect(privacyLink).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(privacyLink.tagName).toBe('A');
   });
 
   it('renders the twitter link pointing to the correct URL', () => {
-    const twitterLink = screen.getByLabelText('twitter');
+    const twitterLink = screen.getByLabelText('Twitter');
     expect(twitterLink).toBeInTheDocument();
     expect(twitterLink).toHaveAttribute('href', 'https://x.com/CosmicSignatureNFT');
     expect(twitterLink).toHaveAttribute('target', '_blank');
@@ -68,7 +66,7 @@ describe('Footer', () => {
   });
 
   it('renders the discord link pointing to the correct URL', () => {
-    const discordLink = screen.getByLabelText('discord');
+    const discordLink = screen.getByLabelText('Discord');
     expect(discordLink).toBeInTheDocument();
     expect(discordLink).toHaveAttribute('href', 'https://discord.gg/bGnPn96Qwt');
     expect(discordLink).toHaveAttribute('target', '_blank');
@@ -83,8 +81,8 @@ describe('Footer', () => {
     });
   });
 
-  it('renders the site-map link', () => {
-    const siteMapLink = screen.getByLabelText('site-map');
+  it('renders the site map link', () => {
+    const siteMapLink = screen.getByText('Site Map');
     expect(siteMapLink).toBeInTheDocument();
     expect(siteMapLink).toHaveAttribute('href', '/site-map');
   });

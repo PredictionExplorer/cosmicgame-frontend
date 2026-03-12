@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
 import {
   CharityDepositTable,
@@ -12,7 +13,10 @@ const CharityDepositsVoluntary = () => {
 
   return (
     <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-8">Voluntary Deposits</h4>
+      <PageHeader
+        title="Voluntary Donations"
+        subtitle="Community members' voluntary contributions to charity"
+      />
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
