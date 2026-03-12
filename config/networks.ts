@@ -60,7 +60,7 @@ const networks: Record<NetworkName, NetworkConfig> = {
     chainId: 421614,
     chainHex: '0x66eee',
     chainName: 'Arbitrum Sepolia',
-    rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'http://161.129.67.42:22545',
+    rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
     explorerUrl: 'https://sepolia-explorer.arbitrum.io',
     apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://161.129.67.42:8353/api/cosmicgame',
     nftApiUrl: 'https://nfts.cosmicsignature.com',
