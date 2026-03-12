@@ -44,12 +44,12 @@ const FAQ = () => {
     {
       summary: 'What is an Endurance Champion?',
       detail:
-        'The bidder who held the lead position for the longest continuous time between two bids (or until the round ended).',
+        'The bidder who remained the last bidder for the longest consecutive period of time (i.e. the longest gap before someone else bid).',
     },
     {
       summary: 'What is a Chrono Warrior?',
       detail:
-        'The bidder who spent the most total time in the lead position during a round, regardless of whether that time came from one long stretch or multiple shorter stretches.',
+        'The bidder who held the Endurance Champion title for the longest consecutive period of time. Similar to how the Endurance Champion is the longest-reigning last bidder, the Chrono Warrior is the longest-reigning Endurance Champion.',
     },
     {
       summary: 'How does the raffle work?',
