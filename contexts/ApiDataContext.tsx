@@ -45,6 +45,8 @@ interface ApiDataContextValue {
   setApiData: Dispatch<SetStateAction<ApiData>>;
   fetchData: () => Promise<void>;
   unclaimedRewards: StakingCSTReward[];
+  error: string | null;
+  isLoading: boolean;
 }
 
 const ApiDataContext = createContext<ApiDataContextValue | undefined>(undefined);
@@ -59,12 +61,21 @@ export const useApiData = (): ApiDataContextValue => {
 
 export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
   const [apiData, setApiData] = useState<ApiData>(initialApiData);
+  const [error, setError] = useState<string | null>(null);
 
   const { cstokens: stakedTokens } = useStakedToken();
   const { account } = useActiveWeb3React();
 
-  const { data: redBoxData, refetch: refetchRedBox } = useNotifyRedBox(account);
-  const { data: rewardsData, refetch: refetchRewards } = useStakingCSTRewardsToClaimByUser(account);
+  const {
+    data: redBoxData,
+    refetch: refetchRedBox,
+    isLoading: redBoxLoading,
+  } = useNotifyRedBox(account);
+  const {
+    data: rewardsData,
+    refetch: refetchRewards,
+    isLoading: rewardsLoading,
+  } = useStakingCSTRewardsToClaimByUser(account);
 
   const unclaimedRewards = useMemo(() => rewardsData ?? [], [rewardsData]);
 
@@ -143,6 +154,7 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
           const actionIds = await fetchActionIds(rewardList);
           if (!cancelled) {
             setApiData({ ...initialApiData, ...redBoxData, ...actionIds });
+            setError(null);
           }
         } else {
           if (!cancelled) {
@@ -152,10 +164,14 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
               unstakeableActionIds: [],
               claimableActionIds: [],
             });
+            setError(null);
           }
         }
-      } catch (error) {
-        reportError(error, 'ApiDataContext processData');
+      } catch (err) {
+        reportError(err, 'ApiDataContext processData');
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load winnings data');
+        }
       }
     };
 
@@ -169,8 +185,12 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
     await Promise.all([refetchRedBox(), refetchRewards()]);
   }, [refetchRedBox, refetchRewards]);
 
+  const isLoading = redBoxLoading || rewardsLoading;
+
   return (
-    <ApiDataContext.Provider value={{ apiData, setApiData, fetchData, unclaimedRewards }}>
+    <ApiDataContext.Provider
+      value={{ apiData, setApiData, fetchData, unclaimedRewards, error, isLoading }}
+    >
       {children}
     </ApiDataContext.Provider>
   );

@@ -139,13 +139,15 @@ describe('StakedTokenContext', () => {
     expect(typeof result.current.fetchData).toBe('function');
   });
 
-  it('context value has exactly three properties', () => {
+  it('context value has the expected properties', () => {
     const { result } = renderHook(() => useStakedToken(), { wrapper });
     const keys = Object.keys(result.current);
-    expect(keys).toHaveLength(3);
+    expect(keys).toHaveLength(5);
     expect(keys).toContain('cstokens');
     expect(keys).toContain('rwlktokens');
     expect(keys).toContain('fetchData');
+    expect(keys).toContain('error');
+    expect(keys).toContain('isLoading');
   });
 
   it('fetchData is a stable reference across re-renders', () => {

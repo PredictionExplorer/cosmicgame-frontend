@@ -8,6 +8,8 @@ interface StakedTokenContextValue {
   cstokens: StakedTokenInfo[];
   rwlktokens: StakedTokenInfo[];
   fetchData: () => Promise<void>;
+  error: string | null;
+  isLoading: boolean;
 }
 
 const StakedTokenContext = createContext<StakedTokenContextValue | undefined>(undefined);
@@ -19,11 +21,24 @@ interface StakedTokenProviderProps {
 export const StakedTokenProvider = ({ children }: StakedTokenProviderProps) => {
   const { account } = useActiveWeb3React();
 
-  const { data: cstData, refetch: refetchCST } = useStakedCSTTokensByUser(account);
-  const { data: rwlkData, refetch: refetchRWLK } = useStakedRWLKTokensByUser(account);
+  const {
+    data: cstData,
+    refetch: refetchCST,
+    isLoading: cstLoading,
+    error: cstError,
+  } = useStakedCSTTokensByUser(account);
+  const {
+    data: rwlkData,
+    refetch: refetchRWLK,
+    isLoading: rwlkLoading,
+    error: rwlkError,
+  } = useStakedRWLKTokensByUser(account);
 
   const cstokens = cstData ?? [];
   const rwlktokens = rwlkData ?? [];
+  const isLoading = cstLoading || rwlkLoading;
+  const queryError = cstError || rwlkError;
+  const error = queryError ? (queryError instanceof Error ? queryError.message : String(queryError)) : null;
 
   const fetchData = useMemo(
     () => async () => {
@@ -33,7 +48,7 @@ export const StakedTokenProvider = ({ children }: StakedTokenProviderProps) => {
   );
 
   return (
-    <StakedTokenContext.Provider value={{ cstokens, rwlktokens, fetchData }}>
+    <StakedTokenContext.Provider value={{ cstokens, rwlktokens, fetchData, error, isLoading }}>
       {children}
     </StakedTokenContext.Provider>
   );
