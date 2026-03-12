@@ -1,9 +1,12 @@
 import Image from 'next/image';
+import { Lock, Unlock, Coins, Gift, Layers } from 'lucide-react';
 
 import { formatEthValue } from '@/utils';
 
 import type { StakingAction, StakingRewardMint } from '@/services/api';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { StatCard } from '@/components/ui/stat-card';
+import { EmptyState } from '@/components/ui/empty-state';
 import StakingActionsTable from '@/components/staking/StakingActionsTable';
 import { StakingRewardsTable } from '@/components/staking/StakingRewardsTable';
 import { CSTStakingRewardsByDepositTable } from '@/components/staking/CSTStakingRewardsByDepositTable';
@@ -12,8 +15,7 @@ import { UncollectedCSTStakingRewardsTable } from '@/components/staking/Uncollec
 import { RwalkStakingRewardMintsTable } from '@/components/staking/RwalkStakingRewardMintsTable';
 import type { CSTStakingRewardByDeposit } from '@/components/staking/CSTStakingRewardsByDepositTable';
 
-import { StatRow, type UserProfileInfo } from './UserStatsSection';
-
+import type { UserProfileInfo } from './UserStatsSection';
 
 interface StakingRewardRow {
   TokenId: number;
@@ -34,7 +36,7 @@ export interface UserStakingSectionProps {
   rwlkMints: StakingRewardMint[];
 }
 
-/** Staking statistics section with CST and RWLK tabs. */
+/** Staking statistics section with CST and RWLK tabs, stat cards, and detailed tables. */
 export function UserStakingSection({
   address,
   userInfo,
@@ -57,10 +59,12 @@ export function UserStakingSection({
   );
 
   const rwlkStats = userInfo?.StakingStatisticsRWalk;
+  const hasCSTActivity = stakingCSTActions.length > 0 || cstStakingRewards.length > 0;
+  const hasRWLKActivity =
+    (rwlkStats?.TotalNumStakeActions ?? 0) > 0 || stakingRWLKActions.length > 0;
 
   return (
-    <div className="mt-8">
-      <h6 className="text-xl font-medium leading-none mb-2">Staking Statistics</h6>
+    <div data-testid="user-staking-section">
       <Tabs defaultValue="cst" className="w-full">
         <TabsList className="w-full grid grid-cols-2 h-auto bg-transparent border-b border-border rounded-none p-0">
           <TabsTrigger
@@ -92,57 +96,140 @@ export function UserStakingSection({
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="cst" className="p-6">
-          <StatRow label="Total Number of Stake Actions:">{totalStakeActions}</StatRow>
-          <StatRow label="Total Number of Unstake Actions:">{totalUnstakeActions}</StatRow>
-          <StatRow label="Total Tokens with Rewards:">{cstStakingRewards.length}</StatRow>
-          <StatRow label="Total Rewards:">{formatEthValue(totalRewardEth)}</StatRow>
-          <StatRow label="Unclaimed Rewards:">{formatEthValue(unclaimedRewardEth)}</StatRow>
+        <TabsContent value="cst" className="pt-6">
+          {!hasCSTActivity ? (
+            <EmptyState
+              icon={<Layers className="h-8 w-8 text-muted-foreground/50" />}
+              title="No staking activity yet"
+              description="Stake your CosmicSignature NFTs to earn ETH rewards from each round."
+            />
+          ) : (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
+                <StatCard
+                  label="Stake Actions"
+                  value={totalStakeActions.toLocaleString()}
+                  icon={<Lock className="h-3.5 w-3.5" />}
+                  tooltip="Number of times you have staked CosmicSignature NFTs."
+                />
+                <StatCard
+                  label="Unstake Actions"
+                  value={totalUnstakeActions.toLocaleString()}
+                  icon={<Unlock className="h-3.5 w-3.5" />}
+                  tooltip="Number of times you have unstaked CosmicSignature NFTs."
+                />
+                <StatCard
+                  label="Tokens with Rewards"
+                  value={cstStakingRewards.length.toLocaleString()}
+                  icon={<Layers className="h-3.5 w-3.5" />}
+                  tooltip="Number of staked tokens that have accumulated reward distributions."
+                />
+                <StatCard
+                  label="Total Rewards"
+                  value={formatEthValue(totalRewardEth)}
+                  icon={<Coins className="h-3.5 w-3.5" />}
+                  tooltip="Total ETH rewards earned from staking (collected + uncollected)."
+                  featured
+                />
+                <StatCard
+                  label="Unclaimed Rewards"
+                  value={formatEthValue(unclaimedRewardEth)}
+                  icon={<Gift className="h-3.5 w-3.5" />}
+                  tooltip="ETH rewards earned but not yet collected to your wallet."
+                  featured={unclaimedRewardEth > 0}
+                  gradient={unclaimedRewardEth > 0}
+                />
+              </div>
 
-          <div>
-            <h6 className="text-base font-medium leading-none mt-8 mb-4">
-              Stake / Unstake Actions
-            </h6>
-            <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
-          </div>
-          <div className="mt-8">
-            <h6 className="text-base font-medium leading-none mb-4">Staking Rewards by Token</h6>
-            <StakingRewardsTable list={cstStakingRewards} address={address} />
-          </div>
-          <div className="mt-8">
-            <h6 className="text-base font-medium leading-none mb-4">Staking Rewards by Deposit</h6>
-            <CSTStakingRewardsByDepositTable list={cstStakingRewardsByDeposit} />
-          </div>
-          <div className="mt-8">
-            <h6 className="text-base font-medium leading-none mb-4">Collected Staking Rewards</h6>
-            <CollectedCSTStakingRewardsTable list={collectedCstStakingRewards} />
-          </div>
-          <div className="mt-8">
-            <h6 className="text-base font-medium leading-none mb-4">Uncollected Staking Rewards</h6>
-            <UncollectedCSTStakingRewardsTable user={address} />
-          </div>
+              <div className="space-y-8">
+                <div>
+                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
+                    Stake / Unstake Actions
+                  </h6>
+                  <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
+                </div>
+                <div>
+                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
+                    Staking Rewards by Token
+                  </h6>
+                  <StakingRewardsTable list={cstStakingRewards} address={address} />
+                </div>
+                <div>
+                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
+                    Staking Rewards by Deposit
+                  </h6>
+                  <CSTStakingRewardsByDepositTable list={cstStakingRewardsByDeposit} />
+                </div>
+                <div>
+                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
+                    Collected Staking Rewards
+                  </h6>
+                  <CollectedCSTStakingRewardsTable list={collectedCstStakingRewards} />
+                </div>
+                <div>
+                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
+                    Uncollected Staking Rewards
+                  </h6>
+                  <UncollectedCSTStakingRewardsTable user={address} />
+                </div>
+              </div>
+            </>
+          )}
         </TabsContent>
 
-        <TabsContent value="rwlk" className="p-6">
-          <StatRow label="Total Number of Stake Actions:">
-            {rwlkStats?.TotalNumStakeActions ?? 0}
-          </StatRow>
-          <StatRow label="Total Number of Unstake Actions:">
-            {rwlkStats?.TotalNumUnstakeActions ?? 0}
-          </StatRow>
-          <StatRow label="Total Tokens Staked:">{rwlkStats?.TotalTokensStaked ?? 0}</StatRow>
-          <StatRow label="Total Tokens Minted:">{rwlkStats?.TotalTokensMinted ?? 0}</StatRow>
+        <TabsContent value="rwlk" className="pt-6">
+          {!hasRWLKActivity ? (
+            <EmptyState
+              icon={<Layers className="h-8 w-8 text-muted-foreground/50" />}
+              title="No RandomWalk staking yet"
+              description="Stake your RandomWalk NFTs to participate in random reward mints."
+            />
+          ) : (
+            <>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+                <StatCard
+                  label="Stake Actions"
+                  value={(rwlkStats?.TotalNumStakeActions ?? 0).toLocaleString()}
+                  icon={<Lock className="h-3.5 w-3.5" />}
+                  tooltip="Number of times you have staked RandomWalk NFTs."
+                />
+                <StatCard
+                  label="Unstake Actions"
+                  value={(rwlkStats?.TotalNumUnstakeActions ?? 0).toLocaleString()}
+                  icon={<Unlock className="h-3.5 w-3.5" />}
+                  tooltip="Number of times you have unstaked RandomWalk NFTs."
+                />
+                <StatCard
+                  label="Tokens Staked"
+                  value={(rwlkStats?.TotalTokensStaked ?? 0).toLocaleString()}
+                  icon={<Layers className="h-3.5 w-3.5" />}
+                  tooltip="Total RandomWalk NFTs currently staked."
+                  featured
+                />
+                <StatCard
+                  label="Tokens Minted"
+                  value={(rwlkStats?.TotalTokensMinted ?? 0).toLocaleString()}
+                  icon={<Gift className="h-3.5 w-3.5" />}
+                  tooltip="CosmicSignature tokens earned through RandomWalk staking reward mints."
+                />
+              </div>
 
-          <div>
-            <h6 className="text-base font-medium leading-none mt-8 mb-4">
-              Stake / Unstake Actions
-            </h6>
-            <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
-          </div>
-          <div>
-            <h6 className="text-base font-medium leading-none mt-8 mb-4">Staking Reward Tokens</h6>
-            <RwalkStakingRewardMintsTable list={rwlkMints} />
-          </div>
+              <div className="space-y-8">
+                <div>
+                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
+                    Stake / Unstake Actions
+                  </h6>
+                  <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
+                </div>
+                <div>
+                  <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
+                    Staking Reward Tokens
+                  </h6>
+                  <RwalkStakingRewardMintsTable list={rwlkMints} />
+                </div>
+              </div>
+            </>
+          )}
         </TabsContent>
       </Tabs>
     </div>

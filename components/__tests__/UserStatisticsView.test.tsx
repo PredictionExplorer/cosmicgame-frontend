@@ -76,6 +76,17 @@ jest.mock('../../contexts/NotificationContext', () => ({
   useNotification: () => ({ setNotification: jest.fn() }),
 }));
 
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <div data-testid={props['data-testid'] as string | undefined}>{children}</div>
+    ),
+    section: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <section data-testid={props['data-testid'] as string | undefined}>{children}</section>
+    ),
+  },
+}));
+
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => <img {...props} />,
@@ -90,12 +101,6 @@ jest.mock('next/link', () => ({
 jest.mock('../user-statistics/UserStatsSection', () => ({
   UserStatsSection: ({ userInfo }: { userInfo: { NumBids: number } }) => (
     <div data-testid="user-stats-section">bids: {userInfo?.NumBids}</div>
-  ),
-  StatRow: ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <div>
-      <span>{label}</span>
-      <span>{children}</span>
-    </div>
   ),
 }));
 jest.mock('../user-statistics/UserStakingSection', () => ({
@@ -159,22 +164,22 @@ const baseUserInfo = {
 };
 
 describe('UserStatisticsView', () => {
-  it('shows invalid address message', () => {
+  it('shows invalid address empty state', () => {
     render(<UserStatisticsView address="Invalid Address" isOwnProfile={false} />);
     expect(screen.getByText('Invalid Address')).toBeInTheDocument();
   });
 
-  it('shows loading state', () => {
+  it('shows skeleton loading state', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByTestId('statistics-loading-skeleton')).toBeInTheDocument();
   });
 
-  it('shows no user info message when data is empty', () => {
+  it('shows empty state when no user info', () => {
     mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
     mockUseUserInfo.mockReturnValue({ data: null, isLoading: false });
     render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
-    expect(screen.getByText('There is no user information yet.')).toBeInTheDocument();
+    expect(screen.getByText('No activity yet')).toBeInTheDocument();
   });
 
   it('renders user stats and tables with full data', () => {
@@ -203,12 +208,22 @@ describe('UserStatisticsView', () => {
     expect(screen.getByText('My Statistics')).toBeInTheDocument();
   });
 
-  it('shows user address heading for other profile', () => {
+  it('shows "User Profile" heading for other profile', () => {
     mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
     mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
     render(<UserStatisticsView address="0xOther" isOwnProfile={false} />);
-    expect(screen.getByText('User')).toBeInTheDocument();
-    expect(screen.getByText('0xOther')).toBeInTheDocument();
+    expect(screen.getByText('User Profile')).toBeInTheDocument();
+  });
+
+  it('renders section dividers', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
+    mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
+    render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
+    expect(screen.getByText('Bidding History')).toBeInTheDocument();
+    expect(screen.getByText('Winning History')).toBeInTheDocument();
+    expect(screen.getByText('Staking')).toBeInTheDocument();
+    expect(screen.getByText('Token Holdings')).toBeInTheDocument();
+    expect(screen.getByText('Claimable Assets')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
