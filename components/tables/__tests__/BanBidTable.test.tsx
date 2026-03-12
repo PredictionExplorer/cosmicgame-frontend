@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import { checkA11y, render, screen, waitFor } from '@/test-utils';
+import { act, checkA11y, render, screen, waitFor } from '@/test-utils';
 
 const mockSetNotification = jest.fn();
 const mockBanBid = jest.fn().mockResolvedValue(undefined);
@@ -51,40 +51,54 @@ beforeEach(() => {
 });
 
 describe('BanBidTable', () => {
-  it('renders empty state when no bids', () => {
-    render(<BanBidTable biddingHistory={[]} />);
+  it('renders empty state when no bids', async () => {
+    await act(async () => {
+      render(<BanBidTable biddingHistory={[]} />);
+    });
     expect(screen.getByText('No bid history yet.')).toBeInTheDocument();
   });
 
-  it('renders bid type "ETH Bid" for BidType 0', () => {
-    render(<BanBidTable biddingHistory={[createBidHistory({ BidType: 0 })]} />);
+  it('renders bid type "ETH Bid" for BidType 0', async () => {
+    await act(async () => {
+      render(<BanBidTable biddingHistory={[createBidHistory({ BidType: 0 })]} />);
+    });
     expect(screen.getAllByText('ETH Bid').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders bid type "RWLK Token Bid" for BidType 1', () => {
-    render(<BanBidTable biddingHistory={[createBidHistory({ BidType: 1 })]} />);
+  it('renders bid type "RWLK Token Bid" for BidType 1', async () => {
+    await act(async () => {
+      render(<BanBidTable biddingHistory={[createBidHistory({ BidType: 1 })]} />);
+    });
     expect(screen.getAllByText('RWLK Token Bid').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders bid type "CST Bid" for BidType 2', () => {
-    render(<BanBidTable biddingHistory={[createBidHistory({ BidType: 2 })]} />);
+  it('renders bid type "CST Bid" for BidType 2', async () => {
+    await act(async () => {
+      render(<BanBidTable biddingHistory={[createBidHistory({ BidType: 2 })]} />);
+    });
     expect(screen.getAllByText('CST Bid').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders Ban button for non-banned bids', () => {
-    render(<BanBidTable biddingHistory={[createBidHistory()]} />);
+  it('renders Ban button for non-banned bids', async () => {
+    await act(async () => {
+      render(<BanBidTable biddingHistory={[createBidHistory()]} />);
+    });
     expect(screen.getAllByText('Ban').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders round number as link', () => {
-    render(<BanBidTable biddingHistory={[createBidHistory({ RoundNum: 5 })]} />);
+  it('renders round number as link', async () => {
+    await act(async () => {
+      render(<BanBidTable biddingHistory={[createBidHistory({ RoundNum: 5 })]} />);
+    });
     const links = screen.getAllByRole('link');
     const prizeLink = links.find((l) => l.getAttribute('href') === '/prize/5');
     expect(prizeLink).toBeInTheDocument();
   });
 
-  it('sets rel="noopener noreferrer" on target="_blank" links', () => {
-    render(<BanBidTable biddingHistory={[createBidHistory()]} />);
+  it('sets rel="noopener noreferrer" on target="_blank" links', async () => {
+    await act(async () => {
+      render(<BanBidTable biddingHistory={[createBidHistory()]} />);
+    });
     const links = screen.getAllByRole('link');
     for (const link of links) {
       if (link.getAttribute('target') === '_blank') {
@@ -93,13 +107,17 @@ describe('BanBidTable', () => {
     }
   });
 
-  it('renders message text', () => {
-    render(<BanBidTable biddingHistory={[createBidHistory({ Message: 'Test message' })]} />);
+  it('renders message text', async () => {
+    await act(async () => {
+      render(<BanBidTable biddingHistory={[createBidHistory({ Message: 'Test message' })]} />);
+    });
     expect(screen.getAllByText('Test message').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('calls get_banned_bids on mount', () => {
-    render(<BanBidTable biddingHistory={[createBidHistory()]} />);
+  it('calls get_banned_bids on mount', async () => {
+    await act(async () => {
+      render(<BanBidTable biddingHistory={[createBidHistory()]} />);
+    });
     expect(mockGetBannedBids).toHaveBeenCalled();
   });
 
@@ -182,7 +200,11 @@ describe('BanBidTable', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<BanBidTable biddingHistory={[]} />);
-    await checkA11y(container);
+    let container: HTMLElement;
+    await act(async () => {
+      const result = render(<BanBidTable biddingHistory={[]} />);
+      container = result.container;
+    });
+    await checkA11y(container!);
   });
 });

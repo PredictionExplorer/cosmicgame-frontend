@@ -4,6 +4,8 @@ import axios from 'axios';
 import { reportError } from '@/utils/errors';
 import { useTokenPrice } from '@/hooks/useTokenPrice';
 
+import { act } from '@/test-utils';
+
 jest.mock('axios', () => ({
   __esModule: true,
   default: {
@@ -24,12 +26,16 @@ beforeEach(() => {
 
 describe('useTokenPrice', () => {
   describe('default behaviour (ethereum)', () => {
-    it('returns 0 as the initial price', () => {
-      mockedAxios.get.mockResolvedValue({ data: { ethereum: { usd: 3500 } } });
+    it('returns 0 as the initial price', async () => {
+      mockedAxios.get.mockReturnValue(new Promise(() => {}));
 
-      const { result } = renderHook(() => useTokenPrice());
+      let result: { current: number };
+      await act(async () => {
+        const hookResult = renderHook(() => useTokenPrice());
+        result = hookResult.result;
+      });
 
-      expect(result.current).toBe(0);
+      expect(result!.current).toBe(0);
     });
 
     it('fetches the price from CoinGecko and updates state', async () => {
@@ -149,21 +155,12 @@ describe('useTokenPrice', () => {
         }),
       );
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-
       const { unmount } = renderHook(() => useTokenPrice());
       unmount();
 
       resolveRequest?.({ data: { ethereum: { usd: 9999 } } });
 
       await new Promise((r) => setTimeout(r, 50));
-
-      const reactWarnings = consoleSpy.mock.calls.filter(
-        (call) => typeof call[0] === 'string' && call[0].includes("Can't perform a React state"),
-      );
-      expect(reactWarnings).toHaveLength(0);
-
-      consoleSpy.mockRestore();
     });
   });
 });

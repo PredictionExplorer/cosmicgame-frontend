@@ -14,7 +14,7 @@ describe('Dialog', () => {
   it('renders DialogContent when open', () => {
     render(
       <Dialog open>
-        <DialogContent>
+        <DialogContent aria-describedby={undefined}>
           <DialogTitle>Test Dialog</DialogTitle>
           <p>Dialog body</p>
         </DialogContent>
@@ -51,7 +51,7 @@ describe('Dialog', () => {
   it('renders DialogHeader and DialogFooter', () => {
     render(
       <Dialog open>
-        <DialogContent>
+        <DialogContent aria-describedby={undefined}>
           <DialogTitle>Title</DialogTitle>
           <DialogHeader data-testid="dialog-header">Header content</DialogHeader>
           <DialogFooter data-testid="dialog-footer">Footer content</DialogFooter>

@@ -1,6 +1,7 @@
-import { renderHook, act } from '@testing-library/react';
-
 import type { DashboardInfo } from '@/services/api/types';
+
+import { act, renderHook } from '@/test-utils';
+
 
 const mockNotify = jest.fn();
 const mockNotifyErrorFromEthers = jest.fn();
@@ -84,14 +85,19 @@ const baseData = {
 } as Partial<DashboardInfo> as DashboardInfo;
 
 describe('usePrizeClaim', () => {
-  it('initializes with correct default state', () => {
-    const { result } = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
+  it('initializes with correct default state', async () => {
+    mockUseCosmicGameContract.mockReturnValueOnce(null);
+    let result: { current: ReturnType<typeof usePrizeClaim> };
+    await act(async () => {
+      const hookResult = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
+      result = hookResult.result;
+    });
 
-    expect(result.current.prizeTime).toBeGreaterThan(0);
-    expect(result.current.timeoutClaimPrize).toBe(0);
-    expect(result.current.isClaiming).toBe(false);
-    expect(typeof result.current.onClaimPrize).toBe('function');
-    expect(typeof result.current.fetchActivationTime).toBe('function');
+    expect(result!.current.prizeTime).toBeGreaterThan(0);
+    expect(result!.current.timeoutClaimPrize).toBe(0);
+    expect(result!.current.isClaiming).toBe(false);
+    expect(typeof result!.current.onClaimPrize).toBe('function');
+    expect(typeof result!.current.fetchActivationTime).toBe('function');
   });
 
   it('onClaimPrize success: estimates gas, claims, creates token, redirects, returns true', async () => {
@@ -159,14 +165,22 @@ describe('usePrizeClaim', () => {
     );
   });
 
-  it('claimHistory is derived from useClaimHistory hook', () => {
-    const { result } = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
-    expect(result.current.claimHistory).toEqual([{ round: 1, prize: '1.0' }]);
+  it('claimHistory is derived from useClaimHistory hook', async () => {
+    let result: { current: ReturnType<typeof usePrizeClaim> };
+    await act(async () => {
+      const hookResult = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
+      result = hookResult.result;
+    });
+    expect(result!.current.claimHistory).toEqual([{ round: 1, prize: '1.0' }]);
   });
 
-  it('prizeTime is derived from usePrizeTime and useCurrentTime hooks', () => {
-    const { result } = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
-    expect(result.current.prizeTime).toBeGreaterThan(0);
+  it('prizeTime is derived from usePrizeTime and useCurrentTime hooks', async () => {
+    let result: { current: ReturnType<typeof usePrizeClaim> };
+    await act(async () => {
+      const hookResult = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
+      result = hookResult.result;
+    });
+    expect(result!.current.prizeTime).toBeGreaterThan(0);
   });
 
   it('isClaiming state transitions (true during claim, false after)', async () => {

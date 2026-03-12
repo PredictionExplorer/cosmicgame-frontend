@@ -1,4 +1,4 @@
-import { checkA11y, render, screen } from '@/test-utils';
+import { act, checkA11y, render, screen, waitFor } from '@/test-utils';
 
 import MyStaking from '../MyStaking';
 
@@ -89,21 +89,24 @@ beforeEach(() => {
 });
 
 describe('MyStaking', () => {
-  it('prompts login when no account is connected', () => {
+  it('prompts login when no account is connected', async () => {
     mockAccount = null;
-    render(<MyStaking />);
+    await act(async () => {
+      render(<MyStaking />);
+    });
     expect(
       screen.getByText('Please connect your wallet to manage your staking.'),
     ).toBeInTheDocument();
   });
 
-  it('shows loading state', () => {
+  it('shows loading state', async () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<MyStaking />);
+    await waitFor(() => {});
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('renders staking panels with data', () => {
+  it('renders staking panels with data', async () => {
     mockUseDashboardInfo.mockReturnValue({
       data: {
         MainStats: {
@@ -115,6 +118,7 @@ describe('MyStaking', () => {
       isLoading: false,
     });
     render(<MyStaking />);
+    await waitFor(() => {});
 
     expect(screen.getByText('My Staking')).toBeInTheDocument();
     expect(screen.getByText('10')).toBeInTheDocument();
@@ -123,7 +127,7 @@ describe('MyStaking', () => {
     expect(screen.getByTestId('staking-actions-table')).toBeInTheDocument();
   });
 
-  it('computes reward per CST when tokens are staked', () => {
+  it('computes reward per CST when tokens are staked', async () => {
     mockUseDashboardInfo.mockReturnValue({
       data: {
         MainStats: {
@@ -135,18 +139,25 @@ describe('MyStaking', () => {
       isLoading: false,
     });
     render(<MyStaking />);
+    await waitFor(() => {});
     expect(screen.getByText('0.500000')).toBeInTheDocument();
   });
 
-  it('renders page title', () => {
+  it('renders page title', async () => {
     mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false });
     mockAccount = null;
-    render(<MyStaking />);
+    await act(async () => {
+      render(<MyStaking />);
+    });
     expect(screen.getByText('My Staking')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<MyStaking />);
-    await checkA11y(container);
+    let container: HTMLElement;
+    act(() => {
+      const result = render(<MyStaking />);
+      container = result.container;
+    });
+    await checkA11y(container!);
   });
 });
