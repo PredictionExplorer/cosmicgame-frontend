@@ -101,6 +101,7 @@ const Contracts = () => {
   const [charityAddress, setCharityAddress] = useState('');
   const [priceIncrease, setPriceIncrease] = useState(0);
   const [timeIncrease, setTimeIncrease] = useState(0);
+  const [timeIncrement, setTimeIncrement] = useState(0);
   const [msgMaxLen, setMsgMaxLen] = useState(0);
   const [cstRewardAmountForBidding, setCstRewardAmountForBidding] = useState(0);
   const [cstDutchAuctionDurations, setCstDutchAuctionDurations] = useState({
@@ -142,6 +143,11 @@ const Contracts = () => {
       const v = await cosmicGameContract.read.mainPrizeTimeIncrementIncreaseDivisor?.();
       setTimeIncrease(100 / Number(v ?? 1));
     }, 'mainPrizeTimeIncrementIncreaseDivisor');
+
+    safeCall(async () => {
+      const v = await cosmicGameContract.read.mainPrizeTimeIncrementInMicroSeconds?.();
+      setTimeIncrement(Number(v ?? 0) / 1_000_000);
+    }, 'mainPrizeTimeIncrementInMicroSeconds');
 
     safeCall(async () => {
       const v = await cosmicGameContract.read.cstRewardAmountForBidding?.();
@@ -225,6 +231,7 @@ const Contracts = () => {
           <GameConfiguration
             priceIncrease={priceIncrease}
             timeIncrease={timeIncrease}
+            timeIncrement={timeIncrement}
             cstRewardPerBid={cstRewardAmountForBidding}
             maxMessageLength={msgMaxLen}
             claimTimeout={data?.TimeoutClaimPrize ?? 0}

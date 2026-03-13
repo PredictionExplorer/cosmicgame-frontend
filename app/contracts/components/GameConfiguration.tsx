@@ -11,6 +11,7 @@ import { SectionDivider } from '@/components/ui/section-divider';
 interface GameConfigurationProps {
   priceIncrease: number;
   timeIncrease: number;
+  timeIncrement: number;
   cstRewardPerBid: number;
   maxMessageLength: number;
   claimTimeout: number;
@@ -31,6 +32,7 @@ const fadeUp = {
 export function GameConfiguration({
   priceIncrease,
   timeIncrease,
+  timeIncrement,
   cstRewardPerBid,
   maxMessageLength,
   claimTimeout,
@@ -60,9 +62,9 @@ export function GameConfiguration({
     },
     {
       label: 'Time Increase',
-      value: `${timeIncrease}%`,
+      value: timeIncrement > 0 ? formatSeconds(timeIncrement) : '--',
       icon: <Clock className="h-4 w-4" />,
-      tooltip: 'Each bid extends the round timer by this percentage of remaining time',
+      tooltip: `Each bid adds this much time to the round clock. The increment grows by ${timeIncrease}% with each bid.`,
       featured: true,
     },
     {

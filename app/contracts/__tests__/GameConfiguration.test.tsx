@@ -27,6 +27,7 @@ jest.mock('../../../utils', () => ({
 const defaultProps = {
   priceIncrease: 1,
   timeIncrease: 1,
+  timeIncrement: 3600,
   cstRewardPerBid: 200,
   maxMessageLength: 280,
   claimTimeout: 86400,
@@ -37,9 +38,9 @@ describe('GameConfiguration', () => {
   it('renders all stat cards with correct values', () => {
     render(<GameConfiguration {...defaultProps} />);
     expect(screen.getByText('Price Increase')).toBeInTheDocument();
-    const pctValues = screen.getAllByText('1%');
-    expect(pctValues.length).toBe(2);
+    expect(screen.getByText('1%')).toBeInTheDocument();
     expect(screen.getByText('Time Increase')).toBeInTheDocument();
+    expect(screen.getByText('3600s')).toBeInTheDocument();
     expect(screen.getByText('CST Reward per Bid')).toBeInTheDocument();
     expect(screen.getByText('200 CST')).toBeInTheDocument();
     expect(screen.getByText('Max Message Length')).toBeInTheDocument();
@@ -64,6 +65,7 @@ describe('GameConfiguration', () => {
       <GameConfiguration
         priceIncrease={0}
         timeIncrease={0}
+        timeIncrement={0}
         cstRewardPerBid={0}
         maxMessageLength={0}
         claimTimeout={0}
@@ -72,6 +74,18 @@ describe('GameConfiguration', () => {
     );
     const dashes = screen.getAllByText('--');
     expect(dashes.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('displays time increment as duration, not the increase percentage', () => {
+    render(<GameConfiguration {...defaultProps} timeIncrease={5} timeIncrement={7200} />);
+    expect(screen.getByText('7200s')).toBeInTheDocument();
+    expect(screen.queryByText('5%')).not.toBeInTheDocument();
+  });
+
+  it('shows "--" for Time Increase when timeIncrement is 0 regardless of timeIncrease', () => {
+    render(<GameConfiguration {...defaultProps} timeIncrease={1} timeIncrement={0} />);
+    const dashes = screen.getAllByText('--');
+    expect(dashes.length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows loading skeletons when loading is true', () => {
