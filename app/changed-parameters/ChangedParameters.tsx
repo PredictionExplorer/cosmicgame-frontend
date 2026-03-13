@@ -21,6 +21,12 @@ function ChangedParameters() {
           title="Changed Parameters"
           subtitle="History of system parameter changes and admin events"
         />
+        <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+          The Cosmic Signature game parameters can be adjusted by the contract owner during round
+          activation windows. This log provides full transparency into every change, including bid
+          increments, time additions, and reward distributions. Once ownership is renounced, all
+          parameters become permanently immutable.
+        </p>
         <p className="text-base font-medium">Please login to Metamask to see your winnings.</p>
       </MainWrapper>
     );
@@ -32,6 +38,12 @@ function ChangedParameters() {
         title="Changed Parameters"
         subtitle="History of system parameter changes and admin events"
       />
+      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+        The Cosmic Signature game parameters can be adjusted by the contract owner during round
+        activation windows. This log provides full transparency into every change, including bid
+        increments, time additions, and reward distributions. Once ownership is renounced, all
+        parameters become permanently immutable.
+      </p>
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (

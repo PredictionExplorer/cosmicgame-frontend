@@ -7,6 +7,8 @@ import MyStatistics from './MyStatistics';
 export const metadata: Metadata = createMetadata(
   'My Statistics | Cosmic Signature',
   "Track your performance with Cosmic Signature's My Statistics page. View detailed bid history, stake status, rewards, and more. Stay informed and optimize your participation in our blockchain ecosystem.",
+  undefined,
+  '/my-statistics',
 );
 
 export default function Page() {

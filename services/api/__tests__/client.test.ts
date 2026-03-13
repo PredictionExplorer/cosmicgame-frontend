@@ -39,6 +39,17 @@ const makeAxios400 = (): AxiosError => {
   return err;
 };
 
+const makeAxios403 = (): AxiosError => {
+  const err = new AxiosError('Forbidden', 'ERR_BAD_REQUEST', undefined, undefined, {
+    status: 403,
+    statusText: 'Forbidden',
+    headers: {},
+    config: {} as never,
+    data: {},
+  });
+  return err;
+};
+
 const makeAxios500 = (): AxiosError => {
   const err = new AxiosError('Server Error', 'ERR_BAD_RESPONSE', undefined, undefined, {
     status: 500,
@@ -79,6 +90,27 @@ describe('apiCall', () => {
       throw makeAxios400();
     }, 0);
     expect(result).toBe(0);
+  });
+
+  it('returns [] fallback on Axios 403', async () => {
+    const result = await apiCall(async () => {
+      throw makeAxios403();
+    }, [] as number[]);
+    expect(result).toEqual([]);
+  });
+
+  it('returns null fallback on Axios 403', async () => {
+    const result = await apiCall(async (): Promise<string | null> => {
+      throw makeAxios403();
+    }, null);
+    expect(result).toBeNull();
+  });
+
+  it('does not report 403 errors to Sentry', async () => {
+    await apiCall(async () => {
+      throw makeAxios403();
+    }, []);
+    expect(mockReportError).not.toHaveBeenCalled();
   });
 
   it('throws for non-Axios errors and reports to Sentry', async () => {

@@ -6,7 +6,9 @@ import ChangedParameters from './ChangedParameters';
 
 export const metadata: Metadata = createMetadata(
   'Changed Parameters | Cosmic Signature',
-  'Changed Parameters',
+  'Review the complete history of game parameter changes in Cosmic Signature. Track adjustments to bid increments, time additions, reward distributions, and other system settings.',
+  undefined,
+  '/changed-parameters',
 );
 
 export default function Page() {

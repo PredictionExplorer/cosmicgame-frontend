@@ -39,7 +39,8 @@ describe('RootLayout metadata', () => {
   });
 
   it('exports metadata with correct description', () => {
-    expect(metadata.description).toBe('Cosmic Signature is a strategy bidding game.');
+    expect(metadata.description).toContain('Cosmic Signature is a strategy bidding game');
+    expect(metadata.description).toContain('Arbitrum');
   });
 
   it('exports metadata with metadataBase', () => {

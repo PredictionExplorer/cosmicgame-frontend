@@ -44,6 +44,12 @@ const make400 = () =>
     isAxiosError: true,
   });
 
+const make403 = () =>
+  Object.assign(new Error('Forbidden'), {
+    response: { status: 403 },
+    isAxiosError: true,
+  });
+
 const mockTx = (id: number) => ({
   EvtLogId: id,
   Tx: {
@@ -480,6 +486,11 @@ describe('rounds API', () => {
 
     it('returns empty array on 400 response', async () => {
       mockedAxios.get.mockRejectedValue(make400());
+      expect(await get_banned_bids()).toEqual([]);
+    });
+
+    it('returns empty array on 403 response', async () => {
+      mockedAxios.get.mockRejectedValue(make403());
       expect(await get_banned_bids()).toEqual([]);
     });
 

@@ -85,6 +85,13 @@ const Mint = () => {
         subtitle="Own a Random Walk NFT and get 50% discount on your bids"
       />
 
+      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+        RandomWalk NFTs are unique digital collectibles that grant holders a strategic advantage in
+        the Cosmic Signature game. By attaching a RandomWalk NFT to your bid, you receive a 50%
+        discount on the bid price — a significant edge when competition heats up. Each RandomWalk
+        NFT can be used once per wallet, so choose your moment wisely for maximum impact.
+      </p>
+
       <div className="flex flex-col items-center">
         <div className="rounded-2xl border border-primary/20 bg-gradient-to-b from-primary/[0.06] to-transparent p-8 text-center max-w-md w-full">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mx-auto mb-4">

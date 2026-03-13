@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
@@ -41,13 +42,13 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <a href={`/user/${FromAddr}`} className="text-inherit font-mono">
+              <Link href={`/user/${FromAddr}`} className="text-inherit font-mono">
                 {FromAddr === STAKING_WALLET_CST_ADDRESS
                   ? 'StakingWallet CST'
                   : FromAddr === STAKING_WALLET_RWLK_ADDRESS
                     ? 'StakingWallet RandomWalk'
                     : shortenHex(FromAddr ?? '', 6)}
-              </a>
+              </Link>
             </TooltipTrigger>
             <TooltipContent>{FromAddr}</TooltipContent>
           </Tooltip>
@@ -57,13 +58,13 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <a href={`/user/${ToAddr}`} className="text-inherit font-mono">
+              <Link href={`/user/${ToAddr}`} className="text-inherit font-mono">
                 {ToAddr === STAKING_WALLET_CST_ADDRESS
                   ? 'StakingWallet CST'
                   : ToAddr === STAKING_WALLET_RWLK_ADDRESS
                     ? 'StakingWallet RandomWalk'
                     : shortenHex(ToAddr ?? '', 6)}
-              </a>
+              </Link>
             </TooltipTrigger>
             <TooltipContent>{ToAddr ?? ''}</TooltipContent>
           </Tooltip>

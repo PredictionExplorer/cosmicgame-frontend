@@ -108,6 +108,13 @@ const StakingPage = () => {
         subtitle="Overview of global staking activity and reward distributions"
       />
 
+      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+        Stake your Cosmic Signature NFTs or RandomWalk NFTs to earn passive ETH rewards from the
+        game&apos;s prize pool. Each round, 19% of the CosmicGame contract balance is distributed
+        equally among all staked token holders. The more tokens you stake, the larger your share of
+        the reward pool.
+      </p>
+
       <StakingHeroStats stats={heroStats} loading={statsLoading} className="mb-10" />
 
       <HowStakingWorks className="mb-10" />

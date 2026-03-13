@@ -5,6 +5,7 @@ import Script from 'next/script';
 import { logoImgUrl } from '@/utils';
 
 import { GA_TRACKING_ID } from '@/utils/analytics';
+import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
 
 import { Providers } from './providers';
 import { Analytics } from './analytics';
@@ -13,7 +14,8 @@ import '@rainbow-me/rainbowkit/styles.css';
 import '@/styles/global.css';
 
 const defaultTitle = 'Cosmic Signature';
-const defaultDescription = 'Cosmic Signature is a strategy bidding game.';
+const defaultDescription =
+  'Cosmic Signature is a strategy bidding game on the Arbitrum blockchain featuring generative NFT art inspired by the three-body problem, ETH prizes, staking rewards, and charitable giving.';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cosmicsignature.com'),
@@ -28,19 +30,42 @@ export const metadata: Metadata = {
   verification: {
     google: 'ZUw5gzqw7CFIEZgCJ2pLy-MhDe7Fdotpc31fS75v3dE',
   },
+  alternates: {
+    canonical: 'https://www.cosmicsignature.com',
+  },
   openGraph: {
     type: 'website',
     siteName: defaultTitle,
     title: defaultTitle,
     description: defaultDescription,
     images: [logoImgUrl],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@CosmicSignatureNFT',
     title: defaultTitle,
     description: defaultDescription,
     images: [logoImgUrl],
   },
+  keywords: [
+    'Cosmic Signature',
+    'NFT',
+    'bidding game',
+    'Arbitrum',
+    'Ethereum',
+    'generative art',
+    'three-body problem',
+    'staking',
+    'crypto game',
+    'NFT game',
+    'ETH prizes',
+    'blockchain game',
+    'ERC-721',
+    'RandomWalkNFT',
+    'Cosmic Signature Token',
+    'CST',
+  ],
 };
 
 export const viewport: Viewport = {
@@ -53,6 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <JsonLd data={[websiteJsonLd(), organizationJsonLd(), webApplicationJsonLd()]} />
         {GA_TRACKING_ID && (
           <>
             <Script

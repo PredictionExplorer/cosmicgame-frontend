@@ -164,7 +164,8 @@ export async function apiCall<T>(fn: () => Promise<T>, fallback: T): Promise<T> 
   try {
     return await fn();
   } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) return fallback;
+    const status = isAxiosError(err) ? err.response?.status : undefined;
+    if (status === 400 || status === 403) return fallback;
     reportError(err, 'apiCall');
     throw new Error('Network response was not OK');
   }

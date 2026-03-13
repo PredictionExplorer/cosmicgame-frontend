@@ -1,16 +1,5 @@
 import { useMemo, type FC } from 'react';
-import {
-  Chart,
-  ChartArea,
-  ChartCategoryAxis,
-  ChartCategoryAxisItem,
-  ChartLegend,
-  ChartSeries,
-  ChartSeriesItem,
-  ChartValueAxis,
-  ChartValueAxisItem,
-} from '@progress/kendo-react-charts';
-import '@progress/kendo-theme-default/dist/all.css';
+import { BarChart, Bar, XAxis, YAxis, LabelList, ResponsiveContainer, Cell } from 'recharts';
 
 import { shortenHex } from '@/utils';
 
@@ -18,6 +7,8 @@ import { MARKETING_WALLET_ADDRESS } from '@/config/networks';
 
 /** Maximum number of individual addresses to highlight before grouping the rest */
 const DISPLAY_LIMIT = 9;
+const BAR_HEIGHT = 36;
+const CHART_PADDING = 40;
 
 /**
  * Balance entry as returned by the backend.
@@ -25,7 +16,7 @@ const DISPLAY_LIMIT = 9;
 export interface BalanceDistribution {
   /** Wallet address */
   OwnerAddr: string;
-  /** Floating‑point token balance */
+  /** Floating-point token balance */
   BalanceFloat: number;
 }
 
@@ -45,11 +36,9 @@ const useProcessedBalances = (list: BalanceDistribution[], limit: number) => {
     if (list.length === 0) return { processed: [], max: 0 };
 
     if (list.length <= limit) {
-      // Nothing to group – return the list as‑is
       return { processed: list, max: list[0]?.BalanceFloat ?? 0 };
     }
 
-    // Group everything after the limit into a single "Others" category
     const othersValue = list.slice(limit).reduce((sum, curr) => sum + curr.BalanceFloat, 0);
 
     const processed: BalanceDistribution[] = [
@@ -63,6 +52,9 @@ const useProcessedBalances = (list: BalanceDistribution[], limit: number) => {
   }, [list, limit]);
 };
 
+const formatLabel: import('recharts/types/component/Label').LabelFormatter = (value) =>
+  Number(value ?? 0).toFixed(2);
+
 /**
  * Bar chart that shows the distribution of token balances among top holders.
  * Remaining holders are aggregated into an "Others" bucket.
@@ -70,52 +62,47 @@ const useProcessedBalances = (list: BalanceDistribution[], limit: number) => {
 export const CTBalanceDistributionChart: FC<CTBalanceDistributionChartProps> = ({ list }) => {
   const { processed: data, max } = useProcessedBalances(list, DISPLAY_LIMIT);
 
-  if (data.length === 0) return null; // Nothing to render yet
+  const chartData = useMemo(
+    () =>
+      data.map((entry) => ({
+        category:
+          entry.OwnerAddr === MARKETING_WALLET_ADDRESS
+            ? 'Marketing Wallet'
+            : entry.OwnerAddr === 'Others'
+              ? 'Others'
+              : shortenHex(entry.OwnerAddr, 6),
+        value: entry.BalanceFloat,
+      })),
+    [data],
+  );
 
-  /** Map raw data into objects understood by KendoReact */
-  const chartData = data.map((entry) => ({
-    category:
-      entry.OwnerAddr === MARKETING_WALLET_ADDRESS
-        ? 'Marketing Wallet'
-        : entry.OwnerAddr === 'Others'
-          ? 'Others'
-          : shortenHex(entry.OwnerAddr, 6),
-    value: entry.BalanceFloat,
-  }));
+  if (chartData.length === 0) return null;
 
   return (
-    <Chart transitions={false} style={{ width: '100%' }}>
-      {/* Hide legend – we label bars directly */}
-      <ChartLegend visible={false} />
-
-      {/* Transparent background so parent containers control styling */}
-      <ChartArea background="transparent" />
-
-      {/* Category axis – just show white tick labels */}
-      <ChartCategoryAxis>
-        <ChartCategoryAxisItem color="white" />
-      </ChartCategoryAxis>
-
-      {/* Value axis – hidden, but we cap it to 140% of the max for spacing */}
-      <ChartValueAxis>
-        <ChartValueAxisItem visible={false} max={max * 1.4} />
-      </ChartValueAxis>
-
-      {/* Single series for the bar chart */}
-      <ChartSeries>
-        <ChartSeriesItem
-          type="bar"
-          data={chartData}
-          field="value"
-          categoryField="category"
-          labels={{
-            visible: true,
-            content: ({ value }) => value.toFixed(2),
-            color: 'white',
-            background: 'none',
-          }}
+    <ResponsiveContainer width="100%" height={chartData.length * BAR_HEIGHT + CHART_PADDING}>
+      <BarChart data={chartData} layout="vertical" margin={{ right: 80 }}>
+        <XAxis type="number" hide domain={[0, max * 1.4]} />
+        <YAxis
+          type="category"
+          dataKey="category"
+          tick={{ fill: 'white', fontSize: 13 }}
+          width={130}
+          axisLine={false}
+          tickLine={false}
         />
-      </ChartSeries>
-    </Chart>
+        <Bar dataKey="value" fill="#15bffd" isAnimationActive={false} barSize={20}>
+          {chartData.map((entry) => (
+            <Cell key={entry.category} />
+          ))}
+          <LabelList
+            dataKey="value"
+            position="right"
+            fill="white"
+            fontSize={12}
+            formatter={formatLabel}
+          />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
   );
 };

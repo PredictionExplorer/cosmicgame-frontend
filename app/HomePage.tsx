@@ -161,6 +161,18 @@ const HomePage = () => {
           </div>
         )}
 
+        <section aria-label="About Cosmic Signature" className="mb-10">
+          <h1 className="sr-only">
+            Cosmic Signature — Strategy Bidding Game on Arbitrum with Generative NFT Art
+          </h1>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
+            Cosmic Signature is a strategy bidding game on the Arbitrum blockchain. Players bid
+            against each other and against time to win ETH prizes and unique generative NFTs
+            inspired by three-body problem physics. Every bid earns CST tokens, raffle tickets, and
+            a chance to win exclusive digital collectibles.
+          </p>
+        </section>
+
         {/* ===== LIVE ROUND BAR ===== */}
         <motion.div
           initial={{ opacity: 0, y: -12 }}
@@ -194,12 +206,12 @@ const HomePage = () => {
                 <ArrowRight className="h-3 w-3" />
               </Link>
             )}
-            <a
+            <Link
               href="/changed-parameters"
               className="text-xs text-muted-foreground/60 hover:text-primary transition-colors"
             >
               Parameters
-            </a>
+            </Link>
           </div>
         </motion.div>
 

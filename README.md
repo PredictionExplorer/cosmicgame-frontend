@@ -8,7 +8,7 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 - **UI:** React 19, MUI 7, Tailwind CSS v4
 - **Web3:** wagmi v3, viem v2, RainbowKit v2, Porto (WebAuthn account abstraction)
 - **Data:** TanStack React Query v5 for all data fetching, Axios via API proxy
-- **Charts:** Kendo React Charts
+- **Charts:** Recharts
 - **Testing:** Jest (unit), Playwright (E2E)
 - **Quality:** ESLint 9 (flat config), Prettier, Husky, lint-staged, commitlint
 

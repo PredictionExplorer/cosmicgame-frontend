@@ -52,7 +52,8 @@ describe('app/faq/page.tsx', () => {
     });
 
     it('has the correct description', () => {
-      expect(metadata.description).toBe('Frequently Asked Questions (FAQ)');
+      expect(metadata.description).toContain('Frequently Asked Questions');
+      expect(metadata.description).toContain('Cosmic Signature');
     });
 
     it('does not contain the "Frequenly" typo', () => {
@@ -63,7 +64,6 @@ describe('app/faq/page.tsx', () => {
       expect(metadata.openGraph).toEqual(
         expect.objectContaining({
           title: 'FAQ | Cosmic Signature',
-          description: 'Frequently Asked Questions (FAQ)',
         }),
       );
     });
@@ -79,7 +79,6 @@ describe('app/faq/page.tsx', () => {
         expect.objectContaining({
           card: 'summary_large_image',
           title: 'FAQ | Cosmic Signature',
-          description: 'Frequently Asked Questions (FAQ)',
         }),
       );
     });

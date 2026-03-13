@@ -1,0 +1,54 @@
+# Cosmic Signature
+
+> Cosmic Signature is a strategy bidding game on the Arbitrum blockchain featuring generative NFT art inspired by the three-body problem, ETH prizes, staking rewards, and charitable giving.
+
+## Overview
+
+Cosmic Signature combines generative art, an exciting Ethereum bidding game, and social impact through charitable giving. Players bid against each other and against time to win ETH prizes and unique Cosmic Signature NFTs. The game is deployed on Arbitrum, a Layer 2 scaling solution for Ethereum, providing fast and low-cost transactions.
+
+## Key Pages
+
+- [Home](https://www.cosmicsignature.com/): Main bidding interface and live game status
+- [Gallery](https://www.cosmicsignature.com/gallery): Browse all minted Cosmic Signature NFTs
+- [How to Play](https://www.cosmicsignature.com/how-to-play): Complete guide to game mechanics
+- [FAQ](https://www.cosmicsignature.com/faq): Frequently asked questions
+- [Statistics](https://www.cosmicsignature.com/statistics): Game statistics and analytics
+- [Staking](https://www.cosmicsignature.com/staking): Stake CST tokens to earn rewards
+- [Prize](https://www.cosmicsignature.com/prize): Current prize pool information
+- [Contracts](https://www.cosmicsignature.com/contracts): Smart contract details and addresses
+- [Marketing](https://www.cosmicsignature.com/marketing): Marketing rewards program
+- [Mint](https://www.cosmicsignature.com/mint): Mint new tokens
+
+## Game Mechanics
+
+- Each round starts with a 24-hour countdown and a low initial bid (~0.01 ETH)
+- Every bid increases price by 1% and adds 1 hour to the timer
+- Last bidder when timer expires wins the main prize (25% of ETH pot)
+- Every bid earns 100 CST tokens and a raffle ticket
+- 12 Cosmic Signature NFTs minted per round
+- Raffle winners share 6% of the prize pool
+- 10% goes to a charitable beneficiary chosen by the Cosmic DAO
+- Players can bid with ETH or CST tokens (Dutch auction)
+- RandomWalkNFT holders get a 50% bid discount
+
+## Tokens
+
+- **CST (Cosmic Signature Token)**: ERC-20 governance and utility token
+- **Cosmic Signature NFT**: ERC-721 generative art based on three-body problem physics
+- **RandomWalkNFT**: Partner NFT offering bid discounts
+
+## Community
+
+- Twitter/X: https://x.com/CosmicSignatureNFT
+- Discord: https://discord.gg/bGnPn96Qwt
+
+## Technical
+
+- Blockchain: Arbitrum (Ethereum Layer 2)
+- Smart contracts: Immutable, open-source
+- NFT art: Generated from on-chain random seeds using open-source Rust program
+- Frontend: Next.js, React, TypeScript
+
+## Optional
+
+- [Full documentation](https://www.cosmicsignature.com/llms-full.txt)

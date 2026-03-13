@@ -75,6 +75,11 @@ const NamedNFTsPage = () => {
         title="Named Cosmic Signature Tokens"
         subtitle="Browse tokens that have been given custom names"
       />
+      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+        Cosmic Signature NFT owners can give their tokens custom names, creating a unique identity
+        within the collection. Named tokens stand out in the gallery and carry the personal touch of
+        their owners.
+      </p>
 
       <div className="mt-12">
         {loading ? (
