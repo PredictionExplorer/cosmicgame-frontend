@@ -19,10 +19,6 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
-      interceptors: {
-        request: { use: jest.fn() },
-        response: { use: jest.fn() },
-      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -56,7 +52,7 @@ describe('users API', () => {
       expect(result?.Addr).toBe(mockUserData.Addr);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*user.*info/),
+        expect.stringMatching(/user.*info/),
       );
     });
 
@@ -105,7 +101,7 @@ describe('users API', () => {
 
       expect(result).toEqual(mockBalance);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*user.*balances/),
+        expect.stringMatching(/user.*balances/),
       );
     });
 
@@ -129,7 +125,7 @@ describe('users API', () => {
 
       expect(result).toEqual(mockBidders);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*statistics.*unique.*bidders/),
+        expect.stringMatching(/statistics.*unique.*bidders/),
       );
     });
 
@@ -153,7 +149,7 @@ describe('users API', () => {
 
       expect(result).toEqual(winnings);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*user.*notif_red_box.*0xuser/),
+        expect.stringMatching(/user.*notif_red_box.*0xuser/),
       );
     });
 
@@ -177,7 +173,7 @@ describe('users API', () => {
 
       expect(result).toEqual(winners);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*statistics.*unique.*winners/),
+        expect.stringMatching(/statistics.*unique.*winners/),
       );
     });
 
@@ -201,7 +197,7 @@ describe('users API', () => {
 
       expect(result).toEqual(donors);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*statistics.*unique.*donors/),
+        expect.stringMatching(/statistics.*unique.*donors/),
       );
     });
 
@@ -225,7 +221,7 @@ describe('users API', () => {
 
       expect(result).toEqual(stakers);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*statistics.*unique.*stakers.*cst/),
+        expect.stringMatching(/statistics.*unique.*stakers.*cst/),
       );
     });
 
@@ -249,7 +245,7 @@ describe('users API', () => {
 
       expect(result).toEqual(stakers);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*statistics.*unique.*stakers.*rwalk/),
+        expect.stringMatching(/statistics.*unique.*stakers.*rwalk/),
       );
     });
 
@@ -273,7 +269,7 @@ describe('users API', () => {
 
       expect(result).toEqual(stakers);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*statistics.*unique.*stakers.*both/),
+        expect.stringMatching(/statistics.*unique.*stakers.*both/),
       );
     });
 

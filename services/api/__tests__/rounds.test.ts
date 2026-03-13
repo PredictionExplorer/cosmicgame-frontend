@@ -27,10 +27,6 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
-      interceptors: {
-        request: { use: jest.fn() },
-        response: { use: jest.fn() },
-      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -77,7 +73,7 @@ describe('rounds API', () => {
       expect(result).toEqual(mockData);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*statistics.*dashboard/),
+        expect.stringMatching(/statistics.*dashboard/),
       );
     });
 
@@ -109,7 +105,7 @@ describe('rounds API', () => {
       expect(Array.isArray(result)).toBe(true);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*rounds.*list/),
+        expect.stringMatching(/rounds.*list/),
       );
     });
 
@@ -139,7 +135,7 @@ describe('rounds API', () => {
       expect(result[0]).toHaveProperty('EvtLogId', 1);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*bid.*list/),
+        expect.stringMatching(/bid.*list/),
       );
     });
 
@@ -207,7 +203,7 @@ describe('rounds API', () => {
       expect(result).toHaveProperty('TxHash', '0xr5');
       expect(result).toHaveProperty('CharityAddress', '0xcharity');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*rounds.*info.*5/),
+        expect.stringMatching(/rounds.*info.*5/),
       );
     });
 
@@ -238,7 +234,7 @@ describe('rounds API', () => {
 
       expect(result).toBe(1700001234);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*rounds.*current.*time/),
+        expect.stringMatching(/rounds.*current.*time/),
       );
     });
 
@@ -265,7 +261,7 @@ describe('rounds API', () => {
       expect(result[0]).toHaveProperty('TxHash', '0x1');
       expect(result[1]).toHaveProperty('TxHash', '0x2');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*prizes.*history.*global/),
+        expect.stringMatching(/prizes.*history.*global/),
       );
     });
 
@@ -327,7 +323,7 @@ describe('rounds API', () => {
       expect(result).toHaveProperty('TxHash', '0x7');
       expect(result).toHaveProperty('EvtLogId', 7);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*bid.*info.*7/),
+        expect.stringMatching(/bid.*info.*7/),
       );
     });
 
@@ -399,7 +395,7 @@ describe('rounds API', () => {
 
       expect(result).toEqual(winners);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*bid.*current_special_winners/),
+        expect.stringMatching(/bid.*current_special_winners/),
       );
     });
 
@@ -425,7 +421,7 @@ describe('rounds API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*raffle.*deposits.*list/),
+        expect.stringMatching(/raffle.*deposits.*list/),
       );
     });
 
@@ -480,7 +476,7 @@ describe('rounds API', () => {
 
       expect(result).toEqual(bids);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*get_banned_bids/),
+        expect.stringMatching(/get_banned_bids/),
       );
     });
 
@@ -508,7 +504,7 @@ describe('rounds API', () => {
 
       expect(result).toEqual({ success: true });
       expect(mockedAxios.post).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*ban_bid/),
+        expect.stringMatching(/ban_bid/),
         { bid_id: 42, user_addr: '0xuser' },
       );
     });
@@ -527,7 +523,7 @@ describe('rounds API', () => {
 
       expect(result).toEqual({ success: true });
       expect(mockedAxios.post).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*unban_bid/),
+        expect.stringMatching(/unban_bid/),
         { bid_id: 42 },
       );
     });
@@ -547,7 +543,7 @@ describe('rounds API', () => {
 
       expect(result).toEqual(priceInfo);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*bid.*eth_price/),
+        expect.stringMatching(/bid.*eth_price/),
       );
     });
 
@@ -570,7 +566,7 @@ describe('rounds API', () => {
 
       expect(result).toBe(3600);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*time.*until_prize/),
+        expect.stringMatching(/time.*until_prize/),
       );
     });
 

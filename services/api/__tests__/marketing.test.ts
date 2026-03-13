@@ -9,10 +9,7 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
-      interceptors: {
-        request: { use: jest.fn() },
-        response: { use: jest.fn() },
-      },
+      interceptors: { response: { use: jest.fn() } },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -45,7 +42,7 @@ describe('marketing API', () => {
       expect(result[0]).toHaveProperty('TxHash', '0xabc');
       expect(result[0]).not.toHaveProperty('Tx');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*marketing.*rewards.*global/),
+        expect.stringMatching(/marketing.*rewards.*global/),
       );
     });
 
@@ -75,7 +72,7 @@ describe('marketing API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('EvtLogId', 2);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*marketing.*rewards.*by_user.*0xuser/),
+        expect.stringMatching(/marketing.*rewards.*by_user.*0xuser/),
       );
     });
 

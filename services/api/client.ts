@@ -14,19 +14,17 @@ export { axios, isAxiosError };
 
 /** Base URL for the main NFT/token API. */
 export const baseUrl = networkConfig.nftApiUrl;
-/** Local proxy path prepended to external API URLs to avoid CORS. */
-export const proxyUrl = '/api/proxy?url=';
 /** Base URL for the Cosmic Game statistics API. */
 export const cosmicGameBaseUrl = networkConfig.apiUrl;
 
-/** Builds a proxied URL targeting the Cosmic Game API. */
+/** Builds a direct URL targeting the Cosmic Game API. */
 export const getAPIUrl = (url: string) => {
-  return `${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl + url)}`;
+  return cosmicGameBaseUrl + url;
 };
 
-/** Builds a proxied URL targeting the main NFT/token API. */
+/** Builds a direct URL targeting the main NFT/token API. */
 export const getMainAPIUrl = (url: string) => {
-  return `${proxyUrl}${encodeURIComponent(baseUrl + url)}`;
+  return baseUrl + url;
 };
 
 /** Hoists nested `Tx` fields (EvtLogId, BlockNum, TxHash, etc.) to the top level of a record. */

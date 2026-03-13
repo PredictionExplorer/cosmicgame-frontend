@@ -10,6 +10,7 @@ import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
 
 import { wagmiConfig } from '@/config/wagmi';
+import { networkConfig } from '@/config/networks';
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Header from '@/components/layout/Header';
@@ -81,6 +82,20 @@ export function Providers({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     installGlobalErrorHandlers();
+  }, []);
+
+  useEffect(() => {
+    const rpcDisplay =
+      typeof window !== 'undefined' && networkConfig.rpcUrl.includes('161.129.67.42')
+        ? `${window.location.origin}/api/rpc → ${networkConfig.rpcUrl}`
+        : networkConfig.rpcUrl;
+    console.warn(
+      '[Cosmic Signature] Config:\n' +
+        `  Network: ${process.env.NEXT_PUBLIC_NETWORK || 'sepolia'}\n` +
+        `  Chain ID: ${networkConfig.chainId}\n` +
+        `  RPC URL: ${rpcDisplay}\n` +
+        `  API URL: ${networkConfig.apiUrl}`,
+    );
   }, []);
 
   useEffect(() => {

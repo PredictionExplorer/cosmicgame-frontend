@@ -1,7 +1,5 @@
-import type { NextConfig } from 'next';
-import { withSentryConfig } from '@sentry/nextjs';
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
@@ -14,8 +12,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  turbopack: {},
+  turbopack: {
+    root: __dirname,
+  },
   webpack: (config) => {
+    config.context = __dirname;
     config.resolve.fallback = {
       ...config.resolve.fallback,
       '@react-native-async-storage/async-storage': false,
@@ -32,13 +33,18 @@ const nextConfig: NextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'unsafe-none',
+          },
         ],
       },
     ];
   },
 };
 
-export default withSentryConfig(nextConfig, {
+const { withSentryConfig } = require('@sentry/nextjs');
+module.exports = withSentryConfig(nextConfig, {
   silent: true,
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,

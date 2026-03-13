@@ -32,7 +32,14 @@ const Footer = () => (
       <div className="grid grid-cols-2 gap-8 py-12 md:grid-cols-4">
         {/* Brand */}
         <div className="col-span-2 md:col-span-1">
-          <Image src="/images/logo2.svg" width={180} height={36} alt="Cosmic Signature" />
+          <Image
+            src="/images/logo2.svg"
+            width={180}
+            height={36}
+            alt="Cosmic Signature"
+            loading="eager"
+            className="h-8 w-auto max-w-[140px] object-contain"
+          />
           <p className="mt-4 text-sm text-muted-foreground max-w-[240px]">
             A strategy bidding game where players compete for ETH prizes and unique NFTs.
           </p>

@@ -8,7 +8,6 @@ import {
   normalizeFieldNamesArray,
   getAPIUrl,
   getMainAPIUrl,
-  proxyUrl,
   cosmicGameBaseUrl,
   baseUrl,
   apiCall,
@@ -388,48 +387,42 @@ describe('client helper functions', () => {
   });
 
   describe('getAPIUrl', () => {
-    it('returns proxy URL with encoded cosmicGame base + path', () => {
+    it('returns direct URL with cosmicGame base + path', () => {
       const result = getAPIUrl('rounds/list/0/100');
 
-      expect(result).toContain(proxyUrl);
-      expect(result).toContain(encodeURIComponent(cosmicGameBaseUrl + 'rounds/list/0/100'));
+      expect(result).toBe(cosmicGameBaseUrl + 'rounds/list/0/100');
     });
 
-    it('encodes special characters in the path', () => {
+    it('passes path through without encoding', () => {
       const result = getAPIUrl('search?q=hello world&limit=10');
 
-      expect(decodeURIComponent(result.replace(proxyUrl, ''))).toBe(
-        cosmicGameBaseUrl + 'search?q=hello world&limit=10',
-      );
+      expect(result).toBe(cosmicGameBaseUrl + 'search?q=hello world&limit=10');
     });
 
     it('handles empty path', () => {
       const result = getAPIUrl('');
 
-      expect(result).toBe(`${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl)}`);
+      expect(result).toBe(cosmicGameBaseUrl);
     });
   });
 
   describe('getMainAPIUrl', () => {
-    it('returns proxy URL with encoded main base + path', () => {
+    it('returns direct URL with main base + path', () => {
       const result = getMainAPIUrl('get_banned_bids');
 
-      expect(result).toContain(proxyUrl);
-      expect(result).toContain(encodeURIComponent(baseUrl + 'get_banned_bids'));
+      expect(result).toBe(baseUrl + 'get_banned_bids');
     });
 
-    it('encodes special characters in the path', () => {
+    it('passes path through without encoding', () => {
       const result = getMainAPIUrl('action?id=42&type=ban');
 
-      expect(decodeURIComponent(result.replace(proxyUrl, ''))).toBe(
-        baseUrl + 'action?id=42&type=ban',
-      );
+      expect(result).toBe(baseUrl + 'action?id=42&type=ban');
     });
 
     it('handles empty path', () => {
       const result = getMainAPIUrl('');
 
-      expect(result).toBe(`${proxyUrl}${encodeURIComponent(baseUrl)}`);
+      expect(result).toBe(baseUrl);
     });
   });
 

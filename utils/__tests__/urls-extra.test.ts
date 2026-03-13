@@ -8,15 +8,14 @@ import {
 } from '../urls';
 
 describe('getProxiedUrl', () => {
-  it('prepends the proxy path and encodes the URL', () => {
+  it('returns the URL directly (no proxy)', () => {
     const result = getProxiedUrl('https://example.com/path?q=1');
-    expect(result).toContain('/api/proxy?url=');
-    expect(result).toContain(encodeURIComponent('https://example.com/path?q=1'));
+    expect(result).toBe('https://example.com/path?q=1');
   });
 
   it('handles empty string', () => {
     const result = getProxiedUrl('');
-    expect(result).toContain('/api/proxy?url=');
+    expect(result).toBe('');
   });
 });
 
@@ -33,28 +32,26 @@ describe('getOriginUrl', () => {
 });
 
 describe('getAssetsUrl', () => {
-  it('constructs proxied URL with the NFT image server base', () => {
+  it('constructs direct URL with the NFT image server base', () => {
     const result = getAssetsUrl('cosmicsignature/logo.png');
-    expect(result).toContain(
-      encodeURIComponent('https://nfts.cosmicsignature.com/images/new/cosmicsignature/logo.png'),
+    expect(result).toBe(
+      'https://nfts.cosmicsignature.com/images/new/cosmicsignature/logo.png',
     );
   });
 });
 
 describe('getRWLKImageUrl', () => {
-  it('constructs proxied URL with default variant', () => {
+  it('constructs direct URL with default variant', () => {
     const result = getRWLKImageUrl('12345');
-    expect(result).toContain(
-      encodeURIComponent(
-        'https://nfts.cosmicsignature.com/images/randomwalk/12345_black_thumb.jpg',
-      ),
+    expect(result).toBe(
+      'https://nfts.cosmicsignature.com/images/randomwalk/12345_black_thumb.jpg',
     );
   });
 
   it('uses custom variant when provided', () => {
     const result = getRWLKImageUrl('12345', 'color.png');
-    expect(result).toContain(
-      encodeURIComponent('https://nfts.cosmicsignature.com/images/randomwalk/12345_color.png'),
+    expect(result).toBe(
+      'https://nfts.cosmicsignature.com/images/randomwalk/12345_color.png',
     );
   });
 });
@@ -67,16 +64,14 @@ describe('logoImgUrl', () => {
 });
 
 describe('getProxiedUrl edge cases', () => {
-  it('encodes URLs with spaces', () => {
+  it('returns URLs with spaces unchanged', () => {
     const result = getProxiedUrl('https://example.com/path with spaces');
-    expect(result).toContain(encodeURIComponent('https://example.com/path with spaces'));
+    expect(result).toBe('https://example.com/path with spaces');
   });
 
-  it('encodes URLs with ampersands and query params', () => {
+  it('returns URLs with ampersands and query params unchanged', () => {
     const result = getProxiedUrl('https://api.example.com?a=1&b=2&c=3');
-    expect(decodeURIComponent(result.replace('/api/proxy?url=', ''))).toBe(
-      'https://api.example.com?a=1&b=2&c=3',
-    );
+    expect(result).toBe('https://api.example.com?a=1&b=2&c=3');
   });
 });
 

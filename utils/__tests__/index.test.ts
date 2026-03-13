@@ -187,33 +187,28 @@ describe('getExplorerUrl', () => {
 });
 
 describe('getAssetsUrl', () => {
-  it('builds proxy URL with correct base path', () => {
+  it('builds direct URL with correct base path', () => {
     const result = getAssetsUrl('cosmicsignature/logo.png');
-    expect(result).toContain('/api/proxy?url=');
-    expect(result).toContain(encodeURIComponent('https://nfts.cosmicsignature.com/images/new/'));
-    expect(result).toContain(encodeURIComponent('cosmicsignature/logo.png'));
+    expect(result).toBe('https://nfts.cosmicsignature.com/images/new/cosmicsignature/logo.png');
   });
 
-  it('encodes the full URL', () => {
+  it('concatenates path to base URL', () => {
     const result = getAssetsUrl('path/to/image.png');
-    expect(decodeURIComponent(result.replace('/api/proxy?url=', ''))).toBe(
-      'https://nfts.cosmicsignature.com/images/new/path/to/image.png',
-    );
+    expect(result).toBe('https://nfts.cosmicsignature.com/images/new/path/to/image.png');
   });
 });
 
 describe('getRWLKImageUrl', () => {
-  it('builds proxy URL with default variant', () => {
+  it('builds direct URL with default variant', () => {
     const result = getRWLKImageUrl('token_123');
-    expect(result).toContain('/api/proxy?url=');
-    expect(decodeURIComponent(result.replace('/api/proxy?url=', ''))).toContain(
+    expect(result).toBe(
       'https://nfts.cosmicsignature.com/images/randomwalk/token_123_black_thumb.jpg',
     );
   });
 
-  it('builds proxy URL with custom variant', () => {
+  it('builds direct URL with custom variant', () => {
     const result = getRWLKImageUrl('token_456', 'full.jpg');
-    expect(decodeURIComponent(result.replace('/api/proxy?url=', ''))).toBe(
+    expect(result).toBe(
       'https://nfts.cosmicsignature.com/images/randomwalk/token_456_full.jpg',
     );
   });

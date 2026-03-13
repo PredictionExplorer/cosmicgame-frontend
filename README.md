@@ -7,8 +7,8 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 - **Framework:** Next.js 16 (App Router) with TypeScript 5.9
 - **UI:** React 19, MUI 7, Tailwind CSS v4
 - **Web3:** wagmi v3, viem v2, RainbowKit v2, Porto (WebAuthn account abstraction)
-- **Data:** TanStack React Query v5 for all data fetching, Axios via API proxy
-- **Charts:** Recharts
+- **Data:** TanStack React Query v5 for all data fetching, Axios for direct API access
+- **Charts:** Kendo React Charts
 - **Testing:** Jest (unit), Playwright (E2E)
 - **Quality:** ESLint 9 (flat config), Prettier, Husky, lint-staged, commitlint
 
@@ -74,7 +74,6 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 | `NEXT_PUBLIC_RPC_URL`                  | No            | Per-network default | Override the RPC endpoint                                   |
 | `NEXT_PUBLIC_API_URL`                  | No            | Per-network default | Override the backend API URL                                |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Yes           | —                   | WalletConnect project ID from cloud.walletconnect.com       |
-| `PROXY_ALLOWED_HOSTS`                  | No            | —                   | Comma-separated extra hostnames for the API proxy allowlist |
 | `NEXT_PUBLIC_GA4_MEASUREMENT_ID`       | No            | —                   | Google Analytics 4 measurement ID                           |
 | `NEXT_PUBLIC_SENTRY_DSN`               | No            | —                   | Sentry DSN for error reporting                              |
 
