@@ -7,7 +7,7 @@ import type { Chain } from 'viem';
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 
 import { networkConfig } from './networks';
-import { activeChain } from './chains';
+import { activeChain, localChain } from './chains';
 
 /*
  * Minimal no-op indexedDB stub for server / SSG environments.
@@ -83,13 +83,37 @@ const projectId =
   process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ||
   'placeholder_get_real_id_from_cloud_walletconnect_com';
 
+/**
+ * Use RPC proxy when the node doesn't support CORS (e.g. self-hosted).
+ * Infura/Alchemy have CORS; custom IPs need the proxy.
+ */
+const rpcUrl = networkConfig.rpcUrl || '';
+const useRpcProxy =
+  rpcUrl &&
+  !rpcUrl.includes('infura.io') &&
+  !rpcUrl.includes('alchemy.com') &&
+  !rpcUrl.includes('arbitrum-mainnet.infura.io');
+// Server: use RPC directly (no CORS). Client: use proxy when RPC lacks CORS.
+const transportUrl = useRpcProxy
+  ? typeof window !== 'undefined'
+    ? `${window.location.origin}/api/rpc`
+    : rpcUrl
+  : rpcUrl;
+
 /** Wagmi config for RainbowKit; used by the app's wallet provider. */
 export const wagmiConfig = getDefaultConfig({
   appName: 'Cosmic Signature',
   projectId,
-  chains: [activeChain as Chain],
+  chains: activeChain.id === localChain.id
+    ? [activeChain as Chain]
+    : ([activeChain, localChain] as Chain[]),
   transports: {
-    [activeChain.id]: http(networkConfig.rpcUrl || undefined),
+    [activeChain.id]: http(transportUrl || undefined),
+    [localChain.id]: http(
+      typeof window !== 'undefined' && rpcUrl && !rpcUrl.includes('infura.io') && !rpcUrl.includes('alchemy.com')
+        ? `${window.location.origin}/api/rpc`
+        : rpcUrl || 'http://127.0.0.1:8545',
+    ),
   },
   ssr: true,
 });

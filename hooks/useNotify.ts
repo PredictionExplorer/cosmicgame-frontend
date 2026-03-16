@@ -17,8 +17,11 @@ export function useNotify() {
   const notifyErrorFromEthers = useCallback(
     (err: unknown) => {
       if (isEthProviderError(err) && err.data?.message) {
-        notify('error', getErrorMessage(err.data.message));
+        reportError(err, 'ethers provider error');
+        const msg = getErrorMessage(err.data.message);
+        notify('error', msg || 'Unexpected error. Please try again.');
       } else if (err instanceof Error) {
+        reportError(err, 'ethers provider error');
         notify('error', err.message);
       } else {
         reportError(err, 'ethers provider error');

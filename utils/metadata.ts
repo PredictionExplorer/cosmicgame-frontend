@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 import { reportError } from './errors';
-import { getProxiedUrl } from './urls';
 
 export interface PageMetadata {
   title: string;
@@ -12,14 +11,14 @@ export interface PageMetadata {
 
 /**
  * Fetches and parses metadata (title, description, keywords, og:image)
- * from a remote URL via the app proxy.
+ * from a remote URL.
  *
  * @param url - The target page URL to scrape metadata from.
  * @returns Parsed metadata object, or `null` if the fetch fails.
  */
 export async function getMetadata(url: string): Promise<PageMetadata | null> {
   try {
-    const { data: html } = await axios.get(getProxiedUrl(url));
+    const { data: html } = await axios.get(url);
 
     const titleMatch = html.match(/<title>(.*?)<\/title>/);
     const title = titleMatch ? titleMatch[1] : '';

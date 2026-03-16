@@ -9,10 +9,6 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
-      interceptors: {
-        request: { use: jest.fn() },
-        response: { use: jest.fn() },
-      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -41,7 +37,7 @@ describe('system API', () => {
 
       expect(result).toBe(1700000000);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*time.*current/),
+        expect.stringMatching(/time.*current/),
       );
     });
 
@@ -72,7 +68,7 @@ describe('system API', () => {
       expect(result[0]).toHaveProperty('TxHash', '0xm');
       expect(result[0]).not.toHaveProperty('Tx');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*system.*modelist/),
+        expect.stringMatching(/system.*modelist/),
       );
     });
 
@@ -104,7 +100,7 @@ describe('system API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xe');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*system.*admin_events.*0.*100/),
+        expect.stringMatching(/system.*admin_events.*0.*100/),
       );
     });
 

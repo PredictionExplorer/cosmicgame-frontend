@@ -25,6 +25,8 @@ const ALLOWED_PATTERNS = [
   'Preload assets timed out',
   'load preload assets',
   'Missing `Description` or `aria-describedby',
+  '[apiCall]',
+  '[apiPost]',
 ];
 
 function isAllowed(msg) {

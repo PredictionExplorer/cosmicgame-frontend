@@ -1,5 +1,4 @@
 import { networkConfig } from '@/config/networks';
-import { proxyUrl } from '@/services/api/client';
 
 const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
 
@@ -7,28 +6,30 @@ const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
 export const getExplorerUrl = (type: 'tx' | 'address' | 'token', value: string): string =>
   `${EXPLORER_BASE}/${type}/${value}`;
 
-/** Wraps a URL through the app proxy to avoid CORS. */
+/** Returns the URL directly (no proxy; for compatibility with code that previously used getProxiedUrl). */
 export const getProxiedUrl = (url: string): string => {
-  return `${proxyUrl}${encodeURIComponent(url)}`;
+  return url;
 };
 
-/** Returns proxied CST asset URL (images) from the NFT server. */
+/** Returns direct CST asset URL (images) from the NFT server. */
 export const getAssetsUrl = (url: string): string => {
   const imageServerUrl = 'https://nfts.cosmicsignature.com/images/new/';
-  return `${proxyUrl}${encodeURIComponent(imageServerUrl + url)}`;
+  return imageServerUrl + url;
 };
 
-/** Returns proxied RandomWalk NFT image URL. */
+/** Returns direct RandomWalk NFT image URL. */
 export const getRWLKImageUrl = (fileName: string, variant: string = 'black_thumb.jpg'): string => {
   const imageServerUrl = 'https://nfts.cosmicsignature.com/images/randomwalk/';
-  return `${proxyUrl}${encodeURIComponent(`${imageServerUrl}${fileName}_${variant}`)}`;
+  return `${imageServerUrl}${fileName}_${variant}`;
 };
 
-/** Decodes the original URL from a proxied URL. */
+/** Decodes the original URL (handles legacy proxied format for backwards compatibility). */
 export const getOriginUrl = (url: string): string => {
-  const strippedUrl = url.replace('/api/proxy?url=', '');
-  return decodeURIComponent(strippedUrl);
+  if (url.startsWith('/api/proxy?url=')) {
+    return decodeURIComponent(url.replace('/api/proxy?url=', ''));
+  }
+  return url;
 };
 
-/** Proxied URL to the Cosmic Signature site logo image. */
+/** Direct URL to the Cosmic Signature site logo image. */
 export const logoImgUrl = getAssetsUrl('cosmicsignature/logo.png');

@@ -31,6 +31,7 @@ const mockWaitForTransactionReceipt = jest.fn().mockResolvedValue({});
 const mockGetCode = jest.fn().mockResolvedValue('0x1234');
 const mockGetBalance = jest.fn().mockResolvedValue(BigInt(10e18));
 const mockReadContract = jest.fn().mockResolvedValue(true);
+const mockEstimateContractGas = jest.fn().mockResolvedValue(BigInt(500_000));
 const mockWriteContract = jest.fn().mockResolvedValue('0xhash');
 
 jest.mock('wagmi', () => ({
@@ -39,6 +40,7 @@ jest.mock('wagmi', () => ({
     getCode: mockGetCode,
     getBalance: mockGetBalance,
     readContract: mockReadContract,
+    estimateContractGas: mockEstimateContractGas,
   })),
   useWalletClient: jest.fn(() => ({
     data: { writeContract: mockWriteContract },
@@ -152,6 +154,7 @@ jest.mock('viem', () => ({
 /* ────────────────────────────────────────────────────────────────── */
 
 jest.mock('../../config/networks', () => ({
+  COSMICGAME_ADDRESS: '0xCosmicGame',
   RAFFLE_WALLET_ADDRESS: '0xRaffle',
 }));
 
@@ -163,16 +166,17 @@ jest.mock('../../config/constants', () => ({
 jest.mock('../../contracts/abis', () => ({
   randomWalkNftAbi: [],
   cosmicTokenAbi: [],
+  cosmicGameAbi: [],
 }));
 
 const mockIsUserRejection = jest.fn().mockReturnValue(false);
-const mockIsEthProviderError = jest.fn().mockReturnValue(false);
 const mockReportError = jest.fn();
+const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
 
 jest.mock('../../utils/errors', () => ({
   isUserRejection: (...args: unknown[]) => mockIsUserRejection(...args),
-  isEthProviderError: (...args: unknown[]) => mockIsEthProviderError(...args),
   reportError: (...args: unknown[]) => mockReportError(...args),
+  getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
 }));
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -205,7 +209,8 @@ beforeEach(() => {
   mockWriteContract.mockResolvedValue('0xhash');
   mockWaitForTransactionReceipt.mockResolvedValue({});
   mockIsUserRejection.mockReturnValue(false);
-  mockIsEthProviderError.mockReturnValue(false);
+  mockGetContractErrorMessage.mockReturnValue(null);
+  mockEstimateContractGas.mockResolvedValue(BigInt(500_000));
   mockUseCosmicGameContract.mockReturnValue(mockContractObj);
   mockApiGetUserBalance.mockResolvedValue({
     CosmicTokenBalance: '1000000000000000000000',
