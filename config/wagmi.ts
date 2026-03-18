@@ -79,8 +79,12 @@ if (typeof globalThis.indexedDB === 'undefined') {
   };
 }
 
+// RainbowKit requires a projectId. Use a real ID from cloud.walletconnect.com for local + prod.
+// If unset we pass a placeholder so the app still runs; injected wallets work.
+export const isPlaceholderWalletConnectId =
+  !process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
 const projectId =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ||
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim() ||
   'placeholder_get_real_id_from_cloud_walletconnect_com';
 
 /**
