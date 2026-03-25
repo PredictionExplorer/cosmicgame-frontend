@@ -108,9 +108,10 @@ const transportUrl = useRpcProxy
 export const wagmiConfig = getDefaultConfig({
   appName: 'Cosmic Signature',
   projectId,
-  chains: activeChain.id === localChain.id
-    ? [activeChain as Chain]
-    : ([activeChain, localChain] as Chain[]),
+  chains: [
+    activeChain,
+    ...(activeChain.id === localChain.id ? [] : [localChain]),
+  ] as [Chain, ...Chain[]],
   transports: {
     [activeChain.id]: http(transportUrl || undefined),
     [localChain.id]: http(
