@@ -6,7 +6,7 @@ import RewardsByTokenPage from './RewardsByTokenPage';
 
 export const metadata: Metadata = createMetadata(
   'Rewards Details By Token | Cosmic Signature',
-  'Rewards Details By Token',
+  'View staking reward details for a specific Cosmic Signature token, including ETH distributions, reward history, and cumulative earnings.',
 );
 
 export default async function Page({

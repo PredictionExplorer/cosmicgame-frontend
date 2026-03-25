@@ -18,6 +18,39 @@ jest.mock('../../tables/UniqueStakersCSTTable', () => ({
 jest.mock('../../tables/UniqueStakersRWLKTable', () => ({
   UniqueStakersRWLKTable: () => <div data-testid="unique-rwlk-stakers" />,
 }));
+jest.mock('../StatisticsItem', () => ({
+  StatisticsItem: ({
+    title,
+    value,
+    tooltip,
+  }: {
+    title: string;
+    value: React.ReactNode;
+    tooltip?: string;
+  }) => (
+    <div data-testid="statistics-item">
+      <span>{title}</span>
+      <span>{typeof value === 'number' ? String(value) : value}</span>
+      {tooltip && <span data-testid="staking-tooltip">{tooltip}</span>}
+    </div>
+  ),
+}));
+jest.mock('../StatisticsGroup', () => ({
+  StatisticsGroup: ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div data-testid="statistics-group">
+      <span>{title}</span>
+      {children}
+    </div>
+  ),
+}));
+jest.mock('../CollapsibleSection', () => ({
+  CollapsibleSection: ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div data-testid="collapsible-section">
+      <span>{title}</span>
+      {children}
+    </div>
+  ),
+}));
 
 const defaultProps: StakingSectionProps = {
   cstStats: {
@@ -48,6 +81,17 @@ describe('StakingSection', () => {
     expect(screen.getByText('50')).toBeInTheDocument();
   });
 
+  it('wraps CST stats in a StatisticsGroup', () => {
+    render(<StakingSection {...defaultProps} />);
+    expect(screen.getByText('CST Staking Overview')).toBeInTheDocument();
+  });
+
+  it('wraps tables in CollapsibleSections', () => {
+    render(<StakingSection {...defaultProps} />);
+    const collapsible = screen.getAllByTestId('collapsible-section');
+    expect(collapsible.length).toBeGreaterThanOrEqual(3);
+  });
+
   it('renders staking actions table for CST', () => {
     render(<StakingSection {...defaultProps} />);
     const tables = screen.getAllByTestId('global-staking-actions');
@@ -63,6 +107,12 @@ describe('StakingSection', () => {
     render(<StakingSection {...defaultProps} />);
     expect(screen.getByText('CosmicSignature Token')).toBeInTheDocument();
     expect(screen.getByText('RandomWalk Token')).toBeInTheDocument();
+  });
+
+  it('renders tooltips on staking metrics', () => {
+    render(<StakingSection {...defaultProps} />);
+    const tooltips = screen.getAllByTestId('staking-tooltip');
+    expect(tooltips.length).toBeGreaterThan(0);
   });
 
   it('has no accessibility violations', async () => {

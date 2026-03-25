@@ -1,7 +1,10 @@
+'use client';
+
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
 import { formatEther } from 'viem';
 import { useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { UserCircle } from 'lucide-react';
 
 import { useActiveWeb3React } from '@/hooks/web3';
 import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
@@ -29,6 +32,12 @@ import {
 } from '@/hooks/useApiQuery';
 import getErrorMessage from '@/utils/alert';
 import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
+import { MainWrapper } from '@/components/styled';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { SectionDivider } from '@/components/ui/section-divider';
+import { StatCardSkeleton } from '@/components/ui/stat-card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AddressChip } from '@/components/ui/address-chip';
 
 import { CSTTable } from './tokens/CSTTable';
 import type { WinningHistoryEntry } from './tables/WinningHistoryTable';
@@ -39,7 +48,6 @@ import type { DonatedERC20Token } from './donations/DonatedERC20Table';
 import BiddingHistoryTable from './tables/BiddingHistoryTable';
 import WinningHistoryTable from './tables/WinningHistoryTable';
 import MarketingRewardsTable from './tables/MarketingRewardsTable';
-import { MainWrapper } from './styled';
 import { UserStatsSection, type UserProfileInfo } from './user-statistics/UserStatsSection';
 import { UserStakingSection } from './user-statistics/UserStakingSection';
 import { DonatedAssetsSection } from './user-statistics/DonatedAssetsSection';
@@ -51,9 +59,32 @@ interface StakingRewardRow {
   [key: string]: unknown;
 }
 
+const sectionVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } },
+};
+
 interface UserStatisticsViewProps {
   address: string | null | undefined;
   isOwnProfile: boolean;
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-8" data-testid="statistics-loading-skeleton">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <StatCardSkeleton key={i} />
+        ))}
+      </div>
+      <Skeleton className="h-40 w-full rounded-xl" />
+      <div className="space-y-3">
+        <Skeleton className="h-10 w-full rounded-lg" />
+        <Skeleton className="h-10 w-full rounded-lg" />
+        <Skeleton className="h-10 w-full rounded-lg" />
+      </div>
+    </div>
+  );
 }
 
 /** Comprehensive user profile view with bidding stats, winning history, staking actions, token holdings, and raffle claims. */
@@ -103,7 +134,10 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const claimHistory = (claimHistoryRaw as WinningHistoryEntry[] | null) ?? null;
   const marketingRewards = (marketingRewardsRaw ?? []) as MarketingReward[];
   const cstList = cstListRaw ?? [];
-  const cstStakingRewards = (cstStakingRewardsRaw ?? []) as StakingRewardRow[];
+  const cstStakingRewards = useMemo(
+    () => (cstStakingRewardsRaw ?? []) as StakingRewardRow[],
+    [cstStakingRewardsRaw],
+  );
   const collectedCstStakingRewards = collectedCstStakingRewardsRaw ?? [];
   const cstStakingRewardsByDeposit = (cstStakingRewardsByDepositRaw ??
     []) as CSTStakingRewardByDeposit[];
@@ -148,6 +182,15 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     }
     return { raffleETHProbability: -1, raffleNFTProbability: -1 };
   }, [address, dashboardData, bidListForProb]);
+
+  const totalStakeRewardEth = useMemo(
+    () =>
+      cstStakingRewards.reduce(
+        (sum, r) => sum + (r.RewardCollectedEth ?? 0) + (r.RewardToCollectEth ?? 0),
+        0,
+      ),
+    [cstStakingRewards],
+  );
 
   const loading =
     loadingDashboard ||
@@ -249,28 +292,42 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   if (address === 'Invalid Address') {
     return (
       <MainWrapper>
-        <h6 className="text-xl font-medium">Invalid Address</h6>
+        <h1 className="text-xl font-medium">Invalid Address</h1>
       </MainWrapper>
     );
   }
 
   return (
-    <MainWrapper>
-      {isOwnProfile ? (
-        <h4 className="text-2xl font-bold text-primary mb-8">My Statistics</h4>
-      ) : (
-        <div className="mb-8">
-          <span className="text-xl font-medium text-primary mr-4">User</span>
-          <span className="text-xl font-mono break-all">{address}</span>
-        </div>
-      )}
+    <MainWrapper aria-label={isOwnProfile ? 'My Statistics' : 'User Statistics'}>
+      <PageHeader
+        title={isOwnProfile ? 'My Statistics' : 'User Profile'}
+        subtitle={
+          isOwnProfile
+            ? 'Your complete performance dashboard and activity history'
+            : 'Viewing another player\u2019s statistics and activity'
+        }
+      >
+        {address && !isOwnProfile && (
+          <div className="mt-3 flex justify-center">
+            <AddressChip address={address} truncateLength={8} />
+          </div>
+        )}
+      </PageHeader>
 
       {loading ? (
-        <h6 className="text-xl font-medium">Loading...</h6>
+        <LoadingSkeleton />
       ) : !userInfo ? (
-        <h6 className="text-xl font-medium">There is no user information yet.</h6>
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="mb-4 rounded-full bg-white/[0.04] p-4">
+            <UserCircle className="h-8 w-8 text-muted-foreground/50" />
+          </div>
+          <h2 className="text-lg font-semibold">No activity yet</h2>
+          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+            This account hasn&apos;t participated in any rounds yet. Place a bid to get started!
+          </p>
+        </div>
       ) : (
-        <>
+        <div className="space-y-12">
           <UserStatsSection
             userInfo={userInfo}
             balanceETH={balance.ETH}
@@ -278,59 +335,110 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             raffleETHProbability={raffleETHProbability}
             raffleNFTProbability={raffleNFTProbability}
             data={data}
+            isOwnProfile={isOwnProfile}
+            totalStakeRewardEth={totalStakeRewardEth}
           />
 
-          <UserStakingSection
-            address={address!}
-            userInfo={userInfo}
-            stakingCSTActions={stakingCSTActions}
-            stakingRWLKActions={stakingRWLKActions}
-            cstStakingRewards={cstStakingRewards}
-            cstStakingRewardsByDeposit={cstStakingRewardsByDeposit}
-            collectedCstStakingRewards={collectedCstStakingRewards}
-            rwlkMints={rwlkMints}
-          />
-
-          <div className="mt-12">
-            <h6 className="text-xl font-medium leading-none mb-4">Bid History</h6>
-            <BiddingHistoryTable biddingHistory={bidHistory} />
-          </div>
-          <div>
-            <h6 className="text-xl font-medium leading-none mt-16 mb-4">
-              Cosmic Signature Tokens User Own
-            </h6>
-            <CSTTable list={cstList} />
-          </div>
-          <div>
-            <h6 className="text-xl font-medium leading-none mt-16 mb-4">History of Winnings</h6>
-            <WinningHistoryTable
-              winningHistory={claimHistory ?? []}
-              showClaimedStatus={true}
-              showWinnerAddr={false}
-            />
-          </div>
-          {marketingRewards.length > 0 && (
-            <div>
-              <h6 className="text-xl font-medium leading-none mt-16 mb-4">Marketing Rewards</h6>
-              <MarketingRewardsTable list={marketingRewards} />
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            <SectionDivider title="Bidding History" />
+            <div className="mt-6">
+              <BiddingHistoryTable biddingHistory={bidHistory} />
             </div>
+          </motion.section>
+
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            <SectionDivider title="Winning History" />
+            <div className="mt-6">
+              <WinningHistoryTable
+                winningHistory={claimHistory ?? []}
+                showClaimedStatus={true}
+                showWinnerAddr={false}
+              />
+            </div>
+          </motion.section>
+
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            <SectionDivider title="Staking" />
+            <div className="mt-6">
+              <UserStakingSection
+                address={address!}
+                userInfo={userInfo}
+                stakingCSTActions={stakingCSTActions}
+                stakingRWLKActions={stakingRWLKActions}
+                cstStakingRewards={cstStakingRewards}
+                cstStakingRewardsByDeposit={cstStakingRewardsByDeposit}
+                collectedCstStakingRewards={collectedCstStakingRewards}
+                rwlkMints={rwlkMints}
+              />
+            </div>
+          </motion.section>
+
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            <SectionDivider title="Token Holdings" />
+            <div className="mt-6">
+              <CSTTable list={cstList} />
+            </div>
+          </motion.section>
+
+          {marketingRewards.length > 0 && (
+            <motion.section
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+            >
+              <SectionDivider title="Marketing Rewards" />
+              <div className="mt-6">
+                <MarketingRewardsTable list={marketingRewards} />
+              </div>
+            </motion.section>
           )}
 
-          <DonatedAssetsSection
-            unclaimedNFTs={unclaimedDonatedNFTsList}
-            claimedNFTs={claimedDonatedNFTsList}
-            donatedERC20={donatedERC20List}
-            loadingNFTs={loadingUnclaimedNFTs || loadingClaimedNFTs}
-            loadingERC20={loadingERC20}
-            canClaim={canClaim}
-            isClaiming={isClaiming}
-            claimingDonatedNFTs={claimingDonatedNFTs}
-            onClaimNFT={handleDonatedNFTsClaim}
-            onClaimAllNFTs={handleAllDonatedNFTsClaim}
-            onClaimERC20={handleDonatedERC20Claim}
-            onClaimAllERC20={handleAllDonatedERC20Claim}
-          />
-        </>
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
+            <SectionDivider title="Claimable Assets" />
+            <div className="mt-6 space-y-10">
+              <DonatedAssetsSection
+                unclaimedNFTs={unclaimedDonatedNFTsList}
+                claimedNFTs={claimedDonatedNFTsList}
+                donatedERC20={donatedERC20List}
+                loadingNFTs={loadingUnclaimedNFTs || loadingClaimedNFTs}
+                loadingERC20={loadingERC20}
+                canClaim={canClaim}
+                isClaiming={isClaiming}
+                claimingDonatedNFTs={claimingDonatedNFTs}
+                onClaimNFT={handleDonatedNFTsClaim}
+                onClaimAllNFTs={handleAllDonatedNFTsClaim}
+                onClaimERC20={handleDonatedERC20Claim}
+                onClaimAllERC20={handleAllDonatedERC20Claim}
+              />
+            </div>
+          </motion.section>
+        </div>
       )}
     </MainWrapper>
   );

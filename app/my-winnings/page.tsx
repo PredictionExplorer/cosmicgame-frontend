@@ -6,7 +6,9 @@ import MyWinnings from './MyWinnings';
 
 export const metadata: Metadata = createMetadata(
   'Pending Winnings | Cosmic Signature',
-  'Pending Winnings',
+  'View and claim your pending ETH rewards, raffle winnings, staking distributions, and donated assets from the Cosmic Signature game.',
+  undefined,
+  '/my-winnings',
 );
 
 export default function Page() {

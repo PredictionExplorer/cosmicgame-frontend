@@ -1,4 +1,4 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, waitFor, checkA11y } from '@/test-utils';
 
 import { RaffleWinningsTable, type RaffleWinning } from '../RaffleWinningsTable';
 
@@ -57,9 +57,15 @@ const winning: RaffleWinning = {
   Claimed: false,
 };
 
+async function renderAndFlush(list: RaffleWinning[]) {
+  const result = render(<RaffleWinningsTable list={list} />);
+  await waitFor(() => {});
+  return result;
+}
+
 describe('RaffleWinningsTable', () => {
-  it('renders table headers', () => {
-    render(<RaffleWinningsTable list={[]} />);
+  it('renders table headers', async () => {
+    await renderAndFlush([]);
     expect(screen.getByText('Datetime')).toBeInTheDocument();
     expect(screen.getByText('Round')).toBeInTheDocument();
     expect(screen.getByText('Winner')).toBeInTheDocument();
@@ -67,44 +73,44 @@ describe('RaffleWinningsTable', () => {
     expect(screen.getByText('Claimed')).toBeInTheDocument();
   });
 
-  it('renders a winning row with correct data', () => {
-    render(<RaffleWinningsTable list={[winning]} />);
+  it('renders a winning row with correct data', async () => {
+    await renderAndFlush([winning]);
     expect(screen.getByText('date-1700000000')).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('1.2345678')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
   });
 
-  it('shows "Yes" for claimed winnings', () => {
-    render(<RaffleWinningsTable list={[{ ...winning, Claimed: true }]} />);
+  it('shows "Yes" for claimed winnings', async () => {
+    await renderAndFlush([{ ...winning, Claimed: true }]);
     expect(screen.getByText('Yes')).toBeInTheDocument();
   });
 
-  it('renders multiple rows', () => {
+  it('renders multiple rows', async () => {
     const list = [
       winning,
       { ...winning, EvtLogId: 2, RoundNum: 43 },
       { ...winning, EvtLogId: 3, RoundNum: 44 },
     ];
-    render(<RaffleWinningsTable list={list} />);
+    await renderAndFlush(list);
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('43')).toBeInTheDocument();
     expect(screen.getByText('44')).toBeInTheDocument();
   });
 
-  it('renders empty table when list is empty', () => {
-    render(<RaffleWinningsTable list={[]} />);
+  it('renders empty table when list is empty', async () => {
+    await renderAndFlush([]);
     expect(screen.getByTestId('table-primary')).toBeInTheDocument();
   });
 
-  it('links round number to /prize/{round}', () => {
-    render(<RaffleWinningsTable list={[winning]} />);
+  it('links round number to /prize/{round}', async () => {
+    await renderAndFlush([winning]);
     const roundLink = screen.getByText('42').closest('a');
     expect(roundLink).toHaveAttribute('href', '/prize/42');
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<RaffleWinningsTable list={[winning]} />);
+    const { container } = await renderAndFlush([winning]);
     await checkA11y(container);
   });
 });

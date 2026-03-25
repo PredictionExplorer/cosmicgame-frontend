@@ -57,6 +57,34 @@ describe('VideoPlayerDialog', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 
+  it('has a visually hidden dialog title for screen readers', () => {
+    render(<VideoPlayerDialog open={true} videoPath="/video.mp4" onClose={jest.fn()} />);
+    const dialog = screen.getByRole('dialog');
+    const heading = dialog.querySelector('h2');
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveTextContent('Video Player');
+  });
+
+  it('does not produce console.error about missing DialogTitle', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    render(<VideoPlayerDialog open={true} videoPath="/video.mp4" onClose={jest.fn()} />);
+    const titleWarnings = spy.mock.calls.filter((args) =>
+      args.some((arg) => typeof arg === 'string' && arg.includes('DialogTitle')),
+    );
+    expect(titleWarnings).toHaveLength(0);
+    spy.mockRestore();
+  });
+
+  it('does not produce console.warn about missing Description', () => {
+    const spy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<VideoPlayerDialog open={true} videoPath="/video.mp4" onClose={jest.fn()} />);
+    const descWarnings = spy.mock.calls.filter((args) =>
+      args.some((arg) => typeof arg === 'string' && arg.includes('Description')),
+    );
+    expect(descWarnings).toHaveLength(0);
+    spy.mockRestore();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <VideoPlayerDialog open={true} videoPath="/video.mp4" onClose={jest.fn()} />,

@@ -1,6 +1,7 @@
-import { renderHook, act } from '@testing-library/react';
-
 import type { DashboardInfo } from '@/services/api/types';
+
+import { act, renderHook } from '@/test-utils';
+
 
 const mockNotify = jest.fn();
 const mockNotifyErrorFromEthers = jest.fn();
@@ -20,6 +21,7 @@ jest.mock('wagmi', () => ({
 
 const mockEstimateGas = jest.fn().mockResolvedValue(BigInt(500000));
 const mockClaimMainPrize = jest.fn().mockResolvedValue('0xhash');
+const mockReadRoundNum = jest.fn();
 const mockReadActivationTime = jest.fn().mockResolvedValue(BigInt(1000));
 const mockReadTimeout = jest.fn().mockResolvedValue(BigInt(3600));
 
@@ -29,16 +31,10 @@ jest.mock('../../hooks/useCosmicGameContract', () => ({
     estimateGas: { claimMainPrize: mockEstimateGas },
     write: { claimMainPrize: mockClaimMainPrize },
     read: {
+      roundNum: mockReadRoundNum,
       roundActivationTime: mockReadActivationTime,
       timeoutDurationToClaimMainPrize: mockReadTimeout,
     },
-  })),
-}));
-
-jest.mock('../../hooks/useCosmicSignatureContract', () => ({
-  __esModule: true,
-  default: jest.fn(() => ({
-    read: { totalSupply: jest.fn().mockResolvedValue(BigInt(10)) },
   })),
 }));
 
@@ -55,24 +51,32 @@ jest.mock('../../services/api', () => ({
   },
 }));
 
+const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
+
 jest.mock('../../utils/errors', () => ({
   isUserRejection: jest.fn(() => false),
   reportError: jest.fn(),
+  getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
 }));
 
 import { usePrizeClaim } from '../usePrizeClaim';
 import api from '../../services/api';
-import { isUserRejection } from '../../utils/errors';
+import { isUserRejection, reportError } from '../../utils/errors';
 import useCosmicGameContract from '../../hooks/useCosmicGameContract';
 
 const mockApi = api as jest.Mocked<typeof api>;
 const mockIsUserRejection = isUserRejection as jest.MockedFunction<typeof isUserRejection>;
+const mockReportError = reportError as jest.MockedFunction<typeof reportError>;
 const mockUseCosmicGameContract = useCosmicGameContract as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockClaimMainPrize.mockResolvedValue('0xhash');
   mockEstimateGas.mockResolvedValue(BigInt(500000));
+  mockReadRoundNum
+    .mockResolvedValueOnce(BigInt(5))
+    .mockResolvedValueOnce(BigInt(6));
+  mockGetContractErrorMessage.mockReturnValue(null);
 });
 
 const baseData = {
@@ -84,17 +88,22 @@ const baseData = {
 } as Partial<DashboardInfo> as DashboardInfo;
 
 describe('usePrizeClaim', () => {
-  it('initializes with correct default state', () => {
-    const { result } = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
+  it('initializes with correct default state', async () => {
+    mockUseCosmicGameContract.mockReturnValueOnce(null);
+    let result: { current: ReturnType<typeof usePrizeClaim> };
+    await act(async () => {
+      const hookResult = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
+      result = hookResult.result;
+    });
 
-    expect(result.current.prizeTime).toBeGreaterThan(0);
-    expect(result.current.timeoutClaimPrize).toBe(0);
-    expect(result.current.isClaiming).toBe(false);
-    expect(typeof result.current.onClaimPrize).toBe('function');
-    expect(typeof result.current.fetchActivationTime).toBe('function');
+    expect(result!.current.prizeTime).toBeGreaterThan(0);
+    expect(result!.current.timeoutClaimPrize).toBe(0);
+    expect(result!.current.isClaiming).toBe(false);
+    expect(typeof result!.current.onClaimPrize).toBe('function');
+    expect(typeof result!.current.fetchActivationTime).toBe('function');
   });
 
-  it('onClaimPrize success: estimates gas, claims, creates token, redirects, returns true', async () => {
+  it('onClaimPrize success: estimates gas, claims, detects round increment, redirects, returns true', async () => {
     const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
 
     let success: boolean | undefined;
@@ -105,13 +114,14 @@ describe('usePrizeClaim', () => {
     expect(success).toBe(true);
     expect(mockEstimateGas).toHaveBeenCalled();
     expect(mockClaimMainPrize).toHaveBeenCalled();
-    expect(mockApi.create).toHaveBeenCalledWith(9, 5);
+    expect(mockReadRoundNum).toHaveBeenCalledTimes(2);
+    expect(mockApi.create).toHaveBeenCalledWith(5, 5);
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('/prize-claimed'));
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('round=5'));
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('message=success'));
   });
 
-  it('onClaimPrize error: shows notification, returns false', async () => {
+  it('onClaimPrize error: reports error, shows notification, returns false', async () => {
     const claimError = new Error('transaction failed');
     mockClaimMainPrize.mockRejectedValueOnce(claimError);
 
@@ -123,6 +133,7 @@ describe('usePrizeClaim', () => {
     });
 
     expect(success).toBe(false);
+    expect(mockReportError).toHaveBeenCalledWith(claimError, 'claim-main-prize');
     expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(claimError);
   });
 
@@ -159,17 +170,30 @@ describe('usePrizeClaim', () => {
     );
   });
 
-  it('claimHistory is derived from useClaimHistory hook', () => {
-    const { result } = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
-    expect(result.current.claimHistory).toEqual([{ round: 1, prize: '1.0' }]);
+  it('claimHistory is derived from useClaimHistory hook', async () => {
+    let result: { current: ReturnType<typeof usePrizeClaim> };
+    await act(async () => {
+      const hookResult = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
+      result = hookResult.result;
+    });
+    expect(result!.current.claimHistory).toEqual([{ round: 1, prize: '1.0' }]);
   });
 
-  it('prizeTime is derived from usePrizeTime and useCurrentTime hooks', () => {
-    const { result } = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
-    expect(result.current.prizeTime).toBeGreaterThan(0);
+  it('prizeTime is derived from usePrizeTime and useCurrentTime hooks', async () => {
+    let result: { current: ReturnType<typeof usePrizeClaim> };
+    await act(async () => {
+      const hookResult = renderHook(() => usePrizeClaim({ data: null, offset: 0 }));
+      result = hookResult.result;
+    });
+    expect(result!.current.prizeTime).toBeGreaterThan(0);
   });
 
   it('isClaiming state transitions (true during claim, false after)', async () => {
+    mockReadRoundNum
+      .mockReset()
+      .mockResolvedValueOnce(BigInt(5))
+      .mockResolvedValue(BigInt(6));
+
     let resolveClaim!: (value: string) => void;
     mockClaimMainPrize.mockReturnValueOnce(
       new Promise<string>((resolve) => {

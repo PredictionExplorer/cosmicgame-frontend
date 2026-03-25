@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { parseUnits } from 'viem';
 import { Wallet, Trophy, Gift, Coins } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -12,18 +11,15 @@ import { SectionDivider } from '@/components/ui/section-divider';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { Spinner } from '@/components/ui/spinner';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import getErrorMessage from '@/utils/alert';
 import { useActiveWeb3React } from '@/hooks/web3';
-import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
 import { useApiData } from '@/contexts/ApiDataContext';
-import { useNotification } from '@/contexts/NotificationContext';
 import {
   useUnclaimedDonatedNFTByUser,
   useUnclaimedRaffleDepositsByUser,
   useDonationsERC20ByUser,
 } from '@/hooks/useApiQuery';
+import { useClaimWinnings } from '@/hooks/useClaimWinnings';
 import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
 import { UncollectedCSTStakingRewardsTable } from '@/components/staking/UncollectedCSTStakingRewardsTable';
 import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
@@ -45,8 +41,7 @@ interface UnclaimedDonatedNFT {
 
 export default function MyWinnings() {
   const { account } = useActiveWeb3React();
-  const { setNotification } = useNotification();
-  const { apiData: status, fetchData: fetchStatusData } = useApiData();
+  const { apiData: status } = useApiData();
   const router = useRouter();
 
   const {
@@ -67,6 +62,22 @@ export default function MyWinnings() {
     refetch: refetchERC20,
   } = useDonationsERC20ByUser(account);
 
+  const refetch = useCallback(() => {
+    refetchNFTs();
+    refetchRaffle();
+    refetchERC20();
+  }, [refetchNFTs, refetchRaffle, refetchERC20]);
+
+  const {
+    isClaiming,
+    claimingDonatedNFTs,
+    claimAllRaffleETH,
+    claimDonatedNFT,
+    claimAllDonatedNFTs,
+    claimDonatedERC20,
+    claimAllDonatedERC20,
+  } = useClaimWinnings(refetch);
+
   const donatedNFTs = useMemo(
     () =>
       nftsRaw
@@ -86,142 +97,25 @@ export default function MyWinnings() {
 
   const loading = loadingNFTs || loadingRaffle;
   const error = nftError || raffleError ? 'Failed to load unclaimed winnings data' : null;
-  const refetch = () => {
-    refetchNFTs();
-    refetchRaffle();
-  };
-
-  const raffleWalletContract = useRaffleWalletContract();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [isClaiming, setIsClaiming] = useState({
-    donatedNFT: false,
-    raffleETH: false,
-  });
-  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
   const perPage = 5;
 
-  const handleAllETHClaim = async () => {
-    if (!raffleWalletContract) {
-      setNotification({ text: 'Wallet not connected', type: 'error', visible: true });
-      return;
-    }
-    setIsClaiming((prev) => ({ ...prev, raffleETH: true }));
-    try {
-      const roundNums = (raffleETHWinnings || []).filter((w) => !w.Claimed).map((w) => w.RoundNum);
-      await raffleWalletContract.write.withdrawEverything?.([roundNums, [], []]);
-
-      setTimeout(() => {
-        fetchStatusData();
-        refetch();
-      }, 3000);
-    } catch (err: unknown) {
-      if (isUserRejection(err)) return;
-      reportError(err, 'claim all raffle ETH');
-      const rawMsg = getEthErrorMessage(err);
-      if (rawMsg) {
-        const msg = getErrorMessage(rawMsg) || rawMsg;
-        setNotification({ text: msg, type: 'error', visible: true });
-      }
-    } finally {
-      setIsClaiming((prev) => ({ ...prev, raffleETH: false }));
-    }
+  const handleAllETHClaim = () => {
+    const roundNums = (raffleETHWinnings || []).filter((w) => !w.Claimed).map((w) => w.RoundNum);
+    claimAllRaffleETH(roundNums);
   };
 
-  const handleDonatedNFTsClaim = async (tokenID: number) => {
-    if (!raffleWalletContract) {
-      setNotification({ text: 'Wallet not connected', type: 'error', visible: true });
-      return;
-    }
-    setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
-    try {
-      await raffleWalletContract.write.claimDonatedNft?.([tokenID]);
-
-      setTimeout(() => {
-        fetchStatusData();
-        refetch();
-      }, 3000);
-    } catch (err: unknown) {
-      if (isUserRejection(err)) return;
-      reportError(err, 'claim donated NFT');
-      const rawMsg = getEthErrorMessage(err);
-      if (rawMsg) {
-        const msg = getErrorMessage(rawMsg) || rawMsg;
-        setNotification({ text: msg, type: 'error', visible: true });
-      }
-    } finally {
-      setClaimingDonatedNFTs((prev) => prev.filter((id) => id !== tokenID));
-    }
-  };
-
-  const handleAllDonatedNFTsClaim = async () => {
-    if (!raffleWalletContract) {
-      setNotification({ text: 'Wallet not connected', type: 'error', visible: true });
-      return;
-    }
+  const handleAllDonatedNFTsClaim = () => {
     if (!donatedNFTs) return;
-    setIsClaiming((prev) => ({ ...prev, donatedNFT: true }));
-
-    try {
-      const indexList = donatedNFTs.map((item) => item.Index);
-      await raffleWalletContract.write.claimManyDonatedNfts?.([indexList]);
-
-      setTimeout(() => {
-        fetchStatusData();
-        refetch();
-      }, 3000);
-    } catch (err: unknown) {
-      if (isUserRejection(err)) return;
-      reportError(err, 'claim all donated NFTs');
-      const rawMsg = getEthErrorMessage(err);
-      if (rawMsg) {
-        const msg = getErrorMessage(rawMsg) || rawMsg;
-        setNotification({ text: msg, type: 'error', visible: true });
-      }
-    } finally {
-      setIsClaiming((prev) => ({ ...prev, donatedNFT: false }));
-    }
+    claimAllDonatedNFTs(donatedNFTs.map((item) => item.Index));
   };
 
-  const handleDonatedERC20Claim = async (roundNum: number, tokenAddr: string, amount: string) => {
-    try {
-      await raffleWalletContract!.write.claimDonatedToken?.([
-        roundNum,
-        tokenAddr,
-        parseUnits(amount.toString(), 18),
-      ]);
-      setTimeout(() => {
-        refetchERC20();
-      }, 3000);
-    } catch (err: unknown) {
-      if (isUserRejection(err)) return;
-      reportError(err, 'claim donated ERC20 token');
-      const rawMsg = getEthErrorMessage(err, 'An error occurred');
-      const msg = getErrorMessage(rawMsg) || rawMsg;
-      setNotification({ text: msg, type: 'error', visible: true });
-    }
-  };
-
-  const handleAllDonatedERC20Claim = async () => {
-    try {
-      const donatedTokensToClaim = donatedERC20Data
-        .filter((x) => !x.Claimed)
-        .map((x) => ({
-          roundNum: x.RoundNum,
-          tokenAddress: x.TokenAddr,
-          amount: x.AmountEth,
-        }));
-      await raffleWalletContract!.write.claimManyDonatedTokens?.([donatedTokensToClaim]);
-      setTimeout(() => {
-        refetchERC20();
-      }, 3000);
-    } catch (err: unknown) {
-      if (isUserRejection(err)) return;
-      reportError(err, 'claim all donated ERC20 tokens');
-      const rawMsg = getEthErrorMessage(err, 'An error occurred');
-      const msg = getErrorMessage(rawMsg) || rawMsg;
-      setNotification({ text: msg, type: 'error', visible: true });
-    }
+  const handleAllDonatedERC20Claim = () => {
+    const tokens = donatedERC20Data
+      .filter((x) => !x.Claimed)
+      .map((x) => ({ roundNum: x.RoundNum, tokenAddress: x.TokenAddr, amount: x.AmountEth }));
+    claimAllDonatedERC20(tokens);
   };
 
   if (!account) {
@@ -241,7 +135,7 @@ export default function MyWinnings() {
     return (
       <MainWrapper>
         <PageHeader title="My Rewards" />
-        <ErrorState title="Failed to load" message={error} onRetry={() => refetch()} />
+        <ErrorState title="Failed to load" message={error} onRetry={refetch} />
       </MainWrapper>
     );
   }
@@ -338,7 +232,7 @@ export default function MyWinnings() {
           ) : (
             <DonatedNFTTable
               list={donatedNFTs}
-              handleClaim={handleDonatedNFTsClaim}
+              handleClaim={claimDonatedNFT}
               claimingTokens={claimingDonatedNFTs}
             />
           )}
@@ -365,7 +259,7 @@ export default function MyWinnings() {
               description="ERC20 tokens donated during bidding rounds will appear here."
             />
           ) : (
-            <DonatedERC20Table list={donatedERC20Data} handleClaim={handleDonatedERC20Claim} />
+            <DonatedERC20Table list={donatedERC20Data} handleClaim={claimDonatedERC20} />
           )}
         </section>
 

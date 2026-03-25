@@ -47,7 +47,7 @@ export const SpecialPrizeWinners = () => {
       icon: <Crown className="h-5 w-5" />,
       title: 'Endurance Champion',
       tooltip:
-        'The bidder who holds the longest gap between consecutive bids wins CST tokens and a Cosmic Signature NFT.',
+        'The bidder who remained the last bidder for the longest consecutive period of time. Wins CST tokens and a Cosmic Signature NFT.',
       address: specialWinners?.EnduranceChampionAddress,
       extra: hasEndurance && (specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
         <div className="mt-3 flex items-center gap-2">
@@ -69,7 +69,7 @@ export const SpecialPrizeWinners = () => {
       icon: <Swords className="h-5 w-5" />,
       title: 'Chrono Warrior',
       tooltip:
-        'The bidder with the single longest time between their bid and the next bid wins a percentage of the total contract balance.',
+        'The bidder who held the Endurance Champion title for the longest consecutive period. Wins a percentage of the total contract balance.',
       address: specialWinners?.EnduranceChampionAddress,
       extra: hasEndurance && (specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
         <div className="mt-3">

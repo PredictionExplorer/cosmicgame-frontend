@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
@@ -37,9 +38,9 @@ const WinnerRow = ({ winner }: { winner: StakingCSTReward }) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <a href={`/user/${winner.StakerAddr}`} className="text-inherit font-mono">
+              <Link href={`/user/${winner.StakerAddr}`} className="text-inherit font-mono">
                 {shortenHex(winner.StakerAddr ?? '', 6)}
-              </a>
+              </Link>
             </TooltipTrigger>
             <TooltipContent>{winner.StakerAddr}</TooltipContent>
           </Tooltip>

@@ -5,6 +5,7 @@ import { getAssetsUrl } from '@/utils';
 
 import { cosmicGameBaseUrl } from '@/services/api';
 import { createMetadata } from '@/utils/seo';
+import { JsonLd, nftProductJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 
 import DetailPage from './DetailPage';
 
@@ -22,13 +23,39 @@ export async function generateMetadata({
     const { data } = await axios.get(`${cosmicGameBaseUrl}cst/info/${id}`);
     const fileName = `0x${data.TokenInfo.Seed}`;
     const imageUrl = getAssetsUrl(`cosmicsignature/${fileName}.png`);
-    return createMetadata(title, description, imageUrl);
+    return createMetadata(title, description, imageUrl, '/detail/' + id);
   } catch {
-    return createMetadata(title, description);
+    return createMetadata(title, description, undefined, '/detail/' + id);
   }
 }
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return <DetailPage tokenId={parseInt(id, 10)} />;
+  const tokenId = parseInt(id, 10);
+
+  const name = `Cosmic Signature Token #${id}`;
+  const description = `Unique generative NFT from the Cosmic Signature bidding game, featuring artwork based on three-body problem physics.`;
+  let imageUrl = 'https://nfts.cosmicsignature.com/images/new/cosmicsignature/logo.png';
+
+  try {
+    const { data } = await axios.get(`${cosmicGameBaseUrl}cst/info/${id}`);
+    const fileName = `0x${data.TokenInfo.Seed}`;
+    imageUrl = `https://nfts.cosmicsignature.com/images/new/cosmicsignature/${fileName}.png`;
+  } catch {
+    // fallback to logo
+  }
+
+  return (
+    <>
+      <JsonLd data={nftProductJsonLd({ tokenId, name, description, imageUrl })} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'Gallery', path: '/gallery' },
+          { name: `Token #${id}`, path: `/detail/${id}` },
+        ])}
+      />
+      <DetailPage tokenId={tokenId} />
+    </>
+  );
 }

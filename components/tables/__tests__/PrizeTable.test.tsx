@@ -125,8 +125,42 @@ describe('PrizeTable', () => {
     expect(screen.queryByText('11')).not.toBeInTheDocument();
   });
 
+  describe('tooltip column headers', () => {
+    it('renders info tooltip icons in table headers', () => {
+      const { container } = render(<PrizeTable list={[createPrize()]} loading={false} />);
+      const headerRow = container.querySelector('thead tr');
+      expect(headerRow).toBeTruthy();
+      const infoIcons = headerRow!.querySelectorAll('svg');
+      expect(infoIcons.length).toBe(9);
+    });
+
+    it('each header contains its label text alongside a tooltip', () => {
+      render(<PrizeTable list={[createPrize()]} loading={false} />);
+      const headers = [
+        'Round',
+        'Finalized',
+        'Winner',
+        'Prize Amount',
+        'Bids',
+        'Donated NFTs',
+        'Raffle Deposits',
+        'Staking Deposit',
+        'NFTs Awarded',
+      ];
+      for (const label of headers) {
+        const elements = screen.getAllByText(label);
+        expect(elements.length).toBeGreaterThanOrEqual(1);
+      }
+    });
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<PrizeTable list={[]} loading={false} />);
+    await checkA11y(container);
+  });
+
+  it('has no accessibility violations with data', async () => {
+    const { container } = render(<PrizeTable list={[createPrize()]} loading={false} />);
     await checkA11y(container);
   });
 });

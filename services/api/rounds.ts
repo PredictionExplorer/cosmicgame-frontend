@@ -1,7 +1,6 @@
 import {
   axios,
   getAPIUrl,
-  getMainAPIUrl,
   apiCall,
   apiPost,
   flattenTx,
@@ -66,7 +65,10 @@ export function get_claim_history(): Promise<TxInfo[]> {
 export function get_claim_history_by_user(address: string): Promise<WinningHistoryEntry[] | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`prizes/history/by_user/${address}/0/1000000`));
-    return flattenTxArray<WinningHistoryEntry>(data.USerPrizeHistory);
+    // Backend uses `USerPrizeHistory` (typo); accept the corrected key as well.
+    return flattenTxArray<WinningHistoryEntry>(
+      data.UserPrizeHistory ?? data.USerPrizeHistory,
+    );
   }, null);
 }
 
@@ -119,18 +121,18 @@ export function get_prize_deposits_by_round(round: number): Promise<TxInfo[]> {
   }, []);
 }
 
-/** Fetches the list of administratively banned bids. */
+/** Fetches the list of administratively banned bids (Cosmic Game / Go API). */
 export function get_banned_bids(): Promise<BannedBid[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getMainAPIUrl('get_banned_bids'));
+    const { data } = await axios.get(getAPIUrl('get_banned_bids'));
     return data as BannedBid[];
   }, []);
 }
 
-/** Bans a bid by its ID and the bidder's address (admin action). */
+/** Bans a bid by its ID and the bidder's address (admin action). Uses Cosmic Game / Go API. */
 export function ban_bid(bid_id: number, user_addr: string) {
   return apiPost(async () => {
-    const { data } = await axios.post(getMainAPIUrl('ban_bid'), {
+    const { data } = await axios.post(getAPIUrl('ban_bid'), {
       bid_id,
       user_addr,
     });
@@ -138,10 +140,10 @@ export function ban_bid(bid_id: number, user_addr: string) {
   });
 }
 
-/** Unbans a previously banned bid (admin action). */
+/** Unbans a previously banned bid (admin action). Uses Cosmic Game / Go API. */
 export function unban_bid(bid_id: number) {
   return apiPost(async () => {
-    const { data } = await axios.post(getMainAPIUrl('unban_bid'), { bid_id });
+    const { data } = await axios.post(getAPIUrl('unban_bid'), { bid_id });
     return data;
   });
 }

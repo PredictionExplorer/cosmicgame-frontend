@@ -99,10 +99,19 @@ jest.mock('../../../components/tokens/CTBalanceDistributionChart', () => ({
   CTBalanceDistributionChart: () => <div data-testid="ct-balance-distribution-chart" />,
 }));
 jest.mock('../../../components/statistics/StatisticsItem', () => ({
-  StatisticsItem: ({ title, value }: { title: string; value: React.ReactNode }) => (
+  StatisticsItem: ({
+    title,
+    value,
+    tooltip,
+  }: {
+    title: string;
+    value: React.ReactNode;
+    tooltip?: string;
+  }) => (
     <div data-testid="statistics-item">
       <span>{title}</span>
       <span>{value}</span>
+      {tooltip && <span data-testid="stat-tooltip">{tooltip}</span>}
     </div>
   ),
   CountdownRenderer: () => <span data-testid="countdown-renderer" />,
@@ -119,7 +128,23 @@ jest.mock('../../../components/statistics/StakingSection', () => ({
 jest.mock('../../../components/statistics/DonatedNFTsGrid', () => ({
   DonatedNFTsGrid: ({ nftDonations }: { nftDonations: unknown[] }) => (
     <div data-testid="donated-nfts-grid">
-      {nftDonations.length === 0 && <p>No ERC721 tokens were donated on this round.</p>}
+      {nftDonations.length === 0 && <p>No NFTs have been donated yet.</p>}
+    </div>
+  ),
+}));
+jest.mock('../../../components/statistics/StatisticsGroup', () => ({
+  StatisticsGroup: ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div data-testid="statistics-group">
+      <span>{title}</span>
+      {children}
+    </div>
+  ),
+}));
+jest.mock('../../../components/statistics/CollapsibleSection', () => ({
+  CollapsibleSection: ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div data-testid="collapsible-section">
+      <span>{title}</span>
+      {children}
     </div>
   ),
 }));
@@ -229,16 +254,17 @@ describe('Statistics', () => {
     expect(roundValues.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders overall statistics section', () => {
+  it('renders Financial Overview section with grouped stats', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Overall Statistics')).toBeInTheDocument();
-    expect(screen.getByText('CosmicGame contract balance')).toBeInTheDocument();
-    expect(screen.getByText('Num Prizes Given')).toBeInTheDocument();
+    expect(screen.getByText('Financial Overview')).toBeInTheDocument();
+    expect(screen.getByText('Prize Economy')).toBeInTheDocument();
+    expect(screen.getByText('Token Economy')).toBeInTheDocument();
+    expect(screen.getByText('Charity & Donations')).toBeInTheDocument();
   });
 
   it('renders link to current round page', () => {
@@ -255,20 +281,33 @@ describe('Statistics', () => {
     );
   });
 
-  it('renders unique bidders and winners tables', () => {
+  it('renders Community & Participation section with summary cards', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Unique Bidders')).toBeInTheDocument();
-    expect(screen.getByTestId('unique-bidders-table')).toBeInTheDocument();
-    expect(screen.getByText('Unique Winners')).toBeInTheDocument();
-    expect(screen.getByTestId('unique-winners-table')).toBeInTheDocument();
+    expect(screen.getByText('Community & Participation')).toBeInTheDocument();
+    expect(screen.getAllByText('Unique Bidders').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Unique Winners').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Unique ETH Donors').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Unique Stakers')).toBeInTheDocument();
   });
 
-  it('renders staking tabs', () => {
+  it('renders participant tables inside collapsible sections', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByTestId('unique-bidders-table')).toBeInTheDocument();
+    expect(screen.getByTestId('unique-winners-table')).toBeInTheDocument();
+    expect(screen.getByTestId('unique-eth-donors-table')).toBeInTheDocument();
+  });
+
+  it('renders staking section', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -298,7 +337,7 @@ describe('Statistics', () => {
     });
     mockUseDonationsNFTList.mockReturnValue({ data: [] });
     render(<Statistics />);
-    expect(screen.getByText('No ERC721 tokens were donated on this round.')).toBeInTheDocument();
+    expect(screen.getByText('No NFTs have been donated yet.')).toBeInTheDocument();
   });
 
   it('renders contract balance stat card', () => {
@@ -309,6 +348,144 @@ describe('Statistics', () => {
     });
     render(<Statistics />);
     expect(screen.getByText('Contract Balance')).toBeInTheDocument();
+  });
+
+  it('renders tooltips on stat items', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    const tooltips = screen.getAllByTestId('stat-tooltip');
+    expect(tooltips.length).toBeGreaterThan(0);
+  });
+
+  it('renders token distribution section with stat cards', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('Token Distribution')).toBeInTheDocument();
+    expect(screen.getByText('CST Holders')).toBeInTheDocument();
+    expect(screen.getByText('CST (ERC-20) Holders')).toBeInTheDocument();
+    expect(screen.getByText('Donated Token Distribution')).toBeInTheDocument();
+  });
+
+  it('renders staking section with stat cards', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('Active CST Stakers')).toBeInTheDocument();
+    expect(screen.getByText('Active RWLK Stakers')).toBeInTheDocument();
+    expect(screen.getByText('Total Staking Rewards')).toBeInTheDocument();
+  });
+
+  it('renders system events section divider', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('System Events')).toBeInTheDocument();
+  });
+
+  it('renders round activations collapsible section', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('Round Activations')).toBeInTheDocument();
+  });
+
+  it('renders statistics groups', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    const groups = screen.getAllByTestId('statistics-group');
+    expect(groups.length).toBe(3);
+  });
+
+  it('renders collapsible sections', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    const sections = screen.getAllByTestId('collapsible-section');
+    expect(sections.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('renders conditional cosmic game donations when present', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        MainStats: {
+          ...makeDashboardData().MainStats,
+          NumCosmicGameDonations: 5,
+          SumCosmicGameDonationsEth: 1.2,
+        },
+      }),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('Cosmic Game Donations')).toBeInTheDocument();
+    expect(screen.getByText('CG Donations Sum')).toBeInTheDocument();
+  });
+
+  it('renders voluntary donations when present', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        SumVoluntaryDonationsEth: '2.5',
+        NumVoluntaryDonations: 3,
+      }),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('Voluntary Donations')).toBeInTheDocument();
+  });
+
+  it('renders charity withdrawals when present', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        MainStats: {
+          ...makeDashboardData().MainStats,
+          NumWithdrawals: 2,
+        },
+      }),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('Charity Withdrawals')).toBeInTheDocument();
+  });
+
+  it('renders pending raffle withdrawal message when applicable', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({
+        MainStats: {
+          ...makeDashboardData().MainStats,
+          NumWinnersWithPendingRaffleWithdrawal: 3,
+        },
+      }),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText(/3 winners are yet to withdraw/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

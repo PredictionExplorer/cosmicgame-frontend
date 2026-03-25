@@ -5,7 +5,7 @@ import axios from 'axios';
 import { cosmicGameBaseUrl } from '@/services/api';
 import { createMetadata } from '@/utils/seo';
 
-import HomePage from './HomePage';
+import HomePageLoader from './HomePageLoader';
 
 export async function generateMetadata(): Promise<Metadata> {
   let prizeAmountStr = '';
@@ -17,13 +17,13 @@ export async function generateMetadata(): Promise<Metadata> {
     // fallback
   }
   const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${prizeAmountStr}prizes and Cosmic Signature NFTs.`;
-  return createMetadata('Cosmic Signature', description);
+  return createMetadata('Cosmic Signature', description, undefined, '/');
 }
 
 export default function Page() {
   return (
     <Suspense>
-      <HomePage />
+      <HomePageLoader />
     </Suspense>
   );
 }

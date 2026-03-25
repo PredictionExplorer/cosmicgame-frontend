@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
@@ -72,18 +73,18 @@ const WinnerRow = ({ winner }: { winner: RaffleWinnerEntry }) => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <a href={`/user/${WinnerAddr}`} className="text-inherit font-mono">
+              <Link href={`/user/${WinnerAddr}`} className="text-inherit font-mono">
                 {shortenHex(WinnerAddr, 6)}
-              </a>
+              </Link>
             </TooltipTrigger>
             <TooltipContent>{WinnerAddr}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <a href={`/prize/${RoundNum}`} className="text-inherit">
+        <Link href={`/prize/${RoundNum}`} className="text-inherit">
           {RoundNum}
-        </a>
+        </Link>
       </TablePrimaryCell>
       <TablePrimaryCell>
         {Amount
@@ -100,9 +101,9 @@ const WinnerRow = ({ winner }: { winner: RaffleWinnerEntry }) => {
       <TablePrimaryCell align="right">{Amount ? `${Amount.toFixed(4)} ETH` : ' '}</TablePrimaryCell>
       <TablePrimaryCell align="center">
         {TokenId ? (
-          <a href={`/detail/${TokenId}`} className="text-inherit">
+          <Link href={`/detail/${TokenId}`} className="text-inherit">
             {TokenId}
-          </a>
+          </Link>
         ) : (
           ' '
         )}

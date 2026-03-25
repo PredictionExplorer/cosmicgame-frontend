@@ -29,8 +29,9 @@ const NFTImage = ({ src, alt = 'NFT', style, className }: NFTImageProps) => {
       width={800}
       height={450}
       unoptimized
+      loading="eager"
       className={cn('w-full aspect-video object-contain align-middle', className)}
-      style={style}
+      style={{ ...style, width: 'auto', height: 'auto' }}
     />
   );
 };

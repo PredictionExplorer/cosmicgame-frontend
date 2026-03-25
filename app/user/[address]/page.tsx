@@ -32,7 +32,7 @@ export async function generateMetadata({
   const title = `Information for User ${address} | Cosmic Signature`;
   const description = `Information for User ${address}`;
 
-  return createMetadata(title, description);
+  return createMetadata(title, description, undefined, '/user/' + rawAddress);
 }
 
 export default async function Page({ params }: { params: Promise<{ address: string }> }) {

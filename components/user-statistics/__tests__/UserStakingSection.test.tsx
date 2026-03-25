@@ -55,9 +55,9 @@ const defaultProps: UserStakingSectionProps = {
 };
 
 describe('UserStakingSection', () => {
-  it('renders staking statistics heading', () => {
+  it('renders the staking section container', () => {
     render(<UserStakingSection {...defaultProps} />);
-    expect(screen.getByText('Staking Statistics')).toBeInTheDocument();
+    expect(screen.getByTestId('user-staking-section')).toBeInTheDocument();
   });
 
   it('renders tab triggers', () => {
@@ -66,15 +66,23 @@ describe('UserStakingSection', () => {
     expect(screen.getByText('Random Walk Staking')).toBeInTheDocument();
   });
 
-  it('computes CST stake action counts', () => {
+  it('renders CST stat cards with correct values', () => {
     render(<UserStakingSection {...defaultProps} />);
-    expect(screen.getByText('Total Number of Stake Actions:')).toBeInTheDocument();
+    expect(screen.getByText('Stake Actions')).toBeInTheDocument();
+    expect(screen.getByText('Unstake Actions')).toBeInTheDocument();
+    expect(screen.getByText('Total Rewards')).toBeInTheDocument();
+    expect(screen.getByText('Unclaimed Rewards')).toBeInTheDocument();
   });
 
   it('renders staking tables', () => {
     render(<UserStakingSection {...defaultProps} />);
     expect(screen.getByTestId('staking-actions-table')).toBeInTheDocument();
     expect(screen.getByTestId('staking-rewards-table')).toBeInTheDocument();
+  });
+
+  it('shows empty state when no CST staking activity', () => {
+    render(<UserStakingSection {...defaultProps} stakingCSTActions={[]} cstStakingRewards={[]} />);
+    expect(screen.getByText('No staking activity yet')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

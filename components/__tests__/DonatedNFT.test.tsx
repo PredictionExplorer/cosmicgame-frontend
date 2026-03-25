@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import DonatedNFT from '@/components/donations/DonatedNFT';
 
-import { render, screen, waitFor, checkA11y } from '@/test-utils';
+import { act, render, screen, waitFor, checkA11y } from '@/test-utils';
 
 jest.mock('axios');
 
@@ -65,7 +65,11 @@ describe('DonatedNFT', () => {
       NFTTokenURI: 'https://token.artblocks.io/1',
       Index: 0,
     };
-    const { container } = render(<DonatedNFT nft={mockData} />);
-    await checkA11y(container);
+    let container: HTMLElement;
+    await act(async () => {
+      const result = render(<DonatedNFT nft={mockData} />);
+      container = result.container;
+    });
+    await checkA11y(container!);
   });
 });

@@ -87,6 +87,11 @@ const EthDonations = () => {
         title="ETH Donations"
         subtitle="Donate ETH directly to the Cosmic Signature charity pool"
       />
+      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+        Donate ETH directly to the Cosmic Signature charity pool to support causes chosen by the
+        Cosmic DAO. You can include an optional title, message, and URL with your donation. Top
+        donors for each round may be featured on the home page.
+      </p>
 
       {!!account && (
         <div className="mb-12 rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 space-y-4">

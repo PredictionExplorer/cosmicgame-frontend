@@ -1,26 +1,30 @@
-import axios, { isAxiosError } from 'axios';
+import axios, { isAxiosError, type AxiosResponse } from 'axios';
 
 import { networkConfig } from '@/config/networks';
+import { reportError } from '@/utils/errors';
 
 import type { RoundInfo } from './types';
+
+axios.interceptors.response.use((response) => {
+  assertApiEnvelope(response);
+  return response;
+});
 
 export { axios, isAxiosError };
 
 /** Base URL for the main NFT/token API. */
 export const baseUrl = networkConfig.nftApiUrl;
-/** Local proxy path prepended to external API URLs to avoid CORS. */
-export const proxyUrl = '/api/proxy?url=';
 /** Base URL for the Cosmic Game statistics API. */
 export const cosmicGameBaseUrl = networkConfig.apiUrl;
 
-/** Builds a proxied URL targeting the Cosmic Game API. */
+/** Builds a direct URL targeting the Cosmic Game API. */
 export const getAPIUrl = (url: string) => {
-  return `${proxyUrl}${encodeURIComponent(cosmicGameBaseUrl + url)}`;
+  return cosmicGameBaseUrl + url;
 };
 
-/** Builds a proxied URL targeting the main NFT/token API. */
+/** Builds a direct URL targeting the main NFT/token API. */
 export const getMainAPIUrl = (url: string) => {
-  return `${proxyUrl}${encodeURIComponent(baseUrl + url)}`;
+  return baseUrl + url;
 };
 
 /** Hoists nested `Tx` fields (EvtLogId, BlockNum, TxHash, etc.) to the top level of a record. */
@@ -133,12 +137,34 @@ export const normalizeFieldNamesArray = (items: unknown) => {
   return items.map((item) => normalizeFieldNames(item));
 };
 
-/** Wraps an API call with standard 400-fallback error handling. */
+/**
+ * Checks the backend response envelope for soft errors.
+ * The Go API returns `{ status: 1, error: "" }` on success and
+ * `{ status: 0, error: "..." }` on logical failure (still HTTP 200).
+ * Throws with the backend message when the response signals failure.
+ */
+export function assertApiEnvelope(response: AxiosResponse): void {
+  const body = response.data;
+  if (body && typeof body === 'object' && !Array.isArray(body)) {
+    if ('status' in body && body.status !== undefined && Number(body.status) !== 1) {
+      const msg =
+        typeof body.error === 'string' && body.error ? body.error : 'API returned an error';
+      throw new Error(msg);
+    }
+    if ('error' in body && typeof body.error === 'string' && body.error) {
+      throw new Error(body.error);
+    }
+  }
+}
+
+/** Wraps an API call with response-envelope checking and standard error handling. */
 export async function apiCall<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
   try {
     return await fn();
   } catch (err: unknown) {
-    if (isAxiosError(err) && err.response?.status === 400) return fallback;
+    const status = isAxiosError(err) ? err.response?.status : undefined;
+    if (status === 400 || status === 403) return fallback;
+    reportError(err, 'apiCall');
     throw new Error('Network response was not OK');
   }
 }
@@ -147,7 +173,8 @@ export async function apiCall<T>(fn: () => Promise<T>, fallback: T): Promise<T> 
 export async function apiPost<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn();
-  } catch {
+  } catch (err: unknown) {
+    reportError(err, 'apiPost');
     throw new Error('Network response was not OK');
   }
 }

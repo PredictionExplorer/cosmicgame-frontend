@@ -1,5 +1,4 @@
 import React, { type ComponentPropsWithoutRef } from 'react';
-import Image from 'next/image';
 import { Table, Thead, Tr, Th, Td } from 'react-super-responsive-table';
 
 import { cn } from '@/lib/utils';
@@ -179,9 +178,9 @@ export function MobileConnectButton({
   return <ConnectButton className={cn('mr-auto', className)} {...props} />;
 }
 
-export function MainWrapper({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+export function MainWrapper({ className, ...props }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <div
+    <main
       className={cn(
         'mx-auto w-full max-w-7xl px-4 pt-40 pb-40 overflow-hidden leading-none min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-36 max-sm:pb-24',
         className,
@@ -231,48 +230,6 @@ export function CounterItemWrapper({
 
 export function CounterItem({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('w-1/4 py-2 box-border max-sm:w-4/5', className)} {...props} />;
-}
-
-export function QuestionIcon({
-  className,
-  src,
-  alt = '',
-  width = 24,
-  height = 24,
-}: {
-  className?: string;
-  src: string;
-  alt?: string;
-  width?: number;
-  height?: number;
-}) {
-  return (
-    <Image className={cn('mr-2', className)} src={src} alt={alt} width={width} height={height} />
-  );
-}
-
-export function FaqAccordion({
-  className,
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn(
-        'border-0 px-4 py-3 relative rounded-lg z-0 mb-10',
-        'before:hidden',
-        'after:z-[-1] after:content-[""] after:absolute after:inset-0 after:rounded-lg after:p-px after:h-full after:bg-gradient-to-br after:from-primary/50 after:to-accent/50 after:[mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] after:[-webkit-mask-composite:xor] after:opacity-100',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-}
-
-export function FaqAccordionDetails({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('px-10 pb-3 pt-0', className)} {...props} />;
 }
 
 export function NFTImageWrapper({

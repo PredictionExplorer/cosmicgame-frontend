@@ -45,4 +45,34 @@ describe('createMetadata', () => {
       images: ['https://img.com/pic.png'],
     });
   });
+
+  it('does not include alternates when path is omitted', () => {
+    const result = createMetadata('Title', 'Desc');
+
+    expect(result.alternates).toBeUndefined();
+  });
+
+  it('includes canonical URL when path is provided', () => {
+    const result = createMetadata('Title', 'Desc', undefined, '/faq');
+
+    expect(result.alternates).toEqual({
+      canonical: 'https://www.cosmicsignature.com/faq',
+    });
+  });
+
+  it('generates canonical for root path', () => {
+    const result = createMetadata('Title', 'Desc', undefined, '/');
+
+    expect(result.alternates).toEqual({
+      canonical: 'https://www.cosmicsignature.com/',
+    });
+  });
+
+  it('generates canonical for dynamic paths', () => {
+    const result = createMetadata('Title', 'Desc', 'https://img.com/pic.png', '/detail/42');
+
+    expect(result.alternates).toEqual({
+      canonical: 'https://www.cosmicsignature.com/detail/42',
+    });
+  });
 });

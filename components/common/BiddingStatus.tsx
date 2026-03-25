@@ -54,7 +54,7 @@ export const BiddingStatus = ({
   ethBidInfo,
   prizeTime,
 }: BiddingStatusProps) => {
-  const [roundStarted, setRoundStarted] = useState('');
+  const [_roundStarted, setRoundStarted] = useState('');
   const [lastBidderElapsed, setLastBidderElapsed] = useState('');
 
   const { account } = useActiveWeb3React();

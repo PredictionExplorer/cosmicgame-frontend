@@ -1,5 +1,12 @@
 import '@testing-library/jest-dom';
 import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import { CookiesProvider } from 'react-cookie';
+
+import { checkA11y } from '@/test-utils';
+
+import { Providers } from '../providers';
+import { NOTIFICATION_AUTO_HIDE_MS } from '../../config/constants';
 
 const mockInitParticlesEngine = jest.fn<Promise<void>, [(engine: unknown) => Promise<void>]>();
 const mockLoadSlim = jest.fn().mockResolvedValue(undefined);
@@ -89,14 +96,6 @@ jest.mock('../../components/layout/ErrorBoundary', () => ({
 // CookiesProvider is intentionally NOT mocked.
 // It validates that react-cookie v8's functional CookiesProvider
 // works correctly with React 19 JSX types — the core fix for task 4b.
-
-import { render, screen, waitFor } from '@testing-library/react';
-import { CookiesProvider } from 'react-cookie';
-
-import { checkA11y } from '@/test-utils';
-
-import { Providers } from '../providers';
-import { NOTIFICATION_AUTO_HIDE_MS } from '../../config/constants';
 
 describe('CookiesProvider (react-cookie v8 + React 19)', () => {
   it('renders as a JSX component without type errors', () => {

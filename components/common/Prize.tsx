@@ -1,7 +1,7 @@
 'use client';
 
 import { type FC } from 'react';
-import { Trophy, Shuffle, Image, Layers, Swords, Crown, Coins, Users } from 'lucide-react';
+import { Trophy, Shuffle, ImageIcon, Layers, Swords, Crown, Coins, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
@@ -68,7 +68,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
       winners: `${data?.NumRaffleEthWinnersBidding}`,
     },
     {
-      icon: <Image className="h-5 w-5" />,
+      icon: <ImageIcon className="h-5 w-5" />,
       name: 'Raffle NFT',
       tooltip: 'Random bidders win Cosmic Signature NFTs from the raffle.',
       amounts: ['1 Cosmic Signature NFT each'],
@@ -92,7 +92,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
       icon: <Swords className="h-5 w-5" />,
       name: 'Chrono Warrior',
       tooltip:
-        'The bidder with the single longest time between their bid and the next bid wins a percentage of the total contract balance.',
+        'The bidder who held the Endurance Champion title for the longest consecutive period. Wins a percentage of the total contract balance.',
       amounts: [
         `${(((data?.CosmicGameBalanceEth ?? 0) * (data?.ChronoWarriorPercentage ?? 0)) / 100).toFixed(4)} ETH`,
       ],
@@ -103,7 +103,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
       icon: <Crown className="h-5 w-5" />,
       name: 'Endurance Champion',
       tooltip:
-        'The bidder who holds the longest gap between consecutive bids wins CST tokens and an NFT.',
+        'The bidder who remained the last bidder for the longest consecutive period of time. Wins CST tokens and an NFT.',
       amounts: [`${(data?.CurNumBids ?? 0) * 10} CST`, '1 Cosmic Signature NFT'],
       winners: '1',
       faqLink: '/faq#endurance-champion',

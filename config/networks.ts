@@ -1,8 +1,42 @@
 /**
  * Network configuration for Cosmic Signature. Exposes chain params, RPC, explorer,
  * API URLs, and contract addresses per environment (local, sepolia, mainnet).
+ *
+ * No defaults for network, API URL, or RPC URL — they must be set via environment
+ * variables to avoid running against the wrong backend or chain.
  */
 export type NetworkName = 'local' | 'sepolia' | 'mainnet';
+
+export const REQUIRED_ENV_VARS = [
+  'NEXT_PUBLIC_NETWORK',
+  'NEXT_PUBLIC_API_URL',
+  'NEXT_PUBLIC_RPC_URL',
+] as const;
+
+export interface EnvValidation {
+  valid: boolean;
+  missing: string[];
+}
+
+/** Returns validation result. Call before using networkConfig. */
+export function getEnvValidation(): EnvValidation {
+  const missing: string[] = [];
+  const network = process.env.NEXT_PUBLIC_NETWORK?.trim();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL?.trim();
+
+  if (!network) missing.push('NEXT_PUBLIC_NETWORK');
+  else if (network !== 'local' && network !== 'sepolia' && network !== 'mainnet') {
+    missing.push('NEXT_PUBLIC_NETWORK (must be: local, sepolia, or mainnet)');
+  }
+  if (!apiUrl) missing.push('NEXT_PUBLIC_API_URL');
+  if (!rpcUrl) missing.push('NEXT_PUBLIC_RPC_URL');
+
+  return {
+    valid: missing.length === 0,
+    missing,
+  };
+}
 
 interface NetworkConfig {
   chainId: number;
@@ -31,14 +65,12 @@ interface NetworkConfig {
 
 const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY || '';
 
-const networks: Record<NetworkName, NetworkConfig> = {
+const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUrl'>> = {
   local: {
     chainId: 31337,
     chainHex: '0x7A69',
     chainName: 'Local Network',
-    rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545',
     explorerUrl: 'http://localhost',
-    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7070/api/cosmicgame/',
     nftApiUrl: 'https://nfts.cosmicsignature.com/',
     infuraKey,
     NFT_ADDRESS: '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318',
@@ -55,15 +87,11 @@ const networks: Record<NetworkName, NetworkConfig> = {
     ART_BLOCKS_ADDRESS: '',
     MARKET_ADDRESS: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
   },
-
   sepolia: {
     chainId: 421614,
     chainHex: '0x66eee',
     chainName: 'Arbitrum Sepolia',
-    rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'https://sepolia-rollup.arbitrum.io/rpc',
     explorerUrl: 'https://sepolia-explorer.arbitrum.io',
-    apiUrl:
-      process.env.NEXT_PUBLIC_API_URL || 'https://api-sepolia.cosmicsignature.com/api/cosmicgame/',
     nftApiUrl: 'https://nfts.cosmicsignature.com/',
     infuraKey,
     NFT_ADDRESS: '0xbB749EfF6018a9213DFbca2a20292DB1576F530d',
@@ -80,14 +108,11 @@ const networks: Record<NetworkName, NetworkConfig> = {
     ART_BLOCKS_ADDRESS: '0x36b58F5C1969B7b6591D752ea6F5486D069010AB',
     MARKET_ADDRESS: '0x47eF85Dfb775aCE0934fBa9EEd09D22e6eC0Cc08',
   },
-
   mainnet: {
     chainId: 42161,
     chainHex: '0xa4b1',
     chainName: 'Arbitrum One',
-    rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || `https://arbitrum-mainnet.infura.io/v3/${infuraKey}`,
     explorerUrl: 'https://arbiscan.io',
-    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'https://api.cosmicsignature.com/api/cosmicgame/',
     nftApiUrl: 'https://nfts.cosmicsignature.com/',
     infuraKey,
     NFT_ADDRESS: '0x895a6F444BE4ba9d124F61DF736605792B35D66b',
@@ -106,8 +131,20 @@ const networks: Record<NetworkName, NetworkConfig> = {
   },
 };
 
-const networkName = (process.env.NEXT_PUBLIC_NETWORK || 'sepolia') as NetworkName;
-export const networkConfig: NetworkConfig = networks[networkName] ?? networks.sepolia;
+const networkNameRaw = process.env.NEXT_PUBLIC_NETWORK?.trim();
+const resolvedNetworkName: NetworkName =
+  networkNameRaw === 'local' || networkNameRaw === 'sepolia' || networkNameRaw === 'mainnet'
+    ? networkNameRaw
+    : 'sepolia'; // fallback only for building the object; getEnvValidation() will report invalid
+
+const defaults = networkDefaults[resolvedNetworkName] ?? networkDefaults.sepolia;
+
+/** API and RPC URLs come only from env; no defaults. */
+export const networkConfig: NetworkConfig = {
+  ...defaults,
+  apiUrl: process.env.NEXT_PUBLIC_API_URL?.trim() ?? '',
+  rpcUrl: process.env.NEXT_PUBLIC_RPC_URL?.trim() ?? '',
+};
 
 export const INFURA_KEY = networkConfig.infuraKey;
 export const MARKET_ADDRESS = networkConfig.MARKET_ADDRESS;
@@ -123,3 +160,16 @@ export const STAKING_WALLET_CST_ADDRESS = networkConfig.STAKING_WALLET_CST_ADDRE
 export const STAKING_WALLET_RWLK_ADDRESS = networkConfig.STAKING_WALLET_RWLK_ADDRESS;
 export const IMPLEMENTATION_ADDRESS = networkConfig.IMPLEMENTATION_ADDRESS;
 export const ART_BLOCKS_ADDRESS = networkConfig.ART_BLOCKS_ADDRESS;
+
+/**
+ * RPC URL to use for viem public client (e.g. useContractNoSigner).
+ * In the browser with a custom RPC (no Infura/Alchemy), returns the app's /api/rpc proxy
+ * to avoid CORS; otherwise returns networkConfig.rpcUrl.
+ */
+export function getPublicClientRpcUrl(): string {
+  const rpc = networkConfig.rpcUrl || '';
+  if (typeof window === 'undefined') return rpc;
+  if (!rpc) return '';
+  if (rpc.includes('infura.io') || rpc.includes('alchemy.com')) return rpc;
+  return `${window.location.origin}/api/rpc`;
+}

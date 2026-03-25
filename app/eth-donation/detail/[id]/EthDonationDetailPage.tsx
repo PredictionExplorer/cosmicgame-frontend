@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { getExplorerUrl, convertTimestampToDateTime, getMetadata } from '@/utils';
 
@@ -94,16 +95,16 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
 
       <div className="mb-2 flex flex-wrap">
         <span className="text-primary">Donor Address:</span>&nbsp;
-        <a href={`/user/${donationInfo.DonorAddr}`} className="text-inherit">
+        <Link href={`/user/${donationInfo.DonorAddr}`} className="text-inherit">
           <span className="font-mono">{donationInfo.DonorAddr}</span>
-        </a>
+        </Link>
       </div>
 
       <div className="mb-2 flex flex-wrap">
         <span className="text-primary">Round Number:</span>&nbsp;
-        <a href={`/prize/${donationInfo.RoundNum}`} className="text-inherit">
+        <Link href={`/prize/${donationInfo.RoundNum}`} className="text-inherit">
           <span>{donationInfo.RoundNum}</span>
-        </a>
+        </Link>
       </div>
 
       <div className="mb-2 flex flex-wrap">

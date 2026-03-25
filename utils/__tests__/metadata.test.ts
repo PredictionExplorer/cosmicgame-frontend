@@ -6,7 +6,7 @@ import { reportError } from '../errors';
 jest.mock('axios');
 jest.mock('../errors', () => ({ reportError: jest.fn() }));
 jest.mock('../urls', () => ({
-  getProxiedUrl: (url: string) => `/api/proxy?url=${encodeURIComponent(url)}`,
+  getProxiedUrl: (url: string) => url,
 }));
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -41,14 +41,12 @@ describe('getMetadata', () => {
     });
   });
 
-  it('passes the URL through getProxiedUrl', async () => {
+  it('passes the URL directly to axios (no proxy)', async () => {
     mockedAxios.get.mockResolvedValue({ data: '<html></html>' });
 
     await getMetadata('https://test.com');
 
-    expect(mockedAxios.get).toHaveBeenCalledWith(
-      `/api/proxy?url=${encodeURIComponent('https://test.com')}`,
-    );
+    expect(mockedAxios.get).toHaveBeenCalledWith('https://test.com');
   });
 
   it('returns empty strings for missing meta tags', async () => {

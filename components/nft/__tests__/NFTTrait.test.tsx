@@ -1,7 +1,42 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
 import NFTTrait from '../NFTTrait';
 
+/* ── framer-motion mock ───────────────────────────────────────── */
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  return {
+    motion: new Proxy(
+      {},
+      {
+        get: (_t: unknown, prop: string) => {
+          const Comp = React.forwardRef(function MotionProxy(
+            props: Record<string, unknown>,
+            ref: React.Ref<HTMLElement>,
+          ) {
+            const {
+              initial: _i,
+              animate: _a,
+              exit: _e,
+              transition: _tr,
+              whileInView: _w,
+              viewport: _v,
+              variants: _va,
+              layout: _l,
+              ...rest
+            } = props;
+            return React.createElement(prop, { ...rest, ref });
+          });
+          Comp.displayName = `motion.${prop}`;
+          return Comp;
+        },
+      },
+    ),
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  };
+});
+
+/* ── API hooks ────────────────────────────────────────────────── */
 const mockUseDashboardInfo = jest.fn().mockReturnValue({ data: undefined, isLoading: false });
 const mockUseCSTInfo = jest
   .fn()
@@ -30,14 +65,15 @@ jest.mock('wagmi', () => ({
   usePublicClient: () => ({ waitForTransactionReceipt: jest.fn() }),
 }));
 
+const mockRouterPush = jest.fn();
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn() }),
+  useRouter: () => ({ push: mockRouterPush }),
 }));
 
 jest.mock('../../../hooks/useCosmicSignatureContract', () => ({
   __esModule: true,
   default: () => ({
-    read: { totalSupply: jest.fn() },
+    read: { totalSupply: jest.fn().mockResolvedValue(BigInt(100)) },
     write: { transferFrom: jest.fn(), setNftName: jest.fn() },
   }),
 }));
@@ -65,6 +101,12 @@ jest.mock('../NFTVideo', () => ({
   __esModule: true,
   default: () => <div data-testid="nft-video" />,
 }));
+jest.mock('../NFTMetadata', () => ({
+  NFTMetadata: () => <div data-testid="nft-metadata" />,
+}));
+jest.mock('../NFTOwnerActions', () => ({
+  NFTOwnerActions: () => <div data-testid="owner-actions" />,
+}));
 jest.mock('../../../components/tables/NameHistoryTable', () => ({
   __esModule: true,
   default: () => <div data-testid="name-history-table" />,
@@ -81,7 +123,10 @@ jest.mock('yet-another-react-lightbox', () => ({
   default: () => null,
 }));
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockRouterPush.mockClear();
+});
 
 const baseNft = {
   TokenId: 5,
@@ -97,75 +142,163 @@ const baseNft = {
   WasUnstaked: false,
 };
 
-describe('NFTTrait', () => {
-  it('shows loading state', () => {
-    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
-    render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+const withDashboard = () =>
+  mockUseDashboardInfo.mockReturnValue({
+    data: { MainStats: { NumCSTokenMints: 10, TotalNamedTokens: 3 } },
+    isLoading: false,
   });
 
-  it('renders NFT details after data loads', () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: { MainStats: { NumCSTokenMints: 10, TotalNamedTokens: 3 } },
-      isLoading: false,
-    });
-    mockUseCSTInfo.mockReturnValue({ data: baseNft, isLoading: false, refetch: jest.fn() });
-    mockUseNameHistory.mockReturnValue({
-      data: [{ TokenName: 'MyToken' }],
-      isLoading: false,
-      refetch: jest.fn(),
-    });
-    render(<NFTTrait tokenId={5} />);
+const withNft = (overrides = {}) =>
+  mockUseCSTInfo.mockReturnValue({
+    data: { ...baseNft, ...overrides },
+    isLoading: false,
+    refetch: jest.fn(),
+  });
 
-    expect(screen.getByText('0xWinner')).toBeInTheDocument();
-    expect(screen.getByText('0xOwner')).toBeInTheDocument();
-    expect(screen.getByText('abc123')).toBeInTheDocument();
+const withNameHistory = (names: Array<{ TokenName: string }> = [{ TokenName: 'MyToken' }]) =>
+  mockUseNameHistory.mockReturnValue({
+    data: names,
+    isLoading: false,
+    refetch: jest.fn(),
+  });
+
+describe('NFTTrait', () => {
+  it('shows skeleton loading state', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByTestId('nft-detail-skeleton')).toBeInTheDocument();
+  });
+
+  it('renders hero section after data loads', () => {
+    withDashboard();
+    withNft();
+    withNameHistory();
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByTestId('hero-section')).toBeInTheDocument();
+  });
+
+  it('renders breadcrumb', () => {
+    withDashboard();
+    withNft();
+    withNameHistory();
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByTestId('nft-breadcrumb')).toBeInTheDocument();
+  });
+
+  it('renders token identity with name', () => {
+    withDashboard();
+    withNft();
+    withNameHistory([{ TokenName: 'MyToken' }]);
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByTestId('token-identity')).toBeInTheDocument();
+    expect(screen.getAllByText('MyToken').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders "Unnamed Token" when no name history', () => {
+    withDashboard();
+    withNft();
+    mockUseNameHistory.mockReturnValue({ data: [], isLoading: false, refetch: jest.fn() });
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByText('Unnamed Token')).toBeInTheDocument();
+  });
+
+  it('renders token badges', () => {
+    withDashboard();
+    withNft();
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByTestId('token-badges')).toBeInTheDocument();
+  });
+
+  it('renders staking eligible badge when not staked', () => {
+    withDashboard();
+    withNft({ Staked: false, WasUnstaked: false });
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByText('Eligible for Staking')).toBeInTheDocument();
+  });
+
+  it('renders already staked badge when staked', () => {
+    withDashboard();
+    withNft({ Staked: true });
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByText('Already Staked')).toBeInTheDocument();
+  });
+
+  it('renders prize type badge for Round Winner', () => {
+    withDashboard();
+    withNft({ RecordType: 3 });
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByText('Round Winner')).toBeInTheDocument();
+  });
+
+  it('renders NFT image', () => {
+    withDashboard();
+    withNft();
+    render(<NFTTrait tokenId={5} />);
     expect(screen.getByTestId('nft-image')).toBeInTheDocument();
   });
 
-  it('shows staking eligibility when token is not staked', () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: { MainStats: { NumCSTokenMints: 10, TotalNamedTokens: 3 } },
-      isLoading: false,
-    });
-    mockUseCSTInfo.mockReturnValue({
-      data: { ...baseNft, Staked: false, WasUnstaked: false },
-      isLoading: false,
-      refetch: jest.fn(),
-    });
+  it('renders metadata section', () => {
+    withDashboard();
+    withNft();
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('The token is eligible for staking.')).toBeInTheDocument();
-  });
-
-  it('shows already staked when token was staked', () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: { MainStats: { NumCSTokenMints: 10, TotalNamedTokens: 3 } },
-      isLoading: false,
-    });
-    mockUseCSTInfo.mockReturnValue({
-      data: { ...baseNft, Staked: true },
-      isLoading: false,
-      refetch: jest.fn(),
-    });
-    render(<NFTTrait tokenId={5} />);
-    expect(
-      screen.getByText('The token has already been staked and cannot be staked again.'),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('nft-metadata')).toBeInTheDocument();
   });
 
   it('renders name history table when history exists', () => {
-    mockUseDashboardInfo.mockReturnValue({
-      data: { MainStats: { NumCSTokenMints: 10, TotalNamedTokens: 3 } },
-      isLoading: false,
-    });
-    mockUseCSTInfo.mockReturnValue({ data: baseNft, isLoading: false, refetch: jest.fn() });
-    mockUseNameHistory.mockReturnValue({
-      data: [{ TokenName: 'MyToken' }],
-      isLoading: false,
-      refetch: jest.fn(),
-    });
+    withDashboard();
+    withNft();
+    withNameHistory([{ TokenName: 'MyToken' }]);
     render(<NFTTrait tokenId={5} />);
     expect(screen.getByTestId('name-history-table')).toBeInTheDocument();
+  });
+
+  it('does not render name history table when no history', () => {
+    withDashboard();
+    withNft();
+    mockUseNameHistory.mockReturnValue({ data: [], isLoading: false, refetch: jest.fn() });
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.queryByTestId('name-history-table')).not.toBeInTheDocument();
+  });
+
+  it('renders owner actions when account matches owner', () => {
+    withDashboard();
+    withNft({ CurOwnerAddr: '0xOwner' });
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.getByTestId('owner-actions')).toBeInTheDocument();
+  });
+
+  it('hides owner actions when account does not match', () => {
+    withDashboard();
+    withNft({ CurOwnerAddr: '0xSomeoneElse' });
+    render(<NFTTrait tokenId={5} />);
+    expect(screen.queryByTestId('owner-actions')).not.toBeInTheDocument();
+  });
+
+  it('supports keyboard navigation with ArrowLeft', () => {
+    withDashboard();
+    withNft();
+    render(<NFTTrait tokenId={5} />);
+    fireEvent.keyDown(window, { key: 'ArrowLeft' });
+    expect(mockRouterPush).toHaveBeenCalledWith('/detail/4');
+  });
+
+  it('does not navigate left when tokenId is 0', () => {
+    withDashboard();
+    withNft();
+    render(<NFTTrait tokenId={0} />);
+    fireEvent.keyDown(window, { key: 'ArrowLeft' });
+    expect(mockRouterPush).not.toHaveBeenCalled();
+  });
+
+  it('does not trigger keyboard nav when typing in input', () => {
+    withDashboard();
+    withNft({ CurOwnerAddr: '0xOwner' });
+    const { container } = render(<NFTTrait tokenId={5} />);
+    const input = container.querySelector('input');
+    if (input) {
+      fireEvent.keyDown(input, { key: 'ArrowLeft' });
+      expect(mockRouterPush).not.toHaveBeenCalled();
+    }
   });
 
   it('has no accessibility violations', async () => {

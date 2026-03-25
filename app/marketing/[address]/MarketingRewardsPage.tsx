@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { getAddress, isAddress } from 'viem';
 
 import { MainWrapper } from '@/components/styled';
@@ -37,9 +38,12 @@ const MarketingRewardsPage = ({ address: rawAddress }: MarketingRewardsPageProps
               Marketing Rewards for User
             </span>
             <span className="text-lg font-semibold font-mono break-all">
-              <a href={`/user/${address}`} className="text-inherit text-[length:inherit] font-mono">
+              <Link
+                href={`/user/${address}`}
+                className="text-inherit text-[length:inherit] font-mono"
+              >
                 {address}
-              </a>
+              </Link>
             </span>
           </div>
           {loading ? (

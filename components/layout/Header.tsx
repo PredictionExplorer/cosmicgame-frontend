@@ -103,7 +103,14 @@ const Header: FC = () => {
   const renderDesktop = () => (
     <nav className="flex items-center">
       <Link href="/">
-        <Image src="/images/logo2.svg" width={48} height={48} alt="logo" />
+        <Image
+          src="/images/logo2.svg"
+          width={48}
+          height={48}
+          alt="logo"
+          loading="eager"
+          className="h-10 w-auto max-h-10 object-contain"
+        />
       </Link>
 
       {navs.map((nav, i) => (
@@ -145,7 +152,14 @@ const Header: FC = () => {
         </Button>
 
         <Link href="/">
-          <Image src="/images/logo2.svg" width={48} height={48} alt="logo" />
+          <Image
+            src="/images/logo2.svg"
+            width={48}
+            height={48}
+            alt="logo"
+            loading="eager"
+            className="h-10 w-auto max-h-10 object-contain"
+          />
         </Link>
 
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>

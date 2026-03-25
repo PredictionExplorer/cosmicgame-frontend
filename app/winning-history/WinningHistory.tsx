@@ -22,6 +22,10 @@ function WinningHistory() {
           title="History of My Winnings"
           subtitle="View your past prize claims and rewards"
         />
+        <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+          Track your complete winning history across all Cosmic Signature game rounds. This includes
+          main prize claims, raffle ETH winnings, NFT prizes, and staking reward distributions.
+        </p>
         <EmptyState
           title="Wallet not connected"
           description="Please connect your wallet to see your winnings."
@@ -36,6 +40,10 @@ function WinningHistory() {
         title="History of My Winnings"
         subtitle="View your past prize claims and rewards"
       />
+      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
+        Track your complete winning history across all Cosmic Signature game rounds. This includes
+        main prize claims, raffle ETH winnings, NFT prizes, and staking reward distributions.
+      </p>
 
       {loading ? (
         <div className="flex justify-center py-8">

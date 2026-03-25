@@ -32,10 +32,12 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: { response: { use: jest.fn() } },
     },
     isAxiosError: actual.isAxiosError,
   };
 });
+jest.mock('../../../utils/errors', () => ({ reportError: jest.fn() }));
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const make400 = () =>
@@ -60,7 +62,7 @@ describe('donations API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xa');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*eth.*simple.*list/),
+        expect.stringMatching(/donations.*eth.*simple.*list/),
       );
     });
 
@@ -80,7 +82,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { DirectCGDonations: [] } });
       await get_donations_cg_simple_by_round(5);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*eth.*simple.*by_round.*5/),
+        expect.stringMatching(/donations.*eth.*simple.*by_round.*5/),
       );
     });
 
@@ -103,7 +105,7 @@ describe('donations API', () => {
       const result = await get_donations_cg_with_info_list();
       expect(result).toHaveLength(1);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*eth.*with_info.*list/),
+        expect.stringMatching(/donations.*eth.*with_info.*list/),
       );
     });
 
@@ -125,7 +127,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { DirectCGDonations: [] } });
       await get_donations_cg_with_info_by_round(3);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*eth.*with_info.*by_round.*3/),
+        expect.stringMatching(/donations.*eth.*with_info.*by_round.*3/),
       );
     });
 
@@ -150,7 +152,7 @@ describe('donations API', () => {
       const result = await get_donations_with_info_by_id(10);
       expect(result).toHaveProperty('TxHash', '0xb');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*eth.*with_info.*info.*10/),
+        expect.stringMatching(/donations.*eth.*with_info.*info.*10/),
       );
     });
 
@@ -172,7 +174,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { CombinedDonationRecords: [] } });
       await get_donations_eth_by_user('0xabc');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*eth.*by_user.*0xabc/),
+        expect.stringMatching(/donations.*eth.*by_user.*0xabc/),
       );
     });
 
@@ -194,7 +196,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { CosmicGameDonations: [] } });
       await get_donations_both_by_round(7);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*eth.*both.*by_round.*7/),
+        expect.stringMatching(/donations.*eth.*both.*by_round.*7/),
       );
     });
 
@@ -214,7 +216,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { CosmicGameDonations: [] } });
       await get_donations_both();
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*eth.*both.*all/),
+        expect.stringMatching(/donations.*eth.*both.*all/),
       );
     });
 
@@ -234,7 +236,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { CharityDonations: [] } });
       await get_charity_donations_deposits();
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*charity.*deposits/),
+        expect.stringMatching(/donations.*charity.*deposits/),
       );
     });
 
@@ -254,7 +256,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { CharityDonations: [] } });
       await get_charity_cg_deposits();
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*charity.*cg_deposits/),
+        expect.stringMatching(/donations.*charity.*cg_deposits/),
       );
     });
 
@@ -274,7 +276,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { CharityDonations: [] } });
       await get_charity_voluntary();
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*charity.*voluntary/),
+        expect.stringMatching(/donations.*charity.*voluntary/),
       );
     });
 
@@ -294,7 +296,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { CharityWithdrawals: [] } });
       await get_charity_withdrawals();
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*charity.*withdrawals/),
+        expect.stringMatching(/donations.*charity.*withdrawals/),
       );
     });
 
@@ -318,7 +320,7 @@ describe('donations API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TokenAddr', '0xT');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*nft.*list/),
+        expect.stringMatching(/donations.*nft.*list/),
       );
     });
 
@@ -348,7 +350,7 @@ describe('donations API', () => {
       expect(result).toHaveProperty('TxHash', '0xc');
       expect(result).toHaveProperty('TokenAddr', '0xN');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*nft.*info.*5/),
+        expect.stringMatching(/donations.*nft.*info.*5/),
       );
     });
 
@@ -368,7 +370,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { DonatedNFTClaims: [] } });
       await get_donated_nft_claims_all();
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*nft.*claims/),
+        expect.stringMatching(/donations.*nft.*claims/),
       );
     });
 
@@ -388,7 +390,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { DonatedNFTClaims: [] } });
       await get_claimed_donated_nft_by_user('0xuser');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*nft.*claims.*by_user.*0xuser/),
+        expect.stringMatching(/donations.*nft.*claims.*by_user.*0xuser/),
       );
     });
 
@@ -412,7 +414,7 @@ describe('donations API', () => {
       const result = await get_nft_donation_stats();
       expect(result).toEqual(stats);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*nft.*statistics/),
+        expect.stringMatching(/donations.*nft.*statistics/),
       );
     });
 
@@ -432,7 +434,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { NFTDonations: [] } });
       await get_donations_nft_by_round(2);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*nft.*by_round.*2/),
+        expect.stringMatching(/donations.*nft.*by_round.*2/),
       );
     });
 
@@ -452,7 +454,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { NFTDonations: [] } });
       await get_donations_nft_unclaimed_by_round(4);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*nft.*unclaimed.*by_round.*4/),
+        expect.stringMatching(/donations.*nft.*unclaimed.*by_round.*4/),
       );
     });
 
@@ -474,7 +476,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { UnclaimedDonatedNFTs: [] } });
       await get_unclaimed_donated_nft_by_user('0xaddr');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*nft.*unclaimed.*by_user.*0xaddr/),
+        expect.stringMatching(/donations.*nft.*unclaimed.*by_user.*0xaddr/),
       );
     });
 
@@ -496,7 +498,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { DonationsERC20ByRoundDetailed: [] } });
       await get_donations_erc20_by_round(6);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*erc20.*by_round.*detailed.*6/),
+        expect.stringMatching(/donations.*erc20.*by_round.*detailed.*6/),
       );
     });
 
@@ -516,7 +518,7 @@ describe('donations API', () => {
       mockedAxios.get.mockResolvedValue({ data: { DonatedPrizesERC20ByWinner: [] } });
       await get_donations_erc20_by_user('0xwinner');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/\/api\/proxy\?url=.*donations.*erc20.*by_user.*0xwinner/),
+        expect.stringMatching(/donations.*erc20.*by_user.*0xwinner/),
       );
     });
 

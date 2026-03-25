@@ -4,15 +4,14 @@ import { useRouter } from 'next/navigation';
 
 import api from '@/services/api';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
-import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import type { DashboardInfo } from '@/services/api/types';
-import { isUserRejection } from '@/utils/errors';
+import { isUserRejection, reportError, getContractErrorMessage } from '@/utils/errors';
 import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
 import { usePrizeTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
 
+const GAS_EXTRA = BigInt(1_000_000);
 const GAS_FLOOR = BigInt(2_000_000);
-const GAS_BUFFER_BPS = BigInt(12_000);
 
 interface UsePrizeClaimOptions {
   data: DashboardInfo | null;
@@ -23,7 +22,6 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
   const router = useRouter();
   const publicClient = usePublicClient();
   const cosmicGameContract = useCosmicGameContract();
-  const cosmicSignatureContract = useCosmicSignatureContract();
   const { notify, notifyErrorFromEthers } = useNotify();
 
   const { data: prizeTimeRaw } = usePrizeTime();
@@ -50,11 +48,6 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
     await publicClient!.waitForTransactionReceipt({ hash });
   };
 
-  const minGasWithBuffer = (estimate: bigint) => {
-    const buffered = (estimate * GAS_BUFFER_BPS) / BigInt(10_000);
-    return buffered > GAS_FLOOR ? buffered : GAS_FLOOR;
-  };
-
   /**
    * Claim the main prize.
    * Returns `true` on success so the caller can trigger a post-tx refresh.
@@ -67,26 +60,38 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
         return false;
       }
 
+      const roundBefore = (await cosmicGameContract.read.roundNum?.()) as bigint;
+
       const estimate = await cosmicGameContract.estimateGas.claimMainPrize?.({});
-      const gasLimit = estimate ? minGasWithBuffer(estimate) : GAS_FLOOR;
+      const gasLimit = estimate ? estimate + GAS_EXTRA : GAS_FLOOR;
 
       await handleTx(asWriteFn(cosmicGameContract.write.claimMainPrize)({ gas: gasLimit }));
 
-      if (!cosmicSignatureContract) {
-        notify('error', 'Unable to complete post-claim actions. Please refresh the page.');
-        return false;
+      const roundAfter = (await cosmicGameContract.read.roundNum?.()) as bigint;
+      if (roundAfter <= roundBefore) {
+        notify('warning', 'Claim transaction succeeded but the round did not advance. Please refresh the page.');
+        return true;
       }
-      const totalSupply = await cosmicSignatureContract.read.totalSupply?.();
-      const tokenId = Number(totalSupply ?? 0) - 1;
+
+      const claimedRound = data?.CurRoundNum ?? Number(roundBefore);
 
       let count = (data?.NumRaffleNFTWinnersBidding ?? 0) + 3;
       if ((data?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0) > 0) {
         count += data?.NumRaffleNFTWinnersStakingRWalk ?? 0;
       }
 
-      await api.create(tokenId, count);
+      try {
+        await api.create(Number(roundBefore), count);
+      } catch (apiErr) {
+        reportError(apiErr, 'post-claim-api');
+        notify(
+          'warning',
+          'Prize claimed successfully on-chain! Token metadata may still be updating. Check My Winnings or refresh later.',
+        );
+      }
+
       const params = new URLSearchParams();
-      params.set('round', String(data?.CurRoundNum ?? ''));
+      params.set('round', String(claimedRound));
       params.set('message', 'success');
       router.push(`/prize-claimed?${params.toString()}`);
 
@@ -95,7 +100,13 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
       if (isUserRejection(err)) {
         return false;
       }
-      notifyErrorFromEthers(err);
+      reportError(err, 'claim-main-prize');
+      const msg = getContractErrorMessage(err);
+      if (msg) {
+        notify('error', msg);
+      } else {
+        notifyErrorFromEthers(err);
+      }
       return false;
     } finally {
       setIsClaiming(false);

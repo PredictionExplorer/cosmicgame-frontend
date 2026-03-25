@@ -27,6 +27,7 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 
 interface RaffleETHDeposit {
   EvtLogId: number;
@@ -139,10 +140,10 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
   );
 
   const handleAllETHClaim = async () => {
+    if (!raffleWalletContract) return;
+    setIsClaiming(true);
     try {
-      setIsClaiming(true);
-      await raffleWalletContract!.write.withdrawEth?.();
-
+      await raffleWalletContract.write.withdrawEth?.();
       setTimeout(() => {
         fetchStatusData();
         refetchDeposits();
@@ -151,10 +152,9 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
     } catch (err: unknown) {
       if (!isUserRejection(err)) {
         reportError(err, 'claim raffle ETH');
-        const msg = getEthErrorMessage(err);
-        if (msg !== 'An error occurred') {
-          setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
-        }
+        const rawMsg = getEthErrorMessage(err, 'An error occurred');
+        const msg = getErrorMessage(rawMsg) || rawMsg;
+        setNotification({ text: msg, type: 'error', visible: true });
       }
       setIsClaiming(false);
     }
@@ -192,7 +192,9 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
         </div>
 
         {raffleETHToClaim.loading ? (
-          <p className="text-lg font-semibold">Loading...</p>
+          <div className="flex justify-center py-8">
+            <Spinner />
+          </div>
         ) : (
           <RaffleWinningsTable list={raffleETHToClaim.data} />
         )}

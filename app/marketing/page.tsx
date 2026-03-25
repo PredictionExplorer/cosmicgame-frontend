@@ -6,7 +6,9 @@ import MarketingRewards from './MarketingRewards';
 
 export const metadata: Metadata = createMetadata(
   'Marketing Rewards | Cosmic Signature',
-  'Earn marketing rewards by promoting our project online.',
+  'Promote Cosmic Signature and earn CST token rewards. View top marketers, reward history, and learn how to join the program.',
+  undefined,
+  '/marketing',
 );
 
 export default function Page() {

@@ -203,7 +203,11 @@ const ConnectWalletButton = ({
     );
   }
 
-  return <RainbowConnectButton />;
+  return (
+    <div className="ml-auto">
+      <RainbowConnectButton />
+    </div>
+  );
 };
 
 export default ConnectWalletButton;
