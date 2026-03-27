@@ -182,26 +182,10 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
 
   const handleCloseDialog = () => setOpenDialog(false);
 
-  const handlePlay = async (videoUrl: string) => {
-    try {
-      const res = await fetch(videoUrl, { method: 'HEAD' });
-      if (res.ok) {
-        setVideoPath(videoUrl);
-        setOpenVideo(true);
-      } else {
-        setNotification({
-          visible: true,
-          type: 'info',
-          text: 'Video is being generated, come back later!',
-        });
-      }
-    } catch {
-      setNotification({
-        visible: true,
-        type: 'info',
-        text: 'Video is being generated, come back later!',
-      });
-    }
+  const handlePlay = (videoUrl: string) => {
+    if (!videoUrl) return;
+    setVideoPath(videoUrl);
+    setOpenVideo(true);
   };
 
   const handleTransfer = async () => {
