@@ -32,6 +32,10 @@ import {
   useCurrentTime,
   useCSTInfo,
 } from '@/hooks/useApiQuery';
+import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/activationTime';
+import { isLandingHost } from '@/lib/hostRouting';
+import { LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO } from '@/lib/landingFlags';
+import { RootLandingPage } from '@/components/landing/RootLandingPage';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 20 },
@@ -42,6 +46,11 @@ const HomePage = () => {
   const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
+
+  const [hostname, setHostname] = useState<string | null>(null);
+  useEffect(() => {
+    setHostname(window.location.hostname);
+  }, []);
 
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo();
   const { data: currentTimeData } = useCurrentTime();
@@ -151,6 +160,28 @@ const HomePage = () => {
   const canClaim = !(prizeTime > Date.now() || data?.LastBidderAddr === zeroAddress || loading);
   const claimWait = prizeTime + timeoutClaimPrize * 1000;
   const isActive = account !== null && activationTime < Date.now() / 1000;
+
+  const landingHost = hostname !== null && isLandingHost(hostname);
+  if (hostname === null) {
+    return <div className="min-h-screen bg-background" />;
+  }
+  if (landingHost && dashboardLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  const roundOk =
+    !LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO || (dashboardData?.CurRoundNum ?? -1) === 0;
+  const launchMs = parseActivationMsFromDashboard(dashboardData ?? null);
+  const showPrelaunchLanding =
+    landingHost && roundOk && launchMs != null && launchMs > localClockUtcEpochMs();
+
+  if (showPrelaunchLanding && launchMs != null) {
+    return <RootLandingPage launchTimestampMs={launchMs} />;
+  }
 
   return (
     <>

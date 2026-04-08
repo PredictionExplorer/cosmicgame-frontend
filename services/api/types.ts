@@ -119,6 +119,9 @@ export interface RoundStats {
   TotalDonatedNFTs?: number;
   TotalRaffleEthDepositsEth?: number;
   TotalRaffleNFTs?: number;
+  /** Unix seconds; contract `roundActivationTime` (dashboard). */
+  ActivationTime?: number;
+  DelayDurationBeforeRoundActivation?: number;
   [key: string]: unknown;
 }
 

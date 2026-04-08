@@ -152,7 +152,14 @@ function EnvErrorScreen({ missing }: { missing: string[] }) {
   );
 }
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({
+  children,
+  showAppChrome = true,
+}: {
+  children: ReactNode;
+  /** When false (marketing hosts), header/footer are hidden. */
+  showAppChrome?: boolean;
+}) {
   const [engineReady, setEngineReady] = useState(false);
 
   useEffect(() => {
@@ -218,9 +225,9 @@ export function Providers({ children }: { children: ReactNode }) {
                 <SystemModeProvider>
                   <ApiDataProvider>
                     <NotificationProvider>
-                      <Header />
+                      {showAppChrome && <Header />}
                       <ErrorBoundary>{children}</ErrorBoundary>
-                      <Footer />
+                      {showAppChrome && <Footer />}
                     </NotificationProvider>
                   </ApiDataProvider>
                 </SystemModeProvider>
