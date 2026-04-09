@@ -5,19 +5,19 @@ import StakingActionDetailPage from '../[IsRwalk]/[actionId]/StakingActionDetail
 const mockUseStakingRWLKActionsInfo = jest.fn();
 const mockUseStakingCSTActionsInfo = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useStakingRWLKActionsInfo: (...args: unknown[]) => mockUseStakingRWLKActionsInfo(...args),
   useStakingCSTActionsInfo: (...args: unknown[]) => mockUseStakingCSTActionsInfo(...args),
 }));
 
-jest.mock('../../../utils', () => ({
+jest.mock('../../../../utils', () => ({
   getExplorerUrl: (type: string, hash: string) => `https://explorer/${type}/${hash}`,
   getAssetsUrl: (path: string) => `/assets/${path}`,
   getRWLKImageUrl: (id: string) => `/rwlk/${id}.png`,
   convertTimestampToDateTime: (ts: number) => `date-${ts}`,
 }));
 
-jest.mock('../../../components/nft/NFTImage', () => ({
+jest.mock('../../../../components/nft/NFTImage', () => ({
   __esModule: true,
   default: ({ src, alt = 'NFT' }: { src: string; alt?: string }) => (
     <img data-testid="nft-image" src={src} alt={alt} />

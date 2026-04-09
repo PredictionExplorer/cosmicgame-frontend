@@ -2,7 +2,7 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import DetailPage from '../[id]/DetailPage';
 
-jest.mock('../../../components/nft/NFTTrait', () => ({
+jest.mock('../../../../components/nft/NFTTrait', () => ({
   __esModule: true,
   default: ({ tokenId }: { tokenId: number }) => (
     <div data-testid="nft-trait">Token: {tokenId}</div>

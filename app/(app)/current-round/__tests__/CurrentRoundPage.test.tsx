@@ -10,7 +10,7 @@ const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: [] });
 const mockUsePrizeTime = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useBidListByRound: (...args: unknown[]) => mockUseBidListByRound(...args),
   useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
@@ -27,12 +27,12 @@ jest.mock('react-countdown', () => ({
   ),
 }));
 
-jest.mock('../../../components/common/Counter', () => ({
+jest.mock('../../../../components/common/Counter', () => ({
   __esModule: true,
   default: () => <div data-testid="counter" />,
 }));
 
-jest.mock('../../../components/home/RoundInfoSection', () => ({
+jest.mock('../../../../components/home/RoundInfoSection', () => ({
   RoundInfoSection: (props: Record<string, unknown>) => (
     <div data-testid="round-info-section" data-round={props.data ? 'loaded' : 'none'}>
       RoundInfoSection
@@ -40,7 +40,7 @@ jest.mock('../../../components/home/RoundInfoSection', () => ({
   ),
 }));
 
-jest.mock('../../../components/tables/SpecialPrizeWinners', () => ({
+jest.mock('../../../../components/tables/SpecialPrizeWinners', () => ({
   SpecialPrizeWinners: () => <div data-testid="special-prize-winners">Special Prizes</div>,
 }));
 

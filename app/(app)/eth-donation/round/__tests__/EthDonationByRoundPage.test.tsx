@@ -4,11 +4,11 @@ import EthDonationByRoundPage from '../[round]/EthDonationByRoundPage';
 
 const mockUseDonationsBothByRound = jest.fn();
 
-jest.mock('../../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../../hooks/useApiQuery', () => ({
   useDonationsBothByRound: (...args: unknown[]) => mockUseDonationsBothByRound(...args),
 }));
 
-jest.mock('../../../../components/tables/EthDonationTable', () => ({
+jest.mock('../../../../../components/tables/EthDonationTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
     <div data-testid="donation-table">rows: {list.length}</div>

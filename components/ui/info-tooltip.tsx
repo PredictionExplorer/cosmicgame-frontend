@@ -33,7 +33,7 @@ export function InfoTooltip({
             />
           </span>
         </TooltipTrigger>
-        <TooltipContent side={side}>
+        <TooltipContent side={side} align="center">
           <p className="text-xs leading-relaxed" style={{ maxWidth }}>
             {content}
           </p>

@@ -5,7 +5,7 @@ import MarketingRewards from '../MarketingRewards';
 const mockUseMarketingRewards = jest.fn();
 const mockUseDashboardInfo = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useMarketingRewards: (...args: unknown[]) => mockUseMarketingRewards(...args),
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
 }));
@@ -48,7 +48,7 @@ jest.mock('framer-motion', () => {
 function MockHero() {
   return <div data-testid="hero">Hero</div>;
 }
-jest.mock('../../../components/marketing/MarketingHero', () => ({
+jest.mock('../../../../components/marketing/MarketingHero', () => ({
   MarketingHero: MockHero,
 }));
 
@@ -64,35 +64,35 @@ function MockStats(props: Record<string, unknown>) {
     </div>
   );
 }
-jest.mock('../../../components/marketing/MarketingStats', () => ({
+jest.mock('../../../../components/marketing/MarketingStats', () => ({
   MarketingStats: MockStats,
 }));
 
 function MockHowItWorks() {
   return <div data-testid="how-it-works">HowItWorks</div>;
 }
-jest.mock('../../../components/marketing/HowItWorks', () => ({
+jest.mock('../../../../components/marketing/HowItWorks', () => ({
   HowItWorks: MockHowItWorks,
 }));
 
 function MockLeaderboard({ rewards }: { rewards: unknown[] }) {
   return <div data-testid="leaderboard">Leaderboard: {rewards.length}</div>;
 }
-jest.mock('../../../components/marketing/TopMarketersLeaderboard', () => ({
+jest.mock('../../../../components/marketing/TopMarketersLeaderboard', () => ({
   TopMarketersLeaderboard: MockLeaderboard,
 }));
 
 function MockHistory({ rewards }: { rewards: unknown[] }) {
   return <div data-testid="history">History: {rewards.length}</div>;
 }
-jest.mock('../../../components/marketing/RewardsHistorySection', () => ({
+jest.mock('../../../../components/marketing/RewardsHistorySection', () => ({
   RewardsHistorySection: MockHistory,
 }));
 
 function MockCTA() {
   return <div data-testid="cta">CTA</div>;
 }
-jest.mock('../../../components/marketing/MarketingCTA', () => ({
+jest.mock('../../../../components/marketing/MarketingCTA', () => ({
   MarketingCTA: MockCTA,
 }));
 

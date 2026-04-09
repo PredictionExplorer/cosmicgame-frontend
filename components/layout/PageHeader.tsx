@@ -1,5 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
 
@@ -26,7 +29,12 @@ export function PageHeader({
   children,
 }: PageHeaderProps) {
   return (
-    <div className={cn('mb-12', align === 'center' && 'text-center', className)}>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
+      className={cn('mb-10', align === 'center' && 'text-center', className)}
+    >
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav className="mb-4 flex items-center gap-1 text-sm text-muted-foreground">
           {breadcrumbs.map((crumb, i) => (
@@ -43,11 +51,14 @@ export function PageHeader({
           ))}
         </nav>
       )}
-      <h1 className="font-display text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
+      <h1 className="font-display text-3xl font-bold leading-[1.15] tracking-tight md:text-4xl">
+        {title}
+      </h1>
+      <div className="mx-auto mt-4 h-px max-w-xs bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
       {subtitle && (
         <p className="mt-3 text-base text-muted-foreground max-w-2xl mx-auto">{subtitle}</p>
       )}
       {children}
-    </div>
+    </motion.div>
   );
 }

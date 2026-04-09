@@ -8,21 +8,21 @@ const mockUseDashboardInfo = jest.fn().mockReturnValue({
   error: null,
 });
 
-jest.mock('../../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
 }));
 
-jest.mock('../../../../components/ui/button', () => ({
+jest.mock('../../../../../components/ui/button', () => ({
   Button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
     <button {...props}>{children}</button>
   ),
 }));
 
-jest.mock('../../../../components/ui/input', () => ({
+jest.mock('../../../../../components/ui/input', () => ({
   Input: (props: Record<string, unknown>) => <input {...props} />,
 }));
 
-jest.mock('../../../../components/ui/select', () => ({
+jest.mock('../../../../../components/ui/select', () => ({
   Select: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
   SelectContent: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
   SelectItem: ({ children }: React.PropsWithChildren) => <div>{children}</div>,

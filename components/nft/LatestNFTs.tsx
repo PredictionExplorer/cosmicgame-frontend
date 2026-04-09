@@ -1,8 +1,9 @@
-import Image from 'next/image';
 import { useSnapCarousel } from 'react-snap-carousel';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ImageIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { SectionDivider } from '@/components/ui/section-divider';
+import { EmptyState } from '@/components/ui/empty-state';
 import { useCSTList } from '@/hooks/useApiQuery';
 
 import NFT from './NFT';
@@ -14,19 +15,14 @@ const LatestNFTs = () => {
   const { scrollRef, pages, activePageIndex, next, prev } = useSnapCarousel();
 
   return (
-    <div className="bg-[#101441]">
-      <div className="container mx-auto px-2.5 py-20 md:pb-[150px]">
-        <div className="flex items-center justify-center flex-wrap">
-          <h4 className="text-2xl font-semibold text-foreground">Latest NFT&apos;s</h4>
-        </div>
-        <div className="text-center mb-14">
-          <Image src="/images/divider.svg" width={93} height={3} alt="divider" />
-        </div>
+    <div className="bg-card/50">
+      <div className="max-w-7xl mx-auto px-4 py-20 md:pb-32">
+        <h4 className="text-center font-display text-2xl font-bold tracking-tight">Latest NFTs</h4>
+        <SectionDivider className="mt-4 mb-10" />
 
         {nftData.length > 0 ? (
           <>
-            {/* Desktop grid */}
-            <div className="hidden md:grid md:grid-cols-3 gap-4 mt-[58px]">
+            <div className="hidden md:grid md:grid-cols-3 gap-4">
               {nftData.slice(0, 6).map((nft, index) => (
                 <div key={nft.TokenId || index}>
                   <NFT nft={nft} />
@@ -34,7 +30,6 @@ const LatestNFTs = () => {
               ))}
             </div>
 
-            {/* Mobile carousel */}
             <div className="md:hidden">
               <ul
                 ref={scrollRef}
@@ -57,7 +52,11 @@ const LatestNFTs = () => {
             </div>
           </>
         ) : (
-          <p className="text-center mt-8 text-foreground">There is no NFT yet.</p>
+          <EmptyState
+            icon={<ImageIcon className="h-8 w-8 text-muted-foreground/50" />}
+            title="No NFTs yet"
+            description="Cosmic Signature NFTs will appear here once the first round completes."
+          />
         )}
       </div>
     </div>

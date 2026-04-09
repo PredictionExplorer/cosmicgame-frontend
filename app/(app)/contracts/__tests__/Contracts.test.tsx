@@ -45,7 +45,7 @@ jest.mock('viem', () => ({
 
 /* ── utils mock ────────────────────────────────────────────────── */
 
-jest.mock('../../../utils', () => ({
+jest.mock('../../../../utils', () => ({
   formatSeconds: (s: number) => (s > 0 ? `${s}s` : '0s'),
 }));
 
@@ -65,7 +65,7 @@ const mockUseDashboardInfo = jest.fn().mockReturnValue({
   isLoading: false,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
 }));
 
@@ -73,14 +73,14 @@ jest.mock('../../../hooks/useApiQuery', () => ({
 
 const mockUseContractNoSigner = jest.fn().mockReturnValue(null);
 
-jest.mock('../../../hooks/useContractNoSigner', () => ({
+jest.mock('../../../../hooks/useContractNoSigner', () => ({
   __esModule: true,
   default: (...args: unknown[]) => mockUseContractNoSigner(...args),
 }));
 
 /* ── config/networks mock ──────────────────────────────────────── */
 
-jest.mock('../../../config/networks', () => ({
+jest.mock('../../../../config/networks', () => ({
   networkConfig: {
     chainName: 'Arbitrum Sepolia',
     chainId: 421614,
@@ -92,14 +92,14 @@ jest.mock('../../../config/networks', () => ({
 
 /* ── contracts/abis mock ──────────────────────────────────────── */
 
-jest.mock('../../../contracts/abis', () => ({
+jest.mock('../../../../contracts/abis', () => ({
   charityWalletAbi: [],
   cosmicGameAbi: [],
 }));
 
 /* ── utils/errors mock ─────────────────────────────────────────── */
 
-jest.mock('../../../utils/errors', () => ({
+jest.mock('../../../../utils/errors', () => ({
   reportError: jest.fn(),
 }));
 

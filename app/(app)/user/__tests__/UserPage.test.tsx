@@ -2,7 +2,7 @@ import { checkA11y, render, screen } from '@/test-utils';
 
 import UserPage from '../[address]/UserPage';
 
-jest.mock('../../../components/UserStatisticsView', () => ({
+jest.mock('../../../../components/UserStatisticsView', () => ({
   __esModule: true,
   default: ({ address, isOwnProfile }: { address: string; isOwnProfile: boolean }) => (
     <div data-testid="user-stats">

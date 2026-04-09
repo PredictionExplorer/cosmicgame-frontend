@@ -8,11 +8,11 @@ const mockUseBidList = jest.fn().mockReturnValue({
   error: null,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useBidList: (...args: unknown[]) => mockUseBidList(...args),
 }));
 
-jest.mock('../../../components/tables/BanBidTable', () => ({
+jest.mock('../../../../components/tables/BanBidTable', () => ({
   __esModule: true,
   default: ({ biddingHistory }: { biddingHistory: unknown[] }) => (
     <div data-testid="ban-bid-table">rows: {biddingHistory.length}</div>

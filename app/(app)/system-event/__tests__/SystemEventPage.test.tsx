@@ -10,17 +10,17 @@ const mockUseSystemEvents = jest.fn().mockReturnValue({
   error: null,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useSystemEvents: (...args: unknown[]) => mockUseSystemEvents(...args),
 }));
 
-jest.mock('../../../components/tables/AdminEventsTable', () => ({
+jest.mock('../../../../components/tables/AdminEventsTable', () => ({
   AdminEventsTable: ({ list }: { list: unknown[] }) => (
     <div data-testid="events-table">events: {list.length}</div>
   ),
 }));
 
-jest.mock('../../../utils/errors', () => ({
+jest.mock('../../../../utils/errors', () => ({
   reportError: jest.fn(),
 }));
 

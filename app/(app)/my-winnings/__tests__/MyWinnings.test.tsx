@@ -24,7 +24,7 @@ const mockUseDonationsERC20ByUser = jest.fn().mockReturnValue({
   refetch: mockRefetchERC20,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useUnclaimedDonatedNFTByUser: (...args: unknown[]) => mockUseUnclaimedDonatedNFTByUser(...args),
   useUnclaimedRaffleDepositsByUser: (...args: unknown[]) =>
     mockUseUnclaimedRaffleDepositsByUser(...args),
@@ -32,7 +32,7 @@ jest.mock('../../../hooks/useApiQuery', () => ({
 }));
 
 let mockAccount: string | null = '0xUser';
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: mockAccount }),
 }));
 
@@ -40,16 +40,16 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
 
-jest.mock('../../../contexts/NotificationContext', () => ({
+jest.mock('../../../../contexts/NotificationContext', () => ({
   useNotification: () => ({ setNotification: jest.fn() }),
 }));
-jest.mock('../../../contexts/ApiDataContext', () => ({
+jest.mock('../../../../contexts/ApiDataContext', () => ({
   useApiData: () => ({
     apiData: { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 0 },
     fetchData: jest.fn(),
   }),
 }));
-jest.mock('../../../hooks/useRaffleWalletContract', () => ({
+jest.mock('../../../../hooks/useRaffleWalletContract', () => ({
   __esModule: true,
   default: () => ({
     write: {
@@ -63,22 +63,22 @@ jest.mock('../../../hooks/useRaffleWalletContract', () => ({
   }),
 }));
 
-jest.mock('../../../components/winnings/RaffleWinningsTable', () => ({
+jest.mock('../../../../components/winnings/RaffleWinningsTable', () => ({
   RaffleWinningsTable: ({ list }: { list: unknown[] }) => (
     <div data-testid="raffle-winnings-table">rows: {list.length}</div>
   ),
 }));
 
-jest.mock('../../../components/donations/DonatedNFTTable', () => ({
+jest.mock('../../../../components/donations/DonatedNFTTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
     <div data-testid="donated-nft-table">nfts: {list.length}</div>
   ),
 }));
-jest.mock('../../../components/staking/UncollectedCSTStakingRewardsTable', () => ({
+jest.mock('../../../../components/staking/UncollectedCSTStakingRewardsTable', () => ({
   UncollectedCSTStakingRewardsTable: () => <div data-testid="uncollected-rewards" />,
 }));
-jest.mock('../../../components/donations/DonatedERC20Table', () => ({
+jest.mock('../../../../components/donations/DonatedERC20Table', () => ({
   __esModule: true,
   default: () => <div data-testid="donated-erc20-table" />,
 }));

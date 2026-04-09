@@ -10,19 +10,19 @@ const mockUseDonationsBoth = jest.fn().mockReturnValue({
   refetch: mockRefetch,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useDonationsBoth: (...args: unknown[]) => mockUseDonationsBoth(...args),
 }));
 
-jest.mock('../../../contexts/NotificationContext', () => ({
+jest.mock('../../../../contexts/NotificationContext', () => ({
   useNotification: () => ({ setNotification: jest.fn() }),
 }));
 
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: '0xUser' }),
 }));
 
-jest.mock('../../../hooks/useCosmicGameContract', () => ({
+jest.mock('../../../../hooks/useCosmicGameContract', () => ({
   __esModule: true,
   default: () => ({
     write: {
@@ -32,7 +32,7 @@ jest.mock('../../../hooks/useCosmicGameContract', () => ({
   }),
 }));
 
-jest.mock('../../../components/tables/EthDonationTable', () => ({
+jest.mock('../../../../components/tables/EthDonationTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
     <div data-testid="donation-table">donations: {list.length}</div>

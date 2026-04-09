@@ -9,7 +9,7 @@ const mockGetMintPrice = jest.fn(() => Promise.resolve(BigInt(1000000000000000))
 const mockWalletOfOwner = jest.fn(() => Promise.resolve([] as readonly bigint[]));
 const mockWaitForTxReceipt = jest.fn().mockResolvedValue({ status: 'success' });
 
-jest.mock('../../../hooks/useRWLKNFTContract', () => ({
+jest.mock('../../../../hooks/useRWLKNFTContract', () => ({
   __esModule: true,
   default: () => ({
     read: {
@@ -23,7 +23,7 @@ jest.mock('../../../hooks/useRWLKNFTContract', () => ({
 }));
 
 const mockUseActiveWeb3React = jest.fn(() => ({ account: '0xUser' as string | null }));
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => mockUseActiveWeb3React(),
 }));
 
@@ -38,7 +38,7 @@ jest.mock('viem', () => ({
   parseEther: (val: string) => BigInt(Math.round(parseFloat(val) * 1e18)),
 }));
 
-jest.mock('../../../utils', () => ({
+jest.mock('../../../../utils', () => ({
   parseBalance: (val: bigint) => (Number(val) / 1e18).toString(),
 }));
 
@@ -47,14 +47,14 @@ const mockIsUserRejection = jest.fn<boolean, [unknown]>(() => false);
 const mockIsEthProviderError = jest.fn<boolean, [unknown]>(() => false);
 const mockGetEthErrorMessage = jest.fn<string, [unknown, string?]>(() => 'Mint failed');
 
-jest.mock('../../../utils/errors', () => ({
+jest.mock('../../../../utils/errors', () => ({
   isUserRejection: (err: unknown) => mockIsUserRejection(err),
   isEthProviderError: (err: unknown) => mockIsEthProviderError(err),
   reportError: (err: unknown, ctx: string) => mockReportError(err, ctx),
   getEthErrorMessage: (err: unknown, fallback?: string) => mockGetEthErrorMessage(err, fallback),
 }));
 
-jest.mock('../../../utils/contractWrite', () => ({
+jest.mock('../../../../utils/contractWrite', () => ({
   asWriteFn: (fn: (...a: unknown[]) => unknown) => fn,
 }));
 

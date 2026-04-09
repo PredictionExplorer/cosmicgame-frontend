@@ -4,7 +4,7 @@ import BidPage from '../[id]/BidPage';
 
 const mockUseBidInfo = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useBidInfo: (...args: unknown[]) => mockUseBidInfo(...args),
 }));
 
@@ -12,17 +12,17 @@ jest.mock('axios', () => ({
   get: jest.fn(() => Promise.resolve({ data: {} })),
 }));
 
-jest.mock('../../../utils', () => ({
+jest.mock('../../../../utils', () => ({
   getExplorerUrl: (type: string, hash: string) => `https://explorer/${type}/${hash}`,
   convertTimestampToDateTime: (ts: number) => `date-${ts}`,
 }));
 
-jest.mock('../../../components/nft/RandomWalkNFT', () => ({
+jest.mock('../../../../components/nft/RandomWalkNFT', () => ({
   __esModule: true,
   default: ({ tokenId }: { tokenId: number }) => <div data-testid="rwlk-nft">{tokenId}</div>,
 }));
 
-jest.mock('../../../components/nft/NFTImage', () => ({
+jest.mock('../../../../components/nft/NFTImage', () => ({
   __esModule: true,
   default: ({ src, alt = 'NFT' }: { src?: string; alt?: string }) => (
     <img data-testid="nft-image" src={src} alt={alt} />

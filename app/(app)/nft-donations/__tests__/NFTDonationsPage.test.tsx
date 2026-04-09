@@ -4,11 +4,11 @@ import NFTDonationsPage from '../NFTDonationsPage';
 
 const mockUseDonationsNFTList = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useDonationsNFTList: (...args: unknown[]) => mockUseDonationsNFTList(...args),
 }));
 
-jest.mock('../../../components/donations/DonatedNFTTable', () => ({
+jest.mock('../../../../components/donations/DonatedNFTTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
     <div data-testid="nft-table">rows: {list.length}</div>

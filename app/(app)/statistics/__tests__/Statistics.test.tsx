@@ -23,7 +23,7 @@ const mockUseStakedRWLKTokensGlobal = jest.fn().mockReturnValue({ data: undefine
 const mockUseSystemModelist = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCTPrice = jest.fn().mockReturnValue({ data: undefined });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useBidListByRound: (...args: unknown[]) => mockUseBidListByRound(...args),
   useUniqueBidders: (...args: unknown[]) => mockUseUniqueBidders(...args),
@@ -53,52 +53,52 @@ jest.mock('next/link', () => ({
 
 /* ── child components (stub heavy tables/charts) ────────────────── */
 
-jest.mock('../../../components/tables/BiddingHistoryTable', () => ({
+jest.mock('../../../../components/tables/BiddingHistoryTable', () => ({
   __esModule: true,
   default: () => <div data-testid="bidding-history-table" />,
 }));
-jest.mock('../../../components/tables/UniqueBiddersTable', () => ({
+jest.mock('../../../../components/tables/UniqueBiddersTable', () => ({
   UniqueBiddersTable: () => <div data-testid="unique-bidders-table" />,
   Bidder: undefined,
 }));
-jest.mock('../../../components/tables/UniqueWinnersTable', () => ({
+jest.mock('../../../../components/tables/UniqueWinnersTable', () => ({
   UniqueWinnersTable: () => <div data-testid="unique-winners-table" />,
   Winner: undefined,
 }));
-jest.mock('../../../components/tables/UniqueEthDonorsTable', () => ({
+jest.mock('../../../../components/tables/UniqueEthDonorsTable', () => ({
   UniqueEthDonorsTable: () => <div data-testid="unique-eth-donors-table" />,
   UniqueEthDonor: undefined,
 }));
-jest.mock('../../../components/tables/UniqueStakersCSTTable', () => ({
+jest.mock('../../../../components/tables/UniqueStakersCSTTable', () => ({
   UniqueStakersCSTTable: () => <div data-testid="unique-stakers-cst-table" />,
   UniqueStakerCST: undefined,
 }));
-jest.mock('../../../components/tables/UniqueStakersRWLKTable', () => ({
+jest.mock('../../../../components/tables/UniqueStakersRWLKTable', () => ({
   UniqueStakersRWLKTable: () => <div data-testid="unique-stakers-rwlk-table" />,
   UniqueStakerRWLK: undefined,
 }));
-jest.mock('../../../components/tables/SystemModesTable', () => ({
+jest.mock('../../../../components/tables/SystemModesTable', () => ({
   SystemModesTable: () => <div data-testid="system-modes-table" />,
   EventRow: undefined,
 }));
-jest.mock('../../../components/donations/DonatedNFT', () => ({
+jest.mock('../../../../components/donations/DonatedNFT', () => ({
   __esModule: true,
   default: () => <div data-testid="donated-nft" />,
 }));
-jest.mock('../../../components/donations/DonatedNFTDistributionTable', () => ({
+jest.mock('../../../../components/donations/DonatedNFTDistributionTable', () => ({
   __esModule: true,
   default: () => <div data-testid="donated-nft-distribution-table" />,
 }));
-jest.mock('../../../components/tokens/CSTokenDistributionTable', () => ({
+jest.mock('../../../../components/tokens/CSTokenDistributionTable', () => ({
   CSTokenDistributionTable: () => <div data-testid="cs-token-distribution-table" />,
 }));
-jest.mock('../../../components/tokens/CTBalanceDistributionTable', () => ({
+jest.mock('../../../../components/tokens/CTBalanceDistributionTable', () => ({
   CTBalanceDistributionTable: () => <div data-testid="ct-balance-distribution-table" />,
 }));
-jest.mock('../../../components/tokens/CTBalanceDistributionChart', () => ({
+jest.mock('../../../../components/tokens/CTBalanceDistributionChart', () => ({
   CTBalanceDistributionChart: () => <div data-testid="ct-balance-distribution-chart" />,
 }));
-jest.mock('../../../components/statistics/StatisticsItem', () => ({
+jest.mock('../../../../components/statistics/StatisticsItem', () => ({
   StatisticsItem: ({
     title,
     value,
@@ -116,7 +116,7 @@ jest.mock('../../../components/statistics/StatisticsItem', () => ({
   ),
   CountdownRenderer: () => <span data-testid="countdown-renderer" />,
 }));
-jest.mock('../../../components/statistics/StakingSection', () => ({
+jest.mock('../../../../components/statistics/StakingSection', () => ({
   StakingSection: () => (
     <div data-testid="staking-section">
       <span>CosmicSignature Token</span>
@@ -125,14 +125,14 @@ jest.mock('../../../components/statistics/StakingSection', () => ({
     </div>
   ),
 }));
-jest.mock('../../../components/statistics/DonatedNFTsGrid', () => ({
+jest.mock('../../../../components/statistics/DonatedNFTsGrid', () => ({
   DonatedNFTsGrid: ({ nftDonations }: { nftDonations: unknown[] }) => (
     <div data-testid="donated-nfts-grid">
       {nftDonations.length === 0 && <p>No NFTs have been donated yet.</p>}
     </div>
   ),
 }));
-jest.mock('../../../components/statistics/StatisticsGroup', () => ({
+jest.mock('../../../../components/statistics/StatisticsGroup', () => ({
   StatisticsGroup: ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div data-testid="statistics-group">
       <span>{title}</span>
@@ -140,7 +140,7 @@ jest.mock('../../../components/statistics/StatisticsGroup', () => ({
     </div>
   ),
 }));
-jest.mock('../../../components/statistics/CollapsibleSection', () => ({
+jest.mock('../../../../components/statistics/CollapsibleSection', () => ({
   CollapsibleSection: ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div data-testid="collapsible-section">
       <span>{title}</span>
@@ -148,7 +148,7 @@ jest.mock('../../../components/statistics/CollapsibleSection', () => ({
     </div>
   ),
 }));
-jest.mock('../../../config/misc', () => ({
+jest.mock('../../../../config/misc', () => ({
   ZERO_ADDRESS: '0x0000000000000000000000000000000000000000',
 }));
 

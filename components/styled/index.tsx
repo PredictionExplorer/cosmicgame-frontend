@@ -44,7 +44,7 @@ export function TablePrimaryContainer({
   return (
     <div
       className={cn(
-        'rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden',
+        'rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden transition-all duration-200',
         className,
       )}
       {...props}
@@ -64,7 +64,7 @@ export function TablePrimaryHeadCell({ className, ...props }: ComponentPropsWith
   return (
     <Th
       className={cn(
-        'text-muted-foreground font-medium text-xs uppercase tracking-wider leading-[1.43] border-b border-white/[0.06] px-4 py-3 max-sm:text-[10px]',
+        'text-primary/40 font-medium text-xs uppercase tracking-wider leading-[1.43] border-b border-white/[0.06] px-4 py-3 max-sm:text-[10px]',
         className,
       )}
       {...props}
@@ -88,7 +88,7 @@ export function TablePrimaryRow({ className, ...props }: ComponentPropsWithoutRe
   return (
     <Tr
       className={cn(
-        'border-0 transition-colors hover:bg-white/[0.04] even:bg-white/[0.015]',
+        'border-0 transition-colors duration-200 hover:bg-white/[0.05] even:bg-white/[0.015]',
         className,
       )}
       {...props}
@@ -182,7 +182,7 @@ export function MainWrapper({ className, ...props }: React.HTMLAttributes<HTMLEl
   return (
     <main
       className={cn(
-        'mx-auto w-full max-w-7xl px-4 pt-40 pb-40 overflow-hidden leading-none min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-36 max-sm:pb-24',
+        'mx-auto w-full max-w-7xl px-4 pt-32 pb-24 overflow-hidden leading-none min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-28 max-sm:pb-16',
         className,
       )}
       {...props}

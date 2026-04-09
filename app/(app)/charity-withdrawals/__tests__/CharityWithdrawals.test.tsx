@@ -4,11 +4,11 @@ import CharityWithdrawals from '../CharityWithdrawals';
 
 const mockUseCharityWithdrawals = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useCharityWithdrawals: (...args: unknown[]) => mockUseCharityWithdrawals(...args),
 }));
 
-jest.mock('../../../components/tables/CharityWithdrawalTable', () => ({
+jest.mock('../../../../components/tables/CharityWithdrawalTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
     <div data-testid="withdrawal-table">rows: {list.length}</div>

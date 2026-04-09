@@ -4,11 +4,11 @@ import MarketingRewardsPage from '../MarketingRewardsPage';
 
 const mockUseMarketingRewardsByUser = jest.fn();
 
-jest.mock('../../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../../hooks/useApiQuery', () => ({
   useMarketingRewardsByUser: (...args: unknown[]) => mockUseMarketingRewardsByUser(...args),
 }));
 
-jest.mock('../../../../components/tables/MarketingRewardsTable', () => ({
+jest.mock('../../../../../components/tables/MarketingRewardsTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
     <div data-testid="rewards-table">rows: {list.length}</div>

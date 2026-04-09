@@ -10,24 +10,24 @@ const mockUseRaffleDepositsByUser = jest.fn().mockReturnValue({
   refetch: mockRefetchDeposits,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useRaffleDepositsByUser: (...args: unknown[]) => mockUseRaffleDepositsByUser(...args),
 }));
 
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: '0x1234567890123456789012345678901234567890' }),
 }));
 
-jest.mock('../../../contexts/ApiDataContext', () => ({
+jest.mock('../../../../contexts/ApiDataContext', () => ({
   useApiData: () => ({ apiData: { ETHRaffleToClaim: 0 }, fetchData: jest.fn() }),
 }));
 
-jest.mock('../../../hooks/useRaffleWalletContract', () => ({
+jest.mock('../../../../hooks/useRaffleWalletContract', () => ({
   __esModule: true,
   default: () => ({ write: {} }),
 }));
 
-jest.mock('../../../contexts/NotificationContext', () => ({
+jest.mock('../../../../contexts/NotificationContext', () => ({
   useNotification: () => ({ setNotification: jest.fn() }),
 }));
 

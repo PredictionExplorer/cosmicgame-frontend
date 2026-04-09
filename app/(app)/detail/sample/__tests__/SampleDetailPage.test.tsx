@@ -4,7 +4,7 @@ import SampleDetailPage from '../SampleDetailPage';
 
 const mockCopy = jest.fn();
 
-jest.mock('../../../../hooks/useClipboard', () => ({
+jest.mock('../../../../../hooks/useClipboard', () => ({
   useClipboard: () => ({ copy: mockCopy }),
 }));
 
@@ -14,21 +14,21 @@ jest.mock('yet-another-react-lightbox', () => ({
     open ? <div data-testid="lightbox">Lightbox</div> : null,
 }));
 
-jest.mock('../../../../components/nft/NFTImage', () => ({
+jest.mock('../../../../../components/nft/NFTImage', () => ({
   __esModule: true,
   default: ({ src, alt = 'NFT' }: { src: string; alt?: string }) => (
     <img data-testid="nft-image" src={src} alt={alt} />
   ),
 }));
 
-jest.mock('../../../../components/nft/NFTVideo', () => ({
+jest.mock('../../../../../components/nft/NFTVideo', () => ({
   __esModule: true,
   default: ({ image_thumb }: { image_thumb: string }) => (
     <div data-testid="nft-video">{image_thumb}</div>
   ),
 }));
 
-jest.mock('../../../../components/common/VideoPlayerDialog', () => ({
+jest.mock('../../../../../components/common/VideoPlayerDialog', () => ({
   __esModule: true,
   default: ({ open }: { open: boolean }) =>
     open ? <div data-testid="video-dialog">Video</div> : null,

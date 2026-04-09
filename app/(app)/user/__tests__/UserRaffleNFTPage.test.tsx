@@ -8,7 +8,7 @@ const mockUseRaffleNFTWinningsByUser = jest.fn().mockReturnValue({
   error: null,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useRaffleNFTWinningsByUser: (...args: unknown[]) => mockUseRaffleNFTWinningsByUser(...args),
 }));
 

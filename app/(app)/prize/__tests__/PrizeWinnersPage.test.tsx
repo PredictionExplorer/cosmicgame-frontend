@@ -4,12 +4,12 @@ import PrizeWinnersPage from '../PrizeWinnersPage';
 
 const mockUseRoundList = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useRoundList: (...args: unknown[]) => mockUseRoundList(...args),
 }));
 
 let capturedList: unknown[] = [];
-jest.mock('../../../components/tables/PrizeTable', () => ({
+jest.mock('../../../../components/tables/PrizeTable', () => ({
   PrizeTable: ({ list, loading }: { list: unknown[]; loading: boolean }) => {
     capturedList = list;
     return <div data-testid="prize-table">{loading ? 'Loading...' : `rows: ${list.length}`}</div>;

@@ -8,16 +8,16 @@ const mockUseCSTTokensByUser = jest.fn().mockReturnValue({
   isError: false,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useCSTTokensByUser: (...args: unknown[]) => mockUseCSTTokensByUser(...args),
 }));
 
 let mockAccount: string | null = '0xUser';
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: mockAccount }),
 }));
 
-jest.mock('../../../components/tokens/CSTTable', () => ({
+jest.mock('../../../../components/tokens/CSTTable', () => ({
   CSTTable: ({ list }: { list: unknown[] }) => (
     <div data-testid="cst-table">tokens: {list.length}</div>
   ),

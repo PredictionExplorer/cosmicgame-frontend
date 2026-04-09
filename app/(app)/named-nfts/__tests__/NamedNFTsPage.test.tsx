@@ -4,15 +4,15 @@ import NamedNFTsPage from '../NamedNFTsPage';
 
 const mockUseNamedNFTs = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useNamedNFTs: (...args: unknown[]) => mockUseNamedNFTs(...args),
 }));
 
-jest.mock('../../../components/common/CustomPagination', () => ({
+jest.mock('../../../../components/common/CustomPagination', () => ({
   CustomPagination: () => <div data-testid="pagination">Pagination</div>,
 }));
 
-jest.mock('../../../utils', () => ({
+jest.mock('../../../../utils', () => ({
   convertTimestampToDateTime: (ts: number) => `date-${ts}`,
 }));
 

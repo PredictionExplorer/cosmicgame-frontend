@@ -42,11 +42,11 @@ const mockUseCSTList = jest.fn().mockReturnValue({
   error: null,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useCSTList: (...args: unknown[]) => mockUseCSTList(...args),
 }));
 
-jest.mock('../../../services/api', () => ({
+jest.mock('../../../../services/api', () => ({
   __esModule: true,
   default: {
     get_token_by_name: jest.fn().mockResolvedValue([]),

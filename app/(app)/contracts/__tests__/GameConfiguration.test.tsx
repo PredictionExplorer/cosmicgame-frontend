@@ -20,7 +20,7 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
-jest.mock('../../../utils', () => ({
+jest.mock('../../../../utils', () => ({
   formatSeconds: (s: number) => (s > 0 ? `${s}s` : '0s'),
 }));
 

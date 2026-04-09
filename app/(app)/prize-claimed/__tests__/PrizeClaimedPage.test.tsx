@@ -8,7 +8,7 @@ const mockUseRoundInfo = jest.fn().mockReturnValue({
   error: null,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useRoundInfo: (...args: unknown[]) => mockUseRoundInfo(...args),
 }));
 

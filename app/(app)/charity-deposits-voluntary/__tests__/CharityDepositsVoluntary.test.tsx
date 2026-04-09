@@ -4,11 +4,11 @@ import CharityDepositsVoluntary from '../CharityDepositsVoluntary';
 
 const mockUseCharityVoluntary = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useCharityVoluntary: (...args: unknown[]) => mockUseCharityVoluntary(...args),
 }));
 
-jest.mock('../../../components/tables/CharityDepositTable', () => ({
+jest.mock('../../../../components/tables/CharityDepositTable', () => ({
   CharityDepositTable: ({ list }: { list: unknown[] }) => (
     <div data-testid="deposit-table">rows: {list.length}</div>
   ),

@@ -4,11 +4,11 @@ import MyStatistics from '../MyStatistics';
 
 const mockUseActiveWeb3React = jest.fn();
 
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => mockUseActiveWeb3React(),
 }));
 
-jest.mock('../../../components/UserStatisticsView', () => ({
+jest.mock('../../../../components/UserStatisticsView', () => ({
   __esModule: true,
   default: ({ address, isOwnProfile }: { address: string | null; isOwnProfile: boolean }) => (
     <div data-testid="user-stats">

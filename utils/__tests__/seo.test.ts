@@ -56,7 +56,7 @@ describe('createMetadata', () => {
     const result = createMetadata('Title', 'Desc', undefined, '/faq');
 
     expect(result.alternates).toEqual({
-      canonical: 'https://www.cosmicsignature.com/faq',
+      canonical: 'https://app.cosmicsignature.com/faq',
     });
   });
 
@@ -64,7 +64,7 @@ describe('createMetadata', () => {
     const result = createMetadata('Title', 'Desc', undefined, '/');
 
     expect(result.alternates).toEqual({
-      canonical: 'https://www.cosmicsignature.com/',
+      canonical: 'https://app.cosmicsignature.com/',
     });
   });
 
@@ -72,7 +72,7 @@ describe('createMetadata', () => {
     const result = createMetadata('Title', 'Desc', 'https://img.com/pic.png', '/detail/42');
 
     expect(result.alternates).toEqual({
-      canonical: 'https://www.cosmicsignature.com/detail/42',
+      canonical: 'https://app.cosmicsignature.com/detail/42',
     });
   });
 });

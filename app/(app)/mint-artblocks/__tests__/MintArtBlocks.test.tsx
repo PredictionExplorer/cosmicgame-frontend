@@ -4,7 +4,7 @@ import MintArtBlocks from '../MintArtBlocks';
 
 const mockCurTokenId = jest.fn(() => Promise.resolve(BigInt(100)));
 
-jest.mock('../../../hooks/useArtBlocksContract', () => ({
+jest.mock('../../../../hooks/useArtBlocksContract', () => ({
   __esModule: true,
   default: () => ({
     read: {
@@ -16,7 +16,7 @@ jest.mock('../../../hooks/useArtBlocksContract', () => ({
   }),
 }));
 
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: '0xUser' }),
 }));
 
@@ -26,7 +26,7 @@ jest.mock('wagmi', () => ({
   }),
 }));
 
-jest.mock('../../../utils/errors', () => ({
+jest.mock('../../../../utils/errors', () => ({
   isUserRejection: () => false,
   isEthProviderError: () => false,
   reportError: jest.fn(),

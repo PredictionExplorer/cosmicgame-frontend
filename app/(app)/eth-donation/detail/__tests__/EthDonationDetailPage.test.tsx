@@ -4,11 +4,11 @@ import EthDonationDetailPage from '../[id]/EthDonationDetailPage';
 
 const mockUseDonationsWithInfoById = jest.fn();
 
-jest.mock('../../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../../hooks/useApiQuery', () => ({
   useDonationsWithInfoById: (...args: unknown[]) => mockUseDonationsWithInfoById(...args),
 }));
 
-jest.mock('../../../../utils', () => ({
+jest.mock('../../../../../utils', () => ({
   getExplorerUrl: (type: string, hash: string) => `https://explorer/${type}/${hash}`,
   convertTimestampToDateTime: (ts: number) => `date-${ts}`,
   getMetadata: jest.fn(() => Promise.resolve({})),

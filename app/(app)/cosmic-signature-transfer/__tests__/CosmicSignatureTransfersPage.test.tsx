@@ -4,21 +4,21 @@ import CosmicSignatureTransfersPage from '../[address]/CosmicSignatureTransfersP
 
 const mockUseCSTTransfers = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useCSTTransfers: (...args: unknown[]) => mockUseCSTTransfers(...args),
 }));
 
-jest.mock('../../../utils', () => ({
+jest.mock('../../../../utils', () => ({
   getExplorerUrl: (type: string, hash: string) => `https://explorer/${type}/${hash}`,
   convertTimestampToDateTime: (ts: number) => `date-${ts}`,
   isWalletAddress: () => '',
 }));
 
-jest.mock('../../../components/common/CustomPagination', () => ({
+jest.mock('../../../../components/common/CustomPagination', () => ({
   CustomPagination: () => <div data-testid="pagination">Pagination</div>,
 }));
 
-jest.mock('../../../components/common/AddressLink', () => ({
+jest.mock('../../../../components/common/AddressLink', () => ({
   AddressLink: ({ address }: { address: string }) => <span data-testid="addr">{address}</span>,
 }));
 

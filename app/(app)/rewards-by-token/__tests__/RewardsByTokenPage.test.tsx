@@ -8,7 +8,7 @@ const mockUseStakingRewardsByUserByTokenDetails = jest.fn().mockReturnValue({
   error: null,
 });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useStakingRewardsByUserByTokenDetails: (...args: unknown[]) =>
     mockUseStakingRewardsByUserByTokenDetails(...args),
 }));

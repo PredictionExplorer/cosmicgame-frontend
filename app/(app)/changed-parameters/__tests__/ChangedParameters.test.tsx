@@ -6,16 +6,16 @@ const mockUseActiveWeb3React = jest.fn();
 const mockUseSystemModelist = jest.fn();
 const mockUseSystemEvents = jest.fn();
 
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => mockUseActiveWeb3React(),
 }));
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useSystemModelist: (...args: unknown[]) => mockUseSystemModelist(...args),
   useSystemEvents: (...args: unknown[]) => mockUseSystemEvents(...args),
 }));
 
-jest.mock('../../../components/tables/AdminEventsTable', () => ({
+jest.mock('../../../../components/tables/AdminEventsTable', () => ({
   AdminEventsTable: ({ list }: { list: unknown[] }) => (
     <div data-testid="events-table">rows: {list.length}</div>
   ),

@@ -4,11 +4,11 @@ import CharityCGDeposits from '../CharityCGDeposits';
 
 const mockUseCharityCGDeposits = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useCharityCGDeposits: (...args: unknown[]) => mockUseCharityCGDeposits(...args),
 }));
 
-jest.mock('../../../components/tables/CharityDepositTable', () => ({
+jest.mock('../../../../components/tables/CharityDepositTable', () => ({
   CharityDepositTable: ({ list }: { list: unknown[] }) => (
     <div data-testid="deposit-table">rows: {list.length}</div>
   ),

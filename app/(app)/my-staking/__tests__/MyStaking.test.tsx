@@ -9,7 +9,7 @@ const mockUseStakingRewardsByUser = jest.fn().mockReturnValue({ data: [], isLoad
 const mockUseStakingRWLKActionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
 const mockUseStakingRWLKMintsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useStakingCSTActionsByUser: (...args: unknown[]) => mockUseStakingCSTActionsByUser(...args),
   useCSTTokensByUser: (...args: unknown[]) => mockUseCSTTokensByUser(...args),
@@ -19,7 +19,7 @@ jest.mock('../../../hooks/useApiQuery', () => ({
 }));
 
 let mockAccount: string | null = '0xUser';
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: mockAccount }),
 }));
 
@@ -32,22 +32,22 @@ jest.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries: jest.fn() }),
 }));
 
-jest.mock('../../../hooks/useStakingWalletCSTContract', () => ({
+jest.mock('../../../../hooks/useStakingWalletCSTContract', () => ({
   __esModule: true,
   default: () => ({ write: { stake: jest.fn(), stakeMany: jest.fn() } }),
 }));
-jest.mock('../../../hooks/useStakingWalletRWLKContract', () => ({
+jest.mock('../../../../hooks/useStakingWalletRWLKContract', () => ({
   __esModule: true,
   default: () => ({ write: { stake: jest.fn(), stakeMany: jest.fn() } }),
 }));
-jest.mock('../../../hooks/useCosmicSignatureContract', () => ({
+jest.mock('../../../../hooks/useCosmicSignatureContract', () => ({
   __esModule: true,
   default: () => ({
     read: { isApprovedForAll: jest.fn() },
     write: { setApprovalForAll: jest.fn() },
   }),
 }));
-jest.mock('../../../hooks/useRWLKNFTContract', () => ({
+jest.mock('../../../../hooks/useRWLKNFTContract', () => ({
   __esModule: true,
   default: () => ({
     read: { isApprovedForAll: jest.fn(), walletOfOwner: jest.fn().mockResolvedValue([]) },
@@ -55,13 +55,13 @@ jest.mock('../../../hooks/useRWLKNFTContract', () => ({
   }),
 }));
 
-jest.mock('../../../contexts/StakedTokenContext', () => ({
+jest.mock('../../../../contexts/StakedTokenContext', () => ({
   useStakedToken: () => ({ cstokens: [], rwlktokens: [], fetchData: jest.fn() }),
 }));
-jest.mock('../../../contexts/NotificationContext', () => ({
+jest.mock('../../../../contexts/NotificationContext', () => ({
   useNotification: () => ({ setNotification: jest.fn() }),
 }));
-jest.mock('../../../config/networks', () => ({
+jest.mock('../../../../config/networks', () => ({
   STAKING_WALLET_CST_ADDRESS: '0xCST',
   STAKING_WALLET_RWLK_ADDRESS: '0xRWLK',
 }));
@@ -71,7 +71,7 @@ jest.mock('next/image', () => ({
   default: (props: Record<string, unknown>) => <img {...props} />,
 }));
 
-jest.mock('../../../components/staking/StakingHeroStats', () => ({
+jest.mock('../../../../components/staking/StakingHeroStats', () => ({
   StakingHeroStats: ({ stats }: { stats: { label: string; value: string }[] }) => (
     <div data-testid="staking-hero-stats">
       {stats.map((s) => (
@@ -83,7 +83,7 @@ jest.mock('../../../components/staking/StakingHeroStats', () => ({
   ),
 }));
 
-jest.mock('../../../components/staking/CSTStakingPanel', () => ({
+jest.mock('../../../../components/staking/CSTStakingPanel', () => ({
   CSTStakingPanel: () => (
     <div data-testid="cst-staking-panel">
       <div data-testid="staking-rewards-table" />
@@ -91,7 +91,7 @@ jest.mock('../../../components/staking/CSTStakingPanel', () => ({
     </div>
   ),
 }));
-jest.mock('../../../components/staking/RWLKStakingPanel', () => ({
+jest.mock('../../../../components/staking/RWLKStakingPanel', () => ({
   RWLKStakingPanel: () => <div data-testid="rwlk-staking-panel" />,
 }));
 

@@ -17,6 +17,7 @@ const footerLinks: Record<string, { label: string; href: string; external?: bool
   Resources: [
     { label: 'How to Play', href: '/how-to-play' },
     { label: 'FAQ', href: '/faq' },
+    { label: 'About', href: 'https://cosmicsignature.com', external: true },
     { label: 'Site Map', href: '/site-map' },
   ],
   Community: [

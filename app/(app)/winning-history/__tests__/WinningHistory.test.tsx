@@ -5,15 +5,15 @@ import WinningHistory from '../WinningHistory';
 const mockUseActiveWeb3React = jest.fn();
 const mockUseClaimHistoryByUser = jest.fn();
 
-jest.mock('../../../hooks/web3', () => ({
+jest.mock('../../../../hooks/web3', () => ({
   useActiveWeb3React: () => mockUseActiveWeb3React(),
 }));
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useClaimHistoryByUser: (...args: unknown[]) => mockUseClaimHistoryByUser(...args),
 }));
 
-jest.mock('../../../components/tables/WinningHistoryTable', () => ({
+jest.mock('../../../../components/tables/WinningHistoryTable', () => ({
   __esModule: true,
   default: ({ winningHistory }: { winningHistory: unknown[] }) => (
     <div data-testid="history-table">rows: {winningHistory.length}</div>

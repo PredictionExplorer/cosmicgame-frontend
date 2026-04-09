@@ -74,7 +74,7 @@ describe('Footer', () => {
 
   it('sets rel="noopener noreferrer" on every target="_blank" link', () => {
     const links = document.querySelectorAll('a[target="_blank"]');
-    expect(links.length).toBe(4);
+    expect(links.length).toBe(5);
     links.forEach((link) => {
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });

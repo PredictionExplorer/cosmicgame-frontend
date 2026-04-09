@@ -7,15 +7,6 @@ jest.mock('next/script', () => ({
   ),
 }));
 
-jest.mock('@rainbow-me/rainbowkit');
-jest.mock('wagmi');
-
-jest.mock('../providers', () => ({
-  Providers: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="providers">{children}</div>
-  ),
-}));
-
 jest.mock('../analytics', () => ({
   Analytics: () => null,
 }));
@@ -79,27 +70,15 @@ describe('RootLayout viewport', () => {
 });
 
 describe('RootLayout component', () => {
-  it('renders children wrapped in Providers', () => {
+  it('renders children directly (Providers are in route group layouts)', () => {
     render(
       <RootLayout>
         <div data-testid="child-content">Hello World</div>
       </RootLayout>,
     );
 
-    expect(screen.getByTestId('providers')).toBeInTheDocument();
     expect(screen.getByTestId('child-content')).toBeInTheDocument();
     expect(screen.getByText('Hello World')).toBeInTheDocument();
-  });
-
-  it('wraps children inside the Providers component', () => {
-    render(
-      <RootLayout>
-        <span>Nested</span>
-      </RootLayout>,
-    );
-
-    const providers = screen.getByTestId('providers');
-    expect(providers).toContainHTML('Nested');
   });
 
   it('has no accessibility violations', async () => {

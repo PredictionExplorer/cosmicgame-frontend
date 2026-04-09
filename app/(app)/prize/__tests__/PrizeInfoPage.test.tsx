@@ -11,7 +11,7 @@ const mockUseStakingCSTRewardsByRound = jest.fn();
 const mockUseDonationsERC20ByRound = jest.fn();
 const mockUseRoundList = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useRoundInfo: (...args: unknown[]) => mockUseRoundInfo(...args),
   useBidListByRound: (...args: unknown[]) => mockUseBidListByRound(...args),
   useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
@@ -21,7 +21,7 @@ jest.mock('../../../hooks/useApiQuery', () => ({
 }));
 
 const mockCopy = jest.fn();
-jest.mock('../../../hooks/useClipboard', () => ({
+jest.mock('../../../../hooks/useClipboard', () => ({
   useClipboard: () => ({ copy: mockCopy }),
 }));
 
@@ -29,29 +29,29 @@ jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn() },
 }));
 
-jest.mock('../../../components/tables/RaffleWinnerTable', () => ({
+jest.mock('../../../../components/tables/RaffleWinnerTable', () => ({
   __esModule: true,
   default: () => <div data-testid="raffle-winner-table" />,
 }));
-jest.mock('../../../components/tables/BiddingHistoryTable', () => ({
+jest.mock('../../../../components/tables/BiddingHistoryTable', () => ({
   __esModule: true,
   default: ({ biddingHistory }: { biddingHistory: unknown[] }) => (
     <div data-testid="bidding-history-table">bids: {biddingHistory.length}</div>
   ),
 }));
-jest.mock('../../../components/tables/StakingWinnerTable', () => ({
+jest.mock('../../../../components/tables/StakingWinnerTable', () => ({
   __esModule: true,
   default: () => <div data-testid="staking-winner-table" />,
 }));
-jest.mock('../../../components/donations/DonatedNFTTable', () => ({
+jest.mock('../../../../components/donations/DonatedNFTTable', () => ({
   __esModule: true,
   default: () => <div data-testid="donated-nft-table" />,
 }));
-jest.mock('../../../components/tables/EnduranceChampionsTable', () => ({
+jest.mock('../../../../components/tables/EnduranceChampionsTable', () => ({
   __esModule: true,
   default: () => <div data-testid="endurance-champions-table" />,
 }));
-jest.mock('../../../components/donations/DonatedERC20Table', () => ({
+jest.mock('../../../../components/donations/DonatedERC20Table', () => ({
   __esModule: true,
   default: () => <div data-testid="donated-erc20-table" />,
 }));

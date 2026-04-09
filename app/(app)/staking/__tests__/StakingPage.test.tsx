@@ -7,26 +7,26 @@ const mockUseStakingRWLKMintsGlobal = jest.fn();
 const mockUseDashboardInfo = jest.fn();
 const mockUseUniqueCSTStakers = jest.fn();
 
-jest.mock('../../../hooks/useApiQuery', () => ({
+jest.mock('../../../../hooks/useApiQuery', () => ({
   useStakingCSTRewards: (...args: unknown[]) => mockUseStakingCSTRewards(...args),
   useStakingRWLKMintsGlobal: (...args: unknown[]) => mockUseStakingRWLKMintsGlobal(...args),
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useUniqueCSTStakers: (...args: unknown[]) => mockUseUniqueCSTStakers(...args),
 }));
 
-jest.mock('../../../components/staking/GlobalStakingRewardsTable', () => ({
+jest.mock('../../../../components/staking/GlobalStakingRewardsTable', () => ({
   GlobalStakingRewardsTable: ({ list }: { list: unknown[] }) => (
     <div data-testid="cst-table">CST rows: {list.length}</div>
   ),
 }));
 
-jest.mock('../../../components/staking/RwalkStakingRewardMintsTable', () => ({
+jest.mock('../../../../components/staking/RwalkStakingRewardMintsTable', () => ({
   RwalkStakingRewardMintsTable: ({ list }: { list: unknown[] }) => (
     <div data-testid="rwlk-table">RWLK rows: {list.length}</div>
   ),
 }));
 
-jest.mock('../../../components/staking/StakingHeroStats', () => ({
+jest.mock('../../../../components/staking/StakingHeroStats', () => ({
   StakingHeroStats: ({
     stats,
     loading,
@@ -46,7 +46,7 @@ jest.mock('../../../components/staking/StakingHeroStats', () => ({
   ),
 }));
 
-jest.mock('../../../components/staking/HowStakingWorks', () => ({
+jest.mock('../../../../components/staking/HowStakingWorks', () => ({
   HowStakingWorks: () => <div data-testid="how-staking-works">How Staking Works</div>,
 }));
 
