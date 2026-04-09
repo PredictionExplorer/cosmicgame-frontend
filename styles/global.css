@@ -32,6 +32,18 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-family-display: var(--font-clash-display), 'ClashDisplay-Variable', sans-serif;
+
+  /* Landing page brand colors */
+  --color-cosmic-indigo: #1a0b3e;
+  --color-nebula-violet: #6c3ce1;
+  --color-stellar-white: #f0edff;
+  --color-aurora-cyan: #00e5ff;
+  --color-solar-gold: #ffb800;
+  --color-chrono-rose: #ff3d8a;
+  --color-impact-green: #00d68f;
+  --color-alert-red: #ff4757;
+  --color-muted-cosmos: #2d1b69;
+  --color-deep-bg: #0d0521;
 }
 
 :root {
@@ -252,6 +264,32 @@
 
 .gradient-border-card-accent::before {
   background: linear-gradient(135deg, rgba(21, 191, 253, 0.6), rgba(156, 55, 253, 0.6));
+}
+
+/* Landing page keyframes */
+@keyframes twinkle {
+  0% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes bar-fill {
+  from {
+    width: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

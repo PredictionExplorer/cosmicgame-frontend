@@ -1,6 +1,6 @@
 import { render, screen, checkA11y } from '@/test-utils';
 
-import HomePage from '../HomePage';
+import HomePage from '../(app)/HomePage';
 
 /* ── useApiQuery hooks ──────────────────────────────────────────── */
 

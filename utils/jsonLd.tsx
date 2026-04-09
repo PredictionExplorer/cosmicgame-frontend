@@ -1,4 +1,4 @@
-import type { FAQItem } from '@/app/faq/data/faq-data';
+import type { FAQItem } from '@/app/(app)/faq/data/faq-data';
 
 const SITE_URL = 'https://www.cosmicsignature.com';
 const SITE_NAME = 'Cosmic Signature';

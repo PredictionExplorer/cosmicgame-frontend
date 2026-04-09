@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { logoImgUrl } from './index';
 
-const SITE_URL = 'https://www.cosmicsignature.com';
+const SITE_URL = 'https://app.cosmicsignature.com';
 
 /**
  * Builds App Router Metadata for a page with OpenGraph + Twitter meta tags

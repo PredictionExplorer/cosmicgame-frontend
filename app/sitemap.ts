@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://www.cosmicsignature.com';
+const APP_URL = 'https://app.cosmicsignature.com';
+const MARKETING_URL = 'https://www.cosmicsignature.com';
 
 type Freq = MetadataRoute.Sitemap[number]['changeFrequency'];
 
@@ -10,8 +11,10 @@ interface SitemapEntry {
   changeFrequency: Freq;
 }
 
+const marketingPages: SitemapEntry[] = [{ path: '', priority: 1.0, changeFrequency: 'weekly' }];
+
 const pages: SitemapEntry[] = [
-  { path: '', priority: 1.0, changeFrequency: 'hourly' },
+  { path: '', priority: 0.95, changeFrequency: 'hourly' },
   { path: '/current-round', priority: 0.9, changeFrequency: 'hourly' },
   { path: '/gallery', priority: 0.9, changeFrequency: 'hourly' },
   { path: '/statistics', priority: 0.8, changeFrequency: 'hourly' },
@@ -45,10 +48,19 @@ const pages: SitemapEntry[] = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return pages.map(({ path, priority, changeFrequency }) => ({
-    url: `${BASE_URL}${path}`,
+  const marketing = marketingPages.map(({ path, priority, changeFrequency }) => ({
+    url: `${MARKETING_URL}${path}`,
     lastModified: new Date(),
     changeFrequency,
     priority,
   }));
+
+  const app = pages.map(({ path, priority, changeFrequency }) => ({
+    url: `${APP_URL}${path}`,
+    lastModified: new Date(),
+    changeFrequency,
+    priority,
+  }));
+
+  return [...marketing, ...app];
 }

@@ -7,10 +7,8 @@ import { logoImgUrl } from '@/utils';
 import { GA_TRACKING_ID } from '@/utils/analytics';
 import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
 
-import { Providers } from './providers';
 import { Analytics } from './analytics';
 
-import '@rainbow-me/rainbowkit/styles.css';
 import '@/styles/global.css';
 
 const defaultTitle = 'Cosmic Signature';
@@ -104,7 +102,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </Script>
       </head>
       <body>
-        <Providers>{children}</Providers>
+        {children}
         <Suspense fallback={null}>
           <Analytics />
         </Suspense>
