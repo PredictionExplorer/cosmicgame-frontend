@@ -10,8 +10,7 @@ const DEFAULT_RPC: Record<string, string> = {
   sepolia: 'http://161.129.67.42:22545',
   mainnet: '', // mainnet uses Infura, no proxy by default
 };
-const RPC_URL =
-  process.env.NEXT_PUBLIC_RPC_URL || DEFAULT_RPC[NETWORK] || DEFAULT_RPC.sepolia;
+const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || DEFAULT_RPC[NETWORK] || DEFAULT_RPC.sepolia;
 
 export async function POST(req: NextRequest) {
   if (!RPC_URL) {
@@ -33,10 +32,8 @@ export async function POST(req: NextRequest) {
     const data = await res.json();
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
+    // eslint-disable-next-line no-console -- server-side API route error logging
     console.error('[rpc proxy]', err);
-    return NextResponse.json(
-      { error: 'RPC proxy request failed' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: 'RPC proxy request failed' }, { status: 500 });
   }
 }

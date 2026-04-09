@@ -30,9 +30,17 @@ const config = {
     'services/**/*.{ts,tsx}',
     '!**/*.d.ts',
     '!**/node_modules/**',
+    '!app/**/page.tsx',
+    '!app/**/layout.tsx',
+    '!app/manifest.ts',
+    '!app/api/**',
+    '!app/(app)/HomePageLoader.tsx',
+    '!app/(app)/statistics/StatisticsLoader.tsx',
+    '!components/landing/**',
+    '!contexts/index.ts',
   ],
   coverageThreshold: {
-    global: { branches: 66, functions: 73, lines: 78, statements: 79 },
+    global: { branches: 71, functions: 79, lines: 87, statements: 86 },
   },
 };
 

@@ -128,12 +128,14 @@ describe('NotificationContext', () => {
   });
 
   it('throws when useNotification is used outside NotificationProvider', () => {
+    /* eslint-disable no-console -- suppress React error output during expected throw */
     const originalError = console.error;
     console.error = jest.fn();
     expect(() => render(<TestConsumer />)).toThrow(
       'useNotification must be used within a NotificationProvider',
     );
     console.error = originalError;
+    /* eslint-enable no-console */
   });
 
   it('has no accessibility violations', async () => {

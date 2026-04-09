@@ -1,5 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useConfig, useChainId, usePublicClient, useWalletClient, useConnectorClient, useSwitchChain } from 'wagmi';
+import {
+  useConfig,
+  useChainId,
+  usePublicClient,
+  useWalletClient,
+  useConnectorClient,
+  useSwitchChain,
+} from 'wagmi';
 import { getConnectorClient, writeContract } from '@wagmi/core';
 import { formatEther, isAddress, maxUint256, parseEther, parseUnits } from 'viem';
 
@@ -134,7 +141,7 @@ export function useBidForm() {
       functionName: 'isApprovedForAll',
       args: [account as `0x${string}`, RAFFLE_WALLET_ADDRESS as `0x${string}`],
     });
-      if (!approved) {
+    if (!approved) {
       const hash = await writeContract(config, {
         address: nftAddress as `0x${string}`,
         abi: NFT_ABI,
@@ -189,7 +196,6 @@ export function useBidForm() {
         functionName: 'decimals',
       })) as number;
     } catch {
-      console.warn('decimals() not found, assuming 18.');
       notify('warning', "Token doesn't implement decimals(); assuming 18 decimal places.");
       return 18;
     }
@@ -318,9 +324,7 @@ export function useBidForm() {
       const baseFee = block?.baseFeePerGas ?? 0n;
       const minFromBase = baseFee ? (baseFee * 200n) / 100n : 0n;
       const fromEstimate =
-        fees?.maxFeePerGas && fees?.maxPriorityFeePerGas
-          ? (fees.maxFeePerGas * 125n) / 100n
-          : 0n;
+        fees?.maxFeePerGas && fees?.maxPriorityFeePerGas ? (fees.maxFeePerGas * 125n) / 100n : 0n;
       const maxFeePerGas = fromEstimate > minFromBase ? fromEstimate : minFromBase;
       const maxPriorityFeePerGas = fees?.maxPriorityFeePerGas ?? 1_000_000_000n;
       if (maxFeePerGas > 0n) {
@@ -394,11 +398,7 @@ export function useBidForm() {
         const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
         if (!ok) return false;
         const donateArgs = [rwlkId, message, nftDonateAddress, nftIdNum];
-        const gas = await estimateDonationGas(
-          'bidWithEthAndDonateNft',
-          donateArgs,
-          ethBidPrice,
-        );
+        const gas = await estimateDonationGas('bidWithEthAndDonateNft', donateArgs, ethBidPrice);
         const signerAddress =
           (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
           (account as `0x${string}`);
@@ -421,11 +421,7 @@ export function useBidForm() {
         const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
         if (!res.ok) return false;
         const donateArgs = [rwlkId, message, tokenDonateAddress, res.amountWei];
-        const gas = await estimateDonationGas(
-          'bidWithEthAndDonateToken',
-          donateArgs,
-          ethBidPrice,
-        );
+        const gas = await estimateDonationGas('bidWithEthAndDonateToken', donateArgs, ethBidPrice);
         const signerAddress =
           (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
           (account as `0x${string}`);

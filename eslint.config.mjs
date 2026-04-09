@@ -18,7 +18,7 @@ const config = [
       ...(reactHooksPlugin ? { 'react-hooks': reactHooksPlugin } : {}),
     },
     rules: {
-      'no-console': ['error', { allow: ['warn', 'error'] }],
+      'no-console': 'error',
       'no-loss-of-precision': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react-hooks/set-state-in-effect': 'warn',

@@ -5,6 +5,7 @@ import ErrorBoundary from '@/components/layout/ErrorBoundary';
 
 import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
+/* eslint-disable no-console -- testing error boundary console.error behavior */
 const originalError = console.error;
 beforeAll(() => {
   console.error = jest.fn();
@@ -12,6 +13,7 @@ beforeAll(() => {
 afterAll(() => {
   console.error = originalError;
 });
+/* eslint-enable no-console */
 
 function ThrowError({ shouldThrow }: { shouldThrow: boolean }) {
   if (shouldThrow) throw new Error('Test error');
@@ -96,6 +98,7 @@ describe('ErrorBoundary', () => {
         <ThrowError shouldThrow />
       </ErrorBoundary>,
     );
+    // eslint-disable-next-line no-console -- asserting console.error was called by React
     expect(console.error).toHaveBeenCalled();
   });
 

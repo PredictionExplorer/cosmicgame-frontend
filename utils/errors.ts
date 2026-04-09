@@ -61,9 +61,7 @@ function extractContractErrorName(err: unknown): string | null {
   const walkable = err as Error & { cause?: unknown; walk?: (fn: (e: Error) => boolean) => Error };
 
   if (typeof walkable.walk === 'function') {
-    const inner = walkable.walk(
-      (e: Error) => e.name === 'ContractFunctionRevertedError',
-    );
+    const inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
     if (inner && 'data' in inner) {
       const data = (inner as Error & { data?: { errorName?: string; args?: unknown[] } }).data;
       if (data?.errorName) return data.errorName;
@@ -94,9 +92,7 @@ export function getContractErrorMessage(err: unknown, displayedEthPrice?: number
   if (errorName === 'InsufficientReceivedBidAmount' && displayedEthPrice !== undefined) {
     const walkable = err as Error & { walk?: (fn: (e: Error) => boolean) => Error };
     if (typeof walkable.walk === 'function') {
-      const inner = walkable.walk(
-        (e: Error) => e.name === 'ContractFunctionRevertedError',
-      );
+      const inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
       if (inner && 'data' in inner) {
         const data = (inner as Error & { data?: { args?: readonly unknown[] } }).data;
         const requiredWei = data?.args?.[1];
@@ -122,11 +118,10 @@ export function getContractErrorMessage(err: unknown, displayedEthPrice?: number
  * Use this instead of bare `console.error` throughout the codebase.
  */
 export function reportError(error: unknown, context?: string): void {
-  if (context) {
-    console.error(`[${context}]`, error);
-  } else {
-    console.error(error);
-  }
+  // eslint-disable-next-line no-console -- centralised error reporter; only place console is allowed
+  if (context) console.error(`[${context}]`, error);
+  // eslint-disable-next-line no-console
+  else console.error(error);
 
   if (error instanceof Error) {
     Sentry.captureException(error, context ? { tags: { context } } : undefined);
