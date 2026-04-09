@@ -18,6 +18,7 @@ jest.mock('../../utils/errors', () => ({
 
 jest.mock('../../config/networks', () => ({
   networkConfig: { rpcUrl: 'http://localhost:8545', chainId: 31337 },
+  getPublicClientRpcUrl: jest.fn(() => 'http://localhost:8545'),
 }));
 
 jest.mock('../../config/chains', () => ({
@@ -106,7 +107,7 @@ describe('useContractNoSigner', () => {
 
   it('calls reportError for non-Error throwables', () => {
     mockGetContract.mockImplementation(() => {
-      throw 'string error';  
+      throw 'string error';
     });
 
     const { result } = renderHook(() => useContractNoSigner(TEST_ADDRESS, TEST_ABI));

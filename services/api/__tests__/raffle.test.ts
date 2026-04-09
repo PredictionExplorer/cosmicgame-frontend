@@ -16,6 +16,10 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn(), eject: jest.fn() },
+        response: { use: jest.fn(), eject: jest.fn() },
+      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -67,9 +71,7 @@ describe('raffle API', () => {
       mockedAxios.get.mockResolvedValue({ data: { UserChronoWarriorDeposits: [] } });
       await get_chrono_warrior_deposits_by_user('0xdef');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /prizes.*deposits.*chrono_warrior.*by_user.*0xdef/,
-        ),
+        expect.stringMatching(/prizes.*deposits.*chrono_warrior.*by_user.*0xdef/),
       );
     });
 
@@ -116,9 +118,7 @@ describe('raffle API', () => {
       const result = await get_raffle_nft_winners_list();
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xb');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/raffle.*nft.*all.*list/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/raffle.*nft.*all.*list/));
     });
 
     it('returns empty array on 400', async () => {

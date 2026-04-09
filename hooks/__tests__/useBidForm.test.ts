@@ -1,4 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
+import { writeContract as wagmiWriteContract } from '@wagmi/core';
+
+const mockWagmiWriteContract = wagmiWriteContract as jest.Mock;
 
 import { useBidForm } from '../useBidForm';
 import useCosmicGameContract from '../../hooks/useCosmicGameContract';
@@ -45,6 +48,15 @@ jest.mock('wagmi', () => ({
   useWalletClient: jest.fn(() => ({
     data: { writeContract: mockWriteContract },
   })),
+  useConnectorClient: jest.fn(() => ({ data: undefined })),
+  useConfig: jest.fn(() => ({})),
+  useChainId: jest.fn(() => 1),
+  useSwitchChain: jest.fn(() => ({ switchChainAsync: jest.fn() })),
+}));
+
+jest.mock('@wagmi/core', () => ({
+  getConnectorClient: jest.fn(),
+  writeContract: jest.fn().mockResolvedValue('0xhash'),
 }));
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -152,6 +164,14 @@ jest.mock('viem', () => ({
 /* ────────────────────────────────────────────────────────────────── */
 /*  Config & utilities                                               */
 /* ────────────────────────────────────────────────────────────────── */
+
+jest.mock('../../config/chains', () => ({
+  activeChain: { id: 1, name: 'mainnet' },
+}));
+
+jest.mock('../../config/wagmi', () => ({
+  wagmiConfig: {},
+}));
 
 jest.mock('../../config/networks', () => ({
   COSMICGAME_ADDRESS: '0xCosmicGame',
@@ -334,7 +354,7 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithEth).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalled();
     expect(mockWaitForTransactionReceipt).toHaveBeenCalled();
     expect(result.current.isBidding).toBe(false);
   });
@@ -359,7 +379,7 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithEthAndDonateNft).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalled();
     expect(result.current.nftDonateAddress).toBe('');
     expect(result.current.nftId).toBe('');
   });
@@ -387,7 +407,7 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithEthAndDonateToken).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalled();
     expect(result.current.tokenDonateAddress).toBe('');
     expect(result.current.tokenAmount).toBe('');
   });
@@ -404,7 +424,7 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithCst).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalled();
     expect(mockApiGetUserBalance).toHaveBeenCalled();
     expect(result.current.isBidding).toBe(false);
   });
@@ -422,7 +442,7 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithCst).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalled();
     expect(mockApiGetUserBalance).not.toHaveBeenCalled();
   });
 
@@ -439,7 +459,7 @@ describe('useBidForm', () => {
 
     expect(success).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith('error', expect.stringContaining('Insufficient ETH'));
-    expect(mockBidWithEth).not.toHaveBeenCalled();
+    expect(mockWagmiWriteContract).not.toHaveBeenCalled();
   });
 
   it('onBidWithCST notifies on insufficient CST balance', async () => {
@@ -457,7 +477,7 @@ describe('useBidForm', () => {
 
     expect(success).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith('error', expect.stringContaining('Insufficient CST'));
-    expect(mockBidWithCst).not.toHaveBeenCalled();
+    expect(mockWagmiWriteContract).not.toHaveBeenCalled();
   });
 
   it('onBid notifies when no contract available', async () => {
@@ -480,7 +500,7 @@ describe('useBidForm', () => {
 
   it('onBid silently ignores user rejection', async () => {
     const rejectionError = { code: 4001, message: 'User rejected' };
-    mockBidWithEth.mockRejectedValue(rejectionError);
+    mockWagmiWriteContract.mockRejectedValue(rejectionError);
     mockIsUserRejection.mockReturnValue(true);
 
     const { result } = renderHook(() => useBidForm());

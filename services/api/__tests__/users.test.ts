@@ -19,6 +19,10 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn(), eject: jest.fn() },
+        response: { use: jest.fn(), eject: jest.fn() },
+      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -51,9 +55,7 @@ describe('users API', () => {
       expect(result).toBeDefined();
       expect(result?.Addr).toBe(mockUserData.Addr);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/user.*info/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/user.*info/));
     });
 
     it('flattens Tx in nested arrays', async () => {
@@ -100,9 +102,7 @@ describe('users API', () => {
       const result = await get_user_balance('0x1234567890123456789012345678901234567890');
 
       expect(result).toEqual(mockBalance);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/user.*balances/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/user.*balances/));
     });
 
     it('returns null on 400 response', async () => {

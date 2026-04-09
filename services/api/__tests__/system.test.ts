@@ -9,6 +9,10 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn(), eject: jest.fn() },
+        response: { use: jest.fn(), eject: jest.fn() },
+      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -36,9 +40,7 @@ describe('system API', () => {
       const result = await get_current_time();
 
       expect(result).toBe(1700000000);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/time.*current/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/time.*current/));
     });
 
     it('returns 0 on 400 response', async () => {
@@ -67,9 +69,7 @@ describe('system API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xm');
       expect(result[0]).not.toHaveProperty('Tx');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/system.*modelist/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/system.*modelist/));
     });
 
     it('returns empty array on 400 response', async () => {

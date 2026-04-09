@@ -31,6 +31,10 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn(), eject: jest.fn() },
+        response: { use: jest.fn(), eject: jest.fn() },
+      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -60,9 +64,7 @@ describe('staking API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xh');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /staking.*cst.*rewards.*to_claim.*by_user.*0xabc/,
-        ),
+        expect.stringMatching(/staking.*cst.*rewards.*to_claim.*by_user.*0xabc/),
       );
     });
 
@@ -87,9 +89,7 @@ describe('staking API', () => {
       const result = await get_staking_cst_rewards_collected_by_user('0xdef');
       expect(result).toHaveLength(1);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /staking.*cst.*rewards.*collected.*by_user.*0xdef/,
-        ),
+        expect.stringMatching(/staking.*cst.*rewards.*collected.*by_user.*0xdef/),
       );
     });
 
@@ -137,9 +137,7 @@ describe('staking API', () => {
       const result = await get_cst_action_ids_by_deposit_id('0xabc', 5);
       expect(result).toEqual(ids);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /staking.*cst.*rewards.*action_ids_by_deposit.*0xabc.*5/,
-        ),
+        expect.stringMatching(/staking.*cst.*rewards.*action_ids_by_deposit.*0xabc.*5/),
       );
     });
 
@@ -327,9 +325,7 @@ describe('staking API', () => {
       const result = await get_staking_rewards_by_user('0xabc');
       expect(result).toEqual(rewards);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /staking.*cst.*rewards.*by_user.*by_token.*summary.*0xabc/,
-        ),
+        expect.stringMatching(/staking.*cst.*rewards.*by_user.*by_token.*summary.*0xabc/),
       );
     });
 
@@ -387,9 +383,7 @@ describe('staking API', () => {
       mockedAxios.get.mockResolvedValue({ data: { RewardsByDeposit: [] } });
       await get_staking_cst_by_user_by_deposit_rewards('0xabc');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /staking.*cst.*rewards.*by_user.*by_deposit.*0xabc/,
-        ),
+        expect.stringMatching(/staking.*cst.*rewards.*by_user.*by_deposit.*0xabc/),
       );
     });
 

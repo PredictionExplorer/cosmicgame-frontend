@@ -27,6 +27,10 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn(), eject: jest.fn() },
+        response: { use: jest.fn(), eject: jest.fn() },
+      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -72,9 +76,7 @@ describe('rounds API', () => {
 
       expect(result).toEqual(mockData);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/statistics.*dashboard/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/statistics.*dashboard/));
     });
 
     it('returns null on 400 response', async () => {
@@ -104,9 +106,7 @@ describe('rounds API', () => {
 
       expect(Array.isArray(result)).toBe(true);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/rounds.*list/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/rounds.*list/));
     });
 
     it('returns empty array when Rounds is missing', async () => {
@@ -134,9 +134,7 @@ describe('rounds API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('EvtLogId', 1);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/bid.*list/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*list/));
     });
 
     it('returns empty array when Bids is missing', async () => {
@@ -202,9 +200,7 @@ describe('rounds API', () => {
       expect(result).toHaveProperty('WinnerAddr', '0xwinner');
       expect(result).toHaveProperty('TxHash', '0xr5');
       expect(result).toHaveProperty('CharityAddress', '0xcharity');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/rounds.*info.*5/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/rounds.*info.*5/));
     });
 
     it('clamps negative roundNum to 0', async () => {
@@ -233,9 +229,7 @@ describe('rounds API', () => {
       const result = await get_prize_time();
 
       expect(result).toBe(1700001234);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/rounds.*current.*time/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/rounds.*current.*time/));
     });
 
     it('returns 0 on 400 response', async () => {
@@ -322,9 +316,7 @@ describe('rounds API', () => {
 
       expect(result).toHaveProperty('TxHash', '0x7');
       expect(result).toHaveProperty('EvtLogId', 7);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/bid.*info.*7/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*info.*7/));
     });
 
     it('returns null when BidInfo is null', async () => {
@@ -420,9 +412,7 @@ describe('rounds API', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/raffle.*deposits.*list/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/raffle.*deposits.*list/));
     });
 
     it('returns empty array when RaffleDeposits is missing', async () => {
@@ -475,9 +465,7 @@ describe('rounds API', () => {
       const result = await get_banned_bids();
 
       expect(result).toEqual(bids);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/get_banned_bids/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/get_banned_bids/));
     });
 
     it('returns empty array on 400 response', async () => {
@@ -503,10 +491,10 @@ describe('rounds API', () => {
       const result = await ban_bid(42, '0xuser');
 
       expect(result).toEqual({ success: true });
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        expect.stringMatching(/ban_bid/),
-        { bid_id: 42, user_addr: '0xuser' },
-      );
+      expect(mockedAxios.post).toHaveBeenCalledWith(expect.stringMatching(/ban_bid/), {
+        bid_id: 42,
+        user_addr: '0xuser',
+      });
     });
 
     it('throws on server error', async () => {
@@ -522,10 +510,9 @@ describe('rounds API', () => {
       const result = await unban_bid(42);
 
       expect(result).toEqual({ success: true });
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        expect.stringMatching(/unban_bid/),
-        { bid_id: 42 },
-      );
+      expect(mockedAxios.post).toHaveBeenCalledWith(expect.stringMatching(/unban_bid/), {
+        bid_id: 42,
+      });
     });
 
     it('throws on server error', async () => {
@@ -542,9 +529,7 @@ describe('rounds API', () => {
       const result = await get_bid_eth_price();
 
       expect(result).toEqual(priceInfo);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/bid.*eth_price/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*eth_price/));
     });
 
     it('returns null on 400 response', async () => {
@@ -565,9 +550,7 @@ describe('rounds API', () => {
       const result = await get_time_until_prize();
 
       expect(result).toBe(3600);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/time.*until_prize/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/time.*until_prize/));
     });
 
     it('returns 0 on 400 response', async () => {

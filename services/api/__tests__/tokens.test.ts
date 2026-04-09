@@ -25,6 +25,10 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn(), eject: jest.fn() },
+        response: { use: jest.fn(), eject: jest.fn() },
+      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -53,9 +57,7 @@ describe('tokens API', () => {
       const result = await get_cst_list();
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xa');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/cst.*list.*all/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/cst.*list.*all/));
     });
 
     it('returns empty array on 400', async () => {
@@ -96,9 +98,7 @@ describe('tokens API', () => {
       });
       const result = await get_cst_info(5);
       expect(result).toHaveProperty('TxHash', '0xb');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/cst.*info.*5/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/cst.*info.*5/));
     });
 
     it('returns null on 400', async () => {
@@ -116,9 +116,7 @@ describe('tokens API', () => {
     it('calls correct endpoint', async () => {
       mockedAxios.get.mockResolvedValue({ data: { TokenNameHistory: [] } });
       await get_name_history(3);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/cst.*names.*history.*3/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/cst.*names.*history.*3/));
     });
 
     it('returns empty array on 400', async () => {
@@ -156,9 +154,7 @@ describe('tokens API', () => {
     it('calls correct endpoint', async () => {
       mockedAxios.get.mockResolvedValue({ data: { NamedTokens: [] } });
       await get_named_nfts();
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/cst.*names.*named_only/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/cst.*names.*named_only/));
     });
 
     it('returns empty array on 400', async () => {
@@ -198,9 +194,7 @@ describe('tokens API', () => {
       mockedAxios.get.mockResolvedValue({ data: { CosmicSignatureTokenDistribution: dist } });
       const result = await get_cst_distribution();
       expect(result).toEqual(dist);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/cst.*distribution/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/cst.*distribution/));
     });
 
     it('returns empty array on 400', async () => {
@@ -220,9 +214,7 @@ describe('tokens API', () => {
       mockedAxios.get.mockResolvedValue({ data: { CosmicTokenBalances: balances } });
       const result = await get_ct_balances_distribution();
       expect(result).toEqual(balances);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/ct.*balances/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/ct.*balances/));
     });
 
     it('returns empty array on 400', async () => {
@@ -260,9 +252,7 @@ describe('tokens API', () => {
     it('calls correct endpoint', async () => {
       mockedAxios.get.mockResolvedValue({ data: { TokenTransfers: [] } });
       await get_ct_ownership_transfers(7);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/cst.*transfers.*all.*7/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/cst.*transfers.*all.*7/));
     });
 
     it('returns empty array on 400', async () => {
@@ -282,9 +272,7 @@ describe('tokens API', () => {
       mockedAxios.get.mockResolvedValue({ data: price });
       const result = await get_ct_price();
       expect(result).toEqual(price);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/bid.*cst_price/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*cst_price/));
     });
 
     it('returns null on 400', async () => {
@@ -304,9 +292,7 @@ describe('tokens API', () => {
       mockedAxios.get.mockResolvedValue({ data: { TokenInfo: info } });
       const result = await get_info(1);
       expect(result).toEqual(info);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/token_info.*1/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/token_info.*1/));
     });
 
     it('returns null on 400', async () => {
@@ -326,9 +312,7 @@ describe('tokens API', () => {
       mockedAxios.get.mockResolvedValue({ data: { UsedRwalkNFTs: nfts } });
       const result = await get_used_rwlk_nfts();
       expect(result).toEqual(nfts);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/bid.*used_rwalk_nfts/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*used_rwalk_nfts/));
     });
 
     it('returns empty array on 400', async () => {
@@ -347,10 +331,10 @@ describe('tokens API', () => {
       mockedAxios.post.mockResolvedValue({ data: { task_id: 42 } });
       const result = await create(1, 5);
       expect(result).toBe(42);
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        expect.stringMatching(/cosmicgame_tokens/),
-        { token_id: 1, count: 5 },
-      );
+      expect(mockedAxios.post).toHaveBeenCalledWith(expect.stringMatching(/cosmicgame_tokens/), {
+        token_id: 1,
+        count: 5,
+      });
     });
 
     it('returns -1 when task_id is missing', async () => {
