@@ -5,6 +5,7 @@ import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors
 import getErrorMessage from '@/utils/alert';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useApiData } from '@/contexts/ApiDataContext';
+
 import useRaffleWalletContract from './useRaffleWalletContract';
 
 interface ClaimingState {
@@ -122,9 +123,7 @@ export function useClaimWinnings(onSuccess?: () => void) {
   );
 
   const claimAllDonatedERC20 = useCallback(
-    async (
-      tokens: { roundNum: number; tokenAddress: string; amount: number | undefined }[],
-    ) => {
+    async (tokens: { roundNum: number; tokenAddress: string; amount: number | undefined }[]) => {
       try {
         await raffleWalletContract!.write.claimManyDonatedTokens?.([tokens]);
         refreshAfterClaim();

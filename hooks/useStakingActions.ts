@@ -7,6 +7,7 @@ import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors
 import getErrorMessage from '@/utils/alert';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useStakedToken } from '@/contexts/StakedTokenContext';
+
 import { useActiveWeb3React } from './web3';
 import useStakingWalletCSTContract from './useStakingWalletCSTContract';
 import useStakingWalletRWLKContract from './useStakingWalletRWLKContract';
@@ -168,7 +169,14 @@ export function useStakingActions() {
         return err;
       }
     },
-    [cstStakingContract, rwlkStakingContract, publicClient, setNotification, invalidateStakingQueries, handleError],
+    [
+      cstStakingContract,
+      rwlkStakingContract,
+      publicClient,
+      setNotification,
+      invalidateStakingQueries,
+      handleError,
+    ],
   );
 
   return { stake, unstake, handleError, rwalkContract };

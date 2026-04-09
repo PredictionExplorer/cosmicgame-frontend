@@ -92,7 +92,8 @@ if (
 
   const origFetch = window.fetch;
   window.fetch = function (input: RequestInfo | URL, init?: RequestInit) {
-    const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+    const url =
+      typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
     if (isWcUrl(url)) {
       // project-limits expects planLimits.tier; return a minimal valid shape to avoid SDK destructuring errors
       const body = url.includes('project-limits')
@@ -165,6 +166,7 @@ export function Providers({ children }: { children: ReactNode }) {
       typeof window !== 'undefined' && networkConfig.rpcUrl.includes('161.129.67.42')
         ? `${window.location.origin}/api/rpc → ${networkConfig.rpcUrl}`
         : networkConfig.rpcUrl;
+    // eslint-disable-next-line no-console
     console.debug(
       '[Cosmic Signature] Config:\n' +
         `  Network: ${process.env.NEXT_PUBLIC_NETWORK}\n` +
