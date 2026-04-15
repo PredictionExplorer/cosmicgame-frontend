@@ -226,7 +226,7 @@ const CurrentRoundPage = () => {
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Last Bidder — Current Leader
                   </p>
-                  <InfoTooltip content="The last bidder when the countdown reaches zero wins the main ETH prize and a Cosmic Signature NFT." />
+                  <InfoTooltip content="The last bidder when the countdown reaches zero wins the main ETH prize and a COSMIC NFT." />
                 </div>
                 <a
                   href={`/user/${data.LastBidderAddr}`}

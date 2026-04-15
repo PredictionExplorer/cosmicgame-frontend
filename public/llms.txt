@@ -4,12 +4,12 @@
 
 ## Overview
 
-Cosmic Signature combines generative art, an exciting Ethereum bidding game, and social impact through charitable giving. Players bid against each other and against time to win ETH prizes and unique Cosmic Signature NFTs. The game is deployed on Arbitrum, a Layer 2 scaling solution for Ethereum, providing fast and low-cost transactions.
+Cosmic Signature combines generative art, an exciting Ethereum bidding game, and social impact through charitable giving. Players bid against each other and against time to win ETH prizes and unique COSMIC NFTs. The game is deployed on Arbitrum, a Layer 2 scaling solution for Ethereum, providing fast and low-cost transactions.
 
 ## Key Pages
 
 - [Home](https://www.cosmicsignature.com/): Main bidding interface and live game status
-- [Gallery](https://www.cosmicsignature.com/gallery): Browse all minted Cosmic Signature NFTs
+- [Gallery](https://www.cosmicsignature.com/gallery): Browse all minted COSMIC NFTs
 - [How to Play](https://www.cosmicsignature.com/how-to-play): Complete guide to game mechanics
 - [FAQ](https://www.cosmicsignature.com/faq): Frequently asked questions
 - [Statistics](https://www.cosmicsignature.com/statistics): Game statistics and analytics
@@ -25,7 +25,7 @@ Cosmic Signature combines generative art, an exciting Ethereum bidding game, and
 - Every bid increases price by 1% and adds 1 hour to the timer
 - Last bidder when timer expires wins the main prize (25% of ETH pot)
 - Every bid earns 100 CST tokens and a raffle ticket
-- 12 Cosmic Signature NFTs minted per round
+- 12 COSMIC NFTs minted per round
 - Raffle winners share 6% of the prize pool
 - 10% goes to a charitable beneficiary chosen by the Cosmic DAO
 - Players can bid with ETH or CST tokens (Dutch auction)
@@ -34,7 +34,7 @@ Cosmic Signature combines generative art, an exciting Ethereum bidding game, and
 ## Tokens
 
 - **CST (Cosmic Signature Token)**: ERC-20 governance and utility token
-- **Cosmic Signature NFT**: ERC-721 generative art based on three-body problem physics
+- **COSMIC NFT**: ERC-721 generative art based on three-body problem physics
 - **RandomWalkNFT**: Partner NFT offering bid discounts
 
 ## Community

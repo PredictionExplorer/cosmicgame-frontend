@@ -44,7 +44,7 @@ export function HeroSection() {
 
       <motion.p variants={fadeUp} className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
         Outsmart other players in a thrilling countdown. The last bidder standing wins the ETH prize
-        pool and exclusive Cosmic Signature NFTs.
+        pool and exclusive COSMIC NFTs.
       </motion.p>
 
       <motion.div variants={fadeUp} className="mt-8 flex items-center justify-center gap-4">

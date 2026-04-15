@@ -284,7 +284,7 @@ const HomePage = () => {
                     />
                   </div>
                   <div className="p-3 text-center">
-                    <p className="text-xs text-muted-foreground">Sample Cosmic Signature NFT</p>
+                    <p className="text-xs text-muted-foreground">Sample COSMIC NFT</p>
                   </div>
                 </StyledCard>
               </Link>

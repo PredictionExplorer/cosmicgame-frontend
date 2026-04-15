@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   } catch {
     // fallback
   }
-  const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${prizeAmountStr}prizes and Cosmic Signature NFTs.`;
+  const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${prizeAmountStr}prizes and COSMIC NFTs.`;
   return createMetadata('Cosmic Signature', description, undefined, '/');
 }
 

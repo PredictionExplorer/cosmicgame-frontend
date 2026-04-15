@@ -122,7 +122,7 @@ function GridCard({ nft, image, hasName, index }: CardInnerProps) {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Unique sequential identifier for this Cosmic Signature NFT</p>
+                  <p>Unique sequential identifier for this COSMIC NFT</p>
                 </TooltipContent>
               </Tooltip>
               {nft.MintTimeStamp && (
@@ -176,7 +176,7 @@ function ListRow({ nft, image, hasName, index }: CardInnerProps) {
                 </span>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p>Unique sequential identifier for this Cosmic Signature NFT</p>
+                <p>Unique sequential identifier for this COSMIC NFT</p>
               </TooltipContent>
             </Tooltip>
             {hasName ? (

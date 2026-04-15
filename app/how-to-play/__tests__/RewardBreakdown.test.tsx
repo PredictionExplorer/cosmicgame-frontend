@@ -59,7 +59,7 @@ describe('RewardBreakdown', () => {
     renderWithTooltip(<RewardBreakdown />);
     expect(screen.getByText(/Earn 100 Cosmic Signature Tokens/)).toBeInTheDocument();
     expect(screen.getByText(/earns a raffle ticket/)).toBeInTheDocument();
-    expect(screen.getByText(/Win a unique Cosmic Signature NFT/)).toBeInTheDocument();
+    expect(screen.getByText(/Win a unique COSMIC NFT/)).toBeInTheDocument();
     expect(screen.getByText(/25% of the entire round prize pool/)).toBeInTheDocument();
   });
 

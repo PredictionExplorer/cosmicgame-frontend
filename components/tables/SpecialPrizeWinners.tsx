@@ -47,7 +47,7 @@ export const SpecialPrizeWinners = () => {
       icon: <Crown className="h-5 w-5" />,
       title: 'Endurance Champion',
       tooltip:
-        'The bidder who remained the last bidder for the longest consecutive period of time. Wins CST tokens and a Cosmic Signature NFT.',
+        'The bidder who remained the last bidder for the longest consecutive period of time. Wins CST tokens and a COSMIC NFT.',
       address: specialWinners?.EnduranceChampionAddress,
       extra: hasEndurance && (specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
         <div className="mt-3 flex items-center gap-2">
@@ -87,7 +87,7 @@ export const SpecialPrizeWinners = () => {
       icon: <Coins className="h-5 w-5" />,
       title: 'Last CST Bidder',
       tooltip:
-        'The last person to place a bid using CST tokens wins CST tokens and a Cosmic Signature NFT.',
+        'The last person to place a bid using CST tokens wins CST tokens and a COSMIC NFT.',
       address: specialWinners?.LastCstBidderAddress,
       extra: null,
       accent: false,

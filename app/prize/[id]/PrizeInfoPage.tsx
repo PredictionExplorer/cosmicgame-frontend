@@ -602,7 +602,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                       >
                         Cosmic Signature #{prizeInfo.TokenId}
                       </Link>
-                      <InfoTooltip content="View this Cosmic Signature NFT in the gallery." />
+                      <InfoTooltip content="View this COSMIC NFT in the gallery." />
                     </div>
                   )}
 
@@ -659,11 +659,11 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
           <WinnerCard
             icon={<Trophy className="h-5 w-5" />}
             title="Main Prize Winner"
-            tooltip="The last bidder when the countdown reached zero. Wins the main ETH prize and a Cosmic Signature NFT."
+            tooltip="The last bidder when the countdown reached zero. Wins the main ETH prize and a COSMIC NFT."
             address={prizeInfo.WinnerAddr}
             rewards={[{ label: 'ETH Prize', value: `${prizeInfo.AmountEth.toFixed(4)} ETH` }]}
             tokenId={prizeInfo.TokenId}
-            tokenLabel="Cosmic Signature NFT"
+            tokenLabel="COSMIC NFT"
             featured
           />
           <WinnerCard
@@ -683,7 +683,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
           <WinnerCard
             icon={<Crown className="h-5 w-5" />}
             title="Endurance Champion"
-            tooltip="The bidder who held the last-bidder position for the longest uninterrupted streak. Wins CST tokens and a Cosmic Signature NFT."
+            tooltip="The bidder who held the last-bidder position for the longest uninterrupted streak. Wins CST tokens and a COSMIC NFT."
             address={prizeInfo.EnduranceWinnerAddr}
             rewards={[
               {
@@ -692,12 +692,12 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
               },
             ]}
             tokenId={prizeInfo.EnduranceERC721TokenId}
-            tokenLabel="Cosmic Signature NFT"
+            tokenLabel="COSMIC NFT"
           />
           <WinnerCard
             icon={<Coins className="h-5 w-5" />}
             title="Last CST Bidder"
-            tooltip="The last person to place a bid using CST tokens. Receives CST tokens and a Cosmic Signature NFT."
+            tooltip="The last person to place a bid using CST tokens. Receives CST tokens and a COSMIC NFT."
             address={prizeInfo.LastCstBidderAddr}
             rewards={[
               {
@@ -706,7 +706,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
               },
             ]}
             tokenId={prizeInfo.LastCstBidderERC721TokenId}
-            tokenLabel="Cosmic Signature NFT"
+            tokenLabel="COSMIC NFT"
           />
         </motion.div>
       </motion.section>

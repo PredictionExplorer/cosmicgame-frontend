@@ -28,7 +28,7 @@ const tips = [
     description:
       'Every bid earns a raffle ticket. More bids means better odds in the end-of-round prize drawing.',
     tooltip:
-      '4 raffle tickets are drawn for 6% of the prize pool. Additional winners receive Cosmic Signature NFTs.',
+      '4 raffle tickets are drawn for 6% of the prize pool. Additional winners receive COSMIC NFTs.',
   },
   {
     Icon: Shield,

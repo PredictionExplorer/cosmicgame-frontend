@@ -77,20 +77,20 @@ export const faqCategories: FAQCategory[] = [
         id: 'what-is-the-main-prize',
         question: 'What is the main prize?',
         answer:
-          'The main prize includes a unique Cosmic Signature NFT, 25% of the ETH pot, and any donated tokens (ERC-20/ERC-721) from other projects.',
+          'The main prize includes a unique COSMIC NFT, 25% of the ETH pot, and any donated tokens (ERC-20/ERC-721) from other projects.',
         hashAnchor: 'main-prize',
       },
       {
         id: 'what-rewards-per-bid',
         question: 'What rewards do I get for each bid?',
         answer:
-          'Every bid earns you three things: 100 CST (Cosmic Signature Tokens), 1 raffle ticket for end-of-round drawings, and a chance to win a Cosmic Signature NFT.',
+          'Every bid earns you three things: 100 CST (Cosmic Signature Tokens), 1 raffle ticket for end-of-round drawings, and a chance to win a COSMIC NFT.',
       },
       {
         id: 'how-does-the-raffle-work',
         question: 'How does the raffle work?',
         answer:
-          'Each bid also serves as a raffle ticket. At the end of each round, the smart contract randomly selects 4 raffle ticket holders who share 6% of the prize pool. Additionally, 5 winners receive a Cosmic Signature NFT, and 4 Random Walk NFT stakers also receive an NFT. The more bids you make, the higher your chances.',
+          'Each bid also serves as a raffle ticket. At the end of each round, the smart contract randomly selects 4 raffle ticket holders who share 6% of the prize pool. Additionally, 5 winners receive a COSMIC NFT, and 4 Random Walk NFT stakers also receive an NFT. The more bids you make, the higher your chances.',
       },
       {
         id: 'how-do-i-claim-my-prize',
@@ -112,9 +112,9 @@ export const faqCategories: FAQCategory[] = [
       },
       {
         id: 'how-many-nfts-minted',
-        question: 'How many Cosmic Signature NFTs are minted each round?',
+        question: 'How many COSMIC NFTs are minted each round?',
         answer:
-          '12 Cosmic Signature NFTs are minted each round — one for the main prize winner and one for each of the eleven NFT raffle winners.',
+          '12 COSMIC NFTs are minted each round — one for the main prize winner and one for each of the eleven NFT raffle winners.',
       },
       {
         id: 'what-happens-to-remaining-eth',
@@ -172,13 +172,13 @@ export const faqCategories: FAQCategory[] = [
         id: 'why-time-per-bid-increases',
         question: 'Why does the time added per bid increase over time?',
         answer:
-          'The primary reason for this mechanism is to control the total number of Cosmic Signature NFTs minted. By slowing down the game, we limit the number of new NFTs created, maintaining their exclusivity and potential value over time.',
+          'The primary reason for this mechanism is to control the total number of COSMIC NFTs minted. By slowing down the game, we limit the number of new NFTs created, maintaining their exclusivity and potential value over time.',
       },
       {
         id: 'how-time-increase-affects-game',
         question: 'How does the increase in time per bid affect the game?',
         answer:
-          'As the time added per bid increases, the game slows down, meaning that rounds will last longer. This change is designed to be gradual, ensuring a smooth gameplay experience while also limiting the total number of Cosmic Signature NFTs.',
+          'As the time added per bid increases, the game slows down, meaning that rounds will last longer. This change is designed to be gradual, ensuring a smooth gameplay experience while also limiting the total number of COSMIC NFTs.',
       },
       {
         id: 'what-if-two-bids-same-time',
@@ -214,33 +214,33 @@ export const faqCategories: FAQCategory[] = [
       },
       {
         id: 'what-makes-nfts-unique',
-        question: 'What makes Cosmic Signature NFTs unique?',
+        question: 'What makes COSMIC NFTs unique?',
         answer:
-          'Cosmic Signature NFTs are unique in that they are on-chain and self-sustaining. Each NFT is created with a randomly generated seed that is stored in the smart contract. The image and video of the NFT are produced from this seed using an open-source Rust program. The seed determines the starting positions and the number of planets displayed in the NFT, making every NFT unique and special.',
+          'COSMIC NFTs are unique in that they are on-chain and self-sustaining. Each NFT is created with a randomly generated seed that is stored in the smart contract. The image and video of the NFT are produced from this seed using an open-source Rust program. The seed determines the starting positions and the number of planets displayed in the NFT, making every NFT unique and special.',
       },
       {
         id: 'how-are-nft-images-created',
         question: 'How are the NFT images created?',
         answer:
-          'The images for the Cosmic Signature NFTs are generated based on the three-body problem in physics. We simulate the movement of three planets in space and draw the trajectories of each planet, creating beautiful and unique patterns.',
+          'The images for the COSMIC NFTs are generated based on the three-body problem in physics. We simulate the movement of three planets in space and draw the trajectories of each planet, creating beautiful and unique patterns.',
       },
       {
         id: 'significance-of-random-seed',
         question: 'What is the significance of generating NFTs with a random seed?',
         answer:
-          'The seed-based creation process of Cosmic Signature NFTs ensures their long-term existence. Unlike other NFT projects, where images are stored on centralized servers that can go down — making the NFT images unavailable — the seed for each Cosmic Signature NFT is stored on the blockchain. Using our open-source Rust program, anyone can take the seed and generate the NFT image and video at any time.',
+          'The seed-based creation process of COSMIC NFTs ensures their long-term existence. Unlike other NFT projects, where images are stored on centralized servers that can go down — making the NFT images unavailable — the seed for each COSMIC NFT is stored on the blockchain. Using our open-source Rust program, anyone can take the seed and generate the NFT image and video at any time.',
       },
       {
         id: 'is-nft-supply-limited',
-        question: 'Does this mean that the number of Cosmic Signature NFTs is limited?',
+        question: 'Does this mean that the number of COSMIC NFTs is limited?',
         answer:
-          'Yes, due to the gradual increase in time added per bid, the pace of new NFT creation slows over time. This effectively limits the total number of Cosmic Signature NFTs, making them a limited resource in the long run.',
+          'Yes, due to the gradual increase in time added per bid, the pace of new NFT creation slows over time. This effectively limits the total number of COSMIC NFTs, making them a limited resource in the long run.',
       },
       {
         id: 'impact-of-limiting-nfts',
-        question: 'What impact does limiting the number of Cosmic Signature NFTs have?',
+        question: 'What impact does limiting the number of COSMIC NFTs have?',
         answer:
-          'By limiting the total number of Cosmic Signature NFTs, we aim to maintain their exclusivity and potential value. As the time added per bid increases and the creation of new NFTs slows, each Cosmic Signature NFT becomes a more exclusive asset. This limited supply could make each NFT more valuable over time.',
+          'By limiting the total number of COSMIC NFTs, we aim to maintain their exclusivity and potential value. As the time added per bid increases and the creation of new NFTs slows, each COSMIC NFT becomes a more exclusive asset. This limited supply could make each NFT more valuable over time.',
       },
       {
         id: 'connection-with-randomwalknft',
@@ -250,9 +250,9 @@ export const faqCategories: FAQCategory[] = [
       },
       {
         id: 'how-to-trade-nfts-tokens',
-        question: 'How can I trade or sell my Cosmic Signature NFTs or Cosmic Signature Tokens?',
+        question: 'How can I trade or sell my COSMIC NFTs or Cosmic Signature Tokens?',
         answer:
-          'Cosmic Signature NFTs and Cosmic Signature Tokens are compatible with any marketplace or exchange that supports ERC-721 and ERC-20 tokens, respectively. This includes popular platforms like OpenSea for NFTs and Uniswap for tokens.',
+          'COSMIC NFTs and Cosmic Signature Tokens are compatible with any marketplace or exchange that supports ERC-721 and ERC-20 tokens, respectively. This includes popular platforms like OpenSea for NFTs and Uniswap for tokens.',
       },
       {
         id: 'participate-dao-without-bidding',
@@ -382,11 +382,11 @@ export const faqCategories: FAQCategory[] = [
         id: 'what-if-team-disappears',
         question: 'What if the team behind Cosmic Signature disappears?',
         answer:
-          "Should anything happen to the team, the project is designed to be self-sustaining. Since the seeds for each NFT are stored on-chain, anyone can recreate the NFT images and videos using the open-source Rust program. This ensures the longevity and continued existence of your Cosmic Signature NFTs, regardless of the project team's status.",
+          "Should anything happen to the team, the project is designed to be self-sustaining. Since the seeds for each NFT are stored on-chain, anyone can recreate the NFT images and videos using the open-source Rust program. This ensures the longevity and continued existence of your COSMIC NFTs, regardless of the project team's status.",
       },
       {
         id: 'can-create-competing-site',
-        question: 'Can I create a competing site with the Cosmic Signature NFTs?',
+        question: 'Can I create a competing site with the COSMIC NFTs?',
         answer:
           'Absolutely! The open-source nature of the project allows anyone to generate NFT images and videos based on the seeds. You could even create a competing site using the same mechanism. This open ecosystem encourages creativity and fosters a sense of community around the project.',
       },

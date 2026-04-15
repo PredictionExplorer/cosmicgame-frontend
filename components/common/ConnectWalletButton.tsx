@@ -171,7 +171,7 @@ const ConnectWalletButton = ({
                   <span className="font-medium">{balance.CosmicToken.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">CS NFTs</span>
+                  <span className="text-muted-foreground">COSMIC NFTs</span>
                   <span className="font-medium">{balance.CosmicSignature}</span>
                 </div>
                 <div className="flex justify-between text-xs">

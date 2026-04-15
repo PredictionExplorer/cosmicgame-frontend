@@ -29,7 +29,7 @@ const cards = [
     number: '03',
     title: 'Win',
     description:
-      'Be the last bidder when the timer reaches zero to claim the main ETH prize and a Cosmic Signature NFT.',
+      'Be the last bidder when the timer reaches zero to claim the main ETH prize and a COSMIC NFT.',
     tooltip:
       'The winner receives 25% of the prize pool. Raffle winners, NFT stakers, and other participants also earn rewards.',
     Icon: Trophy,

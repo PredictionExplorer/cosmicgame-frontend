@@ -237,7 +237,7 @@ export const BiddingStatus = ({
                         You
                       </span>
                     )}
-                    <InfoTooltip content="The last bidder when the countdown reaches zero wins the main ETH prize and a Cosmic Signature NFT." />
+                    <InfoTooltip content="The last bidder when the countdown reaches zero wins the main ETH prize and a COSMIC NFT." />
                   </div>
                   <a
                     href={`/user/${data.LastBidderAddr}`}
