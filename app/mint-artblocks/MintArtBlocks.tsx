@@ -15,11 +15,14 @@ import {
 import { MainWrapper, CenterBox } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import useArtBlocksContract from '@/hooks/useArtBlocksContract';
+import { toast } from 'sonner';
+
 import {
   isUserRejection,
   isEthProviderError,
   reportError,
   getEthErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
 } from '@/utils/errors';
 
 const MintArtBlocks = () => {
@@ -42,7 +45,10 @@ const MintArtBlocks = () => {
         setMintedTokens(tokenIds);
         getCurrentTokenId();
       } catch (err: unknown) {
-        if (isUserRejection(err)) return;
+        if (isUserRejection(err)) {
+          toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
+          return;
+        }
         reportError(err, 'mint Art Blocks NFT');
         if (isEthProviderError(err)) {
           alert(getEthErrorMessage(err, 'Mint failed'));

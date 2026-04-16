@@ -181,7 +181,7 @@ export function BidForm({
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="space-y-4 pt-2">
+            <div className="space-y-4 pt-2 max-w-xl">
               <p className="text-xs text-muted-foreground">
                 Donate tokens or NFTs while bidding, or adjust bid collision prevention.
               </p>
@@ -191,7 +191,7 @@ export function BidForm({
                   setRwlkId(-1);
                   setDonationType(value);
                 }}
-                className="flex flex-row gap-4"
+                className="flex flex-row flex-wrap gap-x-4 gap-y-2"
               >
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <RadioGroupItem value="NFT" />
@@ -204,7 +204,7 @@ export function BidForm({
               </RadioGroup>
               {donationType === 'Token' && (
                 <div className="space-y-3">
-                  <div>
+                  <div className="min-w-0">
                     <Label className="text-xs text-muted-foreground mb-1 block">
                       Contract Address
                     </Label>
@@ -212,22 +212,26 @@ export function BidForm({
                       placeholder="0x..."
                       value={tokenDonateAddress}
                       onChange={(e) => setTokenDonateAddress(e.target.value)}
+                      className="w-full max-w-md font-mono text-sm"
+                      spellCheck={false}
+                      autoComplete="off"
                     />
                   </div>
-                  <div>
+                  <div className="w-full max-w-[11rem]">
                     <Label className="text-xs text-muted-foreground mb-1 block">Amount</Label>
                     <Input
                       placeholder="0.0"
                       type="number"
                       value={tokenAmount}
                       onChange={(e) => setTokenAmount(e.target.value)}
+                      className="font-mono text-sm tabular-nums"
                     />
                   </div>
                 </div>
               )}
               {donationType === 'NFT' && (
                 <div className="space-y-3">
-                  <div>
+                  <div className="min-w-0">
                     <Label className="text-xs text-muted-foreground mb-1 block">
                       NFT Contract Address
                     </Label>
@@ -235,15 +239,20 @@ export function BidForm({
                       placeholder="0x..."
                       value={nftDonateAddress}
                       onChange={(e) => setNftDonateAddress(e.target.value)}
+                      className="w-full max-w-md font-mono text-sm"
+                      spellCheck={false}
+                      autoComplete="off"
                     />
                   </div>
-                  <div>
+                  <div className="w-full max-w-[7.5rem]">
                     <Label className="text-xs text-muted-foreground mb-1 block">Token ID</Label>
                     <Input
                       placeholder="Token ID"
                       type="number"
+                      min={0}
                       value={nftId}
                       onChange={(e) => setNftId(e.target.value)}
+                      className="font-mono text-sm tabular-nums"
                     />
                   </div>
                 </div>
@@ -253,27 +262,29 @@ export function BidForm({
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Collision Prevention
                   </p>
-                  <div className="flex items-center gap-3">
-                    <span className="whitespace-nowrap text-sm text-muted-foreground">
-                      Raise by
-                    </span>
-                    <div className="relative flex-1">
-                      <CustomTextField
-                        type="number"
-                        placeholder="0"
-                        value={bidPricePlus}
-                        min={0}
-                        max={50}
-                        onChange={(e) => {
-                          const value = Number(e.target.value);
-                          if (value <= 50) setBidPricePlus(value);
-                        }}
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-sm">
-                        %
-                      </span>
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">Raise by</span>
+                      <div className="relative w-[4.25rem] shrink-0">
+                        <CustomTextField
+                          type="number"
+                          placeholder="0"
+                          value={bidPricePlus}
+                          min={0}
+                          max={50}
+                          className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
+                          onChange={(e) => {
+                            const value = Number(e.target.value);
+                            if (value <= 50) setBidPricePlus(value);
+                          }}
+                        />
+                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-xs">
+                          %
+                        </span>
+                      </div>
                     </div>
-                    <span className="whitespace-nowrap text-sm font-mono text-muted-foreground">
+                    <span className="text-sm font-mono text-muted-foreground tabular-nums min-w-0">
+                      ≈{' '}
                       {(
                         (ethBidInfo?.ETHPrice ?? 0) *
                         (1 + bidPricePlus / 100) *
@@ -282,7 +293,7 @@ export function BidForm({
                       ETH
                     </span>
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     Bumps bid price by {bidPricePlus}% to avoid collision when two bids land in the
                     same block. Does not permanently raise the price.
                   </p>

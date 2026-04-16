@@ -3,7 +3,12 @@ import { usePublicClient } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '@/config/networks';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
+import {
+  isUserRejection,
+  reportError,
+  getEthErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 import getErrorMessage from '@/utils/alert';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useStakedToken } from '@/contexts/StakedTokenContext';
@@ -40,12 +45,14 @@ export function useStakingActions() {
 
   const handleError = useCallback(
     (err: unknown) => {
-      if (!isUserRejection(err)) {
-        reportError(err, 'staking error');
-        const msg = getEthErrorMessage(err);
-        if (msg !== 'An error occurred') {
-          setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
-        }
+      if (isUserRejection(err)) {
+        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        return;
+      }
+      reportError(err, 'staking error');
+      const msg = getEthErrorMessage(err);
+      if (msg !== 'An error occurred') {
+        setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
       }
     },
     [setNotification],

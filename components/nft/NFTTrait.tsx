@@ -35,7 +35,12 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import { useNotification } from '@/contexts/NotificationContext';
 import type { CSTTokenInfo, CSTTransferRecord } from '@/services/api';
-import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
+import {
+  isUserRejection,
+  getEthErrorMessage,
+  reportError,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 import {
   useDashboardInfo,
   useCSTInfo,
@@ -89,7 +94,7 @@ function getPrizeTypeConfig(recordType?: number) {
   }
 }
 
-/** Full detail page for a COSMIC NFT, showing metadata, image/video, naming, transfer, and ownership history. */
+/** Full detail page for a Cosmic Signature NFT, showing metadata, image/video, naming, transfer, and ownership history. */
 const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openVideo, setOpenVideo] = useState(false);
@@ -197,7 +202,13 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       await Promise.all([refetchCSTInfo(), refetchTransferHistory()]);
       setAddress('');
     } catch (err) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
+      } else {
         setNotification({
           text: 'Please input a valid address for the token receiver!',
           type: 'error',
@@ -222,7 +233,9 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         visible: true,
       });
     } catch (err) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({ visible: true, type: 'info', text: WALLET_TRANSACTION_CANCELLED_MESSAGE });
+      } else {
         const msg = getEthErrorMessage(err, 'An error occurred while setting the token name.');
         setNotification({ visible: true, type: 'error', text: msg });
       }
@@ -244,7 +257,9 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         visible: true,
       });
     } catch (err) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({ visible: true, type: 'info', text: WALLET_TRANSACTION_CANCELLED_MESSAGE });
+      } else {
         const msg = getEthErrorMessage(err, 'An error occurred while clearing the token name.');
         setNotification({ visible: true, type: 'error', text: msg });
       }

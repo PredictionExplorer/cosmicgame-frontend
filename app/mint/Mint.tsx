@@ -15,11 +15,14 @@ import { SectionDivider } from '@/components/ui/section-divider';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { asWriteFn } from '@/utils/contractWrite';
+import { toast } from 'sonner';
+
 import {
   isUserRejection,
   isEthProviderError,
   reportError,
   getEthErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
 } from '@/utils/errors';
 
 const Mint = () => {
@@ -40,7 +43,10 @@ const Mint = () => {
         });
         await publicClient?.waitForTransactionReceipt({ hash });
       } catch (err: unknown) {
-        if (isUserRejection(err)) return;
+        if (isUserRejection(err)) {
+          toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
+          return;
+        }
         reportError(err, 'mint RWLK NFT');
         if (isEthProviderError(err)) {
           alert(getEthErrorMessage(err, 'Mint failed'));
