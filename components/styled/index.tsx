@@ -182,7 +182,7 @@ export function MainWrapper({ className, ...props }: React.HTMLAttributes<HTMLEl
   return (
     <main
       className={cn(
-        'mx-auto w-full max-w-7xl px-4 pt-40 pb-40 overflow-hidden leading-none min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-36 max-sm:pb-24',
+        'mx-auto w-full max-w-7xl px-4 pt-40 pb-40 overflow-hidden leading-normal min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-36 max-sm:pb-24',
         className,
       )}
       {...props}

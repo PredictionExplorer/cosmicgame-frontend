@@ -101,7 +101,7 @@ const Header: FC = () => {
   );
 
   const renderDesktop = () => (
-    <nav className="flex items-center">
+    <nav className="flex items-center gap-6 lg:gap-8">
       <Link href="/">
         <Image
           src="/images/logo2.svg"

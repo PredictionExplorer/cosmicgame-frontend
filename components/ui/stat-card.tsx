@@ -58,7 +58,7 @@ export function StatCard({
       ) : (
         <p
           className={cn(
-            'mt-2.5 text-lg font-bold tracking-tight',
+            'mt-2.5 text-lg font-bold tracking-tight tabular-nums',
             gradient &&
               'bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent',
             featured && !gradient && 'text-white',

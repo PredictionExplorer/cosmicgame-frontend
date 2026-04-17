@@ -28,7 +28,7 @@ const ListNavItem: FC<ListNavItemProps> = ({ nav }) => {
       : (nav.children?.some((c) => c.route && pathname.startsWith(c.route)) ?? false);
 
   return (
-    <div className="ml-6">
+    <div>
       {nav.children ? (
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger

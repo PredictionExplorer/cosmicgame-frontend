@@ -154,7 +154,7 @@ const Statistics = () => {
       </Link>
 
       {/* 1 ── Hero Stat Cards ────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-12">
         <StatCard
           label="Total Rounds"
           value={data.CurRoundNum}
@@ -373,7 +373,7 @@ const Statistics = () => {
         <div>
           <SectionDivider title="Community & Participation" className="mb-6" />
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             <StatCard
               label="Unique Bidders"
               value={data.MainStats.NumUniqueBidders}
@@ -417,7 +417,7 @@ const Statistics = () => {
         <div>
           <SectionDivider title="Token Distribution" className="mb-6" />
 
-          <div className="grid grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-8">
             <StatCard
               label="CST Holders"
               value={cstDistribution.length}
@@ -470,7 +470,7 @@ const Statistics = () => {
         <div>
           <SectionDivider title="Staking" className="mb-6" />
 
-          <div className="grid grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-8">
             <StatCard
               label="Active CST Stakers"
               value={data.MainStats.StakeStatisticsCST.NumActiveStakers}

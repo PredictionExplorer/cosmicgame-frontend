@@ -5,11 +5,12 @@ import dynamic from 'next/dynamic';
 import type { ISourceOptions } from '@tsparticles/engine';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
 
 import { wagmiConfig, isPlaceholderWalletConnectId } from '@/config/wagmi';
+import { cosmicRainbowTheme } from '@/config/rainbowkit-theme';
 import { networkConfig, getEnvValidation } from '@/config/networks';
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
@@ -38,7 +39,7 @@ const particleOptions: ISourceOptions = {
       onClick: { enable: false },
     },
     modes: {
-      grab: { distance: 140, links: { opacity: 0.3 } },
+      grab: { distance: 120, links: { opacity: 0.22 } },
     },
   },
   particles: {
@@ -53,17 +54,17 @@ const particleOptions: ISourceOptions = {
         l: { enable: false, offset: 0, speed: 1, sync: true },
       },
     },
-    links: { color: '#ffffff', distance: 150, enable: true, opacity: 0.15, width: 1 },
+    links: { color: '#ffffff', distance: 150, enable: true, opacity: 0.1, width: 1 },
     collisions: { enable: false },
     move: {
       direction: 'none',
       enable: true,
       outModes: { default: 'out' },
       random: true,
-      speed: 0.5,
+      speed: 0.35,
       straight: false,
     },
-    number: { density: { enable: true, width: 1000, height: 1000 }, value: 30 },
+    number: { density: { enable: true, width: 1000, height: 1000 }, value: 20 },
     opacity: {
       value: { min: 0.1, max: 0.4 },
       animation: { enable: true, speed: 0.5, startValue: 'min', sync: false },
@@ -203,7 +204,7 @@ export function Providers({
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={darkTheme()}>
+        <RainbowKitProvider theme={cosmicRainbowTheme}>
           {engineReady && (
             <Particles
               id="tsparticles"

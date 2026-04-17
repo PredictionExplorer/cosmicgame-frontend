@@ -79,10 +79,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  a {
-    -webkit-text-decoration-color: white !important;
-    text-decoration-color: white !important;
-  }
 }
 
 @property --radius {
