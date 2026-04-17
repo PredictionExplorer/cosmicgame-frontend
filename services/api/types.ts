@@ -31,6 +31,10 @@ export interface StakeStatistics {
 }
 
 export interface MainStats {
+  /** Same as dashboard root `TotalPrizeAwards` when MainStats embeds full server stats. */
+  TotalPrizeAwards?: number;
+  CgPrizeRowCount?: number;
+  TotalPrizes?: number;
   NumCSTokenMints: number;
   TotalRaffleEthDeposits: number;
   TotalCSTConsumedEth: number;
@@ -106,6 +110,12 @@ export interface DashboardInfo {
   RaffleAmountEth?: number;
   CosmicGameBalanceEth?: number;
   CurRoundStats?: RoundStats;
+  /** Main prize claims completed (roughly one per finished round). */
+  TotalPrizes?: number;
+  /** Sum of cg_winner.prizes_count (may be lower than cg_prize rows). */
+  TotalPrizeAwards?: number;
+  /** COUNT(*) FROM cg_prize — every unified prize row (matches your SQL). */
+  CgPrizeRowCount?: number;
   [key: string]: unknown;
 }
 

@@ -97,6 +97,19 @@ const Statistics = () => {
   const stakedRWLKTokens = stakedRWLKTokensData ?? null;
   const systemModeChanges = (systemModeChangesData as EventRow[] | undefined) ?? null;
 
+  /** Prefer DB row count from cg_prize; fall back to aggregated winner counts. */
+  const totalPrizesGiven =
+    data != null
+      ? Number(
+          data.CgPrizeRowCount ??
+            data.MainStats?.CgPrizeRowCount ??
+            data.TotalPrizeAwards ??
+            data.MainStats?.TotalPrizeAwards ??
+            data.TotalPrizes ??
+            0,
+        )
+      : 0;
+
   if (dashboardLoading) {
     return (
       <MainWrapper>
@@ -150,9 +163,9 @@ const Statistics = () => {
         />
         <StatCard
           label="Prizes Given"
-          value={data.TotalPrizes as ReactNode}
+          value={totalPrizesGiven as ReactNode}
           icon={<Trophy className="h-4 w-4" />}
-          tooltip="Total number of main prizes awarded to round winners"
+          tooltip="Rows in cg_prize (every prize slot). Includes markers that are not attributed to a single winner in cg_winner (e.g. staking pool deposits per round)."
         />
         <StatCard
           label="NFTs Minted"
@@ -184,10 +197,10 @@ const Statistics = () => {
                 title="Num Prizes Given"
                 value={
                   <Link href="/prize" className="text-inherit">
-                    {data.TotalPrizes as ReactNode}
+                    {totalPrizesGiven as ReactNode}
                   </Link>
                 }
-                tooltip="Number of main prizes awarded to round winners"
+                tooltip="COUNT(*) from cg_prize when available; otherwise aggregated winner prize counts"
               />
               <StatisticsItem
                 title="Total Main Prizes Paid"

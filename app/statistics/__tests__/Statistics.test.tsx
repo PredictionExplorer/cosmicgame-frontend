@@ -173,7 +173,9 @@ const makeDashboardData = (overrides = {}) => ({
   PrizeAmountEth: 1.5,
   PrizeClaimTs: 0,
   TsRoundStart: Math.floor(Date.now() / 1000) - 3600,
-  TotalPrizes: 10,
+  TotalPrizes: 12,
+  TotalPrizeAwards: 370,
+  CgPrizeRowCount: 381,
   TotalPrizesPaidAmountEth: '2.5',
   NumRwalkTokensUsed: 3,
   CharityBalanceEth: '0.5',
@@ -252,6 +254,8 @@ describe('Statistics', () => {
     expect(screen.getByText('Total Rounds')).toBeInTheDocument();
     const roundValues = screen.getAllByText('5');
     expect(roundValues.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Prizes Given')).toBeInTheDocument();
+    expect(screen.getAllByText('381').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders Financial Overview section with grouped stats', () => {

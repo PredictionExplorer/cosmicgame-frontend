@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Crown, Swords, Coins } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import { formatSeconds, shortenHex } from '@/utils';
+import { formatSeconds } from '@/utils';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useCurrentSpecialWinners } from '@/hooks/useApiQuery';
@@ -145,9 +145,9 @@ export const SpecialPrizeWinners = () => {
                 {card.address ? (
                   <a
                     href={`/user/${card.address}`}
-                    className="mt-1 block truncate font-mono text-sm text-white hover:text-primary transition-colors"
+                    className="mt-1 block break-all font-mono text-sm text-white transition-colors hover:text-primary"
                   >
-                    {shortenHex(card.address, 6)}
+                    {card.address}
                   </a>
                 ) : (
                   <p className="mt-1 text-sm text-muted-foreground/50 italic">No holder yet</p>

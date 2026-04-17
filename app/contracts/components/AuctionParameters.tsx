@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Copy, Check, ExternalLink, Gavel, Timer } from 'lucide-react';
 
 import { formatSeconds } from '@/utils';
+import { useClipboard } from '@/hooks/useClipboard';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
@@ -81,9 +82,10 @@ function CharityRow({
   explorerUrl: string;
 }) {
   const [copied, setCopied] = useState(false);
+  const { copy } = useClipboard();
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(address);
+    await copy(address);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

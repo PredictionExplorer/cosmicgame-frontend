@@ -6,7 +6,7 @@ import Countdown from 'react-countdown';
 import { Trophy, Coins, User, MessageSquare, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import { calculateTimeDiff, convertTimestampToDateTime, shortenHex } from '@/utils';
+import { calculateTimeDiff, convertTimestampToDateTime } from '@/utils';
 
 import { cn } from '@/lib/utils';
 import { StatCard } from '@/components/ui/stat-card';
@@ -241,9 +241,9 @@ export const BiddingStatus = ({
                   </div>
                   <a
                     href={`/user/${data.LastBidderAddr}`}
-                    className="mt-0.5 text-sm font-mono text-white hover:text-primary transition-colors truncate block"
+                    className="mt-0.5 block break-all text-sm font-mono text-white transition-colors hover:text-primary"
                   >
-                    {shortenHex(data.LastBidderAddr, 8)}
+                    {data.LastBidderAddr}
                   </a>
                 </div>
                 {lastBidderElapsed !== '' && (
