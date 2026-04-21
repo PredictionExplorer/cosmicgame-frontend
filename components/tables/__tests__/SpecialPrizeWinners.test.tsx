@@ -21,7 +21,7 @@ import { SpecialPrizeWinners } from '@/components/tables/SpecialPrizeWinners';
 describe('SpecialPrizeWinners', () => {
   it('renders section heading', () => {
     render(<SpecialPrizeWinners />);
-    expect(screen.getByText('Special Prize Leaders')).toBeInTheDocument();
+    expect(screen.getByTestId('special-prize-heading')).toHaveTextContent('Special Prize Leaders');
   });
 
   it('renders all three prize category labels', () => {
@@ -60,7 +60,7 @@ describe('SpecialPrizeWinners', () => {
   it('renders without data (undefined specialWinners)', () => {
     mockUseCurrentSpecialWinners.mockReturnValue({ data: undefined });
     render(<SpecialPrizeWinners />);
-    expect(screen.getByText('Special Prize Leaders')).toBeInTheDocument();
+    expect(screen.getByTestId('special-prize-heading')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

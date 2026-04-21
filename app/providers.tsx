@@ -168,6 +168,17 @@ export function Providers({
   }, []);
 
   useEffect(() => {
+    const onBefore = () => document.documentElement.setAttribute('data-cosmic-print', '1');
+    const onAfter = () => document.documentElement.removeAttribute('data-cosmic-print');
+    window.addEventListener('beforeprint', onBefore);
+    window.addEventListener('afterprint', onAfter);
+    return () => {
+      window.removeEventListener('beforeprint', onBefore);
+      window.removeEventListener('afterprint', onAfter);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!envValidation.valid) return;
     const rpcDisplay =
       typeof window !== 'undefined' && networkConfig.rpcUrl.includes('161.129.67.42')

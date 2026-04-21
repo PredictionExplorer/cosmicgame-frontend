@@ -300,7 +300,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         animate="visible"
         variants={fadeUp}
         transition={{ duration: 0.4 }}
-        className="pb-6"
+        className="print-motion-visible pb-6"
       >
         <NFTBreadcrumb tokenId={tokenId} tokenName={currentTokenName} />
       </motion.div>
@@ -311,6 +311,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         animate="visible"
         variants={fadeUp}
         transition={{ duration: 0.5, delay: 0.1 }}
+        className="print-motion-visible"
         data-testid="hero-section"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -472,7 +473,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         animate="visible"
         variants={fadeUp}
         transition={{ duration: 0.5, delay: 0.25 }}
-        className="mt-12"
+        className="print-motion-visible mt-12"
         data-testid="metadata-section"
       >
         <NFTMetadata nft={nft} />
@@ -484,7 +485,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         animate="visible"
         variants={fadeUp}
         transition={{ duration: 0.5, delay: 0.35 }}
-        className="mt-12"
+        className="print-motion-visible mt-12"
       >
         <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
       </motion.section>
@@ -496,7 +497,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           animate="visible"
           variants={fadeUp}
           transition={{ duration: 0.5, delay: 0.45 }}
-          className="mt-12"
+          className="print-motion-visible mt-12"
         >
           <NFTOwnerActions
             address={address}
@@ -522,7 +523,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           animate="visible"
           variants={fadeUp}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-12"
+          className="print-motion-visible mt-12"
         >
           <SectionDivider title="Name History" className="mb-6" />
           <NameHistoryTable list={nameHistory} />
@@ -536,7 +537,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           animate="visible"
           variants={fadeUp}
           transition={{ duration: 0.5, delay: 0.55 }}
-          className="mt-12"
+          className="print-motion-visible mt-12"
         >
           <SectionDivider title="Ownership History" className="mb-6" />
           <TransferHistoryTable list={transferHistory} />

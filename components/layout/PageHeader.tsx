@@ -26,9 +26,15 @@ export function PageHeader({
   children,
 }: PageHeaderProps) {
   return (
-    <div className={cn('mb-12', align === 'center' && 'text-center', className)}>
+    <div
+      className={cn(
+        'mb-12 print:relative print:z-[2] print:text-foreground',
+        align === 'center' && 'text-center',
+        className,
+      )}
+    >
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav className="mb-4 flex items-center gap-1 text-sm text-muted-foreground">
+        <nav className="mb-4 flex items-center gap-1 text-sm text-muted-foreground print:!text-foreground/80">
           {breadcrumbs.map((crumb, i) => (
             <span key={i} className="flex items-center gap-1">
               {i > 0 && <ChevronRight className="h-3.5 w-3.5" />}
@@ -43,9 +49,13 @@ export function PageHeader({
           ))}
         </nav>
       )}
-      <h1 className="font-display text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
+      <h1 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl print:!text-foreground">
+        {title}
+      </h1>
       {subtitle && (
-        <p className="mt-3 text-base text-muted-foreground max-w-2xl mx-auto">{subtitle}</p>
+        <p className="mt-3 text-base text-muted-foreground max-w-2xl mx-auto print:!text-foreground/85">
+          {subtitle}
+        </p>
       )}
       {children}
     </div>

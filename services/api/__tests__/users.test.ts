@@ -19,6 +19,10 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
+        response: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
+      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -245,7 +249,7 @@ describe('users API', () => {
 
       expect(result).toEqual(stakers);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/statistics.*unique.*stakers.*rwalk/),
+        expect.stringMatching(/statistics.*unique.*stakers.*randomwalk/),
       );
     });
 

@@ -494,7 +494,7 @@ export interface CTPriceInfo {
 }
 
 // ---------------------------------------------------------------------------
-// Token Mint Info (from main API token_info endpoint)
+// Token Mint Info (GET /api/cosmicgame/randomwalk/tokens/info/:id or /api/randomwalk/tokens/info/:id)
 // ---------------------------------------------------------------------------
 
 export interface TokenMintInfo {

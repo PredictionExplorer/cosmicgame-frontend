@@ -5,10 +5,40 @@ import { reportError } from '@/utils/errors';
 
 import type { RoundInfo } from './types';
 
-axios.interceptors.response.use((response) => {
-  assertApiEnvelope(response);
-  return response;
-});
+axios.interceptors.response.use(
+  (response) => {
+    assertApiEnvelope(response);
+    return response;
+  },
+  (error: unknown) => {
+    if (process.env.NODE_ENV === 'development' && isAxiosError(error) && !error.response) {
+      const cfg = error.config;
+      const built = cfg?.url ?? '';
+      const fullUrl = cfg?.baseURL ? `${cfg.baseURL.replace(/\/$/, '')}/${(cfg.url ?? '').replace(/^\//, '')}` : built;
+      console.error(
+        '[Cosmic API] Network error (no response). Request URL:',
+        fullUrl || built || '(unknown)',
+      );
+      console.error(
+        'Check: (1) Go websrv is running, (2) NEXT_PUBLIC_API_URL ends with /api/cosmicgame — e.g. http://127.0.0.1:8099/api/cosmicgame',
+      );
+      console.error(
+        'If the page is HTTPS and the API is HTTP, use same-origin proxy: set NEXT_PUBLIC_API_URL to this app origin + /api/cosmicgame and COSMICGAME_API_UPSTREAM in .env.local (see .env.example).',
+      );
+    }
+    return Promise.reject(error);
+  },
+);
+
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  const b = (process.env.NEXT_PUBLIC_API_URL || '').trim();
+  if (b && !b.includes('cosmicgame')) {
+    console.warn(
+      '[Cosmic API] NEXT_PUBLIC_API_URL should include the path /api/cosmicgame (see .env.example). Got:',
+      b,
+    );
+  }
+}
 
 export { axios, isAxiosError };
 
@@ -17,9 +47,18 @@ export const baseUrl = networkConfig.nftApiUrl;
 /** Base URL for the Cosmic Game statistics API. */
 export const cosmicGameBaseUrl = networkConfig.apiUrl;
 
-/** Builds a direct URL targeting the Cosmic Game API. */
+/**
+ * Builds a full URL to the Cosmic Game API. Joins `NEXT_PUBLIC_API_URL` and `url` with exactly one
+ * `/` (so `.../api/cosmicgame` + `bid/...` does not become `.../api/cosmicgamebid/...`).
+ */
 export const getAPIUrl = (url: string) => {
-  return cosmicGameBaseUrl + url;
+  if (url === '') {
+    return cosmicGameBaseUrl;
+  }
+  const base = (cosmicGameBaseUrl || '').replace(/\/+$/, '');
+  const path = (url || '').replace(/^\/+/, '');
+  if (!base) return `/${path}`;
+  return `${base}/${path}`;
 };
 
 /** Builds a direct URL targeting the main NFT/token API. */

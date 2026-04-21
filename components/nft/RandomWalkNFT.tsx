@@ -2,7 +2,7 @@ import { formatId } from '@/utils';
 
 import { cn } from '@/lib/utils';
 import { useRWLKNFT } from '@/hooks/useRWLKNFT';
-import { NFTSkeleton, NFTInfoWrapper } from '@/components/styled';
+import { NFTSkeleton } from '@/components/styled';
 
 import NFTImage from './NFTImage';
 
@@ -16,16 +16,22 @@ const RandomWalkNFT = ({
   selectable?: boolean;
 }) => {
   const nft = useRWLKNFT(tokenId);
+  const idLabel = formatId(tokenId);
 
   const content = (
-    <>
+    <div className="relative">
       {!nft ? <NFTSkeleton /> : <NFTImage src={nft.black_image_thumb} />}
-      {nft && (
-        <NFTInfoWrapper>
-          <span className="text-[11px] text-foreground">{formatId(nft.id)}</span>
-        </NFTInfoWrapper>
-      )}
-    </>
+      <div
+        className={cn(
+          'pointer-events-none absolute bottom-2 right-2 z-[1] rounded-md px-2 py-1',
+          'bg-black/75 font-mono text-[11px] font-semibold tabular-nums text-white shadow-sm',
+          'ring-1 ring-white/10',
+        )}
+        aria-hidden
+      >
+        {idLabel}
+      </div>
+    </div>
   );
 
   return (

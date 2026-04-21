@@ -115,10 +115,14 @@ export function get_ct_price(): Promise<CTPriceInfo | null> {
   }, null);
 }
 
-/** Fetches mint metadata (image, seed, owner) for a token from the main API. */
+/**
+ * Fetches RandomWalk token metadata (owner, name, seed). Uses the same base as other Cosmic Game
+ * calls: `GET {NEXT_PUBLIC_API_URL}/randomwalk/tokens/info/:id` → the Go server serves this at
+ * `/api/cosmicgame/randomwalk/tokens/info/:id` (and also `/api/randomwalk/tokens/info/:id`).
+ */
 export function get_info(token_id: number | string): Promise<TokenMintInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getMainAPIUrl(`token_info/${token_id}`));
+    const { data } = await axios.get(getAPIUrl(`randomwalk/tokens/info/${token_id}`));
     return data.TokenInfo as TokenMintInfo | null;
   }, null);
 }
@@ -126,7 +130,7 @@ export function get_info(token_id: number | string): Promise<TokenMintInfo | nul
 /** Fetches RandomWalk NFTs that have been used for discounted bids. */
 export function get_used_rwlk_nfts(): Promise<UsedRWLKNFT[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('bid/used_rwalk_nfts'));
+    const { data } = await axios.get(getAPIUrl('bid/used_randomwalk_nfts'));
     return data.UsedRwalkNFTs;
   }, []);
 }

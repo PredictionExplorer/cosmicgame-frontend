@@ -1,6 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  /**
+   * Optional: proxy /api/cosmicgame/* to the Go websrv so the browser can use same-origin
+   * NEXT_PUBLIC_API_URL (e.g. http://localhost:3000/api/cosmicgame) and avoid CORS / mixed-content.
+   * Set COSMICGAME_API_UPSTREAM=http://127.0.0.1:8099 (no path) in .env.local
+   */
+  async rewrites() {
+    const upstream = process.env.COSMICGAME_API_UPSTREAM?.trim();
+    if (!upstream) return [];
+    const base = upstream.replace(/\/+$/, '');
+    return [
+      {
+        source: '/api/cosmicgame/:path*',
+        destination: `${base}/api/cosmicgame/:path*`,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

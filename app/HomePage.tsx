@@ -209,7 +209,7 @@ const HomePage = () => {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-3.5 backdrop-blur-sm"
+          className="print-motion-visible mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-3.5 backdrop-blur-sm"
         >
           <div className="flex items-center gap-3">
             <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
@@ -258,17 +258,13 @@ const HomePage = () => {
 
         {/* ===== SPECIAL PRIZE LEADERS + NFT PREVIEW ===== */}
         {data?.TsRoundStart !== 0 && (
-          <motion.div
-            variants={sectionFade}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.2 }}
-            className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6"
-          >
-            <div className="lg:col-span-2">
+          /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
+          <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3 print:grid-cols-1">
+            {/* min-w-0 + print col fixes: home PDF often uses narrow width; col-span-2 can collapse badly in Skia */}
+            <div className="min-w-0 lg:col-span-2 print:col-auto">
               <SpecialPrizeWinners />
             </div>
-            <div className="hidden lg:block">
+            <div className="hidden min-w-0 lg:block print:hidden">
               <Link
                 href={bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample'}
                 className="block group"
@@ -289,7 +285,7 @@ const HomePage = () => {
                 </StyledCard>
               </Link>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* ===== BID ACTION AREA ===== */}
@@ -299,7 +295,7 @@ const HomePage = () => {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
-            className="mt-10"
+            className="print-motion-visible mt-10"
           >
             <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
               <h2 className="font-display text-xl font-bold tracking-tight mb-1">Place Your Bid</h2>
@@ -379,6 +375,7 @@ const HomePage = () => {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.4 }}
+            className="print-motion-visible"
           >
             <Prize data={data} />
           </motion.div>
@@ -390,6 +387,7 @@ const HomePage = () => {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.5 }}
+          className="print-motion-visible"
         >
           <Link
             href="/current-round"

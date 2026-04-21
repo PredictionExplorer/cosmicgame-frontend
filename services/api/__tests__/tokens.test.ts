@@ -25,6 +25,10 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
+        response: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
+      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -305,7 +309,7 @@ describe('tokens API', () => {
       const result = await get_info(1);
       expect(result).toEqual(info);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/token_info.*1/),
+        expect.stringMatching(/randomwalk\/tokens\/info\/1/),
       );
     });
 
@@ -327,7 +331,7 @@ describe('tokens API', () => {
       const result = await get_used_rwlk_nfts();
       expect(result).toEqual(nfts);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/bid.*used_rwalk_nfts/),
+        expect.stringMatching(/bid.*used_randomwalk_nfts/),
       );
     });
 

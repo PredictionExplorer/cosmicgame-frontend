@@ -2,22 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { Crown, Swords, Coins } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 import { formatSeconds } from '@/utils';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useCurrentSpecialWinners } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.4, ease: 'easeOut' as const },
-  }),
-};
+import type { SpecialWinners } from '@/services/api/types';
 
 function EnduranceCountdown({ duration }: { duration: number }) {
   const [elapsed, setElapsed] = useState(0);
@@ -32,6 +23,55 @@ function EnduranceCountdown({ duration }: { duration: number }) {
     <span className="font-mono text-sm tabular-nums text-emerald-400">
       {formatSeconds(currentDuration)}
     </span>
+  );
+}
+
+/**
+ * Minimal static markup only for @media print / Save as PDF. Chrome’s Skia pipeline often drops
+ * the interactive layout on the home page (`/`) even when on-screen CSS looks fine; this block is
+ * `hidden` on screen and `display:block` when printing so addresses reliably appear in the PDF.
+ */
+function SpecialPrizeLeadersPrintFallback({ data }: { data: SpecialWinners | null | undefined }) {
+  const sw = data;
+  const dur = sw?.EnduranceChampionDuration ?? 0;
+  const enduranceAddr = sw?.EnduranceChampionAddress;
+  const lastCst = sw?.LastCstBidderAddress;
+
+  return (
+    <div
+      className="hidden rounded-md border-2 border-foreground/40 bg-background p-4 text-sm text-foreground shadow-none [print-color-adjust:exact] print:block"
+      data-special-prize-leaders-print
+    >
+      <h3 className="mb-4 border-b border-foreground/30 pb-2 font-display text-base font-bold">
+        Special Prize Leaders
+      </h3>
+      <dl className="space-y-4">
+        <div>
+          <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
+            Endurance Champion
+          </dt>
+          <dd className="mt-1 break-all font-mono text-xs leading-relaxed">{enduranceAddr ?? '—'}</dd>
+          {dur > 0 && (
+            <dd className="mt-1 text-xs">Held for {formatSeconds(dur)}</dd>
+          )}
+        </div>
+        <div>
+          <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
+            Chrono Warrior
+          </dt>
+          <dd className="mt-1 break-all font-mono text-xs leading-relaxed">{enduranceAddr ?? '—'}</dd>
+          {dur > 0 && (
+            <dd className="mt-1 text-xs">Duration: {formatSeconds(dur)}</dd>
+          )}
+        </div>
+        <div>
+          <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
+            Last CST Bidder
+          </dt>
+          <dd className="mt-1 break-all font-mono text-xs leading-relaxed">{lastCst ?? '—'}</dd>
+        </div>
+      </dl>
+    </div>
   );
 }
 
@@ -99,66 +139,85 @@ export const SpecialPrizeWinners = () => {
     },
   ];
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <h3 className="font-display text-lg font-semibold tracking-tight">Special Prize Leaders</h3>
-        <InfoTooltip content="These players are currently in line to win special prizes when the round ends. Positions can change with every new bid!" />
-      </div>
+  const printDuplex =
+    process.env.NODE_ENV !== 'test' ? (
+      <SpecialPrizeLeadersPrintFallback data={specialWinners} />
+    ) : null;
 
-      <div className="grid grid-cols-1 gap-3">
-        {cards.map((card, i) => (
-          <motion.div
-            key={card.key}
-            custom={i}
-            variants={cardVariants}
-            initial="hidden"
-            animate="visible"
-            className={cn(
-              'gradient-border-card rounded-xl bg-white/[0.02] p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.04]',
-              card.accent && 'gradient-border-card-accent animate-pulse-glow',
-            )}
+  return (
+    <>
+      <section
+        className="min-h-[2rem] space-y-4 print:min-h-0 print:hidden"
+        data-special-prize-leaders
+        aria-label="Special prize leaders"
+      >
+        <div className="flex items-center gap-2">
+          <h3
+            data-testid="special-prize-heading"
+            className="font-display text-lg font-semibold tracking-tight text-foreground print:!text-foreground"
           >
-            <div className="flex items-start gap-3">
-              <div
-                className={cn(
-                  'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
-                  card.accent
-                    ? 'bg-gradient-to-br from-primary/20 to-accent/20 text-primary'
-                    : 'bg-white/[0.06] text-muted-foreground',
-                )}
-              >
-                {card.icon}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className={cn(
-                      'text-xs font-medium uppercase tracking-wider',
-                      card.accent ? 'text-primary' : 'text-muted-foreground',
-                    )}
-                  >
-                    {card.title}
-                  </span>
-                  <InfoTooltip content={card.tooltip} />
+            Special Prize Leaders
+          </h3>
+          <span className="print:hidden">
+            <InfoTooltip content="These players are currently in line to win special prizes when the round ends. Positions can change with every new bid!" />
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3">
+          {cards.map((card) => (
+            <div
+              key={card.key}
+              data-special-prize-card
+              className={cn(
+                'rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.04] print:border print:border-border print:animate-none',
+                card.accent &&
+                  'border-primary/40 bg-primary/[0.04] shadow-[0_0_20px_-8px_rgba(21,191,253,0.35)] animate-pulse-glow',
+              )}
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className={cn(
+                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
+                    card.accent
+                      ? 'bg-gradient-to-br from-primary/20 to-accent/20 text-primary'
+                      : 'bg-white/[0.06] text-muted-foreground',
+                  )}
+                >
+                  {card.icon}
                 </div>
-                {card.address ? (
-                  <a
-                    href={`/user/${card.address}`}
-                    className="mt-1 block break-all font-mono text-sm text-white transition-colors hover:text-primary"
-                  >
-                    {card.address}
-                  </a>
-                ) : (
-                  <p className="mt-1 text-sm text-muted-foreground/50 italic">No holder yet</p>
-                )}
-                {card.extra}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={cn(
+                        'text-xs font-medium uppercase tracking-wider',
+                        card.accent ? 'text-primary' : 'text-muted-foreground',
+                      )}
+                    >
+                      {card.title}
+                    </span>
+                    <span className="print:hidden">
+                      <InfoTooltip content={card.tooltip} />
+                    </span>
+                  </div>
+                  {card.address ? (
+                    <a
+                      href={`/user/${card.address}`}
+                      className="mt-1 block break-all font-mono text-sm text-foreground print:!text-foreground transition-colors hover:text-primary"
+                    >
+                      {card.address}
+                    </a>
+                  ) : (
+                    <p className="mt-1 text-sm text-muted-foreground/50 italic">No holder yet</p>
+                  )}
+                  {card.extra}
+                </div>
               </div>
+              {card.urgency}
             </div>
-            {card.urgency}
-          </motion.div>
-        ))}
-      </div>
-    </div>
+          ))}
+        </div>
+      </section>
+      {printDuplex}
+    </>
   );
 };
