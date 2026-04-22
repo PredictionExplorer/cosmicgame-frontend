@@ -10,14 +10,25 @@ describe('next.config', () => {
     expect(config).toHaveProperty('reactStrictMode', true);
   });
 
-  it('configures NFT image remote pattern', () => {
+  it('configures NFT image remote patterns for all CDN hosts', () => {
     const patterns = (config as NextConfig).images?.remotePatterns;
-    expect(patterns).toEqual([
-      expect.objectContaining({
-        protocol: 'https',
-        hostname: 'nfts.cosmicsignature.com',
-      }),
-    ]);
+    expect(patterns).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          protocol: 'https',
+          hostname: 'nfts.cosmicsignature.com',
+        }),
+        expect.objectContaining({
+          protocol: 'https',
+          hostname: 'nfts-sepolia.cosmicsignature.com',
+        }),
+        expect.objectContaining({
+          protocol: 'https',
+          hostname: 'nfts-local.cosmicsignature.com',
+        }),
+      ]),
+    );
+    expect(patterns).toHaveLength(3);
   });
 
   it('enables turbopack', () => {

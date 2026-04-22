@@ -2,6 +2,11 @@ import { networkConfig } from '@/config/networks';
 
 const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
 
+/** NFT CDN origin (no path); from `networkConfig.nftApiUrl` per environment. */
+function nftCdnOrigin(): string {
+  return (networkConfig.nftApiUrl || 'https://nfts.cosmicsignature.com/').replace(/\/+$/, '');
+}
+
 /** Returns a block-explorer URL for a tx hash, address, or token. */
 export const getExplorerUrl = (type: 'tx' | 'address' | 'token', value: string): string =>
   `${EXPLORER_BASE}/${type}/${value}`;
@@ -13,14 +18,12 @@ export const getProxiedUrl = (url: string): string => {
 
 /** Returns direct CST asset URL (images) from the NFT server. */
 export const getAssetsUrl = (url: string): string => {
-  const imageServerUrl = 'https://nfts.cosmicsignature.com/images/new/';
-  return imageServerUrl + url;
+  return `${nftCdnOrigin()}/images/new/${url}`;
 };
 
 /** Returns direct RandomWalk NFT image URL. */
 export const getRWLKImageUrl = (fileName: string, variant: string = 'black_thumb.jpg'): string => {
-  const imageServerUrl = 'https://nfts.cosmicsignature.com/images/randomwalk/';
-  return `${imageServerUrl}${fileName}_${variant}`;
+  return `${nftCdnOrigin()}/images/randomwalk/${fileName}_${variant}`;
 };
 
 /** Decodes the original URL (handles legacy proxied format for backwards compatibility). */
@@ -31,5 +34,8 @@ export const getOriginUrl = (url: string): string => {
   return url;
 };
 
-/** Direct URL to the Cosmic Signature site logo image. */
-export const logoImgUrl = getAssetsUrl('cosmicsignature/logo.png');
+/** Same origin as root `metadataBase` — marketing/branding, not chain-specific. */
+const CANONICAL_SITE_ORIGIN = 'https://www.cosmicsignature.com';
+
+/** Site branding logo (`public/images/logo.svg`). Not on the NFT CDN. */
+export const logoImgUrl = `${CANONICAL_SITE_ORIGIN}/images/logo.svg`;

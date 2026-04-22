@@ -39,7 +39,7 @@ describe('JSON-LD generators', () => {
     it('includes name, URL, and logo', () => {
       expect(result.name).toBe('Cosmic Signature');
       expect(result.url).toBe('https://www.cosmicsignature.com');
-      expect(result.logo).toContain('logo.png');
+      expect(result.logo).toBe('https://www.cosmicsignature.com/images/logo.svg');
     });
 
     it('includes social media profiles', () => {

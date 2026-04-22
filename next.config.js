@@ -26,6 +26,20 @@ const nextConfig = {
         pathname: '/**',
         search: '',
       },
+      {
+        protocol: 'https',
+        hostname: 'nfts-sepolia.cosmicsignature.com',
+        port: '',
+        pathname: '/**',
+        search: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'nfts-local.cosmicsignature.com',
+        port: '',
+        pathname: '/**',
+        search: '',
+      },
     ],
   },
   turbopack: {
