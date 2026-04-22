@@ -15,7 +15,7 @@ const defaultProps = {
   name: 'Cosmic Game',
   address: '0xC801d06c9900ef0cD878Ad6f59622aAfAd8F54dE',
   description: 'The main game contract',
-  explorerUrl: 'https://sepolia-explorer.arbitrum.io',
+  explorerUrl: 'https://sepolia.arbiscan.io',
 };
 
 describe('ContractAddressCard', () => {
@@ -39,7 +39,7 @@ describe('ContractAddressCard', () => {
     const link = screen.getByLabelText('View Cosmic Game on block explorer');
     expect(link).toHaveAttribute(
       'href',
-      'https://sepolia-explorer.arbitrum.io/address/0xC801d06c9900ef0cD878Ad6f59622aAfAd8F54dE',
+      'https://sepolia.arbiscan.io/address/0xC801d06c9900ef0cD878Ad6f59622aAfAd8F54dE',
     );
     expect(link).toHaveAttribute('target', '_blank');
   });

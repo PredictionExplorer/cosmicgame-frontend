@@ -16,7 +16,7 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { asWriteFn } from '@/utils/contractWrite';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
-import { isUserRejection, reportError } from '@/utils/errors';
+import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
 
 const EthDonations = () => {
   const [donateAmount, setDonateAmount] = useState('');
@@ -43,7 +43,13 @@ const EthDonations = () => {
       setDonateAmount('');
       refetchDonations();
     } catch (error: unknown) {
-      if (!isUserRejection(error)) {
+      if (isUserRejection(error)) {
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
+      } else {
         reportError(error, 'Donation error');
         setNotification({
           text: 'Donation failed, please try again.',
@@ -70,7 +76,13 @@ const EthDonations = () => {
       setDonationInformation('');
       refetchDonations();
     } catch (error: unknown) {
-      if (!isUserRejection(error)) {
+      if (isUserRejection(error)) {
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
+      } else {
         reportError(error, 'Donation with info error');
         setNotification({
           text: 'Donation with information failed, please check your input.',

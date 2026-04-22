@@ -57,6 +57,7 @@ jest.mock('../../utils/errors', () => ({
   isUserRejection: jest.fn(() => false),
   reportError: jest.fn(),
   getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
+  WALLET_TRANSACTION_CANCELLED_MESSAGE: 'Transaction cancelled by user',
 }));
 
 import { usePrizeClaim } from '../usePrizeClaim';
@@ -150,7 +151,7 @@ describe('usePrizeClaim', () => {
 
     expect(success).toBe(false);
     expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
-    expect(mockNotify).not.toHaveBeenCalled();
+    expect(mockNotify).toHaveBeenCalledWith('info', expect.any(String));
   });
 
   it('onClaimPrize with no contract: notifies error, returns false', async () => {

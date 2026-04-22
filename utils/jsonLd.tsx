@@ -35,7 +35,7 @@ export function organizationJsonLd() {
     name: SITE_NAME,
     url: SITE_URL,
     logo: LOGO_URL,
-    sameAs: ['https://x.com/CosmicSignatureNFT', 'https://discord.gg/bGnPn96Qwt'],
+    sameAs: ['https://x.com/CosmicSignature', 'https://discord.gg/bGnPn96Qwt'],
     description:
       'Cosmic Signature combines generative art, an exciting Ethereum bidding game, and social impact through charitable giving on the Arbitrum network.',
   };

@@ -55,7 +55,7 @@ const statCards: {
     key: 'total',
     label: 'Total Minted',
     icon: Gem,
-    tooltip: 'The total number of Cosmic Signature NFTs minted across all game rounds',
+    tooltip: 'The total number of COSMIC NFTs minted across all game rounds',
     gradient: 'from-[#06AEEC] to-[#35C9FF]',
   },
   {

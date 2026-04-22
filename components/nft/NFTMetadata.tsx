@@ -77,7 +77,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
     nft?.RoundNum != null ? (
       <Link
         href={`/prize/${nft.RoundNum}`}
-        className="text-inherit hover:text-primary transition-colors no-underline"
+        className="text-inherit transition-colors no-underline print:!text-foreground hover:text-primary"
       >
         Round #{nft.RoundNum}
       </Link>
@@ -100,7 +100,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
                 href={getExplorerUrl('tx', nft.TxHash!)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-inherit hover:text-primary transition-colors no-underline"
+                className="text-inherit transition-colors no-underline print:!text-foreground hover:text-primary"
               >
                 {mintedDisplay}
               </a>

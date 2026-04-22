@@ -101,7 +101,7 @@ const Header: FC = () => {
   );
 
   const renderDesktop = () => (
-    <nav className="flex items-center">
+    <nav className="flex items-center gap-6 lg:gap-8">
       <Link href="/">
         <Image
           src="/images/logo2.svg"
@@ -255,7 +255,7 @@ const Header: FC = () => {
                           <span className="font-medium">{balance.CosmicToken.toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between text-xs">
-                          <span className="text-muted-foreground">CS NFTs</span>
+                          <span className="text-muted-foreground">COSMIC NFTs</span>
                           <span className="font-medium">{balance.CosmicSignature}</span>
                         </div>
                         <div className="flex justify-between text-xs">

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Copy, Check, ExternalLink } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { useClipboard } from '@/hooks/useClipboard';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface ContractAddressCardProps {
@@ -22,9 +23,10 @@ export function ContractAddressCard({
   className,
 }: ContractAddressCardProps) {
   const [copied, setCopied] = useState(false);
+  const { copy } = useClipboard();
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(address);
+    await copy(address);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

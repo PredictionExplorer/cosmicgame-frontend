@@ -5,6 +5,7 @@ import { formatEther, parseEther } from 'viem';
 import { usePublicClient } from 'wagmi';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { parseBalance } from '@/utils';
 
@@ -20,6 +21,7 @@ import {
   isEthProviderError,
   reportError,
   getEthErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
 } from '@/utils/errors';
 
 const Mint = () => {
@@ -40,7 +42,10 @@ const Mint = () => {
         });
         await publicClient?.waitForTransactionReceipt({ hash });
       } catch (err: unknown) {
-        if (isUserRejection(err)) return;
+        if (isUserRejection(err)) {
+          toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
+          return;
+        }
         reportError(err, 'mint RWLK NFT');
         if (isEthProviderError(err)) {
           alert(getEthErrorMessage(err, 'Mint failed'));

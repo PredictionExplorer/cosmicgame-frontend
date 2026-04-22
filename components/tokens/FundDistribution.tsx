@@ -93,7 +93,7 @@ export function FundDistribution({ data }: { data?: DistData }) {
       value: staking,
       eth: (staking * balance) / 100,
       icon: <Layers className="h-4 w-4" />,
-      tooltip: 'Distributed to Cosmic Signature NFT stakers proportional to their stake.',
+      tooltip: 'Distributed to COSMIC NFT stakers proportional to their stake.',
       color: 'text-[hsl(45,93%,52%)]',
       gradient: 'from-[hsl(45,93%,52%)] to-[hsl(45,93%,38%)]',
     },

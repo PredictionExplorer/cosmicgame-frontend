@@ -106,7 +106,7 @@ const tableHeaders = [
   {
     label: 'NFTs Awarded',
     width: '13%',
-    tooltip: 'Total Cosmic Signature NFTs awarded via raffle in this round.',
+    tooltip: 'Total COSMIC NFTs awarded via raffle in this round.',
   },
 ];
 

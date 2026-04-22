@@ -85,7 +85,7 @@ const PrizeWinnersPage = () => {
 
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         At the end of each round, the last bidder wins the main prize — 25% of the ETH pot plus a
-        unique Cosmic Signature NFT. Additional prizes are distributed through raffle drawings, with
+        unique COSMIC NFT. Additional prizes are distributed through raffle drawings, with
         4 ETH winners and 11 NFT winners selected from all bidders. Explore the complete prize
         history and see how rewards have grown over time.
       </p>

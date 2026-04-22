@@ -4,123 +4,19 @@ import Link from 'next/link';
 
 import { getExplorerUrl, getAssetsUrl, getRWLKImageUrl, convertTimestampToDateTime } from '@/utils';
 
+import {
+  DefinitionList,
+  DetailRow,
+  SectionCard,
+  detailLinkClass,
+  detailPanelClass,
+} from '@/components/detail-page/DetailPageChrome';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper, StyledCard } from '@/components/styled';
 import type { StakingAction } from '@/services/api/types';
 import NFTImage from '@/components/nft/NFTImage';
 import { useStakingRWLKActionsInfo, useStakingCSTActionsInfo } from '@/hooks/useApiQuery';
-
-interface TokenInfoPanelProps {
-  isRwalk: boolean;
-  actionId: number;
-  stake: StakingAction;
-}
-function TokenInfoPanel({ isRwalk, actionId, stake }: TokenInfoPanelProps) {
-  const { TokenId, Seed, StakerAddr } = stake;
-
-  const tokenImageURL = isRwalk
-    ? getRWLKImageUrl(TokenId.toString().padStart(6, '0'))
-    : getAssetsUrl(`cosmicsignature/0x${Seed}.png`);
-
-  const tokenDetailHref = isRwalk
-    ? `https://randomwalknft.com/detail/${TokenId}`
-    : `/detail/${TokenId}`;
-
-  return (
-    <div className="w-full md:w-1/2">
-      <div className="mb-4 max-w-[400px]">
-        <StyledCard>
-          <Link href={tokenDetailHref} className="block">
-            <NFTImage src={tokenImageURL} />
-          </Link>
-        </StyledCard>
-      </div>
-
-      <div className="mb-2">
-        <span className="text-primary">Action Id:</span>
-        &nbsp;
-        <span>{actionId}</span>
-      </div>
-
-      <div className="mb-2">
-        <span className="text-primary">Staker Address:</span>
-        &nbsp;
-        <Link href={`/user/${StakerAddr}`} className="break-all text-inherit">
-          <span className="font-mono">{StakerAddr}</span>
-        </Link>
-      </div>
-
-      <div className="mb-2">
-        <span className="text-primary">Token Id:</span>
-        &nbsp;
-        <Link href={tokenDetailHref} className="text-inherit">
-          <span>{TokenId}</span>
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-interface StakeInfoProps {
-  stake: StakingAction;
-}
-function StakeInfo({ stake }: StakeInfoProps) {
-  const { TxHash, TimeStamp, NumStakedNFTs } = stake;
-
-  return (
-    <div>
-      <h4 className="text-lg font-semibold">Stake</h4>
-      <div className="mb-2">
-        <span className="text-primary">Staked Datetime:</span>
-        &nbsp;
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span>{convertTimestampToDateTime(TimeStamp)}</span>
-        </a>
-      </div>
-      <div className="mb-2">
-        <span className="text-primary">Number of Staked Tokens:</span>
-        &nbsp;
-        <span>{NumStakedNFTs}</span>
-      </div>
-    </div>
-  );
-}
-
-interface UnstakeInfoProps {
-  unstake: StakingAction;
-}
-function UnstakeInfo({ unstake }: UnstakeInfoProps) {
-  const { EvtLogId, TxHash, TimeStamp, NumStakedNFTs } = unstake;
-
-  if (!EvtLogId || EvtLogId === 0) return null;
-
-  return (
-    <div className="mt-4">
-      <h4 className="text-lg font-semibold">Unstake</h4>
-      <div className="mb-2">
-        <span className="text-primary">Unstaked Datetime:</span>
-        &nbsp;
-        <a
-          className="text-inherit"
-          href={getExplorerUrl('tx', TxHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span>{convertTimestampToDateTime(TimeStamp)}</span>
-        </a>
-      </div>
-      <div className="mb-2">
-        <span className="text-primary">Number of Staked Tokens:</span>
-        &nbsp;
-        <span>{NumStakedNFTs}</span>
-      </div>
-    </div>
-  );
-}
+import { cn } from '@/lib/utils';
 
 function StakingActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; actionId: number }) {
   const isRwalk = Boolean(IsRwalk);
@@ -131,31 +27,141 @@ function StakingActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; actio
   const { data: actionInfo = null, isLoading: loading } = activeQuery;
   const error = activeQuery.error?.message ?? null;
 
+  const headingToken = isRwalk ? 'RandomWalk' : 'Cosmic Signature';
+  const subtitleText = `Staking Action for ${headingToken} Token`;
+
   return (
-    <MainWrapper>
-      <div className="mb-8">
-        <span className="mr-4 text-xl font-semibold text-primary">
-          {`Staking Action for ${isRwalk ? 'RandomWalk' : 'Cosmic Signature'} Token`}
-        </span>
+    <MainWrapper className="max-sm:pb-16">
+      <div className="mx-auto max-w-5xl">
+        <PageHeader
+          title="Staking action"
+          subtitle={subtitleText}
+          breadcrumbs={[
+            { label: 'Home', href: '/' },
+            { label: 'My staking', href: '/my-staking' },
+            { label: `Action #${actionId}` },
+          ]}
+          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
+          align="left"
+        />
+
+        {loading ? (
+          <div className={cn(detailPanelClass, 'p-10 text-center')}>
+            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+          </div>
+        ) : error ? (
+          <div className={cn(detailPanelClass, 'p-10 text-center')}>
+            <p className="text-destructive font-medium">{error}</p>
+          </div>
+        ) : actionInfo?.Stake ? (
+          <StakingActionBody
+            isRwalk={isRwalk}
+            actionId={actionId}
+            stake={actionInfo.Stake}
+            unstake={actionInfo.Unstake}
+          />
+        ) : (
+          <div className={cn(detailPanelClass, 'p-10 text-center')}>
+            <p className="font-medium text-foreground">No data found for this staking action.</p>
+          </div>
+        )}
       </div>
+    </MainWrapper>
+  );
+}
 
-      {loading ? (
-        <p className="text-lg font-semibold">Loading...</p>
-      ) : error ? (
-        <p className="text-lg font-semibold text-destructive">{error}</p>
-      ) : actionInfo ? (
-        <div className="flex flex-wrap gap-8">
-          <TokenInfoPanel isRwalk={isRwalk} actionId={actionId} stake={actionInfo.Stake!} />
+function StakingActionBody({
+  isRwalk,
+  actionId,
+  stake,
+  unstake,
+}: {
+  isRwalk: boolean;
+  actionId: number;
+  stake: StakingAction;
+  unstake: StakingAction | null;
+}) {
+  const { TokenId, Seed, StakerAddr } = stake;
 
-          <div className="w-full md:w-1/2">
-            <StakeInfo stake={actionInfo.Stake!} />
-            <UnstakeInfo unstake={actionInfo.Unstake!} />
+  const tokenImageURL = isRwalk
+    ? getRWLKImageUrl(TokenId.toString().padStart(6, '0'))
+    : getAssetsUrl(`cosmicsignature/0x${Seed}.png`);
+
+  const tokenDetailHref = isRwalk ? `https://randomwalknft.com/detail/${TokenId}` : `/detail/${TokenId}`;
+
+  return (
+    <div className="grid gap-8 lg:grid-cols-2">
+      <SectionCard
+        sectionId="staking-action-token"
+        title="Token"
+        description={isRwalk ? 'Random Walk NFT used in this action.' : 'Cosmic Signature token used in this action.'}
+      >
+        <div className="px-4 pb-4 pt-2 sm:px-5">
+          <div className="mx-auto max-w-[400px]">
+            <StyledCard>
+              <Link href={tokenDetailHref} className="block">
+                <NFTImage src={tokenImageURL} />
+              </Link>
+            </StyledCard>
           </div>
         </div>
-      ) : (
-        <p>No data found for this staking action.</p>
-      )}
-    </MainWrapper>
+        <DefinitionList>
+          <DetailRow label="Action ID">
+            <span className="font-mono tabular-nums">{actionId}</span>
+          </DetailRow>
+          <DetailRow label="Staker address">
+            <Link href={`/user/${StakerAddr}`} className={cn(detailLinkClass, 'font-mono text-[13px] break-all')}>
+              {StakerAddr}
+            </Link>
+          </DetailRow>
+          <DetailRow label="Token ID">
+            <Link href={tokenDetailHref} className={detailLinkClass}>
+              {TokenId}
+            </Link>
+          </DetailRow>
+        </DefinitionList>
+      </SectionCard>
+
+      <div className="space-y-8">
+        <SectionCard sectionId="staking-action-stake" title="Stake" description="When tokens were locked for staking.">
+          <DefinitionList>
+            <DetailRow label="Staked datetime">
+              <a
+                href={getExplorerUrl('tx', stake.TxHash)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={detailLinkClass}
+              >
+                {convertTimestampToDateTime(stake.TimeStamp)}
+              </a>
+            </DetailRow>
+            <DetailRow label="Number of staked tokens">
+              <span className="font-mono tabular-nums">{stake.NumStakedNFTs}</span>
+            </DetailRow>
+          </DefinitionList>
+        </SectionCard>
+
+        {unstake && unstake.EvtLogId && unstake.EvtLogId !== 0 ? (
+          <SectionCard sectionId="staking-action-unstake" title="Unstake" description="When the stake was released.">
+            <DefinitionList>
+              <DetailRow label="Unstaked datetime">
+                <a
+                  href={getExplorerUrl('tx', unstake.TxHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={detailLinkClass}
+                >
+                  {convertTimestampToDateTime(unstake.TimeStamp)}
+                </a>
+              </DetailRow>
+              <DetailRow label="Number of staked tokens">
+                <span className="font-mono tabular-nums">{unstake.NumStakedNFTs}</span>
+              </DetailRow>
+            </DefinitionList>
+          </SectionCard>
+        ) : null}
+      </div>
+    </div>
   );
 }
 

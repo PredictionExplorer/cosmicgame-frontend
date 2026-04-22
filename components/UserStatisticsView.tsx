@@ -31,7 +31,12 @@ import {
   useBidListByRound,
 } from '@/hooks/useApiQuery';
 import getErrorMessage from '@/utils/alert';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
+import {
+  isUserRejection,
+  reportError,
+  getEthErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 import { MainWrapper } from '@/components/styled';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
@@ -219,7 +224,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+      } else {
         reportError(err, 'claim donated NFT');
         const msg = getEthErrorMessage(err, 'An error occurred');
         setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
@@ -243,7 +250,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         setIsClaiming(false);
       }, 3000);
     } catch (err) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+      } else {
         reportError(err, 'claim all donated NFTs');
         const msg = getEthErrorMessage(err, 'An error occurred while claiming donated NFTs!');
         setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
@@ -260,7 +269,10 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         queryClient.invalidateQueries({ queryKey: ['donationsERC20ByUser'] });
       }, 3000);
     } catch (err) {
-      if (isUserRejection(err)) return;
+      if (isUserRejection(err)) {
+        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        return;
+      }
       reportError(err, 'claim donated ERC20 token');
       const rawMsg = getEthErrorMessage(err, 'An error occurred');
       setNotification({ text: getErrorMessage(rawMsg) || rawMsg, type: 'error', visible: true });
@@ -282,7 +294,10 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         queryClient.invalidateQueries({ queryKey: ['donationsERC20ByUser'] });
       }, 3000);
     } catch (err) {
-      if (isUserRejection(err)) return;
+      if (isUserRejection(err)) {
+        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        return;
+      }
       reportError(err, 'claim all donated ERC20 tokens');
       const rawMsg = getEthErrorMessage(err, 'An error occurred');
       setNotification({ text: getErrorMessage(rawMsg) || rawMsg, type: 'error', visible: true });

@@ -1,11 +1,11 @@
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 import SiteMapPage from '../SiteMapPage';
 
 describe('SiteMapPage', () => {
   it('renders the page heading', () => {
     render(<SiteMapPage />);
-    expect(screen.getByText('Site Map')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Site Map' })).toBeInTheDocument();
   });
 
   it('renders the per-user section heading', () => {
@@ -49,10 +49,11 @@ describe('SiteMapPage', () => {
     }
   });
 
-  it('renders the correct total number of links', () => {
+  it('renders the correct total number of links in main (sitemap + breadcrumb)', () => {
     render(<SiteMapPage />);
-    const links = screen.getAllByRole('link');
-    expect(links).toHaveLength(11);
+    const main = screen.getByRole('main');
+    const links = within(main).getAllByRole('link');
+    expect(links).toHaveLength(14);
   });
 
   it('has no accessibility violations', async () => {

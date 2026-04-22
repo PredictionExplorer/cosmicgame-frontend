@@ -193,7 +193,7 @@ export function get_staking_rwalk_actions_info(
   actionId: number,
 ): Promise<CombinedStakingRecordInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/rwalk/actions/info/${actionId}`));
+    const { data } = await axios.get(getAPIUrl(`staking/randomwalk/actions/info/${actionId}`));
     const info = data.CombinedRWalkStakingRecordInfo;
     if (!info) return null;
     return {
@@ -207,7 +207,7 @@ export function get_staking_rwalk_actions_info(
 /** Fetches all RandomWalk stake/unstake actions globally. */
 export function get_staking_rwalk_actions(): Promise<StakingAction[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('staking/rwalk/actions/global/0/1000000'));
+    const { data } = await axios.get(getAPIUrl('staking/randomwalk/actions/global/0/1000000'));
     return flattenTxArray<StakingAction>(data.GlobalStakingActionsRWalk);
   }, []);
 }
@@ -216,7 +216,7 @@ export function get_staking_rwalk_actions(): Promise<StakingAction[]> {
 export function get_staking_rwalk_actions_by_user(address: string): Promise<StakingAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`staking/rwalk/actions/by_user/${address}/0/1000000`),
+      getAPIUrl(`staking/randomwalk/actions/by_user/${address}/0/1000000`),
     );
     return flattenTxArray<StakingAction>(data.UserStakingActionsRWalk);
   }, []);
@@ -225,7 +225,7 @@ export function get_staking_rwalk_actions_by_user(address: string): Promise<Stak
 /** Fetches all RandomWalk staking reward mint records globally. */
 export function get_staking_rwalk_mints_global(): Promise<StakingRewardMint[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('staking/rwalk/mints/global/0/1000000'));
+    const { data } = await axios.get(getAPIUrl('staking/randomwalk/mints/global/0/1000000'));
     return flattenTxArray<StakingRewardMint>(data.StakingRWalkRewardsMints);
   }, []);
 }
@@ -233,7 +233,7 @@ export function get_staking_rwalk_mints_global(): Promise<StakingRewardMint[]> {
 /** Fetches RandomWalk staking reward mint records for a wallet address. */
 export function get_staking_rwalk_mints_by_user(address: string): Promise<StakingRewardMint[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/rwalk/mints/by_user/${address}`));
+    const { data } = await axios.get(getAPIUrl(`staking/randomwalk/mints/by_user/${address}`));
     return flattenTxArray<StakingRewardMint>(data.RWalkStakingRewardMints);
   }, []);
 }
@@ -241,7 +241,7 @@ export function get_staking_rwalk_mints_by_user(address: string): Promise<Stakin
 /** Fetches all currently staked RandomWalk NFTs globally. */
 export function get_staked_rwalk_tokens(): Promise<StakedTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('staking/rwalk/staked_tokens/all'));
+    const { data } = await axios.get(getAPIUrl('staking/randomwalk/staked_tokens/all'));
     return data.StakedTokensRWalk as StakedTokenInfo[];
   }, []);
 }
@@ -249,7 +249,7 @@ export function get_staked_rwalk_tokens(): Promise<StakedTokenInfo[]> {
 /** Fetches RandomWalk NFTs currently staked by a wallet address. */
 export function get_staked_rwalk_tokens_by_user(address: string): Promise<StakedTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`staking/rwalk/staked_tokens/by_user/${address}`));
+    const { data } = await axios.get(getAPIUrl(`staking/randomwalk/staked_tokens/by_user/${address}`));
     return data.StakedTokensRWalk as StakedTokenInfo[];
   }, []);
 }

@@ -3,7 +3,17 @@ import axios from 'axios';
 import { getMetadata, PageMetadata } from '../metadata';
 import { reportError } from '../errors';
 
-jest.mock('axios');
+jest.mock('axios', () => {
+  const mockGet = jest.fn();
+  return {
+    __esModule: true,
+    default: {
+      create: jest.fn(() => ({ get: mockGet })),
+      get: mockGet,
+    },
+  };
+});
+
 jest.mock('../errors', () => ({ reportError: jest.fn() }));
 jest.mock('../urls', () => ({
   getProxiedUrl: (url: string) => url,
@@ -14,6 +24,7 @@ const mockedReportError = reportError as jest.MockedFunction<typeof reportError>
 
 beforeEach(() => {
   jest.clearAllMocks();
+  (axios.create as jest.Mock).mockImplementation(() => ({ get: mockedAxios.get }));
 });
 
 const fullHtml = `

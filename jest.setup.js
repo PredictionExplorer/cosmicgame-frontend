@@ -1,5 +1,9 @@
 require('@testing-library/jest-dom');
 
+const { TextDecoder, TextEncoder } = require('util');
+globalThis.TextEncoder = TextEncoder;
+globalThis.TextDecoder = TextDecoder;
+
 // Required by config/networks.ts (no defaults); set so tests can render app.
 process.env.NEXT_PUBLIC_NETWORK = process.env.NEXT_PUBLIC_NETWORK || 'sepolia';
 process.env.NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://test-api.example/api/cosmicgame/';

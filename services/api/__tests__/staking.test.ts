@@ -31,6 +31,10 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: {
+        request: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
+        response: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
+      },
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -446,7 +450,7 @@ describe('staking API', () => {
       const result = await get_staking_rwalk_actions();
       expect(result).toEqual([]);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/staking.*rwalk.*actions.*global/),
+        expect.stringMatching(/staking.*randomwalk.*actions.*global/),
       );
     });
 
@@ -466,7 +470,7 @@ describe('staking API', () => {
       mockedAxios.get.mockResolvedValue({ data: { UserStakingActionsRWalk: [] } });
       await get_staking_rwalk_actions_by_user('0xabc');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/staking.*rwalk.*actions.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*randomwalk.*actions.*by_user.*0xabc/),
       );
     });
 
@@ -489,7 +493,7 @@ describe('staking API', () => {
       const result = await get_staking_rwalk_mints_global();
       expect(result).toEqual([]);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/staking.*rwalk.*mints.*global/),
+        expect.stringMatching(/staking.*randomwalk.*mints.*global/),
       );
     });
 
@@ -509,7 +513,7 @@ describe('staking API', () => {
       mockedAxios.get.mockResolvedValue({ data: { RWalkStakingRewardMints: [] } });
       await get_staking_rwalk_mints_by_user('0xabc');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/staking.*rwalk.*mints.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*randomwalk.*mints.*by_user.*0xabc/),
       );
     });
 
@@ -533,7 +537,7 @@ describe('staking API', () => {
       const result = await get_staked_rwalk_tokens();
       expect(result).toEqual(tokens);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/staking.*rwalk.*staked_tokens.*all/),
+        expect.stringMatching(/staking.*randomwalk.*staked_tokens.*all/),
       );
     });
 
@@ -555,7 +559,7 @@ describe('staking API', () => {
       const result = await get_staked_rwalk_tokens_by_user('0xabc');
       expect(result).toEqual(tokens);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/staking.*rwalk.*staked_tokens.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*randomwalk.*staked_tokens.*by_user.*0xabc/),
       );
     });
 

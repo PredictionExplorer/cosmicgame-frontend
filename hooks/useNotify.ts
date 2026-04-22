@@ -2,7 +2,12 @@ import { useCallback } from 'react';
 
 import { useNotification } from '@/contexts/NotificationContext';
 import getErrorMessage from '@/utils/alert';
-import { isEthProviderError, reportError } from '@/utils/errors';
+import {
+  isEthProviderError,
+  isUserRejection,
+  reportError,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 
 type NotificationType = 'error' | 'warning' | 'success' | 'info';
 
@@ -16,6 +21,10 @@ export function useNotify() {
 
   const notifyErrorFromEthers = useCallback(
     (err: unknown) => {
+      if (isUserRejection(err)) {
+        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        return;
+      }
       if (isEthProviderError(err) && err.data?.message) {
         reportError(err, 'ethers provider error');
         const msg = getErrorMessage(err.data.message);

@@ -35,7 +35,12 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import useCosmicSignatureContract from '@/hooks/useCosmicSignatureContract';
 import { useNotification } from '@/contexts/NotificationContext';
 import type { CSTTokenInfo, CSTTransferRecord } from '@/services/api';
-import { isUserRejection, getEthErrorMessage, reportError } from '@/utils/errors';
+import {
+  isUserRejection,
+  getEthErrorMessage,
+  reportError,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 import {
   useDashboardInfo,
   useCSTInfo,
@@ -182,26 +187,10 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
 
   const handleCloseDialog = () => setOpenDialog(false);
 
-  const handlePlay = async (videoUrl: string) => {
-    try {
-      const res = await fetch(videoUrl, { method: 'HEAD' });
-      if (res.ok) {
-        setVideoPath(videoUrl);
-        setOpenVideo(true);
-      } else {
-        setNotification({
-          visible: true,
-          type: 'info',
-          text: 'Video is being generated, come back later!',
-        });
-      }
-    } catch {
-      setNotification({
-        visible: true,
-        type: 'info',
-        text: 'Video is being generated, come back later!',
-      });
-    }
+  const handlePlay = (videoUrl: string) => {
+    if (!videoUrl) return;
+    setVideoPath(videoUrl);
+    setOpenVideo(true);
   };
 
   const handleTransfer = async () => {
@@ -213,7 +202,13 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       await Promise.all([refetchCSTInfo(), refetchTransferHistory()]);
       setAddress('');
     } catch (err) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
+      } else {
         setNotification({
           text: 'Please input a valid address for the token receiver!',
           type: 'error',
@@ -238,7 +233,9 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         visible: true,
       });
     } catch (err) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({ visible: true, type: 'info', text: WALLET_TRANSACTION_CANCELLED_MESSAGE });
+      } else {
         const msg = getEthErrorMessage(err, 'An error occurred while setting the token name.');
         setNotification({ visible: true, type: 'error', text: msg });
       }
@@ -260,7 +257,9 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         visible: true,
       });
     } catch (err) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({ visible: true, type: 'info', text: WALLET_TRANSACTION_CANCELLED_MESSAGE });
+      } else {
         const msg = getEthErrorMessage(err, 'An error occurred while clearing the token name.');
         setNotification({ visible: true, type: 'error', text: msg });
       }
@@ -301,7 +300,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         animate="visible"
         variants={fadeUp}
         transition={{ duration: 0.4 }}
-        className="pb-6"
+        className="print-motion-visible pb-6"
       >
         <NFTBreadcrumb tokenId={tokenId} tokenName={currentTokenName} />
       </motion.div>
@@ -312,6 +311,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         animate="visible"
         variants={fadeUp}
         transition={{ duration: 0.5, delay: 0.1 }}
+        className="print-motion-visible"
         data-testid="hero-section"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -473,7 +473,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         animate="visible"
         variants={fadeUp}
         transition={{ duration: 0.5, delay: 0.25 }}
-        className="mt-12"
+        className="print-motion-visible mt-12"
         data-testid="metadata-section"
       >
         <NFTMetadata nft={nft} />
@@ -485,7 +485,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
         animate="visible"
         variants={fadeUp}
         transition={{ duration: 0.5, delay: 0.35 }}
-        className="mt-12"
+        className="print-motion-visible mt-12"
       >
         <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
       </motion.section>
@@ -497,7 +497,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           animate="visible"
           variants={fadeUp}
           transition={{ duration: 0.5, delay: 0.45 }}
-          className="mt-12"
+          className="print-motion-visible mt-12"
         >
           <NFTOwnerActions
             address={address}
@@ -523,7 +523,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           animate="visible"
           variants={fadeUp}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-12"
+          className="print-motion-visible mt-12"
         >
           <SectionDivider title="Name History" className="mb-6" />
           <NameHistoryTable list={nameHistory} />
@@ -537,7 +537,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
           animate="visible"
           variants={fadeUp}
           transition={{ duration: 0.5, delay: 0.55 }}
-          className="mt-12"
+          className="print-motion-visible mt-12"
         >
           <SectionDivider title="Ownership History" className="mb-6" />
           <TransferHistoryTable list={transferHistory} />

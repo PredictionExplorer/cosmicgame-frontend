@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from 'next';
 import { Suspense, type ReactNode } from 'react';
 import Script from 'next/script';
+import { headers } from 'next/headers';
 
 import { logoImgUrl } from '@/utils';
 
+import { isLandingHost } from '@/lib/hostRouting';
 import { GA_TRACKING_ID } from '@/utils/analytics';
 import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
 
@@ -43,7 +45,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@CosmicSignatureNFT',
+    site: '@CosmicSignature',
     title: defaultTitle,
     description: defaultDescription,
     images: [logoImgUrl],
@@ -74,7 +76,11 @@ export const viewport: Viewport = {
   themeColor: '#15BFFD',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const h = await headers();
+  const host = h.get('x-forwarded-host') ?? h.get('host');
+  const showAppChrome = !isLandingHost(host);
+
   return (
     <html lang="en">
       <head>
@@ -104,7 +110,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </Script>
       </head>
       <body>
-        <Providers>{children}</Providers>
+        <Providers showAppChrome={showAppChrome}>{children}</Providers>
         <Suspense fallback={null}>
           <Analytics />
         </Suspense>

@@ -19,7 +19,13 @@ const VideoPlayerDialog = ({ open, videoPath, onClose }: VideoPlayerDialogProps)
         <DialogTitle>Video Player</DialogTitle>
       </VisuallyHidden.Root>
       {videoPath && (
-        <video src={videoPath} controls autoPlay className="block max-h-[80vh] w-full" />
+        <video
+          src={videoPath}
+          controls
+          autoPlay
+          playsInline
+          className="block max-h-[80vh] w-full"
+        />
       )}
     </DialogContent>
   </Dialog>

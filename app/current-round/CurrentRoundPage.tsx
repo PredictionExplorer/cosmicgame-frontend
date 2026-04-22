@@ -158,14 +158,10 @@ const CurrentRoundPage = () => {
       </Link>
 
       {/* ===== HERO SECTION ===== */}
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="gradient-border-card gradient-border-card-accent rounded-2xl bg-gradient-to-b from-primary/[0.06] to-transparent p-6 sm:p-8 mb-8"
-      >
+      {/* No gradient-border-card (mask pseudo): Chrome/Skia PDF often drops nested content in that compositing path. */}
+      <div className="flex flex-col gap-6 rounded-2xl border border-white/[0.1] bg-gradient-to-b from-primary/[0.06] to-transparent p-6 sm:p-8 mb-8 print:overflow-visible">
         {/* Header row: LIVE badge + round info */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
               <Radio className="h-5 w-5 text-primary" />
@@ -192,7 +188,7 @@ const CurrentRoundPage = () => {
 
         {/* Countdown or Exhausted state */}
         {hasStarted && isCountdownActive && (
-          <div className="text-center mb-6">
+          <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
               Round ends in
               <InfoTooltip
@@ -205,7 +201,7 @@ const CurrentRoundPage = () => {
         )}
 
         {hasStarted && isBidsExhausted && (
-          <div className="text-center mb-6 rounded-xl bg-primary/[0.06] p-5 animate-pulse-glow">
+          <div className="text-center rounded-xl bg-primary/[0.06] p-5 animate-pulse-glow">
             <Zap className="mx-auto h-7 w-7 text-primary mb-2" />
             <p className="font-display text-lg font-bold text-primary">Bids Exhausted!</p>
             <p className="mt-1 text-sm text-primary/80">
@@ -216,7 +212,7 @@ const CurrentRoundPage = () => {
 
         {/* Last bidder card */}
         {hasLastBidder && (
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 mb-6">
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/10">
                 <User className="h-4 w-4 text-accent" />
@@ -226,7 +222,7 @@ const CurrentRoundPage = () => {
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Last Bidder — Current Leader
                   </p>
-                  <InfoTooltip content="The last bidder when the countdown reaches zero wins the main ETH prize and a Cosmic Signature NFT." />
+                  <InfoTooltip content="The last bidder when the countdown reaches zero wins the main ETH prize and a COSMIC NFT." />
                 </div>
                 <a
                   href={`/user/${data.LastBidderAddr}`}
@@ -253,11 +249,7 @@ const CurrentRoundPage = () => {
         )}
 
         {/* Special Prize Leaders */}
-        {hasLastBidder && (
-          <div className="mb-6">
-            <SpecialPrizeWinners />
-          </div>
-        )}
+        {hasLastBidder && <SpecialPrizeWinners />}
 
         {/* CTA Button */}
         <div className="flex justify-center">
@@ -271,7 +263,7 @@ const CurrentRoundPage = () => {
             </Link>
           </Button>
         </div>
-      </motion.div>
+      </div>
 
       {/* ===== ENHANCED STAT CARDS ===== */}
       <motion.div

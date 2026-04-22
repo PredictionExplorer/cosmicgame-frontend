@@ -1,10 +1,16 @@
 import { useState, useCallback } from 'react';
 import { parseUnits } from 'viem';
 
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
+import {
+  isUserRejection,
+  reportError,
+  getEthErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 import getErrorMessage from '@/utils/alert';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useApiData } from '@/contexts/ApiDataContext';
+
 import useRaffleWalletContract from './useRaffleWalletContract';
 
 interface ClaimingState {
@@ -29,7 +35,10 @@ export function useClaimWinnings(onSuccess?: () => void) {
 
   const handleTxError = useCallback(
     (err: unknown, context: string) => {
-      if (isUserRejection(err)) return;
+      if (isUserRejection(err)) {
+        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        return;
+      }
       reportError(err, context);
       const rawMsg = getEthErrorMessage(err, 'An error occurred');
       const msg = getErrorMessage(rawMsg) || rawMsg;

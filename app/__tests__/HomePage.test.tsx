@@ -9,7 +9,10 @@ const mockUseBidListByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsNFTByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsCGWithInfoByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: undefined });
-const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
+const mockUseCurrentTime = jest.fn().mockReturnValue({
+  data: Math.floor(Date.now() / 1000),
+  isLoading: false,
+});
 const mockUseCSTInfo = jest.fn().mockReturnValue({ data: undefined });
 
 jest.mock('../../hooks/useApiQuery', () => ({

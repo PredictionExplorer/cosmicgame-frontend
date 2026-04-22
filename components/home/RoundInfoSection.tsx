@@ -189,7 +189,7 @@ export function RoundInfoSection({
                     Each bid is also a raffle ticket. {data?.NumRaffleEthWinnersBidding} tickets win{' '}
                     {data?.RafflePercentage}% of the pot. {data?.NumRaffleNFTWinnersBidding}{' '}
                     additional winners and {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT
-                    stakers receive a Cosmic Signature NFT.
+                    stakers receive a COSMIC NFT.
                   </p>
                   <p>
                     Ethereum Protocol Guild receives {data?.CharityPercentage ?? 0}% of the prize

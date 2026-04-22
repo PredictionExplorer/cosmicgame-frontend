@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 
 import { useNotification } from '@/contexts/NotificationContext';
 import getErrorMessage from '@/utils/alert';
-import { isEthProviderError, reportError } from '@/utils/errors';
+import { isEthProviderError, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
 
 import { useNotify } from '../useNotify';
 
@@ -10,10 +10,14 @@ jest.mock('../../contexts/NotificationContext', () => ({
   useNotification: jest.fn(),
 }));
 jest.mock('../../utils/alert', () => jest.fn((msg: string) => `parsed: ${msg}`));
-jest.mock('../../utils/errors', () => ({
-  isEthProviderError: jest.fn(),
-  reportError: jest.fn(),
-}));
+jest.mock('../../utils/errors', () => {
+  const actual = jest.requireActual<typeof import('../../utils/errors')>('../../utils/errors');
+  return {
+    ...actual,
+    isEthProviderError: jest.fn(),
+    reportError: jest.fn(),
+  };
+});
 
 const mockSetNotification = jest.fn();
 const mockUseNotification = useNotification as jest.Mock;
@@ -98,6 +102,21 @@ describe('useNotify', () => {
         type: 'error',
         text: 'Unexpected error. Please try again.',
       });
+    });
+
+    it('shows info when user rejected the transaction (EIP-1193 4001)', () => {
+      const { result } = renderHook(() => useNotify());
+
+      act(() => {
+        result.current.notifyErrorFromEthers({ code: 4001 });
+      });
+
+      expect(mockSetNotification).toHaveBeenCalledWith({
+        visible: true,
+        type: 'info',
+        text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+      });
+      expect(mockReportError).not.toHaveBeenCalled();
     });
   });
 });

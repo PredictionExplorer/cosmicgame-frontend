@@ -78,6 +78,31 @@ describe('isUserRejection', () => {
   it('returns false for number', () => {
     expect(isUserRejection(4001)).toBe(false);
   });
+
+  it('returns true when code 4001 is nested in cause', () => {
+    expect(
+      isUserRejection({
+        name: 'SomeWrapperError',
+        cause: { code: 4001 },
+      }),
+    ).toBe(true);
+  });
+
+  it('returns true for UserRejectedRequestError by name', () => {
+    expect(isUserRejection({ name: 'UserRejectedRequestError', message: 'rejected' })).toBe(true);
+  });
+
+  it('returns true when message indicates user denied signature', () => {
+    expect(
+      isUserRejection({
+        message: 'MetaMask Tx Signature: User denied transaction signature.',
+      }),
+    ).toBe(true);
+  });
+
+  it('returns true for ACTION_REJECTED code', () => {
+    expect(isUserRejection({ code: 'ACTION_REJECTED' })).toBe(true);
+  });
 });
 
 describe('getEthErrorMessage', () => {

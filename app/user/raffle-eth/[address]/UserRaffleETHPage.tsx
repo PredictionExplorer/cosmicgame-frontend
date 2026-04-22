@@ -15,7 +15,12 @@ import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useRaffleDepositsByUser } from '@/hooks/useApiQuery';
 import getErrorMessage from '@/utils/alert';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
+import {
+  isUserRejection,
+  reportError,
+  getEthErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 import {
   MainWrapper,
   TablePrimary,
@@ -150,7 +155,9 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
         setIsClaiming(false);
       }, 2000);
     } catch (err: unknown) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+      } else {
         reportError(err, 'claim raffle ETH');
         const rawMsg = getEthErrorMessage(err, 'An error occurred');
         const msg = getErrorMessage(rawMsg) || rawMsg;

@@ -20,7 +20,7 @@ const footerLinks: Record<string, { label: string; href: string; external?: bool
     { label: 'Site Map', href: '/site-map' },
   ],
   Community: [
-    { label: 'Twitter / X', href: 'https://x.com/CosmicSignatureNFT', external: true },
+    { label: 'Twitter / X', href: 'https://x.com/CosmicSignature', external: true },
     { label: 'Discord', href: 'https://discord.gg/bGnPn96Qwt', external: true },
   ],
 };
@@ -45,7 +45,7 @@ const Footer = () => (
           </p>
           <div className="mt-4 flex items-center gap-2">
             <a
-              href="https://x.com/CosmicSignatureNFT"
+              href="https://x.com/CosmicSignature"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Twitter"
@@ -104,18 +104,18 @@ const Footer = () => (
           &copy; {new Date().getFullYear()} Cosmic Signature. All rights reserved.
         </p>
         <div className="flex items-center gap-6">
-          <a
-            href="#"
+          <Link
+            href="/terms"
             className="text-xs text-muted-foreground no-underline hover:text-white transition-colors"
           >
             Terms
-          </a>
-          <a
-            href="#"
+          </Link>
+          <Link
+            href="/privacy"
             className="text-xs text-muted-foreground no-underline hover:text-white transition-colors"
           >
             Privacy
-          </a>
+          </Link>
         </div>
       </div>
     </div>

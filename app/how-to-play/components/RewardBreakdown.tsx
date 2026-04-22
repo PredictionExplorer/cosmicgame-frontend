@@ -27,9 +27,9 @@ const rewards = [
   {
     Icon: ImageIcon,
     title: 'NFT Chance',
-    description: 'Win a unique Cosmic Signature NFT through raffle or as the round winner.',
+    description: 'Win a unique COSMIC NFT through raffle or as the round winner.',
     tooltip:
-      '5 additional raffle winners and 4 Random Walk NFT stakers receive a Cosmic Signature NFT each round.',
+      '5 additional raffle winners and 4 Random Walk NFT stakers receive a COSMIC NFT each round.',
     accent: 'from-amber-400/20 to-orange-500/20',
     iconColor: 'text-amber-400',
   },

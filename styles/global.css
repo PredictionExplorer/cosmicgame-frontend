@@ -79,10 +79,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  a {
-    -webkit-text-decoration-color: white !important;
-    text-decoration-color: white !important;
-  }
 }
 
 @property --radius {
@@ -252,6 +248,120 @@
 
 .gradient-border-card-accent::before {
   background: linear-gradient(135deg, rgba(21, 191, 253, 0.6), rgba(156, 55, 253, 0.6));
+}
+
+/*
+ * Print: Browsers default to stripping backgrounds and often omit fixed/sticky chrome,
+ * which made the app look white and header/navigation missing vs the on-screen layout.
+ */
+@media print {
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html {
+    background-color: hsl(var(--background)) !important;
+  }
+
+  body {
+    background-color: hsl(var(--background)) !important;
+  }
+
+  /* Canvas particles do not reproduce; rely on solid page background */
+  #tsparticles {
+    display: none !important;
+  }
+
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  /*
+   * Put site header and nested banners in normal flow so logo, nav, and wallet
+   * block print with the page content instead of only on the first paint slice.
+   */
+  header.fixed,
+  header .fixed {
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+  }
+
+  header.fixed {
+    width: 100%;
+    border-bottom: 1px solid hsl(var(--border));
+    background-color: hsl(var(--background) / 0.97) !important;
+    backdrop-filter: none !important;
+  }
+
+  /*
+   * Gradient borders use masks; print engines often composite them as opaque and cover text.
+   * Stat cards fall back to a normal border (see StatCard print:border on featured).
+   */
+  .gradient-border-card::before,
+  .gradient-border-card-accent::before {
+    display: none !important;
+  }
+
+  /*
+   * bg-clip-text + text-transparent often prints as blank; StatCard also forces solid text via utilities.
+   */
+  .bg-clip-text.text-transparent {
+    color: hsl(var(--foreground)) !important;
+    -webkit-text-fill-color: hsl(var(--foreground)) !important;
+    background-image: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+  }
+
+  /*
+   * Framer Motion keeps inline opacity:0 / transform on "initial" until animated; print
+   * often snapshots before finish or never applies the animation, so sections stay invisible.
+   */
+  .print-motion-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  /* Special Prize Leaders: mask-free borders only; force legible text in Skia PDF */
+  [data-special-prize-leaders] {
+    position: relative;
+    z-index: 2;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    overflow: visible !important;
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  [data-special-prize-leaders] h3,
+  [data-special-prize-leaders] a,
+  [data-special-prize-leaders] .font-mono {
+    color: hsl(var(--foreground)) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Content area was spaced for a fixed header; tighten for flowed header */
+  main {
+    overflow: visible !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+    min-height: 0 !important;
+    position: relative;
+    z-index: 1;
+    color: hsl(var(--foreground));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

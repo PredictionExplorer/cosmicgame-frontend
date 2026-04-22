@@ -2,6 +2,16 @@ import axios from 'axios';
 
 import { reportError } from './errors';
 
+/** Axios instance without Cosmic API interceptors (see `services/api/client.ts`). Used for third-party HTML fetches. */
+let metadataHttp: ReturnType<typeof axios.create> | null = null;
+
+function getMetadataHttp() {
+  if (!metadataHttp) {
+    metadataHttp = axios.create({ timeout: 25_000 });
+  }
+  return metadataHttp;
+}
+
 export interface PageMetadata {
   title: string;
   description: string;
@@ -18,21 +28,21 @@ export interface PageMetadata {
  */
 export async function getMetadata(url: string): Promise<PageMetadata | null> {
   try {
-    const { data: html } = await axios.get(url);
+    const { data: html } = await getMetadataHttp().get<string>(url);
 
     const titleMatch = html.match(/<title>(.*?)<\/title>/);
-    const title = titleMatch ? titleMatch[1] : '';
+    const title = titleMatch?.[1] ?? '';
 
     const descriptionMatch = html.match(
       /<meta\s+name=["']description["']\s+content=["'](.*?)["']/i,
     );
-    const description = descriptionMatch ? descriptionMatch[1] : '';
+    const description = descriptionMatch?.[1] ?? '';
 
     const keywordsMatch = html.match(/<meta\s+name=["']keywords["']\s+content=["'](.*?)["']/i);
-    const keywords = keywordsMatch ? keywordsMatch[1] : '';
+    const keywords = keywordsMatch?.[1] ?? '';
 
     const imageMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["'](.*?)["']/i);
-    const image = imageMatch ? imageMatch[1] : '';
+    const image = imageMatch?.[1] ?? '';
 
     return { title, description, keywords, image };
   } catch (error) {

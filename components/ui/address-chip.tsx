@@ -45,7 +45,7 @@ export function AddressChip({
     >
       <Link
         href={resolvedHref}
-        className="text-muted-foreground hover:text-primary transition-colors no-underline"
+        className="text-muted-foreground transition-colors no-underline print:!text-foreground hover:text-primary"
       >
         {display}
       </Link>

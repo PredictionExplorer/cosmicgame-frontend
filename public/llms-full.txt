@@ -13,11 +13,11 @@ The NFT artwork is generated based on the three-body problem in physics — simu
 ### Main Pages
 
 - **Home** (https://www.cosmicsignature.com/): Live bidding interface showing current round status, prize pool, countdown timer, recent bids, and bid submission form
-- **Gallery** (https://www.cosmicsignature.com/gallery): Browse and search all minted Cosmic Signature NFTs with filtering and pagination
+- **Gallery** (https://www.cosmicsignature.com/gallery): Browse and search all minted COSMIC NFTs with filtering and pagination
 - **How to Play** (https://www.cosmicsignature.com/how-to-play): Step-by-step guide covering game overview, bidding process, reward structure, and pro tips
 - **FAQ** (https://www.cosmicsignature.com/faq): 50+ questions organized in 6 categories covering getting started, prizes, game mechanics, tokens, technical details, and governance
 - **Statistics** (https://www.cosmicsignature.com/statistics): Comprehensive game analytics including round history, bid volumes, prize distribution, and player stats
-- **Staking** (https://www.cosmicsignature.com/staking): Stake Cosmic Signature NFTs (CST) to earn ongoing rewards from the game's prize pool
+- **Staking** (https://www.cosmicsignature.com/staking): Stake COSMIC NFTs (CST) to earn ongoing rewards from the game's prize pool
 - **Prize** (https://www.cosmicsignature.com/prize): Current and historical prize pool details
 - **Contracts** (https://www.cosmicsignature.com/contracts): Smart contract addresses, ABIs, and fund distribution breakdown
 - **Marketing** (https://www.cosmicsignature.com/marketing): Referral and marketing rewards program for promoting the game
@@ -26,7 +26,7 @@ The NFT artwork is generated based on the three-body problem in physics — simu
 
 ### User Pages
 
-- **My Tokens** (https://www.cosmicsignature.com/my-tokens): View your owned Cosmic Signature NFTs
+- **My Tokens** (https://www.cosmicsignature.com/my-tokens): View your owned COSMIC NFTs
 - **My Staking** (https://www.cosmicsignature.com/my-staking): Manage your staked tokens and view staking rewards
 - **My Winnings** (https://www.cosmicsignature.com/my-winnings): Track your prize winnings across rounds
 - **My Statistics** (https://www.cosmicsignature.com/my-statistics): Personal gameplay statistics
@@ -64,11 +64,11 @@ The NFT artwork is generated based on the three-body problem in physics — simu
 
 - 100 CST (Cosmic Signature Tokens) earned per bid
 - 1 raffle ticket for end-of-round drawings
-- Chance to win a Cosmic Signature NFT
+- Chance to win a COSMIC NFT
 
 ### NFTs Minted Per Round
 
-12 Cosmic Signature NFTs are minted each round:
+12 COSMIC NFTs are minted each round:
 - 1 for the main prize winner
 - 11 for NFT raffle winners (5 bid-based + 4 RandomWalk staker + 2 additional)
 
@@ -91,7 +91,7 @@ The NFT artwork is generated based on the three-body problem in physics — simu
 - Uses: Alternative bid currency (Dutch auction), Cosmic DAO governance voting
 - Tradeable on Uniswap and other Arbitrum DEXes
 
-### Cosmic Signature NFT
+### COSMIC NFT
 
 - Type: ERC-721
 - Art: Generative, based on three-body problem physics simulation
@@ -125,7 +125,7 @@ The NFT artwork is generated based on the three-body problem in physics — simu
 
 ## Community & Support
 
-- **Twitter/X**: https://x.com/CosmicSignatureNFT
+- **Twitter/X**: https://x.com/CosmicSignature
 - **Discord**: https://discord.gg/bGnPn96Qwt
 - **Website**: https://www.cosmicsignature.com
 
@@ -148,13 +148,13 @@ A: Yes, anyone can participate in the Cosmic Signature game by placing a bid. Yo
 ### Prizes & Rewards
 
 Q: What is the main prize?
-A: The main prize includes a unique Cosmic Signature NFT, 25% of the ETH pot, and any donated tokens (ERC-20/ERC-721) from other projects.
+A: The main prize includes a unique COSMIC NFT, 25% of the ETH pot, and any donated tokens (ERC-20/ERC-721) from other projects.
 
 Q: What rewards do I get for each bid?
-A: Every bid earns you three things: 100 CST (Cosmic Signature Tokens), 1 raffle ticket for end-of-round drawings, and a chance to win a Cosmic Signature NFT.
+A: Every bid earns you three things: 100 CST (Cosmic Signature Tokens), 1 raffle ticket for end-of-round drawings, and a chance to win a COSMIC NFT.
 
 Q: How does the raffle work?
-A: Each bid also serves as a raffle ticket. At the end of each round, the smart contract randomly selects 4 raffle ticket holders who share 6% of the prize pool. Additionally, 5 winners receive a Cosmic Signature NFT, and 4 Random Walk NFT stakers also receive an NFT.
+A: Each bid also serves as a raffle ticket. At the end of each round, the smart contract randomly selects 4 raffle ticket holders who share 6% of the prize pool. Additionally, 5 winners receive a COSMIC NFT, and 4 Random Walk NFT stakers also receive an NFT.
 
 Q: How does staking work?
 A: After winning Cosmic Signature Tokens in raffles, you can stake them and continue earning income. Staking pays 19% of the CosmicGame contract balance each round, distributed equally among the owners of all staked tokens.
@@ -175,7 +175,7 @@ A: The bidder who held the Endurance Champion title for the longest consecutive 
 
 ### Tokens & NFTs
 
-Q: What makes Cosmic Signature NFTs unique?
+Q: What makes COSMIC NFTs unique?
 A: Each NFT is created with a randomly generated seed stored in the smart contract. The image and video are produced from this seed using an open-source Rust program based on the three-body problem in physics.
 
 Q: How are the NFT images created?

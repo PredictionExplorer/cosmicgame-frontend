@@ -31,7 +31,7 @@ const phases = [
   {
     Icon: Trophy,
     label: 'Winner Collects',
-    description: 'The last bidder wins 25% of the prize pool and a Cosmic Signature NFT.',
+    description: 'The last bidder wins 25% of the prize pool and a COSMIC NFT.',
     tooltip:
       'The winner must withdraw their prize from the smart contract. The NFT is minted automatically.',
   },

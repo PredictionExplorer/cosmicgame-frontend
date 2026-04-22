@@ -113,7 +113,7 @@ export function AppBarWrapper({
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/[0.06] py-4',
+        'fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/[0.06] py-4 print:static print:z-auto print:w-full',
         className,
       )}
       {...props}
@@ -182,7 +182,7 @@ export function MainWrapper({ className, ...props }: React.HTMLAttributes<HTMLEl
   return (
     <main
       className={cn(
-        'mx-auto w-full max-w-7xl px-4 pt-40 pb-40 overflow-hidden leading-none min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-36 max-sm:pb-24',
+        'mx-auto w-full max-w-7xl px-4 pt-40 pb-40 overflow-hidden leading-normal min-h-[calc(100vh-100px)] relative z-[1] max-sm:pt-36 max-sm:pb-24',
         className,
       )}
       {...props}

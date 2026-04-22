@@ -32,6 +32,10 @@ import {
   useCurrentTime,
   useCSTInfo,
 } from '@/hooks/useApiQuery';
+import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/activationTime';
+import { isLandingHost } from '@/lib/hostRouting';
+import { LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO } from '@/lib/landingFlags';
+import { RootLandingPage } from '@/components/landing/RootLandingPage';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 20 },
@@ -42,6 +46,11 @@ const HomePage = () => {
   const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
+
+  const [hostname, setHostname] = useState<string | null>(null);
+  useEffect(() => {
+    setHostname(window.location.hostname);
+  }, []);
 
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo();
   const { data: currentTimeData } = useCurrentTime();
@@ -152,6 +161,28 @@ const HomePage = () => {
   const claimWait = prizeTime + timeoutClaimPrize * 1000;
   const isActive = account !== null && activationTime < Date.now() / 1000;
 
+  const landingHost = hostname !== null && isLandingHost(hostname);
+  if (hostname === null) {
+    return <div className="min-h-screen bg-background" />;
+  }
+  if (landingHost && dashboardLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  const roundOk =
+    !LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO || (dashboardData?.CurRoundNum ?? -1) === 0;
+  const launchMs = parseActivationMsFromDashboard(dashboardData ?? null);
+  const showPrelaunchLanding =
+    landingHost && roundOk && launchMs != null && launchMs > localClockUtcEpochMs();
+
+  if (showPrelaunchLanding && launchMs != null) {
+    return <RootLandingPage launchTimestampMs={launchMs} />;
+  }
+
   return (
     <>
       <MainWrapper>
@@ -178,7 +209,7 @@ const HomePage = () => {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-3.5 backdrop-blur-sm"
+          className="print-motion-visible mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-3.5 backdrop-blur-sm"
         >
           <div className="flex items-center gap-3">
             <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
@@ -227,17 +258,13 @@ const HomePage = () => {
 
         {/* ===== SPECIAL PRIZE LEADERS + NFT PREVIEW ===== */}
         {data?.TsRoundStart !== 0 && (
-          <motion.div
-            variants={sectionFade}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.2 }}
-            className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6"
-          >
-            <div className="lg:col-span-2">
+          /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
+          <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3 print:grid-cols-1">
+            {/* min-w-0 + print col fixes: home PDF often uses narrow width; col-span-2 can collapse badly in Skia */}
+            <div className="min-w-0 lg:col-span-2 print:col-auto">
               <SpecialPrizeWinners />
             </div>
-            <div className="hidden lg:block">
+            <div className="hidden min-w-0 lg:block print:hidden">
               <Link
                 href={bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample'}
                 className="block group"
@@ -253,12 +280,12 @@ const HomePage = () => {
                     />
                   </div>
                   <div className="p-3 text-center">
-                    <p className="text-xs text-muted-foreground">Sample Cosmic Signature NFT</p>
+                    <p className="text-xs text-muted-foreground">Sample COSMIC NFT</p>
                   </div>
                 </StyledCard>
               </Link>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* ===== BID ACTION AREA ===== */}
@@ -268,7 +295,7 @@ const HomePage = () => {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.3 }}
-            className="mt-10"
+            className="print-motion-visible mt-10"
           >
             <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
               <h2 className="font-display text-xl font-bold tracking-tight mb-1">Place Your Bid</h2>
@@ -348,6 +375,7 @@ const HomePage = () => {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.4 }}
+            className="print-motion-visible"
           >
             <Prize data={data} />
           </motion.div>
@@ -359,6 +387,7 @@ const HomePage = () => {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.5 }}
+          className="print-motion-visible"
         >
           <Link
             href="/current-round"

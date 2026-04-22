@@ -1,5 +1,7 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -9,361 +11,308 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SectionCard, detailPanelClass } from '@/components/detail-page/DetailPageChrome';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
+import { cn } from '@/lib/utils';
+
+function AdminFieldRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="grid grid-cols-1 gap-3 border-b border-white/[0.06] px-4 py-4 last:border-b-0 sm:grid-cols-[minmax(0,280px)_1fr] sm:items-center sm:px-5">
+      <span className="text-sm font-medium text-foreground">{label}</span>
+      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">{children}</div>
+    </div>
+  );
+}
 
 const AdminSettingsPage = () => {
   const { data, isLoading } = useDashboardInfo();
 
   return (
-    <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center">Administrative methods</h4>
-      {isLoading || !data ? (
-        <h6 className="text-lg font-semibold">Loading...</h6>
-      ) : (
-        <>
-          <div className="mt-12">
-            <h5 className="text-xl font-semibold">Cosmic Game Contract</h5>
-            <div className="ml-4">
-              <div className="mt-6">
-                <p className="text-base font-medium">
-                  Cosmic Signature Token (ERC721) Contract Address
-                </p>
-                <div className="flex mt-2">
-                  <Input
-                    placeholder="Enter address here"
-                    className="flex-1"
-                    value={String(data?.ContractAddrs?.CosmicSignatureAddr ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set Address
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Cosmic Token (ERC20) Contract Address</p>
-                <div className="flex mt-2">
-                  <Input
-                    placeholder="Enter address here"
-                    className="flex-1"
-                    value={String(data?.ContractAddrs?.CosmicTokenAddr ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set Address
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Charity Wallet Contract Address</p>
-                <div className="flex mt-2">
-                  <Input
-                    placeholder="Enter address here"
-                    className="flex-1"
-                    value={String(data?.ContractAddrs?.CharityWalletAddr ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set Address
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">RandomWalk NFT Contract Address</p>
-                <div className="flex mt-2">
-                  <Input
-                    placeholder="Enter address here"
-                    className="flex-1"
-                    value={String(data?.ContractAddrs?.RandomWalkAddr ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set Address
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Raffle Wallet Contract Address</p>
-                <div className="flex mt-2">
-                  <Input
-                    placeholder="Enter address here"
-                    className="flex-1"
-                    value={String(data?.ContractAddrs?.RaffleWalletAddr ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set Address
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Staking Wallet Contract Address</p>
-                <div className="flex mt-2">
-                  <Input
-                    placeholder="Enter address here"
-                    className="flex-1"
-                    value={String(data?.ContractAddrs?.StakingWalletAddr ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set Address
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Marketing Wallet Contract Address</p>
-                <div className="flex mt-2">
-                  <Input
-                    placeholder="Enter address here"
-                    className="flex-1"
-                    value={String(data?.ContractAddrs?.MarketingWalletAddr ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set Address
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Business Logic Contract Address</p>
-                <div className="flex mt-2">
-                  <Input
-                    placeholder="Enter address here"
-                    className="flex-1"
-                    value={String(data?.ContractAddrs?.BusinessLogicAddr ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set Address
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Number of Raffle Winners Per Round</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.NumRaffleEthWinners ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Number of Raffle NFT Winners Per Round</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.NumRaffleNFTWinners ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Number of NFT Holder Winners Per Round</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.NumHolderNFTWinners ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Prize Percentage</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.PrizePercentage ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Charity Percentage</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.CharityPercentage ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Raffle Percentage</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.RafflePercentage ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Staking Percentage</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.StakingPercentage ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Time Increase</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.TimeIncrease ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Timeout Claim Prize</p>
-                <div className="flex mt-2">
-                  <Input type="number" placeholder="Enter number here" className="flex-1" />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Price Increase</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.PriceIncrease ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Nano Seconds Extra</p>
-                <div className="flex mt-2">
-                  <Input
-                    type="number"
-                    placeholder="Enter number here"
-                    className="flex-1"
-                    value={String(data?.NanosecondsExtra ?? '')}
-                    readOnly
-                  />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Initial Seconds Until Prize</p>
-                <div className="flex mt-2">
-                  <Input type="number" placeholder="Enter number here" className="flex-1" />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Initial Bid Amount Fraction</p>
-                <div className="flex mt-2">
-                  <Input type="number" placeholder="Enter number here" className="flex-1" />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Activation Time</p>
-                <div className="flex mt-2">
-                  <Input type="number" placeholder="Enter number here" className="flex-1" />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">ETH To CST Bid Ratio</p>
-                <div className="flex mt-2">
-                  <Input type="number" placeholder="Enter number here" className="flex-1" />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Round Start CST Auction Length</p>
-                <div className="flex mt-2">
-                  <Input type="number" placeholder="Enter number here" className="flex-1" />
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-8">
-                <p className="text-base font-medium">Switch Mode</p>
-                <div className="flex mt-2">
-                  <Select defaultValue="runtime">
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="runtime">Runtime Mode</SelectItem>
-                      <SelectItem value="maintenance">Maintenance Mode</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="secondary" className="ml-2">
-                    Set
-                  </Button>
-                </div>
-              </div>
-            </div>
+    <MainWrapper className="max-sm:pb-16">
+      <div className="mx-auto max-w-4xl">
+        <PageHeader
+          title="Administrative methods"
+          subtitle="Read-only view of dashboard contract addresses and parameters."
+          breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Admin', href: '/admin' }, { label: 'Settings' }]}
+          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
+          align="left"
+        />
+
+        {isLoading || !data ? (
+          <div className={cn(detailPanelClass, 'p-10 text-center')}>
+            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
           </div>
-        </>
-      )}
+        ) : (
+          <SectionCard
+            sectionId="admin-cosmic-contract"
+            title="Cosmic Game Contract"
+            description="Contract addresses and on-chain parameters from the dashboard API."
+          >
+            <div>
+              <AdminFieldRow label="Cosmic Signature Token (ERC721) contract address">
+                <Input
+                  placeholder="Enter address here"
+                  className="flex-1 font-mono text-sm"
+                  value={String(data?.ContractAddrs?.CosmicSignatureAddr ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set Address
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Cosmic Token (ERC20) contract address">
+                <Input
+                  placeholder="Enter address here"
+                  className="flex-1 font-mono text-sm"
+                  value={String(data?.ContractAddrs?.CosmicTokenAddr ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set Address
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Charity wallet contract address">
+                <Input
+                  placeholder="Enter address here"
+                  className="flex-1 font-mono text-sm"
+                  value={String(data?.ContractAddrs?.CharityWalletAddr ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set Address
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="RandomWalk NFT contract address">
+                <Input
+                  placeholder="Enter address here"
+                  className="flex-1 font-mono text-sm"
+                  value={String(data?.ContractAddrs?.RandomWalkAddr ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set Address
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Raffle wallet contract address">
+                <Input
+                  placeholder="Enter address here"
+                  className="flex-1 font-mono text-sm"
+                  value={String(data?.ContractAddrs?.RaffleWalletAddr ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set Address
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Staking wallet contract address">
+                <Input
+                  placeholder="Enter address here"
+                  className="flex-1 font-mono text-sm"
+                  value={String(data?.ContractAddrs?.StakingWalletAddr ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set Address
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Marketing wallet contract address">
+                <Input
+                  placeholder="Enter address here"
+                  className="flex-1 font-mono text-sm"
+                  value={String(data?.ContractAddrs?.MarketingWalletAddr ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set Address
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Business logic contract address">
+                <Input
+                  placeholder="Enter address here"
+                  className="flex-1 font-mono text-sm"
+                  value={String(data?.ContractAddrs?.BusinessLogicAddr ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set Address
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Number of raffle ETH winners per round">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.NumRaffleEthWinners ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Number of raffle NFT winners per round">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.NumRaffleNFTWinners ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Number of NFT holder winners per round">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.NumHolderNFTWinners ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Prize percentage">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.PrizePercentage ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Charity percentage">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.CharityPercentage ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Raffle percentage">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.RafflePercentage ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Staking percentage">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.StakingPercentage ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Time increase">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.TimeIncrease ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Timeout claim prize">
+                <Input type="number" placeholder="Enter number here" className="flex-1" />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Price increase">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.PriceIncrease ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Nano seconds extra">
+                <Input
+                  type="number"
+                  placeholder="Enter number here"
+                  className="flex-1"
+                  value={String(data?.NanosecondsExtra ?? '')}
+                  readOnly
+                />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Initial seconds until prize">
+                <Input type="number" placeholder="Enter number here" className="flex-1" />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Initial bid amount fraction">
+                <Input type="number" placeholder="Enter number here" className="flex-1" />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Activation time">
+                <Input type="number" placeholder="Enter number here" className="flex-1" />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="ETH to CST bid ratio">
+                <Input type="number" placeholder="Enter number here" className="flex-1" />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Round start CST auction length">
+                <Input type="number" placeholder="Enter number here" className="flex-1" />
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+              <AdminFieldRow label="Switch mode">
+                <Select defaultValue="runtime">
+                  <SelectTrigger className="w-full flex-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="runtime">Runtime Mode</SelectItem>
+                    <SelectItem value="maintenance">Maintenance Mode</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
+                  Set
+                </Button>
+              </AdminFieldRow>
+            </div>
+          </SectionCard>
+        )}
+      </div>
     </MainWrapper>
   );
 };

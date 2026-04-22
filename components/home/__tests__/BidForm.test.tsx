@@ -205,7 +205,7 @@ describe('BidForm', () => {
   it('computed bid price shows ETH amount with bidPricePlus applied', () => {
     render(<BidForm {...defaultProps} advancedExpanded={true} bidType="ETH" bidPricePlus={10} />);
     const expectedPrice = (0.01 * (1 + 10 / 100) * 1).toFixed(6);
-    expect(screen.getByText(`${expectedPrice} ETH`)).toBeInTheDocument();
+    expect(screen.getByText(`≈ ${expectedPrice} ETH`)).toBeInTheDocument();
   });
 
   it('computed bid price applies 50% discount for RandomWalk', () => {
@@ -213,7 +213,7 @@ describe('BidForm', () => {
       <BidForm {...defaultProps} advancedExpanded={true} bidType="RandomWalk" bidPricePlus={0} />,
     );
     const expectedPrice = (0.01 * 1 * 0.5).toFixed(6);
-    expect(screen.getByText(`${expectedPrice} ETH`)).toBeInTheDocument();
+    expect(screen.getByText(`≈ ${expectedPrice} ETH`)).toBeInTheDocument();
   });
 
   it('hides bid price collision prevention for CST bid type', () => {

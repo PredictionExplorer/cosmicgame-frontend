@@ -89,7 +89,7 @@ export function get_unique_cst_stakers(): Promise<UniqueStakerCST[]> {
 /** Fetches the list of unique RandomWalk staker addresses with staking stats. */
 export function get_unique_rwalk_stakers(): Promise<UniqueStakerRWLK[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/rwalk'));
+    const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/randomwalk'));
     return data.UniqueStakersRWalk as UniqueStakerRWLK[];
   }, []);
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { usePublicClient } from 'wagmi';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,6 +21,7 @@ import {
   isEthProviderError,
   reportError,
   getEthErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
 } from '@/utils/errors';
 
 const MintArtBlocks = () => {
@@ -42,7 +44,10 @@ const MintArtBlocks = () => {
         setMintedTokens(tokenIds);
         getCurrentTokenId();
       } catch (err: unknown) {
-        if (isUserRejection(err)) return;
+        if (isUserRejection(err)) {
+          toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
+          return;
+        }
         reportError(err, 'mint Art Blocks NFT');
         if (isEthProviderError(err)) {
           alert(getEthErrorMessage(err, 'Mint failed'));

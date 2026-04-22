@@ -63,7 +63,7 @@ describe('EthDonationDetailPage', () => {
   it('renders round number', () => {
     mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
     render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByText('3')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /round 3/i })).toHaveAttribute('href', '/prize/3');
   });
 
   it('renders amount in ETH', () => {

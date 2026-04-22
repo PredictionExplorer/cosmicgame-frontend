@@ -5,7 +5,12 @@ import { useRouter } from 'next/navigation';
 import api from '@/services/api';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import type { DashboardInfo } from '@/services/api/types';
-import { isUserRejection, reportError, getContractErrorMessage } from '@/utils/errors';
+import {
+  isUserRejection,
+  reportError,
+  getContractErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
 import { usePrizeTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
@@ -98,6 +103,7 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
       return true;
     } catch (err: unknown) {
       if (isUserRejection(err)) {
+        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
         return false;
       }
       reportError(err, 'claim-main-prize');

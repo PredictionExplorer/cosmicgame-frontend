@@ -6,7 +6,7 @@ import NamedNFTsPage from './NamedNFTsPage';
 
 export const metadata: Metadata = createMetadata(
   'Named Cosmic Signature Tokens | Cosmic Signature',
-  'Browse Cosmic Signature NFTs that have been given custom names by their owners. Each named token carries a unique identity within the collection.',
+  'Browse COSMIC NFTs that have been given custom names by their owners. Each named token carries a unique identity within the collection.',
   undefined,
   '/named-nfts',
 );

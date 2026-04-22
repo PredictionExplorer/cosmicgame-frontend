@@ -22,7 +22,12 @@ import useStakingWalletCSTContract from '@/hooks/useStakingWalletCSTContract';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useApiData } from '@/contexts/ApiDataContext';
 import getErrorMessage from '@/utils/alert';
-import { isUserRejection, reportError, getEthErrorMessage } from '@/utils/errors';
+import {
+  isUserRejection,
+  reportError,
+  getEthErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -133,7 +138,9 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
         fetchCstWithRewards();
       }, 4000);
     } catch (err: unknown) {
-      if (!isUserRejection(err)) {
+      if (isUserRejection(err)) {
+        setNotification({ visible: true, type: 'info', text: WALLET_TRANSACTION_CANCELLED_MESSAGE });
+      } else {
         reportError(err, 'unstaking CST');
         const msg = getEthErrorMessage(err);
         if (msg !== 'An error occurred') {

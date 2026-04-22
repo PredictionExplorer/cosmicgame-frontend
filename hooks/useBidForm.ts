@@ -16,7 +16,12 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { activeChain } from '@/config/chains';
 import { COSMICGAME_ADDRESS, RAFFLE_WALLET_ADDRESS } from '@/config/networks';
 import { ERC721_INTERFACE_ID, BID_GAS_LIMIT } from '@/config/constants';
-import { isUserRejection, reportError, getContractErrorMessage } from '@/utils/errors';
+import {
+  isUserRejection,
+  reportError,
+  getContractErrorMessage,
+  WALLET_TRANSACTION_CANCELLED_MESSAGE,
+} from '@/utils/errors';
 import { useNotify } from '@/hooks/useNotify';
 import { useCTPrice, useBidEthPrice, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 
@@ -347,7 +352,9 @@ export function useBidForm() {
         try {
           await switchChainAsync({ chainId: activeChain.id });
         } catch (err) {
-          if (!isUserRejection(err)) {
+          if (isUserRejection(err)) {
+            notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+          } else {
             notify('error', `Please switch to ${activeChain.name} in your wallet to bid.`);
           }
           return false;
@@ -448,14 +455,16 @@ export function useBidForm() {
 
       return true;
     } catch (err: unknown) {
-      if (!isUserRejection(err)) {
-        reportError(err, 'bid-eth');
-        const msg = getContractErrorMessage(err, ethBidInfo?.ETHPrice);
-        if (msg) {
-          notify('error', msg);
-        } else {
-          notifyErrorFromEthers(err);
-        }
+      if (isUserRejection(err)) {
+        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        return false;
+      }
+      reportError(err, 'bid-eth');
+      const msg = getContractErrorMessage(err, ethBidInfo?.ETHPrice);
+      if (msg) {
+        notify('error', msg);
+      } else {
+        notifyErrorFromEthers(err);
       }
       return false;
     } finally {
@@ -478,7 +487,9 @@ export function useBidForm() {
         try {
           await switchChainAsync({ chainId: activeChain.id });
         } catch (err) {
-          if (!isUserRejection(err)) {
+          if (isUserRejection(err)) {
+            notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+          } else {
             notify('error', `Please switch to ${activeChain.name} in your wallet to bid.`);
           }
           return false;
@@ -566,14 +577,16 @@ export function useBidForm() {
 
       return true;
     } catch (err: unknown) {
-      if (!isUserRejection(err)) {
-        reportError(err, 'bid-cst');
-        const msg = getContractErrorMessage(err);
-        if (msg) {
-          notify('error', msg);
-        } else {
-          notifyErrorFromEthers(err);
-        }
+      if (isUserRejection(err)) {
+        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+        return false;
+      }
+      reportError(err, 'bid-cst');
+      const msg = getContractErrorMessage(err);
+      if (msg) {
+        notify('error', msg);
+      } else {
+        notifyErrorFromEthers(err);
       }
       return false;
     } finally {

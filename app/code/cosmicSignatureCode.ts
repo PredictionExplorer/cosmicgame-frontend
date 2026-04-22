@@ -1,4 +1,4 @@
-/** Rust source code for the Cosmic Signature NFT generation algorithm. */
+/** Rust source code for the COSMIC NFT generation algorithm. */
 export const COSMIC_SIGNATURE_CODE = `extern crate nalgebra as na;
 use na::{Vector3};
 

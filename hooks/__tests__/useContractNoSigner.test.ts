@@ -18,6 +18,7 @@ jest.mock('../../utils/errors', () => ({
 
 jest.mock('../../config/networks', () => ({
   networkConfig: { rpcUrl: 'http://localhost:8545', chainId: 31337 },
+  getPublicClientRpcUrl: () => 'http://localhost:8545',
 }));
 
 jest.mock('../../config/chains', () => ({

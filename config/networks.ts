@@ -70,7 +70,8 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     chainId: 31337,
     chainHex: '0x7A69',
     chainName: 'Local Network',
-    explorerUrl: 'http://localhost',
+    // Indexed txs from dev APIs are on Arbitrum Sepolia; Anvil has no public explorer.
+    explorerUrl: 'https://sepolia.arbiscan.io',
     nftApiUrl: 'https://nfts.cosmicsignature.com/',
     infuraKey,
     NFT_ADDRESS: '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318',
@@ -91,7 +92,7 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     chainId: 421614,
     chainHex: '0x66eee',
     chainName: 'Arbitrum Sepolia',
-    explorerUrl: 'https://sepolia-explorer.arbitrum.io',
+    explorerUrl: 'https://sepolia.arbiscan.io',
     nftApiUrl: 'https://nfts.cosmicsignature.com/',
     infuraKey,
     NFT_ADDRESS: '0xbB749EfF6018a9213DFbca2a20292DB1576F530d',
@@ -144,6 +145,8 @@ export const networkConfig: NetworkConfig = {
   ...defaults,
   apiUrl: process.env.NEXT_PUBLIC_API_URL?.trim() ?? '',
   rpcUrl: process.env.NEXT_PUBLIC_RPC_URL?.trim() ?? '',
+  explorerUrl:
+    process.env.NEXT_PUBLIC_EXPLORER_URL?.trim() || defaults.explorerUrl,
 };
 
 export const INFURA_KEY = networkConfig.infuraKey;

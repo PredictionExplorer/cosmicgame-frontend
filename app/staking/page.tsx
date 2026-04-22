@@ -6,7 +6,7 @@ import StakingPage from './StakingPage';
 
 export const metadata: Metadata = createMetadata(
   'Staking | Cosmic Signature',
-  'Stake your Cosmic Signature NFTs to earn passive ETH rewards every round. View global staking stats, reward distributions, and learn how staking works on Arbitrum.',
+  'Stake your COSMIC NFTs to earn passive ETH rewards every round. View global staking stats, reward distributions, and learn how staking works on Arbitrum.',
   undefined,
   '/staking',
 );
