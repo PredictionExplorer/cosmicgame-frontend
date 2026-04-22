@@ -2,6 +2,16 @@ import axios from 'axios';
 
 import { reportError } from './errors';
 
+/** Axios instance without Cosmic API interceptors (see `services/api/client.ts`). Used for third-party HTML fetches. */
+let metadataHttp: ReturnType<typeof axios.create> | null = null;
+
+function getMetadataHttp() {
+  if (!metadataHttp) {
+    metadataHttp = axios.create({ timeout: 25_000 });
+  }
+  return metadataHttp;
+}
+
 export interface PageMetadata {
   title: string;
   description: string;
@@ -18,7 +28,7 @@ export interface PageMetadata {
  */
 export async function getMetadata(url: string): Promise<PageMetadata | null> {
   try {
-    const { data: html } = await axios.get(url);
+    const { data: html } = await getMetadataHttp().get<string>(url);
 
     const titleMatch = html.match(/<title>(.*?)<\/title>/);
     const title = titleMatch ? titleMatch[1] : '';

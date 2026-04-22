@@ -231,7 +231,7 @@ export interface BidInfo extends TxInfo {
   NumCSTTokensEth?: number;
   NFTDonationTokenId?: number;
   NFTTokenURI?: string;
-  ERC20RewardAmountEth: number;
+  ERC20RewardAmountEth?: number;
   EthPriceEth?: number;
   CstPriceEth?: number;
   RWalkNFTId?: number;

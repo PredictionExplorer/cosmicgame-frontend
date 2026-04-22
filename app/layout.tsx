@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@CosmicSignatureNFT',
+    site: '@CosmicSignature',
     title: defaultTitle,
     description: defaultDescription,
     images: [logoImgUrl],

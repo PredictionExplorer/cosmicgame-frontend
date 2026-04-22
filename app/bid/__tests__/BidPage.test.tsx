@@ -68,10 +68,10 @@ describe('BidPage', () => {
     expect(screen.getByText('No bid information found.')).toBeInTheDocument();
   });
 
-  it('renders bid information heading', () => {
+  it('renders bid details heading', () => {
     mockUseBidInfo.mockReturnValue({ data: baseBidInfo, isLoading: false });
     render(<BidPage bidId={1} />);
-    expect(screen.getByText('Bid Information')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Bid details', level: 1 })).toBeInTheDocument();
   });
 
   it('renders bidder address', () => {
@@ -83,7 +83,7 @@ describe('BidPage', () => {
   it('renders round number', () => {
     mockUseBidInfo.mockReturnValue({ data: baseBidInfo, isLoading: false });
     render(<BidPage bidId={1} />);
-    expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /round 5/i })).toHaveAttribute('href', '/prize/5');
   });
 
   it('renders ETH bid price for BidType !== 2', () => {

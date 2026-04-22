@@ -52,7 +52,7 @@ export function CallToAction() {
             Discord
           </a>
           <a
-            href="https://x.com/CosmicSignatureNFT"
+            href="https://x.com/CosmicSignature"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 transition-colors hover:text-primary"

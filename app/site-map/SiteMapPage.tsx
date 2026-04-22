@@ -22,6 +22,8 @@ const systemLinks = [
   { href: '/statistics', label: 'System Statistics' },
   { href: '/contracts', label: 'Contract Addresses' },
   { href: '/faq', label: 'FAQ' },
+  { href: '/terms', label: 'Terms of Service' },
+  { href: '/privacy', label: 'Privacy Policy' },
 ];
 
 function SitemapLinkList({

@@ -7,6 +7,13 @@ import { Tr, Tbody } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
+import {
+  DefinitionList,
+  DetailRow,
+  detailLinkClass,
+  detailPanelClass,
+} from '@/components/detail-page/DetailPageChrome';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { useStakingRewardsByUserByTokenDetails } from '@/hooks/useApiQuery';
 import {
@@ -20,10 +27,8 @@ import {
 } from '@/components/styled';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import { cn } from '@/lib/utils';
 
-/* ------------------------------------------------------------------
-  Types
------------------------------------------------------------------- */
 interface StakeInfo {
   TxHash: string;
   TimeStamp: number;
@@ -50,9 +55,6 @@ interface RewardsRowData {
   Unstake: UnstakeInfo;
 }
 
-/* ------------------------------------------------------------------
-  Sub-Component: RewardsDetailRow
------------------------------------------------------------------- */
 function RewardsDetailRow({ row }: { row: RewardsRowData }) {
   const [open, setOpen] = useState<boolean>(false);
 
@@ -92,56 +94,54 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
       {open && (
         <TablePrimaryRow className="border-t-0">
           <TablePrimaryCell className="!py-0" colSpan={6}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">
-              {/* Stake Section */}
-              <div>
-                <p className="text-lg font-semibold">Stake</p>
-                <div className="mb-2">
-                  <span className="text-primary">Staked Datetime:</span>
-                  &nbsp;
-                  <a
-                    className="text-inherit text-[inherit]"
-                    href={getExplorerUrl('tx', Stake.TxHash)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span>{convertTimestampToDateTime(Stake.TimeStamp)}</span>
-                  </a>
+            <div className="grid grid-cols-1 gap-6 py-4 md:grid-cols-2">
+              <div className={cn(detailPanelClass, 'mb-0')}>
+                <div className="border-b border-white/[0.06] px-4 py-3">
+                  <h3 className="font-display text-sm font-semibold text-foreground">Stake</h3>
                 </div>
-                <div className="mb-2">
-                  <span className="text-primary">Number of Staked NFTs:</span>
-                  &nbsp;
-                  <span>{Stake.NumStakedNFTs}</span>
-                </div>
-              </div>
-
-              {/* Unstake Section */}
-              {Unstake.EvtLogId !== 0 && (
-                <div>
-                  <p className="text-lg font-semibold">Unstake</p>
-                  <div className="mb-2">
-                    <span className="text-primary">Unstake Datetime:</span>
-                    &nbsp;
+                <DefinitionList>
+                  <DetailRow label="Staked datetime">
                     <a
-                      className="text-inherit text-[inherit]"
-                      href={getExplorerUrl('tx', Unstake.TxHash)}
+                      className={detailLinkClass}
+                      href={getExplorerUrl('tx', Stake.TxHash)}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <span>{convertTimestampToDateTime(Unstake.TimeStamp)}</span>
+                      {convertTimestampToDateTime(Stake.TimeStamp)}
                     </a>
+                  </DetailRow>
+                  <DetailRow label="Number of staked NFTs">
+                    <span className="font-mono tabular-nums">{Stake.NumStakedNFTs}</span>
+                  </DetailRow>
+                </DefinitionList>
+              </div>
+
+              {Unstake.EvtLogId !== 0 ? (
+                <div className={cn(detailPanelClass, 'mb-0')}>
+                  <div className="border-b border-white/[0.06] px-4 py-3">
+                    <h3 className="font-display text-sm font-semibold text-foreground">Unstake</h3>
                   </div>
-                  <div className="mb-2">
-                    <span className="text-primary">Number of Staked NFTs:</span>
-                    &nbsp;
-                    <span>{Unstake.NumStakedNFTs}</span>
-                  </div>
-                  <div className="mb-2">
-                    <span className="text-primary">Rewards:</span>
-                    &nbsp;
-                    <span>{Unstake.RewardAmountEth.toFixed(6)} ETH</span>
-                  </div>
+                  <DefinitionList>
+                    <DetailRow label="Unstake datetime">
+                      <a
+                        className={detailLinkClass}
+                        href={getExplorerUrl('tx', Unstake.TxHash)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {convertTimestampToDateTime(Unstake.TimeStamp)}
+                      </a>
+                    </DetailRow>
+                    <DetailRow label="Number of staked NFTs">
+                      <span className="font-mono tabular-nums">{Unstake.NumStakedNFTs}</span>
+                    </DetailRow>
+                    <DetailRow label="Rewards">
+                      <span className="font-mono tabular-nums">{Unstake.RewardAmountEth.toFixed(6)} ETH</span>
+                    </DetailRow>
+                  </DefinitionList>
                 </div>
+              ) : (
+                <div />
               )}
             </div>
           </TablePrimaryCell>
@@ -151,9 +151,6 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
   );
 }
 
-/* ------------------------------------------------------------------
-  Sub-Component: RewardsDetailTable
------------------------------------------------------------------- */
 function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
   const PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -162,27 +159,29 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
 
   return (
     <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <Tr>
-              <TablePrimaryHeadCell>
-                <span className="sr-only">Details</span>
-              </TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Is Claimed?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Reward (ETH)</TablePrimaryHeadCell>
-            </Tr>
-          </TablePrimaryHead>
-          <Tbody>
-            {paginatedData.map((row) => (
-              <RewardsDetailRow key={row.DepositId} row={row} />
-            ))}
-          </Tbody>
-        </TablePrimary>
-      </TablePrimaryContainer>
+      <SectionCardTableShell>
+        <TablePrimaryContainer>
+          <TablePrimary>
+            <TablePrimaryHead>
+              <Tr>
+                <TablePrimaryHeadCell>
+                  <span className="sr-only">Details</span>
+                </TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Is Claimed?</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="right">Reward (ETH)</TablePrimaryHeadCell>
+              </Tr>
+            </TablePrimaryHead>
+            <Tbody>
+              {paginatedData.map((row) => (
+                <RewardsDetailRow key={row.DepositId} row={row} />
+              ))}
+            </Tbody>
+          </TablePrimary>
+        </TablePrimaryContainer>
+      </SectionCardTableShell>
 
       <CustomPagination
         page={currentPage}
@@ -194,14 +193,12 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
   );
 }
 
-/* ------------------------------------------------------------------
-  Main Component: RewardsByTokenPage
------------------------------------------------------------------- */
+function SectionCardTableShell({ children }: { children: React.ReactNode }) {
+  return <div className={cn(detailPanelClass, 'mb-8 overflow-x-auto')}>{children}</div>;
+}
+
 function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: number }) {
-  const { data: rawResponse, isLoading: loading } = useStakingRewardsByUserByTokenDetails(
-    address,
-    tokenId,
-  );
+  const { data: rawResponse, isLoading: loading } = useStakingRewardsByUserByTokenDetails(address, tokenId);
   const rewardsData = useMemo(() => {
     if (!rawResponse) return [];
     return Object.keys(rawResponse)
@@ -209,13 +206,31 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
       .map((key) => (rawResponse as Record<string, unknown>)[key]) as RewardsRowData[];
   }, [rawResponse]);
 
-  return (
-    <MainWrapper>
-      <h4 className="text-2xl font-bold text-primary text-center mb-8">
-        Staking Rewards Details for Token {tokenId}
-      </h4>
+  const pageTitle = `Staking Rewards Details for Token ${tokenId}`;
 
-      {loading ? <p>Loading...</p> : <RewardsDetailTable list={rewardsData} />}
+  return (
+    <MainWrapper className="max-sm:pb-16">
+      <div className="mx-auto max-w-5xl">
+        <PageHeader
+          title={pageTitle}
+          subtitle={`Rewards for ${address}`}
+          breadcrumbs={[
+            { label: 'Home', href: '/' },
+            { label: 'User', href: `/user/${address}` },
+            { label: `Token #${tokenId}` },
+          ]}
+          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
+          align="left"
+        />
+
+        {loading ? (
+          <div className={cn(detailPanelClass, 'p-10 text-center')}>
+            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+          </div>
+        ) : (
+          <RewardsDetailTable list={rewardsData} />
+        )}
+      </div>
     </MainWrapper>
   );
 }

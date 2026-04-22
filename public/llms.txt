@@ -39,7 +39,7 @@ Cosmic Signature combines generative art, an exciting Ethereum bidding game, and
 
 ## Community
 
-- Twitter/X: https://x.com/CosmicSignatureNFT
+- Twitter/X: https://x.com/CosmicSignature
 - Discord: https://discord.gg/bGnPn96Qwt
 
 ## Technical

@@ -45,21 +45,21 @@ describe('Footer', () => {
   });
 
   it('renders the terms link', () => {
-    const termsLink = screen.getByText('Terms');
+    const termsLink = screen.getByRole('link', { name: 'Terms' });
     expect(termsLink).toBeInTheDocument();
-    expect(termsLink.tagName).toBe('A');
+    expect(termsLink).toHaveAttribute('href', '/terms');
   });
 
   it('renders the privacy link', () => {
-    const privacyLink = screen.getByText('Privacy');
+    const privacyLink = screen.getByRole('link', { name: 'Privacy' });
     expect(privacyLink).toBeInTheDocument();
-    expect(privacyLink.tagName).toBe('A');
+    expect(privacyLink).toHaveAttribute('href', '/privacy');
   });
 
   it('renders the twitter link pointing to the correct URL', () => {
     const twitterLink = screen.getByLabelText('Twitter');
     expect(twitterLink).toBeInTheDocument();
-    expect(twitterLink).toHaveAttribute('href', 'https://x.com/CosmicSignatureNFT');
+    expect(twitterLink).toHaveAttribute('href', 'https://x.com/CosmicSignature');
     expect(twitterLink).toHaveAttribute('target', '_blank');
     expect(twitterLink).toHaveAttribute('rel', 'noopener noreferrer');
   });

@@ -6,6 +6,8 @@ import Lightbox from 'yet-another-react-lightbox';
 
 import { getAssetsUrl, getOriginUrl } from '@/utils';
 
+import { DefinitionList, DetailRow, SectionCard } from '@/components/detail-page/DetailPageChrome';
+import { PageHeader } from '@/components/layout/PageHeader';
 import NFTImage from '@/components/nft/NFTImage';
 import {
   MainWrapper,
@@ -38,6 +40,13 @@ const SampleDetailPage = () => {
   return (
     <MainWrapper className="max-w-none px-0">
       <div className="mx-auto w-full max-w-7xl px-4">
+        <PageHeader
+          title="Sample NFT detail"
+          subtitle="Reference layout for Cosmic Signature tokens"
+          breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Sample detail' }]}
+          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
+          align="left"
+        />
         <SectionWrapper>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
             <div className="max-w-md mx-auto w-full md:max-w-none">
@@ -90,16 +99,16 @@ const SampleDetailPage = () => {
             </div>
 
             <div className="max-w-md mx-auto w-full md:max-w-none">
-              <div className="mb-2 flex">
-                <span className="text-primary">Token Name:</span>&nbsp;
-                <span>Sample NFT</span>
-              </div>
-              <div className="mb-2 flex">
-                <span className="text-primary">Seed:</span>&nbsp;
-                <span className="font-mono inline-block break-words w-[32ch]">
-                  3c8510e4cbe870a700d7c44b05f2cdf84824fcd8108aaaafd7952222590b31de
-                </span>
-              </div>
+              <SectionCard sectionId="sample-meta" title="Token metadata" description="Static sample values for this demo page.">
+                <DefinitionList>
+                  <DetailRow label="Token name">Sample NFT</DetailRow>
+                  <DetailRow label="Seed">
+                    <span className="font-mono text-[13px] break-all">
+                      3c8510e4cbe870a700d7c44b05f2cdf84824fcd8108aaaafd7952222590b31de
+                    </span>
+                  </DetailRow>
+                </DefinitionList>
+              </SectionCard>
             </div>
           </div>
 

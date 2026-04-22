@@ -8,6 +8,8 @@ import { Tr } from 'react-super-responsive-table';
 
 import { getExplorerUrl, convertTimestampToDateTime, isWalletAddress } from '@/utils';
 
+import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
+import { PageHeader } from '@/components/layout/PageHeader';
 import {
   MainWrapper,
   TablePrimary,
@@ -22,6 +24,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 import type { CSTTransferRecord } from '@/services/api/types';
+import { cn } from '@/lib/utils';
 
 interface TransferRow extends CSTTransferRecord {
   TransferType?: number;
@@ -104,12 +107,14 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
   );
 };
 
-const CosmicTokenTransfersTable = ({ list }: { list: TransferRow[] }) => {
+const CosmicSignatureTransfersTable = ({ list }: { list: TransferRow[] }) => {
   const perPage = 10;
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p className="text-lg font-semibold">No transfers yet.</p>;
+    return (
+      <div className="p-10 text-center text-sm font-medium text-muted-foreground">No transfers yet.</div>
+    );
   }
 
   const currentPageList = list.slice((page - 1) * perPage, page * perPage);
@@ -151,16 +156,30 @@ const CosmicSignatureTransfersPage = ({ address: rawAddress }: { address: string
   const { data: cosmicSignatureTransfers = [], isLoading: loading } = useCSTTransfers(address);
 
   return (
-    <MainWrapper>
-      <h2 className="text-2xl font-bold text-primary text-center mb-8">
-        Cosmic Signature Transfers
-      </h2>
+    <MainWrapper className="max-sm:pb-16">
+      <div className="mx-auto max-w-5xl">
+        <PageHeader
+          title="Cosmic Signature Transfers"
+          subtitle={address !== 'Invalid Address' ? address : undefined}
+          breadcrumbs={[
+            { label: 'Home', href: '/' },
+            ...(address !== 'Invalid Address' ? ([{ label: 'User', href: `/user/${address}` }] as const) : []),
+            { label: 'NFT transfers' },
+          ]}
+          className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
+          align="left"
+        />
 
-      {loading ? (
-        <p className="text-lg font-semibold">Loading...</p>
-      ) : (
-        <CosmicTokenTransfersTable list={cosmicSignatureTransfers} />
-      )}
+        {loading ? (
+          <div className={cn(detailPanelClass, 'p-10 text-center')}>
+            <p className="text-sm font-medium text-muted-foreground">Loading...</p>
+          </div>
+        ) : (
+          <div className={cn(detailPanelClass, 'overflow-x-auto p-2 sm:p-4')}>
+            <CosmicSignatureTransfersTable list={cosmicSignatureTransfers} />
+          </div>
+        )}
+      </div>
     </MainWrapper>
   );
 };

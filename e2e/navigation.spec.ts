@@ -87,12 +87,11 @@ test.describe('Navigation', () => {
   });
 
   test('Footer has Terms, Privacy, and Site-Map links', async ({ page }) => {
-    // FooterWrapper renders as header (MUI AppBar), so find by content. Scroll to bottom first.
+    // Scroll to bottom so footer is in view.
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(300);
-    const termsLink = page.locator('text=Terms and conditions').first();
-    await expect(termsLink).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('text=Privacy policy').first()).toBeVisible();
+    await expect(page.locator('footer a[href="/terms"]').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('footer a[href="/privacy"]').first()).toBeVisible();
     await expect(page.locator('a[href="/site-map"]').first()).toBeVisible();
   });
 

@@ -1,9 +1,27 @@
-import axios, { isAxiosError, type AxiosResponse } from 'axios';
+import axios, { isAxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 
 import { networkConfig } from '@/config/networks';
 import { reportError } from '@/utils/errors';
 
 import type { RoundInfo } from './types';
+
+/** True when the failed request was aimed at our Cosmic Game or main NFT API (not arbitrary third-party URLs). */
+function isConfiguredBackendRequest(cfg: InternalAxiosRequestConfig | undefined): boolean {
+  if (!cfg) return false;
+  const built = (cfg.url ?? '').trim();
+  const base = (cfg.baseURL ?? '').replace(/\/$/, '');
+  const full = base ? `${base}/${built.replace(/^\//, '')}` : built;
+  const target = (full || built).toLowerCase();
+
+  const cosmic = (networkConfig.apiUrl || '').replace(/\/$/, '').toLowerCase();
+  if (cosmic && target.startsWith(cosmic)) return true;
+  if (target.includes('/api/cosmicgame')) return true;
+
+  const main = (networkConfig.nftApiUrl || '').replace(/\/$/, '').toLowerCase();
+  if (main && target.startsWith(main)) return true;
+
+  return false;
+}
 
 axios.interceptors.response.use(
   (response) => {
@@ -11,7 +29,12 @@ axios.interceptors.response.use(
     return response;
   },
   (error: unknown) => {
-    if (process.env.NODE_ENV === 'development' && isAxiosError(error) && !error.response) {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      isAxiosError(error) &&
+      !error.response &&
+      isConfiguredBackendRequest(error.config)
+    ) {
       const cfg = error.config;
       const built = cfg?.url ?? '';
       const fullUrl = cfg?.baseURL ? `${cfg.baseURL.replace(/\/$/, '')}/${(cfg.url ?? '').replace(/^\//, '')}` : built;

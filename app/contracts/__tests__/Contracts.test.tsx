@@ -84,7 +84,7 @@ jest.mock('../../../config/networks', () => ({
   networkConfig: {
     chainName: 'Arbitrum Sepolia',
     chainId: 421614,
-    explorerUrl: 'https://sepolia-explorer.arbitrum.io',
+    explorerUrl: 'https://sepolia.arbiscan.io',
   },
   CHARITY_WALLET_ADDRESS: '0xCharity',
   COSMICGAME_ADDRESS: '0xGame',
