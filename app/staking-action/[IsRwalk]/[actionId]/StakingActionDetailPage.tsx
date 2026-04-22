@@ -54,7 +54,12 @@ function StakingActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; actio
             <p className="text-destructive font-medium">{error}</p>
           </div>
         ) : actionInfo?.Stake ? (
-          <StakingActionBody isRwalk={isRwalk} actionId={actionId} actionInfo={actionInfo} />
+          <StakingActionBody
+            isRwalk={isRwalk}
+            actionId={actionId}
+            stake={actionInfo.Stake}
+            unstake={actionInfo.Unstake}
+          />
         ) : (
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
             <p className="font-medium text-foreground">No data found for this staking action.</p>
@@ -68,14 +73,14 @@ function StakingActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; actio
 function StakingActionBody({
   isRwalk,
   actionId,
-  actionInfo,
+  stake,
+  unstake,
 }: {
   isRwalk: boolean;
   actionId: number;
-  actionInfo: { Stake: StakingAction; Unstake: StakingAction };
+  stake: StakingAction;
+  unstake: StakingAction | null;
 }) {
-  const stake = actionInfo.Stake!;
-  const unstake = actionInfo.Unstake!;
   const { TokenId, Seed, StakerAddr } = stake;
 
   const tokenImageURL = isRwalk
@@ -136,7 +141,7 @@ function StakingActionBody({
           </DefinitionList>
         </SectionCard>
 
-        {unstake.EvtLogId && unstake.EvtLogId !== 0 ? (
+        {unstake && unstake.EvtLogId && unstake.EvtLogId !== 0 ? (
           <SectionCard sectionId="staking-action-unstake" title="Unstake" description="When the stake was released.">
             <DefinitionList>
               <DetailRow label="Unstaked datetime">

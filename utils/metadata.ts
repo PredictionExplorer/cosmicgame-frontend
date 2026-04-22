@@ -31,18 +31,18 @@ export async function getMetadata(url: string): Promise<PageMetadata | null> {
     const { data: html } = await getMetadataHttp().get<string>(url);
 
     const titleMatch = html.match(/<title>(.*?)<\/title>/);
-    const title = titleMatch ? titleMatch[1] : '';
+    const title = titleMatch?.[1] ?? '';
 
     const descriptionMatch = html.match(
       /<meta\s+name=["']description["']\s+content=["'](.*?)["']/i,
     );
-    const description = descriptionMatch ? descriptionMatch[1] : '';
+    const description = descriptionMatch?.[1] ?? '';
 
     const keywordsMatch = html.match(/<meta\s+name=["']keywords["']\s+content=["'](.*?)["']/i);
-    const keywords = keywordsMatch ? keywordsMatch[1] : '';
+    const keywords = keywordsMatch?.[1] ?? '';
 
     const imageMatch = html.match(/<meta\s+property=["']og:image["']\s+content=["'](.*?)["']/i);
-    const image = imageMatch ? imageMatch[1] : '';
+    const image = imageMatch?.[1] ?? '';
 
     return { title, description, keywords, image };
   } catch (error) {
