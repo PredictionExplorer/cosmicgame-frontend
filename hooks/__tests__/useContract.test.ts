@@ -8,6 +8,7 @@ import useContract from '@/hooks/useContract';
 jest.mock('wagmi', () => ({
   usePublicClient: jest.fn(),
   useWalletClient: jest.fn(() => ({ data: undefined })),
+  useConnectorClient: jest.fn(() => ({ data: undefined })),
 }));
 
 jest.mock('viem', () => ({

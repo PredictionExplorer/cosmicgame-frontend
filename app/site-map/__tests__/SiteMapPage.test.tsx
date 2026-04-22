@@ -53,7 +53,7 @@ describe('SiteMapPage', () => {
     render(<SiteMapPage />);
     const main = screen.getByRole('main');
     const links = within(main).getAllByRole('link');
-    expect(links).toHaveLength(12);
+    expect(links).toHaveLength(14);
   });
 
   it('has no accessibility violations', async () => {

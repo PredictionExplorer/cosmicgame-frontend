@@ -179,7 +179,7 @@ export function Providers({
   }, []);
 
   useEffect(() => {
-    if (!envValidation.valid) return;
+    if (!envValidation.valid || process.env.NODE_ENV !== 'development') return;
     const rpcDisplay =
       typeof window !== 'undefined' && networkConfig.rpcUrl.includes('161.129.67.42')
         ? `${window.location.origin}/api/rpc → ${networkConfig.rpcUrl}`

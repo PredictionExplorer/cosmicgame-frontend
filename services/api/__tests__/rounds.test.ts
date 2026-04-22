@@ -27,6 +27,7 @@ jest.mock('axios', () => {
     default: {
       get: jest.fn(),
       post: jest.fn(),
+      interceptors: { response: { use: jest.fn() } },
     },
     isAxiosError: actual.isAxiosError,
   };

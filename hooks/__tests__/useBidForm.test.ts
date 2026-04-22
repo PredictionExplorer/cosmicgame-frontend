@@ -1,8 +1,16 @@
 import { renderHook, act } from '@testing-library/react';
+import { writeContract as wagmiWriteContract } from '@wagmi/core';
 
 import { useBidForm } from '../useBidForm';
 import useCosmicGameContract from '../../hooks/useCosmicGameContract';
 import api from '../../services/api';
+
+jest.mock('@wagmi/core', () => ({
+  getConnectorClient: jest.fn().mockResolvedValue(undefined),
+  writeContract: jest.fn().mockResolvedValue('0xhash'),
+}));
+
+const mockWagmiWriteContract = wagmiWriteContract as jest.MockedFunction<typeof wagmiWriteContract>;
 
 /* ────────────────────────────────────────────────────────────────── */
 /*  Notification                                                     */
@@ -35,6 +43,10 @@ const mockEstimateContractGas = jest.fn().mockResolvedValue(BigInt(500_000));
 const mockWriteContract = jest.fn().mockResolvedValue('0xhash');
 
 jest.mock('wagmi', () => ({
+  useConfig: jest.fn(() => ({})),
+  useChainId: jest.fn(() => 421614),
+  useSwitchChain: jest.fn(() => ({ switchChainAsync: jest.fn().mockResolvedValue(undefined) })),
+  useConnectorClient: jest.fn(() => ({ data: undefined })),
   usePublicClient: jest.fn(() => ({
     waitForTransactionReceipt: mockWaitForTransactionReceipt,
     getCode: mockGetCode,
@@ -43,7 +55,10 @@ jest.mock('wagmi', () => ({
     estimateContractGas: mockEstimateContractGas,
   })),
   useWalletClient: jest.fn(() => ({
-    data: { writeContract: mockWriteContract },
+    data: {
+      writeContract: mockWriteContract,
+      account: { address: '0xUser' as `0x${string}` },
+    },
   })),
 }));
 
@@ -154,6 +169,12 @@ jest.mock('viem', () => ({
 /* ────────────────────────────────────────────────────────────────── */
 
 jest.mock('../../config/networks', () => ({
+  networkConfig: {
+    rpcUrl: 'http://127.0.0.1:8545',
+    chainId: 421614,
+    apiUrl: 'http://test-api.example/api/cosmicgame/',
+    nftApiUrl: 'https://nfts.cosmicsignature.com/',
+  },
   COSMICGAME_ADDRESS: '0xCosmicGame',
   RAFFLE_WALLET_ADDRESS: '0xRaffle',
 }));
@@ -194,6 +215,7 @@ const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffff
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockWagmiWriteContract.mockResolvedValue('0xhash' as `0x${string}`);
 
   mockBidWithEth.mockResolvedValue('0xhash');
   mockBidWithCst.mockResolvedValue('0xhash');
@@ -334,7 +356,10 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithEth).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ functionName: 'bidWithEth' }),
+    );
     expect(mockWaitForTransactionReceipt).toHaveBeenCalled();
     expect(result.current.isBidding).toBe(false);
   });
@@ -359,7 +384,10 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithEthAndDonateNft).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ functionName: 'bidWithEthAndDonateNft' }),
+    );
     expect(result.current.nftDonateAddress).toBe('');
     expect(result.current.nftId).toBe('');
   });
@@ -387,7 +415,10 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithEthAndDonateToken).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ functionName: 'bidWithEthAndDonateToken' }),
+    );
     expect(result.current.tokenDonateAddress).toBe('');
     expect(result.current.tokenAmount).toBe('');
   });
@@ -404,7 +435,10 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithCst).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ functionName: 'bidWithCst' }),
+    );
     expect(mockApiGetUserBalance).toHaveBeenCalled();
     expect(result.current.isBidding).toBe(false);
   });
@@ -422,7 +456,10 @@ describe('useBidForm', () => {
     });
 
     expect(success).toBe(true);
-    expect(mockBidWithCst).toHaveBeenCalledTimes(1);
+    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ functionName: 'bidWithCst' }),
+    );
     expect(mockApiGetUserBalance).not.toHaveBeenCalled();
   });
 
@@ -439,7 +476,7 @@ describe('useBidForm', () => {
 
     expect(success).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith('error', expect.stringContaining('Insufficient ETH'));
-    expect(mockBidWithEth).not.toHaveBeenCalled();
+    expect(mockWagmiWriteContract).not.toHaveBeenCalled();
   });
 
   it('onBidWithCST notifies on insufficient CST balance', async () => {
@@ -480,7 +517,7 @@ describe('useBidForm', () => {
 
   it('onBid silently ignores user rejection', async () => {
     const rejectionError = { code: 4001, message: 'User rejected' };
-    mockBidWithEth.mockRejectedValue(rejectionError);
+    mockWagmiWriteContract.mockRejectedValueOnce(rejectionError);
     mockIsUserRejection.mockReturnValue(true);
 
     const { result } = renderHook(() => useBidForm());
