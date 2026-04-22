@@ -184,7 +184,7 @@ export function Providers({
       typeof window !== 'undefined' && networkConfig.rpcUrl.includes('161.129.67.42')
         ? `${window.location.origin}/api/rpc → ${networkConfig.rpcUrl}`
         : networkConfig.rpcUrl;
-    console.debug(
+    console.warn(
       '[Cosmic Signature] Config:\n' +
         `  Network: ${process.env.NEXT_PUBLIC_NETWORK}\n` +
         `  Chain ID: ${networkConfig.chainId}\n` +

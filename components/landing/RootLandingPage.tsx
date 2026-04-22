@@ -65,10 +65,9 @@ export function RootLandingPage({ launchTimestampMs }: RootLandingPageProps) {
   const [countdown, setCountdown] = useState<Countdown>(() => getCountdown(launchTimestampMs));
 
   useEffect(() => {
-    setCountdown(getCountdown(launchTimestampMs));
-    const timerId = window.setInterval(() => {
-      setCountdown(getCountdown(launchTimestampMs));
-    }, 1000);
+    const tick = () => setCountdown(getCountdown(launchTimestampMs));
+    const timerId = window.setInterval(tick, 1000);
+    void Promise.resolve().then(tick);
     return () => window.clearInterval(timerId);
   }, [launchTimestampMs]);
 

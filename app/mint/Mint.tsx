@@ -5,6 +5,7 @@ import { formatEther, parseEther } from 'viem';
 import { usePublicClient } from 'wagmi';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { parseBalance } from '@/utils';
 
@@ -15,8 +16,6 @@ import { SectionDivider } from '@/components/ui/section-divider';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { asWriteFn } from '@/utils/contractWrite';
-import { toast } from 'sonner';
-
 import {
   isUserRejection,
   isEthProviderError,

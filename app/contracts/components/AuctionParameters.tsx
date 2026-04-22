@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import { Copy, Check, ExternalLink, Gavel, Timer } from 'lucide-react';
 
 import { formatSeconds } from '@/utils';
-import { useClipboard } from '@/hooks/useClipboard';
 
+import { useClipboard } from '@/hooks/useClipboard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { SectionDivider } from '@/components/ui/section-divider';

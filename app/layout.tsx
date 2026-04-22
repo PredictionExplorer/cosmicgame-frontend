@@ -3,10 +3,9 @@ import { Suspense, type ReactNode } from 'react';
 import Script from 'next/script';
 import { headers } from 'next/headers';
 
-import { isLandingHost } from '@/lib/hostRouting';
-
 import { logoImgUrl } from '@/utils';
 
+import { isLandingHost } from '@/lib/hostRouting';
 import { GA_TRACKING_ID } from '@/utils/analytics';
 import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
 

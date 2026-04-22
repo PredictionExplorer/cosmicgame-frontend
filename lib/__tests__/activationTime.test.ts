@@ -1,5 +1,4 @@
 import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/activationTime';
-
 import type { DashboardInfo } from '@/services/api/types';
 
 describe('localClockUtcEpochMs', () => {

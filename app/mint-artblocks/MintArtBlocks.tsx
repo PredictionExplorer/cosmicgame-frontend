@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { usePublicClient } from 'wagmi';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,8 +16,6 @@ import {
 import { MainWrapper, CenterBox } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import useArtBlocksContract from '@/hooks/useArtBlocksContract';
-import { toast } from 'sonner';
-
 import {
   isUserRejection,
   isEthProviderError,
