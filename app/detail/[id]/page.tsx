@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import axios from 'axios';
 
-import { getAssetsUrl } from '@/utils';
+import { getAssetsUrl, logoImgUrl } from '@/utils';
 
 import { cosmicGameBaseUrl } from '@/services/api';
 import { createMetadata } from '@/utils/seo';
@@ -35,12 +35,12 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   const name = `Cosmic Signature Token #${id}`;
   const description = `Unique generative NFT from the Cosmic Signature bidding game, featuring artwork based on three-body problem physics.`;
-  let imageUrl = 'https://nfts.cosmicsignature.com/images/new/cosmicsignature/logo.png';
+  let imageUrl = logoImgUrl;
 
   try {
     const { data } = await axios.get(`${cosmicGameBaseUrl}cst/info/${id}`);
     const fileName = `0x${data.TokenInfo.Seed}`;
-    imageUrl = `https://nfts.cosmicsignature.com/images/new/cosmicsignature/${fileName}.png`;
+    imageUrl = getAssetsUrl(`cosmicsignature/${fileName}.png`);
   } catch {
     // fallback to logo
   }

@@ -35,7 +35,7 @@ describe('getAssetsUrl', () => {
   it('constructs direct URL with the NFT image server base', () => {
     const result = getAssetsUrl('cosmicsignature/logo.png');
     expect(result).toBe(
-      'https://nfts.cosmicsignature.com/images/new/cosmicsignature/logo.png',
+      'https://nfts-sepolia.cosmicsignature.com/images/new/cosmicsignature/logo.png',
     );
   });
 });
@@ -44,14 +44,14 @@ describe('getRWLKImageUrl', () => {
   it('constructs direct URL with default variant', () => {
     const result = getRWLKImageUrl('12345');
     expect(result).toBe(
-      'https://nfts.cosmicsignature.com/images/randomwalk/12345_black_thumb.jpg',
+      'https://nfts-sepolia.cosmicsignature.com/images/randomwalk/12345_black_thumb.jpg',
     );
   });
 
   it('uses custom variant when provided', () => {
     const result = getRWLKImageUrl('12345', 'color.png');
     expect(result).toBe(
-      'https://nfts.cosmicsignature.com/images/randomwalk/12345_color.png',
+      'https://nfts-sepolia.cosmicsignature.com/images/randomwalk/12345_color.png',
     );
   });
 });

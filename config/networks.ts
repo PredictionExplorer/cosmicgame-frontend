@@ -72,7 +72,7 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     chainName: 'Local Network',
     // Indexed txs from dev APIs are on Arbitrum Sepolia; Anvil has no public explorer.
     explorerUrl: 'https://sepolia.arbiscan.io',
-    nftApiUrl: 'https://nfts.cosmicsignature.com/',
+    nftApiUrl: 'https://nfts-local.cosmicsignature.com/',
     infuraKey,
     NFT_ADDRESS: '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318',
     COSMICGAME_ADDRESS: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
@@ -93,7 +93,7 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     chainHex: '0x66eee',
     chainName: 'Arbitrum Sepolia',
     explorerUrl: 'https://sepolia.arbiscan.io',
-    nftApiUrl: 'https://nfts.cosmicsignature.com/',
+    nftApiUrl: 'https://nfts-sepolia.cosmicsignature.com/',
     infuraKey,
     NFT_ADDRESS: '0xbB749EfF6018a9213DFbca2a20292DB1576F530d',
     COSMICGAME_ADDRESS: '0xC801d06c9900ef0cD878Ad6f59622aAfAd8F54dE',

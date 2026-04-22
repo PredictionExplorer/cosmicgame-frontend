@@ -2,7 +2,8 @@ import type { FAQItem } from '@/app/faq/data/faq-data';
 
 const SITE_URL = 'https://www.cosmicsignature.com';
 const SITE_NAME = 'Cosmic Signature';
-const LOGO_URL = 'https://nfts.cosmicsignature.com/images/new/cosmicsignature/logo.png';
+/** Branding from `public/images/logo.svg` — not an NFT asset on the CDN. */
+const SITE_LOGO_URL = `${SITE_URL}/images/logo.svg`;
 
 export interface BreadcrumbSegment {
   name: string;
@@ -34,7 +35,7 @@ export function organizationJsonLd() {
     '@type': 'Organization',
     name: SITE_NAME,
     url: SITE_URL,
-    logo: LOGO_URL,
+    logo: SITE_LOGO_URL,
     sameAs: ['https://x.com/CosmicSignature', 'https://discord.gg/bGnPn96Qwt'],
     description:
       'Cosmic Signature combines generative art, an exciting Ethereum bidding game, and social impact through charitable giving on the Arbitrum network.',

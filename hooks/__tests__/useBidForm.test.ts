@@ -173,7 +173,7 @@ jest.mock('../../config/networks', () => ({
     rpcUrl: 'http://127.0.0.1:8545',
     chainId: 421614,
     apiUrl: 'http://test-api.example/api/cosmicgame/',
-    nftApiUrl: 'https://nfts.cosmicsignature.com/',
+    nftApiUrl: 'https://nfts-sepolia.cosmicsignature.com/',
   },
   COSMICGAME_ADDRESS: '0xCosmicGame',
   RAFFLE_WALLET_ADDRESS: '0xRaffle',
