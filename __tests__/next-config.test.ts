@@ -10,6 +10,14 @@ describe('next.config', () => {
     expect(config).toHaveProperty('reactStrictMode', true);
   });
 
+  it('inlines public build metadata for the client bundle', () => {
+    expect((config as NextConfig).env).toMatchObject({
+      NEXT_PUBLIC_BUILD_COMMIT: expect.any(String),
+      NEXT_PUBLIC_BUILD_REF: expect.any(String),
+      NEXT_PUBLIC_VERCEL_ENV: expect.any(String),
+    });
+  });
+
   it('configures NFT image remote patterns for all CDN hosts', () => {
     const patterns = (config as NextConfig).images?.remotePatterns;
     expect(patterns).toEqual(

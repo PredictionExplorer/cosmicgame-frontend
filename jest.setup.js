@@ -9,6 +9,12 @@ process.env.NEXT_PUBLIC_NETWORK = process.env.NEXT_PUBLIC_NETWORK || 'sepolia';
 process.env.NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://test-api.example/api/cosmicgame/';
 process.env.NEXT_PUBLIC_RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545';
 
+// Build stamp (mirrors next.config `env`); Preview/local show footer line.
+process.env.NEXT_PUBLIC_BUILD_COMMIT =
+  process.env.NEXT_PUBLIC_BUILD_COMMIT || 'deadbeef1234567890abcdef1234567890abcd';
+process.env.NEXT_PUBLIC_BUILD_REF = process.env.NEXT_PUBLIC_BUILD_REF || 'local';
+process.env.NEXT_PUBLIC_VERCEL_ENV = process.env.NEXT_PUBLIC_VERCEL_ENV || 'preview';
+
 const { toHaveNoViolations } = require('jest-axe');
 expect.extend(toHaveNoViolations);
 
