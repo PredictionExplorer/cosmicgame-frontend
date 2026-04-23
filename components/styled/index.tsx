@@ -3,23 +3,6 @@ import { Table, Thead, Tr, Th, Td } from 'react-super-responsive-table';
 
 import { cn } from '@/lib/utils';
 
-const paintWorkletBorder = (
-  border: string,
-  radius: string,
-  path: string,
-  _gradient: string,
-  _beforeExtra?: React.CSSProperties,
-): React.CSSProperties => ({
-  border: 0,
-  borderRadius: 0,
-  '--border': border,
-  '--radius': radius,
-  '--t': 0,
-  '--path': path,
-  WebkitMask: 'paint(rounded-shape)',
-  background: 'transparent',
-});
-
 export function StyledLink({ className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) {
   return <a className={cn('text-white underline', className)} {...props} />;
 }
@@ -214,15 +197,7 @@ export function CounterItemWrapper({
         'relative w-[75px] px-4 py-1.5 mx-auto mb-2 border border-primary/50 rounded overflow-hidden',
         className,
       )}
-      style={{
-        ...paintWorkletBorder(
-          '1px',
-          '4px',
-          '0 0,8px 0,100% 0,100% calc(100% - 14px),calc(100% - 16px) 100%,0 100%',
-          'linear-gradient(152.14deg, #15BFFD 9.96%, #9C37FD 100%)',
-        ),
-        ...style,
-      }}
+      style={style}
       {...props}
     />
   );
@@ -240,15 +215,7 @@ export function NFTImageWrapper({
   return (
     <div
       className={cn('relative border border-primary/50 rounded-lg overflow-hidden', className)}
-      style={{
-        ...paintWorkletBorder(
-          '1px',
-          '8px',
-          '0 0,16px 0,100% 0,100% calc(100% - 16px),100% 100%,0 100%',
-          'linear-gradient(152.14deg, #15BFFD 9.96%, #9C37FD 100%)',
-        ),
-        ...style,
-      }}
+      style={style}
       {...props}
     />
   );
@@ -347,15 +314,7 @@ export function GradientBorder({
   return (
     <div
       className={cn('relative border border-primary/50 rounded-2xl overflow-hidden', className)}
-      style={{
-        ...paintWorkletBorder(
-          '1px',
-          '16px',
-          '0 0,32px 0,100% 0,100% calc(100% - 32px),100% 100%,0 100%',
-          'linear-gradient(152.14deg, rgba(21, 191, 253, 0.7) 9.96%, rgba(156, 55, 253, 0.7) 100%)',
-        ),
-        ...style,
-      }}
+      style={style}
       {...props}
     />
   );
@@ -368,15 +327,7 @@ export function CodeWrapper({ className, style, ...props }: React.HTMLAttributes
         'relative border border-primary/50 rounded-2xl overflow-hidden bg-white/5',
         className,
       )}
-      style={{
-        ...paintWorkletBorder(
-          '1px',
-          '16px',
-          '0 0,32px 0,100% 0,100% 85%,80% 100%,0 100%',
-          'linear-gradient(152.14deg, rgba(156, 55, 253, 0.7) 9.96%, rgba(21, 191, 253, 0.7) 100%)',
-        ),
-        ...style,
-      }}
+      style={style}
       {...props}
     />
   );

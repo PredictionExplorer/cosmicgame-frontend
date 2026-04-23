@@ -202,7 +202,8 @@ export function Providers({
         `  Network: ${process.env.NEXT_PUBLIC_NETWORK}\n` +
         `  Chain ID: ${networkConfig.chainId}\n` +
         `  RPC URL: ${rpcDisplay}\n` +
-        `  API URL: ${networkConfig.apiUrl}` +
+        `  API URL: ${networkConfig.apiUrl}\n` +
+        `  NFT CDN: ${networkConfig.nftApiUrl}` +
         buildLines,
     );
   }, []);

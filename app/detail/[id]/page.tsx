@@ -9,6 +9,9 @@ import { JsonLd, nftProductJsonLd, breadcrumbJsonLd } from '@/utils/jsonLd';
 
 import DetailPage from './DetailPage';
 
+/** Avoid serving og:image / JSON-LD from an older build or data cache when CDN hosts change per network. */
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({
   params,
 }: {
