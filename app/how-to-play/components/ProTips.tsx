@@ -8,51 +8,51 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 const tips = [
   {
     Icon: TrendingDown,
-    title: 'Bid Early, Bid Cheap',
+    title: 'Gesture early, lower cost',
     description:
-      'Bid prices start low after each round reset — roughly 100x lower than the previous winning bid.',
+      'After each cycle reset, ETH gesture costs start near the calibration floor — far below the prior cycle’s peak.',
     tooltip:
-      'Early-round bids cost a fraction of late-round bids. Great for accumulating raffle tickets at low cost.',
+      'Early-cycle gestures cost less ETH. They also increase your selection frequency for future Stellar Selections.',
   },
   {
     Icon: ImageIcon,
-    title: 'Use Your Random Walk NFT',
+    title: 'Attach your Random Walk NFT',
     description:
-      'Holding a Random Walk NFT gives you a one-time 50% discount on your ETH bid price.',
+      'A Random Walk NFT gives a one-time 50% discount on ETH gesture cost when attached.',
     tooltip:
-      'This discount can only be used once per wallet. Save it for a higher-priced bid to maximize savings.',
+      'Each NFT can be used once for this discount. Many participants save it for a higher-cost moment.',
   },
   {
     Icon: Ticket,
-    title: 'Stack Raffle Tickets',
+    title: 'Increase selection frequency',
     description:
-      'Every bid earns a raffle ticket. More bids means better odds in the end-of-round prize drawing.',
+      'More gestures in a cycle increase how often your address is considered in random allocation tracks.',
     tooltip:
-      '4 raffle tickets are drawn for 6% of the prize pool. Additional winners receive COSMIC NFTs.',
+      'Stellar Selection uses on-chain randomness; participation frequency is procedural.',
   },
   {
     Icon: Shield,
-    title: 'Use a Burner Wallet',
+    title: 'Use a dedicated wallet',
     description:
-      'The smart contract is audited, but using a dedicated wallet for bidding adds an extra layer of safety.',
+      'The contracts are audited; a separate wallet still isolates routine participation from long-term holdings.',
     tooltip:
-      'A burner wallet isolates your bidding activity from your main holdings for additional security.',
+      'Operational security: keep cold storage separate from active participation addresses.',
   },
   {
     Icon: Clock,
-    title: 'Watch the Timer',
+    title: 'Watch the Performance clock',
     description:
-      'The timer gains 1 hour per bid. Strategic timing near the end of a round can be the difference between winning and losing.',
+      'Each gesture extends the clock. Timing near finalization affects gesture cost and who holds the final gesture.',
     tooltip:
-      'Bidding when the timer is low is riskier (higher price) but positions you closest to winning.',
+      'Late gestures cost more but keep you closest to the Signature Allocation if the Performance closes.',
   },
   {
     Icon: Zap,
     title: 'Pay with CST',
     description:
-      'Already earned CST from previous bids? Use it as an alternative currency to save your ETH.',
+      'Already received CST imprints from earlier gestures? Use CST to avoid spending ETH on the next gesture.',
     tooltip:
-      'CST bidding follows the same rules as ETH bidding. Your bid still earns raffle tickets and extends the timer.',
+      'CST gestures follow the CST Calibration Window. Each gesture still imprints CST and extends the Performance clock.',
   },
 ] as const;
 
@@ -77,7 +77,7 @@ export function ProTips() {
           Pro Tips &amp; Strategy
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Expert advice to maximize your chances and rewards
+          Practical notes for participating in cycles
         </p>
       </div>
 

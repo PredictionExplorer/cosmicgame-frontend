@@ -6,7 +6,8 @@
     "node": ">=20.9 <23"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
+    "dev:turbo": "next dev",
     "type-check": "tsc --noEmit",
     "test": "jest",
     "test:coverage": "jest --coverage",

@@ -9,47 +9,47 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 const phases = [
   {
     Icon: Play,
-    label: 'Round Starts',
-    description: 'A new round begins with a 24-hour countdown timer.',
+    label: 'Cycle opens',
+    description: 'A new Performance Cycle begins with an initial countdown.',
     tooltip:
-      'The initial timer is set to 24 hours. The prize pool starts at zero and grows with each bid.',
+      'The clock starts around 24 hours. The cycle reserve builds as participants make gestures.',
   },
   {
     Icon: Users,
-    label: 'Players Bid',
-    description: 'Each bid adds 1 hour to the timer and increases the next bid price by 1%.',
+    label: 'Participants gesture',
+    description: 'Each gesture extends the clock and steps the next gesture cost (about +1% for ETH).',
     tooltip:
-      'Bidding extends the countdown and raises the price, creating a strategic tension between early cheap bids and late decisive ones.',
+      'Early gestures cost less; late gestures cost more — a deliberate protocol tension with no operator “house.”',
   },
   {
     Icon: TimerOff,
-    label: 'Timer Expires',
-    description: 'When the countdown reaches zero, the round ends.',
+    label: 'Performance closes',
+    description: 'When the countdown reaches zero, no further gestures are accepted for that cycle.',
     tooltip:
-      'No more bids can be placed once the timer hits zero. The last bidder is declared the winner.',
+      'The participant who made the final gesture may finalize first; later, open finalization is available.',
   },
   {
     Icon: Trophy,
-    label: 'Winner Collects',
-    description: 'The last bidder wins 25% of the prize pool and a COSMIC NFT.',
+    label: 'Finalize & mint',
+    description: 'Finalization runs settlement: ETH tracks, CST imprints, and COSMIC NFT mints.',
     tooltip:
-      'The winner must withdraw their prize from the smart contract. The NFT is minted automatically.',
+      'Recipients retrieve ETH and tokens from the allocations wallet; NFTs mint per the allocation table.',
   },
   {
     Icon: Ticket,
-    label: 'Raffles Drawn',
+    label: 'Stellar Selection',
     description:
-      '4 raffle winners share 6% of the pool. 5 NFT raffle winners + 4 staker winners are drawn.',
+      'Random allocation tracks execute on-chain alongside fixed champion and Signature tracks.',
     tooltip:
-      'Raffle tickets are earned per bid. More bids means higher chances. NFT stakers also have a separate draw.',
+      'Selection frequency increases with participation; anchored Random Walk NFTs have their own NFT track.',
   },
   {
     Icon: RotateCcw,
-    label: 'New Round',
+    label: 'Next cycle',
     description:
-      'The bid price resets to ~100x lower than the winning bid, and it all starts again.',
+      'Gesture costs reset toward the calibration floor, and the protocol opens the next Performance.',
     tooltip:
-      'Each new round is a fresh opportunity. The reset price makes early bids in a new round very affordable.',
+      'Each cycle is a fresh calibration window; opening gestures are comparatively inexpensive.',
   },
 ] as const;
 
@@ -71,10 +71,10 @@ export function GameCycle() {
           id="game-cycle-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          Lifecycle of a Round
+          Lifecycle of a cycle
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Every round follows this cycle from start to finish
+          From open to finalization, the protocol follows this structure
         </p>
       </div>
 

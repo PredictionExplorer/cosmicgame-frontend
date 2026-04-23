@@ -14,16 +14,16 @@ interface ClaimStatus {
 
 const getNAVs = (status: ClaimStatus | null, account: string | null) => {
   const NAVS: NavDescriptor[] = [
-    { title: 'Play', route: '/' },
+    { title: 'Home', route: '/' },
     { title: 'Gallery', route: '/gallery' },
     {
       title: 'Explore',
       route: '#',
       children: [
-        { title: 'Current Round', route: '/current-round' },
-        { title: 'Prize Winners', route: '/prize' },
-        { title: 'Staking Rewards', route: '/staking' },
-        { title: 'Marketing Rewards', route: '/marketing' },
+        { title: 'Current Cycle', route: '/current-round' },
+        { title: 'Allocation Recipients', route: '/prize' },
+        { title: 'Anchor', route: '/staking' },
+        { title: 'Outreach CST', route: '/marketing' },
         { title: 'Statistics', route: '/statistics' },
         { title: 'Contracts', route: '/contracts' },
       ],
@@ -32,7 +32,7 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
       title: 'Help',
       route: '#',
       children: [
-        { title: 'How to Play', route: '/how-to-play' },
+        { title: 'How to Participate', route: '/how-to-play' },
         { title: 'FAQ', route: '/faq' },
       ],
     },
@@ -46,7 +46,7 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
     NAVS.push({
       title: (
         <span className="relative inline-flex items-center gap-1.5">
-          My Rewards
+          My Allocations
           <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
         </span>
       ),

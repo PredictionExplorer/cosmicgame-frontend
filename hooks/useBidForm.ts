@@ -355,7 +355,7 @@ export function useBidForm() {
           if (isUserRejection(err)) {
             notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
           } else {
-            notify('error', `Please switch to ${activeChain.name} in your wallet to bid.`);
+            notify('error', `Please switch to ${activeChain.name} in your wallet to continue.`);
           }
           return false;
         }
@@ -490,7 +490,7 @@ export function useBidForm() {
           if (isUserRejection(err)) {
             notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
           } else {
-            notify('error', `Please switch to ${activeChain.name} in your wallet to bid.`);
+            notify('error', `Please switch to ${activeChain.name} in your wallet to continue.`);
           }
           return false;
         }

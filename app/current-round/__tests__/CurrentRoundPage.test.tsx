@@ -97,7 +97,7 @@ describe('CurrentRoundPage', () => {
   it('renders round number in heading', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(screen.getByText('Round #42')).toBeInTheDocument();
+    expect(screen.getByText('Cycle #42')).toBeInTheDocument();
   });
 
   it('renders LIVE badge', () => {
@@ -109,19 +109,19 @@ describe('CurrentRoundPage', () => {
   it('renders bid count in subtitle', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(screen.getByText(/137 bids placed/)).toBeInTheDocument();
+    expect(screen.getByText(/137 gestures placed/)).toBeInTheDocument();
   });
 
   it('renders all 6 stat cards with correct values', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('Total Bids')).toBeInTheDocument();
-    expect(screen.getByText('Prize Pool')).toBeInTheDocument();
-    expect(screen.getByText('Raffle Pool')).toBeInTheDocument();
-    expect(screen.getByText('Charity')).toBeInTheDocument();
-    expect(screen.getByText('Donated ETH')).toBeInTheDocument();
-    expect(screen.getByText('Donated NFTs')).toBeInTheDocument();
+    expect(screen.getByText('Total Gestures')).toBeInTheDocument();
+    expect(screen.getByText('Signature Allocation (ETH)')).toBeInTheDocument();
+    expect(screen.getByText('ETH Stellar Selection Reserve')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods')).toBeInTheDocument();
+    expect(screen.getByText('Contributed ETH')).toBeInTheDocument();
+    expect(screen.getByText('Attached NFTs')).toBeInTheDocument();
   });
 
   it('displays formatted prize pool value', () => {
@@ -149,7 +149,7 @@ describe('CurrentRoundPage', () => {
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('Round ends in')).toBeInTheDocument();
+    expect(screen.getByText('Performance closes in')).toBeInTheDocument();
     expect(screen.getByTestId('countdown')).toBeInTheDocument();
   });
 
@@ -160,8 +160,10 @@ describe('CurrentRoundPage', () => {
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('Bids Exhausted!')).toBeInTheDocument();
-    expect(screen.getByText('Waiting for the winner to claim the prize.')).toBeInTheDocument();
+    expect(screen.getByText('Gestures closed')).toBeInTheDocument();
+    expect(
+      screen.getByText('Waiting for the designated participant to finalize the cycle.'),
+    ).toBeInTheDocument();
   });
 
   it('does not show countdown or exhausted state when no last bidder', () => {
@@ -170,21 +172,21 @@ describe('CurrentRoundPage', () => {
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     render(<CurrentRoundPage />);
 
-    expect(screen.queryByText('Round ends in')).not.toBeInTheDocument();
-    expect(screen.queryByText('Bids Exhausted!')).not.toBeInTheDocument();
+    expect(screen.queryByText('Performance closes in')).not.toBeInTheDocument();
+    expect(screen.queryByText('Gestures closed')).not.toBeInTheDocument();
   });
 
   it('renders last bidder address', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(screen.getByText('Last Bidder — Current Leader')).toBeInTheDocument();
+    expect(screen.getByText('Last Participant — Current Leader')).toBeInTheDocument();
     expect(screen.getByText(/0xAbCdEf12/)).toBeInTheDocument();
   });
 
   it('does not show last bidder when address is zero', () => {
     setupLoaded({ LastBidderAddr: '0x0000000000000000000000000000000000000000' });
     render(<CurrentRoundPage />);
-    expect(screen.queryByText('Last Bidder — Current Leader')).not.toBeInTheDocument();
+    expect(screen.queryByText('Last Participant — Current Leader')).not.toBeInTheDocument();
   });
 
   it('renders SpecialPrizeWinners in hero when there is a last bidder', () => {
@@ -202,7 +204,7 @@ describe('CurrentRoundPage', () => {
   it('renders "Place a Bid" CTA link', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    const cta = screen.getByRole('link', { name: /Place a Bid/ });
+    const cta = screen.getByRole('link', { name: /Make a Gesture/ });
     expect(cta).toBeInTheDocument();
     expect(cta).toHaveAttribute('href', '/');
   });
@@ -210,7 +212,7 @@ describe('CurrentRoundPage', () => {
   it('renders "Back to Game" navigation link', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    const link = screen.getByRole('link', { name: /Back to Game/ });
+    const link = screen.getByRole('link', { name: /Back to Home/ });
     expect(link).toHaveAttribute('href', '/');
   });
 
@@ -224,7 +226,7 @@ describe('CurrentRoundPage', () => {
   it('renders singular bid text for 1 bid', () => {
     setupLoaded({ CurNumBids: 1 });
     render(<CurrentRoundPage />);
-    expect(screen.getByText(/1 bid placed/)).toBeInTheDocument();
+    expect(screen.getByText(/1 gesture placed/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

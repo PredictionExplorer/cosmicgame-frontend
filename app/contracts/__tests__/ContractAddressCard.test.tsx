@@ -12,22 +12,22 @@ beforeEach(() => {
 });
 
 const defaultProps = {
-  name: 'Cosmic Game',
+  name: 'Cosmic Signature (core)',
   address: '0xC801d06c9900ef0cD878Ad6f59622aAfAd8F54dE',
-  description: 'The main game contract',
+  description: 'Core protocol contract',
   explorerUrl: 'https://sepolia.arbiscan.io',
 };
 
 describe('ContractAddressCard', () => {
   it('renders contract name and address', () => {
     render(<ContractAddressCard {...defaultProps} />);
-    expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature (core)')).toBeInTheDocument();
     expect(screen.getByText('0xC801d06c9900ef0cD878Ad6f59622aAfAd8F54dE')).toBeInTheDocument();
   });
 
   it('copies address to clipboard on copy button click', async () => {
     render(<ContractAddressCard {...defaultProps} />);
-    const copyBtn = screen.getByLabelText('Copy Cosmic Game address');
+    const copyBtn = screen.getByLabelText('Copy Cosmic Signature (core) address');
     fireEvent.click(copyBtn);
     await waitFor(() => {
       expect(mockWriteText).toHaveBeenCalledWith('0xC801d06c9900ef0cD878Ad6f59622aAfAd8F54dE');
@@ -36,7 +36,7 @@ describe('ContractAddressCard', () => {
 
   it('renders explorer link with correct href', () => {
     render(<ContractAddressCard {...defaultProps} />);
-    const link = screen.getByLabelText('View Cosmic Game on block explorer');
+    const link = screen.getByLabelText('View Cosmic Signature (core) on block explorer');
     expect(link).toHaveAttribute(
       'href',
       'https://sepolia.arbiscan.io/address/0xC801d06c9900ef0cD878Ad6f59622aAfAd8F54dE',
@@ -46,12 +46,12 @@ describe('ContractAddressCard', () => {
 
   it('renders tooltip with description', () => {
     render(<ContractAddressCard {...defaultProps} />);
-    expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature (core)')).toBeInTheDocument();
   });
 
   it('opens explorer link in new tab', () => {
     render(<ContractAddressCard {...defaultProps} />);
-    const link = screen.getByLabelText('View Cosmic Game on block explorer');
+    const link = screen.getByLabelText('View Cosmic Signature (core) on block explorer');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
 

@@ -27,9 +27,9 @@ Object.assign(navigator, {
 
 const contracts: ContractEntry[] = [
   {
-    name: 'Cosmic Game',
+    name: 'Cosmic Signature (core)',
     address: '0xAAA',
-    description: 'Main game',
+    description: 'Core protocol',
     category: 'core',
   },
   {
@@ -39,15 +39,15 @@ const contracts: ContractEntry[] = [
     category: 'core',
   },
   {
-    name: 'Charity Wallet',
+    name: 'Public Goods Vault',
     address: '0xCCC',
-    description: 'Charity',
+    description: 'Public goods',
     category: 'wallet',
   },
   {
-    name: 'CST Staking Wallet',
+    name: 'CST Anchor Wallet',
     address: '0xDDD',
-    description: 'CST Staking',
+    description: 'CST anchors',
     category: 'staking',
   },
 ];
@@ -62,10 +62,10 @@ const defaultProps = {
 describe('ContractAddressGrid', () => {
   it('renders all contract address cards', () => {
     render(<ContractAddressGrid {...defaultProps} />);
-    expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature (core)')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature')).toBeInTheDocument();
-    expect(screen.getByText('Charity Wallet')).toBeInTheDocument();
-    expect(screen.getByText('CST Staking Wallet')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
+    expect(screen.getByText('CST Anchor Wallet')).toBeInTheDocument();
   });
 
   it('renders category group dividers', () => {
@@ -76,15 +76,15 @@ describe('ContractAddressGrid', () => {
   });
 
   it('filters contracts by search term (name)', () => {
-    render(<ContractAddressGrid {...defaultProps} searchTerm="charity" />);
-    expect(screen.getByText('Charity Wallet')).toBeInTheDocument();
-    expect(screen.queryByText('Cosmic Game')).not.toBeInTheDocument();
+    render(<ContractAddressGrid {...defaultProps} searchTerm="public" />);
+    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
+    expect(screen.queryByText('Cosmic Signature (core)')).not.toBeInTheDocument();
   });
 
   it('filters contracts by search term (address)', () => {
     render(<ContractAddressGrid {...defaultProps} searchTerm="0xDDD" />);
-    expect(screen.getByText('CST Staking Wallet')).toBeInTheDocument();
-    expect(screen.queryByText('Cosmic Game')).not.toBeInTheDocument();
+    expect(screen.getByText('CST Anchor Wallet')).toBeInTheDocument();
+    expect(screen.queryByText('Cosmic Signature (core)')).not.toBeInTheDocument();
   });
 
   it('shows empty state when search has no results', () => {

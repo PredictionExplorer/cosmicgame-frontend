@@ -18,7 +18,7 @@ export const isWalletAddress = (address: string): string => {
     case RAFFLE_WALLET_ADDRESS:
       return 'Raffle Wallet';
     case CHARITY_WALLET_ADDRESS:
-      return 'Charity Wallet';
+      return 'Public Goods Vault';
     default:
       return '';
   }

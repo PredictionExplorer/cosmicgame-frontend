@@ -44,27 +44,27 @@ const renderWithTooltip = (ui: React.ReactElement) =>
 describe('ProTips', () => {
   it('renders the section heading', () => {
     renderWithTooltip(<ProTips />);
-    expect(screen.getByText('Pro Tips & Strategy')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Pro Tips & Strategy' })).toBeInTheDocument();
   });
 
   it('renders all six tip titles', () => {
     renderWithTooltip(<ProTips />);
-    expect(screen.getByText('Bid Early, Bid Cheap')).toBeInTheDocument();
-    expect(screen.getByText('Use Your Random Walk NFT')).toBeInTheDocument();
-    expect(screen.getByText('Stack Raffle Tickets')).toBeInTheDocument();
-    expect(screen.getByText('Use a Burner Wallet')).toBeInTheDocument();
-    expect(screen.getByText('Watch the Timer')).toBeInTheDocument();
+    expect(screen.getByText('Gesture early, lower cost')).toBeInTheDocument();
+    expect(screen.getByText('Attach your Random Walk NFT')).toBeInTheDocument();
+    expect(screen.getByText('Increase selection frequency')).toBeInTheDocument();
+    expect(screen.getByText('Use a dedicated wallet')).toBeInTheDocument();
+    expect(screen.getByText('Watch the Performance clock')).toBeInTheDocument();
     expect(screen.getByText('Pay with CST')).toBeInTheDocument();
   });
 
   it('renders tip descriptions', () => {
     renderWithTooltip(<ProTips />);
-    expect(screen.getByText(/Bid prices start low/)).toBeInTheDocument();
-    expect(screen.getByText(/one-time 50% discount/)).toBeInTheDocument();
-    expect(screen.getByText(/More bids means better odds/)).toBeInTheDocument();
-    expect(screen.getByText(/smart contract is audited/)).toBeInTheDocument();
-    expect(screen.getByText(/timer gains 1 hour per bid/)).toBeInTheDocument();
-    expect(screen.getByText(/Already earned CST/)).toBeInTheDocument();
+    expect(screen.getByText(/ETH gesture costs start near the calibration floor/)).toBeInTheDocument();
+    expect(screen.getByText(/one-time 50% discount on ETH gesture cost/)).toBeInTheDocument();
+    expect(screen.getByText(/More gestures in a cycle increase how often/)).toBeInTheDocument();
+    expect(screen.getByText(/The contracts are audited/)).toBeInTheDocument();
+    expect(screen.getByText(/Each gesture extends the clock/)).toBeInTheDocument();
+    expect(screen.getByText(/Already received CST imprints/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

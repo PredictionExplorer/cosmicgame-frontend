@@ -60,8 +60,8 @@ describe('JSON-LD generators', () => {
       expect(result['@type']).toBe('WebApplication');
     });
 
-    it('has GameApplication category', () => {
-      expect(result.applicationCategory).toBe('GameApplication');
+    it('has non-gaming application category', () => {
+      expect(result.applicationCategory).toBe('DeveloperApplication');
     });
 
     it('includes an offer', () => {
@@ -72,8 +72,8 @@ describe('JSON-LD generators', () => {
 
   describe('faqPageJsonLd', () => {
     const items = [
-      { id: '1', question: 'What is this?', answer: 'A game.' },
-      { id: '2', question: 'How to play?', answer: 'Place bids.' },
+      { id: '1', question: 'What is this?', answer: 'An on-chain protocol.' },
+      { id: '2', question: 'How to participate?', answer: 'Make a gesture.' },
     ];
     const result = faqPageJsonLd(items);
 
@@ -91,7 +91,7 @@ describe('JSON-LD generators', () => {
       expect(first['@type']).toBe('Question');
       expect(first.name).toBe('What is this?');
       expect(first.acceptedAnswer['@type']).toBe('Answer');
-      expect(first.acceptedAnswer.text).toBe('A game.');
+      expect(first.acceptedAnswer.text).toBe('An on-chain protocol.');
     });
   });
 

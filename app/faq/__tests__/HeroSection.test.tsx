@@ -68,7 +68,7 @@ describe('HeroSection', () => {
     render(<HeroSection {...defaultProps} />);
     expect(
       screen.getByText(
-        /Everything you need to know about Cosmic Signature — from getting started to advanced game mechanics\./,
+        /Everything you need to know about Cosmic Signature — from getting started to advanced protocol mechanics\./,
       ),
     ).toBeInTheDocument();
   });

@@ -112,8 +112,8 @@ export function useStakingActions() {
               visible: true,
               type: 'success',
               text: Array.isArray(tokenIds)
-                ? 'The selected tokens were staked successfully!'
-                : `You have successfully staked token ${tokenIds}!`,
+                ? 'The selected NFTs were anchored successfully!'
+                : `You have successfully anchored token ${tokenIds}!`,
             });
           }
         }, 2000);
@@ -164,8 +164,8 @@ export function useStakingActions() {
               visible: true,
               type: 'success',
               text: Array.isArray(actionIds)
-                ? 'The selected tokens were unstaked successfully!'
-                : 'You have successfully unstaked token!',
+                ? 'The selected anchors were released successfully!'
+                : 'You have successfully released your anchor!',
             });
           }
         }, 2000);

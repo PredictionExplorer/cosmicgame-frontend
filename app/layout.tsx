@@ -17,7 +17,7 @@ import '@/styles/global.css';
 
 const defaultTitle = 'Cosmic Signature';
 const defaultDescription =
-  'Cosmic Signature is a strategy bidding game on the Arbitrum blockchain featuring generative NFT art inspired by the three-body problem, ETH prizes, staking rewards, and charitable giving.';
+  'Cosmic Signature is a procedural on-chain art protocol on Arbitrum where participants make gestures across a Performance Cycle; generative NFT art is inspired by the three-body problem. The protocol distributes ETH across allocation tracks, anchors Cosmic Signature NFTs for per-cycle shares, and forwards a portion to public goods (Protocol Guild).';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cosmicsignature.com'),
@@ -53,20 +53,19 @@ export const metadata: Metadata = {
   keywords: [
     'Cosmic Signature',
     'NFT',
-    'bidding game',
     'Arbitrum',
     'Ethereum',
     'generative art',
     'three-body problem',
-    'staking',
-    'crypto game',
-    'NFT game',
-    'ETH prizes',
-    'blockchain game',
+    'NFT anchoring',
+    'on-chain protocol',
+    'Cosmic Signature NFT',
     'ERC-721',
     'RandomWalkNFT',
     'Cosmic Signature Token',
     'CST',
+    'Stellar Selection',
+    'Protocol Guild',
   ],
 };
 

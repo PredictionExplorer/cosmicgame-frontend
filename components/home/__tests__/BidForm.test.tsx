@@ -56,7 +56,7 @@ describe('BidForm', () => {
   it('renders bid type selector with ETH option', () => {
     render(<BidForm {...defaultProps} />);
     expect(screen.getByText('ETH')).toBeInTheDocument();
-    expect(screen.getByText('Bid Method')).toBeInTheDocument();
+    expect(screen.getByText('Entry method')).toBeInTheDocument();
   });
 
   it('hides RandomWalk/CST when LastBidderAddr is zeroAddress', () => {
@@ -95,12 +95,12 @@ describe('BidForm', () => {
 
   it('CST selection shows auction info', () => {
     render(<BidForm {...defaultProps} bidType="CST" />);
-    expect(screen.getByText('Auction Duration:')).toBeInTheDocument();
+    expect(screen.getByText('Calibration duration:')).toBeInTheDocument();
   });
 
   it('Message textarea accepts input', () => {
     render(<BidForm {...defaultProps} />);
-    const textarea = screen.getByPlaceholderText('Leave a message with your bid...');
+    const textarea = screen.getByPlaceholderText('Optional gesture message (visible on-chain)…');
     fireEvent.change(textarea, { target: { value: 'hello world' } });
     expect(defaultProps.setMessage).toHaveBeenCalledWith('hello world');
   });
@@ -110,7 +110,7 @@ describe('BidForm', () => {
     expect(screen.getByText('Advanced Options')).toBeInTheDocument();
 
     rerender(<BidForm {...defaultProps} advancedExpanded={true} />);
-    expect(screen.getByText(/Donate tokens or NFTs while bidding/)).toBeInTheDocument();
+    expect(screen.getByText(/Attach tokens or NFTs with your gesture/)).toBeInTheDocument();
   });
 
   it('NFT donation form renders with advancedExpanded=true, donationType=NFT', () => {
@@ -154,7 +154,7 @@ describe('BidForm', () => {
     const user = userEvent.setup();
     render(<BidForm {...defaultProps} advancedExpanded={true} donationType="NFT" />);
 
-    await user.click(screen.getByText('Donate Token'));
+    await user.click(screen.getByText('Attach token'));
 
     expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
     expect(defaultProps.setDonationType).toHaveBeenCalledWith('Token');
@@ -229,7 +229,9 @@ describe('BidForm', () => {
         cstBidData={{ AuctionDuration: 3600, CSTPrice: 1.5, SecondsElapsed: 4000 }}
       />,
     );
-    expect(screen.getByText('Auction ended, you can bid for free.')).toBeInTheDocument();
+    expect(
+      screen.getByText('CST Calibration Window ended — you can make a CST gesture at no CST cost.'),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

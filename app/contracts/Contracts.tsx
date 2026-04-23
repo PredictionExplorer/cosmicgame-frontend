@@ -32,63 +32,63 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
   if (!addrs) return [];
   return [
     {
-      name: 'Cosmic Game',
+      name: 'Cosmic Signature (core)',
       address: addrs.CosmicGameAddr ?? '',
-      description: 'The main game contract that manages rounds, bids, and prize distribution',
+      description: 'Core protocol contract: cycles, gestures, and settlement (on-chain name: CosmicGame)',
       category: 'core',
     },
     {
       name: 'Cosmic Signature Token',
       address: addrs.CosmicTokenAddr ?? '',
-      description: 'ERC-20 token (CST) earned by bidding and used for governance',
+      description: 'ERC-20 coordination token (CST) imprinted per gesture and used in on-chain coordination',
       category: 'core',
     },
     {
       name: 'Cosmic Signature',
       address: addrs.CosmicSignatureAddr ?? '',
-      description: 'ERC-721 NFT collection minted as prizes for round winners',
+      description: 'ERC-721 collection minted as part of allocation tracks',
       category: 'core',
     },
     {
       name: 'RandomWalk',
       address: addrs.RandomWalkAddr ?? '',
-      description: 'RandomWalk NFT collection that can be staked for raffle entries',
+      description: 'Random Walk NFT collection; can be anchored for Stellar Selection eligibility',
       category: 'core',
     },
     {
-      name: 'Cosmic DAO',
+      name: 'Cosmic Council',
       address: addrs.CosmicDaoAddr ?? '',
-      description: 'Decentralized governance contract for community proposals',
+      description: 'On-chain coordination (governor) for protocol parameters',
       category: 'core',
     },
     {
-      name: 'Charity Wallet',
+      name: 'Public Goods Vault',
       address: addrs.CharityWalletAddr ?? '',
-      description: "Receives the charity percentage from each round's prize pool",
+      description: 'Forwards the public-goods share each cycle (on-chain: CharityWallet)',
       category: 'wallet',
     },
     {
-      name: 'Marketing Wallet',
+      name: 'Outreach Reserve',
       address: addrs.MarketingWalletAddr ?? '',
-      description: 'Funds allocated for marketing rewards and referrals',
+      description: 'Outreach and ecosystem-growth allocations',
       category: 'wallet',
     },
     {
-      name: 'Prizes Wallet',
+      name: 'Allocations Wallet',
       address: addrs.PrizesWalletAddr ?? '',
-      description: 'Escrow contract holding unclaimed prizes',
+      description: 'Escrow for retrievable ETH and attached tokens (on-chain: PrizesWallet)',
       category: 'wallet',
     },
     {
-      name: 'CST Staking Wallet',
+      name: 'CST Anchor Wallet',
       address: addrs.StakingWalletCSTAddr ?? '',
-      description: 'Staking contract for Cosmic Signature Tokens',
+      description: 'Anchoring contract for Cosmic Signature NFTs',
       category: 'staking',
     },
     {
-      name: 'RWLK Staking Wallet',
+      name: 'Random Walk Anchor Wallet',
       address: addrs.StakingWalletRWalkAddr ?? '',
-      description: 'Staking contract for RandomWalk NFTs',
+      description: 'Anchoring contract for Random Walk NFTs',
       category: 'staking',
     },
   ].filter((c) => c.address) as ContractEntry[];
@@ -199,7 +199,7 @@ const Contracts = () => {
     <MainWrapper>
       <PageHeader
         title="Contract Addresses"
-        subtitle="On-chain addresses and configuration for the Cosmic Game"
+        subtitle="On-chain addresses and parameters for the Cosmic Signature protocol"
       >
         <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
       </PageHeader>
@@ -226,7 +226,7 @@ const Contracts = () => {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.15 }}
-          aria-label="Game Configuration"
+          aria-label="Protocol parameters"
         >
           <GameConfiguration
             priceIncrease={priceIncrease}

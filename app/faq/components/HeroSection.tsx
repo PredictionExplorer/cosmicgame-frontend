@@ -63,8 +63,8 @@ export function HeroSection({
         animate="visible"
         className="mx-auto mt-4 max-w-lg text-base text-muted-foreground"
       >
-        Everything you need to know about Cosmic Signature — from getting started to advanced game
-        mechanics.
+        Everything you need to know about Cosmic Signature — from getting started to advanced
+        protocol mechanics.
       </motion.p>
 
       <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible" className="mt-8">

@@ -224,7 +224,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText('Prize Breakdown')).toBeInTheDocument();
+    expect(screen.getByText('Allocation tracks')).toBeInTheDocument();
   });
 
   it('renders link to full round details', () => {
@@ -233,7 +233,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText('View Full Round Details')).toBeInTheDocument();
+    expect(screen.getByText('View Full Cycle Details')).toBeInTheDocument();
   });
 
   it('shows link to previous round results when round > 1', () => {
@@ -242,7 +242,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText(/Round 4 results/)).toBeInTheDocument();
+    expect(screen.getByText(/Cycle 4 results/)).toBeInTheDocument();
   });
 
   it('does not show previous round link when round is 1', () => {
@@ -251,7 +251,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.queryByText(/Round \d+ results/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Cycle \d+ results/)).not.toBeInTheDocument();
   });
 
   it('does not render BidForm when still loading', () => {
@@ -286,7 +286,7 @@ describe('HomePage', () => {
     });
     render(<HomePage />);
     const bidButtons = screen.getAllByRole('button');
-    const bidButton = bidButtons.find((b) => b.textContent?.includes('Bid'));
+    const bidButton = bidButtons.find((b) => b.textContent?.includes('Gesture'));
     expect(bidButton).toBeDefined();
   });
 
@@ -296,7 +296,7 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    const claimButton = screen.queryByText(/Claim Prize/);
+    const claimButton = screen.queryByText(/Finalize Cycle/);
     expect(claimButton || screen.queryByTestId('bidding-status')).toBeTruthy();
   });
 
@@ -306,8 +306,8 @@ describe('HomePage', () => {
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText(/Round 9 results/)).toBeInTheDocument();
-    const link = screen.getByRole('link', { name: /Round 9 results/ });
+    expect(screen.getByText(/Cycle 9 results/)).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /Cycle 9 results/ });
     expect(link).toHaveAttribute('href', '/prize/9');
   });
 

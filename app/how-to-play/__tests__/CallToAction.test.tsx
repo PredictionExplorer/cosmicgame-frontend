@@ -46,17 +46,17 @@ jest.mock('next/link', () => ({
 describe('CallToAction', () => {
   it('renders the CTA heading', () => {
     render(<CallToAction />);
-    expect(screen.getByRole('heading', { name: 'Ready to Start Bidding?' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Ready to make a gesture?' })).toBeInTheDocument();
   });
 
   it('renders the description text', () => {
     render(<CallToAction />);
-    expect(screen.getByText(/Join the next round/)).toBeInTheDocument();
+    expect(screen.getByText(/Join the active Performance Cycle/)).toBeInTheDocument();
   });
 
-  it('renders Start Playing Now link pointing to homepage', () => {
+  it('renders Go to home link pointing to homepage', () => {
     render(<CallToAction />);
-    const link = screen.getByRole('link', { name: 'Start Playing Now' });
+    const link = screen.getByRole('link', { name: 'Go to home' });
     expect(link).toHaveAttribute('href', '/');
   });
 
@@ -69,7 +69,7 @@ describe('CallToAction', () => {
 
   it('renders Twitter/X link with correct href', () => {
     render(<CallToAction />);
-    const link = screen.getByRole('link', { name: /Twitter/ });
+    const link = screen.getByRole('link', { name: /Twitter \/ X/ });
     expect(link).toHaveAttribute('href', expect.stringContaining('x.com'));
     expect(link).toHaveAttribute('target', '_blank');
   });

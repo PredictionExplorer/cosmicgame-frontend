@@ -28,7 +28,7 @@ export function HeroSection() {
         className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-primary"
       >
         <Sparkles className="h-3.5 w-3.5" />
-        Strategy Bidding Game
+        On-chain art protocol
       </motion.div>
 
       <motion.h1
@@ -36,20 +36,20 @@ export function HeroSection() {
         variants={fadeUp}
         className="font-display text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl"
       >
-        Bid. Compete.{' '}
+        Gesture. Shape.{' '}
         <GradientText as="span" className="font-display">
-          Win Big.
+          Sign the cycle.
         </GradientText>
       </motion.h1>
 
       <motion.p variants={fadeUp} className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-        Outsmart other players in a thrilling countdown. The last bidder standing wins the ETH prize
-        pool and exclusive COSMIC NFTs.
+        Participate in a timed Performance Cycle on Arbitrum. Every gesture shapes the Signature;
+        allocations settle across tracks including the Signature Allocation and Stellar Selection.
       </motion.p>
 
       <motion.div variants={fadeUp} className="mt-8 flex items-center justify-center gap-4">
         <Button asChild size="lg">
-          <Link href="/">Start Playing</Link>
+          <Link href="/">Participate</Link>
         </Button>
         <Button asChild variant="outline" size="lg">
           <a href="#game-overview">Learn More</a>

@@ -16,7 +16,7 @@ const footerLinks: Record<string, { label: string; href: string; external?: bool
     { label: 'Mint', href: '/mint' },
   ],
   Resources: [
-    { label: 'How to Play', href: '/how-to-play' },
+    { label: 'How to Participate', href: '/how-to-play' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Site Map', href: '/site-map' },
   ],
@@ -47,7 +47,8 @@ const Footer = () => {
             className="h-8 w-auto max-w-[140px] object-contain"
           />
           <p className="mt-4 text-sm text-muted-foreground max-w-[240px]">
-            A strategy bidding game where players compete for ETH prizes and unique NFTs.
+            A procedural on-chain art protocol on Arbitrum where participants make gestures and the
+            protocol distributes ETH across allocation tracks.
           </p>
           <div className="mt-4 flex items-center gap-2">
             <a

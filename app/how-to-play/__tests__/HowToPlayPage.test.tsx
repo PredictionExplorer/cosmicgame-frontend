@@ -46,7 +46,8 @@ jest.mock('next/link', () => ({
 describe('HowToPlayPage', () => {
   it('renders the hero section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Bid. Compete. Win Big.');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Gesture\. Shape\./);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Sign the cycle/);
   });
 
   it('renders the game overview section', () => {
@@ -56,12 +57,12 @@ describe('HowToPlayPage', () => {
 
   it('renders the reward breakdown section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByText('Every Bid Earns You')).toBeInTheDocument();
+    expect(screen.getByText('Every gesture imprints value')).toBeInTheDocument();
   });
 
   it('renders the game cycle section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByText('Lifecycle of a Round')).toBeInTheDocument();
+    expect(screen.getByText('Lifecycle of a cycle')).toBeInTheDocument();
   });
 
   it('renders the step-by-step section', () => {
@@ -82,7 +83,7 @@ describe('HowToPlayPage', () => {
 
   it('renders the CTA section', () => {
     render(<HowToPlayPage />);
-    expect(screen.getByText('Ready to Start Bidding?')).toBeInTheDocument();
+    expect(screen.getByText('Ready to make a gesture?')).toBeInTheDocument();
   });
 
   it('has correct heading hierarchy with all section headings', () => {

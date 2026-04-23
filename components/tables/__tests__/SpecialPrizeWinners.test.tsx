@@ -21,14 +21,14 @@ import { SpecialPrizeWinners } from '@/components/tables/SpecialPrizeWinners';
 describe('SpecialPrizeWinners', () => {
   it('renders section heading', () => {
     render(<SpecialPrizeWinners />);
-    expect(screen.getByTestId('special-prize-heading')).toHaveTextContent('Special Prize Leaders');
+    expect(screen.getByTestId('special-prize-heading')).toHaveTextContent('Champion & CST leaders');
   });
 
   it('renders all three prize category labels', () => {
     render(<SpecialPrizeWinners />);
     expect(screen.getByText('Endurance Champion')).toBeInTheDocument();
-    expect(screen.getByText('Chrono Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Last CST Bidder')).toBeInTheDocument();
+    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
+    expect(screen.getByText('Last CST participant')).toBeInTheDocument();
   });
 
   it('renders winner addresses as links', () => {

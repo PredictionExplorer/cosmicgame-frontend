@@ -180,11 +180,11 @@ const Header: FC = () => {
 
               <Separator />
 
-              {/* Game */}
+              {/* Protocol */}
               <p className="px-4 pt-4 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-                Game
+                Protocol
               </p>
-              <ListItemButton nav={{ title: 'Play', route: '/' }} />
+              <ListItemButton nav={{ title: 'Home', route: '/' }} />
               <ListItemButton nav={{ title: 'Gallery', route: '/gallery' }} />
 
               <Separator className="my-2" />
@@ -193,10 +193,10 @@ const Header: FC = () => {
               <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
                 Explore
               </p>
-              <ListItemButton nav={{ title: 'Current Round', route: '/current-round' }} />
-              <ListItemButton nav={{ title: 'Prize Winners', route: '/prize' }} />
-              <ListItemButton nav={{ title: 'Staking Rewards', route: '/staking' }} />
-              <ListItemButton nav={{ title: 'Marketing Rewards', route: '/marketing' }} />
+              <ListItemButton nav={{ title: 'Current Cycle', route: '/current-round' }} />
+              <ListItemButton nav={{ title: 'Allocation Recipients', route: '/prize' }} />
+              <ListItemButton nav={{ title: 'Anchor', route: '/staking' }} />
+              <ListItemButton nav={{ title: 'Outreach CST', route: '/marketing' }} />
               <ListItemButton nav={{ title: 'Statistics', route: '/statistics' }} />
               <ListItemButton nav={{ title: 'Contracts', route: '/contracts' }} />
 
@@ -206,7 +206,7 @@ const Header: FC = () => {
               <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
                 Help
               </p>
-              <ListItemButton nav={{ title: 'How to Play', route: '/how-to-play' }} />
+              <ListItemButton nav={{ title: 'How to Participate', route: '/how-to-play' }} />
               <ListItemButton nav={{ title: 'FAQ', route: '/faq' }} />
 
               {account && (
@@ -222,18 +222,18 @@ const Header: FC = () => {
                     nav={{
                       title: hasUnclaimedRewards ? (
                         <span className="flex items-center gap-2">
-                          My Rewards
+                          My Allocations
                           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                         </span>
                       ) : (
-                        'My Rewards'
+                        'My Allocations'
                       ),
                       route: '/my-winnings',
                     }}
                   />
                   <ListItemButton nav={{ title: 'My Tokens', route: '/my-tokens' }} />
-                  <ListItemButton nav={{ title: 'My Staking', route: '/my-staking' }} />
-                  <ListItemButton nav={{ title: 'Winning History', route: '/winning-history' }} />
+                  <ListItemButton nav={{ title: 'My Anchors', route: '/my-staking' }} />
+                  <ListItemButton nav={{ title: 'Allocation History', route: '/winning-history' }} />
 
                   <Separator className="my-2" />
 
@@ -268,7 +268,7 @@ const Header: FC = () => {
 
                   <div className="px-4 py-2 space-y-1.5">
                     <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-                      Staked
+                      Anchored
                     </p>
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">CST NFTs</span>
@@ -301,8 +301,8 @@ const Header: FC = () => {
             <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
               <p className="text-sm">
                 {systemMode === 1
-                  ? 'Maintenance mode will activate after the current prize claim. You can play again once adjustments are complete.'
-                  : 'System is in maintenance mode. You can play again once parameter adjustments are complete.'}
+                  ? 'Maintenance mode will activate after the current cycle finalization. You can participate again once adjustments are complete.'
+                  : 'System is in maintenance mode. You can participate again once parameter adjustments are complete.'}
               </p>
               <span className="shrink-0 rounded-full bg-black/10 px-3 py-1 text-xs font-bold uppercase tracking-wider">
                 {systemMode === 1 ? 'Pending' : 'Maintenance'}

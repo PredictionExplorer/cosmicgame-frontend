@@ -14,14 +14,14 @@ describe('AuctionInfo', () => {
 
     expect(screen.getByText('Elapsed Time:')).toBeInTheDocument();
     expect(screen.getByText('900s')).toBeInTheDocument();
-    expect(screen.getByText('Auction Duration:')).toBeInTheDocument();
+    expect(screen.getByText('Calibration duration:')).toBeInTheDocument();
     expect(screen.getByText('3600s')).toBeInTheDocument();
   });
 
   it('shows ended message when elapsed > duration', () => {
     render(<AuctionInfo secondsElapsed={4000} auctionDuration={3600} />);
 
-    expect(screen.getByText('Auction ended.')).toBeInTheDocument();
+    expect(screen.getByText('Calibration window ended.')).toBeInTheDocument();
     expect(screen.queryByText('Elapsed Time:')).not.toBeInTheDocument();
   });
 
@@ -29,7 +29,7 @@ describe('AuctionInfo', () => {
     render(<AuctionInfo secondsElapsed={0} auctionDuration={0} />);
 
     expect(screen.getByText('Elapsed Time:')).toBeInTheDocument();
-    expect(screen.getByText('Auction Duration:')).toBeInTheDocument();
+    expect(screen.getByText('Calibration duration:')).toBeInTheDocument();
     expect(screen.getAllByText('0s')).toHaveLength(2);
   });
 
@@ -38,12 +38,14 @@ describe('AuctionInfo', () => {
       <AuctionInfo
         secondsElapsed={5000}
         auctionDuration={3600}
-        endedMessage="Auction ended, you can bid for free."
+        endedMessage="CST window ended — no CST cost for the next CST gesture."
       />,
     );
 
-    expect(screen.getByText('Auction ended, you can bid for free.')).toBeInTheDocument();
-    expect(screen.queryByText('Auction ended.')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('CST window ended — no CST cost for the next CST gesture.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Calibration window ended.')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

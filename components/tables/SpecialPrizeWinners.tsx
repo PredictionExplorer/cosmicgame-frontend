@@ -43,7 +43,7 @@ function SpecialPrizeLeadersPrintFallback({ data }: { data: SpecialWinners | nul
       data-special-prize-leaders-print
     >
       <h3 className="mb-4 border-b border-foreground/30 pb-2 font-display text-base font-bold">
-        Special Prize Leaders
+        Champion & CST leaders
       </h3>
       <dl className="space-y-4">
         <div>
@@ -57,7 +57,7 @@ function SpecialPrizeLeadersPrintFallback({ data }: { data: SpecialWinners | nul
         </div>
         <div>
           <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
-            Chrono Warrior
+            Chrono-Warrior
           </dt>
           <dd className="mt-1 break-all font-mono text-xs leading-relaxed">{enduranceAddr ?? '—'}</dd>
           {dur > 0 && (
@@ -66,7 +66,7 @@ function SpecialPrizeLeadersPrintFallback({ data }: { data: SpecialWinners | nul
         </div>
         <div>
           <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
-            Last CST Bidder
+            Last CST participant
           </dt>
           <dd className="mt-1 break-all font-mono text-xs leading-relaxed">{lastCst ?? '—'}</dd>
         </div>
@@ -87,7 +87,7 @@ export const SpecialPrizeWinners = () => {
       icon: <Crown className="h-5 w-5" />,
       title: 'Endurance Champion',
       tooltip:
-        'The bidder who remained the last bidder for the longest consecutive period of time. Wins CST tokens and a COSMIC NFT.',
+        'The participant who remained last participant for the longest consecutive stretch. Receives CST and a COSMIC NFT allocation.',
       address: specialWinners?.EnduranceChampionAddress,
       extra: hasEndurance && (specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
         <div className="mt-3 flex items-center gap-2">
@@ -99,7 +99,7 @@ export const SpecialPrizeWinners = () => {
       urgency: hasEndurance && (
         <div className="mt-3 rounded-lg bg-emerald-500/[0.06] border border-emerald-500/20 px-3 py-2">
           <p className="text-xs text-emerald-400/90 animate-urgency-pulse">
-            Champion title grows stronger every second no one bids!
+            Endurance window grows every second no one makes a gesture!
           </p>
         </div>
       ),
@@ -107,9 +107,9 @@ export const SpecialPrizeWinners = () => {
     {
       key: 'chrono',
       icon: <Swords className="h-5 w-5" />,
-      title: 'Chrono Warrior',
+      title: 'Chrono-Warrior',
       tooltip:
-        'The bidder who held the Endurance Champion title for the longest consecutive period. Wins a percentage of the total contract balance.',
+        'The participant who held the Endurance Champion interval longest. Receives a share of the contract balance for this track.',
       address: specialWinners?.EnduranceChampionAddress,
       extra: hasEndurance && (specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
         <div className="mt-3">
@@ -125,15 +125,15 @@ export const SpecialPrizeWinners = () => {
     {
       key: 'lastcst',
       icon: <Coins className="h-5 w-5" />,
-      title: 'Last CST Bidder',
+      title: 'Last CST participant',
       tooltip:
-        'The last person to place a bid using CST tokens wins CST tokens and a COSMIC NFT.',
+        'The most recent participant to make a gesture using CST receives CST and a COSMIC NFT allocation.',
       address: specialWinners?.LastCstBidderAddress,
       extra: null,
       accent: false,
       urgency: !hasLastCst && (
         <div className="mt-3 rounded-lg bg-accent/[0.06] border border-accent/20 px-3 py-2">
-          <p className="text-xs text-accent/80">No CST bids yet -- be the first!</p>
+          <p className="text-xs text-accent/80">No CST gestures yet — be the first!</p>
         </div>
       ),
     },
@@ -149,17 +149,17 @@ export const SpecialPrizeWinners = () => {
       <section
         className="min-h-[2rem] space-y-4 print:min-h-0 print:hidden"
         data-special-prize-leaders
-        aria-label="Special prize leaders"
+        aria-label="Champion and CST gesture leaders"
       >
         <div className="flex items-center gap-2">
           <h3
             data-testid="special-prize-heading"
             className="font-display text-lg font-semibold tracking-tight text-foreground print:!text-foreground"
           >
-            Special Prize Leaders
+            Champion & CST leaders
           </h3>
           <span className="print:hidden">
-            <InfoTooltip content="These players are currently in line to win special prizes when the round ends. Positions can change with every new bid!" />
+            <InfoTooltip content="These participants currently lead endurance-related tracks. Positions can change with every new gesture!" />
           </span>
         </div>
 

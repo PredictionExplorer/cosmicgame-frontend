@@ -71,7 +71,7 @@ describe('app/faq/page.tsx', () => {
     it('includes openGraph images with default logo', () => {
       const og = metadata.openGraph as { images: string[] };
       expect(og.images).toHaveLength(1);
-      expect(og.images[0]).toContain('logo.png');
+      expect(og.images[0]).toMatch(/logo\.(png|svg)/);
     });
 
     it('includes twitter card metadata', () => {

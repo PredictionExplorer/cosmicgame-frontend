@@ -101,17 +101,37 @@ export function isContractRevertError(err: unknown): boolean {
 }
 
 const CUSTOM_ERROR_MESSAGES: Record<string, string> = {
+  FirstRound: "This action isn't available during the very first cycle.",
   InsufficientReceivedBidAmount:
-    'The current bid price is greater than the amount you transferred.',
-  UsedRandomWalkNft: 'This RandomWalk NFT has already been used for a bid.',
-  CallerIsNotNftOwner: 'You are not the owner of this NFT.',
-  RoundIsInactive: 'The current round is not active.',
-  TooLongBidMessage: 'Your bid message is too long.',
-  WrongBidType: 'Wrong bid type selected.',
-  FundTransferFailed: 'Fund transfer failed.',
-  MainPrizeEarlyClaim: 'Not enough time has elapsed to claim the prize.',
-  MainPrizeClaimDenied: 'Only the last bidder is permitted to claim the main prize.',
-  NoBidsPlacedInCurrentRound: 'There have been no bids in the current round yet.',
+    'Gesture cost not met. The required ETH amount is greater than what you transferred.',
+  UsedRandomWalkNft:
+    'This Random Walk NFT has already been used for a gesture-cost discount.',
+  CallerIsNotNftOwner: "You don't own this NFT.",
+  RoundIsInactive: "The cycle isn't open yet.",
+  RoundIsActive: 'The cycle is already in progress.',
+  TooLongBidMessage: 'Gesture message is too long. Please shorten it.',
+  WrongBidType: "That gesture type isn't allowed right now.",
+  BidHasBeenPlacedInCurrentRound: 'A gesture has already been made in this cycle.',
+  FundTransferFailed: 'The ETH transfer failed. Please retry.',
+  MainPrizeEarlyClaim: "The Performance hasn't closed yet — too early to finalize the cycle.",
+  MainPrizeClaimDenied:
+    'Only the participant who made the final gesture may finalize the cycle right now.',
+  NoBidsPlacedInCurrentRound: 'No gestures have been made yet in this cycle.',
+  TooLongNftName: 'That NFT name is too long.',
+  EthWithdrawalDenied: "You can't retrieve this allocation yet.",
+  DonatedTokenClaimDenied: "You can't retrieve this attached token yet.",
+  InvalidDonatedNftIndex: "That attached NFT doesn't exist.",
+  DonatedNftAlreadyClaimed: 'This attached NFT has already been retrieved.',
+  DonatedNftClaimDenied: "You can't retrieve this attached NFT yet.",
+  ThereAreStakedNfts: 'There are still anchored NFTs.',
+  NftHasAlreadyBeenStaked:
+    'This NFT has been anchored before. Each NFT can be anchored only once.',
+  NftStakeActionInvalidId: 'That anchor action ID is invalid.',
+  NftStakeActionAccessDenied: 'This anchor action belongs to another wallet.',
+  UnauthorizedCaller: "Your wallet isn't authorized for this action.",
+  ZeroAddress: 'Please enter a non-zero address.',
+  InvalidOperationInCurrentState:
+    "This action isn't available in the protocol's current state.",
 };
 
 /**
@@ -168,8 +188,8 @@ export function getContractErrorMessage(err: unknown, displayedEthPrice?: number
           const delta = requiredEth - displayedEthPrice;
           if (delta > 0) {
             return (
-              `Bid price rose by ${delta.toFixed(6)} ETH while your transaction was in transit. ` +
-              `The new required price is ${requiredEth.toFixed(6)} ETH. Please try again.`
+              `Gesture cost rose by ${delta.toFixed(6)} ETH while your transaction was in transit. ` +
+              `The new required amount is ${requiredEth.toFixed(6)} ETH. Please try again.`
             );
           }
         }

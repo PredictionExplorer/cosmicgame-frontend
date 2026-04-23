@@ -21,23 +21,23 @@ const steps = [
   },
   {
     Icon: Search,
-    title: 'Check the Bid Price',
+    title: 'Review gesture cost',
     highlights: [
-      'Review the round countdown timer — it resets and adds time with each bid.',
-      'Check the current bid price in ETH or CST before committing.',
-      'Note the main prize reward amount to see what you could win.',
-      'Ensure your wallet holds the bid price plus a small amount for gas fees.',
+      'Review the Performance countdown — it extends with each gesture.',
+      'Check the current ETH or CST gesture cost before confirming.',
+      'Note the Signature Allocation amount shown for the active cycle.',
+      'Ensure your wallet holds the gesture amount plus a small buffer for gas fees.',
     ],
     tooltip: 'Gas fees on Arbitrum are typically a few cents — much cheaper than Ethereum mainnet.',
   },
   {
     Icon: MousePointerClick,
-    title: 'Place Your Bid',
+    title: 'Make your gesture',
     highlights: [
-      'Choose your bid currency: ETH, CST, or use a Random Walk NFT for a 50% ETH discount.',
-      'Click "Bid Now" and confirm the transaction in your wallet.',
-      'Your bid extends the timer by 1 hour and increases the next bid price by 1%.',
-      'Every bid earns you 100 CST tokens and a raffle ticket automatically.',
+      'Choose ETH or CST, or attach a Random Walk NFT for a one-time 50% ETH gesture-cost discount.',
+      'Confirm the transaction in your wallet when you are ready.',
+      'Your gesture extends the Performance clock and steps the next gesture cost (about +1% for ETH).',
+      'Each gesture imprints CST and increases your weight for future Stellar Selections.',
     ],
     tooltip:
       'The Random Walk NFT 50% discount can only be used once per wallet, so choose your moment wisely.',
@@ -65,7 +65,7 @@ export function StepByStep() {
           Getting Started
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          From wallet connection to your first bid in three steps
+          From wallet connection to your first gesture in three steps
         </p>
       </div>
 

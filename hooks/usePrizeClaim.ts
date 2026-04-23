@@ -74,7 +74,10 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
 
       const roundAfter = (await cosmicGameContract.read.roundNum?.()) as bigint;
       if (roundAfter <= roundBefore) {
-        notify('warning', 'Claim transaction succeeded but the round did not advance. Please refresh the page.');
+        notify(
+          'warning',
+          'Finalize transaction succeeded but the cycle counter did not advance. Please refresh the page.',
+        );
         return true;
       }
 
@@ -91,7 +94,7 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
         reportError(apiErr, 'post-claim-api');
         notify(
           'warning',
-          'Prize claimed successfully on-chain! Token metadata may still be updating. Check My Winnings or refresh later.',
+          'Cycle finalized on-chain. Token metadata may still be updating. Check My Allocations or refresh later.',
         );
       }
 

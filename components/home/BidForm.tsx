@@ -51,7 +51,7 @@ const bidOptions = [
   { value: 'CST', label: 'CST', desc: 'Cosmic Token' },
 ];
 
-/** Form for placing ETH or CST bids with optional NFT/token donation fields and RandomWalk discount. */
+/** Form for making ETH or CST gestures with optional token/NFT attachment and RandomWalk discount. */
 export function BidForm({
   data,
   bidType,
@@ -85,7 +85,7 @@ export function BidForm({
     <div className="mt-8 space-y-5">
       <div>
         <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3 block">
-          Bid Method
+          Entry method
         </Label>
         <div className="flex gap-2">
           {visibleOptions.map((opt) => (
@@ -128,7 +128,7 @@ export function BidForm({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="max-w-[200px]">
-                    Select a RandomWalk NFT to get a 50% discount on your bid. Each NFT can only be
+                    Select a Random Walk NFT for a 50% gesture-cost discount. Each NFT can only be
                     used once.
                   </p>
                 </TooltipContent>
@@ -148,7 +148,7 @@ export function BidForm({
         <AuctionInfo
           secondsElapsed={cstBidData.SecondsElapsed}
           auctionDuration={cstBidData.AuctionDuration}
-          endedMessage="Auction ended, you can bid for free."
+          endedMessage="CST Calibration Window ended — you can make a CST gesture at no CST cost."
         />
       )}
 
@@ -158,7 +158,7 @@ export function BidForm({
           <span className="normal-case tracking-normal opacity-50">(optional, 280 chars)</span>
         </Label>
         <textarea
-          placeholder="Leave a message with your bid..."
+          placeholder="Optional gesture message (visible on-chain)…"
           value={message}
           maxLength={280}
           rows={3}
@@ -183,7 +183,7 @@ export function BidForm({
           <AccordionContent>
             <div className="space-y-4 pt-2 max-w-xl">
               <p className="text-xs text-muted-foreground">
-                Donate tokens or NFTs while bidding, or adjust bid collision prevention.
+                Attach tokens or NFTs with your gesture, or adjust gesture-cost collision buffer.
               </p>
               <RadioGroup
                 value={donationType}
@@ -195,11 +195,11 @@ export function BidForm({
               >
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <RadioGroupItem value="NFT" />
-                  <span className="text-sm">Donate NFT</span>
+                  <span className="text-sm">Attach NFT</span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <RadioGroupItem value="Token" />
-                  <span className="text-sm">Donate Token</span>
+                  <span className="text-sm">Attach token</span>
                 </label>
               </RadioGroup>
               {donationType === 'Token' && (
@@ -294,8 +294,8 @@ export function BidForm({
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Bumps bid price by {bidPricePlus}% to avoid collision when two bids land in the
-                    same block. Does not permanently raise the price.
+                    Bumps gesture cost by {bidPricePlus}% to avoid collision when two gestures land
+                    in the same block. Does not permanently raise the on-chain price.
                   </p>
                 </div>
               )}

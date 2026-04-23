@@ -25,8 +25,8 @@ describe('isWalletAddress', () => {
     expect(isWalletAddress(RAFFLE_WALLET_ADDRESS)).toBe('Raffle Wallet');
   });
 
-  it('returns "Charity Wallet" for the charity address', () => {
-    expect(isWalletAddress(CHARITY_WALLET_ADDRESS)).toBe('Charity Wallet');
+  it('returns "Public Goods Vault" for the charity address', () => {
+    expect(isWalletAddress(CHARITY_WALLET_ADDRESS)).toBe('Public Goods Vault');
   });
 
   it('returns empty string for an unknown address', () => {

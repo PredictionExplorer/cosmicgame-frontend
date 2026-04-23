@@ -17,7 +17,7 @@ export function websiteJsonLd() {
     name: SITE_NAME,
     url: SITE_URL,
     description:
-      'Cosmic Signature is a strategy bidding game on Arbitrum featuring generative NFT art, ETH prizes, staking rewards, and charitable giving.',
+      'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures across Performance Cycles; the protocol distributes reserves across allocation tracks and supports Ethereum public goods.',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -38,7 +38,7 @@ export function organizationJsonLd() {
     logo: SITE_LOGO_URL,
     sameAs: ['https://x.com/CosmicSignature', 'https://discord.gg/bGnPn96Qwt'],
     description:
-      'Cosmic Signature combines generative art, an exciting Ethereum bidding game, and social impact through charitable giving on the Arbitrum network.',
+      'Cosmic Signature combines generative art with a coordination protocol on Arbitrum, forwarding part of each cycle to Ethereum public-goods infrastructure.',
   };
 }
 
@@ -48,7 +48,7 @@ export function webApplicationJsonLd() {
     '@type': 'WebApplication',
     name: SITE_NAME,
     url: SITE_URL,
-    applicationCategory: 'GameApplication',
+    applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Any',
     browserRequirements: 'Requires a Web3-compatible browser or wallet extension',
     offers: {
@@ -57,7 +57,7 @@ export function webApplicationJsonLd() {
       priceCurrency: 'ETH',
     },
     description:
-      'A strategy bidding game where players compete to win ETH prizes, unique generative NFTs, and staking rewards on the Arbitrum blockchain.',
+      'A procedural on-chain protocol on Arbitrum where participants make gestures, receive CST imprints and allocations across tracks, and can anchor NFTs for per-cycle distributions.',
   };
 }
 

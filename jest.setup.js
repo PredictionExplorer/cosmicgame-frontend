@@ -42,6 +42,7 @@ const ALLOWED_PATTERNS = [
   'Missing `Description` or `aria-describedby',
   '[apiCall]',
   '[apiPost]',
+  '[Cosmic Signature] Config:',
 ];
 
 function isAllowed(msg) {

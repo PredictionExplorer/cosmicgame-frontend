@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, checkA11y, waitFor } from '@/test-utils';
+import { render, screen, checkA11y, waitFor, fireEvent } from '@/test-utils';
 
 import FAQPage from '../FAQPage';
 
@@ -116,19 +116,19 @@ describe('FAQPage', () => {
   });
 
   it('shows "No questions found" for nonsense search', async () => {
-    const user = userEvent.setup();
     render(<FAQPage />);
 
     const searchInput = screen.getByRole('textbox', {
       name: /search frequently asked questions/i,
     });
-    await user.type(searchInput, 'xyznonexistentquestion123');
+    fireEvent.change(searchInput, { target: { value: 'xyznonexistentquestion123' } });
 
     await waitFor(() => {
       expect(
         screen.getByText('No questions found. Try a different search term.'),
       ).toBeInTheDocument();
     });
+    expect(screen.getByRole('button', { name: 'clear the search' })).toBeInTheDocument();
   });
 
   it('hides popular questions and category nav when searching', async () => {

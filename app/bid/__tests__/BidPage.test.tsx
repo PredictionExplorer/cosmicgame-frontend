@@ -53,7 +53,7 @@ describe('BidPage', () => {
   it('shows error for negative bid id', () => {
     mockUseBidInfo.mockReturnValue({ data: null, isLoading: false });
     render(<BidPage bidId={-1} />);
-    expect(screen.getByText('Invalid Bid Id')).toBeInTheDocument();
+    expect(screen.getByText('Invalid gesture ID')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -65,13 +65,13 @@ describe('BidPage', () => {
   it('shows "no bid information" when data is null', () => {
     mockUseBidInfo.mockReturnValue({ data: null, isLoading: false });
     render(<BidPage bidId={1} />);
-    expect(screen.getByText('No bid information found.')).toBeInTheDocument();
+    expect(screen.getByText('No gesture information found.')).toBeInTheDocument();
   });
 
   it('renders bid details heading', () => {
     mockUseBidInfo.mockReturnValue({ data: baseBidInfo, isLoading: false });
     render(<BidPage bidId={1} />);
-    expect(screen.getByRole('heading', { name: 'Bid details', level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Gesture details', level: 1 })).toBeInTheDocument();
   });
 
   it('renders bidder address', () => {
@@ -83,7 +83,7 @@ describe('BidPage', () => {
   it('renders round number', () => {
     mockUseBidInfo.mockReturnValue({ data: baseBidInfo, isLoading: false });
     render(<BidPage bidId={1} />);
-    expect(screen.getByRole('link', { name: /round 5/i })).toHaveAttribute('href', '/prize/5');
+    expect(screen.getByRole('link', { name: /cycle 5/i })).toHaveAttribute('href', '/prize/5');
   });
 
   it('renders ETH bid price for BidType !== 2', () => {
@@ -110,7 +110,7 @@ describe('BidPage', () => {
   it('shows "No" for RandomWalkNFT when RWalkNFTId < 0', () => {
     mockUseBidInfo.mockReturnValue({ data: baseBidInfo, isLoading: false });
     render(<BidPage bidId={1} />);
-    expect(screen.getByText('Was bid with RandomWalkNFT:')).toBeInTheDocument();
+    expect(screen.getByText('Random Walk NFT attached:')).toBeInTheDocument();
     const noTexts = screen.getAllByText('No');
     expect(noTexts.length).toBeGreaterThanOrEqual(1);
   });
@@ -136,7 +136,7 @@ describe('BidPage', () => {
       isLoading: false,
     });
     render(<BidPage bidId={1} />);
-    expect(screen.getByText('Donated ERC20 Token Address:')).toBeInTheDocument();
+    expect(screen.getByText('Attached ERC-20 contract:')).toBeInTheDocument();
     expect(screen.getByText('0xToken')).toBeInTheDocument();
   });
 

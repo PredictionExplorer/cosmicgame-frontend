@@ -148,12 +148,12 @@ const HomePage = () => {
   const getBidLabel = () => {
     const adj = (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100);
     const fmt = (v: number, t: number) => (v > t ? v.toFixed(2) : v.toFixed(5));
-    if (bidType === 'ETH') return `Bid now with ETH (${fmt(adj, 0.1)} ETH)`;
+    if (bidType === 'ETH') return `Make a Gesture — ETH (${fmt(adj, 0.1)} ETH)`;
     if (bidType === 'RandomWalk' && rwlkId !== -1)
-      return `Bid now with RandomWalk token ${rwlkId} (${fmt(adj * 0.5, 0.2)} ETH)`;
+      return `Make a Gesture — RandomWalk #${rwlkId} (${fmt(adj * 0.5, 0.2)} ETH)`;
     if (bidType === 'CST')
-      return `Bid now with CST ${cstBidData.SecondsElapsed > cstBidData.AuctionDuration ? '(FREE BID)' : `(${cstBidData.CSTPrice.toFixed(2)} CST)`}`;
-    return `Bid now with ${bidType}`;
+      return `Make a Gesture — CST ${cstBidData.SecondsElapsed > cstBidData.AuctionDuration ? '(no CST cost)' : `(${cstBidData.CSTPrice.toFixed(2)} CST)`}`;
+    return `Make a Gesture — ${bidType}`;
   };
 
   const canBid = prizeTime > Date.now() || data?.LastBidderAddr !== account;
@@ -194,13 +194,14 @@ const HomePage = () => {
 
         <section aria-label="About Cosmic Signature" className="mb-10">
           <h1 className="sr-only">
-            Cosmic Signature — Strategy Bidding Game on Arbitrum with Generative NFT Art
+            Cosmic Signature — Procedural On-Chain Art Protocol on Arbitrum with Generative NFT Art
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
-            Cosmic Signature is a strategy bidding game on the Arbitrum blockchain. Players bid
-            against each other and against time to win ETH prizes and unique generative NFTs
-            inspired by three-body problem physics. Every bid earns CST tokens, raffle tickets, and
-            a chance to win exclusive digital collectibles.
+            Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make
+            gestures across a Performance Cycle; when the Performance closes, reserves are
+            distributed across allocation tracks. Generative NFTs are inspired by three-body problem
+            physics. Every gesture imprints CST; Stellar Selection and other tracks allocate ETH and
+            NFTs according to the published rules.
           </p>
         </section>
 
@@ -219,10 +220,10 @@ const HomePage = () => {
             {data && (
               <div>
                 <h1 className="font-display text-lg font-bold tracking-tight sm:text-xl">
-                  Round #{data.CurRoundNum}
+                  Cycle #{data.CurRoundNum}
                 </h1>
                 <p className="text-[11px] text-muted-foreground">
-                  {data.CurNumBids} bid{data.CurNumBids !== 1 ? 's' : ''} placed
+                  {data.CurNumBids} gesture{data.CurNumBids !== 1 ? 's' : ''} placed
                 </p>
               </div>
             )}
@@ -233,7 +234,7 @@ const HomePage = () => {
                 href={`/prize/${(data?.CurRoundNum ?? 0) - 1}`}
                 className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
               >
-                Round {(data?.CurRoundNum ?? 0) - 1} results
+                Cycle {(data?.CurRoundNum ?? 0) - 1} results
                 <ArrowRight className="h-3 w-3" />
               </Link>
             )}
@@ -298,9 +299,9 @@ const HomePage = () => {
             className="print-motion-visible mt-10"
           >
             <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
-              <h2 className="font-display text-xl font-bold tracking-tight mb-1">Place Your Bid</h2>
+              <h2 className="font-display text-xl font-bold tracking-tight mb-1">Make a Gesture</h2>
               <p className="text-sm text-muted-foreground mb-6">
-                Choose your bid method and enter the game.
+                Choose ETH, Random Walk–discounted ETH, or CST, then confirm in your wallet.
               </p>
 
               <BidForm {...bidForm} data={data} />
@@ -342,7 +343,7 @@ const HomePage = () => {
                         </span>
                       ) : (
                         <>
-                          Claim Prize
+                          Finalize Cycle
                           <span className="flex items-center">
                             {claimWait > Date.now() && data?.LastBidderAddr !== account && (
                               <>
@@ -358,7 +359,7 @@ const HomePage = () => {
                     </Button>
                     {data?.LastBidderAddr !== account && claimWait > Date.now() && (
                       <p className="text-sm italic text-right text-primary">
-                        Please wait until the last bidder claims the prize.
+                        Please wait until the last participant finalizes the cycle.
                       </p>
                     )}
                   </>
@@ -394,9 +395,9 @@ const HomePage = () => {
             className="mt-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 group hover:bg-white/[0.04] transition-all duration-300"
           >
             <div>
-              <p className="text-sm font-medium text-white">View Full Round Details</p>
+              <p className="text-sm font-medium text-white">View Full Cycle Details</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Bid history, leaderboards, donations, and fund distribution
+                Gesture history, champions, contributions, and fund distribution
               </p>
             </div>
             <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />

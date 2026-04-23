@@ -19,18 +19,18 @@ const mockData = {
 describe('Prize', () => {
   it('renders section heading', () => {
     render(<Prize data={mockData} />);
-    expect(screen.getByText('Prize Breakdown')).toBeInTheDocument();
+    expect(screen.getByText('Allocation tracks')).toBeInTheDocument();
   });
 
-  it('renders Main Prize link', () => {
+  it('renders Signature Allocation link', () => {
     render(<Prize data={mockData} />);
-    const mainPrize = screen.getByText('Main Prize');
+    const mainPrize = screen.getByText('Signature Allocation');
     expect(mainPrize.closest('a')).toHaveAttribute('href', '/faq#main-prize');
   });
 
-  it('renders Chrono Warrior link', () => {
+  it('renders Chrono-Warrior link', () => {
     render(<Prize data={mockData} />);
-    const chrono = screen.getByText('Chrono Warrior');
+    const chrono = screen.getByText('Chrono-Warrior');
     expect(chrono.closest('a')).toHaveAttribute('href', '/faq#chrono-warrior');
   });
 
@@ -63,11 +63,11 @@ describe('Prize', () => {
     expect(screen.getByText('0.7500 ETH')).toBeInTheDocument();
   });
 
-  it('displays raffle winner counts', () => {
+  it('displays recipient counts', () => {
     render(<Prize data={mockData} />);
-    expect(screen.getByText('5 winners')).toBeInTheDocument();
-    expect(screen.getByText('3 winners')).toBeInTheDocument();
-    expect(screen.getByText('2 or 0 winners')).toBeInTheDocument();
+    expect(screen.getByText('Recipients: 5')).toBeInTheDocument();
+    expect(screen.getByText('Recipients: 3')).toBeInTheDocument();
+    expect(screen.getByText('Recipients: 2 or 0')).toBeInTheDocument();
   });
 
   it('calculates Chrono Warrior ETH correctly', () => {
@@ -84,7 +84,7 @@ describe('Prize', () => {
 
   it('renders with null data without crashing', () => {
     render(<Prize data={null} />);
-    expect(screen.getByText('Prize Breakdown')).toBeInTheDocument();
+    expect(screen.getByText('Allocation tracks')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

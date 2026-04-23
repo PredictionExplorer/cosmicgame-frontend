@@ -70,7 +70,7 @@ describe('Header', () => {
 
   it('renders navigation links', () => {
     render(<Header />);
-    expect(screen.getByText('Play')).toBeInTheDocument();
+    expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Gallery')).toBeInTheDocument();
     expect(screen.getByText('Explore')).toBeInTheDocument();
     expect(screen.getByText('Help')).toBeInTheDocument();

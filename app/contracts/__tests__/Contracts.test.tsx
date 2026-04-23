@@ -165,20 +165,20 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     expect(screen.getByText('Fund Distribution')).toBeInTheDocument();
-    expect(screen.getByText('Prize')).toBeInTheDocument();
-    expect(screen.getByText('Chrono Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Raffle')).toBeInTheDocument();
-    expect(screen.getByText('Staking')).toBeInTheDocument();
-    expect(screen.getByText('Charity')).toBeInTheDocument();
+    expect(screen.getByText('Signature')).toBeInTheDocument();
+    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
+    expect(screen.getByText('Anchors')).toBeInTheDocument();
+    expect(screen.getByText('Public goods')).toBeInTheDocument();
   });
 
   it('renders game configuration section', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Game Configuration')).toBeInTheDocument();
-    expect(screen.getByText('Price Increase')).toBeInTheDocument();
-    expect(screen.getByText('Time Increase')).toBeInTheDocument();
-    expect(screen.getByText('CST Reward per Bid')).toBeInTheDocument();
+    expect(screen.getByText('Protocol parameters')).toBeInTheDocument();
+    expect(screen.getByText('Gesture-cost drift')).toBeInTheDocument();
+    expect(screen.getByText('Time added per gesture')).toBeInTheDocument();
+    expect(screen.getByText('CST imprint per gesture')).toBeInTheDocument();
   });
 
   it('renders all contract address groups', () => {
@@ -192,26 +192,26 @@ describe('Contracts', () => {
   it('renders contract address cards', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature (core)')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature Token')).toBeInTheDocument();
-    expect(screen.getByText('Charity Wallet')).toBeInTheDocument();
-    expect(screen.getByText('CST Staking Wallet')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
+    expect(screen.getByText('CST Anchor Wallet')).toBeInTheDocument();
   });
 
   it('renders auction parameters section', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Auction & Raffle Parameters')).toBeInTheDocument();
-    expect(screen.getByText('CST Dutch Auction')).toBeInTheDocument();
-    expect(screen.getByText('ETH Dutch Auction')).toBeInTheDocument();
+    expect(screen.getByText('Calibration & selection parameters')).toBeInTheDocument();
+    expect(screen.getByText('CST Calibration Window')).toBeInTheDocument();
+    expect(screen.getByText('ETH Calibration Window')).toBeInTheDocument();
   });
 
   it('renders raffle configuration cards', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Raffle ETH Winners')).toBeInTheDocument();
-    expect(screen.getByText('Raffle NFT Winners (Bidding)')).toBeInTheDocument();
-    expect(screen.getByText('Raffle NFT Winners (Staking)')).toBeInTheDocument();
+    expect(screen.getByText('ETH Stellar Selection slots')).toBeInTheDocument();
+    expect(screen.getByText('NFT Stellar Selection (gestures)')).toBeInTheDocument();
+    expect(screen.getByText('NFT Stellar Selection (anchors)')).toBeInTheDocument();
   });
 
   it('renders search input for contract addresses', () => {
@@ -224,9 +224,9 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     const searchInput = screen.getByLabelText('Search contracts');
-    fireEvent.change(searchInput, { target: { value: 'charity' } });
-    expect(screen.getByText('Charity Wallet')).toBeInTheDocument();
-    expect(screen.queryByText('Cosmic Game')).not.toBeInTheDocument();
+    fireEvent.change(searchInput, { target: { value: 'public' } });
+    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
+    expect(screen.queryByText('Cosmic Signature (core)')).not.toBeInTheDocument();
   });
 
   it('shows empty state when search has no results', () => {

@@ -67,34 +67,35 @@ export function FundDistribution({
 
   const segments: FundSegment[] = [
     {
-      label: 'Prize',
+      label: 'Signature',
       value: prizePercentage ?? 0,
       color: SEGMENT_COLORS.prize,
-      tooltip: 'Percentage of the pot awarded to the main prize winner each round',
+      tooltip:
+        'Share of the cycle reserve directed to the Signature Allocation track (final gesture at Performance close).',
     },
     {
-      label: 'Chrono Warrior',
+      label: 'Chrono-Warrior',
       value: chronoWarriorPercentage ?? 0,
       color: SEGMENT_COLORS.chrono,
-      tooltip: 'Bonus awarded to the last bidder (Chrono Warrior) of each round',
+      tooltip: 'Share allocated to the Chrono-Warrior track (Endurance Champion interval leader).',
     },
     {
-      label: 'Raffle',
+      label: 'Stellar Selection',
       value: rafflePercentage ?? 0,
       color: SEGMENT_COLORS.raffle,
-      tooltip: 'Portion distributed to random raffle winners after each round',
+      tooltip: 'ETH reserved for random allocation to participants at cycle end (Stellar Selection).',
     },
     {
-      label: 'Staking',
+      label: 'Anchors',
       value: stakingPercentage ?? 0,
       color: SEGMENT_COLORS.staking,
-      tooltip: 'Rewards distributed to token stakers proportional to their stake',
+      tooltip: 'ETH distributed to anchored COSMIC NFT holders proportional to anchors.',
     },
     {
-      label: 'Charity',
+      label: 'Public goods',
       value: charityPercentage ?? 0,
       color: SEGMENT_COLORS.charity,
-      tooltip: 'Funds sent to the charity wallet for charitable causes',
+      tooltip: 'Share forwarded to the Protocol Guild public-goods beneficiary each cycle.',
     },
   ];
 
@@ -105,7 +106,7 @@ export function FundDistribution({
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
           <CardTitle className="text-lg font-semibold">Fund Distribution</CardTitle>
-          <InfoTooltip content="How the total prize pool is split across prizes, raffle, charity, staking, and next round." />
+          <InfoTooltip content="How the cycle reserve is allocated across Signature, Stellar Selection, public goods, anchors, and Chrono-Warrior tracks." />
         </div>
       </CardHeader>
       <CardContent>

@@ -9,29 +9,29 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 const cards = [
   {
     number: '01',
-    title: 'Bid',
+    title: 'Gesture',
     description:
-      'Place a bid using ETH or CST tokens. Each bid resets the countdown timer and raises the stakes.',
+      'Make a gesture with ETH or CST. Each gesture resets the Performance clock and steps the gesture cost.',
     tooltip:
-      'Bids can be placed with ETH or Cosmic Signature Tokens. Holding a Random Walk NFT grants a one-time 50% ETH discount.',
+      'Gestures use ETH or Cosmic Signature Tokens. Attaching a Random Walk NFT grants a one-time 50% ETH gesture-cost discount.',
     Icon: Gavel,
   },
   {
     number: '02',
-    title: 'Compete',
+    title: 'Endure',
     description:
-      'Race against time and other players. The countdown timer adds 1 hour with every new bid.',
+      'The countdown extends with each gesture. The timer starts around 24 hours and adds time per gesture.',
     tooltip:
-      'The round timer starts at 24 hours and gains 1 hour per bid. Bid price increases by 1% after each bid.',
+      'The Performance clock gains duration with each gesture. Gesture cost drifts upward by about 1% after each ETH gesture.',
     Icon: Timer,
   },
   {
     number: '03',
-    title: 'Win',
+    title: 'Finalize',
     description:
-      'Be the last bidder when the timer reaches zero to claim the main ETH prize and a COSMIC NFT.',
+      'When the Performance closes, the final-gesture participant may finalize; reserves distribute across allocation tracks.',
     tooltip:
-      'The winner receives 25% of the prize pool. Raffle winners, NFT stakers, and other participants also earn rewards.',
+      'The Signature Allocation is the main ETH track. Stellar Selection, anchor distributions, and other tracks settle on-chain.',
     Icon: Trophy,
   },
 ] as const;
@@ -57,7 +57,7 @@ export function GameOverview() {
           How It Works
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Three simple steps to compete for the prize pool
+          Three steps to participate in a Performance Cycle
         </p>
       </div>
 

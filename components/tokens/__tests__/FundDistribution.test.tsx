@@ -20,21 +20,21 @@ describe('FundDistribution', () => {
 
   it('renders all six category labels', () => {
     render(<FundDistribution data={createData()} />);
-    expect(screen.getByText('Prize')).toBeInTheDocument();
-    expect(screen.getByText('Raffle')).toBeInTheDocument();
-    expect(screen.getByText('Charity')).toBeInTheDocument();
-    expect(screen.getByText('Staking')).toBeInTheDocument();
-    expect(screen.getByText('Chrono Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Next round')).toBeInTheDocument();
+    expect(screen.getByText('Signature')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
+    expect(screen.getByText('Public goods')).toBeInTheDocument();
+    expect(screen.getByText('Anchors')).toBeInTheDocument();
+    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
+    expect(screen.getByText('Next cycle')).toBeInTheDocument();
   });
 
   it('renders percentage values for each category', () => {
     render(<FundDistribution data={createData()} />);
     expect(screen.getByText(/^25%/)).toBeInTheDocument();
     expect(screen.getByText(/^45%/)).toBeInTheDocument();
-    // 10% appears twice (Raffle and Charity)
+    // 10% appears twice (Stellar Selection and Public goods)
     expect(screen.getAllByText(/^10%/)).toHaveLength(2);
-    // 5% appears twice (Staking and Chrono Warrior)
+    // 5% appears twice (Anchors and Chrono-Warrior)
     expect(screen.getAllByText(/^5%/)).toHaveLength(2);
   });
 
@@ -42,11 +42,11 @@ describe('FundDistribution', () => {
     render(<FundDistribution data={createData({ CosmicGameBalanceEth: 100 })} />);
     expect(screen.getByText(/25\.0000 ETH/)).toBeInTheDocument();
     expect(screen.getByText(/45\.0000 ETH/)).toBeInTheDocument();
-    // 10.0000 ETH appears twice (Raffle and Charity)
+    // 10.0000 ETH appears twice (Stellar Selection and Public goods)
     expect(screen.getAllByText(/10\.0000 ETH/)).toHaveLength(2);
   });
 
-  it('computes Next round as the remainder', () => {
+  it('computes Next cycle as the remainder', () => {
     render(<FundDistribution data={createData()} />);
     // 100 - 25 - 10 - 10 - 5 - 5 = 45%
     expect(screen.getByText(/45%/)).toBeInTheDocument();
@@ -55,19 +55,19 @@ describe('FundDistribution', () => {
   it('handles undefined data gracefully', () => {
     render(<FundDistribution />);
     expect(screen.getByTestId('fund-distribution')).toBeInTheDocument();
-    expect(screen.getByText('Next round')).toBeInTheDocument();
+    expect(screen.getByText('Next cycle')).toBeInTheDocument();
   });
 
   it('clamps negative percentages to zero', () => {
     render(<FundDistribution data={createData({ PrizePercentage: -10 })} />);
-    expect(screen.getByText('Prize')).toBeInTheDocument();
-    const prizeRow = screen.getByText('Prize').closest('[class*="group"]')!;
+    expect(screen.getByText('Signature')).toBeInTheDocument();
+    const prizeRow = screen.getByText('Signature').closest('[class*="group"]')!;
     expect(prizeRow).toHaveTextContent('0%');
   });
 
   it('clamps percentages above 100 to 100', () => {
     render(<FundDistribution data={createData({ RafflePercentage: 200 })} />);
-    const raffleRow = screen.getByText('Raffle').closest('[class*="group"]')!;
+    const raffleRow = screen.getByText('Stellar Selection').closest('[class*="group"]')!;
     expect(raffleRow).toHaveTextContent('100%');
   });
 
@@ -84,8 +84,8 @@ describe('FundDistribution', () => {
       const labelEl = row.querySelector('.text-sm.font-medium.text-white');
       return labelEl?.textContent;
     });
-    expect(labels[0]).toBe('Next round');
-    expect(labels[1]).toBe('Prize');
+    expect(labels[0]).toBe('Next cycle');
+    expect(labels[1]).toBe('Signature');
   });
 
   it('has no accessibility violations', async () => {
