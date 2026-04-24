@@ -5,12 +5,8 @@ import { useRouter } from 'next/navigation';
 import api from '@/services/api';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import type { DashboardInfo } from '@/services/api/types';
-import {
-  isUserRejection,
-  reportError,
-  getContractErrorMessage,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
+import { getContractErrorMessage } from '@/utils/contractErrors';
 import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
 import { usePrizeTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';

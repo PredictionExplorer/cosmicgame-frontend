@@ -11,9 +11,12 @@ import { GA_TRACKING_ID } from '@/utils/analytics';
 import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
 
 import { Providers } from './providers';
+import { LandingShell } from './landing-shell';
 import { Analytics } from './analytics';
 
-import '@rainbow-me/rainbowkit/styles.css';
+// NOTE: '@rainbow-me/rainbowkit/styles.css' is intentionally imported
+// inside app/providers.tsx (not here) so the landing host never ships
+// the RainbowKit stylesheet.
 import '@/styles/global.css';
 
 const defaultTitle = 'Cosmic Signature';
@@ -81,7 +84,7 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const h = await headers();
   const host = h.get('x-forwarded-host') ?? h.get('host');
-  const showAppChrome = !isLandingHost(host);
+  const isLanding = isLandingHost(host);
 
   return (
     <html lang="en" className={`${clashDisplay.variable} ${inter.variable}`}>
@@ -112,7 +115,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         </Script>
       </head>
       <body>
-        <Providers showAppChrome={showAppChrome}>{children}</Providers>
+        {isLanding ? (
+          <LandingShell>{children}</LandingShell>
+        ) : (
+          <Providers showAppChrome>{children}</Providers>
+        )}
         <Suspense fallback={null}>
           <Analytics />
         </Suspense>

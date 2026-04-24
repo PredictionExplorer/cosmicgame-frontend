@@ -5,8 +5,8 @@ import {
   isUserRejection,
   getEthErrorMessage,
   reportError,
-  isContractRevertError,
 } from '@/utils/errors';
+import { isContractRevertError } from '@/utils/contractErrors';
 
 jest.mock('@sentry/nextjs', () => ({
   captureException: jest.fn(),

@@ -197,6 +197,9 @@ const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
 jest.mock('../../utils/errors', () => ({
   isUserRejection: (...args: unknown[]) => mockIsUserRejection(...args),
   reportError: (...args: unknown[]) => mockReportError(...args),
+}));
+
+jest.mock('../../utils/contractErrors', () => ({
   getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
 }));
 

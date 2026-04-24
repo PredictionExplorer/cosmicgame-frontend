@@ -6,6 +6,7 @@ const UTILS_DIR = resolve(__dirname, '..');
 const UTIL_FILES = [
   'alert.ts',
   'analytics.ts',
+  'contractErrors.ts',
   'contractWrite.ts',
   'endurance.ts',
   'errors.ts',
@@ -69,9 +70,10 @@ const files: FileEntry[] = UTIL_FILES.map((name) => {
 const EXPECTED_COUNTS: Record<string, number> = {
   'alert.ts': 1,
   'analytics.ts': 3,
+  'contractErrors.ts': 2,
   'contractWrite.ts': 1,
   'endurance.ts': 1,
-  'errors.ts': 7,
+  'errors.ts': 5,
   'format.ts': 8,
   'metadata.ts': 1,
   'seo.ts': 1,

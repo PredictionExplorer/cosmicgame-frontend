@@ -23,12 +23,8 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { activeChain } from '@/config/chains';
 import { COSMICGAME_ADDRESS, RAFFLE_WALLET_ADDRESS } from '@/config/networks';
 import { ERC721_INTERFACE_ID, BID_GAS_LIMIT } from '@/config/constants';
-import {
-  isUserRejection,
-  reportError,
-  getContractErrorMessage,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
+import { getContractErrorMessage } from '@/utils/contractErrors';
 import { useNotify } from '@/hooks/useNotify';
 import { useCTPrice, useBidEthPrice, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 

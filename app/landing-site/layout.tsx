@@ -5,8 +5,6 @@ import { landingContent } from '@/content/landing';
 
 import { JsonLd, artProtocolJsonLd, organizationJsonLd, websiteJsonLd } from '@/utils/jsonLd';
 
-import { LandingProviders } from './providers';
-
 const { meta } = landingContent;
 
 export const metadata: Metadata = {
@@ -36,13 +34,21 @@ export const viewport: Viewport = {
   themeColor: '#0B1028',
 };
 
+/**
+ * Landing-site nested layout.
+ *
+ * The root layout (app/layout.tsx) already renders <LandingShell> on the
+ * marketing host, which provides React Cookies + Toaster + error
+ * boundaries. This nested layout only adds landing-specific chrome:
+ * JSON-LD blocks and the page background container.
+ */
 export default function LandingLayout({ children }: { children: ReactNode }) {
   return (
-    <LandingProviders>
+    <>
       <JsonLd data={[websiteJsonLd(), organizationJsonLd(), artProtocolJsonLd()]} />
       <div className="relative min-h-screen overflow-x-clip bg-deep-space text-stellar-white antialiased">
         {children}
       </div>
-    </LandingProviders>
+    </>
   );
 }

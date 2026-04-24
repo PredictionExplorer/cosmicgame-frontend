@@ -56,8 +56,11 @@ const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
 jest.mock('../../utils/errors', () => ({
   isUserRejection: jest.fn((_err: unknown) => false),
   reportError: jest.fn(),
-  getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
   WALLET_TRANSACTION_CANCELLED_MESSAGE: 'Transaction cancelled by user',
+}));
+
+jest.mock('../../utils/contractErrors', () => ({
+  getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
 }));
 
 import { usePrizeClaim } from '../usePrizeClaim';

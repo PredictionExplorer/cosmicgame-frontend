@@ -23,6 +23,10 @@ import { NotificationProvider } from '@/contexts/NotificationContext';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
+// Wallet UI stylesheet — kept scoped to Providers (the app-only tree) so
+// the landing host never ships it.
+import '@rainbow-me/rainbowkit/styles.css';
+
 const Particles = dynamic(
   () => import('@tsparticles/react').then((mod) => ({ default: mod.default })),
   { ssr: false },
@@ -103,7 +107,8 @@ if (
 
   const origFetch = window.fetch;
   window.fetch = function (input: RequestInfo | URL, init?: RequestInit) {
-    const url = typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
+    const url =
+      typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
     if (isWcUrl(url)) {
       // project-limits expects planLimits.tier; return a minimal valid shape to avoid SDK destructuring errors
       const body = url.includes('project-limits')
