@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -38,7 +38,7 @@ export interface StatCardTrend {
   invertSentiment?: boolean;
 }
 
-interface StatCardProps {
+interface StatCardProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'> {
   label: string;
   value: ReactNode;
   icon?: ReactNode;
@@ -52,7 +52,6 @@ interface StatCardProps {
   /** Optional trend pill rendered below the value. */
   trend?: StatCardTrend;
   loading?: boolean;
-  className?: string;
 }
 
 export function StatCard({
@@ -66,10 +65,12 @@ export function StatCard({
   trend,
   loading = false,
   className,
+  ...rest
 }: StatCardProps) {
   const palette = ACCENT[accent];
   return (
     <div
+      {...rest}
       className={cn(
         'group relative rounded-[var(--radius-card)] border p-4 backdrop-blur-sm transition-all',
         'duration-[var(--duration-base)] ease-[var(--ease-out-soft)]',
