@@ -83,7 +83,7 @@ describe('StakingPage', () => {
   it('renders the heading', () => {
     setupDefaults();
     render(<StakingPage />);
-    expect(screen.getByText('Staking Rewards')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Distributions')).toBeInTheDocument();
   });
 
   it('renders the stats dashboard', () => {
@@ -95,11 +95,19 @@ describe('StakingPage', () => {
   it('displays stat values from dashboard data', () => {
     setupDefaults();
     render(<StakingPage />);
-    expect(screen.getByTestId('stat-Staking Pool')).toHaveTextContent('Staking Pool');
-    expect(screen.getByTestId('stat-CST Tokens Staked')).toHaveTextContent('CST Tokens Staked');
-    expect(screen.getByTestId('stat-RWLK Tokens Staked')).toHaveTextContent('RWLK Tokens Staked');
-    expect(screen.getByTestId('stat-Reward per CST')).toHaveTextContent('Reward per CST');
-    expect(screen.getByTestId('stat-Unique Stakers')).toHaveTextContent('Unique Stakers');
+    expect(screen.getByTestId('stat-Anchor Distribution Pool')).toHaveTextContent(
+      'Anchor Distribution Pool',
+    );
+    expect(screen.getByTestId('stat-CST Tokens Anchored')).toHaveTextContent('CST Tokens Anchored');
+    expect(screen.getByTestId('stat-RWLK Tokens Anchored')).toHaveTextContent(
+      'RWLK Tokens Anchored',
+    );
+    expect(screen.getByTestId('stat-Distribution per CST')).toHaveTextContent(
+      'Distribution per CST',
+    );
+    expect(screen.getByTestId('stat-Unique Anchor-holders')).toHaveTextContent(
+      'Unique Anchor-holders',
+    );
   });
 
   it('shows stats loading state when dashboard is loading', () => {
@@ -120,7 +128,7 @@ describe('StakingPage', () => {
   it('renders the Start Staking CTA link', () => {
     setupDefaults();
     render(<StakingPage />);
-    const link = screen.getByRole('link', { name: /start staking/i });
+    const link = screen.getByRole('link', { name: /start anchoring/i });
     expect(link).toHaveAttribute('href', '/my-staking');
   });
 
@@ -143,7 +151,7 @@ describe('StakingPage', () => {
     mockUseDashboardInfo.mockReturnValue(mockDashboard);
     mockUseUniqueCSTStakers.mockReturnValue(mockStakers);
     render(<StakingPage />);
-    expect(screen.getByText('Error loading staking data')).toBeInTheDocument();
+    expect(screen.getByText('Error loading anchoring data')).toBeInTheDocument();
     expect(screen.getByText('CST fetch failed')).toBeInTheDocument();
   });
 
@@ -157,7 +165,7 @@ describe('StakingPage', () => {
     mockUseDashboardInfo.mockReturnValue(mockDashboard);
     mockUseUniqueCSTStakers.mockReturnValue(mockStakers);
     render(<StakingPage />);
-    expect(screen.getByText('Error loading staking data')).toBeInTheDocument();
+    expect(screen.getByText('Error loading anchoring data')).toBeInTheDocument();
     expect(screen.getByText('RWLK fetch failed')).toBeInTheDocument();
   });
 

@@ -35,7 +35,11 @@ const AdminSettingsPage = () => {
         <PageHeader
           title="Administrative methods"
           subtitle="Read-only view of dashboard contract addresses and parameters."
-          breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Admin', href: '/admin' }, { label: 'Settings' }]}
+          breadcrumbs={[
+            { label: 'Home', href: '/' },
+            { label: 'Admin', href: '/admin' },
+            { label: 'Settings' },
+          ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
         />
@@ -73,7 +77,7 @@ const AdminSettingsPage = () => {
                   Set Address
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Charity wallet contract address">
+              <AdminFieldRow label="Public Goods Vault contract address">
                 <Input
                   placeholder="Enter address here"
                   className="flex-1 font-mono text-sm"
@@ -187,7 +191,7 @@ const AdminSettingsPage = () => {
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Charity percentage">
+              <AdminFieldRow label="Public Goods percentage">
                 <Input
                   type="number"
                   placeholder="Enter number here"

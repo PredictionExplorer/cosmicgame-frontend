@@ -64,7 +64,9 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
     return (
       <MainWrapper>
         <div className={cn(detailPanelClass, 'mx-auto max-w-lg p-8 text-center')}>
-          <p className="font-display text-lg font-semibold text-foreground">Invalid Donation Id</p>
+          <p className="font-display text-lg font-semibold text-foreground">
+            Invalid Contribution Id
+          </p>
         </div>
       </MainWrapper>
     );
@@ -75,11 +77,11 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
       <MainWrapper className="max-sm:pb-16">
         <div className="mx-auto max-w-3xl">
           <PageHeader
-            title="Direct (ETH) Donation Detail"
-            subtitle="Loading donation…"
+            title="Direct ETH Contribution Detail"
+            subtitle="Loading contribution…"
             breadcrumbs={[
               { label: 'Home', href: '/' },
-              { label: 'ETH donations', href: '/eth-donation' },
+              { label: 'ETH contributions', href: '/eth-donation' },
               { label: `#${id}` },
             ]}
             className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
@@ -98,17 +100,17 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
       <MainWrapper className="max-sm:pb-16">
         <div className="mx-auto max-w-3xl">
           <PageHeader
-            title="Direct (ETH) Donation Detail"
+            title="Direct ETH Contribution Detail"
             breadcrumbs={[
               { label: 'Home', href: '/' },
-              { label: 'ETH donations', href: '/eth-donation' },
+              { label: 'ETH contributions', href: '/eth-donation' },
               { label: `#${id}` },
             ]}
             className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
             align="left"
           />
           <div className={cn(detailPanelClass, 'p-10 text-center')}>
-            <p className="font-medium text-foreground">Donation not found.</p>
+            <p className="font-medium text-foreground">Contribution not found.</p>
           </div>
         </div>
       </MainWrapper>
@@ -119,11 +121,11 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
     <MainWrapper className="max-sm:pb-16">
       <div className="mx-auto max-w-3xl">
         <PageHeader
-          title="Direct (ETH) Donation Detail"
-          subtitle={`Donation #${id}`}
+          title="Direct ETH Contribution Detail"
+          subtitle={`Contribution #${id}`}
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'ETH donations', href: '/eth-donation' },
+            { label: 'ETH contributions', href: '/eth-donation' },
             { label: `#${id}` },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
@@ -132,11 +134,11 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
 
         <SectionCard
           sectionId="eth-donation-core"
-          title="Donation"
-          description="On-chain donation record and round context."
+          title="Contribution"
+          description="On-chain contribution record and cycle context."
         >
           <DefinitionList>
-            <DetailRow label="Donate datetime">
+            <DetailRow label="Contribution datetime">
               <a
                 href={getExplorerUrl('tx', donationInfo.TxHash)}
                 target="_blank"
@@ -149,30 +151,44 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
                 Opens the transaction on the block explorer
               </span>
             </DetailRow>
-            <DetailRow label="Donor address">
-              <Link href={`/user/${donationInfo.DonorAddr}`} className={cn(detailLinkClass, 'font-mono text-[13px] break-all')}>
+            <DetailRow label="Contributor address">
+              <Link
+                href={`/user/${donationInfo.DonorAddr}`}
+                className={cn(detailLinkClass, 'font-mono text-[13px] break-all')}
+              >
                 {donationInfo.DonorAddr}
               </Link>
             </DetailRow>
-            <DetailRow label="Round number">
+            <DetailRow label="Cycle number">
               <Link href={`/prize/${donationInfo.RoundNum}`} className={detailLinkClass}>
-                Round {donationInfo.RoundNum}
+                Cycle {donationInfo.RoundNum}
               </Link>
             </DetailRow>
             <DetailRow label="Amount">
-              <span className="font-mono tabular-nums">{donationInfo.AmountEth.toFixed(2)} ETH</span>
+              <span className="font-mono tabular-nums">
+                {donationInfo.AmountEth.toFixed(2)} ETH
+              </span>
             </DetailRow>
           </DefinitionList>
         </SectionCard>
 
         {dataJson ? (
-          <SectionCard sectionId="eth-donation-json" title="Donor message" description="Structured fields from the donation payload.">
+          <SectionCard
+            sectionId="eth-donation-json"
+            title="Contributor message"
+            description="Structured fields from the contribution payload."
+          >
             <DefinitionList>
               <DetailRow label="Title">{dataJson.title ?? '—'}</DetailRow>
               <DetailRow label="Message">{dataJson.message ?? '—'}</DetailRow>
               <DetailRow label="URL">
                 {dataJson.url ? (
-                  <a href={dataJson.url} target="_blank" rel="noopener noreferrer" className={cn(detailLinkClass, 'break-all')}>
+                  <a
+                    href={dataJson.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(detailLinkClass, 'break-all')}
+                  >
                     {dataJson.url}
                   </a>
                 ) : (
@@ -184,16 +200,28 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
         ) : null}
 
         {metaData?.description || metaData?.Keywords ? (
-          <SectionCard sectionId="eth-donation-meta-text" title="Link preview" description="Metadata fetched from the donor URL.">
+          <SectionCard
+            sectionId="eth-donation-meta-text"
+            title="Link preview"
+            description="Metadata fetched from the contributor URL."
+          >
             <DefinitionList>
-              {metaData?.description ? <DetailRow label="Meta description">{metaData.description}</DetailRow> : null}
-              {metaData?.Keywords ? <DetailRow label="Meta keywords">{metaData.Keywords}</DetailRow> : null}
+              {metaData?.description ? (
+                <DetailRow label="Meta description">{metaData.description}</DetailRow>
+              ) : null}
+              {metaData?.Keywords ? (
+                <DetailRow label="Meta keywords">{metaData.Keywords}</DetailRow>
+              ) : null}
             </DefinitionList>
           </SectionCard>
         ) : null}
 
         {metaData?.image ? (
-          <SectionCard sectionId="eth-donation-meta-image" title="Meta image" description="Open Graph or social preview image.">
+          <SectionCard
+            sectionId="eth-donation-meta-image"
+            title="Meta image"
+            description="Open Graph or social preview image."
+          >
             <div className="px-4 pb-5 pt-2 sm:px-5">
               <Image
                 src={metaData.image}

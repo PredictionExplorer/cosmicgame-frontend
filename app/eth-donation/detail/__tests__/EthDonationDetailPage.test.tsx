@@ -33,7 +33,7 @@ describe('EthDonationDetailPage', () => {
   it('shows error for negative id', () => {
     mockUseDonationsWithInfoById.mockReturnValue({ data: null, isLoading: false });
     render(<EthDonationDetailPage id={-1} />);
-    expect(screen.getByText('Invalid Donation Id')).toBeInTheDocument();
+    expect(screen.getByText('Invalid Contribution Id')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -45,13 +45,13 @@ describe('EthDonationDetailPage', () => {
   it('shows "not found" when data is null', () => {
     mockUseDonationsWithInfoById.mockReturnValue({ data: null, isLoading: false });
     render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByText('Donation not found.')).toBeInTheDocument();
+    expect(screen.getByText('Contribution not found.')).toBeInTheDocument();
   });
 
   it('renders donation heading', () => {
     mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
     render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByText('Direct (ETH) Donation Detail')).toBeInTheDocument();
+    expect(screen.getByText('Direct ETH Contribution Detail')).toBeInTheDocument();
   });
 
   it('renders donor address', () => {
@@ -63,7 +63,7 @@ describe('EthDonationDetailPage', () => {
   it('renders round number', () => {
     mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
     render(<EthDonationDetailPage id={1} />);
-    expect(screen.getByRole('link', { name: /round 3/i })).toHaveAttribute('href', '/prize/3');
+    expect(screen.getByRole('link', { name: /cycle 3/i })).toHaveAttribute('href', '/prize/3');
   });
 
   it('renders amount in ETH', () => {

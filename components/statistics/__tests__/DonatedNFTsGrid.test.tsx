@@ -16,13 +16,13 @@ jest.mock('../../common/CustomPagination', () => ({
 describe('DonatedNFTsGrid', () => {
   it('renders heading', () => {
     render(<DonatedNFTsGrid nftDonations={[]} />);
-    expect(screen.getByText('Donated NFTs')).toBeInTheDocument();
+    expect(screen.getByText('Attached NFTs')).toBeInTheDocument();
   });
 
   it('shows styled empty state when no donations', () => {
     const { container } = render(<DonatedNFTsGrid nftDonations={[]} />);
-    expect(screen.getByText('No NFTs have been donated yet.')).toBeInTheDocument();
-    expect(screen.getByText('Donated NFTs from all rounds will appear here.')).toBeInTheDocument();
+    expect(screen.getByText('No NFTs have been attached yet.')).toBeInTheDocument();
+    expect(screen.getByText('Attached NFTs from all cycles will appear here.')).toBeInTheDocument();
     const svg = container.querySelector('svg');
     expect(svg).toBeInTheDocument();
   });
