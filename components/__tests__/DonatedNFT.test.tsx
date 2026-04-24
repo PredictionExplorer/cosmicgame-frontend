@@ -39,7 +39,10 @@ describe('DonatedNFT', () => {
     expect(screen.getByTestId('NFTTokenId')).toHaveTextContent(String(mockData.NFTTokenId));
 
     await waitFor(() => {
-      expect(screen.getByAltText('NFT').getAttribute('src')).toEqual(mockImageUrl);
+      const src = screen.getByAltText('NFT').getAttribute('src') ?? '';
+      // Next/Image rewrites through /_next/image?url=... — decode to compare.
+      const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
+      expect(decoded).toEqual(mockImageUrl);
     });
   });
 

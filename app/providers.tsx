@@ -28,7 +28,17 @@ const Particles = dynamic(
   { ssr: false },
 );
 
-const queryClient = new QueryClient();
+function makeQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 30_000,
+        gcTime: 300_000,
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+}
 
 const particleOptions: ISourceOptions = {
   background: { color: { value: 'transparent' } },
@@ -161,6 +171,7 @@ export function Providers({
   /** When false (marketing hosts), header/footer are hidden. */
   showAppChrome?: boolean;
 }) {
+  const [queryClient] = useState(() => makeQueryClient());
   const [engineReady, setEngineReady] = useState(false);
 
   useEffect(() => {

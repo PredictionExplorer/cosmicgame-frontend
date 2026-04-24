@@ -39,10 +39,6 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@fortawesome/react-fontawesome', () => ({
-  FontAwesomeIcon: (props: Record<string, unknown>) => <span data-testid="fa-icon" {...props} />,
-}));
-
 Object.assign(navigator, {
   clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
 });

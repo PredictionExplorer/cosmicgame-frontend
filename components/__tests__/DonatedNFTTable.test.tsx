@@ -63,7 +63,9 @@ describe('DonatedNFTTable', () => {
     expect(screen.getByText(String(mockData[0]!.NFTTokenId))).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(screen.getByAltText('NFT').getAttribute('src')).toEqual(mockImageUrl);
+      const src = screen.getByAltText('NFT').getAttribute('src') ?? '';
+      const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
+      expect(decoded).toEqual(mockImageUrl);
     });
 
     expect(screen.getByTestId('Claim Button').textContent).toEqual('Claim');

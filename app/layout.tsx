@@ -91,7 +91,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
-              strategy="afterInteractive"
+              strategy="lazyOnload"
             />
             <Script id="gtag-init" strategy="afterInteractive">
               {`

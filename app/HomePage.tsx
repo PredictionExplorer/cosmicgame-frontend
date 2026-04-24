@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
 import { ArrowRight, Radio } from 'lucide-react';
 import Countdown from 'react-countdown';
@@ -16,7 +17,6 @@ import { Spinner } from '@/components/ui/spinner';
 import { MainWrapper, StyledCard } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { ART_BLOCKS_ADDRESS } from '@/config/networks';
-import LatestNFTs from '@/components/nft/LatestNFTs';
 import NFTImage from '@/components/nft/NFTImage';
 import { reportError } from '@/utils/errors';
 import { SpecialPrizeWinners } from '@/components/tables/SpecialPrizeWinners';
@@ -36,6 +36,11 @@ import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/acti
 import { isLandingHost } from '@/lib/hostRouting';
 import { LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO } from '@/lib/landingFlags';
 import { RootLandingPage } from '@/components/landing/RootLandingPage';
+
+const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
+  ssr: false,
+  loading: () => <div className="py-20" aria-hidden />,
+});
 
 const sectionFade = {
   hidden: { opacity: 0, y: 20 },
@@ -277,6 +282,8 @@ const HomePage = () => {
                           ? '/images/qmark.png'
                           : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
                       }
+                      priority
+                      sizes="(max-width: 768px) 100vw, 500px"
                     />
                   </div>
                   <div className="p-3 text-center">

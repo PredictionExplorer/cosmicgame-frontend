@@ -30,7 +30,9 @@ describe('NFT', () => {
     render(<NFT nft={mockData} />);
 
     const image = getAssetsUrl(`cosmicsignature/0x${mockData.Seed}.png`);
-    expect(screen.getByAltText('NFT').getAttribute('src')).toContain(image);
+    const src = screen.getByAltText('NFT').getAttribute('src') ?? '';
+    const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
+    expect(decoded).toContain(image);
     expect(screen.getByText(formatId(mockData.TokenId))).toBeInTheDocument();
     expect(screen.getByText(mockData.TokenName)).toBeInTheDocument();
   });

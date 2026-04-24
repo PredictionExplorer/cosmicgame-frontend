@@ -39,10 +39,6 @@ jest.mock('framer-motion', () => {
   };
 });
 
-jest.mock('@fortawesome/react-fontawesome', () => ({
-  FontAwesomeIcon: (props: Record<string, unknown>) => <span data-testid="fa-icon" {...props} />,
-}));
-
 describe('ContactCTA', () => {
   it('renders the heading "Still have a question?"', () => {
     render(<ContactCTA />);
