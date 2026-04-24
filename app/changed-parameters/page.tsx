@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import ChangedParameters from './ChangedParameters';
 
 export const metadata: Metadata = createMetadata(
-  'Changed Parameters | Cosmic Signature',
-  'Review the complete history of game parameter changes in Cosmic Signature. Track adjustments to bid increments, time additions, reward distributions, and other system settings.',
+  'Coordination Changes | Cosmic Signature',
+  'Complete history of protocol parameter adjustments in Cosmic Signature. Track Gesture-Cost step-ups, cycle time additions, Anchor Distribution settings, and other coordination updates.',
   undefined,
   '/changed-parameters',
 );

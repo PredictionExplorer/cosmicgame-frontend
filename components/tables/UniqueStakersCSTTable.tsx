@@ -63,7 +63,7 @@ export const UniqueStakersCSTTable = ({ list }: { list: UniqueStakerCST[] }) => 
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No stakers yet.</p>;
+    return <p>No anchor-holders yet.</p>;
   }
 
   return (
@@ -72,13 +72,15 @@ export const UniqueStakersCSTTable = ({ list }: { list: UniqueStakerCST[] }) => 
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Staker Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Num Stake Actions</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Num Unstake Actions</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Minted Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Total Reward (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Unclaimed Reward (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Anchor-holder Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Num Anchor Actions</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Num Release Actions</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Imprinted Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Anchored Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Total Distribution (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Unretrieved Distribution (ETH)
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

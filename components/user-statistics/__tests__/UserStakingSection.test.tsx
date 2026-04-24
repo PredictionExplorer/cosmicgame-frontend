@@ -68,21 +68,21 @@ describe('UserStakingSection', () => {
 
   it('renders CST stat cards with correct values', () => {
     render(<UserStakingSection {...defaultProps} />);
-    expect(screen.getByText('Stake Actions')).toBeInTheDocument();
-    expect(screen.getByText('Unstake Actions')).toBeInTheDocument();
-    expect(screen.getByText('Total Rewards')).toBeInTheDocument();
-    expect(screen.getByText('Unclaimed Rewards')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Actions')).toBeInTheDocument();
+    expect(screen.getByText('Release Actions')).toBeInTheDocument();
+    expect(screen.getByText('Total Distributions')).toBeInTheDocument();
+    expect(screen.getByText('Unretrieved Distributions')).toBeInTheDocument();
   });
 
-  it('renders staking tables', () => {
+  it('renders anchoring tables', () => {
     render(<UserStakingSection {...defaultProps} />);
     expect(screen.getByTestId('staking-actions-table')).toBeInTheDocument();
     expect(screen.getByTestId('staking-rewards-table')).toBeInTheDocument();
   });
 
-  it('shows empty state when no CST staking activity', () => {
+  it('shows empty state when no CST anchoring activity', () => {
     render(<UserStakingSection {...defaultProps} stakingCSTActions={[]} cstStakingRewards={[]} />);
-    expect(screen.getByText('No staking activity yet')).toBeInTheDocument();
+    expect(screen.getByText('No anchoring activity yet')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

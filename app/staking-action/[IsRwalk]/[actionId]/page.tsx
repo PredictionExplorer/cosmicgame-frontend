@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import StakingActionDetailPage from './StakingActionDetailPage';
 
 export const metadata: Metadata = createMetadata(
-  'Staking Action Detail | Cosmic Signature',
-  'View detailed information about a specific staking action in Cosmic Signature, including token type, staked amounts, and reward status.',
+  'Anchor Action Detail | Cosmic Signature',
+  'Details of a specific anchor action in Cosmic Signature \u2014 token type, anchored amounts, and distribution retrieval status.',
 );
 
 export default async function Page({

@@ -16,18 +16,18 @@ const createWinner = (overrides = {}) => ({
 describe('UniqueWinnersTable', () => {
   it('renders empty state when list is empty', () => {
     render(<UniqueWinnersTable list={[]} />);
-    expect(screen.getByText('No winners yet.')).toBeInTheDocument();
+    expect(screen.getByText('No recipients yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<UniqueWinnersTable list={[createWinner()]} />);
-    expect(screen.getAllByText('Winner Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Prizes Taken').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Max Prize (ETH)').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Prizes Sum (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Recipient Address').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Allocations Received').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Max Allocation (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Allocations Sum (ETH)').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders winner data', () => {
+  it('renders recipient data', () => {
     render(<UniqueWinnersTable list={[createWinner()]} />);
     expect(screen.getByText('10')).toBeInTheDocument();
     expect(screen.getByText('2.500000')).toBeInTheDocument();

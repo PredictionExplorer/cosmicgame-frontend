@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import UserRaffleETHPage from './UserRaffleETHPage';
 
 export const metadata: Metadata = createMetadata(
-  'Raffle ETH User Won | Cosmic Signature',
-  'View all ETH raffle prizes won by this user in the Cosmic Signature game. Track raffle winnings across completed rounds.',
+  'Stellar Selection ETH | Cosmic Signature',
+  'All ETH allocations this participant received through Stellar Selection. Track random-selection allocations across completed cycles.',
 );
 
 export default async function Page({ params }: { params: Promise<{ address: string }> }) {

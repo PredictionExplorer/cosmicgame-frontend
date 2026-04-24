@@ -400,14 +400,14 @@ describe('Statistics', () => {
     expect(screen.getByText('System Events')).toBeInTheDocument();
   });
 
-  it('renders round activations collapsible section', () => {
+  it('renders cycle activations collapsible section', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Round Activations')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Activations')).toBeInTheDocument();
   });
 
   it('renders statistics groups', () => {

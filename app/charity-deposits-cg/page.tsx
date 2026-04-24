@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import CharityCGDeposits from './CharityCGDeposits';
 
 export const metadata: Metadata = createMetadata(
-  'Cosmic Game Charity Deposits | Cosmic Signature',
-  "View automatic charity deposits from the Cosmic Signature game. A percentage of every round's prize pool is deposited to support charitable causes via the Cosmic DAO.",
+  'Protocol Public-Goods Contributions | Cosmic Signature',
+  'Automatic forwards from the Cosmic Signature protocol to the Public Goods Beneficiary. Each cycle, a fixed share of the Cycle Reserve is forwarded to support public goods via the Cosmic Council.',
   undefined,
   '/charity-deposits-cg',
 );

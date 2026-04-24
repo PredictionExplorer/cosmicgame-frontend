@@ -51,11 +51,11 @@ beforeEach(() => {
 });
 
 describe('BanBidTable', () => {
-  it('renders empty state when no bids', async () => {
+  it('renders empty state when no gestures', async () => {
     await act(async () => {
       render(<BanBidTable biddingHistory={[]} />);
     });
-    expect(screen.getByText('No bid history yet.')).toBeInTheDocument();
+    expect(screen.getByText('No gesture history yet.')).toBeInTheDocument();
   });
 
   it('renders bid type "ETH Bid" for BidType 0', async () => {

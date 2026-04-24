@@ -53,10 +53,10 @@ beforeEach(() => {
 });
 
 describe('BidForm', () => {
-  it('renders bid type selector with ETH option', () => {
+  it('renders gesture type selector with ETH option', () => {
     render(<BidForm {...defaultProps} />);
     expect(screen.getByText('ETH')).toBeInTheDocument();
-    expect(screen.getByText('Bid Method')).toBeInTheDocument();
+    expect(screen.getByText('Gesture Method')).toBeInTheDocument();
   });
 
   it('hides RandomWalk/CST when LastBidderAddr is zeroAddress', () => {
@@ -93,9 +93,9 @@ describe('BidForm', () => {
     expect(screen.getByTestId('rwlk-grid')).toHaveTextContent('3 NFTs');
   });
 
-  it('CST selection shows auction info', () => {
+  it('CST selection shows Calibration Window info', () => {
     render(<BidForm {...defaultProps} bidType="CST" />);
-    expect(screen.getByText('Auction Duration:')).toBeInTheDocument();
+    expect(screen.getByText('Calibration Window Duration:')).toBeInTheDocument();
   });
 
   it('Message textarea accepts input', () => {

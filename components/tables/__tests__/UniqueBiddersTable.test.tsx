@@ -15,17 +15,17 @@ const createBidder = (overrides = {}) => ({
 describe('UniqueBiddersTable', () => {
   it('renders empty state when list is empty', () => {
     render(<UniqueBiddersTable list={[]} />);
-    expect(screen.getByText('No bidders yet.')).toBeInTheDocument();
+    expect(screen.getByText('No participants yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<UniqueBiddersTable list={[createBidder()]} />);
-    expect(screen.getAllByText('Bidder Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Number of Bids').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Max Bid (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Participant Address').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Number of Gestures').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Max Gesture (ETH)').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders bidder data', () => {
+  it('renders participant data', () => {
     render(<UniqueBiddersTable list={[createBidder()]} />);
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('1.234567')).toBeInTheDocument();

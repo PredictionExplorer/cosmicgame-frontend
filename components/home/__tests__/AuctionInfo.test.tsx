@@ -9,19 +9,19 @@ import { render, screen, checkA11y } from '@/test-utils';
 import { AuctionInfo } from '../AuctionInfo';
 
 describe('AuctionInfo', () => {
-  it('renders elapsed time and duration when auction is active', () => {
+  it('renders elapsed time and duration when calibration window is active', () => {
     render(<AuctionInfo secondsElapsed={900} auctionDuration={3600} />);
 
     expect(screen.getByText('Elapsed Time:')).toBeInTheDocument();
     expect(screen.getByText('900s')).toBeInTheDocument();
-    expect(screen.getByText('Auction Duration:')).toBeInTheDocument();
+    expect(screen.getByText('Calibration Window Duration:')).toBeInTheDocument();
     expect(screen.getByText('3600s')).toBeInTheDocument();
   });
 
   it('shows ended message when elapsed > duration', () => {
     render(<AuctionInfo secondsElapsed={4000} auctionDuration={3600} />);
 
-    expect(screen.getByText('Auction ended.')).toBeInTheDocument();
+    expect(screen.getByText('Calibration Window closed.')).toBeInTheDocument();
     expect(screen.queryByText('Elapsed Time:')).not.toBeInTheDocument();
   });
 
@@ -29,7 +29,7 @@ describe('AuctionInfo', () => {
     render(<AuctionInfo secondsElapsed={0} auctionDuration={0} />);
 
     expect(screen.getByText('Elapsed Time:')).toBeInTheDocument();
-    expect(screen.getByText('Auction Duration:')).toBeInTheDocument();
+    expect(screen.getByText('Calibration Window Duration:')).toBeInTheDocument();
     expect(screen.getAllByText('0s')).toHaveLength(2);
   });
 
@@ -38,12 +38,14 @@ describe('AuctionInfo', () => {
       <AuctionInfo
         secondsElapsed={5000}
         auctionDuration={3600}
-        endedMessage="Auction ended, you can bid for free."
+        endedMessage="Calibration Window closed, you can gesture for free."
       />,
     );
 
-    expect(screen.getByText('Auction ended, you can bid for free.')).toBeInTheDocument();
-    expect(screen.queryByText('Auction ended.')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Calibration Window closed, you can gesture for free.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Calibration Window closed.')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

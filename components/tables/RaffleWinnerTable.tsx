@@ -126,7 +126,7 @@ const RaffleWinnerTable = ({
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No winners yet.</p>;
+    return <p>No recipients yet.</p>;
   }
 
   return (

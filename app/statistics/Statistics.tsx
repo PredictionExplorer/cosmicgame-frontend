@@ -516,7 +516,7 @@ const Statistics = () => {
           <SectionDivider title="System Events" className="mb-6" />
         </div>
         <CollapsibleSection
-          title="Round Activations"
+          title="Cycle Activations"
           defaultOpen={false}
           icon={<Activity className="h-3.5 w-3.5" />}
         >

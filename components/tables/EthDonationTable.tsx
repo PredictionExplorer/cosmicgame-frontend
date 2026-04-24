@@ -95,7 +95,7 @@ const EthDonationTable: FC<EthDonationTableProps> = ({ list, showType = true }) 
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No donations yet.</p>;
+    return <p>No contributions yet.</p>;
   }
 
   const startIndex = (page - 1) * perPage;

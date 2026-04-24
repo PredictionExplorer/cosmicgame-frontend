@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import CharityWithdrawals from './CharityWithdrawals';
 
 export const metadata: Metadata = createMetadata(
-  'Withdrawals from Charity Wallet | Cosmic Signature',
-  'Track charitable fund withdrawals from the Cosmic Signature game. Each round, 10% of the prize pool is allocated to a beneficiary chosen by the Cosmic DAO.',
+  'Public Goods Retrievals | Cosmic Signature',
+  'Retrievals from the Public Goods Vault. Each cycle, a share of the Cycle Reserve is forwarded to a beneficiary address selected by the Cosmic Council.',
   undefined,
   '/charity-withdrawals',
 );

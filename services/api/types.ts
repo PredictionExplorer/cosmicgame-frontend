@@ -1,6 +1,12 @@
 /**
- * API response types for Cosmic Game frontend.
+ * API response types for Cosmic Signature frontend.
  * These interfaces type the return values of API methods.
+ *
+ * immutable: backend wire format — do not rename fields; relabel in UI.
+ * Field names such as NumBidsCST, TotalRaffleEthDeposits, NumActiveStakers,
+ * NumDonatedNFTs mirror the Go server's response keys. Renaming them breaks
+ * deserialization. Translate banned vocabulary at render time via
+ * content/dapp.ts lookups, not here.
  */
 
 // ---------------------------------------------------------------------------

@@ -7,7 +7,7 @@ import TermsPage from './TermsPage';
 
 export const metadata: Metadata = createMetadata(
   'Terms of Service | Cosmic Signature',
-  'Terms of Service for Cosmic Signature — eligibility, game mechanics, prizes, risks, prohibited activities, and legal terms.',
+  'Terms of Service for Cosmic Signature \u2014 eligibility, protocol mechanics, allocations, risks, prohibited activities, and legal terms.',
   undefined,
   '/terms',
 );

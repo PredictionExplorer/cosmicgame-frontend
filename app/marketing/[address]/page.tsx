@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import MarketingRewardsPage from './MarketingRewardsPage';
 
 export const metadata: Metadata = createMetadata(
-  'Marketing Rewards | Cosmic Signature',
-  'View marketing reward history and CST token earnings for a Cosmic Signature promoter. Track referral activity and promotional contributions.',
+  'Outreach Allocations | Cosmic Signature',
+  'Outreach allocation history and CST allocations for a Cosmic Signature ecosystem contributor. Review referral activity and contributions.',
 );
 
 export default async function Page({ params }: { params: Promise<{ address: string }> }) {

@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import PrizeInfoPage from './PrizeInfoPage';
 
 export const metadata: Metadata = createMetadata(
-  'Prize Information | Cosmic Signature',
-  'Detailed prize information for a Cosmic Signature game round — winner details, ETH prize distribution, raffle results, and NFT rewards.',
+  'Allocation Information | Cosmic Signature',
+  'Detailed allocation information for a Cosmic Signature cycle \u2014 recipient details, Signature Allocation distribution, Stellar Selection results, and attached NFT allocations.',
 );
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {

@@ -51,7 +51,7 @@ const bidOptions = [
   { value: 'CST', label: 'CST', desc: 'Cosmic Token' },
 ];
 
-/** Form for placing ETH or CST bids with optional NFT/token donation fields and RandomWalk discount. */
+/** Form for making ETH or CST gestures with optional NFT/token attachment fields and RandomWalk discount. */
 export function BidForm({
   data,
   bidType,
@@ -85,7 +85,7 @@ export function BidForm({
     <div className="mt-8 space-y-5">
       <div>
         <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3 block">
-          Bid Method
+          Gesture Method
         </Label>
         <div className="flex gap-2">
           {visibleOptions.map((opt) => (
@@ -296,8 +296,8 @@ export function BidForm({
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Bumps bid price by {bidPricePlus}% to avoid collision when two bids land in the
-                    same block. Does not permanently raise the price.
+                    Bumps Gesture Cost by {bidPricePlus}% to avoid collision when two gestures land
+                    in the same block. Does not permanently raise the cost.
                   </p>
                 </div>
               )}

@@ -6,11 +6,11 @@ interface AuctionInfoProps {
   endedMessage?: string;
 }
 
-/** Displays elapsed auction time and duration, or an ended message when the auction exceeds its duration. */
+/** Displays elapsed Calibration Window time and duration, or a closed message when the window exceeds its duration. */
 export function AuctionInfo({
   secondsElapsed,
   auctionDuration,
-  endedMessage = 'Auction ended.',
+  endedMessage = 'Calibration Window closed.',
 }: AuctionInfoProps) {
   return (
     <div className="ml-4">
@@ -28,7 +28,7 @@ export function AuctionInfo({
       )}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4 items-center">
         <div className="md:col-span-5">
-          <p className="text-base font-medium">Auction Duration:</p>
+          <p className="text-base font-medium">Calibration Window Duration:</p>
         </div>
         <div className="md:col-span-7">
           <p>{formatSeconds(auctionDuration)}</p>

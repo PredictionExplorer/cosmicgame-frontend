@@ -41,9 +41,9 @@ const createNFTWinner = (overrides = {}) => ({
 });
 
 describe('RaffleWinnerTable', () => {
-  it('renders empty state when no deposits or NFT winners', () => {
+  it('renders empty state when no deposits or NFT recipients', () => {
     render(<RaffleWinnerTable RaffleETHDeposits={[createDeposit()]} RaffleNFTWinners={[]} />);
-    expect(screen.getByText('No winners yet.')).toBeInTheDocument();
+    expect(screen.getByText('No recipients yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {

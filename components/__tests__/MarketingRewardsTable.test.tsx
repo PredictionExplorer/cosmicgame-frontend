@@ -20,9 +20,9 @@ const createReward = (overrides: Partial<MarketingReward> = {}): MarketingReward
 });
 
 describe('MarketingRewardsTable', () => {
-  it('renders "No rewards yet." when list is empty', () => {
+  it('renders "No allocations yet." when list is empty', () => {
     render(<MarketingRewardsTable list={[]} />);
-    expect(screen.getByText('No rewards yet.')).toBeInTheDocument();
+    expect(screen.getByText('No allocations yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {

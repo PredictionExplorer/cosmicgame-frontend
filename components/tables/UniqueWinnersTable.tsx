@@ -46,7 +46,7 @@ export const UniqueWinnersTable = ({ list }: UniqueWinnersTableProps) => {
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No winners yet.</p>;
+    return <p>No recipients yet.</p>;
   }
 
   return (
@@ -55,10 +55,10 @@ export const UniqueWinnersTable = ({ list }: UniqueWinnersTableProps) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Winner Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Prizes Taken</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Max Prize (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Prizes Sum (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Recipient Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Allocations Received</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Max Allocation (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Allocations Sum (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

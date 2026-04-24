@@ -120,53 +120,53 @@ export function RafflePerformance({
       {showProbabilities && (
         <div className="space-y-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
           <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Current Round Win Probability
+            Current Cycle Selection Frequency
           </h4>
           <ProbabilityBar
-            label="ETH Raffle"
+            label="ETH Stellar Selection"
             probability={raffleETHProbability}
-            tooltip="Chance of winning an ETH raffle prize this round, based on your share of total bids and the number of ETH raffle winners drawn."
+            tooltip="Your selection frequency for an ETH Stellar Selection allocation this cycle, based on your share of total gestures and the number of ETH Stellar Selection recipients chosen."
           />
           <ProbabilityBar
-            label="NFT Raffle"
+            label="NFT Stellar Selection"
             probability={raffleNFTProbability}
-            tooltip="Chance of winning a CosmicSignature NFT raffle mint this round, based on your share of total bids."
+            tooltip="Your selection frequency for a Cosmic Signature NFT Stellar Selection imprint this cycle, based on your share of total gestures."
           />
         </div>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <RaffleStat
-          label="Total Raffle ETH"
+          label="Total Stellar Selection ETH"
           value={`${totalRaffleEth.toFixed(4)} ETH`}
-          tooltip="Combined ETH from raffle winnings and withdrawals across all rounds."
+          tooltip="Combined ETH from Stellar Selection allocations and retrievals across all cycles."
           href={userInfo.Address ? `/user/raffle-eth/${userInfo.Address}` : undefined}
         />
         <RaffleStat
-          label="ETH Withdrawn"
+          label="ETH Retrieved"
           value={`${(userInfo.SumRaffleEthWithdrawal ?? 0).toFixed(4)} ETH`}
-          tooltip="ETH already withdrawn from raffle winnings to your wallet."
+          tooltip="ETH already retrieved from Stellar Selection allocations to your wallet."
         />
         <RaffleStat
-          label="Unclaimed NFTs"
+          label="Unretrieved NFTs"
           value={(userInfo.UnclaimedNFTs ?? 0).toLocaleString()}
-          tooltip="Donated NFTs you have won but not yet claimed."
+          tooltip="Attached NFTs allocated to you but not yet retrieved."
         />
         <RaffleStat
-          label="Raffle NFTs"
+          label="Stellar Selection NFTs"
           value={(userInfo.RaffleNFTsCount ?? 0).toLocaleString()}
-          tooltip="CosmicSignature NFTs won through raffle mints."
+          tooltip="Cosmic Signature NFTs imprinted through Stellar Selection."
           href={userInfo.Address ? `/user/raffle-nft/${userInfo.Address}` : undefined}
         />
         <RaffleStat
-          label="Reward NFTs"
+          label="Allocation NFTs"
           value={(userInfo.RewardNFTsCount ?? 0).toLocaleString()}
-          tooltip="Total CosmicSignature NFTs received as rewards (all mint types combined)."
+          tooltip="Total Cosmic Signature NFTs received as allocations (all imprint types combined)."
         />
         <RaffleStat
-          label="CS Tokens Won"
+          label="CS Tokens Received"
           value={(userInfo.TotalCSTokensWon ?? 0).toLocaleString()}
-          tooltip="Total CosmicSignature tokens you have won across all rounds."
+          tooltip="Total Cosmic Signature tokens received across all cycles."
         />
       </div>
     </motion.div>

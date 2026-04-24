@@ -41,7 +41,7 @@ const MarketingRewardsTable = ({ list }: { list: MarketingReward[] }) => {
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No rewards yet.</p>;
+    return <p>No allocations yet.</p>;
   }
 
   const currentItems = list.slice((page - 1) * perPage, page * perPage);

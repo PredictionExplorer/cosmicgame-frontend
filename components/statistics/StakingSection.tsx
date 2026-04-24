@@ -11,7 +11,7 @@ import { StatisticsItem } from './StatisticsItem';
 import { StatisticsGroup } from './StatisticsGroup';
 import { CollapsibleSection } from './CollapsibleSection';
 
-/** Props for the staking statistics section. */
+/** Props for the anchoring statistics section. */
 export interface StakingSectionProps {
   cstStats: {
     NumActiveStakers: number;
@@ -34,7 +34,7 @@ export interface StakingSectionProps {
   uniqueRWLKStakers: UniqueStakerRWLK[];
 }
 
-/** CST and RWLK staking tabs with stats, actions, staked tokens, and unique stakers. */
+/** CST and RWLK anchoring tabs with stats, actions, anchored tokens, and unique anchor-holders. */
 export function StakingSection({
   cstStats,
   rwlkStats,
@@ -57,36 +57,36 @@ export function StakingSection({
       </TabsList>
 
       <TabsContent value="cst" className="space-y-6 pt-4">
-        <StatisticsGroup title="CST Staking Overview" accentColor="blue">
+        <StatisticsGroup title="CST Anchoring Overview" accentColor="blue">
           <StatisticsItem
-            title="Number of Active Stakers"
+            title="Number of Active Anchor-holders"
             value={cstStats.NumActiveStakers}
-            tooltip="Wallets currently staking at least one Cosmic Signature Token"
+            tooltip="Wallets currently anchoring at least one Cosmic Signature Token"
           />
           <StatisticsItem
-            title="Number of Staking Rewards Deposits"
+            title="Number of Anchor-Distribution Deposits"
             value={cstStats.NumDeposits}
-            tooltip="Total reward deposit events into the CST staking pool"
+            tooltip="Total distribution deposit events into the CST Anchor pool"
           />
           <StatisticsItem
-            title="Total Staking Rewards"
+            title="Total Anchor Distributions"
             value={`${(cstStats.TotalRewardEth ?? 0).toFixed(4)} ETH`}
-            tooltip="Total ETH distributed as staking rewards to CST stakers"
+            tooltip="Total ETH distributed as Anchor Distributions to CST anchor-holders"
           />
-          <StatisticsItem title="Total Tokens Minted" value={cstStats.TotalTokensMinted} />
+          <StatisticsItem title="Total Tokens Imprinted" value={cstStats.TotalTokensMinted} />
           <StatisticsItem
-            title="Total Tokens Staked"
+            title="Total Tokens Anchored"
             value={cstStats.TotalTokensStaked}
-            tooltip="Number of Cosmic Signature Tokens currently locked in the staking contract"
+            tooltip="Number of Cosmic Signature Tokens currently anchored in the protocol"
           />
           <StatisticsItem
-            title="Unclaimed Staking Rewards"
+            title="Unretrieved Anchor Distributions"
             value={`${(cstStats.UnclaimedRewardEth ?? 0).toFixed(4)} ETH`}
-            tooltip="Staking rewards earned but not yet withdrawn by stakers"
+            tooltip="Anchor Distributions allocated but not yet retrieved by anchor-holders"
           />
         </StatisticsGroup>
 
-        <CollapsibleSection title="Stake / Unstake Actions">
+        <CollapsibleSection title="Anchor / Release Actions">
           {stakingCSTActions === null ? (
             <p className="text-lg font-semibold">Loading...</p>
           ) : (
@@ -94,7 +94,7 @@ export function StakingSection({
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Staked Tokens">
+        <CollapsibleSection title="Anchored Tokens">
           {stakedCSTokens === null ? (
             <p className="text-lg font-semibold">Loading...</p>
           ) : (
@@ -102,27 +102,27 @@ export function StakingSection({
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Unique Stakers">
+        <CollapsibleSection title="Unique Anchor-holders">
           <UniqueStakersCSTTable list={uniqueCSTStakers} />
         </CollapsibleSection>
       </TabsContent>
 
       <TabsContent value="rwlk" className="space-y-6 pt-4">
-        <StatisticsGroup title="RWLK Staking Overview" accentColor="purple">
+        <StatisticsGroup title="RWLK Anchoring Overview" accentColor="purple">
           <StatisticsItem
-            title="Number of Active Stakers"
+            title="Number of Active Anchor-holders"
             value={rwlkStats.NumActiveStakers}
-            tooltip="Wallets currently staking at least one RandomWalk Token"
+            tooltip="Wallets currently anchoring at least one RandomWalk Token"
           />
-          <StatisticsItem title="Total Tokens Minted" value={rwlkStats.TotalTokensMinted} />
+          <StatisticsItem title="Total Tokens Imprinted" value={rwlkStats.TotalTokensMinted} />
           <StatisticsItem
-            title="Total Tokens Staked"
+            title="Total Tokens Anchored"
             value={rwlkStats.TotalTokensStaked}
-            tooltip="Number of RandomWalk Tokens currently locked in the staking contract"
+            tooltip="Number of RandomWalk Tokens currently anchored in the protocol"
           />
         </StatisticsGroup>
 
-        <CollapsibleSection title="Stake / Unstake Actions">
+        <CollapsibleSection title="Anchor / Release Actions">
           {stakingRWLKActions === null ? (
             <p className="text-lg font-semibold">Loading...</p>
           ) : (
@@ -130,7 +130,7 @@ export function StakingSection({
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Staked Tokens">
+        <CollapsibleSection title="Anchored Tokens">
           {stakedRWLKTokens === null ? (
             <p className="text-lg font-semibold">Loading...</p>
           ) : (
@@ -138,7 +138,7 @@ export function StakingSection({
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Unique Stakers">
+        <CollapsibleSection title="Unique Anchor-holders">
           <UniqueStakersRWLKTable list={uniqueRWLKStakers} />
         </CollapsibleSection>
       </TabsContent>

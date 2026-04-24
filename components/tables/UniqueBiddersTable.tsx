@@ -52,7 +52,7 @@ export const UniqueBiddersTable = ({ list }: UniqueBiddersTableProps) => {
   );
 
   if (list.length === 0) {
-    return <p>No bidders yet.</p>;
+    return <p>No participants yet.</p>;
   }
 
   return (
@@ -61,9 +61,9 @@ export const UniqueBiddersTable = ({ list }: UniqueBiddersTableProps) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Bidder Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Number of Bids</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Max Bid (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Participant Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">Number of Gestures</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Max Gesture (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

@@ -48,7 +48,7 @@ export const GlobalMarketingRewardsTable = ({ list }: { list: MarketingReward[] 
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No rewards yet.</p>;
+    return <p>No allocations yet.</p>;
   }
 
   return (
@@ -58,7 +58,7 @@ export const GlobalMarketingRewardsTable = ({ list }: { list: MarketingReward[] 
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Marketing Agent</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Outreach Contributor</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

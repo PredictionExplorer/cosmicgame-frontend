@@ -18,13 +18,13 @@ const createReward = (overrides = {}) => ({
 describe('GlobalMarketingRewardsTable', () => {
   it('renders empty state when list is empty', () => {
     render(<GlobalMarketingRewardsTable list={[]} />);
-    expect(screen.getByText('No rewards yet.')).toBeInTheDocument();
+    expect(screen.getByText('No allocations yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<GlobalMarketingRewardsTable list={[createReward()]} />);
     expect(screen.getAllByText('Datetime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Marketing Agent').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Outreach Contributor').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Amount').length).toBeGreaterThanOrEqual(1);
   });
 

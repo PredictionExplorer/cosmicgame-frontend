@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import EthDonationByRoundPage from './EthDonationByRoundPage';
 
 export const metadata: Metadata = createMetadata(
-  'Direct (ETH) Donations by Round | Cosmic Signature',
-  'View Direct (ETH) Donations by Round',
+  'Direct ETH Contributions by Cycle | Cosmic Signature',
+  'Direct ETH contributions to the Cosmic Signature protocol broken down by Performance Cycle.',
 );
 
 export default async function Page({ params }: { params: Promise<{ round: string }> }) {

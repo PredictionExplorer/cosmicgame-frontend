@@ -6,7 +6,7 @@ import StatisticsLoader from './StatisticsLoader';
 
 export const metadata: Metadata = createMetadata(
   'Statistics | Cosmic Signature',
-  'Explore comprehensive statistics on Cosmic Signature. Access data on market trends, token performance, user activity, and more. Stay informed with real-time insights into our blockchain ecosystem.',
+  'Protocol statistics for Cosmic Signature \u2014 cycle history, gesture activity, allocation distribution, anchoring metrics, and participant data.',
   undefined,
   '/statistics',
 );

@@ -47,7 +47,7 @@ export const UniqueStakersRWLKTable = ({ list }: { list: UniqueStakerRWLK[] }) =
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No stakers yet.</p>;
+    return <p>No anchor-holders yet.</p>;
   }
 
   return (
@@ -56,11 +56,11 @@ export const UniqueStakersRWLKTable = ({ list }: { list: UniqueStakerRWLK[] }) =
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Staker Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Num Stake Actions</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Num Unstake Actions</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Minted Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Anchor-holder Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Num Anchor Actions</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Num Release Actions</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Anchored Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Imprinted Tokens</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

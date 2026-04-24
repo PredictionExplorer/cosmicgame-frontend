@@ -9,7 +9,7 @@ import { render, screen, checkA11y } from '@/test-utils';
 describe('BiddingHistoryTable', () => {
   test('with no records', () => {
     render(<BiddingHistoryTable biddingHistory={[]} />);
-    expect(screen.getByText('No bid history yet.')).toBeInTheDocument();
+    expect(screen.getByText('No gestures yet.')).toBeInTheDocument();
   });
 
   test('with mock data', () => {

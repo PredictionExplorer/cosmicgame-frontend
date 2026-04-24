@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import Mint from './Mint';
 
 export const metadata: Metadata = createMetadata(
-  'Mint | Cosmic Signature',
-  'Mint a RandomWalk NFT on Cosmic Signature and unlock a 50% discount on your bids. RandomWalk NFTs are unique digital collectibles that enhance your gameplay strategy.',
+  'Imprint RandomWalk NFT | Cosmic Signature',
+  'Imprint a RandomWalk NFT on Cosmic Signature and unlock a 50% Gesture-Cost discount. RandomWalk NFTs are unique generative collectibles that augment a cycle strategy.',
   undefined,
   '/mint',
 );

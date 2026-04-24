@@ -17,7 +17,7 @@ export async function generateMetadata({
   const { id } = await params;
 
   const title = `Token #${id} | Cosmic Signature Token`;
-  const description = `Discover the unique attributes and ownership history of Cosmic Signature Token #${id}, an exclusive digital collectible from the Cosmic Signature game.`;
+  const description = `Attributes and ownership history of Cosmic Signature Token #${id} \u2014 a deterministic three-body NFT rendered spectrally on Arbitrum.`;
 
   try {
     const { data } = await axios.get(`${cosmicGameBaseUrl}cst/info/${id}`);
@@ -34,7 +34,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const tokenId = parseInt(id, 10);
 
   const name = `Cosmic Signature Token #${id}`;
-  const description = `Unique generative NFT from the Cosmic Signature bidding game, featuring artwork based on three-body problem physics.`;
+  const description = `Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics.`;
   let imageUrl = logoImgUrl;
 
   try {

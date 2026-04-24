@@ -217,7 +217,7 @@ const BanBidTable = ({ biddingHistory }: BanBidTableProps) => {
           />
         </>
       ) : (
-        <p>No bid history yet.</p>
+        <p>No gesture history yet.</p>
       )}
     </div>
   );

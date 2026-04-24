@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import SystemEventPage from './SystemEventPage';
 
 export const metadata: Metadata = createMetadata(
-  'Admin Events | Cosmic Signature',
-  'View system administration events and parameter changes for a specific Cosmic Signature game round.',
+  'System Events | Cosmic Signature',
+  'Protocol administration events and coordination parameter changes for a specific Cosmic Signature cycle.',
 );
 
 export default async function Page({

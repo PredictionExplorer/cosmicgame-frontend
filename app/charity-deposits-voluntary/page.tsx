@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import CharityDepositsVoluntary from './CharityDepositsVoluntary';
 
 export const metadata: Metadata = createMetadata(
-  'Deposits To Charity Wallet | Cosmic Signature',
-  'View voluntary charitable donations made by Cosmic Signature community members. These contributions support causes chosen by the Cosmic DAO governance system.',
+  'Voluntary Public-Goods Contributions | Cosmic Signature',
+  'Voluntary contributions to the Public Goods Vault from the Cosmic Signature community. Contributions support beneficiaries selected through Cosmic Council coordination.',
   undefined,
   '/charity-deposits-voluntary',
 );

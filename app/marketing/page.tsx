@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import MarketingRewards from './MarketingRewards';
 
 export const metadata: Metadata = createMetadata(
-  'Marketing Rewards | Cosmic Signature',
-  'Promote Cosmic Signature and earn CST token rewards. View top marketers, reward history, and learn how to join the program.',
+  'Outreach Allocations | Cosmic Signature',
+  'Contribute to Cosmic Signature outreach and receive CST allocations. See top ecosystem contributors, allocation history, and how to take part.',
   undefined,
   '/marketing',
 );

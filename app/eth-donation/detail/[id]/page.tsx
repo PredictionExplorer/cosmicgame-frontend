@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import EthDonationDetailPage from './EthDonationDetailPage';
 
 export const metadata: Metadata = createMetadata(
-  'Direct (ETH) Donation Detail | Cosmic Signature',
-  'View detailed information about a specific ETH donation to the Cosmic Signature charity pool, including donor address, amount, round, and optional message.',
+  'Direct ETH Contribution Detail | Cosmic Signature',
+  'Details of a specific ETH contribution to the Cosmic Signature Public Goods Vault \u2014 contributor address, amount, cycle, and optional note.',
 );
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {

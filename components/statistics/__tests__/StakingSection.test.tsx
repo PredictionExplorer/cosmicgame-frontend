@@ -75,7 +75,7 @@ const defaultProps: StakingSectionProps = {
 };
 
 describe('StakingSection', () => {
-  it('renders CST staking stats', () => {
+  it('renders CST anchoring stats', () => {
     render(<StakingSection {...defaultProps} />);
     expect(screen.getByText('10')).toBeInTheDocument();
     expect(screen.getByText('50')).toBeInTheDocument();
@@ -83,7 +83,7 @@ describe('StakingSection', () => {
 
   it('wraps CST stats in a StatisticsGroup', () => {
     render(<StakingSection {...defaultProps} />);
-    expect(screen.getByText('CST Staking Overview')).toBeInTheDocument();
+    expect(screen.getByText('CST Anchoring Overview')).toBeInTheDocument();
   });
 
   it('wraps tables in CollapsibleSections', () => {
@@ -92,7 +92,7 @@ describe('StakingSection', () => {
     expect(collapsible.length).toBeGreaterThanOrEqual(3);
   });
 
-  it('renders staking actions table for CST', () => {
+  it('renders anchor-action table for CST', () => {
     render(<StakingSection {...defaultProps} />);
     const tables = screen.getAllByTestId('global-staking-actions');
     expect(tables[0]).toHaveTextContent('IsRWLK=false');
@@ -109,7 +109,7 @@ describe('StakingSection', () => {
     expect(screen.getByText('RandomWalk Token')).toBeInTheDocument();
   });
 
-  it('renders tooltips on staking metrics', () => {
+  it('renders tooltips on anchoring metrics', () => {
     render(<StakingSection {...defaultProps} />);
     const tooltips = screen.getAllByTestId('staking-tooltip');
     expect(tooltips.length).toBeGreaterThan(0);

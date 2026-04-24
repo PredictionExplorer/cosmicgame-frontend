@@ -47,10 +47,10 @@ describe('RafflePerformance', () => {
     expect(screen.getByTestId('raffle-performance')).toBeInTheDocument();
   });
 
-  it('renders probability bars when round is active', () => {
+  it('renders probability bars when cycle is active', () => {
     render(<RafflePerformance {...baseProps} />);
-    expect(screen.getByText('ETH Raffle')).toBeInTheDocument();
-    expect(screen.getByText('NFT Raffle')).toBeInTheDocument();
+    expect(screen.getByText('ETH Stellar Selection')).toBeInTheDocument();
+    expect(screen.getByText('NFT Stellar Selection')).toBeInTheDocument();
     expect(screen.getByText('35.00%')).toBeInTheDocument();
     expect(screen.getByText('15.00%')).toBeInTheDocument();
   });
@@ -59,49 +59,49 @@ describe('RafflePerformance', () => {
     render(
       <RafflePerformance {...baseProps} raffleETHProbability={-1} raffleNFTProbability={-1} />,
     );
-    expect(screen.queryByText('ETH Raffle')).not.toBeInTheDocument();
-    expect(screen.queryByText('NFT Raffle')).not.toBeInTheDocument();
+    expect(screen.queryByText('ETH Stellar Selection')).not.toBeInTheDocument();
+    expect(screen.queryByText('NFT Stellar Selection')).not.toBeInTheDocument();
   });
 
-  it('hides probability bars when round is not active', () => {
+  it('hides probability bars when cycle is not active', () => {
     render(
       <RafflePerformance
         {...baseProps}
         data={{ CurRoundNum: 5, TsRoundStart: 0 } as RafflePerformanceProps['data']}
       />,
     );
-    expect(screen.queryByText('Current Round Win Probability')).not.toBeInTheDocument();
+    expect(screen.queryByText('Current Cycle Selection Frequency')).not.toBeInTheDocument();
   });
 
-  it('renders raffle stat cards', () => {
+  it('renders Stellar Selection stat cards', () => {
     render(<RafflePerformance {...baseProps} />);
-    expect(screen.getByText('Total Raffle ETH')).toBeInTheDocument();
-    expect(screen.getByText('ETH Withdrawn')).toBeInTheDocument();
-    expect(screen.getByText('Unclaimed NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Raffle NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Reward NFTs')).toBeInTheDocument();
-    expect(screen.getByText('CS Tokens Won')).toBeInTheDocument();
+    expect(screen.getByText('Total Stellar Selection ETH')).toBeInTheDocument();
+    expect(screen.getByText('ETH Retrieved')).toBeInTheDocument();
+    expect(screen.getByText('Unretrieved NFTs')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection NFTs')).toBeInTheDocument();
+    expect(screen.getByText('Allocation NFTs')).toBeInTheDocument();
+    expect(screen.getByText('CS Tokens Received')).toBeInTheDocument();
   });
 
-  it('displays correct total raffle ETH', () => {
+  it('displays correct total Stellar Selection ETH', () => {
     render(<RafflePerformance {...baseProps} />);
     expect(screen.getByText('0.8000 ETH')).toBeInTheDocument();
   });
 
-  it('displays correct unclaimed NFTs count', () => {
+  it('displays correct unretrieved NFTs count', () => {
     render(<RafflePerformance {...baseProps} />);
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 
-  it('links to raffle ETH page', () => {
+  it('links to Stellar Selection ETH page', () => {
     render(<RafflePerformance {...baseProps} />);
-    const link = screen.getByText('Total Raffle ETH').closest('a');
+    const link = screen.getByText('Total Stellar Selection ETH').closest('a');
     expect(link).toHaveAttribute('href', '/user/raffle-eth/0xUser123');
   });
 
-  it('links to raffle NFT page', () => {
+  it('links to Stellar Selection NFT page', () => {
     render(<RafflePerformance {...baseProps} />);
-    const link = screen.getByText('Raffle NFTs').closest('a');
+    const link = screen.getByText('Stellar Selection NFTs').closest('a');
     expect(link).toHaveAttribute('href', '/user/raffle-nft/0xUser123');
   });
 

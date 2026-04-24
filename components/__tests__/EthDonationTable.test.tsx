@@ -27,9 +27,9 @@ const createDonation = (overrides = {}) => ({
 });
 
 describe('EthDonationTable', () => {
-  it('renders "No donations yet." when list is empty', () => {
+  it('renders "No contributions yet." when list is empty', () => {
     render(<EthDonationTable list={[]} />);
-    expect(screen.getByText('No donations yet.')).toBeInTheDocument();
+    expect(screen.getByText('No contributions yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {

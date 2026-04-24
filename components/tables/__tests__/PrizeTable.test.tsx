@@ -60,7 +60,7 @@ describe('PrizeTable', () => {
 
   it('renders empty state when not loading', () => {
     render(<PrizeTable list={[]} loading={false} />);
-    expect(screen.getByText('No winners yet.')).toBeInTheDocument();
+    expect(screen.getByText('No recipients yet.')).toBeInTheDocument();
   });
 
   it('renders all 9 table headers', () => {

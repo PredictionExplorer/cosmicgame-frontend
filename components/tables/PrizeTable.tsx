@@ -125,7 +125,7 @@ export const PrizeTable = ({ list, loading }: { list: RoundInfo[]; loading: bool
   }
 
   if (!list.length) {
-    return <p className="text-lg font-semibold">No winners yet.</p>;
+    return <p className="text-lg font-semibold">No recipients yet.</p>;
   }
 
   return (

@@ -289,7 +289,7 @@ const BiddingHistoryTable = ({ biddingHistory, showRound = true }: BiddingHistor
           />
         </>
       ) : (
-        <p>No bid history yet.</p>
+        <p>No gestures yet.</p>
       )}
     </div>
   );

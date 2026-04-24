@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import CurrentRoundPage from './CurrentRoundPage';
 
 export const metadata: Metadata = createMetadata(
-  'Current Round | Cosmic Signature',
-  'Full details for the current round: bid history, leaderboards, donations, and fund distribution.',
+  'Current Cycle | Cosmic Signature',
+  'Full details for the active Performance Cycle: gesture history, leaderboards, attached contributions, and allocation distribution.',
   undefined,
   '/current-round',
 );

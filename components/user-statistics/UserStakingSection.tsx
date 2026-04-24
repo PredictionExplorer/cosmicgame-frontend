@@ -100,42 +100,42 @@ export function UserStakingSection({
           {!hasCSTActivity ? (
             <EmptyState
               icon={<Layers className="h-8 w-8 text-muted-foreground/50" />}
-              title="No staking activity yet"
-              description="Stake your CosmicSignature NFTs to earn ETH rewards from each round."
+              title="No anchoring activity yet"
+              description="Anchor your Cosmic Signature NFTs to receive ETH Anchor Distributions each cycle."
             />
           ) : (
             <>
               <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
                 <StatCard
-                  label="Stake Actions"
+                  label="Anchor Actions"
                   value={totalStakeActions.toLocaleString()}
                   icon={<Lock className="h-3.5 w-3.5" />}
-                  tooltip="Number of times you have staked CosmicSignature NFTs."
+                  tooltip="Number of times you have anchored Cosmic Signature NFTs."
                 />
                 <StatCard
-                  label="Unstake Actions"
+                  label="Release Actions"
                   value={totalUnstakeActions.toLocaleString()}
                   icon={<Unlock className="h-3.5 w-3.5" />}
-                  tooltip="Number of times you have unstaked CosmicSignature NFTs."
+                  tooltip="Number of times you have released anchored Cosmic Signature NFTs."
                 />
                 <StatCard
-                  label="Tokens with Rewards"
+                  label="Tokens with Distributions"
                   value={cstStakingRewards.length.toLocaleString()}
                   icon={<Layers className="h-3.5 w-3.5" />}
-                  tooltip="Number of staked tokens that have accumulated reward distributions."
+                  tooltip="Number of anchored tokens that have accumulated Anchor Distributions."
                 />
                 <StatCard
-                  label="Total Rewards"
+                  label="Total Distributions"
                   value={formatEthValue(totalRewardEth)}
                   icon={<Coins className="h-3.5 w-3.5" />}
-                  tooltip="Total ETH rewards earned from staking (collected + uncollected)."
+                  tooltip="Total ETH Anchor Distributions received from anchoring (retrieved + unretrieved)."
                   featured
                 />
                 <StatCard
-                  label="Unclaimed Rewards"
+                  label="Unretrieved Distributions"
                   value={formatEthValue(unclaimedRewardEth)}
                   icon={<Gift className="h-3.5 w-3.5" />}
-                  tooltip="ETH rewards earned but not yet collected to your wallet."
+                  tooltip="Anchor Distributions allocated but not yet retrieved to your wallet."
                   featured={unclaimedRewardEth > 0}
                   gradient={unclaimedRewardEth > 0}
                 />
@@ -144,31 +144,31 @@ export function UserStakingSection({
               <div className="space-y-8">
                 <div>
                   <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    Stake / Unstake Actions
+                    Anchor / Release Actions
                   </h6>
                   <StakingActionsTable list={stakingCSTActions} IsRwalk={false} />
                 </div>
                 <div>
                   <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    Staking Rewards by Token
+                    Anchor Distributions by Token
                   </h6>
                   <StakingRewardsTable list={cstStakingRewards} address={address} />
                 </div>
                 <div>
                   <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    Staking Rewards by Deposit
+                    Anchor Distributions by Deposit
                   </h6>
                   <CSTStakingRewardsByDepositTable list={cstStakingRewardsByDeposit} />
                 </div>
                 <div>
                   <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    Collected Staking Rewards
+                    Retrieved Anchor Distributions
                   </h6>
                   <CollectedCSTStakingRewardsTable list={collectedCstStakingRewards} />
                 </div>
                 <div>
                   <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    Uncollected Staking Rewards
+                    Unretrieved Anchor Distributions
                   </h6>
                   <UncollectedCSTStakingRewardsTable user={address} />
                 </div>
@@ -181,49 +181,49 @@ export function UserStakingSection({
           {!hasRWLKActivity ? (
             <EmptyState
               icon={<Layers className="h-8 w-8 text-muted-foreground/50" />}
-              title="No RandomWalk staking yet"
-              description="Stake your RandomWalk NFTs to participate in random reward mints."
+              title="No RandomWalk anchoring yet"
+              description="Anchor your RandomWalk NFTs to take part in random allocation imprints."
             />
           ) : (
             <>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
                 <StatCard
-                  label="Stake Actions"
+                  label="Anchor Actions"
                   value={(rwlkStats?.TotalNumStakeActions ?? 0).toLocaleString()}
                   icon={<Lock className="h-3.5 w-3.5" />}
-                  tooltip="Number of times you have staked RandomWalk NFTs."
+                  tooltip="Number of times you have anchored RandomWalk NFTs."
                 />
                 <StatCard
-                  label="Unstake Actions"
+                  label="Release Actions"
                   value={(rwlkStats?.TotalNumUnstakeActions ?? 0).toLocaleString()}
                   icon={<Unlock className="h-3.5 w-3.5" />}
-                  tooltip="Number of times you have unstaked RandomWalk NFTs."
+                  tooltip="Number of times you have released anchored RandomWalk NFTs."
                 />
                 <StatCard
-                  label="Tokens Staked"
+                  label="Tokens Anchored"
                   value={(rwlkStats?.TotalTokensStaked ?? 0).toLocaleString()}
                   icon={<Layers className="h-3.5 w-3.5" />}
-                  tooltip="Total RandomWalk NFTs currently staked."
+                  tooltip="Total RandomWalk NFTs currently anchored."
                   featured
                 />
                 <StatCard
-                  label="Tokens Minted"
+                  label="Tokens Imprinted"
                   value={(rwlkStats?.TotalTokensMinted ?? 0).toLocaleString()}
                   icon={<Gift className="h-3.5 w-3.5" />}
-                  tooltip="CosmicSignature tokens earned through RandomWalk staking reward mints."
+                  tooltip="Cosmic Signature tokens received through RandomWalk anchor allocation imprints."
                 />
               </div>
 
               <div className="space-y-8">
                 <div>
                   <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    Stake / Unstake Actions
+                    Anchor / Release Actions
                   </h6>
                   <StakingActionsTable list={stakingRWLKActions} IsRwalk={true} />
                 </div>
                 <div>
                   <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    Staking Reward Tokens
+                    Anchor Allocation Tokens
                   </h6>
                   <RwalkStakingRewardMintsTable list={rwlkMints} />
                 </div>

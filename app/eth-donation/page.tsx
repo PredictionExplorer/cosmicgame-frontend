@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import EthDonations from './EthDonations';
 
 export const metadata: Metadata = createMetadata(
-  'Direct (ETH) Donations | Cosmic Signature',
-  'Donate ETH directly to the Cosmic Signature charity pool and view the complete donation history. Support charitable causes while participating in the game ecosystem.',
+  'Direct ETH Contributions | Cosmic Signature',
+  'Contribute ETH directly to the Cosmic Signature Public Goods Vault and view the complete contribution history. Support public goods while taking part in the protocol.',
   undefined,
   '/eth-donation',
 );

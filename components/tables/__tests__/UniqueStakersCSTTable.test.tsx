@@ -21,21 +21,21 @@ const createStaker = (overrides = {}) => ({
 describe('UniqueStakersCSTTable', () => {
   it('renders empty state when list is empty', () => {
     render(<UniqueStakersCSTTable list={[]} />);
-    expect(screen.getByText('No stakers yet.')).toBeInTheDocument();
+    expect(screen.getByText('No anchor-holders yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<UniqueStakersCSTTable list={[createStaker()]} />);
-    expect(screen.getAllByText('Staker Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Num Stake Actions').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Num Unstake Actions').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Total Minted Tokens').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Total Staked Tokens').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Total Reward (ETH)').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Unclaimed Reward (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Anchor-holder Address').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Num Anchor Actions').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Num Release Actions').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Total Imprinted Tokens').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Total Anchored Tokens').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Total Distribution (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Unretrieved Distribution (ETH)').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders staker data', () => {
+  it('renders anchor-holder data', () => {
     render(<UniqueStakersCSTTable list={[createStaker()]} />);
     expect(screen.getByText('10')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();

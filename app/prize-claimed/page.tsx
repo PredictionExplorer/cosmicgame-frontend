@@ -6,8 +6,8 @@ import { createMetadata } from '@/utils/seo';
 import PrizeClaimedPage from './PrizeClaimedPage';
 
 export const metadata: Metadata = createMetadata(
-  'Claimed Prize Rewards | Cosmic Signature',
-  'Details of your claimed prize rewards from the Cosmic Signature bidding game, including ETH winnings, NFT prizes, and raffle rewards.',
+  'Retrieved Allocations | Cosmic Signature',
+  'Details of retrieved allocations from the Cosmic Signature protocol, including ETH receipts, Cosmic Signature NFT allocations, and Stellar Selection allocations.',
   undefined,
   '/prize-claimed',
 );
