@@ -20,15 +20,16 @@ import {
 
 import { formatCSTValue, formatEthValue } from '@/utils';
 
-import { MainWrapper } from '@/components/styled';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/ui/page-shell';
+import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { StatCard } from '@/components/ui/stat-card';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
-import { UniqueBiddersTable, Bidder } from '@/components/tables/UniqueBiddersTable';
-import { UniqueWinnersTable, Winner } from '@/components/tables/UniqueWinnersTable';
-import DonatedNFTDistributionTable from '@/components/donations/DonatedNFTDistributionTable';
+import { UniqueParticipantsTable, Participant } from '@/components/tables/UniqueParticipantsTable';
+import { UniqueRecipientsTable, Recipient } from '@/components/tables/UniqueRecipientsTable';
+import AttachedNFTDistributionTable from '@/components/attachments/AttachedNFTDistributionTable';
 import { CSTokenDistributionTable } from '@/components/tokens/CSTokenDistributionTable';
 import { CTBalanceDistributionTable } from '@/components/tokens/CTBalanceDistributionTable';
 import { CTBalanceDistributionChart } from '@/components/tokens/CTBalanceDistributionChart';
@@ -36,69 +37,69 @@ import { SystemModesTable, EventRow } from '@/components/tables/SystemModesTable
 import { UniqueEthDonorsTable, UniqueEthDonor } from '@/components/tables/UniqueEthDonorsTable';
 import {
   useDashboardInfo,
-  useUniqueBidders,
-  useUniqueWinners,
-  useUniqueCSTStakers,
-  useUniqueRWLKStakers,
+  useUniqueParticipants,
+  useUniqueRecipients,
+  useUniqueCSTAnchorHolders,
+  useUniqueRWLKAnchorHolders,
   useUniqueDonors,
   useDonationsNFTList,
   useCSTDistribution,
   useCTBalancesDistribution,
-  useStakingCSTActions,
-  useStakingRWLKActions,
-  useStakedCSTTokensGlobal,
-  useStakedRWLKTokensGlobal,
+  useCSTAnchorActions,
+  useRWLKAnchorActions,
+  useGlobalAnchoredCSTokens,
+  useGlobalAnchoredRWLKTokens,
   useSystemModelist,
 } from '@/hooks/useApiQuery';
 import { StatisticsItem } from '@/components/statistics/StatisticsItem';
 import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
 import { CollapsibleSection } from '@/components/statistics/CollapsibleSection';
-import { StakingSection } from '@/components/statistics/StakingSection';
+import { AnchoringSection } from '@/components/statistics/AnchoringSection';
 import { DonatedNFTsGrid } from '@/components/statistics/DonatedNFTsGrid';
-import type { UniqueStakerCST } from '@/components/tables/UniqueStakersCSTTable';
-import type { UniqueStakerRWLK } from '@/components/tables/UniqueStakersRWLKTable';
+import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHoldersCSTTable';
+import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
 
 const Statistics = () => {
   const { data: dashboardData, isLoading: dashboardLoading, isError } = useDashboardInfo();
 
-  const { data: uniqueBiddersData } = useUniqueBidders();
-  const { data: uniqueWinnersData } = useUniqueWinners();
-  const { data: uniqueCSTStakersData } = useUniqueCSTStakers();
-  const { data: uniqueRWLKStakersData } = useUniqueRWLKStakers();
+  const { data: uniqueBiddersData } = useUniqueParticipants();
+  const { data: uniqueWinnersData } = useUniqueRecipients();
+  const { data: uniqueCSTAnchorHoldersData } = useUniqueCSTAnchorHolders();
+  const { data: uniqueRWLKAnchorHoldersData } = useUniqueRWLKAnchorHolders();
   const { data: uniqueDonorsData } = useUniqueDonors();
   const { data: nftDonationsData } = useDonationsNFTList();
   const { data: cstDistributionData } = useCSTDistribution();
   const { data: ctBalanceDistributionData } = useCTBalancesDistribution();
-  const { data: stakingCSTActionsData } = useStakingCSTActions();
-  const { data: stakingRWLKActionsData } = useStakingRWLKActions();
-  const { data: stakedCSTokensData } = useStakedCSTTokensGlobal();
-  const { data: stakedRWLKTokensData } = useStakedRWLKTokensGlobal();
+  const { data: cstAnchorActionsData } = useCSTAnchorActions();
+  const { data: rwlkAnchorActionsData } = useRWLKAnchorActions();
+  const { data: stakedCSTokensData } = useGlobalAnchoredCSTokens();
+  const { data: stakedRWLKTokensData } = useGlobalAnchoredRWLKTokens();
   const { data: systemModeChangesData } = useSystemModelist();
 
   const data = dashboardData ?? null;
 
-  const uniqueBidders = useMemo(() => {
+  const uniqueParticipants = useMemo(() => {
     if (!uniqueBiddersData) return [];
-    return [...uniqueBiddersData].sort((a: Bidder, b: Bidder) => b.NumBids - a.NumBids);
+    return [...uniqueBiddersData].sort((a: Participant, b: Participant) => b.NumBids - a.NumBids);
   }, [uniqueBiddersData]);
 
-  const uniqueWinners = (uniqueWinnersData ?? []) as Winner[];
-  const uniqueCSTStakers = (uniqueCSTStakersData ?? []) as UniqueStakerCST[];
-  const uniqueRWLKStakers = (uniqueRWLKStakersData ?? []) as UniqueStakerRWLK[];
+  const uniqueRecipients = (uniqueWinnersData ?? []) as Recipient[];
+  const uniqueCSTAnchorHolders = (uniqueCSTAnchorHoldersData ?? []) as UniqueAnchorHolderCST[];
+  const uniqueRWLKAnchorHolders = (uniqueRWLKAnchorHoldersData ?? []) as UniqueAnchorHolderRWLK[];
   const uniqueDonors = (uniqueDonorsData ?? []) as UniqueEthDonor[];
   const nftDonations = nftDonationsData ?? [];
   const cstDistribution = (cstDistributionData ??
     []) as import('@/services/api/types').TokenDistribution[];
   const ctBalanceDistribution = (ctBalanceDistributionData ??
     []) as import('@/services/api/types').CTBalanceDistribution[];
-  const stakingCSTActions = stakingCSTActionsData ?? null;
-  const stakingRWLKActions = stakingRWLKActionsData ?? null;
-  const stakedCSTokens = stakedCSTokensData ?? null;
-  const stakedRWLKTokens = stakedRWLKTokensData ?? null;
+  const cstAnchorActions = cstAnchorActionsData ?? null;
+  const rwlkAnchorActions = rwlkAnchorActionsData ?? null;
+  const anchoredCSTokens = stakedCSTokensData ?? null;
+  const anchoredRWLKTokens = stakedRWLKTokensData ?? null;
   const systemModeChanges = (systemModeChangesData as EventRow[] | undefined) ?? null;
 
-  /** Prefer DB row count from cg_prize; fall back to aggregated winner counts. */
-  const totalPrizesGiven =
+  /** Prefer DB row count from cg_prize; fall back to aggregated recipient counts. */
+  const totalAllocationsDistributed =
     data != null
       ? Number(
           data.CgPrizeRowCount ??
@@ -112,30 +113,37 @@ const Statistics = () => {
 
   if (dashboardLoading) {
     return (
-      <MainWrapper>
+      <PageShell variant="data">
         <div className="flex items-center justify-center py-32">
           <Spinner size="lg" />
         </div>
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   if (isError || !data) {
     return (
-      <MainWrapper>
+      <PageShell variant="data">
         <ErrorState
           title="Failed to load statistics"
           message="Please refresh the page to try again."
           onRetry={() => window.location.reload()}
         />
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
+        align="left"
+        eyebrow={
+          <SectionEyebrow tone="aurora" pulse>
+            Protocol Metrics · Live
+          </SectionEyebrow>
+        }
         title="Statistics"
+        gradientTitle="signature"
         subtitle="Historical data and overall metrics for the Cosmic Signature protocol"
       />
 
@@ -163,7 +171,7 @@ const Statistics = () => {
         />
         <StatCard
           label="Allocations Distributed"
-          value={totalPrizesGiven as ReactNode}
+          value={totalAllocationsDistributed as ReactNode}
           icon={<Trophy className="h-4 w-4" />}
           tooltip="Rows in cg_prize (every allocation slot). Includes protocol markers that are not attributed to a single recipient (e.g. Anchor Distribution deposits per cycle)."
         />
@@ -197,7 +205,7 @@ const Statistics = () => {
                 title="Num Allocations Distributed"
                 value={
                   <Link href="/allocation" className="text-inherit">
-                    {totalPrizesGiven as ReactNode}
+                    {totalAllocationsDistributed as ReactNode}
                   </Link>
                 }
                 tooltip="COUNT(*) from cg_prize when available; otherwise aggregated recipient allocation counts"
@@ -402,10 +410,10 @@ const Statistics = () => {
 
           <div className="space-y-8">
             <CollapsibleSection title="Unique Participants" defaultOpen>
-              <UniqueBiddersTable list={uniqueBidders} />
+              <UniqueParticipantsTable list={uniqueParticipants} />
             </CollapsibleSection>
             <CollapsibleSection title="Unique Recipients" defaultOpen>
-              <UniqueWinnersTable list={uniqueWinners} />
+              <UniqueRecipientsTable list={uniqueRecipients} />
             </CollapsibleSection>
             <CollapsibleSection title="Unique ETH Contributors" defaultOpen>
               <UniqueEthDonorsTable list={uniqueDonors} />
@@ -446,7 +454,7 @@ const Statistics = () => {
               defaultOpen={false}
               icon={<Gift className="h-3.5 w-3.5" />}
             >
-              <DonatedNFTDistributionTable list={data.MainStats.DonatedTokenDistribution ?? []} />
+              <AttachedNFTDistributionTable list={data.MainStats.DonatedTokenDistribution ?? []} />
             </CollapsibleSection>
             <CollapsibleSection
               title="Cosmic Signature Token (ERC-721)"
@@ -495,15 +503,15 @@ const Statistics = () => {
           </div>
 
           <div className="gradient-border-card rounded-xl bg-white/[0.02] p-1">
-            <StakingSection
+            <AnchoringSection
               cstStats={data.MainStats.StakeStatisticsCST}
               rwlkStats={data.MainStats.StakeStatisticsRWalk}
-              stakingCSTActions={stakingCSTActions}
-              stakingRWLKActions={stakingRWLKActions}
-              stakedCSTokens={stakedCSTokens}
-              stakedRWLKTokens={stakedRWLKTokens}
-              uniqueCSTStakers={uniqueCSTStakers}
-              uniqueRWLKStakers={uniqueRWLKStakers}
+              cstAnchorActions={cstAnchorActions}
+              rwlkAnchorActions={rwlkAnchorActions}
+              anchoredCSTokens={anchoredCSTokens}
+              anchoredRWLKTokens={anchoredRWLKTokens}
+              uniqueCSTAnchorHolders={uniqueCSTAnchorHolders}
+              uniqueRWLKAnchorHolders={uniqueRWLKAnchorHolders}
             />
           </div>
         </div>
@@ -529,7 +537,7 @@ const Statistics = () => {
           )}
         </CollapsibleSection>
       </section>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

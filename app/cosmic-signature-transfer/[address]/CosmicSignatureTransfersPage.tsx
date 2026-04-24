@@ -10,8 +10,8 @@ import { getExplorerUrl, convertTimestampToDateTime, isWalletAddress } from '@/u
 
 import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/ui/page-shell';
 import {
-  MainWrapper,
   TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
@@ -113,7 +113,9 @@ const CosmicSignatureTransfersTable = ({ list }: { list: TransferRow[] }) => {
 
   if (list.length === 0) {
     return (
-      <div className="p-10 text-center text-sm font-medium text-muted-foreground">No transfers yet.</div>
+      <div className="p-10 text-center text-sm font-medium text-muted-foreground">
+        No transfers yet.
+      </div>
     );
   }
 
@@ -156,14 +158,16 @@ const CosmicSignatureTransfersPage = ({ address: rawAddress }: { address: string
   const { data: cosmicSignatureTransfers = [], isLoading: loading } = useCSTTransfers(address);
 
   return (
-    <MainWrapper className="max-sm:pb-16">
+    <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
           title="Cosmic Signature Transfers"
           subtitle={address !== 'Invalid Address' ? address : undefined}
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            ...(address !== 'Invalid Address' ? ([{ label: 'User', href: `/user/${address}` }] as const) : []),
+            ...(address !== 'Invalid Address'
+              ? ([{ label: 'User', href: `/user/${address}` }] as const)
+              : []),
             { label: 'NFT transfers' },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
@@ -180,7 +184,7 @@ const CosmicSignatureTransfersPage = ({ address: rawAddress }: { address: string
           </div>
         )}
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

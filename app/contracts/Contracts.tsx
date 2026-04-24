@@ -10,7 +10,7 @@ import {
 } from '@/contracts/abis';
 
 import { networkConfig, CHARITY_WALLET_ADDRESS, COSMICGAME_ADDRESS } from '@/config/networks';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
@@ -199,7 +199,7 @@ const Contracts = () => {
   const contracts = buildContracts(data?.ContractAddrs);
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Contract Addresses"
         subtitle="On-chain addresses and configuration for the Cosmic Signature protocol"
@@ -217,7 +217,7 @@ const Contracts = () => {
           <FundDistribution
             prizePercentage={data?.PrizePercentage}
             chronoWarriorPercentage={data?.ChronoWarriorPercentage}
-            rafflePercentage={data?.RafflePercentage}
+            stellarSelectionPercentage={data?.RafflePercentage}
             stakingPercentage={data?.StakingPercentage}
             charityPercentage={data?.CharityPercentage}
             loading={loading}
@@ -280,7 +280,7 @@ const Contracts = () => {
           />
         </motion.section>
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

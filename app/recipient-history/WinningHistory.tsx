@@ -1,8 +1,8 @@
 'use client';
 
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
-import WinningHistoryTable from '@/components/tables/WinningHistoryTable';
+import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
 import { useClaimHistoryByUser } from '@/hooks/useApiQuery';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
@@ -17,7 +17,7 @@ function WinningHistory() {
 
   if (!account) {
     return (
-      <MainWrapper>
+      <PageShell variant="data" backdrop="signature">
         <PageHeader
           title="My Allocation History"
           subtitle="View your past allocation retrievals and distributions"
@@ -31,12 +31,12 @@ function WinningHistory() {
           title="Wallet not connected"
           description="Please connect your wallet to see your allocation history."
         />
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="History of My Allocations"
         subtitle="View your past allocation retrievals and distributions"
@@ -59,13 +59,13 @@ function WinningHistory() {
           description="You currently have no recorded allocations."
         />
       ) : (
-        <WinningHistoryTable
+        <RecipientHistoryTable
           winningHistory={winningHistory}
           showClaimedStatus={true}
           showWinnerAddr={false}
         />
       )}
-    </MainWrapper>
+    </PageShell>
   );
 }
 

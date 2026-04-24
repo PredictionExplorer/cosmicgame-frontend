@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { cn } from '@/lib/utils';
 
 const perUserLinks = [
@@ -61,7 +61,7 @@ function SitemapLinkList({
 
 const SiteMapPage = () => {
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Site Map"
         subtitle="Quick links to account pages and public protocol data."
@@ -102,7 +102,7 @@ const SiteMapPage = () => {
           <SitemapLinkList links={systemLinks} navLabel="System and help pages" />
         </section>
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

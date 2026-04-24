@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { useSystemEvents } from '@/hooks/useApiQuery';
 import { AdminEventsTable } from '@/components/tables/AdminEventsTable';
 import { reportError } from '@/utils/errors';
@@ -32,7 +32,7 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
       : 'System Configuration Made Before Deployment';
 
   return (
-    <MainWrapper className="max-sm:pb-16">
+    <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-6xl">
         <PageHeader
           title={title}
@@ -62,7 +62,7 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
           </div>
         )}
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useCSTTokensByUser } from '@/hooks/useApiQuery';
 import { CSTTable } from '@/components/tokens/CSTTable';
@@ -16,7 +16,7 @@ function MyWallet() {
   const error = hasError ? 'Failed to load CST tokens.' : null;
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="My Cosmic Signature Tokens"
         subtitle="ERC721 tokens in your connected wallet"
@@ -39,7 +39,7 @@ function MyWallet() {
           <CSTTable list={tokens} />
         </div>
       )}
-    </MainWrapper>
+    </PageShell>
   );
 }
 

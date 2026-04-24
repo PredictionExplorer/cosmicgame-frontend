@@ -1,7 +1,7 @@
 'use client';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import CharityWithdrawalTable, {
   type CharityWithdrawal,
 } from '@/components/tables/CharityWithdrawalTable';
@@ -11,7 +11,7 @@ const CharityWithdrawals = () => {
   const { data: charityWithdrawals = [], isLoading: loading } = useCharityWithdrawals();
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Public Goods Retrievals"
         subtitle="Funds retrieved from the Public Goods Vault"
@@ -26,7 +26,7 @@ const CharityWithdrawals = () => {
       ) : (
         <CharityWithdrawalTable list={charityWithdrawals as CharityWithdrawal[]} />
       )}
-    </MainWrapper>
+    </PageShell>
   );
 };
 

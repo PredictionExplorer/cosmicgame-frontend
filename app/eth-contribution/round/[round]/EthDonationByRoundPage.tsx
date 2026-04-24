@@ -2,7 +2,7 @@
 
 import { detailPanelClass } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import EthDonationTable, { type EthDonation } from '@/components/tables/EthDonationTable';
 import { useDonationsBothByRound } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
@@ -16,18 +16,18 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
 
   if (round < 0) {
     return (
-      <MainWrapper>
+      <PageShell variant="data" backdrop="signature">
         <div className={cn(detailPanelClass, 'mx-auto max-w-lg p-8 text-center')}>
           <p className="font-display text-lg font-semibold text-foreground">Invalid Cycle Number</p>
         </div>
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   const title = `Direct (ETH) Contributions for Cycle ${round}`;
 
   return (
-    <MainWrapper className="max-sm:pb-16">
+    <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
           title={title}
@@ -51,7 +51,7 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
           </div>
         )}
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

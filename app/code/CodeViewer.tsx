@@ -6,7 +6,8 @@ import { createTheme } from '@uiw/codemirror-themes';
 const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false });
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { CodeWrapper, MainWrapper, StyledLink } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
+import { CodeWrapper, StyledLink } from '@/components/styled';
 
 import { COSMIC_SIGNATURE_CODE } from './cosmicSignatureCode';
 
@@ -20,7 +21,7 @@ const myTheme = createTheme({
 });
 
 const CodeViewer = () => (
-  <MainWrapper>
+  <PageShell variant="data" backdrop="signature">
     <PageHeader
       title="Code Viewer"
       subtitle="View the generation code that converts seeds into images"
@@ -54,7 +55,7 @@ const CodeViewer = () => (
         </CodeWrapper>
       </div>
     </div>
-  </MainWrapper>
+  </PageShell>
 );
 
 export default CodeViewer;

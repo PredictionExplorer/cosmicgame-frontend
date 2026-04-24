@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { Spinner } from '@/components/ui/spinner';
 import { useMarketingRewards } from '@/hooks/useApiQuery';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
@@ -33,7 +33,7 @@ const MarketingRewards = () => {
 
   if (loading) {
     return (
-      <MainWrapper>
+      <PageShell variant="data" backdrop="signature">
         <div
           className="flex justify-center py-32"
           role="status"
@@ -41,13 +41,13 @@ const MarketingRewards = () => {
         >
           <Spinner />
         </div>
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   return (
     <TooltipProvider delayDuration={200}>
-      <MainWrapper>
+      <PageShell variant="data" backdrop="signature">
         <MarketingHero />
         <MarketingStats
           totalRewardsEth={totalRewardsEth}
@@ -58,7 +58,7 @@ const MarketingRewards = () => {
         <TopMarketersLeaderboard rewards={rewards} />
         <RewardsHistorySection rewards={rewards} />
         <MarketingCTA />
-      </MainWrapper>
+      </PageShell>
     </TooltipProvider>
   );
 };

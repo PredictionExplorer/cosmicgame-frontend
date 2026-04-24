@@ -14,7 +14,7 @@ import {
   detailPanelClass,
 } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { useDonationsWithInfoById } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
 
@@ -62,19 +62,19 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
 
   if (id < 0) {
     return (
-      <MainWrapper>
+      <PageShell variant="data" backdrop="signature">
         <div className={cn(detailPanelClass, 'mx-auto max-w-lg p-8 text-center')}>
           <p className="font-display text-lg font-semibold text-foreground">
             Invalid Contribution Id
           </p>
         </div>
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   if (loading) {
     return (
-      <MainWrapper className="max-sm:pb-16">
+      <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
         <div className="mx-auto max-w-3xl">
           <PageHeader
             title="Direct ETH Contribution Detail"
@@ -91,13 +91,13 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
             <p className="text-sm font-medium text-muted-foreground">Loading...</p>
           </div>
         </div>
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   if (!donationInfo) {
     return (
-      <MainWrapper className="max-sm:pb-16">
+      <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
         <div className="mx-auto max-w-3xl">
           <PageHeader
             title="Direct ETH Contribution Detail"
@@ -113,12 +113,12 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
             <p className="font-medium text-foreground">Contribution not found.</p>
           </div>
         </div>
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   return (
-    <MainWrapper className="max-sm:pb-16">
+    <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-3xl">
         <PageHeader
           title="Direct ETH Contribution Detail"
@@ -235,7 +235,7 @@ const EthDonationDetailPage = ({ id }: EthDonationDetailPageProps) => {
           </SectionCard>
         ) : null}
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

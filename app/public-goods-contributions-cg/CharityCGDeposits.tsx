@@ -1,7 +1,7 @@
 'use client';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import {
   CharityDepositTable,
   type PublicGoodsContributionEntry,
@@ -12,7 +12,7 @@ const CharityCGDeposits = () => {
   const { data: charityCGDeposits = [], isLoading: loading } = useCharityCGDeposits();
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Protocol Public-Goods Contributions"
         subtitle="Automatic forwards from the Cosmic Signature protocol to the Public Goods Vault"
@@ -27,7 +27,7 @@ const CharityCGDeposits = () => {
       ) : (
         <CharityDepositTable list={charityCGDeposits as PublicGoodsContributionEntry[]} />
       )}
-    </MainWrapper>
+    </PageShell>
   );
 };
 

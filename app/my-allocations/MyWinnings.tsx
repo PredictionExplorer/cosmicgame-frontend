@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Wallet, Trophy, Gift, Coins } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { MainWrapper } from '@/components/styled';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/ui/page-shell';
+import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
@@ -16,14 +17,17 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { useApiData } from '@/contexts/ApiDataContext';
 import {
   useUnclaimedDonatedNFTByUser,
-  useUnclaimedRaffleDepositsByUser,
+  useUnretrievedStellarSelectionDepositsByUser,
   useDonationsERC20ByUser,
 } from '@/hooks/useApiQuery';
-import { useClaimWinnings } from '@/hooks/useClaimWinnings';
-import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
-import { UncollectedCSTStakingRewardsTable } from '@/components/staking/UncollectedCSTStakingRewardsTable';
-import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
-import { RaffleWinningsTable, type RaffleWinning } from '@/components/winnings/RaffleWinningsTable';
+import { useClaimAllocations } from '@/hooks/useClaimAllocations';
+import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
+import { UnretrievedCSTAnchorDistributionsTable } from '@/components/anchoring/UnretrievedCSTAnchorDistributionsTable';
+import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
+import {
+  StellarSelectionAllocationsTable,
+  type StellarSelectionAllocation,
+} from '@/components/winnings/StellarSelectionAllocationsTable';
 
 interface UnclaimedDonatedNFT {
   Index: number;
@@ -51,11 +55,11 @@ export default function MyWinnings() {
     refetch: refetchNFTs,
   } = useUnclaimedDonatedNFTByUser(account);
   const {
-    data: raffleRaw,
+    data: stellarSelectionRaw,
     isLoading: loadingRaffle,
     isError: raffleError,
     refetch: refetchRaffle,
-  } = useUnclaimedRaffleDepositsByUser(account);
+  } = useUnretrievedStellarSelectionDepositsByUser(account);
   const {
     data: erc20Raw,
     isLoading: erc20Loading,
@@ -71,12 +75,12 @@ export default function MyWinnings() {
   const {
     isClaiming,
     claimingDonatedNFTs,
-    claimAllRaffleETH,
+    retrieveAllStellarSelectionETH,
     claimDonatedNFT,
     claimAllDonatedNFTs,
     claimDonatedERC20,
     claimAllDonatedERC20,
-  } = useClaimWinnings(refetch);
+  } = useClaimAllocations(refetch);
 
   const donatedNFTs = useMemo(
     () =>
@@ -85,15 +89,17 @@ export default function MyWinnings() {
         : null,
     [nftsRaw],
   );
-  const raffleETHWinnings = useMemo(
+  const stellarSelectionETHAllocations = useMemo(
     () =>
-      raffleRaw
-        ? (raffleRaw as RaffleWinning[]).slice().sort((a, b) => b.TimeStamp - a.TimeStamp)
+      stellarSelectionRaw
+        ? (stellarSelectionRaw as StellarSelectionAllocation[])
+            .slice()
+            .sort((a, b) => b.TimeStamp - a.TimeStamp)
         : null,
-    [raffleRaw],
+    [stellarSelectionRaw],
   );
   const donatedERC20Data = (erc20Raw ??
-    []) as import('@/components/donations/DonatedERC20Table').DonatedERC20Token[];
+    []) as import('@/components/attachments/AttachedERC20Table').DonatedERC20Token[];
 
   const loading = loadingNFTs || loadingRaffle;
   const error = nftError || raffleError ? 'Failed to load pending allocations data' : null;
@@ -102,8 +108,10 @@ export default function MyWinnings() {
   const perPage = 5;
 
   const handleAllETHClaim = () => {
-    const roundNums = (raffleETHWinnings || []).filter((w) => !w.Claimed).map((w) => w.RoundNum);
-    claimAllRaffleETH(roundNums);
+    const roundNums = (stellarSelectionETHAllocations || [])
+      .filter((w) => !w.Claimed)
+      .map((w) => w.RoundNum);
+    retrieveAllStellarSelectionETH(roundNums);
   };
 
   const handleAllDonatedNFTsClaim = () => {
@@ -120,30 +128,42 @@ export default function MyWinnings() {
 
   if (!account) {
     return (
-      <MainWrapper>
-        <PageHeader title="My Allocations" />
+      <PageShell variant="data" backdrop="signature">
+        <PageHeader
+          align="left"
+          eyebrow={<SectionEyebrow tone="solar">Personal · Allocations</SectionEyebrow>}
+          title="My Allocations"
+          gradientTitle="signature"
+        />
         <EmptyState
           icon={<Wallet className="h-8 w-8 text-muted-foreground/50" />}
           title="Wallet not connected"
           description="Connect your wallet to view and retrieve your allocations."
         />
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   if (error) {
     return (
-      <MainWrapper>
+      <PageShell variant="data">
         <PageHeader title="My Allocations" />
         <ErrorState title="Failed to load" message={error} onRetry={refetch} />
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
+        align="left"
+        eyebrow={
+          <SectionEyebrow tone="solar" pulse>
+            Personal · Allocations
+          </SectionEyebrow>
+        }
         title="My Allocations"
+        gradientTitle="signature"
         subtitle="View and retrieve all your pending allocations"
       />
 
@@ -151,11 +171,11 @@ export default function MyWinnings() {
         {/* ETH Allocations */}
         <section>
           <SectionDivider title="Retrievable ETH Allocations" className="mb-6" />
-          {loading && raffleETHWinnings === null ? (
+          {loading && stellarSelectionETHAllocations === null ? (
             <div className="flex justify-center py-8">
               <Spinner />
             </div>
-          ) : !raffleETHWinnings || raffleETHWinnings.length === 0 ? (
+          ) : !stellarSelectionETHAllocations || stellarSelectionETHAllocations.length === 0 ? (
             <EmptyState
               icon={<Trophy className="h-8 w-8 text-muted-foreground/50" />}
               title="No ETH allocations yet"
@@ -163,8 +183,11 @@ export default function MyWinnings() {
             />
           ) : (
             <>
-              <RaffleWinningsTable
-                list={raffleETHWinnings.slice((currentPage - 1) * perPage, currentPage * perPage)}
+              <StellarSelectionAllocationsTable
+                list={stellarSelectionETHAllocations.slice(
+                  (currentPage - 1) * perPage,
+                  currentPage * perPage,
+                )}
               />
               {status?.ETHRaffleToClaim > 0 && (
                 <div className="flex justify-end items-center mt-4 gap-4">
@@ -188,7 +211,7 @@ export default function MyWinnings() {
               <CustomPagination
                 page={currentPage}
                 setPage={setCurrentPage}
-                totalLength={raffleETHWinnings.length}
+                totalLength={stellarSelectionETHAllocations.length}
                 perPage={perPage}
               />
             </>
@@ -198,7 +221,7 @@ export default function MyWinnings() {
         {/* CST Anchoring */}
         <section>
           <SectionDivider title="CST Anchor Distributions" className="mb-6" />
-          <UncollectedCSTStakingRewardsTable user={account} />
+          <UnretrievedCSTAnchorDistributionsTable user={account} />
         </section>
 
         {/* Attached NFTs */}
@@ -233,7 +256,7 @@ export default function MyWinnings() {
               description="NFTs attached to gestures during cycles will appear here."
             />
           ) : (
-            <DonatedNFTTable
+            <AttachedNFTTable
               list={donatedNFTs}
               handleClaim={claimDonatedNFT}
               claimingTokens={claimingDonatedNFTs}
@@ -262,7 +285,7 @@ export default function MyWinnings() {
               description="ERC-20 tokens attached to gestures during cycles will appear here."
             />
           ) : (
-            <DonatedERC20Table list={donatedERC20Data} handleClaim={claimDonatedERC20} />
+            <AttachedERC20Table list={donatedERC20Data} handleClaim={claimDonatedERC20} />
           )}
         </section>
 
@@ -272,6 +295,6 @@ export default function MyWinnings() {
           </Button>
         </div>
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 }

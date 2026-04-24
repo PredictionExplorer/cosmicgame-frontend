@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { parseEther } from 'viem';
 
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { Spinner } from '@/components/ui/spinner';
@@ -94,7 +94,7 @@ const EthDonations = () => {
   };
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="ETH Contributions"
         subtitle="Contribute ETH directly to the Cosmic Signature Public Goods Vault"
@@ -159,7 +159,7 @@ const EthDonations = () => {
       ) : (
         <EthDonationTable list={charityDonations} />
       )}
-    </MainWrapper>
+    </PageShell>
   );
 };
 

@@ -14,10 +14,10 @@ import {
   detailPanelClass,
 } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/ui/page-shell';
 import { Button } from '@/components/ui/button';
-import { useStakingRewardsByUserByTokenDetails } from '@/hooks/useApiQuery';
+import { useAnchorDistributionsByUserByTokenDetails } from '@/hooks/useApiQuery';
 import {
-  MainWrapper,
   TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
@@ -29,13 +29,13 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { cn } from '@/lib/utils';
 
-interface StakeInfo {
+interface AnchorInfo {
   TxHash: string;
   TimeStamp: number;
   NumStakedNFTs: number;
 }
 
-interface UnstakeInfo {
+interface ReleaseInfo {
   EvtLogId: number;
   TxHash: string;
   TimeStamp: number;
@@ -51,8 +51,8 @@ interface RewardsRowData {
   DepositIndex: number;
   Claimed: boolean;
   RewardEth: number;
-  Stake: StakeInfo;
-  Unstake: UnstakeInfo;
+  Stake: AnchorInfo;
+  Unstake: ReleaseInfo;
 }
 
 function RewardsDetailRow({ row }: { row: RewardsRowData }) {
@@ -202,7 +202,7 @@ function SectionCardTableShell({ children }: { children: React.ReactNode }) {
 }
 
 function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: number }) {
-  const { data: rawResponse, isLoading: loading } = useStakingRewardsByUserByTokenDetails(
+  const { data: rawResponse, isLoading: loading } = useAnchorDistributionsByUserByTokenDetails(
     address,
     tokenId,
   );
@@ -216,7 +216,7 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
   const pageTitle = `Anchor Distribution Details for Token ${tokenId}`;
 
   return (
-    <MainWrapper className="max-sm:pb-16">
+    <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
           title={pageTitle}
@@ -238,7 +238,7 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
           <RewardsDetailTable list={rewardsData} />
         )}
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 }
 

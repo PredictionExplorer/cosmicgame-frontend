@@ -28,7 +28,7 @@ import {
   shortenHex,
 } from '@/utils';
 
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { StatCard } from '@/components/ui/stat-card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Spinner } from '@/components/ui/spinner';
@@ -36,20 +36,20 @@ import { ErrorState } from '@/components/ui/error-state';
 import { Button } from '@/components/ui/button';
 import { RoundInfoSection } from '@/components/home/RoundInfoSection';
 import Counter from '@/components/common/Counter';
-import { SpecialPrizeWinners } from '@/components/tables/SpecialPrizeWinners';
-import type { DonatedNFT as DonatedNFTType } from '@/services/api/types';
+import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
+import type { AttachedNFT as DonatedNFTType } from '@/services/api/types';
 import {
   useDashboardInfo,
-  useBidListByRound,
+  useGestureListByCycle,
   useDonationsNFTByRound,
   useDonationsCGWithInfoByRound,
   useDonationsERC20ByRound,
-  usePrizeTime,
+  useAllocationTime,
   useCurrentTime,
 } from '@/hooks/useApiQuery';
 
 type EthDonation = import('@/components/tables/EthDonationTable').EthDonation;
-type DonatedERC20 = import('@/components/donations/DonatedERC20Table').DonatedERC20Token;
+type DonatedERC20 = import('@/components/attachments/AttachedERC20Table').DonatedERC20Token;
 
 const sectionFade = {
   hidden: { opacity: 0, y: 16 },
@@ -62,24 +62,24 @@ const sectionFade = {
 
 const CurrentRoundPage = () => {
   const { data: dashboardData, isLoading, isError } = useDashboardInfo();
-  const { data: prizeTimeRaw } = usePrizeTime();
+  const { data: prizeTimeRaw } = useAllocationTime();
   const { data: currentTimeRaw } = useCurrentTime();
   const round = dashboardData?.CurRoundNum ?? -1;
 
-  const { data: bidListData } = useBidListByRound(round, 'desc');
+  const { data: bidListData } = useGestureListByCycle(round, 'desc');
   const { data: nftDonationsData } = useDonationsNFTByRound(round);
   const { data: ethDonationsRawData } = useDonationsCGWithInfoByRound(round);
   const { data: erc20DonationsData } = useDonationsERC20ByRound(round);
 
   const data = dashboardData ?? null;
-  const curBidList = useMemo(() => bidListData ?? [], [bidListData]);
+  const curGestureList = useMemo(() => bidListData ?? [], [bidListData]);
   const donatedNFTs = (nftDonationsData ?? []) as DonatedNFTType[];
   const ethDonations = (ethDonationsRawData ?? []) as EthDonation[];
   const donatedERC20Tokens = (erc20DonationsData ?? []) as DonatedERC20[];
 
   const [mountTime] = useState(() => Date.now());
 
-  const prizeTime = useMemo(() => {
+  const allocationTime = useMemo(() => {
     if (prizeTimeRaw == null || currentTimeRaw == null) return 0;
     const diff = currentTimeRaw * 1000 - mountTime;
     return prizeTimeRaw * 1000 - diff;
@@ -100,13 +100,13 @@ const CurrentRoundPage = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (curBidList.length) {
-        const lastBidTime = curBidList[0]!.TimeStamp;
-        setLastBidderElapsed(calculateTimeDiff(lastBidTime - offset / 1000));
+      if (curGestureList.length) {
+        const lastGestureTime = curGestureList[0]!.TimeStamp;
+        setLastBidderElapsed(calculateTimeDiff(lastGestureTime - offset / 1000));
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [curBidList, offset]);
+  }, [curGestureList, offset]);
 
   const [curPage, setCurPage] = useState(1);
   const [donatedTokensTab, setDonatedTokensTab] = useState(0);
@@ -114,23 +114,23 @@ const CurrentRoundPage = () => {
 
   if (isLoading) {
     return (
-      <MainWrapper>
+      <PageShell variant="data" backdrop="signature">
         <div className="flex items-center justify-center py-32">
           <Spinner size="lg" />
         </div>
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   if (isError || !data) {
     return (
-      <MainWrapper>
+      <PageShell variant="data" backdrop="signature">
         <ErrorState
           title="Failed to load cycle data"
           message="Please refresh the page to try again."
           onRetry={() => window.location.reload()}
         />
-      </MainWrapper>
+      </PageShell>
     );
   }
 
@@ -139,15 +139,16 @@ const CurrentRoundPage = () => {
     : 'Not started';
 
   const hasStarted = data.TsRoundStart !== 0;
-  const hasLastBidder = data.LastBidderAddr !== zeroAddress;
-  const isCountdownActive = hasLastBidder && prizeTime > mountTime;
-  const isBidsExhausted = hasLastBidder && prizeTime > 0 && prizeTime <= mountTime;
+  const hasLastParticipant = data.LastBidderAddr !== zeroAddress;
+  const isCountdownActive = hasLastParticipant && allocationTime > mountTime;
+  const isGesturesExhausted =
+    hasLastParticipant && allocationTime > 0 && allocationTime <= mountTime;
 
   const charityAmount =
     (Number(data.CosmicGameBalanceEth) || 0) * ((data.CharityPercentage ?? 0) / 100);
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       {/* Back navigation */}
       <Link
         href="/"
@@ -196,11 +197,11 @@ const CurrentRoundPage = () => {
                 className="ml-1.5"
               />
             </p>
-            <Countdown date={prizeTime} renderer={Counter} />
+            <Countdown date={allocationTime} renderer={Counter} />
           </div>
         )}
 
-        {hasStarted && isBidsExhausted && (
+        {hasStarted && isGesturesExhausted && (
           <div className="text-center rounded-xl bg-primary/[0.06] p-5 animate-pulse-glow">
             <Zap className="mx-auto h-7 w-7 text-primary mb-2" />
             <p className="font-display text-lg font-bold text-primary">Cycle Closed</p>
@@ -209,7 +210,7 @@ const CurrentRoundPage = () => {
         )}
 
         {/* Last participant card */}
-        {hasLastBidder && (
+        {hasLastParticipant && (
           <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/10">
@@ -235,19 +236,19 @@ const CurrentRoundPage = () => {
                 </span>
               )}
             </div>
-            {!!(curBidList.length && curBidList[0]?.Message !== '') && (
+            {!!(curGestureList.length && curGestureList[0]?.Message !== '') && (
               <div className="mt-3 flex items-start gap-2 rounded-lg bg-white/[0.03] p-3">
                 <MessageSquare className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/50 shrink-0" />
                 <p className="break-words text-sm text-amber-300/90">
-                  &ldquo;{curBidList[0]?.Message}&rdquo;
+                  &ldquo;{curGestureList[0]?.Message}&rdquo;
                 </p>
               </div>
             )}
           </div>
         )}
 
-        {/* Special Prize Leaders */}
-        {hasLastBidder && <SpecialPrizeWinners />}
+        {/* Special Allocation Leaders */}
+        {hasLastParticipant && <SpecialAllocationRecipients />}
 
         {/* CTA Button */}
         <div className="flex justify-center">
@@ -314,7 +315,7 @@ const CurrentRoundPage = () => {
       <motion.div custom={2} variants={sectionFade} initial="hidden" animate="visible">
         <RoundInfoSection
           data={data}
-          curBidList={curBidList}
+          curGestureList={curGestureList}
           championList={championList}
           ethDonations={ethDonations}
           donatedNFTs={donatedNFTs}
@@ -326,7 +327,7 @@ const CurrentRoundPage = () => {
           perPage={perPage}
         />
       </motion.div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import {
   CharityDepositTable,
   type PublicGoodsContributionEntry,
@@ -12,7 +12,7 @@ const CharityDepositsVoluntary = () => {
   const { data: voluntaryDeposits = [], isLoading: loading } = useCharityVoluntary();
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Voluntary Public-Goods Contributions"
         subtitle="Community members' voluntary contributions to the Public Goods Vault"
@@ -27,7 +27,7 @@ const CharityDepositsVoluntary = () => {
       ) : (
         <CharityDepositTable list={voluntaryDeposits as PublicGoodsContributionEntry[]} />
       )}
-    </MainWrapper>
+    </PageShell>
   );
 };
 
