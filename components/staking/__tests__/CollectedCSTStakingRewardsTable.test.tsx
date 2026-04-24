@@ -20,12 +20,12 @@ const createRow = (overrides = {}) => ({
 describe('CollectedCSTStakingRewardsTable', () => {
   it('renders empty state message', () => {
     render(<CollectedCSTStakingRewardsTable list={[]} />);
-    expect(screen.getByText('No rewards yet.')).toBeInTheDocument();
+    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
   });
 
   it('renders empty state for null list', () => {
     render(<CollectedCSTStakingRewardsTable list={null as unknown as never[]} />);
-    expect(screen.getByText('No rewards yet.')).toBeInTheDocument();
+    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {

@@ -60,7 +60,7 @@ export const RwalkStakingRewardMintsTable = ({ list }: { list: StakingRewardMint
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No rewards yet.</p>;
+    return <p className="text-muted-foreground">No allocations yet.</p>;
   }
 
   const startIndex = (page - 1) * perPage;

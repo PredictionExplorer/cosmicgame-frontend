@@ -25,22 +25,22 @@ const createRow = (overrides = {}) => ({
 describe('CSTStakingRewardsByDepositTable', () => {
   it('renders empty state message', () => {
     render(<CSTStakingRewardsByDepositTable list={[]} />);
-    expect(screen.getByText('No rewards yet.')).toBeInTheDocument();
+    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<CSTStakingRewardsByDepositTable list={[createRow()]} />);
     for (const header of [
       'Deposit Datetime',
-      'Deposit Round',
+      'Deposit Cycle',
       'Deposit ID',
       'Total Deposit Amount',
-      'Total Claimed Amount',
-      'Your Claimable Amount',
-      'Fully Claimed?',
-      'Total Staked NFTs',
-      'Total Collected Tokens',
-      'Your Staked Tokens',
+      'Total Retrieved Amount',
+      'Your Retrievable Amount',
+      'Fully Retrieved?',
+      'Total Anchored NFTs',
+      'Total Retrieved Tokens',
+      'Your Anchored Tokens',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }

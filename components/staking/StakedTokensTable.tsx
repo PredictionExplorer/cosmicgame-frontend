@@ -356,9 +356,9 @@ export const StakedTokensTable = ({
 
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Stake Action ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Stake Datetime</TablePrimaryHeadCell>
-              {!IsRwalk && <TablePrimaryHeadCell>Accumulated Rewards</TablePrimaryHeadCell>}
+              <TablePrimaryHeadCell>Anchor Action ID</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Anchor Datetime</TablePrimaryHeadCell>
+              {!IsRwalk && <TablePrimaryHeadCell>Accumulated Distributions</TablePrimaryHeadCell>}
               <TablePrimaryHeadCell>
                 <span className="sr-only">Actions</span>
               </TablePrimaryHeadCell>

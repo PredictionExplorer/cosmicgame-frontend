@@ -78,7 +78,7 @@ describe('StakedTokensTable', () => {
         />,
       );
     });
-    for (const header of ['Token Image', 'Token ID', 'Stake Action ID', 'Stake Datetime']) {
+    for (const header of ['Token Image', 'Token ID', 'Anchor Action ID', 'Anchor Datetime']) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });
@@ -94,10 +94,10 @@ describe('StakedTokensTable', () => {
         />,
       );
     });
-    expect(screen.getAllByText('Accumulated Rewards').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Accumulated Distributions').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('does not show Accumulated Rewards header for RWLK', async () => {
+  it('does not show Accumulated Distributions header for RWLK', async () => {
     await act(async () => {
       render(
         <StakedTokensTable
@@ -108,7 +108,7 @@ describe('StakedTokensTable', () => {
         />,
       );
     });
-    expect(screen.queryByText('Accumulated Rewards')).not.toBeInTheDocument();
+    expect(screen.queryByText('Accumulated Distributions')).not.toBeInTheDocument();
   });
 
   it('renders RWLK row data', async () => {

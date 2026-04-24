@@ -79,7 +79,7 @@ const StakingActionsTable = ({ list, IsRwalk }: { list: StakingAction[]; IsRwalk
 
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Stake Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Action Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>

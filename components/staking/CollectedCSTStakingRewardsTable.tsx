@@ -52,7 +52,7 @@ export const CollectedCSTStakingRewardsTable = ({ list }: { list: StakingCSTRewa
   const PER_PAGE = 5;
 
   if (!list || list.length === 0) {
-    return <p className="text-muted-foreground">No rewards yet.</p>;
+    return <p className="text-muted-foreground">No distributions yet.</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;

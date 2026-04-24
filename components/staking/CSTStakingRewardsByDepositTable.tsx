@@ -76,7 +76,7 @@ export const CSTStakingRewardsByDepositTable = ({
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No rewards yet.</p>;
+    return <p className="text-muted-foreground">No distributions yet.</p>;
   }
 
   const startIndex = (page - 1) * perPage;
@@ -90,15 +90,15 @@ export const CSTStakingRewardsByDepositTable = ({
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Deposit Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Deposit Cycle</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Deposit Amount</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Claimed Amount</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Your Claimable Amount</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Fully Claimed?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Staked NFTs</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Collected Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Your Staked Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Retrieved Amount</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Your Retrievable Amount</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Fully Retrieved?</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Anchored NFTs</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Retrieved Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Your Anchored Tokens</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

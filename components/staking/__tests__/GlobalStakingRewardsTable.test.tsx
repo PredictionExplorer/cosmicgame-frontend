@@ -26,18 +26,18 @@ const createRow = (overrides = {}) => ({
 describe('GlobalStakingRewardsTable', () => {
   it('renders empty state message', () => {
     render(<GlobalStakingRewardsTable list={[]} />);
-    expect(screen.getByText('No rewards yet.')).toBeInTheDocument();
+    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<GlobalStakingRewardsTable list={[createRow()]} />);
     for (const header of [
       'Deposit Datetime',
-      'Round',
-      'Total Staked Tokens',
+      'Cycle',
+      'Total Anchored Tokens',
       'Total Deposited (ETH)',
-      'Fully Claimed?',
-      'Pending to Collect (ETH)',
+      'Fully Retrieved?',
+      'Pending to Retrieve (ETH)',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }

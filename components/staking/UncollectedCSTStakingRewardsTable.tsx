@@ -125,7 +125,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
       if (res) {
         setNotification({
           visible: true,
-          text: 'The selected tokens were unstaked successfully!',
+          text: 'The selected anchors were released successfully!',
           type: 'success',
         });
       }
@@ -139,7 +139,11 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
       }, 4000);
     } catch (err: unknown) {
       if (isUserRejection(err)) {
-        setNotification({ visible: true, type: 'info', text: WALLET_TRANSACTION_CANCELLED_MESSAGE });
+        setNotification({
+          visible: true,
+          type: 'info',
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+        });
       } else {
         reportError(err, 'unstaking CST');
         const msg = getEthErrorMessage(err);
@@ -166,7 +170,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
   }
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No rewards yet.</p>;
+    return <p className="text-muted-foreground">No distributions yet.</p>;
   }
 
   const currentPageData = list.slice(startIndex, endIndex);
@@ -189,11 +193,11 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
             <Tr>
               <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Staked Tokens (You / Total)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Unclaimed Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Anchored Tokens (You / Total)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Unretrieved Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Deposit Amount (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Reward Amount (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Uncollected Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Distribution Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Unretrieved Amount (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 
@@ -208,7 +212,8 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
       {isOwnAccount && (status?.UnclaimedStakingReward ?? 0) > 0 && (
         <div className="flex justify-end items-center mt-4">
           <p className="mr-4">
-            Your claimable rewards are {`${(status?.UnclaimedStakingReward ?? 0).toFixed(6)} ETH`}
+            Your retrievable distributions are{' '}
+            {`${(status?.UnclaimedStakingReward ?? 0).toFixed(6)} ETH`}
           </p>
           <Button onClick={handleOpen} disabled={isUnstaking}>
             {isUnstaking ? (
@@ -217,7 +222,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
                 Processing...
               </span>
             ) : (
-              'Unstake & Claim All'
+              'Release & Retrieve All'
             )}
           </Button>
         </div>
@@ -233,17 +238,17 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Unstake Tokens &amp; Claim Rewards</DialogTitle>
+            <DialogTitle>Release Tokens &amp; Retrieve Distributions</DialogTitle>
             <DialogDescription>
-              This will <strong>unstake all your CST tokens</strong> and pay out{' '}
+              This will <strong>release all your anchored CST tokens</strong> and forward{' '}
               <strong>{(status?.UnclaimedStakingReward ?? 0).toFixed(6)} ETH</strong> in accumulated
-              rewards to your wallet.
+              distributions to your wallet.
             </DialogDescription>
           </DialogHeader>
           <Alert variant="warning">
             <AlertDescription>
-              <strong>Permanent action:</strong> Once unstaked, these tokens cannot be staked again.
-              Only proceed if you want to exit staking entirely.
+              <strong>Permanent action:</strong> Once released, these tokens cannot be anchored
+              again. Only proceed if you want to exit anchoring entirely.
             </AlertDescription>
           </Alert>
           <DialogFooter className="gap-2">
@@ -257,7 +262,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
                   Processing...
                 </span>
               ) : (
-                'Unstake & Claim'
+                'Release & Retrieve'
               )}
             </Button>
           </DialogFooter>

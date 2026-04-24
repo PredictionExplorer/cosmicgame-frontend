@@ -38,7 +38,7 @@ describe('StakingActionsTable', () => {
 
   it('renders table headers', () => {
     render(<StakingActionsTable list={[createRow()]} IsRwalk={false} />);
-    for (const header of ['Stake Datetime', 'Action Type', 'Token ID', 'Number of NFTs']) {
+    for (const header of ['Action Datetime', 'Action Type', 'Token ID', 'Number of NFTs']) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });

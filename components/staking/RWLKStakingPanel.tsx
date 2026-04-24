@@ -5,7 +5,7 @@ import { RWLKNFTTable } from '@/components/tokens/RWLKNFTTable';
 import { RwalkStakingRewardMintsTable } from '@/components/staking/RwalkStakingRewardMintsTable';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
-/** Props for the RWLK staking panel. */
+/** Props for the RWLK anchoring panel. */
 export interface RWLKStakingPanelProps {
   account: string;
   stakingActions: StakingAction[];
@@ -27,7 +27,7 @@ function SectionHeader({ title, tooltip }: { title: string; tooltip: string }) {
   );
 }
 
-/** Displays RWLK staking reward mints, actions, available tokens, and staked tokens. */
+/** Displays RWLK anchor allocation imprints, actions, available tokens, and anchored tokens. */
 export function RWLKStakingPanel({
   account,
   stakingActions,
@@ -43,8 +43,8 @@ export function RWLKStakingPanel({
     <>
       <div>
         <SectionHeader
-          title="Staked Tokens"
-          tooltip="RandomWalk NFTs you currently have staked. Each staked token is eligible for random reward mints."
+          title="Anchored Tokens"
+          tooltip="RandomWalk NFTs you currently have anchored. Each anchored token is eligible for random anchor allocation imprints."
         />
         <StakedTokensTable
           list={stakedTokens}
@@ -60,8 +60,8 @@ export function RWLKStakingPanel({
 
       <div className="mt-12">
         <SectionHeader
-          title="Available for Staking"
-          tooltip="RandomWalk NFTs in your wallet that can be staked to participate in reward distributions."
+          title="Available for Anchoring"
+          tooltip="RandomWalk NFTs in your wallet that can be anchored to take part in Anchor Distributions."
         />
         <RWLKNFTTable
           list={userTokens}
@@ -77,16 +77,16 @@ export function RWLKStakingPanel({
 
       <div className="mt-12">
         <SectionHeader
-          title="Staking Reward Tokens"
-          tooltip="Tokens minted as rewards for your staked RandomWalk NFTs through the lottery mechanism."
+          title="Anchor Allocation Tokens"
+          tooltip="Tokens imprinted as allocations for your anchored RandomWalk NFTs through the on-chain random selection mechanism."
         />
         <RwalkStakingRewardMintsTable list={rwlkMints} />
       </div>
 
       <div className="mt-12">
         <SectionHeader
-          title="Stake / Unstake History"
-          tooltip="A chronological record of all your staking and unstaking transactions."
+          title="Anchor / Release History"
+          tooltip="A chronological record of all your anchor and release transactions."
         />
         <StakingActionsTable list={stakingActions} IsRwalk={true} />
       </div>

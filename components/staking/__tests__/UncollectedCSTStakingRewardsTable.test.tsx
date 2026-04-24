@@ -94,7 +94,7 @@ describe('UncollectedCSTStakingRewardsTable', () => {
   it('renders empty state when list is empty', async () => {
     mockApi.get_staking_cst_rewards_to_claim_by_user.mockResolvedValue([]);
     render(<UncollectedCSTStakingRewardsTable user="0xOtherUser" />);
-    expect(await screen.findByText('No rewards yet.')).toBeInTheDocument();
+    expect(await screen.findByText('No distributions yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', async () => {
@@ -103,11 +103,11 @@ describe('UncollectedCSTStakingRewardsTable', () => {
     for (const header of [
       'Deposit Datetime',
       'Deposit ID',
-      'Staked Tokens (You / Total)',
-      'Unclaimed Tokens',
+      'Anchored Tokens (You / Total)',
+      'Unretrieved Tokens',
       'Deposit Amount (ETH)',
-      'Reward Amount (ETH)',
-      'Uncollected Amount (ETH)',
+      'Distribution Amount (ETH)',
+      'Unretrieved Amount (ETH)',
     ]) {
       expect((await screen.findAllByText(header)).length).toBeGreaterThanOrEqual(1);
     }
@@ -148,7 +148,7 @@ describe('UncollectedCSTStakingRewardsTable', () => {
     mockApi.get_staking_cst_rewards_to_claim_by_user.mockResolvedValue([createRow()]);
     render(<UncollectedCSTStakingRewardsTable user="0xOtherUser" />);
     await screen.findByText('5');
-    expect(screen.queryByText('Unstake & Claim All')).not.toBeInTheDocument();
+    expect(screen.queryByText('Release & Retrieve All')).not.toBeInTheDocument();
   });
 
   it('calls API to fetch uncollected rewards on mount', async () => {
@@ -166,7 +166,7 @@ describe('UncollectedCSTStakingRewardsTable', () => {
       render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
     });
 
-    expect(screen.getByRole('button', { name: 'Unstake & Claim All' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Release & Retrieve All' })).toBeInTheDocument();
   });
 
   it('own account uses context rewards without API fetch', async () => {
@@ -199,11 +199,11 @@ describe('UncollectedCSTStakingRewardsTable', () => {
       render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
     });
 
-    await user.click(screen.getByRole('button', { name: 'Unstake & Claim All' }));
+    await user.click(screen.getByRole('button', { name: 'Release & Retrieve All' }));
 
-    expect(screen.getByText('Unstake Tokens & Claim Rewards')).toBeInTheDocument();
+    expect(screen.getByText('Release Tokens & Retrieve Distributions')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Unstake & Claim' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Release & Retrieve' })).toBeInTheDocument();
   });
 
   it('Cancel button closes dialog without unstaking', async () => {
@@ -215,7 +215,7 @@ describe('UncollectedCSTStakingRewardsTable', () => {
       render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
     });
 
-    await user.click(screen.getByRole('button', { name: 'Unstake & Claim All' }));
+    await user.click(screen.getByRole('button', { name: 'Release & Retrieve All' }));
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(mockUnstakeMany).not.toHaveBeenCalled();
@@ -234,13 +234,13 @@ describe('UncollectedCSTStakingRewardsTable', () => {
       render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
     });
 
-    await user.click(screen.getByRole('button', { name: 'Unstake & Claim All' }));
+    await user.click(screen.getByRole('button', { name: 'Release & Retrieve All' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Unstake & Claim' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Release & Retrieve' })).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole('button', { name: 'Unstake & Claim' }));
+    await user.click(screen.getByRole('button', { name: 'Release & Retrieve' }));
 
     await waitFor(() => {
       expect(mockUnstakeMany).toHaveBeenCalled();
@@ -255,7 +255,7 @@ describe('UncollectedCSTStakingRewardsTable', () => {
       render(<UncollectedCSTStakingRewardsTable user="0xOwner" />);
     });
 
-    expect(screen.queryByText('Unstake & Claim All')).not.toBeInTheDocument();
+    expect(screen.queryByText('Release & Retrieve All')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

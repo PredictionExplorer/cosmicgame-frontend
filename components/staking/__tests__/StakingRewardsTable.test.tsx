@@ -24,17 +24,21 @@ beforeEach(() => jest.clearAllMocks());
 describe('StakingRewardsTable', () => {
   it('renders empty state message', () => {
     render(<StakingRewardsTable list={[]} address={ADDRESS} />);
-    expect(screen.getByText('No rewards yet.')).toBeInTheDocument();
+    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
   });
 
   it('renders empty state for null list', () => {
     render(<StakingRewardsTable list={null as unknown as never[]} address={ADDRESS} />);
-    expect(screen.getByText('No rewards yet.')).toBeInTheDocument();
+    expect(screen.getByText('No distributions yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<StakingRewardsTable list={[createRow()]} address={ADDRESS} />);
-    for (const header of ['Token ID', 'Collected Rewards (ETH)', 'Rewards to Collect (ETH)']) {
+    for (const header of [
+      'Token ID',
+      'Retrieved Distributions (ETH)',
+      'Distributions to Retrieve (ETH)',
+    ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });

@@ -93,7 +93,7 @@ export const GlobalStakingRewardsTable = ({ list }: { list: StakingCSTReward[] }
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p className="text-muted-foreground">No rewards yet.</p>;
+    return <p className="text-muted-foreground">No distributions yet.</p>;
   }
 
   const displayedRows = list.slice((page - 1) * perPage, page * perPage);
@@ -106,11 +106,11 @@ export const GlobalStakingRewardsTable = ({ list }: { list: StakingCSTReward[] }
             <Tr>
               <TablePrimaryHeadCell className="p-0" />
               <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Staked Tokens</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Total Anchored Tokens</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Total Deposited (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Fully Claimed?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Pending to Collect (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Fully Retrieved?</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Pending to Retrieve (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

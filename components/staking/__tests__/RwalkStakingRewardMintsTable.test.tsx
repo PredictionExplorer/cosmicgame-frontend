@@ -19,7 +19,7 @@ const createRow = (overrides = {}) => ({
 describe('RwalkStakingRewardMintsTable', () => {
   it('renders empty state message', () => {
     render(<RwalkStakingRewardMintsTable list={[]} />);
-    expect(screen.getByText('No rewards yet.')).toBeInTheDocument();
+    expect(screen.getByText('No allocations yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {

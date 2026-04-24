@@ -51,7 +51,7 @@ export const StakingRewardsTable = ({
   const [page, setPage] = useState(1);
 
   if (!list || list.length === 0) {
-    return <p className="text-muted-foreground">No rewards yet.</p>;
+    return <p className="text-muted-foreground">No distributions yet.</p>;
   }
 
   const startIndex = (page - 1) * perPage;
@@ -65,8 +65,8 @@ export const StakingRewardsTable = ({
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Collected Rewards (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Rewards to Collect (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Retrieved Distributions (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Distributions to Retrieve (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

@@ -5,7 +5,7 @@ import { StakedTokensTable } from '@/components/staking/StakedTokensTable';
 import { CSTokensTable } from '@/components/tokens/CSTokensTable';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
-/** Props for the CST staking panel. */
+/** Props for the CST anchoring panel. */
 export interface CSTStakingPanelProps {
   account: string;
   stakingActions: StakingAction[];
@@ -27,7 +27,7 @@ function SectionHeader({ title, tooltip }: { title: string; tooltip: string }) {
   );
 }
 
-/** Displays CST staking rewards, actions, available tokens, and staked tokens. */
+/** Displays CST Anchor Distributions, actions, available tokens, and anchored tokens. */
 export function CSTStakingPanel({
   account,
   stakingActions,
@@ -43,8 +43,8 @@ export function CSTStakingPanel({
     <>
       <div>
         <SectionHeader
-          title="Staked Tokens"
-          tooltip="NFTs you currently have staked. You earn rewards proportional to how many tokens you stake."
+          title="Anchored Tokens"
+          tooltip="NFTs you currently have anchored. You receive distributions proportional to how many tokens you anchor."
         />
         <StakedTokensTable
           list={stakedTokens}
@@ -60,8 +60,8 @@ export function CSTStakingPanel({
 
       <div className="mt-12">
         <SectionHeader
-          title="Available for Staking"
-          tooltip="NFTs in your wallet that can be staked to start earning rewards."
+          title="Available for Anchoring"
+          tooltip="NFTs in your wallet that can be anchored to start receiving Anchor Distributions."
         />
         <CSTokensTable
           list={userTokens}
@@ -76,16 +76,16 @@ export function CSTStakingPanel({
 
       <div className="mt-12">
         <SectionHeader
-          title="Staking Rewards"
-          tooltip="ETH rewards earned by each of your staked tokens. Unclaimed rewards can be collected by unstaking."
+          title="Anchor Distributions"
+          tooltip="ETH Anchor Distributions allocated to each of your anchored tokens. Unretrieved distributions can be collected by releasing the anchor."
         />
         <StakingRewardsTable list={stakingRewards} address={account} />
       </div>
 
       <div className="mt-12">
         <SectionHeader
-          title="Stake / Unstake History"
-          tooltip="A chronological record of all your staking and unstaking transactions."
+          title="Anchor / Release History"
+          tooltip="A chronological record of all your anchor and release transactions."
         />
         <StakingActionsTable list={stakingActions} IsRwalk={false} />
       </div>

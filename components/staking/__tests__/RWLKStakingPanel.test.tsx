@@ -39,34 +39,34 @@ const defaultProps: RWLKStakingPanelProps = {
 describe('RWLKStakingPanel', () => {
   it('renders all four section headers', () => {
     render(<RWLKStakingPanel {...defaultProps} />);
-    expect(screen.getByText('Staked Tokens')).toBeInTheDocument();
-    expect(screen.getByText('Available for Staking')).toBeInTheDocument();
-    expect(screen.getByText('Staking Reward Tokens')).toBeInTheDocument();
-    expect(screen.getByText('Stake / Unstake History')).toBeInTheDocument();
+    expect(screen.getByText('Anchored Tokens')).toBeInTheDocument();
+    expect(screen.getByText('Available for Anchoring')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Allocation Tokens')).toBeInTheDocument();
+    expect(screen.getByText('Anchor / Release History')).toBeInTheDocument();
   });
 
-  it('renders Staked Tokens section first', () => {
+  it('renders Anchored Tokens section first', () => {
     render(<RWLKStakingPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[0]).toHaveTextContent('Staked Tokens');
+    expect(headings[0]).toHaveTextContent('Anchored Tokens');
   });
 
-  it('renders Available for Staking section second', () => {
+  it('renders Available for Anchoring section second', () => {
     render(<RWLKStakingPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[1]).toHaveTextContent('Available for Staking');
+    expect(headings[1]).toHaveTextContent('Available for Anchoring');
   });
 
-  it('renders Staking Reward Tokens section third', () => {
+  it('renders Anchor Allocation Tokens section third', () => {
     render(<RWLKStakingPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[2]).toHaveTextContent('Staking Reward Tokens');
+    expect(headings[2]).toHaveTextContent('Anchor Allocation Tokens');
   });
 
-  it('renders Stake / Unstake History section last', () => {
+  it('renders Anchor / Release History section last', () => {
     render(<RWLKStakingPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[3]).toHaveTextContent('Stake / Unstake History');
+    expect(headings[3]).toHaveTextContent('Anchor / Release History');
   });
 
   it('passes account to RWLKNFTTable as ownerAddress', () => {
