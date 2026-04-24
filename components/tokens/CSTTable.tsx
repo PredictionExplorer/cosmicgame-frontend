@@ -80,17 +80,17 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
 
       <TablePrimaryCell align="right">
         {nft.RecordType === 1 ? (
-          'Raffle NFT Token'
+          'Stellar Selection NFT Token'
         ) : nft.RecordType === 2 ? (
-          'Staking RandomWalk NFT'
+          'Anchor RandomWalk NFT'
         ) : nft.RecordType === 3 ? (
           <Link href={`/prize/${nft.RoundNum}`} className="text-inherit">
-            Main Prize Winner (#{nft.RoundNum})
+            Signature Allocation Recipient (#{nft.RoundNum})
           </Link>
         ) : nft.RecordType === 4 ? (
           'Endurance Champion'
         ) : nft.RecordType === 5 ? (
-          'Last CST Bidder'
+          'Last CST Participant'
         ) : (
           ''
         )}

@@ -90,9 +90,9 @@ const WinnerRow = ({ winner }: { winner: RaffleWinnerEntry }) => {
         {Amount
           ? 'ETH Deposit'
           : IsStaker && IsRwalk
-            ? 'Random Walk Staking Raffle Token'
+            ? 'Random Walk Anchor Stellar Selection Token'
             : IsStaker && !IsRwalk
-              ? 'Cosmic Signature Staking Raffle Token'
+              ? 'Cosmic Signature Anchor Stellar Selection Token'
               : 'Cosmic Signature Token'}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">

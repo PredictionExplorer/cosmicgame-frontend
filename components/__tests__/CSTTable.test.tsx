@@ -99,7 +99,7 @@ describe('CSTTable', () => {
 
     render(<CSTTable list={mockData} />);
 
-    expect(screen.getByText('Raffle NFT Token')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection NFT Token')).toBeInTheDocument();
   });
 
   test('renders table headers', () => {

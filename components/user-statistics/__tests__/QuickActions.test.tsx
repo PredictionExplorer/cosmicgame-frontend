@@ -37,7 +37,7 @@ describe('QuickActions', () => {
     expect(screen.getByText('Stake NFTs')).toBeInTheDocument();
     expect(screen.getByText('Place a Bid')).toBeInTheDocument();
     expect(screen.getByText('View Transfers')).toBeInTheDocument();
-    expect(screen.getByText('Raffle History')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection History')).toBeInTheDocument();
   });
 
   it('renders action descriptions', () => {
@@ -60,7 +60,7 @@ describe('QuickActions', () => {
 
   it('links to correct raffle history page with address', () => {
     render(<QuickActions address={address} />);
-    const raffleLink = screen.getByText('Raffle History').closest('a');
+    const raffleLink = screen.getByText('Stellar Selection History').closest('a');
     expect(raffleLink).toHaveAttribute('href', `/user/raffle-eth/${address}`);
   });
 

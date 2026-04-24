@@ -43,8 +43,8 @@ function buildActions(address: string): ActionItem[] {
       icon: <ArrowLeftRight className="h-4 w-4" />,
     },
     {
-      label: 'Raffle History',
-      description: 'Your raffle wins and ETH deposits',
+      label: 'Stellar Selection History',
+      description: 'Your Stellar Selection allocations and ETH deposits',
       href: `/user/raffle-eth/${address}`,
       icon: <Ticket className="h-4 w-4" />,
     },

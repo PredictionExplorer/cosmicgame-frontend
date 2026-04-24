@@ -79,7 +79,7 @@ describe('RaffleWinnerTable', () => {
       />,
     );
     expect(
-      screen.getAllByText('Cosmic Signature Staking Raffle Token').length,
+      screen.getAllByText('Cosmic Signature Anchor Stellar Selection Token').length,
     ).toBeGreaterThanOrEqual(1);
   });
 
@@ -90,9 +90,9 @@ describe('RaffleWinnerTable', () => {
         RaffleNFTWinners={[createNFTWinner({ IsStaker: true, IsRwalk: true, Amount: 0 })]}
       />,
     );
-    expect(screen.getAllByText('Random Walk Staking Raffle Token').length).toBeGreaterThanOrEqual(
-      1,
-    );
+    expect(
+      screen.getAllByText('Random Walk Anchor Stellar Selection Token').length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('renders TokenId as link to detail page', () => {
