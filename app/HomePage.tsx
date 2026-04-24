@@ -16,7 +16,6 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { MainWrapper, StyledCard } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { ART_BLOCKS_ADDRESS } from '@/config/networks';
 import NFTImage from '@/components/nft/NFTImage';
 import { reportError } from '@/utils/errors';
 import { SpecialPrizeWinners } from '@/components/tables/SpecialPrizeWinners';
@@ -140,12 +139,6 @@ const HomePage = () => {
     if (searchParams?.get('randomwalk')) {
       bidForm.setRwlkId(Number(searchParams.get('tokenId')));
       bidForm.setBidType('RandomWalk');
-    }
-    if (searchParams?.get('attach')) {
-      bidForm.setNftDonateAddress(ART_BLOCKS_ADDRESS);
-      bidForm.setNftId(searchParams.get('tokenId') ?? '');
-      bidForm.setBidType('ETH');
-      bidForm.setAdvancedExpanded(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, requestNotificationPermission]);

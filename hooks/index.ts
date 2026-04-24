@@ -7,7 +7,6 @@ export { default as useRWLKNFTContract } from './useRWLKNFTContract';
 export { default as useStakingWalletCSTContract } from './useStakingWalletCSTContract';
 export { default as useStakingWalletRWLKContract } from './useStakingWalletRWLKContract';
 export { default as useContractNoSigner } from './useContractNoSigner';
-export { default as useArtBlocksContract } from './useArtBlocksContract';
 export { useTokenPrice } from './useTokenPrice';
 export { useNotify } from './useNotify';
 export { useBidForm } from './useBidForm';

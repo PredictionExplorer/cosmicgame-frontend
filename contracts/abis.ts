@@ -14,7 +14,6 @@
  */
 import { type Abi } from 'viem';
 
-import artBlocksJson from './ArtBlocks.json';
 import charityWalletJson from './CharityWallet.json';
 import cosmicDaoJson from './CosmicDAO.json';
 import cosmicGameJson from './CosmicGame.json';
@@ -31,7 +30,6 @@ function asAbi(json: unknown): Abi {
   return json as Abi;
 }
 
-export const artBlocksAbi = asAbi(artBlocksJson);
 export const charityWalletAbi = asAbi(charityWalletJson);
 export const cosmicDaoAbi = asAbi(cosmicDaoJson);
 export const cosmicGameAbi = asAbi(cosmicGameJson);

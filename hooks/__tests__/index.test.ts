@@ -20,7 +20,6 @@ jest.mock('../useRWLKNFTContract', () => ({ __esModule: true, default: jest.fn()
 jest.mock('../useStakingWalletCSTContract', () => ({ __esModule: true, default: jest.fn() }));
 jest.mock('../useStakingWalletRWLKContract', () => ({ __esModule: true, default: jest.fn() }));
 jest.mock('../useContractNoSigner', () => ({ __esModule: true, default: jest.fn() }));
-jest.mock('../useArtBlocksContract', () => ({ __esModule: true, default: jest.fn() }));
 jest.mock('../useTokenPrice', () => ({ useTokenPrice: jest.fn() }));
 jest.mock('../useNotify', () => ({ useNotify: jest.fn() }));
 jest.mock('../useBidForm', () => ({ useBidForm: jest.fn() }));
@@ -37,7 +36,6 @@ const EXISTING_HOOK_EXPORTS = [
   'useStakingWalletCSTContract',
   'useStakingWalletRWLKContract',
   'useContractNoSigner',
-  'useArtBlocksContract',
   'useTokenPrice',
   'useNotify',
   'useBidForm',

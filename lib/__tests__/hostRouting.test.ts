@@ -225,7 +225,6 @@ describe('hostRouting', () => {
         '/how-to-play',
         '/marketing',
         '/mint',
-        '/mint-artblocks',
         '/my-allocations',
         '/my-anchors',
         '/my-statistics',

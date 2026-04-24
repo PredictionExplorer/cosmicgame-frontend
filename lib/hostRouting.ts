@@ -78,7 +78,6 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/marketing',
   '/mint',
   '/attached-nfts',
-  '/mint-artblocks',
   '/my-allocations',
   '/my-anchors',
   '/my-statistics',

@@ -59,7 +59,6 @@ interface NetworkConfig {
   STAKING_WALLET_CST_ADDRESS: string;
   STAKING_WALLET_RWLK_ADDRESS: string;
   IMPLEMENTATION_ADDRESS: string;
-  ART_BLOCKS_ADDRESS: string;
   MARKET_ADDRESS: string;
 }
 
@@ -85,7 +84,6 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     STAKING_WALLET_CST_ADDRESS: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
     STAKING_WALLET_RWLK_ADDRESS: '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e',
     IMPLEMENTATION_ADDRESS: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-    ART_BLOCKS_ADDRESS: '',
     MARKET_ADDRESS: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
   },
   sepolia: {
@@ -106,7 +104,6 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     STAKING_WALLET_CST_ADDRESS: '0xcF1c54DFd233CD031CE5f4F79fD281A38b37AB7a',
     STAKING_WALLET_RWLK_ADDRESS: '0xbE190dC5bd0f12Dbc189351B6172b6a1312d6f5C',
     IMPLEMENTATION_ADDRESS: '0xC9eb12c122dB86e0CCC48ae62668599dcAc5E049',
-    ART_BLOCKS_ADDRESS: '0x36b58F5C1969B7b6591D752ea6F5486D069010AB',
     MARKET_ADDRESS: '0x47eF85Dfb775aCE0934fBa9EEd09D22e6eC0Cc08',
   },
   mainnet: {
@@ -127,7 +124,6 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     STAKING_WALLET_CST_ADDRESS: '0xee31260Bc475416eCAa6818EC8eFD7D432366a52',
     STAKING_WALLET_RWLK_ADDRESS: '0x82119eEdC25529b4193500555f15DE8794B9Dc56',
     IMPLEMENTATION_ADDRESS: '0xaF142d1dAd42dFaeccE4323793Ef43Be931B79f3',
-    ART_BLOCKS_ADDRESS: '0x36b58F5C1969B7b6591D752ea6F5486D069010AB',
     MARKET_ADDRESS: '0x47eF85Dfb775aCE0934fBa9EEd09D22e6eC0Cc08',
   },
 };
@@ -145,8 +141,7 @@ export const networkConfig: NetworkConfig = {
   ...defaults,
   apiUrl: process.env.NEXT_PUBLIC_API_URL?.trim() ?? '',
   rpcUrl: process.env.NEXT_PUBLIC_RPC_URL?.trim() ?? '',
-  explorerUrl:
-    process.env.NEXT_PUBLIC_EXPLORER_URL?.trim() || defaults.explorerUrl,
+  explorerUrl: process.env.NEXT_PUBLIC_EXPLORER_URL?.trim() || defaults.explorerUrl,
 };
 
 export const INFURA_KEY = networkConfig.infuraKey;
@@ -162,7 +157,6 @@ export const MARKETING_WALLET_ADDRESS = networkConfig.MARKETING_WALLET_ADDRESS;
 export const STAKING_WALLET_CST_ADDRESS = networkConfig.STAKING_WALLET_CST_ADDRESS;
 export const STAKING_WALLET_RWLK_ADDRESS = networkConfig.STAKING_WALLET_RWLK_ADDRESS;
 export const IMPLEMENTATION_ADDRESS = networkConfig.IMPLEMENTATION_ADDRESS;
-export const ART_BLOCKS_ADDRESS = networkConfig.ART_BLOCKS_ADDRESS;
 
 /**
  * RPC URL to use for viem public client (e.g. useContractNoSigner).

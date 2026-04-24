@@ -190,11 +190,6 @@ export const dappContent = {
       description:
         'Direct ETH contributions to the Cosmic Signature protocol broken down by Performance Cycle.',
     },
-    mintArtBlocks: {
-      title: 'Imprint Art Blocks \u00b7 Cosmic Signature',
-      description:
-        'Imprint an Art Blocks NFT through Cosmic Signature. Explore the intersection of generative art and on-chain protocols with exclusive Art Blocks tokens.',
-    },
     myStatistics: {
       title: 'My Statistics \u00b7 Cosmic Signature',
       description:

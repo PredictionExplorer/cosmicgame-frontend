@@ -149,10 +149,6 @@ jest.mock('../../components/tables/SpecialPrizeWinners', () => ({
   SpecialPrizeWinners: () => <div data-testid="special-prize-winners">SpecialPrizeWinners</div>,
 }));
 
-jest.mock('../../config/networks', () => ({
-  ART_BLOCKS_ADDRESS: '0xArt',
-}));
-
 jest.mock('../../utils', () => ({
   getAssetsUrl: (path: string) => `https://assets.example.com/${path}`,
   getEnduranceChampions: () => [],
