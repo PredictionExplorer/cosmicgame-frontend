@@ -112,6 +112,9 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
+  "resolutions": {
+    "@noble/hashes": "^1.8.0"
+  },
   "lint-staged": {
     "*.{ts,tsx}": [
       "prettier --write",
