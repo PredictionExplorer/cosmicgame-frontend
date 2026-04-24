@@ -72,7 +72,7 @@ describe('HeroSection', () => {
   it('renders Learn More link pointing to game overview section', () => {
     render(<HeroSection />);
     const link = screen.getByRole('link', { name: 'Learn More' });
-    expect(link).toHaveAttribute('href', '#game-overview');
+    expect(link).toHaveAttribute('href', '#protocol-overview');
   });
 
   it('has the correct aria-labelledby on the section', () => {

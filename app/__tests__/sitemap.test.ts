@@ -132,7 +132,7 @@ describe('sitemap (host-aware)', () => {
       const gallery = entries.find((e) => e.url === 'https://app.cosmicsignature.com/gallery');
       const faq = entries.find((e) => e.url === 'https://app.cosmicsignature.com/faq');
       const howToPlay = entries.find(
-        (e) => e.url === 'https://app.cosmicsignature.com/how-to-play',
+        (e) => e.url === 'https://app.cosmicsignature.com/how-it-works',
       );
 
       expect(gallery?.priority).toBeGreaterThanOrEqual(0.8);

@@ -13,7 +13,7 @@ jest.mock('../../../hooks/useApiQuery', () => ({
 }));
 
 jest.mock('next/navigation', () => ({
-  useSearchParams: () => new URLSearchParams('round=5'),
+  useSearchParams: () => new URLSearchParams('cycle=5'),
 }));
 
 jest.mock('@fireworks-js/react', () => ({

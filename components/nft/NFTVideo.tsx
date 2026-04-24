@@ -14,7 +14,7 @@ const NFTVideo = ({ image_thumb, onClick }: NFTVideoProps) => (
   <div data-testid="nft-video-section">
     <div className="flex items-center gap-2 mb-4">
       <h3 className="text-lg font-semibold text-foreground">Watch Animation</h3>
-      <InfoTooltip content="Each Cosmic Signature token has a unique generative animation derived from its seed. Click to play." />
+      <InfoTooltip content="Each Cosmic Signature token has a unique generative animation derived from its seed. Click to watch." />
     </div>
     <GradientBorder className="max-w-2xl overflow-hidden">
       <div className="relative cursor-pointer group" onClick={onClick} data-testid="nft-video-play">

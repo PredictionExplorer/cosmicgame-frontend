@@ -120,10 +120,10 @@ describe('GalleryPage', () => {
   it('renders hero stats with correct counts', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByText('Total Minted')).toBeInTheDocument();
+    expect(screen.getByText('Total Imprinted')).toBeInTheDocument();
     expect(screen.getByText('Currently Anchored')).toBeInTheDocument();
     expect(screen.getByText('Named NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Game Rounds')).toBeInTheDocument();
+    expect(screen.getByText('Cycles')).toBeInTheDocument();
   });
 
   it('renders NFT cards when data is loaded', () => {
@@ -150,14 +150,14 @@ describe('GalleryPage', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
     expect(screen.getByRole('radio', { name: /All/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /Staked/i })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /Anchored/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /Named/i })).toBeInTheDocument();
   });
 
   it('filters NFTs when Staked chip is clicked', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    fireEvent.click(screen.getByRole('radio', { name: /Staked/i }));
+    fireEvent.click(screen.getByRole('radio', { name: /Anchored/i }));
     expect(screen.getByText('#000003')).toBeInTheDocument();
     expect(screen.getByText('#000002')).toBeInTheDocument();
     expect(screen.queryByText('#000001')).not.toBeInTheDocument();

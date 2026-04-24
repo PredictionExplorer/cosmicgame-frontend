@@ -75,9 +75,9 @@ const GalleryPage = () => {
         return list.sort((a, b) => Number(b.TokenId) - Number(a.TokenId));
       case 'oldest':
         return list.sort((a, b) => Number(a.TokenId) - Number(b.TokenId));
-      case 'round-desc':
+      case 'cycle-desc':
         return list.sort((a, b) => (b.RoundNum ?? 0) - (a.RoundNum ?? 0));
-      case 'round-asc':
+      case 'cycle-asc':
         return list.sort((a, b) => (a.RoundNum ?? 0) - (b.RoundNum ?? 0));
       default:
         return list;

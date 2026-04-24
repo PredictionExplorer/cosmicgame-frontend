@@ -29,7 +29,7 @@ const appPages: SitemapEntry[] = [
   { path: '/current-cycle', priority: 0.9, changeFrequency: 'hourly' },
   { path: '/gallery', priority: 0.9, changeFrequency: 'hourly' },
   { path: '/statistics', priority: 0.8, changeFrequency: 'hourly' },
-  { path: '/how-to-play', priority: 0.9, changeFrequency: 'weekly' },
+  { path: '/how-it-works', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/faq', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/anchoring', priority: 0.8, changeFrequency: 'daily' },
   { path: '/allocation', priority: 0.8, changeFrequency: 'daily' },

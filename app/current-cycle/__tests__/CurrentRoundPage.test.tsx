@@ -85,13 +85,13 @@ describe('CurrentRoundPage', () => {
   it('renders error state on API failure', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false, isError: true });
     render(<CurrentRoundPage />);
-    expect(screen.getByText('Failed to load round data')).toBeInTheDocument();
+    expect(screen.getByText('Failed to load cycle data')).toBeInTheDocument();
   });
 
   it('renders error state when data is null', () => {
     mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false, isError: false });
     render(<CurrentRoundPage />);
-    expect(screen.getByText('Failed to load round data')).toBeInTheDocument();
+    expect(screen.getByText('Failed to load cycle data')).toBeInTheDocument();
   });
 
   it('renders round number in heading', () => {

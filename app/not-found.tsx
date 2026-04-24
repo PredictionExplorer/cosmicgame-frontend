@@ -8,7 +8,7 @@ import { MainWrapper } from '@/components/styled';
 const suggestedLinks = [
   { href: '/', label: 'Home \u2014 Active Cycle' },
   { href: '/gallery', label: 'NFT Gallery' },
-  { href: '/how-to-play', label: 'How It Works' },
+  { href: '/how-it-works', label: 'How It Works' },
   { href: '/faq', label: 'FAQ' },
   { href: '/statistics', label: 'Statistics' },
   { href: '/anchoring', label: 'Anchor Distributions' },

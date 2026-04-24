@@ -222,7 +222,7 @@ describe('hostRouting', () => {
         '/faq',
         '/gallery',
         '/gesture',
-        '/how-to-play',
+        '/how-it-works',
         '/marketing',
         '/mint',
         '/my-allocations',

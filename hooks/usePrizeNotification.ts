@@ -12,7 +12,7 @@ export function usePrizeNotification({ prizeTime }: UsePrizeNotificationOptions)
       const audioElement = new Audio('/audio/notification.wav');
       await audioElement.play();
     } catch (error) {
-      reportError(error, 'play notification sound');
+      reportError(error, 'notification audio error');
     }
   }, []);
 

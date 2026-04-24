@@ -219,7 +219,7 @@ const Header: FC = () => {
               <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
                 Help
               </p>
-              <ListItemButton nav={{ title: 'How It Works', route: '/how-to-play' }} />
+              <ListItemButton nav={{ title: 'How It Works', route: '/how-it-works' }} />
               <ListItemButton nav={{ title: 'FAQ', route: '/faq' }} />
 
               <Separator className="my-2" />

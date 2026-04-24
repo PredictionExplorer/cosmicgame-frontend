@@ -16,9 +16,9 @@ const filters: { key: FilterKey; label: string; icon: typeof Layers; tooltip: st
   { key: 'all', label: 'All', icon: Layers, tooltip: 'Show all NFTs in the collection' },
   {
     key: 'staked',
-    label: 'Staked',
+    label: 'Anchored',
     icon: Lock,
-    tooltip: 'NFTs currently staked and earning rewards',
+    tooltip: 'NFTs currently anchored and receiving Anchor Distributions',
   },
   { key: 'named', label: 'Named', icon: Tag, tooltip: 'NFTs given a custom name by their owner' },
 ];

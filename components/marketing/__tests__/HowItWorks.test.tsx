@@ -52,7 +52,7 @@ describe('HowItWorks', () => {
     renderWithTooltip(<HowItWorks />);
     expect(screen.getByText('Promote')).toBeInTheDocument();
     expect(screen.getByText('Get Verified')).toBeInTheDocument();
-    expect(screen.getByText('Earn CST')).toBeInTheDocument();
+    expect(screen.getByText('Receive CST')).toBeInTheDocument();
   });
 
   it('renders step numbers', () => {
@@ -78,7 +78,7 @@ describe('HowItWorks', () => {
     renderWithTooltip(<HowItWorks />);
     expect(screen.getByLabelText('More info about Promote')).toBeInTheDocument();
     expect(screen.getByLabelText('More info about Get Verified')).toBeInTheDocument();
-    expect(screen.getByLabelText('More info about Earn CST')).toBeInTheDocument();
+    expect(screen.getByLabelText('More info about Receive CST')).toBeInTheDocument();
   });
 
   it('has the correct section id for scroll linking', () => {

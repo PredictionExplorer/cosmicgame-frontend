@@ -152,7 +152,7 @@ describe('StakedTokensTable', () => {
         />,
       );
     });
-    expect(screen.getAllByText('Unstake').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Release').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders only first page of results (perPage=5)', async () => {
@@ -189,7 +189,7 @@ describe('StakedTokensTable', () => {
       );
     });
     await act(async () => {
-      fireEvent.click(screen.getAllByText('Unstake')[0]!);
+      fireEvent.click(screen.getAllByText('Release')[0]!);
     });
     expect(mockUnstake).toHaveBeenCalledWith(42, true);
   });
@@ -248,7 +248,7 @@ describe('StakedTokensTable', () => {
     const cell2 = screen.getAllByText('43').find((el) => el.closest('td'));
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
-    expect(screen.getByText('Unstake Many')).toBeInTheDocument();
+    expect(screen.getByText('Release Many')).toBeInTheDocument();
   });
 
   it('Unstake Many calls handleUnstakeMany with selected action IDs', async () => {
@@ -270,7 +270,7 @@ describe('StakedTokensTable', () => {
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
     await act(async () => {
-      fireEvent.click(screen.getByText('Unstake Many'));
+      fireEvent.click(screen.getByText('Release Many'));
     });
     expect(mockUnstakeMany).toHaveBeenCalledWith(expect.arrayContaining([10, 20]), true);
   });
@@ -287,9 +287,9 @@ describe('StakedTokensTable', () => {
       );
     });
     await act(async () => {
-      fireEvent.click(screen.getAllByText('Unstake')[0]!);
+      fireEvent.click(screen.getAllByText('Release')[0]!);
     });
-    expect(screen.queryByText('Unstake Many')).not.toBeInTheDocument();
+    expect(screen.queryByText('Release Many')).not.toBeInTheDocument();
   });
 
   it('resets selection when list prop changes', async () => {
@@ -316,7 +316,7 @@ describe('StakedTokensTable', () => {
         />,
       );
     });
-    expect(screen.queryByText('Unstake Many')).not.toBeInTheDocument();
+    expect(screen.queryByText('Release Many')).not.toBeInTheDocument();
   });
 
   it('passes isRwlk=false for CST unstake', async () => {
@@ -331,7 +331,7 @@ describe('StakedTokensTable', () => {
       );
     });
     await act(async () => {
-      fireEvent.click(screen.getAllByText('Unstake')[0]!);
+      fireEvent.click(screen.getAllByText('Release')[0]!);
     });
     expect(mockUnstake).toHaveBeenCalledWith(10, false);
   });

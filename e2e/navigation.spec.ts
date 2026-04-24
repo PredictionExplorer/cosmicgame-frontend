@@ -82,8 +82,8 @@ test.describe('Navigation', () => {
     await openMobileNavIfNeeded(page);
     await page.locator('text=Help').first().click();
     await page.waitForTimeout(400);
-    await page.locator('a[href="/how-to-play"]').first().click();
-    await expect(page).toHaveURL(/how-to-play/);
+    await page.locator('a[href="/how-it-works"]').first().click();
+    await expect(page).toHaveURL(/how-it-works/);
   });
 
   test('Footer has Terms, Privacy, and Site-Map links', async ({ page }) => {

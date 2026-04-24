@@ -63,7 +63,7 @@ export function PopularQuestions({ onQuestionClick, className }: PopularQuestion
         >
           Popular Questions
         </h2>
-        <InfoTooltip content="These are the most commonly asked questions by new players." />
+        <InfoTooltip content="These are the most commonly asked questions by new participants." />
       </div>
 
       <motion.div

@@ -231,7 +231,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           visible: true,
         });
       } else {
-        reportError(err, 'claim donated NFT');
+        reportError(err, 'retrieve attached NFT');
         const msg = getEthErrorMessage(err, 'An error occurred');
         setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
       }
@@ -261,8 +261,8 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           visible: true,
         });
       } else {
-        reportError(err, 'claim all donated NFTs');
-        const msg = getEthErrorMessage(err, 'An error occurred while claiming donated NFTs!');
+        reportError(err, 'retrieve all attached NFTs');
+        const msg = getEthErrorMessage(err, 'An error occurred while retrieving attached NFTs!');
         setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
       }
       setIsClaiming(false);
@@ -285,7 +285,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         });
         return;
       }
-      reportError(err, 'claim donated ERC20 token');
+      reportError(err, 'retrieve attached ERC20 token');
       const rawMsg = getEthErrorMessage(err, 'An error occurred');
       setNotification({ text: getErrorMessage(rawMsg) || rawMsg, type: 'error', visible: true });
     }
@@ -314,7 +314,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         });
         return;
       }
-      reportError(err, 'claim all donated ERC20 tokens');
+      reportError(err, 'retrieve all attached ERC20 tokens');
       const rawMsg = getEthErrorMessage(err, 'An error occurred');
       setNotification({ text: getErrorMessage(rawMsg) || rawMsg, type: 'error', visible: true });
     }
@@ -335,7 +335,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
         subtitle={
           isOwnProfile
             ? 'Your complete performance dashboard and activity history'
-            : 'Viewing another player\u2019s statistics and activity'
+            : 'Viewing another participant\u2019s statistics and activity'
         }
       >
         {address && !isOwnProfile && (

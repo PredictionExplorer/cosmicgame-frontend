@@ -377,7 +377,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-team-profits',
         question: 'How does the Cosmic Signature team receive value from the protocol?',
         answer:
-          'No team wallet receives ETH from participant gestures. All ETH flows into the Cycle Reserve and is distributed per the allocation tracks. The team\u2019s interest is held indirectly through Random Walk NFTs; success of the protocol may increase the cultural value of those NFTs. Primary motivations are curiosity, creativity, and contributing to open-source public goods.',
+          'No team wallet receives ETH from participant gestures. All ETH flows into the Cycle Reserve and is distributed per the allocation tracks. The team\u2019s alignment with the protocol is held indirectly through Random Walk NFTs; success of the protocol may increase the cultural value of those NFTs. Primary motivations are curiosity, creativity, and contributing to open-source public goods.',
       },
       {
         id: 'why-was-cs-created',

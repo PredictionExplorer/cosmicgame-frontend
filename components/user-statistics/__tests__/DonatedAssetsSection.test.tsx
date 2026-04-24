@@ -36,7 +36,7 @@ describe('DonatedAssetsSection', () => {
   it('renders both section headings', () => {
     render(<DonatedAssetsSection {...defaultProps} />);
     expect(screen.getByText('Attached NFTs Received')).toBeInTheDocument();
-    expect(screen.getByText('Donated ERC20 Tokens')).toBeInTheDocument();
+    expect(screen.getByText('Attached ERC20 Tokens')).toBeInTheDocument();
   });
 
   it('shows skeleton loading for NFTs', () => {
@@ -56,7 +56,7 @@ describe('DonatedAssetsSection', () => {
 
   it('shows empty state when no donated ERC20 tokens', () => {
     render(<DonatedAssetsSection {...defaultProps} />);
-    expect(screen.getByText('No donated tokens')).toBeInTheDocument();
+    expect(screen.getByText('No attached tokens')).toBeInTheDocument();
   });
 
   it('renders Claim All NFTs button when unclaimed NFTs exist', () => {

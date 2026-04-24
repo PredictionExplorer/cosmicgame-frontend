@@ -45,7 +45,7 @@ jest.mock('../../../utils', () => ({
 const mockReportError = jest.fn<void, [unknown, string]>();
 const mockIsUserRejection = jest.fn<boolean, [unknown]>(() => false);
 const mockIsEthProviderError = jest.fn<boolean, [unknown]>(() => false);
-const mockGetEthErrorMessage = jest.fn<string, [unknown, string?]>(() => 'Mint failed');
+const mockGetEthErrorMessage = jest.fn<string, [unknown, string?]>(() => 'Imprint failed');
 
 jest.mock('../../../utils/errors', () => ({
   isUserRejection: (err: unknown) => mockIsUserRejection(err),
@@ -78,12 +78,12 @@ async function renderMint(overrides?: { account?: string | null; tokens?: readon
 describe('Mint', () => {
   it('renders the page header', async () => {
     await renderMint();
-    expect(screen.getByText('Mint Random Walk NFT')).toBeInTheDocument();
+    expect(screen.getByText('Imprint Random Walk NFT')).toBeInTheDocument();
   });
 
   it('renders the Mint now button', async () => {
     await renderMint();
-    expect(screen.getByRole('button', { name: 'Mint Now' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Imprint Now' })).toBeInTheDocument();
   });
 
   it('renders the My Random Walk NFTs section when tokens exist', async () => {
@@ -95,7 +95,7 @@ describe('Mint', () => {
   it('displays mint price with ETH label', async () => {
     await renderMint();
     expect(screen.getByText('ETH')).toBeInTheDocument();
-    expect(screen.getByText('Current mint price')).toBeInTheDocument();
+    expect(screen.getByText('Current imprint cost')).toBeInTheDocument();
   });
 
   it('calls getMintPrice on mount', async () => {
@@ -121,7 +121,7 @@ describe('Mint', () => {
     mockMint.mockResolvedValueOnce('0xTxHash');
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
+    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
 
     await waitFor(() => {
       expect(mockMint).toHaveBeenCalledWith(expect.objectContaining({ value: expect.anything() }));
@@ -133,7 +133,7 @@ describe('Mint', () => {
     mockMint.mockResolvedValueOnce('0xTxHash');
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
+    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
 
     await waitFor(() => {
       expect(mockWaitForTxReceipt).toHaveBeenCalledWith({ hash: '0xTxHash' });
@@ -147,7 +147,7 @@ describe('Mint', () => {
     mockIsUserRejection.mockReturnValueOnce(true);
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
+    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
 
     await waitFor(() => {
       expect(mockIsUserRejection).toHaveBeenCalledWith(rejectionErr);
@@ -163,10 +163,10 @@ describe('Mint', () => {
     mockIsEthProviderError.mockReturnValueOnce(false);
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
+    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
 
     await waitFor(() => {
-      expect(mockReportError).toHaveBeenCalledWith(mintErr, 'mint RWLK NFT');
+      expect(mockReportError).toHaveBeenCalledWith(mintErr, 'imprint RWLK NFT');
     });
   });
 
@@ -180,7 +180,7 @@ describe('Mint', () => {
     const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
     render(<Mint />);
 
-    await user.click(screen.getByRole('button', { name: 'Mint Now' }));
+    await user.click(screen.getByRole('button', { name: 'Imprint Now' }));
 
     await waitFor(() => {
       expect(alertSpy).toHaveBeenCalledWith('Insufficient funds');

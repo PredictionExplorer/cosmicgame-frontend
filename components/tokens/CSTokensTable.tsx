@@ -109,10 +109,10 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
             {processing ? (
               <span className="flex items-center gap-1">
                 <Spinner size="sm" />
-                Staking...
+                Anchoring...
               </span>
             ) : (
-              'Stake'
+              'Anchor'
             )}
           </Button>
         )}
@@ -267,10 +267,10 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
             {processing ? (
               <span className="flex items-center gap-1">
                 <Spinner size="sm" />
-                Staking...
+                Anchoring...
               </span>
             ) : (
-              'Stake Many'
+              'Anchor Many'
             )}
           </Button>
         </div>

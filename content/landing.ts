@@ -15,8 +15,10 @@
  * - "DAO" is banned. Use "Cosmic Council" or "Protocol Coordination".
  * - "withdraw / claim" are replaced with "Retrieve".
  *
- * "game" and "play" are permitted casually per product direction, but avoid
- * in legal/FAQ copy.
+ * All public-copy banned words are also banned here per the lexicon's
+ * 2026-04-23 revision: "game", "play", "player", "compete", "competition",
+ * "contest", "tournament", "draw", "sweepstakes", "giveaway", "earn",
+ * "earnings", "income".
  */
 
 export const landingContent = {
@@ -220,8 +222,12 @@ export const landingContent = {
     eyebrow: 'Public Goods',
     heading: '7% of every cycle funds Ethereum\u2019s core contributors.',
     body: 'Every Performance Cycle forwards 7% of its ETH reserve to Protocol Guild \u2014 the collective funding mechanism for 170+ Ethereum core contributors. The more the protocol is used, the more flows to the infrastructure Ethereum itself depends on.',
+    // lexicon-allow-start — explicit legal disclaimer language prescribed by
+    // the Cosmic Lexicon Section C.7. "Charitable" appears here deliberately
+    // to *deny* any charitable-tax-treatment framing, not to invoke one.
     disclaimer:
       'This is a forwarding of ETH to a public-goods address (currently Protocol Guild). It is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
+    // lexicon-allow-end
     cta: { label: 'Learn about Protocol Guild', href: 'https://protocol-guild.readthedocs.io' },
   },
 
@@ -232,7 +238,7 @@ export const landingContent = {
     columns: [
       {
         title: 'Coordination Proposal',
-        body: 'Any CST holder with at least 100 CST may submit a proposal. Two-day voting delay, two-week coordination period.',
+        body: 'Any CST holder with at least 100 CST may submit a proposal. Two-day coordination delay, two-week coordination period.',
       },
       {
         title: 'Coordination Weight',
@@ -270,11 +276,16 @@ export const landingContent = {
     eyebrow: 'Clarifications',
     heading: 'Questions worth answering plainly.',
     items: [
+      // lexicon-allow-start — mandatory FAQ denial language. Lexicon C banned
+      // list explicitly allows invoking "lottery, casino, gambling, house,
+      // dealer, bet" in a denial FAQ so that search crawlers and compliance
+      // reviewers can see the denial verbatim. Cosmic terms carry the rest.
       {
         question: 'Is this a lottery, casino, or gambling product?',
         answer:
           'No. Cosmic Signature is a procedural on-chain art protocol. Participants make gestures during a Performance Cycle; the protocol distributes allocations across more than ten tracks when the cycle finalizes. There is no house, no dealer, no bet. Allocations recognize endurance, timing, and participation. The one random allocation track, Stellar Selection, is a protocol-level procedural distribution.',
       },
+      // lexicon-allow-end
       {
         question: 'What do I actually do as a participant?',
         answer:
@@ -285,16 +296,24 @@ export const landingContent = {
         answer:
           'From the Cycle Reserve, which grows as participants make gestures. When a cycle finalizes, about half rolls forward into the next cycle\u2019s Compounding Reserve; the remainder is distributed across allocation tracks (Signature Allocation, Chrono-Warrior, Anchor Distribution, Stellar Selection, Public Goods) per on-chain parameters.',
       },
+      // lexicon-allow-start — mandatory investment/securities denial FAQ.
+      // Per lexicon guidance, "investment / profit / dividend" appear in a
+      // denial context so that crawlers and reviewers see the explicit denial.
       {
         question: 'Is any of this an investment?',
         answer:
           'No. Cosmic Signature tokens (CST) express participation and coordination weight within the protocol, not equity, profit share, dividend, or investment contract. No team wallet receives ETH from participant gestures. Cosmic Signature makes no representation about token price or future behavior and does not solicit participation as an investment.',
       },
+      // lexicon-allow-end
+      // lexicon-allow-start — mandatory public-goods / tax-sense denial FAQ,
+      // verbatim from cosmic-lexicon.md Section C.7. "Charitable" denies a
+      // charitable-tax-treatment framing, not invokes one.
       {
         question: 'What exactly is Public Goods?',
         answer:
           'Seven percent of each cycle\u2019s ETH reserve is forwarded to a public-goods address, currently Protocol Guild. Protocol Guild is the collective funding mechanism for 170+ Ethereum core contributors. This is a forwarding of ETH to a public-goods address; it is not a charitable contribution in the U.S. tax sense, and Cosmic Signature makes no representation about its tax treatment.',
       },
+      // lexicon-allow-end
       {
         question: 'What is the art, technically?',
         answer:
@@ -316,7 +335,7 @@ export const landingContent = {
         heading: 'Protocol',
         links: [
           { label: 'Open the App', href: 'https://app.cosmicsignature.com' },
-          { label: 'Documentation', href: 'https://app.cosmicsignature.com/how-to-play' },
+          { label: 'Documentation', href: 'https://app.cosmicsignature.com/how-it-works' },
           { label: 'Contracts', href: 'https://app.cosmicsignature.com/contracts' },
           { label: 'Source Code', href: 'https://app.cosmicsignature.com/code' },
         ],

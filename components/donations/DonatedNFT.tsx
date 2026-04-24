@@ -29,7 +29,7 @@ const DonatedNFT = ({ nft }: DonatedNFTProps) => {
         const { data } = await axios.get<TokenURI>(nft.NFTTokenURI!);
         setTokenURI(data);
       } catch (error) {
-        reportError(error, 'fetch donated NFT token URI');
+        reportError(error, 'fetch attached NFT token URI');
       }
     };
 

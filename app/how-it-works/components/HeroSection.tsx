@@ -53,7 +53,7 @@ export function HeroSection() {
           <Link href="/">Open the Protocol</Link>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <a href="#game-overview">Learn More</a>
+          <a href="#protocol-overview">Learn More</a>
         </Button>
       </motion.div>
     </motion.section>

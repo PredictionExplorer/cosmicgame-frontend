@@ -37,7 +37,7 @@ const footerLinks: Record<string, { label: string; href: string; external?: bool
     { label: 'Source Code', href: '/code' },
   ],
   Resources: [
-    { label: 'How to Play', href: '/how-to-play' },
+    { label: 'How It Works', href: '/how-it-works' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Site Map', href: '/site-map' },
     {

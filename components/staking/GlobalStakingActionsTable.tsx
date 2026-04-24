@@ -49,7 +49,7 @@ const GlobalStakingActionsRow: FC<GlobalStakingActionsRowProps> = ({ row, IsRWLK
       <TablePrimaryCell>{convertTimestampToDateTime(row.TimeStamp)}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {row.ActionType === 0 ? 'Stake' : 'Unstake'}
+        {row.ActionType === 0 ? 'Anchor' : 'Release'}
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">

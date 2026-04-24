@@ -357,7 +357,7 @@ describe('useClaimWinnings', () => {
         await result.current.claimDonatedNFT(42);
       });
       expect(result.current.claimingDonatedNFTs).toEqual([]);
-      expect(mockReportError).toHaveBeenCalledWith(err, 'claim donated NFT');
+      expect(mockReportError).toHaveBeenCalledWith(err, 'retrieve attached NFT');
     });
   });
 

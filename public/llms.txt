@@ -1,41 +1,41 @@
 # Cosmic Signature
 
-> Cosmic Signature is a strategy bidding game on the Arbitrum blockchain featuring generative NFT art inspired by the three-body problem, ETH prizes, staking rewards, and charitable giving.
+> Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle's final Signature, and the protocol redistributes its reserves across more than ten allocation tracks — including the infrastructure Ethereum itself depends on.
 
 ## Overview
 
-Cosmic Signature combines generative art, an exciting Ethereum bidding game, and social impact through charitable giving. Players bid against each other and against time to win ETH prizes and unique COSMIC NFTs. The game is deployed on Arbitrum, a Layer 2 scaling solution for Ethereum, providing fast and low-cost transactions.
+Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; when the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors. The protocol runs on Arbitrum, a Layer 2 scaling solution for Ethereum, providing fast and low-cost transactions.
 
 ## Key Pages
 
-- [Home](https://www.cosmicsignature.com/): Main bidding interface and live game status
-- [Gallery](https://www.cosmicsignature.com/gallery): Browse all minted COSMIC NFTs
-- [How to Play](https://www.cosmicsignature.com/how-to-play): Complete guide to game mechanics
+- [Home](https://www.cosmicsignature.com/): Live gesture interface and active cycle status
+- [Gallery](https://www.cosmicsignature.com/gallery): Browse all imprinted COSMIC NFTs
+- [How It Works](https://www.cosmicsignature.com/how-it-works): Complete guide to protocol mechanics
 - [FAQ](https://www.cosmicsignature.com/faq): Frequently asked questions
-- [Statistics](https://www.cosmicsignature.com/statistics): Game statistics and analytics
-- [Staking](https://www.cosmicsignature.com/staking): Stake CST tokens to earn rewards
-- [Prize](https://www.cosmicsignature.com/prize): Current prize pool information
+- [Statistics](https://www.cosmicsignature.com/statistics): Protocol statistics and analytics
+- [Anchoring](https://www.cosmicsignature.com/anchoring): Anchor COSMIC NFTs to receive Anchor Distributions
+- [Allocation](https://www.cosmicsignature.com/allocation): Current Cycle Reserve and allocation tracks
 - [Contracts](https://www.cosmicsignature.com/contracts): Smart contract details and addresses
-- [Marketing](https://www.cosmicsignature.com/marketing): Marketing rewards program
-- [Mint](https://www.cosmicsignature.com/mint): Mint new tokens
+- [Outreach](https://www.cosmicsignature.com/marketing): Outreach allocation program
+- [Imprint](https://www.cosmicsignature.com/mint): Imprint new tokens
 
-## Game Mechanics
+## Protocol Mechanics
 
-- Each round starts with a 24-hour countdown and a low initial bid (~0.01 ETH)
-- Every bid increases price by 1% and adds 1 hour to the timer
-- Last bidder when timer expires wins the main prize (25% of ETH pot)
-- Every bid earns 100 CST tokens and a raffle ticket
-- 12 COSMIC NFTs minted per round
-- Raffle winners share 6% of the prize pool
-- 10% goes to a charitable beneficiary chosen by the Cosmic DAO
-- Players can bid with ETH or CST tokens (Dutch auction)
-- RandomWalkNFT holders get a 50% bid discount
+- Each cycle opens with a Calibration Window where Gesture Cost descends over roughly two days
+- Every gesture increases the Gesture Cost by ~1% and extends the Cycle Finalization Time by about an hour
+- The participant who made the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation (25% of the Cycle Reserve)
+- Every gesture imprints 100 CST tokens and a Stellar Selection entry
+- 12 COSMIC NFTs are imprinted per cycle
+- Stellar Selection recipients share 6% of the Cycle Reserve
+- 7% of each Cycle Reserve is forwarded to Protocol Guild (public goods)
+- Participants can make gestures with ETH or CST tokens (CST uses its own Calibration Window)
+- RandomWalkNFT holders receive a 50% Gesture-Cost reduction
 
 ## Tokens
 
-- **CST (Cosmic Signature Token)**: ERC-20 governance and utility token
+- **CST (Cosmic Signature Token)**: ERC-20 coordination and utility token
 - **COSMIC NFT**: ERC-721 generative art based on three-body problem physics
-- **RandomWalkNFT**: Partner NFT offering bid discounts
+- **RandomWalkNFT**: Partner NFT offering Gesture-Cost reductions
 
 ## Community
 
@@ -45,8 +45,8 @@ Cosmic Signature combines generative art, an exciting Ethereum bidding game, and
 ## Technical
 
 - Blockchain: Arbitrum (Ethereum Layer 2)
-- Smart contracts: Immutable, open-source
-- NFT art: Generated from on-chain random seeds using open-source Rust program
+- Smart contracts: Immutable, open-source, formally verified
+- NFT art: Generated from on-chain seeds using an open-source Rust program
 - Frontend: Next.js, React, TypeScript
 
 ## Optional

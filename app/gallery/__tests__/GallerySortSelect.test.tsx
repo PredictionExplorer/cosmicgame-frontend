@@ -25,9 +25,9 @@ describe('GallerySortSelect', () => {
     expect(screen.getByText('Oldest First')).toBeInTheDocument();
   });
 
-  it('displays round desc when selected', () => {
-    render(<GallerySortSelect {...defaultProps} value="round-desc" />);
-    expect(screen.getByText(/Round.*High/)).toBeInTheDocument();
+  it('displays cycle desc when selected', () => {
+    render(<GallerySortSelect {...defaultProps} value="cycle-desc" />);
+    expect(screen.getByText(/Cycle.*High/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

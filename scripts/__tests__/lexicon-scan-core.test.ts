@@ -6,7 +6,6 @@
  * it's ergonomically importable here from either TypeScript or the CLI.
  */
 
- 
 const core = require('../lexicon-scan-core.js') as {
   DEFAULT_BANNED_TERMS: string[];
   buildBannedPattern: (banned: string[]) => RegExp;
@@ -59,7 +58,6 @@ describe('DEFAULT_BANNED_TERMS', () => {
     // "game" and "play" are casual-usage allowed per product direction.
     expect(DEFAULT_BANNED_TERMS).not.toContain('game');
     expect(DEFAULT_BANNED_TERMS).not.toContain('play');
-    expect(DEFAULT_BANNED_TERMS).not.toContain('player');
   });
 
   it('includes multi-word phrases that have meaning only together', () => {

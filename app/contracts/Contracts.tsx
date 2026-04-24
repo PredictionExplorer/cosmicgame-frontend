@@ -229,7 +229,7 @@ const Contracts = () => {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.15 }}
-          aria-label="Game Configuration"
+          aria-label="Protocol Configuration"
         >
           <GameConfiguration
             priceIncrease={priceIncrease}

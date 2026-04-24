@@ -48,10 +48,10 @@ const itemVariants = {
 
 export function GameOverview() {
   return (
-    <section id="game-overview" aria-labelledby="game-overview-heading" className="py-16">
+    <section id="protocol-overview" aria-labelledby="protocol-overview-heading" className="py-16">
       <div className="mb-10 text-center">
         <h2
-          id="game-overview-heading"
+          id="protocol-overview-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
           How It Works

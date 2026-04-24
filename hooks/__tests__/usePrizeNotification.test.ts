@@ -55,7 +55,7 @@ describe('usePrizeNotification', () => {
         await result.current.playAudio();
       });
 
-      expect(mockReportError).toHaveBeenCalledWith(playError, 'play notification sound');
+      expect(mockReportError).toHaveBeenCalledWith(playError, 'notification audio error');
     });
   });
 

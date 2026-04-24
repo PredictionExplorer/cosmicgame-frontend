@@ -154,7 +154,7 @@ export function useClaimWinnings(onSuccess?: () => void) {
         await awaitTx(hash);
         refreshAfterClaim();
       } catch (err) {
-        handleTxError(err, 'claim donated NFT');
+        handleTxError(err, 'retrieve attached NFT');
       } finally {
         if (mountedRef.current) {
           setClaimingDonatedNFTs((prev) => prev.filter((id) => id !== tokenID));
@@ -176,7 +176,7 @@ export function useClaimWinnings(onSuccess?: () => void) {
         await awaitTx(hash);
         refreshAfterClaim();
       } catch (err) {
-        handleTxError(err, 'claim all donated NFTs');
+        handleTxError(err, 'retrieve all attached NFTs');
       } finally {
         if (mountedRef.current) {
           setIsClaiming((prev) => ({ ...prev, donatedNFT: false }));
@@ -207,7 +207,7 @@ export function useClaimWinnings(onSuccess?: () => void) {
         await awaitTx(hash);
         refreshAfterClaim();
       } catch (err) {
-        handleTxError(err, 'claim donated ERC20 token');
+        handleTxError(err, 'retrieve attached ERC20 token');
       } finally {
         if (mountedRef.current) {
           setIsClaiming((prev) => ({ ...prev, donatedERC20: false }));
@@ -229,7 +229,7 @@ export function useClaimWinnings(onSuccess?: () => void) {
         await awaitTx(hash);
         refreshAfterClaim();
       } catch (err) {
-        handleTxError(err, 'claim all donated ERC20 tokens');
+        handleTxError(err, 'retrieve all attached ERC20 tokens');
       } finally {
         if (mountedRef.current) {
           setIsClaiming((prev) => ({ ...prev, donatedERC20: false }));

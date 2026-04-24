@@ -128,7 +128,7 @@ describe('usePrizeClaim', () => {
     expect(mockReadRoundNum).toHaveBeenCalledTimes(2);
     expect(mockApi.create).toHaveBeenCalledWith(5, 5);
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('/allocation-finalized'));
-    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('round=5'));
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('cycle=5'));
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('message=success'));
   });
 
@@ -201,7 +201,7 @@ describe('usePrizeClaim', () => {
       await result.current.onClaimPrize();
     });
 
-    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('round=7'));
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('cycle=7'));
   });
 
   // ─────────────────────────────────────────────

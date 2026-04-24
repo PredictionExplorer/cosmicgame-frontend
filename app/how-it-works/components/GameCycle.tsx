@@ -68,10 +68,10 @@ const itemVariants = {
 
 export function GameCycle() {
   return (
-    <section aria-labelledby="game-cycle-heading" className="py-16">
+    <section aria-labelledby="protocol-cycle-heading" className="py-16">
       <div className="mb-10 text-center">
         <h2
-          id="game-cycle-heading"
+          id="protocol-cycle-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
           Lifecycle of a Performance Cycle

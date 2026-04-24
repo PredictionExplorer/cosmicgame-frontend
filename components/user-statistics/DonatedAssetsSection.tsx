@@ -96,9 +96,9 @@ export function DonatedAssetsSection({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Donated ERC20 Tokens
+              Attached ERC20 Tokens
             </p>
-            <InfoTooltip content="ERC20 tokens donated by other users. Unclaimed tokens can be claimed to your wallet." />
+            <InfoTooltip content="ERC20 tokens attached by other participants. Unretrieved tokens can be retrieved to your wallet." />
             {unclaimedERC20Count > 0 && (
               <Badge variant="default" className="text-[10px] px-1.5 py-0">
                 {unclaimedERC20Count} unclaimed
@@ -116,8 +116,8 @@ export function DonatedAssetsSection({
         ) : donatedERC20.length === 0 ? (
           <EmptyState
             icon={<Coins className="h-8 w-8 text-muted-foreground/50" />}
-            title="No donated tokens"
-            description="You haven't received any donated ERC20 tokens yet."
+            title="No attached tokens"
+            description="You haven't received any attached ERC20 tokens yet."
           />
         ) : (
           <DonatedERC20Table

@@ -26,7 +26,7 @@ const PrizeClaimedPage = () => {
 
   const [finishFireworks, setFinishFireworks] = useState(false);
 
-  const roundStr = searchParams.get('round');
+  const roundStr = searchParams.get('cycle');
   const roundNum = parseInt(roundStr ?? '0');
 
   const { data: prizeInfo, isLoading: loading } = useRoundInfo(roundNum);

@@ -13,19 +13,22 @@ describe('GalleryFilterChips', () => {
   it('renders All, Staked, and Named chips', () => {
     render(<GalleryFilterChips {...defaultProps} />);
     expect(screen.getByRole('radio', { name: /All/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /Staked/i })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /Anchored/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /Named/i })).toBeInTheDocument();
   });
 
   it('marks the active chip as checked', () => {
     render(<GalleryFilterChips {...defaultProps} value="staked" />);
-    expect(screen.getByRole('radio', { name: /Staked/i })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('radio', { name: /Anchored/i })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
     expect(screen.getByRole('radio', { name: /All/i })).toHaveAttribute('aria-checked', 'false');
   });
 
   it('calls onChange with correct key on click', () => {
     render(<GalleryFilterChips {...defaultProps} />);
-    fireEvent.click(screen.getByRole('radio', { name: /Staked/i }));
+    fireEvent.click(screen.getByRole('radio', { name: /Anchored/i }));
     expect(defaultProps.onChange).toHaveBeenCalledWith('staked');
   });
 

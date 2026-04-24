@@ -25,7 +25,7 @@ describe('GalleryToolbar', () => {
   it('renders filter chips', () => {
     render(<GalleryToolbar {...defaultProps} />);
     expect(screen.getByRole('radio', { name: /All/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /Staked/i })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: /Anchored/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /Named/i })).toBeInTheDocument();
   });
 
@@ -42,7 +42,7 @@ describe('GalleryToolbar', () => {
 
   it('calls onFilterChange when chip is clicked', () => {
     render(<GalleryToolbar {...defaultProps} />);
-    fireEvent.click(screen.getByRole('radio', { name: /Staked/i }));
+    fireEvent.click(screen.getByRole('radio', { name: /Anchored/i }));
     expect(defaultProps.onFilterChange).toHaveBeenCalledWith('staked');
   });
 

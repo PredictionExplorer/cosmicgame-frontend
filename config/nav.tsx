@@ -32,7 +32,7 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
       title: 'Help',
       route: '#',
       children: [
-        { title: 'How It Works', route: '/how-to-play' },
+        { title: 'How It Works', route: '/how-it-works' },
         { title: 'FAQ', route: '/faq' },
       ],
     },

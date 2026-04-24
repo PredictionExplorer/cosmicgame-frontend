@@ -53,9 +53,9 @@ const statCards: {
 }[] = [
   {
     key: 'total',
-    label: 'Total Minted',
+    label: 'Total Imprinted',
     icon: Gem,
-    tooltip: 'The total number of COSMIC NFTs minted across all game rounds',
+    tooltip: 'The total number of COSMIC NFTs imprinted across all cycles',
     gradient: 'from-[#06AEEC] to-[#35C9FF]',
   },
   {
@@ -74,9 +74,9 @@ const statCards: {
   },
   {
     key: 'rounds',
-    label: 'Game Rounds',
+    label: 'Cycles',
     icon: Trophy,
-    tooltip: 'The number of unique game rounds that have produced NFTs',
+    tooltip: 'The number of unique cycles that have produced NFTs',
     gradient: 'from-[#35C9FF] to-[#9C37FD]',
   },
 ];

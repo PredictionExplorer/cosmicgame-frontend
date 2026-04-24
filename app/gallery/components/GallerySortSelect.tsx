@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-export type SortKey = 'newest' | 'oldest' | 'round-desc' | 'round-asc';
+export type SortKey = 'newest' | 'oldest' | 'cycle-desc' | 'cycle-asc';
 
 interface GallerySortSelectProps {
   value: SortKey;
@@ -21,8 +21,8 @@ interface GallerySortSelectProps {
 const sortOptions: { value: SortKey; label: string }[] = [
   { value: 'newest', label: 'Newest First' },
   { value: 'oldest', label: 'Oldest First' },
-  { value: 'round-desc', label: 'Round (High → Low)' },
-  { value: 'round-asc', label: 'Round (Low → High)' },
+  { value: 'cycle-desc', label: 'Cycle (High → Low)' },
+  { value: 'cycle-asc', label: 'Cycle (Low → High)' },
 ];
 
 export function GallerySortSelect({ value, onChange }: GallerySortSelectProps) {

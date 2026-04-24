@@ -48,14 +48,14 @@ describe('StakingActionsTable', () => {
     expect(
       screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
     ).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Stake').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Anchor').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('42').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
   });
 
   it('displays Unstake for ActionType 1', () => {
     render(<StakingActionsTable list={[createRow({ ActionType: 1 })]} IsRwalk={false} />);
-    expect(screen.getAllByText('Unstake').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Release').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders only first page of results (perPage=5)', () => {
@@ -69,14 +69,14 @@ describe('StakingActionsTable', () => {
 
   it('navigates to staking action on row click (CST)', () => {
     render(<StakingActionsTable list={[createRow({ ActionId: 7 })]} IsRwalk={false} />);
-    const row = screen.getAllByText('Stake')[0]!.closest('tr');
+    const row = screen.getAllByText('Anchor')[0]!.closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/7');
   });
 
   it('navigates with IsRwalk=1 flag on row click', () => {
     render(<StakingActionsTable list={[createRow({ ActionId: 3 })]} IsRwalk={true} />);
-    const row = screen.getAllByText('Stake')[0]!.closest('tr');
+    const row = screen.getAllByText('Anchor')[0]!.closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/anchor-action/1/3');
   });

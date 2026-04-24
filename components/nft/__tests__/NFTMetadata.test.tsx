@@ -71,7 +71,7 @@ describe('NFTMetadata', () => {
 
   it('renders dash for minted when no TimeStamp', () => {
     render(<NFTMetadata nft={{ ...fullNft, TimeStamp: undefined }} />);
-    expect(screen.getByText('Minted').closest('[class]')).toBeInTheDocument();
+    expect(screen.getByText('Imprinted').closest('[class]')).toBeInTheDocument();
   });
 
   it('handles null nft gracefully', () => {

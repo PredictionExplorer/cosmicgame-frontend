@@ -93,7 +93,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
     <div data-testid="nft-metadata">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label="Minted"
+          label="Imprinted"
           value={
             nft?.TimeStamp ? (
               <a
@@ -109,7 +109,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
             )
           }
           icon={<Calendar className="h-4 w-4" />}
-          tooltip="When this token was minted on-chain. Click to view the transaction."
+          tooltip="When this token was imprinted on-chain. Click to view the transaction."
         />
         <StatCard
           label="Cycle"

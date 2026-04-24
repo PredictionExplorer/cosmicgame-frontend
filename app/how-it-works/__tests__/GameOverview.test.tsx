@@ -72,7 +72,7 @@ describe('GameOverview', () => {
 
   it('has the correct section id for anchor linking', () => {
     const { container } = renderWithTooltip(<GameOverview />);
-    expect(container.querySelector('#game-overview')).toBeInTheDocument();
+    expect(container.querySelector('#protocol-overview')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

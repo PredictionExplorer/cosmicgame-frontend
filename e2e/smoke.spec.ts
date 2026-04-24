@@ -5,7 +5,7 @@ const staticRoutes = [
   '/gallery',
   '/statistics',
   '/faq',
-  '/how-to-play',
+  '/how-it-works',
   '/site-map',
   '/contracts',
   '/code',

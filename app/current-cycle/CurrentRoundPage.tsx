@@ -126,7 +126,7 @@ const CurrentRoundPage = () => {
     return (
       <MainWrapper>
         <ErrorState
-          title="Failed to load round data"
+          title="Failed to load cycle data"
           message="Please refresh the page to try again."
           onRetry={() => window.location.reload()}
         />

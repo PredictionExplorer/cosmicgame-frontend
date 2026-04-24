@@ -173,7 +173,7 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
                 ` and a token (${shortenHex(
                   history.NFTDonationTokenAddr,
                   6,
-                )}) with ID ${history.NFTDonationTokenId} was donated`}
+                )}) with ID ${history.NFTDonationTokenId} was attached`}
               {!!history.DonatedERC20TokenAddr && (
                 <>
                   {` and ${formatUnits(BigInt(history.DonatedERC20TokenAmount || '0'), decimals)}`}{' '}
@@ -185,7 +185,7 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
                   >
                     {symbol}
                   </a>
-                  {' was donated'}
+                  {' was attached'}
                 </>
               )}
             </>

@@ -171,10 +171,10 @@ function RoundNavigation({ roundNum, maxRound }: { roundNum: number; maxRound: n
         <Link
           href={`/allocation/${roundNum - 1}`}
           className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all"
-          aria-label="Previous round"
+          aria-label="Previous cycle"
         >
           <ChevronLeft className="h-4 w-4" />
-          <span className="hidden sm:inline">Round {roundNum - 1}</span>
+          <span className="hidden sm:inline">Cycle {roundNum - 1}</span>
         </Link>
       ) : (
         <span />
@@ -183,9 +183,9 @@ function RoundNavigation({ roundNum, maxRound }: { roundNum: number; maxRound: n
         <Link
           href={`/allocation/${roundNum + 1}`}
           className="inline-flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all"
-          aria-label="Next round"
+          aria-label="Next cycle"
         >
-          <span className="hidden sm:inline">Round {roundNum + 1}</span>
+          <span className="hidden sm:inline">Cycle {roundNum + 1}</span>
           <ChevronRight className="h-4 w-4" />
         </Link>
       ) : (

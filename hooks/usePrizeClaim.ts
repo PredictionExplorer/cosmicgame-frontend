@@ -117,7 +117,7 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
       }
 
       const params = new URLSearchParams();
-      params.set('round', String(claimedRound));
+      params.set('cycle', String(claimedRound));
       params.set('message', 'success');
       router.push(`/allocation-finalized?${params.toString()}`);
 

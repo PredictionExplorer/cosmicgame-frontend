@@ -6,7 +6,7 @@ import AdminPage from './AdminPage';
 
 export const metadata: Metadata = createMetadata(
   'Admin | Cosmic Signature',
-  'Administrative controls for the Cosmic Signature game. Manage game parameters, contract settings, and system configuration.',
+  'Administrative controls for the Cosmic Signature protocol. Manage protocol parameters, contract settings, and system configuration.',
   undefined,
   '/admin',
 );

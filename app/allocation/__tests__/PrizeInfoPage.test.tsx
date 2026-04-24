@@ -276,14 +276,14 @@ describe('PrizeInfoPage', () => {
       renderWithData(1);
       const nav = screen.getByTestId('round-navigation');
       expect(nav).toBeInTheDocument();
-      expect(screen.getByLabelText('Previous round')).toBeInTheDocument();
-      expect(screen.getByLabelText('Next round')).toBeInTheDocument();
+      expect(screen.getByLabelText('Previous cycle')).toBeInTheDocument();
+      expect(screen.getByLabelText('Next cycle')).toBeInTheDocument();
     });
 
     it('hides previous button for round 0', () => {
       renderWithData(0);
-      expect(screen.queryByLabelText('Previous round')).not.toBeInTheDocument();
-      expect(screen.getByLabelText('Next round')).toBeInTheDocument();
+      expect(screen.queryByLabelText('Previous cycle')).not.toBeInTheDocument();
+      expect(screen.getByLabelText('Next cycle')).toBeInTheDocument();
     });
 
     it('hides next button when at max round', () => {
@@ -292,19 +292,19 @@ describe('PrizeInfoPage', () => {
         isLoading: false,
       });
       renderWithData(1);
-      expect(screen.getByLabelText('Previous round')).toBeInTheDocument();
-      expect(screen.queryByLabelText('Next round')).not.toBeInTheDocument();
+      expect(screen.getByLabelText('Previous cycle')).toBeInTheDocument();
+      expect(screen.queryByLabelText('Next cycle')).not.toBeInTheDocument();
     });
 
     it('previous link points to correct round', () => {
       renderWithData(2);
-      const prev = screen.getByLabelText('Previous round');
+      const prev = screen.getByLabelText('Previous cycle');
       expect(prev).toHaveAttribute('href', '/allocation/1');
     });
 
     it('next link points to correct round', () => {
       renderWithData(1);
-      const next = screen.getByLabelText('Next round');
+      const next = screen.getByLabelText('Next cycle');
       expect(next).toHaveAttribute('href', '/allocation/2');
     });
   });
@@ -727,8 +727,8 @@ describe('PrizeInfoPage', () => {
 
     it('navigation links have accessible labels', () => {
       renderWithData(1);
-      expect(screen.getByLabelText('Previous round')).toBeInTheDocument();
-      expect(screen.getByLabelText('Next round')).toBeInTheDocument();
+      expect(screen.getByLabelText('Previous cycle')).toBeInTheDocument();
+      expect(screen.getByLabelText('Next cycle')).toBeInTheDocument();
     });
 
     it('copy buttons have accessible labels', () => {

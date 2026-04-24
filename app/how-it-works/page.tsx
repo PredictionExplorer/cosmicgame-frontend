@@ -8,7 +8,7 @@ export const metadata: Metadata = createMetadata(
   'How It Works | Cosmic Signature',
   'Learn how a Cosmic Signature Performance Cycle unfolds \u2014 from the Calibration Window through Gestures to final allocation distribution.',
   undefined,
-  '/how-to-play',
+  '/how-it-works',
 );
 
 export default function Page() {

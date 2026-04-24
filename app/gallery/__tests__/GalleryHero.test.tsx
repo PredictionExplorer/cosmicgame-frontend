@@ -34,10 +34,10 @@ const defaultStats: GalleryStats = {
 describe('GalleryHero', () => {
   it('renders all four stat labels', () => {
     render(<GalleryHero stats={defaultStats} />);
-    expect(screen.getByText('Total Minted')).toBeInTheDocument();
+    expect(screen.getByText('Total Imprinted')).toBeInTheDocument();
     expect(screen.getByText('Currently Anchored')).toBeInTheDocument();
     expect(screen.getByText('Named NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Game Rounds')).toBeInTheDocument();
+    expect(screen.getByText('Cycles')).toBeInTheDocument();
   });
 
   it('renders stat icons', () => {
@@ -55,7 +55,7 @@ describe('GalleryHero', () => {
   it('renders zero stats correctly', () => {
     const zeroStats: GalleryStats = { total: 0, staked: 0, named: 0, rounds: 0 };
     render(<GalleryHero stats={zeroStats} />);
-    expect(screen.getByText('Total Minted')).toBeInTheDocument();
+    expect(screen.getByText('Total Imprinted')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

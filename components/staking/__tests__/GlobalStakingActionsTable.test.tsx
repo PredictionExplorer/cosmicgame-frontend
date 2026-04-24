@@ -54,14 +54,14 @@ describe('GlobalStakingActionsTable', () => {
     expect(
       screen.getAllByText(convertTimestampToDateTime(1701346718)).length,
     ).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Stake').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Anchor').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('42').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
   });
 
   it('displays Unstake for ActionType 1', () => {
     render(<GlobalStakingActionsTable list={[createRow({ ActionType: 1 })]} IsRWLK={false} />);
-    expect(screen.getAllByText('Unstake').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Release').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows shortened staker address', () => {
@@ -81,14 +81,14 @@ describe('GlobalStakingActionsTable', () => {
 
   it('navigates to staking action page on row click', () => {
     render(<GlobalStakingActionsTable list={[createRow({ ActionId: 7 })]} IsRWLK={false} />);
-    const row = screen.getAllByText('Stake')[0]!.closest('tr');
+    const row = screen.getAllByText('Anchor')[0]!.closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/7');
   });
 
   it('uses RWLK flag in navigation', () => {
     render(<GlobalStakingActionsTable list={[createRow({ ActionId: 3 })]} IsRWLK={true} />);
-    const row = screen.getAllByText('Stake')[0]!.closest('tr');
+    const row = screen.getAllByText('Anchor')[0]!.closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/anchor-action/1/3');
   });

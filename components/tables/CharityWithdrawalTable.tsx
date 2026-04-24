@@ -19,11 +19,11 @@ import type { CharityWithdrawal } from '@/services/api/types';
 export type { CharityWithdrawal };
 
 interface WithdrawalRowProps {
-  withdrawal?: CharityWithdrawal;
+  retrieval?: CharityWithdrawal;
 }
 
-const WithdrawalRow: FC<WithdrawalRowProps> = ({ withdrawal }) => {
-  if (!withdrawal) {
+const WithdrawalRow: FC<WithdrawalRowProps> = ({ retrieval }) => {
+  if (!retrieval) {
     return <TablePrimaryRow />;
   }
 
@@ -32,20 +32,20 @@ const WithdrawalRow: FC<WithdrawalRowProps> = ({ withdrawal }) => {
       <TablePrimaryCell>
         <a
           className="text-inherit"
-          href={getExplorerUrl('tx', withdrawal.TxHash)}
+          href={getExplorerUrl('tx', retrieval.TxHash)}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(withdrawal.TimeStamp)}
+          {convertTimestampToDateTime(retrieval.TimeStamp)}
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <AddressLink
-          address={withdrawal.DestinationAddr}
-          url={`/user/${withdrawal.DestinationAddr}`}
+          address={retrieval.DestinationAddr}
+          url={`/user/${retrieval.DestinationAddr}`}
         />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{withdrawal.AmountEth.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{retrieval.AmountEth.toFixed(6)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -77,8 +77,8 @@ const CharityWithdrawalTable: FC<CharityWithdrawalTableProps> = ({ list }) => {
             </Tr>
           </TablePrimaryHead>
           <tbody>
-            {list.slice(startIndex, endIndex).map((withdrawal) => (
-              <WithdrawalRow withdrawal={withdrawal} key={withdrawal.EvtLogId} />
+            {list.slice(startIndex, endIndex).map((retrieval) => (
+              <WithdrawalRow retrieval={retrieval} key={retrieval.EvtLogId} />
             ))}
           </tbody>
         </TablePrimary>

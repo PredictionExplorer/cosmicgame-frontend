@@ -25,10 +25,10 @@ const steps = [
   },
   {
     number: '03',
-    title: 'Earn CST',
-    description: 'Receive CST token rewards directly to your wallet.',
+    title: 'Receive CST',
+    description: 'Receive CST token allocations directly to your wallet.',
     tooltip:
-      'Once verified, CST tokens are sent on-chain to your wallet address. Rewards scale with the impact of your promotion.',
+      'Once verified, CST tokens are sent on-chain to your wallet address. Allocations scale with the impact of your outreach.',
     Icon: Coins,
   },
 ] as const;

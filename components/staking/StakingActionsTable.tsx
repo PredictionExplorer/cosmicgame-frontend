@@ -34,7 +34,7 @@ const StakingActionsRow = ({ row, IsRwalk }: { row: StakingAction; IsRwalk: bool
       <TablePrimaryCell>{convertTimestampToDateTime(row.TimeStamp)}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {row.ActionType === 1 ? 'Unstake' : 'Stake'}
+        {row.ActionType === 1 ? 'Release' : 'Anchor'}
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">

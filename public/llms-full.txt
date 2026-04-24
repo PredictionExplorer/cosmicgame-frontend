@@ -14,7 +14,7 @@ The NFT artwork is derived from the three-body problem in physics — simulating
 
 - **Home** (https://www.cosmicsignature.com/): Live gesture interface showing the active cycle, Cycle Reserve, countdown timer, recent gestures, and gesture submission form
 - **Gallery** (https://www.cosmicsignature.com/gallery): Browse and search all imprinted COSMIC NFTs with filtering and pagination
-- **How It Works** (https://www.cosmicsignature.com/how-to-play): Step-by-step guide covering protocol mechanics, gesture submission, allocation tracks, and tips
+- **How It Works** (https://www.cosmicsignature.com/how-it-works): Step-by-step guide covering protocol mechanics, gesture submission, allocation tracks, and tips
 - **FAQ** (https://www.cosmicsignature.com/faq): Questions organized into categories covering getting started, allocations, cycle mechanics, tokens, technical details, and Cosmic Council coordination
 - **Statistics** (https://www.cosmicsignature.com/statistics): Protocol analytics including cycle history, gesture volumes, allocation distribution, and participant stats
 - **Anchoring** (https://www.cosmicsignature.com/anchoring): Anchor COSMIC NFTs (CST) to receive ongoing Anchor Distributions from each Cycle Reserve

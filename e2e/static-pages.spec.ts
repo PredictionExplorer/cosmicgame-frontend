@@ -20,7 +20,7 @@ test.describe('FAQ page', () => {
 
 test.describe('How-to-Play page', () => {
   test('renders instructions content', async ({ page }) => {
-    await page.goto('/how-to-play', { waitUntil: 'networkidle' });
+    await page.goto('/how-it-works', { waitUntil: 'networkidle' });
     await expect(page.locator('body')).not.toHaveText('Internal Server Error');
     const bodyText = await page.locator('body').textContent();
     expect(bodyText!.length).toBeGreaterThan(100);

@@ -192,10 +192,10 @@ const StakedTokenRow = ({
           {processing ? (
             <span className="flex items-center gap-1">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Unstaking...
+              Releasing...
             </span>
           ) : (
-            'Unstake'
+            'Release'
           )}
         </Button>
       </TablePrimaryCell>
@@ -399,10 +399,10 @@ export const StakedTokensTable = ({
             {processing ? (
               <span className="flex items-center gap-1">
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                Unstaking...
+                Releasing...
               </span>
             ) : (
-              'Unstake Many'
+              'Release Many'
             )}
           </Button>
         </div>

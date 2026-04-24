@@ -46,9 +46,9 @@ const Mint = () => {
           toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
           return;
         }
-        reportError(err, 'mint RWLK NFT');
+        reportError(err, 'imprint RWLK NFT');
         if (isEthProviderError(err)) {
-          alert(getEthErrorMessage(err, 'Mint failed'));
+          alert(getEthErrorMessage(err, 'Imprint failed'));
         }
       }
     }
@@ -86,15 +86,15 @@ const Mint = () => {
   return (
     <MainWrapper>
       <PageHeader
-        title="Mint Random Walk NFT"
-        subtitle="Own a Random Walk NFT and get 50% discount on your gestures"
+        title="Imprint Random Walk NFT"
+        subtitle="Own a Random Walk NFT and receive a 50% reduction in Gesture Cost"
       />
 
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         RandomWalk NFTs are unique digital collectibles that grant holders a strategic advantage in
-        the Cosmic Signature game. By attaching a RandomWalk NFT to your bid, you receive a 50%
-        discount on the bid price — a significant edge when competition heats up. Each RandomWalk
-        NFT can be used once per wallet, so choose your moment wisely for maximum impact.
+        the Cosmic Signature protocol. By attaching a RandomWalk NFT to your gesture, you receive a
+        50% reduction in Gesture Cost — a significant edge late in the cycle. Each RandomWalk NFT
+        can be used once per wallet, so choose your moment wisely for maximum impact.
       </p>
 
       <div className="flex flex-col items-center">
@@ -105,9 +105,9 @@ const Mint = () => {
           <p className="text-3xl font-bold font-display">
             {mintPrice} <span className="text-primary">ETH</span>
           </p>
-          <p className="text-sm text-muted-foreground mt-2">Current mint price</p>
+          <p className="text-sm text-muted-foreground mt-2">Current imprint cost</p>
           <Button size="lg" onClick={handleMint} className="w-full mt-6">
-            Mint Now
+            Imprint Now
           </Button>
         </div>
       </div>

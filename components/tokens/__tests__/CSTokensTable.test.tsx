@@ -64,13 +64,13 @@ describe('CSTokensTable', () => {
   it('renders Stake button for unstaked tokens', () => {
     const token = createToken({ Staked: false });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
-    expect(screen.getByText('Stake')).toBeInTheDocument();
+    expect(screen.getByText('Anchor')).toBeInTheDocument();
   });
 
   it('does not render Stake button for staked tokens', () => {
     const token = createToken({ Staked: true });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
-    expect(screen.queryByText('Stake')).not.toBeInTheDocument();
+    expect(screen.queryByText('Anchor')).not.toBeInTheDocument();
   });
 
   it('paginates with perPage=5', () => {
@@ -98,7 +98,7 @@ describe('CSTokensTable', () => {
     const token = createToken({ TokenId: 42, Staked: false });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
 
-    await user.click(screen.getByText('Stake'));
+    await user.click(screen.getByText('Anchor'));
 
     await waitFor(() => {
       expect(defaultProps.handleStake).toHaveBeenCalledWith(42, false);
@@ -118,7 +118,7 @@ describe('CSTokensTable', () => {
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
 
-    expect(screen.getByText('Stake Many')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Many')).toBeInTheDocument();
   });
 
   it('Stake Many calls handleStakeMany with selected IDs and isRwlk=false flags', async () => {
@@ -133,7 +133,7 @@ describe('CSTokensTable', () => {
     const cell2 = screen.getAllByText('20').find((el) => el.closest('td'));
     fireEvent.click(cell1!.closest('tr')!);
     fireEvent.click(cell2!.closest('tr')!);
-    await user.click(screen.getByText('Stake Many'));
+    await user.click(screen.getByText('Anchor Many'));
 
     await waitFor(() => {
       expect(defaultProps.handleStakeMany).toHaveBeenCalledWith(
@@ -151,7 +151,7 @@ describe('CSTokensTable', () => {
     ];
     render(<CSTokensTable {...defaultProps} list={list} />);
 
-    const stakeButtons = screen.getAllByText('Stake');
+    const stakeButtons = screen.getAllByText('Anchor');
     await user.click(stakeButtons[0]!);
 
     await waitFor(() => {
@@ -164,7 +164,7 @@ describe('CSTokensTable', () => {
     const list2 = [createToken({ TokenId: 2, EvtLogId: 2 })];
     const { rerender } = render(<CSTokensTable {...defaultProps} list={list1} />);
     rerender(<CSTokensTable {...defaultProps} list={list2} />);
-    expect(screen.queryByText('Stake Many')).not.toBeInTheDocument();
+    expect(screen.queryByText('Anchor Many')).not.toBeInTheDocument();
   });
 
   it('Token ID links to detail page', () => {
