@@ -76,14 +76,20 @@ const fadeUp = {
 function getPrizeTypeConfig(recordType?: number) {
   switch (recordType) {
     case 1:
-      return { label: 'Raffle Winner', className: 'bg-accent/20 text-accent border-accent/30' };
+      return {
+        label: 'Stellar Selection Recipient',
+        className: 'bg-accent/20 text-accent border-accent/30',
+      };
     case 2:
       return {
-        label: 'Staking Winner',
+        label: 'Anchor Recipient',
         className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
       };
     case 3:
-      return { label: 'Round Winner', className: 'bg-primary/20 text-primary border-primary/30' };
+      return {
+        label: 'Cycle Recipient',
+        className: 'bg-primary/20 text-primary border-primary/30',
+      };
     case 4:
       return {
         label: 'Endurance Champion',
@@ -234,7 +240,11 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       });
     } catch (err) {
       if (isUserRejection(err)) {
-        setNotification({ visible: true, type: 'info', text: WALLET_TRANSACTION_CANCELLED_MESSAGE });
+        setNotification({
+          visible: true,
+          type: 'info',
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+        });
       } else {
         const msg = getEthErrorMessage(err, 'An error occurred while setting the token name.');
         setNotification({ visible: true, type: 'error', text: msg });
@@ -258,7 +268,11 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       });
     } catch (err) {
       if (isUserRejection(err)) {
-        setNotification({ visible: true, type: 'info', text: WALLET_TRANSACTION_CANCELLED_MESSAGE });
+        setNotification({
+          visible: true,
+          type: 'info',
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+        });
       } else {
         const msg = getEthErrorMessage(err, 'An error occurred while clearing the token name.');
         setNotification({ visible: true, type: 'error', text: msg });
@@ -422,8 +436,8 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                   <InfoTooltip
                     content={
                       nft?.RecordType === 3
-                        ? `Won as the Round Winner in Round #${nft?.RoundNum}`
-                        : `Won as a ${prizeConfig.label}`
+                        ? `Received as the Cycle Recipient in Cycle #${nft?.RoundNum}`
+                        : `Received as a ${prizeConfig.label}`
                     }
                     iconClassName="h-3 w-3 ml-1"
                   />
@@ -432,17 +446,17 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
 
               {stakingEligible ? (
                 <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs">
-                  Eligible for Staking
+                  Eligible for Anchoring
                   <InfoTooltip
-                    content="This token has never been staked and can earn rewards through the staking program."
+                    content="This token has never been anchored and can receive distributions through the Anchor Distribution program."
                     iconClassName="h-3 w-3 ml-1"
                   />
                 </Badge>
               ) : (
                 <Badge className="bg-red-500/15 text-red-400 border border-red-500/30 text-xs">
-                  Already Staked
+                  Already Anchored
                   <InfoTooltip
-                    content="This token has already been staked and cannot be staked again."
+                    content="This token has already been anchored and cannot be anchored again."
                     iconClassName="h-3 w-3 ml-1"
                   />
                 </Badge>
@@ -459,7 +473,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                   className="text-xs"
                 >
                   <Trophy className="h-3.5 w-3.5 mr-1.5" />
-                  View Round #{nft.RoundNum} Details
+                  View Cycle #{nft.RoundNum} Details
                 </Button>
               </div>
             )}

@@ -213,21 +213,21 @@ describe('NFTTrait', () => {
     withDashboard();
     withNft({ Staked: false, WasUnstaked: false });
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('Eligible for Staking')).toBeInTheDocument();
+    expect(screen.getByText('Eligible for Anchoring')).toBeInTheDocument();
   });
 
   it('renders already staked badge when staked', () => {
     withDashboard();
     withNft({ Staked: true });
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('Already Staked')).toBeInTheDocument();
+    expect(screen.getByText('Already Anchored')).toBeInTheDocument();
   });
 
   it('renders prize type badge for Round Winner', () => {
     withDashboard();
     withNft({ RecordType: 3 });
     render(<NFTTrait tokenId={5} />);
-    expect(screen.getByText('Round Winner')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Recipient')).toBeInTheDocument();
   });
 
   it('renders NFT image', () => {
