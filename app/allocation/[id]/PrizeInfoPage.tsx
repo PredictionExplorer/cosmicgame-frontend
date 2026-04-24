@@ -777,9 +777,9 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
         variants={sectionFade}
         aria-label="Cycle Data"
       >
-        <Tabs defaultValue="bids" className="w-full">
+        <Tabs defaultValue="gestures" className="w-full">
           <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-white/[0.03] p-1.5 rounded-xl">
-            <TabsTrigger value="bids" className="flex-1 min-w-[100px]">
+            <TabsTrigger value="gestures" className="flex-1 min-w-[100px]">
               Gesture History
               <TabBadge count={bidHistory.length} />
             </TabsTrigger>
@@ -787,7 +787,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
               Endurance Champions
               <TabBadge count={championList.length} />
             </TabsTrigger>
-            <TabsTrigger value="raffle" className="flex-1 min-w-[100px]">
+            <TabsTrigger value="stellar-selection" className="flex-1 min-w-[100px]">
               Stellar Selection
               <TabBadge
                 count={
@@ -796,17 +796,17 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                 }
               />
             </TabsTrigger>
-            <TabsTrigger value="staking" className="flex-1 min-w-[100px]">
+            <TabsTrigger value="anchoring" className="flex-1 min-w-[100px]">
               Anchor Distributions
               <TabBadge count={stakingRewards.length} />
             </TabsTrigger>
-            <TabsTrigger value="donations" className="flex-1 min-w-[100px]">
+            <TabsTrigger value="contributions" className="flex-1 min-w-[100px]">
               Contributions
               <TabBadge count={donationsCount} />
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="bids" className="mt-6">
+          <TabsContent value="gestures" className="mt-6">
             {bidHistory.length > 0 ? (
               <BiddingHistoryTable biddingHistory={bidHistory} />
             ) : (
@@ -822,7 +822,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             )}
           </TabsContent>
 
-          <TabsContent value="raffle" className="mt-6">
+          <TabsContent value="stellar-selection" className="mt-6">
             {(prizeInfo.RaffleETHDeposits?.length ?? 0) +
               (prizeInfo.RaffleNFTWinners?.length ?? 0) >
             0 ? (
@@ -835,7 +835,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             )}
           </TabsContent>
 
-          <TabsContent value="staking" className="mt-6">
+          <TabsContent value="anchoring" className="mt-6">
             {stakingRewards.length > 0 ? (
               <StakingWinnerTable list={stakingRewards} />
             ) : (
@@ -843,7 +843,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             )}
           </TabsContent>
 
-          <TabsContent value="donations" className="mt-6">
+          <TabsContent value="contributions" className="mt-6">
             <div className="space-y-8">
               <div>
                 <div className="flex items-center gap-2 mb-4">

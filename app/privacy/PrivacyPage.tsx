@@ -19,11 +19,11 @@ const sections = [
     content: [
       {
         subtitle: 'Wallet Information',
-        text: 'When you connect your Web3 wallet to use Cosmic Signature, we collect your public wallet address. This is necessary to process transactions, display your NFTs, track your bids, and award prizes.',
+        text: 'When you connect your Web3 wallet to use Cosmic Signature, we collect your public wallet address. This is necessary to process transactions, display your NFTs, track your gestures, and distribute allocations.',
       },
       {
         subtitle: 'Transaction Data',
-        text: 'We collect information about your interactions with our smart contracts, including bids placed, NFTs won, staking activities, and prize claims. All of this data is publicly available on the blockchain.',
+        text: 'We collect information about your interactions with our smart contracts, including gestures made, NFTs received, anchoring activities, and allocation retrievals. All of this data is publicly available on the blockchain.',
       },
       {
         subtitle: 'Usage Data',
@@ -37,7 +37,7 @@ const sections = [
     content: [
       {
         subtitle: 'Service Delivery',
-        text: 'Your wallet address and transaction data are used to provide you with the game services, including processing bids, managing NFTs, distributing prizes, and displaying your game statistics.',
+        text: 'Your wallet address and transaction data are used to provide you with the protocol services, including processing gestures, managing NFTs, distributing allocations, and displaying your protocol statistics.',
       },
       {
         subtitle: 'Platform Improvement',
@@ -45,7 +45,7 @@ const sections = [
       },
       {
         subtitle: 'Communication',
-        text: 'We may use your information to send important updates about the platform, such as security notifications or major changes to the game mechanics.',
+        text: 'We may use your information to send important updates about the platform, such as security notifications or major changes to the protocol mechanics.',
       },
     ],
   },
@@ -55,7 +55,7 @@ const sections = [
     content: [
       {
         subtitle: 'Blockchain Security',
-        text: 'All game transactions are secured by the Ethereum blockchain. We do not have custody of your funds or NFTs - they remain in your wallet at all times.',
+        text: 'All protocol transactions are secured by the Ethereum blockchain. We do not have custody of your funds or NFTs - they remain in your wallet at all times.',
       },
       {
         subtitle: 'Infrastructure Security',
@@ -134,14 +134,14 @@ export default function PrivacyPage() {
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground">
             <p>
-              Cosmic Signature is a decentralized blockchain game built on Ethereum. As a decentralized
-              application (dApp), we operate differently from traditional web applications when it comes to
-              data and privacy.
+              Cosmic Signature is a decentralized blockchain game built on Ethereum. As a
+              decentralized application (dApp), we operate differently from traditional web
+              applications when it comes to data and privacy.
             </p>
             <p>
-              This Privacy Policy describes how we handle information in connection with your use of Cosmic
-              Signature. By using our platform, you agree to the collection and use of information in
-              accordance with this policy.
+              This Privacy Policy describes how we handle information in connection with your use of
+              Cosmic Signature. By using our platform, you agree to the collection and use of
+              information in accordance with this policy.
             </p>
           </CardContent>
         </Card>
@@ -183,35 +183,36 @@ export default function PrivacyPage() {
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Children&apos;s Privacy</h3>
               <p className="leading-relaxed">
-                Our service is not intended for users under the age of 18. We do not knowingly collect
-                personal information from children. If you are a parent or guardian and believe your child has
-                provided us with personal information, please contact us.
+                Our service is not intended for users under the age of 18. We do not knowingly
+                collect personal information from children. If you are a parent or guardian and
+                believe your child has provided us with personal information, please contact us.
               </p>
             </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Changes to This Policy</h3>
               <p className="leading-relaxed">
-                We may update our Privacy Policy from time to time. We will notify you of any changes by
-                posting the new Privacy Policy on this page and updating the &quot;Last updated&quot; date. You
-                are advised to review this Privacy Policy periodically for any changes.
+                We may update our Privacy Policy from time to time. We will notify you of any
+                changes by posting the new Privacy Policy on this page and updating the &quot;Last
+                updated&quot; date. You are advised to review this Privacy Policy periodically for
+                any changes.
               </p>
             </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Contact Information</h3>
               <p className="leading-relaxed">
-                If you have any questions about this Privacy Policy, please contact us through our official
-                community channels or GitHub repository.
+                If you have any questions about this Privacy Policy, please contact us through our
+                official community channels or GitHub repository.
               </p>
             </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">International Users</h3>
               <p className="leading-relaxed">
-                Cosmic Signature operates on the Ethereum blockchain, which is globally accessible. By using
-                our platform, you acknowledge that your information may be processed and stored in various
-                locations around the world.
+                Cosmic Signature operates on the Ethereum blockchain, which is globally accessible.
+                By using our platform, you acknowledge that your information may be processed and
+                stored in various locations around the world.
               </p>
             </div>
           </CardContent>
@@ -222,12 +223,14 @@ export default function PrivacyPage() {
             <div className="flex items-start gap-4">
               <Shield className="mt-0.5 h-6 w-6 shrink-0 text-primary" aria-hidden />
               <div className="space-y-2">
-                <h3 className="font-semibold text-foreground">Important: blockchain transparency</h3>
+                <h3 className="font-semibold text-foreground">
+                  Important: blockchain transparency
+                </h3>
                 <p className="leading-relaxed text-muted-foreground">
-                  Please be aware that blockchain transactions are public and permanent. Your wallet address and
-                  all your interactions with our smart contracts are publicly visible and cannot be deleted.
-                  This is a fundamental characteristic of blockchain technology, not a limitation of our
-                  privacy practices.
+                  Please be aware that blockchain transactions are public and permanent. Your wallet
+                  address and all your interactions with our smart contracts are publicly visible
+                  and cannot be deleted. This is a fundamental characteristic of blockchain
+                  technology, not a limitation of our privacy practices.
                 </p>
               </div>
             </div>

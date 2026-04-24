@@ -87,7 +87,7 @@ const Mint = () => {
     <MainWrapper>
       <PageHeader
         title="Mint Random Walk NFT"
-        subtitle="Own a Random Walk NFT and get 50% discount on your bids"
+        subtitle="Own a Random Walk NFT and get 50% discount on your gestures"
       />
 
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">

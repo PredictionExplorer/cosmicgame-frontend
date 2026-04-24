@@ -32,9 +32,10 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
   if (!addrs) return [];
   return [
     {
-      name: 'Cosmic Game',
+      name: 'Cosmic Signature',
       address: addrs.CosmicGameAddr ?? '',
-      description: 'The main game contract that manages rounds, bids, and prize distribution',
+      description:
+        'The main protocol contract that manages cycles, gestures, and allocation distribution',
       category: 'core',
     },
     {
@@ -85,13 +86,13 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
       name: 'CST Anchoring Wallet',
       address: addrs.StakingWalletCSTAddr ?? '',
       description: 'Anchoring contract for Cosmic Signature Tokens',
-      category: 'staking',
+      category: 'anchoring',
     },
     {
       name: 'RWLK Anchoring Wallet',
       address: addrs.StakingWalletRWalkAddr ?? '',
       description: 'Anchoring contract for RandomWalk NFTs',
-      category: 'staking',
+      category: 'anchoring',
     },
   ].filter((c) => c.address) as ContractEntry[];
 }
@@ -189,7 +190,7 @@ const Contracts = () => {
         const addr = (await charityWalletContract.read.charityAddress?.()) as string;
         setCharityAddress(addr);
       } catch (e) {
-        reportError(e, 'fetch charity address');
+        reportError(e, 'fetch public goods beneficiary address');
       }
     };
     fetchData();

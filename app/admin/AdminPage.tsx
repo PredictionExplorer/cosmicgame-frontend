@@ -14,9 +14,9 @@ const AdminPage = () => {
 
   return (
     <MainWrapper>
-      <PageHeader title="Admin" subtitle="Manage bids and system administration" />
+      <PageHeader title="Admin" subtitle="Manage gestures and system administration" />
       <div>
-        <h2 className="text-xl font-semibold mb-4">Bid List</h2>
+        <h2 className="text-xl font-semibold mb-4">Gesture List</h2>
         {isLoading || bidList === null ? (
           <p className="text-lg font-semibold" role="status">
             Loading...

@@ -60,9 +60,9 @@ const statCards: {
   },
   {
     key: 'staked',
-    label: 'Currently Staked',
+    label: 'Currently Anchored',
     icon: Lock,
-    tooltip: 'NFTs locked in staking contracts, earning rewards for their owners',
+    tooltip: 'NFTs anchored to the protocol, receiving distributions for their owners',
     gradient: 'from-[#9C37FD] to-[#C77DFF]',
   },
   {

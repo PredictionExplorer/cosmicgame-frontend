@@ -125,7 +125,7 @@ const PrizeClaimedPage = () => {
             <SectionCard
               sectionId="prize-claimed-next"
               title="Next steps"
-              description="Stellar Selection and anchoring may yield separate allocations."
+              description="Stellar Selection and anchoring may produce separate allocations."
             >
               <div className="px-4 py-4 text-sm leading-relaxed text-muted-foreground sm:px-5">
                 There could also be additional allocations from Stellar Selection. To view your
