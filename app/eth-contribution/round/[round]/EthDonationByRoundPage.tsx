@@ -34,7 +34,7 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
           subtitle="All direct ETH donations recorded for this round."
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'ETH donations', href: '/eth-donation' },
+            { label: 'ETH donations', href: '/eth-contribution' },
             { label: `Round ${round}` },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"

@@ -17,7 +17,7 @@ describe('ListNavItem', () => {
       route: '#',
       children: [
         { title: 'Prizes', route: '/prize' },
-        { title: 'Staking', route: '/staking' },
+        { title: 'Staking', route: '/anchoring' },
       ],
     };
     render(<ListNavItem nav={nav} />);
@@ -31,7 +31,7 @@ describe('ListNavItem', () => {
       route: '#',
       children: [
         { title: 'Prizes', route: '/prize' },
-        { title: 'Staking', route: '/staking' },
+        { title: 'Staking', route: '/anchoring' },
       ],
     };
     render(<ListNavItem nav={nav} />);

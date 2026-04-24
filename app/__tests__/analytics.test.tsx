@@ -43,7 +43,7 @@ describe('Analytics', () => {
   });
 
   it('includes search params in the pageview URL', () => {
-    mockUsePathname.mockReturnValue('/staking');
+    mockUsePathname.mockReturnValue('/anchoring');
     // jsdom's URLSearchParams lacks the .size property, so we attach it manually
     const params = new URLSearchParams('tab=overview');
     Object.defineProperty(params, 'size', { value: 1 });
@@ -51,7 +51,7 @@ describe('Analytics', () => {
 
     render(<Analytics />);
 
-    expect(mockPageview).toHaveBeenCalledWith('/staking?tab=overview');
+    expect(mockPageview).toHaveBeenCalledWith('/anchoring?tab=overview');
   });
 
   it('renders nothing (returns null)', () => {

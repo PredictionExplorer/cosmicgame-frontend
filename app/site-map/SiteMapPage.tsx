@@ -9,15 +9,15 @@ import { cn } from '@/lib/utils';
 
 const perUserLinks = [
   { href: '/my-tokens', label: 'My Tokens' },
-  { href: '/my-winnings', label: 'My Unretrieved Allocations' },
-  { href: '/winning-history', label: 'History of My Allocations' },
-  { href: '/my-staking', label: 'My Anchors' },
+  { href: '/my-allocations', label: 'My Unretrieved Allocations' },
+  { href: '/recipient-history', label: 'History of My Allocations' },
+  { href: '/my-anchors', label: 'My Anchors' },
 ];
 
 const systemLinks = [
   { href: '/gallery', label: 'Cosmic Signature Gallery' },
   { href: '/prize', label: 'Cycles Completed' },
-  { href: '/staking', label: 'Anchor Distributions' },
+  { href: '/anchoring', label: 'Anchor Distributions' },
   { href: '/marketing', label: 'Outreach Allocations' },
   { href: '/statistics', label: 'System Statistics' },
   { href: '/contracts', label: 'Contract Addresses' },

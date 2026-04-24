@@ -82,7 +82,7 @@ describe('sitemap (host-aware)', () => {
       );
       expect(urls).toContain('https://app.cosmicsignature.com/public-goods-retrievals');
 
-      // Legacy paths are absent.
+      // Legacy (pre-migration) paths are absent.
       const legacyPaths = [
         '/current-round',
         '/staking',

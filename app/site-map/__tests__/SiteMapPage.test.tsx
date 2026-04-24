@@ -17,9 +17,9 @@ describe('SiteMapPage', () => {
     render(<SiteMapPage />);
     const expectedLinks = [
       { label: 'My Tokens', href: '/my-tokens' },
-      { label: 'My Unretrieved Allocations', href: '/my-winnings' },
-      { label: 'History of My Allocations', href: '/winning-history' },
-      { label: 'My Anchors', href: '/my-staking' },
+      { label: 'My Unretrieved Allocations', href: '/my-allocations' },
+      { label: 'History of My Allocations', href: '/recipient-history' },
+      { label: 'My Anchors', href: '/my-anchors' },
     ];
     for (const { label, href } of expectedLinks) {
       const link = screen.getByRole('link', { name: label });
@@ -37,7 +37,7 @@ describe('SiteMapPage', () => {
     const expectedLinks = [
       { label: 'Cosmic Signature Gallery', href: '/gallery' },
       { label: 'Cycles Completed', href: '/prize' },
-      { label: 'Anchor Distributions', href: '/staking' },
+      { label: 'Anchor Distributions', href: '/anchoring' },
       { label: 'Outreach Allocations', href: '/marketing' },
       { label: 'System Statistics', href: '/statistics' },
       { label: 'Contract Addresses', href: '/contracts' },

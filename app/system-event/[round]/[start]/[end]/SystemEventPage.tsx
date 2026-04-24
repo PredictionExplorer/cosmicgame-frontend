@@ -39,7 +39,7 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
           subtitle={`Event log range ${start}–${end}`}
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'Changed parameters', href: '/changed-parameters' },
+            { label: 'Changed parameters', href: '/coordination-changes' },
             { label: round > 0 ? `Before round ${round}` : 'Deployment' },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"

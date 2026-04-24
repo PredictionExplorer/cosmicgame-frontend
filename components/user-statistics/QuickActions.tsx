@@ -25,14 +25,14 @@ interface ActionItem {
 function buildActions(address: string): ActionItem[] {
   return [
     {
-      label: 'Stake NFTs',
-      description: 'Earn rewards by staking your tokens',
-      href: '/my-staking',
+      label: 'Anchor NFTs',
+      description: 'Receive Anchor Distributions by anchoring your tokens',
+      href: '/my-anchors',
       icon: <Layers className="h-4 w-4" />,
     },
     {
-      label: 'Place a Bid',
-      description: 'Enter the current round',
+      label: 'Make a Gesture',
+      description: 'Take part in the active cycle',
       href: '/',
       icon: <Gavel className="h-4 w-4" />,
     },

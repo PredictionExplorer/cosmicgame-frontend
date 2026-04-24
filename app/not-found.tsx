@@ -11,7 +11,7 @@ const suggestedLinks = [
   { href: '/how-to-play', label: 'How It Works' },
   { href: '/faq', label: 'FAQ' },
   { href: '/statistics', label: 'Statistics' },
-  { href: '/staking', label: 'Anchor Distributions' },
+  { href: '/anchoring', label: 'Anchor Distributions' },
 ];
 
 export default function NotFound() {

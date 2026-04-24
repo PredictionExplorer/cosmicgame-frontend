@@ -75,7 +75,7 @@ describe('NestedListItem', () => {
       route: '#',
       children: [
         { title: 'Prizes', route: '/prize' },
-        { title: 'Staking', route: '/staking' },
+        { title: 'Staking', route: '/anchoring' },
       ],
     };
     render(<NestedListItem nav={nav} />);

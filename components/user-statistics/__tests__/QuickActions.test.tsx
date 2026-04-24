@@ -34,22 +34,24 @@ describe('QuickActions', () => {
 
   it('renders all 4 action links', () => {
     render(<QuickActions address={address} />);
-    expect(screen.getByText('Stake NFTs')).toBeInTheDocument();
-    expect(screen.getByText('Place a Bid')).toBeInTheDocument();
+    expect(screen.getByText('Anchor NFTs')).toBeInTheDocument();
+    expect(screen.getByText('Make a Gesture')).toBeInTheDocument();
     expect(screen.getByText('View Transfers')).toBeInTheDocument();
     expect(screen.getByText('Stellar Selection History')).toBeInTheDocument();
   });
 
   it('renders action descriptions', () => {
     render(<QuickActions address={address} />);
-    expect(screen.getByText('Earn rewards by staking your tokens')).toBeInTheDocument();
-    expect(screen.getByText('Enter the current round')).toBeInTheDocument();
+    expect(
+      screen.getByText('Receive Anchor Distributions by anchoring your tokens'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Take part in the active cycle')).toBeInTheDocument();
   });
 
-  it('links to correct staking page', () => {
+  it('links to correct anchoring page', () => {
     render(<QuickActions address={address} />);
-    const stakeLink = screen.getByText('Stake NFTs').closest('a');
-    expect(stakeLink).toHaveAttribute('href', '/my-staking');
+    const anchorLink = screen.getByText('Anchor NFTs').closest('a');
+    expect(anchorLink).toHaveAttribute('href', '/my-anchors');
   });
 
   it('links to correct transfer page with address', () => {

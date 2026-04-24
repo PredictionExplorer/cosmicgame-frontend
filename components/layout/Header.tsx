@@ -206,9 +206,9 @@ const Header: FC = () => {
               <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
                 Explore
               </p>
-              <ListItemButton nav={{ title: 'Current Cycle', route: '/current-round' }} />
-              <ListItemButton nav={{ title: 'Allocation Recipients', route: '/prize' }} />
-              <ListItemButton nav={{ title: 'Anchor Distributions', route: '/staking' }} />
+              <ListItemButton nav={{ title: 'Current Cycle', route: '/current-cycle' }} />
+              <ListItemButton nav={{ title: 'Allocation Recipients', route: '/allocation' }} />
+              <ListItemButton nav={{ title: 'Anchor Distributions', route: '/anchoring' }} />
               <ListItemButton nav={{ title: 'Outreach Reserve', route: '/marketing' }} />
               <ListItemButton nav={{ title: 'Statistics', route: '/statistics' }} />
               <ListItemButton nav={{ title: 'Contracts', route: '/contracts' }} />
@@ -259,12 +259,14 @@ const Header: FC = () => {
                       ) : (
                         'My Allocations'
                       ),
-                      route: '/my-winnings',
+                      route: '/my-allocations',
                     }}
                   />
                   <ListItemButton nav={{ title: 'My Tokens', route: '/my-tokens' }} />
-                  <ListItemButton nav={{ title: 'My Anchors', route: '/my-staking' }} />
-                  <ListItemButton nav={{ title: 'Recipient History', route: '/winning-history' }} />
+                  <ListItemButton nav={{ title: 'My Anchors', route: '/my-anchors' }} />
+                  <ListItemButton
+                    nav={{ title: 'Recipient History', route: '/recipient-history' }}
+                  />
 
                   <Separator className="my-2" />
 

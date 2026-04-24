@@ -38,7 +38,7 @@ function StakingActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; actio
           subtitle={subtitleText}
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'My Anchors', href: '/my-staking' },
+            { label: 'My Anchors', href: '/my-anchors' },
             { label: `Action #${actionId}` },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
