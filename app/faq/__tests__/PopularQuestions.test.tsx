@@ -62,15 +62,15 @@ describe('PopularQuestions', () => {
   it('renders correct question text for each card', () => {
     render(<PopularQuestions onQuestionClick={onQuestionClick} />);
     expect(screen.getByText('What is Cosmic Signature?')).toBeInTheDocument();
-    expect(screen.getByText('What is the main prize?')).toBeInTheDocument();
-    expect(screen.getByText('How does the raffle work?')).toBeInTheDocument();
-    expect(screen.getByText('How does staking work?')).toBeInTheDocument();
+    expect(screen.getByText('What is the Signature Allocation?')).toBeInTheDocument();
+    expect(screen.getByText('How does Stellar Selection work?')).toBeInTheDocument();
+    expect(screen.getByText('How does Anchoring work?')).toBeInTheDocument();
   });
 
   it('shows category label on each card', () => {
     render(<PopularQuestions onQuestionClick={onQuestionClick} />);
     expect(screen.getByText('Getting Started')).toBeInTheDocument();
-    expect(screen.getAllByText('Prizes & Rewards')).toHaveLength(3);
+    expect(screen.getAllByText('Allocations & Distributions')).toHaveLength(3);
   });
 
   it('calls onQuestionClick with correct arguments when clicked', async () => {

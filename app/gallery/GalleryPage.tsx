@@ -174,14 +174,14 @@ const GalleryPage = () => {
     <MainWrapper>
       <PageHeader
         title="NFT Gallery"
-        subtitle="Explore the complete COSMIC NFT collection minted across every round"
+        subtitle="Explore the complete Cosmic Signature NFT collection imprinted across every cycle"
       />
 
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Each COSMIC NFT is a unique piece of generative art created from an on-chain
-        random seed using three-body problem physics simulations. Twelve new NFTs are minted every
-        round — one for the main prize winner and eleven for raffle winners. Browse, search, and
-        filter the entire collection below.
+        Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain seed
+        via three-body-problem physics simulations. Up to twelve new NFTs are imprinted every cycle
+        &mdash; one for the participant who made the Final Gesture and eleven for Stellar Selection
+        recipients. Browse, search, and filter the entire collection below.
       </p>
 
       <GalleryHero stats={stats} loading={isLoading} />

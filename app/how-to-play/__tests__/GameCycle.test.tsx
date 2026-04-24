@@ -44,17 +44,19 @@ const renderWithTooltip = (ui: React.ReactElement) =>
 describe('GameCycle', () => {
   it('renders the section heading', () => {
     renderWithTooltip(<GameCycle />);
-    expect(screen.getByRole('heading', { name: 'Lifecycle of a Round' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Lifecycle of a Performance Cycle' }),
+    ).toBeInTheDocument();
   });
 
   it('renders all six phase labels in order', () => {
     renderWithTooltip(<GameCycle />);
-    expect(screen.getByText('Round Starts')).toBeInTheDocument();
-    expect(screen.getByText('Players Bid')).toBeInTheDocument();
-    expect(screen.getByText('Timer Expires')).toBeInTheDocument();
-    expect(screen.getByText('Winner Collects')).toBeInTheDocument();
-    expect(screen.getByText('Raffles Drawn')).toBeInTheDocument();
-    expect(screen.getByText('New Round')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Opens')).toBeInTheDocument();
+    expect(screen.getByText('Participants Gesture')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Finalization Time Expires')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Finalizes')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selections')).toBeInTheDocument();
+    expect(screen.getByText('Next Cycle')).toBeInTheDocument();
   });
 
   it('renders phase numbers 01 through 06', () => {
@@ -69,12 +71,12 @@ describe('GameCycle', () => {
 
   it('renders phase descriptions', () => {
     renderWithTooltip(<GameCycle />);
-    expect(screen.getByText(/24-hour countdown timer/)).toBeInTheDocument();
-    expect(screen.getByText(/adds 1 hour to the timer/)).toBeInTheDocument();
-    expect(screen.getByText(/countdown reaches zero/)).toBeInTheDocument();
-    expect(screen.getByText(/25% of the prize pool/)).toBeInTheDocument();
-    expect(screen.getByText(/4 raffle winners share/)).toBeInTheDocument();
-    expect(screen.getByText(/bid price resets/)).toBeInTheDocument();
+    expect(screen.getByText(/Calibration Window opens/)).toBeInTheDocument();
+    expect(screen.getByText(/adds ~1 hour to the Cycle Finalization Time/)).toBeInTheDocument();
+    expect(screen.getByText(/countdown reaches zero, the cycle closes/)).toBeInTheDocument();
+    expect(screen.getByText(/25% of the Cycle Reserve/)).toBeInTheDocument();
+    expect(screen.getByText(/Three ETH Stellar Selection recipients/)).toBeInTheDocument();
+    expect(screen.getByText(/Cycle Reserve rolls forward/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

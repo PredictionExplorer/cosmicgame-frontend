@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './tokens.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -78,7 +79,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
 }
 
 @property --radius {

@@ -21,26 +21,27 @@ const steps = [
   },
   {
     Icon: Search,
-    title: 'Check the Bid Price',
+    title: 'Check the Gesture Cost',
     highlights: [
-      'Review the round countdown timer — it resets and adds time with each bid.',
-      'Check the current bid price in ETH or CST before committing.',
-      'Note the main prize reward amount to see what you could win.',
-      'Ensure your wallet holds the bid price plus a small amount for gas fees.',
+      'Review the Cycle Finalization Time \u2014 every gesture adds ~1 hour to the clock.',
+      'Check the current Gesture Cost in ETH or CST before committing.',
+      'Note the Signature Allocation amount to see the potential ETH distribution.',
+      'Ensure your wallet holds the Gesture Cost plus a small amount for gas fees.',
     ],
-    tooltip: 'Gas fees on Arbitrum are typically a few cents — much cheaper than Ethereum mainnet.',
+    tooltip:
+      'Gas fees on Arbitrum are typically a few cents \u2014 much cheaper than Ethereum mainnet.',
   },
   {
     Icon: MousePointerClick,
-    title: 'Place Your Bid',
+    title: 'Make Your Gesture',
     highlights: [
-      'Choose your bid currency: ETH, CST, or use a Random Walk NFT for a 50% ETH discount.',
-      'Click "Bid Now" and confirm the transaction in your wallet.',
-      'Your bid extends the timer by 1 hour and increases the next bid price by 1%.',
-      'Every bid earns you 100 CST tokens and a raffle ticket automatically.',
+      'Choose your gesture method: ETH, CST, or attach a Random Walk NFT for a 50% ETH cost reduction.',
+      'Click "Gesture Now" and confirm the transaction in your wallet.',
+      'Your gesture extends the Cycle Finalization Time by ~1 hour and raises the Gesture Cost by ~1%.',
+      'Every gesture imprints 100 CST and records a Stellar Selection entry automatically.',
     ],
     tooltip:
-      'The Random Walk NFT 50% discount can only be used once per wallet, so choose your moment wisely.',
+      'The Random Walk NFT 50% cost reduction can only be used once per wallet \u2014 choose your moment wisely.',
   },
 ] as const;
 
@@ -65,7 +66,7 @@ export function StepByStep() {
           Getting Started
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          From wallet connection to your first bid in three steps
+          From wallet connection to your first gesture in three steps.
         </p>
       </div>
 

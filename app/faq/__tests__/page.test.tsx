@@ -52,8 +52,8 @@ describe('app/faq/page.tsx', () => {
     });
 
     it('has the correct description', () => {
-      expect(metadata.description).toContain('Frequently Asked Questions');
       expect(metadata.description).toContain('Cosmic Signature');
+      expect(metadata.description).toMatch(/clarifications|performance cycles|gestures/i);
     });
 
     it('does not contain the "Frequenly" typo', () => {
@@ -71,7 +71,7 @@ describe('app/faq/page.tsx', () => {
     it('includes openGraph images with default logo', () => {
       const og = metadata.openGraph as { images: string[] };
       expect(og.images).toHaveLength(1);
-      expect(og.images[0]).toContain('logo.png');
+      expect(og.images[0]).toMatch(/logo\.(svg|png)/);
     });
 
     it('includes twitter card metadata', () => {

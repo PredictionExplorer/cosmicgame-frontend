@@ -1,14 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import {
-  FileText,
-  AlertTriangle,
-  Scale,
-  Shield,
-  Users,
-  Coins,
-} from 'lucide-react';
+import { FileText, AlertTriangle, Scale, Shield, Users, Coins } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
@@ -46,47 +39,47 @@ const sections = [
       },
       {
         subtitle: 'Legal Compliance',
-        text: 'You agree to comply with all applicable laws and regulations in your jurisdiction when using Cosmic Signature, including those related to cryptocurrency, online gaming, and blockchain technology.',
+        text: 'You agree to comply with all applicable laws and regulations in your jurisdiction when using Cosmic Signature, including those related to cryptocurrency and blockchain technology.',
       },
     ],
   },
   {
     icon: Coins,
-    title: 'Game Mechanics and Smart Contracts',
+    title: 'Protocol Mechanics and Smart Contracts',
     content: [
       {
-        subtitle: 'How the Game Works',
-        text: 'Cosmic Signature is a decentralized auction game where users place bids using ETH or CST tokens. The last bidder when the timer expires wins the main prize. Additional prizes are distributed according to the published prize structure.',
+        subtitle: 'How the Protocol Works',
+        text: 'Cosmic Signature is a decentralized, procedural on-chain art protocol where participants make gestures with ETH or CST tokens during a Performance Cycle. When the Cycle Finalization Time expires, the participant who made the Final Gesture may retrieve the Signature Allocation. Additional allocations are distributed according to the published allocation-track structure.',
       },
       {
         subtitle: 'Smart Contract Interaction',
-        text: 'All game actions are executed through smart contracts on the Ethereum blockchain. Once a transaction is confirmed on the blockchain, it cannot be reversed. You acknowledge that blockchain transactions are final and irreversible.',
+        text: 'All protocol actions are executed through smart contracts on the Arbitrum network. Once a transaction is confirmed on-chain, it cannot be reversed. You acknowledge that blockchain transactions are final and irreversible.',
       },
       {
         subtitle: 'Gas Fees',
-        text: 'You are responsible for paying all Ethereum network gas fees associated with your transactions. Gas fees are separate from bid amounts and are paid to Ethereum miners, not to Cosmic Signature.',
+        text: 'You are responsible for paying all Arbitrum network gas fees associated with your transactions. Gas fees are separate from Gesture Cost and are paid to the network, not to Cosmic Signature.',
       },
       {
-        subtitle: 'Random Walk NFT Discount',
-        text: 'Random Walk NFTs can be used once per NFT to receive a 50% discount on ETH bids. This action is permanent and cannot be undone. Once used, a Random Walk NFT cannot be used again for discounts.',
+        subtitle: 'Random Walk NFT Cost Reduction',
+        text: 'A Random Walk NFT can be attached once to a gesture to receive a 50% Gesture-Cost reduction. This action is permanent and cannot be undone. Once used, a Random Walk NFT cannot be used again for a cost reduction.',
       },
     ],
   },
   {
     icon: Scale,
-    title: 'Prizes and Payouts',
+    title: 'Allocations and Distributions',
     content: [
       {
-        subtitle: 'Prize Distribution',
-        text: 'Prizes are distributed automatically according to the smart contract rules. The current prize structure includes Main Prize (25% ETH + NFT), Endurance Champion (CST + NFT), Last CST Bidder (CST + NFT), Chrono-Warrior (8% ETH), Raffle prizes (4% ETH + 9 NFTs), NFT Stakers (6% ETH), and Charity (7% ETH).',
+        subtitle: 'Allocation Distribution',
+        text: 'Allocations are distributed automatically according to the smart contract rules. The current allocation structure includes the Signature Allocation (25% ETH + Cosmic Signature NFT), Endurance Champion (Recognition CST + Cosmic Signature NFT), Final CST Gesture (Recognition CST + Cosmic Signature NFT), Chrono-Warrior (8% ETH), ETH Stellar Selection (4% ETH) and NFT Stellar Selection (up to 20 Cosmic Signature NFTs), Anchor Distribution (6% ETH), and Public Goods (7% ETH to Protocol Guild).',
       },
       {
-        subtitle: 'Claiming Prizes',
-        text: 'Some prizes require manual claiming through the platform. The Main Prize winner has 24 hours to claim their prize after the round ends. If not claimed within this period, the prize may become available for others to claim according to smart contract rules.',
+        subtitle: 'Retrieving Allocations',
+        text: 'Some allocations require manual retrieval through the platform. The participant eligible for the Signature Allocation has 24 hours to finalize the cycle and retrieve the allocation. After that window, anyone may finalize the cycle according to the smart contract rules.',
       },
       {
-        subtitle: 'No Guaranteed Returns',
-        text: 'Participation in Cosmic Signature does not guarantee any returns or profits. All bids are considered final, and you may lose the full amount of your bid. Never bid more than you can afford to lose.',
+        subtitle: 'No Guaranteed Outcomes',
+        text: 'Participation in Cosmic Signature does not guarantee any outcome. All gestures are considered final, and you may not recover the full amount of your Gesture Cost. Never make gestures with funds you cannot afford to forgo.',
       },
     ],
   },
@@ -120,7 +113,7 @@ const sections = [
         text: 'You agree not to engage in any of the following prohibited activities:',
       },
       {
-        text: '• Attempting to manipulate or exploit the game mechanics through bugs, glitches, or vulnerabilities',
+        text: '\u2022 Attempting to manipulate or exploit the protocol mechanics through bugs, glitches, or vulnerabilities',
       },
       {
         text: '• Using bots, scripts, or automated tools to interact with the platform',
@@ -204,40 +197,41 @@ export default function TermsPage() {
               <h3 className="font-semibold text-foreground">Intellectual Property</h3>
               <p className="leading-relaxed">
                 All content on Cosmic Signature, including but not limited to text, graphics, logos,
-                and software, is the property of Cosmic Signature or its licensors and is protected by
-                copyright and other intellectual property laws. NFTs awarded through the game grant you
-                ownership of the specific token, but not the underlying intellectual property unless
-                explicitly stated.
+                and software, is the property of Cosmic Signature or its licensors and is protected
+                by copyright and other intellectual property laws. NFTs awarded through the game
+                grant you ownership of the specific token, but not the underlying intellectual
+                property unless explicitly stated.
               </p>
             </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Limitation of Liability</h3>
               <p className="leading-relaxed">
-                To the maximum extent permitted by law, Cosmic Signature and its affiliates shall not
-                be liable for any indirect, incidental, special, consequential, or punitive damages, or
-                any loss of profits or revenues, whether incurred directly or indirectly, or any loss of
-                data, use, goodwill, or other intangible losses resulting from your use of the platform.
+                To the maximum extent permitted by law, Cosmic Signature and its affiliates shall
+                not be liable for any indirect, incidental, special, consequential, or punitive
+                damages, or any loss of profits or revenues, whether incurred directly or
+                indirectly, or any loss of data, use, goodwill, or other intangible losses resulting
+                from your use of the platform.
               </p>
             </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Indemnification</h3>
               <p className="leading-relaxed">
-                You agree to indemnify and hold harmless Cosmic Signature and its affiliates from any
-                claims, losses, damages, liabilities, and expenses (including legal fees) arising from
-                your use of the platform, your violation of these terms, or your violation of any rights of
-                another party.
+                You agree to indemnify and hold harmless Cosmic Signature and its affiliates from
+                any claims, losses, damages, liabilities, and expenses (including legal fees)
+                arising from your use of the platform, your violation of these terms, or your
+                violation of any rights of another party.
               </p>
             </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Dispute Resolution</h3>
               <p className="leading-relaxed">
-                Any disputes arising from these terms or your use of Cosmic Signature shall be resolved
-                through binding arbitration in accordance with the rules of the American Arbitration
-                Association. You waive any right to a jury trial or to participate in a class action
-                lawsuit.
+                Any disputes arising from these terms or your use of Cosmic Signature shall be
+                resolved through binding arbitration in accordance with the rules of the American
+                Arbitration Association. You waive any right to a jury trial or to participate in a
+                class action lawsuit.
               </p>
             </div>
 
@@ -253,24 +247,24 @@ export default function TermsPage() {
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Severability</h3>
               <p className="leading-relaxed">
-                If any provision of these terms is found to be invalid or unenforceable, the remaining
-                provisions shall continue in full force and effect.
+                If any provision of these terms is found to be invalid or unenforceable, the
+                remaining provisions shall continue in full force and effect.
               </p>
             </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Entire Agreement</h3>
               <p className="leading-relaxed">
-                These terms constitute the entire agreement between you and Cosmic Signature regarding
-                your use of the platform and supersede any prior agreements.
+                These terms constitute the entire agreement between you and Cosmic Signature
+                regarding your use of the platform and supersede any prior agreements.
               </p>
             </div>
 
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Contact Information</h3>
               <p className="leading-relaxed">
-                If you have questions about these Terms of Service, please contact us through our official
-                community channels or GitHub repository.
+                If you have questions about these Terms of Service, please contact us through our
+                official community channels or GitHub repository.
               </p>
             </div>
           </CardContent>
@@ -291,11 +285,12 @@ export default function TermsPage() {
               <div className="space-y-2">
                 <h3 className="font-semibold text-foreground">Important warning</h3>
                 <p className="leading-relaxed text-muted-foreground">
-                  Participating in Cosmic Signature involves financial risk. Cryptocurrency and NFT markets
-                  are highly volatile, and you may lose some or all of your investment. Never spend more than
-                  you can afford to lose. This platform is not an investment vehicle, and no returns are
-                  guaranteed. Always do your own research and consider your financial situation carefully
-                  before participating.
+                  Participating in Cosmic Signature involves financial risk. Cryptocurrency and NFT
+                  markets are highly volatile, and you may not recover the value of your gestures.
+                  Never make gestures with funds you cannot afford to forgo. Cosmic Signature is not
+                  an investment product, makes no representation about token price or future
+                  behavior, and does not solicit participation as an investment. Always do your own
+                  research and consider your financial situation carefully before participating.
                 </p>
               </div>
             </div>
@@ -309,9 +304,10 @@ export default function TermsPage() {
               <div className="space-y-2">
                 <h3 className="font-semibold text-foreground">Acknowledgment</h3>
                 <p className="leading-relaxed text-muted-foreground">
-                  By using Cosmic Signature, you acknowledge that you have read, understood, and agree to be
-                  bound by these Terms of Service. You also acknowledge that you understand the risks
-                  associated with blockchain technology, cryptocurrency, and NFTs.
+                  By using Cosmic Signature, you acknowledge that you have read, understood, and
+                  agree to be bound by these Terms of Service. You also acknowledge that you
+                  understand the risks associated with blockchain technology, cryptocurrency, and
+                  NFTs.
                 </p>
               </div>
             </div>

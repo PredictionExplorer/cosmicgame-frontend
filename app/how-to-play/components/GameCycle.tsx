@@ -9,47 +9,50 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 const phases = [
   {
     Icon: Play,
-    label: 'Round Starts',
-    description: 'A new round begins with a 24-hour countdown timer.',
+    label: 'Cycle Opens',
+    description:
+      'A new Performance Cycle begins. The Calibration Window opens: Gesture Cost descends from the Calibration Ceiling to the Calibration Floor over ~2 days.',
     tooltip:
-      'The initial timer is set to 24 hours. The prize pool starts at zero and grows with each bid.',
+      'The Calibration Window lets any participant gesture at a falling cost. The Cycle Reserve starts at zero plus the Compounding Reserve from the previous cycle.',
   },
   {
     Icon: Users,
-    label: 'Players Bid',
-    description: 'Each bid adds 1 hour to the timer and increases the next bid price by 1%.',
+    label: 'Participants Gesture',
+    description:
+      'Each gesture adds ~1 hour to the Cycle Finalization Time and raises the Gesture Cost by ~1%.',
     tooltip:
-      'Bidding extends the countdown and raises the price, creating a strategic tension between early cheap bids and late decisive ones.',
+      'Gestures extend the cycle and introduce a Gesture-Cost Drift \u2014 a strategic tension between cost-efficient early gestures and decisive late ones.',
   },
   {
     Icon: TimerOff,
-    label: 'Timer Expires',
-    description: 'When the countdown reaches zero, the round ends.',
+    label: 'Cycle Finalization Time Expires',
+    description: 'When the countdown reaches zero, the cycle closes.',
     tooltip:
-      'No more bids can be placed once the timer hits zero. The last bidder is declared the winner.',
+      'No more gestures can be made once the timer hits zero. The participant who made the Final Gesture becomes eligible to finalize the cycle.',
   },
   {
     Icon: Trophy,
-    label: 'Winner Collects',
-    description: 'The last bidder wins 25% of the prize pool and a COSMIC NFT.',
+    label: 'Cycle Finalizes',
+    description:
+      'The participant who made the Final Gesture retrieves the Signature Allocation: 25% of the Cycle Reserve plus a Cosmic Signature NFT.',
     tooltip:
-      'The winner must withdraw their prize from the smart contract. The NFT is minted automatically.',
+      'The Signature Allocation retrieval happens via the protocol contract. The Cosmic Signature NFT is imprinted automatically.',
   },
   {
     Icon: Ticket,
-    label: 'Raffles Drawn',
+    label: 'Stellar Selections',
     description:
-      '4 raffle winners share 6% of the pool. 5 NFT raffle winners + 4 staker winners are drawn.',
+      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus up to ten Anchored-NFT Stellar Selection recipients receive Cosmic Signature NFTs.',
     tooltip:
-      'Raffle tickets are earned per bid. More bids means higher chances. NFT stakers also have a separate draw.',
+      'Entries are recorded per gesture. More gestures means higher Selection frequency. Random Walk NFT anchor-holders have a separate Stellar Selection.',
   },
   {
     Icon: RotateCcw,
-    label: 'New Round',
+    label: 'Next Cycle',
     description:
-      'The bid price resets to ~100x lower than the winning bid, and it all starts again.',
+      'About half of the Cycle Reserve rolls forward as the Compounding Reserve, and the Gesture Cost resets ~100x lower than the Final Gesture cost.',
     tooltip:
-      'Each new round is a fresh opportunity. The reset price makes early bids in a new round very affordable.',
+      'Each new cycle begins with a reset Calibration Window. The Compounding Cycle Reserve means the protocol accumulates value rather than extracts it.',
   },
 ] as const;
 
@@ -71,10 +74,10 @@ export function GameCycle() {
           id="game-cycle-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          Lifecycle of a Round
+          Lifecycle of a Performance Cycle
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Every round follows this cycle from start to finish
+          Every cycle follows this sequence from open to finalization.
         </p>
       </div>
 

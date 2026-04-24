@@ -44,23 +44,27 @@ const renderWithTooltip = (ui: React.ReactElement) =>
 describe('RewardBreakdown', () => {
   it('renders the section heading', () => {
     renderWithTooltip(<RewardBreakdown />);
-    expect(screen.getByRole('heading', { name: 'Every Bid Earns You' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'What Every Gesture Imprints' }),
+    ).toBeInTheDocument();
   });
 
   it('renders all four reward titles', () => {
     renderWithTooltip(<RewardBreakdown />);
-    expect(screen.getByText('100 CST Tokens')).toBeInTheDocument();
-    expect(screen.getByText('1 Raffle Ticket')).toBeInTheDocument();
-    expect(screen.getByText('NFT Chance')).toBeInTheDocument();
-    expect(screen.getByText('Main Prize')).toBeInTheDocument();
+    expect(screen.getByText('100 Participation CST')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection Entry')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Chance')).toBeInTheDocument();
+    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
   });
 
   it('renders reward descriptions', () => {
     renderWithTooltip(<RewardBreakdown />);
-    expect(screen.getByText(/Earn 100 Cosmic Signature Tokens/)).toBeInTheDocument();
-    expect(screen.getByText(/earns a raffle ticket/)).toBeInTheDocument();
-    expect(screen.getByText(/Win a unique COSMIC NFT/)).toBeInTheDocument();
-    expect(screen.getByText(/25% of the entire round prize pool/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Every gesture imprints 100 Cosmic Signature Tokens/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/records an entry in Stellar Selection/)).toBeInTheDocument();
+    expect(screen.getByText(/receive a unique Cosmic Signature NFT/)).toBeInTheDocument();
+    expect(screen.getByText(/25% of the Cycle Reserve/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

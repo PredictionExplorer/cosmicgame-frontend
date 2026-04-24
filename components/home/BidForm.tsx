@@ -128,8 +128,8 @@ export function BidForm({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="max-w-[200px]">
-                    Select a RandomWalk NFT to get a 50% discount on your bid. Each NFT can only be
-                    used once.
+                    Attach a RandomWalk NFT to your gesture to receive a 50% cost reduction. Each
+                    NFT can only be used once.
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -148,7 +148,7 @@ export function BidForm({
         <AuctionInfo
           secondsElapsed={cstBidData.SecondsElapsed}
           auctionDuration={cstBidData.AuctionDuration}
-          endedMessage="Auction ended, you can bid for free."
+          endedMessage="Calibration Window ended — you can gesture for free."
         />
       )}
 
@@ -158,7 +158,7 @@ export function BidForm({
           <span className="normal-case tracking-normal opacity-50">(optional, 280 chars)</span>
         </Label>
         <textarea
-          placeholder="Leave a message with your bid..."
+          placeholder="Leave a message with your gesture..."
           value={message}
           maxLength={280}
           rows={3}
@@ -183,7 +183,7 @@ export function BidForm({
           <AccordionContent>
             <div className="space-y-4 pt-2 max-w-xl">
               <p className="text-xs text-muted-foreground">
-                Donate tokens or NFTs while bidding, or adjust bid collision prevention.
+                Attach tokens or NFTs to your gesture, or adjust gesture-cost collision prevention.
               </p>
               <RadioGroup
                 value={donationType}
@@ -195,11 +195,11 @@ export function BidForm({
               >
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <RadioGroupItem value="NFT" />
-                  <span className="text-sm">Donate NFT</span>
+                  <span className="text-sm">Attach NFT</span>
                 </label>
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <RadioGroupItem value="Token" />
-                  <span className="text-sm">Donate Token</span>
+                  <span className="text-sm">Attach Token</span>
                 </label>
               </RadioGroup>
               {donationType === 'Token' && (
@@ -264,7 +264,9 @@ export function BidForm({
                   </p>
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-sm text-muted-foreground whitespace-nowrap">Raise by</span>
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">
+                        Raise by
+                      </span>
                       <div className="relative w-[4.25rem] shrink-0">
                         <CustomTextField
                           type="number"

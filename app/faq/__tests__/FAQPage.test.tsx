@@ -67,11 +67,11 @@ describe('FAQPage', () => {
     render(<FAQPage />);
     const categoryHeadings = [
       'Getting Started',
-      'Prizes & Rewards',
-      'Game Mechanics',
-      'Tokens & NFTs',
+      'Allocations & Distributions',
+      'Cycle Mechanics',
+      'Tokens & Cosmic Signatures',
       'Arbitrum & Technical',
-      'Trust & Governance',
+      'Trust & Coordination',
     ];
     for (const title of categoryHeadings) {
       expect(screen.getByRole('heading', { name: title })).toBeInTheDocument();

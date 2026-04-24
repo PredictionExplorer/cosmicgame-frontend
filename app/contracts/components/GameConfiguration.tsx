@@ -42,7 +42,7 @@ export function GameConfiguration({
   if (loading) {
     return (
       <div>
-        <SectionDivider title="Game Configuration" className="mb-4" />
+        <SectionDivider title="Protocol Configuration" className="mb-4" />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <StatCardSkeleton key={i} />
@@ -54,48 +54,49 @@ export function GameConfiguration({
 
   const cards = [
     {
-      label: 'Price Increase',
+      label: 'Gesture-Cost Drift',
       value: `${priceIncrease}%`,
       icon: <TrendingUp className="h-4 w-4" />,
-      tooltip: 'Each bid increases the next bid price by this percentage',
+      tooltip: 'Each gesture increases the next Gesture Cost by this percentage',
       featured: true,
     },
     {
-      label: 'Time Increase',
+      label: 'Time Increment',
       value: timeIncrement > 0 ? formatSeconds(timeIncrement) : '--',
       icon: <Clock className="h-4 w-4" />,
-      tooltip: `Each bid adds this much time to the round clock. The increment grows by ${timeIncrease}% with each bid.`,
+      tooltip: `Each gesture adds this much time to the Cycle Finalization Time. The increment grows by ${timeIncrease}% with each gesture.`,
       featured: true,
     },
     {
-      label: 'CST Reward per Bid',
+      label: 'Participation CST per Gesture',
       value: `${cstRewardPerBid} CST`,
       icon: <Coins className="h-4 w-4" />,
-      tooltip: 'Number of Cosmic Tokens earned with each bid placed',
+      tooltip: 'Cosmic Signature Tokens imprinted with each gesture',
     },
     {
-      label: 'Claim Timeout',
+      label: 'Finalization Timeout',
       value: claimTimeout > 0 ? formatSeconds(claimTimeout) : '--',
       icon: <Timer className="h-4 w-4" />,
-      tooltip: 'Time the winner has to claim their prize before it can be reclaimed',
+      tooltip:
+        'Time the Final Gesture participant has to finalize the cycle before the Open-Finalization Window opens to anyone',
     },
     {
       label: 'Initial Time Increment',
       value: initialIncrement > 0 ? formatSeconds(initialIncrement) : '--',
       icon: <Zap className="h-4 w-4" />,
-      tooltip: 'The initial countdown duration added when the first bid is placed',
+      tooltip: 'The initial Cycle Finalization Time added when the first gesture is made',
     },
     {
       label: 'Max Message Length',
       value: maxMessageLength > 0 ? maxMessageLength : '--',
       icon: <MessageSquare className="h-4 w-4" />,
-      tooltip: 'Maximum character length allowed in bid messages',
+      tooltip: 'Maximum character length allowed in gesture messages',
     },
   ];
 
   return (
     <div>
-      <SectionDivider title="Game Configuration" className="mb-4" />
+      <SectionDivider title="Protocol Configuration" className="mb-4" />
       <motion.div
         className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
         variants={stagger}

@@ -116,8 +116,7 @@ export const BiddingStatus = ({
           className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 text-center"
         >
           <p className="text-sm text-muted-foreground">
-            Round {data.CurRoundNum} becomes active at{' '}
-            {convertTimestampToDateTime(activationTime, true)}
+            Cycle {data.CurRoundNum} opens at {convertTimestampToDateTime(activationTime, true)}
           </p>
           <div className="mt-4">
             <Countdown key={3} date={activationTime * 1000} renderer={Counter} />
@@ -135,9 +134,9 @@ export const BiddingStatus = ({
                 className="gradient-border-card gradient-border-card-accent rounded-2xl bg-gradient-to-b from-primary/[0.06] to-transparent p-6 text-center"
               >
                 <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
-                  Round ends in
+                  Cycle finalizes in
                   <InfoTooltip
-                    content="When this timer hits zero, the last bidder wins the main prize. Each new bid resets the timer."
+                    content="When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation. Each new gesture extends the timer."
                     className="ml-1.5"
                   />
                 </p>
@@ -150,10 +149,8 @@ export const BiddingStatus = ({
                 className="gradient-border-card rounded-2xl bg-primary/[0.06] p-6 text-center animate-pulse-glow"
               >
                 <Zap className="mx-auto h-8 w-8 text-primary mb-2" />
-                <h5 className="font-display text-xl font-bold text-primary">Bids Exhausted!</h5>
-                <p className="mt-1 text-sm text-primary/80">
-                  Waiting for the winner to claim the prize.
-                </p>
+                <h5 className="font-display text-xl font-bold text-primary">Cycle Closed</h5>
+                <p className="mt-1 text-sm text-primary/80">Waiting for the cycle to finalize.</p>
               </motion.div>
             ))}
 
@@ -161,11 +158,11 @@ export const BiddingStatus = ({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible">
               <StatCard
-                label="Main Prize"
+                label="Signature Allocation"
                 value={`${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`}
                 icon={<Trophy className="h-5 w-5" />}
                 gradient
-                tooltip="The amount you win if you're the last bidder when time runs out"
+                tooltip="The ETH allocation the participant who makes the Final Gesture may retrieve when the cycle finalizes"
               />
             </motion.div>
 
@@ -173,26 +170,26 @@ export const BiddingStatus = ({
               <>
                 <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible">
                   <StatCard
-                    label="ETH Bid"
+                    label="ETH Gesture"
                     value={`${(ethBidInfo?.ETHPrice ?? 0).toFixed(5)} ETH`}
                     icon={<Coins className="h-4 w-4" />}
-                    tooltip="Current price to place an ETH bid"
+                    tooltip="Current cost to make a gesture with ETH"
                   />
                 </motion.div>
                 <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible">
                   <StatCard
-                    label="RandomWalk Bid"
+                    label="RandomWalk Gesture"
                     value={`${((ethBidInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH`}
-                    tooltip="50% discount when using a RandomWalk NFT to bid"
+                    tooltip="50% cost reduction when attaching a RandomWalk NFT to your gesture"
                   />
                 </motion.div>
                 <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
                   <StatCard
-                    label="CST Bid"
+                    label="CST Gesture"
                     value={
                       cstBidData?.CSTPrice > 0 ? `${cstBidData.CSTPrice.toFixed(4)} CST` : 'FREE'
                     }
-                    tooltip="Bid using Cosmic Token. Price decreases over time via Dutch auction -- can become free!"
+                    tooltip="Gesture with CST. Cost descends over time via the Calibration Window — can become free."
                   />
                 </motion.div>
               </>
@@ -230,14 +227,14 @@ export const BiddingStatus = ({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Last Bidder
+                      Last Participant
                     </p>
                     {data.LastBidderAddr === account && (
                       <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
                         You
                       </span>
                     )}
-                    <InfoTooltip content="The last bidder when the countdown reaches zero wins the main ETH prize and a COSMIC NFT." />
+                    <InfoTooltip content="The participant who made the Final Gesture when the countdown reaches zero may finalize the cycle and retrieve the Signature Allocation plus a Cosmic Signature NFT." />
                   </div>
                   <a
                     href={`/user/${data.LastBidderAddr}`}
@@ -277,22 +274,23 @@ export const BiddingStatus = ({
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Your Chances
                 </p>
-                <InfoTooltip content="Your probability of winning raffle prizes based on the number of bids you've placed this round." />
+                <InfoTooltip content="Your Stellar Selection frequency based on the number of gestures you've made this cycle." />
               </div>
               {data.LastBidderAddr === account ? (
                 <p className="text-sm font-medium text-emerald-400">
-                  You&apos;re the last bidder! You win the main prize (
-                  {(data.PrizeAmountEth ?? 0).toFixed(4)} ETH) if no one else bids.
+                  You made the most recent gesture. If no one else gestures, you receive the
+                  Signature Allocation ({(data.PrizeAmountEth ?? 0).toFixed(4)} ETH).
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  Not the last bidder &mdash; bid again to take the lead, or win via raffle.
+                  You are not the most recent participant &mdash; gesture again to take the lead, or
+                  remain eligible for Stellar Selection.
                 </p>
               )}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">ETH Raffle</span>
+                    <span className="text-muted-foreground">ETH Stellar Selection</span>
                     <span className="font-medium text-primary">
                       {winProbability.raffle.toFixed(1)}%
                     </span>
@@ -308,7 +306,7 @@ export const BiddingStatus = ({
                 </div>
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">NFT Raffle</span>
+                    <span className="text-muted-foreground">NFT Stellar Selection</span>
                     <span className="font-medium text-accent">
                       {winProbability.nft.toFixed(1)}%
                     </span>
@@ -333,12 +331,12 @@ export const BiddingStatus = ({
           className="gradient-border-card rounded-2xl bg-primary/[0.04] p-8 text-center"
         >
           {data && data.CurRoundNum > 0 ? (
-            <h4 className="font-display text-2xl font-bold">Round {data.CurRoundNum}</h4>
+            <h4 className="font-display text-2xl font-bold">Cycle {data.CurRoundNum}</h4>
           ) : (
-            <h4 className="font-display text-2xl font-bold">Start the Game</h4>
+            <h4 className="font-display text-2xl font-bold">Open the Cycle</h4>
           )}
           <p className="mt-2 text-sm text-muted-foreground">
-            Dutch auction for the first bid in ETH has started. Make your bid.
+            The Calibration Window for the first ETH gesture is open. Make your gesture.
           </p>
         </motion.div>
       )}

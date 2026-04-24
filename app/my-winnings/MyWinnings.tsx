@@ -96,7 +96,7 @@ export default function MyWinnings() {
     []) as import('@/components/donations/DonatedERC20Table').DonatedERC20Token[];
 
   const loading = loadingNFTs || loadingRaffle;
-  const error = nftError || raffleError ? 'Failed to load unclaimed winnings data' : null;
+  const error = nftError || raffleError ? 'Failed to load pending allocations data' : null;
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const perPage = 5;
@@ -142,12 +142,15 @@ export default function MyWinnings() {
 
   return (
     <MainWrapper>
-      <PageHeader title="My Rewards" subtitle="View and claim all your pending winnings" />
+      <PageHeader
+        title="My Allocations"
+        subtitle="View and retrieve all your pending allocations"
+      />
 
       <div className="space-y-12">
-        {/* ETH Rewards */}
+        {/* ETH Allocations */}
         <section>
-          <SectionDivider title="Claimable ETH Rewards" className="mb-6" />
+          <SectionDivider title="Retrievable ETH Allocations" className="mb-6" />
           {loading && raffleETHWinnings === null ? (
             <div className="flex justify-center py-8">
               <Spinner />
@@ -155,8 +158,8 @@ export default function MyWinnings() {
           ) : !raffleETHWinnings || raffleETHWinnings.length === 0 ? (
             <EmptyState
               icon={<Trophy className="h-8 w-8 text-muted-foreground/50" />}
-              title="No ETH rewards yet"
-              description="Win raffles by placing bids to earn ETH rewards."
+              title="No ETH allocations yet"
+              description="Participate in Stellar Selection by making gestures to receive ETH allocations."
             />
           ) : (
             <>
@@ -166,7 +169,7 @@ export default function MyWinnings() {
               {status?.ETHRaffleToClaim > 0 && (
                 <div className="flex justify-end items-center mt-4 gap-4">
                   <p className="text-sm text-muted-foreground">
-                    Claimable:{' '}
+                    Retrievable:{' '}
                     <span className="text-white font-medium">
                       {status.ETHRaffleToClaim.toFixed(6)} ETH
                     </span>
@@ -174,10 +177,10 @@ export default function MyWinnings() {
                   <Button onClick={handleAllETHClaim} disabled={isClaiming.raffleETH} size="sm">
                     {isClaiming.raffleETH ? (
                       <>
-                        <Spinner size="sm" /> Claiming...
+                        <Spinner size="sm" /> Retrieving...
                       </>
                     ) : (
-                      'Claim All'
+                      'Retrieve All'
                     )}
                   </Button>
                 </div>
@@ -192,16 +195,16 @@ export default function MyWinnings() {
           )}
         </section>
 
-        {/* CST Staking */}
+        {/* CST Anchoring */}
         <section>
-          <SectionDivider title="CST Staking Rewards" className="mb-6" />
+          <SectionDivider title="CST Anchor Distributions" className="mb-6" />
           <UncollectedCSTStakingRewardsTable user={account} />
         </section>
 
-        {/* Donated NFTs */}
+        {/* Attached NFTs */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <SectionDivider title="Donated NFTs" className="flex-1" />
+            <SectionDivider title="Attached NFTs" className="flex-1" />
             {status?.NumDonatedNFTToClaim > 0 && (
               <Button
                 onClick={handleAllDonatedNFTsClaim}
@@ -211,10 +214,10 @@ export default function MyWinnings() {
               >
                 {isClaiming.donatedNFT ? (
                   <>
-                    <Spinner size="sm" /> Claiming...
+                    <Spinner size="sm" /> Retrieving...
                   </>
                 ) : (
-                  'Claim All'
+                  'Retrieve All'
                 )}
               </Button>
             )}
@@ -226,8 +229,8 @@ export default function MyWinnings() {
           ) : !donatedNFTs || donatedNFTs.length === 0 ? (
             <EmptyState
               icon={<Gift className="h-8 w-8 text-muted-foreground/50" />}
-              title="No donated NFTs"
-              description="NFTs donated during bidding rounds will appear here."
+              title="No attached NFTs"
+              description="NFTs attached to gestures during cycles will appear here."
             />
           ) : (
             <DonatedNFTTable
@@ -238,13 +241,13 @@ export default function MyWinnings() {
           )}
         </section>
 
-        {/* Donated ERC20 */}
+        {/* Attached ERC-20 Tokens */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <SectionDivider title="Donated ERC20 Tokens" className="flex-1" />
+            <SectionDivider title="Attached ERC-20 Tokens" className="flex-1" />
             {donatedERC20Data.filter((x) => !x.Claimed).length > 0 && (
               <Button onClick={handleAllDonatedERC20Claim} size="sm" className="ml-4">
-                Claim All
+                Retrieve All
               </Button>
             )}
           </div>
@@ -255,8 +258,8 @@ export default function MyWinnings() {
           ) : donatedERC20Data.length === 0 ? (
             <EmptyState
               icon={<Coins className="h-8 w-8 text-muted-foreground/50" />}
-              title="No donated tokens"
-              description="ERC20 tokens donated during bidding rounds will appear here."
+              title="No attached tokens"
+              description="ERC-20 tokens attached to gestures during cycles will appear here."
             />
           ) : (
             <DonatedERC20Table list={donatedERC20Data} handleClaim={claimDonatedERC20} />

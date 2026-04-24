@@ -79,15 +79,16 @@ const PrizeWinnersPage = () => {
   return (
     <MainWrapper>
       <PageHeader
-        title="Prize Winners"
-        subtitle="Browse the complete history of prize winners, round statistics, and prize distributions across all completed rounds."
+        title="Allocation Recipients"
+        subtitle="Browse the complete history of allocation recipients, cycle statistics, and allocation distributions across all finalized Performance Cycles."
       />
 
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        At the end of each round, the last bidder wins the main prize — 25% of the ETH pot plus a
-        unique COSMIC NFT. Additional prizes are distributed through raffle drawings, with
-        4 ETH winners and 11 NFT winners selected from all bidders. Explore the complete prize
-        history and see how rewards have grown over time.
+        When a Performance Cycle finalizes, the participant who made the Final Gesture retrieves the
+        Signature Allocation &mdash; 25% of the Cycle Reserve plus a unique Cosmic Signature NFT.
+        Additional allocations are distributed through Stellar Selection: three ETH recipients and
+        eleven NFT recipients are randomly selected from all cycle participants. Explore the
+        complete allocation history and how distributions have evolved over time.
       </p>
 
       {loading ? (
@@ -97,30 +98,30 @@ const PrizeWinnersPage = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10" data-testid="summary-stats">
             <SummaryStat
               icon={<Layers className="h-4 w-4" />}
-              label="Total Rounds"
+              label="Total Cycles"
               value={summaryStats.totalRounds}
-              tooltip="The total number of completed rounds in the game so far."
+              tooltip="The total number of finalized Performance Cycles so far."
               index={0}
             />
             <SummaryStat
               icon={<Trophy className="h-4 w-4" />}
-              label="Total ETH Awarded"
+              label="Total ETH Distributed"
               value={`${summaryStats.totalEth.toFixed(2)} ETH`}
-              tooltip="The combined ETH awarded to main prize winners across all rounds."
+              tooltip="The combined ETH distributed as Signature Allocations across all cycles."
               index={1}
             />
             <SummaryStat
               icon={<Gavel className="h-4 w-4" />}
-              label="Total Bids"
+              label="Total Gestures"
               value={summaryStats.totalBids.toLocaleString()}
-              tooltip="The cumulative number of bids placed across all completed rounds."
+              tooltip="The cumulative number of gestures made across all finalized cycles."
               index={2}
             />
             <SummaryStat
               icon={<Users className="h-4 w-4" />}
-              label="Unique Winners"
+              label="Unique Recipients"
               value={summaryStats.uniqueWinners}
-              tooltip="The number of distinct wallet addresses that have won the main prize."
+              tooltip="The number of distinct wallet addresses that have retrieved a Signature Allocation."
               index={3}
             />
           </div>

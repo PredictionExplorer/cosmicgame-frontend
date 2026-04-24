@@ -65,35 +65,35 @@ export function HeroStats({
         label: 'CST Balance',
         value: `${balanceCST.toFixed(2)} CST`,
         tooltip:
-          'Your Cosmic Token (ERC20) balance, earned through gameplay and reward distributions.',
+          'Your Cosmic Signature Token (ERC-20) balance, imprinted through participation and Anchor Distributions.',
         icon: <Coins className="h-4 w-4" />,
         featured: true,
       },
       {
-        label: 'Prizes Won',
+        label: 'Signature Allocations Received',
         value: userInfo.NumPrizes.toLocaleString(),
         tooltip:
-          'Number of times you have won the main prize by being the last bidder when the round timer expired.',
+          'Number of times you retrieved the Signature Allocation by making the Final Gesture before the Cycle Finalization Time expired.',
         icon: <Trophy className="h-4 w-4" />,
       },
       {
-        label: 'Total ETH Won',
+        label: 'Total ETH Received',
         value: formatEthValue(totalEthWon),
         tooltip:
-          'Combined ETH earned from raffle winnings and withdrawals across all rounds you participated in.',
+          'Combined ETH retrieved from Stellar Selection allocations and other distributions across all cycles you participated in.',
         icon: <Gem className="h-4 w-4" />,
       },
       {
-        label: 'Bids Placed',
+        label: 'Gestures Made',
         value: userInfo.NumBids.toLocaleString(),
-        tooltip: 'Total number of bids you have placed across all rounds of the game.',
+        tooltip: 'Total number of gestures you have made across all Performance Cycles.',
         icon: <Gavel className="h-4 w-4" />,
       },
       {
-        label: 'Win Probability',
+        label: 'Selection Frequency',
         value: bestProbability >= 0 ? `${(bestProbability * 100).toFixed(2)}%` : '--',
         tooltip:
-          'Your best chance of winning in the current round, calculated from your bid count relative to total bids and the number of raffle winners drawn.',
+          'Your best Stellar Selection frequency in the current cycle, calculated from your gesture count relative to total gestures and the number of selected recipients.',
         icon: <TrendingUp className="h-4 w-4" />,
       },
     ],

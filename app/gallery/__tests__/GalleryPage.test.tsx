@@ -105,7 +105,9 @@ describe('GalleryPage', () => {
     mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<GalleryPage />);
     expect(screen.getByText('NFT Gallery')).toBeInTheDocument();
-    expect(screen.getByText(/Explore the complete COSMIC NFT collection/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Explore the complete Cosmic Signature NFT collection imprinted/),
+    ).toBeInTheDocument();
   });
 
   it('shows skeleton loading state', () => {

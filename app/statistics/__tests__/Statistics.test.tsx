@@ -63,7 +63,7 @@ jest.mock('../../../components/tables/UniqueBiddersTable', () => ({
 }));
 jest.mock('../../../components/tables/UniqueWinnersTable', () => ({
   UniqueWinnersTable: () => <div data-testid="unique-winners-table" />,
-  Winner: undefined,
+  Recipient: undefined,
 }));
 jest.mock('../../../components/tables/UniqueEthDonorsTable', () => ({
   UniqueEthDonorsTable: () => <div data-testid="unique-eth-donors-table" />,
@@ -192,13 +192,13 @@ const makeDashboardData = (overrides = {}) => ({
     TotalRaffleEthWithdrawn: 0.5,
     NumBidsCST: 20,
     NumUniqueBidders: 15,
-    NumUniqueWinners: 8,
+    NumUniqueRecipients: 8,
     NumUniqueDonors: 6,
     TotalNamedTokens: 12,
     NumUniqueStakersCST: 4,
     NumUniqueStakersRWalk: 3,
     DonatedTokenDistribution: [],
-    NumWinnersWithPendingRaffleWithdrawal: 0,
+    NumRecipientsWithPendingRaffleWithdrawal: 0,
     NumCosmicGameDonations: 0,
     SumCosmicGameDonationsEth: 0,
     NumWithdrawals: 0,
@@ -251,10 +251,10 @@ describe('Statistics', () => {
     });
     render(<Statistics />);
     expect(screen.getByRole('heading', { name: 'Statistics', level: 1 })).toBeInTheDocument();
-    expect(screen.getByText('Total Rounds')).toBeInTheDocument();
+    expect(screen.getByText('Total Cycles')).toBeInTheDocument();
     const roundValues = screen.getAllByText('5');
     expect(roundValues.length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('Prizes Given')).toBeInTheDocument();
+    expect(screen.getByText('Allocations Distributed')).toBeInTheDocument();
     expect(screen.getAllByText('381').length).toBeGreaterThanOrEqual(1);
   });
 
@@ -266,9 +266,9 @@ describe('Statistics', () => {
     });
     render(<Statistics />);
     expect(screen.getByText('Financial Overview')).toBeInTheDocument();
-    expect(screen.getByText('Prize Economy')).toBeInTheDocument();
+    expect(screen.getByText('Allocation Economy')).toBeInTheDocument();
     expect(screen.getByText('Token Economy')).toBeInTheDocument();
-    expect(screen.getByText('Charity & Donations')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods & Contributions')).toBeInTheDocument();
   });
 
   it('renders link to current round page', () => {
@@ -278,8 +278,8 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Looking for current round data?')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /current round data/ })).toHaveAttribute(
+    expect(screen.getByText('Looking for current cycle data?')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /current cycle data/ })).toHaveAttribute(
       'href',
       '/current-round',
     );
@@ -293,10 +293,10 @@ describe('Statistics', () => {
     });
     render(<Statistics />);
     expect(screen.getByText('Community & Participation')).toBeInTheDocument();
-    expect(screen.getAllByText('Unique Bidders').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Unique Winners').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Unique ETH Donors').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('Unique Stakers')).toBeInTheDocument();
+    expect(screen.getAllByText('Unique Participants').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Unique Recipients').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Unique ETH Contributors').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Unique Anchor-holders')).toBeInTheDocument();
   });
 
   it('renders participant tables inside collapsible sections', () => {
@@ -373,9 +373,9 @@ describe('Statistics', () => {
     });
     render(<Statistics />);
     expect(screen.getByText('Token Distribution')).toBeInTheDocument();
-    expect(screen.getByText('CST Holders')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Holders')).toBeInTheDocument();
     expect(screen.getByText('CST (ERC-20) Holders')).toBeInTheDocument();
-    expect(screen.getByText('Donated Token Distribution')).toBeInTheDocument();
+    expect(screen.getByText('Attached Token Distribution')).toBeInTheDocument();
   });
 
   it('renders staking section with stat cards', () => {
@@ -385,9 +385,9 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Active CST Stakers')).toBeInTheDocument();
-    expect(screen.getByText('Active RWLK Stakers')).toBeInTheDocument();
-    expect(screen.getByText('Total Staking Rewards')).toBeInTheDocument();
+    expect(screen.getByText('Active CST Anchor-holders')).toBeInTheDocument();
+    expect(screen.getByText('Active RWLK Anchor-holders')).toBeInTheDocument();
+    expect(screen.getByText('Total Anchor Distributions')).toBeInTheDocument();
   });
 
   it('renders system events section divider', () => {
@@ -445,8 +445,8 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Cosmic Game Donations')).toBeInTheDocument();
-    expect(screen.getByText('CG Donations Sum')).toBeInTheDocument();
+    expect(screen.getByText('Protocol Contributions')).toBeInTheDocument();
+    expect(screen.getByText('Protocol Contributions Sum')).toBeInTheDocument();
   });
 
   it('renders voluntary donations when present', () => {
@@ -459,7 +459,7 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Voluntary Donations')).toBeInTheDocument();
+    expect(screen.getByText('Voluntary Contributions')).toBeInTheDocument();
   });
 
   it('renders charity withdrawals when present', () => {
@@ -474,7 +474,7 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Charity Withdrawals')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods Retrievals')).toBeInTheDocument();
   });
 
   it('renders pending raffle withdrawal message when applicable', () => {
@@ -489,7 +489,7 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText(/3 winners are yet to withdraw/)).toBeInTheDocument();
+    expect(screen.getByText(/3 recipients have yet to retrieve/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

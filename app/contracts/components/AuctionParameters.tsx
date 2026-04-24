@@ -96,8 +96,8 @@ function CharityRow({
     <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-medium text-foreground">Charity Address</span>
-          <InfoTooltip content="The on-chain address currently receiving charity funds from the CharityWallet contract" />
+          <span className="text-sm font-medium text-foreground">Public Goods Address</span>
+          <InfoTooltip content="The on-chain address currently receiving the Public Goods Allocation from the Public Goods Vault contract" />
         </div>
         <div className="flex items-center gap-2">
           {percentage != null && (
@@ -106,7 +106,7 @@ function CharityRow({
           <button
             onClick={handleCopy}
             className="rounded-md p-1.5 text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-muted-foreground"
-            aria-label="Copy charity address"
+            aria-label="Copy Public Goods address"
           >
             {copied ? (
               <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -119,7 +119,7 @@ function CharityRow({
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-md p-1.5 text-muted-foreground/50 transition-colors hover:bg-white/[0.06] hover:text-muted-foreground"
-            aria-label="View charity address on block explorer"
+            aria-label="View Public Goods address on block explorer"
           >
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
@@ -147,7 +147,10 @@ export function AuctionParameters({
   if (loading) {
     return (
       <div>
-        <SectionDivider title="Auction & Raffle Parameters" className="mb-4" />
+        <SectionDivider
+          title="Calibration Window & Stellar Selection Parameters"
+          className="mb-4"
+        />
         <div className="grid gap-3 sm:grid-cols-2">
           <Skeleton className="h-40 rounded-xl" />
           <Skeleton className="h-40 rounded-xl" />
@@ -163,7 +166,7 @@ export function AuctionParameters({
 
   return (
     <div>
-      <SectionDivider title="Auction & Raffle Parameters" className="mb-4" />
+      <SectionDivider title="Calibration Window & Stellar Selection Parameters" className="mb-4" />
 
       <motion.div
         className="grid gap-3 sm:grid-cols-2"
@@ -173,24 +176,25 @@ export function AuctionParameters({
       >
         <motion.div variants={fadeUp}>
           <AuctionCard
-            title="CST Dutch Auction"
+            title="CST Calibration Window"
             icon={<Gavel className="h-4 w-4" />}
             items={[
               {
                 label: 'Duration',
                 value: formatSeconds(cstDurations.AuctionDuration),
-                tooltip: 'Total duration of the CST Dutch auction where price decreases over time',
+                tooltip:
+                  'Total duration of the CST Calibration Window where Gesture Cost descends over time',
               },
               {
                 label: 'Elapsed Duration',
                 value: formatSeconds(cstDurations.ElapsedDuration),
-                tooltip: 'Time already elapsed in the current CST Dutch auction cycle',
+                tooltip: 'Time already elapsed in the current CST Calibration Window',
               },
               {
-                label: 'Beginning Bid Price',
+                label: 'Calibration Ceiling',
                 value: `${cstBeginningBidPrice} CST`,
                 tooltip:
-                  'Starting price of the CST Dutch auction that decreases linearly over time',
+                  'Starting Gesture Cost of the CST Calibration Window that descends linearly over time',
               },
             ]}
           />
@@ -198,18 +202,19 @@ export function AuctionParameters({
 
         <motion.div variants={fadeUp}>
           <AuctionCard
-            title="ETH Dutch Auction"
+            title="ETH Calibration Window"
             icon={<Timer className="h-4 w-4" />}
             items={[
               {
                 label: 'Duration',
                 value: formatSeconds(ethDurations.AuctionDuration),
-                tooltip: 'Total duration of the ETH Dutch auction where price decreases over time',
+                tooltip:
+                  'Total duration of the ETH Calibration Window where Gesture Cost descends over time',
               },
               {
                 label: 'Elapsed Duration',
                 value: formatSeconds(ethDurations.ElapsedDuration),
-                tooltip: 'Time already elapsed in the current ETH Dutch auction cycle',
+                tooltip: 'Time already elapsed in the current ETH Calibration Window',
               },
             ]}
           />
@@ -224,19 +229,19 @@ export function AuctionParameters({
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <StatCard
-          label="Raffle ETH Winners"
+          label="ETH Stellar Selection Recipients"
           value={raffleEthWinners ?? '--'}
-          tooltip="Number of bidders randomly selected to win ETH raffle rewards each round"
+          tooltip="Number of participants randomly selected to receive ETH allocations each cycle"
         />
         <StatCard
-          label="Raffle NFT Winners (Bidding)"
+          label="NFT Stellar Selection (Participants)"
           value={raffleNftWinnersBidding ?? '--'}
-          tooltip="Number of bidders randomly selected to win NFT raffle prizes each round"
+          tooltip="Number of participants randomly selected to receive Cosmic Signature NFTs each cycle"
         />
         <StatCard
-          label="Raffle NFT Winners (Staking)"
+          label="NFT Stellar Selection (Anchored RWLK)"
           value={raffleNftWinnersStaking ?? '--'}
-          tooltip="Number of RandomWalk stakers randomly selected to win NFT raffle prizes each round"
+          tooltip="Number of RandomWalk NFT anchor-holders randomly selected to receive Cosmic Signature NFTs each cycle"
         />
       </div>
     </div>

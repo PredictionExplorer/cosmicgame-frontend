@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import MyWinnings from './MyWinnings';
 
 export const metadata: Metadata = createMetadata(
-  'Pending Winnings | Cosmic Signature',
-  'View and claim your pending ETH rewards, raffle winnings, staking distributions, and donated assets from the Cosmic Signature game.',
+  'My Allocations | Cosmic Signature',
+  'View and retrieve your pending ETH allocations, Stellar Selection distributions, Anchor Distributions, and attached assets from the Cosmic Signature protocol.',
   undefined,
   '/my-winnings',
 );

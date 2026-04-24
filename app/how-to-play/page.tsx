@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import HowToPlayPage from './HowToPlayPage';
 
 export const metadata: Metadata = createMetadata(
-  'How To Play Guide | Cosmic Signature',
-  'Learn how to play Cosmic Signature with our comprehensive guide. Discover game rules, strategies, and tips to enhance your gameplay experience. Start mastering the cosmic adventure today!',
+  'How It Works | Cosmic Signature',
+  'Learn how a Cosmic Signature Performance Cycle unfolds \u2014 from the Calibration Window through Gestures to final allocation distribution.',
   undefined,
   '/how-to-play',
 );

@@ -47,7 +47,7 @@ const sectionFade = {
   }),
 };
 
-/** Displays full round details: prize info, fund distribution, leaderboards, bid history, donations, and rules. */
+/** Displays full cycle details: allocation breakdown, fund distribution, leaderboards, gesture history, contributions, and rules. */
 export function RoundInfoSection({
   data,
   curBidList,
@@ -85,16 +85,16 @@ export function RoundInfoSection({
       <motion.div custom={1} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
           <SectionDivider title="Fund Distribution" className="flex-1" />
-          <InfoTooltip content="How the total prize pool is split across prizes, raffle, charity, staking, and next round." />
+          <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
         </div>
         <FundDistribution data={data ?? undefined} />
       </motion.div>
 
-      {/* 3. Raffle Ticket Holders */}
+      {/* 3. Stellar Selection Entries */}
       <motion.div custom={2} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
-          <SectionDivider title="Raffle Ticket Holders" className="flex-1" />
-          <InfoTooltip content="Each bid earns one raffle ticket. More bids = higher chance of winning ETH or NFT raffle prizes." />
+          <SectionDivider title="Stellar Selection Entries" className="flex-1" />
+          <InfoTooltip content="Each gesture records one Stellar Selection entry. More gestures = higher Selection frequency for ETH or Cosmic Signature NFT allocations." />
         </div>
         <RaffleHolderTable
           list={curBidList}
@@ -107,7 +107,7 @@ export function RoundInfoSection({
       <motion.div custom={3} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
           <SectionDivider title="Top ETH Spenders" className="flex-1" />
-          <InfoTooltip content="Addresses ranked by total ETH spent on bids this round." />
+          <InfoTooltip content="Participant addresses ranked by total ETH spent on gestures this cycle." />
         </div>
         <ETHSpentTable list={curBidList as ComponentProps<typeof ETHSpentTable>['list']} />
       </motion.div>
@@ -116,33 +116,33 @@ export function RoundInfoSection({
       <motion.div custom={4} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
           <SectionDivider title="Endurance Champions" className="flex-1" />
-          <InfoTooltip content="Bidders ranked by how long they remained the last bidder. The one with the longest consecutive reign wins CST tokens and an NFT." />
+          <InfoTooltip content="Participants ranked by how long they remained the most-recent gesture maker. The one with the longest consecutive interval receives Recognition CST and a Cosmic Signature NFT." />
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(45,93%,52%)]/40">
           <EnduranceChampionsTable championList={championList} />
         </div>
       </motion.div>
 
-      {/* 6. Bid History */}
+      {/* 6. Gesture History */}
       <motion.div custom={5} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
           <SectionDivider
-            title={`Bid History — Round ${data?.CurRoundNum ?? ''}`}
+            title={`Gesture History \u2014 Cycle ${data?.CurRoundNum ?? ''}`}
             className="flex-1"
           />
-          <InfoTooltip content="Chronological record of every bid placed in this round, newest first." />
+          <InfoTooltip content="Chronological record of every gesture made in this cycle, newest first." />
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(196,98%,54%)]/40">
           <BiddingHistory biddingHistory={curBidList} showRound={false} />
         </div>
       </motion.div>
 
-      {/* 7. ETH Donations (conditional) */}
+      {/* 7. ETH Contributions (conditional) */}
       {ethDonations.length > 0 && (
         <motion.div custom={6} variants={sectionFade} initial="hidden" animate="visible">
           <div className="flex items-center gap-2 mb-6">
-            <SectionDivider title="ETH Donations" className="flex-1" />
-            <InfoTooltip content="Direct ETH donations made by community members during this round." />
+            <SectionDivider title="ETH Contributions" className="flex-1" />
+            <InfoTooltip content="Direct ETH contributions made by community members during this cycle." />
           </div>
           <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(205,100%,71%)]/40">
             <EthDonationTable list={ethDonations} showType={false} />
@@ -150,7 +150,7 @@ export function RoundInfoSection({
         </motion.div>
       )}
 
-      {/* 8. Donated Tokens */}
+      {/* 8. Attached Tokens */}
       <motion.div custom={7} variants={sectionFade} initial="hidden" animate="visible">
         <DonatedTokensSection
           donatedNFTs={donatedNFTs}
@@ -163,11 +163,11 @@ export function RoundInfoSection({
         />
       </motion.div>
 
-      {/* 9. Round Rules (collapsible) */}
+      {/* 9. Cycle Rules (collapsible) */}
       <motion.div custom={8} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-4">
-          <SectionDivider title="Round Rules" className="flex-1" />
-          <InfoTooltip content="Key rules and reward mechanics for this round." />
+          <SectionDivider title="Cycle Rules" className="flex-1" />
+          <InfoTooltip content="Key rules and allocation mechanics for this cycle." />
         </div>
         <div className="gradient-border-card rounded-xl bg-white/[0.02]">
           <Accordion type="single" collapsible>
@@ -181,24 +181,25 @@ export function RoundInfoSection({
               <AccordionContent className="px-5 pb-5">
                 <div className="text-sm text-muted-foreground space-y-3">
                   <p>
-                    When you bid, you receive{' '}
-                    <span className="text-white font-medium">100 Cosmic Tokens</span> as a reward,
-                    enabling DAO participation.
+                    When you gesture, you imprint{' '}
+                    <span className="text-white font-medium">100 Participation CST</span>, which
+                    expresses Coordination Weight on the Cosmic Council.
                   </p>
                   <p>
-                    Each bid is also a raffle ticket. {data?.NumRaffleEthWinnersBidding} tickets win{' '}
-                    {data?.RafflePercentage}% of the pot. {data?.NumRaffleNFTWinnersBidding}{' '}
-                    additional winners and {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT
-                    stakers receive a COSMIC NFT.
+                    Each gesture records one Stellar Selection entry.{' '}
+                    {data?.NumRaffleEthWinnersBidding} entries receive {data?.RafflePercentage}% of
+                    the Cycle Reserve. {data?.NumRaffleNFTWinnersBidding} additional Selection
+                    recipients and {data?.NumRaffleNFTWinnersStakingRWalk} Random Walk NFT
+                    anchor-holders receive a Cosmic Signature NFT.
                   </p>
                   <p>
-                    Ethereum Protocol Guild receives {data?.CharityPercentage ?? 0}% of the prize
-                    pool (at least{' '}
+                    Protocol Guild receives {data?.CharityPercentage ?? 0}% of the Cycle Reserve (at
+                    least{' '}
                     {(
                       (Number(data?.CosmicGameBalanceEth) || 0) *
                       ((data?.CharityPercentage ?? 0) / 100)
                     ).toFixed(4)}{' '}
-                    ETH) each round.
+                    ETH) each cycle.
                   </p>
                 </div>
               </AccordionContent>
@@ -233,7 +234,7 @@ export function RoundInfoSection({
               </div>
               <div>
                 <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Round Duration
+                  Cycle Duration
                 </p>
                 <p className="text-sm font-bold text-white">{roundDuration || 'Not started'}</p>
               </div>
@@ -244,7 +245,7 @@ export function RoundInfoSection({
               </div>
               <div>
                 <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                  Unique Bidders
+                  Unique Participants
                 </p>
                 <p className="text-sm font-bold text-white">{uniqueBidders}</p>
               </div>

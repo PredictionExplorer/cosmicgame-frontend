@@ -36,8 +36,8 @@ export function FAQCallout() {
         </h2>
 
         <p className="mx-auto mt-3 max-w-md text-muted-foreground">
-          Check our comprehensive FAQ for detailed answers about game mechanics, rewards, tokens,
-          and everything Cosmic Signature.
+          Read the FAQ for detailed answers on cycle mechanics, allocation tracks, tokens, and
+          everything else about Cosmic Signature.
         </p>
 
         <div className="mt-6">

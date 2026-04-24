@@ -40,10 +40,10 @@ describe('HeroStats', () => {
     render(<HeroStats {...baseProps} />);
     expect(screen.getByText('ETH Balance')).toBeInTheDocument();
     expect(screen.getByText('CST Balance')).toBeInTheDocument();
-    expect(screen.getByText('Prizes Won')).toBeInTheDocument();
-    expect(screen.getByText('Total ETH Won')).toBeInTheDocument();
-    expect(screen.getByText('Bids Placed')).toBeInTheDocument();
-    expect(screen.getByText('Win Probability')).toBeInTheDocument();
+    expect(screen.getByText('Signature Allocations Received')).toBeInTheDocument();
+    expect(screen.getByText('Total ETH Received')).toBeInTheDocument();
+    expect(screen.getByText('Gestures Made')).toBeInTheDocument();
+    expect(screen.getByText('Selection Frequency')).toBeInTheDocument();
   });
 
   it('displays ETH balance value', () => {

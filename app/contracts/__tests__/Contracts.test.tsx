@@ -118,9 +118,9 @@ const makeDashboardData = (overrides = {}) => ({
   RafflePercentage: 25,
   StakingPercentage: 30,
   CharityPercentage: 10,
-  NumRaffleEthWinnersBidding: 5,
-  NumRaffleNFTWinnersBidding: 3,
-  NumRaffleNFTWinnersStakingRWalk: 2,
+  NumRaffleEthRecipientsBidding: 5,
+  NumRaffleNFTRecipientsBidding: 3,
+  NumRaffleNFTRecipientsStakingRWalk: 2,
   TimeoutClaimPrize: 86400,
   InitialSecondsUntilPrize: 43200,
   ContractAddrs: {
@@ -165,20 +165,20 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     expect(screen.getByText('Fund Distribution')).toBeInTheDocument();
-    expect(screen.getByText('Prize')).toBeInTheDocument();
-    expect(screen.getByText('Chrono Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Raffle')).toBeInTheDocument();
-    expect(screen.getByText('Staking')).toBeInTheDocument();
-    expect(screen.getByText('Charity')).toBeInTheDocument();
+    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
+    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Distribution')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods')).toBeInTheDocument();
   });
 
   it('renders game configuration section', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Game Configuration')).toBeInTheDocument();
-    expect(screen.getByText('Price Increase')).toBeInTheDocument();
-    expect(screen.getByText('Time Increase')).toBeInTheDocument();
-    expect(screen.getByText('CST Reward per Bid')).toBeInTheDocument();
+    expect(screen.getByText('Protocol Configuration')).toBeInTheDocument();
+    expect(screen.getByText('Gesture-Cost Drift')).toBeInTheDocument();
+    expect(screen.getByText('Time Increment')).toBeInTheDocument();
+    expect(screen.getByText('Participation CST per Gesture')).toBeInTheDocument();
   });
 
   it('renders all contract address groups', () => {
@@ -192,26 +192,27 @@ describe('Contracts', () => {
   it('renders contract address cards', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature Token')).toBeInTheDocument();
-    expect(screen.getByText('Charity Wallet')).toBeInTheDocument();
-    expect(screen.getByText('CST Staking Wallet')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
+    expect(screen.getByText('CST Anchoring Wallet')).toBeInTheDocument();
   });
 
   it('renders auction parameters section', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Auction & Raffle Parameters')).toBeInTheDocument();
-    expect(screen.getByText('CST Dutch Auction')).toBeInTheDocument();
-    expect(screen.getByText('ETH Dutch Auction')).toBeInTheDocument();
+    expect(
+      screen.getByText('Calibration Window & Stellar Selection Parameters'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('CST Calibration Window')).toBeInTheDocument();
+    expect(screen.getByText('ETH Calibration Window')).toBeInTheDocument();
   });
 
   it('renders raffle configuration cards', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Raffle ETH Winners')).toBeInTheDocument();
-    expect(screen.getByText('Raffle NFT Winners (Bidding)')).toBeInTheDocument();
-    expect(screen.getByText('Raffle NFT Winners (Staking)')).toBeInTheDocument();
+    expect(screen.getByText('ETH Stellar Selection Recipients')).toBeInTheDocument();
+    expect(screen.getByText('NFT Stellar Selection (Participants)')).toBeInTheDocument();
+    expect(screen.getByText('NFT Stellar Selection (Anchored RWLK)')).toBeInTheDocument();
   });
 
   it('renders search input for contract addresses', () => {
@@ -225,8 +226,8 @@ describe('Contracts', () => {
     render(<Contracts />);
     const searchInput = screen.getByLabelText('Search contracts');
     fireEvent.change(searchInput, { target: { value: 'charity' } });
-    expect(screen.getByText('Charity Wallet')).toBeInTheDocument();
-    expect(screen.queryByText('Cosmic Game')).not.toBeInTheDocument();
+    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
+    expect(screen.queryByText('Cosmic Signature Token')).not.toBeInTheDocument();
   });
 
   it('shows empty state when search has no results', () => {

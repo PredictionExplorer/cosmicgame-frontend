@@ -46,17 +46,19 @@ jest.mock('next/link', () => ({
 describe('CallToAction', () => {
   it('renders the CTA heading', () => {
     render(<CallToAction />);
-    expect(screen.getByRole('heading', { name: 'Ready to Start Bidding?' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Ready to Make Your First Gesture?' }),
+    ).toBeInTheDocument();
   });
 
   it('renders the description text', () => {
     render(<CallToAction />);
-    expect(screen.getByText(/Join the next round/)).toBeInTheDocument();
+    expect(screen.getByText(/Join the active Performance Cycle/)).toBeInTheDocument();
   });
 
-  it('renders Start Playing Now link pointing to homepage', () => {
+  it('renders Open the Protocol link pointing to homepage', () => {
     render(<CallToAction />);
-    const link = screen.getByRole('link', { name: 'Start Playing Now' });
+    const link = screen.getByRole('link', { name: 'Open the Protocol' });
     expect(link).toHaveAttribute('href', '/');
   });
 

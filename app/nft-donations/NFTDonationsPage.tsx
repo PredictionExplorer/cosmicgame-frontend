@@ -12,13 +12,13 @@ const NFTDonationsPage = () => {
   return (
     <MainWrapper>
       <PageHeader
-        title="NFT Donations"
-        subtitle="NFTs donated to the prize pool by community members"
+        title="Attached NFT Contributions"
+        subtitle="NFTs attached to gestures by community members across cycles"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Community members can donate their NFTs (ERC-721) to the Cosmic Signature prize pool using
-        the advanced bidding options. Donated NFTs are awarded to the main prize winner at the end
-        of each round, enriching the rewards beyond ETH.
+        Community members can attach their NFTs (ERC-721) to gestures using the advanced options.
+        Attached NFTs forward to the participant who receives the Signature Allocation when the
+        cycle finalizes, enriching the distribution beyond ETH.
       </p>
 
       {nftDonations === null ? (

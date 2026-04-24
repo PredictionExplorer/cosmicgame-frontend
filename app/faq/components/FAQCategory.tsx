@@ -16,26 +16,27 @@ import { type FAQCategory as FAQCategoryType, type FAQItem } from '../data/faq-d
 
 const tooltipTerms: Record<string, string> = {
   'Endurance Champion':
-    'A special title given to the bidder who held the "last bidder" position for the longest uninterrupted stretch of time in a round.',
+    'A special title given to the participant who held the most-recent-gesture position for the longest uninterrupted interval within a Performance Cycle.',
   'Chrono Warrior':
-    'An even rarer title — the bidder who held the Endurance Champion title for the longest consecutive period.',
-  'Dutch auction':
-    'An auction format where the price starts high and decreases over time until someone bids. The longer you wait, the cheaper it gets.',
-  'Dutch Auction':
-    'An auction format where the price starts high and decreases over time until someone bids. The longer you wait, the cheaper it gets.',
-  'Cosmic DAO':
-    "A decentralized autonomous organization where CST holders vote on how 10% of each round's pot is allocated to a beneficiary.",
-  CST: 'Cosmic Signature Tokens — the ERC-20 token you earn by bidding. Used for DAO voting and as alternative bid currency.',
+    'An even rarer title \u2014 the participant who held the Endurance Champion position for the longest consecutive interval.',
+  'Chrono-Warrior':
+    'An even rarer title \u2014 the participant who held the Endurance Champion position for the longest consecutive interval.',
+  'Calibration Window':
+    'A price-discovery window where Gesture Cost starts high and descends over time from the Calibration Ceiling toward the Calibration Floor. The longer you wait, the lower the cost.',
+  'Cosmic Council':
+    'The on-chain coordination body where CST holders submit Coordination Proposals and express Support or Opposition \u2014 for example, selecting the Public Goods Beneficiary that receives each cycle\u2019s public-goods allocation.',
+  CST: 'Cosmic Signature Tokens \u2014 the ERC-20 token imprinted with every gesture. Used on the Cosmic Council and as alternative gesture currency.',
   'ERC-20': 'A widely used Ethereum token standard for fungible (interchangeable) tokens.',
-  'ERC-721': 'The Ethereum token standard for non-fungible tokens (NFTs) — each token is unique.',
+  'ERC-721':
+    'The Ethereum token standard for non-fungible tokens (NFTs) \u2014 each token is unique.',
   'Layer 2':
     "A secondary protocol built on top of Ethereum that processes transactions faster and cheaper while inheriting Ethereum's security.",
   rollup:
     'A Layer 2 technique that bundles ("rolls up") many transactions into one, dramatically reducing costs while keeping Ethereum-level security.',
   RandomWalkNFT:
-    'A sister NFT collection. Holding one gives you a one-time 50% discount on your ETH bid price.',
+    'A sister NFT collection. Attaching one to your gesture grants a one-time 50% Gesture-Cost reduction.',
   'renounceOwnership()':
-    "A smart contract function that permanently gives up the team's ability to change game parameters — making the rules immutable.",
+    "A smart contract function that permanently gives up the team's ability to change protocol parameters \u2014 making the rules immutable.",
 };
 
 function enrichWithTooltips(text: string): React.ReactNode[] {

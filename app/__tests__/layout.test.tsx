@@ -35,9 +35,10 @@ describe('RootLayout metadata', () => {
     expect(metadata.title).toEqual(expect.objectContaining({ default: 'Cosmic Signature' }));
   });
 
-  it('exports metadata with correct description', () => {
-    expect(metadata.description).toContain('Cosmic Signature is a strategy bidding game');
+  it('exports metadata with correct lexicon-safe description', () => {
+    expect(metadata.description).toContain('procedural on-chain art protocol');
     expect(metadata.description).toContain('Arbitrum');
+    expect(metadata.description).not.toMatch(/strategy bidding game/i);
   });
 
   it('exports metadata with metadataBase', () => {

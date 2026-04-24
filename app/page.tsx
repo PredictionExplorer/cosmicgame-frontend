@@ -8,15 +8,15 @@ import { createMetadata } from '@/utils/seo';
 import HomePageLoader from './HomePageLoader';
 
 export async function generateMetadata(): Promise<Metadata> {
-  let prizeAmountStr = '';
+  let reserveStr = '';
   try {
     const { data } = await axios.get(cosmicGameBaseUrl + 'statistics/dashboard');
-    const prize = data?.PrizeAmountEth ?? 0;
-    prizeAmountStr = `${prize.toFixed(4)}ETH `;
+    const reserve = data?.PrizeAmountEth ?? 0;
+    reserveStr = `${reserve.toFixed(4)} ETH `;
   } catch {
     // fallback
   }
-  const description = `Cosmic Signature is a strategy bidding game. In an exhilarating contest, players will bid against other players and against time to win exciting ${prizeAmountStr}prizes and COSMIC NFTs.`;
+  const description = `Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Make a gesture during the Performance Cycle; when it finalizes, the ${reserveStr}Cycle Reserve distributes across allocation tracks — including Protocol Guild.`;
   return createMetadata('Cosmic Signature', description, undefined, '/');
 }
 

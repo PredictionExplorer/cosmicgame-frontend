@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import NFTDonationsPage from './NFTDonationsPage';
 
 export const metadata: Metadata = createMetadata(
-  'NFT Donations | Cosmic Signature',
-  'Browse the history of NFT donations contributed to the Cosmic Signature prize pool by community members. Donated NFTs are awarded to main prize winners each round.',
+  'Attached NFT Contributions | Cosmic Signature',
+  'Browse the history of NFTs attached to gestures by community members. Attached NFTs forward to the participant who receives the Signature Allocation each cycle.',
   undefined,
   '/nft-donations',
 );

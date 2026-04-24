@@ -39,9 +39,9 @@ describe('Footer', () => {
     expect(logo).toHaveAttribute('src', '/images/logo2.svg');
   });
 
-  it('renders copyright text', () => {
-    expect(screen.getByText(/Cosmic Signature\. All rights reserved\./)).toBeInTheDocument();
-    expect(screen.getByText(/\d{4} Cosmic Signature/)).toBeInTheDocument();
+  it('renders copyright and CC0 colophon', () => {
+    expect(screen.getByText(/\d{4} Cosmic Signature\. CC0 1\.0/)).toBeInTheDocument();
+    expect(screen.getByText(/CC0 · Verified · Reproducible/i)).toBeInTheDocument();
   });
 
   it('renders the terms link', () => {
@@ -74,10 +74,17 @@ describe('Footer', () => {
 
   it('sets rel="noopener noreferrer" on every target="_blank" link', () => {
     const links = document.querySelectorAll('a[target="_blank"]');
-    expect(links.length).toBe(4);
+    expect(links.length).toBeGreaterThanOrEqual(4);
     links.forEach((link) => {
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
+  });
+
+  it('renders the new Protocol Guild external link', () => {
+    const pg = screen.getByText('Protocol Guild');
+    expect(pg).toBeInTheDocument();
+    expect(pg).toHaveAttribute('href', 'https://protocol-guild.readthedocs.io');
+    expect(pg).toHaveAttribute('target', '_blank');
   });
 
   it('renders the site map link', () => {

@@ -40,55 +40,57 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
     {
       name: 'Cosmic Signature Token',
       address: addrs.CosmicTokenAddr ?? '',
-      description: 'ERC-20 token (CST) earned by bidding and used for governance',
+      description:
+        'ERC-20 token (CST) imprinted with every gesture and used to express Coordination Weight on the Cosmic Council',
       category: 'core',
     },
     {
       name: 'Cosmic Signature',
       address: addrs.CosmicSignatureAddr ?? '',
-      description: 'ERC-721 NFT collection minted as prizes for round winners',
+      description: 'ERC-721 NFT collection imprinted as allocations to cycle recipients',
       category: 'core',
     },
     {
       name: 'RandomWalk',
       address: addrs.RandomWalkAddr ?? '',
-      description: 'RandomWalk NFT collection that can be staked for raffle entries',
+      description:
+        'RandomWalk NFT collection that can be anchored to the protocol for Stellar Selection entries',
       category: 'core',
     },
     {
-      name: 'Cosmic DAO',
+      name: 'Cosmic Council',
       address: addrs.CosmicDaoAddr ?? '',
-      description: 'Decentralized governance contract for community proposals',
+      description: 'On-chain Protocol Coordination contract for Coordination Proposals',
       category: 'core',
     },
     {
-      name: 'Charity Wallet',
+      name: 'Public Goods Vault',
       address: addrs.CharityWalletAddr ?? '',
-      description: "Receives the charity percentage from each round's prize pool",
+      description: "Receives the Public Goods Allocation from each cycle's Cycle Reserve",
       category: 'wallet',
     },
     {
-      name: 'Marketing Wallet',
+      name: 'Outreach Reserve',
       address: addrs.MarketingWalletAddr ?? '',
-      description: 'Funds allocated for marketing rewards and referrals',
+      description: 'Funds allocated for outreach distributions and ecosystem contributors',
       category: 'wallet',
     },
     {
-      name: 'Prizes Wallet',
+      name: 'Allocations Wallet',
       address: addrs.PrizesWalletAddr ?? '',
-      description: 'Escrow contract holding unclaimed prizes',
+      description: 'Escrow contract holding allocations awaiting retrieval',
       category: 'wallet',
     },
     {
-      name: 'CST Staking Wallet',
+      name: 'CST Anchoring Wallet',
       address: addrs.StakingWalletCSTAddr ?? '',
-      description: 'Staking contract for Cosmic Signature Tokens',
+      description: 'Anchoring contract for Cosmic Signature Tokens',
       category: 'staking',
     },
     {
-      name: 'RWLK Staking Wallet',
+      name: 'RWLK Anchoring Wallet',
       address: addrs.StakingWalletRWalkAddr ?? '',
-      description: 'Staking contract for RandomWalk NFTs',
+      description: 'Anchoring contract for RandomWalk NFTs',
       category: 'staking',
     },
   ].filter((c) => c.address) as ContractEntry[];
@@ -199,7 +201,7 @@ const Contracts = () => {
     <MainWrapper>
       <PageHeader
         title="Contract Addresses"
-        subtitle="On-chain addresses and configuration for the Cosmic Game"
+        subtitle="On-chain addresses and configuration for the Cosmic Signature protocol"
       >
         <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
       </PageHeader>

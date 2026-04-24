@@ -37,24 +37,24 @@ const defaultProps = {
 describe('GameConfiguration', () => {
   it('renders all stat cards with correct values', () => {
     render(<GameConfiguration {...defaultProps} />);
-    expect(screen.getByText('Price Increase')).toBeInTheDocument();
+    expect(screen.getByText('Gesture-Cost Drift')).toBeInTheDocument();
     expect(screen.getByText('1%')).toBeInTheDocument();
-    expect(screen.getByText('Time Increase')).toBeInTheDocument();
+    expect(screen.getByText('Time Increment')).toBeInTheDocument();
     expect(screen.getByText('3600s')).toBeInTheDocument();
-    expect(screen.getByText('CST Reward per Bid')).toBeInTheDocument();
+    expect(screen.getByText('Participation CST per Gesture')).toBeInTheDocument();
     expect(screen.getByText('200 CST')).toBeInTheDocument();
     expect(screen.getByText('Max Message Length')).toBeInTheDocument();
     expect(screen.getByText('280')).toBeInTheDocument();
   });
 
-  it('renders the Game Configuration section title', () => {
+  it('renders the Protocol Configuration section title', () => {
     render(<GameConfiguration {...defaultProps} />);
-    expect(screen.getByText('Game Configuration')).toBeInTheDocument();
+    expect(screen.getByText('Protocol Configuration')).toBeInTheDocument();
   });
 
   it('renders formatted time values', () => {
     render(<GameConfiguration {...defaultProps} />);
-    expect(screen.getByText('Claim Timeout')).toBeInTheDocument();
+    expect(screen.getByText('Finalization Timeout')).toBeInTheDocument();
     expect(screen.getByText('86400s')).toBeInTheDocument();
     expect(screen.getByText('Initial Time Increment')).toBeInTheDocument();
     expect(screen.getByText('43200s')).toBeInTheDocument();
@@ -82,7 +82,7 @@ describe('GameConfiguration', () => {
     expect(screen.queryByText('5%')).not.toBeInTheDocument();
   });
 
-  it('shows "--" for Time Increase when timeIncrement is 0 regardless of timeIncrease', () => {
+  it('shows "--" for Time Increment when timeIncrement is 0 regardless of timeIncrease', () => {
     render(<GameConfiguration {...defaultProps} timeIncrease={1} timeIncrement={0} />);
     const dashes = screen.getAllByText('--');
     expect(dashes.length).toBeGreaterThanOrEqual(1);

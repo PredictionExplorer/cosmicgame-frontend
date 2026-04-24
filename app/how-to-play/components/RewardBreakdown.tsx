@@ -8,37 +8,39 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 const rewards = [
   {
     Icon: Coins,
-    title: '100 CST Tokens',
-    description: 'Earn 100 Cosmic Signature Tokens with every bid you place.',
+    title: '100 Participation CST',
+    description: 'Every gesture imprints 100 Cosmic Signature Tokens directly to your wallet.',
     tooltip:
-      'CST is the native token of Cosmic Signature. Use it as an alternative bid currency or trade it.',
+      'CST is the native Cosmic Signature token. Use it as an alternative gesture currency or express Coordination Weight on the Cosmic Council.',
     accent: 'from-cyan-400/20 to-blue-500/20',
     iconColor: 'text-cyan-400',
   },
   {
     Icon: Ticket,
-    title: '1 Raffle Ticket',
-    description: 'Each bid earns a raffle ticket for end-of-round prize drawings.',
+    title: 'Stellar Selection Entry',
+    description: 'Each gesture records an entry in Stellar Selection for end-of-cycle allocations.',
     tooltip:
-      'At round end, 4 raffle tickets are randomly drawn. Winners share 6% of the total prize pool.',
+      'When the cycle finalizes, entries are randomly selected: three participants share 4% of the Cycle Reserve in ETH.',
     accent: 'from-purple-400/20 to-pink-500/20',
     iconColor: 'text-purple-400',
   },
   {
     Icon: ImageIcon,
-    title: 'NFT Chance',
-    description: 'Win a unique COSMIC NFT through raffle or as the round winner.',
+    title: 'Cosmic Signature NFT Chance',
+    description:
+      'Up to ten participants receive a unique Cosmic Signature NFT via Stellar Selection each cycle.',
     tooltip:
-      '5 additional raffle winners and 4 Random Walk NFT stakers receive a COSMIC NFT each round.',
+      'Ten Stellar Selection recipients plus up to ten Random Walk NFT anchor-holders receive a Cosmic Signature NFT each cycle.',
     accent: 'from-amber-400/20 to-orange-500/20',
     iconColor: 'text-amber-400',
   },
   {
     Icon: Trophy,
-    title: 'Main Prize',
-    description: 'The last bidder wins 25% of the entire round prize pool in ETH.',
+    title: 'Signature Allocation',
+    description:
+      'The participant who made the Final Gesture may retrieve 25% of the Cycle Reserve in ETH.',
     tooltip:
-      'The prize pool accumulates from all bids during a round. The winner must withdraw from the prize contract.',
+      'The Cycle Reserve grows from all gestures. The participant who made the Final Gesture retrieves the Signature Allocation via the protocol contract.',
     accent: 'from-emerald-400/20 to-teal-500/20',
     iconColor: 'text-emerald-400',
   },
@@ -62,10 +64,10 @@ export function RewardBreakdown() {
           id="rewards-heading"
           className="font-display text-2xl font-bold tracking-tight sm:text-3xl"
         >
-          Every Bid Earns You
+          What Every Gesture Imprints
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Multiple ways to win with each bid you place
+          Participation imprints multiple allocation tracks per cycle.
         </p>
       </div>
 

@@ -50,8 +50,8 @@ describe('StepByStep', () => {
   it('renders all three step titles', () => {
     renderWithTooltip(<StepByStep />);
     expect(screen.getByText('Connect Your Wallet')).toBeInTheDocument();
-    expect(screen.getByText('Check the Bid Price')).toBeInTheDocument();
-    expect(screen.getByText('Place Your Bid')).toBeInTheDocument();
+    expect(screen.getByText('Check the Gesture Cost')).toBeInTheDocument();
+    expect(screen.getByText('Make Your Gesture')).toBeInTheDocument();
   });
 
   it('renders step labels with correct numbering', () => {
@@ -65,8 +65,8 @@ describe('StepByStep', () => {
     renderWithTooltip(<StepByStep />);
     expect(screen.getByText(/Connect Wallet/)).toBeInTheDocument();
     expect(screen.getByText(/Arbitrum blockchain/)).toBeInTheDocument();
-    expect(screen.getByText(/Review the round countdown/)).toBeInTheDocument();
-    expect(screen.getByText(/Click "Bid Now"/)).toBeInTheDocument();
+    expect(screen.getByText(/Review the Cycle Finalization Time/)).toBeInTheDocument();
+    expect(screen.getByText(/Click "Gesture Now"/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

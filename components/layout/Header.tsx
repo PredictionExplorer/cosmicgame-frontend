@@ -101,13 +101,17 @@ const Header: FC = () => {
   );
 
   const renderDesktop = () => (
-    <nav className="flex items-center gap-6 lg:gap-8">
-      <Link href="/">
+    <nav aria-label="Primary" className="flex items-center gap-6 lg:gap-8">
+      <Link
+        href="/"
+        aria-label="Cosmic Signature home"
+        className="flex items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[oklch(84.7%_0.149_213)]"
+      >
         <Image
           src="/images/logo2.svg"
           width={48}
           height={48}
-          alt="logo"
+          alt="Cosmic Signature"
           loading="eager"
           className="h-10 w-auto max-h-10 object-contain"
         />
@@ -116,6 +120,15 @@ const Header: FC = () => {
       {navs.map((nav, i) => (
         <ListNavItem key={i} nav={nav} />
       ))}
+
+      <a
+        href="https://cosmicsignature.com"
+        className="hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[oklch(84.7%_0.149_213)]/40 hover:bg-white/10 hover:text-white xl:inline-flex"
+        rel="noopener"
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-[oklch(84.7%_0.149_213)]" aria-hidden />
+        Protocol site
+      </a>
 
       <ConnectWalletButton
         isMobileView={false}
@@ -180,11 +193,11 @@ const Header: FC = () => {
 
               <Separator />
 
-              {/* Game */}
+              {/* Protocol */}
               <p className="px-4 pt-4 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-                Game
+                Protocol
               </p>
-              <ListItemButton nav={{ title: 'Play', route: '/' }} />
+              <ListItemButton nav={{ title: 'Home', route: '/' }} />
               <ListItemButton nav={{ title: 'Gallery', route: '/gallery' }} />
 
               <Separator className="my-2" />
@@ -193,10 +206,10 @@ const Header: FC = () => {
               <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
                 Explore
               </p>
-              <ListItemButton nav={{ title: 'Current Round', route: '/current-round' }} />
-              <ListItemButton nav={{ title: 'Prize Winners', route: '/prize' }} />
-              <ListItemButton nav={{ title: 'Staking Rewards', route: '/staking' }} />
-              <ListItemButton nav={{ title: 'Marketing Rewards', route: '/marketing' }} />
+              <ListItemButton nav={{ title: 'Current Cycle', route: '/current-round' }} />
+              <ListItemButton nav={{ title: 'Allocation Recipients', route: '/prize' }} />
+              <ListItemButton nav={{ title: 'Anchor Distributions', route: '/staking' }} />
+              <ListItemButton nav={{ title: 'Outreach Reserve', route: '/marketing' }} />
               <ListItemButton nav={{ title: 'Statistics', route: '/statistics' }} />
               <ListItemButton nav={{ title: 'Contracts', route: '/contracts' }} />
 
@@ -206,8 +219,26 @@ const Header: FC = () => {
               <p className="px-4 pt-2 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
                 Help
               </p>
-              <ListItemButton nav={{ title: 'How to Play', route: '/how-to-play' }} />
+              <ListItemButton nav={{ title: 'How It Works', route: '/how-to-play' }} />
               <ListItemButton nav={{ title: 'FAQ', route: '/faq' }} />
+
+              <Separator className="my-2" />
+
+              {/* Protocol site cross-host link */}
+              <a
+                href="https://cosmicsignature.com"
+                rel="noopener"
+                className="mx-4 mt-2 inline-flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70 transition hover:border-[oklch(84.7%_0.149_213)]/40 hover:bg-white/10 hover:text-white"
+              >
+                <span className="flex items-center gap-2">
+                  <span
+                    className="h-1.5 w-1.5 rounded-full bg-[oklch(84.7%_0.149_213)]"
+                    aria-hidden
+                  />
+                  Protocol site
+                </span>
+                <span aria-hidden>&rarr;</span>
+              </a>
 
               {account && (
                 <>
@@ -222,18 +253,18 @@ const Header: FC = () => {
                     nav={{
                       title: hasUnclaimedRewards ? (
                         <span className="flex items-center gap-2">
-                          My Rewards
+                          My Allocations
                           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                         </span>
                       ) : (
-                        'My Rewards'
+                        'My Allocations'
                       ),
                       route: '/my-winnings',
                     }}
                   />
                   <ListItemButton nav={{ title: 'My Tokens', route: '/my-tokens' }} />
-                  <ListItemButton nav={{ title: 'My Staking', route: '/my-staking' }} />
-                  <ListItemButton nav={{ title: 'Winning History', route: '/winning-history' }} />
+                  <ListItemButton nav={{ title: 'My Anchors', route: '/my-staking' }} />
+                  <ListItemButton nav={{ title: 'Recipient History', route: '/winning-history' }} />
 
                   <Separator className="my-2" />
 
@@ -301,8 +332,8 @@ const Header: FC = () => {
             <div className="mx-auto max-w-7xl flex items-center justify-between gap-4">
               <p className="text-sm">
                 {systemMode === 1
-                  ? 'Maintenance mode will activate after the current prize claim. You can play again once adjustments are complete.'
-                  : 'System is in maintenance mode. You can play again once parameter adjustments are complete.'}
+                  ? 'Maintenance mode activates after the current allocation finalizes. The protocol reopens once adjustments are complete.'
+                  : 'Protocol is in maintenance mode. Gestures will resume once parameter adjustments are complete.'}
               </p>
               <span className="shrink-0 rounded-full bg-black/10 px-3 py-1 text-xs font-bold uppercase tracking-wider">
                 {systemMode === 1 ? 'Pending' : 'Maintenance'}

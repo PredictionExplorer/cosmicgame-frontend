@@ -14,18 +14,18 @@ const mockCategory: FAQCategory = {
   items: [
     {
       id: 'q1',
-      question: 'What is a Dutch auction?',
-      answer: 'A Dutch auction lowers the bid price over time.',
+      question: 'What is a Calibration Window?',
+      answer: 'A Calibration Window descends the Gesture Cost over time.',
     },
     {
       id: 'q2',
-      question: 'How does staking work?',
-      answer: 'Staking pays 19% of the contract balance each round.',
+      question: 'How does Anchoring work?',
+      answer: 'Anchoring pays a share of each cycle distribution.',
     },
     {
       id: 'q3',
       question: 'What is an Endurance Champion?',
-      answer: 'The longest-reigning last bidder.',
+      answer: 'The longest-interval most-recent gesture maker.',
       hashAnchor: 'endurance-champion',
     },
   ],
@@ -106,8 +106,8 @@ describe('FAQCategorySection', () => {
 
   it('renders all questions in the category', () => {
     renderFAQCategory();
-    expect(screen.getByText('What is a Dutch auction?')).toBeInTheDocument();
-    expect(screen.getByText('How does staking work?')).toBeInTheDocument();
+    expect(screen.getByText('What is a Calibration Window?')).toBeInTheDocument();
+    expect(screen.getByText('How does Anchoring work?')).toBeInTheDocument();
     expect(screen.getByText('What is an Endurance Champion?')).toBeInTheDocument();
   });
 
@@ -123,7 +123,7 @@ describe('FAQCategorySection', () => {
     const user = userEvent.setup();
     const onItemToggle = jest.fn();
     renderFAQCategory({ expandedItems: [], onItemToggle });
-    const trigger = screen.getByRole('button', { name: 'What is a Dutch auction?' });
+    const trigger = screen.getByRole('button', { name: 'What is a Calibration Window?' });
     await user.click(trigger);
     expect(onItemToggle).toHaveBeenCalledWith('test-cat', 'q1');
   });
@@ -147,10 +147,12 @@ describe('FAQCategorySection', () => {
   });
 
   it('filters items based on searchQuery', () => {
-    renderFAQCategory({ searchQuery: 'Dutch' });
-    expect(screen.getByRole('button', { name: /What is a Dutch auction\?/ })).toBeInTheDocument();
+    renderFAQCategory({ searchQuery: 'Calibration' });
     expect(
-      screen.queryByRole('button', { name: /How does staking work\?/ }),
+      screen.getByRole('button', { name: /What is a Calibration Window\?/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /How does Anchoring work\?/ }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /What is an Endurance Champion\?/ }),
@@ -163,10 +165,10 @@ describe('FAQCategorySection', () => {
   });
 
   it('highlights search matches with mark elements', () => {
-    renderFAQCategory({ searchQuery: 'Dutch' });
+    renderFAQCategory({ searchQuery: 'Calibration' });
     const marks = document.querySelectorAll('mark');
     expect(marks.length).toBeGreaterThan(0);
-    expect(marks[0]).toHaveTextContent(/Dutch/i);
+    expect(marks[0]).toHaveTextContent(/Calibration/i);
   });
 
   it('renders "Copy link" button in expanded items', async () => {

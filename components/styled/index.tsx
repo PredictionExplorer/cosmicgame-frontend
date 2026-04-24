@@ -328,8 +328,10 @@ export function GradientText({
   as: Component = 'span',
   ...props
 }: React.HTMLAttributes<HTMLElement> & { as?: React.ElementType }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const AnyComponent = Component as any;
   return (
-    <Component
+    <AnyComponent
       className={cn(
         'bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent',
         className,

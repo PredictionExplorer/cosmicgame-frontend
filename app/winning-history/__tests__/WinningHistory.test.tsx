@@ -35,7 +35,7 @@ describe('WinningHistory', () => {
     mockUseClaimHistoryByUser.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<WinningHistory />);
     expect(
-      screen.getByText('Please connect your wallet to see your winnings.'),
+      screen.getByText('Please connect your wallet to see your allocation history.'),
     ).toBeInTheDocument();
   });
 
@@ -61,7 +61,7 @@ describe('WinningHistory', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseClaimHistoryByUser.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<WinningHistory />);
-    expect(screen.getByText('You currently have no recorded winnings.')).toBeInTheDocument();
+    expect(screen.getByText('You currently have no recorded allocations.')).toBeInTheDocument();
   });
 
   it('renders history table with data', () => {

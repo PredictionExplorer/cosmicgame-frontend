@@ -63,17 +63,24 @@ beforeEach(() => {
 describe('Header', () => {
   it('renders the logo', () => {
     render(<Header />);
-    const logo = screen.getByAltText('logo');
+    const logo = screen.getByAltText('Cosmic Signature');
     expect(logo).toBeInTheDocument();
     expect(logo).toHaveAttribute('src', '/images/logo2.svg');
   });
 
-  it('renders navigation links', () => {
+  it('renders navigation links with lexicon-safe labels', () => {
     render(<Header />);
-    expect(screen.getByText('Play')).toBeInTheDocument();
+    expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Gallery')).toBeInTheDocument();
     expect(screen.getByText('Explore')).toBeInTheDocument();
     expect(screen.getByText('Help')).toBeInTheDocument();
+  });
+
+  it('renders the cross-host link to the protocol site', () => {
+    render(<Header />);
+    const link = screen.getByText(/protocol site/i);
+    expect(link).toBeInTheDocument();
+    expect(link.closest('a')).toHaveAttribute('href', 'https://cosmicsignature.com');
   });
 
   it('does not render a maintenance banner when systemMode is 0', () => {

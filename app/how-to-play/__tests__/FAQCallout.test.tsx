@@ -52,7 +52,7 @@ describe('FAQCallout', () => {
 
   it('renders description text', () => {
     render(<FAQCallout />);
-    expect(screen.getByText(/comprehensive FAQ/i)).toBeInTheDocument();
+    expect(screen.getByText(/Read the FAQ/i)).toBeInTheDocument();
   });
 
   it('renders a link to the FAQ page', () => {

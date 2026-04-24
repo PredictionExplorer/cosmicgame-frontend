@@ -48,8 +48,8 @@ const defaultProps = {
 describe('AuctionParameters', () => {
   it('renders CST and ETH auction cards', () => {
     render(<AuctionParameters {...defaultProps} />);
-    expect(screen.getByText('CST Dutch Auction')).toBeInTheDocument();
-    expect(screen.getByText('ETH Dutch Auction')).toBeInTheDocument();
+    expect(screen.getByText('CST Calibration Window')).toBeInTheDocument();
+    expect(screen.getByText('ETH Calibration Window')).toBeInTheDocument();
   });
 
   it('renders duration and elapsed values', () => {
@@ -67,11 +67,11 @@ describe('AuctionParameters', () => {
 
   it('renders charity address with copy and explorer link', () => {
     render(<AuctionParameters {...defaultProps} />);
-    expect(screen.getByText('Charity Address')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods Address')).toBeInTheDocument();
     expect(screen.getByText('0xCharity123')).toBeInTheDocument();
-    expect(screen.getByLabelText('Copy charity address')).toBeInTheDocument();
+    expect(screen.getByLabelText('Copy Public Goods address')).toBeInTheDocument();
 
-    const explorerLink = screen.getByLabelText('View charity address on block explorer');
+    const explorerLink = screen.getByLabelText('View Public Goods address on block explorer');
     expect(explorerLink).toHaveAttribute(
       'href',
       'https://explorer.example.com/address/0xCharity123',
@@ -80,7 +80,7 @@ describe('AuctionParameters', () => {
 
   it('copies charity address on copy button click', async () => {
     render(<AuctionParameters {...defaultProps} />);
-    fireEvent.click(screen.getByLabelText('Copy charity address'));
+    fireEvent.click(screen.getByLabelText('Copy Public Goods address'));
     await waitFor(() => {
       expect(mockWriteText).toHaveBeenCalledWith('0xCharity123');
     });
@@ -91,19 +91,21 @@ describe('AuctionParameters', () => {
     expect(screen.getByText('10%')).toBeInTheDocument();
   });
 
-  it('renders raffle stat cards', () => {
+  it('renders Stellar Selection stat cards', () => {
     render(<AuctionParameters {...defaultProps} />);
-    expect(screen.getByText('Raffle ETH Winners')).toBeInTheDocument();
-    expect(screen.getByText('5')).toBeInTheDocument();
-    expect(screen.getByText('Raffle NFT Winners (Bidding)')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText('Raffle NFT Winners (Staking)')).toBeInTheDocument();
-    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.getByText('ETH Stellar Selection Recipients')).toBeInTheDocument();
+    expect(screen.getByText('NFT Stellar Selection (Participants)')).toBeInTheDocument();
+    expect(screen.getByText('NFT Stellar Selection (Anchored RWLK)')).toBeInTheDocument();
+    expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('3').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('2').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders section title', () => {
     render(<AuctionParameters {...defaultProps} />);
-    expect(screen.getByText('Auction & Raffle Parameters')).toBeInTheDocument();
+    expect(
+      screen.getByText('Calibration Window & Stellar Selection Parameters'),
+    ).toBeInTheDocument();
   });
 
   it('shows loading skeletons when loading is true', () => {

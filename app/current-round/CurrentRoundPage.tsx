@@ -154,7 +154,7 @@ const CurrentRoundPage = () => {
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-white transition-colors mb-6"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Back to Game
+        Back to Home
       </Link>
 
       {/* ===== HERO SECTION ===== */}
@@ -169,11 +169,11 @@ const CurrentRoundPage = () => {
             </div>
             <div>
               <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                Round #{data.CurRoundNum}
+                Cycle #{data.CurRoundNum}
               </h1>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Started {roundStarted} &bull; {data.CurNumBids} bid
-                {data.CurNumBids !== 1 ? 's' : ''} placed
+                Opened {roundStarted} &bull; {data.CurNumBids} gesture
+                {data.CurNumBids !== 1 ? 's' : ''} made
               </p>
             </div>
           </div>
@@ -186,13 +186,13 @@ const CurrentRoundPage = () => {
           </span>
         </div>
 
-        {/* Countdown or Exhausted state */}
+        {/* Countdown or Closed state */}
         {hasStarted && isCountdownActive && (
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
-              Round ends in
+              Cycle finalizes in
               <InfoTooltip
-                content="When this timer hits zero, the last bidder wins the main prize. Each new bid resets the timer."
+                content="When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and retrieve the Signature Allocation. Each new gesture extends the timer."
                 className="ml-1.5"
               />
             </p>
@@ -203,14 +203,12 @@ const CurrentRoundPage = () => {
         {hasStarted && isBidsExhausted && (
           <div className="text-center rounded-xl bg-primary/[0.06] p-5 animate-pulse-glow">
             <Zap className="mx-auto h-7 w-7 text-primary mb-2" />
-            <p className="font-display text-lg font-bold text-primary">Bids Exhausted!</p>
-            <p className="mt-1 text-sm text-primary/80">
-              Waiting for the winner to claim the prize.
-            </p>
+            <p className="font-display text-lg font-bold text-primary">Cycle Closed</p>
+            <p className="mt-1 text-sm text-primary/80">Waiting for the cycle to finalize.</p>
           </div>
         )}
 
-        {/* Last bidder card */}
+        {/* Last participant card */}
         {hasLastBidder && (
           <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
             <div className="flex items-center gap-3">
@@ -220,9 +218,9 @@ const CurrentRoundPage = () => {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Last Bidder — Current Leader
+                    Last Participant &mdash; Current Leader
                   </p>
-                  <InfoTooltip content="The last bidder when the countdown reaches zero wins the main ETH prize and a COSMIC NFT." />
+                  <InfoTooltip content="The participant who made the Final Gesture when the countdown reaches zero may retrieve the Signature Allocation plus a Cosmic Signature NFT." />
                 </div>
                 <a
                   href={`/user/${data.LastBidderAddr}`}
@@ -259,7 +257,7 @@ const CurrentRoundPage = () => {
             className="bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold"
           >
             <Link href="/">
-              Place a Bid <ArrowRight className="ml-2 h-4 w-4" />
+              Make a Gesture <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>
@@ -274,41 +272,41 @@ const CurrentRoundPage = () => {
         className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-12"
       >
         <StatCard
-          label="Total Bids"
+          label="Total Gestures"
           value={data.CurNumBids}
           icon={<Hash className="h-4 w-4" />}
-          tooltip="Total bids placed in this round. Each bid is also a raffle ticket."
+          tooltip="Total gestures made in this cycle. Each gesture is also a Stellar Selection entry."
         />
         <StatCard
-          label="Prize Pool"
+          label="Cycle Reserve"
           value={formatEthValue(data.PrizeAmountEth ?? 0)}
           icon={<Trophy className="h-4 w-4" />}
-          tooltip="ETH prize awarded to the last bidder when the countdown reaches zero."
+          tooltip="Signature Allocation retrieved by the participant who made the Final Gesture when the countdown reaches zero."
           gradient
         />
         <StatCard
-          label="Raffle Pool"
+          label="Stellar Selection Pool"
           value={formatEthValue(data.RaffleAmountEth ?? 0)}
           icon={<Shuffle className="h-4 w-4" />}
-          tooltip={`ETH split among ${data.NumRaffleEthWinnersBidding ?? 0} random raffle winners at round end.`}
+          tooltip={`ETH split across ${data.NumRaffleEthWinnersBidding ?? 0} randomly selected participants when the cycle finalizes.`}
         />
         <StatCard
-          label="Charity"
+          label="Public Goods"
           value={formatEthValue(charityAmount)}
           icon={<Heart className="h-4 w-4" />}
-          tooltip={`${data.CharityPercentage ?? 0}% of the prize pool is donated to Ethereum Protocol Guild each round.`}
+          tooltip={`${data.CharityPercentage ?? 0}% of the Cycle Reserve is forwarded to Protocol Guild each cycle.`}
         />
         <StatCard
-          label="Donated ETH"
+          label="Contributed ETH"
           value={formatEthValue(data.CurRoundStats?.TotalDonatedAmountEth ?? 0)}
           icon={<Coins className="h-4 w-4" />}
-          tooltip="Direct ETH donations from the community this round."
+          tooltip="Direct ETH contributions from the community this cycle."
         />
         <StatCard
-          label="Donated NFTs"
+          label="Attached NFTs"
           value={data.CurRoundStats?.TotalDonatedNFTs ?? 0}
           icon={<ImageIcon className="h-4 w-4" />}
-          tooltip="NFTs donated to the prize pool by the community."
+          tooltip="NFTs attached to gestures by the community this cycle."
         />
       </motion.div>
 

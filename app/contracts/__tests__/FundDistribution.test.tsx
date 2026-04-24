@@ -33,11 +33,11 @@ const defaultProps = {
 describe('FundDistribution', () => {
   it('renders all percentage segments with labels', () => {
     render(<FundDistribution {...defaultProps} />);
-    expect(screen.getByText('Prize')).toBeInTheDocument();
-    expect(screen.getByText('Chrono Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Raffle')).toBeInTheDocument();
-    expect(screen.getByText('Staking')).toBeInTheDocument();
-    expect(screen.getByText('Charity')).toBeInTheDocument();
+    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
+    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Distribution')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods')).toBeInTheDocument();
   });
 
   it('renders percentage values for each segment', () => {
@@ -69,7 +69,7 @@ describe('FundDistribution', () => {
         charityPercentage={0}
       />,
     );
-    expect(screen.getByText('Prize')).toBeInTheDocument();
+    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
     const zeros = screen.getAllByText('0%');
     expect(zeros.length).toBe(5);
   });

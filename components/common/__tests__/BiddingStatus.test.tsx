@@ -52,28 +52,28 @@ describe('BiddingStatus', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('shows first-bid prompt when no round started', () => {
+  it('shows first-gesture prompt when no cycle started', () => {
     render(
       <BiddingStatus
         {...baseProps}
         data={{ ...activeData, TsRoundStart: 0, CurRoundNum: 0 } as never}
       />,
     );
-    expect(screen.getByText('Start the Game')).toBeInTheDocument();
+    expect(screen.getByText('Open the Cycle')).toBeInTheDocument();
   });
 
-  it('shows round started message for first bid in existing round', () => {
+  it('shows cycle opened message for first gesture in existing cycle', () => {
     render(
       <BiddingStatus
         {...baseProps}
         data={{ ...activeData, TsRoundStart: 0, CurRoundNum: 5 } as never}
       />,
     );
-    expect(screen.getByText('Round 5')).toBeInTheDocument();
-    expect(screen.getByText(/Dutch auction/)).toBeInTheDocument();
+    expect(screen.getByText('Cycle 5')).toBeInTheDocument();
+    expect(screen.getByText(/Calibration Window/)).toBeInTheDocument();
   });
 
-  it('displays main prize reward and last bidder info', () => {
+  it('displays Signature Allocation and last participant info', () => {
     render(
       <BiddingStatus
         {...baseProps}
@@ -88,7 +88,7 @@ describe('BiddingStatus', () => {
     expect(screen.getByText('0.00500 ETH')).toBeInTheDocument();
   });
 
-  it('shows bids exhausted when prize time has passed', () => {
+  it('shows cycle closed when finalization time has passed', () => {
     render(
       <BiddingStatus
         {...baseProps}
@@ -97,8 +97,8 @@ describe('BiddingStatus', () => {
         ethBidInfo={{ ETHPrice: 0.01 }}
       />,
     );
-    expect(screen.getByText('Bids Exhausted!')).toBeInTheDocument();
-    expect(screen.getByText('Waiting for the winner to claim the prize.')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Closed')).toBeInTheDocument();
+    expect(screen.getByText('Waiting for the cycle to finalize.')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

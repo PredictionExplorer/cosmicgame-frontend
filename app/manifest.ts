@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Cosmic Signature',
     short_name: 'CosmicSig',
     description:
-      'A strategy bidding game on Arbitrum featuring generative NFT art, ETH prizes, staking rewards, and charitable giving.',
+      'A procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle\u2019s final Signature, and the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild.',
     start_url: '/',
     display: 'standalone',
     theme_color: '#15BFFD',
@@ -17,6 +17,6 @@ export default function manifest(): MetadataRoute.Manifest {
         type: 'image/svg+xml',
       },
     ],
-    categories: ['games', 'entertainment'],
+    categories: ['art', 'entertainment'],
   };
 }

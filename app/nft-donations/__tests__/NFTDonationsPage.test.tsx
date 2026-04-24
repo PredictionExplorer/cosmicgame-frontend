@@ -21,7 +21,7 @@ describe('NFTDonationsPage', () => {
   it('renders the heading', () => {
     mockUseDonationsNFTList.mockReturnValue({ data: null });
     render(<NFTDonationsPage />);
-    expect(screen.getByText('NFT Donations')).toBeInTheDocument();
+    expect(screen.getByText('Attached NFT Contributions')).toBeInTheDocument();
   });
 
   it('shows loading when data is null', () => {

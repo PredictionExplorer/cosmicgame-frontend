@@ -21,7 +21,7 @@ describe('CategoryNav', () => {
         onCategoryClick={onCategoryClick}
       />,
     );
-    expect(screen.getByRole('button', { name: /All/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^All$/i })).toBeInTheDocument();
   });
 
   it('renders a button for each category', () => {
@@ -58,8 +58,8 @@ describe('CategoryNav', () => {
         onCategoryClick={onCategoryClick}
       />,
     );
-    const prizesButton = screen.getByRole('button', { name: /Prizes & Rewards/i });
-    expect(prizesButton).toHaveClass('text-primary');
+    const allocationsButton = screen.getByRole('button', { name: /Allocations & Distributions/i });
+    expect(allocationsButton).toHaveClass('text-primary');
   });
 
   it('highlights "All" when activeCategory is null', () => {
@@ -70,7 +70,7 @@ describe('CategoryNav', () => {
         onCategoryClick={onCategoryClick}
       />,
     );
-    const allButton = screen.getByRole('button', { name: /All/i });
+    const allButton = screen.getByRole('button', { name: /^All$/i });
     expect(allButton).toHaveClass('text-primary');
   });
 
@@ -83,7 +83,7 @@ describe('CategoryNav', () => {
         onCategoryClick={onCategoryClick}
       />,
     );
-    const allButton = screen.getByRole('button', { name: /All/i });
+    const allButton = screen.getByRole('button', { name: /^All$/i });
     await user.click(allButton);
     expect(onCategoryClick).toHaveBeenCalledTimes(1);
     expect(onCategoryClick).toHaveBeenCalledWith(null);
@@ -98,8 +98,8 @@ describe('CategoryNav', () => {
         onCategoryClick={onCategoryClick}
       />,
     );
-    const gameMechanicsButton = screen.getByRole('button', { name: /Game Mechanics/i });
-    await user.click(gameMechanicsButton);
+    const cycleMechanicsButton = screen.getByRole('button', { name: /Cycle Mechanics/i });
+    await user.click(cycleMechanicsButton);
     expect(onCategoryClick).toHaveBeenCalledTimes(1);
     expect(onCategoryClick).toHaveBeenCalledWith('game-mechanics');
   });

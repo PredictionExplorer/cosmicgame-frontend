@@ -125,8 +125,8 @@ describe('PrizeInfoPage', () => {
   describe('error and loading states', () => {
     it('shows invalid round message for negative roundNum', () => {
       render(<PrizeInfoPage roundNum={-1} />);
-      expect(screen.getByText('Invalid Round Number')).toBeInTheDocument();
-      expect(screen.getByText(/Back to Prize Winners/i)).toBeInTheDocument();
+      expect(screen.getByText('Invalid Cycle Number')).toBeInTheDocument();
+      expect(screen.getByText(/Back to Allocation Recipients/i)).toBeInTheDocument();
     });
 
     it('shows skeleton loading state', () => {
@@ -163,33 +163,33 @@ describe('PrizeInfoPage', () => {
     it('shows not found when prizeInfo is null after loading', () => {
       mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false });
       render(<PrizeInfoPage roundNum={1} />);
-      expect(screen.getByText('Prize Data Not Found')).toBeInTheDocument();
-      expect(screen.getByText(/Back to Prize Winners/i)).toBeInTheDocument();
+      expect(screen.getByText('Allocation Data Not Found')).toBeInTheDocument();
+      expect(screen.getByText(/Back to Allocation Recipients/i)).toBeInTheDocument();
     });
 
     it('not found message includes the round number', () => {
       mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false });
       render(<PrizeInfoPage roundNum={99} />);
-      expect(screen.getByText(/round #99/i)).toBeInTheDocument();
+      expect(screen.getByText(/Cycle #99/i)).toBeInTheDocument();
     });
   });
 
   describe('hero banner', () => {
     it('renders round number as heading', () => {
       renderWithData(4);
-      expect(screen.getByText('Round #4')).toBeInTheDocument();
+      expect(screen.getByText('Cycle #4')).toBeInTheDocument();
     });
 
-    it('renders breadcrumbs with Prize Winners link', () => {
+    it('renders breadcrumbs with Allocation Recipients link', () => {
       renderWithData(1);
-      const breadcrumbLink = screen.getByText('Prize Winners');
+      const breadcrumbLink = screen.getByText('Allocation Recipients');
       expect(breadcrumbLink).toBeInTheDocument();
       expect(breadcrumbLink.closest('a')).toHaveAttribute('href', '/prize');
     });
 
     it('renders current round in breadcrumbs', () => {
       renderWithData(3);
-      expect(screen.getByText('Round 3')).toBeInTheDocument();
+      expect(screen.getByText('Cycle 3')).toBeInTheDocument();
     });
 
     it('displays large hero prize amount', () => {
@@ -200,13 +200,13 @@ describe('PrizeInfoPage', () => {
 
     it('displays winner address in hero section', () => {
       renderWithData(1);
-      const heroSection = screen.getByLabelText('Round Hero');
+      const heroSection = screen.getByLabelText('Cycle Hero');
       expect(within(heroSection).getByText(/0xWinn/)).toBeInTheDocument();
     });
 
     it('renders NFT token link in hero', () => {
       renderWithData(1);
-      const heroSection = screen.getByLabelText('Round Hero');
+      const heroSection = screen.getByLabelText('Cycle Hero');
       expect(within(heroSection).getByText('Cosmic Signature #42')).toBeInTheDocument();
     });
 
@@ -222,7 +222,7 @@ describe('PrizeInfoPage', () => {
 
     it('does not show NFT link when tokenId is 0', () => {
       renderWithData(1, { TokenId: 0 });
-      const heroSection = screen.getByLabelText('Round Hero');
+      const heroSection = screen.getByLabelText('Cycle Hero');
       expect(within(heroSection).queryByText(/Cosmic Signature #/)).not.toBeInTheDocument();
     });
   });
@@ -238,7 +238,7 @@ describe('PrizeInfoPage', () => {
       renderWithData(1);
       await user.click(screen.getByTestId('share-round-button'));
       await waitFor(() => {
-        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('Round #1'));
+        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('Cycle #1'));
       });
     });
 
@@ -256,7 +256,7 @@ describe('PrizeInfoPage', () => {
       renderWithData(1);
       await user.click(screen.getByTestId('share-round-button'));
       await waitFor(() => {
-        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('Winner:'));
+        expect(mockCopy).toHaveBeenCalledWith(expect.stringContaining('Recipient:'));
       });
     });
 
@@ -266,7 +266,7 @@ describe('PrizeInfoPage', () => {
       renderWithData(1);
       await user.click(screen.getByTestId('share-round-button'));
       await waitFor(() => {
-        expect(toast.success).toHaveBeenCalledWith('Round summary copied to clipboard');
+        expect(toast.success).toHaveBeenCalledWith('Cycle summary copied to clipboard');
       });
     });
   });
@@ -312,15 +312,15 @@ describe('PrizeInfoPage', () => {
   describe('round winners section', () => {
     it('renders section heading', () => {
       renderWithData(1);
-      expect(screen.getByText('Round Winners')).toBeInTheDocument();
+      expect(screen.getByText('Cycle Recipients')).toBeInTheDocument();
     });
 
     it('renders all four winner cards', () => {
       renderWithData(1);
-      expect(screen.getByTestId('winner-card-main-prize-winner')).toBeInTheDocument();
+      expect(screen.getByTestId('winner-card-signature-allocation')).toBeInTheDocument();
       expect(screen.getByTestId('winner-card-chrono-warrior')).toBeInTheDocument();
       expect(screen.getByTestId('winner-card-endurance-champion')).toBeInTheDocument();
-      expect(screen.getByTestId('winner-card-last-cst-bidder')).toBeInTheDocument();
+      expect(screen.getByTestId('winner-card-final-cst-gesture')).toBeInTheDocument();
     });
 
     it('displays main prize ETH amount', () => {
@@ -343,7 +343,7 @@ describe('PrizeInfoPage', () => {
 
     it('displays last CST bidder amount', () => {
       renderWithData(1);
-      const card = screen.getByTestId('winner-card-last-cst-bidder');
+      const card = screen.getByTestId('winner-card-final-cst-gesture');
       expect(card).toHaveTextContent('0.0300 CST');
     });
 
@@ -376,19 +376,19 @@ describe('PrizeInfoPage', () => {
 
     it('renders all four distribution segments', () => {
       renderWithData(1);
-      expect(screen.getByTestId('distribution-segment-main-prize')).toBeInTheDocument();
-      expect(screen.getByTestId('distribution-segment-charity')).toBeInTheDocument();
-      expect(screen.getByTestId('distribution-segment-staking')).toBeInTheDocument();
-      expect(screen.getByTestId('distribution-segment-raffle')).toBeInTheDocument();
+      expect(screen.getByTestId('distribution-segment-signature-allocation')).toBeInTheDocument();
+      expect(screen.getByTestId('distribution-segment-public-goods')).toBeInTheDocument();
+      expect(screen.getByTestId('distribution-segment-anchor-distribution')).toBeInTheDocument();
+      expect(screen.getByTestId('distribution-segment-stellar-selection')).toBeInTheDocument();
     });
 
     it('displays distribution labels', () => {
       renderWithData(1);
       const bar = screen.getByTestId('prize-distribution-bar');
-      expect(within(bar).getByText('Main Prize')).toBeInTheDocument();
-      expect(within(bar).getByText('Charity')).toBeInTheDocument();
-      expect(within(bar).getByText('Staking')).toBeInTheDocument();
-      expect(within(bar).getByText('Raffle')).toBeInTheDocument();
+      expect(within(bar).getByText('Signature Allocation')).toBeInTheDocument();
+      expect(within(bar).getByText('Public Goods')).toBeInTheDocument();
+      expect(within(bar).getByText('Anchor Distribution')).toBeInTheDocument();
+      expect(within(bar).getByText('Stellar Selection')).toBeInTheDocument();
     });
 
     it('displays percentage values', () => {
@@ -400,28 +400,28 @@ describe('PrizeInfoPage', () => {
 
     it('renders section heading with tooltip', () => {
       renderWithData(1);
-      expect(screen.getByText('Prize Distribution')).toBeInTheDocument();
+      expect(screen.getByText('Allocation Distribution')).toBeInTheDocument();
     });
   });
 
   describe('round statistics', () => {
     it('renders section heading', () => {
       renderWithData(1);
-      expect(screen.getByText('Round Statistics')).toBeInTheDocument();
+      expect(screen.getByText('Cycle Statistics')).toBeInTheDocument();
     });
 
     it('renders all 9 stat cards', () => {
       renderWithData(1);
-      const statsSection = screen.getByLabelText('Round Statistics');
-      expect(within(statsSection).getByText('Prize Pool')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Charity')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Staking Deposit')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Raffle Deposits')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Total Bids')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Donated NFTs')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Staked Tokens')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Unique Stakers')).toBeInTheDocument();
-      expect(within(statsSection).getByText('Total Donated')).toBeInTheDocument();
+      const statsSection = screen.getByLabelText('Cycle Statistics');
+      expect(within(statsSection).getByText('Cycle Reserve')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Public Goods')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Anchor Distribution')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Stellar Selection Pool')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Total Gestures')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Attached NFTs')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Anchored Tokens')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Unique Anchor-holders')).toBeInTheDocument();
+      expect(within(statsSection).getByText('Total Contributed')).toBeInTheDocument();
     });
 
     it('displays correct bid count', () => {
@@ -441,7 +441,7 @@ describe('PrizeInfoPage', () => {
 
     it('displays unique stakers count', () => {
       renderWithData(1);
-      const statsSection = screen.getByLabelText('Round Statistics');
+      const statsSection = screen.getByLabelText('Cycle Statistics');
       expect(within(statsSection).getByText('0')).toBeInTheDocument();
     });
 
@@ -452,7 +452,7 @@ describe('PrizeInfoPage', () => {
 
     it('displays staking deposit amount', () => {
       renderWithData(1);
-      const statsSection = screen.getByLabelText('Round Statistics');
+      const statsSection = screen.getByLabelText('Cycle Statistics');
       expect(within(statsSection).getByText('0.5000 ETH')).toBeInTheDocument();
     });
   });
@@ -467,11 +467,11 @@ describe('PrizeInfoPage', () => {
   describe('tabbed data sections', () => {
     it('renders all tab triggers', () => {
       renderWithData(1);
-      expect(screen.getByRole('tab', { name: /Bid History/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /Gesture History/i })).toBeInTheDocument();
       expect(screen.getByRole('tab', { name: /Endurance Champions/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /Raffle Rewards/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /Staking Rewards/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /Donations/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /Stellar Selection/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /Anchor Distributions/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /Contributions/i })).toBeInTheDocument();
     });
 
     it('shows bid history table by default', () => {
@@ -491,7 +491,7 @@ describe('PrizeInfoPage', () => {
     it('switches to raffle rewards tab', async () => {
       const user = userEvent.setup();
       renderWithData(1);
-      await user.click(screen.getByRole('tab', { name: /Raffle Rewards/i }));
+      await user.click(screen.getByRole('tab', { name: /Stellar Selection/i }));
       await waitFor(() => {
         expect(screen.getByTestId('raffle-winner-table')).toBeInTheDocument();
       });
@@ -500,10 +500,10 @@ describe('PrizeInfoPage', () => {
     it('switches to staking rewards tab and shows empty state', async () => {
       const user = userEvent.setup();
       renderWithData(1);
-      await user.click(screen.getByRole('tab', { name: /Staking Rewards/i }));
+      await user.click(screen.getByRole('tab', { name: /Anchor Distributions/i }));
       await waitFor(() => {
         expect(
-          screen.getByText('No staking rewards distributed in this round.'),
+          screen.getByText('No Anchor Distributions distributed in this cycle.'),
         ).toBeInTheDocument();
       });
     });
@@ -519,7 +519,7 @@ describe('PrizeInfoPage', () => {
         isLoading: false,
       });
       renderWithData(1);
-      await user.click(screen.getByRole('tab', { name: /Donations/i }));
+      await user.click(screen.getByRole('tab', { name: /Contributions/i }));
       await waitFor(() => {
         expect(screen.getByTestId('donated-nft-table')).toBeInTheDocument();
         expect(screen.getByTestId('donated-erc20-table')).toBeInTheDocument();
@@ -529,11 +529,11 @@ describe('PrizeInfoPage', () => {
     it('shows donated NFT and ERC20 headings in donations tab', async () => {
       const user = userEvent.setup();
       renderWithData(1);
-      await user.click(screen.getByRole('tab', { name: /Donations/i }));
+      await user.click(screen.getByRole('tab', { name: /Contributions/i }));
       await waitFor(() => {
-        const headings = screen.getAllByText('Donated NFTs');
+        const headings = screen.getAllByText('Attached NFTs');
         expect(headings.length).toBeGreaterThanOrEqual(1);
-        expect(screen.getByText('Donated ERC20 Tokens')).toBeInTheDocument();
+        expect(screen.getByText('Attached ERC-20 Tokens')).toBeInTheDocument();
       });
     });
   });
@@ -543,7 +543,7 @@ describe('PrizeInfoPage', () => {
       mockUseRoundInfo.mockReturnValue({ data: basePrizeInfo, isLoading: false });
       mockUseBidListByRound.mockReturnValue({ data: [], isLoading: false });
       render(<PrizeInfoPage roundNum={1} />);
-      expect(screen.getByText('No bids were placed in this round.')).toBeInTheDocument();
+      expect(screen.getByText('No gestures were made in this cycle.')).toBeInTheDocument();
     });
 
     it('shows empty state for raffle when no deposits or winners', async () => {
@@ -558,9 +558,11 @@ describe('PrizeInfoPage', () => {
       });
       mockUseBidListByRound.mockReturnValue({ data: [], isLoading: false });
       render(<PrizeInfoPage roundNum={1} />);
-      await user.click(screen.getByRole('tab', { name: /Raffle Rewards/i }));
+      await user.click(screen.getByRole('tab', { name: /Stellar Selection/i }));
       await waitFor(() => {
-        expect(screen.getByText('No raffle rewards for this round.')).toBeInTheDocument();
+        expect(
+          screen.getByText('No Stellar Selection recipients for this cycle.'),
+        ).toBeInTheDocument();
       });
     });
 
@@ -572,7 +574,7 @@ describe('PrizeInfoPage', () => {
       await user.click(screen.getByRole('tab', { name: /Endurance Champions/i }));
       await waitFor(() => {
         expect(
-          screen.getByText('No endurance champion data available for this round.'),
+          screen.getByText('No Endurance Champion data available for this cycle.'),
         ).toBeInTheDocument();
       });
     });
@@ -582,10 +584,10 @@ describe('PrizeInfoPage', () => {
       mockUseRoundInfo.mockReturnValue({ data: basePrizeInfo, isLoading: false });
       mockUseBidListByRound.mockReturnValue({ data: [], isLoading: false });
       render(<PrizeInfoPage roundNum={1} />);
-      await user.click(screen.getByRole('tab', { name: /Staking Rewards/i }));
+      await user.click(screen.getByRole('tab', { name: /Anchor Distributions/i }));
       await waitFor(() => {
         expect(
-          screen.getByText('No staking rewards distributed in this round.'),
+          screen.getByText('No Anchor Distributions distributed in this cycle.'),
         ).toBeInTheDocument();
       });
     });
@@ -595,10 +597,14 @@ describe('PrizeInfoPage', () => {
       mockUseRoundInfo.mockReturnValue({ data: basePrizeInfo, isLoading: false });
       mockUseBidListByRound.mockReturnValue({ data: [], isLoading: false });
       render(<PrizeInfoPage roundNum={1} />);
-      await user.click(screen.getByRole('tab', { name: /Donations/i }));
+      await user.click(screen.getByRole('tab', { name: /Contributions/i }));
       await waitFor(() => {
-        expect(screen.getByText('No NFTs were donated in this round.')).toBeInTheDocument();
-        expect(screen.getByText('No ERC20 tokens were donated in this round.')).toBeInTheDocument();
+        expect(
+          screen.getByText('No NFTs were attached to gestures in this cycle.'),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText('No ERC-20 tokens were attached to gestures in this cycle.'),
+        ).toBeInTheDocument();
       });
     });
   });
@@ -636,13 +642,13 @@ describe('PrizeInfoPage', () => {
   describe('tab badges', () => {
     it('shows bid count badge on bid history tab', () => {
       renderWithData(1);
-      const bidsTab = screen.getByRole('tab', { name: /Bid History/i });
+      const bidsTab = screen.getByRole('tab', { name: /Gesture History/i });
       expect(bidsTab).toHaveTextContent('1');
     });
 
     it('shows raffle count badge', () => {
       renderWithData(1);
-      const raffleTab = screen.getByRole('tab', { name: /Raffle Rewards/i });
+      const raffleTab = screen.getByRole('tab', { name: /Stellar Selection/i });
       expect(raffleTab).toHaveTextContent('2');
     });
 
@@ -656,7 +662,7 @@ describe('PrizeInfoPage', () => {
         isLoading: false,
       });
       renderWithData(1);
-      const donationsTab = screen.getByRole('tab', { name: /Donations/i });
+      const donationsTab = screen.getByRole('tab', { name: /Contributions/i });
       expect(donationsTab).toHaveTextContent('3');
     });
   });
@@ -707,16 +713,16 @@ describe('PrizeInfoPage', () => {
 
     it('sections have aria labels', () => {
       renderWithData(1);
-      expect(screen.getByLabelText('Round Hero')).toBeInTheDocument();
-      expect(screen.getByLabelText('Round Winners')).toBeInTheDocument();
-      expect(screen.getByLabelText('Prize Distribution')).toBeInTheDocument();
-      expect(screen.getByLabelText('Round Statistics')).toBeInTheDocument();
-      expect(screen.getByLabelText('Round Data')).toBeInTheDocument();
+      expect(screen.getByLabelText('Cycle Hero')).toBeInTheDocument();
+      expect(screen.getByLabelText('Cycle Recipients')).toBeInTheDocument();
+      expect(screen.getByLabelText('Allocation Distribution')).toBeInTheDocument();
+      expect(screen.getByLabelText('Cycle Statistics')).toBeInTheDocument();
+      expect(screen.getByLabelText('Cycle Data')).toBeInTheDocument();
     });
 
     it('share button has accessible label', () => {
       renderWithData(1);
-      expect(screen.getByLabelText('Share round summary')).toBeInTheDocument();
+      expect(screen.getByLabelText('Share cycle summary')).toBeInTheDocument();
     });
 
     it('navigation links have accessible labels', () => {

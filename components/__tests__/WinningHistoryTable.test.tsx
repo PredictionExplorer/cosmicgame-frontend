@@ -15,12 +15,12 @@ const createEntry = (overrides: Partial<WinningHistoryEntry> = {}): WinningHisto
   TimeStamp: 1701346718,
   DateTime: '2023-11-30T12:18:38Z',
   RecordType: 0,
-  WinnerAddr: '0x1234567890abcdef1234567890abcdef12345678',
+  RecipientAddr: '0x1234567890abcdef1234567890abcdef12345678',
   RoundNum: 42,
   AmountEth: 1.5,
   TokenAddress: '',
   TokenId: -1,
-  WinnerIndex: 0,
+  RecipientIndex: 0,
   Claimed: true,
   ...overrides,
 });
@@ -45,14 +45,14 @@ describe('WinningHistoryTable', () => {
     expect(screen.getByText(convertTimestampToDateTime(entry.TimeStamp))).toBeInTheDocument();
   });
 
-  it('renders record type text for Main Prize ETH', () => {
+  it('renders record type text for Signature Allocation ETH', () => {
     render(<WinningHistoryTable winningHistory={[createEntry({ RecordType: 0 })]} />);
-    expect(screen.getByText('Main Prize ETH')).toBeInTheDocument();
+    expect(screen.getByText('Signature Allocation ETH')).toBeInTheDocument();
   });
 
   it('renders record type text for Raffle ETH', () => {
     render(<WinningHistoryTable winningHistory={[createEntry({ RecordType: 3 })]} />);
-    expect(screen.getByText('Raffle ETH (for bidders)')).toBeInTheDocument();
+    expect(screen.getByText('ETH Stellar Selection (for participants)')).toBeInTheDocument();
   });
 
   it('renders round number as link', () => {
@@ -85,13 +85,13 @@ describe('WinningHistoryTable', () => {
   it('renders winner address when showWinnerAddr is true', () => {
     const entry = createEntry();
     render(<WinningHistoryTable winningHistory={[entry]} showWinnerAddr={true} />);
-    const winnerHeaders = screen.getAllByText('Winner');
+    const winnerHeaders = screen.getAllByText('Recipient');
     expect(winnerHeaders.length).toBeGreaterThanOrEqual(1);
   });
 
   it('hides winner column when showWinnerAddr is false', () => {
     render(<WinningHistoryTable winningHistory={[createEntry()]} showWinnerAddr={false} />);
-    expect(screen.queryByText('Winner')).not.toBeInTheDocument();
+    expect(screen.queryByText('Recipient')).not.toBeInTheDocument();
   });
 
   it('renders token ID link when TokenId >= 0', () => {

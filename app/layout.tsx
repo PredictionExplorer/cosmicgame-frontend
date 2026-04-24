@@ -6,6 +6,7 @@ import { headers } from 'next/headers';
 import { logoImgUrl } from '@/utils';
 
 import { isLandingHost } from '@/lib/hostRouting';
+import { clashDisplay, inter } from '@/lib/fonts';
 import { GA_TRACKING_ID } from '@/utils/analytics';
 import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
 
@@ -17,7 +18,7 @@ import '@/styles/global.css';
 
 const defaultTitle = 'Cosmic Signature';
 const defaultDescription =
-  'Cosmic Signature is a strategy bidding game on the Arbitrum blockchain featuring generative NFT art inspired by the three-body problem, ETH prizes, staking rewards, and charitable giving.';
+  'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle\u2019s final Signature, and the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild.';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cosmicsignature.com'),
@@ -53,16 +54,17 @@ export const metadata: Metadata = {
   keywords: [
     'Cosmic Signature',
     'NFT',
-    'bidding game',
+    'procedural art protocol',
     'Arbitrum',
     'Ethereum',
     'generative art',
     'three-body problem',
-    'staking',
-    'crypto game',
-    'NFT game',
-    'ETH prizes',
-    'blockchain game',
+    'anchoring',
+    'CC0',
+    'formally verified',
+    'on-chain art',
+    'public goods',
+    'Protocol Guild',
     'ERC-721',
     'RandomWalkNFT',
     'Cosmic Signature Token',
@@ -82,7 +84,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const showAppChrome = !isLandingHost(host);
 
   return (
-    <html lang="en">
+    <html lang="en" className={`${clashDisplay.variable} ${inter.variable}`}>
       <head>
         <JsonLd data={[websiteJsonLd(), organizationJsonLd(), webApplicationJsonLd()]} />
         {GA_TRACKING_ID && (

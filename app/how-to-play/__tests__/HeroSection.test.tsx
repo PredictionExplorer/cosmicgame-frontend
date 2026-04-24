@@ -46,22 +46,26 @@ jest.mock('next/link', () => ({
 describe('HeroSection', () => {
   it('renders the main heading', () => {
     render(<HeroSection />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Bid. Compete. Win Big.');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Gesture. Endure. Shape the Signature.',
+    );
   });
 
   it('renders the tagline', () => {
     render(<HeroSection />);
-    expect(screen.getByText(/Outsmart other players/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Participants make gestures during a Performance Cycle/),
+    ).toBeInTheDocument();
   });
 
-  it('renders the strategy badge', () => {
+  it('renders the protocol badge', () => {
     render(<HeroSection />);
-    expect(screen.getByText('Strategy Bidding Game')).toBeInTheDocument();
+    expect(screen.getByText('Procedural On-Chain Art Protocol')).toBeInTheDocument();
   });
 
-  it('renders Start Playing link pointing to homepage', () => {
+  it('renders Open the Protocol link pointing to homepage', () => {
     render(<HeroSection />);
-    const link = screen.getByRole('link', { name: 'Start Playing' });
+    const link = screen.getByRole('link', { name: 'Open the Protocol' });
     expect(link).toHaveAttribute('href', '/');
   });
 

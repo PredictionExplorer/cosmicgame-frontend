@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import WinningHistory from './WinningHistory';
 
 export const metadata: Metadata = createMetadata(
-  'History of My Winnings | Cosmic Signature',
-  'View your complete winning history in the Cosmic Signature game, including main prizes, raffle ETH rewards, NFT wins, and staking distributions.',
+  'My Allocation History | Cosmic Signature',
+  'View your complete allocation history in Cosmic Signature, including Signature Allocations, ETH Stellar Selection distributions, Cosmic Signature NFTs, and Anchor Distributions.',
   undefined,
   '/winning-history',
 );

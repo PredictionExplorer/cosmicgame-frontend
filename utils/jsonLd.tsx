@@ -1,9 +1,15 @@
-import type { FAQItem } from '@/app/faq/data/faq-data';
+interface FAQItem {
+  question: string;
+  answer: string;
+}
 
 const SITE_URL = 'https://www.cosmicsignature.com';
+const APP_URL = 'https://app.cosmicsignature.com';
 const SITE_NAME = 'Cosmic Signature';
-/** Branding from `public/images/logo.svg` — not an NFT asset on the CDN. */
 const SITE_LOGO_URL = `${SITE_URL}/images/logo.svg`;
+
+const PROTOCOL_DESCRIPTION =
+  'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle\u2019s final Signature, and the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild.';
 
 export interface BreadcrumbSegment {
   name: string;
@@ -16,13 +22,12 @@ export function websiteJsonLd() {
     '@type': 'WebSite',
     name: SITE_NAME,
     url: SITE_URL,
-    description:
-      'Cosmic Signature is a strategy bidding game on Arbitrum featuring generative NFT art, ETH prizes, staking rewards, and charitable giving.',
+    description: PROTOCOL_DESCRIPTION,
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${SITE_URL}/gallery?search={search_term_string}`,
+        urlTemplate: `${APP_URL}/gallery?search={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -37,8 +42,7 @@ export function organizationJsonLd() {
     url: SITE_URL,
     logo: SITE_LOGO_URL,
     sameAs: ['https://x.com/CosmicSignature', 'https://discord.gg/bGnPn96Qwt'],
-    description:
-      'Cosmic Signature combines generative art, an exciting Ethereum bidding game, and social impact through charitable giving on the Arbitrum network.',
+    description: PROTOCOL_DESCRIPTION,
   };
 }
 
@@ -47,8 +51,8 @@ export function webApplicationJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: SITE_NAME,
-    url: SITE_URL,
-    applicationCategory: 'GameApplication',
+    url: APP_URL,
+    applicationCategory: 'EntertainmentApplication',
     operatingSystem: 'Any',
     browserRequirements: 'Requires a Web3-compatible browser or wallet extension',
     offers: {
@@ -57,7 +61,31 @@ export function webApplicationJsonLd() {
       priceCurrency: 'ETH',
     },
     description:
-      'A strategy bidding game where players compete to win ETH prizes, unique generative NFTs, and staking rewards on the Arbitrum blockchain.',
+      'A procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; the protocol distributes allocations across more than ten tracks when the cycle finalizes.',
+  };
+}
+
+export function artProtocolJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: SITE_NAME,
+    url: SITE_URL,
+    image: SITE_LOGO_URL,
+    license: 'https://creativecommons.org/publicdomain/zero/1.0/',
+    creditText: 'Cosmic Signature Protocol',
+    description: PROTOCOL_DESCRIPTION,
+    genre: 'Generative Art',
+    keywords: [
+      'procedural art',
+      'on-chain art',
+      'three-body problem',
+      'generative',
+      'deterministic',
+      'CC0',
+      'Arbitrum',
+      'Ethereum',
+    ],
   };
 }
 
@@ -106,7 +134,7 @@ export function nftProductJsonLd({
     name,
     description,
     image: imageUrl,
-    url: `${SITE_URL}/detail/${tokenId}`,
+    url: `${APP_URL}/detail/${tokenId}`,
     brand: {
       '@type': 'Organization',
       name: SITE_NAME,

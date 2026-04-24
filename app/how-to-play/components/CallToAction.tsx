@@ -27,17 +27,17 @@ export function CallToAction() {
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent" />
 
         <h2 id="cta-heading" className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          Ready to Start Bidding?
+          Ready to Make Your First Gesture?
         </h2>
 
         <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-          Join the next round of Cosmic Signature. Connect your wallet and place your first bid to
-          start earning rewards.
+          Join the active Performance Cycle. Connect your wallet and make your first gesture to
+          start imprinting CST and shaping the cycle\u2019s Signature.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Button asChild size="lg">
-            <Link href="/">Start Playing Now</Link>
+            <Link href="/">Open the Protocol</Link>
           </Button>
         </div>
 

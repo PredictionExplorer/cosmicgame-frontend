@@ -24,7 +24,7 @@ beforeEach(() => {
 const createRound = (overrides = {}) => ({
   TimeStamp: 100,
   AmountEth: 1.5,
-  WinnerAddr: '0xWinner',
+  RecipientAddr: '0xRecipient',
   RoundStats: { TotalBids: 10 },
   ...overrides,
 });
@@ -33,13 +33,15 @@ describe('PrizeWinnersPage', () => {
   it('renders the heading', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<PrizeWinnersPage />);
-    expect(screen.getByText('Prize Winners')).toBeInTheDocument();
+    expect(screen.getByText('Allocation Recipients')).toBeInTheDocument();
   });
 
   it('renders the enhanced subtitle', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<PrizeWinnersPage />);
-    expect(screen.getByText(/Browse the complete history of prize winners/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Browse the complete history of allocation recipients/i),
+    ).toBeInTheDocument();
   });
 
   it('passes loading state to PrizeTable', () => {
@@ -86,10 +88,12 @@ describe('PrizeWinnersPage', () => {
       const statsContainer = screen.getByTestId('summary-stats');
       expect(statsContainer).toBeInTheDocument();
 
-      expect(screen.getByTestId('summary-stat-total-rounds')).toHaveTextContent('3');
-      expect(screen.getByTestId('summary-stat-total-eth-awarded')).toHaveTextContent('7.00 ETH');
-      expect(screen.getByTestId('summary-stat-total-bids')).toHaveTextContent('60');
-      expect(screen.getByTestId('summary-stat-unique-winners')).toHaveTextContent('2');
+      expect(screen.getByTestId('summary-stat-total-cycles')).toHaveTextContent('3');
+      expect(screen.getByTestId('summary-stat-total-eth-distributed')).toHaveTextContent(
+        '7.00 ETH',
+      );
+      expect(screen.getByTestId('summary-stat-total-gestures')).toHaveTextContent('60');
+      expect(screen.getByTestId('summary-stat-unique-recipients')).toHaveTextContent('2');
     });
 
     it('does not render summary stats when data is empty', () => {
@@ -114,7 +118,7 @@ describe('PrizeWinnersPage', () => {
 
   it('has no accessibility violations with data', async () => {
     mockUseRoundList.mockReturnValue({
-      data: [createRound(), createRound({ TimeStamp: 200, WinnerAddr: '0xB' })],
+      data: [createRound(), createRound({ TimeStamp: 200, RecipientAddr: '0xB' })],
       isLoading: false,
     });
     const { container } = render(<PrizeWinnersPage />);

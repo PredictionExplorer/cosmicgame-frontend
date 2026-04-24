@@ -52,7 +52,7 @@ describe('NotFound page', () => {
     render(<NotFound />);
     expect(screen.getByLabelText('Suggested pages')).toBeInTheDocument();
     expect(screen.getByText('NFT Gallery')).toBeInTheDocument();
-    expect(screen.getByText('How to Play')).toBeInTheDocument();
+    expect(screen.getByText('How It Works')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

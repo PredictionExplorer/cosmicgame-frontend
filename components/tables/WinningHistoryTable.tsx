@@ -21,22 +21,37 @@ import type { WinningHistoryEntry } from '@/services/api/types';
 export type { WinningHistoryEntry };
 
 const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; text: string }> = {
-  0: { icon: <Ticket className="h-5 w-5" />, text: 'Main Prize ETH' },
-  1: { icon: <Coins className="h-5 w-5" />, text: 'Main Prize CST (ERC20)' },
-  2: { icon: <Heart className="h-5 w-5" />, text: 'Main Prize COSMIC NFT' },
-  3: { icon: <Trophy className="h-5 w-5" />, text: 'Raffle ETH (for bidders)' },
-  4: { icon: <Ticket className="h-5 w-5" />, text: 'Raffle CST (for bidders)' },
-  5: { icon: <Layers className="h-5 w-5" />, text: 'Raffle COSMIC NFT (for bidders)' },
-  6: { icon: <Layers className="h-5 w-5" />, text: 'Raffle CST (for RandomWalk stakers)' },
-  7: { icon: <Trophy className="h-5 w-5" />, text: 'Raffle COSMIC NFT (for RandomWalk stakers)' },
-  8: { icon: <Trophy className="h-5 w-5" />, text: 'Endurance Champion COSMIC NFT' },
-  9: { icon: <Trophy className="h-5 w-5" />, text: 'Endurance Champion ERC20 (CST)' },
-  10: { icon: <Trophy className="h-5 w-5" />, text: 'Chrono Warrior ETH' },
-  11: { icon: <Trophy className="h-5 w-5" />, text: 'Chrono Warrior CST (ERC20)' },
-  12: { icon: <Ticket className="h-5 w-5" />, text: 'Chrono Warrior COSMIC NFT' },
-  13: { icon: <Ticket className="h-5 w-5" />, text: 'Staking Deposit ETH (for COSMIC NFT stakers)' },
-  14: { icon: <Ticket className="h-5 w-5" />, text: 'Last CST Bidder COSMIC NFT (ERC721)' },
-  15: { icon: <Ticket className="h-5 w-5" />, text: 'Last CST Bidder ERC20 (CST)' },
+  0: { icon: <Ticket className="h-5 w-5" />, text: 'Signature Allocation ETH' },
+  1: { icon: <Coins className="h-5 w-5" />, text: 'Signature Allocation CST (ERC-20)' },
+  2: { icon: <Heart className="h-5 w-5" />, text: 'Signature Allocation Cosmic Signature NFT' },
+  3: { icon: <Trophy className="h-5 w-5" />, text: 'ETH Stellar Selection (for participants)' },
+  4: { icon: <Ticket className="h-5 w-5" />, text: 'CST Stellar Selection (for participants)' },
+  5: {
+    icon: <Layers className="h-5 w-5" />,
+    text: 'Cosmic Signature NFT Stellar Selection (for participants)',
+  },
+  6: {
+    icon: <Layers className="h-5 w-5" />,
+    text: 'CST Stellar Selection (for RandomWalk anchor-holders)',
+  },
+  7: {
+    icon: <Trophy className="h-5 w-5" />,
+    text: 'Cosmic Signature NFT Stellar Selection (for RandomWalk anchor-holders)',
+  },
+  8: { icon: <Trophy className="h-5 w-5" />, text: 'Endurance Champion Cosmic Signature NFT' },
+  9: { icon: <Trophy className="h-5 w-5" />, text: 'Endurance Champion Recognition CST (ERC-20)' },
+  10: { icon: <Trophy className="h-5 w-5" />, text: 'Chrono-Warrior ETH' },
+  11: { icon: <Trophy className="h-5 w-5" />, text: 'Chrono-Warrior CST (ERC-20)' },
+  12: { icon: <Ticket className="h-5 w-5" />, text: 'Chrono-Warrior Cosmic Signature NFT' },
+  13: {
+    icon: <Ticket className="h-5 w-5" />,
+    text: 'Anchor Distribution ETH (for Cosmic Signature NFT anchor-holders)',
+  },
+  14: {
+    icon: <Ticket className="h-5 w-5" />,
+    text: 'Final CST Gesture Cosmic Signature NFT (ERC-721)',
+  },
+  15: { icon: <Ticket className="h-5 w-5" />, text: 'Final CST Gesture Recognition CST (ERC-20)' },
 };
 
 const WinningHistoryRow = ({
@@ -212,8 +227,8 @@ function WinningHistorySubTable({
           <Tr>
             <TablePrimaryHeadCell align="left">Record Type</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-            {showWinnerAddr && <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>}
-            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+            {showWinnerAddr && <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>}
+            <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Token Address</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>

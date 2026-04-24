@@ -4,7 +4,7 @@ import { RoundInfoSection } from '../RoundInfoSection';
 
 jest.mock('../../common/Prize', () => ({
   __esModule: true,
-  default: () => <div data-testid="prize-breakdown">Prize</div>,
+  default: () => <div data-testid="prize-breakdown">Signature Allocation</div>,
 }));
 
 jest.mock('../../tokens/FundDistribution', () => ({
@@ -13,7 +13,7 @@ jest.mock('../../tokens/FundDistribution', () => ({
 
 jest.mock('../../tables/RaffleHolderTable', () => ({
   __esModule: true,
-  default: () => <div data-testid="raffle-holder-table">Raffle</div>,
+  default: () => <div data-testid="raffle-holder-table">Stellar Selection</div>,
 }));
 
 jest.mock('../../tables/ETHSpentTable', () => ({
@@ -49,9 +49,9 @@ const baseData = {
   LastBidderAddr: '0xBidder',
   BidPriceEth: 0.01,
   StakingAmountEth: 1,
-  NumRaffleEthWinnersBidding: 5,
-  NumRaffleNFTWinnersBidding: 3,
-  NumRaffleNFTWinnersStakingRWalk: 2,
+  NumRaffleEthRecipientsBidding: 5,
+  NumRaffleNFTRecipientsBidding: 3,
+  NumRaffleNFTRecipientsStakingRWalk: 2,
   PrizePercentage: 25,
   RafflePercentage: 15,
   CharityPercentage: 10,
@@ -91,7 +91,7 @@ describe('RoundInfoSection', () => {
     expect(screen.getByTestId('fund-distribution')).toBeInTheDocument();
   });
 
-  it('renders Raffle Ticket Holders section', () => {
+  it('renders Stellar Selection Entries section', () => {
     render(<RoundInfoSection {...defaultProps} />);
     expect(screen.getByTestId('raffle-holder-table')).toBeInTheDocument();
   });
@@ -106,7 +106,7 @@ describe('RoundInfoSection', () => {
     expect(screen.getByTestId('endurance-table')).toBeInTheDocument();
   });
 
-  it('renders Bid History section', () => {
+  it('renders Gesture History section', () => {
     render(<RoundInfoSection {...defaultProps} />);
     expect(screen.getByTestId('bidding-history')).toBeInTheDocument();
   });
@@ -116,7 +116,7 @@ describe('RoundInfoSection', () => {
     expect(screen.getByTestId('donated-tokens')).toBeInTheDocument();
   });
 
-  it('shows ETH Donations section when donations exist', () => {
+  it('shows ETH Contributions section when donations exist', () => {
     const propsWithDonations = {
       ...defaultProps,
       ethDonations: [{ id: 1 }] as never[],
@@ -125,15 +125,15 @@ describe('RoundInfoSection', () => {
     expect(screen.getByTestId('eth-donation-table')).toBeInTheDocument();
   });
 
-  it('hides ETH Donations section when list is empty', () => {
+  it('hides ETH Contributions section when list is empty', () => {
     render(<RoundInfoSection {...defaultProps} />);
     expect(screen.queryByTestId('eth-donation-table')).not.toBeInTheDocument();
   });
 
-  it('renders collapsible Round Rules section', () => {
+  it('renders collapsible Cycle Rules section', () => {
     render(<RoundInfoSection {...defaultProps} />);
     expect(screen.getByText('How it works')).toBeInTheDocument();
-    expect(screen.getByText('Round Rules')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Rules')).toBeInTheDocument();
   });
 
   it('hides rules content when collapsed (default state)', () => {
@@ -145,8 +145,8 @@ describe('RoundInfoSection', () => {
     render(<RoundInfoSection {...defaultProps} />);
     expect(screen.getByTestId('round-summary-footer')).toBeInTheDocument();
     expect(screen.getByText('Contract Balance')).toBeInTheDocument();
-    expect(screen.getByText('Round Duration')).toBeInTheDocument();
-    expect(screen.getByText('Unique Bidders')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Duration')).toBeInTheDocument();
+    expect(screen.getByText('Unique Participants')).toBeInTheDocument();
   });
 
   it('displays formatted contract balance in footer', () => {
@@ -175,12 +175,12 @@ describe('RoundInfoSection', () => {
     render(<RoundInfoSection {...propsWithDonations} />);
 
     expect(screen.getByText('Fund Distribution')).toBeInTheDocument();
-    expect(screen.getByText('Raffle Ticket Holders')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection Entries')).toBeInTheDocument();
     expect(screen.getByText('Top ETH Spenders')).toBeInTheDocument();
     expect(screen.getByText('Endurance Champions')).toBeInTheDocument();
-    expect(screen.getByText(/Bid History/)).toBeInTheDocument();
-    expect(screen.getByText('ETH Donations')).toBeInTheDocument();
-    expect(screen.getByText('Round Rules')).toBeInTheDocument();
+    expect(screen.getByText(/Gesture History/)).toBeInTheDocument();
+    expect(screen.getByText('ETH Contributions')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Rules')).toBeInTheDocument();
   });
 
   it('renders sections in correct order (bid history before donations)', () => {

@@ -20,12 +20,12 @@ describe('FundDistribution', () => {
 
   it('renders all six category labels', () => {
     render(<FundDistribution data={createData()} />);
-    expect(screen.getByText('Prize')).toBeInTheDocument();
-    expect(screen.getByText('Raffle')).toBeInTheDocument();
-    expect(screen.getByText('Charity')).toBeInTheDocument();
-    expect(screen.getByText('Staking')).toBeInTheDocument();
-    expect(screen.getByText('Chrono Warrior')).toBeInTheDocument();
-    expect(screen.getByText('Next round')).toBeInTheDocument();
+    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
+    expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Distribution')).toBeInTheDocument();
+    expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
+    expect(screen.getByText('Next cycle')).toBeInTheDocument();
   });
 
   it('renders percentage values for each category', () => {
@@ -34,7 +34,7 @@ describe('FundDistribution', () => {
     expect(screen.getByText(/^45%/)).toBeInTheDocument();
     // 10% appears twice (Raffle and Charity)
     expect(screen.getAllByText(/^10%/)).toHaveLength(2);
-    // 5% appears twice (Staking and Chrono Warrior)
+    // 5% appears twice (Staking and Chrono-Warrior)
     expect(screen.getAllByText(/^5%/)).toHaveLength(2);
   });
 
@@ -55,19 +55,19 @@ describe('FundDistribution', () => {
   it('handles undefined data gracefully', () => {
     render(<FundDistribution />);
     expect(screen.getByTestId('fund-distribution')).toBeInTheDocument();
-    expect(screen.getByText('Next round')).toBeInTheDocument();
+    expect(screen.getByText('Next cycle')).toBeInTheDocument();
   });
 
   it('clamps negative percentages to zero', () => {
     render(<FundDistribution data={createData({ PrizePercentage: -10 })} />);
-    expect(screen.getByText('Prize')).toBeInTheDocument();
-    const prizeRow = screen.getByText('Prize').closest('[class*="group"]')!;
+    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
+    const prizeRow = screen.getByText('Signature Allocation').closest('[class*="group"]')!;
     expect(prizeRow).toHaveTextContent('0%');
   });
 
   it('clamps percentages above 100 to 100', () => {
     render(<FundDistribution data={createData({ RafflePercentage: 200 })} />);
-    const raffleRow = screen.getByText('Raffle').closest('[class*="group"]')!;
+    const raffleRow = screen.getByText('Stellar Selection').closest('[class*="group"]')!;
     expect(raffleRow).toHaveTextContent('100%');
   });
 
@@ -84,8 +84,8 @@ describe('FundDistribution', () => {
       const labelEl = row.querySelector('.text-sm.font-medium.text-white');
       return labelEl?.textContent;
     });
-    expect(labels[0]).toBe('Next round');
-    expect(labels[1]).toBe('Prize');
+    expect(labels[0]).toBe('Next cycle');
+    expect(labels[1]).toBe('Signature Allocation');
   });
 
   it('has no accessibility violations', async () => {

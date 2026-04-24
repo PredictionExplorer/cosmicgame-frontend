@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { MainWrapper } from '@/components/styled';
 
 const suggestedLinks = [
-  { href: '/', label: 'Home — Live Bidding' },
+  { href: '/', label: 'Home \u2014 Active Cycle' },
   { href: '/gallery', label: 'NFT Gallery' },
-  { href: '/how-to-play', label: 'How to Play' },
+  { href: '/how-to-play', label: 'How It Works' },
   { href: '/faq', label: 'FAQ' },
   { href: '/statistics', label: 'Statistics' },
-  { href: '/staking', label: 'Staking Rewards' },
+  { href: '/staking', label: 'Anchor Distributions' },
 ];
 
 export default function NotFound() {
@@ -21,8 +21,8 @@ export default function NotFound() {
         <h1 className="text-2xl font-bold text-primary text-center">404 — Page Not Found</h1>
         <p className="text-sm text-muted-foreground text-center max-w-md">
           The page you&apos;re looking for doesn&apos;t exist or may have been moved. Cosmic
-          Signature is a strategy bidding game on Arbitrum — explore the links below to find what
-          you need.
+          Signature is a procedural on-chain art protocol on Arbitrum \u2014 explore the links below
+          to find what you need.
         </p>
         <Button variant="outline" asChild>
           <Link href="/">Return Home</Link>

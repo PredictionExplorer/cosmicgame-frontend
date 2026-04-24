@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import BidPage from './BidPage';
 
 export const metadata: Metadata = createMetadata(
-  'Bid Information | Cosmic Signature',
-  'View detailed bid information including timestamp, bidder address, bid amount, and round context for the Cosmic Signature bidding game.',
+  'Gesture Information | Cosmic Signature',
+  'View detailed gesture information including timestamp, participant address, gesture cost, and cycle context for the Cosmic Signature protocol.',
 );
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {

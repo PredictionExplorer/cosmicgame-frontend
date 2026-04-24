@@ -141,7 +141,7 @@ describe('MyWinnings', () => {
       refetch: mockRefetchRaffle,
     });
     render(<MyWinnings />);
-    expect(screen.getByText('No ETH rewards yet')).toBeInTheDocument();
+    expect(screen.getByText('No ETH allocations yet')).toBeInTheDocument();
   });
 
   it('renders page heading and sections with data', () => {
@@ -169,9 +169,9 @@ describe('MyWinnings', () => {
     });
     render(<MyWinnings />);
 
-    expect(screen.getByText('My Rewards')).toBeInTheDocument();
-    expect(screen.getByText('Claimable ETH Rewards')).toBeInTheDocument();
-    expect(screen.getByText('Donated NFTs')).toBeInTheDocument();
+    expect(screen.getByText('My Allocations')).toBeInTheDocument();
+    expect(screen.getByText('Retrievable ETH Allocations')).toBeInTheDocument();
+    expect(screen.getByText('Attached NFTs')).toBeInTheDocument();
     expect(screen.getByTestId('donated-nft-table')).toHaveTextContent('nfts: 1');
     expect(screen.getByTestId('uncollected-rewards')).toBeInTheDocument();
   });

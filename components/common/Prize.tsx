@@ -47,12 +47,13 @@ const Prize: FC<PrizeProps> = ({ data }) => {
   const prizes: PrizeCardData[] = [
     {
       icon: <Trophy className="h-5 w-5" />,
-      name: 'Main Prize',
-      tooltip: 'The last bidder when the countdown hits zero wins this prize.',
+      name: 'Signature Allocation',
+      tooltip:
+        'The participant who made the Final Gesture when the countdown reaches zero may retrieve this allocation.',
       amounts: [
         `${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`,
-        '1 COSMIC NFT',
-        'Donated tokens (if any)',
+        '1 Cosmic Signature NFT',
+        'Attached tokens (if any)',
       ],
       winners: '1',
       faqLink: '/faq#main-prize',
@@ -60,8 +61,9 @@ const Prize: FC<PrizeProps> = ({ data }) => {
     },
     {
       icon: <Shuffle className="h-5 w-5" />,
-      name: 'Raffle ETH',
-      tooltip: 'Random bidders are selected to win ETH from the raffle pool.',
+      name: 'ETH Stellar Selection',
+      tooltip:
+        'Participants are selected at random from the cycle entries to share an allocation of ETH.',
       amounts: [
         `${((data?.RaffleAmountEth ?? 0) / (data?.NumRaffleEthWinnersBidding ?? 1)).toFixed(4)} ETH each`,
       ],
@@ -69,30 +71,31 @@ const Prize: FC<PrizeProps> = ({ data }) => {
     },
     {
       icon: <ImageIcon className="h-5 w-5" />,
-      name: 'Raffle NFT',
-      tooltip: 'Random bidders win COSMIC NFTs from the raffle.',
-      amounts: ['1 COSMIC NFT each'],
+      name: 'NFT Stellar Selection',
+      tooltip:
+        'Participants are selected at random from the cycle entries to receive Cosmic Signature NFTs.',
+      amounts: ['1 Cosmic Signature NFT each'],
       winners: `${data?.NumRaffleNFTWinnersBidding}`,
     },
     {
       icon: <Layers className="h-5 w-5" />,
-      name: 'RandomWalk Staker',
-      tooltip: 'Stakers of RandomWalk NFTs can win COSMIC NFTs.',
-      amounts: ['1 COSMIC NFT each'],
+      name: 'RandomWalk Anchor-holder',
+      tooltip: 'Anchor-holders of RandomWalk NFTs may receive Cosmic Signature NFTs.',
+      amounts: ['1 Cosmic Signature NFT each'],
       winners: `${data?.NumRaffleNFTWinnersStakingRWalk} or 0`,
     },
     {
       icon: <Users className="h-5 w-5" />,
-      name: 'COSMIC NFT Staker',
-      tooltip: 'Stakers of COSMIC NFTs share the staking ETH pool.',
+      name: 'Cosmic Signature Anchor',
+      tooltip: 'Anchor-holders of Cosmic Signature NFTs share the per-cycle Anchor Distribution.',
       amounts: [`${(data?.StakingAmountEth ?? 0).toFixed(4)} ETH`],
       winners: '1',
     },
     {
       icon: <Swords className="h-5 w-5" />,
-      name: 'Chrono Warrior',
+      name: 'Chrono-Warrior Allocation',
       tooltip:
-        'The bidder who held the Endurance Champion title for the longest consecutive period. Wins a percentage of the total contract balance.',
+        'The participant who held the Endurance Champion position for the longest consecutive interval receives a percentage of the Cycle Reserve.',
       amounts: [
         `${(((data?.CosmicGameBalanceEth ?? 0) * (data?.ChronoWarriorPercentage ?? 0)) / 100).toFixed(4)} ETH`,
       ],
@@ -103,16 +106,17 @@ const Prize: FC<PrizeProps> = ({ data }) => {
       icon: <Crown className="h-5 w-5" />,
       name: 'Endurance Champion',
       tooltip:
-        'The bidder who remained the last bidder for the longest consecutive period of time. Wins CST tokens and an NFT.',
-      amounts: [`${(data?.CurNumBids ?? 0) * 10} CST`, '1 COSMIC NFT'],
+        'The participant who remained the most recent gesture maker for the longest consecutive interval. Receives Recognition CST and a Cosmic Signature NFT.',
+      amounts: [`${(data?.CurNumBids ?? 0) * 10} CST`, '1 Cosmic Signature NFT'],
       winners: '1',
       faqLink: '/faq#endurance-champion',
     },
     {
       icon: <Coins className="h-5 w-5" />,
-      name: 'Last CST Bidder',
-      tooltip: 'The last person to bid with CST tokens wins CST tokens and an NFT.',
-      amounts: [`${(data?.CurNumBids ?? 0) * 10} CST`, '1 COSMIC NFT'],
+      name: 'Final CST Gesture',
+      tooltip:
+        'The participant who made the last CST gesture of the cycle receives Recognition CST and a Cosmic Signature NFT.',
+      amounts: [`${(data?.CurNumBids ?? 0) * 10} CST`, '1 Cosmic Signature NFT'],
       winners: '1 or 0',
     },
   ];
@@ -120,8 +124,8 @@ const Prize: FC<PrizeProps> = ({ data }) => {
   return (
     <div className="mt-12">
       <div className="flex items-center gap-2 mb-6">
-        <h3 className="font-display text-lg font-semibold tracking-tight">Prize Breakdown</h3>
-        <InfoTooltip content="All prizes awarded when the round ends. Multiple ways to win!" />
+        <h3 className="font-display text-lg font-semibold tracking-tight">Allocation Breakdown</h3>
+        <InfoTooltip content="Allocations distributed when the cycle finalizes across more than ten tracks." />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {prizes.map((prize, i) => (
@@ -189,7 +193,7 @@ const Prize: FC<PrizeProps> = ({ data }) => {
                 </div>
                 <div className="mt-2.5 flex items-center gap-1.5">
                   <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                    {prize.winners} winner{prize.winners === '1' ? '' : 's'}
+                    {prize.winners} recipient{prize.winners === '1' ? '' : 's'}
                   </span>
                 </div>
               </div>

@@ -49,9 +49,9 @@ describe('GameOverview', () => {
 
   it('renders all three card titles', () => {
     renderWithTooltip(<GameOverview />);
-    expect(screen.getByText('Bid')).toBeInTheDocument();
-    expect(screen.getByText('Compete')).toBeInTheDocument();
-    expect(screen.getByText('Win')).toBeInTheDocument();
+    expect(screen.getByText('Gesture')).toBeInTheDocument();
+    expect(screen.getByText('Endure')).toBeInTheDocument();
+    expect(screen.getByText('Receive')).toBeInTheDocument();
   });
 
   it('renders step numbers', () => {
@@ -63,9 +63,11 @@ describe('GameOverview', () => {
 
   it('renders card descriptions', () => {
     renderWithTooltip(<GameOverview />);
-    expect(screen.getByText(/Place a bid using ETH or CST/)).toBeInTheDocument();
-    expect(screen.getByText(/Race against time and other players/)).toBeInTheDocument();
-    expect(screen.getByText(/Be the last bidder/)).toBeInTheDocument();
+    expect(screen.getByText(/Make a gesture with ETH or CST/)).toBeInTheDocument();
+    expect(screen.getByText(/Cycle Finalization Time expires/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Participate in allocations when the cycle finalizes/),
+    ).toBeInTheDocument();
   });
 
   it('has the correct section id for anchor linking', () => {

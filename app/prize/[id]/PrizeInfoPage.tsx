@@ -399,28 +399,28 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
   const handleShareRound = async () => {
     if (!prizeInfo) return;
     const summary = [
-      `Round #${roundNum} — Cosmic Signature`,
-      `Prize: ${prizeInfo.AmountEth.toFixed(4)} ETH`,
-      `Winner: ${shortenHex(prizeInfo.WinnerAddr, 6)}`,
-      `Bids: ${prizeInfo.RoundStats.TotalBids}`,
+      `Cycle #${roundNum} \u2014 Cosmic Signature`,
+      `Signature Allocation: ${prizeInfo.AmountEth.toFixed(4)} ETH`,
+      `Recipient: ${shortenHex(prizeInfo.WinnerAddr, 6)}`,
+      `Gestures: ${prizeInfo.RoundStats.TotalBids}`,
       `${typeof window !== 'undefined' ? window.location.href : ''}`,
     ].join('\n');
     await copy(summary);
-    toast.success('Round summary copied to clipboard');
+    toast.success('Cycle summary copied to clipboard');
   };
 
   if (roundNum < 0) {
     return (
       <MainWrapper>
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <h2 className="text-2xl font-bold mb-2">Invalid Round Number</h2>
-          <p className="text-muted-foreground mb-6">The round number must be a positive integer.</p>
+          <h2 className="text-2xl font-bold mb-2">Invalid Cycle Number</h2>
+          <p className="text-muted-foreground mb-6">The cycle number must be a positive integer.</p>
           <Link
             href="/prize"
             className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
           >
             <ChevronLeft className="h-4 w-4" />
-            Back to Prize Winners
+            Back to Allocation Recipients
           </Link>
         </div>
       </MainWrapper>
@@ -435,16 +435,16 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
     return (
       <MainWrapper>
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <h2 className="text-2xl font-bold mb-2">Prize Data Not Found</h2>
+          <h2 className="text-2xl font-bold mb-2">Allocation Data Not Found</h2>
           <p className="text-muted-foreground mb-6">
-            No data available for round #{roundNum}. The round may not have ended yet.
+            No data available for Cycle #{roundNum}. The cycle may not have finalized yet.
           </p>
           <Link
             href="/prize"
             className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
           >
             <ChevronLeft className="h-4 w-4" />
-            Back to Prize Winners
+            Back to Allocation Recipients
           </Link>
         </div>
       </MainWrapper>
@@ -453,85 +453,89 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
 
   const distributionSegments: DistributionSegment[] = [
     {
-      label: 'Main Prize',
+      label: 'Signature Allocation',
       value: prizeInfo.AmountEth,
       color: 'bg-[#15BFFD]',
-      tooltip: `${prizeInfo.AmountEth.toFixed(4)} ETH awarded to the main prize winner.`,
+      tooltip: `${prizeInfo.AmountEth.toFixed(4)} ETH retrieved by the participant who made the Final Gesture.`,
     },
     {
-      label: 'Charity',
+      label: 'Public Goods',
       value: prizeInfo.CharityAmountETH,
       color: 'bg-emerald-500',
-      tooltip: `${prizeInfo.CharityAmountETH.toFixed(4)} ETH donated to charity.`,
+      tooltip: `${prizeInfo.CharityAmountETH.toFixed(4)} ETH forwarded to the Public Goods Beneficiary (Protocol Guild).`,
     },
     {
-      label: 'Staking',
+      label: 'Anchor Distribution',
       value: prizeInfo.StakingDepositAmountEth,
       color: 'bg-[#9C37FD]',
-      tooltip: `${prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH distributed to NFT stakers.`,
+      tooltip: `${prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH distributed across Cosmic Signature NFTs anchored to the protocol.`,
     },
     {
-      label: 'Raffle',
+      label: 'Stellar Selection',
       value: prizeInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0,
       color: 'bg-[#5B8DEF]',
-      tooltip: `${(prizeInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4)} ETH in raffle deposits.`,
+      tooltip: `${(prizeInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4)} ETH allocated to the Stellar Selection pool.`,
     },
   ];
 
   const stats = [
     {
       icon: <Trophy className="h-3.5 w-3.5" />,
-      label: 'Prize Pool',
+      label: 'Cycle Reserve',
       value: `${prizeInfo.AmountEth.toFixed(4)} ETH`,
-      tooltip: 'The total ETH awarded to the main prize winner for this round.',
+      tooltip:
+        'The total ETH retrieved by the participant who made the Final Gesture of this cycle.',
     },
     {
       icon: <Heart className="h-3.5 w-3.5" />,
-      label: 'Charity',
+      label: 'Public Goods',
       value: `${prizeInfo.CharityAmountETH.toFixed(4)} ETH`,
-      tooltip: 'The amount donated to charity from this round.',
+      tooltip:
+        'The amount forwarded to the Public Goods Beneficiary (Protocol Guild) from this cycle.',
     },
     {
       icon: <Landmark className="h-3.5 w-3.5" />,
-      label: 'Staking Deposit',
+      label: 'Anchor Distribution',
       value: `${prizeInfo.StakingDepositAmountEth.toFixed(4)} ETH`,
-      tooltip: 'Total ETH deposited into the staking pool, distributed among NFT stakers.',
+      tooltip:
+        'Total ETH distributed to participants who anchored Cosmic Signature NFTs for this cycle.',
     },
     {
       icon: <BarChart3 className="h-3.5 w-3.5" />,
-      label: 'Raffle Deposits',
+      label: 'Stellar Selection Pool',
       value: `${(prizeInfo.RoundStats.TotalRaffleEthDepositsEth ?? 0).toFixed(4)} ETH`,
-      tooltip: 'Total ETH deposited into the raffle pool by participants.',
+      tooltip: 'Total ETH allocated to the Stellar Selection pool across the cycle.',
     },
     {
       icon: <Gavel className="h-3.5 w-3.5" />,
-      label: 'Total Bids',
+      label: 'Total Gestures',
       value: prizeInfo.RoundStats.TotalBids,
-      tooltip: 'The total number of bids placed during this round.',
+      tooltip: 'The total number of gestures made during this cycle.',
     },
     {
       icon: <Gift className="h-3.5 w-3.5" />,
-      label: 'Donated NFTs',
+      label: 'Attached NFTs',
       value: prizeInfo.RoundStats.TotalDonatedNFTs ?? 0,
-      tooltip: 'Number of NFTs donated by participants during this round.',
+      tooltip: 'Number of NFTs attached to gestures by participants during this cycle.',
     },
     {
       icon: <Layers className="h-3.5 w-3.5" />,
-      label: 'Staked Tokens',
+      label: 'Anchored Tokens',
       value: prizeInfo.StakingNumStakedTokens,
-      tooltip: 'Number of NFT tokens staked during this round, earning staking rewards.',
+      tooltip: 'Number of NFT tokens anchored to the protocol for this cycle.',
     },
     {
       icon: <Users className="h-3.5 w-3.5" />,
-      label: 'Unique Stakers',
+      label: 'Unique Anchor-holders',
       value: stakingRewards.length,
-      tooltip: 'How many unique addresses had tokens staked in this round.',
+      tooltip: 'How many unique addresses had tokens anchored during this cycle.',
     },
     {
       icon: <Sparkles className="h-3.5 w-3.5" />,
-      label: 'Total Donated',
+      label: 'Total Contributed',
       value: formatEthValue(prizeInfo.RoundStats.TotalDonatedAmountEth ?? 0),
-      tooltip: 'Combined value of all ERC20 token donations during this round.',
+      tooltip:
+        'Combined value of all ERC-20 token contributions attached to gestures during this cycle.',
     },
   ];
 
@@ -542,10 +546,10 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
       {/* Breadcrumbs */}
       <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
         <Link href="/prize" className="hover:text-primary transition-colors">
-          Prize Winners
+          Allocation Recipients
         </Link>
         <ChevronRight className="h-3.5 w-3.5" />
-        <span className="text-foreground">Round {roundNum}</span>
+        <span className="text-foreground">Cycle {roundNum}</span>
       </nav>
 
       {/* Hero Banner */}
@@ -554,7 +558,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
         animate="visible"
         variants={sectionFade}
         className="mb-12"
-        aria-label="Round Hero"
+        aria-label="Cycle Hero"
       >
         <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.04] via-white/[0.02] to-transparent p-6 md:p-10">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/[0.04] via-transparent to-accent/[0.04] pointer-events-none" />
@@ -563,7 +567,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
               <div className="space-y-4 min-w-0 flex-1">
                 <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-white">
-                  Round #{roundNum}
+                  Cycle #{roundNum}
                 </h1>
 
                 <div className="flex items-baseline gap-2 flex-wrap">
@@ -575,7 +579,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                     {prizeInfo.AmountEth.toFixed(4)} ETH
                   </p>
                   <InfoTooltip
-                    content="Total ETH awarded to the last bidder when the countdown reached zero."
+                    content="Total ETH retrieved by the participant who made the Final Gesture when the countdown reached zero."
                     iconClassName="h-4 w-4"
                   />
                 </div>
@@ -583,7 +587,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
-                      Winner
+                      Recipient
                     </span>
                     <CopyableAddress
                       address={prizeInfo.WinnerAddr}
@@ -602,7 +606,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                       >
                         Cosmic Signature #{prizeInfo.TokenId}
                       </Link>
-                      <InfoTooltip content="View this COSMIC NFT in the gallery." />
+                      <InfoTooltip content="View this Cosmic Signature NFT in the gallery." />
                     </div>
                   )}
 
@@ -625,7 +629,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                 <button
                   onClick={handleShareRound}
                   className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-sm text-muted-foreground hover:text-white hover:border-white/[0.15] transition-all"
-                  aria-label="Share round summary"
+                  aria-label="Share cycle summary"
                   data-testid="share-round-button"
                 >
                   <Share2 className="h-3.5 w-3.5" />
@@ -638,17 +642,17 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
         </div>
       </motion.section>
 
-      {/* Round Winners */}
+      {/* Cycle Recipients */}
       <motion.section
         initial="hidden"
         animate="visible"
         variants={sectionFade}
         className="mb-12"
-        aria-label="Round Winners"
+        aria-label="Cycle Recipients"
       >
         <div className="flex items-center gap-2 mb-5">
-          <h2 className="font-display text-lg font-semibold tracking-tight">Round Winners</h2>
-          <InfoTooltip content="All prize recipients for this round. The main winner gets the ETH jackpot; special roles earn additional rewards." />
+          <h2 className="font-display text-lg font-semibold tracking-tight">Cycle Recipients</h2>
+          <InfoTooltip content="All allocation recipients for this cycle. The Signature Allocation goes to the participant who made the Final Gesture; special roles receive additional allocations." />
         </div>
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
@@ -658,87 +662,89 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
         >
           <WinnerCard
             icon={<Trophy className="h-5 w-5" />}
-            title="Main Prize Winner"
-            tooltip="The last bidder when the countdown reached zero. Wins the main ETH prize and a COSMIC NFT."
+            title="Signature Allocation"
+            tooltip="The participant who made the Final Gesture when the countdown reached zero. Retrieves the Signature Allocation in ETH plus a Cosmic Signature NFT."
             address={prizeInfo.WinnerAddr}
-            rewards={[{ label: 'ETH Prize', value: `${prizeInfo.AmountEth.toFixed(4)} ETH` }]}
+            rewards={[{ label: 'ETH Allocation', value: `${prizeInfo.AmountEth.toFixed(4)} ETH` }]}
             tokenId={prizeInfo.TokenId}
-            tokenLabel="COSMIC NFT"
+            tokenLabel="Cosmic Signature NFT"
             featured
           />
           <WinnerCard
             icon={<Swords className="h-5 w-5" />}
-            title="Chrono Warrior"
-            tooltip="The bidder who accumulated the longest total time as Endurance Champion. Wins ETH from the contract balance and an NFT."
+            title="Chrono-Warrior"
+            tooltip="The participant who accumulated the longest total time as Endurance Champion. Retrieves a share of the Cycle Reserve plus a Cosmic Signature NFT."
             address={prizeInfo.ChronoWarriorAddr}
             rewards={[
               {
-                label: 'ETH Reward',
+                label: 'ETH Allocation',
                 value: `${prizeInfo.ChronoWarriorAmountEth.toFixed(4)} ETH`,
               },
             ]}
             tokenId={prizeInfo.ChronoWarriorNftTokenId}
-            tokenLabel="NFT Reward"
+            tokenLabel="Cosmic Signature NFT"
           />
           <WinnerCard
             icon={<Crown className="h-5 w-5" />}
             title="Endurance Champion"
-            tooltip="The bidder who held the last-bidder position for the longest uninterrupted streak. Wins CST tokens and a COSMIC NFT."
+            tooltip="The participant who held the most-recent-gesture position for the longest uninterrupted interval. Receives Recognition CST and a Cosmic Signature NFT."
             address={prizeInfo.EnduranceWinnerAddr}
             rewards={[
               {
-                label: 'CST Reward',
+                label: 'Recognition CST',
                 value: `${(prizeInfo.EnduranceERC20AmountEth ?? 0).toFixed(4)} CST`,
               },
             ]}
             tokenId={prizeInfo.EnduranceERC721TokenId}
-            tokenLabel="COSMIC NFT"
+            tokenLabel="Cosmic Signature NFT"
           />
           <WinnerCard
             icon={<Coins className="h-5 w-5" />}
-            title="Last CST Bidder"
-            tooltip="The last person to place a bid using CST tokens. Receives CST tokens and a COSMIC NFT."
+            title="Final CST Gesture"
+            tooltip="The participant who made the last CST gesture of the cycle. Receives Recognition CST and a Cosmic Signature NFT."
             address={prizeInfo.LastCstBidderAddr}
             rewards={[
               {
-                label: 'CST Reward',
+                label: 'Recognition CST',
                 value: `${(prizeInfo.LastCstBidderERC20AmountEth ?? 0).toFixed(4)} CST`,
               },
             ]}
             tokenId={prizeInfo.LastCstBidderERC721TokenId}
-            tokenLabel="COSMIC NFT"
+            tokenLabel="Cosmic Signature NFT"
           />
         </motion.div>
       </motion.section>
 
-      {/* Prize Distribution */}
+      {/* Allocation Distribution */}
       <motion.section
         initial="hidden"
         animate="visible"
         variants={sectionFade}
         className="mb-12"
-        aria-label="Prize Distribution"
+        aria-label="Allocation Distribution"
       >
         <div className="flex items-center gap-2 mb-5">
-          <h2 className="font-display text-lg font-semibold tracking-tight">Prize Distribution</h2>
-          <InfoTooltip content="Visual breakdown of how the round's funds were allocated across prize categories." />
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            Allocation Distribution
+          </h2>
+          <InfoTooltip content="Visual breakdown of how the cycle's Cycle Reserve was distributed across allocation tracks." />
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
           <PrizeDistributionBar segments={distributionSegments} />
         </div>
       </motion.section>
 
-      {/* Round Statistics */}
+      {/* Cycle Statistics */}
       <motion.section
         initial="hidden"
         animate="visible"
         variants={sectionFade}
         className="mb-12"
-        aria-label="Round Statistics"
+        aria-label="Cycle Statistics"
       >
         <div className="flex items-center gap-2 mb-5">
-          <h2 className="font-display text-lg font-semibold tracking-tight">Round Statistics</h2>
-          <InfoTooltip content="Key metrics summarizing this round's activity and prize distribution." />
+          <h2 className="font-display text-lg font-semibold tracking-tight">Cycle Statistics</h2>
+          <InfoTooltip content="Key metrics summarizing this cycle's activity and allocation distribution." />
         </div>
         <motion.div
           className="grid grid-cols-2 sm:grid-cols-3 gap-3"
@@ -769,12 +775,12 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
         initial="hidden"
         animate="visible"
         variants={sectionFade}
-        aria-label="Round Data"
+        aria-label="Cycle Data"
       >
         <Tabs defaultValue="bids" className="w-full">
           <TabsList className="w-full flex flex-wrap h-auto gap-1 bg-white/[0.03] p-1.5 rounded-xl">
             <TabsTrigger value="bids" className="flex-1 min-w-[100px]">
-              Bid History
+              Gesture History
               <TabBadge count={bidHistory.length} />
             </TabsTrigger>
             <TabsTrigger value="endurance" className="flex-1 min-w-[100px]">
@@ -782,7 +788,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
               <TabBadge count={championList.length} />
             </TabsTrigger>
             <TabsTrigger value="raffle" className="flex-1 min-w-[100px]">
-              Raffle Rewards
+              Stellar Selection
               <TabBadge
                 count={
                   (prizeInfo.RaffleETHDeposits?.length ?? 0) +
@@ -791,11 +797,11 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
               />
             </TabsTrigger>
             <TabsTrigger value="staking" className="flex-1 min-w-[100px]">
-              Staking Rewards
+              Anchor Distributions
               <TabBadge count={stakingRewards.length} />
             </TabsTrigger>
             <TabsTrigger value="donations" className="flex-1 min-w-[100px]">
-              Donations
+              Contributions
               <TabBadge count={donationsCount} />
             </TabsTrigger>
           </TabsList>
@@ -804,7 +810,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             {bidHistory.length > 0 ? (
               <BiddingHistoryTable biddingHistory={bidHistory} />
             ) : (
-              <EmptyState title="No bids were placed in this round." />
+              <EmptyState title="No gestures were made in this cycle." />
             )}
           </TabsContent>
 
@@ -812,7 +818,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             {championList.length > 0 ? (
               <EnduranceChampionsTable championList={championList} />
             ) : (
-              <EmptyState title="No endurance champion data available for this round." />
+              <EmptyState title="No Endurance Champion data available for this cycle." />
             )}
           </TabsContent>
 
@@ -825,7 +831,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                 RaffleNFTWinners={prizeInfo.RaffleNFTWinners}
               />
             ) : (
-              <EmptyState title="No raffle rewards for this round." />
+              <EmptyState title="No Stellar Selection recipients for this cycle." />
             )}
           </TabsContent>
 
@@ -833,7 +839,7 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
             {stakingRewards.length > 0 ? (
               <StakingWinnerTable list={stakingRewards} />
             ) : (
-              <EmptyState title="No staking rewards distributed in this round." />
+              <EmptyState title="No Anchor Distributions distributed in this cycle." />
             )}
           </TabsContent>
 
@@ -842,8 +848,8 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <ImageIcon className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-sm font-semibold">Donated NFTs</h3>
-                  <InfoTooltip content="NFTs donated by participants during this round, awarded to the main prize winner." />
+                  <h3 className="text-sm font-semibold">Attached NFTs</h3>
+                  <InfoTooltip content="NFTs attached to gestures during this cycle, forwarded to the participant who made the Final Gesture." />
                 </div>
                 {nftDonations.length > 0 ? (
                   <DonatedNFTTable
@@ -852,19 +858,19 @@ const PrizeInfoPage = ({ roundNum }: PrizeInfoPageProps) => {
                     claimingTokens={[]}
                   />
                 ) : (
-                  <EmptyState title="No NFTs were donated in this round." />
+                  <EmptyState title="No NFTs were attached to gestures in this cycle." />
                 )}
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <Coins className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-sm font-semibold">Donated ERC20 Tokens</h3>
-                  <InfoTooltip content="ERC20 tokens donated by participants, distributed as part of the prize pool." />
+                  <h3 className="text-sm font-semibold">Attached ERC-20 Tokens</h3>
+                  <InfoTooltip content="ERC-20 tokens attached to gestures by participants, forwarded to the Signature Allocation recipient." />
                 </div>
                 {donatedERC20Tokens.length > 0 ? (
                   <DonatedERC20Table list={donatedERC20Tokens} handleClaim={null} />
                 ) : (
-                  <EmptyState title="No ERC20 tokens were donated in this round." />
+                  <EmptyState title="No ERC-20 tokens were attached to gestures in this cycle." />
                 )}
               </div>
             </div>

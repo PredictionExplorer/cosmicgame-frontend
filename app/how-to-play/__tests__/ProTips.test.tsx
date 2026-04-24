@@ -49,22 +49,22 @@ describe('ProTips', () => {
 
   it('renders all six tip titles', () => {
     renderWithTooltip(<ProTips />);
-    expect(screen.getByText('Bid Early, Bid Cheap')).toBeInTheDocument();
-    expect(screen.getByText('Use Your Random Walk NFT')).toBeInTheDocument();
-    expect(screen.getByText('Stack Raffle Tickets')).toBeInTheDocument();
+    expect(screen.getByText('Gesture Early, Gesture Cheap')).toBeInTheDocument();
+    expect(screen.getByText('Attach a Random Walk NFT')).toBeInTheDocument();
+    expect(screen.getByText('Stack Stellar Selection Entries')).toBeInTheDocument();
     expect(screen.getByText('Use a Burner Wallet')).toBeInTheDocument();
-    expect(screen.getByText('Watch the Timer')).toBeInTheDocument();
-    expect(screen.getByText('Pay with CST')).toBeInTheDocument();
+    expect(screen.getByText('Watch the Finalization Time')).toBeInTheDocument();
+    expect(screen.getByText('Gesture with CST')).toBeInTheDocument();
   });
 
   it('renders tip descriptions', () => {
     renderWithTooltip(<ProTips />);
-    expect(screen.getByText(/Bid prices start low/)).toBeInTheDocument();
-    expect(screen.getByText(/one-time 50% discount/)).toBeInTheDocument();
-    expect(screen.getByText(/More bids means better odds/)).toBeInTheDocument();
-    expect(screen.getByText(/smart contract is audited/)).toBeInTheDocument();
-    expect(screen.getByText(/timer gains 1 hour per bid/)).toBeInTheDocument();
-    expect(screen.getByText(/Already earned CST/)).toBeInTheDocument();
+    expect(screen.getByText(/Gesture Cost starts low/)).toBeInTheDocument();
+    expect(screen.getByText(/one-time 50% cost reduction/)).toBeInTheDocument();
+    expect(screen.getByText(/higher Selection frequency/)).toBeInTheDocument();
+    expect(screen.getByText(/smart contract is formally verified/)).toBeInTheDocument();
+    expect(screen.getByText(/Cycle Finalization Time gains/)).toBeInTheDocument();
+    expect(screen.getByText(/Already imprinted CST/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

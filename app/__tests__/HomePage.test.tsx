@@ -218,40 +218,40 @@ describe('HomePage', () => {
     expect(screen.getByTestId('latest-nfts')).toBeInTheDocument();
   });
 
-  it('renders Prize breakdown when data is loaded', () => {
+  it('renders Allocation breakdown when data is loaded', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText('Prize Breakdown')).toBeInTheDocument();
+    expect(screen.getByText('Allocation Breakdown')).toBeInTheDocument();
   });
 
-  it('renders link to full round details', () => {
+  it('renders link to full cycle details', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText('View Full Round Details')).toBeInTheDocument();
+    expect(screen.getByText('View Full Cycle Details')).toBeInTheDocument();
   });
 
-  it('shows link to previous round results when round > 1', () => {
+  it('shows link to previous cycle allocations when cycle > 1', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 5 }),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText(/Round 4 results/)).toBeInTheDocument();
+    expect(screen.getByText(/Cycle 4 allocations/)).toBeInTheDocument();
   });
 
-  it('does not show previous round link when round is 1', () => {
+  it('does not show previous cycle link when cycle is 1', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 1 }),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.queryByText(/Round \d+ results/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Cycle \d+ allocations/)).not.toBeInTheDocument();
   });
 
   it('does not render BidForm when still loading', () => {
@@ -279,35 +279,35 @@ describe('HomePage', () => {
     expect(screen.getByTestId('special-prize-winners')).toBeInTheDocument();
   });
 
-  it('renders bid button text', () => {
+  it('renders gesture button text', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    const bidButtons = screen.getAllByRole('button');
-    const bidButton = bidButtons.find((b) => b.textContent?.includes('Bid'));
-    expect(bidButton).toBeDefined();
+    const buttons = screen.getAllByRole('button');
+    const gestureButton = buttons.find((b) => b.textContent?.includes('Gesture'));
+    expect(gestureButton).toBeDefined();
   });
 
-  it('renders claim prize button when data is available', () => {
+  it('renders finalize cycle button when data is available', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    const claimButton = screen.queryByText(/Claim Prize/);
-    expect(claimButton || screen.queryByTestId('bidding-status')).toBeTruthy();
+    const finalizeButton = screen.queryByText(/Finalize Cycle/);
+    expect(finalizeButton || screen.queryByTestId('bidding-status')).toBeTruthy();
   });
 
-  it('renders previous round link with correct round number', () => {
+  it('renders previous cycle link with correct cycle number', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 10 }),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByText(/Round 9 results/)).toBeInTheDocument();
-    const link = screen.getByRole('link', { name: /Round 9 results/ });
+    expect(screen.getByText(/Cycle 9 allocations/)).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /Cycle 9 allocations/ });
     expect(link).toHaveAttribute('href', '/prize/9');
   });
 

@@ -19,16 +19,17 @@ function WinningHistory() {
     return (
       <MainWrapper>
         <PageHeader
-          title="History of My Winnings"
-          subtitle="View your past prize claims and rewards"
+          title="My Allocation History"
+          subtitle="View your past allocation retrievals and distributions"
         />
         <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-          Track your complete winning history across all Cosmic Signature game rounds. This includes
-          main prize claims, raffle ETH winnings, NFT prizes, and staking reward distributions.
+          Track your complete allocation history across all Cosmic Signature Performance Cycles.
+          This includes Signature Allocation retrievals, ETH Stellar Selection distributions, Cosmic
+          Signature NFT allocations, and Anchor Distributions.
         </p>
         <EmptyState
           title="Wallet not connected"
-          description="Please connect your wallet to see your winnings."
+          description="Please connect your wallet to see your allocation history."
         />
       </MainWrapper>
     );
@@ -50,11 +51,11 @@ function WinningHistory() {
           <Spinner />
         </div>
       ) : error ? (
-        <ErrorState title="Failed to load winnings" message={error} />
+        <ErrorState title="Failed to load allocation history" message={error} />
       ) : !winningHistory || winningHistory.length === 0 ? (
         <EmptyState
-          title="No winnings yet"
-          description="You currently have no recorded winnings."
+          title="No allocations yet"
+          description="You currently have no recorded allocations."
         />
       ) : (
         <WinningHistoryTable
