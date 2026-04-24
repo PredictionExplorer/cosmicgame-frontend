@@ -74,7 +74,10 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
 
       const roundAfter = (await cosmicGameContract.read.roundNum?.()) as bigint;
       if (roundAfter <= roundBefore) {
-        notify('warning', 'Claim transaction succeeded but the round did not advance. Please refresh the page.');
+        notify(
+          'warning',
+          'Claim transaction succeeded but the round did not advance. Please refresh the page.',
+        );
         return true;
       }
 
@@ -98,7 +101,7 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
       const params = new URLSearchParams();
       params.set('round', String(claimedRound));
       params.set('message', 'success');
-      router.push(`/prize-claimed?${params.toString()}`);
+      router.push(`/allocation-finalized?${params.toString()}`);
 
       return true;
     } catch (err: unknown) {

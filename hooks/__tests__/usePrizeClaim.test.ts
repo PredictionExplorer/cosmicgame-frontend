@@ -2,7 +2,6 @@ import type { DashboardInfo } from '@/services/api/types';
 
 import { act, renderHook } from '@/test-utils';
 
-
 const mockNotify = jest.fn();
 const mockNotifyErrorFromEthers = jest.fn();
 const mockPush = jest.fn();
@@ -74,9 +73,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockClaimMainPrize.mockResolvedValue('0xhash');
   mockEstimateGas.mockResolvedValue(BigInt(500000));
-  mockReadRoundNum
-    .mockResolvedValueOnce(BigInt(5))
-    .mockResolvedValueOnce(BigInt(6));
+  mockReadRoundNum.mockResolvedValueOnce(BigInt(5)).mockResolvedValueOnce(BigInt(6));
   mockGetContractErrorMessage.mockReturnValue(null);
 });
 
@@ -117,7 +114,7 @@ describe('usePrizeClaim', () => {
     expect(mockClaimMainPrize).toHaveBeenCalled();
     expect(mockReadRoundNum).toHaveBeenCalledTimes(2);
     expect(mockApi.create).toHaveBeenCalledWith(5, 5);
-    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('/prize-claimed'));
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('/allocation-finalized'));
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('round=5'));
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('message=success'));
   });
@@ -190,10 +187,7 @@ describe('usePrizeClaim', () => {
   });
 
   it('isClaiming state transitions (true during claim, false after)', async () => {
-    mockReadRoundNum
-      .mockReset()
-      .mockResolvedValueOnce(BigInt(5))
-      .mockResolvedValue(BigInt(6));
+    mockReadRoundNum.mockReset().mockResolvedValueOnce(BigInt(5)).mockResolvedValue(BigInt(6));
 
     let resolveClaim!: (value: string) => void;
     mockClaimMainPrize.mockReturnValueOnce(
