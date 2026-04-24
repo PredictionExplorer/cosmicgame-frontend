@@ -1,5 +1,38 @@
+const { execSync } = require('child_process');
+
+function resolveGitSha() {
+  if (process.env.VERCEL_GIT_COMMIT_SHA?.trim()) return process.env.VERCEL_GIT_COMMIT_SHA.trim();
+  if (process.env.GITHUB_SHA?.trim()) return process.env.GITHUB_SHA.trim();
+  try {
+    return execSync('git rev-parse HEAD', {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return '';
+  }
+}
+
+function resolveGitRef() {
+  if (process.env.VERCEL_GIT_COMMIT_REF?.trim()) return process.env.VERCEL_GIT_COMMIT_REF.trim();
+  if (process.env.GITHUB_REF_NAME?.trim()) return process.env.GITHUB_REF_NAME.trim();
+  try {
+    return execSync('git rev-parse --abbrev-ref HEAD', {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return '';
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: {
+    NEXT_PUBLIC_BUILD_COMMIT: resolveGitSha(),
+    NEXT_PUBLIC_BUILD_REF: resolveGitRef(),
+    NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV || '',
+  },
   reactStrictMode: true,
   /**
    * Optional: proxy /api/cosmicgame/* to the Go websrv so the browser can use same-origin

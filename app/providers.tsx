@@ -22,6 +22,7 @@ import { ApiDataProvider } from '@/contexts/ApiDataContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
+import { getClientBuildInfo } from '@/lib/buildInfo';
 
 const Particles = dynamic(
   () => import('@tsparticles/react').then((mod) => ({ default: mod.default })),
@@ -179,17 +180,31 @@ export function Providers({
   }, []);
 
   useEffect(() => {
-    if (!envValidation.valid || process.env.NODE_ENV !== 'development') return;
+    if (!envValidation.valid) return;
+    const showConfigLog =
+      process.env.NODE_ENV === 'development' ||
+      process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
+    if (!showConfigLog) return;
+
     const rpcDisplay =
       typeof window !== 'undefined' && networkConfig.rpcUrl.includes('161.129.67.42')
         ? `${window.location.origin}/api/rpc → ${networkConfig.rpcUrl}`
         : networkConfig.rpcUrl;
+
+    const build = getClientBuildInfo();
+    const buildLines =
+      build != null
+        ? `\n  Build: ${build.shortSha}${build.ref ? ` (${build.ref})` : ''}\n  Commit: ${build.fullSha}`
+        : '';
+
     console.warn(
       '[Cosmic Signature] Config:\n' +
         `  Network: ${process.env.NEXT_PUBLIC_NETWORK}\n` +
         `  Chain ID: ${networkConfig.chainId}\n` +
         `  RPC URL: ${rpcDisplay}\n` +
-        `  API URL: ${networkConfig.apiUrl}`,
+        `  API URL: ${networkConfig.apiUrl}\n` +
+        `  NFT CDN: ${networkConfig.nftApiUrl}` +
+        buildLines,
     );
   }, []);
 

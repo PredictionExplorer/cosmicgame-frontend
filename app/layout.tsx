@@ -101,13 +101,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             </Script>
           </>
         )}
-        <Script id="paint-worklet" strategy="afterInteractive">
-          {`
-            if ('paintWorklet' in CSS) {
-              CSS.paintWorklet.addModule('/paint-worklet.js');
-            }
-          `}
-        </Script>
       </head>
       <body>
         <Providers showAppChrome={showAppChrome}>{children}</Providers>

@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons';
 
 import { FooterWrapper } from '@/components/styled';
+import { getClientBuildInfo, isVercelProductionDeploy } from '@/lib/buildInfo';
 
 const footerLinks: Record<string, { label: string; href: string; external?: boolean }[]> = {
   Product: [
@@ -25,7 +26,12 @@ const footerLinks: Record<string, { label: string; href: string; external?: bool
   ],
 };
 
-const Footer = () => (
+const Footer = () => {
+  const build = getClientBuildInfo();
+  const showBuild =
+    build && (!isVercelProductionDeploy() || process.env.NEXT_PUBLIC_SHOW_BUILD_COMMIT === '1');
+
+  return (
   <FooterWrapper>
     <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
     <div className="mx-auto w-full max-w-7xl px-4">
@@ -100,9 +106,21 @@ const Footer = () => (
 
       {/* Bottom bar */}
       <div className="border-t border-white/[0.06] py-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <p className="text-xs text-muted-foreground">
-          &copy; {new Date().getFullYear()} Cosmic Signature. All rights reserved.
-        </p>
+        <div className="flex flex-col items-center gap-1 sm:items-start">
+          <p className="text-xs text-muted-foreground">
+            &copy; {new Date().getFullYear()} Cosmic Signature. All rights reserved.
+          </p>
+          {showBuild ? (
+            <p
+              data-testid="build-commit"
+              className="font-mono text-[10px] text-muted-foreground/60"
+              title={`${build.fullSha}${build.ref ? ` (${build.ref})` : ''}`}
+            >
+              {build.shortSha}
+              {build.ref ? ` · ${build.ref}` : ''}
+            </p>
+          ) : null}
+        </div>
         <div className="flex items-center gap-6">
           <Link
             href="/terms"
@@ -120,6 +138,7 @@ const Footer = () => (
       </div>
     </div>
   </FooterWrapper>
-);
+  );
+};
 
 export default Footer;
