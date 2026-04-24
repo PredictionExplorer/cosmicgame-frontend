@@ -121,7 +121,7 @@ describe('GalleryPage', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
     expect(screen.getByText('Total Minted')).toBeInTheDocument();
-    expect(screen.getByText('Currently Staked')).toBeInTheDocument();
+    expect(screen.getByText('Currently Anchored')).toBeInTheDocument();
     expect(screen.getByText('Named NFTs')).toBeInTheDocument();
     expect(screen.getByText('Game Rounds')).toBeInTheDocument();
   });

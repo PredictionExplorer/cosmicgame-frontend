@@ -32,7 +32,7 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
   if (!addrs) return [];
   return [
     {
-      name: 'Cosmic Signature',
+      name: 'Cosmic Signature Protocol',
       address: addrs.CosmicGameAddr ?? '',
       description:
         'The main protocol contract that manages cycles, gestures, and allocation distribution',
@@ -46,7 +46,7 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
       category: 'core',
     },
     {
-      name: 'Cosmic Signature',
+      name: 'Cosmic Signature NFT',
       address: addrs.CosmicSignatureAddr ?? '',
       description: 'ERC-721 NFT collection imprinted as allocations to cycle recipients',
       category: 'core',

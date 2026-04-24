@@ -35,7 +35,7 @@ describe('GalleryHero', () => {
   it('renders all four stat labels', () => {
     render(<GalleryHero stats={defaultStats} />);
     expect(screen.getByText('Total Minted')).toBeInTheDocument();
-    expect(screen.getByText('Currently Staked')).toBeInTheDocument();
+    expect(screen.getByText('Currently Anchored')).toBeInTheDocument();
     expect(screen.getByText('Named NFTs')).toBeInTheDocument();
     expect(screen.getByText('Game Rounds')).toBeInTheDocument();
   });

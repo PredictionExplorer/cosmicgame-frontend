@@ -21,7 +21,7 @@ describe('EthDonationByRoundPage', () => {
   it('renders the heading with round number', () => {
     mockUseDonationsBothByRound.mockReturnValue({ data: [], isLoading: false });
     render(<EthDonationByRoundPage round={7} />);
-    expect(screen.getByText('Direct (ETH) Donations for Round 7')).toBeInTheDocument();
+    expect(screen.getByText('Direct (ETH) Contributions for Cycle 7')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -42,7 +42,7 @@ describe('EthDonationByRoundPage', () => {
   it('shows error for negative round', () => {
     mockUseDonationsBothByRound.mockReturnValue({ data: [], isLoading: false });
     render(<EthDonationByRoundPage round={-1} />);
-    expect(screen.getByText('Invalid Round Number')).toBeInTheDocument();
+    expect(screen.getByText('Invalid Cycle Number')).toBeInTheDocument();
   });
 
   it('does not render table for negative round', () => {

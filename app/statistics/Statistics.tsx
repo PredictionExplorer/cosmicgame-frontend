@@ -299,7 +299,7 @@ const Statistics = () => {
               <StatisticsItem
                 title="Attached NFTs"
                 value={
-                  <Link className="text-inherit" href="/nft-donations">
+                  <Link className="text-inherit" href="/attached-nfts">
                     {data.NumDonatedNFTs as ReactNode}
                   </Link>
                 }

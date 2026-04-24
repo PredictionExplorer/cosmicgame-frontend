@@ -112,7 +112,7 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
   if (!history) return <TablePrimaryRow />;
 
   const backgroundStyle = bidTypeStyles[history.BidType] || 'rgba(0,0,0,0.1)';
-  const bidTypeLabel = bidTypeLabels[history.BidType] || 'Unknown Bid';
+  const bidTypeLabel = bidTypeLabels[history.BidType] || 'Unknown Gesture';
 
   const price =
     history.BidType === 2
@@ -154,7 +154,7 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
         <span className="break-all">
           {history.BidType === 1 && history.RWalkNFTId && (
             <>
-              {`Bid was made using RandomWalk Token (ID = ${history.RWalkNFTId})`}
+              {`Gesture was made using RandomWalk Token (ID = ${history.RWalkNFTId})`}
               <Image
                 src={getRWLKImageUrl(history.RWalkNFTId.toString().padStart(6, '0'))}
                 width={32}
@@ -167,8 +167,8 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
           )}
           {(!!history.NFTDonationTokenAddr || !!history.DonatedERC20TokenAddr) && (
             <>
-              {history.BidType === 2 && 'Bid was made using Cosmic Signature Tokens'}
-              {history.BidType === 0 && 'Bid was made using ETH'}
+              {history.BidType === 2 && 'Gesture was made using Cosmic Signature Tokens'}
+              {history.BidType === 0 && 'Gesture was made using ETH'}
               {!!history.NFTDonationTokenAddr &&
                 ` and a token (${shortenHex(
                   history.NFTDonationTokenAddr,

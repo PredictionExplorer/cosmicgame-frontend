@@ -96,13 +96,13 @@ describe('RafflePerformance', () => {
   it('links to Stellar Selection ETH page', () => {
     render(<RafflePerformance {...baseProps} />);
     const link = screen.getByText('Total Stellar Selection ETH').closest('a');
-    expect(link).toHaveAttribute('href', '/user/raffle-eth/0xUser123');
+    expect(link).toHaveAttribute('href', '/user/stellar-selection-eth/0xUser123');
   });
 
   it('links to Stellar Selection NFT page', () => {
     render(<RafflePerformance {...baseProps} />);
     const link = screen.getByText('Stellar Selection NFTs').closest('a');
-    expect(link).toHaveAttribute('href', '/user/raffle-nft/0xUser123');
+    expect(link).toHaveAttribute('href', '/user/stellar-selection-nft/0xUser123');
   });
 
   it('has no accessibility violations', async () => {

@@ -15,7 +15,7 @@ import {
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 
-export interface CharityDepositDonation {
+export interface PublicGoodsContributionEntry {
   EvtLogId: number;
   TxHash: string;
   TimeStamp: number;
@@ -24,16 +24,16 @@ export interface CharityDepositDonation {
   AmountEth: number;
 }
 
-interface DonationRowProps {
-  donation: CharityDepositDonation;
+interface ContributionRowProps {
+  entry: PublicGoodsContributionEntry;
 }
 
 interface CharityDepositTableProps {
-  list: CharityDepositDonation[];
+  list: PublicGoodsContributionEntry[];
 }
 
-const DonationRow = ({ donation }: DonationRowProps) => {
-  if (!donation) {
+const ContributionRow = ({ entry }: ContributionRowProps) => {
+  if (!entry) {
     return <TablePrimaryRow />;
   }
 
@@ -42,31 +42,31 @@ const DonationRow = ({ donation }: DonationRowProps) => {
       <TablePrimaryCell>
         <a
           className="text-inherit"
-          href={getExplorerUrl('tx', donation.TxHash)}
+          href={getExplorerUrl('tx', entry.TxHash)}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(donation.TimeStamp)}
+          {convertTimestampToDateTime(entry.TimeStamp)}
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {donation.RoundNum < 0 ? (
+        {entry.RoundNum < 0 ? (
           ' '
         ) : (
           <a
             className="text-inherit"
-            href={`/allocation/${donation.RoundNum}`}
+            href={`/allocation/${entry.RoundNum}`}
             target="_blank"
             rel="noopener noreferrer"
           >
-            {donation.RoundNum}
+            {entry.RoundNum}
           </a>
         )}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <AddressLink address={donation.DonorAddr} url={`/user/${donation.DonorAddr}`} />
+        <AddressLink address={entry.DonorAddr} url={`/user/${entry.DonorAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{donation.AmountEth.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{entry.AmountEth.toFixed(6)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -94,8 +94,8 @@ export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
             </Tr>
           </TablePrimaryHead>
           <tbody>
-            {currentData.map((donation) => (
-              <DonationRow donation={donation} key={donation.EvtLogId} />
+            {currentData.map((entry) => (
+              <ContributionRow entry={entry} key={entry.EvtLogId} />
             ))}
           </tbody>
         </TablePrimary>

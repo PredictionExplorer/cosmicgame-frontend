@@ -112,7 +112,7 @@ export const UncollectedCSTStakingRewardsTable = ({ user }: { user: string }) =>
       const res = await api.get_staking_cst_rewards_to_claim_by_user(user);
       setLocalList(res);
     } catch (err) {
-      reportError(err, 'fetch uncollected CST staking rewards');
+      reportError(err, 'fetch uncollected CST anchor distributions');
     }
   }, [user]);
 

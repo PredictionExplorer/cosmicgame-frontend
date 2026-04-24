@@ -62,21 +62,21 @@ describe('BanBidTable', () => {
     await act(async () => {
       render(<BanBidTable biddingHistory={[createBidHistory({ BidType: 0 })]} />);
     });
-    expect(screen.getAllByText('ETH Bid').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('ETH Gesture').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders bid type "RWLK Token Bid" for BidType 1', async () => {
     await act(async () => {
       render(<BanBidTable biddingHistory={[createBidHistory({ BidType: 1 })]} />);
     });
-    expect(screen.getAllByText('RWLK Token Bid').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('RWLK Token Gesture').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders bid type "CST Bid" for BidType 2', async () => {
     await act(async () => {
       render(<BanBidTable biddingHistory={[createBidHistory({ BidType: 2 })]} />);
     });
-    expect(screen.getAllByText('CST Bid').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('CST Gesture').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders Ban button for non-banned bids', async () => {
@@ -143,7 +143,7 @@ describe('BanBidTable', () => {
 
     await waitFor(() => {
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success', text: 'Bid was banned successfully!' }),
+        expect.objectContaining({ type: 'success', text: 'Gesture was banned successfully!' }),
       );
     });
   });
@@ -179,7 +179,7 @@ describe('BanBidTable', () => {
 
     await waitFor(() => {
       expect(mockSetNotification).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'success', text: 'Bid was unbanned successfully!' }),
+        expect.objectContaining({ type: 'success', text: 'Gesture was unbanned successfully!' }),
       );
     });
   });

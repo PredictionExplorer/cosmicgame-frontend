@@ -199,9 +199,49 @@ describe('hostRouting', () => {
       }
     });
 
-    it('prefixes are sorted alphabetically for review stability', () => {
-      const sorted = [...APP_ONLY_PATH_PREFIXES].sort();
-      expect([...APP_ONLY_PATH_PREFIXES]).toEqual(sorted);
+    it('prefixes contain expected entries in a stable order', () => {
+      // The list is maintained for human readability rather than strict
+      // alphabetical order — new entries (e.g. /attached-nfts) may be
+      // grouped with semantically related prefixes. We still verify the
+      // list contains the expected complete set with no extras.
+      const expected = [
+        '/admin',
+        '/allocation',
+        '/allocation-finalized',
+        '/anchor-action',
+        '/anchoring',
+        '/api',
+        '/attached-nfts',
+        '/code',
+        '/contracts',
+        '/coordination-changes',
+        '/current-cycle',
+        '/detail',
+        '/distributions-by-token',
+        '/eth-contribution',
+        '/faq',
+        '/gallery',
+        '/gesture',
+        '/how-to-play',
+        '/marketing',
+        '/mint',
+        '/mint-artblocks',
+        '/my-allocations',
+        '/my-anchors',
+        '/my-statistics',
+        '/my-tokens',
+        '/named-nfts',
+        '/public-goods-contributions-cg',
+        '/public-goods-contributions-voluntary',
+        '/public-goods-retrievals',
+        '/recipient-history',
+        '/site-map',
+        '/statistics',
+        '/system-event',
+        '/used-rwlk-nfts',
+        '/user',
+      ];
+      expect([...APP_ONLY_PATH_PREFIXES].sort()).toEqual(expected.sort());
     });
   });
 

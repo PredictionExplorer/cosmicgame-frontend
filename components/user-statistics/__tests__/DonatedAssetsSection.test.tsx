@@ -35,7 +35,7 @@ const defaultProps: DonatedAssetsSectionProps = {
 describe('DonatedAssetsSection', () => {
   it('renders both section headings', () => {
     render(<DonatedAssetsSection {...defaultProps} />);
-    expect(screen.getByText('Donated NFTs Won')).toBeInTheDocument();
+    expect(screen.getByText('Attached NFTs Received')).toBeInTheDocument();
     expect(screen.getByText('Donated ERC20 Tokens')).toBeInTheDocument();
   });
 
@@ -51,7 +51,7 @@ describe('DonatedAssetsSection', () => {
 
   it('shows empty state when no donated NFTs', () => {
     render(<DonatedAssetsSection {...defaultProps} />);
-    expect(screen.getByText('No donated NFTs')).toBeInTheDocument();
+    expect(screen.getByText('No attached NFTs')).toBeInTheDocument();
   });
 
   it('shows empty state when no donated ERC20 tokens', () => {

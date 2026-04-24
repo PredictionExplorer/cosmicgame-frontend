@@ -18,24 +18,24 @@ const EthDonationByRoundPage = ({ round }: EthDonationByRoundPageProps) => {
     return (
       <MainWrapper>
         <div className={cn(detailPanelClass, 'mx-auto max-w-lg p-8 text-center')}>
-          <p className="font-display text-lg font-semibold text-foreground">Invalid Round Number</p>
+          <p className="font-display text-lg font-semibold text-foreground">Invalid Cycle Number</p>
         </div>
       </MainWrapper>
     );
   }
 
-  const title = `Direct (ETH) Donations for Round ${round}`;
+  const title = `Direct (ETH) Contributions for Cycle ${round}`;
 
   return (
     <MainWrapper className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
           title={title}
-          subtitle="All direct ETH donations recorded for this round."
+          subtitle="All direct ETH contributions recorded for this cycle."
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'ETH donations', href: '/eth-contribution' },
-            { label: `Round ${round}` },
+            { label: 'ETH contributions', href: '/eth-contribution' },
+            { label: `Cycle ${round}` },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"

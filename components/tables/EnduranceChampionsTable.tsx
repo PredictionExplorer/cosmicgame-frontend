@@ -17,7 +17,7 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 
 interface EnduranceChampion {
-  bidder: string;
+  participant: string;
   championTime: number;
   chronoWarrior?: number;
 }
@@ -34,7 +34,7 @@ const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell align="left">
-        <AddressLink address={row.bidder} url={`/user/${row.bidder}`} />
+        <AddressLink address={row.participant} url={`/user/${row.participant}`} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{formatSeconds(row.championTime)}</TablePrimaryCell>
       <TablePrimaryCell align="center">{formatSeconds(row.chronoWarrior || 0)}</TablePrimaryCell>
@@ -143,7 +143,7 @@ const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList }) => {
           </TablePrimaryHead>
           <tbody>
             {paginatedList.map((row, index) => (
-              <EnduranceChampionsRow key={`${row.bidder}-${index}-${page}`} row={row} />
+              <EnduranceChampionsRow key={`${row.participant}-${index}-${page}`} row={row} />
             ))}
           </tbody>
         </TablePrimary>

@@ -388,7 +388,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
-            <SectionDivider title="Winning History" />
+            <SectionDivider title="Recipient History" />
             <div className="mt-6">
               <WinningHistoryTable
                 winningHistory={claimHistory ?? []}
@@ -404,7 +404,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
-            <SectionDivider title="Staking" />
+            <SectionDivider title="Anchoring" />
             <div className="mt-6">
               <UserStakingSection
                 address={address!}

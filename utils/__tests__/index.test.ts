@@ -189,7 +189,9 @@ describe('getExplorerUrl', () => {
 describe('getAssetsUrl', () => {
   it('builds direct URL with correct base path', () => {
     const result = getAssetsUrl('cosmicsignature/logo.png');
-    expect(result).toBe('https://nfts-sepolia.cosmicsignature.com/images/new/cosmicsignature/logo.png');
+    expect(result).toBe(
+      'https://nfts-sepolia.cosmicsignature.com/images/new/cosmicsignature/logo.png',
+    );
   });
 
   it('concatenates path to base URL', () => {
@@ -230,7 +232,7 @@ describe('getEnduranceChampions', () => {
     const result = getEnduranceChampions(bidList, 2000);
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
-      bidder: '0x123',
+      participant: '0x123',
       championTime: 1000,
       chronoWarrior: 0,
     });
@@ -244,8 +246,8 @@ describe('getEnduranceChampions', () => {
     ];
     const result = getEnduranceChampions(bidList, 600);
     expect(result.length).toBeGreaterThan(0);
-    expect(result.every((c) => 'bidder' in c && 'championTime' in c && 'chronoWarrior' in c)).toBe(
-      true,
-    );
+    expect(
+      result.every((c) => 'participant' in c && 'championTime' in c && 'chronoWarrior' in c),
+    ).toBe(true);
   });
 });

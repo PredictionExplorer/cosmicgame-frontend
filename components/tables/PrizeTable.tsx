@@ -18,43 +18,47 @@ import {
 import { CustomPagination } from '@/components/common/CustomPagination';
 import type { RoundInfo } from '@/services/api';
 
-const PrizeRow = ({ prize }: { prize: RoundInfo }) => {
+const PrizeRow = ({ allocation }: { allocation: RoundInfo }) => {
   const router = useRouter();
 
-  if (!prize) return <TablePrimaryRow />;
+  if (!allocation) return <TablePrimaryRow />;
 
   const handleRowClick = () => {
-    router.push(`/allocation/${prize.RoundNum}`);
+    router.push(`/allocation/${allocation.RoundNum}`);
   };
 
   return (
     <TablePrimaryRow className="cursor-pointer" onClick={handleRowClick}>
-      <TablePrimaryCell align="center">{prize.RoundNum}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{allocation.RoundNum}</TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(prize.TimeStamp)}
+        {convertTimestampToDateTime(allocation.TimeStamp)}
       </TablePrimaryCell>
       <TablePrimaryCell>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="font-mono">
-                {prize.WinnerAddr ? shortenHex(prize.WinnerAddr, 6) : '-'}
+                {allocation.WinnerAddr ? shortenHex(allocation.WinnerAddr, 6) : '-'}
               </span>
             </TooltipTrigger>
-            <TooltipContent>{prize.WinnerAddr || ''}</TooltipContent>
+            <TooltipContent>{allocation.WinnerAddr || ''}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{(prize.AmountEth || 0).toFixed(4)}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{prize.RoundStats?.TotalBids || 0}</TablePrimaryCell>
-      <TablePrimaryCell align="center">{prize.RoundStats?.TotalDonatedNFTs || 0}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{(allocation.AmountEth || 0).toFixed(4)}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{allocation.RoundStats?.TotalBids || 0}</TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {((prize.RoundStats?.TotalRaffleEthDepositsEth as number) || 0).toFixed(4)}
+        {allocation.RoundStats?.TotalDonatedNFTs || 0}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {(prize.StakingDepositAmountEth || 0).toFixed(4)}
+        {((allocation.RoundStats?.TotalRaffleEthDepositsEth as number) || 0).toFixed(4)}
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{prize.RoundStats?.TotalRaffleNFTs || 0}</TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {(allocation.StakingDepositAmountEth || 0).toFixed(4)}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="center">
+        {allocation.RoundStats?.TotalRaffleNFTs || 0}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -151,8 +155,8 @@ export const PrizeTable = ({ list, loading }: { list: RoundInfo[]; loading: bool
             </Tr>
           </TablePrimaryHead>
           <tbody>
-            {paginatedList.map((prize, index) => (
-              <PrizeRow prize={prize} key={prize.RoundNum ?? `round-${index}`} />
+            {paginatedList.map((allocation, index) => (
+              <PrizeRow allocation={allocation} key={allocation.RoundNum ?? `cycle-${index}`} />
             ))}
           </tbody>
         </TablePrimary>

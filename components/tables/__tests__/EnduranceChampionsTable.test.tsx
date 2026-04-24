@@ -8,7 +8,7 @@ import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable
 import { checkA11y, render, screen } from '@/test-utils';
 
 const createChampion = (overrides = {}) => ({
-  bidder: '0x1234567890abcdef1234567890abcdef12345678',
+  participant: '0x1234567890abcdef1234567890abcdef12345678',
   championTime: 3600,
   chronoWarrior: 1800,
   ...overrides,
@@ -47,8 +47,8 @@ describe('EnduranceChampionsTable', () => {
 
   it('sorts by championTime desc by default (largest first)', () => {
     const list = [
-      createChampion({ bidder: '0x' + '1'.repeat(40), championTime: 60 }),
-      createChampion({ bidder: '0x' + '2'.repeat(40), championTime: 300 }),
+      createChampion({ participant: '0x' + '1'.repeat(40), championTime: 60 }),
+      createChampion({ participant: '0x' + '2'.repeat(40), championTime: 300 }),
     ];
     render(<EnduranceChampionsTable championList={list} />);
     const rows = screen.getAllByRole('row');
@@ -59,8 +59,8 @@ describe('EnduranceChampionsTable', () => {
 
   it('toggles sort direction on same column click', () => {
     const list = [
-      createChampion({ bidder: '0x' + '1'.repeat(40), championTime: 60 }),
-      createChampion({ bidder: '0x' + '2'.repeat(40), championTime: 300 }),
+      createChampion({ participant: '0x' + '1'.repeat(40), championTime: 60 }),
+      createChampion({ participant: '0x' + '2'.repeat(40), championTime: 300 }),
     ];
     render(<EnduranceChampionsTable championList={list} />);
     const sortButtons = screen.getAllByText('Champion Time');
@@ -74,8 +74,8 @@ describe('EnduranceChampionsTable', () => {
 
   it('switches sort field to chronoWarrior', () => {
     const list = [
-      createChampion({ bidder: '0x' + '1'.repeat(40), chronoWarrior: 500 }),
-      createChampion({ bidder: '0x' + '2'.repeat(40), chronoWarrior: 100 }),
+      createChampion({ participant: '0x' + '1'.repeat(40), chronoWarrior: 500 }),
+      createChampion({ participant: '0x' + '2'.repeat(40), chronoWarrior: 100 }),
     ];
     render(<EnduranceChampionsTable championList={list} />);
     const sortButtons = screen.getAllByText('Chrono Warrior');
@@ -92,7 +92,7 @@ describe('EnduranceChampionsTable', () => {
 
   it('shows pagination when list.length > perPage', () => {
     const list = Array.from({ length: 8 }, (_, i) =>
-      createChampion({ bidder: `0x${String(i).padStart(40, '0')}` }),
+      createChampion({ participant: `0x${String(i).padStart(40, '0')}` }),
     );
     render(<EnduranceChampionsTable championList={list} />);
     expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -101,7 +101,7 @@ describe('EnduranceChampionsTable', () => {
   it('pagination click changes visible rows', () => {
     const list = Array.from({ length: 8 }, (_, i) =>
       createChampion({
-        bidder: `0x${String(i).padStart(40, '0')}`,
+        participant: `0x${String(i).padStart(40, '0')}`,
         championTime: (i + 1) * 1000,
       }),
     );
@@ -119,7 +119,7 @@ describe('EnduranceChampionsTable', () => {
 
   it('renders AddressLink with correct href', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
-    render(<EnduranceChampionsTable championList={[createChampion({ bidder: addr })]} />);
+    render(<EnduranceChampionsTable championList={[createChampion({ participant: addr })]} />);
     const links = screen.getAllByRole('link');
     const userLink = links.find((l) => l.getAttribute('href') === `/user/${addr}`);
     expect(userLink).toBeInTheDocument();
@@ -127,8 +127,8 @@ describe('EnduranceChampionsTable', () => {
 
   it('sort resets to desc when switching columns', () => {
     const list = [
-      createChampion({ bidder: '0x' + '1'.repeat(40), championTime: 100, chronoWarrior: 50 }),
-      createChampion({ bidder: '0x' + '2'.repeat(40), championTime: 200, chronoWarrior: 300 }),
+      createChampion({ participant: '0x' + '1'.repeat(40), championTime: 100, chronoWarrior: 50 }),
+      createChampion({ participant: '0x' + '2'.repeat(40), championTime: 200, chronoWarrior: 300 }),
     ];
     render(<EnduranceChampionsTable championList={list} />);
 

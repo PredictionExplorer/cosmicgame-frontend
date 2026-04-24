@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
 import {
   CharityDepositTable,
-  type CharityDepositDonation,
+  type PublicGoodsContributionEntry,
 } from '@/components/tables/CharityDepositTable';
 import { useCharityCGDeposits } from '@/hooks/useApiQuery';
 
@@ -25,7 +25,7 @@ const CharityCGDeposits = () => {
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>
       ) : (
-        <CharityDepositTable list={charityCGDeposits as CharityDepositDonation[]} />
+        <CharityDepositTable list={charityCGDeposits as PublicGoodsContributionEntry[]} />
       )}
     </MainWrapper>
   );

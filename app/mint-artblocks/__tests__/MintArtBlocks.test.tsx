@@ -49,7 +49,7 @@ describe('MintArtBlocks', () => {
     await act(async () => {
       render(<MintArtBlocks />);
     });
-    expect(screen.getByRole('button', { name: 'Mint now' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Imprint now' })).toBeInTheDocument();
   });
 
   it('renders "Current Token ID" label', async () => {
@@ -83,7 +83,7 @@ describe('MintArtBlocks', () => {
     await act(async () => {
       render(<MintArtBlocks />);
     });
-    expect(screen.getByRole('button', { name: 'Mint now' })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Imprint now' })).not.toBeDisabled();
   });
 
   it('has no accessibility violations', async () => {

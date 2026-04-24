@@ -127,7 +127,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
           label="Owner"
           value={ownerDisplay}
           icon={<User className="h-4 w-4" />}
-          tooltip="The current holder of this token. May differ from the winner if the token was transferred."
+          tooltip="The current holder of this token. May differ from the recipient if the token was transferred."
         />
       </div>
 

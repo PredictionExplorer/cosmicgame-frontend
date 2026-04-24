@@ -16,7 +16,7 @@ describe('getEnduranceChampions', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
-      bidder: '0xAlice',
+      participant: '0xAlice',
       championTime: 500,
       chronoWarrior: 0,
     });
@@ -28,7 +28,7 @@ describe('getEnduranceChampions', () => {
     const result = getEnduranceChampions(bids, 0);
 
     expect(result).toHaveLength(1);
-    expect(result[0]!.bidder).toBe('0xBob');
+    expect(result[0]!.participant).toBe('0xBob');
     expect(result[0]!.championTime).toBeGreaterThanOrEqual(99);
     expect(result[0]!.championTime).toBeLessThanOrEqual(102);
   });
@@ -41,8 +41,8 @@ describe('getEnduranceChampions', () => {
     const result = getEnduranceChampions(bids, 1300);
 
     expect(result.length).toBeGreaterThanOrEqual(1);
-    const bidders = result.map((c: EnduranceChampion) => c.bidder);
-    expect(bidders).toContain('0xAlice');
+    const participants = result.map((c: EnduranceChampion) => c.participant);
+    expect(participants).toContain('0xAlice');
   });
 
   it('sorts unsorted input correctly', () => {
@@ -53,7 +53,7 @@ describe('getEnduranceChampions', () => {
     const result = getEnduranceChampions(bids, 1300);
 
     expect(result.length).toBeGreaterThanOrEqual(1);
-    expect(result[0]!.bidder).toBe('0xAlice');
+    expect(result[0]!.participant).toBe('0xAlice');
   });
 
   it('tracks increasing champion records across multiple bids', () => {
@@ -66,13 +66,13 @@ describe('getEnduranceChampions', () => {
     const result = getEnduranceChampions(bids, 1070);
 
     expect(result.length).toBeGreaterThanOrEqual(2);
-    expect(result[0]!.bidder).toBe('0xA');
+    expect(result[0]!.participant).toBe('0xA');
     expect(result[0]!.championTime).toBe(10);
-    expect(result[1]!.bidder).toBe('0xB');
+    expect(result[1]!.participant).toBe('0xB');
     expect(result[1]!.championTime).toBe(40);
   });
 
-  it('includes last bidder when their window is the longest', () => {
+  it('includes last participant when their window is the longest', () => {
     const bids = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
       { TimeStamp: 1005, BidderAddr: '0xB' }, // gap=5
@@ -80,11 +80,11 @@ describe('getEnduranceChampions', () => {
     const result = getEnduranceChampions(bids, 2000);
 
     const lastChampion = result[result.length - 1]!;
-    expect(lastChampion.bidder).toBe('0xB');
+    expect(lastChampion.participant).toBe('0xB');
     expect(lastChampion.championTime).toBe(995);
   });
 
-  it('does not include last bidder when their window is shorter', () => {
+  it('does not include last participant when their window is shorter', () => {
     const bids = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
       { TimeStamp: 2000, BidderAddr: '0xB' }, // gap=1000
@@ -92,7 +92,7 @@ describe('getEnduranceChampions', () => {
     const result = getEnduranceChampions(bids, 2005);
 
     expect(result).toHaveLength(1);
-    expect(result[0]!.bidder).toBe('0xA');
+    expect(result[0]!.participant).toBe('0xA');
     expect(result[0]!.championTime).toBe(1000);
   });
 
@@ -109,7 +109,7 @@ describe('getEnduranceChampions', () => {
     });
   });
 
-  it('returns objects with bidder, championTime, chronoWarrior fields only', () => {
+  it('returns objects with participant, championTime, chronoWarrior fields only', () => {
     const bids = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
       { TimeStamp: 1100, BidderAddr: '0xB' },
@@ -117,7 +117,7 @@ describe('getEnduranceChampions', () => {
     const result = getEnduranceChampions(bids, 1200);
 
     result.forEach((c: EnduranceChampion) => {
-      expect(Object.keys(c).sort()).toEqual(['bidder', 'championTime', 'chronoWarrior']);
+      expect(Object.keys(c).sort()).toEqual(['championTime', 'chronoWarrior', 'participant']);
     });
   });
 

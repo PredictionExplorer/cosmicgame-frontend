@@ -17,8 +17,8 @@ import {
 import { CustomPagination } from '@/components/common/CustomPagination';
 import type { StakingCSTReward } from '@/services/api';
 
-const WinnerRow = ({ winner }: { winner: StakingCSTReward }) => {
-  if (!winner) {
+const RecipientRow = ({ recipient }: { recipient: StakingCSTReward }) => {
+  if (!recipient) {
     return <TablePrimaryRow />;
   }
 
@@ -27,27 +27,29 @@ const WinnerRow = ({ winner }: { winner: StakingCSTReward }) => {
       <TablePrimaryCell>
         <a
           className="text-inherit"
-          href={getExplorerUrl('tx', winner.TxHash ?? '')}
+          href={getExplorerUrl('tx', recipient.TxHash ?? '')}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {convertTimestampToDateTime(winner.TimeStamp ?? 0)}
+          {convertTimestampToDateTime(recipient.TimeStamp ?? 0)}
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="left">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Link href={`/user/${winner.StakerAddr}`} className="text-inherit font-mono">
-                {shortenHex(winner.StakerAddr ?? '', 6)}
+              <Link href={`/user/${recipient.StakerAddr}`} className="text-inherit font-mono">
+                {shortenHex(recipient.StakerAddr ?? '', 6)}
               </Link>
             </TooltipTrigger>
-            <TooltipContent>{winner.StakerAddr}</TooltipContent>
+            <TooltipContent>{recipient.StakerAddr}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </TablePrimaryCell>
-      <TablePrimaryCell align="center">{winner.StakerNumStakedNFTs}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{(winner.StakerAmountEth ?? 0).toFixed(4)}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{recipient.StakerNumStakedNFTs}</TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {(recipient.StakerAmountEth ?? 0).toFixed(4)}
+      </TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -80,8 +82,8 @@ const StakingWinnerTable = ({ list }: { list: StakingCSTReward[] }) => {
             </Tr>
           </TablePrimaryHead>
           <tbody>
-            {displayedWinners.map((winner) => (
-              <WinnerRow key={winner.StakerAddr} winner={winner} />
+            {displayedWinners.map((recipient) => (
+              <RecipientRow key={recipient.StakerAddr} recipient={recipient} />
             ))}
           </tbody>
         </TablePrimary>

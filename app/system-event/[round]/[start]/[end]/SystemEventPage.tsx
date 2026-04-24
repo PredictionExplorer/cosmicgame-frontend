@@ -28,7 +28,7 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
 
   const title =
     round > 0
-      ? `System Configuration Made Before Round ${round}`
+      ? `System Configuration Made Before Cycle ${round}`
       : 'System Configuration Made Before Deployment';
 
   return (
@@ -39,8 +39,8 @@ const SystemEventPage = ({ start, end, round }: SystemEventPageProps) => {
           subtitle={`Event log range ${start}–${end}`}
           breadcrumbs={[
             { label: 'Home', href: '/' },
-            { label: 'Changed parameters', href: '/coordination-changes' },
-            { label: round > 0 ? `Before round ${round}` : 'Deployment' },
+            { label: 'Coordination changes', href: '/coordination-changes' },
+            { label: round > 0 ? `Before cycle ${round}` : 'Deployment' },
           ]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"

@@ -102,16 +102,17 @@ export function isContractRevertError(err: unknown): boolean {
 
 const CUSTOM_ERROR_MESSAGES: Record<string, string> = {
   InsufficientReceivedBidAmount:
-    'The current bid price is greater than the amount you transferred.',
-  UsedRandomWalkNft: 'This RandomWalk NFT has already been used for a bid.',
+    'The current Gesture Cost is greater than the amount you transferred.',
+  UsedRandomWalkNft: 'This RandomWalk NFT has already been used for a gesture.',
   CallerIsNotNftOwner: 'You are not the owner of this NFT.',
-  RoundIsInactive: 'The current round is not active.',
-  TooLongBidMessage: 'Your bid message is too long.',
-  WrongBidType: 'Wrong bid type selected.',
+  RoundIsInactive: 'The current cycle is not active.',
+  TooLongBidMessage: 'Your gesture message is too long.',
+  WrongBidType: 'Wrong gesture type selected.',
   FundTransferFailed: 'Fund transfer failed.',
-  MainPrizeEarlyClaim: 'Not enough time has elapsed to claim the prize.',
-  MainPrizeClaimDenied: 'Only the last bidder is permitted to claim the main prize.',
-  NoBidsPlacedInCurrentRound: 'There have been no bids in the current round yet.',
+  MainPrizeEarlyClaim: 'Not enough time has elapsed to retrieve the Signature Allocation.',
+  MainPrizeClaimDenied:
+    'Only the Last Participant is permitted to retrieve the Signature Allocation.',
+  NoBidsPlacedInCurrentRound: 'No gestures have been made in the current cycle yet.',
 };
 
 /**
@@ -124,9 +125,7 @@ function extractContractErrorName(err: unknown): string | null {
   const walkable = err as Error & { cause?: unknown; walk?: (fn: (e: Error) => boolean) => Error };
 
   if (typeof walkable.walk === 'function') {
-    const inner = walkable.walk(
-      (e: Error) => e.name === 'ContractFunctionRevertedError',
-    );
+    const inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
     if (inner && 'data' in inner) {
       const data = (inner as Error & { data?: { errorName?: string; args?: unknown[] } }).data;
       if (data?.errorName) return data.errorName;
@@ -157,9 +156,7 @@ export function getContractErrorMessage(err: unknown, displayedEthPrice?: number
   if (errorName === 'InsufficientReceivedBidAmount' && displayedEthPrice !== undefined) {
     const walkable = err as Error & { walk?: (fn: (e: Error) => boolean) => Error };
     if (typeof walkable.walk === 'function') {
-      const inner = walkable.walk(
-        (e: Error) => e.name === 'ContractFunctionRevertedError',
-      );
+      const inner = walkable.walk((e: Error) => e.name === 'ContractFunctionRevertedError');
       if (inner && 'data' in inner) {
         const data = (inner as Error & { data?: { args?: readonly unknown[] } }).data;
         const requiredWei = data?.args?.[1];
@@ -168,8 +165,8 @@ export function getContractErrorMessage(err: unknown, displayedEthPrice?: number
           const delta = requiredEth - displayedEthPrice;
           if (delta > 0) {
             return (
-              `Bid price rose by ${delta.toFixed(6)} ETH while your transaction was in transit. ` +
-              `The new required price is ${requiredEth.toFixed(6)} ETH. Please try again.`
+              `Gesture Cost rose by ${delta.toFixed(6)} ETH while your transaction was in transit. ` +
+              `The new required cost is ${requiredEth.toFixed(6)} ETH. Please try again.`
             );
           }
         }

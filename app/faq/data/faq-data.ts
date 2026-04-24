@@ -419,12 +419,16 @@ export const faqCategories: FAQCategory[] = [
   },
 ];
 
+// lexicon-allow-start — legacy URL fragment IDs preserved for backward
+// compatibility with external backlinks. User-visible question/answer copy
+// is cosmic-primary; only these identifier strings retain old vocabulary.
 export const popularQuestionIds = [
   'what-is-cosmic-signature',
   'what-is-the-main-prize',
   'how-does-the-raffle-work',
   'how-does-staking-work',
 ];
+// lexicon-allow-end
 
 export function getAllItems(): FAQItem[] {
   return faqCategories.flatMap((cat) => cat.items);

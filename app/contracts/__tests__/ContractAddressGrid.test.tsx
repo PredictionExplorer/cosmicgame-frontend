@@ -39,16 +39,16 @@ const contracts: ContractEntry[] = [
     category: 'core',
   },
   {
-    name: 'Charity Wallet',
+    name: 'Public Goods Vault',
     address: '0xCCC',
-    description: 'Charity',
+    description: 'Public Goods',
     category: 'wallet',
   },
   {
-    name: 'CST Staking Wallet',
+    name: 'CST Anchoring Wallet',
     address: '0xDDD',
-    description: 'CST Staking',
-    category: 'staking',
+    description: 'CST Anchoring',
+    category: 'anchoring',
   },
 ];
 
@@ -64,26 +64,26 @@ describe('ContractAddressGrid', () => {
     render(<ContractAddressGrid {...defaultProps} />);
     expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature')).toBeInTheDocument();
-    expect(screen.getByText('Charity Wallet')).toBeInTheDocument();
-    expect(screen.getByText('CST Staking Wallet')).toBeInTheDocument();
+    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
+    expect(screen.getByText('CST Anchoring Wallet')).toBeInTheDocument();
   });
 
   it('renders category group dividers', () => {
     render(<ContractAddressGrid {...defaultProps} />);
     expect(screen.getByText('Core Contracts')).toBeInTheDocument();
     expect(screen.getByText('Wallet Contracts')).toBeInTheDocument();
-    expect(screen.getByText('Staking Contracts')).toBeInTheDocument();
+    expect(screen.getByText('Anchoring Contracts')).toBeInTheDocument();
   });
 
   it('filters contracts by search term (name)', () => {
-    render(<ContractAddressGrid {...defaultProps} searchTerm="charity" />);
-    expect(screen.getByText('Charity Wallet')).toBeInTheDocument();
+    render(<ContractAddressGrid {...defaultProps} searchTerm="public goods" />);
+    expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
     expect(screen.queryByText('Cosmic Game')).not.toBeInTheDocument();
   });
 
   it('filters contracts by search term (address)', () => {
     render(<ContractAddressGrid {...defaultProps} searchTerm="0xDDD" />);
-    expect(screen.getByText('CST Staking Wallet')).toBeInTheDocument();
+    expect(screen.getByText('CST Anchoring Wallet')).toBeInTheDocument();
     expect(screen.queryByText('Cosmic Game')).not.toBeInTheDocument();
   });
 

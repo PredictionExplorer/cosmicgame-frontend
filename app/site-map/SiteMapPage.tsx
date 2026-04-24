@@ -16,7 +16,7 @@ const perUserLinks = [
 
 const systemLinks = [
   { href: '/gallery', label: 'Cosmic Signature Gallery' },
-  { href: '/prize', label: 'Cycles Completed' },
+  { href: '/allocation', label: 'Cycles Completed' },
   { href: '/anchoring', label: 'Anchor Distributions' },
   { href: '/marketing', label: 'Outreach Allocations' },
   { href: '/statistics', label: 'System Statistics' },

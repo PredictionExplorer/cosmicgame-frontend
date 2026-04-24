@@ -45,7 +45,7 @@ function buildActions(address: string): ActionItem[] {
     {
       label: 'Stellar Selection History',
       description: 'Your Stellar Selection allocations and ETH deposits',
-      href: `/user/raffle-eth/${address}`,
+      href: `/user/stellar-selection-eth/${address}`,
       icon: <Ticket className="h-4 w-4" />,
     },
   ];

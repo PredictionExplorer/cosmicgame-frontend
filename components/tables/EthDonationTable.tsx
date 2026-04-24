@@ -64,7 +64,7 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
       </TablePrimaryCell>
       {showType && (
         <TablePrimaryCell align="center">
-          {row.RecordType ? 'Donation with info' : 'Simple donation'}
+          {row.RecordType ? 'Contribution with info' : 'Simple contribution'}
         </TablePrimaryCell>
       )}
       <TablePrimaryCell align="center">

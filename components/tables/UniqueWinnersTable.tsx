@@ -17,22 +17,22 @@ import type { Winner } from '@/services/api/types';
 export type { Winner };
 
 interface UniqueWinnersRowProps {
-  winner?: Winner;
+  recipient?: Winner;
 }
 
-const UniqueWinnersRow = ({ winner }: UniqueWinnersRowProps) => {
-  if (!winner) {
+const UniqueWinnersRow = ({ recipient }: UniqueWinnersRowProps) => {
+  if (!recipient) {
     return <TablePrimaryRow />;
   }
 
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <AddressLink address={winner.WinnerAddr} url={`/user/${winner.WinnerAddr}`} />
+        <AddressLink address={recipient.WinnerAddr} url={`/user/${recipient.WinnerAddr}`} />
       </TablePrimaryCell>
-      <TablePrimaryCell align="right">{winner.PrizesCount}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{winner.MaxWinAmountEth.toFixed(6)}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{winner.PrizesSum.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{recipient.PrizesCount}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{recipient.MaxWinAmountEth.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{recipient.PrizesSum.toFixed(6)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };
@@ -62,8 +62,8 @@ export const UniqueWinnersTable = ({ list }: UniqueWinnersTableProps) => {
             </Tr>
           </TablePrimaryHead>
           <tbody>
-            {list.slice((page - 1) * perPage, page * perPage).map((winner) => (
-              <UniqueWinnersRow winner={winner} key={winner.WinnerAid} />
+            {list.slice((page - 1) * perPage, page * perPage).map((recipient) => (
+              <UniqueWinnersRow recipient={recipient} key={recipient.WinnerAid} />
             ))}
           </tbody>
         </TablePrimary>

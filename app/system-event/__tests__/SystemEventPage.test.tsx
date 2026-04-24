@@ -48,7 +48,7 @@ describe('SystemEventPage', () => {
   it('shows round-specific title when round > 0', () => {
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false, error: null });
     render(<SystemEventPage start={0} end={100} round={5} />);
-    expect(screen.getByText('System Configuration Made Before Round 5')).toBeInTheDocument();
+    expect(screen.getByText('System Configuration Made Before Cycle 5')).toBeInTheDocument();
   });
 
   it('shows deployment title when round is 0', () => {
@@ -111,7 +111,7 @@ describe('SystemEventPage', () => {
         error: new Error('fail'),
       });
       render(<SystemEventPage start={0} end={100} round={3} />);
-      expect(screen.getByText('System Configuration Made Before Round 3')).toBeInTheDocument();
+      expect(screen.getByText('System Configuration Made Before Cycle 3')).toBeInTheDocument();
     });
 
     it('still shows deployment title when in error state (round === 0)', () => {

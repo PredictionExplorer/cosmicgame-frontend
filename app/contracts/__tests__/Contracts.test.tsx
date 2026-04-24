@@ -186,7 +186,7 @@ describe('Contracts', () => {
     render(<Contracts />);
     expect(screen.getByText('Core Contracts')).toBeInTheDocument();
     expect(screen.getByText('Wallet Contracts')).toBeInTheDocument();
-    expect(screen.getByText('Staking Contracts')).toBeInTheDocument();
+    expect(screen.getByText('Anchoring Contracts')).toBeInTheDocument();
   });
 
   it('renders contract address cards', () => {

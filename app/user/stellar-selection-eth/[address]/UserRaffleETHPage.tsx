@@ -162,7 +162,7 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
           visible: true,
         });
       } else {
-        reportError(err, 'claim raffle ETH');
+        reportError(err, 'retrieve stellar selection ETH');
         const rawMsg = getEthErrorMessage(err, 'An error occurred');
         const msg = getErrorMessage(rawMsg) || rawMsg;
         setNotification({ text: msg, type: 'error', visible: true });

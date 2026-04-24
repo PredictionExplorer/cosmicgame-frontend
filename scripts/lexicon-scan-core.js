@@ -143,7 +143,8 @@ function isInternalCallSite(line, start) {
   // Object literal shorthand for the above keys: `{ id: '...' }`,
   // `{ sectionId: '...' }`, `{ testId: '...' }`. We limit to cases where
   // the key is unambiguously an internal-identifier key.
-  if (/\b(sectionId|testId|slotId|elementId|anchorId)\s*:\s*$/.test(trimmedPrefix)) return true;
+  if (/\b(sectionId|testId|slotId|elementId|anchorId|hashAnchor)\s*:\s*$/.test(trimmedPrefix))
+    return true;
 
   return false;
 }

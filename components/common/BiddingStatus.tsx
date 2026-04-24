@@ -75,7 +75,7 @@ export const BiddingStatus = ({
     const pSelect = (total: number, chosen: number, yours: number) =>
       1 - Math.pow((total - yours) / total, chosen);
     return {
-      raffle:
+      stellarEth:
         pSelect(curBidList.length, data.NumRaffleEthWinnersBidding ?? 1, curRoundBids.length) * 100,
       nft:
         pSelect(curBidList.length, data.NumRaffleNFTWinnersBidding ?? 1, curRoundBids.length) * 100,
@@ -292,13 +292,13 @@ export const BiddingStatus = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">ETH Stellar Selection</span>
                     <span className="font-medium text-primary">
-                      {winProbability.raffle.toFixed(1)}%
+                      {winProbability.stellarEth.toFixed(1)}%
                     </span>
                   </div>
                   <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${Math.min(winProbability.raffle, 100)}%` }}
+                      animate={{ width: `${Math.min(winProbability.stellarEth, 100)}%` }}
                       transition={{ duration: 0.8, ease: 'easeOut' }}
                       className="h-full rounded-full bg-gradient-to-r from-primary to-primary/60"
                     />

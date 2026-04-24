@@ -9,24 +9,24 @@ import {
 import { isWalletAddress } from '../wallet';
 
 describe('isWalletAddress', () => {
-  it('returns "Staking CST Wallet" for the CST staking address', () => {
-    expect(isWalletAddress(STAKING_WALLET_CST_ADDRESS)).toBe('Staking CST Wallet');
+  it('returns "CST Anchoring Wallet" for the CST anchoring address', () => {
+    expect(isWalletAddress(STAKING_WALLET_CST_ADDRESS)).toBe('CST Anchoring Wallet');
   });
 
-  it('returns "Staking RandomWalk Wallet" for the RWLK staking address', () => {
-    expect(isWalletAddress(STAKING_WALLET_RWLK_ADDRESS)).toBe('Staking RandomWalk Wallet');
+  it('returns "RandomWalk Anchoring Wallet" for the RWLK anchoring address', () => {
+    expect(isWalletAddress(STAKING_WALLET_RWLK_ADDRESS)).toBe('RandomWalk Anchoring Wallet');
   });
 
-  it('returns "Marketing Wallet" for the marketing address', () => {
-    expect(isWalletAddress(MARKETING_WALLET_ADDRESS)).toBe('Marketing Wallet');
+  it('returns "Outreach Wallet" for the outreach address', () => {
+    expect(isWalletAddress(MARKETING_WALLET_ADDRESS)).toBe('Outreach Wallet');
   });
 
-  it('returns "Raffle Wallet" for the raffle address', () => {
-    expect(isWalletAddress(RAFFLE_WALLET_ADDRESS)).toBe('Raffle Wallet');
+  it('returns "Stellar Selection Wallet" for the stellar-selection address', () => {
+    expect(isWalletAddress(RAFFLE_WALLET_ADDRESS)).toBe('Stellar Selection Wallet');
   });
 
-  it('returns "Charity Wallet" for the charity address', () => {
-    expect(isWalletAddress(CHARITY_WALLET_ADDRESS)).toBe('Charity Wallet');
+  it('returns "Public Goods Vault" for the public-goods address', () => {
+    expect(isWalletAddress(CHARITY_WALLET_ADDRESS)).toBe('Public Goods Vault');
   });
 
   it('returns empty string for an unknown address', () => {

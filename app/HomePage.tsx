@@ -136,7 +136,7 @@ const HomePage = () => {
       bidForm.setRwlkId(Number(searchParams.get('tokenId')));
       bidForm.setBidType('RandomWalk');
     }
-    if (searchParams?.get('donation')) {
+    if (searchParams?.get('attach')) {
       bidForm.setNftDonateAddress(ART_BLOCKS_ADDRESS);
       bidForm.setNftId(searchParams.get('tokenId') ?? '');
       bidForm.setBidType('ETH');

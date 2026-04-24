@@ -63,7 +63,7 @@ describe('QuickActions', () => {
   it('links to correct raffle history page with address', () => {
     render(<QuickActions address={address} />);
     const raffleLink = screen.getByText('Stellar Selection History').closest('a');
-    expect(raffleLink).toHaveAttribute('href', `/user/raffle-eth/${address}`);
+    expect(raffleLink).toHaveAttribute('href', `/user/stellar-selection-eth/${address}`);
   });
 
   it('has no accessibility violations', async () => {

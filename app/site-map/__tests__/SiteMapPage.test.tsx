@@ -36,7 +36,7 @@ describe('SiteMapPage', () => {
     render(<SiteMapPage />);
     const expectedLinks = [
       { label: 'Cosmic Signature Gallery', href: '/gallery' },
-      { label: 'Cycles Completed', href: '/prize' },
+      { label: 'Cycles Completed', href: '/allocation' },
       { label: 'Anchor Distributions', href: '/anchoring' },
       { label: 'Outreach Allocations', href: '/marketing' },
       { label: 'System Statistics', href: '/statistics' },

@@ -11,7 +11,7 @@ export interface ContractEntry {
   name: string;
   address: string;
   description: string;
-  category: 'core' | 'wallet' | 'staking';
+  category: 'core' | 'wallet' | 'anchoring';
 }
 
 interface ContractAddressGridProps {
@@ -24,10 +24,10 @@ interface ContractAddressGridProps {
 const CATEGORY_LABELS: Record<ContractEntry['category'], string> = {
   core: 'Core Contracts',
   wallet: 'Wallet Contracts',
-  staking: 'Staking Contracts',
+  anchoring: 'Anchoring Contracts',
 };
 
-const CATEGORY_ORDER: ContractEntry['category'][] = ['core', 'wallet', 'staking'];
+const CATEGORY_ORDER: ContractEntry['category'][] = ['core', 'wallet', 'anchoring'];
 
 const stagger = {
   hidden: {},
@@ -80,7 +80,7 @@ export function ContractAddressGrid({
             animate="visible"
           >
             {group.items.map((contract) => (
-              <motion.div key={contract.name} variants={fadeUp}>
+              <motion.div key={contract.address || contract.name} variants={fadeUp}>
                 <ContractAddressCard
                   name={contract.name}
                   address={contract.address}

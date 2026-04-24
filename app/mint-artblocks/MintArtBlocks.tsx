@@ -27,30 +27,30 @@ import {
 const MintArtBlocks = () => {
   const [count, setCount] = useState(1);
   const [curTokenId, setCurTokenId] = useState(-1);
-  const [mintedTokens, setMintedTokens] = useState<number[]>([]);
+  const [imprintedTokens, setImprintedTokens] = useState<number[]>([]);
   const { account } = useActiveWeb3React();
   const publicClient = usePublicClient();
   const nftContract = useArtBlocksContract();
 
-  const handleMint = async () => {
+  const handleImprint = async () => {
     if (nftContract) {
       try {
-        let tokenIds = [...mintedTokens];
+        let tokenIds = [...imprintedTokens];
         const hash = await nftContract.write.multimint?.([account, count]);
         if (hash) await publicClient?.waitForTransactionReceipt({ hash });
         for (let i = 0; i < count; i++) {
           tokenIds.push(curTokenId + i);
         }
-        setMintedTokens(tokenIds);
+        setImprintedTokens(tokenIds);
         getCurrentTokenId();
       } catch (err: unknown) {
         if (isUserRejection(err)) {
           toast.info(WALLET_TRANSACTION_CANCELLED_MESSAGE);
           return;
         }
-        reportError(err, 'mint Art Blocks NFT');
+        reportError(err, 'imprint Art Blocks NFT');
         if (isEthProviderError(err)) {
-          alert(getEthErrorMessage(err, 'Mint failed'));
+          alert(getEthErrorMessage(err, 'Imprint failed'));
         }
       }
     }
@@ -94,20 +94,24 @@ const MintArtBlocks = () => {
               <SelectItem value="15">15</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handleMint} className="ml-2" disabled={count < 1 || Number.isNaN(count)}>
-            Mint now
+          <Button
+            onClick={handleImprint}
+            className="ml-2"
+            disabled={count < 1 || Number.isNaN(count)}
+          >
+            Imprint now
           </Button>
         </div>
         <div className="flex">
           <p className="text-base mr-2">Current Token ID: </p>
           <p className="text-base">{curTokenId}</p>
         </div>
-        {mintedTokens.length > 0 && (
+        {imprintedTokens.length > 0 && (
           <div className="mt-4">
-            {mintedTokens.map((tokenId) => (
+            {imprintedTokens.map((tokenId) => (
               <Link
                 key={tokenId}
-                href={`/?donation=true&tokenId=${tokenId}`}
+                href={`/?attach=true&tokenId=${tokenId}`}
                 className="mr-4 text-inherit"
               >
                 <span className="text-base">{tokenId}</span>

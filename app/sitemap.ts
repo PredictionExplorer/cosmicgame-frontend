@@ -39,7 +39,7 @@ const appPages: SitemapEntry[] = [
   { path: '/contracts', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/code', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/eth-contribution', priority: 0.6, changeFrequency: 'daily' },
-  { path: '/nft-donations', priority: 0.6, changeFrequency: 'daily' },
+  { path: '/attached-nfts', priority: 0.6, changeFrequency: 'daily' },
   { path: '/recipient-history', priority: 0.7, changeFrequency: 'daily' },
   { path: '/allocation-finalized', priority: 0.6, changeFrequency: 'daily' },
   { path: '/named-nfts', priority: 0.6, changeFrequency: 'daily' },

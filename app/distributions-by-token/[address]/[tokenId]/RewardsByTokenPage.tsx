@@ -97,10 +97,10 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
             <div className="grid grid-cols-1 gap-6 py-4 md:grid-cols-2">
               <div className={cn(detailPanelClass, 'mb-0')}>
                 <div className="border-b border-white/[0.06] px-4 py-3">
-                  <h3 className="font-display text-sm font-semibold text-foreground">Stake</h3>
+                  <h3 className="font-display text-sm font-semibold text-foreground">Anchor</h3>
                 </div>
                 <DefinitionList>
-                  <DetailRow label="Staked datetime">
+                  <DetailRow label="Anchored datetime">
                     <a
                       className={detailLinkClass}
                       href={getExplorerUrl('tx', Stake.TxHash)}
@@ -110,7 +110,7 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                       {convertTimestampToDateTime(Stake.TimeStamp)}
                     </a>
                   </DetailRow>
-                  <DetailRow label="Number of staked NFTs">
+                  <DetailRow label="Number of anchored NFTs">
                     <span className="font-mono tabular-nums">{Stake.NumStakedNFTs}</span>
                   </DetailRow>
                 </DefinitionList>
@@ -119,10 +119,12 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
               {Unstake.EvtLogId !== 0 ? (
                 <div className={cn(detailPanelClass, 'mb-0')}>
                   <div className="border-b border-white/[0.06] px-4 py-3">
-                    <h3 className="font-display text-sm font-semibold text-foreground">Unstake</h3>
+                    <h3 className="font-display text-sm font-semibold text-foreground">
+                      Release Anchor
+                    </h3>
                   </div>
                   <DefinitionList>
-                    <DetailRow label="Unstake datetime">
+                    <DetailRow label="Released datetime">
                       <a
                         className={detailLinkClass}
                         href={getExplorerUrl('tx', Unstake.TxHash)}
@@ -132,10 +134,10 @@ function RewardsDetailRow({ row }: { row: RewardsRowData }) {
                         {convertTimestampToDateTime(Unstake.TimeStamp)}
                       </a>
                     </DetailRow>
-                    <DetailRow label="Number of staked NFTs">
+                    <DetailRow label="Number of anchored NFTs">
                       <span className="font-mono tabular-nums">{Unstake.NumStakedNFTs}</span>
                     </DetailRow>
-                    <DetailRow label="Rewards">
+                    <DetailRow label="Distribution">
                       <span className="font-mono tabular-nums">
                         {Unstake.RewardAmountEth.toFixed(6)} ETH
                       </span>
@@ -170,10 +172,10 @@ function RewardsDetailTable({ list }: { list: RewardsRowData[] }) {
                   <span className="sr-only">Details</span>
                 </TablePrimaryHeadCell>
                 <TablePrimaryHeadCell align="left">Deposit Datetime</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
                 <TablePrimaryHeadCell>Deposit Id</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell>Is Claimed?</TablePrimaryHeadCell>
-                <TablePrimaryHeadCell align="right">Reward (ETH)</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Is Retrieved?</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="right">Distribution (ETH)</TablePrimaryHeadCell>
               </Tr>
             </TablePrimaryHead>
             <Tbody>
@@ -211,14 +213,14 @@ function RewardsByTokenPage({ address, tokenId }: { address: string; tokenId: nu
       .map((key) => (rawResponse as Record<string, unknown>)[key]) as RewardsRowData[];
   }, [rawResponse]);
 
-  const pageTitle = `Staking Rewards Details for Token ${tokenId}`;
+  const pageTitle = `Anchor Distribution Details for Token ${tokenId}`;
 
   return (
     <MainWrapper className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
           title={pageTitle}
-          subtitle={`Rewards for ${address}`}
+          subtitle={`Distributions for ${address}`}
           breadcrumbs={[
             { label: 'Home', href: '/' },
             { label: 'User', href: `/user/${address}` },

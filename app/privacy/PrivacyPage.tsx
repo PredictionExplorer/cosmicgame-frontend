@@ -73,7 +73,7 @@ const sections = [
     content: [
       {
         subtitle: 'Public Blockchain Data',
-        text: 'All blockchain transactions are public by nature. Your wallet address, bids, NFT ownership, and prize winnings are visible on the blockchain and through our platform.',
+        text: 'All blockchain transactions are public by nature. Your wallet address, gestures, NFT ownership, and allocations are visible on the blockchain and through our platform.',
       },
       {
         subtitle: 'Third-Party Services',
@@ -95,7 +95,7 @@ const sections = [
       },
       {
         subtitle: 'Blockchain Permanence',
-        text: 'Please note that blockchain transactions are permanent and cannot be deleted. Once a bid is placed or an NFT is transferred, this information remains on the blockchain forever.',
+        text: 'Please note that blockchain transactions are permanent and cannot be deleted. Once a gesture is made or an NFT is transferred, this information remains on the blockchain forever.',
       },
       {
         subtitle: 'Cookie Preferences',

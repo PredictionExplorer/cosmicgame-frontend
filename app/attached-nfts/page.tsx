@@ -8,7 +8,7 @@ export const metadata: Metadata = createMetadata(
   'Attached NFT Contributions | Cosmic Signature',
   'Browse the history of NFTs attached to gestures by community members. Attached NFTs forward to the participant who receives the Signature Allocation each cycle.',
   undefined,
-  '/nft-donations',
+  '/attached-nfts',
 );
 
 export default function Page() {

@@ -56,7 +56,9 @@ const Prize: FC<PrizeProps> = ({ data }) => {
         'Attached tokens (if any)',
       ],
       winners: '1',
+      // lexicon-allow-start — FAQ hash anchor preserves legacy URL fragment
       faqLink: '/faq#main-prize',
+      // lexicon-allow-end
       featured: true,
     },
     {

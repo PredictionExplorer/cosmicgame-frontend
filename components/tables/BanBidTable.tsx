@@ -66,10 +66,10 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
       setNotification({
         visible: true,
         type: 'success',
-        text: 'Bid was banned successfully!',
+        text: 'Gesture was banned successfully!',
       });
     } catch (e) {
-      reportError(e, 'ban bid');
+      reportError(e, 'ban gesture');
       const rawMsg = getEthErrorMessage(e, 'An error occurred');
       if (rawMsg) {
         const msg = getErrorMessage(rawMsg) || rawMsg;
@@ -85,10 +85,10 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
       setNotification({
         visible: true,
         type: 'success',
-        text: 'Bid was unbanned successfully!',
+        text: 'Gesture was unbanned successfully!',
       });
     } catch (e) {
-      reportError(e, 'unban bid');
+      reportError(e, 'unban gesture');
       const rawMsg = getEthErrorMessage(e, 'An error occurred');
       if (rawMsg) {
         const msg = getErrorMessage(rawMsg) || rawMsg;
@@ -127,7 +127,11 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        {history.BidType === 2 ? 'CST Bid' : history.BidType === 1 ? 'RWLK Token Bid' : 'ETH Bid'}
+        {history.BidType === 2
+          ? 'CST Gesture'
+          : history.BidType === 1
+            ? 'RWLK Token Gesture'
+            : 'ETH Gesture'}
       </TablePrimaryCell>
       <TablePrimaryCell>
         <TooltipProvider>
@@ -176,9 +180,9 @@ const HistoryTable = ({ biddingHistory, perPage, curPage }: HistoryTableProps) =
         <TablePrimaryHead>
           <Tr>
             <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Bidder</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Bid Type</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Participant</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Gesture Type</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>
               <span className="sr-only">Actions</span>

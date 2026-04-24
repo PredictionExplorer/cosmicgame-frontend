@@ -5,7 +5,7 @@ interface BidEntry {
 }
 
 export interface EnduranceChampion {
-  bidder: string;
+  participant: string;
   championTime: number;
   chronoWarrior: number;
 }
@@ -40,7 +40,7 @@ export const getEnduranceChampions = (
   if (currentRoundBids.length === 1) {
     return [
       {
-        bidder: currentRoundBids[0]!.BidderAddr,
+        participant: currentRoundBids[0]!.BidderAddr,
         championTime: currentTime - currentRoundBids[0]!.TimeStamp,
         chronoWarrior: 0,
       },
@@ -96,7 +96,7 @@ export const getEnduranceChampions = (
   }
 
   return enduranceChampions.map((champion) => ({
-    bidder: champion.address,
+    participant: champion.address,
     championTime: champion.championTime,
     chronoWarrior: champion.chronoWarrior,
   }));

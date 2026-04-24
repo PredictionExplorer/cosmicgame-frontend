@@ -19,7 +19,7 @@ const TwitterShareButton = () => {
   const handleConfirm = () => {
     const formattedHandle = handle.startsWith('@') ? handle.slice(1) : handle;
 
-    const tweetText = `I'm joining the @CosmicSignature test round on @arbitrum Sepolia for free! Over $60,000 in prizes up for grabs! https://x.com/CosmicSignature/status/1821607885819785412\nUse my referral link and you'll get an extra $100 if you win: https://cosmicsignature.com/?referred_by=${formattedHandle}`;
+    const tweetText = `I'm joining the @CosmicSignature test cycle on @arbitrum Sepolia for free! Over $60,000 in allocations up for grabs! https://x.com/CosmicSignature/status/1821607885819785412\nUse my referral link and you'll receive an extra $100: https://cosmicsignature.com/?referred_by=${formattedHandle}`;
 
     const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(twitterUrl, '_blank');

@@ -56,12 +56,12 @@ describe('EthDonationTable', () => {
 
   it('shows donation type when showType is true', () => {
     render(<EthDonationTable list={[createDonation({ RecordType: 0 })]} showType={true} />);
-    expect(screen.getByText('Simple donation')).toBeInTheDocument();
+    expect(screen.getByText('Simple contribution')).toBeInTheDocument();
   });
 
   it('shows "Donation with info" for RecordType > 0', () => {
     render(<EthDonationTable list={[createDonation({ RecordType: 1 })]} showType={true} />);
-    expect(screen.getByText('Donation with info')).toBeInTheDocument();
+    expect(screen.getByText('Contribution with info')).toBeInTheDocument();
   });
 
   it('sets rel="noopener noreferrer" on all target="_blank" links', () => {

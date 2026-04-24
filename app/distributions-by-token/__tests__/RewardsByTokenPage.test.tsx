@@ -51,7 +51,7 @@ describe('RewardsByTokenPage', () => {
       error: null,
     });
     render(<RewardsByTokenPage address="0xUser" tokenId={42} />);
-    expect(screen.getByText('Staking Rewards Details for Token 42')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Distribution Details for Token 42')).toBeInTheDocument();
   });
 
   it('passes correct arguments to the hook', () => {
@@ -71,7 +71,7 @@ describe('RewardsByTokenPage', () => {
       error: null,
     });
     render(<RewardsByTokenPage address="0xUser" tokenId={42} />);
-    expect(screen.getByText('Staking Rewards Details for Token 42')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Distribution Details for Token 42')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

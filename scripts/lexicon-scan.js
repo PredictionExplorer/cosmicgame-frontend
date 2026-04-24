@@ -29,14 +29,7 @@ const { DEFAULT_BANNED_TERMS, buildBannedPattern, scanContent } = require('./lex
 
 const ROOT = resolve(process.cwd());
 
-const SCAN_DIRS = [
-  'content',
-  'components/landing-v2',
-  'components/three',
-  'app/landing-site',
-  'hooks',
-  'lib',
-];
+const SCAN_DIRS = ['app', 'components', 'content', 'hooks', 'lib', 'utils'];
 
 const INCLUDE_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mdx']);
 const EXCLUDE_DIRS = new Set(['__tests__', '__mocks__', 'node_modules']);

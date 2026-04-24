@@ -140,7 +140,7 @@ export function RafflePerformance({
           label="Total Stellar Selection ETH"
           value={`${totalRaffleEth.toFixed(4)} ETH`}
           tooltip="Combined ETH from Stellar Selection allocations and retrievals across all cycles."
-          href={userInfo.Address ? `/user/raffle-eth/${userInfo.Address}` : undefined}
+          href={userInfo.Address ? `/user/stellar-selection-eth/${userInfo.Address}` : undefined}
         />
         <RaffleStat
           label="ETH Retrieved"
@@ -156,7 +156,7 @@ export function RafflePerformance({
           label="Stellar Selection NFTs"
           value={(userInfo.RaffleNFTsCount ?? 0).toLocaleString()}
           tooltip="Cosmic Signature NFTs imprinted through Stellar Selection."
-          href={userInfo.Address ? `/user/raffle-nft/${userInfo.Address}` : undefined}
+          href={userInfo.Address ? `/user/stellar-selection-nft/${userInfo.Address}` : undefined}
         />
         <RaffleStat
           label="Allocation NFTs"

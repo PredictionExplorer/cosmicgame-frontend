@@ -137,8 +137,9 @@ describe('lexicon-scan.mjs', () => {
   });
 
   it('scans only the configured directories', () => {
-    fixture.write('app/some-other/page.tsx', `export const x = "bid";`);
-    // Not under content/, components/landing-v2/, etc. Should pass.
+    // SCAN_DIRS currently includes: app, components, content, hooks, lib, utils.
+    // A file written outside all of these (e.g. under e2e/) should be skipped.
+    fixture.write('e2e/some-other/page.tsx', `export const x = "bid";`);
     const result = runScanner(fixture.root);
     expect(result.exitCode).toBe(0);
   });

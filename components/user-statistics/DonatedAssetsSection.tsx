@@ -60,9 +60,9 @@ export function DonatedAssetsSection({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              Donated NFTs Won
+              Attached NFTs Received
             </p>
-            <InfoTooltip content="NFTs donated by other users that you won through raffles. Unclaimed NFTs can be claimed to your wallet." />
+            <InfoTooltip content="NFTs attached by other participants that were allocated to you through Stellar Selection. Unretrieved NFTs can be retrieved to your wallet." />
             {unclaimedNFTs.length > 0 && (
               <Badge variant="default" className="text-[10px] px-1.5 py-0">
                 {unclaimedNFTs.length} unclaimed
@@ -80,8 +80,8 @@ export function DonatedAssetsSection({
         ) : allNFTs.length === 0 ? (
           <EmptyState
             icon={<Gift className="h-8 w-8 text-muted-foreground/50" />}
-            title="No donated NFTs"
-            description="You haven't won any donated NFTs through raffles yet."
+            title="No attached NFTs"
+            description="You haven't received any attached NFTs through Stellar Selection yet."
           />
         ) : (
           <DonatedNFTTable
