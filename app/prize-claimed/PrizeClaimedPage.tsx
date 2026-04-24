@@ -42,9 +42,9 @@ const PrizeClaimedPage = () => {
         {loading ? (
           <>
             <PageHeader
-              title="Prize claimed"
-              subtitle="Loading round data…"
-              breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Prize claimed' }]}
+              title="Allocation retrieved"
+              subtitle="Loading cycle data\u2026"
+              breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Allocation retrieved' }]}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
             />
@@ -55,13 +55,13 @@ const PrizeClaimedPage = () => {
         ) : !prizeInfo ? (
           <>
             <PageHeader
-              title="Prize claimed"
-              breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Prize claimed' }]}
+              title="Allocation retrieved"
+              breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Allocation retrieved' }]}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
             />
             <div className={cn(detailPanelClass, 'p-10 text-center')}>
-              <p className="font-medium text-foreground">No prize information.</p>
+              <p className="font-medium text-foreground">No allocation information.</p>
             </div>
           </>
         ) : (
@@ -83,11 +83,11 @@ const PrizeClaimedPage = () => {
             )}
 
             <PageHeader
-              title={`Congratulations! You won Round ${prizeInfo.RoundNum}.`}
+              title={`Congratulations! Cycle ${prizeInfo.RoundNum} Signature Allocation received.`}
               breadcrumbs={[
                 { label: 'Home', href: '/' },
-                { label: 'Prize', href: `/prize/${prizeInfo.RoundNum}` },
-                { label: 'Claimed' },
+                { label: 'Allocation', href: `/prize/${prizeInfo.RoundNum}` },
+                { label: 'Retrieved' },
               ]}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
@@ -95,37 +95,47 @@ const PrizeClaimedPage = () => {
 
             <SectionCard
               sectionId="prize-claimed-rewards"
-              title={`Round ${prizeInfo.RoundNum} rewards`}
-              description="Summary of the main prize components for this round."
+              title={`Cycle ${prizeInfo.RoundNum} allocations`}
+              description="Summary of the Signature Allocation components for this cycle."
             >
               <DefinitionList>
-                <DetailRow label="ETH prize">
-                  <span className="font-mono tabular-nums">{prizeInfo.AmountEth.toFixed(6)} ETH</span>
+                <DetailRow label="ETH allocation">
+                  <span className="font-mono tabular-nums">
+                    {prizeInfo.AmountEth.toFixed(6)} ETH
+                  </span>
                 </DetailRow>
                 <DetailRow label="Cosmic Signature Token number">
-                  <Link href={`/detail/${prizeInfo.TokenId}`} className={cn(detailLinkClass, 'font-mono tabular-nums')}>
+                  <Link
+                    href={`/detail/${prizeInfo.TokenId}`}
+                    className={cn(detailLinkClass, 'font-mono tabular-nums')}
+                  >
                     {prizeInfo.TokenId}
                   </Link>
                 </DetailRow>
                 {!!(prizeInfo.RoundStats.TotalDonatedNFTs as number) ? (
-                  <DetailRow label="Donated tokens (ERC721)">
+                  <DetailRow label="Attached tokens (ERC721)">
                     <span>
-                      {prizeInfo.RoundStats.TotalDonatedNFTs as ReactNode} donated tokens (ERC721)
+                      {prizeInfo.RoundStats.TotalDonatedNFTs as ReactNode} attached tokens (ERC721)
                     </span>
                   </DetailRow>
                 ) : null}
               </DefinitionList>
             </SectionCard>
 
-            <SectionCard sectionId="prize-claimed-next" title="Next steps" description="Raffles and staking may add separate rewards.">
+            <SectionCard
+              sectionId="prize-claimed-next"
+              title="Next steps"
+              description="Stellar Selection and anchoring may yield separate allocations."
+            >
               <div className="px-4 py-4 text-sm leading-relaxed text-muted-foreground sm:px-5">
-                There could also be random rewards from raffles. To check your winnings, go to{' '}
+                There could also be additional allocations from Stellar Selection. To view your
+                allocations, go to{' '}
                 <Link href="/my-winnings" className={detailLinkClass}>
-                  My-Winnings
+                  My Allocations
                 </Link>{' '}
-                page. For staking rewards, visit{' '}
+                page. For Anchor Distributions, visit{' '}
                 <Link href="/my-staking" className={detailLinkClass}>
-                  My-Staking
+                  My Anchors
                 </Link>{' '}
                 page.
               </div>

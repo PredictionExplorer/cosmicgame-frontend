@@ -33,7 +33,7 @@ describe('PrizeClaimedPage', () => {
   it('shows no prize info message when data is null', () => {
     mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<PrizeClaimedPage />);
-    expect(screen.getByText('No prize information.')).toBeInTheDocument();
+    expect(screen.getByText('No allocation information.')).toBeInTheDocument();
   });
 
   it('renders prize info when data is loaded', () => {
@@ -48,7 +48,9 @@ describe('PrizeClaimedPage', () => {
       error: null,
     });
     render(<PrizeClaimedPage />);
-    expect(screen.getByText('Congratulations! You won Round 5.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Congratulations! Cycle 5 Signature Allocation received.'),
+    ).toBeInTheDocument();
     expect(screen.getByText('1.234567 ETH')).toBeInTheDocument();
   });
 
@@ -70,7 +72,7 @@ describe('PrizeClaimedPage', () => {
       error: null,
     });
     render(<PrizeClaimedPage />);
-    expect(screen.getByText(/7 donated tokens/)).toBeInTheDocument();
+    expect(screen.getByText(/7 attached tokens/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

@@ -77,7 +77,7 @@ function NFTWinningsTable({ list }: { list: RaffleNFTWinning[] }) {
   const [currentPage, setCurrentPage] = useState(1);
 
   if (!list.length) {
-    return <p>No NFT winnings yet.</p>;
+    return <p>No NFT allocations yet.</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -91,9 +91,9 @@ function NFTWinningsTable({ list }: { list: RaffleNFTWinning[] }) {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Is RandomWalk</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Is Staker</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Is Anchor-holder</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
@@ -153,7 +153,9 @@ function UserRaffleNFTPage({ address: rawAddress }: { address: string }) {
       </div>
 
       <div className="mt-8">
-        <h4 className="mb-4 text-lg font-semibold leading-none">Raffle NFTs User Won</h4>
+        <h4 className="mb-4 text-lg font-semibold leading-none">
+          Stellar Selection NFTs allocated to this participant
+        </h4>
 
         {raffleNfts.loading ? (
           <p className="text-lg font-semibold">Loading...</p>

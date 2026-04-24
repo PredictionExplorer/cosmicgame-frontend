@@ -78,7 +78,7 @@ const RaffleWinningsTable = ({ list }: { list: RaffleETHDeposit[] }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No Raffle ETH yet.</p>;
+    return <p>No Stellar Selection ETH yet.</p>;
   }
 
   const startIndex = (currentPage - 1) * PER_PAGE;
@@ -92,7 +92,7 @@ const RaffleWinningsTable = ({ list }: { list: RaffleETHDeposit[] }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Date</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">Amount (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
@@ -156,7 +156,11 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
       }, 2000);
     } catch (err: unknown) {
       if (isUserRejection(err)) {
-        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
       } else {
         reportError(err, 'claim raffle ETH');
         const rawMsg = getEthErrorMessage(err, 'An error occurred');
@@ -184,15 +188,17 @@ const UserRaffleETHPage = ({ address: rawAddress }: { address: string }) => {
 
       <div className="mt-8">
         <div className="mb-4 flex items-center justify-between">
-          <h4 className="text-lg font-semibold leading-none">Raffle ETH User Won</h4>
+          <h4 className="text-lg font-semibold leading-none">
+            Stellar Selection ETH allocated to this participant
+          </h4>
 
           {status?.ETHRaffleToClaim > 0 && account === validatedAddress && (
             <div className="flex items-center gap-4">
               <span className="mr-4">
-                Your claimable winnings are {status.ETHRaffleToClaim.toFixed(6)} ETH
+                Your retrievable allocations are {status.ETHRaffleToClaim.toFixed(6)} ETH
               </span>
               <Button onClick={handleAllETHClaim} disabled={isClaiming}>
-                Claim All
+                Retrieve All
               </Button>
             </div>
           )}

@@ -66,7 +66,9 @@ describe('UserRaffleETHPage', () => {
       refetch: mockRefetchDeposits,
     });
     render(<UserRaffleETHPage address={validAddr} />);
-    expect(screen.getByText('Raffle ETH User Won')).toBeInTheDocument();
+    expect(
+      screen.getByText('Stellar Selection ETH allocated to this participant'),
+    ).toBeInTheDocument();
   });
 
   it('shows empty state when no deposits', () => {
@@ -77,7 +79,7 @@ describe('UserRaffleETHPage', () => {
       refetch: mockRefetchDeposits,
     });
     render(<UserRaffleETHPage address={validAddr} />);
-    expect(screen.getByText('No Raffle ETH yet.')).toBeInTheDocument();
+    expect(screen.getByText('No Stellar Selection ETH yet.')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

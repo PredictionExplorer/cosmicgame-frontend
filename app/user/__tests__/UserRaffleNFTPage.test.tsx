@@ -54,7 +54,9 @@ describe('UserRaffleNFTPage', () => {
       error: null,
     });
     render(<UserRaffleNFTPage address={validAddr} />);
-    expect(screen.getByText('Raffle NFTs User Won')).toBeInTheDocument();
+    expect(
+      screen.getByText('Stellar Selection NFTs allocated to this participant'),
+    ).toBeInTheDocument();
   });
 
   it('shows empty state when no winnings', () => {
@@ -64,7 +66,7 @@ describe('UserRaffleNFTPage', () => {
       error: null,
     });
     render(<UserRaffleNFTPage address={validAddr} />);
-    expect(screen.getByText('No NFT winnings yet.')).toBeInTheDocument();
+    expect(screen.getByText('No NFT allocations yet.')).toBeInTheDocument();
   });
 
   it('sorts winnings by timestamp descending', () => {
@@ -102,7 +104,9 @@ describe('UserRaffleNFTPage', () => {
       error: null,
     });
     render(<UserRaffleNFTPage address={validAddr} />);
-    expect(screen.getByText('Raffle NFTs User Won')).toBeInTheDocument();
+    expect(
+      screen.getByText('Stellar Selection NFTs allocated to this participant'),
+    ).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
