@@ -66,15 +66,15 @@ describe('PrizeTable', () => {
   it('renders all 9 table headers', () => {
     render(<PrizeTable list={[createPrize()]} loading={false} />);
     for (const header of [
-      'Round',
+      'Cycle',
       'Finalized',
-      'Winner',
-      'Prize Amount',
-      'Bids',
-      'Donated NFTs',
-      'Raffle Deposits',
-      'Staking Deposit',
-      'NFTs Awarded',
+      'Recipient',
+      'Allocation Amount',
+      'Gestures',
+      'Attached NFTs',
+      'Stellar Selection Deposits',
+      'Anchor Distribution Deposit',
+      'NFTs Distributed',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
@@ -137,15 +137,15 @@ describe('PrizeTable', () => {
     it('each header contains its label text alongside a tooltip', () => {
       render(<PrizeTable list={[createPrize()]} loading={false} />);
       const headers = [
-        'Round',
+        'Cycle',
         'Finalized',
-        'Winner',
-        'Prize Amount',
-        'Bids',
-        'Donated NFTs',
-        'Raffle Deposits',
-        'Staking Deposit',
-        'NFTs Awarded',
+        'Recipient',
+        'Allocation Amount',
+        'Gestures',
+        'Attached NFTs',
+        'Stellar Selection Deposits',
+        'Anchor Distribution Deposit',
+        'NFTs Distributed',
       ];
       for (const label of headers) {
         const elements = screen.getAllByText(label);

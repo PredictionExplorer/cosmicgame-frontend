@@ -61,52 +61,53 @@ const PrizeRow = ({ prize }: { prize: RoundInfo }) => {
 
 const tableHeaders = [
   {
-    label: 'Round',
+    label: 'Cycle',
     width: '5%',
-    tooltip: 'The sequential round number in the game.',
+    tooltip: 'The sequential cycle number in the protocol.',
   },
   {
     label: 'Finalized',
     width: '20%',
-    tooltip: 'The date and time when this round ended and prizes were distributed.',
+    tooltip: 'The date and time when this cycle ended and allocations were distributed.',
   },
   {
-    label: 'Winner',
+    label: 'Recipient',
     width: '7%',
-    tooltip: 'The wallet address of the main prize winner.',
+    tooltip: 'The wallet address of the Signature Allocation recipient.',
   },
   {
-    label: 'Prize Amount',
+    label: 'Allocation Amount',
     width: '15%',
     align: 'center' as const,
-    tooltip: 'The total ETH awarded as the main prize for this round.',
+    tooltip: 'The total ETH distributed as the Signature Allocation for this cycle.',
   },
   {
-    label: 'Bids',
+    label: 'Gestures',
     width: '5%',
-    tooltip: 'Total number of bids placed during this round.',
+    tooltip: 'Total number of gestures made during this cycle.',
   },
   {
-    label: 'Donated NFTs',
+    label: 'Attached NFTs',
     width: '12%',
-    tooltip: 'Number of NFTs donated by participants during this round.',
+    tooltip: 'Number of NFTs attached to gestures by participants during this cycle.',
   },
   {
-    label: 'Raffle Deposits',
+    label: 'Stellar Selection Deposits',
     width: '12%',
     align: 'center' as const,
-    tooltip: 'Total ETH deposited into the raffle pool by participants.',
+    tooltip: 'Total ETH allocated to the Stellar Selection pool by participants.',
   },
   {
-    label: 'Staking Deposit',
+    label: 'Anchor Distribution Deposit',
     width: '11%',
     align: 'center' as const,
-    tooltip: 'Total ETH deposited into the staking pool, distributed among NFT stakers.',
+    tooltip:
+      'Total ETH allocated to the Anchor Distribution pool, distributed among NFT anchor-holders.',
   },
   {
-    label: 'NFTs Awarded',
+    label: 'NFTs Distributed',
     width: '13%',
-    tooltip: 'Total COSMIC NFTs awarded via raffle in this round.',
+    tooltip: 'Total Cosmic Signature NFTs distributed via Stellar Selection in this cycle.',
   },
 ];
 
