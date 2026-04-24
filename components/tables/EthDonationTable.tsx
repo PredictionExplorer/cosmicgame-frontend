@@ -43,7 +43,7 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
 
   const handleRowClick = () => {
     if (clickable) {
-      router.push(`/eth-donation/detail/${row.CGRecordId}`);
+      router.push(`/eth-contribution/detail/${row.CGRecordId}`);
     }
   };
 
@@ -70,7 +70,7 @@ const EthDonationRow: FC<EthDonationRowProps> = ({ row, showType }) => {
       <TablePrimaryCell align="center">
         <a
           className="text-inherit"
-          href={`/prize/${row.RoundNum}`}
+          href={`/allocation/${row.RoundNum}`}
           target="_blank"
           rel="noopener noreferrer"
         >

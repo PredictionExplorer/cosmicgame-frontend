@@ -34,7 +34,7 @@ const GlobalStakedTokensRow: FC<GlobalStakedTokensRowProps> = ({ row, IsRWLK }) 
 
       <TablePrimaryCell align="center">
         <Link
-          href={`/staking-action/${IsRWLK ? 1 : 0}/${row.StakeActionId}`}
+          href={`/anchor-action/${IsRWLK ? 1 : 0}/${row.StakeActionId}`}
           className="text-inherit"
         >
           {row.StakeActionId}

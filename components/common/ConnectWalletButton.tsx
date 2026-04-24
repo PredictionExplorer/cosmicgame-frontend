@@ -112,7 +112,7 @@ const ConnectWalletButton = ({
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer p-0">
               <NavLink
-                href="/my-winnings"
+                href="/my-allocations"
                 className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
               >
                 <Gift className="h-3.5 w-3.5 text-muted-foreground" />
@@ -133,7 +133,7 @@ const ConnectWalletButton = ({
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer p-0">
               <NavLink
-                href="/my-staking"
+                href="/my-anchors"
                 className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
               >
                 <Layers className="h-3.5 w-3.5 text-muted-foreground" />
@@ -142,7 +142,7 @@ const ConnectWalletButton = ({
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer p-0">
               <NavLink
-                href="/winning-history"
+                href="/recipient-history"
                 className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
               >
                 <History className="h-3.5 w-3.5 text-muted-foreground" />

@@ -76,7 +76,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
   const roundDisplay =
     nft?.RoundNum != null ? (
       <Link
-        href={`/prize/${nft.RoundNum}`}
+        href={`/allocation/${nft.RoundNum}`}
         className="text-inherit transition-colors no-underline print:!text-foreground hover:text-primary"
       >
         Round #{nft.RoundNum}

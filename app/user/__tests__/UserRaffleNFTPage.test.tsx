@@ -1,6 +1,6 @@
 import { checkA11y, render, screen } from '@/test-utils';
 
-import UserRaffleNFTPage from '../raffle-nft/[address]/UserRaffleNFTPage';
+import UserRaffleNFTPage from '../stellar-selection-nft/[address]/UserRaffleNFTPage';
 
 const mockUseRaffleNFTWinningsByUser = jest.fn().mockReturnValue({
   data: undefined,

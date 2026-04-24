@@ -83,14 +83,14 @@ describe('GlobalStakingActionsTable', () => {
     render(<GlobalStakingActionsTable list={[createRow({ ActionId: 7 })]} IsRWLK={false} />);
     const row = screen.getAllByText('Stake')[0]!.closest('tr');
     fireEvent.click(row!);
-    expect(mockPush).toHaveBeenCalledWith('/staking-action/0/7');
+    expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/7');
   });
 
   it('uses RWLK flag in navigation', () => {
     render(<GlobalStakingActionsTable list={[createRow({ ActionId: 3 })]} IsRWLK={true} />);
     const row = screen.getAllByText('Stake')[0]!.closest('tr');
     fireEvent.click(row!);
-    expect(mockPush).toHaveBeenCalledWith('/staking-action/1/3');
+    expect(mockPush).toHaveBeenCalledWith('/anchor-action/1/3');
   });
 
   it('has no accessibility violations', async () => {

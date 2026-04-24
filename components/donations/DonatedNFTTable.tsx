@@ -115,7 +115,7 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
 
       <TablePrimaryCell align="center">
         <Link
-          href={`/prize/${nft.RoundNum}`}
+          href={`/allocation/${nft.RoundNum}`}
           className="text-inherit text-[inherit]"
           target="_blank"
           rel="noopener noreferrer"

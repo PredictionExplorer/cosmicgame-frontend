@@ -469,7 +469,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => router.push(`/prize/${nft.RoundNum ?? 0}`)}
+                  onClick={() => router.push(`/allocation/${nft.RoundNum ?? 0}`)}
                   className="text-xs"
                 >
                   <Trophy className="h-3.5 w-3.5 mr-1.5" />

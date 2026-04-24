@@ -41,7 +41,7 @@ const StakingRewardMintsRow = ({ row }: { row: StakingRewardMint }) => {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${row.RoundNum}`} className="text-inherit">
+        <Link href={`/allocation/${row.RoundNum}`} className="text-inherit">
           {row.RoundNum}
         </Link>
       </TablePrimaryCell>

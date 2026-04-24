@@ -91,7 +91,7 @@ describe('BanBidTable', () => {
       render(<BanBidTable biddingHistory={[createBidHistory({ RoundNum: 5 })]} />);
     });
     const links = screen.getAllByRole('link');
-    const prizeLink = links.find((l) => l.getAttribute('href') === '/prize/5');
+    const prizeLink = links.find((l) => l.getAttribute('href') === '/allocation/5');
     expect(prizeLink).toBeInTheDocument();
   });
 

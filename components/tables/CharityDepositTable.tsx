@@ -55,7 +55,7 @@ const DonationRow = ({ donation }: DonationRowProps) => {
         ) : (
           <a
             className="text-inherit"
-            href={`/prize/${donation.RoundNum}`}
+            href={`/allocation/${donation.RoundNum}`}
             target="_blank"
             rel="noopener noreferrer"
           >

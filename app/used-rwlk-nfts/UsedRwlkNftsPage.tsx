@@ -55,7 +55,7 @@ const UsedRwlkNftRow = ({ nft }: { nft: UsedRwlkNftRecord }) => {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${nft.RoundNum}`} className="text-inherit">
+        <Link href={`/allocation/${nft.RoundNum}`} className="text-inherit">
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>

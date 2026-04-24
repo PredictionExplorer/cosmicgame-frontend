@@ -47,7 +47,7 @@ describe('NFTMetadata', () => {
     render(<NFTMetadata nft={fullNft} />);
     expect(screen.getByText('Round #42')).toBeInTheDocument();
     const link = screen.getByText('Round #42').closest('a');
-    expect(link).toHaveAttribute('href', '/prize/42');
+    expect(link).toHaveAttribute('href', '/allocation/42');
   });
 
   it('renders seed value', () => {

@@ -63,7 +63,7 @@ describe('CollectedCSTStakingRewardsTable', () => {
   it('renders round link', () => {
     render(<CollectedCSTStakingRewardsTable list={[createRow({ RoundNum: 7 })]} />);
     const link = screen.getByText('7').closest('a');
-    expect(link).toHaveAttribute('href', '/prize/7');
+    expect(link).toHaveAttribute('href', '/allocation/7');
   });
 
   it('renders only first page of results (perPage=5)', () => {

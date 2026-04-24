@@ -71,14 +71,14 @@ describe('StakingActionsTable', () => {
     render(<StakingActionsTable list={[createRow({ ActionId: 7 })]} IsRwalk={false} />);
     const row = screen.getAllByText('Stake')[0]!.closest('tr');
     fireEvent.click(row!);
-    expect(mockPush).toHaveBeenCalledWith('/staking-action/0/7');
+    expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/7');
   });
 
   it('navigates with IsRwalk=1 flag on row click', () => {
     render(<StakingActionsTable list={[createRow({ ActionId: 3 })]} IsRwalk={true} />);
     const row = screen.getAllByText('Stake')[0]!.closest('tr');
     fireEvent.click(row!);
-    expect(mockPush).toHaveBeenCalledWith('/staking-action/1/3');
+    expect(mockPush).toHaveBeenCalledWith('/anchor-action/1/3');
   });
 
   it('renders RWLK token link when IsRwalk', () => {

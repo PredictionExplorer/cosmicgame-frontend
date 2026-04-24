@@ -24,7 +24,7 @@ const PrizeRow = ({ prize }: { prize: RoundInfo }) => {
   if (!prize) return <TablePrimaryRow />;
 
   const handleRowClick = () => {
-    router.push(`/prize/${prize.RoundNum}`);
+    router.push(`/allocation/${prize.RoundNum}`);
   };
 
   return (

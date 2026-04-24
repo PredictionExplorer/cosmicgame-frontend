@@ -308,7 +308,7 @@ describe('HomePage', () => {
     render(<HomePage />);
     expect(screen.getByText(/Cycle 9 allocations/)).toBeInTheDocument();
     const link = screen.getByRole('link', { name: /Cycle 9 allocations/ });
-    expect(link).toHaveAttribute('href', '/prize/9');
+    expect(link).toHaveAttribute('href', '/allocation/9');
   });
 
   it('renders loading spinner and hides BidForm when loading', () => {

@@ -41,7 +41,7 @@ describe('CharityDepositTable', () => {
   it('renders round number as a link', () => {
     render(<CharityDepositTable list={[createDonation({ RoundNum: 5 })]} />);
     const roundLink = screen.getByText('5');
-    expect(roundLink.closest('a')).toHaveAttribute('href', '/prize/5');
+    expect(roundLink.closest('a')).toHaveAttribute('href', '/allocation/5');
   });
 
   it('renders blank cell for negative RoundNum', () => {

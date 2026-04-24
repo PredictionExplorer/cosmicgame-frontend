@@ -1,6 +1,6 @@
 import { checkA11y, render, screen } from '@/test-utils';
 
-import UserRaffleETHPage from '../raffle-eth/[address]/UserRaffleETHPage';
+import UserRaffleETHPage from '../stellar-selection-eth/[address]/UserRaffleETHPage';
 
 const mockRefetchDeposits = jest.fn();
 const mockUseRaffleDepositsByUser = jest.fn().mockReturnValue({

@@ -82,7 +82,7 @@ const WinnerRow = ({ winner }: { winner: RaffleWinnerEntry }) => {
         </TooltipProvider>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${RoundNum}`} className="text-inherit">
+        <Link href={`/allocation/${RoundNum}`} className="text-inherit">
           {RoundNum}
         </Link>
       </TablePrimaryCell>

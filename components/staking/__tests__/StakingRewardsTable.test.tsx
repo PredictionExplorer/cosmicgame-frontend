@@ -71,7 +71,7 @@ describe('StakingRewardsTable', () => {
     render(<StakingRewardsTable list={[createRow({ TokenId: 42 })]} address={ADDRESS} />);
     const row = screen.getByText('42').closest('tr');
     fireEvent.click(row!);
-    expect(mockPush).toHaveBeenCalledWith(`/rewards-by-token/${ADDRESS}/42`);
+    expect(mockPush).toHaveBeenCalledWith(`/distributions-by-token/${ADDRESS}/42`);
   });
 
   it('has no accessibility violations', async () => {

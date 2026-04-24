@@ -115,7 +115,7 @@ describe('PrizeTable', () => {
     render(<PrizeTable list={[createPrize({ RoundNum: 7 })]} loading={false} />);
     const row = screen.getByText('7').closest('tr');
     fireEvent.click(row!);
-    expect(mockPush).toHaveBeenCalledWith('/prize/7');
+    expect(mockPush).toHaveBeenCalledWith('/allocation/7');
   });
 
   it('renders only first page of results (perPage=10)', () => {

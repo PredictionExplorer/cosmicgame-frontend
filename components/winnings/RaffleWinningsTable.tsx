@@ -56,7 +56,7 @@ function RaffleWinningRow({
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link
-          href={`/prize/${RoundNum}`}
+          href={`/allocation/${RoundNum}`}
           className="text-inherit text-[inherit]"
           target="_blank"
           rel="noopener noreferrer"

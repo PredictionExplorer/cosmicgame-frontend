@@ -28,7 +28,7 @@ const StakingRewardsRow = ({ row, address }: { row: StakingReward; address: stri
   }
 
   const handleRowClick = () => {
-    router.push(`/rewards-by-token/${address}/${row.TokenId}`);
+    router.push(`/distributions-by-token/${address}/${row.TokenId}`);
   };
 
   return (

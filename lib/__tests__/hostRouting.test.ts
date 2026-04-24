@@ -125,32 +125,63 @@ describe('hostRouting', () => {
   });
 
   describe('APP_ONLY_PATH_PREFIXES', () => {
-    it('includes critical legacy dApp paths', () => {
+    it('includes critical dApp paths (cosmic-lexicon)', () => {
       expect(APP_ONLY_PATH_PREFIXES).toEqual(
         expect.arrayContaining([
-          '/bid',
-          '/prize',
-          '/staking',
+          '/gesture',
+          '/allocation',
+          '/anchoring',
           '/gallery',
-          '/current-round',
+          '/current-cycle',
           '/faq',
           '/admin',
         ]),
       );
     });
 
-    it('includes new lexicon-safe dApp paths', () => {
+    it('includes anchor, allocation, and public-goods paths', () => {
       expect(APP_ONLY_PATH_PREFIXES).toEqual(
         expect.arrayContaining([
           '/gesture',
           '/allocation',
           '/anchoring',
+          '/anchor-action',
           '/current-cycle',
           '/my-anchors',
           '/my-allocations',
           '/public-goods-contributions-cg',
+          '/public-goods-contributions-voluntary',
+          '/public-goods-retrievals',
+          '/coordination-changes',
+          '/recipient-history',
+          '/allocation-finalized',
+          '/eth-contribution',
+          '/distributions-by-token',
         ]),
       );
+    });
+
+    it('excludes legacy (pre-migration) paths entirely', () => {
+      const legacyPaths = [
+        '/bid',
+        '/prize',
+        '/prize-claimed',
+        '/staking',
+        '/staking-action',
+        '/my-winnings',
+        '/my-staking',
+        '/current-round',
+        '/winning-history',
+        '/changed-parameters',
+        '/charity-deposits-cg',
+        '/charity-deposits-voluntary',
+        '/charity-withdrawals',
+        '/rewards-by-token',
+        '/eth-donation',
+      ];
+      for (const legacy of legacyPaths) {
+        expect(APP_ONLY_PATH_PREFIXES).not.toContain(legacy);
+      }
     });
 
     it('does not include the landing root path', () => {
@@ -167,6 +198,11 @@ describe('hostRouting', () => {
         expect(prefix.startsWith('/')).toBe(true);
       }
     });
+
+    it('prefixes are sorted alphabetically for review stability', () => {
+      const sorted = [...APP_ONLY_PATH_PREFIXES].sort();
+      expect([...APP_ONLY_PATH_PREFIXES]).toEqual(sorted);
+    });
   });
 
   describe('isAppOnlyPath', () => {
@@ -180,12 +216,12 @@ describe('hostRouting', () => {
 
     it.each([
       '/gallery',
-      '/current-round',
+      '/current-cycle',
       '/faq',
-      '/staking',
-      '/bid/1',
-      '/prize/42',
-      '/my-staking',
+      '/anchoring',
+      '/gesture/1',
+      '/allocation/42',
+      '/my-anchors',
       '/admin',
       '/gesture/1',
       '/allocation/42',
@@ -196,7 +232,7 @@ describe('hostRouting', () => {
     });
 
     it('returns true for a nested path under a protected prefix', () => {
-      expect(isAppOnlyPath('/bid/123/details')).toBe(true);
+      expect(isAppOnlyPath('/gesture/123/details')).toBe(true);
       expect(isAppOnlyPath('/gallery/subview')).toBe(true);
     });
 
@@ -213,7 +249,7 @@ describe('hostRouting', () => {
     });
 
     it('treats exact match as true', () => {
-      expect(isAppOnlyPath('/bid')).toBe(true);
+      expect(isAppOnlyPath('/gesture')).toBe(true);
       expect(isAppOnlyPath('/gesture')).toBe(true);
       expect(isAppOnlyPath('/current-cycle')).toBe(true);
     });

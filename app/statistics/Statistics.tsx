@@ -141,7 +141,7 @@ const Statistics = () => {
 
       {/* Link to current cycle */}
       <Link
-        href="/current-round"
+        href="/current-cycle"
         className="gradient-border-card mb-12 flex items-center justify-between rounded-xl border border-primary/20 bg-gradient-to-r from-primary/[0.06] via-accent/[0.04] to-primary/[0.06] p-4 group hover:from-primary/[0.08] hover:to-primary/[0.08] transition-all"
       >
         <div>
@@ -196,7 +196,7 @@ const Statistics = () => {
               <StatisticsItem
                 title="Num Allocations Distributed"
                 value={
-                  <Link href="/prize" className="text-inherit">
+                  <Link href="/allocation" className="text-inherit">
                     {totalPrizesGiven as ReactNode}
                   </Link>
                 }
@@ -310,7 +310,7 @@ const Statistics = () => {
                 value={
                   <Link
                     className="text-inherit"
-                    href="/eth-donation"
+                    href="/eth-contribution"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -324,7 +324,7 @@ const Statistics = () => {
                   <StatisticsItem
                     title="Protocol Contributions"
                     value={
-                      <Link className="text-inherit" href="/charity-deposits-cg">
+                      <Link className="text-inherit" href="/public-goods-contributions-cg">
                         {data.MainStats.NumCosmicGameDonations}
                       </Link>
                     }
@@ -332,7 +332,7 @@ const Statistics = () => {
                   <StatisticsItem
                     title="Protocol Contributions Sum"
                     value={
-                      <Link className="text-inherit" href="/charity-deposits-cg">
+                      <Link className="text-inherit" href="/public-goods-contributions-cg">
                         {formatEthValue(data.MainStats.SumCosmicGameDonationsEth ?? 0)}
                       </Link>
                     }
@@ -343,7 +343,7 @@ const Statistics = () => {
                 <StatisticsItem
                   title="Voluntary Contributions"
                   value={
-                    <Link className="text-inherit" href="/charity-deposits-voluntary">
+                    <Link className="text-inherit" href="/public-goods-contributions-voluntary">
                       {`${data.NumVoluntaryDonations} totaling ${(Number(data.SumVoluntaryDonationsEth) || 0).toFixed(4)} ETH`}
                     </Link>
                   }
@@ -354,7 +354,7 @@ const Statistics = () => {
                 <StatisticsItem
                   title="Public Goods Retrievals"
                   value={
-                    <Link className="text-inherit" href="/charity-withdrawals">
+                    <Link className="text-inherit" href="/public-goods-retrievals">
                       {data.MainStats.NumWithdrawals}
                     </Link>
                   }

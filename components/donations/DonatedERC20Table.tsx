@@ -59,7 +59,7 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
 
       <TablePrimaryCell align="center">
         <Link
-          href={`/prize/${token.RoundNum}`}
+          href={`/allocation/${token.RoundNum}`}
           className="text-inherit text-[inherit]"
           target="_blank"
           rel="noopener noreferrer"

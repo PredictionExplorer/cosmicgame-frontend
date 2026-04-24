@@ -281,7 +281,7 @@ describe('Statistics', () => {
     expect(screen.getByText('Looking for current cycle data?')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /current cycle data/ })).toHaveAttribute(
       'href',
-      '/current-round',
+      '/current-cycle',
     );
   });
 

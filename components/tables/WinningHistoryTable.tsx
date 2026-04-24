@@ -124,7 +124,7 @@ const WinningHistoryRow = ({
       )}
       <TablePrimaryCell align="center">
         <a
-          href={`/prize/${history.RoundNum}`}
+          href={`/allocation/${history.RoundNum}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-inherit"

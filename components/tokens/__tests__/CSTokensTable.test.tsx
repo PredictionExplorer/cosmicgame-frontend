@@ -177,7 +177,9 @@ describe('CSTokensTable', () => {
   it('Round links to prize page', () => {
     const token = createToken({ RoundNum: 7 });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
-    const link = screen.getAllByRole('link').find((l) => l.getAttribute('href') === '/prize/7');
+    const link = screen
+      .getAllByRole('link')
+      .find((l) => l.getAttribute('href') === '/allocation/7');
     expect(link).toBeInTheDocument();
   });
 

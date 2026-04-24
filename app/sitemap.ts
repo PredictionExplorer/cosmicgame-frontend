@@ -21,39 +21,30 @@ interface SitemapEntry {
 const landingPages: SitemapEntry[] = [{ path: '', priority: 1.0, changeFrequency: 'weekly' }];
 
 /**
- * App sitemap: every dApp route. Includes both legacy paths and their
- * new lexicon-safe aliases so search engines can index either form.
+ * App sitemap: cosmic-lexicon-only URLs. No legacy paths; this is a
+ * brand-new-site launch.
  */
 const appPages: SitemapEntry[] = [
   { path: '', priority: 1.0, changeFrequency: 'hourly' },
-  { path: '/current-round', priority: 0.9, changeFrequency: 'hourly' },
   { path: '/current-cycle', priority: 0.9, changeFrequency: 'hourly' },
   { path: '/gallery', priority: 0.9, changeFrequency: 'hourly' },
   { path: '/statistics', priority: 0.8, changeFrequency: 'hourly' },
   { path: '/how-to-play', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/faq', priority: 0.9, changeFrequency: 'weekly' },
-  { path: '/staking', priority: 0.8, changeFrequency: 'daily' },
   { path: '/anchoring', priority: 0.8, changeFrequency: 'daily' },
-  { path: '/prize', priority: 0.8, changeFrequency: 'daily' },
   { path: '/allocation', priority: 0.8, changeFrequency: 'daily' },
   { path: '/marketing', priority: 0.7, changeFrequency: 'daily' },
   { path: '/mint', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/mint-artblocks', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/contracts', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/code', priority: 0.5, changeFrequency: 'monthly' },
-  { path: '/eth-donation', priority: 0.6, changeFrequency: 'daily' },
+  { path: '/eth-contribution', priority: 0.6, changeFrequency: 'daily' },
   { path: '/nft-donations', priority: 0.6, changeFrequency: 'daily' },
-  { path: '/winning-history', priority: 0.7, changeFrequency: 'daily' },
   { path: '/recipient-history', priority: 0.7, changeFrequency: 'daily' },
-  { path: '/prize-claimed', priority: 0.6, changeFrequency: 'daily' },
   { path: '/allocation-finalized', priority: 0.6, changeFrequency: 'daily' },
   { path: '/named-nfts', priority: 0.6, changeFrequency: 'daily' },
   { path: '/used-rwlk-nfts', priority: 0.5, changeFrequency: 'daily' },
-  { path: '/changed-parameters', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/coordination-changes', priority: 0.4, changeFrequency: 'monthly' },
-  { path: '/charity-deposits-cg', priority: 0.5, changeFrequency: 'daily' },
-  { path: '/charity-deposits-voluntary', priority: 0.5, changeFrequency: 'daily' },
-  { path: '/charity-withdrawals', priority: 0.5, changeFrequency: 'daily' },
   { path: '/public-goods-contributions-cg', priority: 0.5, changeFrequency: 'daily' },
   { path: '/public-goods-contributions-voluntary', priority: 0.5, changeFrequency: 'daily' },
   { path: '/public-goods-retrievals', priority: 0.5, changeFrequency: 'daily' },

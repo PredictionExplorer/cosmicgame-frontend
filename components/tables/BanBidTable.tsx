@@ -119,7 +119,7 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
       <TablePrimaryCell align="center">
         <a
           className="text-inherit"
-          href={`/prize/${history.RoundNum}`}
+          href={`/allocation/${history.RoundNum}`}
           target="_blank"
           rel="noopener noreferrer"
         >

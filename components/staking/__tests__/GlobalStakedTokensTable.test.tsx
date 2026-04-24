@@ -52,7 +52,7 @@ describe('GlobalStakedTokensTable', () => {
   it('renders action ID as link', () => {
     render(<GlobalStakedTokensTable list={[createRow({ StakeActionId: 20 })]} IsRWLK={false} />);
     const link = screen.getByText('20').closest('a');
-    expect(link).toHaveAttribute('href', '/staking-action/0/20');
+    expect(link).toHaveAttribute('href', '/anchor-action/0/20');
   });
 
   it('renders only first page of results (perPage=5)', () => {

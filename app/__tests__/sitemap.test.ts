@@ -65,17 +65,51 @@ describe('sitemap (host-aware)', () => {
       expect(urls).toContain('https://app.cosmicsignature.com');
     });
 
-    it('contains both legacy and new lexicon-safe paths', async () => {
+    it('contains only cosmic-lexicon paths (no legacy URLs)', async () => {
       const entries = await sitemap();
       const urls = entries.map((e) => e.url);
-      // Legacy
-      expect(urls).toContain('https://app.cosmicsignature.com/current-round');
-      expect(urls).toContain('https://app.cosmicsignature.com/staking');
-      expect(urls).toContain('https://app.cosmicsignature.com/prize');
-      // Lexicon-safe aliases
+      // Cosmic-lexicon paths are present.
       expect(urls).toContain('https://app.cosmicsignature.com/current-cycle');
       expect(urls).toContain('https://app.cosmicsignature.com/anchoring');
       expect(urls).toContain('https://app.cosmicsignature.com/allocation');
+      expect(urls).toContain('https://app.cosmicsignature.com/recipient-history');
+      expect(urls).toContain('https://app.cosmicsignature.com/allocation-finalized');
+      expect(urls).toContain('https://app.cosmicsignature.com/coordination-changes');
+      expect(urls).toContain('https://app.cosmicsignature.com/eth-contribution');
+      expect(urls).toContain('https://app.cosmicsignature.com/public-goods-contributions-cg');
+      expect(urls).toContain(
+        'https://app.cosmicsignature.com/public-goods-contributions-voluntary',
+      );
+      expect(urls).toContain('https://app.cosmicsignature.com/public-goods-retrievals');
+
+      // Legacy paths are absent.
+      const legacyPaths = [
+        '/current-round',
+        '/staking',
+        '/prize',
+        '/my-winnings',
+        '/my-staking',
+        '/winning-history',
+        '/prize-claimed',
+        '/changed-parameters',
+        '/eth-donation',
+        '/charity-deposits-cg',
+        '/charity-deposits-voluntary',
+        '/charity-withdrawals',
+      ];
+      for (const legacy of legacyPaths) {
+        expect(urls).not.toContain(`https://app.cosmicsignature.com${legacy}`);
+      }
+    });
+
+    it('does not include user-scoped routes (they are per-wallet, not crawlable)', async () => {
+      const entries = await sitemap();
+      const urls = entries.map((e) => e.url);
+      // These are per-user pages; they should not appear in a public sitemap.
+      expect(urls).not.toContain('https://app.cosmicsignature.com/my-allocations');
+      expect(urls).not.toContain('https://app.cosmicsignature.com/my-anchors');
+      expect(urls).not.toContain('https://app.cosmicsignature.com/my-tokens');
+      expect(urls).not.toContain('https://app.cosmicsignature.com/my-statistics');
     });
 
     it('contains expected static pages', async () => {

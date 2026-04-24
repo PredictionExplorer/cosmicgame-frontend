@@ -7,9 +7,6 @@ import {
   isLandingHost,
   normalizeHost,
 } from '@/lib/hostRouting';
-import { resolveNewPathToLegacy } from '@/lib/routeRewrites';
-
-export { PATH_REWRITES, resolveNewPathToLegacy } from '@/lib/routeRewrites';
 
 export const config = {
   matcher: [
@@ -44,14 +41,6 @@ export default function middleware(req: NextRequest) {
       const target = `${APP_ORIGIN}${pathname}${search}`;
       return NextResponse.redirect(target, 308);
     }
-  }
-
-  // Lexicon-safe URL aliases: serve legacy page handlers from new paths.
-  const legacyPath = resolveNewPathToLegacy(pathname);
-  if (legacyPath) {
-    const url = req.nextUrl.clone();
-    url.pathname = legacyPath;
-    return NextResponse.rewrite(url);
   }
 
   return NextResponse.next();

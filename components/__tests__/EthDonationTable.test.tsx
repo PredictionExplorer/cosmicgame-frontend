@@ -85,7 +85,7 @@ describe('EthDonationTable', () => {
   it('renders round number as a link', () => {
     render(<EthDonationTable list={[createDonation({ RoundNum: '5' })]} />);
     const roundLink = screen.getByText('5');
-    expect(roundLink.closest('a')).toHaveAttribute('href', '/prize/5');
+    expect(roundLink.closest('a')).toHaveAttribute('href', '/allocation/5');
     expect(roundLink.closest('a')).toHaveAttribute('target', '_blank');
     expect(roundLink.closest('a')).toHaveAttribute('rel', 'noopener noreferrer');
   });

@@ -90,7 +90,7 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
 
       <TablePrimaryCell align="center">
         <Link
-          href={`/prize/${RoundNum}`}
+          href={`/allocation/${RoundNum}`}
           className="text-inherit"
           target="_blank"
           rel="noopener noreferrer"

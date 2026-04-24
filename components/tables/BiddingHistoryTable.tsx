@@ -106,7 +106,7 @@ const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowPro
   }, [history.DonatedERC20TokenAddr, publicClient]);
 
   const handleRowClick = () => {
-    router.push(`/bid/${history.EvtLogId}`);
+    router.push(`/gesture/${history.EvtLogId}`);
   };
 
   if (!history) return <TablePrimaryRow />;

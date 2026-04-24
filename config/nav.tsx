@@ -20,9 +20,9 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
       title: 'Explore',
       route: '#',
       children: [
-        { title: 'Current Cycle', route: '/current-round' },
-        { title: 'Allocation Recipients', route: '/prize' },
-        { title: 'Anchor Distributions', route: '/staking' },
+        { title: 'Current Cycle', route: '/current-cycle' },
+        { title: 'Allocation Recipients', route: '/allocation' },
+        { title: 'Anchor Distributions', route: '/anchoring' },
         { title: 'Outreach Reserve', route: '/marketing' },
         { title: 'Statistics', route: '/statistics' },
         { title: 'Contracts', route: '/contracts' },
@@ -50,7 +50,7 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
           <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
         </span>
       ),
-      route: '/my-winnings',
+      route: '/my-allocations',
     });
   }
   return NAVS;

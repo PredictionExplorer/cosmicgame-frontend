@@ -103,10 +103,10 @@ describe('RaffleWinningsTable', () => {
     expect(screen.getByTestId('table-primary')).toBeInTheDocument();
   });
 
-  it('links round number to /prize/{round}', async () => {
+  it('links round number to /allocation/{round}', async () => {
     await renderAndFlush([winning]);
     const roundLink = screen.getByText('42').closest('a');
-    expect(roundLink).toHaveAttribute('href', '/prize/42');
+    expect(roundLink).toHaveAttribute('href', '/allocation/42');
   });
 
   it('has no accessibility violations', async () => {

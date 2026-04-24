@@ -230,7 +230,7 @@ const HomePage = () => {
           <div className="flex items-center gap-4">
             {(data?.CurRoundNum ?? 0) > 1 && (
               <Link
-                href={`/prize/${(data?.CurRoundNum ?? 0) - 1}`}
+                href={`/allocation/${(data?.CurRoundNum ?? 0) - 1}`}
                 className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
               >
                 Cycle {(data?.CurRoundNum ?? 0) - 1} allocations
@@ -238,7 +238,7 @@ const HomePage = () => {
               </Link>
             )}
             <Link
-              href="/changed-parameters"
+              href="/coordination-changes"
               className="text-xs text-muted-foreground/60 hover:text-primary transition-colors"
             >
               Parameters
@@ -393,7 +393,7 @@ const HomePage = () => {
           className="print-motion-visible"
         >
           <Link
-            href="/current-round"
+            href="/current-cycle"
             className="mt-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 group hover:bg-white/[0.04] transition-all duration-300"
           >
             <div>

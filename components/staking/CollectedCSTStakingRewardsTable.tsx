@@ -35,7 +35,7 @@ const CollectedRewardsRow = ({ row }: { row: StakingCSTReward }) => {
       <TablePrimaryCell align="center">{DepositId}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${RoundNum}`} className="text-inherit">
+        <Link href={`/allocation/${RoundNum}`} className="text-inherit">
           {RoundNum}
         </Link>
       </TablePrimaryCell>

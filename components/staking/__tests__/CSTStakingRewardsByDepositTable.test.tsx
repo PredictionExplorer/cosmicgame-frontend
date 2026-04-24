@@ -75,7 +75,7 @@ describe('CSTStakingRewardsByDepositTable', () => {
   it('renders deposit round link', () => {
     render(<CSTStakingRewardsByDepositTable list={[createRow({ DepositRoundNum: 7 })]} />);
     const link = screen.getByText('7').closest('a');
-    expect(link).toHaveAttribute('href', '/prize/7');
+    expect(link).toHaveAttribute('href', '/allocation/7');
   });
 
   it('renders datetime as explorer link', () => {

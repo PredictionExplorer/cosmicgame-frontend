@@ -156,7 +156,7 @@ const StakedTokenRow = ({
 
       <TablePrimaryCell align="center">
         <Link
-          href={`/staking-action/${isRandomWalk ? 1 : 0}/${stakeActionId}`}
+          href={`/anchor-action/${isRandomWalk ? 1 : 0}/${stakeActionId}`}
           className="text-inherit"
           target="_blank"
           rel="noopener noreferrer"

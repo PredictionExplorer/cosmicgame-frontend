@@ -56,7 +56,7 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
       <TablePrimaryCell align="center">{nft.TokenName || ' '}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${nft.RoundNum}`} className="text-inherit">
+        <Link href={`/allocation/${nft.RoundNum}`} className="text-inherit">
           {nft.RoundNum}
         </Link>
       </TablePrimaryCell>
@@ -84,7 +84,7 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
         ) : nft.RecordType === 2 ? (
           'Anchor RandomWalk NFT'
         ) : nft.RecordType === 3 ? (
-          <Link href={`/prize/${nft.RoundNum}`} className="text-inherit">
+          <Link href={`/allocation/${nft.RoundNum}`} className="text-inherit">
             Signature Allocation Recipient (#{nft.RoundNum})
           </Link>
         ) : nft.RecordType === 4 ? (

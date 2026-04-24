@@ -50,7 +50,7 @@ const CSTStakingRewardsByDepositRow = ({ row }: { row: CSTStakingRewardByDeposit
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Link href={`/prize/${row.DepositRoundNum}`} className="text-inherit">
+        <Link href={`/allocation/${row.DepositRoundNum}`} className="text-inherit">
           {row.DepositRoundNum}
         </Link>
       </TablePrimaryCell>

@@ -41,7 +41,7 @@ const GlobalStakingActionsRow: FC<GlobalStakingActionsRowProps> = ({ row, IsRWLK
   }
 
   const handleRowClick = () => {
-    router.push(`/staking-action/${IsRWLK ? 1 : 0}/${row.ActionId}`);
+    router.push(`/anchor-action/${IsRWLK ? 1 : 0}/${row.ActionId}`);
   };
 
   return (

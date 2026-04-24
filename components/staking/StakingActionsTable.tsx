@@ -26,7 +26,7 @@ const StakingActionsRow = ({ row, IsRwalk }: { row: StakingAction; IsRwalk: bool
   }
 
   const handleRowClick = () => {
-    router.push(`/staking-action/${IsRwalk ? 1 : 0}/${row.ActionId}`);
+    router.push(`/anchor-action/${IsRwalk ? 1 : 0}/${row.ActionId}`);
   };
 
   return (

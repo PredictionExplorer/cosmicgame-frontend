@@ -41,7 +41,7 @@ describe('RwalkStakingRewardMintsTable', () => {
   it('renders round link', () => {
     render(<RwalkStakingRewardMintsTable list={[createRow({ RoundNum: 7 })]} />);
     const link = screen.getByText('7').closest('a');
-    expect(link).toHaveAttribute('href', '/prize/7');
+    expect(link).toHaveAttribute('href', '/allocation/7');
   });
 
   it('renders token ID link', () => {

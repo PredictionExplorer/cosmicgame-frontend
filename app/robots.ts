@@ -27,22 +27,24 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
   const siteUrl = onAppHost ? APP_URL : LANDING_URL;
 
-  // On the landing host, disallow all paths except the root and legal docs
-  // (those that are OK to crawl on the marketing site). Everything else
-  // exists on app.cosmicsignature.com and the proxy redirects there.
+  // On the landing host, disallow dApp paths. Everything dApp-related lives on
+  // app.cosmicsignature.com and the proxy redirects there. Cosmic-lexicon-only.
   const landingDisallow = [
     '/admin/',
+    '/allocation',
+    '/anchor-action/',
+    '/anchoring',
     '/api/',
+    '/coordination-changes',
+    '/current-cycle',
+    '/eth-contribution',
     '/gallery/',
-    '/current-round/',
-    '/current-cycle/',
-    '/staking/',
-    '/anchoring/',
+    '/gesture/',
     '/my-',
-    '/prize/',
-    '/allocation/',
-    '/charity-',
+    '/nft-donations',
     '/public-goods-',
+    '/recipient-history',
+    '/statistics',
   ];
 
   const appDisallow = ['/admin/', '/api/'];
