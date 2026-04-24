@@ -18,7 +18,7 @@ interface DonatedTokensSectionProps {
   perPage: number;
 }
 
-/** Tabbed display of donated NFTs (grid) and ERC-20 tokens (table) for the current round, with pagination. */
+/** Tabbed display of attached NFTs (grid) and ERC-20 tokens (table) for the current cycle, with pagination. */
 export function DonatedTokensSection({
   donatedNFTs,
   donatedERC20Tokens,
@@ -38,8 +38,8 @@ export function DonatedTokensSection({
   return (
     <div>
       <div className="flex items-center gap-2 mb-6">
-        <SectionDivider title="Donated Tokens" className="flex-1" />
-        <InfoTooltip content="NFTs and ERC-20 tokens donated by the community to enrich the round's prize pool." />
+        <SectionDivider title="Attached Tokens" className="flex-1" />
+        <InfoTooltip content="NFTs and ERC-20 tokens attached to gestures by the community to enrich the cycle's Cycle Reserve." />
       </div>
       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(271,98%,60%)]/40">
         <Tabs
@@ -75,7 +75,7 @@ export function DonatedTokensSection({
               </>
             ) : (
               <p className="text-muted-foreground text-sm">
-                No ERC721 tokens were donated this round.
+                No ERC721 tokens were attached this cycle.
               </p>
             )}
           </TabsContent>

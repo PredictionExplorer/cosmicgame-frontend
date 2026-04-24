@@ -18,7 +18,7 @@ interface WinningHistorySectionProps {
   setTwitterHandle: (handle: string) => void;
 }
 
-/** Shows the winning history table with a lightbox for the latest NFT and Twitter sharing controls. */
+/** Shows the recipient history table with a lightbox for the latest NFT and Twitter sharing controls. */
 export function WinningHistorySection({
   claimHistory,
   imageOpen,
@@ -38,7 +38,7 @@ export function WinningHistorySection({
       <div className="container mx-auto px-4">
         <div className="my-[100px]">
           <h4 className="text-2xl font-semibold text-center mb-12 text-foreground">
-            History of Winnings
+            History of Allocations
           </h4>
           {claimHistory === null ? (
             <p className="text-lg font-medium text-foreground">Loading...</p>

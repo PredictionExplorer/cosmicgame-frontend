@@ -67,10 +67,10 @@ describe('RaffleWinningsTable', () => {
   it('renders table headers', async () => {
     await renderAndFlush([]);
     expect(screen.getByText('Datetime')).toBeInTheDocument();
-    expect(screen.getByText('Round')).toBeInTheDocument();
-    expect(screen.getByText('Winner')).toBeInTheDocument();
+    expect(screen.getByText('Cycle')).toBeInTheDocument();
+    expect(screen.getByText('Recipient')).toBeInTheDocument();
     expect(screen.getByText('Amount (ETH)')).toBeInTheDocument();
-    expect(screen.getByText('Claimed')).toBeInTheDocument();
+    expect(screen.getByText('Retrieved')).toBeInTheDocument();
   });
 
   it('renders a winning row with correct data', async () => {

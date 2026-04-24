@@ -127,11 +127,11 @@ export function RaffleWinningsTable({ list }: { list: RaffleWinning[] }) {
         <TablePrimaryHead>
           <Tr>
             <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Amount (ETH)</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Claimed</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Retrieved</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
         <Tbody>

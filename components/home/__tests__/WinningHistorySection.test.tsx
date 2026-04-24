@@ -65,9 +65,9 @@ describe('WinningHistorySection', () => {
     expect(screen.getByTestId('winning-table')).toHaveTextContent('2 entries');
   });
 
-  it('renders History of Winnings heading', () => {
+  it('renders History of Allocations heading', () => {
     render(<WinningHistorySection {...defaultProps} />);
-    expect(screen.getByText('History of Winnings')).toBeInTheDocument();
+    expect(screen.getByText('History of Allocations')).toBeInTheDocument();
   });
 
   it('renders Twitter section heading', () => {

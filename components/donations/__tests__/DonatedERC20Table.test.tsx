@@ -40,12 +40,12 @@ describe('DonatedERC20Table', () => {
     render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
     for (const header of [
       'Datetime',
-      'Round #',
+      'Cycle #',
       'Token Address',
-      'Donated Amount',
-      'Claimed Amount',
-      'Winner',
-      'Claimed',
+      'Attached Amount',
+      'Retrieved Amount',
+      'Recipient',
+      'Retrieved',
       'Expiration Date',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);

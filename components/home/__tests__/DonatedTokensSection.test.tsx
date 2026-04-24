@@ -52,10 +52,10 @@ const defaultProps = {
 describe('DonatedTokensSection', () => {
   it('renders SectionDivider heading', () => {
     render(<DonatedTokensSection {...defaultProps} />);
-    expect(screen.getByText('Donated Tokens')).toBeInTheDocument();
+    expect(screen.getByText('Attached Tokens')).toBeInTheDocument();
   });
 
-  it('renders InfoTooltip for donated tokens', () => {
+  it('renders InfoTooltip for attached tokens', () => {
     const { container } = render(<DonatedTokensSection {...defaultProps} />);
     const tooltipTriggers = container.querySelectorAll('[data-state="closed"]');
     expect(tooltipTriggers.length).toBeGreaterThanOrEqual(1);
@@ -69,7 +69,7 @@ describe('DonatedTokensSection', () => {
 
   it('shows empty state for ERC721 when no NFTs', () => {
     render(<DonatedTokensSection {...defaultProps} donatedTokensTab={0} />);
-    expect(screen.getByText('No ERC721 tokens were donated this round.')).toBeInTheDocument();
+    expect(screen.getByText('No ERC721 tokens were attached this cycle.')).toBeInTheDocument();
   });
 
   it('renders NFT grid when NFTs are provided', () => {
