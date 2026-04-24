@@ -59,7 +59,7 @@ const DonatedNFT = ({ nft }: DonatedNFTProps) => {
         >
           #{nft.NFTTokenId}
         </span>
-        <span className="text-primary [text-shadow:0px_0px_8px_var(--background)]">Donated</span>
+        <span className="text-primary [text-shadow:0px_0px_8px_var(--background)]">Attached</span>
       </div>
     </StyledCard>
   );

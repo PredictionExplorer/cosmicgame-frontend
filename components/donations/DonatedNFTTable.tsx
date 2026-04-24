@@ -198,7 +198,7 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
   const [page, setPage] = useState<number>(1);
 
   if (!list || list.length === 0) {
-    return <p>No donated NFTs yet.</p>;
+    return <p>No attached NFTs yet.</p>;
   }
 
   return (

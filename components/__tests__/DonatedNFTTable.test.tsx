@@ -24,7 +24,7 @@ describe('DonatedNFTTable', () => {
 
   test('with no records', () => {
     render(<DonatedNFTTable list={[]} claimingTokens={[]} />);
-    expect(screen.getByText('No donated NFTs yet.')).toBeInTheDocument();
+    expect(screen.getByText('No attached NFTs yet.')).toBeInTheDocument();
   });
 
   test('with mock data', async () => {

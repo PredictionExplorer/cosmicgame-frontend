@@ -39,10 +39,10 @@ describe('GlobalStakingActionsTable', () => {
   it('renders table headers', () => {
     render(<GlobalStakingActionsTable list={[createRow()]} IsRWLK={false} />);
     for (const header of [
-      'Stake Datetime',
+      'Anchor Datetime',
       'Action Type',
       'Token ID',
-      'Staker Address',
+      'Anchor-holder Address',
       'Number of NFTs',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);

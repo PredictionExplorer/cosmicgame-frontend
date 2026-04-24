@@ -34,7 +34,7 @@ const appPages: SitemapEntry[] = [
   { path: '/anchoring', priority: 0.8, changeFrequency: 'daily' },
   { path: '/allocation', priority: 0.8, changeFrequency: 'daily' },
   { path: '/marketing', priority: 0.7, changeFrequency: 'daily' },
-  { path: '/mint', priority: 0.7, changeFrequency: 'weekly' },
+  { path: '/imprint', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/contracts', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/code', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/eth-contribution', priority: 0.6, changeFrequency: 'daily' },

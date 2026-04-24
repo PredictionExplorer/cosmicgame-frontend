@@ -224,7 +224,7 @@ describe('hostRouting', () => {
         '/gesture',
         '/how-it-works',
         '/marketing',
-        '/mint',
+        '/imprint',
         '/my-allocations',
         '/my-anchors',
         '/my-statistics',

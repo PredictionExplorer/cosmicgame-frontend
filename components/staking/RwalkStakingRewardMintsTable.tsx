@@ -74,8 +74,8 @@ export const RwalkStakingRewardMintsTable = ({ list }: { list: StakingRewardMint
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Winner</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

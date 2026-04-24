@@ -236,11 +236,11 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
                 </DropdownMenu>
               </TablePrimaryHeadCell>
 
-              <TablePrimaryHeadCell align="left">Mint Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Imprint Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Recipient Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>
                 <span className="sr-only">Actions</span>
               </TablePrimaryHeadCell>

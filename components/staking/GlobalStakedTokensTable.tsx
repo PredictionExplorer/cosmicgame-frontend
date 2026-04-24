@@ -86,10 +86,10 @@ export const GlobalStakedTokensTable: FC<GlobalStakedTokensTableProps> = ({ list
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Stake Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Anchor Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Staker Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Anchor-holder Address</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

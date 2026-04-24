@@ -95,7 +95,7 @@ function GridCard({ nft, image, hasName, index }: CardInnerProps) {
                     </span>
                   </TooltipTrigger>
                   <TooltipContent side="left">
-                    <p>Currently staked and earning rewards</p>
+                    <p>Currently anchored and receiving Anchor Distributions</p>
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -205,7 +205,7 @@ function ListRow({ nft, image, hasName, index }: CardInnerProps) {
                     </span>
                   </TooltipTrigger>
                   <TooltipContent side="left">
-                    <p>Currently staked and earning rewards</p>
+                    <p>Currently anchored and receiving Anchor Distributions</p>
                   </TooltipContent>
                 </Tooltip>
               )}

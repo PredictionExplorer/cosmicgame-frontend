@@ -54,7 +54,7 @@ describe('RaffleWinnerTable', () => {
       />,
     );
     expect(screen.getAllByText('Datetime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Winner').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Recipient').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Type').length).toBeGreaterThanOrEqual(1);
   });
 

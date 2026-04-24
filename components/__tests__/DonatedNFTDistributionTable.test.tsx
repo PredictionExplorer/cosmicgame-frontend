@@ -6,7 +6,7 @@ import '@testing-library/jest-dom';
 describe('DonatedNFTDistributionTable', () => {
   test('with no records', () => {
     render(<DonatedNFTDistributionTable list={[]} />);
-    expect(screen.getByText('No donated tokens yet.')).toBeInTheDocument();
+    expect(screen.getByText('No attached tokens yet.')).toBeInTheDocument();
   });
 
   test('with mock data', () => {

@@ -145,8 +145,8 @@ const RaffleWinnerTable = ({
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Winner</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Round #</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Recipient</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">Cycle #</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Type</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="center">Expiration Date</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>

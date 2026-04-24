@@ -16,7 +16,7 @@ const VideoPlayerDialog = ({ open, videoPath, onClose }: VideoPlayerDialogProps)
       aria-describedby={undefined}
     >
       <VisuallyHidden.Root asChild>
-        <DialogTitle>Video Player</DialogTitle>
+        <DialogTitle>Video</DialogTitle>
       </VisuallyHidden.Root>
       {videoPath && (
         <video

@@ -128,8 +128,8 @@ describe('CSTTable', () => {
     // so we use getAllByText and check at least one match exists
     expect(screen.getAllByText('Token ID').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Token Name').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Round').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Winner Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Prize Type').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Cycle').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Recipient Address').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Allocation Type').length).toBeGreaterThanOrEqual(1);
   });
 });

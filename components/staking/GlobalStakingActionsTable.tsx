@@ -115,10 +115,10 @@ export const GlobalStakingActionsTable: FC<GlobalStakingActionsTableProps> = ({ 
 
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Stake Datetime</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Anchor Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Staker Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Anchor-holder Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

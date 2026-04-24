@@ -42,7 +42,13 @@ describe('CSTokensTable', () => {
 
   it('renders table headers', () => {
     render(<CSTokensTable {...defaultProps} list={[createToken()]} />);
-    for (const header of ['Mint Datetime', 'Token ID', 'Token Name', 'Round', 'Winner Address']) {
+    for (const header of [
+      'Imprint Datetime',
+      'Token ID',
+      'Token Name',
+      'Cycle',
+      'Recipient Address',
+    ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });

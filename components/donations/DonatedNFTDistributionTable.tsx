@@ -53,7 +53,7 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
   );
 
   if (list.length === 0) {
-    return <p>No donated tokens yet.</p>;
+    return <p>No attached tokens yet.</p>;
   }
 
   return (

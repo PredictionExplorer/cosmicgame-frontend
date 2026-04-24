@@ -62,7 +62,7 @@ describe('VideoPlayerDialog', () => {
     const dialog = screen.getByRole('dialog');
     const heading = dialog.querySelector('h2');
     expect(heading).toBeInTheDocument();
-    expect(heading).toHaveTextContent('Video Player');
+    expect(heading).toHaveTextContent('Video');
   });
 
   it('does not produce console.error about missing DialogTitle', () => {

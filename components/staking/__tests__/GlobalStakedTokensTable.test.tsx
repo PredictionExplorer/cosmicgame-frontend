@@ -24,7 +24,7 @@ describe('GlobalStakedTokensTable', () => {
 
   it('renders table headers', () => {
     render(<GlobalStakedTokensTable list={[createRow()]} IsRWLK={false} />);
-    for (const header of ['Stake Datetime', 'Action ID', 'Token ID', 'Staker Address']) {
+    for (const header of ['Anchor Datetime', 'Action ID', 'Token ID', 'Anchor-holder Address']) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });

@@ -72,8 +72,8 @@ const UsedRwlkNftsTable = ({ list }: { list: UsedRwlkNftRecord[] }) => {
         <TablePrimaryHead>
           <Tr>
             <TablePrimaryHeadCell align="left">DateTime</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Bidder Address</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Participant Address</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Token Id</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>

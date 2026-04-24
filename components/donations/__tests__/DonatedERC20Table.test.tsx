@@ -33,7 +33,7 @@ const createToken = (overrides = {}) => ({
 describe('DonatedERC20Table', () => {
   it('renders empty state when list is empty', () => {
     render(<DonatedERC20Table list={[]} handleClaim={null} />);
-    expect(screen.getByText('No donated ERC20 tokens yet.')).toBeInTheDocument();
+    expect(screen.getByText('No attached ERC20 tokens yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {

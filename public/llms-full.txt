@@ -21,7 +21,7 @@ The NFT artwork is derived from the three-body problem in physics — simulating
 - **Allocations** (https://www.cosmicsignature.com/allocation): Current and historical Cycle Reserve details
 - **Contracts** (https://www.cosmicsignature.com/contracts): Smart contract addresses, ABIs, and fund distribution breakdown
 - **Outreach** (https://www.cosmicsignature.com/marketing): Outreach Allocation program for community contributors
-- **Imprint** (https://www.cosmicsignature.com/mint): Interface for imprinting new tokens
+- **Imprint** (https://www.cosmicsignature.com/imprint): Interface for imprinting new tokens
 - **Current Cycle** (https://www.cosmicsignature.com/current-cycle): Detailed view of the active cycle including gesture history, leaderboards, contributions, and allocation distribution
 
 ### User Pages

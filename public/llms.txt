@@ -17,7 +17,7 @@ Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants
 - [Allocation](https://www.cosmicsignature.com/allocation): Current Cycle Reserve and allocation tracks
 - [Contracts](https://www.cosmicsignature.com/contracts): Smart contract details and addresses
 - [Outreach](https://www.cosmicsignature.com/marketing): Outreach allocation program
-- [Imprint](https://www.cosmicsignature.com/mint): Imprint new tokens
+- [Imprint](https://www.cosmicsignature.com/imprint): Imprint new tokens
 
 ## Protocol Mechanics
 

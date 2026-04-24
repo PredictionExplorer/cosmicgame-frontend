@@ -24,7 +24,7 @@ describe('RwalkStakingRewardMintsTable', () => {
 
   it('renders table headers', () => {
     render(<RwalkStakingRewardMintsTable list={[createRow()]} />);
-    for (const header of ['Datetime', 'Winner', 'Round', 'Token ID']) {
+    for (const header of ['Datetime', 'Recipient', 'Cycle', 'Token ID']) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });

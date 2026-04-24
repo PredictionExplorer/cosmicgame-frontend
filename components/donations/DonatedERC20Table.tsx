@@ -156,7 +156,7 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
   }, []);
 
   if (!list || list.length === 0) {
-    return <p>No donated ERC20 tokens yet.</p>;
+    return <p>No attached ERC20 tokens yet.</p>;
   }
 
   return (

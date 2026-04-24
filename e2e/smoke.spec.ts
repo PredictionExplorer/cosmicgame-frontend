@@ -25,7 +25,7 @@ const staticRoutes = [
   '/my-anchors',
   '/my-allocations',
   '/my-statistics',
-  '/mint',
+  '/imprint',
   '/admin',
 ];
 

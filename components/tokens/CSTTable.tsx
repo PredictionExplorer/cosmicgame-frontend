@@ -134,11 +134,11 @@ export function CSTTable({ list }: { list: CSTTokenInfo[] }) {
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Winner Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Currently Staked?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Staked Once?</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Prize Type</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Recipient Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Currently Anchored?</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Anchored Once?</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Allocation Type</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>
