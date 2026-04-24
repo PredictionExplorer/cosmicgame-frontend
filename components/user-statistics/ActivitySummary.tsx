@@ -88,17 +88,17 @@ export function ActivitySummary({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:divide-x sm:divide-white/[0.06]">
           <StatGroup
             icon={<Gavel className="h-3.5 w-3.5" />}
-            title="Bidding"
+            title="Gestures"
             stats={[
               {
-                label: 'Bids Placed',
+                label: 'Gestures Made',
                 value: userInfo.NumBids.toLocaleString(),
-                tooltip: 'Total bids across all rounds.',
+                tooltip: 'Total gestures across all cycles.',
               },
               {
-                label: 'Max Bid',
+                label: 'Max Gesture',
                 value: formatEthValue(userInfo.MaxBidAmount ?? 0),
-                tooltip: 'The highest single bid you have ever placed.',
+                tooltip: 'The highest single gesture you have ever made.',
               },
             ]}
           />
@@ -121,18 +121,18 @@ export function ActivitySummary({
           />
           <StatGroup
             icon={<Layers className="h-3.5 w-3.5" />}
-            title="Staking"
+            title="Anchoring"
             className="sm:pl-6"
             stats={[
               {
-                label: 'Stake Actions',
+                label: 'Anchor Actions',
                 value: totalStakeActions.toLocaleString(),
-                tooltip: 'Combined stake and unstake actions for RandomWalk NFTs.',
+                tooltip: 'Combined anchor and release actions for RandomWalk NFTs.',
               },
               {
-                label: 'Rewards Earned',
+                label: 'Distributions Received',
                 value: formatEthValue(totalStakeRewardEth),
-                tooltip: 'Total ETH earned from staking CosmicSignature NFTs.',
+                tooltip: 'Total ETH received from anchoring Cosmic Signature NFTs.',
               },
             ]}
           />

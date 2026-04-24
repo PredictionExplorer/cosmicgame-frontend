@@ -49,8 +49,8 @@ describe('ActivitySummary', () => {
 
   it('renders bidding stats', () => {
     render(<ActivitySummary {...baseProps} />);
-    expect(screen.getByText('Bids Placed')).toBeInTheDocument();
-    expect(screen.getByText('Max Bid')).toBeInTheDocument();
+    expect(screen.getByText('Gestures Made')).toBeInTheDocument();
+    expect(screen.getByText('Max Gesture')).toBeInTheDocument();
   });
 
   it('renders raffle stats', () => {
@@ -61,8 +61,8 @@ describe('ActivitySummary', () => {
 
   it('renders staking stats', () => {
     render(<ActivitySummary {...baseProps} />);
-    expect(screen.getByText('Stake Actions')).toBeInTheDocument();
-    expect(screen.getByText('Rewards Earned')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Actions')).toBeInTheDocument();
+    expect(screen.getByText('Distributions Received')).toBeInTheDocument();
   });
 
   it('displays correct bid count', () => {
@@ -72,7 +72,7 @@ describe('ActivitySummary', () => {
 
   it('displays combined stake actions count', () => {
     render(<ActivitySummary {...baseProps} />);
-    const stakeLabel = screen.getByText('Stake Actions');
+    const stakeLabel = screen.getByText('Anchor Actions');
     const stakeRow = stakeLabel.closest('div')!.parentElement!;
     expect(stakeRow).toHaveTextContent('5');
   });
