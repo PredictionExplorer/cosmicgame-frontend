@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { SectionCard, detailPanelClass } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +30,7 @@ const AdminSettingsPage = () => {
   const { data, isLoading } = useDashboardInfo();
 
   return (
-    <MainWrapper className="max-sm:pb-16">
+    <PageShell variant="data" className="max-sm:pb-16">
       <div className="mx-auto max-w-4xl">
         <PageHeader
           title="Administrative methods"
@@ -317,7 +317,7 @@ const AdminSettingsPage = () => {
           </SectionCard>
         )}
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

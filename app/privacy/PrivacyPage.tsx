@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Shield, Lock, Eye, Database, UserCheck } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -107,7 +107,7 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <MainWrapper className="max-sm:pb-16">
+    <PageShell variant="form" className="max-sm:pb-16">
       <PageHeader
         title="Privacy Policy"
         subtitle="Your privacy is important to us. This policy explains how Cosmic Signature collects, uses, and protects your information when you interact with our decentralized application."
@@ -237,6 +237,6 @@ export default function PrivacyPage() {
           </CardContent>
         </Card>
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { SectionDivider } from '@/components/ui/section-divider';
 
 import { HeroSection } from './components/HeroSection';
@@ -16,7 +16,7 @@ import { CallToAction } from './components/CallToAction';
 const HowToPlayPage = () => {
   return (
     <TooltipProvider delayDuration={150}>
-      <MainWrapper>
+      <PageShell variant="marketing" backdrop="signature">
         <HeroSection />
         <SectionDivider />
         <GameOverview />
@@ -32,7 +32,7 @@ const HowToPlayPage = () => {
         <FAQCallout />
         <SectionDivider />
         <CallToAction />
-      </MainWrapper>
+      </PageShell>
     </TooltipProvider>
   );
 };

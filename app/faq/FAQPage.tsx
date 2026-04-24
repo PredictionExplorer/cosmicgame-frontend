@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { SectionDivider } from '@/components/ui/section-divider';
 
 import { faqCategories, findItemByHash, getTotalQuestionCount } from './data/faq-data';
@@ -146,7 +146,7 @@ const FAQPage = () => {
 
   return (
     <TooltipProvider delayDuration={150}>
-      <MainWrapper>
+      <PageShell variant="marketing" backdrop="signature">
         <HeroSection
           searchValue={searchInput}
           onSearchChange={setSearchInput}
@@ -203,7 +203,7 @@ const FAQPage = () => {
 
         <SectionDivider className="mt-12" />
         <ContactCTA />
-      </MainWrapper>
+      </PageShell>
     </TooltipProvider>
   );
 };

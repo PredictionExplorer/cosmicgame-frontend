@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { getAddress, isAddress } from 'viem';
 
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import MarketingRewardsTable, {
   type MarketingReward,
 } from '@/components/tables/MarketingRewardsTable';
@@ -28,7 +28,7 @@ const MarketingRewardsPage = ({ address: rawAddress }: MarketingRewardsPageProps
   );
 
   return (
-    <MainWrapper>
+    <PageShell variant="marketing" backdrop="signature">
       {invalidAddress ? (
         <p className="text-lg font-semibold">Invalid Ethereum Address</p>
       ) : (
@@ -53,7 +53,7 @@ const MarketingRewardsPage = ({ address: rawAddress }: MarketingRewardsPageProps
           )}
         </>
       )}
-    </MainWrapper>
+    </PageShell>
   );
 };
 

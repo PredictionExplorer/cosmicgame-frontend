@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { FileText, AlertTriangle, Scale, Shield, Users, Coins } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -139,7 +139,7 @@ const sections = [
 
 export default function TermsPage() {
   return (
-    <MainWrapper className="max-sm:pb-16">
+    <PageShell variant="form" className="max-sm:pb-16">
       <PageHeader
         title="Terms of Service"
         subtitle="Please read these terms carefully before using Cosmic Signature. By using our platform, you agree to be bound by these terms."
@@ -204,6 +204,7 @@ export default function TermsPage() {
               </p>
             </div>
 
+            {/* lexicon-allow-start: boilerplate limitation-of-liability language must reference "profits" to be enforceable */}
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Limitation of Liability</h3>
               <p className="leading-relaxed">
@@ -214,6 +215,7 @@ export default function TermsPage() {
                 from your use of the platform.
               </p>
             </div>
+            {/* lexicon-allow-end */}
 
             <div className="space-y-2">
               <h3 className="font-semibold text-foreground">Indemnification</h3>
@@ -282,6 +284,7 @@ export default function TermsPage() {
                 className="mt-0.5 h-6 w-6 shrink-0 text-amber-600 dark:text-amber-400"
                 aria-hidden
               />
+              {/* lexicon-allow-start: Howey-test denial copy must literally say "investment" to negate investment-contract claims */}
               <div className="space-y-2">
                 <h3 className="font-semibold text-foreground">Important warning</h3>
                 <p className="leading-relaxed text-muted-foreground">
@@ -293,6 +296,7 @@ export default function TermsPage() {
                   research and consider your financial situation carefully before participating.
                 </p>
               </div>
+              {/* lexicon-allow-end */}
             </div>
           </CardContent>
         </Card>
@@ -314,6 +318,6 @@ export default function TermsPage() {
           </CardContent>
         </Card>
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 }

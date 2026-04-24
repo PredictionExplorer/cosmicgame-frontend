@@ -16,6 +16,7 @@ const dotVariants = cva('h-1.5 w-1.5 shrink-0 rounded-full', {
       nebula: 'bg-[oklch(50.4%_0.247_296)]',
       solar: 'bg-[oklch(82.4%_0.162_81)]',
       impact: 'bg-[oklch(77.1%_0.163_161)]',
+      rose: 'bg-[oklch(67.2%_0.228_4)]',
       muted: 'bg-white/40',
     },
   },
