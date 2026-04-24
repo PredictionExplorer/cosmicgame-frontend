@@ -10,7 +10,10 @@ describe('NFTDetailSkeleton', () => {
 
   it('renders multiple skeleton shimmer elements', () => {
     const { container } = render(<NFTDetailSkeleton />);
-    const skeletons = container.querySelectorAll('.animate-pulse');
+    // Skeleton primitive now uses shimmer (before:animate-shimmer) by default
+    // and exposes aria-hidden; older styles still use animate-pulse. Accept
+    // either so this contract tracks overall element count, not the animation.
+    const skeletons = container.querySelectorAll('.animate-pulse, [aria-hidden]');
     expect(skeletons.length).toBeGreaterThanOrEqual(8);
   });
 

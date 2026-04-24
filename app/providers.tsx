@@ -16,7 +16,8 @@ import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { StakedTokenProvider } from '@/contexts/StakedTokenContext';
+import { SkipLink } from '@/components/ui/skip-link';
+import { AnchoredTokenProvider } from '@/contexts/AnchoredTokenContext';
 import { SystemModeProvider } from '@/contexts/SystemModeContext';
 import { ApiDataProvider } from '@/contexts/ApiDataContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
@@ -249,17 +250,18 @@ export function Providers({
           )}
           <ErrorBoundary>
             <CookiesProvider>
-              <StakedTokenProvider>
+              <AnchoredTokenProvider>
                 <SystemModeProvider>
                   <ApiDataProvider>
                     <NotificationProvider>
+                      <SkipLink />
                       {showAppChrome && <Header />}
                       <ErrorBoundary>{children}</ErrorBoundary>
                       {showAppChrome && <Footer />}
                     </NotificationProvider>
                   </ApiDataProvider>
                 </SystemModeProvider>
-              </StakedTokenProvider>
+              </AnchoredTokenProvider>
             </CookiesProvider>
           </ErrorBoundary>
           <Toaster

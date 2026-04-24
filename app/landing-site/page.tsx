@@ -11,7 +11,7 @@ import { Verifiability } from '@/components/landing-v2/Verifiability';
 
 export default function LandingPage() {
   return (
-    <main className="relative">
+    <main id="main" tabIndex={-1} className="relative">
       <Hero />
       <TheCycle />
       <TheArt />

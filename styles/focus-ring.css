@@ -1,0 +1,36 @@
+/*
+ * Global focus-visible recipe.
+ *
+ * Every interactive element (button, a, [role=button], [tabindex]) gets a
+ * two-layer aurora ring on keyboard focus. Pointer focus is suppressed
+ * thanks to :focus-visible so the ring only appears when useful.
+ *
+ * Tokens live in tokens.css (--focus-ring-*). Components opt out with the
+ * `focus-ring-none` utility if they provide their own treatment.
+ */
+
+@layer base {
+  :where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [role='button'],
+    [role='link'],
+    [role='tab'],
+    [tabindex]:not([tabindex='-1'])
+  ):focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 var(--focus-ring-offset) hsl(var(--background)),
+      0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-ring-color),
+      0 0 24px var(--focus-ring-glow);
+    border-radius: inherit;
+  }
+
+  .focus-ring-none:focus-visible {
+    box-shadow: none;
+  }
+}

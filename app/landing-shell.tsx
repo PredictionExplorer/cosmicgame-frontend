@@ -20,7 +20,7 @@
  *   - @rainbow-me/rainbowkit (+ its CSS)
  *   - @walletconnect/* / @coinbase/wallet-sdk / @metamask/sdk
  *   - @tanstack/react-query (no API data fetching on landing)
- *   - StakedTokenProvider / SystemModeProvider / ApiDataProvider /
+ *   - AnchoredTokenProvider / SystemModeProvider / ApiDataProvider /
  *     NotificationProvider — all protocol-state contexts
  *   - tsparticles — the landing uses its own three.js / CSS background
  *
@@ -34,6 +34,7 @@ import { Toaster } from 'sonner';
 
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
+import { SkipLink } from '@/components/ui/skip-link';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
 export function LandingShell({ children }: { children: ReactNode }) {
@@ -44,6 +45,7 @@ export function LandingShell({ children }: { children: ReactNode }) {
   return (
     <ErrorBoundary>
       <CookiesProvider>
+        <SkipLink />
         <ErrorBoundary>{children}</ErrorBoundary>
         <Toaster
           position="top-right"
