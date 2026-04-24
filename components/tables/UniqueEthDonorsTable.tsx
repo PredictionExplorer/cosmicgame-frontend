@@ -37,7 +37,7 @@ export const UniqueEthDonorsTable = ({ list }: { list: UniqueEthDonor[] }) => {
   const [page, setPage] = useState(1);
 
   if (!list || list.length === 0) {
-    return <p>No donors yet.</p>;
+    return <p>No contributors yet.</p>;
   }
 
   return (
@@ -46,9 +46,11 @@ export const UniqueEthDonorsTable = ({ list }: { list: UniqueEthDonor[] }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Donor Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Number of Donations</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Total Donated Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Contributor Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Number of Contributions</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                Total Contributed Amount (ETH)
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

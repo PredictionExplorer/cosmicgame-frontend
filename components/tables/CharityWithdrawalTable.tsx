@@ -59,7 +59,7 @@ const CharityWithdrawalTable: FC<CharityWithdrawalTableProps> = ({ list }) => {
   const [page, setPage] = useState<number>(1);
 
   if (list.length === 0) {
-    return <p>No deposits yet.</p>;
+    return <p>No retrievals yet.</p>;
   }
 
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
@@ -73,7 +73,7 @@ const CharityWithdrawalTable: FC<CharityWithdrawalTableProps> = ({ list }) => {
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Destination Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Withdrawal amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Retrieval amount (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

@@ -59,8 +59,8 @@ const StakingWinnerTable = ({ list }: { list: StakingCSTReward[] }) => {
   if (list.length === 0) {
     return (
       <p>
-        There were no staked tokens at the time the round ended. The deposit amount was sent to the
-        charity address.
+        There were no anchored tokens at the time the cycle ended. The deposit amount was forwarded
+        to the Public Goods address.
       </p>
     );
   }
@@ -74,9 +74,9 @@ const StakingWinnerTable = ({ list }: { list: StakingCSTReward[] }) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Staker</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">Anchor-holder</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Reward Amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Distribution Amount (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

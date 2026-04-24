@@ -19,15 +19,15 @@ const createDonation = (overrides = {}) => ({
 describe('CharityDepositTable', () => {
   it('renders empty state when list is empty', () => {
     render(<CharityDepositTable list={[]} />);
-    expect(screen.getByText('No deposits yet.')).toBeInTheDocument();
+    expect(screen.getByText('No contributions yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<CharityDepositTable list={[createDonation()]} />);
     expect(screen.getAllByText('Datetime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Round Num').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Donor Address').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Donation amount (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Cycle Num').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Contributor Address').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Contribution amount (ETH)').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders datetime as explorer link', () => {

@@ -9,7 +9,7 @@ import { render, screen, checkA11y } from '@/test-utils';
 describe('CharityWithdrawalTable', () => {
   test('with no records', () => {
     render(<CharityWithdrawalTable list={[]} />);
-    expect(screen.getByText('No deposits yet.')).toBeInTheDocument();
+    expect(screen.getByText('No retrievals yet.')).toBeInTheDocument();
   });
 
   test('with mock data', () => {

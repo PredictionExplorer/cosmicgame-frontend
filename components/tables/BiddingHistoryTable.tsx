@@ -69,9 +69,9 @@ const bidTypeStyles: Record<number, string> = {
 };
 
 const bidTypeLabels: Record<number, string> = {
-  2: 'CST Bid',
-  1: 'RWLK Token Bid',
-  0: 'ETH Bid',
+  2: 'CST Gesture',
+  1: 'RWLK Token Gesture',
+  0: 'ETH Gesture',
 };
 
 const HistoryRow = ({ history, isBanned, showRound, bidDuration }: HistoryRowProps) => {
@@ -232,12 +232,12 @@ const HistoryTable = ({ biddingHistory, perPage, curPage, showRound }: HistoryTa
         <TablePrimaryHead>
           <Tr>
             <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Bidder</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="right">Price</TablePrimaryHeadCell>
-            {showRound && <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>}
-            <TablePrimaryHeadCell>Bid Type</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="center">Bid Duration</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell align="left">Bid Info</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">Participant</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="right">Cost</TablePrimaryHeadCell>
+            {showRound && <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>}
+            <TablePrimaryHeadCell>Gesture Type</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="center">Gesture Duration</TablePrimaryHeadCell>
+            <TablePrimaryHeadCell align="left">Gesture Info</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>

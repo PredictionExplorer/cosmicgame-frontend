@@ -23,16 +23,16 @@ describe('StakingWinnerTable', () => {
   it('renders custom empty message when list is empty', () => {
     render(<StakingWinnerTable list={[]} />);
     expect(
-      screen.getByText(/There were no staked tokens at the time the round ended/),
+      screen.getByText(/There were no anchored tokens at the time the cycle ended/),
     ).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
     render(<StakingWinnerTable list={[createWinner()]} />);
     expect(screen.getAllByText('Datetime').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Staker').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Anchor-holder').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Number of NFTs').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Reward Amount (ETH)').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Distribution Amount (ETH)').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders datetime as explorer link', () => {

@@ -76,7 +76,7 @@ export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
   const [page, setPage] = useState(1);
 
   if (list.length === 0) {
-    return <p>No deposits yet.</p>;
+    return <p>No contributions yet.</p>;
   }
 
   const currentData = list.slice((page - 1) * perPage, page * perPage);
@@ -88,9 +88,9 @@ export const CharityDepositTable = ({ list }: CharityDepositTableProps) => {
           <TablePrimaryHead>
             <Tr>
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round Num</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Donor Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Donation amount (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Cycle Num</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Contributor Address</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">Contribution amount (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>
