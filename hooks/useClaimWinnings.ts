@@ -132,7 +132,7 @@ export function useClaimWinnings(onSuccess?: () => void) {
         await awaitTx(hash);
         refreshAfterClaim();
       } catch (err) {
-        handleTxError(err, 'claim all raffle ETH');
+        handleTxError(err, 'retrieve all Stellar Selection ETH');
       } finally {
         if (mountedRef.current) {
           setIsClaiming((prev) => ({ ...prev, raffleETH: false }));

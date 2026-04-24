@@ -130,8 +130,8 @@ describe('usePrizeNotification', () => {
         jest.advanceTimersByTime(1000);
       });
 
-      expect(mockNotification).toHaveBeenCalledWith('Bid Now or Miss Out!', {
-        body: 'Time is running out! You have 5 minutes to place your bids and win amazing prizes.',
+      expect(mockNotification).toHaveBeenCalledWith('Gesture now or the cycle closes', {
+        body: 'The Performance Cycle closes in 5 minutes. Make a gesture now to take part in the final allocations.',
       });
     });
 

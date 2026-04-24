@@ -215,7 +215,7 @@ describe('useClaimWinnings', () => {
       await act(async () => {
         await result.current.claimAllRaffleETH([1]);
       });
-      expect(mockReportError).toHaveBeenCalledWith(err, 'claim all raffle ETH');
+      expect(mockReportError).toHaveBeenCalledWith(err, 'retrieve all Stellar Selection ETH');
       expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
       expect(result.current.isClaiming.raffleETH).toBe(false);
     });

@@ -47,10 +47,14 @@ export function useStakingActions() {
   const handleError = useCallback(
     (err: unknown) => {
       if (isUserRejection(err)) {
-        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
         return;
       }
-      reportError(err, 'staking error');
+      reportError(err, 'anchor action error');
       const msg = getEthErrorMessage(err);
       if (msg !== 'An error occurred') {
         setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
@@ -176,7 +180,14 @@ export function useStakingActions() {
         return err;
       }
     },
-    [cstStakingContract, rwlkStakingContract, publicClient, setNotification, invalidateStakingQueries, handleError],
+    [
+      cstStakingContract,
+      rwlkStakingContract,
+      publicClient,
+      setNotification,
+      invalidateStakingQueries,
+      handleError,
+    ],
   );
 
   return { stake, unstake, handleError, rwalkContract };

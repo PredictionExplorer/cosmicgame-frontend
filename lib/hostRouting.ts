@@ -83,7 +83,10 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/my-statistics',
   '/my-tokens',
   '/named-nfts',
+  // lexicon-allow-start: route slug is /nft-donations for external
+  // compatibility, even though user-facing labels say "Attached NFTs".
   '/nft-donations',
+  // lexicon-allow-end
   '/public-goods-contributions-cg',
   '/public-goods-contributions-voluntary',
   '/public-goods-retrievals',

@@ -94,7 +94,7 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
         reportError(apiErr, 'post-claim-api');
         notify(
           'warning',
-          'Prize claimed successfully on-chain! Token metadata may still be updating. Check My Winnings or refresh later.',
+          'Cycle finalized on-chain. Token metadata may still be updating — check My Allocations or refresh later.',
         );
       }
 
@@ -109,7 +109,7 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
         notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
         return false;
       }
-      reportError(err, 'claim-main-prize');
+      reportError(err, 'finalize-cycle');
       const msg = getContractErrorMessage(err);
       if (msg) {
         notify('error', msg);

@@ -303,7 +303,7 @@ describe('useStakingActions', () => {
       await act(async () => {
         await result.current.stake(42, false);
       });
-      expect(mockReportError).toHaveBeenCalledWith(err, 'staking error');
+      expect(mockReportError).toHaveBeenCalledWith(err, 'anchor action error');
       expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
   });
@@ -466,7 +466,7 @@ describe('useStakingActions', () => {
       mockGetEthErrorMessage.mockReturnValueOnce('revert: bad state');
       const { result } = renderHook(() => useStakingActions());
       result.current.handleError(err);
-      expect(mockReportError).toHaveBeenCalledWith(err, 'staking error');
+      expect(mockReportError).toHaveBeenCalledWith(err, 'anchor action error');
       expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
 

@@ -131,7 +131,7 @@ describe('usePrizeClaim', () => {
     });
 
     expect(success).toBe(false);
-    expect(mockReportError).toHaveBeenCalledWith(claimError, 'claim-main-prize');
+    expect(mockReportError).toHaveBeenCalledWith(claimError, 'finalize-cycle');
     expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(claimError);
   });
 

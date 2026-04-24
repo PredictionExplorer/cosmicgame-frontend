@@ -36,8 +36,8 @@ export function usePrizeNotification({ prizeTime }: UsePrizeNotificationOptions)
     const interval = setInterval(() => {
       const now = Date.now();
       if (prizeTime && now >= prizeTime - 5 * 60 * 1000 && now <= prizeTime) {
-        sendNotification('Bid Now or Miss Out!', {
-          body: 'Time is running out! You have 5 minutes to place your bids and win amazing prizes.',
+        sendNotification('Gesture now or the cycle closes', {
+          body: 'The Performance Cycle closes in 5 minutes. Make a gesture now to take part in the final allocations.',
         });
         clearInterval(interval);
       }

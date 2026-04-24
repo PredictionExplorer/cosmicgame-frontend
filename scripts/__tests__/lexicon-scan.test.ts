@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const SCAN_SCRIPT = join(process.cwd(), 'scripts/lexicon-scan.mjs');
+const SCAN_SCRIPT = join(process.cwd(), 'scripts/lexicon-scan.js');
 
 interface ScanResult {
   exitCode: number;

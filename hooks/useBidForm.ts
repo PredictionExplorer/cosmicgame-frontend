@@ -1,5 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useConfig, useChainId, usePublicClient, useWalletClient, useConnectorClient, useSwitchChain } from 'wagmi';
+import {
+  useConfig,
+  useChainId,
+  usePublicClient,
+  useWalletClient,
+  useConnectorClient,
+  useSwitchChain,
+} from 'wagmi';
 import { getConnectorClient, writeContract } from '@wagmi/core';
 import { formatEther, isAddress, maxUint256, parseEther, parseUnits } from 'viem';
 
@@ -139,7 +146,7 @@ export function useBidForm() {
       functionName: 'isApprovedForAll',
       args: [account as `0x${string}`, RAFFLE_WALLET_ADDRESS as `0x${string}`],
     });
-      if (!approved) {
+    if (!approved) {
       const hash = await writeContract(config, {
         address: nftAddress as `0x${string}`,
         abi: NFT_ABI,
@@ -233,14 +240,14 @@ export function useBidForm() {
 
   const withNftDonation = async (nftAddress: string, tokenId: number) => {
     if (!nftAddress || nftAddress.trim() === '' || Number.isNaN(tokenId)) {
-      throw new Error('Missing NFT donation address or tokenId.');
+      throw new Error('Missing attached NFT address or tokenId.');
     }
     if (!(await isContractAddress(nftAddress))) {
       notify('error', 'The address provided is not a valid contract address!');
       return false;
     }
     if (!(await isERC721(nftAddress))) {
-      notify('error', 'The donate NFT contract is not an ERC721 token contract.');
+      notify('error', 'The attached NFT contract is not an ERC721 token contract.');
       return false;
     }
     if (!(await ensureNftOwnership(nftAddress, tokenId))) return false;
@@ -250,7 +257,7 @@ export function useBidForm() {
 
   const withTokenDonation = async (tokenAddress: string, amountStr: string) => {
     if (!tokenAddress || !amountStr) {
-      throw new Error('Missing token donation address or amount.');
+      throw new Error('Missing attached token address or amount.');
     }
     if (!(await isContractAddress(tokenAddress))) {
       notify('error', 'The address provided is not a valid contract address!');
@@ -265,7 +272,7 @@ export function useBidForm() {
       });
       if (!ts) throw new Error('Not an ERC20');
     } catch {
-      notify('error', 'The donate token contract is not an ERC20 token contract.');
+      notify('error', 'The attached token contract is not an ERC20 token contract.');
       return { ok: false as const };
     }
 
@@ -279,7 +286,7 @@ export function useBidForm() {
     })) as bigint;
 
     if (bal < amountWei) {
-      notify('error', 'Insufficient token balance for donation.');
+      notify('error', 'Insufficient token balance to attach to this gesture.');
       return { ok: false as const };
     }
     await ensureErc20Allowance(tokenAddress, amountWei);
@@ -323,9 +330,7 @@ export function useBidForm() {
       const baseFee = block?.baseFeePerGas ?? 0n;
       const minFromBase = baseFee ? (baseFee * 200n) / 100n : 0n;
       const fromEstimate =
-        fees?.maxFeePerGas && fees?.maxPriorityFeePerGas
-          ? (fees.maxFeePerGas * 125n) / 100n
-          : 0n;
+        fees?.maxFeePerGas && fees?.maxPriorityFeePerGas ? (fees.maxFeePerGas * 125n) / 100n : 0n;
       const maxFeePerGas = fromEstimate > minFromBase ? fromEstimate : minFromBase;
       const maxPriorityFeePerGas = fees?.maxPriorityFeePerGas ?? 1_000_000_000n;
       if (maxFeePerGas > 0n) {
@@ -355,7 +360,10 @@ export function useBidForm() {
           if (isUserRejection(err)) {
             notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
           } else {
-            notify('error', `Please switch to ${activeChain.name} in your wallet to bid.`);
+            notify(
+              'error',
+              `Please switch to ${activeChain.name} in your wallet to make a gesture.`,
+            );
           }
           return false;
         }
@@ -401,11 +409,7 @@ export function useBidForm() {
         const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
         if (!ok) return false;
         const donateArgs = [rwlkId, message, nftDonateAddress, nftIdNum];
-        const gas = await estimateDonationGas(
-          'bidWithEthAndDonateNft',
-          donateArgs,
-          ethBidPrice,
-        );
+        const gas = await estimateDonationGas('bidWithEthAndDonateNft', donateArgs, ethBidPrice);
         const signerAddress =
           (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
           (account as `0x${string}`);
@@ -428,11 +432,7 @@ export function useBidForm() {
         const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
         if (!res.ok) return false;
         const donateArgs = [rwlkId, message, tokenDonateAddress, res.amountWei];
-        const gas = await estimateDonationGas(
-          'bidWithEthAndDonateToken',
-          donateArgs,
-          ethBidPrice,
-        );
+        const gas = await estimateDonationGas('bidWithEthAndDonateToken', donateArgs, ethBidPrice);
         const signerAddress =
           (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
           (account as `0x${string}`);
@@ -459,7 +459,7 @@ export function useBidForm() {
         notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
         return false;
       }
-      reportError(err, 'bid-eth');
+      reportError(err, 'gesture-eth');
       const msg = getContractErrorMessage(err, ethBidInfo?.ETHPrice);
       if (msg) {
         notify('error', msg);
@@ -490,7 +490,10 @@ export function useBidForm() {
           if (isUserRejection(err)) {
             notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
           } else {
-            notify('error', `Please switch to ${activeChain.name} in your wallet to bid.`);
+            notify(
+              'error',
+              `Please switch to ${activeChain.name} in your wallet to make a gesture.`,
+            );
           }
           return false;
         }
@@ -581,7 +584,7 @@ export function useBidForm() {
         notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
         return false;
       }
-      reportError(err, 'bid-cst');
+      reportError(err, 'gesture-cst');
       const msg = getContractErrorMessage(err);
       if (msg) {
         notify('error', msg);

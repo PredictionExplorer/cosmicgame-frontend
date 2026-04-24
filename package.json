@@ -16,7 +16,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
-    "lexicon:scan": "node scripts/lexicon-scan.mjs",
+    "lexicon:scan": "node scripts/lexicon-scan.js",
     "prepare": "husky"
   },
   "dependencies": {
