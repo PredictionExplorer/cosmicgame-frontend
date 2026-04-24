@@ -12,10 +12,11 @@ jest.mock('../../hooks/useNotify', () => ({
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
+
+const mockWaitForReceipt = jest.fn().mockResolvedValue({ status: 'success' });
+const mockUsePublicClient = jest.fn(() => ({ waitForTransactionReceipt: mockWaitForReceipt }));
 jest.mock('wagmi', () => ({
-  usePublicClient: jest.fn(() => ({
-    waitForTransactionReceipt: jest.fn().mockResolvedValue({}),
-  })),
+  usePublicClient: () => mockUsePublicClient(),
 }));
 
 const mockEstimateGas = jest.fn().mockResolvedValue(BigInt(500000));
@@ -53,7 +54,7 @@ jest.mock('../../services/api', () => ({
 const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
 
 jest.mock('../../utils/errors', () => ({
-  isUserRejection: jest.fn(() => false),
+  isUserRejection: jest.fn((_err: unknown) => false),
   reportError: jest.fn(),
   getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
   WALLET_TRANSACTION_CANCELLED_MESSAGE: 'Transaction cancelled by user',
@@ -73,8 +74,11 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockClaimMainPrize.mockResolvedValue('0xhash');
   mockEstimateGas.mockResolvedValue(BigInt(500000));
+  mockReadRoundNum.mockReset();
   mockReadRoundNum.mockResolvedValueOnce(BigInt(5)).mockResolvedValueOnce(BigInt(6));
   mockGetContractErrorMessage.mockReturnValue(null);
+  mockUsePublicClient.mockReturnValue({ waitForTransactionReceipt: mockWaitForReceipt });
+  mockWaitForReceipt.mockResolvedValue({ status: 'success' });
 });
 
 const baseData = {
@@ -86,6 +90,10 @@ const baseData = {
 } as Partial<DashboardInfo> as DashboardInfo;
 
 describe('usePrizeClaim', () => {
+  // ─────────────────────────────────────────────
+  //  initial state
+  // ─────────────────────────────────────────────
+
   it('initializes with correct default state', async () => {
     mockUseCosmicGameContract.mockReturnValueOnce(null);
     let result: { current: ReturnType<typeof usePrizeClaim> };
@@ -101,6 +109,10 @@ describe('usePrizeClaim', () => {
     expect(typeof result!.current.fetchActivationTime).toBe('function');
   });
 
+  // ─────────────────────────────────────────────
+  //  happy path
+  // ─────────────────────────────────────────────
+
   it('onClaimPrize success: estimates gas, claims, detects round increment, redirects, returns true', async () => {
     const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
 
@@ -112,12 +124,89 @@ describe('usePrizeClaim', () => {
     expect(success).toBe(true);
     expect(mockEstimateGas).toHaveBeenCalled();
     expect(mockClaimMainPrize).toHaveBeenCalled();
+    expect(mockWaitForReceipt).toHaveBeenCalledWith({ hash: '0xhash' });
     expect(mockReadRoundNum).toHaveBeenCalledTimes(2);
     expect(mockApi.create).toHaveBeenCalledWith(5, 5);
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('/allocation-finalized'));
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('round=5'));
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('message=success'));
   });
+
+  it('uses estimate + GAS_EXTRA when gas estimation succeeds', async () => {
+    mockEstimateGas.mockResolvedValueOnce(BigInt(300_000));
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    await act(async () => {
+      await result.current.onClaimPrize();
+    });
+
+    expect(mockClaimMainPrize).toHaveBeenCalledWith({ gas: BigInt(300_000) + BigInt(1_000_000) });
+  });
+
+  it('falls back to GAS_FLOOR when estimateGas returns undefined', async () => {
+    mockEstimateGas.mockResolvedValueOnce(undefined as unknown as bigint);
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    await act(async () => {
+      await result.current.onClaimPrize();
+    });
+
+    expect(mockClaimMainPrize).toHaveBeenCalledWith({ gas: BigInt(2_000_000) });
+  });
+
+  it('falls back to GAS_FLOOR when estimateGas throws (still claims)', async () => {
+    const estimateErr = new Error('estimate reverted');
+    mockEstimateGas.mockRejectedValueOnce(estimateErr);
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    await act(async () => {
+      await result.current.onClaimPrize();
+    });
+
+    expect(mockReportError).toHaveBeenCalledWith(estimateErr, 'finalize-cycle-gas-estimate');
+    expect(mockClaimMainPrize).toHaveBeenCalledWith({ gas: BigInt(2_000_000) });
+  });
+
+  it('includes NumRaffleNFTWinnersStakingRWalk in count when RWLK tokens are staked', async () => {
+    const data = {
+      ...baseData,
+      MainStats: { StakeStatisticsRWalk: { TotalTokensStaked: 10 } },
+    } as DashboardInfo;
+
+    const { result } = renderHook(() => usePrizeClaim({ data, offset: 0 }));
+
+    await act(async () => {
+      await result.current.onClaimPrize();
+    });
+
+    // base: NumRaffleNFTWinnersBidding (2) + 3 = 5; +1 (NumRaffleNFTWinnersStakingRWalk)
+    expect(mockApi.create).toHaveBeenCalledWith(5, 6);
+  });
+
+  it('uses Number(roundBefore) for claimedRound when data.CurRoundNum is undefined', async () => {
+    mockReadRoundNum.mockReset();
+    mockReadRoundNum.mockResolvedValueOnce(BigInt(7)).mockResolvedValueOnce(BigInt(8));
+
+    const { result } = renderHook(() =>
+      usePrizeClaim({
+        data: { ...baseData, CurRoundNum: undefined } as unknown as DashboardInfo,
+        offset: 0,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.onClaimPrize();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('round=7'));
+  });
+
+  // ─────────────────────────────────────────────
+  //  error paths
+  // ─────────────────────────────────────────────
 
   it('onClaimPrize error: reports error, shows notification, returns false', async () => {
     const claimError = new Error('transaction failed');
@@ -135,7 +224,7 @@ describe('usePrizeClaim', () => {
     expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(claimError);
   });
 
-  it('onClaimPrize user rejection: silently returns false', async () => {
+  it('onClaimPrize user rejection: silently returns false with info toast', async () => {
     mockIsUserRejection.mockReturnValueOnce(true);
     mockClaimMainPrize.mockRejectedValueOnce(new Error('user rejected'));
 
@@ -148,10 +237,45 @@ describe('usePrizeClaim', () => {
 
     expect(success).toBe(false);
     expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
-    expect(mockNotify).toHaveBeenCalledWith('info', expect.any(String));
+    expect(mockNotify).toHaveBeenCalledWith('info', 'Transaction cancelled by user');
   });
 
-  it('onClaimPrize with no contract: notifies error, returns false', async () => {
+  it('shows the decoded contract error message when getContractErrorMessage returns one', async () => {
+    const err = new Error('MainPrizeEarlyClaim revert');
+    mockClaimMainPrize.mockRejectedValueOnce(err);
+    mockGetContractErrorMessage.mockReturnValueOnce(
+      'Not enough time has elapsed to retrieve the Signature Allocation.',
+    );
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    await act(async () => {
+      await result.current.onClaimPrize();
+    });
+
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'Not enough time has elapsed to retrieve the Signature Allocation.',
+    );
+    expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
+  });
+
+  it('waitForTransactionReceipt failure is caught and surfaced as error', async () => {
+    const rxErr = new Error('tx reverted on mine');
+    mockWaitForReceipt.mockRejectedValueOnce(rxErr);
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.onClaimPrize();
+    });
+
+    expect(success).toBe(false);
+    expect(mockReportError).toHaveBeenCalledWith(rxErr, 'finalize-cycle');
+  });
+
+  it('onClaimPrize with no contract: notifies error, returns false, never calls write', async () => {
     mockUseCosmicGameContract.mockReturnValueOnce(null);
 
     const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
@@ -166,7 +290,162 @@ describe('usePrizeClaim', () => {
       'error',
       'Please connect your wallet and ensure you are on the correct network.',
     );
+    expect(mockClaimMainPrize).not.toHaveBeenCalled();
   });
+
+  it('onClaimPrize with no publicClient: notifies error, returns false, never calls write', async () => {
+    mockUsePublicClient.mockReturnValueOnce(
+      null as unknown as ReturnType<typeof mockUsePublicClient>,
+    );
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.onClaimPrize();
+    });
+
+    expect(success).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'Network unavailable — please reconnect your wallet.',
+    );
+    expect(mockClaimMainPrize).not.toHaveBeenCalled();
+  });
+
+  // ─────────────────────────────────────────────
+  //  round-advance guard
+  // ─────────────────────────────────────────────
+
+  it('warns if on-chain round did not advance after successful tx', async () => {
+    mockReadRoundNum.mockReset();
+    mockReadRoundNum.mockResolvedValueOnce(BigInt(5)).mockResolvedValueOnce(BigInt(5));
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.onClaimPrize();
+    });
+
+    expect(success).toBe(true); // still true — tx succeeded
+    expect(mockNotify).toHaveBeenCalledWith('warning', expect.stringContaining('did not advance'));
+    expect(mockApi.create).not.toHaveBeenCalled();
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('warns if on-chain round went backwards (chain reorg edge case)', async () => {
+    mockReadRoundNum.mockReset();
+    mockReadRoundNum.mockResolvedValueOnce(BigInt(5)).mockResolvedValueOnce(BigInt(4));
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    await act(async () => {
+      await result.current.onClaimPrize();
+    });
+
+    expect(mockNotify).toHaveBeenCalledWith('warning', expect.stringContaining('did not advance'));
+  });
+
+  // ─────────────────────────────────────────────
+  //  post-tx api failure
+  // ─────────────────────────────────────────────
+
+  it('swallows post-claim api.create failure and still navigates', async () => {
+    const apiErr = new Error('api 500');
+    mockApi.create.mockRejectedValueOnce(apiErr);
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.onClaimPrize();
+    });
+
+    expect(success).toBe(true);
+    expect(mockReportError).toHaveBeenCalledWith(apiErr, 'post-claim-api');
+    expect(mockNotify).toHaveBeenCalledWith(
+      'warning',
+      expect.stringContaining('Token metadata may still be updating'),
+    );
+    expect(mockPush).toHaveBeenCalled();
+  });
+
+  // ─────────────────────────────────────────────
+  //  concurrency
+  // ─────────────────────────────────────────────
+
+  it('prevents concurrent claim attempts (returns false on second call while first in flight)', async () => {
+    mockReadRoundNum.mockReset();
+    mockReadRoundNum
+      .mockResolvedValueOnce(BigInt(5))
+      .mockResolvedValueOnce(BigInt(6))
+      .mockResolvedValueOnce(BigInt(5))
+      .mockResolvedValueOnce(BigInt(6));
+
+    let resolveFirstClaim!: (hash: string) => void;
+    mockClaimMainPrize.mockImplementationOnce(
+      () =>
+        new Promise<string>((resolve) => {
+          resolveFirstClaim = resolve;
+        }),
+    );
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    let firstPromise: Promise<boolean>;
+    act(() => {
+      firstPromise = result.current.onClaimPrize();
+    });
+
+    // second call while first is in flight
+    let secondResult: boolean | undefined;
+    await act(async () => {
+      secondResult = await result.current.onClaimPrize();
+    });
+
+    expect(secondResult).toBe(false);
+    expect(mockClaimMainPrize).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolveFirstClaim('0xhash');
+      await firstPromise;
+    });
+  });
+
+  // ─────────────────────────────────────────────
+  //  unmount safety
+  // ─────────────────────────────────────────────
+
+  it('does not crash if component unmounts mid-transaction', async () => {
+    let resolveClaim!: (hash: string) => void;
+    const pendingPromise = new Promise<string>((resolve) => {
+      resolveClaim = resolve;
+    });
+    mockClaimMainPrize.mockReturnValueOnce(pendingPromise);
+
+    const { result, unmount } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    let claimPromise!: Promise<boolean>;
+    await act(async () => {
+      claimPromise = result.current.onClaimPrize();
+      // allow roundNum + estimateGas awaits to flush so claimMainPrize is invoked
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    unmount();
+
+    await act(async () => {
+      resolveClaim('0xhash');
+      await claimPromise;
+    });
+    // No error thrown — React warning for setState after unmount should not fire
+  });
+
+  // ─────────────────────────────────────────────
+  //  derived state
+  // ─────────────────────────────────────────────
 
   it('claimHistory is derived from useClaimHistory hook', async () => {
     let result: { current: ReturnType<typeof usePrizeClaim> };
@@ -213,5 +492,44 @@ describe('usePrizeClaim', () => {
     });
 
     expect(result.current.isClaiming).toBe(false);
+  });
+
+  it('fetchActivationTime pulls from contract and applies offset', async () => {
+    mockReadActivationTime.mockResolvedValue(BigInt(2500));
+
+    let renderResult!: ReturnType<typeof renderHook<ReturnType<typeof usePrizeClaim>, unknown>>;
+    await act(async () => {
+      renderResult = renderHook(() => usePrizeClaim({ data: baseData, offset: 10_000 }));
+    });
+
+    await act(async () => {
+      await renderResult.result.current.fetchActivationTime();
+    });
+
+    expect(renderResult.result.current.activationTime).toBe(2500 - 10);
+    // Restore default
+    mockReadActivationTime.mockResolvedValue(BigInt(1000));
+  });
+
+  it('fetchActivationTime is a no-op when contract is null', async () => {
+    mockUseCosmicGameContract.mockReturnValue(null);
+
+    const { result } = renderHook(() => usePrizeClaim({ data: baseData, offset: 0 }));
+
+    await act(async () => {
+      await result.current.fetchActivationTime();
+    });
+
+    expect(result.current.activationTime).toBe(0);
+
+    mockUseCosmicGameContract.mockReturnValue({
+      estimateGas: { claimMainPrize: mockEstimateGas },
+      write: { claimMainPrize: mockClaimMainPrize },
+      read: {
+        roundNum: mockReadRoundNum,
+        roundActivationTime: mockReadActivationTime,
+        timeoutDurationToClaimMainPrize: mockReadTimeout,
+      },
+    });
   });
 });

@@ -561,4 +561,149 @@ describe('useBidForm', () => {
 
     expect(result.current.isBidding).toBe(false);
   });
+
+  /* ────────────────────────────────────────────────────────────────
+   *  Error-boundary + blockchain-interaction edge cases
+   * ──────────────────────────────────────────────────────────────── */
+
+  it('onBid without connected account notifies error', async () => {
+    const useWeb3 = jest.requireMock('../../hooks/web3');
+    useWeb3.useActiveWeb3React.mockReturnValueOnce({ account: null, chainId: 1, active: false });
+
+    const { result } = renderHook(() => useBidForm());
+    await act(async () => {});
+
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.onBid();
+    });
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith('error', 'Please connect your wallet.');
+    expect(mockWagmiWriteContract).not.toHaveBeenCalled();
+    // Restore
+    useWeb3.useActiveWeb3React.mockReturnValue({ account: '0xUser', chainId: 1, active: true });
+  });
+
+  it('onBid reports error with context "gesture-eth" and falls back to notifyErrorFromEthers', async () => {
+    const rpcErr = new Error('rpc timeout');
+    mockWagmiWriteContract.mockRejectedValueOnce(rpcErr);
+    mockGetContractErrorMessage.mockReturnValue(null);
+    mockIsUserRejection.mockReturnValue(false);
+
+    const { result } = renderHook(() => useBidForm());
+    await act(async () => {});
+
+    await act(async () => {
+      await result.current.onBid();
+    });
+
+    expect(mockReportError).toHaveBeenCalledWith(rpcErr, 'gesture-eth');
+    expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(rpcErr);
+  });
+
+  it('onBid decodes contract error via getContractErrorMessage when revert hits', async () => {
+    const revertErr = new Error('execution reverted');
+    mockWagmiWriteContract.mockRejectedValueOnce(revertErr);
+    mockGetContractErrorMessage.mockReturnValueOnce(
+      'The current Gesture Cost is greater than the amount you transferred.',
+    );
+    mockIsUserRejection.mockReturnValue(false);
+
+    const { result } = renderHook(() => useBidForm());
+    await act(async () => {});
+
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.onBid();
+    });
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'The current Gesture Cost is greater than the amount you transferred.',
+    );
+    expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
+    // Restore
+    mockGetContractErrorMessage.mockReturnValue(null);
+  });
+
+  it('onBidWithCST reports error with context "gesture-cst"', async () => {
+    const cstErr = new Error('cst revert');
+    mockWagmiWriteContract.mockRejectedValueOnce(cstErr);
+    mockGetContractErrorMessage.mockReturnValue(null);
+    mockIsUserRejection.mockReturnValue(false);
+
+    const { result } = renderHook(() => useBidForm());
+    await act(async () => {});
+
+    await act(async () => {
+      await result.current.onBidWithCST();
+    });
+
+    expect(mockReportError).toHaveBeenCalledWith(cstErr, 'gesture-cst');
+  });
+
+  it('onBid awaits transaction receipt after writeContract returns a hash', async () => {
+    const { result } = renderHook(() => useBidForm());
+    await act(async () => {});
+
+    await act(async () => {
+      await result.current.onBid();
+    });
+
+    expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xhash' });
+  });
+
+  it('onBid aborts if ensureNftOwnership reports wrong owner', async () => {
+    mockReadContract.mockImplementation(async (args: { functionName: string }) => {
+      if (args.functionName === 'supportsInterface') return true;
+      if (args.functionName === 'ownerOf') return '0xOtherOwner';
+      return true;
+    });
+
+    const { result } = renderHook(() => useBidForm());
+    await act(async () => {});
+    act(() => {
+      result.current.setDonationType('NFT');
+      result.current.setNftDonateAddress('0xNft');
+      result.current.setNftId('1');
+    });
+
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.onBid();
+    });
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith('error', "You aren't the owner of the token!");
+    mockReadContract.mockResolvedValue(true);
+  });
+
+  it('onBid with non-ERC721 attached NFT aborts with error', async () => {
+    mockReadContract.mockImplementation(async (args: { functionName: string }) => {
+      if (args.functionName === 'supportsInterface') return false;
+      return true;
+    });
+
+    const { result } = renderHook(() => useBidForm());
+    await act(async () => {});
+    act(() => {
+      result.current.setDonationType('NFT');
+      result.current.setNftDonateAddress('0xNft');
+      result.current.setNftId('1');
+    });
+
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.onBid();
+    });
+
+    expect(ok).toBe(false);
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      'The attached NFT contract is not an ERC721 token contract.',
+    );
+    mockReadContract.mockResolvedValue(true);
+  });
 });

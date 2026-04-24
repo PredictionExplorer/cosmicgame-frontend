@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { usePublicClient } from 'wagmi';
 import { useRouter } from 'next/navigation';
 
@@ -48,35 +48,53 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
   const [isClaiming, setIsClaiming] = useState(false);
   const [activationTime, setActivationTime] = useState(0);
 
-  const handleTx = async (hashPromise: Promise<`0x${string}`>) => {
-    const hash = await hashPromise;
-    await publicClient!.waitForTransactionReceipt({ hash });
-  };
+  const mountedRef = useRef(true);
+  const inFlightRef = useRef(false);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+    },
+    [],
+  );
 
   /**
-   * Claim the main prize.
-   * Returns `true` on success so the caller can trigger a post-tx refresh.
+   * Claim the Signature Allocation for the current cycle.
+   * Returns `true` on a successfully mined transaction so the caller can
+   * trigger a post-tx refresh. Returns `false` on wallet-not-connected,
+   * user rejection, tx failure, or concurrent double-submit attempt.
    */
   const onClaimPrize = async (): Promise<boolean> => {
+    if (inFlightRef.current) return false;
+    if (!cosmicGameContract) {
+      notify('error', 'Please connect your wallet and ensure you are on the correct network.');
+      return false;
+    }
+    if (!publicClient) {
+      notify('error', 'Network unavailable — please reconnect your wallet.');
+      return false;
+    }
+
+    inFlightRef.current = true;
     setIsClaiming(true);
     try {
-      if (!cosmicGameContract) {
-        notify('error', 'Please connect your wallet and ensure you are on the correct network.');
-        return false;
-      }
-
       const roundBefore = (await cosmicGameContract.read.roundNum?.()) as bigint;
 
-      const estimate = await cosmicGameContract.estimateGas.claimMainPrize?.({});
-      const gasLimit = estimate ? estimate + GAS_EXTRA : GAS_FLOOR;
+      let gasLimit = GAS_FLOOR;
+      try {
+        const estimate = await cosmicGameContract.estimateGas.claimMainPrize?.({});
+        if (estimate) gasLimit = estimate + GAS_EXTRA;
+      } catch (estimateErr) {
+        reportError(estimateErr, 'finalize-cycle-gas-estimate');
+      }
 
-      await handleTx(asWriteFn(cosmicGameContract.write.claimMainPrize)({ gas: gasLimit }));
+      const hash = await asWriteFn(cosmicGameContract.write.claimMainPrize)({ gas: gasLimit });
+      await publicClient.waitForTransactionReceipt({ hash });
 
       const roundAfter = (await cosmicGameContract.read.roundNum?.()) as bigint;
       if (roundAfter <= roundBefore) {
         notify(
           'warning',
-          'Claim transaction succeeded but the round did not advance. Please refresh the page.',
+          'Claim transaction succeeded but the cycle did not advance. Please refresh the page.',
         );
         return true;
       }
@@ -118,7 +136,8 @@ export function usePrizeClaim({ data, offset }: UsePrizeClaimOptions) {
       }
       return false;
     } finally {
-      setIsClaiming(false);
+      inFlightRef.current = false;
+      if (mountedRef.current) setIsClaiming(false);
     }
   };
 
