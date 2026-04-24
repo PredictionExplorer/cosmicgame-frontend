@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
 jest.mock('viem', () => ({
-  ...jest.requireActual('../../../__mocks__/viem.js'),
+  ...jest.requireActual('../../../__mocks__/viem'),
   zeroAddress: '0x0000000000000000000000000000000000000000',
 }));
 

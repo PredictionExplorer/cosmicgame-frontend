@@ -3,7 +3,7 @@
  *
  * This module is separate from the CLI entry point so it can be imported by
  * unit tests without running the walk-filesystem side effect. The CLI
- * (scripts/lexicon-scan.js) re-imports these primitives and adds the
+ * (scripts/lexicon-scan.ts) re-imports these primitives and adds the
  * file-walk + process-exit behavior.
  *
  * The scanner reads string literals from a source file and checks them
@@ -18,14 +18,22 @@
  * or internal developer docs explaining the vocabulary rules).
  */
 
-'use strict';
+/** A single banned-term hit inside a scanned file. */
+export interface ScannerHit {
+  /** 1-based line number of the hit. */
+  line: number;
+  /** The exact substring that matched (original case preserved). */
+  term: string;
+  /** The full string literal containing the hit. */
+  literal: string;
+}
 
 /**
  * The default banned-term list for Cosmic Signature, derived from
- * marketing/cosmic-lexicon.md. "game" and "play" are intentionally absent
- * per product direction (casual usage approved).
+ * marketing/cosmic-lexicon.md (including the 2026-04-23 revision that
+ * expanded the ban list to cover UK / EU / Australian gambling statutes).
  */
-const DEFAULT_BANNED_TERMS = [
+export const DEFAULT_BANNED_TERMS: readonly string[] = [
   // Auction / bidding
   'bid',
   'bids',
@@ -122,7 +130,7 @@ const DEFAULT_BANNED_TERMS = [
  * banned terms. Escapes regex metacharacters so "Dutch auction" matches
  * the literal phrase and "tax-deductible" matches the literal hyphen.
  */
-function buildBannedPattern(banned) {
+export function buildBannedPattern(banned: readonly string[]): RegExp {
   if (banned.length === 0) {
     // An empty alternation `\b(|)\b` would match zero-width positions at
     // every word boundary, producing a flood of empty matches. Return a
@@ -139,12 +147,12 @@ function buildBannedPattern(banned) {
  * along with the zero-based column offset in the line so callers can
  * inspect what precedes the literal.
  */
-function extractStringLiterals(line) {
-  const result = [];
+export function extractStringLiterals(line: string): Array<{ literal: string; start: number }> {
+  const result: Array<{ literal: string; start: number }> = [];
   const regex = /(['"`])((?:\\.|(?!\1)[^\\])*)\1/g;
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = regex.exec(line)) !== null) {
-    result.push({ literal: match[0], start: match.index });
+    result.push({ literal: match[0]!, start: match.index });
   }
   return result;
 }
@@ -158,7 +166,7 @@ function extractStringLiterals(line) {
  * We match on the trimmed trailing tokens to identify the surrounding
  * call site.
  */
-function isInternalCallSite(line, start) {
+export function isInternalCallSite(line: string, start: number): boolean {
   const prefix = line.slice(0, start);
   const trimmedPrefix = prefix.trimEnd();
 
@@ -202,9 +210,9 @@ function isInternalCallSite(line, start) {
  * pragmas are excluded. Pure-comment lines (starting with `//` or `*`)
  * are also excluded so JSDoc mentioning a banned term is fine.
  */
-function scanContent(content, pattern) {
+export function scanContent(content: string, pattern: RegExp): ScannerHit[] {
   const lines = content.split('\n');
-  const hits = [];
+  const hits: ScannerHit[] = [];
   let inAllowBlock = false;
 
   lines.forEach((line, idx) => {
@@ -240,11 +248,3 @@ function scanContent(content, pattern) {
 
   return hits;
 }
-
-module.exports = {
-  DEFAULT_BANNED_TERMS,
-  buildBannedPattern,
-  extractStringLiterals,
-  isInternalCallSite,
-  scanContent,
-};

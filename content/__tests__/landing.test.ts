@@ -2,7 +2,7 @@ import { landingContent } from '@/content/landing';
 
 /**
  * Structural and regulatory invariants for the landing copy. Paired with
- * scripts/lexicon-scan.mjs, these tests make it impossible to regress the
+ * scripts/lexicon-scan.ts, these tests make it impossible to regress the
  * landing copy silently: any banned term outside the FAQ denial block or
  * any structural change (missing sections, missing CTAs) fails CI.
  */

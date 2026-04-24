@@ -1,3 +1,9 @@
+// MUST stay as .js — this file is served as a static asset from /public
+// and loaded by the browser's CSS Paint Worklet API via
+// `CSS.paintWorklet.addModule('/paint-worklet.js')` at runtime. Worklets
+// execute in a restricted global context that only accepts raw JavaScript;
+// there is no TypeScript compilation step available, and this file is not
+// imported from any TS module in the bundle.
 registerPaint(
   'rounded-shape',
   class {

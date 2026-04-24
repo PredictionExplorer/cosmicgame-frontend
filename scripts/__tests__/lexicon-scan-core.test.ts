@@ -2,27 +2,16 @@
  * Tests for the lexicon scanner core.
  *
  * These tests pin the scanner's behaviour so future refactors can't
- * silently regress its coverage. The core is a plain CommonJS module so
- * it's ergonomically importable here from either TypeScript or the CLI.
+ * silently regress its coverage.
  */
 
-const core = require('../lexicon-scan-core.js') as {
-  DEFAULT_BANNED_TERMS: string[];
-  buildBannedPattern: (banned: string[]) => RegExp;
-  extractStringLiterals: (line: string) => { literal: string; start: number }[];
-  isInternalCallSite: (line: string, start: number) => boolean;
-  scanContent: (
-    content: string,
-    pattern: RegExp,
-  ) => { line: number; term: string; literal: string }[];
-};
-const {
+import {
   DEFAULT_BANNED_TERMS,
   buildBannedPattern,
   extractStringLiterals,
   isInternalCallSite,
   scanContent,
-} = core;
+} from '../lexicon-scan-core';
 
 describe('DEFAULT_BANNED_TERMS', () => {
   it('includes the core regulator-risky vocabulary', () => {
@@ -54,10 +43,17 @@ describe('DEFAULT_BANNED_TERMS', () => {
     expect(DEFAULT_BANNED_TERMS).toContain('winners');
   });
 
-  it('does not include terms the product deliberately permits', () => {
-    // "game" and "play" are casual-usage allowed per product direction.
+  it('omits bare "game" and "play" to avoid false positives on SVG / common English', () => {
+    // The lexicon bans these in public copy, but the auto-scanner can't
+    // include them without flooding hits on `strokeLinecap="round"`,
+    // `Play` icon labels, `game-theoretic` academic usage, etc. The
+    // expanded forms — `gaming`, `player`, `players` — are covered here,
+    // and manual auditing + JSX-text scan catch bare-word uses.
     expect(DEFAULT_BANNED_TERMS).not.toContain('game');
     expect(DEFAULT_BANNED_TERMS).not.toContain('play');
+    expect(DEFAULT_BANNED_TERMS).toContain('gaming');
+    expect(DEFAULT_BANNED_TERMS).toContain('player');
+    expect(DEFAULT_BANNED_TERMS).toContain('players');
   });
 
   it('includes multi-word phrases that have meaning only together', () => {

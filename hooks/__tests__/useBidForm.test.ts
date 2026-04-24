@@ -156,7 +156,7 @@ jest.mock('../../services/api', () => ({
 /* ────────────────────────────────────────────────────────────────── */
 
 jest.mock('viem', () => ({
-  ...jest.requireActual('../../__mocks__/viem.js'),
+  ...jest.requireActual('../../__mocks__/viem'),
   formatEther: jest.fn((v: bigint) => (Number(v) / 1e18).toString()),
   isAddress: jest.fn().mockReturnValue(true),
   parseEther: jest.fn((v: string) => BigInt(Math.round(Number(v) * 1e18))),

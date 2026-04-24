@@ -1,11 +1,9 @@
-const nextJest = require('next/jest');
+import type { Config } from 'jest';
+import nextJest from 'next/jest.js';
 
-const createJestConfig = nextJest({
-  dir: './',
-});
+const createJestConfig = nextJest({ dir: './' });
 
-/** @type {import('jest').Config} */
-const config = {
+const config: Config = {
   testPathIgnorePatterns: [
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
@@ -14,13 +12,13 @@ const config = {
   ],
   testEnvironment: 'jsdom',
   moduleNameMapper: {
-    '\\.(css|less|scss|sass)$': '<rootDir>/__mocks__/styleMock.js',
-    '\\.(jpg|jpeg|png|gif|webp|svg|wav|mp3)$': '<rootDir>/__mocks__/fileMock.js',
+    '\\.(css|less|scss|sass)$': '<rootDir>/__mocks__/styleMock.ts',
+    '\\.(jpg|jpeg|png|gif|webp|svg|wav|mp3)$': '<rootDir>/__mocks__/fileMock.ts',
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(viem|wagmi|@wagmi|@rainbow-me|@tanstack|abitype|ox)/)',
   ],
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   collectCoverageFrom: [
     'app/**/*.{ts,tsx}',
     'components/**/*.{ts,tsx}',
@@ -36,4 +34,4 @@ const config = {
   },
 };
 
-module.exports = createJestConfig(config);
+export default createJestConfig(config);

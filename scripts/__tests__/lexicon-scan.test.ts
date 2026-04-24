@@ -3,7 +3,8 @@ import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-const SCAN_SCRIPT = join(process.cwd(), 'scripts/lexicon-scan.js');
+const SCAN_SCRIPT = join(process.cwd(), 'scripts/lexicon-scan.ts');
+const TSX_BIN = join(process.cwd(), 'node_modules/.bin/tsx');
 
 interface ScanResult {
   exitCode: number;
@@ -13,7 +14,7 @@ interface ScanResult {
 
 function runScanner(cwd: string): ScanResult {
   try {
-    const stdout = execSync(`node "${SCAN_SCRIPT}"`, {
+    const stdout = execSync(`"${TSX_BIN}" "${SCAN_SCRIPT}"`, {
       cwd,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
@@ -49,7 +50,7 @@ function makeFixture(): {
   };
 }
 
-describe('lexicon-scan.mjs', () => {
+describe('lexicon-scan.ts', () => {
   let fixture: ReturnType<typeof makeFixture>;
 
   beforeEach(() => {

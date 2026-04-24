@@ -1,3 +1,7 @@
+// Kept as .mjs (not .ts) because ESLint v9 flat-config requires native ESM
+// and TypeScript support needs the extra `jiti` loader + a nested tsconfig
+// project-reference. The rest of the codebase is strict TypeScript; this
+// file is narrow, small, and purely declarative.
 import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';
 import prettierConfig from 'eslint-config-prettier/flat';
 

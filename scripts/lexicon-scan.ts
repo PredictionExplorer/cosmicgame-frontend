@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env tsx
 /**
  * Cosmic Signature lexicon scanner (CLI).
  *
@@ -15,32 +15,27 @@
  * "Is this a lottery?" / "No, this is not an investment." per the lexicon,
  * and internal developer-facing content that explains what terms are
  * banned and why.
- *
- * NOTE: "game" and "play" are intentionally excluded from BANNED per
- * product direction (user opted for casual usage).
  */
 
-'use strict';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { extname, join, relative, resolve } from 'node:path';
 
-const { readFileSync, readdirSync, statSync } = require('node:fs');
-const { extname, join, relative, resolve } = require('node:path');
-
-const { DEFAULT_BANNED_TERMS, buildBannedPattern, scanContent } = require('./lexicon-scan-core.js');
+import { DEFAULT_BANNED_TERMS, buildBannedPattern, scanContent } from './lexicon-scan-core';
 
 const ROOT = resolve(process.cwd());
 
-const SCAN_DIRS = ['app', 'components', 'content', 'hooks', 'lib', 'utils'];
+const SCAN_DIRS: readonly string[] = ['app', 'components', 'content', 'hooks', 'lib', 'utils'];
 
-const INCLUDE_EXTS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mdx']);
-const EXCLUDE_DIRS = new Set(['__tests__', '__mocks__', 'node_modules']);
+const INCLUDE_EXTS: ReadonlySet<string> = new Set(['.ts', '.tsx', '.js', '.jsx', '.mdx']);
+const EXCLUDE_DIRS: ReadonlySet<string> = new Set(['__tests__', '__mocks__', 'node_modules']);
 
 const PATTERN = buildBannedPattern(DEFAULT_BANNED_TERMS);
 
 let failed = false;
 
-function walk(dir) {
+function walk(dir: string): void {
   const abs = join(ROOT, dir);
-  let entries;
+  let entries: string[];
   try {
     entries = readdirSync(abs);
   } catch {
@@ -65,6 +60,8 @@ function walk(dir) {
   }
 }
 
+/* eslint-disable no-console -- CLI banner output. This file is a Node
+   script run via `yarn lexicon:scan` and never ships to the browser. */
 console.log('\u2728  Cosmic Signature lexicon scanner');
 console.log('   scanning:', SCAN_DIRS.join(', '));
 console.log('');

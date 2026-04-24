@@ -12,7 +12,7 @@ jest.mock('wagmi', () => ({
 }));
 
 jest.mock('viem', () => ({
-  ...jest.requireActual('../../__mocks__/viem.js'),
+  ...jest.requireActual('../../__mocks__/viem'),
   getContract: jest.fn(),
 }));
 

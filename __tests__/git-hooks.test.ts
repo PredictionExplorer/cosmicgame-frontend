@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 
 const HUSKY_DIR = resolve(__dirname, '..', '.husky');
 const PKG_PATH = resolve(__dirname, '..', 'package.json');
-const JEST_CONFIG_PATH = resolve(__dirname, '..', 'jest.config.js');
+const JEST_CONFIG_PATH = resolve(__dirname, '..', 'jest.config.ts');
 
 function readHook(name: string): string {
   return readFileSync(resolve(HUSKY_DIR, name), 'utf-8').trim();

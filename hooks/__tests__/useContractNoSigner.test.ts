@@ -6,7 +6,7 @@ import { reportError } from '@/utils/errors';
 import useContractNoSigner from '../useContractNoSigner';
 
 jest.mock('viem', () => ({
-  ...jest.requireActual('../../__mocks__/viem.js'),
+  ...jest.requireActual('../../__mocks__/viem'),
   getContract: jest.fn(),
   createPublicClient: jest.fn(() => ({ request: jest.fn() })),
   http: jest.fn(),
@@ -107,7 +107,7 @@ describe('useContractNoSigner', () => {
 
   it('calls reportError for non-Error throwables', () => {
     mockGetContract.mockImplementation(() => {
-      throw 'string error';  
+      throw 'string error';
     });
 
     const { result } = renderHook(() => useContractNoSigner(TEST_ADDRESS, TEST_ABI));
