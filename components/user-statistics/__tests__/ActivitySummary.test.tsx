@@ -55,8 +55,8 @@ describe('ActivitySummary', () => {
 
   it('renders raffle stats', () => {
     render(<ActivitySummary {...baseProps} />);
-    expect(screen.getByText('ETH Raffles Entered')).toBeInTheDocument();
-    expect(screen.getByText('NFTs Won')).toBeInTheDocument();
+    expect(screen.getByText('ETH Stellar Selections Participated')).toBeInTheDocument();
+    expect(screen.getByText('NFTs Received')).toBeInTheDocument();
   });
 
   it('renders staking stats', () => {

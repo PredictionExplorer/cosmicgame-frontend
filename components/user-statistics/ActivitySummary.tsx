@@ -104,18 +104,18 @@ export function ActivitySummary({
           />
           <StatGroup
             icon={<Ticket className="h-3.5 w-3.5" />}
-            title="Raffles"
+            title="Stellar Selections"
             className="sm:pl-6"
             stats={[
               {
-                label: 'ETH Raffles Entered',
+                label: 'ETH Stellar Selections Participated',
                 value: (userInfo.NumRaffleEthWinnings ?? 0).toLocaleString(),
-                tooltip: 'Number of ETH raffle draws you have participated in.',
+                tooltip: 'Number of ETH Stellar Selection allocations you have taken part in.',
               },
               {
-                label: 'NFTs Won',
+                label: 'NFTs Received',
                 value: (userInfo.RaffleNFTsCount ?? 0).toLocaleString(),
-                tooltip: 'CosmicSignature NFTs won through raffle mints.',
+                tooltip: 'Cosmic Signature NFTs received through Stellar Selection imprints.',
               },
             ]}
           />

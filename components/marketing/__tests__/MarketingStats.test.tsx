@@ -51,16 +51,16 @@ const defaultProps = {
 describe('MarketingStats', () => {
   it('renders all three stat labels', () => {
     renderWithTooltip(<MarketingStats {...defaultProps} />);
-    expect(screen.getByText('Total Rewards')).toBeInTheDocument();
-    expect(screen.getByText('Active Marketers')).toBeInTheDocument();
-    expect(screen.getByText('Reward Transactions')).toBeInTheDocument();
+    expect(screen.getByText('Total Allocations')).toBeInTheDocument();
+    expect(screen.getByText('Active Outreach Contributors')).toBeInTheDocument();
+    expect(screen.getByText('Allocation Transactions')).toBeInTheDocument();
   });
 
   it('renders info buttons for each stat', () => {
     renderWithTooltip(<MarketingStats {...defaultProps} />);
-    expect(screen.getByLabelText('Info about Total Rewards')).toBeInTheDocument();
-    expect(screen.getByLabelText('Info about Active Marketers')).toBeInTheDocument();
-    expect(screen.getByLabelText('Info about Reward Transactions')).toBeInTheDocument();
+    expect(screen.getByLabelText('Info about Total Allocations')).toBeInTheDocument();
+    expect(screen.getByLabelText('Info about Active Outreach Contributors')).toBeInTheDocument();
+    expect(screen.getByLabelText('Info about Allocation Transactions')).toBeInTheDocument();
   });
 
   it('renders the CST suffix for total rewards', () => {
@@ -70,14 +70,14 @@ describe('MarketingStats', () => {
 
   it('has a screen-reader-only heading', () => {
     renderWithTooltip(<MarketingStats {...defaultProps} />);
-    expect(screen.getByText('Marketing Program Statistics')).toBeInTheDocument();
+    expect(screen.getByText('Outreach Program Statistics')).toBeInTheDocument();
   });
 
   it('renders zero values without crashing', () => {
     renderWithTooltip(
       <MarketingStats totalRewardsEth={0} activeMarketers={0} rewardTransactions={0} />,
     );
-    expect(screen.getByText('Total Rewards')).toBeInTheDocument();
+    expect(screen.getByText('Total Allocations')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

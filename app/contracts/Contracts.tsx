@@ -263,7 +263,7 @@ const Contracts = () => {
           initial="hidden"
           animate="visible"
           transition={{ delay: 0.45 }}
-          aria-label="Auction and Raffle Parameters"
+          aria-label="Calibration Window and Stellar Selection Parameters"
         >
           <AuctionParameters
             cstDurations={cstDutchAuctionDurations}

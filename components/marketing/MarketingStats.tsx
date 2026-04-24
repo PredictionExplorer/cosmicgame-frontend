@@ -101,25 +101,25 @@ export function MarketingStats({
   return (
     <section aria-labelledby="stats-heading" className="py-16">
       <h2 id="stats-heading" className="sr-only">
-        Marketing Program Statistics
+        Outreach Program Statistics
       </h2>
       <div className="grid gap-6 sm:grid-cols-3">
         <StatCard
-          label="Total Rewards"
+          label="Total Allocations"
           value={totalRewardsEth}
           suffix="CST"
           decimals={2}
-          tooltip="Total CST tokens paid out to all marketing agents since launch"
+          tooltip="Total CST tokens forwarded to all outreach contributors since launch"
         />
         <StatCard
-          label="Active Marketers"
+          label="Active Outreach Contributors"
           value={activeMarketers}
-          tooltip="Number of unique wallet addresses that have earned marketing rewards"
+          tooltip="Number of unique wallet addresses that have received outreach allocations"
         />
         <StatCard
-          label="Reward Transactions"
+          label="Allocation Transactions"
           value={rewardTransactions}
-          tooltip="Total number of individual reward payouts processed"
+          tooltip="Total number of individual allocation payouts processed"
         />
       </div>
     </section>

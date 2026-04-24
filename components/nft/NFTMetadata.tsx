@@ -112,16 +112,16 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
           tooltip="When this token was minted on-chain. Click to view the transaction."
         />
         <StatCard
-          label="Round"
+          label="Cycle"
           value={roundDisplay}
           icon={<Trophy className="h-4 w-4" />}
-          tooltip="The game round in which this token was won. Click to view round details."
+          tooltip="The Performance Cycle in which this token was allocated. Click to view cycle details."
         />
         <StatCard
-          label="Winner"
+          label="Recipient"
           value={winnerDisplay}
           icon={<Award className="h-4 w-4" />}
-          tooltip="The address that originally won this token during the game round."
+          tooltip="The address that originally received this token during the Performance Cycle."
         />
         <StatCard
           label="Owner"

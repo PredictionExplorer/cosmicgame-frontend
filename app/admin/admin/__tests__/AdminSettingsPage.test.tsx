@@ -73,7 +73,7 @@ describe('AdminSettingsPage', () => {
       error: null,
     });
     render(<AdminSettingsPage />);
-    expect(screen.getByText('Cosmic Game Contract')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature Contract')).toBeInTheDocument();
     expect(screen.getByDisplayValue('0xCST')).toBeInTheDocument();
     expect(screen.getByDisplayValue('5')).toBeInTheDocument();
   });

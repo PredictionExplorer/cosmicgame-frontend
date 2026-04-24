@@ -225,7 +225,11 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       }, 3000);
     } catch (err) {
       if (isUserRejection(err)) {
-        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
       } else {
         reportError(err, 'claim donated NFT');
         const msg = getEthErrorMessage(err, 'An error occurred');
@@ -251,7 +255,11 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       }, 3000);
     } catch (err) {
       if (isUserRejection(err)) {
-        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
       } else {
         reportError(err, 'claim all donated NFTs');
         const msg = getEthErrorMessage(err, 'An error occurred while claiming donated NFTs!');
@@ -270,7 +278,11 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       }, 3000);
     } catch (err) {
       if (isUserRejection(err)) {
-        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
         return;
       }
       reportError(err, 'claim donated ERC20 token');
@@ -295,7 +307,11 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
       }, 3000);
     } catch (err) {
       if (isUserRejection(err)) {
-        setNotification({ text: WALLET_TRANSACTION_CANCELLED_MESSAGE, type: 'info', visible: true });
+        setNotification({
+          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
+          type: 'info',
+          visible: true,
+        });
         return;
       }
       reportError(err, 'claim all donated ERC20 tokens');
@@ -422,7 +438,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
               whileInView="visible"
               viewport={{ once: true, amount: 0.1 }}
             >
-              <SectionDivider title="Marketing Rewards" />
+              <SectionDivider title="Outreach Allocations" />
               <div className="mt-6">
                 <MarketingRewardsTable list={marketingRewards} />
               </div>

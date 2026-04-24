@@ -51,7 +51,7 @@ const AdminSettingsPage = () => {
         ) : (
           <SectionCard
             sectionId="admin-cosmic-contract"
-            title="Cosmic Game Contract"
+            title="Cosmic Signature Contract"
             description="Contract addresses and on-chain parameters from the dashboard API."
           >
             <div>
@@ -99,7 +99,7 @@ const AdminSettingsPage = () => {
                   Set Address
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Raffle wallet contract address">
+              <AdminFieldRow label="Stellar Selection wallet contract address">
                 <Input
                   placeholder="Enter address here"
                   className="flex-1 font-mono text-sm"
@@ -110,7 +110,7 @@ const AdminSettingsPage = () => {
                   Set Address
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Staking wallet contract address">
+              <AdminFieldRow label="Anchoring wallet contract address">
                 <Input
                   placeholder="Enter address here"
                   className="flex-1 font-mono text-sm"
@@ -121,7 +121,7 @@ const AdminSettingsPage = () => {
                   Set Address
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Marketing wallet contract address">
+              <AdminFieldRow label="Outreach wallet contract address">
                 <Input
                   placeholder="Enter address here"
                   className="flex-1 font-mono text-sm"
@@ -143,7 +143,7 @@ const AdminSettingsPage = () => {
                   Set Address
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Number of raffle ETH winners per round">
+              <AdminFieldRow label="Number of ETH Stellar Selection recipients per cycle">
                 <Input
                   type="number"
                   placeholder="Enter number here"
@@ -155,7 +155,7 @@ const AdminSettingsPage = () => {
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Number of raffle NFT winners per round">
+              <AdminFieldRow label="Number of NFT Stellar Selection recipients per cycle">
                 <Input
                   type="number"
                   placeholder="Enter number here"
@@ -167,7 +167,7 @@ const AdminSettingsPage = () => {
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Number of NFT holder winners per round">
+              <AdminFieldRow label="Number of NFT holder recipients per cycle">
                 <Input
                   type="number"
                   placeholder="Enter number here"
@@ -179,7 +179,7 @@ const AdminSettingsPage = () => {
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Prize percentage">
+              <AdminFieldRow label="Signature Allocation percentage">
                 <Input
                   type="number"
                   placeholder="Enter number here"
@@ -203,7 +203,7 @@ const AdminSettingsPage = () => {
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Raffle percentage">
+              <AdminFieldRow label="Stellar Selection percentage">
                 <Input
                   type="number"
                   placeholder="Enter number here"
@@ -215,7 +215,7 @@ const AdminSettingsPage = () => {
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Staking percentage">
+              <AdminFieldRow label="Anchor Distribution percentage">
                 <Input
                   type="number"
                   placeholder="Enter number here"
@@ -239,7 +239,7 @@ const AdminSettingsPage = () => {
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Timeout claim prize">
+              <AdminFieldRow label="Timeout to retrieve Signature Allocation">
                 <Input type="number" placeholder="Enter number here" className="flex-1" />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
                   Set
@@ -269,13 +269,13 @@ const AdminSettingsPage = () => {
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Initial seconds until prize">
+              <AdminFieldRow label="Initial seconds until Signature Allocation">
                 <Input type="number" placeholder="Enter number here" className="flex-1" />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Initial bid amount fraction">
+              <AdminFieldRow label="Initial Gesture Cost fraction">
                 <Input type="number" placeholder="Enter number here" className="flex-1" />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
                   Set
@@ -287,13 +287,13 @@ const AdminSettingsPage = () => {
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="ETH to CST bid ratio">
+              <AdminFieldRow label="ETH to CST Gesture ratio">
                 <Input type="number" placeholder="Enter number here" className="flex-1" />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
                   Set
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Round start CST auction length">
+              <AdminFieldRow label="Cycle start CST Calibration Window length">
                 <Input type="number" placeholder="Enter number here" className="flex-1" />
                 <Button variant="secondary" className="shrink-0 w-full sm:ml-2 sm:w-auto">
                   Set
