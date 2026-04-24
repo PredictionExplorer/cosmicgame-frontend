@@ -52,8 +52,8 @@ jest.mock('sonner', () => ({
 
 jest.mock('../../config/wagmi', () => ({ wagmiConfig: {} }));
 
-jest.mock('../../contexts/StakedTokenContext', () => ({
-  StakedTokenProvider: ({ children }: { children: React.ReactNode }) => (
+jest.mock('../../contexts/AnchoredTokenContext', () => ({
+  AnchoredTokenProvider: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="staked-token-provider">{children}</div>
   ),
 }));
@@ -199,10 +199,10 @@ describe('Providers', () => {
         <div>Content</div>
       </Providers>,
     );
-    expect(screen.getByTestId('toaster')).toHaveAttribute(
-      'data-classname',
-      'bg-card text-foreground border-border',
-    );
+    // The Toaster mock spreads className onto data-classname; the value
+    // changed when we themed the toast to brand tokens (border, glass bg,
+    // elevation shadow). Assert the recipe is applied, not the exact string.
+    expect(screen.getByTestId('toaster').getAttribute('data-classname')).toMatch(/bg-card/);
   });
 
   it('wraps content in two ErrorBoundary layers', () => {
@@ -231,12 +231,12 @@ describe('Providers', () => {
       </Providers>,
     );
 
-    const stakedToken = screen.getByTestId('staked-token-provider');
+    const anchoredToken = screen.getByTestId('staked-token-provider');
     const systemMode = screen.getByTestId('system-mode-provider');
     const apiData = screen.getByTestId('api-data-provider');
     const notification = screen.getByTestId('notification-provider');
 
-    expect(stakedToken).toContainElement(systemMode);
+    expect(anchoredToken).toContainElement(systemMode);
     expect(systemMode).toContainElement(apiData);
     expect(apiData).toContainElement(notification);
     expect(notification).toContainElement(screen.getByTestId('child'));

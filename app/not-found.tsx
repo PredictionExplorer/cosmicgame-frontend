@@ -3,7 +3,7 @@
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 
 const suggestedLinks = [
   { href: '/', label: 'Home \u2014 Active Cycle' },
@@ -16,7 +16,7 @@ const suggestedLinks = [
 
 export default function NotFound() {
   return (
-    <MainWrapper>
+    <PageShell variant="form" backdrop="signature">
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
         <h1 className="text-2xl font-bold text-primary text-center">404 — Page Not Found</h1>
         <p className="text-sm text-muted-foreground text-center max-w-md">
@@ -46,6 +46,6 @@ export default function NotFound() {
           </ul>
         </nav>
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 }

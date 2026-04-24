@@ -9,13 +9,8 @@ import { getAssetsUrl, getOriginUrl } from '@/utils';
 import { DefinitionList, DetailRow, SectionCard } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
 import NFTImage from '@/components/nft/NFTImage';
-import {
-  MainWrapper,
-  NFTInfoWrapper,
-  PrimaryMenuItem,
-  SectionWrapper,
-  StyledCard,
-} from '@/components/styled';
+import { NFTInfoWrapper, PrimaryMenuItem, SectionWrapper, StyledCard } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { Button } from '@/components/ui/button';
 import { useClipboard } from '@/hooks/useClipboard';
 import 'yet-another-react-lightbox/styles.css';
@@ -38,7 +33,7 @@ const SampleDetailPage = () => {
   };
 
   return (
-    <MainWrapper className="max-w-none px-0">
+    <PageShell variant="detail" backdrop="signature" className="max-w-none px-0">
       <div className="mx-auto w-full max-w-7xl px-4">
         <PageHeader
           title="Sample NFT detail"
@@ -99,7 +94,11 @@ const SampleDetailPage = () => {
             </div>
 
             <div className="max-w-md mx-auto w-full md:max-w-none">
-              <SectionCard sectionId="sample-meta" title="Token metadata" description="Static sample values for this demo page.">
+              <SectionCard
+                sectionId="sample-meta"
+                title="Token metadata"
+                description="Static sample values for this demo page."
+              >
                 <DefinitionList>
                   <DetailRow label="Token name">Sample NFT</DetailRow>
                   <DetailRow label="Seed">
@@ -132,7 +131,7 @@ const SampleDetailPage = () => {
           />
         </SectionWrapper>
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

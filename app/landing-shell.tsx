@@ -49,9 +49,13 @@ export function LandingShell({ children }: { children: ReactNode }) {
         <ErrorBoundary>{children}</ErrorBoundary>
         <Toaster
           position="top-right"
+          theme="dark"
+          richColors
+          closeButton
           toastOptions={{
             duration: NOTIFICATION_AUTO_HIDE_MS,
-            className: 'bg-card text-foreground border-border',
+            className:
+              'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
           }}
         />
       </CookiesProvider>

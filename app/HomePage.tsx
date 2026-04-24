@@ -14,20 +14,21 @@ import { getAssetsUrl } from '@/utils';
 
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { MainWrapper, StyledCard } from '@/components/styled';
+import { StyledCard } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
 import NFTImage from '@/components/nft/NFTImage';
 import { reportError } from '@/utils/errors';
-import { SpecialPrizeWinners } from '@/components/tables/SpecialPrizeWinners';
-import { BiddingStatus } from '@/components/common/BiddingStatus';
-import { BidForm } from '@/components/home/BidForm';
-import Prize from '@/components/common/Prize';
-import { useBidForm } from '@/hooks/useBidForm';
-import { usePrizeClaim } from '@/hooks/usePrizeClaim';
-import { usePrizeNotification } from '@/hooks/usePrizeNotification';
+import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
+import { GestureStatus } from '@/components/common/GestureStatus';
+import { GestureForm } from '@/components/home/GestureForm';
+import Allocation from '@/components/common/Allocation';
+import { useGestureForm } from '@/hooks/useGestureForm';
+import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
+import { useAllocationNotification } from '@/hooks/useAllocationNotification';
 import {
   useDashboardInfo,
-  useBidListByRound,
+  useGestureListByCycle,
   useCurrentTime,
   useCSTInfo,
 } from '@/hooks/useApiQuery';
@@ -60,11 +61,11 @@ const HomePage = () => {
   const { data: currentTimeData } = useCurrentTime();
 
   const round = dashboardData?.CurRoundNum ?? -1;
-  const { data: bidListData } = useBidListByRound(round, 'desc');
+  const { data: bidListData } = useGestureListByCycle(round, 'desc');
 
   const data = dashboardData ?? null;
   const loading = dashboardLoading;
-  const curBidList = bidListData ?? [];
+  const curGestureList = bidListData ?? [];
 
   const offset = useMemo(() => {
     if (currentTimeData == null) return 0;
@@ -92,71 +93,77 @@ const HomePage = () => {
     return { seed: '', id: -1 };
   }, [bannerTokenId, bannerCSTInfo]);
 
-  const bidForm = useBidForm();
-  const prizeClaim = usePrizeClaim({ data, offset });
-  const { playAudio, requestNotificationPermission } = usePrizeNotification({
-    prizeTime: prizeClaim.prizeTime,
+  const gestureForm = useGestureForm();
+  const allocationFinalize = useAllocationFinalize({ data, offset });
+  const { playAudio, requestNotificationPermission } = useAllocationNotification({
+    allocationTime: allocationFinalize.allocationTime,
   });
 
-  const prevBidCountRef = useRef<number>(0);
+  const prevGestureCountRef = useRef<number>(0);
   useEffect(() => {
-    if (dashboardData && prevBidCountRef.current > 0) {
+    if (dashboardData && prevGestureCountRef.current > 0) {
       if (
         account !== dashboardData.LastBidderAddr &&
-        dashboardData.CurNumBids > prevBidCountRef.current
+        dashboardData.CurNumBids > prevGestureCountRef.current
       ) {
         playAudio();
       }
     }
     if (dashboardData) {
-      prevBidCountRef.current = dashboardData.CurNumBids;
+      prevGestureCountRef.current = dashboardData.CurNumBids;
     }
   }, [dashboardData, account, playAudio]);
 
-  const { bidType, ethBidInfo, cstBidData, isBidding, rwlkId, bidPricePlus } = bidForm;
-  const { fetchActivationTime, prizeTime, timeoutClaimPrize, isClaiming, activationTime } =
-    prizeClaim;
+  const { gestureType, ethGestureInfo, cstGestureData, isGesturing, rwlkId, gestureCostPlus } =
+    gestureForm;
+  const { fetchActivationTime, allocationTime, timeoutFinalize, isClaiming, activationTime } =
+    allocationFinalize;
 
   const withPostTxRefresh = (afterMs = 1500, activationMs = 3000) => {
     setTimeout(() => {
       queryClient.invalidateQueries();
-      bidForm.setMessage('');
+      gestureForm.setMessage('');
     }, afterMs);
     setTimeout(() => {
       fetchActivationTime().catch((e) => reportError(e, 'fetchActivationTime'));
     }, activationMs);
   };
 
-  const handleBid = async () => {
-    if (await (bidType === 'CST' ? bidForm.onBidWithCST() : bidForm.onBid())) withPostTxRefresh();
+  const handleGesture = async () => {
+    if (await (gestureType === 'CST' ? gestureForm.onGestureWithCST() : gestureForm.onGesture()))
+      withPostTxRefresh();
   };
-  const handleClaimPrize = async () => {
-    if (await prizeClaim.onClaimPrize()) withPostTxRefresh(1000, 3000);
+  const handleFinalize = async () => {
+    if (await allocationFinalize.onFinalize()) withPostTxRefresh(1000, 3000);
   };
 
   useEffect(() => {
     requestNotificationPermission();
     if (searchParams?.get('randomwalk')) {
-      bidForm.setRwlkId(Number(searchParams.get('tokenId')));
-      bidForm.setBidType('RandomWalk');
+      gestureForm.setRwlkId(Number(searchParams.get('tokenId')));
+      gestureForm.setBidType('RandomWalk');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, requestNotificationPermission]);
 
-  const getBidLabel = () => {
-    const adj = (ethBidInfo?.ETHPrice ?? 0) * (1 + bidPricePlus / 100);
+  const getGestureLabel = () => {
+    const adj = (ethGestureInfo?.ETHPrice ?? 0) * (1 + gestureCostPlus / 100);
     const fmt = (v: number, t: number) => (v > t ? v.toFixed(2) : v.toFixed(5));
-    if (bidType === 'ETH') return `Gesture with ETH (${fmt(adj, 0.1)} ETH)`;
-    if (bidType === 'RandomWalk' && rwlkId !== -1)
+    if (gestureType === 'ETH') return `Gesture with ETH (${fmt(adj, 0.1)} ETH)`;
+    if (gestureType === 'RandomWalk' && rwlkId !== -1)
       return `Gesture with RandomWalk token ${rwlkId} (${fmt(adj * 0.5, 0.2)} ETH)`;
-    if (bidType === 'CST')
-      return `Gesture with CST ${cstBidData.SecondsElapsed > cstBidData.AuctionDuration ? '(FREE GESTURE)' : `(${cstBidData.CSTPrice.toFixed(2)} CST)`}`;
-    return `Gesture with ${bidType}`;
+    if (gestureType === 'CST')
+      return `Gesture with CST ${cstGestureData.SecondsElapsed > cstGestureData.AuctionDuration ? '(FREE GESTURE)' : `(${cstGestureData.CSTPrice.toFixed(2)} CST)`}`;
+    return `Gesture with ${gestureType}`;
   };
 
-  const canBid = prizeTime > Date.now() || data?.LastBidderAddr !== account;
-  const canClaim = !(prizeTime > Date.now() || data?.LastBidderAddr === zeroAddress || loading);
-  const claimWait = prizeTime + timeoutClaimPrize * 1000;
+  const canGesture = allocationTime > Date.now() || data?.LastBidderAddr !== account;
+  const canClaim = !(
+    allocationTime > Date.now() ||
+    data?.LastBidderAddr === zeroAddress ||
+    loading
+  );
+  const claimWait = allocationTime + timeoutFinalize * 1000;
   const isActive = account !== null && activationTime < Date.now() / 1000;
 
   const landingHost = hostname !== null && isLandingHost(hostname);
@@ -182,7 +189,7 @@ const HomePage = () => {
 
   return (
     <>
-      <MainWrapper>
+      <PageShell variant="data" backdrop="signature">
         {loading && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <Spinner size="lg" className="text-white" />
@@ -245,13 +252,13 @@ const HomePage = () => {
         </motion.div>
 
         {/* ===== BIDDING STATUS (countdown + stats) ===== */}
-        <BiddingStatus
+        <GestureStatus
           data={data}
           loading={loading}
           activationTime={activationTime}
-          curBidList={curBidList}
-          ethBidInfo={ethBidInfo}
-          prizeTime={prizeTime}
+          curGestureList={curGestureList}
+          ethGestureInfo={ethGestureInfo}
+          allocationTime={allocationTime}
         />
 
         {/* ===== SPECIAL PRIZE LEADERS + NFT PREVIEW ===== */}
@@ -260,7 +267,7 @@ const HomePage = () => {
           <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3 print:grid-cols-1">
             {/* min-w-0 + print col fixes: home PDF often uses narrow width; col-span-2 can collapse badly in Skia */}
             <div className="min-w-0 lg:col-span-2 print:col-auto">
-              <SpecialPrizeWinners />
+              <SpecialAllocationRecipients />
             </div>
             <div className="hidden min-w-0 lg:block print:hidden">
               <Link
@@ -305,25 +312,27 @@ const HomePage = () => {
                 Choose a gesture method and participate in the active cycle.
               </p>
 
-              <BidForm {...bidForm} data={data} />
+              <GestureForm {...gestureForm} data={data} />
 
               <div className="mt-6 space-y-4">
-                {canBid && (
+                {canGesture && (
                   <Button
                     size="lg"
-                    onClick={handleBid}
+                    onClick={handleGesture}
                     className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
                     disabled={
-                      isBidding || (bidType === 'RandomWalk' && rwlkId === -1) || bidType === ''
+                      isGesturing ||
+                      (gestureType === 'RandomWalk' && rwlkId === -1) ||
+                      gestureType === ''
                     }
                   >
-                    {isBidding ? (
+                    {isGesturing ? (
                       <span className="flex items-center gap-2">
                         <Spinner size="sm" /> Processing...
                       </span>
                     ) : (
                       <>
-                        {getBidLabel()} <ArrowRight className="ml-2 h-5 w-5" />
+                        {getGestureLabel()} <ArrowRight className="ml-2 h-5 w-5" />
                       </>
                     )}
                   </Button>
@@ -332,7 +341,7 @@ const HomePage = () => {
                   <>
                     <Button
                       size="lg"
-                      onClick={handleClaimPrize}
+                      onClick={handleFinalize}
                       className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
                       disabled={
                         isClaiming || (data?.LastBidderAddr !== account && claimWait > Date.now())
@@ -380,7 +389,7 @@ const HomePage = () => {
             transition={{ delay: 0.4 }}
             className="print-motion-visible"
           >
-            <Prize data={data} />
+            <Allocation data={data} />
           </motion.div>
         )}
 
@@ -405,7 +414,7 @@ const HomePage = () => {
             <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
           </Link>
         </motion.div>
-      </MainWrapper>
+      </PageShell>
 
       <LatestNFTs />
     </>

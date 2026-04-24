@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom';
 import { render, screen, checkA11y } from '@/test-utils';
 
-jest.mock('../../components/styled', () => ({
-  MainWrapper: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+jest.mock('../../components/ui/page-shell', () => ({
+  PageShell: ({ children }: { children: React.ReactNode }) => <main>{children}</main>,
 }));
 
 jest.mock('next/link', () => ({

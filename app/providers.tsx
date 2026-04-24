@@ -266,9 +266,24 @@ export function Providers({
           </ErrorBoundary>
           <Toaster
             position="top-right"
+            theme="dark"
+            richColors
+            closeButton
             toastOptions={{
               duration: NOTIFICATION_AUTO_HIDE_MS,
-              className: 'bg-card text-foreground border-border',
+              className:
+                'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
+              classNames: {
+                toast: 'group',
+                title: 'type-body-md text-foreground',
+                description: 'type-body-sm text-muted-foreground',
+                actionButton: 'bg-primary text-primary-foreground',
+                cancelButton: 'bg-muted text-muted-foreground',
+                success: 'border-[rgb(var(--impact-green-rgb)/0.4)]',
+                error: 'border-[rgb(var(--chrono-rose-rgb)/0.4)]',
+                warning: 'border-[rgb(var(--solar-gold-rgb)/0.4)]',
+                info: 'border-[rgb(var(--aurora-cyan-rgb)/0.4)]',
+              },
             }}
           />
         </RainbowKitProvider>
