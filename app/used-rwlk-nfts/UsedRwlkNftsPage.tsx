@@ -9,8 +9,9 @@ import { Tr } from 'react-super-responsive-table';
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/ui/page-shell';
+import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import {
-  MainWrapper,
   TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
@@ -93,9 +94,12 @@ const UsedRwlkNftsPage = () => {
   const { data: list = [], isLoading: loading } = useUsedRWLKNFTs();
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
+        align="left"
+        eyebrow={<SectionEyebrow tone="nebula">Used RWLK · {list.length}</SectionEyebrow>}
         title="Used Random Walk NFTs"
+        gradientTitle="signature"
         subtitle="Random Walk NFTs that have been anchored to gestures"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
@@ -123,7 +127,7 @@ const UsedRwlkNftsPage = () => {
           <p className="text-lg font-semibold">No NFTs yet.</p>
         )}
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

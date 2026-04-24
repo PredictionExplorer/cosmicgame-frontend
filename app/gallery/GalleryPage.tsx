@@ -3,8 +3,10 @@
 import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-import { MainWrapper } from '@/components/styled';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/ui/page-shell';
+import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import { Surface } from '@/components/ui/surface';
 import { useCSTList } from '@/hooks/useApiQuery';
 import api from '@/services/api';
 
@@ -171,9 +173,16 @@ const GalleryPage = () => {
   );
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
+        align="left"
+        eyebrow={
+          <SectionEyebrow tone="aurora" pulse>
+            Collection · {stats.total > 0 ? `${stats.total} NFTs Imprinted` : 'Live'}
+          </SectionEyebrow>
+        }
         title="NFT Gallery"
+        gradientTitle="signature"
         subtitle="Explore the complete Cosmic Signature NFT collection imprinted across every cycle"
       />
 
@@ -186,19 +195,26 @@ const GalleryPage = () => {
 
       <GalleryHero stats={stats} loading={isLoading} />
 
-      <GalleryToolbar
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        onSearchSubmit={handleSearchSubmit}
-        filter={filter}
-        onFilterChange={handleFilterChange}
-        sort={sort}
-        onSortChange={handleSortChange}
-        viewMode={viewMode}
-        onViewModeChange={handleViewModeChange}
-        resultCount={searchQuery ? searched.length : undefined}
-        totalCount={searchQuery ? filtered.length : undefined}
-      />
+      <Surface
+        variant="glass-bordered"
+        radius="md"
+        padding="md"
+        className="sticky top-20 z-10 mb-6 backdrop-blur-md"
+      >
+        <GalleryToolbar
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearchSubmit}
+          filter={filter}
+          onFilterChange={handleFilterChange}
+          sort={sort}
+          onSortChange={handleSortChange}
+          viewMode={viewMode}
+          onViewModeChange={handleViewModeChange}
+          resultCount={searchQuery ? searched.length : undefined}
+          totalCount={searchQuery ? filtered.length : undefined}
+        />
+      </Surface>
 
       <GalleryGrid
         items={visibleItems}
@@ -210,7 +226,7 @@ const GalleryPage = () => {
         onPageChange={handlePageChange}
         onPerPageChange={handlePerPageChange}
       />
-    </MainWrapper>
+    </PageShell>
   );
 };
 

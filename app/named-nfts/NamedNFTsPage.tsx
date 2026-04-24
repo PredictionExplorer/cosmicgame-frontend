@@ -7,7 +7,6 @@ import { Tr, Tbody } from 'react-super-responsive-table';
 import { convertTimestampToDateTime } from '@/utils';
 
 import {
-  MainWrapper,
   TablePrimary,
   TablePrimaryCell,
   TablePrimaryContainer,
@@ -22,6 +21,8 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import { Spinner } from '@/components/ui/spinner';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/ui/page-shell';
+import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 const NamedNFTRow = ({ nft }: { nft: CSTTokenInfo }) => {
   if (!nft) {
@@ -70,15 +71,18 @@ const NamedNFTsPage = () => {
   const { data: list = [], isLoading: loading } = useNamedNFTs();
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
+        align="left"
+        eyebrow={<SectionEyebrow tone="aurora">Named Tokens · {list.length}</SectionEyebrow>}
         title="Named Cosmic Signature Tokens"
+        gradientTitle="signature"
         subtitle="Browse tokens that have been given custom names"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        COSMIC NFT owners can give their tokens custom names, creating a unique identity
-        within the collection. Named tokens stand out in the gallery and carry the personal touch of
-        their owners.
+        COSMIC NFT owners can give their tokens custom names, creating a unique identity within the
+        collection. Named tokens stand out in the gallery and carry the personal touch of their
+        owners.
       </p>
 
       <div className="mt-12">
@@ -103,7 +107,7 @@ const NamedNFTsPage = () => {
           />
         )}
       </div>
-    </MainWrapper>
+    </PageShell>
   );
 };
 

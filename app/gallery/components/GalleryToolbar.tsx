@@ -33,7 +33,7 @@ export function GalleryToolbar({
   totalCount,
 }: GalleryToolbarProps) {
   return (
-    <div className="space-y-4 mb-8">
+    <div className="space-y-4">
       <GallerySearchInput
         value={searchQuery}
         onChange={onSearchChange}

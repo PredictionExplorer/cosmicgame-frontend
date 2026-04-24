@@ -1,18 +1,24 @@
 'use client';
 
-import { MainWrapper } from '@/components/styled';
-import DonatedNFTTable, { type NFTRecord } from '@/components/donations/DonatedNFTTable';
+import AttachedNFTTable, { type NFTRecord } from '@/components/attachments/AttachedNFTTable';
 import { useDonationsNFTList } from '@/hooks/useApiQuery';
 import { Spinner } from '@/components/ui/spinner';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/ui/page-shell';
+import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 const NFTDonationsPage = () => {
   const { data: nftDonations = null } = useDonationsNFTList();
 
   return (
-    <MainWrapper>
+    <PageShell variant="data" backdrop="signature">
       <PageHeader
+        align="left"
+        eyebrow={
+          <SectionEyebrow tone="impact">Attached NFTs · {nftDonations?.length ?? 0}</SectionEyebrow>
+        }
         title="Attached NFT Contributions"
+        gradientTitle="signature"
         subtitle="NFTs attached to gestures by community members across cycles"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
@@ -26,13 +32,13 @@ const NFTDonationsPage = () => {
           <Spinner />
         </div>
       ) : (
-        <DonatedNFTTable
+        <AttachedNFTTable
           list={(nftDonations ?? []) as NFTRecord[]}
           handleClaim={undefined}
           claimingTokens={[]}
         />
       )}
-    </MainWrapper>
+    </PageShell>
   );
 };
 

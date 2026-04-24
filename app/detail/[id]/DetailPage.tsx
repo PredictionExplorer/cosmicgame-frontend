@@ -1,21 +1,21 @@
 'use client';
 
 import NFTTrait from '@/components/nft/NFTTrait';
-import { MainWrapper } from '@/components/styled';
+import { PageShell } from '@/components/ui/page-shell';
 
 const DetailPage = ({ tokenId }: { tokenId: number }) => {
   if (tokenId < 0) {
     return (
-      <MainWrapper>
+      <PageShell variant="form">
         <p className="text-lg font-semibold">Invalid Token Id</p>
-      </MainWrapper>
+      </PageShell>
     );
   }
 
   return (
-    <MainWrapper className="max-w-none px-0">
+    <PageShell variant="detail" backdrop="signature" className="max-w-none px-0">
       <NFTTrait tokenId={tokenId} />
-    </MainWrapper>
+    </PageShell>
   );
 };
 
