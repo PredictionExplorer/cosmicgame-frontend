@@ -376,7 +376,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
           >
-            <SectionDivider title="Bidding History" />
+            <SectionDivider title="Gesture History" />
             <div className="mt-6">
               <BiddingHistoryTable biddingHistory={bidHistory} />
             </div>

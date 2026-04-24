@@ -50,14 +50,14 @@ describe('StakingActionDetailPage', () => {
     mockUseStakingRWLKActionsInfo.mockReturnValue(noData);
     mockUseStakingCSTActionsInfo.mockReturnValue(noData);
     render(<StakingActionDetailPage IsRwalk={1} actionId={5} />);
-    expect(screen.getByText('Staking Action for RandomWalk Token')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Action for RandomWalk Token')).toBeInTheDocument();
   });
 
   it('renders CST heading when IsRwalk=0', () => {
     mockUseStakingRWLKActionsInfo.mockReturnValue(noData);
     mockUseStakingCSTActionsInfo.mockReturnValue(noData);
     render(<StakingActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('Staking Action for Cosmic Signature Token')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Action for Cosmic Signature Token')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -82,7 +82,7 @@ describe('StakingActionDetailPage', () => {
     mockUseStakingRWLKActionsInfo.mockReturnValue(noData);
     mockUseStakingCSTActionsInfo.mockReturnValue(noData);
     render(<StakingActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('No data found for this staking action.')).toBeInTheDocument();
+    expect(screen.getByText('No data found for this anchor action.')).toBeInTheDocument();
   });
 
   it('renders stake info when data is available (CST)', () => {
@@ -93,7 +93,7 @@ describe('StakingActionDetailPage', () => {
       error: null,
     });
     render(<StakingActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('Stake')).toBeInTheDocument();
+    expect(screen.getByText('Anchor')).toBeInTheDocument();
     expect(screen.getByText('0xStaker')).toBeInTheDocument();
   });
 

@@ -219,7 +219,7 @@ describe('UserStatisticsView', () => {
     mockUseDashboardInfo.mockReturnValue({ data: {}, isLoading: false });
     mockUseUserInfo.mockReturnValue({ data: baseUserInfo, isLoading: false });
     render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
-    expect(screen.getByText('Bidding History')).toBeInTheDocument();
+    expect(screen.getByText('Gesture History')).toBeInTheDocument();
     expect(screen.getByText('Winning History')).toBeInTheDocument();
     expect(screen.getByText('Staking')).toBeInTheDocument();
     expect(screen.getByText('Token Holdings')).toBeInTheDocument();
