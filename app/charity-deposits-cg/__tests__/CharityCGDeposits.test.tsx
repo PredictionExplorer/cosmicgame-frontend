@@ -20,7 +20,7 @@ describe('CharityCGDeposits', () => {
   it('renders the heading', () => {
     mockUseCharityCGDeposits.mockReturnValue({ data: [], isLoading: false });
     render(<CharityCGDeposits />);
-    expect(screen.getByText('Charity Deposits')).toBeInTheDocument();
+    expect(screen.getByText('Protocol Public-Goods Contributions')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {

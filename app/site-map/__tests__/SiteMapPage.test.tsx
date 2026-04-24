@@ -17,9 +17,9 @@ describe('SiteMapPage', () => {
     render(<SiteMapPage />);
     const expectedLinks = [
       { label: 'My Tokens', href: '/my-tokens' },
-      { label: 'My Unclaimed Winnings', href: '/my-winnings' },
-      { label: 'History of My Winnings', href: '/winning-history' },
-      { label: 'My Staking', href: '/my-staking' },
+      { label: 'My Unretrieved Allocations', href: '/my-winnings' },
+      { label: 'History of My Allocations', href: '/winning-history' },
+      { label: 'My Anchors', href: '/my-staking' },
     ];
     for (const { label, href } of expectedLinks) {
       const link = screen.getByRole('link', { name: label });
@@ -35,10 +35,10 @@ describe('SiteMapPage', () => {
   it('renders all system links', () => {
     render(<SiteMapPage />);
     const expectedLinks = [
-      { label: 'CosmicSignature Gallery', href: '/gallery' },
-      { label: 'Rounds Played', href: '/prize' },
-      { label: 'Staking Rewards', href: '/staking' },
-      { label: 'Marketing Rewards', href: '/marketing' },
+      { label: 'Cosmic Signature Gallery', href: '/gallery' },
+      { label: 'Cycles Completed', href: '/prize' },
+      { label: 'Anchor Distributions', href: '/staking' },
+      { label: 'Outreach Allocations', href: '/marketing' },
       { label: 'System Statistics', href: '/statistics' },
       { label: 'Contract Addresses', href: '/contracts' },
       { label: 'FAQ', href: '/faq' },

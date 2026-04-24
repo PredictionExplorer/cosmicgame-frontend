@@ -72,7 +72,7 @@ describe('EthDonations', () => {
       refetch: mockRefetch,
     });
     render(<EthDonations />);
-    expect(screen.getByText('ETH Donations')).toBeInTheDocument();
+    expect(screen.getByText('ETH Contributions')).toBeInTheDocument();
   });
 
   it('renders donation form when account is connected', () => {
@@ -84,8 +84,8 @@ describe('EthDonations', () => {
     });
     render(<EthDonations />);
     expect(screen.getByPlaceholderText('0.0')).toBeInTheDocument();
-    expect(screen.getByText('Donate')).toBeInTheDocument();
-    expect(screen.getByText('Donate with Info')).toBeInTheDocument();
+    expect(screen.getByText('Contribute')).toBeInTheDocument();
+    expect(screen.getByText('Contribute with Info')).toBeInTheDocument();
   });
 
   it('updates donation amount on input change', () => {

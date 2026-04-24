@@ -12,11 +12,14 @@ const CharityWithdrawals = () => {
 
   return (
     <MainWrapper>
-      <PageHeader title="Charity Withdrawals" subtitle="Funds withdrawn from the charity wallet" />
+      <PageHeader
+        title="Public Goods Retrievals"
+        subtitle="Funds retrieved from the Public Goods Vault"
+      />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        This page tracks all fund withdrawals from the Cosmic Signature charity wallet. Each
-        withdrawal represents charitable funds being deployed to beneficiaries chosen through the
-        Cosmic DAO governance process.
+        This page tracks all retrievals from the Cosmic Signature Public Goods Vault. Each retrieval
+        represents public-goods funds being forwarded to beneficiaries selected through Cosmic
+        Council coordination.
       </p>
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>

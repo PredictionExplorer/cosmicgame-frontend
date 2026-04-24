@@ -9,16 +9,16 @@ import { cn } from '@/lib/utils';
 
 const perUserLinks = [
   { href: '/my-tokens', label: 'My Tokens' },
-  { href: '/my-winnings', label: 'My Unclaimed Winnings' },
-  { href: '/winning-history', label: 'History of My Winnings' },
-  { href: '/my-staking', label: 'My Staking' },
+  { href: '/my-winnings', label: 'My Unretrieved Allocations' },
+  { href: '/winning-history', label: 'History of My Allocations' },
+  { href: '/my-staking', label: 'My Anchors' },
 ];
 
 const systemLinks = [
-  { href: '/gallery', label: 'CosmicSignature Gallery' },
-  { href: '/prize', label: 'Rounds Played' },
-  { href: '/staking', label: 'Staking Rewards' },
-  { href: '/marketing', label: 'Marketing Rewards' },
+  { href: '/gallery', label: 'Cosmic Signature Gallery' },
+  { href: '/prize', label: 'Cycles Completed' },
+  { href: '/staking', label: 'Anchor Distributions' },
+  { href: '/marketing', label: 'Outreach Allocations' },
   { href: '/statistics', label: 'System Statistics' },
   { href: '/contracts', label: 'Contract Addresses' },
   { href: '/faq', label: 'FAQ' },
@@ -64,11 +64,8 @@ const SiteMapPage = () => {
     <MainWrapper>
       <PageHeader
         title="Site Map"
-        subtitle="Quick links to account pages and public game data."
-        breadcrumbs={[
-          { label: 'Home', href: '/' },
-          { label: 'Site Map' },
-        ]}
+        subtitle="Quick links to account pages and public protocol data."
+        breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Site Map' }]}
         className="mb-10 max-w-3xl md:mx-auto md:text-center"
       />
 
@@ -84,7 +81,7 @@ const SiteMapPage = () => {
             Per-user information
           </h2>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            Wallet-specific pages: balances, claims, staking, and your history.
+            Wallet-specific pages: balances, retrievals, anchoring, and your history.
           </p>
           <SitemapLinkList links={perUserLinks} navLabel="Per-user pages" />
         </section>
@@ -100,7 +97,7 @@ const SiteMapPage = () => {
             Overall system information
           </h2>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            Public leaderboards, rewards, stats, contracts, and help.
+            Public leaderboards, distributions, stats, contracts, and help.
           </p>
           <SitemapLinkList links={systemLinks} navLabel="System and help pages" />
         </section>

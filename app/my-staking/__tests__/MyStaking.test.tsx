@@ -107,7 +107,7 @@ describe('MyStaking', () => {
       render(<MyStaking />);
     });
     expect(
-      screen.getByText('Please connect your wallet to manage your staking.'),
+      screen.getByText('Please connect your wallet to manage your anchors.'),
     ).toBeInTheDocument();
   });
 
@@ -132,7 +132,7 @@ describe('MyStaking', () => {
     render(<MyStaking />);
     await waitFor(() => {});
 
-    expect(screen.getByText('My Staking')).toBeInTheDocument();
+    expect(screen.getByText('My Anchors')).toBeInTheDocument();
     expect(screen.getByTestId('staking-hero-stats')).toBeInTheDocument();
     expect(screen.getByTestId('staking-rewards-table')).toBeInTheDocument();
     expect(screen.getByTestId('staking-actions-table')).toBeInTheDocument();
@@ -151,10 +151,10 @@ describe('MyStaking', () => {
     });
     render(<MyStaking />);
     await waitFor(() => {});
-    expect(screen.getByTestId('stat-Your Staked CST')).toBeInTheDocument();
-    expect(screen.getByTestId('stat-Your Staked RWLK')).toBeInTheDocument();
-    expect(screen.getByTestId('stat-Unclaimed Rewards')).toBeInTheDocument();
-    expect(screen.getByTestId('stat-Reward per CST')).toBeInTheDocument();
+    expect(screen.getByTestId('stat-Your Anchored CST')).toBeInTheDocument();
+    expect(screen.getByTestId('stat-Your Anchored RWLK')).toBeInTheDocument();
+    expect(screen.getByTestId('stat-Unretrieved Distributions')).toBeInTheDocument();
+    expect(screen.getByTestId('stat-Distribution per CST')).toBeInTheDocument();
   });
 
   it('renders page title', async () => {
@@ -163,7 +163,7 @@ describe('MyStaking', () => {
     await act(async () => {
       render(<MyStaking />);
     });
-    expect(screen.getByText('My Staking')).toBeInTheDocument();
+    expect(screen.getByText('My Anchors')).toBeInTheDocument();
   });
 
   it('does not render hero stats when wallet is not connected', async () => {

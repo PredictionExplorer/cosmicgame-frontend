@@ -37,7 +37,9 @@ describe('ChangedParameters', () => {
     mockUseSystemModelist.mockReturnValue({ data: null, isLoading: false });
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
     render(<ChangedParameters />);
-    expect(screen.getByText('Please login to Metamask to see your winnings.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Please login to Metamask to see your allocations.'),
+    ).toBeInTheDocument();
   });
 
   it('shows loading state', () => {

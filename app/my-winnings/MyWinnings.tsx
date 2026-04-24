@@ -121,11 +121,11 @@ export default function MyWinnings() {
   if (!account) {
     return (
       <MainWrapper>
-        <PageHeader title="My Rewards" />
+        <PageHeader title="My Allocations" />
         <EmptyState
           icon={<Wallet className="h-8 w-8 text-muted-foreground/50" />}
           title="Wallet not connected"
-          description="Connect your wallet to view and claim your winnings."
+          description="Connect your wallet to view and retrieve your allocations."
         />
       </MainWrapper>
     );
@@ -134,7 +134,7 @@ export default function MyWinnings() {
   if (error) {
     return (
       <MainWrapper>
-        <PageHeader title="My Rewards" />
+        <PageHeader title="My Allocations" />
         <ErrorState title="Failed to load" message={error} onRetry={refetch} />
       </MainWrapper>
     );
@@ -268,7 +268,7 @@ export default function MyWinnings() {
 
         <div>
           <Button variant="outline" onClick={() => router.push('/winning-history')}>
-            View Winning History
+            View Allocation History
           </Button>
         </div>
       </div>

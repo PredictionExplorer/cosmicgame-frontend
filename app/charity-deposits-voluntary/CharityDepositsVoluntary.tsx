@@ -14,13 +14,13 @@ const CharityDepositsVoluntary = () => {
   return (
     <MainWrapper>
       <PageHeader
-        title="Voluntary Donations"
-        subtitle="Community members' voluntary contributions to charity"
+        title="Voluntary Public-Goods Contributions"
+        subtitle="Community members' voluntary contributions to the Public Goods Vault"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Beyond automatic game contributions, community members can make voluntary donations to the
-        charity pool. These contributions reflect the Cosmic Signature community&apos;s commitment
-        to supporting meaningful causes through blockchain technology.
+        Beyond automatic protocol forwards, community members can make voluntary contributions to
+        the Public Goods Vault. These contributions reflect the Cosmic Signature community&apos;s
+        commitment to supporting public-goods initiatives through on-chain coordination.
       </p>
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>

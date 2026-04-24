@@ -27,7 +27,7 @@ describe('WinningHistory', () => {
     mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseClaimHistoryByUser.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<WinningHistory />);
-    expect(screen.getByText('History of My Winnings')).toBeInTheDocument();
+    expect(screen.getByText('History of My Allocations')).toBeInTheDocument();
   });
 
   it('shows login prompt when no account', () => {

@@ -35,7 +35,7 @@ const EthDonations = () => {
       });
 
       setNotification({
-        text: `${donateAmount} ETH was donated successfully!`,
+        text: `${donateAmount} ETH was contributed successfully!`,
         type: 'success',
         visible: true,
       });
@@ -50,9 +50,9 @@ const EthDonations = () => {
           visible: true,
         });
       } else {
-        reportError(error, 'Donation error');
+        reportError(error, 'Contribution error');
         setNotification({
-          text: 'Donation failed, please try again.',
+          text: 'Contribution failed, please try again.',
           type: 'error',
           visible: true,
         });
@@ -67,7 +67,7 @@ const EthDonations = () => {
       });
 
       setNotification({
-        text: `${donateAmount} ETH with information was donated successfully!`,
+        text: `${donateAmount} ETH with information was contributed successfully!`,
         type: 'success',
         visible: true,
       });
@@ -83,9 +83,9 @@ const EthDonations = () => {
           visible: true,
         });
       } else {
-        reportError(error, 'Donation with info error');
+        reportError(error, 'Contribution with info error');
         setNotification({
-          text: 'Donation with information failed, please check your input.',
+          text: 'Contribution with information failed, please check your input.',
           type: 'error',
           visible: true,
         });
@@ -96,19 +96,20 @@ const EthDonations = () => {
   return (
     <MainWrapper>
       <PageHeader
-        title="ETH Donations"
-        subtitle="Donate ETH directly to the Cosmic Signature charity pool"
+        title="ETH Contributions"
+        subtitle="Contribute ETH directly to the Cosmic Signature Public Goods Vault"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Donate ETH directly to the Cosmic Signature charity pool to support causes chosen by the
-        Cosmic DAO. You can include an optional title, message, and URL with your donation. Top
-        donors for each round may be featured on the home page.
+        Contribute ETH directly to the Cosmic Signature Public Goods Vault to support beneficiaries
+        selected through Cosmic Council coordination. You can include an optional title, message,
+        and URL with your contribution. Top contributors for each cycle may be featured on the home
+        page.
       </p>
 
       {!!account && (
         <div className="mb-12 rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 space-y-4">
           <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Make a Donation
+            Make a Contribution
           </h3>
           <div>
             <Label className="text-xs text-muted-foreground mb-1.5 block">Amount (ETH)</Label>
@@ -137,20 +138,20 @@ const EthDonations = () => {
           </div>
           <div className="flex gap-2 pt-2">
             <Button disabled={!donateAmount || donateAmount === '0'} onClick={handleDonate}>
-              Donate
+              Contribute
             </Button>
             <Button
               variant="outline"
               disabled={!donateAmount || donateAmount === '0'}
               onClick={handleDonateWithInfo}
             >
-              Donate with Info
+              Contribute with Info
             </Button>
           </div>
         </div>
       )}
 
-      <SectionDivider title="Donation History" className="mb-6" />
+      <SectionDivider title="Contribution History" className="mb-6" />
       {isLoading || charityDonations === null ? (
         <div className="flex justify-center py-8">
           <Spinner />

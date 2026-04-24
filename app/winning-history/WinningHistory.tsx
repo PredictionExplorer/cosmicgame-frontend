@@ -38,12 +38,13 @@ function WinningHistory() {
   return (
     <MainWrapper>
       <PageHeader
-        title="History of My Winnings"
-        subtitle="View your past prize claims and rewards"
+        title="History of My Allocations"
+        subtitle="View your past allocation retrievals and distributions"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Track your complete winning history across all Cosmic Signature game rounds. This includes
-        main prize claims, raffle ETH winnings, NFT prizes, and staking reward distributions.
+        Track your complete allocation history across all Cosmic Signature Performance Cycles. This
+        includes Signature Allocation retrievals, Stellar Selection ETH allocations, Cosmic
+        Signature NFT allocations, and Anchor Distributions.
       </p>
 
       {loading ? (

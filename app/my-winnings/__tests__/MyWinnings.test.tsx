@@ -94,7 +94,7 @@ describe('MyWinnings', () => {
     render(<MyWinnings />);
     expect(screen.getByText('Wallet not connected')).toBeInTheDocument();
     expect(
-      screen.getByText('Connect your wallet to view and claim your winnings.'),
+      screen.getByText('Connect your wallet to view and retrieve your allocations.'),
     ).toBeInTheDocument();
   });
 

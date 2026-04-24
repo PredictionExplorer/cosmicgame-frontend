@@ -68,33 +68,33 @@ const MyStaking = () => {
   const heroStats: StakingStatItem[] = useMemo(
     () => [
       {
-        label: 'Your Staked CST',
+        label: 'Your Anchored CST',
         value: stakedCSTokens.length.toLocaleString(),
         tooltip:
-          'Number of CosmicSignature NFTs you currently have staked. Staking more tokens increases your share of reward distributions.',
+          'Number of Cosmic Signature NFTs you currently have anchored. Anchoring more tokens increases your share of Anchor Distributions.',
         icon: <Layers className="h-4 w-4" />,
       },
       {
-        label: 'Your Staked RWLK',
+        label: 'Your Anchored RWLK',
         value: stakedRWLKTokens.length.toLocaleString(),
         tooltip:
-          'Number of RandomWalk NFTs you currently have staked. Each staked RWLK has a chance to receive a reward mint.',
+          'Number of RandomWalk NFTs you currently have anchored. Each anchored RWLK has a chance to receive an allocation imprint.',
         icon: <Layers className="h-4 w-4" />,
       },
       {
-        label: 'Unclaimed Rewards',
+        label: 'Unretrieved Distributions',
         value: unclaimedRewardEth > 0 ? `${unclaimedRewardEth.toFixed(4)} ETH` : '0 ETH',
         tooltip:
-          'ETH rewards that have been earned by your staked CST tokens but not yet collected. Unstaking a token automatically claims its accumulated rewards.',
+          'ETH Anchor Distributions allocated to your anchored CST tokens but not yet retrieved. Releasing an anchor automatically retrieves its accumulated distributions.',
         icon: <Gift className="h-4 w-4" />,
         featured: true,
         gradient: true,
       },
       {
-        label: 'Reward per CST',
+        label: 'Distribution per CST',
         value: rewardPerCST > 0 ? `${rewardPerCST.toFixed(6)} ETH` : '--',
         tooltip:
-          'Current ETH reward earned per staked CST token, calculated as the total staking pool divided by the number of staked tokens.',
+          'Current ETH Anchor Distribution per anchored CST token, calculated as the total anchoring pool divided by the number of anchored tokens.',
         icon: <TrendingUp className="h-4 w-4" />,
       },
     ],
@@ -123,12 +123,15 @@ const MyStaking = () => {
 
   return (
     <MainWrapper>
-      <PageHeader title="My Staking" subtitle="Manage your staked tokens and view rewards" />
+      <PageHeader
+        title="My Anchors"
+        subtitle="Manage your anchored tokens and view distributions"
+      />
 
       {!account ? (
         <EmptyState
           title="Wallet not connected"
-          description="Please connect your wallet to manage your staking."
+          description="Please connect your wallet to manage your anchors."
         />
       ) : loading ? (
         <div data-testid="my-staking-skeleton">
@@ -157,7 +160,7 @@ const MyStaking = () => {
                     alt="cosmic signature nft"
                   />
                   <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
-                    Cosmic Signature Staking
+                    Cosmic Signature Anchoring
                   </span>
                 </div>
               </TabsTrigger>
@@ -165,7 +168,7 @@ const MyStaking = () => {
                 <div className="flex items-center">
                   <Image src="/images/rwalk.jpg" width={94} height={60} alt="RandomWalk nft" />
                   <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
-                    Random Walk Staking
+                    Random Walk Anchoring
                   </span>
                 </div>
               </TabsTrigger>

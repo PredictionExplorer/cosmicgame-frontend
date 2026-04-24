@@ -18,16 +18,16 @@ function ChangedParameters() {
     return (
       <MainWrapper>
         <PageHeader
-          title="Changed Parameters"
-          subtitle="History of system parameter changes and admin events"
+          title="Coordination Changes"
+          subtitle="History of protocol parameter changes and admin events"
         />
         <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-          The Cosmic Signature game parameters can be adjusted by the contract owner during round
-          activation windows. This log provides full transparency into every change, including bid
-          increments, time additions, and reward distributions. Once ownership is renounced, all
-          parameters become permanently immutable.
+          The Cosmic Signature protocol parameters can be adjusted by the contract owner during
+          cycle activation windows. This log provides full transparency into every change, including
+          Gesture Cost step-ups, time additions, and Anchor Distribution settings. Once ownership is
+          renounced, all parameters become permanently immutable.
         </p>
-        <p className="text-base font-medium">Please login to Metamask to see your winnings.</p>
+        <p className="text-base font-medium">Please login to Metamask to see your allocations.</p>
       </MainWrapper>
     );
   }
