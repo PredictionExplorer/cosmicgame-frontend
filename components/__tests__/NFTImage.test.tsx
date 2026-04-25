@@ -65,6 +65,30 @@ describe('NFTImage', () => {
     expect(screen.getByAltText('NFT')).toBeInTheDocument();
   });
 
+  test('passes optimization-bypass for arbitrary marketplace hosts', () => {
+    // Arbitrary NFT marketplace hostnames (Art Blocks media-proxy, IPFS
+    // gateways, etc.) aren't in next.config.ts → images.remotePatterns,
+    // so NFTImage marks them `unoptimized` to keep the page alive instead
+    // of throwing on render. The serialized src then preserves the raw
+    // URL rather than going through /_next/image.
+    const externalSrc =
+      'https://media-proxy.artblocks.io/1/0xa7d8d9ef8d8ce8992df33d8b8cf4aebabd5bd270/13000002.png';
+    render(<NFTImage src={externalSrc} />);
+    const img = screen.getByAltText('NFT');
+    expect(img.getAttribute('src')).toBe(externalSrc);
+  });
+
+  test('keeps optimization for allowlisted hosts', () => {
+    const localSrc = 'https://nfts.cosmicsignature.com/some-token.png';
+    render(<NFTImage src={localSrc} />);
+    const img = screen.getByAltText('NFT');
+    // Allowlisted hosts keep going through /_next/image — the raw src
+    // isn't returned verbatim; the original URL is encoded as a query.
+    const rawSrc = img.getAttribute('src') ?? '';
+    expect(rawSrc).not.toBe(localSrc);
+    expect(extractOptimizedUrl(rawSrc)).toContain(localSrc);
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<NFTImage src="" />);
     await checkA11y(container);
