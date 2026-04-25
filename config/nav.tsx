@@ -14,7 +14,6 @@ interface ClaimStatus {
 
 const getNAVs = (status: ClaimStatus | null, account: string | null) => {
   const NAVS: NavDescriptor[] = [
-    { title: 'Home', route: '/' },
     { title: 'Gallery', route: '/gallery' },
     {
       title: 'Explore',

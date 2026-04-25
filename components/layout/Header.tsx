@@ -198,7 +198,6 @@ const Header: FC = () => {
               <p className="px-4 pt-4 pb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
                 Protocol
               </p>
-              <ListItemButton nav={{ title: 'Home', route: '/' }} />
               <ListItemButton nav={{ title: 'Gallery', route: '/gallery' }} />
 
               <Separator className="my-2" />
