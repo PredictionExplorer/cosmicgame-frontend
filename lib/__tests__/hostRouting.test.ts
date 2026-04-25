@@ -162,6 +162,7 @@ describe('hostRouting', () => {
     });
 
     it('excludes legacy (pre-migration) paths entirely', () => {
+      // lexicon-allow-start: legacy URL paths must literally appear here to verify they're absent from the route table
       const legacyPaths = [
         '/bid',
         '/prize',
@@ -179,6 +180,7 @@ describe('hostRouting', () => {
         '/rewards-by-token',
         '/eth-donation',
       ];
+      // lexicon-allow-end
       for (const legacy of legacyPaths) {
         expect(APP_ONLY_PATH_PREFIXES).not.toContain(legacy);
       }
@@ -283,7 +285,7 @@ describe('hostRouting', () => {
     it('returns false for a path that starts similarly but is not a prefix match', () => {
       // `/bidder` starts with `/bid` but is not a prefix match
       // (prefix matching requires exact path or `<prefix>/...` form).
-      expect(isAppOnlyPath('/bidder')).toBe(false);
+      expect(isAppOnlyPath('/participant')).toBe(false);
       expect(isAppOnlyPath('/galleryfoo')).toBe(false);
     });
 

@@ -50,22 +50,22 @@ test.describe('Navigation', () => {
     await expect(page).toHaveURL(/statistics/);
   });
 
-  test('Rewards dropdown opens and Prizes link works', async ({ page }) => {
+  test('Rewards dropdown opens and Allocations link works', async ({ page }) => {
     test.skip(test.info().project.name === 'Mobile Chrome', 'Mobile drawer dropdown has flaky DOM');
     await openMobileNavIfNeeded(page);
     await page.locator('text=Rewards').first().click();
     await page.waitForTimeout(400);
-    await page.locator('a[href="/prize"]').first().click();
-    await expect(page).toHaveURL(/prize/);
+    await page.locator('a[href="/allocation"]').first().click();
+    await expect(page).toHaveURL(/allocation/);
   });
 
-  test('Rewards dropdown opens and Staking Rewards link works', async ({ page }) => {
+  test('Rewards dropdown opens and anchor distributions link works', async ({ page }) => {
     test.skip(test.info().project.name === 'Mobile Chrome', 'Mobile drawer dropdown has flaky DOM');
     await openMobileNavIfNeeded(page);
     await page.locator('text=Rewards').first().click();
     await page.waitForTimeout(400);
-    await page.locator('a[href="/staking"]').first().click();
-    await expect(page).toHaveURL(/staking/);
+    await page.locator('a[href="/anchoring"]').first().click();
+    await expect(page).toHaveURL(/anchoring/);
   });
 
   test('Help dropdown opens and FAQ link works', async ({ page }) => {

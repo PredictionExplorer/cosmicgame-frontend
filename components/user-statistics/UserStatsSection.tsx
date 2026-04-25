@@ -3,7 +3,7 @@ import type { DashboardInfo } from '@/services/api';
 import { HeroStats } from './HeroStats';
 import { ActivitySummary } from './ActivitySummary';
 import { QuickActions } from './QuickActions';
-import { RafflePerformance } from './RafflePerformance';
+import { StellarSelectionPerformance } from './StellarSelectionPerformance';
 
 /** User profile info shape. */
 export interface UserProfileInfo {
@@ -34,23 +34,23 @@ export interface UserStatsSectionProps {
   userInfo: UserProfileInfo;
   balanceETH: number;
   balanceCST: number;
-  raffleETHProbability: number;
-  raffleNFTProbability: number;
+  stellarSelectionETHProbability: number;
+  stellarSelectionNFTProbability: number;
   data: DashboardInfo | null;
   isOwnProfile?: boolean;
-  totalStakeRewardEth?: number;
+  totalAnchorDistributionEth?: number;
 }
 
-/** Orchestrates the hero stats, activity summary, quick actions, and raffle performance sections. */
+/** Orchestrates the hero stats, activity summary, quick actions, and stellarSelection performance sections. */
 export function UserStatsSection({
   userInfo,
   balanceETH,
   balanceCST,
-  raffleETHProbability,
-  raffleNFTProbability,
+  stellarSelectionETHProbability,
+  stellarSelectionNFTProbability,
   data,
   isOwnProfile = false,
-  totalStakeRewardEth = 0,
+  totalAnchorDistributionEth = 0,
 }: UserStatsSectionProps) {
   if (!userInfo) {
     return null;
@@ -62,18 +62,21 @@ export function UserStatsSection({
         userInfo={userInfo}
         balanceETH={balanceETH}
         balanceCST={balanceCST}
-        raffleETHProbability={raffleETHProbability}
-        raffleNFTProbability={raffleNFTProbability}
+        stellarSelectionETHProbability={stellarSelectionETHProbability}
+        stellarSelectionNFTProbability={stellarSelectionNFTProbability}
       />
 
-      <ActivitySummary userInfo={userInfo} totalStakeRewardEth={totalStakeRewardEth} />
+      <ActivitySummary
+        userInfo={userInfo}
+        totalAnchorDistributionEth={totalAnchorDistributionEth}
+      />
 
       {isOwnProfile && userInfo.Address && <QuickActions address={userInfo.Address} />}
 
-      <RafflePerformance
+      <StellarSelectionPerformance
         userInfo={userInfo}
-        raffleETHProbability={raffleETHProbability}
-        raffleNFTProbability={raffleNFTProbability}
+        stellarSelectionETHProbability={stellarSelectionETHProbability}
+        stellarSelectionNFTProbability={stellarSelectionNFTProbability}
         data={data}
       />
     </div>

@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: internal marketing draft — needs lexicon rewrite before public use -->
+
 # Cosmic Signature Press Kit
 
 _Last updated: [DATE]_
@@ -409,3 +411,5 @@ _[To be customized with actual quotes]_
 ---
 
 _For the latest information, visit cosmicsignature.com or contact [press@cosmicsignature.com]._
+
+<!-- lexicon-allow-end -->

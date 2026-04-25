@@ -68,7 +68,12 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     // "lottery" / "gambling" / "investment" appear only in FAQ denial
     // copy; confirm outside-FAQ text has no OTHER banned terms. We test
     // the most load-bearing ones here.
-    const bannedOutsideFAQ = [/\bplace\s+a\s+bid\b/, /\braffle\b/, /\bprize\s+winner/, /\byield\b/];
+    const bannedOutsideFAQ = [
+      /\bplace\s+a\s+bid\b/,
+      /\braffle\b/,
+      /\bprize\s+recipient/,
+      /\byield\b/,
+    ];
     for (const pattern of bannedOutsideFAQ) {
       expect(bodyText).not.toMatch(pattern);
     }

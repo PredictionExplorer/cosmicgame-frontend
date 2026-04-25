@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
-import Mint from './Mint';
+import Imprint from './Imprint';
 
 export const metadata: Metadata = createMetadata(
   'Imprint RandomWalk NFT | Cosmic Signature',
@@ -12,5 +12,5 @@ export const metadata: Metadata = createMetadata(
 );
 
 export default function Page() {
-  return <Mint />;
+  return <Imprint />;
 }

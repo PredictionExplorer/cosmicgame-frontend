@@ -15,7 +15,7 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { ZERO_ADDRESS } from '@/config/misc';
-import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '@/config/networks';
+import { ANCHORING_WALLET_CST_ADDRESS, ANCHORING_WALLET_RWLK_ADDRESS } from '@/config/networks';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import type { CSTTransferRecord } from '@/services/api';
 
@@ -43,9 +43,9 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link href={`/user/${FromAddr}`} className="text-inherit font-mono">
-                {FromAddr === STAKING_WALLET_CST_ADDRESS
+                {FromAddr === ANCHORING_WALLET_CST_ADDRESS
                   ? 'StakingWallet CST'
-                  : FromAddr === STAKING_WALLET_RWLK_ADDRESS
+                  : FromAddr === ANCHORING_WALLET_RWLK_ADDRESS
                     ? 'StakingWallet RandomWalk'
                     : shortenHex(FromAddr ?? '', 6)}
               </Link>
@@ -59,9 +59,9 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link href={`/user/${ToAddr}`} className="text-inherit font-mono">
-                {ToAddr === STAKING_WALLET_CST_ADDRESS
+                {ToAddr === ANCHORING_WALLET_CST_ADDRESS
                   ? 'StakingWallet CST'
-                  : ToAddr === STAKING_WALLET_RWLK_ADDRESS
+                  : ToAddr === ANCHORING_WALLET_RWLK_ADDRESS
                     ? 'StakingWallet RandomWalk'
                     : shortenHex(ToAddr ?? '', 6)}
               </Link>

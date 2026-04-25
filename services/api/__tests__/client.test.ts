@@ -1,3 +1,5 @@
+// lexicon-allow-start: service test fixtures mirror the backend-sealed API surface
+
 import { AxiosError } from 'axios';
 
 import {
@@ -595,3 +597,5 @@ describe('assertApiEnvelope', () => {
     expect(() => assertApiEnvelope(wrap({ status: 2 }))).toThrow('API returned an error');
   });
 });
+
+// lexicon-allow-end

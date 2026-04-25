@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import DonatedNFT from '@/components/donations/DonatedNFT';
-import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
+import AttachedNFT from '@/components/attachments/AttachedNFT';
+import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-import type { DonatedNFT as DonatedNFTType } from '@/services/api/types';
-import type { DonatedERC20Token } from '@/components/donations/DonatedERC20Table';
+import type { AttachedNFT as DonatedNFTType } from '@/services/api/types';
+import type { DonatedERC20Token } from '@/components/attachments/AttachedERC20Table';
 
 interface DonatedTokensSectionProps {
   donatedNFTs: DonatedNFTType[];
@@ -62,7 +62,7 @@ export function DonatedTokensSection({
                 <div className={cn('grid gap-4', gridLayout)}>
                   {donatedNFTs.map((nft) => (
                     <div key={nft.RecordId}>
-                      <DonatedNFT nft={nft} />
+                      <AttachedNFT nft={nft} />
                     </div>
                   ))}
                 </div>
@@ -80,7 +80,7 @@ export function DonatedTokensSection({
             )}
           </TabsContent>
           <TabsContent value="1" className="p-6">
-            <DonatedERC20Table list={donatedERC20Tokens} handleClaim={null} />
+            <AttachedERC20Table list={donatedERC20Tokens} handleClaim={null} />
           </TabsContent>
         </Tabs>
       </div>

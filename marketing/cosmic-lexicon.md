@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: this is the lexicon specification itself; it documents banned terms by definition -->
+
 # Cosmic Lexicon
 
 **A regulator-aware terminology guide for every participant-facing surface of Cosmic Signature.**
@@ -769,3 +771,5 @@ Once this lexicon is ratified, apply it to these files in the following priority
 ---
 
 _Maintained by the Cosmic Signature team. License: CC0 1.0 Universal, consistent with the rest of the project. Updates to this document supersede the terminology section of [`marketing/brand-identity-guide.md`](brand-identity-guide.md)._
+
+<!-- lexicon-allow-end -->

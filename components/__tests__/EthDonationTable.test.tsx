@@ -54,12 +54,12 @@ describe('EthDonationTable', () => {
     expect(screen.getByText('0.50')).toBeInTheDocument();
   });
 
-  it('shows donation type when showType is true', () => {
+  it('shows contribution type when showType is true', () => {
     render(<EthDonationTable list={[createDonation({ RecordType: 0 })]} showType={true} />);
     expect(screen.getByText('Simple contribution')).toBeInTheDocument();
   });
 
-  it('shows "Donation with info" for RecordType > 0', () => {
+  it('shows "Contribution with info" for RecordType > 0', () => {
     render(<EthDonationTable list={[createDonation({ RecordType: 1 })]} showType={true} />);
     expect(screen.getByText('Contribution with info')).toBeInTheDocument();
   });

@@ -15,16 +15,16 @@ test.describe('Statistics page', () => {
     await ensureVisible(currentRound);
     await expect(currentRound).toBeVisible({ timeout: 15000 });
     await expect(page.locator('text=/Current Round/').first()).toBeVisible();
-    await expect(page.locator('text=/Current Bid Price/').first()).toBeVisible();
-    await expect(page.locator('text=/Prize Amount/').first()).toBeVisible();
+    await expect(page.locator('text=/Current gesture cost/').first()).toBeVisible();
+    await expect(page.locator('text=/allocation amount/').first()).toBeVisible();
   });
 
   test('shows Overall Statistics', async ({ page }) => {
     const overallStats = page.locator('text=/Overall Statistics/');
     await ensureVisible(overallStats);
     await expect(overallStats).toBeVisible();
-    await expect(page.locator('text=/Num Prizes Given/')).toBeVisible();
-    await expect(page.locator('text=/Number of Unique Bidders/')).toBeVisible();
+    await expect(page.locator('text=/Num Allocations/')).toBeVisible();
+    await expect(page.locator('text=/Number of unique participants/')).toBeVisible();
   });
 
   test('CosmicSignature / RandomWalk tabs work', async ({ page }) => {
@@ -39,13 +39,13 @@ test.describe('Statistics page', () => {
     }
   });
 
-  test('Unique Bidders section has data', async ({ page }) => {
-    const uniqueBidders = page.getByRole('heading', { name: 'Unique Bidders' });
-    await ensureVisible(uniqueBidders);
-    await expect(uniqueBidders).toBeVisible();
+  test('unique participants section has data', async ({ page }) => {
+    const uniqueParticipants = page.getByRole('heading', { name: 'unique participants' });
+    await ensureVisible(uniqueParticipants);
+    await expect(uniqueParticipants).toBeVisible();
   });
 
-  test('bid history pagination exists', async ({ page }) => {
+  test('gesture history pagination exists', async ({ page }) => {
     const pagination = page.locator('role=navigation[name="pagination navigation"]').first();
     await ensureVisible(pagination);
     await expect(pagination).toBeVisible();

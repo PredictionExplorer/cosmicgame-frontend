@@ -1,16 +1,18 @@
+// lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
+
 import { axios, getAPIUrl, apiCall, flattenTxArray } from './client';
 import type {
   UserInfoWithLists,
   UserBalance,
   NotifyRedBoxResult,
-  Bidder,
-  Winner,
+  Participant,
+  Recipient,
   UniqueEthDonor,
-  UniqueStakerCST,
-  UniqueStakerRWLK,
+  UniqueAnchorHolderCST,
+  UniqueAnchorHolderRWLK,
 } from './types';
 
-/** Fetches comprehensive user profile including flattened bids, prizes, tokens, staking, and donation lists. */
+/** Fetches comprehensive user profile including flattened gestures, allocations, tokens, anchoring, and donation lists. */
 export function get_user_info(address: string): Promise<UserInfoWithLists | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`user/info/${address}`));
@@ -18,7 +20,7 @@ export function get_user_info(address: string): Promise<UserInfoWithLists | null
     if (data) {
       return {
         ...data,
-        Bids: flattenTxArray(data.Bids || []),
+        Gestures: flattenTxArray(data.Gestures || []),
         PrizeHistory: flattenTxArray(data.PrizeHistory || []),
         CosmicSignatureTokensOwned: flattenTxArray(data.CosmicSignatureTokensOwned || []),
         CurrentlyStakedTokens: flattenTxArray(data.CurrentlyStakedTokens || []),
@@ -55,18 +57,18 @@ export function notify_red_box(address: string): Promise<NotifyRedBoxResult | nu
 }
 
 /** Fetches the list of unique bidder addresses with bid counts and totals. */
-export function get_unique_bidders(): Promise<Bidder[]> {
+export function get_unique_bidders(): Promise<Participant[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/bidders'));
-    return data.UniqueBidders as Bidder[];
+    return data.UniqueBidders as Participant[];
   }, []);
 }
 
-/** Fetches the list of unique prize-winner addresses with win counts. */
-export function get_unique_winners(): Promise<Winner[]> {
+/** Fetches the list of unique allocation-recipient addresses with win counts. */
+export function get_unique_winners(): Promise<Recipient[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/unique/winners'));
-    return data.UniqueWinners as Winner[];
+    const { data } = await axios.get(getAPIUrl('statistics/unique/recipients'));
+    return data.UniqueWinners as Recipient[];
   }, []);
 }
 
@@ -78,26 +80,28 @@ export function get_unique_donors(): Promise<UniqueEthDonor[]> {
   }, []);
 }
 
-/** Fetches the list of unique CST staker addresses with staking stats. */
-export function get_unique_cst_stakers(): Promise<UniqueStakerCST[]> {
+/** Fetches the list of unique CST anchorHolder addresses with anchoring stats. */
+export function get_unique_cst_stakers(): Promise<UniqueAnchorHolderCST[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/cst'));
-    return data.UniqueStakersCST as UniqueStakerCST[];
+    const { data } = await axios.get(getAPIUrl('statistics/unique/anchorHolders/cst'));
+    return data.UniqueStakersCST as UniqueAnchorHolderCST[];
   }, []);
 }
 
-/** Fetches the list of unique RandomWalk staker addresses with staking stats. */
-export function get_unique_rwalk_stakers(): Promise<UniqueStakerRWLK[]> {
+/** Fetches the list of unique RandomWalk anchorHolder addresses with anchoring stats. */
+export function get_unique_rwalk_stakers(): Promise<UniqueAnchorHolderRWLK[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/randomwalk'));
-    return data.UniqueStakersRWalk as UniqueStakerRWLK[];
+    const { data } = await axios.get(getAPIUrl('statistics/unique/anchorHolders/randomwalk'));
+    return data.UniqueStakersRWalk as UniqueAnchorHolderRWLK[];
   }, []);
 }
 
 /** Fetches addresses that have staked both CST and RandomWalk tokens. */
-export function get_unique_both_stakers(): Promise<UniqueStakerRWLK[]> {
+export function get_unique_both_stakers(): Promise<UniqueAnchorHolderRWLK[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/both'));
-    return data.UniqueStakersBoth as UniqueStakerRWLK[];
+    const { data } = await axios.get(getAPIUrl('statistics/unique/anchorHolders/both'));
+    return data.UniqueStakersBoth as UniqueAnchorHolderRWLK[];
   }, []);
 }
+
+// lexicon-allow-end

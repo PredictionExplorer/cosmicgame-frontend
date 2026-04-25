@@ -17,10 +17,11 @@ export function MarketingCTA() {
       className="gradient-border-card rounded-2xl bg-white/[0.02] px-8 py-16 text-center sm:px-16"
     >
       <h2 id="cta-heading" className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-        Ready to Start Earning?
+        Ready to Contribute?
       </h2>
       <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-        Join our marketing program and earn CST rewards for promoting Cosmic Signature to the world.
+        Join our outreach program and receive CST distributions for promoting Cosmic Signature to
+        the world.
       </p>
       <div className="mt-8 inline-flex items-center gap-2">
         <Tooltip>

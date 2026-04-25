@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: internal marketing draft — needs lexicon rewrite before public use -->
+
 # Marketing Site Implementation Guide
 
 How to port the marketing landing page and content into your Next.js + Tailwind CSS frontend.
@@ -471,3 +473,5 @@ All marketing content lives in this `marketing/` folder:
 | `partnership-outreach-materials.md`   | Email templates for all partner categories                 | Copy-paste outreach for partnerships                |
 | `ambassador-program.md`               | Full ambassador program structure                          | Operational guide for community team                |
 | `social-channels-setup.md`            | Twitter, Discord, Telegram setup specs                     | Setup guide for all social channels                 |
+
+<!-- lexicon-allow-end -->

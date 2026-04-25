@@ -136,7 +136,7 @@ describe('FAQPage', () => {
     const searchInput = screen.getByRole('textbox', {
       name: /search frequently asked questions/i,
     });
-    await user.type(searchInput, 'staking');
+    await user.type(searchInput, 'anchoring'); // lexicon-allow-line
 
     await waitFor(() => {
       expect(screen.queryByText('Popular Questions')).not.toBeInTheDocument();

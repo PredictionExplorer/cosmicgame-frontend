@@ -1,18 +1,18 @@
 import { getEnduranceChampions, type EnduranceChampion } from '../endurance';
 
 describe('getEnduranceChampions', () => {
-  it('returns empty array for empty bid list', () => {
+  it('returns empty array for empty gesture list', () => {
     expect(getEnduranceChampions([])).toEqual([]);
   });
 
-  it('returns empty array for null bid list', () => {
+  it('returns empty array for null gesture list', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(getEnduranceChampions(null as any)).toEqual([]);
   });
 
-  it('handles a single bid with explicit roundEndTimeStamp', () => {
-    const bids = [{ TimeStamp: 1000, BidderAddr: '0xAlice' }];
-    const result = getEnduranceChampions(bids, 1500);
+  it('handles a single gesture with explicit roundEndTimeStamp', () => {
+    const gestures = [{ TimeStamp: 1000, BidderAddr: '0xAlice' }];
+    const result = getEnduranceChampions(gestures, 1500);
 
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
@@ -24,8 +24,8 @@ describe('getEnduranceChampions', () => {
 
   it('uses Date.now when roundEndTimeStamp is 0', () => {
     const now = Math.floor(Date.now() / 1000);
-    const bids = [{ TimeStamp: now - 100, BidderAddr: '0xBob' }];
-    const result = getEnduranceChampions(bids, 0);
+    const gestures = [{ TimeStamp: now - 100, BidderAddr: '0xBob' }];
+    const result = getEnduranceChampions(gestures, 0);
 
     expect(result).toHaveLength(1);
     expect(result[0]!.participant).toBe('0xBob');
@@ -33,12 +33,12 @@ describe('getEnduranceChampions', () => {
     expect(result[0]!.championTime).toBeLessThanOrEqual(102);
   });
 
-  it('computes champion from two bids', () => {
-    const bids = [
+  it('computes champion from two gestures', () => {
+    const gestures = [
       { TimeStamp: 1000, BidderAddr: '0xAlice' },
       { TimeStamp: 1200, BidderAddr: '0xBob' },
     ];
-    const result = getEnduranceChampions(bids, 1300);
+    const result = getEnduranceChampions(gestures, 1300);
 
     expect(result.length).toBeGreaterThanOrEqual(1);
     const participants = result.map((c: EnduranceChampion) => c.participant);
@@ -46,24 +46,24 @@ describe('getEnduranceChampions', () => {
   });
 
   it('sorts unsorted input correctly', () => {
-    const bids = [
+    const gestures = [
       { TimeStamp: 1200, BidderAddr: '0xBob' },
       { TimeStamp: 1000, BidderAddr: '0xAlice' },
     ];
-    const result = getEnduranceChampions(bids, 1300);
+    const result = getEnduranceChampions(gestures, 1300);
 
     expect(result.length).toBeGreaterThanOrEqual(1);
     expect(result[0]!.participant).toBe('0xAlice');
   });
 
-  it('tracks increasing champion records across multiple bids', () => {
-    const bids = [
+  it('tracks increasing champion records across multiple gestures', () => {
+    const gestures = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
       { TimeStamp: 1010, BidderAddr: '0xB' }, // gap=10
       { TimeStamp: 1050, BidderAddr: '0xC' }, // gap=40, new champion
       { TimeStamp: 1060, BidderAddr: '0xD' }, // gap=10, not champion
     ];
-    const result = getEnduranceChampions(bids, 1070);
+    const result = getEnduranceChampions(gestures, 1070);
 
     expect(result.length).toBeGreaterThanOrEqual(2);
     expect(result[0]!.participant).toBe('0xA');
@@ -73,11 +73,11 @@ describe('getEnduranceChampions', () => {
   });
 
   it('includes last participant when their window is the longest', () => {
-    const bids = [
+    const gestures = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
       { TimeStamp: 1005, BidderAddr: '0xB' }, // gap=5
     ];
-    const result = getEnduranceChampions(bids, 2000);
+    const result = getEnduranceChampions(gestures, 2000);
 
     const lastChampion = result[result.length - 1]!;
     expect(lastChampion.participant).toBe('0xB');
@@ -85,11 +85,11 @@ describe('getEnduranceChampions', () => {
   });
 
   it('does not include last participant when their window is shorter', () => {
-    const bids = [
+    const gestures = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
       { TimeStamp: 2000, BidderAddr: '0xB' }, // gap=1000
     ];
-    const result = getEnduranceChampions(bids, 2005);
+    const result = getEnduranceChampions(gestures, 2005);
 
     expect(result).toHaveLength(1);
     expect(result[0]!.participant).toBe('0xA');
@@ -97,12 +97,12 @@ describe('getEnduranceChampions', () => {
   });
 
   it('computes chronoWarrior values', () => {
-    const bids = [
+    const gestures = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
       { TimeStamp: 1010, BidderAddr: '0xB' },
       { TimeStamp: 1050, BidderAddr: '0xC' },
     ];
-    const result = getEnduranceChampions(bids, 1100);
+    const result = getEnduranceChampions(gestures, 1100);
 
     result.forEach((c: EnduranceChampion) => {
       expect(c.chronoWarrior).toBeGreaterThanOrEqual(0);
@@ -110,23 +110,23 @@ describe('getEnduranceChampions', () => {
   });
 
   it('returns objects with participant, championTime, chronoWarrior fields only', () => {
-    const bids = [
+    const gestures = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
       { TimeStamp: 1100, BidderAddr: '0xB' },
     ];
-    const result = getEnduranceChampions(bids, 1200);
+    const result = getEnduranceChampions(gestures, 1200);
 
     result.forEach((c: EnduranceChampion) => {
       expect(Object.keys(c).sort()).toEqual(['championTime', 'chronoWarrior', 'participant']);
     });
   });
 
-  it('handles bids with identical timestamps', () => {
-    const bids = [
+  it('handles gestures with identical timestamps', () => {
+    const gestures = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
       { TimeStamp: 1000, BidderAddr: '0xB' },
     ];
-    const result = getEnduranceChampions(bids, 1500);
+    const result = getEnduranceChampions(gestures, 1500);
     expect(result.length).toBeGreaterThanOrEqual(1);
   });
 });

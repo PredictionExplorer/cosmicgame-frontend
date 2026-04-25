@@ -157,8 +157,8 @@ describe('CSTokensTable', () => {
     ];
     render(<CSTokensTable {...defaultProps} list={list} />);
 
-    const stakeButtons = screen.getAllByText('Anchor');
-    await user.click(stakeButtons[0]!);
+    const anchorButtons = screen.getAllByText('Anchor');
+    await user.click(anchorButtons[0]!);
 
     await waitFor(() => {
       expect(defaultProps.handleStake).toHaveBeenCalledWith(5, false);
@@ -180,7 +180,7 @@ describe('CSTokensTable', () => {
     expect(link).toBeInTheDocument();
   });
 
-  it('Round links to prize page', () => {
+  it('Round links to allocation page', () => {
     const token = createToken({ RoundNum: 7 });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
     const link = screen

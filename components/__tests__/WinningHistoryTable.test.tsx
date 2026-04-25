@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import WinningHistoryTable from '@/components/tables/WinningHistoryTable';
+import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
 import type { WinningHistoryEntry } from '@/services/api/types';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -25,14 +25,14 @@ const createEntry = (overrides: Partial<WinningHistoryEntry> = {}): WinningHisto
   ...overrides,
 });
 
-describe('WinningHistoryTable', () => {
+describe('RecipientHistoryTable', () => {
   it('renders "No history yet." when list is empty', () => {
-    render(<WinningHistoryTable winningHistory={[]} />);
+    render(<RecipientHistoryTable winningHistory={[]} />);
     expect(screen.getByText('No history yet.')).toBeInTheDocument();
   });
 
   it('renders table headers', () => {
-    render(<WinningHistoryTable winningHistory={[createEntry()]} />);
+    render(<RecipientHistoryTable winningHistory={[createEntry()]} />);
     const headers = screen.getAllByText('Record Type');
     expect(headers.length).toBeGreaterThanOrEqual(1);
     const datetimeHeaders = screen.getAllByText('Datetime');
@@ -41,29 +41,29 @@ describe('WinningHistoryTable', () => {
 
   it('renders datetime from TxHash link', () => {
     const entry = createEntry();
-    render(<WinningHistoryTable winningHistory={[entry]} />);
+    render(<RecipientHistoryTable winningHistory={[entry]} />);
     expect(screen.getByText(convertTimestampToDateTime(entry.TimeStamp))).toBeInTheDocument();
   });
 
   it('renders record type text for Signature Allocation ETH', () => {
-    render(<WinningHistoryTable winningHistory={[createEntry({ RecordType: 0 })]} />);
+    render(<RecipientHistoryTable winningHistory={[createEntry({ RecordType: 0 })]} />);
     expect(screen.getByText('Signature Allocation ETH')).toBeInTheDocument();
   });
 
-  it('renders record type text for Raffle ETH', () => {
-    render(<WinningHistoryTable winningHistory={[createEntry({ RecordType: 3 })]} />);
+  it('renders record type text for Stellar Selection ETH', () => {
+    render(<RecipientHistoryTable winningHistory={[createEntry({ RecordType: 3 })]} />);
     expect(screen.getByText('ETH Stellar Selection (for participants)')).toBeInTheDocument();
   });
 
   it('renders round number as link', () => {
     const entry = createEntry({ RoundNum: 42 });
-    render(<WinningHistoryTable winningHistory={[entry]} />);
+    render(<RecipientHistoryTable winningHistory={[entry]} />);
     expect(screen.getByText('42')).toBeInTheDocument();
   });
 
   it('renders amount in ETH for ETH record types', () => {
     render(
-      <WinningHistoryTable winningHistory={[createEntry({ RecordType: 0, AmountEth: 1.5 })]} />,
+      <RecipientHistoryTable winningHistory={[createEntry({ RecordType: 0, AmountEth: 1.5 })]} />,
     );
     expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
   });
@@ -73,7 +73,7 @@ describe('WinningHistoryTable', () => {
       TokenAddress: '0xTokenAddress1234567890abcdef12345678901234',
       TokenId: 5,
     });
-    render(<WinningHistoryTable winningHistory={[entry]} />);
+    render(<RecipientHistoryTable winningHistory={[entry]} />);
     const links = screen.getAllByRole('link');
     for (const link of links) {
       if (link.getAttribute('target') === '_blank') {
@@ -82,27 +82,27 @@ describe('WinningHistoryTable', () => {
     }
   });
 
-  it('renders winner address when showWinnerAddr is true', () => {
+  it('renders recipient address when showWinnerAddr is true', () => {
     const entry = createEntry();
-    render(<WinningHistoryTable winningHistory={[entry]} showWinnerAddr={true} />);
-    const winnerHeaders = screen.getAllByText('Recipient');
-    expect(winnerHeaders.length).toBeGreaterThanOrEqual(1);
+    render(<RecipientHistoryTable winningHistory={[entry]} showWinnerAddr={true} />);
+    const recipientHeaders = screen.getAllByText('Recipient');
+    expect(recipientHeaders.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('hides winner column when showWinnerAddr is false', () => {
-    render(<WinningHistoryTable winningHistory={[createEntry()]} showWinnerAddr={false} />);
+  it('hides recipient column when showWinnerAddr is false', () => {
+    render(<RecipientHistoryTable winningHistory={[createEntry()]} showWinnerAddr={false} />);
     expect(screen.queryByText('Recipient')).not.toBeInTheDocument();
   });
 
   it('renders token ID link when TokenId >= 0', () => {
     const entry = createEntry({ TokenId: 10 });
-    render(<WinningHistoryTable winningHistory={[entry]} />);
+    render(<RecipientHistoryTable winningHistory={[entry]} />);
     const tokenLink = screen.getByText('10');
     expect(tokenLink.closest('a')).toHaveAttribute('href', '/detail/10');
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<WinningHistoryTable winningHistory={[]} />);
+    const { container } = render(<RecipientHistoryTable winningHistory={[]} />);
     await checkA11y(container);
   });
 });

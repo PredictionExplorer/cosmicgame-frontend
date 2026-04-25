@@ -5,7 +5,7 @@ import type { WinningHistoryEntry } from '@/services/api/types';
 import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock(
-  '../../../components/tables/WinningHistoryTable',
+  '../../../components/tables/RecipientHistoryTable',
   () =>
     function MockWinningHistoryTable({ winningHistory }: { winningHistory: unknown[] }) {
       return <div data-testid="winning-table">{winningHistory.length} entries</div>;

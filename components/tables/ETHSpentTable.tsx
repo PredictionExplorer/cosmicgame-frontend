@@ -14,7 +14,7 @@ import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 import { useActiveWeb3React } from '@/hooks/web3';
 
-interface BidEvent {
+interface GestureEvent {
   BidderAddr: string;
   EthPriceEth: number;
 }
@@ -50,7 +50,7 @@ const ETHSpentRow: FC<ETHSpentRowProps> = ({ row }) => {
 };
 
 interface ETHSpentTableProps {
-  list: BidEvent[];
+  list: GestureEvent[];
 }
 
 const ETHSpentTable: FC<ETHSpentTableProps> = ({ list }) => {
@@ -60,7 +60,7 @@ const ETHSpentTable: FC<ETHSpentTableProps> = ({ list }) => {
   const { account } = useActiveWeb3React();
 
   useEffect(() => {
-    const groupAndCountByBidderAddr = (): SpenderInfo[] => {
+    const groupAndCountByParticipantAddr = (): SpenderInfo[] => {
       const result: Record<string, number> = {};
 
       list.forEach((event) => {
@@ -83,7 +83,7 @@ const ETHSpentTable: FC<ETHSpentTableProps> = ({ list }) => {
       return sortedResults;
     };
 
-    const spender = groupAndCountByBidderAddr();
+    const spender = groupAndCountByParticipantAddr();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSpenderList(spender);
   }, [list, account]);

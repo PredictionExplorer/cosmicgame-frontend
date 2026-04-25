@@ -5,7 +5,7 @@ const COMPONENTS_DIR = resolve(__dirname, '..');
 
 const COMPONENT_FILES = [
   'home/AuctionInfo.tsx',
-  'home/BidForm.tsx',
+  'home/GestureForm.tsx',
   'home/CustomTabPanel.tsx',
   'home/DonatedTokensSection.tsx',
   'home/RoundInfoSection.tsx',
@@ -70,7 +70,7 @@ const files: FileEntry[] = COMPONENT_FILES.map((name) => {
 
 const EXPECTED_COUNTS: Record<string, number> = {
   'home/AuctionInfo.tsx': 1,
-  'home/BidForm.tsx': 1,
+  'home/GestureForm.tsx': 1,
   'home/CustomTabPanel.tsx': 2,
   'home/DonatedTokensSection.tsx': 1,
   'home/RoundInfoSection.tsx': 1,

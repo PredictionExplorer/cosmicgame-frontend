@@ -7,37 +7,37 @@ import Statistics from '../Statistics';
 const mockUseDashboardInfo = jest
   .fn()
   .mockReturnValue({ data: undefined, isLoading: false, isError: false });
-const mockUseBidListByRound = jest.fn().mockReturnValue({ data: undefined });
-const mockUseUniqueBidders = jest.fn().mockReturnValue({ data: undefined });
-const mockUseUniqueWinners = jest.fn().mockReturnValue({ data: undefined });
-const mockUseUniqueCSTStakers = jest.fn().mockReturnValue({ data: undefined });
-const mockUseUniqueRWLKStakers = jest.fn().mockReturnValue({ data: undefined });
+const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: undefined });
+const mockUseUniqueParticipants = jest.fn().mockReturnValue({ data: undefined });
+const mockUseUniqueRecipients = jest.fn().mockReturnValue({ data: undefined });
+const mockUseUniqueCSTAnchorHolders = jest.fn().mockReturnValue({ data: undefined });
+const mockUseUniqueRWLKAnchorHolders = jest.fn().mockReturnValue({ data: undefined });
 const mockUseUniqueDonors = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsNFTList = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCSTDistribution = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCTBalancesDistribution = jest.fn().mockReturnValue({ data: undefined });
-const mockUseStakingCSTActions = jest.fn().mockReturnValue({ data: undefined });
-const mockUseStakingRWLKActions = jest.fn().mockReturnValue({ data: undefined });
-const mockUseStakedCSTTokensGlobal = jest.fn().mockReturnValue({ data: undefined });
-const mockUseStakedRWLKTokensGlobal = jest.fn().mockReturnValue({ data: undefined });
+const mockUseCSTAnchorActions = jest.fn().mockReturnValue({ data: undefined });
+const mockUseRWLKAnchorActions = jest.fn().mockReturnValue({ data: undefined });
+const mockUseGlobalAnchoredCSTokens = jest.fn().mockReturnValue({ data: undefined });
+const mockUseGlobalAnchoredRWLKTokens = jest.fn().mockReturnValue({ data: undefined });
 const mockUseSystemModelist = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCTPrice = jest.fn().mockReturnValue({ data: undefined });
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
-  useBidListByRound: (...args: unknown[]) => mockUseBidListByRound(...args),
-  useUniqueBidders: (...args: unknown[]) => mockUseUniqueBidders(...args),
-  useUniqueWinners: (...args: unknown[]) => mockUseUniqueWinners(...args),
-  useUniqueCSTStakers: (...args: unknown[]) => mockUseUniqueCSTStakers(...args),
-  useUniqueRWLKStakers: (...args: unknown[]) => mockUseUniqueRWLKStakers(...args),
+  useGestureListByCycle: (...args: unknown[]) => mockUseGestureListByCycle(...args),
+  useUniqueParticipants: (...args: unknown[]) => mockUseUniqueParticipants(...args),
+  useUniqueRecipients: (...args: unknown[]) => mockUseUniqueRecipients(...args),
+  useUniqueCSTAnchorHolders: (...args: unknown[]) => mockUseUniqueCSTAnchorHolders(...args),
+  useUniqueRWLKAnchorHolders: (...args: unknown[]) => mockUseUniqueRWLKAnchorHolders(...args),
   useUniqueDonors: (...args: unknown[]) => mockUseUniqueDonors(...args),
   useDonationsNFTList: (...args: unknown[]) => mockUseDonationsNFTList(...args),
   useCSTDistribution: (...args: unknown[]) => mockUseCSTDistribution(...args),
   useCTBalancesDistribution: (...args: unknown[]) => mockUseCTBalancesDistribution(...args),
-  useStakingCSTActions: (...args: unknown[]) => mockUseStakingCSTActions(...args),
-  useStakingRWLKActions: (...args: unknown[]) => mockUseStakingRWLKActions(...args),
-  useStakedCSTTokensGlobal: (...args: unknown[]) => mockUseStakedCSTTokensGlobal(...args),
-  useStakedRWLKTokensGlobal: (...args: unknown[]) => mockUseStakedRWLKTokensGlobal(...args),
+  useCSTAnchorActions: (...args: unknown[]) => mockUseCSTAnchorActions(...args),
+  useRWLKAnchorActions: (...args: unknown[]) => mockUseRWLKAnchorActions(...args),
+  useGlobalAnchoredCSTokens: (...args: unknown[]) => mockUseGlobalAnchoredCSTokens(...args),
+  useGlobalAnchoredRWLKTokens: (...args: unknown[]) => mockUseGlobalAnchoredRWLKTokens(...args),
   useSystemModelist: (...args: unknown[]) => mockUseSystemModelist(...args),
   useCTPrice: (...args: unknown[]) => mockUseCTPrice(...args),
 }));
@@ -53,41 +53,41 @@ jest.mock('next/link', () => ({
 
 /* ── child components (stub heavy tables/charts) ────────────────── */
 
-jest.mock('../../../components/tables/BiddingHistoryTable', () => ({
+jest.mock('../../../components/tables/GestureHistoryTable', () => ({
   __esModule: true,
-  default: () => <div data-testid="bidding-history-table" />,
+  default: () => <div data-testid="gesture-history-table" />,
 }));
-jest.mock('../../../components/tables/UniqueBiddersTable', () => ({
-  UniqueBiddersTable: () => <div data-testid="unique-bidders-table" />,
-  Bidder: undefined,
+jest.mock('../../../components/tables/UniqueParticipantsTable', () => ({
+  UniqueParticipantsTable: () => <div data-testid="unique-participants-table" />,
+  Participant: undefined,
 }));
-jest.mock('../../../components/tables/UniqueWinnersTable', () => ({
-  UniqueWinnersTable: () => <div data-testid="unique-winners-table" />,
+jest.mock('../../../components/tables/UniqueRecipientsTable', () => ({
+  UniqueRecipientsTable: () => <div data-testid="unique-recipients-table" />,
   Recipient: undefined,
 }));
 jest.mock('../../../components/tables/UniqueEthDonorsTable', () => ({
-  UniqueEthDonorsTable: () => <div data-testid="unique-eth-donors-table" />,
+  UniqueEthDonorsTable: () => <div data-testid="unique-eth-contributors-table" />,
   UniqueEthDonor: undefined,
 }));
-jest.mock('../../../components/tables/UniqueStakersCSTTable', () => ({
-  UniqueStakersCSTTable: () => <div data-testid="unique-stakers-cst-table" />,
-  UniqueStakerCST: undefined,
+jest.mock('../../../components/tables/UniqueAnchorHoldersCSTTable', () => ({
+  UniqueAnchorHoldersCSTTable: () => <div data-testid="unique-anchorHolders-cst-table" />,
+  UniqueAnchorHolderCST: undefined,
 }));
-jest.mock('../../../components/tables/UniqueStakersRWLKTable', () => ({
-  UniqueStakersRWLKTable: () => <div data-testid="unique-stakers-rwlk-table" />,
-  UniqueStakerRWLK: undefined,
+jest.mock('../../../components/tables/UniqueAnchorHoldersRWLKTable', () => ({
+  UniqueAnchorHoldersRWLKTable: () => <div data-testid="unique-anchorHolders-rwlk-table" />,
+  UniqueAnchorHolderRWLK: undefined,
 }));
 jest.mock('../../../components/tables/SystemModesTable', () => ({
   SystemModesTable: () => <div data-testid="system-modes-table" />,
   EventRow: undefined,
 }));
-jest.mock('../../../components/donations/DonatedNFT', () => ({
+jest.mock('../../../components/attachments/AttachedNFT', () => ({
   __esModule: true,
   default: () => <div data-testid="donated-nft" />,
 }));
-jest.mock('../../../components/donations/DonatedNFTDistributionTable', () => ({
+jest.mock('../../../components/attachments/AttachedNFTDistributionTable', () => ({
   __esModule: true,
-  default: () => <div data-testid="donated-nft-distribution-table" />,
+  default: () => <div data-testid="attached-nft-distribution-table" />,
 }));
 jest.mock('../../../components/tokens/CSTokenDistributionTable', () => ({
   CSTokenDistributionTable: () => <div data-testid="cs-token-distribution-table" />,
@@ -116,19 +116,19 @@ jest.mock('../../../components/statistics/StatisticsItem', () => ({
   ),
   CountdownRenderer: () => <span data-testid="countdown-renderer" />,
 }));
-jest.mock('../../../components/statistics/StakingSection', () => ({
-  StakingSection: () => (
-    <div data-testid="staking-section">
+jest.mock('../../../components/statistics/AnchoringSection', () => ({
+  AnchoringSection: () => (
+    <div data-testid="anchoring-section">
       <span>CosmicSignature Token</span>
       <span>RandomWalk Token</span>
-      <span>Number of Active Stakers</span>
+      <span>Number of Active Anchor-Holders</span>
     </div>
   ),
 }));
 jest.mock('../../../components/statistics/DonatedNFTsGrid', () => ({
   DonatedNFTsGrid: ({ nftDonations }: { nftDonations: unknown[] }) => (
-    <div data-testid="donated-nfts-grid">
-      {nftDonations.length === 0 && <p>No NFTs have been donated yet.</p>}
+    <div data-testid="attached-nfts-grid">
+      {nftDonations.length === 0 && <p>No NFTs have been attached yet.</p>}
     </div>
   ),
 }));
@@ -169,7 +169,7 @@ const makeDashboardData = (overrides = {}) => ({
   CurRoundNum: 5,
   CurNumBids: 42,
   LastBidderAddr: '0xBidder',
-  BidPriceEth: 0.01,
+  GestureCostEth: 0.01,
   PrizeAmountEth: 1.5,
   PrizeClaimTs: 0,
   TsRoundStart: Math.floor(Date.now() / 1000) - 3600,
@@ -306,12 +306,12 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByTestId('unique-bidders-table')).toBeInTheDocument();
-    expect(screen.getByTestId('unique-winners-table')).toBeInTheDocument();
-    expect(screen.getByTestId('unique-eth-donors-table')).toBeInTheDocument();
+    expect(screen.getByTestId('unique-participants-table')).toBeInTheDocument();
+    expect(screen.getByTestId('unique-recipients-table')).toBeInTheDocument();
+    expect(screen.getByTestId('unique-eth-contributors-table')).toBeInTheDocument();
   });
 
-  it('renders staking section', () => {
+  it('renders anchoring section', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -322,18 +322,18 @@ describe('Statistics', () => {
     expect(screen.getByText('RandomWalk Token')).toBeInTheDocument();
   });
 
-  it('renders CST staking statistics', () => {
+  it('renders CST anchoring statistics', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
       isError: false,
     });
     render(<Statistics />);
-    const activeStakersLabels = screen.getAllByText('Number of Active Stakers');
-    expect(activeStakersLabels.length).toBeGreaterThanOrEqual(1);
+    const activeAnchorHoldersLabels = screen.getAllByText('Number of Active Anchor-Holders');
+    expect(activeAnchorHoldersLabels.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('shows "no donated NFTs" message when list is empty', () => {
+  it('shows "no attached NFTs" message when list is empty', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -341,7 +341,7 @@ describe('Statistics', () => {
     });
     mockUseDonationsNFTList.mockReturnValue({ data: [] });
     render(<Statistics />);
-    expect(screen.getByText('No NFTs have been donated yet.')).toBeInTheDocument();
+    expect(screen.getByText('No NFTs have been attached yet.')).toBeInTheDocument();
   });
 
   it('renders contract balance stat card', () => {
@@ -378,7 +378,7 @@ describe('Statistics', () => {
     expect(screen.getByText('Attached Token Distribution')).toBeInTheDocument();
   });
 
-  it('renders staking section with stat cards', () => {
+  it('renders anchoring section with stat cards', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -432,7 +432,7 @@ describe('Statistics', () => {
     expect(sections.length).toBeGreaterThanOrEqual(4);
   });
 
-  it('renders conditional cosmic game donations when present', () => {
+  it('renders conditional cosmic protocol contributions when present', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({
         MainStats: {
@@ -449,7 +449,7 @@ describe('Statistics', () => {
     expect(screen.getByText('Protocol Contributions Sum')).toBeInTheDocument();
   });
 
-  it('renders voluntary donations when present', () => {
+  it('renders voluntary contributions when present', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({
         SumVoluntaryDonationsEth: '2.5',
@@ -462,7 +462,7 @@ describe('Statistics', () => {
     expect(screen.getByText('Voluntary Contributions')).toBeInTheDocument();
   });
 
-  it('renders charity withdrawals when present', () => {
+  it('renders public-goods retrievals when present', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({
         MainStats: {
@@ -477,7 +477,7 @@ describe('Statistics', () => {
     expect(screen.getByText('Public Goods Retrievals')).toBeInTheDocument();
   });
 
-  it('renders pending raffle withdrawal message when applicable', () => {
+  it('renders pending stellar-selection retrieval message when applicable', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({
         MainStats: {

@@ -1,3 +1,5 @@
+// lexicon-allow-start: service test fixtures mirror the backend-sealed API surface
+
 import axios from 'axios';
 
 import {
@@ -45,7 +47,7 @@ describe('users API', () => {
     it('returns user data on successful response', async () => {
       const mockUserData = {
         Addr: '0x1234567890123456789012345678901234567890',
-        Bids: [],
+        Gestures: [],
         PrizeHistory: [],
       };
       mockedAxios.get.mockResolvedValue({ data: mockUserData });
@@ -55,15 +57,13 @@ describe('users API', () => {
       expect(result).toBeDefined();
       expect(result?.Addr).toBe(mockUserData.Addr);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/user.*info/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/user.*info/));
     });
 
     it('flattens Tx in nested arrays', async () => {
       const mockUserData = {
         Addr: '0x1234',
-        Bids: [
+        Gestures: [
           {
             EvtLogId: 1,
             Tx: {
@@ -81,8 +81,8 @@ describe('users API', () => {
 
       const result = await get_user_info('0x1234');
 
-      expect(result?.Bids).toHaveLength(1);
-      expect(result?.Bids[0]).toHaveProperty('TxHash', '0xabc');
+      expect(result?.Gestures).toHaveLength(1);
+      expect(result?.Gestures[0]).toHaveProperty('TxHash', '0xabc');
     });
 
     it('returns null on 400 response', async () => {
@@ -104,9 +104,7 @@ describe('users API', () => {
       const result = await get_user_balance('0x1234567890123456789012345678901234567890');
 
       expect(result).toEqual(mockBalance);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/user.*balances/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/user.*balances/));
     });
 
     it('returns null on 400 response', async () => {
@@ -121,13 +119,13 @@ describe('users API', () => {
   });
 
   describe('get_unique_bidders', () => {
-    it('returns unique bidders on successful response', async () => {
-      const mockBidders = [{ Addr: '0xaaa' }, { Addr: '0xbbb' }];
-      mockedAxios.get.mockResolvedValue({ data: { UniqueBidders: mockBidders } });
+    it('returns unique participants on successful response', async () => {
+      const mockParticipants = [{ Addr: '0xaaa' }, { Addr: '0xbbb' }];
+      mockedAxios.get.mockResolvedValue({ data: { UniqueBidders: mockParticipants } });
 
       const result = await get_unique_bidders();
 
-      expect(result).toEqual(mockBidders);
+      expect(result).toEqual(mockParticipants);
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringMatching(/statistics.*unique.*bidders/),
       );
@@ -169,15 +167,15 @@ describe('users API', () => {
   });
 
   describe('get_unique_winners', () => {
-    it('returns unique winners on success', async () => {
-      const winners = [{ Addr: '0x1', Wins: 3 }];
-      mockedAxios.get.mockResolvedValue({ data: { UniqueWinners: winners } });
+    it('returns unique recipients on success', async () => {
+      const recipients = [{ Addr: '0x1', Wins: 3 }];
+      mockedAxios.get.mockResolvedValue({ data: { UniqueWinners: recipients } });
 
       const result = await get_unique_winners();
 
-      expect(result).toEqual(winners);
+      expect(result).toEqual(recipients);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/statistics.*unique.*winners/),
+        expect.stringMatching(/statistics.*unique.*recipients/),
       );
     });
 
@@ -217,15 +215,15 @@ describe('users API', () => {
   });
 
   describe('get_unique_cst_stakers', () => {
-    it('returns unique CST stakers on success', async () => {
-      const stakers = [{ Addr: '0xs1', StakeCount: 2 }];
-      mockedAxios.get.mockResolvedValue({ data: { UniqueStakersCST: stakers } });
+    it('returns unique CST anchorHolders on success', async () => {
+      const anchorHolders = [{ Addr: '0xs1', StakeCount: 2 }];
+      mockedAxios.get.mockResolvedValue({ data: { UniqueStakersCST: anchorHolders } });
 
       const result = await get_unique_cst_stakers();
 
-      expect(result).toEqual(stakers);
+      expect(result).toEqual(anchorHolders);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/statistics.*unique.*stakers.*cst/),
+        expect.stringMatching(/statistics.*unique.*anchorHolders.*cst/),
       );
     });
 
@@ -241,15 +239,15 @@ describe('users API', () => {
   });
 
   describe('get_unique_rwalk_stakers', () => {
-    it('returns unique RWLK stakers on success', async () => {
-      const stakers = [{ Addr: '0xr1', StakeCount: 4 }];
-      mockedAxios.get.mockResolvedValue({ data: { UniqueStakersRWalk: stakers } });
+    it('returns unique RWLK anchorHolders on success', async () => {
+      const anchorHolders = [{ Addr: '0xr1', StakeCount: 4 }];
+      mockedAxios.get.mockResolvedValue({ data: { UniqueStakersRWalk: anchorHolders } });
 
       const result = await get_unique_rwalk_stakers();
 
-      expect(result).toEqual(stakers);
+      expect(result).toEqual(anchorHolders);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/statistics.*unique.*stakers.*randomwalk/),
+        expect.stringMatching(/statistics.*unique.*anchorHolders.*randomwalk/),
       );
     });
 
@@ -265,15 +263,15 @@ describe('users API', () => {
   });
 
   describe('get_unique_both_stakers', () => {
-    it('returns unique combined stakers on success', async () => {
-      const stakers = [{ Addr: '0xb1', StakeCount: 6 }];
-      mockedAxios.get.mockResolvedValue({ data: { UniqueStakersBoth: stakers } });
+    it('returns unique combined anchorHolders on success', async () => {
+      const anchorHolders = [{ Addr: '0xb1', StakeCount: 6 }];
+      mockedAxios.get.mockResolvedValue({ data: { UniqueStakersBoth: anchorHolders } });
 
       const result = await get_unique_both_stakers();
 
-      expect(result).toEqual(stakers);
+      expect(result).toEqual(anchorHolders);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/statistics.*unique.*stakers.*both/),
+        expect.stringMatching(/statistics.*unique.*anchorHolders.*both/),
       );
     });
 
@@ -288,3 +286,5 @@ describe('users API', () => {
     });
   });
 });
+
+// lexicon-allow-end

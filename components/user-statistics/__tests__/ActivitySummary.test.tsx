@@ -33,7 +33,7 @@ const baseProps: ActivitySummaryProps = {
       TotalTokensMinted: 2,
     },
   },
-  totalStakeRewardEth: 0.5,
+  totalAnchorDistributionEth: 0.5,
 };
 
 describe('ActivitySummary', () => {
@@ -47,49 +47,49 @@ describe('ActivitySummary', () => {
     expect(screen.getByText('Activity Overview')).toBeInTheDocument();
   });
 
-  it('renders bidding stats', () => {
+  it('renders gesturing stats', () => {
     render(<ActivitySummary {...baseProps} />);
     expect(screen.getByText('Gestures Made')).toBeInTheDocument();
     expect(screen.getByText('Max Gesture')).toBeInTheDocument();
   });
 
-  it('renders raffle stats', () => {
+  it('renders stellar-selection stats', () => {
     render(<ActivitySummary {...baseProps} />);
     expect(screen.getByText('ETH Stellar Selections Participated')).toBeInTheDocument();
     expect(screen.getByText('NFTs Received')).toBeInTheDocument();
   });
 
-  it('renders staking stats', () => {
+  it('renders anchoring stats', () => {
     render(<ActivitySummary {...baseProps} />);
     expect(screen.getByText('Anchor Actions')).toBeInTheDocument();
     expect(screen.getByText('Distributions Received')).toBeInTheDocument();
   });
 
-  it('displays correct bid count', () => {
+  it('displays correct gesture count', () => {
     render(<ActivitySummary {...baseProps} />);
     expect(screen.getByText('20')).toBeInTheDocument();
   });
 
-  it('displays combined stake actions count', () => {
+  it('displays combined anchor actions count', () => {
     render(<ActivitySummary {...baseProps} />);
-    const stakeLabel = screen.getByText('Anchor Actions');
-    const stakeRow = stakeLabel.closest('div')!.parentElement!;
-    expect(stakeRow).toHaveTextContent('5');
+    const anchorLabel = screen.getByText('Anchor Actions');
+    const anchorRow = anchorLabel.closest('div')!.parentElement!;
+    expect(anchorRow).toHaveTextContent('5');
   });
 
-  it('displays staking rewards', () => {
+  it('displays anchor distributions', () => {
     render(<ActivitySummary {...baseProps} />);
     expect(screen.getByText('0.5000 ETH')).toBeInTheDocument();
   });
 
-  it('handles zero staking stats gracefully', () => {
+  it('handles zero anchoring stats gracefully', () => {
     render(
       <ActivitySummary
         userInfo={{
           NumBids: 0,
           NumPrizes: 0,
         }}
-        totalStakeRewardEth={0}
+        totalAnchorDistributionEth={0}
       />,
     );
     expect(screen.getByTestId('activity-summary')).toBeInTheDocument();

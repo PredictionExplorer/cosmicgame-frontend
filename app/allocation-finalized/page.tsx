@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 
 import { createMetadata } from '@/utils/seo';
 
-import PrizeClaimedPage from './PrizeClaimedPage';
+import AllocationFinalizedPage from './AllocationFinalizedPage';
 
 export const metadata: Metadata = createMetadata(
   'Retrieved Allocations | Cosmic Signature',
@@ -15,7 +15,7 @@ export const metadata: Metadata = createMetadata(
 export default function Page() {
   return (
     <Suspense>
-      <PrizeClaimedPage />
+      <AllocationFinalizedPage />
     </Suspense>
   );
 }

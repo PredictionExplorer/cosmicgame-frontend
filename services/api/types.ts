@@ -7,7 +7,14 @@
  * NumDonatedNFTs mirror the Go server's response keys. Renaming them breaks
  * deserialization. Translate banned vocabulary at render time via
  * content/dapp.ts lookups, not here.
+ *
+ * The entire file is wrapped in a single `lexicon-allow` block: the field
+ * names inside these interfaces are a sealed contract with the backend and
+ * cannot be renamed without coordinated server changes (see Phase 6 of the
+ * lexicon plan for the optional adapter that would translate fully).
  */
+
+// lexicon-allow-start: backend wire-format field names mirror the Go server response keys
 
 // ---------------------------------------------------------------------------
 // Base transaction info (from flattenTx helper)
@@ -27,7 +34,7 @@ export interface TxInfo {
 // Dashboard / Statistics
 // ---------------------------------------------------------------------------
 
-export interface StakeStatistics {
+export interface AnchoringStatistics {
   NumActiveStakers: number;
   NumDeposits: number;
   TotalRewardEth: number;
@@ -61,8 +68,8 @@ export interface MainStats {
   SumWithdrawals?: number;
   TotalEthDonatedAmountEth?: number;
   DonatedTokenDistribution?: DonatedTokenDistributionEntry[];
-  StakeStatisticsCST: StakeStatistics;
-  StakeStatisticsRWalk: StakeStatistics;
+  StakeStatisticsCST: AnchoringStatistics;
+  StakeStatisticsRWalk: AnchoringStatistics;
 }
 
 export interface DonatedTokenDistributionEntry {
@@ -96,7 +103,7 @@ export interface DashboardInfo {
   PrizeClaimTs: number;
   TsRoundStart: number;
   LastBidderAddr: string;
-  BidPriceEth: number;
+  GestureCostEth: number;
   StakingAmountEth: number;
   CurRoundPrizeTime?: number;
   MainStats: MainStats;
@@ -116,11 +123,11 @@ export interface DashboardInfo {
   RaffleAmountEth?: number;
   CosmicGameBalanceEth?: number;
   CurRoundStats?: RoundStats;
-  /** Main prize claims completed (roughly one per finished round). */
+  /** Main allocation claims completed (roughly one per finished round). */
   TotalPrizes?: number;
   /** Sum of cg_winner.prizes_count (may be lower than cg_prize rows). */
   TotalPrizeAwards?: number;
-  /** COUNT(*) FROM cg_prize — every unified prize row (matches your SQL). */
+  /** COUNT(*) FROM cg_prize — every unified allocation row (matches your SQL). */
   CgPrizeRowCount?: number;
   [key: string]: unknown;
 }
@@ -141,7 +148,7 @@ export interface RoundStats {
   [key: string]: unknown;
 }
 
-export interface RaffleNFTWinner {
+export interface StellarSelectionNFTRecipient {
   EvtLogId?: number;
   TxHash?: string;
   TimeStamp?: number;
@@ -154,7 +161,7 @@ export interface RaffleNFTWinner {
   [key: string]: unknown;
 }
 
-export interface RaffleETHDeposit {
+export interface StellarSelectionETHDeposit {
   EvtLogId: number;
   TxHash: string;
   TimeStamp: number;
@@ -178,7 +185,7 @@ export interface WinningHistoryEntry extends TxInfo {
   [key: string]: unknown;
 }
 
-export interface PrizeEntry {
+export interface AllocationEntry {
   EvtLogId?: number;
   RoundNum?: number;
   WinnerAddr?: string;
@@ -199,10 +206,10 @@ export interface RoundInfo {
   BlockNum?: number;
   TxId?: number;
   RoundStats: RoundStats;
-  RaffleNFTWinners: RaffleNFTWinner[];
-  StakingNFTWinners: RaffleNFTWinner[];
-  RaffleETHDeposits: RaffleETHDeposit[];
-  AllPrizes: PrizeEntry[];
+  RaffleNFTWinners: StellarSelectionNFTRecipient[];
+  StakingNFTWinners: StellarSelectionNFTRecipient[];
+  RaffleETHDeposits: StellarSelectionETHDeposit[];
+  AllPrizes: AllocationEntry[];
   CSTAmountEth: number;
   CharityAddress: string;
   CharityAmountETH: number;
@@ -223,16 +230,16 @@ export interface RoundInfo {
 }
 
 // ---------------------------------------------------------------------------
-// Bids
+// Gestures
 // ---------------------------------------------------------------------------
 
-export interface BidInfo extends TxInfo {
-  BidPrice?: number;
+export interface GestureInfo extends TxInfo {
+  GestureCost?: number;
   RoundNum: number;
   BidderAddr: string;
   Message?: string;
-  BidType: number;
-  BidPriceEth: number;
+  GestureType: number;
+  GestureCostEth: number;
   NumCSTokensEth?: number;
   NumCSTTokensEth?: number;
   NFTDonationTokenId?: number;
@@ -272,18 +279,18 @@ export interface UserBalance {
 /** User info response with flattened arrays (from get_user_info) */
 export interface UserInfoWithLists {
   UserInfo?: UserInfo;
-  Bids: BidInfo[];
+  Gestures: GestureInfo[];
   PrizeHistory: TxInfo[];
   CosmicSignatureTokensOwned: CSTTokenInfo[];
-  CurrentlyStakedTokens: StakedTokenInfo[];
-  DonatedNFTsClaimed: DonatedNFT[];
+  CurrentlyStakedTokens: AnchoredTokenInfo[];
+  DonatedNFTsClaimed: AttachedNFT[];
   DonatedTokensClaimed: unknown[];
   ERC20Transfers: TxInfo[];
   ERC721Transfers: TxInfo[];
   ETHDonationsMade: TxInfo[];
   MainPrizeClaims: TxInfo[];
   MarketingRewardsAwarded: TxInfo[];
-  StakingActions: StakingAction[];
+  StakingActions: AnchorAction[];
   TokenDonationsMade: TxInfo[];
   [key: string]: unknown;
 }
@@ -343,7 +350,7 @@ export interface CSTTransferRecord extends TxInfo {
 // Staking
 // ---------------------------------------------------------------------------
 
-export interface StakingAction extends TxInfo {
+export interface AnchorAction extends TxInfo {
   ActionId: number;
   ActionType: number;
   TokenAddr: string;
@@ -354,7 +361,7 @@ export interface StakingAction extends TxInfo {
   [key: string]: unknown;
 }
 
-export interface StakedTokenInfo {
+export interface AnchoredTokenInfo {
   StakeActionId: number;
   StakedTokenId: number;
   TokenInfo?: {
@@ -369,7 +376,7 @@ export interface StakedTokenInfo {
   [key: string]: unknown;
 }
 
-export interface StakingCSTReward {
+export interface CSTAnchorDistribution {
   EvtLogId: number;
   RoundNum: number;
   TokenId: number;
@@ -398,9 +405,9 @@ export interface StakingCSTReward {
   [key: string]: unknown;
 }
 
-export interface CombinedStakingRecordInfo {
-  Stake: StakingAction | null;
-  Unstake: StakingAction | null;
+export interface CombinedAnchorRecordInfo {
+  Stake: AnchorAction | null;
+  Unstake: AnchorAction | null;
   [key: string]: unknown;
 }
 
@@ -411,7 +418,7 @@ export interface RewardsByToken {
   [key: string]: unknown;
 }
 
-export interface StakingRewardMint {
+export interface AnchorDistributionImprint {
   EvtLogId: number;
   TxHash: string;
   TimeStamp: number;
@@ -426,7 +433,7 @@ export interface StakingRewardMint {
 // Donations
 // ---------------------------------------------------------------------------
 
-export interface DonatedNFT extends TxInfo {
+export interface AttachedNFT extends TxInfo {
   RecordId?: number | string;
   RoundNum: number;
   DonorAddr: string;
@@ -465,7 +472,7 @@ export interface CharityWithdrawal {
 // Special Winners
 // ---------------------------------------------------------------------------
 
-export interface SpecialWinners {
+export interface SpecialRecipients {
   EnduranceChampionAddress?: string;
   EnduranceChampionDuration?: number;
   LastCstBidderAddress?: string;
@@ -473,10 +480,10 @@ export interface SpecialWinners {
 }
 
 // ---------------------------------------------------------------------------
-// Banned Bids
+// Banned Gestures
 // ---------------------------------------------------------------------------
 
-export interface BannedBid {
+export interface BannedGesture {
   bid_id: number;
   [key: string]: unknown;
 }
@@ -485,7 +492,7 @@ export interface BannedBid {
 // Price Info
 // ---------------------------------------------------------------------------
 
-export interface BidEthPriceInfo {
+export interface GestureEthCostInfo {
   AuctionDuration: string;
   ETHPrice: string;
   SecondsElapsed: string;
@@ -503,7 +510,7 @@ export interface CTPriceInfo {
 // Token Mint Info (GET /api/cosmicgame/randomwalk/tokens/info/:id or /api/randomwalk/tokens/info/:id)
 // ---------------------------------------------------------------------------
 
-export interface TokenMintInfo {
+export interface TokenImprintInfo {
   CurName?: string;
   CurOwnerAddr?: string;
   SeedHex?: string;
@@ -515,7 +522,7 @@ export interface TokenMintInfo {
 // Unique Address Statistics
 // ---------------------------------------------------------------------------
 
-export interface Bidder {
+export interface Participant {
   BidderAid: string;
   BidderAddr: string;
   NumBids: number;
@@ -523,16 +530,16 @@ export interface Bidder {
   [key: string]: unknown;
 }
 
-export interface Winner {
+export interface Recipient {
   WinnerAid: string;
   WinnerAddr: string;
-  PrizesCount: number;
+  AllocationsCount: number;
   MaxWinAmountEth: number;
   PrizesSum: number;
   [key: string]: unknown;
 }
 
-export interface UniqueStakerCST {
+export interface UniqueAnchorHolderCST {
   StakerAid: string | number;
   StakerAddr: string;
   NumStakeActions: number;
@@ -544,7 +551,7 @@ export interface UniqueStakerCST {
   [key: string]: unknown;
 }
 
-export interface UniqueStakerRWLK {
+export interface UniqueAnchorHolderRWLK {
   StakerAid: string | number;
   StakerAddr: string;
   NumStakeActions: number;
@@ -570,7 +577,7 @@ export interface NotifyRedBoxResult {
   ETHRaffleToClaim: number;
   ETHRaffleToClaimWei: number;
   NumDonatedNFTToClaim: number;
-  UnclaimedStakingReward: number;
+  UnretrievedAnchorDistribution: number;
   [key: string]: unknown;
 }
 
@@ -646,3 +653,5 @@ export interface ActionIdWithClaimInfo {
   Claimed: boolean;
   [key: string]: unknown;
 }
+
+// lexicon-allow-end

@@ -176,10 +176,10 @@ describe('reportError', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const err = new Error('test error');
 
-    reportError(err, 'bidding');
+    reportError(err, 'gesturing');
 
     expect(mockedSentry.captureException).toHaveBeenCalledWith(err, {
-      tags: { context: 'bidding' },
+      tags: { context: 'gesturing' },
     });
     consoleSpy.mockRestore();
   });
@@ -198,11 +198,11 @@ describe('reportError', () => {
   it('passes context as tag when provided with non-Error', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    reportError('string error', 'staking');
+    reportError('string error', 'anchoring');
 
     expect(mockedSentry.captureMessage).toHaveBeenCalledWith('string error', {
       level: 'error',
-      tags: { context: 'staking' },
+      tags: { context: 'anchoring' },
     });
     consoleSpy.mockRestore();
   });

@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: internal marketing draft — needs lexicon rewrite before public use -->
+
 # Cosmic Signature Ambassador Program
 
 ## Program Name: "Cosmic Ambassadors"
@@ -419,3 +421,5 @@ Off-boarding process:
 | New bidders referred by ambassadors           | 50               | 300              |
 | Ambassador retention rate                     | 90%              | 85%              |
 | Average performance score                     | 65%              | 70%              |
+
+<!-- lexicon-allow-end -->

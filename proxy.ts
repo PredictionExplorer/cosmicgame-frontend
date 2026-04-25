@@ -1,12 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import {
-  APP_ORIGIN,
-  isAppHost,
-  isAppOnlyPath,
-  isLandingHost,
-  normalizeHost,
-} from '@/lib/hostRouting';
+import { APP_ORIGIN, isAppOnlyPath, isLandingHost, normalizeHost } from '@/lib/hostRouting';
 
 export const config = {
   matcher: [
@@ -23,11 +17,17 @@ export default function middleware(req: NextRequest) {
   const host = normalizeHost(hostHeader);
   const { pathname, search } = req.nextUrl;
 
+  // `/landing-site` is an INTERNAL route — the landing lives publicly only at
+  // cosmicsignature.com/. Any direct external request is either canonicalized
+  // (on the marketing host) or 404'd (anywhere else) so search engines never
+  // see a duplicate URL for the same content.
   if (pathname.startsWith('/landing-site')) {
-    if (isAppHost(host)) {
-      return new NextResponse('Not Found', { status: 404 });
+    if (isLandingHost(host)) {
+      const url = req.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url, 308);
     }
-    return NextResponse.next();
+    return new NextResponse('Not Found', { status: 404 });
   }
 
   if (isLandingHost(host)) {

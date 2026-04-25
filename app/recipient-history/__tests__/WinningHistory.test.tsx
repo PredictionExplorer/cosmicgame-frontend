@@ -13,7 +13,7 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useClaimHistoryByUser: (...args: unknown[]) => mockUseClaimHistoryByUser(...args),
 }));
 
-jest.mock('../../../components/tables/WinningHistoryTable', () => ({
+jest.mock('../../../components/tables/RecipientHistoryTable', () => ({
   __esModule: true,
   default: ({ winningHistory }: { winningHistory: unknown[] }) => (
     <div data-testid="history-table">rows: {winningHistory.length}</div>

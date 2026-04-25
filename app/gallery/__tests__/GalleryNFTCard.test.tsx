@@ -40,7 +40,7 @@ jest.mock('next/image', () => ({
   },
 }));
 
-const baseMint = Math.floor(Date.now() / 1000) - 86400;
+const baseImprint = Math.floor(Date.now() / 1000) - 86400;
 
 const fullNFT: GalleryNFTData = {
   TokenId: 42,
@@ -48,7 +48,7 @@ const fullNFT: GalleryNFTData = {
   TokenName: 'Cosmic Pioneer',
   RoundNum: 7,
   Staked: true,
-  MintTimeStamp: baseMint,
+  MintTimeStamp: baseImprint,
 };
 
 const unnamedNFT: GalleryNFTData = {
@@ -57,7 +57,7 @@ const unnamedNFT: GalleryNFTData = {
   TokenName: '',
   RoundNum: 3,
   Staked: false,
-  MintTimeStamp: baseMint,
+  MintTimeStamp: baseImprint,
 };
 
 describe('GalleryNFTCard (grid)', () => {

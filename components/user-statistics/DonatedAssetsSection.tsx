@@ -5,10 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
-import DonatedERC20Table from '@/components/donations/DonatedERC20Table';
-import type { NFTRecord } from '@/components/donations/DonatedNFTTable';
-import type { DonatedERC20Token } from '@/components/donations/DonatedERC20Table';
+import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
+import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
+import type { NFTRecord } from '@/components/attachments/AttachedNFTTable';
+import type { DonatedERC20Token } from '@/components/attachments/AttachedERC20Table';
 
 /** Props for the donated assets section. */
 export interface DonatedAssetsSectionProps {
@@ -84,7 +84,7 @@ export function DonatedAssetsSection({
             description="You haven't received any attached NFTs through Stellar Selection yet."
           />
         ) : (
-          <DonatedNFTTable
+          <AttachedNFTTable
             list={allNFTs}
             handleClaim={canClaim ? onClaimNFT : undefined}
             claimingTokens={claimingDonatedNFTs}
@@ -120,7 +120,7 @@ export function DonatedAssetsSection({
             description="You haven't received any attached ERC20 tokens yet."
           />
         ) : (
-          <DonatedERC20Table
+          <AttachedERC20Table
             list={donatedERC20}
             handleClaim={canClaim ? (onClaimERC20 ?? null) : null}
           />

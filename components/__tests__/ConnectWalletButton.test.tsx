@@ -15,7 +15,7 @@ jest.mock('../../hooks/web3', () => ({
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 
 const defaultBalance = { ETH: 1.5, CosmicToken: 100, CosmicSignature: 3, RWLK: 2 };
-const defaultStaked = { cst: 1, rwalk: 0 };
+const defaultAnchored = { cst: 1, rwalk: 0 };
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -29,7 +29,7 @@ describe('ConnectWalletButton', () => {
         isMobileView={false}
         loading={false}
         balance={defaultBalance}
-        stakedTokenCount={defaultStaked}
+        stakedTokenCount={defaultAnchored}
       />,
     );
     expect(container).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('ConnectWalletButton', () => {
         isMobileView={false}
         loading={false}
         balance={defaultBalance}
-        stakedTokenCount={defaultStaked}
+        stakedTokenCount={defaultAnchored}
       />,
     );
 
@@ -66,7 +66,7 @@ describe('ConnectWalletButton', () => {
         isMobileView={true}
         loading={false}
         balance={defaultBalance}
-        stakedTokenCount={defaultStaked}
+        stakedTokenCount={defaultAnchored}
       />,
     );
 
@@ -85,7 +85,7 @@ describe('ConnectWalletButton', () => {
         isMobileView={false}
         loading={false}
         balance={defaultBalance}
-        stakedTokenCount={defaultStaked}
+        stakedTokenCount={defaultAnchored}
       />,
     );
 
@@ -106,7 +106,7 @@ describe('ConnectWalletButton', () => {
         isMobileView={false}
         loading={false}
         balance={{ ETH: 2.5, CosmicToken: 50, CosmicSignature: 5, RWLK: 3 }}
-        stakedTokenCount={defaultStaked}
+        stakedTokenCount={defaultAnchored}
       />,
     );
 
@@ -129,7 +129,7 @@ describe('ConnectWalletButton', () => {
         isMobileView={false}
         loading={true}
         balance={defaultBalance}
-        stakedTokenCount={defaultStaked}
+        stakedTokenCount={defaultAnchored}
       />,
     );
 
@@ -174,7 +174,7 @@ describe('ConnectWalletButton', () => {
         isMobileView={false}
         loading={false}
         balance={defaultBalance}
-        stakedTokenCount={defaultStaked}
+        stakedTokenCount={defaultAnchored}
       />,
     );
 
@@ -193,7 +193,7 @@ describe('ConnectWalletButton', () => {
         isMobileView={false}
         loading={false}
         balance={defaultBalance}
-        stakedTokenCount={defaultStaked}
+        stakedTokenCount={defaultAnchored}
       />,
     );
     await checkA11y(container);

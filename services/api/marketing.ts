@@ -1,3 +1,5 @@
+// lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
+
 import { axios, getAPIUrl, apiCall, flattenTxArray } from './client';
 import type { MarketingReward } from './types';
 
@@ -16,3 +18,5 @@ export function get_marketing_rewards_by_user(address: string): Promise<Marketin
     return flattenTxArray<MarketingReward>(data.UserMarketingRewards);
   }, []);
 }
+
+// lexicon-allow-end

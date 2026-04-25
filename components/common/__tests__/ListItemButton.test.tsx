@@ -9,7 +9,7 @@ describe('NestedListItem', () => {
     const nav = {
       title: 'Rewards',
       route: '#',
-      children: [{ title: 'Prizes', route: '/prize' }],
+      children: [{ title: 'Allocations', route: '/allocation' }],
     };
     render(<NestedListItem nav={nav} />);
     expect(screen.getByText('Rewards')).toBeInTheDocument();
@@ -26,7 +26,7 @@ describe('NestedListItem', () => {
     const nav = {
       title: 'Rewards',
       route: '#',
-      children: [{ title: 'Prizes', route: '/prize' }],
+      children: [{ title: 'Allocations', route: '/allocation' }],
     };
     render(<NestedListItem nav={nav} />);
 
@@ -42,7 +42,7 @@ describe('NestedListItem', () => {
     const nav = {
       title: 'Rewards',
       route: '#',
-      children: [{ title: 'Prizes', route: '/prize' }],
+      children: [{ title: 'Allocations', route: '/allocation' }],
     };
     render(<NestedListItem nav={nav} />);
 
@@ -58,7 +58,7 @@ describe('NestedListItem', () => {
     const nav = {
       title: 'Rewards',
       route: '#',
-      children: [{ title: 'Prizes', route: '/prize' }],
+      children: [{ title: 'Allocations', route: '/allocation' }],
     };
     render(<NestedListItem nav={nav} />);
 
@@ -74,20 +74,20 @@ describe('NestedListItem', () => {
       title: 'Rewards',
       route: '#',
       children: [
-        { title: 'Prizes', route: '/prize' },
-        { title: 'Staking', route: '/anchoring' },
+        { title: 'Allocations', route: '/allocation' },
+        { title: 'Anchoring', route: '/anchoring' },
       ],
     };
     render(<NestedListItem nav={nav} />);
-    expect(screen.getByText('Prizes')).toBeInTheDocument();
-    expect(screen.getByText('Staking')).toBeInTheDocument();
+    expect(screen.getByText('Allocations')).toBeInTheDocument();
+    expect(screen.getByText('Anchoring')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
     const nav = {
       title: 'Rewards',
       route: '#',
-      children: [{ title: 'Prizes', route: '/prize' }],
+      children: [{ title: 'Allocations', route: '/allocation' }],
     };
     const { container } = render(<NestedListItem nav={nav} />);
     await checkA11y(container);

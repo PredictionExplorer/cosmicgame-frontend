@@ -1,3 +1,5 @@
+// lexicon-allow-start: service test fixtures mirror the backend-sealed API surface
+
 import axios from 'axios';
 
 import { get_marketing_rewards, get_marketing_rewards_by_user } from '@/services/api/marketing';
@@ -93,3 +95,5 @@ describe('marketing API', () => {
     });
   });
 });
+
+// lexicon-allow-end

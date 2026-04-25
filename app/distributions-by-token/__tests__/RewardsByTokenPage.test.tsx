@@ -2,22 +2,22 @@ import { checkA11y, render, screen } from '@/test-utils';
 
 import RewardsByTokenPage from '../[address]/[tokenId]/RewardsByTokenPage';
 
-const mockUseStakingRewardsByUserByTokenDetails = jest.fn().mockReturnValue({
+const mockUseAnchorDistributionsByUserByTokenDetails = jest.fn().mockReturnValue({
   data: undefined,
   isLoading: false,
   error: null,
 });
 
 jest.mock('../../../hooks/useApiQuery', () => ({
-  useStakingRewardsByUserByTokenDetails: (...args: unknown[]) =>
-    mockUseStakingRewardsByUserByTokenDetails(...args),
+  useAnchorDistributionsByUserByTokenDetails: (...args: unknown[]) =>
+    mockUseAnchorDistributionsByUserByTokenDetails(...args),
 }));
 
 beforeEach(() => jest.clearAllMocks());
 
 describe('RewardsByTokenPage', () => {
   it('shows loading state', () => {
-    mockUseStakingRewardsByUserByTokenDetails.mockReturnValue({
+    mockUseAnchorDistributionsByUserByTokenDetails.mockReturnValue({
       data: undefined,
       isLoading: true,
       error: null,
@@ -27,7 +27,7 @@ describe('RewardsByTokenPage', () => {
   });
 
   it('renders rewards table with data', () => {
-    mockUseStakingRewardsByUserByTokenDetails.mockReturnValue({
+    mockUseAnchorDistributionsByUserByTokenDetails.mockReturnValue({
       data: {
         0: {
           DepositTimeStamp: 1000000,
@@ -55,17 +55,17 @@ describe('RewardsByTokenPage', () => {
   });
 
   it('passes correct arguments to the hook', () => {
-    mockUseStakingRewardsByUserByTokenDetails.mockReturnValue({
+    mockUseAnchorDistributionsByUserByTokenDetails.mockReturnValue({
       data: undefined,
       isLoading: false,
       error: null,
     });
     render(<RewardsByTokenPage address="0xABC" tokenId={7} />);
-    expect(mockUseStakingRewardsByUserByTokenDetails).toHaveBeenCalledWith('0xABC', 7);
+    expect(mockUseAnchorDistributionsByUserByTokenDetails).toHaveBeenCalledWith('0xABC', 7);
   });
 
   it('handles empty response', () => {
-    mockUseStakingRewardsByUserByTokenDetails.mockReturnValue({
+    mockUseAnchorDistributionsByUserByTokenDetails.mockReturnValue({
       data: {},
       isLoading: false,
       error: null,

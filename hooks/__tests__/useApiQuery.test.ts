@@ -5,18 +5,18 @@ import {
   useDashboardInfo,
   useRoundList,
   useRoundInfo,
-  usePrizeTime,
+  useAllocationTime,
   useClaimHistory,
   useClaimHistoryByUser,
-  useBidList,
-  useBidInfo,
-  useBidListByRound,
-  useCurrentSpecialWinners,
-  usePrizeDepositsList,
-  usePrizeDepositsByRound,
-  useBannedBids,
-  useBidEthPrice,
-  useTimeUntilPrize,
+  useGestureList,
+  useGestureInfo,
+  useGestureListByCycle,
+  useCurrentSpecialRecipients,
+  useAllocationDepositsList,
+  useAllocationDepositsByCycle,
+  useBannedGestures,
+  useGestureEthCost,
+  useTimeUntilAllocation,
   useCSTList,
   useCSTTokensByUser,
   useCSTInfo,
@@ -31,27 +31,27 @@ import {
   useCTPrice,
   useTokenInfo,
   useUsedRWLKNFTs,
-  useStakingCSTRewardsToClaimByUser,
-  useStakingCSTRewardsCollectedByUser,
-  useStakedCSTTokensByUser,
+  useCSTAnchorDistributionsToRetrieveByUser,
+  useCSTAnchorDistributionsRetrievedByUser,
+  useAnchoredCSTokensByUser,
   useCSTActionIdsByDepositId,
-  useStakingCSTActionsByUser,
-  useStakingCSTActions,
-  useStakingCSTActionsInfo,
-  useStakingCSTRewards,
-  useStakingCSTRewardsByRound,
-  useStakingCSTRewardPaidRecordsByUser,
-  useStakedCSTTokensGlobal,
-  useStakingRewardsByUser,
-  useStakingRewardsByUserByTokenDetails,
-  useStakingCSTByUserByDepositRewards,
-  useStakingRWLKActionsInfo,
-  useStakingRWLKActions,
-  useStakingRWLKActionsByUser,
-  useStakingRWLKMintsGlobal,
-  useStakingRWLKMintsByUser,
-  useStakedRWLKTokensGlobal,
-  useStakedRWLKTokensByUser,
+  useCSTAnchorActionsByUser,
+  useCSTAnchorActions,
+  useCSTAnchorActionInfo,
+  useCSTAnchorDistributions,
+  useCSTAnchorDistributionsByCycle,
+  useCSTAnchorDistributionPaidRecordsByUser,
+  useGlobalAnchoredCSTokens,
+  useAnchorDistributionsByUser,
+  useAnchorDistributionsByUserByTokenDetails,
+  useCSTAnchorDistributionsByUserByDeposit,
+  useRWLKAnchorActionInfo,
+  useRWLKAnchorActions,
+  useRWLKAnchorActionsByUser,
+  useGlobalRWLKAnchorImprints,
+  useRWLKAnchorImprintsByUser,
+  useGlobalAnchoredRWLKTokens,
+  useAnchoredRWLKTokensByUser,
   useDonationsCGSimpleList,
   useDonationsCGSimpleByRound,
   useDonationsCGWithInfoList,
@@ -77,18 +77,18 @@ import {
   useUserInfo,
   useUserBalance,
   useNotifyRedBox,
-  useUniqueBidders,
-  useUniqueWinners,
+  useUniqueParticipants,
+  useUniqueRecipients,
   useUniqueDonors,
-  useUniqueCSTStakers,
-  useUniqueRWLKStakers,
-  useUniqueBothStakers,
-  useRaffleDepositsByUser,
+  useUniqueCSTAnchorHolders,
+  useUniqueRWLKAnchorHolders,
+  useUniqueBothAnchorHolders,
+  useStellarSelectionDepositsByUser,
   useChronoWarriorDepositsByUser,
-  useUnclaimedRaffleDepositsByUser,
-  useRaffleNFTWinnersList,
-  useRaffleNFTWinnersByRound,
-  useRaffleNFTWinningsByUser,
+  useUnretrievedStellarSelectionDepositsByUser,
+  useStellarSelectionNFTRecipientsList,
+  useStellarSelectionNFTRecipientsByCycle,
+  useStellarSelectionNFTAllocationsByUser,
   useMarketingRewards,
   useMarketingRewardsByUser,
   useCurrentTime,
@@ -194,17 +194,17 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('usePrizeTime', () => {
+  describe('useAllocationTime', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => usePrizeTime());
+      renderHook(() => useAllocationTime());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['prizeTime'] }),
+        expect.objectContaining({ queryKey: ['allocationTime'] }),
       );
     });
 
     it('polls frequently with short staleTime', () => {
-      renderHook(() => usePrizeTime());
+      renderHook(() => useAllocationTime());
 
       const options = getOptions();
       expect(options.staleTime).toBe(5_000);
@@ -251,15 +251,17 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('useBidList', () => {
+  describe('useGestureList', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useBidList());
+      renderHook(() => useGestureList());
 
-      expect(mockUseQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['bidList'] }));
+      expect(mockUseQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['gestureList'] }),
+      );
     });
 
     it('configures polling', () => {
-      renderHook(() => useBidList());
+      renderHook(() => useGestureList());
 
       const options = getOptions();
       expect(options.staleTime).toBe(10_000);
@@ -268,31 +270,31 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('useBidInfo', () => {
+  describe('useGestureInfo', () => {
     it('includes evtLogId in the query key', () => {
-      renderHook(() => useBidInfo(99));
+      renderHook(() => useGestureInfo(99));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['bidInfo', 99] }),
+        expect.objectContaining({ queryKey: ['gestureInfo', 99] }),
       );
     });
 
     it('is disabled when evtLogId is 0', () => {
-      renderHook(() => useBidInfo(0));
+      renderHook(() => useGestureInfo(0));
 
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(false);
     });
 
     it('is enabled when evtLogId > 0', () => {
-      renderHook(() => useBidInfo(1));
+      renderHook(() => useGestureInfo(1));
 
       expect(getOptions().enabled).toBe(true);
     });
   });
 
-  describe('useBidListByRound', () => {
+  describe('useGestureListByCycle', () => {
     it('includes round and sortDir in the query key', () => {
-      renderHook(() => useBidListByRound(3, 'asc'));
+      renderHook(() => useGestureListByCycle(3, 'asc'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['bidListByRound', 3, 'asc'] }),
@@ -300,7 +302,7 @@ describe('useApiQuery hooks', () => {
     });
 
     it('defaults sortDir to desc', () => {
-      renderHook(() => useBidListByRound(3));
+      renderHook(() => useGestureListByCycle(3));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['bidListByRound', 3, 'desc'] }),
@@ -308,14 +310,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is enabled for round >= 0', () => {
-      renderHook(() => useBidListByRound(0));
+      renderHook(() => useGestureListByCycle(0));
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(true);
     });
   });
 
-  describe('useCurrentSpecialWinners', () => {
+  describe('useCurrentSpecialRecipients', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useCurrentSpecialWinners());
+      renderHook(() => useCurrentSpecialRecipients());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['currentSpecialWinners'] }),
@@ -323,7 +325,7 @@ describe('useApiQuery hooks', () => {
     });
 
     it('configures polling', () => {
-      renderHook(() => useCurrentSpecialWinners());
+      renderHook(() => useCurrentSpecialRecipients());
 
       const options = getOptions();
       expect(options.staleTime).toBe(15_000);
@@ -332,9 +334,9 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('usePrizeDepositsList', () => {
+  describe('useAllocationDepositsList', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => usePrizeDepositsList());
+      renderHook(() => useAllocationDepositsList());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['prizeDepositsList'] }),
@@ -342,14 +344,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('has staleTime of 30s', () => {
-      renderHook(() => usePrizeDepositsList());
+      renderHook(() => useAllocationDepositsList());
       expect(getOptions().staleTime).toBe(30_000);
     });
   });
 
-  describe('usePrizeDepositsByRound', () => {
+  describe('useAllocationDepositsByCycle', () => {
     it('includes round in the query key', () => {
-      renderHook(() => usePrizeDepositsByRound(5));
+      renderHook(() => useAllocationDepositsByCycle(5));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['prizeDepositsByRound', 5] }),
@@ -357,14 +359,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is enabled for round >= 0', () => {
-      renderHook(() => usePrizeDepositsByRound(0));
+      renderHook(() => useAllocationDepositsByCycle(0));
       expect(getOptions().enabled).toBe(true);
     });
   });
 
-  describe('useBannedBids', () => {
+  describe('useBannedGestures', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useBannedBids());
+      renderHook(() => useBannedGestures());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['bannedBids'] }),
@@ -372,14 +374,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('has staleTime of 30s', () => {
-      renderHook(() => useBannedBids());
+      renderHook(() => useBannedGestures());
       expect(getOptions().staleTime).toBe(30_000);
     });
   });
 
-  describe('useBidEthPrice', () => {
+  describe('useGestureEthCost', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useBidEthPrice());
+      renderHook(() => useGestureEthCost());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['bidEthPrice'] }),
@@ -387,7 +389,7 @@ describe('useApiQuery hooks', () => {
     });
 
     it('configures polling', () => {
-      renderHook(() => useBidEthPrice());
+      renderHook(() => useGestureEthCost());
 
       const options = getOptions();
       expect(options.staleTime).toBe(10_000);
@@ -396,9 +398,9 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('useTimeUntilPrize', () => {
+  describe('useTimeUntilAllocation', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useTimeUntilPrize());
+      renderHook(() => useTimeUntilAllocation());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['timeUntilPrize'] }),
@@ -406,7 +408,7 @@ describe('useApiQuery hooks', () => {
     });
 
     it('polls frequently', () => {
-      renderHook(() => useTimeUntilPrize());
+      renderHook(() => useTimeUntilAllocation());
 
       const options = getOptions();
       expect(options.staleTime).toBe(5_000);
@@ -678,9 +680,9 @@ describe('useApiQuery hooks', () => {
   // Staking – CST
   // ---------------------------------------------------------------------------
 
-  describe('useStakingCSTRewardsToClaimByUser', () => {
+  describe('useCSTAnchorDistributionsToRetrieveByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakingCSTRewardsToClaimByUser('0xaaa'));
+      renderHook(() => useCSTAnchorDistributionsToRetrieveByUser('0xaaa'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingCSTRewardsToClaim', '0xaaa'] }),
@@ -688,12 +690,12 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useStakingCSTRewardsToClaimByUser(null));
+      renderHook(() => useCSTAnchorDistributionsToRetrieveByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
 
     it('configures polling', () => {
-      renderHook(() => useStakingCSTRewardsToClaimByUser('0xaaa'));
+      renderHook(() => useCSTAnchorDistributionsToRetrieveByUser('0xaaa'));
 
       const options = getOptions();
       expect(options.refetchInterval).toBe(30_000);
@@ -702,9 +704,9 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('useStakingCSTRewardsCollectedByUser', () => {
+  describe('useCSTAnchorDistributionsRetrievedByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakingCSTRewardsCollectedByUser('0xbbb'));
+      renderHook(() => useCSTAnchorDistributionsRetrievedByUser('0xbbb'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingCSTRewardsCollected', '0xbbb'] }),
@@ -712,14 +714,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is undefined', () => {
-      renderHook(() => useStakingCSTRewardsCollectedByUser(undefined));
+      renderHook(() => useCSTAnchorDistributionsRetrievedByUser(undefined));
       expect(getOptions().enabled).toBe(false);
     });
   });
 
-  describe('useStakedCSTTokensByUser', () => {
+  describe('useAnchoredCSTokensByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakedCSTTokensByUser('0xdead'));
+      renderHook(() => useAnchoredCSTokensByUser('0xdead'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakedCSTTokens', '0xdead'] }),
@@ -727,13 +729,13 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled for falsy address', () => {
-      renderHook(() => useStakedCSTTokensByUser(''));
+      renderHook(() => useAnchoredCSTokensByUser(''));
 
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(false);
     });
 
     it('configures polling', () => {
-      renderHook(() => useStakedCSTTokensByUser('0xdead'));
+      renderHook(() => useAnchoredCSTokensByUser('0xdead'));
 
       const options = getOptions();
       expect(options.refetchInterval).toBe(30_000);
@@ -767,9 +769,9 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('useStakingCSTActionsByUser', () => {
+  describe('useCSTAnchorActionsByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakingCSTActionsByUser('0xddd'));
+      renderHook(() => useCSTAnchorActionsByUser('0xddd'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingCSTActionsByUser', '0xddd'] }),
@@ -777,29 +779,29 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useStakingCSTActionsByUser(null));
+      renderHook(() => useCSTAnchorActionsByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
   });
 
-  describe('useStakingCSTActions', () => {
+  describe('useCSTAnchorActions', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useStakingCSTActions());
+      renderHook(() => useCSTAnchorActions());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['stakingCSTActions'] }),
+        expect.objectContaining({ queryKey: ['cstAnchorActions'] }),
       );
     });
 
     it('has staleTime of 30s', () => {
-      renderHook(() => useStakingCSTActions());
+      renderHook(() => useCSTAnchorActions());
       expect(getOptions().staleTime).toBe(30_000);
     });
   });
 
-  describe('useStakingCSTActionsInfo', () => {
+  describe('useCSTAnchorActionInfo', () => {
     it('includes actionId in the query key', () => {
-      renderHook(() => useStakingCSTActionsInfo(5));
+      renderHook(() => useCSTAnchorActionInfo(5));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingCSTActionsInfo', 5] }),
@@ -807,19 +809,19 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when actionId is null', () => {
-      renderHook(() => useStakingCSTActionsInfo(null));
+      renderHook(() => useCSTAnchorActionInfo(null));
       expect(getOptions().enabled).toBe(false);
     });
 
     it('is enabled for actionId = 0', () => {
-      renderHook(() => useStakingCSTActionsInfo(0));
+      renderHook(() => useCSTAnchorActionInfo(0));
       expect(getOptions().enabled).toBe(true);
     });
   });
 
-  describe('useStakingCSTRewards', () => {
+  describe('useCSTAnchorDistributions', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useStakingCSTRewards());
+      renderHook(() => useCSTAnchorDistributions());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingCSTRewards'] }),
@@ -827,14 +829,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('has staleTime of 30s', () => {
-      renderHook(() => useStakingCSTRewards());
+      renderHook(() => useCSTAnchorDistributions());
       expect(getOptions().staleTime).toBe(30_000);
     });
   });
 
-  describe('useStakingCSTRewardsByRound', () => {
+  describe('useCSTAnchorDistributionsByCycle', () => {
     it('includes round in the query key', () => {
-      renderHook(() => useStakingCSTRewardsByRound(3));
+      renderHook(() => useCSTAnchorDistributionsByCycle(3));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingCSTRewardsByRound', 3] }),
@@ -842,19 +844,19 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when round is null', () => {
-      renderHook(() => useStakingCSTRewardsByRound(null));
+      renderHook(() => useCSTAnchorDistributionsByCycle(null));
       expect(getOptions().enabled).toBe(false);
     });
 
     it('is enabled for round = 0', () => {
-      renderHook(() => useStakingCSTRewardsByRound(0));
+      renderHook(() => useCSTAnchorDistributionsByCycle(0));
       expect(getOptions().enabled).toBe(true);
     });
   });
 
-  describe('useStakingCSTRewardPaidRecordsByUser', () => {
+  describe('useCSTAnchorDistributionPaidRecordsByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakingCSTRewardPaidRecordsByUser('0xeee'));
+      renderHook(() => useCSTAnchorDistributionPaidRecordsByUser('0xeee'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingCSTRewardPaidRecords', '0xeee'] }),
@@ -862,14 +864,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useStakingCSTRewardPaidRecordsByUser(null));
+      renderHook(() => useCSTAnchorDistributionPaidRecordsByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
   });
 
-  describe('useStakedCSTTokensGlobal', () => {
+  describe('useGlobalAnchoredCSTokens', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useStakedCSTTokensGlobal());
+      renderHook(() => useGlobalAnchoredCSTokens());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakedCSTTokensGlobal'] }),
@@ -877,14 +879,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('has staleTime of 30s', () => {
-      renderHook(() => useStakedCSTTokensGlobal());
+      renderHook(() => useGlobalAnchoredCSTokens());
       expect(getOptions().staleTime).toBe(30_000);
     });
   });
 
-  describe('useStakingRewardsByUser', () => {
+  describe('useAnchorDistributionsByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakingRewardsByUser('0xfff'));
+      renderHook(() => useAnchorDistributionsByUser('0xfff'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingRewardsByUser', '0xfff'] }),
@@ -892,14 +894,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useStakingRewardsByUser(null));
+      renderHook(() => useAnchorDistributionsByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
   });
 
-  describe('useStakingRewardsByUserByTokenDetails', () => {
+  describe('useAnchorDistributionsByUserByTokenDetails', () => {
     it('includes address and tokenId in the query key', () => {
-      renderHook(() => useStakingRewardsByUserByTokenDetails('0x111', 4));
+      renderHook(() => useAnchorDistributionsByUserByTokenDetails('0x111', 4));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingRewardsByUserByToken', '0x111', 4] }),
@@ -907,24 +909,24 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useStakingRewardsByUserByTokenDetails(null, 4));
+      renderHook(() => useAnchorDistributionsByUserByTokenDetails(null, 4));
       expect(getOptions().enabled).toBe(false);
     });
 
     it('is disabled when tokenId is null', () => {
-      renderHook(() => useStakingRewardsByUserByTokenDetails('0x111', null));
+      renderHook(() => useAnchorDistributionsByUserByTokenDetails('0x111', null));
       expect(getOptions().enabled).toBe(false);
     });
 
     it('is enabled when both params are valid', () => {
-      renderHook(() => useStakingRewardsByUserByTokenDetails('0x111', 0));
+      renderHook(() => useAnchorDistributionsByUserByTokenDetails('0x111', 0));
       expect(getOptions().enabled).toBe(true);
     });
   });
 
-  describe('useStakingCSTByUserByDepositRewards', () => {
+  describe('useCSTAnchorDistributionsByUserByDeposit', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakingCSTByUserByDepositRewards('0x222'));
+      renderHook(() => useCSTAnchorDistributionsByUserByDeposit('0x222'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingCSTByUserByDeposit', '0x222'] }),
@@ -932,7 +934,7 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useStakingCSTByUserByDepositRewards(null));
+      renderHook(() => useCSTAnchorDistributionsByUserByDeposit(null));
       expect(getOptions().enabled).toBe(false);
     });
   });
@@ -941,9 +943,9 @@ describe('useApiQuery hooks', () => {
   // Staking – RWLK
   // ---------------------------------------------------------------------------
 
-  describe('useStakingRWLKActionsInfo', () => {
+  describe('useRWLKAnchorActionInfo', () => {
     it('includes actionId in the query key', () => {
-      renderHook(() => useStakingRWLKActionsInfo(8));
+      renderHook(() => useRWLKAnchorActionInfo(8));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingRWLKActionsInfo', 8] }),
@@ -951,34 +953,34 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when actionId is null', () => {
-      renderHook(() => useStakingRWLKActionsInfo(null));
+      renderHook(() => useRWLKAnchorActionInfo(null));
       expect(getOptions().enabled).toBe(false);
     });
 
     it('is enabled for actionId = 0', () => {
-      renderHook(() => useStakingRWLKActionsInfo(0));
+      renderHook(() => useRWLKAnchorActionInfo(0));
       expect(getOptions().enabled).toBe(true);
     });
   });
 
-  describe('useStakingRWLKActions', () => {
+  describe('useRWLKAnchorActions', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useStakingRWLKActions());
+      renderHook(() => useRWLKAnchorActions());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['stakingRWLKActions'] }),
+        expect.objectContaining({ queryKey: ['rwlkAnchorActions'] }),
       );
     });
 
     it('has staleTime of 30s', () => {
-      renderHook(() => useStakingRWLKActions());
+      renderHook(() => useRWLKAnchorActions());
       expect(getOptions().staleTime).toBe(30_000);
     });
   });
 
-  describe('useStakingRWLKActionsByUser', () => {
+  describe('useRWLKAnchorActionsByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakingRWLKActionsByUser('0x333'));
+      renderHook(() => useRWLKAnchorActionsByUser('0x333'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingRWLKActionsByUser', '0x333'] }),
@@ -986,14 +988,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useStakingRWLKActionsByUser(null));
+      renderHook(() => useRWLKAnchorActionsByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
   });
 
-  describe('useStakingRWLKMintsGlobal', () => {
+  describe('useGlobalRWLKAnchorImprints', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useStakingRWLKMintsGlobal());
+      renderHook(() => useGlobalRWLKAnchorImprints());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingRWLKMintsGlobal'] }),
@@ -1001,14 +1003,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('has staleTime of 30s', () => {
-      renderHook(() => useStakingRWLKMintsGlobal());
+      renderHook(() => useGlobalRWLKAnchorImprints());
       expect(getOptions().staleTime).toBe(30_000);
     });
   });
 
-  describe('useStakingRWLKMintsByUser', () => {
+  describe('useRWLKAnchorImprintsByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakingRWLKMintsByUser('0x444'));
+      renderHook(() => useRWLKAnchorImprintsByUser('0x444'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakingRWLKMintsByUser', '0x444'] }),
@@ -1016,14 +1018,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useStakingRWLKMintsByUser(null));
+      renderHook(() => useRWLKAnchorImprintsByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
   });
 
-  describe('useStakedRWLKTokensGlobal', () => {
+  describe('useGlobalAnchoredRWLKTokens', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useStakedRWLKTokensGlobal());
+      renderHook(() => useGlobalAnchoredRWLKTokens());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['stakedRWLKTokensGlobal'] }),
@@ -1031,27 +1033,27 @@ describe('useApiQuery hooks', () => {
     });
 
     it('has staleTime of 30s', () => {
-      renderHook(() => useStakedRWLKTokensGlobal());
+      renderHook(() => useGlobalAnchoredRWLKTokens());
       expect(getOptions().staleTime).toBe(30_000);
     });
   });
 
-  describe('useStakedRWLKTokensByUser', () => {
+  describe('useAnchoredRWLKTokensByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useStakedRWLKTokensByUser('0x555'));
+      renderHook(() => useAnchoredRWLKTokensByUser('0x555'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['stakedRWLKTokens', '0x555'] }),
+        expect.objectContaining({ queryKey: ['anchoredRWLKTokens', '0x555'] }),
       );
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useStakedRWLKTokensByUser(null));
+      renderHook(() => useAnchoredRWLKTokensByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
 
     it('configures polling', () => {
-      renderHook(() => useStakedRWLKTokensByUser('0x555'));
+      renderHook(() => useAnchoredRWLKTokensByUser('0x555'));
 
       const options = getOptions();
       expect(options.refetchInterval).toBe(30_000);
@@ -1488,32 +1490,32 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('useUniqueBidders', () => {
+  describe('useUniqueParticipants', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useUniqueBidders());
+      renderHook(() => useUniqueParticipants());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['uniqueBidders'] }),
+        expect.objectContaining({ queryKey: ['uniqueParticipants'] }),
       );
     });
 
     it('has staleTime of 60s', () => {
-      renderHook(() => useUniqueBidders());
+      renderHook(() => useUniqueParticipants());
       expect(getOptions().staleTime).toBe(60_000);
     });
   });
 
-  describe('useUniqueWinners', () => {
+  describe('useUniqueRecipients', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useUniqueWinners());
+      renderHook(() => useUniqueRecipients());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['uniqueWinners'] }),
+        expect.objectContaining({ queryKey: ['uniqueRecipients'] }),
       );
     });
 
     it('has staleTime of 60s', () => {
-      renderHook(() => useUniqueWinners());
+      renderHook(() => useUniqueRecipients());
       expect(getOptions().staleTime).toBe(60_000);
     });
   });
@@ -1533,39 +1535,39 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('useUniqueCSTStakers', () => {
+  describe('useUniqueCSTAnchorHolders', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useUniqueCSTStakers());
+      renderHook(() => useUniqueCSTAnchorHolders());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['uniqueCSTStakers'] }),
+        expect.objectContaining({ queryKey: ['uniqueCSTAnchorHolders'] }),
       );
     });
 
     it('has staleTime of 60s', () => {
-      renderHook(() => useUniqueCSTStakers());
+      renderHook(() => useUniqueCSTAnchorHolders());
       expect(getOptions().staleTime).toBe(60_000);
     });
   });
 
-  describe('useUniqueRWLKStakers', () => {
+  describe('useUniqueRWLKAnchorHolders', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useUniqueRWLKStakers());
+      renderHook(() => useUniqueRWLKAnchorHolders());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: ['uniqueRWLKStakers'] }),
+        expect.objectContaining({ queryKey: ['uniqueRWLKAnchorHolders'] }),
       );
     });
 
     it('has staleTime of 60s', () => {
-      renderHook(() => useUniqueRWLKStakers());
+      renderHook(() => useUniqueRWLKAnchorHolders());
       expect(getOptions().staleTime).toBe(60_000);
     });
   });
 
-  describe('useUniqueBothStakers', () => {
+  describe('useUniqueBothAnchorHolders', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useUniqueBothStakers());
+      renderHook(() => useUniqueBothAnchorHolders());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['uniqueBothStakers'] }),
@@ -1573,7 +1575,7 @@ describe('useApiQuery hooks', () => {
     });
 
     it('has staleTime of 60s', () => {
-      renderHook(() => useUniqueBothStakers());
+      renderHook(() => useUniqueBothAnchorHolders());
       expect(getOptions().staleTime).toBe(60_000);
     });
   });
@@ -1582,9 +1584,9 @@ describe('useApiQuery hooks', () => {
   // Raffle
   // ---------------------------------------------------------------------------
 
-  describe('useRaffleDepositsByUser', () => {
+  describe('useStellarSelectionDepositsByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useRaffleDepositsByUser('0xbbb'));
+      renderHook(() => useStellarSelectionDepositsByUser('0xbbb'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['raffleDepositsByUser', '0xbbb'] }),
@@ -1592,7 +1594,7 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useRaffleDepositsByUser(null));
+      renderHook(() => useStellarSelectionDepositsByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
   });
@@ -1612,9 +1614,9 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('useUnclaimedRaffleDepositsByUser', () => {
+  describe('useUnretrievedStellarSelectionDepositsByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useUnclaimedRaffleDepositsByUser('0xddd'));
+      renderHook(() => useUnretrievedStellarSelectionDepositsByUser('0xddd'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['unclaimedRaffleDepositsByUser', '0xddd'] }),
@@ -1622,12 +1624,12 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useUnclaimedRaffleDepositsByUser(null));
+      renderHook(() => useUnretrievedStellarSelectionDepositsByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
 
     it('configures polling', () => {
-      renderHook(() => useUnclaimedRaffleDepositsByUser('0xddd'));
+      renderHook(() => useUnretrievedStellarSelectionDepositsByUser('0xddd'));
 
       const options = getOptions();
       expect(options.refetchInterval).toBe(30_000);
@@ -1636,9 +1638,9 @@ describe('useApiQuery hooks', () => {
     });
   });
 
-  describe('useRaffleNFTWinnersList', () => {
+  describe('useStellarSelectionNFTRecipientsList', () => {
     it('calls useQuery with the correct query key', () => {
-      renderHook(() => useRaffleNFTWinnersList());
+      renderHook(() => useStellarSelectionNFTRecipientsList());
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['raffleNFTWinnersList'] }),
@@ -1646,14 +1648,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('has staleTime of 30s', () => {
-      renderHook(() => useRaffleNFTWinnersList());
+      renderHook(() => useStellarSelectionNFTRecipientsList());
       expect(getOptions().staleTime).toBe(30_000);
     });
   });
 
-  describe('useRaffleNFTWinnersByRound', () => {
+  describe('useStellarSelectionNFTRecipientsByCycle', () => {
     it('includes round in the query key', () => {
-      renderHook(() => useRaffleNFTWinnersByRound(5));
+      renderHook(() => useStellarSelectionNFTRecipientsByCycle(5));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['raffleNFTWinnersByRound', 5] }),
@@ -1661,14 +1663,14 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is enabled for round >= 0', () => {
-      renderHook(() => useRaffleNFTWinnersByRound(0));
+      renderHook(() => useStellarSelectionNFTRecipientsByCycle(0));
       expect(getOptions().enabled).toBe(true);
     });
   });
 
-  describe('useRaffleNFTWinningsByUser', () => {
+  describe('useStellarSelectionNFTAllocationsByUser', () => {
     it('includes address in the query key', () => {
-      renderHook(() => useRaffleNFTWinningsByUser('0xeee'));
+      renderHook(() => useStellarSelectionNFTAllocationsByUser('0xeee'));
 
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.objectContaining({ queryKey: ['raffleNFTWinningsByUser', '0xeee'] }),
@@ -1676,7 +1678,7 @@ describe('useApiQuery hooks', () => {
     });
 
     it('is disabled when address is null', () => {
-      renderHook(() => useRaffleNFTWinningsByUser(null));
+      renderHook(() => useStellarSelectionNFTAllocationsByUser(null));
       expect(getOptions().enabled).toBe(false);
     });
   });

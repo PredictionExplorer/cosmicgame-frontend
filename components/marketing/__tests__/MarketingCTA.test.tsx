@@ -45,12 +45,12 @@ jest.mock('framer-motion', () => {
 describe('MarketingCTA', () => {
   it('renders the heading', () => {
     renderWithTooltip(<MarketingCTA />);
-    expect(screen.getByText('Ready to Start Earning?')).toBeInTheDocument();
+    expect(screen.getByText('Ready to Contribute?')).toBeInTheDocument();
   });
 
   it('renders the description', () => {
     renderWithTooltip(<MarketingCTA />);
-    expect(screen.getByText(/Join our marketing program/)).toBeInTheDocument();
+    expect(screen.getByText(/Join our outreach program/)).toBeInTheDocument();
   });
 
   it('renders the contact link', () => {

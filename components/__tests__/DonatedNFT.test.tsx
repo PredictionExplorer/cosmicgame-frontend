@@ -1,13 +1,13 @@
 import '@testing-library/jest-dom';
 import axios from 'axios';
 
-import DonatedNFT from '@/components/donations/DonatedNFT';
+import AttachedNFT from '@/components/attachments/AttachedNFT';
 
 import { act, render, screen, waitFor, checkA11y } from '@/test-utils';
 
 jest.mock('axios');
 
-describe('DonatedNFT', () => {
+describe('AttachedNFT', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -35,7 +35,7 @@ describe('DonatedNFT', () => {
       NFTTokenURI: 'https://token.artblocks.io/13000081',
       Index: 44,
     };
-    render(<DonatedNFT nft={mockData} />);
+    render(<AttachedNFT nft={mockData} />);
     expect(screen.getByTestId('NFTTokenId')).toHaveTextContent(String(mockData.NFTTokenId));
 
     await waitFor(() => {
@@ -70,7 +70,7 @@ describe('DonatedNFT', () => {
     };
     let container: HTMLElement;
     await act(async () => {
-      const result = render(<DonatedNFT nft={mockData} />);
+      const result = render(<AttachedNFT nft={mockData} />);
       container = result.container;
     });
     await checkA11y(container!);

@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: internal marketing draft — needs lexicon rewrite before public use -->
+
 # The Cosmic Codex
 
 ## The Complete Strategy Guide to Cosmic Signature
@@ -885,3 +887,5 @@ Later bids: mainPrizeTime = max(mainPrizeTime, block.timestamp) + timeIncrement
 _This guide is provided for educational purposes. Smart contract interactions carry inherent risk. Always verify transactions and understand the mechanics before participating. The game's source code is released under the CC0 1.0 license and is publicly available on GitHub for independent review and audit._
 
 _cosmicsignature.com | @CosmicSignatureNFT_
+
+<!-- lexicon-allow-end -->

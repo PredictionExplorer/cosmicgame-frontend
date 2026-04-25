@@ -46,7 +46,7 @@ const defaultProps = {
 };
 
 describe('AuctionParameters', () => {
-  it('renders CST and ETH auction cards', () => {
+  it('renders CST and ETH calibration cards', () => {
     render(<AuctionParameters {...defaultProps} />);
     expect(screen.getByText('CST Calibration Window')).toBeInTheDocument();
     expect(screen.getByText('ETH Calibration Window')).toBeInTheDocument();
@@ -60,12 +60,12 @@ describe('AuctionParameters', () => {
     expect(screen.getByText('7200s')).toBeInTheDocument();
   });
 
-  it('renders CST beginning bid price', () => {
+  it('renders CST beginning gesture cost', () => {
     render(<AuctionParameters {...defaultProps} />);
     expect(screen.getByText('100 CST')).toBeInTheDocument();
   });
 
-  it('renders charity address with copy and explorer link', () => {
+  it('renders public goods address with copy and explorer link', () => {
     render(<AuctionParameters {...defaultProps} />);
     expect(screen.getByText('Public Goods Address')).toBeInTheDocument();
     expect(screen.getByText('0xCharity123')).toBeInTheDocument();
@@ -78,7 +78,7 @@ describe('AuctionParameters', () => {
     );
   });
 
-  it('copies charity address on copy button click', async () => {
+  it('copies public goods address on copy button click', async () => {
     render(<AuctionParameters {...defaultProps} />);
     fireEvent.click(screen.getByLabelText('Copy Public Goods address'));
     await waitFor(() => {
@@ -86,7 +86,7 @@ describe('AuctionParameters', () => {
     });
   });
 
-  it('renders charity percentage', () => {
+  it('renders public goods percentage', () => {
     render(<AuctionParameters {...defaultProps} />);
     expect(screen.getByText('10%')).toBeInTheDocument();
   });
@@ -114,7 +114,7 @@ describe('AuctionParameters', () => {
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
-  it('handles missing raffle data with "--" fallback', () => {
+  it('handles missing stellar selection data with "--" fallback', () => {
     render(
       <AuctionParameters
         {...defaultProps}

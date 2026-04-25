@@ -1,3 +1,5 @@
+// lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
+
 import {
   axios,
   getAPIUrl,
@@ -16,7 +18,7 @@ import type {
   UsedRWLKNFT,
   TxInfo,
   CTPriceInfo,
-  TokenMintInfo,
+  TokenImprintInfo,
 } from './types';
 
 /** Fetches all Cosmic Signature Tokens with flattened transaction fields. */
@@ -120,14 +122,14 @@ export function get_ct_price(): Promise<CTPriceInfo | null> {
  * calls: `GET {NEXT_PUBLIC_API_URL}/randomwalk/tokens/info/:id` → the Go server serves this at
  * `/api/cosmicgame/randomwalk/tokens/info/:id` (and also `/api/randomwalk/tokens/info/:id`).
  */
-export function get_info(token_id: number | string): Promise<TokenMintInfo | null> {
+export function get_info(token_id: number | string): Promise<TokenImprintInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`randomwalk/tokens/info/${token_id}`));
-    return data.TokenInfo as TokenMintInfo | null;
+    return data.TokenInfo as TokenImprintInfo | null;
   }, null);
 }
 
-/** Fetches RandomWalk NFTs that have been used for discounted bids. */
+/** Fetches RandomWalk NFTs that have been used for discounted gestures. */
 export function get_used_rwlk_nfts(): Promise<UsedRWLKNFT[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('bid/used_randomwalk_nfts'));
@@ -145,3 +147,5 @@ export function create(token_id: number, count: number) {
     return data?.task_id || -1;
   });
 }
+
+// lexicon-allow-end

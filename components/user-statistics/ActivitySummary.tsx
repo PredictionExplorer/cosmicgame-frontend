@@ -64,17 +64,18 @@ function StatGroup({
 
 export interface ActivitySummaryProps {
   userInfo: UserProfileInfo;
-  totalStakeRewardEth?: number;
+  totalAnchorDistributionEth?: number;
   className?: string;
 }
 
 export function ActivitySummary({
   userInfo,
-  totalStakeRewardEth = 0,
+  totalAnchorDistributionEth = 0,
   className,
 }: ActivitySummaryProps) {
   const rwlk = userInfo.StakingStatisticsRWalk;
-  const totalStakeActions = (rwlk?.TotalNumStakeActions ?? 0) + (rwlk?.TotalNumUnstakeActions ?? 0);
+  const totalAnchorActions =
+    (rwlk?.TotalNumStakeActions ?? 0) + (rwlk?.TotalNumUnstakeActions ?? 0);
 
   return (
     <motion.div variants={fadeIn} initial="hidden" animate="visible">
@@ -126,12 +127,12 @@ export function ActivitySummary({
             stats={[
               {
                 label: 'Anchor Actions',
-                value: totalStakeActions.toLocaleString(),
+                value: totalAnchorActions.toLocaleString(),
                 tooltip: 'Combined anchor and release actions for RandomWalk NFTs.',
               },
               {
                 label: 'Distributions Received',
-                value: formatEthValue(totalStakeRewardEth),
+                value: formatEthValue(totalAnchorDistributionEth),
                 tooltip: 'Total ETH received from anchoring Cosmic Signature NFTs.',
               },
             ]}

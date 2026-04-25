@@ -1,19 +1,19 @@
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
-import type { DonatedNFT, DonatedERC20Token } from '@/services/api/types';
+import type { AttachedNFT, DonatedERC20Token } from '@/services/api/types';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock(
-  '../../../components/donations/DonatedNFT',
+  '../../../components/attachments/AttachedNFT',
   () =>
     function MockDonatedNFT({ nft }: { nft: { RecordId: number } }) {
       return <div data-testid="nft">{nft.RecordId}</div>;
     },
 );
 jest.mock(
-  '../../../components/donations/DonatedERC20Table',
+  '../../../components/attachments/AttachedERC20Table',
   () =>
     function MockDonatedERC20Table({ list }: { list: unknown[] }) {
       return <div data-testid="erc20-table">{list.length} tokens</div>;
@@ -40,7 +40,7 @@ const createNFT = (overrides = {}) => ({
 });
 
 const defaultProps = {
-  donatedNFTs: [] as DonatedNFT[],
+  donatedNFTs: [] as AttachedNFT[],
   donatedERC20Tokens: [] as DonatedERC20Token[],
   donatedTokensTab: 0,
   onTabChange: jest.fn(),
@@ -93,7 +93,7 @@ describe('DonatedTokensSection', () => {
     expect(container.querySelector('[data-state="active"]')).toHaveTextContent('ERC20 Tokens');
   });
 
-  it('renders DonatedERC20Table in second tab', () => {
+  it('renders AttachedERC20Table in second tab', () => {
     const tokens = [
       {
         RoundNum: 1,

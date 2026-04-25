@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: internal marketing draft — needs lexicon rewrite before public use -->
+
 # Cosmic Signature Explainer Video Script
 
 ## Production Specifications
@@ -204,3 +206,5 @@ Scenes 2 through 7 with tighter timing. For Twitter, Instagram, TikTok.
 - **Audio description**: Text descriptions available for visually impaired users.
 - **Contrast**: All text meets WCAG AA minimum contrast on video backgrounds.
 - **Speed**: Voiceover paced at ~150 words per minute for comprehension.
+
+<!-- lexicon-allow-end -->

@@ -27,7 +27,7 @@ interface GalleryNFTCardProps {
   variant: ViewMode;
 }
 
-function formatMintAge(timestamp: number): string {
+function formatImprintAge(timestamp: number): string {
   const seconds = Math.floor(Date.now() / 1000) - timestamp;
   if (seconds < 60) return 'just now';
   const minutes = Math.floor(seconds / 60);
@@ -129,7 +129,7 @@ function GridCard({ nft, image, hasName, index }: CardInnerProps) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className="text-[10px] text-muted-foreground/60 cursor-help">
-                      {formatMintAge(nft.MintTimeStamp)}
+                      {formatImprintAge(nft.MintTimeStamp)}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
@@ -226,7 +226,7 @@ function ListRow({ nft, image, hasName, index }: CardInnerProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="hidden md:block text-[10px] text-muted-foreground/60 shrink-0 cursor-help">
-                    {formatMintAge(nft.MintTimeStamp)}
+                    {formatImprintAge(nft.MintTimeStamp)}
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">

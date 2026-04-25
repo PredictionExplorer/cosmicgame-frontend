@@ -1,3 +1,5 @@
+// lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
+
 import {
   axios,
   getAPIUrl,
@@ -10,7 +12,7 @@ import {
 import type {
   CharityWithdrawal,
   ETHDonation,
-  DonatedNFT,
+  AttachedNFT,
   DonatedERC20Token,
   NFTDonationStatsEntry,
 } from './types';
@@ -79,7 +81,7 @@ export function get_donations_both(): Promise<ETHDonation[]> {
   }, []);
 }
 
-/** Fetches charity donation deposits from prize-pool distributions. */
+/** Fetches charity donation deposits from allocation-pool distributions. */
 export function get_charity_donations_deposits(): Promise<ETHDonation[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('donations/charity/deposits'));
@@ -112,34 +114,36 @@ export function get_charity_withdrawals(): Promise<CharityWithdrawal[]> {
 }
 
 /** Fetches all donated NFTs with normalized field names. */
-export function get_donations_nft_list(): Promise<DonatedNFT[]> {
+export function get_donations_nft_list(): Promise<AttachedNFT[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('donations/nft/list/0/1000000'));
-    return normalizeFieldNamesArray(flattenTxArray<DonatedNFT>(data.NFTDonations)) as DonatedNFT[];
+    return normalizeFieldNamesArray(
+      flattenTxArray<AttachedNFT>(data.NFTDonations),
+    ) as AttachedNFT[];
   }, []);
 }
 
 /** Fetches detailed info for a single donated NFT by its record ID. */
-export function get_donated_nft_info(record_id: number): Promise<DonatedNFT | null> {
+export function get_donated_nft_info(record_id: number): Promise<AttachedNFT | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`donations/nft/info/${record_id}`));
-    return normalizeFieldNames(flattenTx(data.NFTDonation)) as DonatedNFT | null;
+    return normalizeFieldNames(flattenTx(data.NFTDonation)) as AttachedNFT | null;
   }, null);
 }
 
 /** Fetches all donated NFT claim records globally. */
-export function get_donated_nft_claims_all(): Promise<DonatedNFT[]> {
+export function get_donated_nft_claims_all(): Promise<AttachedNFT[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('donations/nft/claims/0/100000'));
-    return flattenTxArray<DonatedNFT>(data.DonatedNFTClaims);
+    return flattenTxArray<AttachedNFT>(data.DonatedNFTClaims);
   }, []);
 }
 
 /** Fetches donated NFTs that have been claimed by a specific wallet address. */
-export function get_claimed_donated_nft_by_user(address: string): Promise<DonatedNFT[]> {
+export function get_claimed_donated_nft_by_user(address: string): Promise<AttachedNFT[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`donations/nft/claims/by_user/${address}`));
-    return flattenTxArray<DonatedNFT>(data.DonatedNFTClaims);
+    return flattenTxArray<AttachedNFT>(data.DonatedNFTClaims);
   }, []);
 }
 
@@ -152,28 +156,32 @@ export function get_nft_donation_stats(): Promise<NFTDonationStatsEntry[]> {
 }
 
 /** Fetches donated NFTs for a specific round with normalized field names. */
-export function get_donations_nft_by_round(round: number): Promise<DonatedNFT[]> {
+export function get_donations_nft_by_round(round: number): Promise<AttachedNFT[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`donations/nft/by_round/${round}`));
-    return normalizeFieldNamesArray(flattenTxArray<DonatedNFT>(data.NFTDonations)) as DonatedNFT[];
+    return normalizeFieldNamesArray(
+      flattenTxArray<AttachedNFT>(data.NFTDonations),
+    ) as AttachedNFT[];
   }, []);
 }
 
 /** Fetches unclaimed donated NFTs for a specific round. */
-export function get_donations_nft_unclaimed_by_round(round: number): Promise<DonatedNFT[]> {
+export function get_donations_nft_unclaimed_by_round(round: number): Promise<AttachedNFT[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`donations/nft/unclaimed/by_round/${round}`));
-    return normalizeFieldNamesArray(flattenTxArray<DonatedNFT>(data.NFTDonations)) as DonatedNFT[];
+    return normalizeFieldNamesArray(
+      flattenTxArray<AttachedNFT>(data.NFTDonations),
+    ) as AttachedNFT[];
   }, []);
 }
 
 /** Fetches unclaimed donated NFTs available for a specific wallet address. */
-export function get_unclaimed_donated_nft_by_user(address: string): Promise<DonatedNFT[]> {
+export function get_unclaimed_donated_nft_by_user(address: string): Promise<AttachedNFT[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`donations/nft/unclaimed/by_user/${address}`));
     return normalizeFieldNamesArray(
-      flattenTxArray<DonatedNFT>(data.UnclaimedDonatedNFTs),
-    ) as DonatedNFT[];
+      flattenTxArray<AttachedNFT>(data.UnclaimedDonatedNFTs),
+    ) as AttachedNFT[];
   }, []);
 }
 
@@ -196,3 +204,5 @@ export function get_donations_erc20_by_user(address: string): Promise<DonatedERC
     ) as DonatedERC20Token[];
   }, []);
 }
+
+// lexicon-allow-end

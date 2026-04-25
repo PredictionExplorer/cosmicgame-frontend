@@ -54,7 +54,7 @@ describe('CategoryNav', () => {
     render(
       <CategoryNav
         categories={faqCategories}
-        activeCategory="prizes-and-rewards"
+        activeCategory="allocations-and-rewards"
         onCategoryClick={onCategoryClick}
       />,
     );

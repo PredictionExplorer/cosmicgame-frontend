@@ -2,18 +2,18 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import { RoundInfoSection } from '../RoundInfoSection';
 
-jest.mock('../../common/Prize', () => ({
+jest.mock('../../common/Allocation', () => ({
   __esModule: true,
-  default: () => <div data-testid="prize-breakdown">Signature Allocation</div>,
+  default: () => <div data-testid="allocation-breakdown">Signature Allocation</div>,
 }));
 
 jest.mock('../../tokens/FundDistribution', () => ({
   FundDistribution: () => <div data-testid="fund-distribution">Fund Distribution Chart</div>,
 }));
 
-jest.mock('../../tables/RaffleHolderTable', () => ({
+jest.mock('../../tables/StellarSelectionHolderTable', () => ({
   __esModule: true,
-  default: () => <div data-testid="raffle-holder-table">Stellar Selection</div>,
+  default: () => <div data-testid="stellar-selection-holder-table">Stellar Selection</div>,
 }));
 
 jest.mock('../../tables/ETHSpentTable', () => ({
@@ -26,18 +26,18 @@ jest.mock('../../tables/EnduranceChampionsTable', () => ({
   default: () => <div data-testid="endurance-table">Endurance</div>,
 }));
 
-jest.mock('../../tables/BiddingHistoryTable', () => ({
+jest.mock('../../tables/GestureHistoryTable', () => ({
   __esModule: true,
-  default: () => <div data-testid="bidding-history">Bids</div>,
+  default: () => <div data-testid="gesture-history">Gestures</div>,
 }));
 
 jest.mock('../../tables/EthDonationTable', () => ({
   __esModule: true,
-  default: () => <div data-testid="eth-donation-table">ETH Donation rows</div>,
+  default: () => <div data-testid="eth-contribution-table">ETH Contribution rows</div>,
 }));
 
 jest.mock('../../home/DonatedTokensSection', () => ({
-  DonatedTokensSection: () => <div data-testid="donated-tokens">Donated Tokens</div>,
+  DonatedTokensSection: () => <div data-testid="attached-tokens">Attached Tokens</div>,
 }));
 
 beforeEach(() => jest.clearAllMocks());
@@ -47,7 +47,7 @@ const baseData = {
   CurNumBids: 50,
   TsRoundStart: Math.floor(Date.now() / 1000) - 3600,
   LastBidderAddr: '0xBidder',
-  BidPriceEth: 0.01,
+  GestureCostEth: 0.01,
   StakingAmountEth: 1,
   NumRaffleEthRecipientsBidding: 5,
   NumRaffleNFTRecipientsBidding: 3,
@@ -63,7 +63,7 @@ const baseData = {
 
 const defaultProps = {
   data: baseData as never,
-  curBidList: [],
+  curGestureList: [],
   championList: null,
   ethDonations: [] as never[],
   donatedNFTs: [],
@@ -76,14 +76,14 @@ const defaultProps = {
 };
 
 describe('RoundInfoSection', () => {
-  it('renders Prize component when data exists', () => {
+  it('renders Allocation component when data exists', () => {
     render(<RoundInfoSection {...defaultProps} />);
-    expect(screen.getByTestId('prize-breakdown')).toBeInTheDocument();
+    expect(screen.getByTestId('allocation-breakdown')).toBeInTheDocument();
   });
 
-  it('does not render Prize when data is null', () => {
+  it('does not render Allocation when data is null', () => {
     render(<RoundInfoSection {...defaultProps} data={null} />);
-    expect(screen.queryByTestId('prize-breakdown')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('allocation-breakdown')).not.toBeInTheDocument();
   });
 
   it('renders Fund Distribution chart', () => {
@@ -93,7 +93,7 @@ describe('RoundInfoSection', () => {
 
   it('renders Stellar Selection Entries section', () => {
     render(<RoundInfoSection {...defaultProps} />);
-    expect(screen.getByTestId('raffle-holder-table')).toBeInTheDocument();
+    expect(screen.getByTestId('stellar-selection-holder-table')).toBeInTheDocument();
   });
 
   it('renders Top ETH Spenders section', () => {
@@ -108,26 +108,26 @@ describe('RoundInfoSection', () => {
 
   it('renders Gesture History section', () => {
     render(<RoundInfoSection {...defaultProps} />);
-    expect(screen.getByTestId('bidding-history')).toBeInTheDocument();
+    expect(screen.getByTestId('gesture-history')).toBeInTheDocument();
   });
 
   it('renders DonatedTokensSection', () => {
     render(<RoundInfoSection {...defaultProps} />);
-    expect(screen.getByTestId('donated-tokens')).toBeInTheDocument();
+    expect(screen.getByTestId('attached-tokens')).toBeInTheDocument();
   });
 
-  it('shows ETH Contributions section when donations exist', () => {
+  it('shows ETH Contributions section when contributions exist', () => {
     const propsWithDonations = {
       ...defaultProps,
       ethDonations: [{ id: 1 }] as never[],
     };
     render(<RoundInfoSection {...propsWithDonations} />);
-    expect(screen.getByTestId('eth-donation-table')).toBeInTheDocument();
+    expect(screen.getByTestId('eth-contribution-table')).toBeInTheDocument();
   });
 
   it('hides ETH Contributions section when list is empty', () => {
     render(<RoundInfoSection {...defaultProps} />);
-    expect(screen.queryByTestId('eth-donation-table')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('eth-contribution-table')).not.toBeInTheDocument();
   });
 
   it('renders collapsible Cycle Rules section', () => {
@@ -154,16 +154,16 @@ describe('RoundInfoSection', () => {
     expect(screen.getByText('20.00 ETH')).toBeInTheDocument();
   });
 
-  it('displays unique bidder count in footer', () => {
-    const propsWithBids = {
+  it('displays unique participant count in footer', () => {
+    const propsWithGestures = {
       ...defaultProps,
-      curBidList: [
+      curGestureList: [
         { BidderAddr: '0xA', TimeStamp: 1 },
         { BidderAddr: '0xB', TimeStamp: 2 },
         { BidderAddr: '0xA', TimeStamp: 3 },
       ] as never[],
     };
-    render(<RoundInfoSection {...propsWithBids} />);
+    render(<RoundInfoSection {...propsWithGestures} />);
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 
@@ -183,30 +183,30 @@ describe('RoundInfoSection', () => {
     expect(screen.getByText('Cycle Rules')).toBeInTheDocument();
   });
 
-  it('renders sections in correct order (bid history before donations)', () => {
+  it('renders sections in correct order (gesture history before contributions)', () => {
     const propsWithDonations = {
       ...defaultProps,
       ethDonations: [{ id: 1 }] as never[],
     };
     const { container } = render(<RoundInfoSection {...propsWithDonations} />);
 
-    const bidHistory = container.querySelector('[data-testid="bidding-history"]')!;
-    const ethDonation = container.querySelector('[data-testid="eth-donation-table"]')!;
-    const donatedTokens = container.querySelector('[data-testid="donated-tokens"]')!;
+    const gestureHistory = container.querySelector('[data-testid="gesture-history"]')!;
+    const ethDonation = container.querySelector('[data-testid="eth-contribution-table"]')!;
+    const donatedTokens = container.querySelector('[data-testid="attached-tokens"]')!;
 
     const allElements = container.querySelectorAll('[data-testid]');
     const order = Array.from(allElements).map((el) => el.getAttribute('data-testid'));
 
-    const bidIdx = order.indexOf('bidding-history');
-    const ethDonIdx = order.indexOf('eth-donation-table');
-    const donatedIdx = order.indexOf('donated-tokens');
+    const gestureIdx = order.indexOf('gesture-history');
+    const ethDonIdx = order.indexOf('eth-contribution-table');
+    const donatedIdx = order.indexOf('attached-tokens');
 
-    expect(bidHistory).toBeInTheDocument();
+    expect(gestureHistory).toBeInTheDocument();
     expect(ethDonation).toBeInTheDocument();
     expect(donatedTokens).toBeInTheDocument();
 
-    expect(bidIdx).toBeLessThan(ethDonIdx);
-    expect(bidIdx).toBeLessThan(donatedIdx);
+    expect(gestureIdx).toBeLessThan(ethDonIdx);
+    expect(gestureIdx).toBeLessThan(donatedIdx);
   });
 
   it('has no accessibility violations', async () => {

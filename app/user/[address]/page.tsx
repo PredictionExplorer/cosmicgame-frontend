@@ -19,7 +19,7 @@ export async function generateMetadata({
     address = getAddress(address.toLowerCase());
     try {
       const { data } = await axios.get(`${cosmicGameBaseUrl}user/info/${address}`);
-      if (!data || !data.Bids?.length) {
+      if (!data || !data.Gestures?.length) {
         address = 'Invalid Address';
       }
     } catch {

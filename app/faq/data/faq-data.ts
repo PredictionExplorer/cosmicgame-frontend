@@ -43,7 +43,7 @@ export const faqCategories: FAQCategory[] = [
           'Each cycle opens with a Calibration Window where Gesture Cost descends from the Calibration Ceiling toward the Calibration Floor over roughly two days. The first gesture starts the Cycle Finalization Time (initially ~24 hours). Each subsequent gesture increases the Gesture Cost by approximately 1% and extends the Cycle Finalization Time by about an hour. When the Cycle Finalization Time expires, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation.',
       },
       {
-        id: 'what-type-of-bids-are-available',
+        id: 'what-type-of-gestures-are-available',
         question: 'What types of gestures are available?',
         answer:
           'Gestures can be made with ETH or Cosmic Signature Tokens (ERC-20 CST). You may also attach a Random Walk NFT to your gesture to receive a 50% reduction in Gesture Cost. The CST Gesture Cost drifts downward continuously within its own Calibration Window, allowing more cost-efficient participation later in the cycle.',
@@ -67,7 +67,7 @@ export const faqCategories: FAQCategory[] = [
           'Each cycle begins with an initial Cycle Finalization Time of approximately 24 hours once the first gesture is made. Every gesture extends the time by about an hour, so cycles frequently last longer than a day. The cycle ends when the Cycle Finalization Time expires without another gesture arriving.',
       },
       {
-        id: 'can-i-place-multiple-bids',
+        id: 'can-i-place-multiple-gestures',
         question: 'Can I make multiple gestures in one cycle?',
         answer:
           'Yes. Each gesture imprints 100 Participation CST into your wallet, increases your entry count for Stellar Selections, and shapes the cycle\u2019s evolving Signature.',
@@ -75,17 +75,17 @@ export const faqCategories: FAQCategory[] = [
     ],
   },
   {
-    id: 'prizes-and-rewards',
+    id: 'allocations-and-rewards',
     title: 'Allocations & Distributions',
     description: 'What participants may receive when the cycle finalizes',
     icon: Trophy,
     items: [
       {
-        id: 'what-is-the-main-prize',
+        id: 'what-is-the-main-allocation',
         question: 'What is the Signature Allocation?',
         answer:
           'The Signature Allocation is received by the participant who made the Final Gesture of a cycle. It includes one Cosmic Signature NFT, a Recognition CST imprint of 1,000 CST, and 25% of the Cycle Reserve in ETH, plus any tokens or NFTs attached to participant gestures during the cycle.',
-        hashAnchor: 'main-prize',
+        hashAnchor: 'main-allocation',
       },
       {
         id: 'what-rewards-per-bid',
@@ -94,19 +94,19 @@ export const faqCategories: FAQCategory[] = [
           'Every gesture imprints three things: 100 Participation CST (ERC-20), one entry in end-of-cycle Stellar Selections, and a record of your Endurance Window contribution toward the Endurance Champion and Chrono-Warrior tracks.',
       },
       {
-        id: 'how-does-the-raffle-work',
+        id: 'how-does-the-stellarSelection-work',
         question: 'How does Stellar Selection work?',
         answer:
           'Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects participants from the entry pool: three participants share 4% of the Cycle Reserve in ETH, ten participants each receive a Cosmic Signature NFT, and up to ten anchor-holders of Random Walk NFTs also receive Cosmic Signature NFTs. Selection frequency increases with the number of gestures you make.',
       },
       {
-        id: 'how-do-i-claim-my-prize',
+        id: 'how-do-i-claim-my-allocation',
         question: 'How do I retrieve my allocation if I\u2019m a recipient?',
         answer:
           'Recipients of the Signature Allocation retrieve their share of the Cycle Reserve through the protocol contract. Visit the My Allocations page or the cycle allocation page to initiate the retrieval after the cycle finalizes.',
       },
       {
-        id: 'how-does-staking-work',
+        id: 'how-does-anchoring-work',
         question: 'How does Anchoring work?',
         answer:
           'After receiving Cosmic Signature Tokens through Recognition or gestures, you can anchor them to the protocol to receive Anchor Distributions. Anchoring pays 6% of the Cycle Reserve each cycle, distributed proportionally across all anchored tokens. Visit the My Anchors page (from your account menu) to anchor tokens.',
@@ -188,7 +188,7 @@ export const faqCategories: FAQCategory[] = [
           'As the time added per gesture increases, cycles run longer on average. The change is gradual, preserving a smooth participation experience while limiting total Cosmic Signature NFT supply over long time horizons.',
       },
       {
-        id: 'what-if-two-bids-same-time',
+        id: 'what-if-two-gestures-same-time',
         question: 'What happens if two gestures are submitted at the same time?',
         answer:
           'Transactions on Arbitrum are processed in the order they are included by the sequencer. If two gestures arrive at the same moment, the one confirmed first is the valid gesture.',
@@ -424,9 +424,9 @@ export const faqCategories: FAQCategory[] = [
 // is cosmic-primary; only these identifier strings retain old vocabulary.
 export const popularQuestionIds = [
   'what-is-cosmic-signature',
-  'what-is-the-main-prize',
-  'how-does-the-raffle-work',
-  'how-does-staking-work',
+  'what-is-the-main-allocation',
+  'how-does-the-stellarSelection-work',
+  'how-does-anchoring-work',
 ];
 // lexicon-allow-end
 

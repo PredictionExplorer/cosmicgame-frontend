@@ -51,20 +51,20 @@ const fillVariants = {
 };
 
 export function FundDistribution({ data }: { data?: DistData }) {
-  const prize = clamp(data?.PrizePercentage);
-  const raffle = clamp(data?.RafflePercentage);
+  const allocation = clamp(data?.PrizePercentage);
+  const stellarSelection = clamp(data?.RafflePercentage);
   const charity = clamp(data?.CharityPercentage);
-  const staking = clamp(data?.StakingPercentage);
+  const anchoring = clamp(data?.StakingPercentage);
   const chrono = clamp(data?.ChronoWarriorPercentage);
   const balance = Number(data?.CosmicGameBalanceEth) || 0;
 
-  const remainder = clamp(100 - (prize + raffle + charity + staking + chrono));
+  const remainder = clamp(100 - (allocation + stellarSelection + charity + anchoring + chrono));
 
   const categories: FundCategory[] = [
     {
       label: 'Signature Allocation',
-      value: prize,
-      eth: (prize * balance) / 100,
+      value: allocation,
+      eth: (allocation * balance) / 100,
       icon: <Trophy className="h-4 w-4" />,
       tooltip:
         'ETH retrieved by the participant who made the Final Gesture when the countdown reaches zero.',
@@ -73,8 +73,8 @@ export function FundDistribution({ data }: { data?: DistData }) {
     },
     {
       label: 'Stellar Selection',
-      value: raffle,
-      eth: (raffle * balance) / 100,
+      value: stellarSelection,
+      eth: (stellarSelection * balance) / 100,
       icon: <Shuffle className="h-4 w-4" />,
       tooltip:
         'ETH split across participants randomly selected from cycle entries at finalization.',
@@ -92,8 +92,8 @@ export function FundDistribution({ data }: { data?: DistData }) {
     },
     {
       label: 'Anchor Distribution',
-      value: staking,
-      eth: (staking * balance) / 100,
+      value: anchoring,
+      eth: (anchoring * balance) / 100,
       icon: <Layers className="h-4 w-4" />,
       tooltip:
         'Distributed to Cosmic Signature NFT anchor-holders proportional to their anchored count.',

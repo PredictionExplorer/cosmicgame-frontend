@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: internal marketing draft — needs lexicon rewrite before public use -->
+
 # Cosmic Signature: 12-Week Content Calendar
 
 ## Calendar Structure
@@ -424,3 +426,5 @@ These educational threads and posts explain specific game mechanics with contrac
 3. **Friday**: Newsletter, weekly recap, plan next week's themes
 4. **Weekend**: Community engagement, lighter content (memes, community highlights)
 5. **Ongoing**: Monitor round activity for real-time updates, respond to all mentions within 2 hours
+
+<!-- lexicon-allow-end -->

@@ -48,13 +48,13 @@ describe('EthDonationDetailPage', () => {
     expect(screen.getByText('Contribution not found.')).toBeInTheDocument();
   });
 
-  it('renders donation heading', () => {
+  it('renders contribution heading', () => {
     mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
     render(<EthDonationDetailPage id={1} />);
     expect(screen.getByText('Direct ETH Contribution Detail')).toBeInTheDocument();
   });
 
-  it('renders donor address', () => {
+  it('renders contributor address', () => {
     mockUseDonationsWithInfoById.mockReturnValue({ data: baseDonation, isLoading: false });
     render(<EthDonationDetailPage id={1} />);
     expect(screen.getByText('0xDonor')).toBeInTheDocument();

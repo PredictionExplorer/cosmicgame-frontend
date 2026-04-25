@@ -15,7 +15,7 @@ import ListItemButton from '@/components/common/ListItemButton';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { useUserBalance, useUserInfo } from '@/hooks/useApiQuery';
-import { useStakedToken } from '@/contexts/StakedTokenContext';
+import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
 import { useSystemMode } from '@/contexts/SystemModeContext';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { HEADER_POLL_INTERVAL_MS } from '@/config/constants';
@@ -71,7 +71,7 @@ const Header: FC = () => {
 
   const loading = (!!account && !!nftContract && (isLoadingBalance || isLoadingUserInfo)) || false;
 
-  const { cstokens: stakedCSTokens, rwlktokens: stakedRWLKTokens } = useStakedToken();
+  const { cstokens: anchoredCSTokens, rwlktokens: anchoredRWLKTokens } = useAnchoredToken();
 
   const systemModeCtx = useSystemMode();
   const systemMode = systemModeCtx?.data ?? 0;
@@ -97,7 +97,8 @@ const Header: FC = () => {
     account &&
     ((status?.ETHRaffleToClaim ?? 0) > 0 ||
       (status?.NumDonatedNFTToClaim ?? 0) > 0 ||
-      ((status?.UnclaimedStakingReward ?? 0) > 0 && (status?.claimableActionIds?.length ?? 0) > 0))
+      ((status?.UnretrievedAnchorDistribution ?? 0) > 0 &&
+        (status?.claimableActionIds?.length ?? 0) > 0))
   );
 
   const renderDesktop = () => (
@@ -135,8 +136,8 @@ const Header: FC = () => {
         loading={loading}
         balance={balance}
         stakedTokenCount={{
-          cst: stakedCSTokens?.length,
-          rwalk: stakedRWLKTokens?.length,
+          cst: anchoredCSTokens?.length,
+          rwalk: anchoredRWLKTokens?.length,
         }}
         hasUnclaimedRewards={hasUnclaimedRewards}
       />
@@ -185,8 +186,8 @@ const Header: FC = () => {
                   balance={balance}
                   loading={loading}
                   stakedTokenCount={{
-                    cst: stakedCSTokens?.length,
-                    rwalk: stakedRWLKTokens?.length,
+                    cst: anchoredCSTokens?.length,
+                    rwalk: anchoredRWLKTokens?.length,
                   }}
                 />
               </div>
@@ -305,11 +306,11 @@ const Header: FC = () => {
                     </p>
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">CST NFTs</span>
-                      <span className="font-medium text-primary">{stakedCSTokens?.length}</span>
+                      <span className="font-medium text-primary">{anchoredCSTokens?.length}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">RWLK NFTs</span>
-                      <span className="font-medium text-primary">{stakedRWLKTokens?.length}</span>
+                      <span className="font-medium text-primary">{anchoredRWLKTokens?.length}</span>
                     </div>
                   </div>
                 </>

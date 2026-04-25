@@ -73,7 +73,7 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
-function getPrizeTypeConfig(recordType?: number) {
+function getAllocationTypeConfig(recordType?: number) {
   switch (recordType) {
     case 1:
       return {
@@ -146,9 +146,9 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const { copy } = useClipboard();
 
   const isOwner = account != null && account === nft?.CurOwnerAddr;
-  const totalMints = dashboard?.MainStats?.NumCSTokenMints ?? 0;
+  const totalImprints = dashboard?.MainStats?.NumCSTokenMints ?? 0;
   const canGoPrev = tokenId > 0;
-  const canGoNext = totalMints > 0 && tokenId < totalMints - 1;
+  const canGoNext = totalImprints > 0 && tokenId < totalImprints - 1;
 
   const handlePrev = useCallback(() => {
     if (canGoPrev) router.push(`/detail/${tokenId - 1}`);
@@ -303,8 +303,8 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   }
 
   const currentTokenName = nameHistory.length > 0 ? nameHistory[0]?.TokenName : undefined;
-  const prizeConfig = getPrizeTypeConfig(nft?.RecordType);
-  const stakingEligible = !nft?.Staked && !nft?.WasUnstaked;
+  const allocationConfig = getAllocationTypeConfig(nft?.RecordType);
+  const anchoringEligible = !nft?.Staked && !nft?.WasUnstaked;
 
   return (
     <div className="container mx-auto px-4">
@@ -430,21 +430,21 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                 {formatId(tokenId)}
               </Badge>
 
-              {prizeConfig && (
-                <Badge className={`border text-xs ${prizeConfig.className}`}>
-                  {prizeConfig.label}
+              {allocationConfig && (
+                <Badge className={`border text-xs ${allocationConfig.className}`}>
+                  {allocationConfig.label}
                   <InfoTooltip
                     content={
                       nft?.RecordType === 3
                         ? `Received as the Cycle Recipient in Cycle #${nft?.RoundNum}`
-                        : `Received as a ${prizeConfig.label}`
+                        : `Received as a ${allocationConfig.label}`
                     }
                     iconClassName="h-3 w-3 ml-1"
                   />
                 </Badge>
               )}
 
-              {stakingEligible ? (
+              {anchoringEligible ? (
                 <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs">
                   Eligible for Anchoring
                   <InfoTooltip

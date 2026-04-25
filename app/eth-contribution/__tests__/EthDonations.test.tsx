@@ -35,7 +35,7 @@ jest.mock('../../../hooks/useCosmicGameContract', () => ({
 jest.mock('../../../components/tables/EthDonationTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
-    <div data-testid="donation-table">donations: {list.length}</div>
+    <div data-testid="contribution-table">contributions: {list.length}</div>
   ),
 }));
 
@@ -53,7 +53,7 @@ describe('EthDonations', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('renders donation table with data', () => {
+  it('renders contribution table with data', () => {
     mockUseDonationsBoth.mockReturnValue({
       data: [{ id: 1 }, { id: 2 }],
       isLoading: false,
@@ -61,7 +61,7 @@ describe('EthDonations', () => {
       refetch: mockRefetch,
     });
     render(<EthDonations />);
-    expect(screen.getByTestId('donation-table')).toHaveTextContent('donations: 2');
+    expect(screen.getByTestId('contribution-table')).toHaveTextContent('contributions: 2');
   });
 
   it('renders page title', () => {
@@ -75,7 +75,7 @@ describe('EthDonations', () => {
     expect(screen.getByText('ETH Contributions')).toBeInTheDocument();
   });
 
-  it('renders donation form when account is connected', () => {
+  it('renders contribution form when account is connected', () => {
     mockUseDonationsBoth.mockReturnValue({
       data: [],
       isLoading: false,
@@ -88,7 +88,7 @@ describe('EthDonations', () => {
     expect(screen.getByText('Contribute with Info')).toBeInTheDocument();
   });
 
-  it('updates donation amount on input change', () => {
+  it('updates contribution amount on input change', () => {
     mockUseDonationsBoth.mockReturnValue({
       data: [],
       isLoading: false,

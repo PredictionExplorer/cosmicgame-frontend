@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: internal marketing draft — needs lexicon rewrite before public use -->
+
 # Cosmic Signature Social Channels Setup Guide
 
 ## Overview
@@ -355,3 +357,5 @@ Docs: docs.cosmicsignature.com
 - New Bidder role assignments (Discord)
 - Support ticket volume and resolution time
 - Sentiment analysis (positive/negative/neutral mentions)
+
+<!-- lexicon-allow-end -->

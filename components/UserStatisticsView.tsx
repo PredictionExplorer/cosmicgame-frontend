@@ -7,28 +7,28 @@ import { motion } from 'framer-motion';
 import { UserCircle } from 'lucide-react';
 
 import { useActiveWeb3React } from '@/hooks/web3';
-import useRaffleWalletContract from '@/hooks/useRaffleWalletContract';
-import { useStakedToken } from '@/contexts/StakedTokenContext';
+import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
+import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
 import { useApiData } from '@/contexts/ApiDataContext';
 import { useNotification } from '@/contexts/NotificationContext';
-import type { BidInfo } from '@/services/api';
+import type { GestureInfo } from '@/services/api';
 import {
   useDashboardInfo,
   useClaimHistoryByUser,
   useUserInfo,
   useUserBalance,
-  useStakingCSTActionsByUser,
-  useStakingRWLKActionsByUser,
+  useCSTAnchorActionsByUser,
+  useRWLKAnchorActionsByUser,
   useMarketingRewardsByUser,
   useCSTTokensByUser,
-  useStakingRewardsByUser,
-  useStakingCSTRewardsCollectedByUser,
-  useStakingCSTByUserByDepositRewards,
-  useStakingRWLKMintsByUser,
+  useAnchorDistributionsByUser,
+  useCSTAnchorDistributionsRetrievedByUser,
+  useCSTAnchorDistributionsByUserByDeposit,
+  useRWLKAnchorImprintsByUser,
   useClaimedDonatedNFTByUser,
   useUnclaimedDonatedNFTByUser,
   useDonationsERC20ByUser,
-  useBidListByRound,
+  useGestureListByCycle,
 } from '@/hooks/useApiQuery';
 import getErrorMessage from '@/utils/alert';
 import {
@@ -45,19 +45,19 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AddressChip } from '@/components/ui/address-chip';
 
 import { CSTTable } from './tokens/CSTTable';
-import type { WinningHistoryEntry } from './tables/WinningHistoryTable';
+import type { WinningHistoryEntry } from './tables/RecipientHistoryTable';
 import type { MarketingReward } from './tables/MarketingRewardsTable';
-import type { CSTStakingRewardByDeposit } from './staking/CSTStakingRewardsByDepositTable';
-import type { NFTRecord } from './donations/DonatedNFTTable';
-import type { DonatedERC20Token } from './donations/DonatedERC20Table';
-import BiddingHistoryTable from './tables/BiddingHistoryTable';
-import WinningHistoryTable from './tables/WinningHistoryTable';
+import type { CSTAnchorDistributionByDeposit } from './anchoring/CSTAnchorDistributionsByDepositTable';
+import type { NFTRecord } from './attachments/AttachedNFTTable';
+import type { DonatedERC20Token } from './attachments/AttachedERC20Table';
+import GestureHistoryTable from './tables/GestureHistoryTable';
+import RecipientHistoryTable from './tables/RecipientHistoryTable';
 import MarketingRewardsTable from './tables/MarketingRewardsTable';
 import { UserStatsSection, type UserProfileInfo } from './user-statistics/UserStatsSection';
-import { UserStakingSection } from './user-statistics/UserStakingSection';
+import { UserAnchoringSection } from './user-statistics/UserAnchoringSection';
 import { DonatedAssetsSection } from './user-statistics/DonatedAssetsSection';
 
-interface StakingRewardRow {
+interface AnchorDistributionRow {
   TokenId: number;
   RewardCollectedEth?: number;
   RewardToCollectEth?: number;
@@ -92,11 +92,11 @@ function LoadingSkeleton() {
   );
 }
 
-/** Comprehensive user profile view with bidding stats, winning history, staking actions, token holdings, and raffle claims. */
+/** Comprehensive user profile view with bidding stats, winning history, anchoring actions, token holdings, and stellarSelection claims. */
 const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) => {
   const { account } = useActiveWeb3React();
-  const prizeWalletContract = useRaffleWalletContract();
-  const { fetchData: fetchStakedTokens } = useStakedToken();
+  const allocationWalletContract = useStellarSelectionWalletContract();
+  const { fetchData: fetchStakedTokens } = useAnchoredToken();
   const { fetchData: fetchStatusData } = useApiData();
   const { setNotification } = useNotification();
   const queryClient = useQueryClient();
@@ -110,20 +110,20 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const { data: claimHistoryRaw, isLoading: loadingClaims } = useClaimHistoryByUser(address);
   const { data: userInfoRaw, isLoading: loadingUserInfo } = useUserInfo(address);
   const { data: balanceData, isLoading: loadingBalance } = useUserBalance(address);
-  const { data: stakingCSTActions = [], isLoading: loadingCSTActions } =
-    useStakingCSTActionsByUser(address);
-  const { data: stakingRWLKActions = [], isLoading: loadingRWLKActions } =
-    useStakingRWLKActionsByUser(address);
+  const { data: cstAnchorActions = [], isLoading: loadingCSTActions } =
+    useCSTAnchorActionsByUser(address);
+  const { data: rwlkAnchorActions = [], isLoading: loadingRWLKActions } =
+    useRWLKAnchorActionsByUser(address);
   const { data: marketingRewardsRaw = [], isLoading: loadingMarketing } =
     useMarketingRewardsByUser(address);
   const { data: cstListRaw = [], isLoading: loadingCST } = useCSTTokensByUser(address);
   const { data: cstStakingRewardsRaw = [], isLoading: loadingStakingRewards } =
-    useStakingRewardsByUser(address);
+    useAnchorDistributionsByUser(address);
   const { data: collectedCstStakingRewardsRaw = [], isLoading: loadingCollected } =
-    useStakingCSTRewardsCollectedByUser(address);
+    useCSTAnchorDistributionsRetrievedByUser(address);
   const { data: cstStakingRewardsByDepositRaw = [], isLoading: loadingByDeposit } =
-    useStakingCSTByUserByDepositRewards(address);
-  const { data: rwlkMints = [], isLoading: loadingMints } = useStakingRWLKMintsByUser(address);
+    useCSTAnchorDistributionsByUserByDeposit(address);
+  const { data: rwlkImprints = [], isLoading: loadingMints } = useRWLKAnchorImprintsByUser(address);
   const { data: claimedNFTsRaw = [], isLoading: loadingClaimedNFTs } =
     useClaimedDonatedNFTByUser(address);
   const { data: unclaimedNFTsRaw = [], isLoading: loadingUnclaimedNFTs } =
@@ -131,21 +131,21 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   const { data: erc20Raw = [], isLoading: loadingERC20 } = useDonationsERC20ByUser(address);
 
   const curRoundNum = dashboardData?.CurRoundNum ?? -1;
-  const { data: bidListForProb = [] } = useBidListByRound(curRoundNum, 'desc');
+  const { data: bidListForProb = [] } = useGestureListByCycle(curRoundNum, 'desc');
 
   const data = dashboardData ?? null;
-  const { Bids: bidHistory = [], UserInfo: userInfoObj } = userInfoRaw ?? {};
+  const { Gestures: gestureHistory = [], UserInfo: userInfoObj } = userInfoRaw ?? {};
   const userInfo = (userInfoObj as UserProfileInfo) ?? null;
   const claimHistory = (claimHistoryRaw as WinningHistoryEntry[] | null) ?? null;
   const marketingRewards = (marketingRewardsRaw ?? []) as MarketingReward[];
   const cstList = cstListRaw ?? [];
-  const cstStakingRewards = useMemo(
-    () => (cstStakingRewardsRaw ?? []) as StakingRewardRow[],
+  const cstAnchorDistributions = useMemo(
+    () => (cstStakingRewardsRaw ?? []) as AnchorDistributionRow[],
     [cstStakingRewardsRaw],
   );
-  const collectedCstStakingRewards = collectedCstStakingRewardsRaw ?? [];
-  const cstStakingRewardsByDeposit = (cstStakingRewardsByDepositRaw ??
-    []) as CSTStakingRewardByDeposit[];
+  const retrievedCstAnchorDistributions = collectedCstStakingRewardsRaw ?? [];
+  const cstAnchorDistributionsByDeposit = (cstStakingRewardsByDepositRaw ??
+    []) as CSTAnchorDistributionByDeposit[];
   const claimedDonatedNFTsList = Array.isArray(claimedNFTsRaw)
     ? (claimedNFTsRaw as NFTRecord[])
     : [];
@@ -162,39 +162,39 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     };
   }, [balanceData]);
 
-  const { raffleETHProbability, raffleNFTProbability } = useMemo(() => {
+  const { stellarSelectionETHProbability, stellarSelectionNFTProbability } = useMemo(() => {
     if (!address || !dashboardData || !bidListForProb.length)
-      return { raffleETHProbability: -1, raffleNFTProbability: -1 };
-    const totalBids = bidListForProb.length;
-    const userBids = bidListForProb.filter(
-      (bid: BidInfo) => bid.BidderAddr?.toLowerCase() === address?.toLowerCase(),
+      return { stellarSelectionETHProbability: -1, stellarSelectionNFTProbability: -1 };
+    const totalGestures = bidListForProb.length;
+    const userGestures = bidListForProb.filter(
+      (bid: GestureInfo) => bid.BidderAddr?.toLowerCase() === address?.toLowerCase(),
     ).length;
-    if (totalBids > 0) {
+    if (totalGestures > 0) {
       return {
-        raffleETHProbability:
+        stellarSelectionETHProbability:
           1 -
           Math.pow(
-            (totalBids - userBids) / totalBids,
+            (totalGestures - userGestures) / totalGestures,
             dashboardData.NumRaffleEthWinnersBidding ?? 1,
           ),
-        raffleNFTProbability:
+        stellarSelectionNFTProbability:
           1 -
           Math.pow(
-            (totalBids - userBids) / totalBids,
+            (totalGestures - userGestures) / totalGestures,
             dashboardData.NumRaffleNFTWinnersBidding ?? 1,
           ),
       };
     }
-    return { raffleETHProbability: -1, raffleNFTProbability: -1 };
+    return { stellarSelectionETHProbability: -1, stellarSelectionNFTProbability: -1 };
   }, [address, dashboardData, bidListForProb]);
 
-  const totalStakeRewardEth = useMemo(
+  const totalAnchorDistributionEth = useMemo(
     () =>
-      cstStakingRewards.reduce(
+      cstAnchorDistributions.reduce(
         (sum, r) => sum + (r.RewardCollectedEth ?? 0) + (r.RewardToCollectEth ?? 0),
         0,
       ),
-    [cstStakingRewards],
+    [cstAnchorDistributions],
   );
 
   const loading =
@@ -212,11 +212,11 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     loadingMints;
 
   const handleDonatedNFTsClaim = async (tokenID: number) => {
-    if (!prizeWalletContract) return;
+    if (!allocationWalletContract) return;
     setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
     setIsClaiming(true);
     try {
-      await prizeWalletContract.write.claimDonatedNft?.([tokenID]);
+      await allocationWalletContract.write.claimDonatedNft?.([tokenID]);
       setTimeout(() => {
         queryClient.invalidateQueries();
         fetchStakedTokens();
@@ -242,11 +242,11 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   };
 
   const handleAllDonatedNFTsClaim = async () => {
-    if (!unclaimedDonatedNFTsList.length || !prizeWalletContract) return;
+    if (!unclaimedDonatedNFTsList.length || !allocationWalletContract) return;
     setIsClaiming(true);
     try {
       const indexList = unclaimedDonatedNFTsList.map((item: { Index: number }) => item.Index);
-      await prizeWalletContract.write.claimManyDonatedNfts?.([indexList]);
+      await allocationWalletContract.write.claimManyDonatedNfts?.([indexList]);
       setTimeout(() => {
         queryClient.invalidateQueries();
         fetchStakedTokens();
@@ -270,9 +270,9 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   };
 
   const handleDonatedERC20Claim = async (roundNum: number, tokenAddr: string, amount: string) => {
-    if (!prizeWalletContract) return;
+    if (!allocationWalletContract) return;
     try {
-      await prizeWalletContract.write.claimDonatedToken?.([roundNum, tokenAddr, amount]);
+      await allocationWalletContract.write.claimDonatedToken?.([roundNum, tokenAddr, amount]);
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['donationsERC20ByUser'] });
       }, 3000);
@@ -292,7 +292,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
   };
 
   const handleAllDonatedERC20Claim = async () => {
-    if (!prizeWalletContract) return;
+    if (!allocationWalletContract) return;
     try {
       const donatedTokensToClaim = donatedERC20List
         .filter((x) => !x.Claimed)
@@ -301,7 +301,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           tokenAddress: x.TokenAddr,
           amount: x.AmountDonatedEth,
         }));
-      await prizeWalletContract.write.claimManyDonatedTokens?.([donatedTokensToClaim]);
+      await allocationWalletContract.write.claimManyDonatedTokens?.([donatedTokensToClaim]);
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['donationsERC20ByUser'] });
       }, 3000);
@@ -363,11 +363,11 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
             userInfo={userInfo}
             balanceETH={balance.ETH}
             balanceCST={balance.CosmicToken}
-            raffleETHProbability={raffleETHProbability}
-            raffleNFTProbability={raffleNFTProbability}
+            stellarSelectionETHProbability={stellarSelectionETHProbability}
+            stellarSelectionNFTProbability={stellarSelectionNFTProbability}
             data={data}
             isOwnProfile={isOwnProfile}
-            totalStakeRewardEth={totalStakeRewardEth}
+            totalAnchorDistributionEth={totalAnchorDistributionEth}
           />
 
           <motion.section
@@ -378,7 +378,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           >
             <SectionDivider title="Gesture History" />
             <div className="mt-6">
-              <BiddingHistoryTable biddingHistory={bidHistory} />
+              <GestureHistoryTable gestureHistory={gestureHistory} />
             </div>
           </motion.section>
 
@@ -390,7 +390,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           >
             <SectionDivider title="Recipient History" />
             <div className="mt-6">
-              <WinningHistoryTable
+              <RecipientHistoryTable
                 winningHistory={claimHistory ?? []}
                 showClaimedStatus={true}
                 showWinnerAddr={false}
@@ -406,15 +406,15 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           >
             <SectionDivider title="Anchoring" />
             <div className="mt-6">
-              <UserStakingSection
+              <UserAnchoringSection
                 address={address!}
                 userInfo={userInfo}
-                stakingCSTActions={stakingCSTActions}
-                stakingRWLKActions={stakingRWLKActions}
-                cstStakingRewards={cstStakingRewards}
-                cstStakingRewardsByDeposit={cstStakingRewardsByDeposit}
-                collectedCstStakingRewards={collectedCstStakingRewards}
-                rwlkMints={rwlkMints}
+                cstAnchorActions={cstAnchorActions}
+                rwlkAnchorActions={rwlkAnchorActions}
+                cstAnchorDistributions={cstAnchorDistributions}
+                cstAnchorDistributionsByDeposit={cstAnchorDistributionsByDeposit}
+                retrievedCstAnchorDistributions={retrievedCstAnchorDistributions}
+                rwlkImprints={rwlkImprints}
               />
             </div>
           </motion.section>

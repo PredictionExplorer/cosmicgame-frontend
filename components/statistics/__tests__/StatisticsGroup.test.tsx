@@ -7,11 +7,11 @@ import { StatisticsGroup } from '../StatisticsGroup';
 describe('StatisticsGroup', () => {
   it('renders the title', () => {
     render(
-      <StatisticsGroup title="Prize Economy">
+      <StatisticsGroup title="Allocation Economy">
         <p>Content</p>
       </StatisticsGroup>,
     );
-    expect(screen.getByText('Prize Economy')).toBeInTheDocument();
+    expect(screen.getByText('Allocation Economy')).toBeInTheDocument();
   });
 
   it('renders children', () => {
@@ -44,7 +44,7 @@ describe('StatisticsGroup', () => {
 
   it('applies accentColor left border', () => {
     const { container } = render(
-      <StatisticsGroup title="Prizes" accentColor="blue">
+      <StatisticsGroup title="Allocations" accentColor="blue">
         <p>Content</p>
       </StatisticsGroup>,
     );

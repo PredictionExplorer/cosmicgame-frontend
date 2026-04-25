@@ -118,7 +118,7 @@ const EthDonationTable: FC<EthDonationTableProps> = ({ list, showType = true }) 
               <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
               {showType && <TablePrimaryHeadCell>Type</TablePrimaryHeadCell>}
               <TablePrimaryHeadCell>Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Donor</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>Contributor</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">Amount (ETH)</TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

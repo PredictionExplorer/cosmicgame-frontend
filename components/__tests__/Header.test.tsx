@@ -22,8 +22,8 @@ jest.mock('../../contexts/ApiDataContext', () => ({
       ETHRaffleToClaim: 0,
       ETHRaffleToClaimWei: 0,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 0,
-      unstakeableActionIds: [],
+      UnretrievedAnchorDistribution: 0,
+      releasableActionIds: [],
     },
     setApiData: jest.fn(),
     fetchData: jest.fn(),
@@ -31,8 +31,8 @@ jest.mock('../../contexts/ApiDataContext', () => ({
   }),
 }));
 
-jest.mock('../../contexts/StakedTokenContext', () => ({
-  useStakedToken: () => ({ cstokens: [], rwlktokens: [], fetchData: jest.fn() }),
+jest.mock('../../contexts/AnchoredTokenContext', () => ({
+  useAnchoredToken: () => ({ cstokens: [], rwlktokens: [], fetchData: jest.fn() }),
 }));
 
 jest.mock('../../contexts/SystemModeContext', () => ({

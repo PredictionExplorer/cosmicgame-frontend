@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
-import PrizeWinnersPage from './PrizeWinnersPage';
+import AllocationRecipientsPage from './AllocationRecipientsPage';
 
 export const metadata: Metadata = createMetadata(
   'Allocation Recipients | Cosmic Signature',
@@ -12,5 +12,5 @@ export const metadata: Metadata = createMetadata(
 );
 
 export default function Page() {
-  return <PrizeWinnersPage />;
+  return <AllocationRecipientsPage />;
 }

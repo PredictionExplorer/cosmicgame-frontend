@@ -12,15 +12,15 @@ const mockUseNotifyRedBox = jest.fn().mockReturnValue({
   data: undefined,
   refetch: mockRefetchRedBox,
 });
-const mockUseStakingCSTRewardsToClaimByUser = jest.fn().mockReturnValue({
+const mockUseCSTAnchorDistributionsToRetrieveByUser = jest.fn().mockReturnValue({
   data: undefined,
   refetch: mockRefetchRewards,
 });
 
 jest.mock('../../hooks/useApiQuery', () => ({
   useNotifyRedBox: (...args: unknown[]) => mockUseNotifyRedBox(...args),
-  useStakingCSTRewardsToClaimByUser: (...args: unknown[]) =>
-    mockUseStakingCSTRewardsToClaimByUser(...args),
+  useCSTAnchorDistributionsToRetrieveByUser: (...args: unknown[]) =>
+    mockUseCSTAnchorDistributionsToRetrieveByUser(...args),
 }));
 
 const mockAccount = jest.fn<string | null, []>(() => '0xUser');
@@ -28,9 +28,13 @@ jest.mock('../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: mockAccount() }),
 }));
 
-const mockStakedTokens = jest.fn((): unknown[] => []);
-jest.mock('../StakedTokenContext', () => ({
-  useStakedToken: () => ({ cstokens: mockStakedTokens(), rwlktokens: [], fetchData: jest.fn() }),
+const mockAnchoredTokens = jest.fn((): unknown[] => []);
+jest.mock('../AnchoredTokenContext', () => ({
+  useAnchoredToken: () => ({
+    cstokens: mockAnchoredTokens(),
+    rwlktokens: [],
+    fetchData: jest.fn(),
+  }),
 }));
 
 const mockGetCstActionIds = jest.fn();
@@ -49,9 +53,9 @@ jest.mock('../../utils/errors', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount.mockReturnValue('0xUser');
-  mockStakedTokens.mockReturnValue([]);
+  mockAnchoredTokens.mockReturnValue([]);
   mockUseNotifyRedBox.mockReturnValue({ data: undefined, refetch: mockRefetchRedBox });
-  mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+  mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
     data: undefined,
     refetch: mockRefetchRewards,
   });
@@ -68,8 +72,8 @@ describe('ApiDataContext', () => {
       ETHRaffleToClaim: 0,
       ETHRaffleToClaimWei: 0,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 0,
-      unstakeableActionIds: [],
+      UnretrievedAnchorDistribution: 0,
+      releasableActionIds: [],
     });
     expect(result.current.unclaimedRewards).toEqual([]);
   });
@@ -79,7 +83,7 @@ describe('ApiDataContext', () => {
       ETHRaffleToClaim: 5,
       ETHRaffleToClaimWei: 5000,
       NumDonatedNFTToClaim: 2,
-      UnclaimedStakingReward: 0,
+      UnretrievedAnchorDistribution: 0,
     };
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
 
@@ -89,13 +93,13 @@ describe('ApiDataContext', () => {
       expect(result.current.apiData.ETHRaffleToClaim).toBe(5);
     });
     expect(result.current.apiData.NumDonatedNFTToClaim).toBe(2);
-    expect(result.current.apiData.unstakeableActionIds).toEqual([]);
+    expect(result.current.apiData.releasableActionIds).toEqual([]);
     expect(result.current.apiData.claimableActionIds).toEqual([]);
   });
 
   it('provides unclaimed rewards from the hook', () => {
     const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });
@@ -109,7 +113,7 @@ describe('ApiDataContext', () => {
     renderHook(() => useApiData(), { wrapper });
 
     expect(mockUseNotifyRedBox).toHaveBeenCalledWith('0xABC');
-    expect(mockUseStakingCSTRewardsToClaimByUser).toHaveBeenCalledWith('0xABC');
+    expect(mockUseCSTAnchorDistributionsToRetrieveByUser).toHaveBeenCalledWith('0xABC');
   });
 
   it('fetchData triggers refetch on both hooks', async () => {
@@ -128,16 +132,16 @@ describe('ApiDataContext', () => {
       ETHRaffleToClaim: 1,
       ETHRaffleToClaimWei: 1000,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 3,
+      UnretrievedAnchorDistribution: 3,
     };
     const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
 
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });
-    mockStakedTokens.mockReturnValue([
+    mockAnchoredTokens.mockReturnValue([
       {
         StakeActionId: 100,
         StakedTokenId: 10,
@@ -153,7 +157,7 @@ describe('ApiDataContext', () => {
     const { result } = renderHook(() => useApiData(), { wrapper });
 
     await waitFor(() => {
-      expect(result.current.apiData.unstakeableActionIds).toContain(100);
+      expect(result.current.apiData.releasableActionIds).toContain(100);
     });
     expect(result.current.apiData.claimableActionIds).toEqual([
       { DepositId: 5, StakeActionId: 100 },
@@ -170,9 +174,9 @@ describe('ApiDataContext', () => {
 
   it('does not process data when account is null', async () => {
     mockAccount.mockReturnValue(null);
-    const redBox = { ETHRaffleToClaim: 1, UnclaimedStakingReward: 1 };
+    const redBox = { ETHRaffleToClaim: 1, UnretrievedAnchorDistribution: 1 };
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: [{ EvtLogId: 1, RoundNum: 1, TokenId: 1, DepositId: 1 }],
       refetch: mockRefetchRewards,
     });
@@ -202,7 +206,7 @@ describe('ApiDataContext', () => {
       ETHRaffleToClaim: 1,
       ETHRaffleToClaimWei: 100,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 2,
+      UnretrievedAnchorDistribution: 2,
     };
     const rewards = [
       { EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 },
@@ -211,7 +215,7 @@ describe('ApiDataContext', () => {
     ];
 
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });
@@ -228,12 +232,12 @@ describe('ApiDataContext', () => {
     expect(mockGetCstActionIds).toHaveBeenCalledWith('0xUser', 5);
   });
 
-  it('deduplicates unstakeableActionIds across multiple deposits', async () => {
+  it('deduplicates releasableActionIds across multiple deposits', async () => {
     const redBox = {
       ETHRaffleToClaim: 0,
       ETHRaffleToClaimWei: 0,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 5,
+      UnretrievedAnchorDistribution: 5,
     };
     const rewards = [
       { EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 },
@@ -241,11 +245,11 @@ describe('ApiDataContext', () => {
     ];
 
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });
-    mockStakedTokens.mockReturnValue([
+    mockAnchoredTokens.mockReturnValue([
       {
         StakeActionId: 100,
         StakedTokenId: 10,
@@ -258,7 +262,7 @@ describe('ApiDataContext', () => {
     const { result } = renderHook(() => useApiData(), { wrapper });
 
     await waitFor(() => {
-      expect(result.current.apiData.unstakeableActionIds).toEqual([100]);
+      expect(result.current.apiData.releasableActionIds).toEqual([100]);
     });
     expect(mockGetCstActionIds).toHaveBeenCalledTimes(2);
   });
@@ -269,12 +273,12 @@ describe('ApiDataContext', () => {
       ETHRaffleToClaim: 1,
       ETHRaffleToClaimWei: 100,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 2,
+      UnretrievedAnchorDistribution: 2,
     };
     const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
 
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });
@@ -292,16 +296,16 @@ describe('ApiDataContext', () => {
       ETHRaffleToClaim: 1,
       ETHRaffleToClaimWei: 100,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 1,
+      UnretrievedAnchorDistribution: 1,
     };
     const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
 
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });
-    mockStakedTokens.mockReturnValue([
+    mockAnchoredTokens.mockReturnValue([
       {
         StakeActionId: 100,
         StakedTokenId: 10,
@@ -316,7 +320,7 @@ describe('ApiDataContext', () => {
     await waitFor(() => {
       expect(result.current.apiData.ETHRaffleToClaim).toBe(1);
     });
-    expect(result.current.apiData.unstakeableActionIds).toEqual([]);
+    expect(result.current.apiData.releasableActionIds).toEqual([]);
     expect(result.current.apiData.claimableActionIds).toEqual([]);
   });
 
@@ -325,12 +329,12 @@ describe('ApiDataContext', () => {
       ETHRaffleToClaim: 1,
       ETHRaffleToClaimWei: 100,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 1,
+      UnretrievedAnchorDistribution: 1,
     };
     const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
 
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });
@@ -352,7 +356,7 @@ describe('ApiDataContext', () => {
       ETHRaffleToClaim: 1,
       ETHRaffleToClaimWei: 100,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 3,
+      UnretrievedAnchorDistribution: 3,
     };
     const rewards = [
       { EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 },
@@ -360,7 +364,7 @@ describe('ApiDataContext', () => {
     ];
 
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });
@@ -383,17 +387,17 @@ describe('ApiDataContext', () => {
     expect(mockGetCstActionIds).toHaveBeenCalledWith('0xUser', 7);
   });
 
-  it('skips action ID processing when UnclaimedStakingReward is 0', async () => {
+  it('skips action ID processing when UnretrievedAnchorDistribution is 0', async () => {
     const redBox = {
       ETHRaffleToClaim: 3,
       ETHRaffleToClaimWei: 3000,
       NumDonatedNFTToClaim: 1,
-      UnclaimedStakingReward: 0,
+      UnretrievedAnchorDistribution: 0,
     };
     const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
 
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });
@@ -404,7 +408,7 @@ describe('ApiDataContext', () => {
       expect(result.current.apiData.ETHRaffleToClaim).toBe(3);
     });
     expect(mockGetCstActionIds).not.toHaveBeenCalled();
-    expect(result.current.apiData.unstakeableActionIds).toEqual([]);
+    expect(result.current.apiData.releasableActionIds).toEqual([]);
     expect(result.current.apiData.claimableActionIds).toEqual([]);
   });
 
@@ -418,12 +422,12 @@ describe('ApiDataContext', () => {
       ETHRaffleToClaim: 99,
       ETHRaffleToClaimWei: 9900,
       NumDonatedNFTToClaim: 0,
-      UnclaimedStakingReward: 1,
+      UnretrievedAnchorDistribution: 1,
     };
     const rewards = [{ EvtLogId: 1, RoundNum: 1, TokenId: 10, DepositId: 5 }];
 
     mockUseNotifyRedBox.mockReturnValue({ data: redBox, refetch: mockRefetchRedBox });
-    mockUseStakingCSTRewardsToClaimByUser.mockReturnValue({
+    mockUseCSTAnchorDistributionsToRetrieveByUser.mockReturnValue({
       data: rewards,
       refetch: mockRefetchRewards,
     });

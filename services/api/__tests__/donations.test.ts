@@ -1,3 +1,5 @@
+// lexicon-allow-start: service test fixtures mirror the backend-sealed API surface
+
 import axios from 'axios';
 
 import {
@@ -319,9 +321,7 @@ describe('donations API', () => {
       const result = (await get_donations_nft_list()) as Array<{ TokenAddr: string }>;
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TokenAddr', '0xT');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/donations.*nft.*list/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/donations.*nft.*list/));
     });
 
     it('returns empty array on 400', async () => {
@@ -369,9 +369,7 @@ describe('donations API', () => {
     it('calls correct endpoint', async () => {
       mockedAxios.get.mockResolvedValue({ data: { DonatedNFTClaims: [] } });
       await get_donated_nft_claims_all();
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/donations.*nft.*claims/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/donations.*nft.*claims/));
     });
 
     it('returns empty array on 400', async () => {
@@ -535,3 +533,5 @@ describe('donations API', () => {
     });
   });
 });
+
+// lexicon-allow-end

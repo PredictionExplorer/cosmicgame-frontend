@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
-import PrizeInfoPage from './PrizeInfoPage';
+import AllocationInfoPage from './AllocationInfoPage';
 
 export const metadata: Metadata = createMetadata(
   'Allocation Information | Cosmic Signature',
@@ -11,5 +11,5 @@ export const metadata: Metadata = createMetadata(
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return <PrizeInfoPage roundNum={parseInt(id, 10)} />;
+  return <AllocationInfoPage roundNum={parseInt(id, 10)} />;
 }

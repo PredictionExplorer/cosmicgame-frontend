@@ -21,8 +21,8 @@ test.describe('Wallet connection state (disconnected)', () => {
     await expect(page.locator('body')).not.toHaveText('Internal Server Error');
   });
 
-  test('my-staking page handles no wallet gracefully', async ({ page }) => {
-    const response = await page.goto('/my-staking', { waitUntil: 'domcontentloaded' });
+  test('my-anchors page handles no wallet gracefully', async ({ page }) => {
+    const response = await page.goto('/my-anchors', { waitUntil: 'domcontentloaded' });
     expect(response?.status()).toBe(200);
     await expect(page.locator('body')).not.toHaveText('Internal Server Error');
   });

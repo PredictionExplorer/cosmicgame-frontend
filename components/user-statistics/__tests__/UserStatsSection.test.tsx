@@ -8,7 +8,7 @@ import {
 
 jest.mock('../HeroStats', () => ({
   HeroStats: (props: { userInfo: UserProfileInfo }) => (
-    <div data-testid="hero-stats">bids: {props.userInfo?.NumBids}</div>
+    <div data-testid="hero-stats">gestures: {props.userInfo?.NumBids}</div>
   ),
 }));
 jest.mock('../ActivitySummary', () => ({
@@ -19,8 +19,8 @@ jest.mock('../QuickActions', () => ({
     <div data-testid="quick-actions">{address}</div>
   ),
 }));
-jest.mock('../RafflePerformance', () => ({
-  RafflePerformance: () => <div data-testid="raffle-performance" />,
+jest.mock('../StellarSelectionPerformance', () => ({
+  StellarSelectionPerformance: () => <div data-testid="stellar-selection-performance" />,
 }));
 
 const userInfo: UserProfileInfo = {
@@ -43,17 +43,17 @@ const defaultProps: UserStatsSectionProps = {
   userInfo,
   balanceETH: 1.5,
   balanceCST: 100,
-  raffleETHProbability: 0.25,
-  raffleNFTProbability: 0.1,
+  stellarSelectionETHProbability: 0.25,
+  stellarSelectionNFTProbability: 0.1,
   data: null,
   isOwnProfile: false,
-  totalStakeRewardEth: 0,
+  totalAnchorDistributionEth: 0,
 };
 
 describe('UserStatsSection', () => {
   it('renders HeroStats with user info', () => {
     render(<UserStatsSection {...defaultProps} />);
-    expect(screen.getByTestId('hero-stats')).toHaveTextContent('bids: 10');
+    expect(screen.getByTestId('hero-stats')).toHaveTextContent('gestures: 10');
   });
 
   it('renders ActivitySummary', () => {
@@ -61,9 +61,9 @@ describe('UserStatsSection', () => {
     expect(screen.getByTestId('activity-summary')).toBeInTheDocument();
   });
 
-  it('renders RafflePerformance', () => {
+  it('renders StellarSelectionPerformance', () => {
     render(<UserStatsSection {...defaultProps} />);
-    expect(screen.getByTestId('raffle-performance')).toBeInTheDocument();
+    expect(screen.getByTestId('stellar-selection-performance')).toBeInTheDocument();
   });
 
   it('renders QuickActions for own profile', () => {

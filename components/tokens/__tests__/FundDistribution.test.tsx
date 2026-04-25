@@ -61,14 +61,14 @@ describe('FundDistribution', () => {
   it('clamps negative percentages to zero', () => {
     render(<FundDistribution data={createData({ PrizePercentage: -10 })} />);
     expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
-    const prizeRow = screen.getByText('Signature Allocation').closest('[class*="group"]')!;
-    expect(prizeRow).toHaveTextContent('0%');
+    const allocationRow = screen.getByText('Signature Allocation').closest('[class*="group"]')!;
+    expect(allocationRow).toHaveTextContent('0%');
   });
 
   it('clamps percentages above 100 to 100', () => {
     render(<FundDistribution data={createData({ RafflePercentage: 200 })} />);
-    const raffleRow = screen.getByText('Stellar Selection').closest('[class*="group"]')!;
-    expect(raffleRow).toHaveTextContent('100%');
+    const stellarSelectionRow = screen.getByText('Stellar Selection').closest('[class*="group"]')!;
+    expect(stellarSelectionRow).toHaveTextContent('100%');
   });
 
   it('renders tooltip icons for each category', () => {

@@ -35,11 +35,11 @@ describe('NFTMetadata', () => {
     expect(screen.getByTestId('nft-metadata')).toBeInTheDocument();
   });
 
-  it('renders minted date stat card with explorer link', () => {
+  it('renders imprinted date stat card with explorer link', () => {
     render(<NFTMetadata nft={fullNft} />);
-    const mintedLink = screen.getByText(/rel-1700000000/);
-    expect(mintedLink).toBeInTheDocument();
-    const anchor = mintedLink.closest('a');
+    const imprintedLink = screen.getByText(/rel-1700000000/);
+    expect(imprintedLink).toBeInTheDocument();
+    const anchor = imprintedLink.closest('a');
     expect(anchor).toHaveAttribute('href', 'https://explorer/tx/0xABC');
   });
 
@@ -69,7 +69,7 @@ describe('NFTMetadata', () => {
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('deadbeef');
   });
 
-  it('renders dash for minted when no TimeStamp', () => {
+  it('renders dash for imprinted when no TimeStamp', () => {
     render(<NFTMetadata nft={{ ...fullNft, TimeStamp: undefined }} />);
     expect(screen.getByText('Imprinted').closest('[class]')).toBeInTheDocument();
   });

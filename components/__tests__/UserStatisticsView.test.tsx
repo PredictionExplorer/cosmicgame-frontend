@@ -8,42 +8,42 @@ const mockUseDashboardInfo = jest.fn().mockReturnValue(defaultHookReturn);
 const mockUseClaimHistoryByUser = jest.fn().mockReturnValue(defaultHookReturn);
 const mockUseUserInfo = jest.fn().mockReturnValue(defaultHookReturn);
 const mockUseUserBalance = jest.fn().mockReturnValue(defaultHookReturn);
-const mockUseStakingCSTActionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseStakingRWLKActionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
+const mockUseCSTAnchorActionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
+const mockUseRWLKAnchorActionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
 const mockUseMarketingRewardsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
 const mockUseCSTTokensByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseStakingRewardsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseStakingCSTRewardsCollectedByUser = jest
+const mockUseAnchorDistributionsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
+const mockUseCSTAnchorDistributionsRetrievedByUser = jest
   .fn()
   .mockReturnValue({ data: [], isLoading: false });
-const mockUseStakingCSTByUserByDepositRewards = jest
+const mockUseCSTAnchorDistributionsByUserByDeposit = jest
   .fn()
   .mockReturnValue({ data: [], isLoading: false });
-const mockUseStakingRWLKMintsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
+const mockUseRWLKAnchorImprintsByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
 const mockUseClaimedDonatedNFTByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
 const mockUseUnclaimedDonatedNFTByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
 const mockUseDonationsERC20ByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
-const mockUseBidListByRound = jest.fn().mockReturnValue({ data: [], isLoading: false });
+const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: [], isLoading: false });
 
 jest.mock('../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
   useClaimHistoryByUser: (...args: unknown[]) => mockUseClaimHistoryByUser(...args),
   useUserInfo: (...args: unknown[]) => mockUseUserInfo(...args),
   useUserBalance: (...args: unknown[]) => mockUseUserBalance(...args),
-  useStakingCSTActionsByUser: (...args: unknown[]) => mockUseStakingCSTActionsByUser(...args),
-  useStakingRWLKActionsByUser: (...args: unknown[]) => mockUseStakingRWLKActionsByUser(...args),
+  useCSTAnchorActionsByUser: (...args: unknown[]) => mockUseCSTAnchorActionsByUser(...args),
+  useRWLKAnchorActionsByUser: (...args: unknown[]) => mockUseRWLKAnchorActionsByUser(...args),
   useMarketingRewardsByUser: (...args: unknown[]) => mockUseMarketingRewardsByUser(...args),
   useCSTTokensByUser: (...args: unknown[]) => mockUseCSTTokensByUser(...args),
-  useStakingRewardsByUser: (...args: unknown[]) => mockUseStakingRewardsByUser(...args),
-  useStakingCSTRewardsCollectedByUser: (...args: unknown[]) =>
-    mockUseStakingCSTRewardsCollectedByUser(...args),
-  useStakingCSTByUserByDepositRewards: (...args: unknown[]) =>
-    mockUseStakingCSTByUserByDepositRewards(...args),
-  useStakingRWLKMintsByUser: (...args: unknown[]) => mockUseStakingRWLKMintsByUser(...args),
+  useAnchorDistributionsByUser: (...args: unknown[]) => mockUseAnchorDistributionsByUser(...args),
+  useCSTAnchorDistributionsRetrievedByUser: (...args: unknown[]) =>
+    mockUseCSTAnchorDistributionsRetrievedByUser(...args),
+  useCSTAnchorDistributionsByUserByDeposit: (...args: unknown[]) =>
+    mockUseCSTAnchorDistributionsByUserByDeposit(...args),
+  useRWLKAnchorImprintsByUser: (...args: unknown[]) => mockUseRWLKAnchorImprintsByUser(...args),
   useClaimedDonatedNFTByUser: (...args: unknown[]) => mockUseClaimedDonatedNFTByUser(...args),
   useUnclaimedDonatedNFTByUser: (...args: unknown[]) => mockUseUnclaimedDonatedNFTByUser(...args),
   useDonationsERC20ByUser: (...args: unknown[]) => mockUseDonationsERC20ByUser(...args),
-  useBidListByRound: (...args: unknown[]) => mockUseBidListByRound(...args),
+  useGestureListByCycle: (...args: unknown[]) => mockUseGestureListByCycle(...args),
 }));
 
 jest.mock('../../hooks/web3', () => ({
@@ -55,7 +55,7 @@ jest.mock('@tanstack/react-query', () => ({
   useQueryClient: () => ({ invalidateQueries: jest.fn() }),
 }));
 
-jest.mock('../../hooks/useRaffleWalletContract', () => ({
+jest.mock('../../hooks/useStellarSelectionWalletContract', () => ({
   __esModule: true,
   default: () => ({
     write: {
@@ -66,8 +66,8 @@ jest.mock('../../hooks/useRaffleWalletContract', () => ({
     },
   }),
 }));
-jest.mock('../../contexts/StakedTokenContext', () => ({
-  useStakedToken: () => ({ fetchData: jest.fn() }),
+jest.mock('../../contexts/AnchoredTokenContext', () => ({
+  useAnchoredToken: () => ({ fetchData: jest.fn() }),
 }));
 jest.mock('../../contexts/ApiDataContext', () => ({
   useApiData: () => ({ fetchData: jest.fn() }),
@@ -100,31 +100,31 @@ jest.mock('next/link', () => ({
 
 jest.mock('../user-statistics/UserStatsSection', () => ({
   UserStatsSection: ({ userInfo }: { userInfo: { NumBids: number } }) => (
-    <div data-testid="user-stats-section">bids: {userInfo?.NumBids}</div>
+    <div data-testid="user-stats-section">gestures: {userInfo?.NumBids}</div>
   ),
 }));
-jest.mock('../user-statistics/UserStakingSection', () => ({
-  UserStakingSection: () => (
-    <div data-testid="user-staking-section">
-      <div data-testid="staking-actions-table" />
-      <div data-testid="staking-rewards-table" />
+jest.mock('../user-statistics/UserAnchoringSection', () => ({
+  UserAnchoringSection: () => (
+    <div data-testid="user-anchoring-section">
+      <div data-testid="anchor-actions-table" />
+      <div data-testid="anchor-distributions-table" />
     </div>
   ),
 }));
 jest.mock('../user-statistics/DonatedAssetsSection', () => ({
   DonatedAssetsSection: () => (
-    <div data-testid="donated-assets-section">
-      <div data-testid="donated-nft-table" />
-      <div data-testid="donated-erc20-table" />
+    <div data-testid="attached-assets-section">
+      <div data-testid="attached-nft-table" />
+      <div data-testid="attached-erc20-table" />
     </div>
   ),
 }));
 
-jest.mock('../tables/BiddingHistoryTable', () => ({
+jest.mock('../tables/GestureHistoryTable', () => ({
   __esModule: true,
-  default: () => <div data-testid="bidding-history-table" />,
+  default: () => <div data-testid="gesture-history-table" />,
 }));
-jest.mock('../tables/WinningHistoryTable', () => ({
+jest.mock('../tables/RecipientHistoryTable', () => ({
   __esModule: true,
   default: () => <div data-testid="winning-history-table" />,
 }));
@@ -160,7 +160,7 @@ const baseUserInfo = {
       TotalTokensMinted: 1,
     },
   },
-  Bids: [],
+  Gestures: [],
 };
 
 describe('UserStatisticsView', () => {
@@ -194,11 +194,11 @@ describe('UserStatisticsView', () => {
     });
     render(<UserStatisticsView address="0xUser" isOwnProfile={false} />);
 
-    expect(screen.getByTestId('user-stats-section')).toHaveTextContent('bids: 5');
-    expect(screen.getByTestId('bidding-history-table')).toBeInTheDocument();
+    expect(screen.getByTestId('user-stats-section')).toHaveTextContent('gestures: 5');
+    expect(screen.getByTestId('gesture-history-table')).toBeInTheDocument();
     expect(screen.getByTestId('cst-table')).toBeInTheDocument();
     expect(screen.getByTestId('winning-history-table')).toBeInTheDocument();
-    expect(screen.getByTestId('donated-assets-section')).toBeInTheDocument();
+    expect(screen.getByTestId('attached-assets-section')).toBeInTheDocument();
   });
 
   it('shows "My Statistics" heading for own profile', () => {

@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: internal marketing draft — needs lexicon rewrite before public use -->
+
 # Cosmic Signature: Quest Campaign Design
 
 ## Overview
@@ -229,3 +231,5 @@ These quests test deeper understanding and strategic play:
 | Conversion to bidder    | 15%+ of quest completions | 10%+/month   |
 | Social followers gained | 5,000+                    | 2,000+/month |
 | Discord members         | 3,000+                    | 1,000+/month |
+
+<!-- lexicon-allow-end -->

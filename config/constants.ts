@@ -11,7 +11,7 @@ export const HEADER_POLL_INTERVAL_MS = 30_000;
 export const NOTIFICATION_AUTO_HIDE_MS = 5_000;
 
 /** Gas limit for bid transactions. */
-export const BID_GAS_LIMIT = 30_000_000n;
+export const GESTURE_GAS_LIMIT = 30_000_000n;
 
 /** ERC-165 interface identifier for ERC-721. */
 export const ERC721_INTERFACE_ID = '0x80ac58cd' as const;

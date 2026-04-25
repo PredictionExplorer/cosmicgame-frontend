@@ -25,8 +25,8 @@ export interface HeroStatsProps {
   userInfo: UserProfileInfo;
   balanceETH: number;
   balanceCST: number;
-  raffleETHProbability: number;
-  raffleNFTProbability: number;
+  stellarSelectionETHProbability: number;
+  stellarSelectionNFTProbability: number;
   loading?: boolean;
   className?: string;
 }
@@ -35,8 +35,8 @@ export function HeroStats({
   userInfo,
   balanceETH,
   balanceCST,
-  raffleETHProbability,
-  raffleNFTProbability,
+  stellarSelectionETHProbability,
+  stellarSelectionNFTProbability,
   loading = false,
   className,
 }: HeroStatsProps) {
@@ -46,10 +46,10 @@ export function HeroStats({
   );
 
   const bestProbability = useMemo(() => {
-    const eth = raffleETHProbability >= 0 ? raffleETHProbability : -1;
-    const nft = raffleNFTProbability >= 0 ? raffleNFTProbability : -1;
+    const eth = stellarSelectionETHProbability >= 0 ? stellarSelectionETHProbability : -1;
+    const nft = stellarSelectionNFTProbability >= 0 ? stellarSelectionNFTProbability : -1;
     return Math.max(eth, nft);
-  }, [raffleETHProbability, raffleNFTProbability]);
+  }, [stellarSelectionETHProbability, stellarSelectionNFTProbability]);
 
   const stats = useMemo(
     () => [

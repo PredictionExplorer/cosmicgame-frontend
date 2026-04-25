@@ -9,7 +9,7 @@ import {
 
 const EXPECTED_CATEGORY_IDS = [
   'getting-started',
-  'prizes-and-rewards',
+  'allocations-and-rewards',
   'game-mechanics',
   'tokens-and-nfts',
   'arbitrum-and-technical',
@@ -139,10 +139,10 @@ describe('faq-data', () => {
       expect(result?.category.id).toBe('getting-started');
     });
 
-    it('returns correct category for item in prizes-and-rewards', () => {
-      const result = findItemById('what-is-the-main-prize');
+    it('returns correct category for item in allocations-and-rewards', () => {
+      const result = findItemById('what-is-the-main-allocation');
       expect(result).toBeDefined();
-      expect(result?.category.id).toBe('prizes-and-rewards');
+      expect(result?.category.id).toBe('allocations-and-rewards');
     });
 
     it('returns undefined for non-existing ID', () => {
@@ -158,22 +158,22 @@ describe('faq-data', () => {
 
   describe('findItemByHash', () => {
     it('works with # prefix', () => {
-      const result = findItemByHash('#main-prize');
+      const result = findItemByHash('#main-allocation');
       expect(result).toBeDefined();
-      expect(result?.item.hashAnchor).toBe('main-prize');
-      expect(result?.item.id).toBe('what-is-the-main-prize');
+      expect(result?.item.hashAnchor).toBe('main-allocation');
+      expect(result?.item.id).toBe('what-is-the-main-allocation');
     });
 
     it('works without # prefix', () => {
-      const result = findItemByHash('main-prize');
+      const result = findItemByHash('main-allocation');
       expect(result).toBeDefined();
-      expect(result?.item.hashAnchor).toBe('main-prize');
+      expect(result?.item.hashAnchor).toBe('main-allocation');
     });
 
-    it('finds by hashAnchor for main-prize', () => {
-      const result = findItemByHash('main-prize');
+    it('finds by hashAnchor for main-allocation', () => {
+      const result = findItemByHash('main-allocation');
       expect(result).toBeDefined();
-      expect(result?.item.id).toBe('what-is-the-main-prize');
+      expect(result?.item.id).toBe('what-is-the-main-allocation');
     });
 
     it('finds by hashAnchor for endurance-champion', () => {

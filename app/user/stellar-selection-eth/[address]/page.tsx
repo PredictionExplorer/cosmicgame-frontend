@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
-import UserRaffleETHPage from './UserRaffleETHPage';
+import UserStellarSelectionETHPage from './UserStellarSelectionETHPage';
 
 export const metadata: Metadata = createMetadata(
   'Stellar Selection ETH | Cosmic Signature',
@@ -11,5 +11,5 @@ export const metadata: Metadata = createMetadata(
 
 export default async function Page({ params }: { params: Promise<{ address: string }> }) {
   const { address } = await params;
-  return <UserRaffleETHPage address={address} />;
+  return <UserStellarSelectionETHPage address={address} />;
 }

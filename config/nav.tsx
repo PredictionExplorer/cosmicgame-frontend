@@ -9,7 +9,7 @@ export interface NavDescriptor {
 interface ClaimStatus {
   ETHRaffleToClaim?: number;
   NumDonatedNFTToClaim?: number;
-  UnclaimedStakingReward?: number;
+  UnretrievedAnchorDistribution?: number;
 }
 
 const getNAVs = (status: ClaimStatus | null, account: string | null) => {
@@ -41,7 +41,7 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
     account &&
     ((status?.ETHRaffleToClaim ?? 0) > 0 ||
       (status?.NumDonatedNFTToClaim ?? 0) > 0 ||
-      (status?.UnclaimedStakingReward ?? 0) > 0)
+      (status?.UnretrievedAnchorDistribution ?? 0) > 0)
   ) {
     NAVS.push({
       title: (

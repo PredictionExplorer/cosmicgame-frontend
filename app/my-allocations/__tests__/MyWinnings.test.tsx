@@ -3,7 +3,7 @@ import { checkA11y, render, screen } from '@/test-utils';
 import MyWinnings from '../MyWinnings';
 
 const mockRefetchNFTs = jest.fn();
-const mockRefetchRaffle = jest.fn();
+const mockRefetchStellarSelection = jest.fn();
 const mockRefetchERC20 = jest.fn();
 
 const mockUseUnclaimedDonatedNFTByUser = jest.fn().mockReturnValue({
@@ -12,11 +12,11 @@ const mockUseUnclaimedDonatedNFTByUser = jest.fn().mockReturnValue({
   isError: false,
   refetch: mockRefetchNFTs,
 });
-const mockUseUnclaimedRaffleDepositsByUser = jest.fn().mockReturnValue({
+const mockUseUnretrievedStellarSelectionDepositsByUser = jest.fn().mockReturnValue({
   data: undefined,
   isLoading: false,
   isError: false,
-  refetch: mockRefetchRaffle,
+  refetch: mockRefetchStellarSelection,
 });
 const mockUseDonationsERC20ByUser = jest.fn().mockReturnValue({
   data: [],
@@ -26,8 +26,8 @@ const mockUseDonationsERC20ByUser = jest.fn().mockReturnValue({
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useUnclaimedDonatedNFTByUser: (...args: unknown[]) => mockUseUnclaimedDonatedNFTByUser(...args),
-  useUnclaimedRaffleDepositsByUser: (...args: unknown[]) =>
-    mockUseUnclaimedRaffleDepositsByUser(...args),
+  useUnretrievedStellarSelectionDepositsByUser: (...args: unknown[]) =>
+    mockUseUnretrievedStellarSelectionDepositsByUser(...args),
   useDonationsERC20ByUser: (...args: unknown[]) => mockUseDonationsERC20ByUser(...args),
 }));
 
@@ -49,7 +49,7 @@ jest.mock('../../../contexts/ApiDataContext', () => ({
     fetchData: jest.fn(),
   }),
 }));
-jest.mock('../../../hooks/useRaffleWalletContract', () => ({
+jest.mock('../../../hooks/useStellarSelectionWalletContract', () => ({
   __esModule: true,
   default: () => ({
     write: {
@@ -59,28 +59,28 @@ jest.mock('../../../hooks/useRaffleWalletContract', () => ({
       claimDonatedToken: jest.fn(),
       claimManyDonatedTokens: jest.fn(),
     },
-    read: { roundTimeoutTimesToWithdrawPrizes: jest.fn() },
+    read: { cycleTimeoutTimesToRetrieveAllocations: jest.fn() },
   }),
 }));
 
-jest.mock('../../../components/winnings/RaffleWinningsTable', () => ({
-  RaffleWinningsTable: ({ list }: { list: unknown[] }) => (
-    <div data-testid="raffle-winnings-table">rows: {list.length}</div>
+jest.mock('../../../components/winnings/StellarSelectionAllocationsTable', () => ({
+  StellarSelectionAllocationsTable: ({ list }: { list: unknown[] }) => (
+    <div data-testid="stellar-selection-allocations-table">rows: {list.length}</div>
   ),
 }));
 
-jest.mock('../../../components/donations/DonatedNFTTable', () => ({
+jest.mock('../../../components/attachments/AttachedNFTTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
-    <div data-testid="donated-nft-table">nfts: {list.length}</div>
+    <div data-testid="attached-nft-table">nfts: {list.length}</div>
   ),
 }));
-jest.mock('../../../components/staking/UncollectedCSTStakingRewardsTable', () => ({
-  UncollectedCSTStakingRewardsTable: () => <div data-testid="uncollected-rewards" />,
+jest.mock('../../../components/anchoring/UnretrievedCSTAnchorDistributionsTable', () => ({
+  UnretrievedCSTAnchorDistributionsTable: () => <div data-testid="uncollected-rewards" />,
 }));
-jest.mock('../../../components/donations/DonatedERC20Table', () => ({
+jest.mock('../../../components/attachments/AttachedERC20Table', () => ({
   __esModule: true,
-  default: () => <div data-testid="donated-erc20-table" />,
+  default: () => <div data-testid="attached-erc20-table" />,
 }));
 
 beforeEach(() => {
@@ -109,36 +109,36 @@ describe('MyWinnings', () => {
     expect(screen.getByText('Failed to load')).toBeInTheDocument();
   });
 
-  it('shows loading for raffle section', () => {
+  it('shows loading for stellar-selection section', () => {
     mockUseUnclaimedDonatedNFTByUser.mockReturnValue({
       data: undefined,
       isLoading: true,
       isError: false,
       refetch: mockRefetchNFTs,
     });
-    mockUseUnclaimedRaffleDepositsByUser.mockReturnValue({
+    mockUseUnretrievedStellarSelectionDepositsByUser.mockReturnValue({
       data: undefined,
       isLoading: true,
       isError: false,
-      refetch: mockRefetchRaffle,
+      refetch: mockRefetchStellarSelection,
     });
     render(<MyWinnings />);
     const loadingElements = screen.getAllByText('Loading...');
     expect(loadingElements.length).toBeGreaterThan(0);
   });
 
-  it('shows "No winnings yet." when raffle data is empty', () => {
+  it('shows "No allocations yet." when stellar-selection data is empty', () => {
     mockUseUnclaimedDonatedNFTByUser.mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
       refetch: mockRefetchNFTs,
     });
-    mockUseUnclaimedRaffleDepositsByUser.mockReturnValue({
+    mockUseUnretrievedStellarSelectionDepositsByUser.mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
-      refetch: mockRefetchRaffle,
+      refetch: mockRefetchStellarSelection,
     });
     render(<MyWinnings />);
     expect(screen.getByText('No ETH allocations yet')).toBeInTheDocument();
@@ -161,18 +161,18 @@ describe('MyWinnings', () => {
       isError: false,
       refetch: mockRefetchNFTs,
     });
-    mockUseUnclaimedRaffleDepositsByUser.mockReturnValue({
+    mockUseUnretrievedStellarSelectionDepositsByUser.mockReturnValue({
       data: [],
       isLoading: false,
       isError: false,
-      refetch: mockRefetchRaffle,
+      refetch: mockRefetchStellarSelection,
     });
     render(<MyWinnings />);
 
     expect(screen.getByText('My Allocations')).toBeInTheDocument();
     expect(screen.getByText('Retrievable ETH Allocations')).toBeInTheDocument();
     expect(screen.getByText('Attached NFTs')).toBeInTheDocument();
-    expect(screen.getByTestId('donated-nft-table')).toHaveTextContent('nfts: 1');
+    expect(screen.getByTestId('attached-nft-table')).toHaveTextContent('nfts: 1');
     expect(screen.getByTestId('uncollected-rewards')).toBeInTheDocument();
   });
 

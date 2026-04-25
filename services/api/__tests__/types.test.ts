@@ -1,3 +1,5 @@
+// lexicon-allow-start: service test fixtures mirror the backend-sealed API surface
+
 /**
  * Tests for centralized API type definitions.
  *
@@ -8,12 +10,12 @@
 import type {
   ActionIdWithClaimInfo,
   AdminEventRow,
-  BannedBid,
-  BidEthPriceInfo,
-  Bidder,
-  BidInfo,
+  BannedGesture,
+  GestureEthCostInfo,
+  Participant,
+  GestureInfo,
   CharityWithdrawal,
-  CombinedStakingRecordInfo,
+  CombinedAnchorRecordInfo,
   ContractAddresses,
   CSTTokenInfo,
   CSTTransferRecord,
@@ -21,7 +23,7 @@ import type {
   CTPriceInfo,
   DashboardInfo,
   DonatedERC20Token,
-  DonatedNFT,
+  AttachedNFT,
   DonatedTokenDistributionEntry,
   ETHDonation,
   MainStats,
@@ -29,30 +31,30 @@ import type {
   NameHistoryRecord,
   NFTDonationStatsEntry,
   NotifyRedBoxResult,
-  PrizeEntry,
-  RaffleETHDeposit,
-  RaffleNFTWinner,
+  AllocationEntry,
+  StellarSelectionETHDeposit,
+  StellarSelectionNFTRecipient,
   RewardsByToken,
   RoundInfo,
   RoundStats,
-  SpecialWinners,
-  StakedTokenInfo,
-  StakeStatistics,
-  StakingAction,
-  StakingCSTReward,
-  StakingRewardMint,
+  SpecialRecipients,
+  AnchoredTokenInfo,
+  AnchoringStatistics,
+  AnchorAction,
+  CSTAnchorDistribution,
+  AnchorDistributionImprint,
   SystemModeChangeEvent,
   TokenDistribution,
-  TokenMintInfo,
+  TokenImprintInfo,
   TxInfo,
   UniqueEthDonor,
-  UniqueStakerCST,
-  UniqueStakerRWLK,
+  UniqueAnchorHolderCST,
+  UniqueAnchorHolderRWLK,
   UsedRWLKNFT,
   UserBalance,
   UserInfo,
   UserInfoWithLists,
-  Winner,
+  Recipient,
   WinningHistoryEntry,
 } from '../types';
 
@@ -85,9 +87,9 @@ describe('API types', () => {
     });
   });
 
-  describe('SpecialWinners', () => {
-    it('satisfies the SpecialWinners contract', () => {
-      const sw: SpecialWinners = {
+  describe('SpecialRecipients', () => {
+    it('satisfies the SpecialRecipients contract', () => {
+      const sw: SpecialRecipients = {
         EnduranceChampionAddress: '0x123',
         EnduranceChampionDuration: 3600,
         LastCstBidderAddress: '0x456',
@@ -97,21 +99,21 @@ describe('API types', () => {
     });
 
     it('allows all fields to be optional', () => {
-      const sw: SpecialWinners = {};
+      const sw: SpecialRecipients = {};
       expect(sw.EnduranceChampionAddress).toBeUndefined();
     });
   });
 
-  describe('BannedBid', () => {
-    it('satisfies the BannedBid contract', () => {
-      const bid: BannedBid = { bid_id: 42 };
+  describe('BannedGesture', () => {
+    it('satisfies the BannedGesture contract', () => {
+      const bid: BannedGesture = { bid_id: 42 };
       expect(bid.bid_id).toBe(42);
     });
   });
 
-  describe('BidEthPriceInfo', () => {
-    it('satisfies the BidEthPriceInfo contract', () => {
-      const info: BidEthPriceInfo = {
+  describe('GestureEthCostInfo', () => {
+    it('satisfies the GestureEthCostInfo contract', () => {
+      const info: GestureEthCostInfo = {
         AuctionDuration: '3600',
         ETHPrice: '1000000000000000000',
         SecondsElapsed: '120',
@@ -132,9 +134,9 @@ describe('API types', () => {
     });
   });
 
-  describe('TokenMintInfo', () => {
-    it('satisfies the TokenMintInfo contract', () => {
-      const info: TokenMintInfo = {
+  describe('TokenImprintInfo', () => {
+    it('satisfies the TokenImprintInfo contract', () => {
+      const info: TokenImprintInfo = {
         CurName: 'Alpha',
         CurOwnerAddr: '0x123',
         SeedHex: '0xdeadbeef',
@@ -145,14 +147,14 @@ describe('API types', () => {
     });
 
     it('allows all fields to be optional', () => {
-      const info: TokenMintInfo = {};
+      const info: TokenImprintInfo = {};
       expect(info.CurName).toBeUndefined();
     });
   });
 
   describe('Unique address entry types', () => {
-    it('satisfies the Bidder contract', () => {
-      const bidder: Bidder = {
+    it('satisfies the Participant contract', () => {
+      const bidder: Participant = {
         BidderAid: '1',
         BidderAddr: '0xabc',
         NumBids: 10,
@@ -161,19 +163,19 @@ describe('API types', () => {
       expect(bidder.NumBids).toBe(10);
     });
 
-    it('satisfies the Winner contract', () => {
-      const winner: Winner = {
+    it('satisfies the Recipient contract', () => {
+      const recipient: Recipient = {
         WinnerAid: '2',
         WinnerAddr: '0xdef',
-        PrizesCount: 3,
+        AllocationsCount: 3,
         MaxWinAmountEth: 5.0,
         PrizesSum: 15.0,
       };
-      expect(winner.PrizesCount).toBe(3);
+      expect(recipient.AllocationsCount).toBe(3);
     });
 
-    it('satisfies the UniqueStakerCST contract', () => {
-      const staker: UniqueStakerCST = {
+    it('satisfies the UniqueAnchorHolderCST contract', () => {
+      const anchorHolder: UniqueAnchorHolderCST = {
         StakerAid: '3',
         StakerAddr: '0xghi',
         NumStakeActions: 5,
@@ -183,11 +185,11 @@ describe('API types', () => {
         TotalRewardEth: 2.5,
         UnclaimedRewardEth: 0.5,
       };
-      expect(staker.TotalRewardEth).toBe(2.5);
+      expect(anchorHolder.TotalRewardEth).toBe(2.5);
     });
 
-    it('satisfies the UniqueStakerRWLK contract', () => {
-      const staker: UniqueStakerRWLK = {
+    it('satisfies the UniqueAnchorHolderRWLK contract', () => {
+      const anchorHolder: UniqueAnchorHolderRWLK = {
         StakerAid: 4,
         StakerAddr: '0xjkl',
         NumStakeActions: 3,
@@ -195,7 +197,7 @@ describe('API types', () => {
         TotalTokensStaked: 6,
         TotalTokensMinted: 4,
       };
-      expect(staker.TotalTokensStaked).toBe(6);
+      expect(anchorHolder.TotalTokensStaked).toBe(6);
     });
 
     it('satisfies the UniqueEthDonor contract', () => {
@@ -215,7 +217,7 @@ describe('API types', () => {
         ETHRaffleToClaim: 1.5,
         ETHRaffleToClaimWei: 1500000000000000000,
         NumDonatedNFTToClaim: 2,
-        UnclaimedStakingReward: 0.5,
+        UnretrievedAnchorDistribution: 0.5,
       };
       expect(result.ETHRaffleToClaim).toBe(1.5);
       expect(result.NumDonatedNFTToClaim).toBe(2);
@@ -287,9 +289,9 @@ describe('API types', () => {
     });
   });
 
-  describe('StakedTokenInfo — new fields (4c)', () => {
+  describe('AnchoredTokenInfo — new fields (4c)', () => {
     it('accepts UserAddr and StakeEvtLogId', () => {
-      const info: StakedTokenInfo = {
+      const info: AnchoredTokenInfo = {
         StakeActionId: 1,
         StakedTokenId: 42,
         StakeTimeStamp: 1700000000,
@@ -301,7 +303,7 @@ describe('API types', () => {
     });
 
     it('UserAddr and StakeEvtLogId are optional', () => {
-      const info: StakedTokenInfo = {
+      const info: AnchoredTokenInfo = {
         StakeActionId: 1,
         StakedTokenId: 42,
         StakeTimeStamp: 1700000000,
@@ -311,9 +313,9 @@ describe('API types', () => {
     });
   });
 
-  describe('StakingCSTReward — new fields (4c)', () => {
+  describe('CSTAnchorDistribution — new fields (4c)', () => {
     it('accepts deposit/collection fields', () => {
-      const reward: StakingCSTReward = {
+      const reward: CSTAnchorDistribution = {
         EvtLogId: 1,
         RoundNum: 5,
         TokenId: 0,
@@ -335,7 +337,7 @@ describe('API types', () => {
     });
 
     it('new fields are optional', () => {
-      const reward: StakingCSTReward = { EvtLogId: 1, RoundNum: 1, TokenId: 0 };
+      const reward: CSTAnchorDistribution = { EvtLogId: 1, RoundNum: 1, TokenId: 0 };
       expect(reward.TotalDepositAmountEth).toBeUndefined();
       expect(reward.PendingToCollectEth).toBeUndefined();
       expect(reward.DepositTimeStamp).toBeUndefined();
@@ -473,9 +475,9 @@ describe('API types', () => {
     });
   });
 
-  describe('DonatedNFT', () => {
+  describe('AttachedNFT', () => {
     it('supports optional Index field', () => {
-      const nft: DonatedNFT = {
+      const nft: AttachedNFT = {
         EvtLogId: 1,
         BlockNum: 100,
         TxId: 42,
@@ -491,9 +493,9 @@ describe('API types', () => {
     });
   });
 
-  describe('StakingCSTReward extended fields', () => {
-    it('supports staking winner fields', () => {
-      const reward: StakingCSTReward = {
+  describe('CSTAnchorDistribution extended fields', () => {
+    it('supports anchoring recipient fields', () => {
+      const reward: CSTAnchorDistribution = {
         EvtLogId: 1,
         RoundNum: 3,
         TokenId: 5,
@@ -507,7 +509,7 @@ describe('API types', () => {
     });
 
     it('supports deposit reward fields', () => {
-      const reward: StakingCSTReward = {
+      const reward: CSTAnchorDistribution = {
         EvtLogId: 1,
         RoundNum: 3,
         TokenId: 5,
@@ -526,18 +528,18 @@ describe('API types', () => {
     it('exports all expected type names', () => {
       const typeAssertions: Record<string, unknown> = {
         TxInfo: {} as TxInfo,
-        StakeStatistics: {} as StakeStatistics,
+        AnchoringStatistics: {} as AnchoringStatistics,
         MainStats: {} as MainStats,
         DonatedTokenDistributionEntry: {} as DonatedTokenDistributionEntry,
         ContractAddresses: {} as ContractAddresses,
         DashboardInfo: {} as DashboardInfo,
         RoundStats: {} as RoundStats,
-        RaffleNFTWinner: {} as RaffleNFTWinner,
-        RaffleETHDeposit: {} as RaffleETHDeposit,
+        StellarSelectionNFTRecipient: {} as StellarSelectionNFTRecipient,
+        StellarSelectionETHDeposit: {} as StellarSelectionETHDeposit,
         WinningHistoryEntry: {} as WinningHistoryEntry,
-        PrizeEntry: {} as PrizeEntry,
+        AllocationEntry: {} as AllocationEntry,
         RoundInfo: {} as RoundInfo,
-        BidInfo: {} as BidInfo,
+        GestureInfo: {} as GestureInfo,
         UserInfo: {} as UserInfo,
         UserBalance: {} as UserBalance,
         UserInfoWithLists: {} as UserInfoWithLists,
@@ -547,24 +549,24 @@ describe('API types', () => {
         NameHistoryRecord: {} as NameHistoryRecord,
         UsedRWLKNFT: {} as UsedRWLKNFT,
         CSTTransferRecord: {} as CSTTransferRecord,
-        StakingAction: {} as StakingAction,
-        StakedTokenInfo: {} as StakedTokenInfo,
-        StakingCSTReward: {} as StakingCSTReward,
-        CombinedStakingRecordInfo: {} as CombinedStakingRecordInfo,
+        AnchorAction: {} as AnchorAction,
+        AnchoredTokenInfo: {} as AnchoredTokenInfo,
+        CSTAnchorDistribution: {} as CSTAnchorDistribution,
+        CombinedAnchorRecordInfo: {} as CombinedAnchorRecordInfo,
         RewardsByToken: {} as RewardsByToken,
-        StakingRewardMint: {} as StakingRewardMint,
-        DonatedNFT: {} as DonatedNFT,
+        AnchorDistributionImprint: {} as AnchorDistributionImprint,
+        AttachedNFT: {} as AttachedNFT,
         ETHDonation: {} as ETHDonation,
         CharityWithdrawal: {} as CharityWithdrawal,
-        SpecialWinners: {} as SpecialWinners,
-        BannedBid: {} as BannedBid,
-        BidEthPriceInfo: {} as BidEthPriceInfo,
+        SpecialRecipients: {} as SpecialRecipients,
+        BannedGesture: {} as BannedGesture,
+        GestureEthCostInfo: {} as GestureEthCostInfo,
         CTPriceInfo: {} as CTPriceInfo,
-        TokenMintInfo: {} as TokenMintInfo,
-        Bidder: {} as Bidder,
-        Winner: {} as Winner,
-        UniqueStakerCST: {} as UniqueStakerCST,
-        UniqueStakerRWLK: {} as UniqueStakerRWLK,
+        TokenImprintInfo: {} as TokenImprintInfo,
+        Participant: {} as Participant,
+        Recipient: {} as Recipient,
+        UniqueAnchorHolderCST: {} as UniqueAnchorHolderCST,
+        UniqueAnchorHolderRWLK: {} as UniqueAnchorHolderRWLK,
         UniqueEthDonor: {} as UniqueEthDonor,
         NotifyRedBoxResult: {} as NotifyRedBoxResult,
         MarketingReward: {} as MarketingReward,
@@ -578,3 +580,5 @@ describe('API types', () => {
     });
   });
 });
+
+// lexicon-allow-end

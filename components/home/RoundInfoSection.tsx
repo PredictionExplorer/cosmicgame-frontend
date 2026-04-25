@@ -6,9 +6,9 @@ import { BookOpen, Wallet, Clock, Users } from 'lucide-react';
 
 import { formatEthValue, formatSeconds, type EnduranceChampion } from '@/utils';
 
-import Prize from '@/components/common/Prize';
-import BiddingHistory from '@/components/tables/BiddingHistoryTable';
-import RaffleHolderTable from '@/components/tables/RaffleHolderTable';
+import Allocation from '@/components/common/Allocation';
+import GestureHistory from '@/components/tables/GestureHistoryTable';
+import StellarSelectionHolderTable from '@/components/tables/StellarSelectionHolderTable';
 import ETHSpentTable from '@/components/tables/ETHSpentTable';
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 import EthDonationTable from '@/components/tables/EthDonationTable';
@@ -22,15 +22,15 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@/components/ui/accordion';
-import type { DashboardInfo, BidInfo, DonatedNFT } from '@/services/api/types';
+import type { DashboardInfo, GestureInfo, AttachedNFT } from '@/services/api/types';
 
 interface RoundInfoSectionProps {
   data: DashboardInfo | null;
-  curBidList: BidInfo[];
+  curGestureList: GestureInfo[];
   championList: EnduranceChampion[] | null;
   ethDonations: import('@/components/tables/EthDonationTable').EthDonation[];
-  donatedNFTs: DonatedNFT[];
-  donatedERC20Tokens: import('@/components/donations/DonatedERC20Table').DonatedERC20Token[];
+  donatedNFTs: AttachedNFT[];
+  donatedERC20Tokens: import('@/components/attachments/AttachedERC20Table').DonatedERC20Token[];
   donatedTokensTab: number;
   onTabChange: (_event: SyntheticEvent, newValue: number) => void;
   curPage: number;
@@ -50,7 +50,7 @@ const sectionFade = {
 /** Displays full cycle details: allocation breakdown, fund distribution, leaderboards, gesture history, contributions, and rules. */
 export function RoundInfoSection({
   data,
-  curBidList,
+  curGestureList,
   championList,
   ethDonations,
   donatedNFTs,
@@ -61,10 +61,10 @@ export function RoundInfoSection({
   setCurPage,
   perPage,
 }: RoundInfoSectionProps) {
-  const uniqueBidders = useMemo(() => {
-    const addrs = new Set(curBidList.map((b) => b.BidderAddr));
+  const uniqueParticipants = useMemo(() => {
+    const addrs = new Set(curGestureList.map((b) => b.BidderAddr));
     return addrs.size;
-  }, [curBidList]);
+  }, [curGestureList]);
 
   const [mountTimeSec] = useState(() => Math.floor(Date.now() / 1000));
 
@@ -76,9 +76,9 @@ export function RoundInfoSection({
 
   return (
     <div className="space-y-16">
-      {/* 1. Prize Breakdown */}
+      {/* 1. Allocation Breakdown */}
       <motion.div custom={0} variants={sectionFade} initial="hidden" animate="visible">
-        {data && <Prize data={data} />}
+        {data && <Allocation data={data} />}
       </motion.div>
 
       {/* 2. Fund Distribution */}
@@ -96,8 +96,8 @@ export function RoundInfoSection({
           <SectionDivider title="Stellar Selection Entries" className="flex-1" />
           <InfoTooltip content="Each gesture records one Stellar Selection entry. More gestures = higher Selection frequency for ETH or Cosmic Signature NFT allocations." />
         </div>
-        <RaffleHolderTable
-          list={curBidList}
+        <StellarSelectionHolderTable
+          list={curGestureList}
           numRaffleEthWinner={data?.NumRaffleEthWinnersBidding}
           numRaffleNFTWinner={data?.NumRaffleNFTWinnersBidding}
         />
@@ -109,7 +109,7 @@ export function RoundInfoSection({
           <SectionDivider title="Top ETH Spenders" className="flex-1" />
           <InfoTooltip content="Participant addresses ranked by total ETH spent on gestures this cycle." />
         </div>
-        <ETHSpentTable list={curBidList as ComponentProps<typeof ETHSpentTable>['list']} />
+        <ETHSpentTable list={curGestureList as ComponentProps<typeof ETHSpentTable>['list']} />
       </motion.div>
 
       {/* 5. Endurance Champions */}
@@ -133,7 +133,7 @@ export function RoundInfoSection({
           <InfoTooltip content="Chronological record of every gesture made in this cycle, newest first." />
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(196,98%,54%)]/40">
-          <BiddingHistory biddingHistory={curBidList} showRound={false} />
+          <GestureHistory gestureHistory={curGestureList} showRound={false} />
         </div>
       </motion.div>
 
@@ -247,7 +247,7 @@ export function RoundInfoSection({
                 <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                   Unique Participants
                 </p>
-                <p className="text-sm font-bold text-white">{uniqueBidders}</p>
+                <p className="text-sm font-bold text-white">{uniqueParticipants}</p>
               </div>
             </div>
           </div>

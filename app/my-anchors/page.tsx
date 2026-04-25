@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
-import MyStaking from './MyStaking';
+import MyAnchors from './MyAnchors';
 
 export const metadata: Metadata = createMetadata(
   'My Anchors | Cosmic Signature',
@@ -12,5 +12,5 @@ export const metadata: Metadata = createMetadata(
 );
 
 export default function Page() {
-  return <MyStaking />;
+  return <MyAnchors />;
 }

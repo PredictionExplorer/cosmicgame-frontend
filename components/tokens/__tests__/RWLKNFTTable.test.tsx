@@ -36,8 +36,8 @@ describe('RWLKNFTTable', () => {
 
   it('renders Stake button for each row', () => {
     render(<RWLKNFTTable {...defaultProps} list={[1, 2]} />);
-    const stakeButtons = screen.getAllByText('Stake');
-    expect(stakeButtons.length).toBeGreaterThanOrEqual(2);
+    const anchorButtons = screen.getAllByText('Stake');
+    expect(anchorButtons.length).toBeGreaterThanOrEqual(2);
   });
 
   it('paginates with 5 items per page', () => {

@@ -1,8 +1,8 @@
 import {
-  STAKING_WALLET_CST_ADDRESS,
-  STAKING_WALLET_RWLK_ADDRESS,
+  ANCHORING_WALLET_CST_ADDRESS,
+  ANCHORING_WALLET_RWLK_ADDRESS,
   MARKETING_WALLET_ADDRESS,
-  RAFFLE_WALLET_ADDRESS,
+  STELLAR_SELECTION_WALLET_ADDRESS,
   CHARITY_WALLET_ADDRESS,
 } from '@/config/networks';
 
@@ -10,11 +10,11 @@ import { isWalletAddress } from '../wallet';
 
 describe('isWalletAddress', () => {
   it('returns "CST Anchoring Wallet" for the CST anchoring address', () => {
-    expect(isWalletAddress(STAKING_WALLET_CST_ADDRESS)).toBe('CST Anchoring Wallet');
+    expect(isWalletAddress(ANCHORING_WALLET_CST_ADDRESS)).toBe('CST Anchoring Wallet');
   });
 
   it('returns "RandomWalk Anchoring Wallet" for the RWLK anchoring address', () => {
-    expect(isWalletAddress(STAKING_WALLET_RWLK_ADDRESS)).toBe('RandomWalk Anchoring Wallet');
+    expect(isWalletAddress(ANCHORING_WALLET_RWLK_ADDRESS)).toBe('RandomWalk Anchoring Wallet');
   });
 
   it('returns "Outreach Wallet" for the outreach address', () => {
@@ -22,7 +22,7 @@ describe('isWalletAddress', () => {
   });
 
   it('returns "Stellar Selection Wallet" for the stellar-selection address', () => {
-    expect(isWalletAddress(RAFFLE_WALLET_ADDRESS)).toBe('Stellar Selection Wallet');
+    expect(isWalletAddress(STELLAR_SELECTION_WALLET_ADDRESS)).toBe('Stellar Selection Wallet');
   });
 
   it('returns "Public Goods Vault" for the public-goods address', () => {
@@ -38,8 +38,8 @@ describe('isWalletAddress', () => {
   });
 
   it('is case-sensitive (lowercase variant returns empty)', () => {
-    const lower = STAKING_WALLET_CST_ADDRESS.toLowerCase();
-    if (lower !== STAKING_WALLET_CST_ADDRESS) {
+    const lower = ANCHORING_WALLET_CST_ADDRESS.toLowerCase();
+    if (lower !== ANCHORING_WALLET_CST_ADDRESS) {
       expect(isWalletAddress(lower)).toBe('');
     }
   });

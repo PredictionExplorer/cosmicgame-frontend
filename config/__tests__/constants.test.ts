@@ -3,7 +3,7 @@ import {
   STATS_POLL_INTERVAL_MS,
   HEADER_POLL_INTERVAL_MS,
   NOTIFICATION_AUTO_HIDE_MS,
-  BID_GAS_LIMIT,
+  GESTURE_GAS_LIMIT,
   ERC721_INTERFACE_ID,
 } from '../constants';
 
@@ -64,17 +64,17 @@ describe('config/constants', () => {
     });
   });
 
-  describe('BID_GAS_LIMIT', () => {
+  describe('GESTURE_GAS_LIMIT', () => {
     it('equals 30 000 000n', () => {
-      expect(BID_GAS_LIMIT).toBe(30_000_000n);
+      expect(GESTURE_GAS_LIMIT).toBe(30_000_000n);
     });
 
     it('is a bigint', () => {
-      expect(typeof BID_GAS_LIMIT).toBe('bigint');
+      expect(typeof GESTURE_GAS_LIMIT).toBe('bigint');
     });
 
     it('is positive', () => {
-      expect(BID_GAS_LIMIT).toBeGreaterThan(0n);
+      expect(GESTURE_GAS_LIMIT).toBeGreaterThan(0n);
     });
   });
 
@@ -108,9 +108,9 @@ describe('config/constants', () => {
       const constants = require('../constants');
       const exportedKeys = Object.keys(constants).sort();
       expect(exportedKeys).toEqual([
-        'BID_GAS_LIMIT',
         'DATA_POLL_INTERVAL_MS',
         'ERC721_INTERFACE_ID',
+        'GESTURE_GAS_LIMIT',
         'HEADER_POLL_INTERVAL_MS',
         'NOTIFICATION_AUTO_HIDE_MS',
         'STATS_POLL_INTERVAL_MS',

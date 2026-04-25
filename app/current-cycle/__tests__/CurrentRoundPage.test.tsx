@@ -3,20 +3,20 @@ import { render, screen, checkA11y } from '@/test-utils';
 import CurrentRoundPage from '../CurrentRoundPage';
 
 const mockUseDashboardInfo = jest.fn();
-const mockUseBidListByRound = jest.fn().mockReturnValue({ data: [] });
+const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: [] });
 const mockUseDonationsNFTByRound = jest.fn().mockReturnValue({ data: [] });
 const mockUseDonationsCGWithInfoByRound = jest.fn().mockReturnValue({ data: [] });
 const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: [] });
-const mockUsePrizeTime = jest.fn().mockReturnValue({ data: undefined });
+const mockUseAllocationTime = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
-  useBidListByRound: (...args: unknown[]) => mockUseBidListByRound(...args),
+  useGestureListByCycle: (...args: unknown[]) => mockUseGestureListByCycle(...args),
   useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
   useDonationsCGWithInfoByRound: (...args: unknown[]) => mockUseDonationsCGWithInfoByRound(...args),
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
-  usePrizeTime: (...args: unknown[]) => mockUsePrizeTime(...args),
+  useAllocationTime: (...args: unknown[]) => mockUseAllocationTime(...args),
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
 }));
 
@@ -40,8 +40,10 @@ jest.mock('../../../components/home/RoundInfoSection', () => ({
   ),
 }));
 
-jest.mock('../../../components/tables/SpecialPrizeWinners', () => ({
-  SpecialPrizeWinners: () => <div data-testid="special-prize-winners">Special Prizes</div>,
+jest.mock('../../../components/tables/SpecialAllocationRecipients', () => ({
+  SpecialAllocationRecipients: () => (
+    <div data-testid="special-allocation-recipients">Special Allocations</div>
+  ),
 }));
 
 beforeEach(() => jest.clearAllMocks());
@@ -57,7 +59,7 @@ const baseDashboardData = {
   RaffleAmountEth: 1.5,
   CosmicGameBalanceEth: 20,
   CharityPercentage: 10,
-  BidPriceEth: 0.01,
+  GestureCostEth: 0.01,
   StakingAmountEth: 2,
   NumRaffleEthRecipientsBidding: 5,
   NumRaffleNFTRecipientsBidding: 3,
@@ -106,7 +108,7 @@ describe('CurrentRoundPage', () => {
     expect(screen.getByTestId('live-badge')).toHaveTextContent('Live');
   });
 
-  it('renders bid count in subtitle', () => {
+  it('renders gesture count in subtitle', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
     expect(screen.getByText(/137 gestures made/)).toBeInTheDocument();
@@ -124,28 +126,28 @@ describe('CurrentRoundPage', () => {
     expect(screen.getByText('Attached NFTs')).toBeInTheDocument();
   });
 
-  it('displays formatted prize pool value', () => {
+  it('displays formatted allocation pool value', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
     expect(screen.getByText('5.1234 ETH')).toBeInTheDocument();
   });
 
-  it('displays formatted raffle pool value', () => {
+  it('displays formatted stellar selection pool value', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
     expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
   });
 
-  it('displays computed charity amount', () => {
+  it('displays computed public goods amount', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
     expect(screen.getByText('2.0000 ETH')).toBeInTheDocument();
   });
 
-  it('renders countdown timer when prize time is in the future', () => {
+  it('renders countdown timer when allocation time is in the future', () => {
     const futureTime = NOW_SEC + 3600;
     setupLoaded();
-    mockUsePrizeTime.mockReturnValue({ data: futureTime });
+    mockUseAllocationTime.mockReturnValue({ data: futureTime });
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     render(<CurrentRoundPage />);
 
@@ -153,10 +155,10 @@ describe('CurrentRoundPage', () => {
     expect(screen.getByTestId('countdown')).toBeInTheDocument();
   });
 
-  it('renders "Bids Exhausted" state when countdown has passed', () => {
+  it('renders "Cycle Closed" state when countdown has passed', () => {
     const pastTime = NOW_SEC - 60;
     setupLoaded();
-    mockUsePrizeTime.mockReturnValue({ data: pastTime });
+    mockUseAllocationTime.mockReturnValue({ data: pastTime });
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     render(<CurrentRoundPage />);
 
@@ -164,9 +166,9 @@ describe('CurrentRoundPage', () => {
     expect(screen.getByText('Waiting for the cycle to finalize.')).toBeInTheDocument();
   });
 
-  it('does not show countdown or exhausted state when no last bidder', () => {
+  it('does not show countdown or exhausted state when no last participant', () => {
     setupLoaded({ LastBidderAddr: '0x0000000000000000000000000000000000000000' });
-    mockUsePrizeTime.mockReturnValue({ data: NOW_SEC + 3600 });
+    mockUseAllocationTime.mockReturnValue({ data: NOW_SEC + 3600 });
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     render(<CurrentRoundPage />);
 
@@ -174,29 +176,29 @@ describe('CurrentRoundPage', () => {
     expect(screen.queryByText('Cycle Closed')).not.toBeInTheDocument();
   });
 
-  it('renders last bidder address', () => {
+  it('renders last participant address', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
     expect(screen.getByText('Last Participant — Current Leader')).toBeInTheDocument();
     expect(screen.getByText(/0xAbCdEf12/)).toBeInTheDocument();
   });
 
-  it('does not show last bidder when address is zero', () => {
+  it('does not show last participant when address is zero', () => {
     setupLoaded({ LastBidderAddr: '0x0000000000000000000000000000000000000000' });
     render(<CurrentRoundPage />);
     expect(screen.queryByText('Last Participant — Current Leader')).not.toBeInTheDocument();
   });
 
-  it('renders SpecialPrizeWinners in hero when there is a last bidder', () => {
+  it('renders SpecialAllocationRecipients in hero when there is a last participant', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(screen.getByTestId('special-prize-winners')).toBeInTheDocument();
+    expect(screen.getByTestId('special-allocation-recipients')).toBeInTheDocument();
   });
 
-  it('does not render SpecialPrizeWinners when no last bidder', () => {
+  it('does not render SpecialAllocationRecipients when no last participant', () => {
     setupLoaded({ LastBidderAddr: '0x0000000000000000000000000000000000000000' });
     render(<CurrentRoundPage />);
-    expect(screen.queryByTestId('special-prize-winners')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('special-allocation-recipients')).not.toBeInTheDocument();
   });
 
   it('renders "Make a Gesture" CTA link', () => {
@@ -221,7 +223,7 @@ describe('CurrentRoundPage', () => {
     expect(section).toHaveAttribute('data-round', 'loaded');
   });
 
-  it('renders singular bid text for 1 bid', () => {
+  it('renders singular gesture text for 1 gesture', () => {
     setupLoaded({ CurNumBids: 1 });
     render(<CurrentRoundPage />);
     expect(screen.getByText(/1 gesture made/)).toBeInTheDocument();
@@ -229,7 +231,7 @@ describe('CurrentRoundPage', () => {
 
   it('has no accessibility violations', async () => {
     setupLoaded();
-    mockUsePrizeTime.mockReturnValue({ data: NOW_SEC + 3600 });
+    mockUseAllocationTime.mockReturnValue({ data: NOW_SEC + 3600 });
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     const { container } = render(<CurrentRoundPage />);
     await checkA11y(container);

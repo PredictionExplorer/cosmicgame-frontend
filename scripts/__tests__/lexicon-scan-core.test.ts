@@ -2,15 +2,26 @@
  * Tests for the lexicon scanner core.
  *
  * These tests pin the scanner's behaviour so future refactors can't
- * silently regress its coverage.
+ * silently regress its coverage. By design, the test fixtures contain
+ * every banned term in the lexicon: that is literally what is being tested.
  */
 
+// lexicon-allow-start: fixture strings exercise every banned term by design
+
 import {
+  DEFAULT_BANNED_STEMS,
   DEFAULT_BANNED_TERMS,
   buildBannedPattern,
+  buildIdentifierPattern,
+  extractJsxTextInline,
   extractStringLiterals,
+  isAbiPropertyAccess,
   isInternalCallSite,
+  looksLikeStandaloneJsxText,
+  scanComments,
   scanContent,
+  scanIdentifiers,
+  scanJsxTextNodes,
 } from '../lexicon-scan-core';
 
 describe('DEFAULT_BANNED_TERMS', () => {
@@ -69,12 +80,22 @@ describe('DEFAULT_BANNED_TERMS', () => {
 
   it('every term is lowercase or a phrase (matching the case-insensitive regex)', () => {
     for (const t of DEFAULT_BANNED_TERMS) {
-      // The regex is `gi` (case-insensitive), so casing here is cosmetic.
-      // We document the convention: short words are lowercase; multi-word
-      // phrases keep their canonical casing.
       expect(typeof t).toBe('string');
       expect(t.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('DEFAULT_BANNED_STEMS', () => {
+  it('covers the identifier stems users mentioned explicitly', () => {
+    expect(DEFAULT_BANNED_STEMS).toContain('Bid');
+    expect(DEFAULT_BANNED_STEMS).toContain('Stake');
+    expect(DEFAULT_BANNED_STEMS).toContain('Staker');
+    expect(DEFAULT_BANNED_STEMS).toContain('Unstake');
+    expect(DEFAULT_BANNED_STEMS).toContain('Mint');
+    expect(DEFAULT_BANNED_STEMS).toContain('Raffle');
+    expect(DEFAULT_BANNED_STEMS).toContain('Prize');
+    expect(DEFAULT_BANNED_STEMS).toContain('Winner');
   });
 });
 
@@ -94,7 +115,6 @@ describe('buildBannedPattern', () => {
   });
 
   it('escapes regex metacharacters in phrases', () => {
-    // "tax-deductible" should be matched as a literal, including the hyphen.
     const p = buildBannedPattern(['tax-deductible']);
     expect('is tax-deductible'.match(p)).toBeTruthy();
     expect('tax deductible'.match(p)).toBeNull();
@@ -114,8 +134,6 @@ describe('buildBannedPattern', () => {
 
   it('builds an empty-matching pattern for an empty list', () => {
     const p = buildBannedPattern([]);
-    // An empty alternation `(...)` that never matches. Any real string
-    // must not match.
     expect('bid'.match(p)).toBeNull();
     expect(''.match(p)).toBeNull();
   });
@@ -197,9 +215,9 @@ describe('isInternalCallSite', () => {
 
   it('distinguishes href=... (user-facing URL) from id=... (internal)', () => {
     const hrefLine = `<a href='/prize'>`;
-    const idLine = `<div id='prize-card'>`;
+    const idLine = `<div id='allocation-card'>`;
     expect(isInternalCallSite(hrefLine, hrefLine.indexOf(`'/prize'`))).toBe(false);
-    expect(isInternalCallSite(idLine, idLine.indexOf(`'prize-card'`))).toBe(true);
+    expect(isInternalCallSite(idLine, idLine.indexOf(`'allocation-card'`))).toBe(true);
   });
 
   it('treats = with surrounding whitespace the same as no whitespace', () => {
@@ -222,11 +240,7 @@ describe('scanContent', () => {
   });
 
   it('reports a single banned term with correct line number', () => {
-    const src = [
-      'const a = 1;', // line 1
-      `const title = 'Make a Bid';`, // line 2
-      'const b = 2;', // line 3
-    ].join('\n');
+    const src = ['const a = 1;', `const title = 'Make a Bid';`, 'const b = 2;'].join('\n');
     const hits = scanContent(src, pattern);
     expect(hits).toHaveLength(1);
     expect(hits[0]).toEqual({ line: 2, term: 'Bid', literal: `'Make a Bid'` });
@@ -259,35 +273,55 @@ describe('scanContent', () => {
 
   it('skips comment-only lines', () => {
     const src = [
-      `// TODO: replace all bid/prize/raffle references in copy`,
-      `   * bid and raffle are banned`,
+      `// TODO: replace all bid/prize/stellarSelection references in copy`,
+      `   * bid and stellarSelection are banned`,
     ].join('\n');
     expect(scanContent(src, pattern)).toEqual([]);
   });
 
   it('honors lexicon-allow-start/end pragmas', () => {
     const src = [
-      'const a = "bid";', // line 1 — should hit
+      'const a = "bid";',
       '// lexicon-allow-start: FAQ denial copy',
       `const b = "Is this a lottery or casino?";`,
       `const c = "The bid is not a wager.";`,
       '// lexicon-allow-end',
-      'const d = "prize";', // line 6 — should hit
+      'const d = "prize";',
     ].join('\n');
     const hits = scanContent(src, pattern);
     expect(hits.map((h) => h.line)).toEqual([1, 6]);
   });
 
+  it('honors single-line lexicon-allow-abi pragma', () => {
+    const src = [
+      `const a = "bid";`,
+      `await contract.write.mint({ value: "minted fee is ok" }); // lexicon-allow-abi`,
+    ].join('\n');
+    const hits = scanContent(src, pattern);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]!.line).toBe(1);
+  });
+
+  it('honors single-line lexicon-allow-backend-type pragma', () => {
+    const src = [
+      `const a = "bid";`,
+      `type BackendRow = { BidderAddr: string; "number of gestures": number }; // lexicon-allow-backend-type`,
+    ].join('\n');
+    const hits = scanContent(src, pattern);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]!.line).toBe(1);
+  });
+
   it('skips `import X from "Y"` entirely (path is internal)', () => {
     const src = [
-      `import StakingSection from '@/components/staking/StakingSection';`,
+      `import AnchoringSection from '@/components/anchoring/AnchoringSection';`,
       `import { foo } from '../lib/bid';`,
     ].join('\n');
     expect(scanContent(src, pattern)).toEqual([]);
   });
 
   it('skips `export ... from "Y"` re-exports', () => {
-    const src = `export { StakingSection } from '@/components/staking';`;
+    const src = `export { AnchoringSection } from '@/components/anchoring';`;
     expect(scanContent(src, pattern)).toEqual([]);
   });
 
@@ -297,12 +331,12 @@ describe('scanContent', () => {
   });
 
   it('skips sectionId prop values', () => {
-    const src = `<SectionCard sectionId="prize-claimed-rewards">`;
+    const src = `<SectionCard sectionId="allocation-finalized-rewards">`;
     expect(scanContent(src, pattern)).toEqual([]);
   });
 
   it('skips DOM id attributes', () => {
-    const src = `<h3 id="prize-header">...</h3>`;
+    const src = `<h3 id="allocation-header">...</h3>`;
     expect(scanContent(src, pattern)).toEqual([]);
   });
 
@@ -335,8 +369,6 @@ describe('scanContent', () => {
   });
 
   it('does not flag API field-shaped identifiers outside strings', () => {
-    // API field names like BidderAddr or NumBidsCST are NOT string
-    // literals; the scanner must not fire on them.
     const src = [
       `const x = data.BidderAddr;`,
       `const y = obj.NumBidsCST;`,
@@ -370,9 +402,6 @@ describe('scanContent', () => {
   });
 
   it('treats the whole rest-of-file as allowed if end pragma is missing', () => {
-    // Intentional: a missing close pragma is less harmful than a silent
-    // auto-close that re-enables enforcement on explicitly-whitelisted
-    // copy. Tests document this invariant.
     const src = [`// lexicon-allow-start: FAQ`, `const x = "bid";`, `const y = "prize";`].join(
       '\n',
     );
@@ -401,6 +430,223 @@ describe('scanContent', () => {
   });
 });
 
+describe('extractJsxTextInline', () => {
+  it('extracts text between tags on one line', () => {
+    const hits = extractJsxTextInline(`<span>Hello World</span>`);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]!.text).toBe('Hello World');
+  });
+
+  it('returns empty for whitespace-only text', () => {
+    const hits = extractJsxTextInline(`<span>   </span>`);
+    expect(hits).toHaveLength(0);
+  });
+
+  it('skips JSX expression containers ({...})', () => {
+    const hits = extractJsxTextInline(`<span>{count}</span>`);
+    expect(hits).toHaveLength(0);
+  });
+
+  it('extracts multiple inline text nodes', () => {
+    const hits = extractJsxTextInline(`<b>A</b><i>B</i>`);
+    expect(hits.map((h) => h.text)).toEqual(['A', 'B']);
+  });
+});
+
+describe('looksLikeStandaloneJsxText', () => {
+  it('returns true for prose-looking lines', () => {
+    expect(looksLikeStandaloneJsxText('Cosmic Signature Staking')).toBe(true);
+    expect(looksLikeStandaloneJsxText('Random Walk Staking')).toBe(true);
+    expect(looksLikeStandaloneJsxText('Make a Gesture')).toBe(true);
+  });
+
+  it('returns false for TS/JS code', () => {
+    expect(looksLikeStandaloneJsxText(`const x = 'hello';`)).toBe(false);
+    expect(looksLikeStandaloneJsxText(`return <div>Hello</div>;`)).toBe(false);
+    expect(looksLikeStandaloneJsxText(`import { x } from 'y';`)).toBe(false);
+    expect(looksLikeStandaloneJsxText(`function foo() {}`)).toBe(false);
+  });
+
+  it('returns false for empty or too-short lines', () => {
+    expect(looksLikeStandaloneJsxText('')).toBe(false);
+    expect(looksLikeStandaloneJsxText('  ')).toBe(false);
+    expect(looksLikeStandaloneJsxText('ok')).toBe(false);
+  });
+});
+
+describe('scanJsxTextNodes', () => {
+  const pattern = buildBannedPattern(DEFAULT_BANNED_TERMS);
+
+  it('flags banned term inside inline JSX text', () => {
+    const src = `<span>Place a Bid</span>`;
+    const hits = scanJsxTextNodes(src, pattern);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]!.term).toBe('Bid');
+    expect(hits[0]!.literal).toBe('Place a Bid');
+  });
+
+  it('flags banned term in multi-line JSX text (the UserAnchoringSection regression)', () => {
+    const src = [
+      `<span className="text-lg whitespace-nowrap normal-case ml-4">`,
+      `  Cosmic Signature Staking`,
+      `</span>`,
+    ].join('\n');
+    const hits = scanJsxTextNodes(src, pattern);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]!.term).toBe('Staking');
+    expect(hits[0]!.line).toBe(2);
+  });
+
+  it('flags both leaked JSX texts in UserAnchoringSection fixture', () => {
+    const src = [
+      `<TabsTrigger>`,
+      `  <span>`,
+      `    Cosmic Signature Staking`,
+      `  </span>`,
+      `</TabsTrigger>`,
+      `<TabsTrigger>`,
+      `  <span>`,
+      `    Random Walk Staking`,
+      `  </span>`,
+      `</TabsTrigger>`,
+    ].join('\n');
+    const hits = scanJsxTextNodes(src, pattern);
+    expect(hits.length).toBeGreaterThanOrEqual(2);
+    expect(hits.map((h) => h.term.toLowerCase()).every((t) => t === 'staking')).toBe(true);
+  });
+
+  it('does not flag JSX expression containers', () => {
+    const src = `<span>{stakingCount}</span>`;
+    expect(scanJsxTextNodes(src, pattern)).toEqual([]);
+  });
+
+  it('honors lexicon-allow-start/end inside JSX', () => {
+    const src = [
+      `// lexicon-allow-start: FAQ denial`,
+      `<p>Is this a lottery product?</p>`,
+      `// lexicon-allow-end`,
+    ].join('\n');
+    expect(scanJsxTextNodes(src, pattern)).toEqual([]);
+  });
+});
+
+describe('buildIdentifierPattern', () => {
+  it('matches an identifier containing a banned stem', () => {
+    const p = buildIdentifierPattern(['Bid']);
+    expect('useBidForm'.match(p)?.[0]).toBe('useBidForm');
+    expect('BidPage'.match(p)?.[0]).toBe('BidPage');
+    expect('bidList'.match(p)?.[0]).toBe('bidList');
+  });
+
+  it('returns null when no banned stem is present', () => {
+    const p = buildIdentifierPattern(['Bid']);
+    expect('useGestureForm'.match(p)).toBeNull();
+  });
+
+  it('handles multiple stems', () => {
+    const p = buildIdentifierPattern(['Bid', 'Stake']);
+    expect('StakeButton'.match(p)?.[0]).toBe('StakeButton');
+    expect('BidButton'.match(p)?.[0]).toBe('BidButton');
+  });
+});
+
+describe('isAbiPropertyAccess', () => {
+  it('returns true when identifier is a property access and line has allow-abi', () => {
+    const line = `await contract.write.mint({ value: x }); // lexicon-allow-abi`;
+    const start = line.indexOf('mint');
+    expect(isAbiPropertyAccess(line, start)).toBe(true);
+  });
+
+  it('returns false without the pragma', () => {
+    const line = `await contract.write.mint({ value: x });`;
+    const start = line.indexOf('mint');
+    expect(isAbiPropertyAccess(line, start)).toBe(false);
+  });
+
+  it('returns false for non-property access (identifier at position 0)', () => {
+    const line = `mint`;
+    expect(isAbiPropertyAccess(line, 0)).toBe(false);
+  });
+});
+
+describe('scanIdentifiers', () => {
+  const pattern = buildIdentifierPattern(DEFAULT_BANNED_STEMS);
+
+  it('flags a const declaration containing a banned stem', () => {
+    const src = `const bidList = [];`;
+    const hits = scanIdentifiers(src, pattern);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]!.term).toBe('bidList');
+  });
+
+  it('flags a function declaration', () => {
+    const src = `function useStakingActions() {}`;
+    const hits = scanIdentifiers(src, pattern);
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+    expect(hits[0]!.term).toMatch(/Staking/i);
+  });
+
+  it('flags an interface declaration', () => {
+    const src = `interface BidderRow { addr: string; }`;
+    const hits = scanIdentifiers(src, pattern);
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+    expect(hits[0]!.term).toMatch(/Bidder/i);
+  });
+
+  it('skips property access unless explicitly scanned', () => {
+    const src = `const n = obj.gestureList;`;
+    const hits = scanIdentifiers(src, pattern, { onlyDeclarations: true });
+    expect(hits).toEqual([]);
+  });
+
+  it('skips lines wrapped in an allow block', () => {
+    const src = [
+      `// lexicon-allow-start: backend contract`,
+      `interface BackendRawBidder { BidderAddr: string; }`,
+      `// lexicon-allow-end`,
+    ].join('\n');
+    expect(scanIdentifiers(src, pattern)).toEqual([]);
+  });
+
+  it('skips lines marked lexicon-allow-backend-type', () => {
+    const src = `interface BackendRawBidder { BidderAddr: string; } // lexicon-allow-backend-type`;
+    expect(scanIdentifiers(src, pattern)).toEqual([]);
+  });
+
+  it('skips import / export paths', () => {
+    const src = `import { GestureForm } from '@/components/home/GestureForm';`;
+    expect(scanIdentifiers(src, pattern)).toEqual([]);
+  });
+});
+
+describe('scanComments', () => {
+  const pattern = buildBannedPattern(DEFAULT_BANNED_TERMS);
+
+  it('flags a banned term in a line comment', () => {
+    const src = `// replace bid with Gesture`;
+    const hits = scanComments(src, pattern);
+    expect(hits).toHaveLength(1);
+    expect(hits[0]!.term.toLowerCase()).toBe('bid');
+  });
+
+  it('flags a banned term in a block comment', () => {
+    const src = `/* this is a bid */`;
+    const hits = scanComments(src, pattern);
+    expect(hits).toHaveLength(1);
+  });
+
+  it('handles block comments spanning multiple lines', () => {
+    const src = ['/*', ' * The bid flow is', ' * being renamed.', ' */'].join('\n');
+    const hits = scanComments(src, pattern);
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('does not flag strings (that is scanContent territory)', () => {
+    const src = `const x = "bid";`;
+    expect(scanComments(src, pattern)).toEqual([]);
+  });
+});
+
 describe('integration: common real-world patterns', () => {
   const pattern = buildBannedPattern(DEFAULT_BANNED_TERMS);
 
@@ -415,6 +661,7 @@ describe('integration: common real-world patterns', () => {
       }
     `;
     expect(scanContent(src, pattern)).toEqual([]);
+    expect(scanJsxTextNodes(src, pattern)).toEqual([]);
   });
 
   it('flags a component that slipped a "Prize" string into a heading', () => {
@@ -429,8 +676,6 @@ describe('integration: common real-world patterns', () => {
   });
 
   it('allow pragma + bracket-key access is the documented escape hatch', () => {
-    // Reading `data['NumBids']` would otherwise fire (string contains
-    // "Bids"); wrap with allow-start/end to accept.
     const src = [
       `// lexicon-allow-start: backend wire format key`,
       `const n = data['NumBids'];`,
@@ -458,3 +703,5 @@ describe('integration: common real-world patterns', () => {
     expect(hits[0]!.term.toLowerCase()).toBe('staking');
   });
 });
+
+// lexicon-allow-end

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
-import StakingActionDetailPage from './StakingActionDetailPage';
+import AnchorActionDetailPage from './AnchorActionDetailPage';
 
 export const metadata: Metadata = createMetadata(
   'Anchor Action Detail | Cosmic Signature',
@@ -15,5 +15,5 @@ export default async function Page({
   params: Promise<{ IsRwalk: string; actionId: string }>;
 }) {
   const { IsRwalk, actionId } = await params;
-  return <StakingActionDetailPage IsRwalk={Number(IsRwalk)} actionId={Number(actionId)} />;
+  return <AnchorActionDetailPage IsRwalk={Number(IsRwalk)} actionId={Number(actionId)} />;
 }

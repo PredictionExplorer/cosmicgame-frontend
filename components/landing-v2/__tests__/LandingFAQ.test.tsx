@@ -41,7 +41,9 @@ describe('<LandingFAQ />', () => {
   it('question text uses cosmic vocabulary (not banned terms, except denial copy)', () => {
     // Questions themselves may include banned words only in FAQ denial copy
     // ("Is this a lottery..."). Non-denial questions must be lexicon-safe.
+    // lexicon-allow-start: denial-marker array must contain the banned words by design
     const denialMarkers = ['lottery', 'casino', 'gambling', 'investment'];
+    // lexicon-allow-end
     for (const item of landingContent.faq.items) {
       const isDenial = denialMarkers.some((m) => item.question.toLowerCase().includes(m));
       if (isDenial) continue;

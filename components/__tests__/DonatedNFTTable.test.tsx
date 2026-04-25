@@ -3,27 +3,27 @@ import axios from 'axios';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import DonatedNFTTable from '@/components/donations/DonatedNFTTable';
+import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 
 import { render, screen, waitFor, fireEvent, checkA11y } from '@/test-utils';
 
 jest.mock('axios');
-jest.mock('../../hooks/useRaffleWalletContract', () => ({
+jest.mock('../../hooks/useStellarSelectionWalletContract', () => ({
   __esModule: true,
   default: () => ({
     read: {
-      roundTimeoutTimesToWithdrawPrizes: () => Promise.resolve(0),
+      cycleTimeoutTimesToRetrieveAllocations: () => Promise.resolve(0),
     },
   }),
 }));
 
-describe('DonatedNFTTable', () => {
+describe('AttachedNFTTable', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   test('with no records', () => {
-    render(<DonatedNFTTable list={[]} claimingTokens={[]} />);
+    render(<AttachedNFTTable list={[]} claimingTokens={[]} />);
     expect(screen.getByText('No attached NFTs yet.')).toBeInTheDocument();
   });
 
@@ -53,7 +53,7 @@ describe('DonatedNFTTable', () => {
         DonorAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
       },
     ];
-    render(<DonatedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[]} />);
+    render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[]} />);
     expect(
       screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
     ).toBeInTheDocument();
@@ -96,7 +96,7 @@ describe('DonatedNFTTable', () => {
         DonorAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
       },
     ];
-    render(<DonatedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[]} />);
+    render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[]} />);
 
     await waitFor(() => {
       const links = screen.getAllByRole('link');
@@ -136,7 +136,7 @@ describe('DonatedNFTTable', () => {
       },
     ];
 
-    render(<DonatedNFTTable list={mockData} handleClaim={mockHandleClaim} claimingTokens={[]} />);
+    render(<AttachedNFTTable list={mockData} handleClaim={mockHandleClaim} claimingTokens={[]} />);
 
     await waitFor(() => {
       expect(screen.getByTestId('Claim Button')).toBeInTheDocument();
@@ -147,7 +147,7 @@ describe('DonatedNFTTable', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<DonatedNFTTable list={[]} claimingTokens={[]} />);
+    const { container } = render(<AttachedNFTTable list={[]} claimingTokens={[]} />);
     await checkA11y(container);
   });
 });

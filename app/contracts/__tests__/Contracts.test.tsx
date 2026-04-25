@@ -197,7 +197,7 @@ describe('Contracts', () => {
     expect(screen.getByText('CST Anchoring Wallet')).toBeInTheDocument();
   });
 
-  it('renders auction parameters section', () => {
+  it('renders calibration parameters section', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     expect(
@@ -207,7 +207,7 @@ describe('Contracts', () => {
     expect(screen.getByText('ETH Calibration Window')).toBeInTheDocument();
   });
 
-  it('renders raffle configuration cards', () => {
+  it('renders stellar selection configuration cards', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     expect(screen.getByText('ETH Stellar Selection Recipients')).toBeInTheDocument();
@@ -225,7 +225,7 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     const searchInput = screen.getByLabelText('Search contracts');
-    fireEvent.change(searchInput, { target: { value: 'charity' } });
+    fireEvent.change(searchInput, { target: { value: 'charity' } }); // lexicon-allow-line
     expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
     expect(screen.queryByText('Cosmic Signature Token')).not.toBeInTheDocument();
   });

@@ -2,7 +2,7 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import { DonatedNFTsGrid } from '../DonatedNFTsGrid';
 
-jest.mock('../../donations/DonatedNFT', () => ({
+jest.mock('../../attachments/AttachedNFT', () => ({
   __esModule: true,
   default: ({ nft }: { nft: { RecordId: string | number } }) => (
     <div data-testid="donated-nft">{nft.RecordId}</div>
@@ -19,7 +19,7 @@ describe('DonatedNFTsGrid', () => {
     expect(screen.getByText('Attached NFTs')).toBeInTheDocument();
   });
 
-  it('shows styled empty state when no donations', () => {
+  it('shows styled empty state when no contributions', () => {
     const { container } = render(<DonatedNFTsGrid nftDonations={[]} />);
     expect(screen.getByText('No NFTs have been attached yet.')).toBeInTheDocument();
     expect(screen.getByText('Attached NFTs from all cycles will appear here.')).toBeInTheDocument();
@@ -27,7 +27,7 @@ describe('DonatedNFTsGrid', () => {
     expect(svg).toBeInTheDocument();
   });
 
-  it('renders donated NFTs when list is non-empty', () => {
+  it('renders attached NFTs when list is non-empty', () => {
     const nfts = [{ RecordId: 'a' }, { RecordId: 'b' }];
     render(<DonatedNFTsGrid nftDonations={nfts} />);
     expect(screen.getByText('a')).toBeInTheDocument();

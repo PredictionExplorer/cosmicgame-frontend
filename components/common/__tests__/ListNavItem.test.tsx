@@ -16,8 +16,8 @@ describe('ListNavItem', () => {
       title: 'Rewards',
       route: '#',
       children: [
-        { title: 'Prizes', route: '/prize' },
-        { title: 'Staking', route: '/anchoring' },
+        { title: 'Allocations', route: '/allocation' },
+        { title: 'Anchoring', route: '/anchoring' },
       ],
     };
     render(<ListNavItem nav={nav} />);
@@ -30,16 +30,16 @@ describe('ListNavItem', () => {
       title: 'Rewards',
       route: '#',
       children: [
-        { title: 'Prizes', route: '/prize' },
-        { title: 'Staking', route: '/anchoring' },
+        { title: 'Allocations', route: '/allocation' },
+        { title: 'Anchoring', route: '/anchoring' },
       ],
     };
     render(<ListNavItem nav={nav} />);
 
     await user.click(screen.getByText('Rewards'));
 
-    expect(screen.getByText('Prizes')).toBeInTheDocument();
-    expect(screen.getByText('Staking')).toBeInTheDocument();
+    expect(screen.getByText('Allocations')).toBeInTheDocument();
+    expect(screen.getByText('Anchoring')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

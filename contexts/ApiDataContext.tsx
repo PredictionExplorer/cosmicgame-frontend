@@ -13,18 +13,18 @@ import {
 
 import { useActiveWeb3React } from '@/hooks/web3';
 import api from '@/services/api';
-import type { StakingCSTReward } from '@/services/api/types';
-import { useNotifyRedBox, useStakingCSTRewardsToClaimByUser } from '@/hooks/useApiQuery';
+import type { CSTAnchorDistribution } from '@/services/api/types';
+import { useNotifyRedBox, useCSTAnchorDistributionsToRetrieveByUser } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
 
-import { useStakedToken } from './StakedTokenContext';
+import { useAnchoredToken } from './AnchoredTokenContext';
 
 interface ApiData {
   ETHRaffleToClaim: number;
   ETHRaffleToClaimWei: number;
   NumDonatedNFTToClaim: number;
-  UnclaimedStakingReward: number;
-  unstakeableActionIds: (number | string)[];
+  UnretrievedAnchorDistribution: number;
+  releasableActionIds: (number | string)[];
   claimableActionIds?: { DepositId: number; StakeActionId: number }[];
 }
 
@@ -32,8 +32,8 @@ const initialApiData: ApiData = {
   ETHRaffleToClaim: 0,
   ETHRaffleToClaimWei: 0,
   NumDonatedNFTToClaim: 0,
-  UnclaimedStakingReward: 0,
-  unstakeableActionIds: [],
+  UnretrievedAnchorDistribution: 0,
+  releasableActionIds: [],
 };
 
 interface ApiDataProviderProps {
@@ -44,7 +44,7 @@ interface ApiDataContextValue {
   apiData: ApiData;
   setApiData: Dispatch<SetStateAction<ApiData>>;
   fetchData: () => Promise<void>;
-  unclaimedRewards: StakingCSTReward[];
+  unclaimedRewards: CSTAnchorDistribution[];
   error: string | null;
   isLoading: boolean;
 }
@@ -63,7 +63,7 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
   const [apiData, setApiData] = useState<ApiData>(initialApiData);
   const [error, setError] = useState<string | null>(null);
 
-  const { cstokens: stakedTokens } = useStakedToken();
+  const { cstokens: anchoredTokens } = useAnchoredToken();
   const { account } = useActiveWeb3React();
 
   const {
@@ -75,25 +75,25 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
     data: rewardsData,
     refetch: refetchRewards,
     isLoading: rewardsLoading,
-  } = useStakingCSTRewardsToClaimByUser(account);
+  } = useCSTAnchorDistributionsToRetrieveByUser(account);
 
   const unclaimedRewards = useMemo(() => rewardsData ?? [], [rewardsData]);
 
-  const stakedActionIdsRef = useRef<(number | string)[]>([]);
+  const anchoredActionIdsRef = useRef<(number | string)[]>([]);
   // eslint-disable-next-line react-hooks/refs
-  stakedActionIdsRef.current = stakedTokens.flatMap((x) =>
+  anchoredActionIdsRef.current = anchoredTokens.flatMap((x) =>
     x.TokenInfo?.StakeActionId != null ? [x.TokenInfo.StakeActionId] : [],
   );
 
   const fetchInfo = useCallback(
     async (depositId: number) => {
-      const unstakeableActionIds: (number | string)[] = [];
+      const releasableActionIds: (number | string)[] = [];
       const claimableActionIds: { DepositId: number; StakeActionId: number }[] = [];
 
       const response = await api.get_cst_action_ids_by_deposit_id(account!, depositId);
-      if (!response) return { unstakeableActionIds, claimableActionIds };
+      if (!response) return { releasableActionIds, claimableActionIds };
 
-      const currentStakedActionIds = stakedActionIdsRef.current;
+      const currentAnchoredActionIds = anchoredActionIdsRef.current;
       for (const item of response) {
         try {
           if (!item.Claimed) {
@@ -102,21 +102,21 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
               StakeActionId: item.StakeActionId,
             });
           }
-          if (currentStakedActionIds.includes(item.StakeActionId)) {
-            unstakeableActionIds.push(item.StakeActionId);
+          if (currentAnchoredActionIds.includes(item.StakeActionId)) {
+            releasableActionIds.push(item.StakeActionId);
           }
         } catch (error) {
-          reportError(error, 'process staking reward item');
+          reportError(error, 'process anchor distribution item');
         }
       }
 
-      return { unstakeableActionIds, claimableActionIds };
+      return { releasableActionIds, claimableActionIds };
     },
     [account],
   );
 
   const fetchActionIds = useCallback(
-    async (list: StakingCSTReward[]) => {
+    async (list: CSTAnchorDistribution[]) => {
       let cl_actionIds: { DepositId: number; StakeActionId: number }[] = [];
       let us_actionIds: (number | string)[] = [];
 
@@ -125,9 +125,9 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
           .filter((item) => item.DepositId != null)
           .map(async (item) => {
             const depositId = item.DepositId!;
-            const { claimableActionIds, unstakeableActionIds } = await fetchInfo(depositId);
+            const { claimableActionIds, releasableActionIds } = await fetchInfo(depositId);
             cl_actionIds = cl_actionIds.concat(claimableActionIds);
-            us_actionIds = us_actionIds.concat(unstakeableActionIds);
+            us_actionIds = us_actionIds.concat(releasableActionIds);
           }),
       );
 
@@ -135,7 +135,7 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
         (item, index) => index === us_actionIds.findIndex((o) => o === item),
       );
 
-      return { unstakeableActionIds: us_actionIds, claimableActionIds: cl_actionIds };
+      return { releasableActionIds: us_actionIds, claimableActionIds: cl_actionIds };
     },
     [fetchInfo],
   );
@@ -148,7 +148,8 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
 
       try {
         const rewardList = unclaimedRewards;
-        const hasUnclaimed = rewardList.length > 0 && (redBoxData?.UnclaimedStakingReward ?? 0) > 0;
+        const hasUnclaimed =
+          rewardList.length > 0 && (redBoxData?.UnretrievedAnchorDistribution ?? 0) > 0;
 
         if (hasUnclaimed) {
           const actionIds = await fetchActionIds(rewardList);
@@ -161,7 +162,7 @@ export const ApiDataProvider = ({ children }: ApiDataProviderProps) => {
             setApiData({
               ...initialApiData,
               ...redBoxData,
-              unstakeableActionIds: [],
+              releasableActionIds: [],
               claimableActionIds: [],
             });
             setError(null);

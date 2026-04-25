@@ -11,7 +11,7 @@ jest.mock('../../../../hooks/useApiQuery', () => ({
 jest.mock('../../../../components/tables/EthDonationTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
-    <div data-testid="donation-table">rows: {list.length}</div>
+    <div data-testid="contribution-table">rows: {list.length}</div>
   ),
 }));
 
@@ -36,7 +36,7 @@ describe('EthDonationByRoundPage', () => {
       isLoading: false,
     });
     render(<EthDonationByRoundPage round={1} />);
-    expect(screen.getByTestId('donation-table')).toHaveTextContent('rows: 1');
+    expect(screen.getByTestId('contribution-table')).toHaveTextContent('rows: 1');
   });
 
   it('shows error for negative round', () => {
@@ -48,7 +48,7 @@ describe('EthDonationByRoundPage', () => {
   it('does not render table for negative round', () => {
     mockUseDonationsBothByRound.mockReturnValue({ data: [], isLoading: false });
     render(<EthDonationByRoundPage round={-1} />);
-    expect(screen.queryByTestId('donation-table')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('contribution-table')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

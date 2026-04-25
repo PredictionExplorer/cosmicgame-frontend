@@ -30,7 +30,7 @@ describe('UniqueEthDonorsTable', () => {
     expect(screen.getAllByText('Total Contributed Amount (ETH)').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders donor data', () => {
+  it('renders contributor data', () => {
     render(<UniqueEthDonorsTable list={[createDonor()]} />);
     expect(screen.getByText('5')).toBeInTheDocument();
     expect(screen.getByText('1.23')).toBeInTheDocument();

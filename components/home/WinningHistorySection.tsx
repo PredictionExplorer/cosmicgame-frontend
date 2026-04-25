@@ -3,8 +3,8 @@ import 'yet-another-react-lightbox/styles.css';
 
 import { getAssetsUrl } from '@/utils';
 
-import WinningHistoryTable from '@/components/tables/WinningHistoryTable';
-import type { WinningHistoryEntry } from '@/components/tables/WinningHistoryTable';
+import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
+import type { WinningHistoryEntry } from '@/components/tables/RecipientHistoryTable';
 import TwitterShareButton from '@/components/common/TwitterShareButton';
 import TwitterPopup from '@/components/common/TwitterPopup';
 
@@ -43,7 +43,7 @@ export function WinningHistorySection({
           {claimHistory === null ? (
             <p className="text-lg font-medium text-foreground">Loading...</p>
           ) : (
-            <WinningHistoryTable winningHistory={claimHistory} />
+            <RecipientHistoryTable winningHistory={claimHistory} />
           )}
         </div>
         <div className="my-[100px]">

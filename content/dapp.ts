@@ -10,9 +10,9 @@
  * Vocabulary rules (see /marketing/cosmic-lexicon.md):
  *   bid        -> Gesture (primary) / Entry (neutral)
  *   prize      -> Allocation / Signature Allocation
- *   raffle     -> Stellar Selection
+ *   stellarSelection     -> Stellar Selection
  *   winner     -> Recipient
- *   staking    -> Anchoring
+ *   anchoring    -> Anchoring
  *   yield      -> Anchor Distribution
  *   charity    -> Public Goods Beneficiary
  *   DAO        -> Cosmic Council

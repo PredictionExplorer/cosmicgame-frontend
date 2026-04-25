@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ImageOff } from 'lucide-react';
 
-import DonatedNFT from '@/components/donations/DonatedNFT';
+import AttachedNFT from '@/components/attachments/AttachedNFT';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { SectionDivider } from '@/components/ui/section-divider';
 
@@ -25,7 +25,7 @@ export function DonatedNFTsGrid({ nftDonations }: DonatedNFTsGridProps) {
             {nftDonations
               .slice((currentNFTPage - 1) * ITEMS_PER_PAGE, currentNFTPage * ITEMS_PER_PAGE)
               .map((nft) => (
-                <DonatedNFT key={nft.RecordId} nft={nft} />
+                <AttachedNFT key={nft.RecordId} nft={nft} />
               ))}
           </div>
           <CustomPagination

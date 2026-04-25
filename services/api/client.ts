@@ -37,7 +37,9 @@ axios.interceptors.response.use(
     ) {
       const cfg = error.config;
       const built = cfg?.url ?? '';
-      const fullUrl = cfg?.baseURL ? `${cfg.baseURL.replace(/\/$/, '')}/${(cfg.url ?? '').replace(/^\//, '')}` : built;
+      const fullUrl = cfg?.baseURL
+        ? `${cfg.baseURL.replace(/\/$/, '')}/${(cfg.url ?? '').replace(/^\//, '')}`
+        : built;
       console.error(
         '[Cosmic API] Network error (no response). Request URL:',
         fullUrl || built || '(unknown)',
@@ -115,7 +117,7 @@ export const flattenTxArray = <T>(items: unknown): T[] => {
   return items.map((item) => flattenTx(item)) as T[];
 };
 
-/** Flattens a raw round response into a single {@link RoundInfo} by extracting nested prize, charity, staking, and tx fields. */
+/** Flattens a raw round response into a single {@link RoundInfo} by extracting nested allocation, charity, anchoring, and tx fields. */
 export const flattenRoundInfo = (roundInfo: unknown) => {
   if (!roundInfo || typeof roundInfo !== 'object') return null;
   const round = roundInfo as Record<string, unknown>;

@@ -37,7 +37,7 @@ interface RWLKRowProps {
 const RWLKRow = ({ tokenId, ownerAddress, onSelectToggle, isSelected, onStake }: RWLKRowProps) => {
   const handleRowClick = () => onSelectToggle(tokenId);
 
-  const handleStakeClick = (e: MouseEvent) => {
+  const handleAnchorClick = (e: MouseEvent) => {
     e.stopPropagation();
     onStake(tokenId);
   };
@@ -60,7 +60,7 @@ const RWLKRow = ({ tokenId, ownerAddress, onSelectToggle, isSelected, onStake }:
       <TablePrimaryCell align="center">{tokenId}</TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <Button size="sm" onClick={handleStakeClick}>
+        <Button size="sm" onClick={handleAnchorClick}>
           Stake
         </Button>
       </TablePrimaryCell>
@@ -127,11 +127,11 @@ export const RWLKNFTTable = ({
     setSelectedTokenIds([]);
   };
 
-  const handleSingleStake = async (tokenId: number) => {
+  const handleSingleAnchor = async (tokenId: number) => {
     await handleStake(tokenId, true);
   };
 
-  const handleManyStake = async () => {
+  const handleManyAnchor = async () => {
     await handleStakeMany(selectedTokenIds, Array(selectedTokenIds.length).fill(true));
   };
 
@@ -194,7 +194,7 @@ export const RWLKNFTTable = ({
                 ownerAddress={ownerAddress}
                 onSelectToggle={handleSelectToggle}
                 isSelected={isSelected(tokenId)}
-                onStake={handleSingleStake}
+                onStake={handleSingleAnchor}
               />
             ))}
           </tbody>
@@ -203,7 +203,7 @@ export const RWLKNFTTable = ({
 
       {selectedTokenIds.length > 1 && (
         <div className="flex justify-end mt-4">
-          <Button variant="text" onClick={handleManyStake}>
+          <Button variant="text" onClick={handleManyAnchor}>
             Stake Many
           </Button>
         </div>

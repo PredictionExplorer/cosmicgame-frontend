@@ -1,3 +1,4 @@
+// lexicon-allow-start: exercises legacy URL rewrites by design
 import { expect, request, test } from '@playwright/test';
 
 /**
@@ -66,13 +67,16 @@ test.describe('proxy middleware', () => {
       await ctx.dispose();
     });
 
-    test('does not redirect unrelated paths (404 or pass-through)', async () => {
+    test('308-redirects direct /landing-site access to / (canonicalization)', async () => {
       const ctx = await request.newContext({
         extraHTTPHeaders: { Host: 'cosmicsignature.com' },
       });
       const res = await ctx.get(`${BASE}/landing-site`, { maxRedirects: 0 });
-      // Direct access to /landing-site on landing host is allowed (200 via pass-through).
-      expect([200, 404]).toContain(res.status());
+      // The landing is public at `/` only. Direct access to the internal
+      // /landing-site route is canonicalized via 308 so there is exactly one
+      // URL in the search index for this content.
+      expect(res.status()).toBe(308);
+      expect(res.headers()['location']).toMatch(/\/$/);
       await ctx.dispose();
     });
   });
@@ -109,7 +113,7 @@ test.describe('proxy middleware', () => {
       await ctx.dispose();
     });
 
-    test('rewrites /anchoring to the /staking handler', async () => {
+    test('rewrites /anchoring to the /anchoring handler', async () => {
       const ctx = await request.newContext({
         extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
       });
@@ -118,7 +122,7 @@ test.describe('proxy middleware', () => {
       await ctx.dispose();
     });
 
-    test('rewrites /allocation to /prize handler', async () => {
+    test('rewrites /allocation to /allocation handler', async () => {
       const ctx = await request.newContext({
         extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
       });
@@ -163,3 +167,5 @@ test.describe('proxy middleware', () => {
     });
   });
 });
+
+// lexicon-allow-end

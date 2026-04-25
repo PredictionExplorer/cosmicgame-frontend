@@ -209,7 +209,7 @@ describe('NFTTrait', () => {
     expect(screen.getByTestId('token-badges')).toBeInTheDocument();
   });
 
-  it('renders staking eligible badge when not staked', () => {
+  it('renders anchoring eligible badge when not anchored', () => {
     withDashboard();
     withNft({ Staked: false, WasUnstaked: false });
     render(<NFTTrait tokenId={5} />);
@@ -223,7 +223,7 @@ describe('NFTTrait', () => {
     expect(screen.getByText('Already Anchored')).toBeInTheDocument();
   });
 
-  it('renders prize type badge for Round Winner', () => {
+  it('renders allocation type badge for Round Recipient', () => {
     withDashboard();
     withNft({ RecordType: 3 });
     render(<NFTTrait tokenId={5} />);

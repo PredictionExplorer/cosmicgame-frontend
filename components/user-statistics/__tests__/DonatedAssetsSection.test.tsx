@@ -2,16 +2,16 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import { DonatedAssetsSection, type DonatedAssetsSectionProps } from '../DonatedAssetsSection';
 
-jest.mock('../../donations/DonatedNFTTable', () => ({
+jest.mock('../../attachments/AttachedNFTTable', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
-    <div data-testid="donated-nft-table">nfts: {list.length}</div>
+    <div data-testid="attached-nft-table">nfts: {list.length}</div>
   ),
 }));
-jest.mock('../../donations/DonatedERC20Table', () => ({
+jest.mock('../../attachments/AttachedERC20Table', () => ({
   __esModule: true,
   default: ({ list }: { list: unknown[] }) => (
-    <div data-testid="donated-erc20-table">tokens: {list.length}</div>
+    <div data-testid="attached-erc20-table">tokens: {list.length}</div>
   ),
 }));
 
@@ -49,12 +49,12 @@ describe('DonatedAssetsSection', () => {
     expect(screen.getAllByTestId('table-skeleton').length).toBeGreaterThan(0);
   });
 
-  it('shows empty state when no donated NFTs', () => {
+  it('shows empty state when no attached NFTs', () => {
     render(<DonatedAssetsSection {...defaultProps} />);
     expect(screen.getByText('No attached NFTs')).toBeInTheDocument();
   });
 
-  it('shows empty state when no donated ERC20 tokens', () => {
+  it('shows empty state when no attached ERC20 tokens', () => {
     render(<DonatedAssetsSection {...defaultProps} />);
     expect(screen.getByText('No attached tokens')).toBeInTheDocument();
   });
@@ -103,7 +103,7 @@ describe('DonatedAssetsSection', () => {
       RecordId: '1',
     } as unknown as DonatedAssetsSectionProps['unclaimedNFTs'][0];
     render(<DonatedAssetsSection {...defaultProps} unclaimedNFTs={[nft]} />);
-    expect(screen.getByTestId('donated-nft-table')).toHaveTextContent('nfts: 1');
+    expect(screen.getByTestId('attached-nft-table')).toHaveTextContent('nfts: 1');
   });
 
   it('has no accessibility violations', async () => {

@@ -217,19 +217,19 @@ describe('getRWLKImageUrl', () => {
 });
 
 describe('getEnduranceChampions', () => {
-  it('returns empty array for empty bid list', () => {
+  it('returns empty array for empty gesture list', () => {
     expect(getEnduranceChampions([])).toEqual([]);
   });
 
-  it('returns empty array for null bid list', () => {
+  it('returns empty array for null gesture list', () => {
     expect(
       getEnduranceChampions(null as unknown as Parameters<typeof getEnduranceChampions>[0]),
     ).toEqual([]);
   });
 
-  it('returns single champion for single bid with explicit roundEndTimeStamp', () => {
-    const bidList = [{ BidderAddr: '0x123', TimeStamp: 1000 }];
-    const result = getEnduranceChampions(bidList, 2000);
+  it('returns single champion for single gesture with explicit roundEndTimeStamp', () => {
+    const gestureList = [{ BidderAddr: '0x123', TimeStamp: 1000 }];
+    const result = getEnduranceChampions(gestureList, 2000);
     expect(result).toHaveLength(1);
     expect(result[0]).toMatchObject({
       participant: '0x123',
@@ -238,13 +238,13 @@ describe('getEnduranceChampions', () => {
     });
   });
 
-  it('returns champions for multiple bids with explicit roundEndTimeStamp', () => {
-    const bidList = [
+  it('returns champions for multiple gestures with explicit roundEndTimeStamp', () => {
+    const gestureList = [
       { BidderAddr: '0x1', TimeStamp: 100 },
       { BidderAddr: '0x2', TimeStamp: 200 },
       { BidderAddr: '0x3', TimeStamp: 500 },
     ];
-    const result = getEnduranceChampions(bidList, 600);
+    const result = getEnduranceChampions(gestureList, 600);
     expect(result.length).toBeGreaterThan(0);
     expect(
       result.every((c) => 'participant' in c && 'championTime' in c && 'chronoWarrior' in c),

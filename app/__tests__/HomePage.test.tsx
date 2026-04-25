@@ -5,7 +5,7 @@ import HomePage from '../HomePage';
 /* ── useApiQuery hooks ──────────────────────────────────────────── */
 
 const mockUseDashboardInfo = jest.fn().mockReturnValue({ data: undefined, isLoading: false });
-const mockUseBidListByRound = jest.fn().mockReturnValue({ data: undefined });
+const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsNFTByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsCGWithInfoByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: undefined });
@@ -17,7 +17,7 @@ const mockUseCSTInfo = jest.fn().mockReturnValue({ data: undefined });
 
 jest.mock('../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
-  useBidListByRound: (...args: unknown[]) => mockUseBidListByRound(...args),
+  useGestureListByCycle: (...args: unknown[]) => mockUseGestureListByCycle(...args),
   useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
   useDonationsCGWithInfoByRound: (...args: unknown[]) => mockUseDonationsCGWithInfoByRound(...args),
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
@@ -25,15 +25,15 @@ jest.mock('../../hooks/useApiQuery', () => ({
   useCSTInfo: (...args: unknown[]) => mockUseCSTInfo(...args),
 }));
 
-/* ── useBidForm ─────────────────────────────────────────────────── */
+/* ── useGestureForm ─────────────────────────────────────────────────── */
 
-const mockBidForm = {
-  bidType: 'ETH',
+const mockGestureForm = {
+  gestureType: 'ETH',
   setBidType: jest.fn(),
-  donationType: 'NFT',
-  setDonationType: jest.fn(),
-  cstBidData: { AuctionDuration: 3600, CSTPrice: 1, SecondsElapsed: 1800 },
-  ethBidInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
+  contributionType: 'NFT',
+  setContributionType: jest.fn(),
+  cstGestureData: { AuctionDuration: 3600, CSTPrice: 1, SecondsElapsed: 1800 },
+  ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
   message: '',
   setMessage: jest.fn(),
   nftDonateAddress: '',
@@ -46,40 +46,40 @@ const mockBidForm = {
   setTokenAmount: jest.fn(),
   rwlkId: -1,
   setRwlkId: jest.fn(),
-  bidPricePlus: 2,
+  gestureCostPlus: 2,
   setBidPricePlus: jest.fn(),
-  isBidding: false,
+  isGesturing: false,
   advancedExpanded: false,
   setAdvancedExpanded: jest.fn(),
   rwlknftIds: [],
-  onBid: jest.fn().mockResolvedValue(true),
-  onBidWithCST: jest.fn().mockResolvedValue(true),
+  onGesture: jest.fn().mockResolvedValue(true),
+  onGestureWithCST: jest.fn().mockResolvedValue(true),
 };
 
-jest.mock('../../hooks/useBidForm', () => ({
-  useBidForm: () => mockBidForm,
+jest.mock('../../hooks/useGestureForm', () => ({
+  useGestureForm: () => mockGestureForm,
 }));
 
-/* ── usePrizeClaim ──────────────────────────────────────────────── */
+/* ── useAllocationFinalize ──────────────────────────────────────────────── */
 
-const mockPrizeClaim = {
+const mockAllocationFinalize = {
   fetchActivationTime: jest.fn().mockResolvedValue(0),
-  prizeTime: Date.now() + 60_000,
-  timeoutClaimPrize: 600,
+  allocationTime: Date.now() + 60_000,
+  timeoutFinalize: 600,
   isClaiming: false,
   activationTime: 0,
   claimHistory: null,
-  onClaimPrize: jest.fn().mockResolvedValue(true),
+  onFinalize: jest.fn().mockResolvedValue(true),
 };
 
-jest.mock('../../hooks/usePrizeClaim', () => ({
-  usePrizeClaim: () => mockPrizeClaim,
+jest.mock('../../hooks/useAllocationFinalize', () => ({
+  useAllocationFinalize: () => mockAllocationFinalize,
 }));
 
-/* ── usePrizeNotification ───────────────────────────────────────── */
+/* ── useAllocationNotification ───────────────────────────────────────── */
 
-jest.mock('../../hooks/usePrizeNotification', () => ({
-  usePrizeNotification: () => ({
+jest.mock('../../hooks/useAllocationNotification', () => ({
+  useAllocationNotification: () => ({
     playAudio: jest.fn(),
     requestNotificationPermission: jest.fn(),
   }),
@@ -117,12 +117,12 @@ jest.mock('@tanstack/react-query', () => ({
 
 /* ── child components ───────────────────────────────────────────── */
 
-jest.mock('../../components/common/BiddingStatus', () => ({
-  BiddingStatus: () => <div data-testid="bidding-status">BiddingStatus</div>,
+jest.mock('../../components/common/GestureStatus', () => ({
+  GestureStatus: () => <div data-testid="gesture-status">GestureStatus</div>,
 }));
 
-jest.mock('../../components/home/BidForm', () => ({
-  BidForm: () => <div data-testid="bid-form">BidForm</div>,
+jest.mock('../../components/home/GestureForm', () => ({
+  GestureForm: () => <div data-testid="gesture-form">GestureForm</div>,
 }));
 
 jest.mock('../../components/home/RoundInfoSection', () => ({
@@ -145,8 +145,10 @@ jest.mock('../../components/nft/NFTImage', () => ({
   ),
 }));
 
-jest.mock('../../components/tables/SpecialPrizeWinners', () => ({
-  SpecialPrizeWinners: () => <div data-testid="special-prize-winners">SpecialPrizeWinners</div>,
+jest.mock('../../components/tables/SpecialAllocationRecipients', () => ({
+  SpecialAllocationRecipients: () => (
+    <div data-testid="special-allocation-recipients">SpecialAllocationRecipients</div>
+  ),
 }));
 
 jest.mock('../../utils', () => ({
@@ -169,7 +171,7 @@ const makeDashboardData = (overrides = {}) => ({
   CurRoundNum: 5,
   CurNumBids: 10,
   LastBidderAddr: '0xBidder',
-  BidPriceEth: 0.01,
+  GestureCostEth: 0.01,
   PrizeAmountEth: 1.5,
   PrizeClaimTs: Math.floor(Date.now() / 1000) + 3600,
   TsRoundStart: Math.floor(Date.now() / 1000) - 3600,
@@ -187,22 +189,22 @@ describe('HomePage', () => {
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
-  it('renders BiddingStatus component with data', () => {
+  it('renders GestureStatus component with data', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByTestId('bidding-status')).toBeInTheDocument();
+    expect(screen.getByTestId('gesture-status')).toBeInTheDocument();
   });
 
-  it('renders BidForm when user is active and not loading', () => {
+  it('renders GestureForm when user is active and not loading', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByTestId('bid-form')).toBeInTheDocument();
+    expect(screen.getByTestId('gesture-form')).toBeInTheDocument();
   });
 
   it('renders LatestNFTs section', () => {
@@ -250,29 +252,29 @@ describe('HomePage', () => {
     expect(screen.queryByText(/Cycle \d+ allocations/)).not.toBeInTheDocument();
   });
 
-  it('does not render BidForm when still loading', () => {
+  it('does not render GestureForm when still loading', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<HomePage />);
-    expect(screen.queryByTestId('bid-form')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
   });
 
-  it('does not render BidForm when account is null', () => {
+  it('does not render GestureForm when account is null', () => {
     mockAccount = null;
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.queryByTestId('bid-form')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
   });
 
-  it('renders SpecialPrizeWinners when TsRoundStart is nonzero', () => {
+  it('renders SpecialAllocationRecipients when TsRoundStart is nonzero', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ TsRoundStart: 1700000000 }),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.getByTestId('special-prize-winners')).toBeInTheDocument();
+    expect(screen.getByTestId('special-allocation-recipients')).toBeInTheDocument();
   });
 
   it('renders gesture button text', () => {
@@ -293,7 +295,7 @@ describe('HomePage', () => {
     });
     render(<HomePage />);
     const finalizeButton = screen.queryByText(/Finalize Cycle/);
-    expect(finalizeButton || screen.queryByTestId('bidding-status')).toBeTruthy();
+    expect(finalizeButton || screen.queryByTestId('gesture-status')).toBeTruthy();
   });
 
   it('renders previous cycle link with correct cycle number', () => {
@@ -307,11 +309,11 @@ describe('HomePage', () => {
     expect(link).toHaveAttribute('href', '/allocation/9');
   });
 
-  it('renders loading spinner and hides BidForm when loading', () => {
+  it('renders loading spinner and hides GestureForm when loading', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<HomePage />);
     expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(screen.queryByTestId('bid-form')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

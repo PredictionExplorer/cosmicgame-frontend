@@ -31,8 +31,8 @@ const baseProps: HeroStatsProps = {
   },
   balanceETH: 3.1415,
   balanceCST: 250.5,
-  raffleETHProbability: 0.25,
-  raffleNFTProbability: 0.1,
+  stellarSelectionETHProbability: 0.25,
+  stellarSelectionNFTProbability: 0.1,
 };
 
 describe('HeroStats', () => {
@@ -56,12 +56,12 @@ describe('HeroStats', () => {
     expect(screen.getByText('250.50 CST')).toBeInTheDocument();
   });
 
-  it('displays bid count', () => {
+  it('displays gesture count', () => {
     render(<HeroStats {...baseProps} />);
     expect(screen.getByText('42')).toBeInTheDocument();
   });
 
-  it('displays prizes won', () => {
+  it('displays allocations won', () => {
     render(<HeroStats {...baseProps} />);
     expect(screen.getByText('5')).toBeInTheDocument();
   });
@@ -72,7 +72,13 @@ describe('HeroStats', () => {
   });
 
   it('displays "--" when probabilities are negative', () => {
-    render(<HeroStats {...baseProps} raffleETHProbability={-1} raffleNFTProbability={-1} />);
+    render(
+      <HeroStats
+        {...baseProps}
+        stellarSelectionETHProbability={-1}
+        stellarSelectionNFTProbability={-1}
+      />,
+    );
     expect(screen.getByText('--')).toBeInTheDocument();
   });
 

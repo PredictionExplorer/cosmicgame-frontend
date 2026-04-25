@@ -5,11 +5,11 @@
  *
  * Vocabulary rules (see /marketing/cosmic-lexicon.md for canonical guide):
  * - "bid" is banned. Use "Gesture" or "Make a Gesture".
- * - "prize" is banned. Use "Allocation" or "Signature Allocation".
- * - "raffle" is banned. Use "Stellar Selection".
- * - "winner" is banned. Use "Recipient".
+ * - "allocation" is banned. Use "Allocation" or "Signature Allocation".
+ * - "stellarSelection" is banned. Use "Stellar Selection".
+ * - "recipient" is banned. Use "Recipient".
  * - "Dutch auction" is banned. Use "Calibration Window".
- * - "staking / stake / staker" are banned. Use "Anchoring / Anchor / Anchor-holder".
+ * - "anchoring / anchor / anchorHolder" are banned. Use "Anchoring / Anchor / Anchor-holder".
  * - "yield / rewards / passive" are banned. Use "Anchor Distribution".
  * - "charity / donation" are banned. Use "Public Goods Contribution".
  * - "DAO" is banned. Use "Cosmic Council" or "Protocol Coordination".
@@ -20,6 +20,8 @@
  * "contest", "tournament", "draw", "sweepstakes", "giveaway", "earn",
  * "earnings", "income".
  */
+
+import { APP_ORIGIN } from '@/lib/hostRouting';
 
 export const landingContent = {
   meta: {
@@ -45,7 +47,7 @@ export const landingContent = {
     headline: 'Every Gesture Shapes the Signature.',
     subhead:
       'A procedural on-chain art protocol on Arbitrum. Make a gesture during a Performance Cycle, and every gesture shapes the cycle\u2019s final Signature. When the cycle closes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including the infrastructure Ethereum itself depends on.',
-    primaryCta: { label: 'Open the App', href: 'https://app.cosmicsignature.com' },
+    primaryCta: { label: 'Open the App', href: APP_ORIGIN },
     secondaryCta: { label: 'Explore the Cycle', href: '#cycle' },
     marqueeChips: [
       'CC0',
@@ -215,7 +217,7 @@ export const landingContent = {
       'Random Walk anchors enter the Stellar Selection',
       'No lockup, no penalties, no fixed term',
     ],
-    cta: { label: 'Anchor in the App', href: 'https://app.cosmicsignature.com/anchoring' },
+    cta: { label: 'Anchor in the App', href: `${APP_ORIGIN}/anchoring` },
   },
 
   publicGoods: {
@@ -334,10 +336,10 @@ export const landingContent = {
       {
         heading: 'Protocol',
         links: [
-          { label: 'Open the App', href: 'https://app.cosmicsignature.com' },
-          { label: 'Documentation', href: 'https://app.cosmicsignature.com/how-it-works' },
-          { label: 'Contracts', href: 'https://app.cosmicsignature.com/contracts' },
-          { label: 'Source Code', href: 'https://app.cosmicsignature.com/code' },
+          { label: 'Open the App', href: APP_ORIGIN },
+          { label: 'Documentation', href: `${APP_ORIGIN}/how-it-works` },
+          { label: 'Contracts', href: `${APP_ORIGIN}/contracts` },
+          { label: 'Source Code', href: `${APP_ORIGIN}/code` },
         ],
       },
       {
@@ -352,8 +354,8 @@ export const landingContent = {
       {
         heading: 'Legal',
         links: [
-          { label: 'Terms', href: 'https://app.cosmicsignature.com/terms' },
-          { label: 'Privacy', href: 'https://app.cosmicsignature.com/privacy' },
+          { label: 'Terms', href: `${APP_ORIGIN}/terms` },
+          { label: 'Privacy', href: `${APP_ORIGIN}/privacy` },
           { label: 'FAQ', href: '#faq' },
         ],
       },

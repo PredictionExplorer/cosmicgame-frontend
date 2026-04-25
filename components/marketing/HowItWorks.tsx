@@ -66,7 +66,7 @@ export function HowItWorks() {
             </button>
           </TooltipTrigger>
           <TooltipContent className="max-w-xs">
-            Three simple steps to start earning marketing rewards with Cosmic Signature
+            Three simple steps to start receiving outreach distributions with Cosmic Signature
           </TooltipContent>
         </Tooltip>
       </div>

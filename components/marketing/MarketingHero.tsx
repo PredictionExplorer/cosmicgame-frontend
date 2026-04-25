@@ -31,7 +31,7 @@ export function MarketingHero() {
       </h1>
 
       <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-        Promote Cosmic Signature and earn CST token rewards for every verified marketing activity.
+        Promote Cosmic Signature and receive CST distributions for every verified outreach activity.
       </p>
 
       <div className="mt-10">

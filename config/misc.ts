@@ -6,50 +6,51 @@ export const ADMIN_EVENTS = [
     name: 'CharityPercentageChanged',
     type: 'percentage',
     description:
-      'The allocation percentage for the funds designated to the Charity wallet has been changed.',
+      'The allocation percentage for the funds designated to the Public Goods Vault has been changed.',
   },
   {
     name: 'PrizePercentageChanged',
     type: 'percentage',
     description:
-      'The allocation percentage for funds designated for prize rewards has been changed.',
+      'The allocation percentage for funds designated for allocation rewards has been changed.',
   },
   {
     name: 'RafflePercentageChanged',
     type: 'percentage',
     description:
-      'The allocation percentage for funds designated for raffle rewards has been changed.',
+      'The allocation percentage for funds designated for Stellar Selection distributions has been changed.',
   },
   {
     name: 'StakingPercentageChanged',
     type: 'percentage',
     description:
-      'The allocation percentage for funds designated for staking rewards has been changed.',
+      'The allocation percentage for funds designated for anchor distributions has been changed.',
   },
   {
     name: 'NumRaffleWinnersPerRoundChanged',
     type: 'number',
-    description: 'The number of raffle winners per round has been changed.',
+    description: 'The number of Stellar Selection recipients per cycle has been changed.',
   },
   {
     name: 'NumRaffleNFTWinnersPerRoundChanged',
     type: 'number',
-    description: 'The number of raffle NFT winners per round has been changed.',
+    description: 'The number of Stellar Selection NFT recipients per cycle has been changed.',
   },
   {
     name: 'DelayDurationBeforeRoundActivationChanged',
     type: 'time',
-    description: 'The delay duration time before round activation has been changed.',
+    description: 'The delay duration time before cycle activation has been changed.',
   },
   {
     name: 'NumRaffleNFTWinnersStakingRWalkChanged',
     type: 'number',
-    description: 'The number of raffle NFT winners for staking RandomWalk NFTs has been changed.',
+    description:
+      'The number of Stellar Selection NFT recipients for anchored RandomWalk NFTs has been changed.',
   },
   {
     name: 'CharityAddressChanged',
     type: 'address',
-    description: 'The address of the charity wallet has been changed.',
+    description: 'The address of the public goods vault has been changed.',
   },
   {
     name: 'RandomWalkAddressChanged',
@@ -59,22 +60,22 @@ export const ADMIN_EVENTS = [
   {
     name: 'PrizeWalletAddressChanged',
     type: 'address',
-    description: 'The address of the raffle wallet has been changed.',
+    description: 'The address of the stellar selection wallet has been changed.',
   },
   {
     name: 'StakingWalletAddressChanged',
     type: 'address',
-    description: 'The address of the staking wallet has been changed.',
+    description: 'The address of the anchoring wallet has been changed.',
   },
   {
     name: 'StakingWalletRWalkAddressChanged',
     type: 'address',
-    description: 'The address of the RandomWalk NFT staking wallet has been changed.',
+    description: 'The address of the RandomWalk NFT anchoring wallet has been changed.',
   },
   {
     name: 'MarketingWalletAddressChanged',
     type: 'address',
-    description: 'The address of the marketing wallet has been changed.',
+    description: 'The address of the outreach wallet has been changed.',
   },
   {
     name: 'CosmicTokenAddressChanged',
@@ -99,37 +100,38 @@ export const ADMIN_EVENTS = [
   {
     name: 'TimeoutClaimPrizeChanged',
     type: 'time',
-    description: 'The time out for claiming prize has been changed.',
+    description: 'The timeout for finalizing allocation has been changed.',
   },
   {
     name: 'PriceIncreaseChanged',
     type: 'number',
-    description: 'The ratio of the bid price increasement has been changed.',
+    description: 'The ratio of the gesture cost increasement has been changed.',
   },
   {
     name: 'NanoSecondsExtraChanged',
     type: 'time',
-    description: 'The value for the increment of prize time after every bid has been changed.',
+    description:
+      'The value for the increment of allocation time after every gesture has been changed.',
   },
   {
     name: 'InitialSecondsUntilPrizeChanged',
     type: 'time',
-    description: 'The initial value of the time until prize has been changed.',
+    description: 'The initial value of the time until allocation has been changed.',
   },
   {
     name: 'TreasurerAddressChanged',
     type: 'address',
-    description: 'The address of the marketing wallet has been changed.',
+    description: 'The address of the outreach wallet has been changed.',
   },
   {
     name: 'ActivationTimeChanged',
     type: 'timestamp',
-    description: 'The round activation time has been changed.',
+    description: 'The cycle activation time has been changed.',
   },
   {
     name: 'RoundStartCSTAuctionLengthChanged',
     type: 'number',
-    description: 'The length of the starting CST auction has been changed.',
+    description: 'The length of the starting CST Calibration Window has been changed.',
   },
   {
     name: 'Erc20RewardMultiplierChanged',
@@ -139,13 +141,13 @@ export const ADMIN_EVENTS = [
   {
     name: 'StartingBidPriceCSTMinLimitChanged',
     type: 'number',
-    description: 'The minimum limit for the starting bid price with CST has been changed.',
+    description: 'The minimum limit for the starting gesture cost with CST has been changed.',
   },
   {
     name: 'MarketingRewardChanged',
     type: 'percentage',
     description:
-      'The allocation percentage for funds designated for marketing rewards has been changed.',
+      'The allocation percentage for funds designated for outreach distributions has been changed.',
   },
   {
     name: 'TokenRewardChanged',
@@ -156,7 +158,7 @@ export const ADMIN_EVENTS = [
   {
     name: 'MaxMessageLengthChanged',
     type: 'number',
-    description: 'The max length of the bid message has been changed.',
+    description: 'The max length of the gesture message has been changed.',
   },
   {
     name: 'TokenGenerationScriptURLEvent',
@@ -181,22 +183,22 @@ export const ADMIN_EVENTS = [
   {
     name: 'TimeoutDurationToWithdrawPrizesChanged',
     type: 'time',
-    description: 'The timeout duration to withdraw prizes has been changed.',
+    description: 'The timeout duration to retrieve allocations has been changed.',
   },
   {
     name: 'EthDutchAuctionDurationDivisorChanged',
     type: 'number',
-    description: 'The Eth dutch auction duration has been changed.',
+    description: 'The ETH Calibration Window duration has been changed.',
   },
   {
     name: 'EthDutchAuctionEndingBidPriceDivisorChanged',
     type: 'number',
-    description: 'The divisor for Eth dutch auction ending bid price has been changed.',
+    description: 'The divisor for ETH Calibration Window ending gesture cost has been changed.',
   },
   {
     name: 'ChronoWarriorEthPrizeAmountPercentageChanged',
     type: 'number',
     description:
-      'The allocation percentage for funds designated for chrono warrior Eth prize rewards has been changed.',
+      'The allocation percentage for funds designated for chrono warrior ETH allocations has been changed.',
   },
 ];

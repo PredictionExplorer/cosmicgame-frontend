@@ -1,3 +1,5 @@
+<!-- lexicon-allow-start: internal marketing draft — needs lexicon rewrite before public use -->
+
 # Cosmic Signature Brand Identity Guide
 
 ## Brand Essence
@@ -354,3 +356,5 @@ For developers implementing the brand in code:
   --radius-full: 9999px;
 }
 ```
+
+<!-- lexicon-allow-end -->

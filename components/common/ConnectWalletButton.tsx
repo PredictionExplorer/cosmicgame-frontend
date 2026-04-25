@@ -31,7 +31,7 @@ interface Balance {
   RWLK: number;
 }
 
-interface StakedTokenCount {
+interface AnchoredTokenCount {
   cst: number;
   rwalk: number;
 }
@@ -40,7 +40,7 @@ interface ConnectWalletButtonProps {
   isMobileView: boolean;
   loading: boolean;
   balance: Balance;
-  stakedTokenCount: StakedTokenCount;
+  stakedTokenCount: AnchoredTokenCount;
   hasUnclaimedRewards?: boolean;
 }
 
@@ -137,7 +137,7 @@ const ConnectWalletButton = ({
                 className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
               >
                 <Layers className="h-3.5 w-3.5 text-muted-foreground" />
-                My Staking
+                My Anchors
               </NavLink>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer p-0">

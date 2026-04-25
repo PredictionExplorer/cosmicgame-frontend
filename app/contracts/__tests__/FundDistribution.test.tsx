@@ -25,7 +25,7 @@ jest.mock('framer-motion', () => ({
 const defaultProps = {
   prizePercentage: 25,
   chronoWarriorPercentage: 10,
-  rafflePercentage: 25,
+  stellarSelectionPercentage: 25,
   stakingPercentage: 30,
   charityPercentage: 10,
 };
@@ -64,7 +64,7 @@ describe('FundDistribution', () => {
       <FundDistribution
         prizePercentage={0}
         chronoWarriorPercentage={0}
-        rafflePercentage={0}
+        stellarSelectionPercentage={0}
         stakingPercentage={0}
         charityPercentage={0}
       />,

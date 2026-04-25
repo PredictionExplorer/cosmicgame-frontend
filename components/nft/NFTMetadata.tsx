@@ -66,12 +66,12 @@ function SeedBlock({ seed }: { seed?: string | number }) {
 }
 
 export function NFTMetadata({ nft }: NFTMetadataProps) {
-  const mintedRelative = nft?.TimeStamp ? getRelativeTime(nft.TimeStamp) : undefined;
-  const mintedAbsolute = nft?.TimeStamp ? convertTimestampToDateTime(nft.TimeStamp) : undefined;
-  const mintedDisplay =
-    mintedRelative && mintedAbsolute
-      ? `${mintedRelative} (${mintedAbsolute})`
-      : (mintedAbsolute ?? '—');
+  const imprintedRelative = nft?.TimeStamp ? getRelativeTime(nft.TimeStamp) : undefined;
+  const imprintedAbsolute = nft?.TimeStamp ? convertTimestampToDateTime(nft.TimeStamp) : undefined;
+  const imprintedDisplay =
+    imprintedRelative && imprintedAbsolute
+      ? `${imprintedRelative} (${imprintedAbsolute})`
+      : (imprintedAbsolute ?? '—');
 
   const roundDisplay =
     nft?.RoundNum != null ? (
@@ -85,7 +85,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
       '—'
     );
 
-  const winnerDisplay = nft?.WinnerAddr ? <AddressChip address={nft.WinnerAddr} /> : '—';
+  const recipientDisplay = nft?.WinnerAddr ? <AddressChip address={nft.WinnerAddr} /> : '—';
 
   const ownerDisplay = nft?.CurOwnerAddr ? <AddressChip address={nft.CurOwnerAddr} /> : '—';
 
@@ -102,7 +102,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
                 rel="noopener noreferrer"
                 className="text-inherit transition-colors no-underline print:!text-foreground hover:text-primary"
               >
-                {mintedDisplay}
+                {imprintedDisplay}
               </a>
             ) : (
               '—'
@@ -119,7 +119,7 @@ export function NFTMetadata({ nft }: NFTMetadataProps) {
         />
         <StatCard
           label="Recipient"
-          value={winnerDisplay}
+          value={recipientDisplay}
           icon={<Award className="h-4 w-4" />}
           tooltip="The address that originally received this token during the Performance Cycle."
         />

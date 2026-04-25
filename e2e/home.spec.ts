@@ -30,28 +30,30 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('shows gesture cost', async ({ page }) => {
-    const bidPrice = page.locator('text=/Bid Price/i').first();
-    await ensureVisible(bidPrice);
-    await expect(bidPrice).toBeVisible({ timeout: 15000 });
+    const gestureCost = page.locator('text=/gesture cost/i').first();
+    await ensureVisible(gestureCost);
+    await expect(gestureCost).toBeVisible({ timeout: 15000 });
     await expect(page.locator('text=/ETH/').first()).toBeVisible();
   });
 
   test('shows main allocation reward', async ({ page }) => {
-    const mainPrize = page.locator('text=/Main Prize Reward/');
-    await ensureVisible(mainPrize);
-    await expect(mainPrize).toBeVisible();
+    const signatureAllocation = page.locator('text=/signature allocation Reward/');
+    await ensureVisible(signatureAllocation);
+    await expect(signatureAllocation).toBeVisible();
   });
 
   test('shows last gesture address', async ({ page }) => {
-    const lastBidder = page.locator('text=/Last Bidder Address/');
-    await ensureVisible(lastBidder);
-    await expect(lastBidder).toBeVisible();
+    const lastParticipant = page.locator('text=/Last Participant Address/');
+    await ensureVisible(lastParticipant);
+    await expect(lastParticipant).toBeVisible();
   });
 
   test('shows special allocation recipients section', async ({ page }) => {
-    const specialPrizes = page.locator('text=/Potential winners of Special Prizes/').first();
-    await ensureVisible(specialPrizes);
-    await expect(specialPrizes).toBeVisible({ timeout: 15000 });
+    const specialAllocations = page
+      .locator('text=/Potential recipients of Special Allocations/')
+      .first();
+    await ensureVisible(specialAllocations);
+    await expect(specialAllocations).toBeVisible({ timeout: 15000 });
     const championLabel = page.locator('text=/Endurance Champion/').first();
     await ensureVisible(championLabel);
     await expect(championLabel).toBeVisible();

@@ -83,6 +83,7 @@ describe('sitemap (host-aware)', () => {
       expect(urls).toContain('https://app.cosmicsignature.com/public-goods-retrievals');
 
       // Legacy (pre-migration) paths are absent.
+      // lexicon-allow-start: legacy URL paths must literally appear here to verify they're absent from the sitemap
       const legacyPaths = [
         '/current-round',
         '/staking',
@@ -97,6 +98,7 @@ describe('sitemap (host-aware)', () => {
         '/charity-deposits-voluntary',
         '/charity-withdrawals',
       ];
+      // lexicon-allow-end
       for (const legacy of legacyPaths) {
         expect(urls).not.toContain(`https://app.cosmicsignature.com${legacy}`);
       }

@@ -1,3 +1,5 @@
+// lexicon-allow-start: service test fixtures mirror the backend-sealed API surface
+
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -7,10 +9,10 @@ const SERVICE_FILES = [
   'client.ts',
   'rounds.ts',
   'tokens.ts',
-  'staking.ts',
+  'anchoring.ts',
   'donations.ts',
   'users.ts',
-  'raffle.ts',
+  'stellarSelection.ts',
   'marketing.ts',
   'system.ts',
 ] as const;
@@ -59,10 +61,10 @@ const EXPECTED_COUNTS: Record<string, number> = {
   'client.ts': 12,
   'rounds.ts': 17,
   'tokens.ts': 15,
-  'staking.ts': 21,
+  'anchoring.ts': 21,
   'donations.ts': 22,
   'users.ts': 9,
-  'raffle.ts': 6,
+  'stellarSelection.ts': 6,
   'marketing.ts': 2,
   'system.ts': 3,
 };
@@ -116,3 +118,5 @@ describe('API service JSDoc coverage', () => {
     }
   });
 });
+
+// lexicon-allow-end

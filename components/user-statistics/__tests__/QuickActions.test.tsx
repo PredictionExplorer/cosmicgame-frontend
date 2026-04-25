@@ -60,10 +60,10 @@ describe('QuickActions', () => {
     expect(transferLink).toHaveAttribute('href', `/cosmic-signature-transfer/${address}`);
   });
 
-  it('links to correct raffle history page with address', () => {
+  it('links to correct stellar-selection history page with address', () => {
     render(<QuickActions address={address} />);
-    const raffleLink = screen.getByText('Stellar Selection History').closest('a');
-    expect(raffleLink).toHaveAttribute('href', `/user/stellar-selection-eth/${address}`);
+    const stellarSelectionLink = screen.getByText('Stellar Selection History').closest('a');
+    expect(stellarSelectionLink).toHaveAttribute('href', `/user/stellar-selection-eth/${address}`);
   });
 
   it('has no accessibility violations', async () => {

@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import { ZERO_ADDRESS } from '@/config/misc';
-import { STAKING_WALLET_CST_ADDRESS, STAKING_WALLET_RWLK_ADDRESS } from '@/config/networks';
+import { ANCHORING_WALLET_CST_ADDRESS, ANCHORING_WALLET_RWLK_ADDRESS } from '@/config/networks';
 import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
 
 import { checkA11y, render, screen } from '@/test-utils';
@@ -50,16 +50,16 @@ describe('TransferHistoryTable', () => {
     expect(datetimes).toHaveLength(1);
   });
 
-  it('shows "StakingWallet CST" label for CST staking address', () => {
+  it('shows "StakingWallet CST" label for CST anchoring address', () => {
     render(
-      <TransferHistoryTable list={[createRecord({ FromAddr: STAKING_WALLET_CST_ADDRESS })]} />,
+      <TransferHistoryTable list={[createRecord({ FromAddr: ANCHORING_WALLET_CST_ADDRESS })]} />,
     );
     expect(screen.getByText('StakingWallet CST')).toBeInTheDocument();
   });
 
-  it('shows "StakingWallet RandomWalk" label for RWLK staking address', () => {
+  it('shows "StakingWallet RandomWalk" label for RWLK anchoring address', () => {
     render(
-      <TransferHistoryTable list={[createRecord({ FromAddr: STAKING_WALLET_RWLK_ADDRESS })]} />,
+      <TransferHistoryTable list={[createRecord({ FromAddr: ANCHORING_WALLET_RWLK_ADDRESS })]} />,
     );
     expect(screen.getByText('StakingWallet RandomWalk')).toBeInTheDocument();
   });

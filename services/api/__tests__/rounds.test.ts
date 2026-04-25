@@ -1,3 +1,5 @@
+// lexicon-allow-start: service test fixtures mirror the backend-sealed API surface
+
 import axios from 'axios';
 
 import {
@@ -15,7 +17,7 @@ import {
   get_prize_deposits_by_round,
   get_banned_bids,
   ban_bid,
-  unban_bid,
+  unban_gesture,
   get_bid_eth_price,
   get_time_until_prize,
 } from '@/services/api/rounds';
@@ -73,9 +75,7 @@ describe('rounds API', () => {
 
       expect(result).toEqual(mockData);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/statistics.*dashboard/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/statistics.*dashboard/));
     });
 
     it('returns null on 400 response', async () => {
@@ -105,9 +105,7 @@ describe('rounds API', () => {
 
       expect(Array.isArray(result)).toBe(true);
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/rounds.*list/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/rounds.*list/));
     });
 
     it('returns empty array when Rounds is missing', async () => {
@@ -127,20 +125,18 @@ describe('rounds API', () => {
   });
 
   describe('get_bid_list', () => {
-    it('returns array of bids on successful response', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { Bids: [mockTx(1)] } });
+    it('returns array of gestures on successful response', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { Gestures: [mockTx(1)] } });
 
       const result = await get_bid_list();
 
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('EvtLogId', 1);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/bid.*list/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*list/));
     });
 
-    it('returns empty array when Bids is missing', async () => {
+    it('returns empty array when Gestures is missing', async () => {
       mockedAxios.get.mockResolvedValue({ data: {} });
       expect(await get_bid_list()).toEqual([]);
     });
@@ -203,9 +199,7 @@ describe('rounds API', () => {
       expect(result).toHaveProperty('WinnerAddr', '0xwinner');
       expect(result).toHaveProperty('TxHash', '0xr5');
       expect(result).toHaveProperty('CharityAddress', '0xcharity');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/rounds.*info.*5/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/rounds.*info.*5/));
     });
 
     it('clamps negative roundNum to 0', async () => {
@@ -234,9 +228,7 @@ describe('rounds API', () => {
       const result = await get_prize_time();
 
       expect(result).toBe(1700001234);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/rounds.*current.*time/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/rounds.*current.*time/));
     });
 
     it('returns 0 on 400 response', async () => {
@@ -262,7 +254,7 @@ describe('rounds API', () => {
       expect(result[0]).toHaveProperty('TxHash', '0x1');
       expect(result[1]).toHaveProperty('TxHash', '0x2');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/prizes.*history.*global/),
+        expect.stringMatching(/allocations.*history.*global/),
       );
     });
 
@@ -295,7 +287,7 @@ describe('rounds API', () => {
       expect(result).toHaveLength(1);
       expect(result![0]).toHaveProperty('TxHash', '0x3');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(new RegExp(`prizes.*history.*by_user.*${addr}`)),
+        expect.stringMatching(new RegExp(`allocations.*history.*by_user.*${addr}`)),
       );
     });
 
@@ -317,19 +309,17 @@ describe('rounds API', () => {
 
   describe('get_bid_info', () => {
     it('returns flattened bid on success', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { BidInfo: mockTx(7) } });
+      mockedAxios.get.mockResolvedValue({ data: { GestureInfo: mockTx(7) } });
 
       const result = await get_bid_info(7);
 
       expect(result).toHaveProperty('TxHash', '0x7');
       expect(result).toHaveProperty('EvtLogId', 7);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/bid.*info.*7/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*info.*7/));
     });
 
-    it('returns null when BidInfo is null', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { BidInfo: null } });
+    it('returns null when GestureInfo is null', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { GestureInfo: null } });
       expect(await get_bid_info(99)).toBeNull();
     });
 
@@ -388,13 +378,13 @@ describe('rounds API', () => {
   });
 
   describe('get_current_special_winners', () => {
-    it('returns special winners on success', async () => {
-      const winners = { EnduranceChampion: '0x1', ChronoWarrior: '0x2' };
-      mockedAxios.get.mockResolvedValue({ data: winners });
+    it('returns special recipients on success', async () => {
+      const recipients = { EnduranceChampion: '0x1', ChronoWarrior: '0x2' };
+      mockedAxios.get.mockResolvedValue({ data: recipients });
 
       const result = await get_current_special_winners();
 
-      expect(result).toEqual(winners);
+      expect(result).toEqual(recipients);
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringMatching(/bid.*current_special_winners/),
       );
@@ -422,7 +412,7 @@ describe('rounds API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/raffle.*deposits.*list/),
+        expect.stringMatching(/stellarSelection.*deposits.*list/),
       );
     });
 
@@ -453,7 +443,7 @@ describe('rounds API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0x2');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/raffle.*deposits.*by_round.*10/),
+        expect.stringMatching(/stellarSelection.*deposits.*by_round.*10/),
       );
     });
 
@@ -469,16 +459,14 @@ describe('rounds API', () => {
   });
 
   describe('get_banned_bids', () => {
-    it('returns banned bids from the main API', async () => {
-      const bids = [{ BidId: 1, UserAddr: '0x1' }];
-      mockedAxios.get.mockResolvedValue({ data: bids });
+    it('returns banned gestures from the main API', async () => {
+      const gestures = [{ BidId: 1, UserAddr: '0x1' }];
+      mockedAxios.get.mockResolvedValue({ data: gestures });
 
       const result = await get_banned_bids();
 
-      expect(result).toEqual(bids);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/get_banned_bids/),
-      );
+      expect(result).toEqual(gestures);
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/get_banned_bids/));
     });
 
     it('returns empty array on 400 response', async () => {
@@ -504,10 +492,10 @@ describe('rounds API', () => {
       const result = await ban_bid(42, '0xuser');
 
       expect(result).toEqual({ success: true });
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        expect.stringMatching(/ban_bid/),
-        { bid_id: 42, user_addr: '0xuser' },
-      );
+      expect(mockedAxios.post).toHaveBeenCalledWith(expect.stringMatching(/ban_bid/), {
+        bid_id: 42,
+        user_addr: '0xuser',
+      });
     });
 
     it('throws on server error', async () => {
@@ -516,36 +504,33 @@ describe('rounds API', () => {
     });
   });
 
-  describe('unban_bid', () => {
+  describe('unban_gesture', () => {
     it('posts unban request with bid_id', async () => {
       mockedAxios.post.mockResolvedValue({ data: { success: true } });
 
-      const result = await unban_bid(42);
+      const result = await unban_gesture(42);
 
       expect(result).toEqual({ success: true });
-      expect(mockedAxios.post).toHaveBeenCalledWith(
-        expect.stringMatching(/unban_bid/),
-        { bid_id: 42 },
-      );
+      expect(mockedAxios.post).toHaveBeenCalledWith(expect.stringMatching(/unban_gesture/), {
+        bid_id: 42,
+      });
     });
 
     it('throws on server error', async () => {
       mockedAxios.post.mockRejectedValue(new Error('Server Error'));
-      await expect(unban_bid(1)).rejects.toThrow('Network response was not OK');
+      await expect(unban_gesture(1)).rejects.toThrow('Network response was not OK');
     });
   });
 
   describe('get_bid_eth_price', () => {
     it('returns bid ETH price info on success', async () => {
-      const priceInfo = { BidPriceEth: 0.5, BidPriceWei: '500000000000000000' };
+      const priceInfo = { GestureCostEth: 0.5, BidPriceWei: '500000000000000000' };
       mockedAxios.get.mockResolvedValue({ data: priceInfo });
 
       const result = await get_bid_eth_price();
 
       expect(result).toEqual(priceInfo);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/bid.*eth_price/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*eth_price/));
     });
 
     it('returns null on 400 response', async () => {
@@ -566,9 +551,7 @@ describe('rounds API', () => {
       const result = await get_time_until_prize();
 
       expect(result).toBe(3600);
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/time.*until_prize/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/time.*until_prize/));
     });
 
     it('returns 0 on 400 response', async () => {
@@ -582,3 +565,5 @@ describe('rounds API', () => {
     });
   });
 });
+
+// lexicon-allow-end

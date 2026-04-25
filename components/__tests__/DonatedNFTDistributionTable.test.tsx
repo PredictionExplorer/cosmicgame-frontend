@@ -1,11 +1,11 @@
-import DonatedNFTDistributionTable from '@/components/donations/DonatedNFTDistributionTable';
+import AttachedNFTDistributionTable from '@/components/attachments/AttachedNFTDistributionTable';
 
 import { render, screen, checkA11y } from '@/test-utils';
 import '@testing-library/jest-dom';
 
-describe('DonatedNFTDistributionTable', () => {
+describe('AttachedNFTDistributionTable', () => {
   test('with no records', () => {
-    render(<DonatedNFTDistributionTable list={[]} />);
+    render(<AttachedNFTDistributionTable list={[]} />);
     expect(screen.getByText('No attached tokens yet.')).toBeInTheDocument();
   });
 
@@ -20,13 +20,13 @@ describe('DonatedNFTDistributionTable', () => {
         NumDonations: 6,
       },
     ];
-    render(<DonatedNFTDistributionTable list={mockData} />);
+    render(<AttachedNFTDistributionTable list={mockData} />);
     expect(screen.getByText(mockData[0]!.TokenAddr)).toBeInTheDocument();
     expect(screen.getByText(mockData[0]!.NumDonations)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<DonatedNFTDistributionTable list={[]} />);
+    const { container } = render(<AttachedNFTDistributionTable list={[]} />);
     await checkA11y(container);
   });
 });

@@ -29,6 +29,9 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 
   // On the landing host, disallow dApp paths. Everything dApp-related lives on
   // app.cosmicsignature.com and the proxy redirects there. Cosmic-lexicon-only.
+  // `/landing-site` is the internal Next route that renders at `/`; it is
+  // 308-redirected to `/` by the proxy but we disallow it here too so crawlers
+  // never try to index the internal path in the first place.
   const landingDisallow = [
     '/admin/',
     '/allocation',
@@ -41,13 +44,14 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     '/eth-contribution',
     '/gallery/',
     '/gesture/',
+    '/landing-site',
     '/my-',
     '/public-goods-',
     '/recipient-history',
     '/statistics',
   ];
 
-  const appDisallow = ['/admin/', '/api/'];
+  const appDisallow = ['/admin/', '/api/', '/landing-site'];
 
   const disallow = onAppHost ? appDisallow : landingDisallow;
 

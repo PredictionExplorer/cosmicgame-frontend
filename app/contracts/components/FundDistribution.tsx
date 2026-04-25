@@ -17,32 +17,32 @@ interface FundSegment {
 interface FundDistributionProps {
   prizePercentage?: number;
   chronoWarriorPercentage?: number;
-  rafflePercentage?: number;
+  stellarSelectionPercentage?: number;
   stakingPercentage?: number;
   charityPercentage?: number;
   loading?: boolean;
 }
 
 const SEGMENT_COLORS = {
-  prize: 'bg-[#35C9FF]',
+  allocation: 'bg-[#35C9FF]',
   chrono: 'bg-[#AC56FF]',
-  raffle: 'bg-[#F59E0B]',
-  staking: 'bg-[#10B981]',
+  stellarSelection: 'bg-[#F59E0B]',
+  anchoring: 'bg-[#10B981]',
   charity: 'bg-[#F472B6]',
 } as const;
 
 const DOT_COLORS = {
-  prize: 'bg-[#35C9FF]',
+  allocation: 'bg-[#35C9FF]',
   chrono: 'bg-[#AC56FF]',
-  raffle: 'bg-[#F59E0B]',
-  staking: 'bg-[#10B981]',
+  stellarSelection: 'bg-[#F59E0B]',
+  anchoring: 'bg-[#10B981]',
   charity: 'bg-[#F472B6]',
 } as const;
 
 export function FundDistribution({
   prizePercentage,
   chronoWarriorPercentage,
-  rafflePercentage,
+  stellarSelectionPercentage,
   stakingPercentage,
   charityPercentage,
   loading = false,
@@ -69,7 +69,7 @@ export function FundDistribution({
     {
       label: 'Signature Allocation',
       value: prizePercentage ?? 0,
-      color: SEGMENT_COLORS.prize,
+      color: SEGMENT_COLORS.allocation,
       tooltip:
         'Percentage of the Cycle Reserve retrieved by the participant who made the Final Gesture',
     },
@@ -82,14 +82,14 @@ export function FundDistribution({
     },
     {
       label: 'Stellar Selection',
-      value: rafflePercentage ?? 0,
-      color: SEGMENT_COLORS.raffle,
+      value: stellarSelectionPercentage ?? 0,
+      color: SEGMENT_COLORS.stellarSelection,
       tooltip: 'Portion distributed to randomly selected participants when the cycle finalizes',
     },
     {
       label: 'Anchor Distribution',
       value: stakingPercentage ?? 0,
-      color: SEGMENT_COLORS.staking,
+      color: SEGMENT_COLORS.anchoring,
       tooltip: 'Distributions to anchor-holders proportional to their anchored token count',
     },
     {
