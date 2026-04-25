@@ -50,6 +50,7 @@ export const landingContent = {
     primaryCta: { label: 'Open the App', href: APP_ORIGIN },
     secondaryCta: { label: 'Explore the Cycle', href: '#cycle' },
     marqueeChips: [
+      'Audited Contracts',
       'CC0',
       'Formally Verified',
       'Deterministic Art',
@@ -256,15 +257,15 @@ export const landingContent = {
   verifiability: {
     eyebrow: 'Verifiability',
     heading: 'Open, verified, reproducible.',
-    body: 'Anyone can verify a Signature by regenerating it from its seed. Contracts are formally verified with Certora. The whole repository is CC0 \u2014 no rights reserved, fork and remix encouraged.',
+    body: 'Anyone can verify a Signature by regenerating it from its seed. All contracts have been audited and are formally verified with Certora. The whole repository is CC0 \u2014 no rights reserved, fork and remix encouraged.',
     pillars: [
       {
         title: 'CC0 1.0',
         body: 'Every contract, every shader, every rendering pipeline. No rights reserved. Public domain.',
       },
       {
-        title: 'Formally Verified',
-        body: 'Certora formal verification on all core contract invariants. Slither static analysis in CI.',
+        title: 'Audited & Formally Verified',
+        body: 'All contracts have been audited prior to deployment. Certora formal verification on core contract invariants and Slither static analysis run in CI.',
       },
       {
         title: 'Reproducible Art',

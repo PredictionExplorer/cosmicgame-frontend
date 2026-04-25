@@ -10,6 +10,7 @@ import { landingContent } from '@/content/landing';
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
 
 import { GradientText } from './GradientText';
+import { LaunchCountdown } from './LaunchCountdown';
 
 const HeroCanvas = dynamic(
   () => import('@/components/three/HeroCanvas').then((m) => m.HeroCanvas),
@@ -56,7 +57,16 @@ export function Hero() {
             {hero.subhead}
           </p>
 
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-10"
+          >
+            <LaunchCountdown />
+          </motion.div>
+
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
             <Link
               href={hero.primaryCta.href}
               className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-base font-semibold text-[#0D0521] transition hover:bg-[oklch(84.7%_0.149_213)] hover:text-[#0D0521] glow-aurora"

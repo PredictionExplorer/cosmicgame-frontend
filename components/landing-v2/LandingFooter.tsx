@@ -13,7 +13,7 @@ export function LandingFooter() {
         <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr] lg:gap-16">
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
-              <Image src="/logo.svg" alt="Cosmic Signature" width={36} height={36} />
+              <Image src="/images/logo.svg" alt="Cosmic Signature" width={36} height={36} />
               <span
                 className="text-xl font-semibold text-white"
                 style={{ fontFamily: 'var(--font-family-display)' }}
