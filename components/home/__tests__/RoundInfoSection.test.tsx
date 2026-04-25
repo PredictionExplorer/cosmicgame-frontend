@@ -174,7 +174,7 @@ describe('RoundInfoSection', () => {
     };
     render(<RoundInfoSection {...propsWithDonations} />);
 
-    expect(screen.getByText('Fund Distribution')).toBeInTheDocument();
+    expect(screen.getByText('Allocation Tracks')).toBeInTheDocument();
     expect(screen.getByText('Stellar Selection Entries')).toBeInTheDocument();
     expect(screen.getByText('Top ETH Spenders')).toBeInTheDocument();
     expect(screen.getByText('Endurance Champions')).toBeInTheDocument();

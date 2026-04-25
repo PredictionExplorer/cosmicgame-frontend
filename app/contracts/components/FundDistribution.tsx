@@ -106,7 +106,7 @@ export function FundDistribution({
     <Card>
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-lg font-semibold">Fund Distribution</CardTitle>
+          <CardTitle className="text-lg font-semibold">Allocation Tracks</CardTitle>
           <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
         </div>
       </CardHeader>
@@ -114,7 +114,7 @@ export function FundDistribution({
         <div
           className="flex h-10 w-full overflow-hidden rounded-full bg-white/[0.06]"
           role="img"
-          aria-label="Fund distribution bar chart"
+          aria-label="Allocation tracks bar chart"
         >
           {segments.map((segment, i) => {
             if (segment.value <= 0) return null;

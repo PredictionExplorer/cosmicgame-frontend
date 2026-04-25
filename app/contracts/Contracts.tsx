@@ -202,7 +202,7 @@ const Contracts = () => {
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Contract Addresses"
-        subtitle="On-chain addresses and configuration for the Cosmic Signature protocol"
+        subtitle="On-chain addresses and configuration for the Cosmic Signature protocol. All contracts have been audited."
       >
         <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
       </PageHeader>
@@ -212,7 +212,7 @@ const Contracts = () => {
           variants={sectionFade}
           initial="hidden"
           animate="visible"
-          aria-label="Fund Distribution"
+          aria-label="Allocation Tracks"
         >
           <FundDistribution
             prizePercentage={data?.PrizePercentage}

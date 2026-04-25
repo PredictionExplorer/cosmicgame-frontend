@@ -49,14 +49,14 @@ describe('FundDistribution', () => {
     expect(screen.getByText('30%')).toBeInTheDocument();
   });
 
-  it('renders the Fund Distribution title', () => {
+  it('renders the Allocation Tracks title', () => {
     render(<FundDistribution {...defaultProps} />);
-    expect(screen.getByText('Fund Distribution')).toBeInTheDocument();
+    expect(screen.getByText('Allocation Tracks')).toBeInTheDocument();
   });
 
   it('renders the distribution bar', () => {
     render(<FundDistribution {...defaultProps} />);
-    expect(screen.getByRole('img', { name: /fund distribution bar chart/i })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /allocation tracks bar chart/i })).toBeInTheDocument();
   });
 
   it('handles zero percentages gracefully', () => {

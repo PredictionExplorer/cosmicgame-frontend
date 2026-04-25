@@ -161,10 +161,10 @@ describe('Contracts', () => {
     expect(screen.getByText('Chain 421614')).toBeInTheDocument();
   });
 
-  it('renders fund distribution section with percentages', () => {
+  it('renders allocation tracks section with percentages', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Fund Distribution')).toBeInTheDocument();
+    expect(screen.getByText('Allocation Tracks')).toBeInTheDocument();
     expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
     expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
     expect(screen.getByText('Stellar Selection')).toBeInTheDocument();
