@@ -43,7 +43,7 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
 
   const handleRowClick = () => onSelectToggle(TokenId);
 
-  const handleStakeClick = async (e: MouseEvent) => {
+  const handleAnchorClick = async (e: MouseEvent) => {
     e.stopPropagation();
     setProcessing(true);
     try {
@@ -105,7 +105,7 @@ const CSTokenRow = ({ row, onSelectToggle, onStakeSingle, isItemSelected }: CSTo
 
       <TablePrimaryCell align="center">
         {!Staked && (
-          <Button size="sm" disabled={processing} onClick={handleStakeClick}>
+          <Button size="sm" disabled={processing} onClick={handleAnchorClick}>
             {processing ? (
               <span className="flex items-center gap-1">
                 <Spinner size="sm" />
@@ -135,10 +135,15 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
   const [processing, setProcessing] = useState(false);
   const headerCheckboxRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  // Reset selection + pagination when the input list reference changes —
+  // canonical "adjust state when a prop changes" pattern (set state during
+  // render rather than in an effect, per React docs).
+  const [previousList, setPreviousList] = useState(list);
+  if (list !== previousList) {
+    setPreviousList(list);
     setSelectedTokenIds([]);
     setPage(1);
-  }, [list]);
+  }
 
   const isIndeterminate = selectedTokenIds.length > 0 && selectedTokenIds.length < list.length;
   const isAllSelected = list.length > 0 && selectedTokenIds.length === list.length;
@@ -175,12 +180,12 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
     setSelectedTokenIds([]);
   };
 
-  const handleStakeSingle = async (id: number) => {
+  const handleAnchorSingle = async (id: number) => {
     setSelectedTokenIds([id]);
     await handleStake(id, false);
   };
 
-  const handleStakeManySelected = async () => {
+  const handleAnchorManySelected = async () => {
     setProcessing(true);
     try {
       await handleStakeMany(selectedTokenIds, Array(selectedTokenIds.length).fill(false));
@@ -254,7 +259,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
                 row={row}
                 isItemSelected={isSelected(row.TokenId)}
                 onSelectToggle={handleSelectToggle}
-                onStakeSingle={handleStakeSingle}
+                onStakeSingle={handleAnchorSingle}
               />
             ))}
           </tbody>
@@ -263,7 +268,7 @@ export const CSTokensTable = ({ list, handleStake, handleStakeMany }: CSTokensTa
 
       {selectedTokenIds.length > 1 && (
         <div className="flex justify-end mt-4">
-          <Button variant="text" disabled={processing} onClick={handleStakeManySelected}>
+          <Button variant="text" disabled={processing} onClick={handleAnchorManySelected}>
             {processing ? (
               <span className="flex items-center gap-1">
                 <Spinner size="sm" />

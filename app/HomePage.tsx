@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
 import { ArrowRight, Radio } from 'lucide-react';
@@ -26,6 +26,7 @@ import Allocation from '@/components/common/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
+import { useNow } from '@/hooks/useNow';
 import {
   useDashboardInfo,
   useGestureListByCycle,
@@ -36,6 +37,14 @@ import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/acti
 import { isLandingHost } from '@/lib/hostRouting';
 import { LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO } from '@/lib/landingFlags';
 import { RootLandingPage } from '@/components/landing/RootLandingPage';
+
+// Hostname is stable for the session — no subscription needed. Returning
+// the same string from getSnapshot satisfies useSyncExternalStore's
+// stable-reference contract.
+const subscribeNoop = (): (() => void) => () => {};
+const getHostnameSnapshot = (): string | null =>
+  typeof window === 'undefined' ? null : window.location.hostname;
+const getHostnameServerSnapshot = (): string | null => null;
 
 const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
   ssr: false,
@@ -52,10 +61,11 @@ const HomePage = () => {
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
 
-  const [hostname, setHostname] = useState<string | null>(null);
-  useEffect(() => {
-    setHostname(window.location.hostname);
-  }, []);
+  const hostname = useSyncExternalStore(
+    subscribeNoop,
+    getHostnameSnapshot,
+    getHostnameServerSnapshot,
+  );
 
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo();
   const { data: currentTimeData } = useCurrentTime();
@@ -67,10 +77,14 @@ const HomePage = () => {
   const loading = dashboardLoading;
   const curGestureList = bidListData ?? [];
 
+  // Re-renders every second so countdown comparisons (allocationTime > now,
+  // claimWait > now, activationTime check) update without bare Date.now().
+  const now = useNow(1000);
+
   const offset = useMemo(() => {
     if (currentTimeData == null) return 0;
-    return currentTimeData * 1000 - Date.now();
-  }, [currentTimeData]);
+    return currentTimeData * 1000 - now;
+  }, [currentTimeData, now]);
 
   const [bannerTokenId, setBannerTokenId] = useState<number | null>(null);
 
@@ -78,6 +92,11 @@ const HomePage = () => {
     if (dashboardData && bannerTokenId === null) {
       const count = dashboardData.MainStats.NumCSTokenMints;
       if (count > 0) {
+        // Random NFT pick happens once per session when dashboardData first
+        // loads. The lint rule flags setState-in-effect as an anti-pattern,
+        // but this is a genuine "compute once from async data" — useMemo
+        // would re-roll on every dashboardData fetch.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setBannerTokenId(Math.floor(Math.random() * count));
       } else {
         setBannerTokenId(-1);
@@ -157,14 +176,10 @@ const HomePage = () => {
     return `Gesture with ${gestureType}`;
   };
 
-  const canGesture = allocationTime > Date.now() || data?.LastBidderAddr !== account;
-  const canClaim = !(
-    allocationTime > Date.now() ||
-    data?.LastBidderAddr === zeroAddress ||
-    loading
-  );
+  const canGesture = allocationTime > now || data?.LastBidderAddr !== account;
+  const canClaim = !(allocationTime > now || data?.LastBidderAddr === zeroAddress || loading);
   const claimWait = allocationTime + timeoutFinalize * 1000;
-  const isActive = account !== null && activationTime < Date.now() / 1000;
+  const isActive = account !== null && activationTime < now / 1000;
 
   const landingHost = hostname !== null && isLandingHost(hostname);
   if (hostname === null) {
@@ -343,9 +358,7 @@ const HomePage = () => {
                       size="lg"
                       onClick={handleFinalize}
                       className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
-                      disabled={
-                        isClaiming || (data?.LastBidderAddr !== account && claimWait > Date.now())
-                      }
+                      disabled={isClaiming || (data?.LastBidderAddr !== account && claimWait > now)}
                     >
                       {isClaiming ? (
                         <span className="flex items-center gap-2">
@@ -355,7 +368,7 @@ const HomePage = () => {
                         <>
                           Finalize Cycle
                           <span className="flex items-center">
-                            {claimWait > Date.now() && data?.LastBidderAddr !== account && (
+                            {claimWait > now && data?.LastBidderAddr !== account && (
                               <>
                                 &nbsp;available in &nbsp;
                                 <Countdown date={claimWait} />
@@ -367,7 +380,7 @@ const HomePage = () => {
                         </>
                       )}
                     </Button>
-                    {data?.LastBidderAddr !== account && claimWait > Date.now() && (
+                    {data?.LastBidderAddr !== account && claimWait > now && (
                       <p className="text-sm italic text-right text-primary">
                         Please wait for the participant who made the Final Gesture to finalize the
                         cycle.

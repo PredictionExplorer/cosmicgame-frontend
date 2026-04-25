@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -29,7 +29,6 @@ const GalleryPage = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const initialPage = parseInt(searchParams.get('page') ?? '1') || 1;
   const initialView = (searchParams.get('view') as ViewMode) || 'grid';
   const initialPerPage = parseInt(searchParams.get('perPage') ?? '12') || 12;
 
@@ -39,13 +38,12 @@ const GalleryPage = () => {
   const [sort, setSort] = useState<SortKey>('newest');
   const [viewMode, setViewMode] = useState<ViewMode>(initialView);
   const [perPage, setPerPage] = useState(initialPerPage);
-  const [currentPage, setCurrentPage] = useState(initialPage);
   const isSearching = useRef(false);
 
-  useEffect(() => {
-    const page = parseInt(searchParams.get('page') ?? '1') || 1;
-    setCurrentPage(page);
-  }, [searchParams]);
+  // Derive current page from URL — the URL is the source of truth so
+  // back/forward, deeplinks, and reset-to-1 (set page=undefined) all just
+  // work without a separate useState + sync useEffect.
+  const currentPage = useMemo(() => parseInt(searchParams.get('page') ?? '1') || 1, [searchParams]);
 
   const updateUrl = useCallback(
     (params: Record<string, string>) => {
@@ -107,13 +105,16 @@ const GalleryPage = () => {
   const startIndex = (currentPage - 1) * perPage;
   const visibleItems: GalleryNFTData[] = searched.slice(startIndex, startIndex + perPage);
 
-  const handleSearchChange = useCallback((query: string) => {
-    setSearchQuery(query);
-    setSearchResults(null);
-    if (!query) {
-      setCurrentPage(1);
-    }
-  }, []);
+  const handleSearchChange = useCallback(
+    (query: string) => {
+      setSearchQuery(query);
+      setSearchResults(null);
+      if (!query) {
+        updateUrl({ page: '' });
+      }
+    },
+    [updateUrl],
+  );
 
   const handleSearchSubmit = useCallback(
     async (query: string) => {
@@ -132,21 +133,26 @@ const GalleryPage = () => {
           isSearching.current = false;
         }
       }
-      setCurrentPage(1);
       updateUrl({ page: '' });
     },
     [updateUrl],
   );
 
-  const handleFilterChange = useCallback((f: FilterKey) => {
-    setFilter(f);
-    setCurrentPage(1);
-  }, []);
+  const handleFilterChange = useCallback(
+    (f: FilterKey) => {
+      setFilter(f);
+      updateUrl({ page: '' });
+    },
+    [updateUrl],
+  );
 
-  const handleSortChange = useCallback((s: SortKey) => {
-    setSort(s);
-    setCurrentPage(1);
-  }, []);
+  const handleSortChange = useCallback(
+    (s: SortKey) => {
+      setSort(s);
+      updateUrl({ page: '' });
+    },
+    [updateUrl],
+  );
 
   const handleViewModeChange = useCallback(
     (mode: ViewMode) => {
@@ -166,7 +172,6 @@ const GalleryPage = () => {
   const handlePerPageChange = useCallback(
     (pp: number) => {
       setPerPage(pp);
-      setCurrentPage(1);
       updateUrl({ perPage: pp === 12 ? '' : String(pp), page: '' });
     },
     [updateUrl],

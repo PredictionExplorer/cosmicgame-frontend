@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import {
   Bloom,
@@ -12,6 +12,7 @@ import {
 import { BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 import { NebulaShader } from './NebulaShader';
@@ -22,22 +23,9 @@ const QUALITY_QUERY = '(min-width: 1024px)';
 
 export function HeroCanvas() {
   const reducedMotion = usePrefersReducedMotion();
-  const [highQuality, setHighQuality] = useState<boolean | null>(null);
+  const highQuality = useMediaQuery(QUALITY_QUERY);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mq = window.matchMedia(QUALITY_QUERY);
-    setHighQuality(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setHighQuality(e.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
-
-  if (reducedMotion || highQuality === false) {
-    return <ReducedMotionFallback />;
-  }
-
-  if (highQuality === null) {
+  if (reducedMotion || !highQuality) {
     return <ReducedMotionFallback />;
   }
 

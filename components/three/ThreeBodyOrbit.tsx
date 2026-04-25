@@ -65,7 +65,12 @@ function advance(bodies: Body[]) {
 }
 
 export function ThreeBodyOrbit() {
-  const bodiesRef = useRef<Body[]>(createBodies());
+  // Bodies are created once and mutated in place by `advance` per-frame —
+  // useMemo gives the same "create once" semantics as useRef without a
+  // `.current` access during render that would trip the refs-in-render
+  // lint rule. The simulation step in useFrame still mutates the array
+  // entries directly, so the closure over `bodies` stays current.
+  const bodies = useMemo(() => createBodies(), []);
   const bodyMeshRefs = useRef<(THREE.Mesh | null)[]>([null, null, null]);
   const groupRef = useRef<THREE.Group | null>(null);
 
@@ -100,14 +105,14 @@ export function ThreeBodyOrbit() {
   useFrame((_, delta) => {
     const steps = Math.min(3, Math.max(1, Math.floor(delta * 120)));
     for (let s = 0; s < steps; s++) {
-      advance(bodiesRef.current);
+      advance(bodies);
     }
 
     if (groupRef.current) {
       groupRef.current.rotation.y += delta * 0.03;
     }
 
-    bodiesRef.current.forEach((body, i) => {
+    bodies.forEach((body, i) => {
       const mesh = bodyMeshRefs.current[i];
       if (mesh) mesh.position.copy(body.position);
 
@@ -138,7 +143,7 @@ export function ThreeBodyOrbit() {
       <ambientLight intensity={0.6} />
       <pointLight position={[5, 5, 5]} intensity={1.1} color="#F0EDFF" />
 
-      {bodiesRef.current.map((body, i) => (
+      {bodies.map((body, i) => (
         <mesh
           key={`body-${i}`}
           ref={(el) => {

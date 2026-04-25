@@ -15,6 +15,10 @@ export function NebulaShader({ intensity = 1 }: NebulaShaderProps) {
   const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const { size, pointer } = useThree();
 
+  // Canonical R3F pattern: a useRef-backed uniforms object whose inner
+  // `.value` slots are mutated each frame by useFrame. This is what the
+  // shaderMaterial expects — see the eslint-disable on the JSX consumer
+  // below for the targeted refs-in-render suppression.
   const uniforms = useRef({
     uTime: { value: 0 },
     uResolution: { value: new THREE.Vector2(size.width, size.height) },
@@ -37,6 +41,7 @@ export function NebulaShader({ intensity = 1 }: NebulaShaderProps) {
       <planeGeometry args={[2, 2]} />
       <shaderMaterial
         ref={materialRef}
+        // eslint-disable-next-line react-hooks/refs
         uniforms={uniforms.current}
         vertexShader={nebulaVertex}
         fragmentShader={nebulaFragment}

@@ -25,7 +25,13 @@ export function GallerySearchInput({
   const [local, setLocal] = useState(value);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+  // Sync local back to prop when the parent resets externally (e.g. clear
+  // button on the toolbar). The lint rule discourages syncing prop → state
+  // via effects, but the alternative (`key={value}`) would remount the
+  // input on every keystroke since the parent updates value via the same
+  // debounce pipeline.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocal(value);
   }, [value]);
 
