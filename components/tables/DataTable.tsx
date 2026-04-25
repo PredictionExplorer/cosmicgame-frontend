@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Surface } from '@/components/ui/surface';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { SkeletonTableRow } from '@/components/ui/skeleton';
 
 /**
@@ -41,7 +42,7 @@ export interface DataTableColumn<T> {
   width?: string;
   /** Hide below `sm` breakpoint. */
   hideOnMobile?: boolean;
-  /** Optional info tooltip id — consume via `headerTooltip`. */
+  /** Help-text tooltip rendered next to the header label. */
   tooltip?: string;
 }
 
@@ -158,20 +159,30 @@ export function DataTable<T>({
                     )}
                   >
                     {col.sortable ? (
-                      <button
-                        type="button"
-                        onClick={() => toggleSort(col.id)}
-                        className={cn(
-                          'inline-flex items-center gap-1.5 transition-colors',
-                          'hover:text-foreground',
-                          isSorted && 'text-foreground',
-                        )}
-                      >
-                        {col.header}
-                        <Icon className="h-3 w-3" aria-hidden />
-                      </button>
+                      <span className="inline-flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => toggleSort(col.id)}
+                          className={cn(
+                            'inline-flex items-center gap-1.5 transition-colors',
+                            'hover:text-foreground',
+                            isSorted && 'text-foreground',
+                          )}
+                        >
+                          {col.header}
+                          <Icon className="h-3 w-3" aria-hidden />
+                        </button>
+                        {col.tooltip ? (
+                          <InfoTooltip content={col.tooltip} iconClassName="h-3 w-3" />
+                        ) : null}
+                      </span>
                     ) : (
-                      col.header
+                      <span className="inline-flex items-center gap-1">
+                        {col.header}
+                        {col.tooltip ? (
+                          <InfoTooltip content={col.tooltip} iconClassName="h-3 w-3" />
+                        ) : null}
+                      </span>
                     )}
                   </Th>
                 );
@@ -268,33 +279,54 @@ function DensityToolbar({
   );
 }
 
+/**
+ * Density state synced to localStorage via useSyncExternalStore so we never
+ * call setState inside an effect (keeps the React-hooks lint rule happy and
+ * stays compatible with React Compiler memoization). A custom event lets
+ * multiple DataTables on the same page stay in sync within a single tab —
+ * the default `storage` event only fires across tabs.
+ */
 function useDensityState(storageKey: string | null): [Density, (d: Density) => void] {
-  const [density, setDensityState] = React.useState<Density>('comfortable');
+  const eventName = storageKey ? `${storageKey}:change` : null;
 
-  // Hydrate from localStorage once on mount.
-  React.useEffect(() => {
-    if (!storageKey || typeof window === 'undefined') return;
+  const subscribe = React.useCallback(
+    (callback: () => void) => {
+      if (!eventName || typeof window === 'undefined') return () => {};
+      window.addEventListener(eventName, callback);
+      window.addEventListener('storage', callback);
+      return () => {
+        window.removeEventListener(eventName, callback);
+        window.removeEventListener('storage', callback);
+      };
+    },
+    [eventName],
+  );
+
+  const getSnapshot = React.useCallback((): Density => {
+    if (!storageKey || typeof window === 'undefined') return 'comfortable';
     try {
-      const saved = window.localStorage.getItem(storageKey);
-      if (saved === 'compact' || saved === 'comfortable') {
-        setDensityState(saved);
-      }
+      const v = window.localStorage.getItem(storageKey);
+      return v === 'compact' || v === 'comfortable' ? v : 'comfortable';
     } catch {
-      // ignore (private mode / disabled storage)
+      return 'comfortable';
     }
   }, [storageKey]);
 
+  const getServerSnapshot = React.useCallback((): Density => 'comfortable', []);
+
+  const density = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
   const setDensity = React.useCallback(
     (d: Density) => {
-      setDensityState(d);
-      if (!storageKey || typeof window === 'undefined') return;
+      if (!storageKey || typeof window === 'undefined' || !eventName) return;
       try {
         window.localStorage.setItem(storageKey, d);
+        window.dispatchEvent(new Event(eventName));
       } catch {
         // ignore
       }
     },
-    [storageKey],
+    [storageKey, eventName],
   );
 
   return [density, setDensity];
