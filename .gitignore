@@ -49,3 +49,13 @@ tsconfig.tsbuildinfo
 
 # AI tooling
 .claude/
+
+# marketing assets — local only
+/marketing/
+
+# SWC compiler cache
+.swc/
+
+# IDE
+.vscode/
+.idea/
