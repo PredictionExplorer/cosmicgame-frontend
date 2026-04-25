@@ -258,14 +258,14 @@ describe('Statistics', () => {
     expect(screen.getAllByText('381').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders Financial Overview section with grouped stats', () => {
+  it('renders Protocol Economy section with grouped stats', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Financial Overview')).toBeInTheDocument();
+    expect(screen.getByText('Protocol Economy')).toBeInTheDocument();
     expect(screen.getByText('Allocation Economy')).toBeInTheDocument();
     expect(screen.getByText('Token Economy')).toBeInTheDocument();
     expect(screen.getByText('Public Goods & Contributions')).toBeInTheDocument();

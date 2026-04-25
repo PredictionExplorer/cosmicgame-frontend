@@ -37,7 +37,7 @@ const STAGES: readonly StageDef[] = [
   {
     id: 'active',
     label: 'Active',
-    description: 'Earning per-cycle distributions',
+    description: 'Receiving per-cycle distributions',
     icon: Hourglass,
   },
   {

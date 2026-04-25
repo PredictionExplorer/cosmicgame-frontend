@@ -191,9 +191,9 @@ const Statistics = () => {
       </div>
 
       <section className="space-y-12">
-        {/* 2 ── Financial Overview ────────────────────────────────── */}
+        {/* 2 ── Protocol Economy ─────────────────────────────────── */}
         <div>
-          <SectionDivider title="Financial Overview" className="mb-6" />
+          <SectionDivider title="Protocol Economy" className="mb-6" />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {/* Allocation Economy */}
             <StatisticsGroup

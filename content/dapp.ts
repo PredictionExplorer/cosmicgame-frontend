@@ -283,7 +283,7 @@ export const dappContent = {
     },
 
     sections: {
-      financial: 'Financial Overview',
+      protocolEconomy: 'Protocol Economy',
       communityParticipation: 'Community & Participation',
       tokenDistribution: 'Token Distribution',
       anchoring: 'Anchoring',
