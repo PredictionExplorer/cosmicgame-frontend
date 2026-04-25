@@ -1,1 +1,1 @@
-yarn lint && yarn type-check && yarn test --coverage && yarn build
+yarn lexicon:scan && yarn lint && yarn type-check && yarn test --coverage && yarn build
