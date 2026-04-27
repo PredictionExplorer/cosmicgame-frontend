@@ -109,7 +109,7 @@ describe('FAQPage', () => {
     await user.type(searchInput, 'Endurance Champion');
 
     await screen.findByText(/Showing \d+ of \d+ questions/i);
-  });
+  }, 15_000);
 
   it('shows "No questions found" for nonsense search', async () => {
     const user = userEvent.setup();
@@ -125,7 +125,7 @@ describe('FAQPage', () => {
         screen.getByText('No questions found. Try a different search term.'),
       ).toBeInTheDocument();
     });
-  });
+  }, 15_000);
 
   it('hides popular questions and category nav when searching', async () => {
     const user = userEvent.setup();

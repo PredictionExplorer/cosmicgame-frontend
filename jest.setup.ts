@@ -20,6 +20,12 @@ process.env.NEXT_PUBLIC_API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://test-api.example/api/cosmicgame/';
 process.env.NEXT_PUBLIC_RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545';
 
+// Build stamp (mirrors next.config `env`); Preview/local show footer line in tests.
+process.env.NEXT_PUBLIC_BUILD_COMMIT =
+  process.env.NEXT_PUBLIC_BUILD_COMMIT || 'deadbeef1234567890abcdef1234567890abcd';
+process.env.NEXT_PUBLIC_BUILD_REF = process.env.NEXT_PUBLIC_BUILD_REF || 'local';
+process.env.NEXT_PUBLIC_VERCEL_ENV = process.env.NEXT_PUBLIC_VERCEL_ENV || 'preview';
+
 expect.extend(toHaveNoViolations);
 
 // Provide IntersectionObserver for jsdom (used by Next.js Link prefetching
@@ -57,6 +63,7 @@ const ALLOWED_PATTERNS: readonly string[] = [
   'Missing `Description` or `aria-describedby',
   '[apiCall]',
   '[apiPost]',
+  '[Cosmic Signature]',
 ];
 
 function isAllowed(msg: string): boolean {

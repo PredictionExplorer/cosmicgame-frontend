@@ -10,10 +10,10 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'relative capitalize text-white border-0 bg-gradient-to-r from-[#06AEEC] to-[#9C37FD] [--border:1px] [--radius:4px] [--t:0] [--path:0_0px,20px_0,100%_0,100%_calc(100%-16px),calc(100%-20px)_100%,0_100%] [@supports(background:paint(id))]:[-webkit-mask:paint(rounded-shape)] hover:opacity-90',
+          'capitalize border-0 bg-gradient-to-r from-[#06AEEC] to-[#9C37FD] text-white hover:opacity-90',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline:
-          'relative capitalize px-6 text-secondary border border-primary/50 bg-transparent hover:bg-primary/10 [--border:1px] [--radius:4px] [--t:0] [--path:0_0px,20px_0,100%_0,100%_calc(100%-16px),calc(100%-20px)_100%,0_100%] [@supports(background:paint(id))]:border-0 [@supports(background:paint(id))]:[-webkit-mask:paint(rounded-shape)] [@supports(background:paint(id))]:bg-transparent before:[@supports(background:paint(id))]:content-[""] before:[@supports(background:paint(id))]:absolute before:[@supports(background:paint(id))]:inset-0 before:[@supports(background:paint(id))]:bg-gradient-to-br before:[@supports(background:paint(id))]:from-primary before:[@supports(background:paint(id))]:to-accent before:[@supports(background:paint(id))]:[--t:1] before:[@supports(background:paint(id))]:[-webkit-mask:paint(rounded-shape)]',
+          'capitalize border border-primary/50 bg-transparent px-6 text-secondary hover:bg-primary/10',
         secondary:
           'relative capitalize px-6 text-primary border border-primary/50 bg-transparent hover:bg-primary/10',
         ghost: 'hover:bg-white/5 hover:text-foreground',

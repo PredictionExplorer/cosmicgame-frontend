@@ -1,12 +1,45 @@
+import { execSync } from 'node:child_process';
+
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 import withBundleAnalyzer from '@next/bundle-analyzer';
+
+function resolveGitSha(): string {
+  if (process.env.VERCEL_GIT_COMMIT_SHA?.trim()) return process.env.VERCEL_GIT_COMMIT_SHA.trim();
+  if (process.env.GITHUB_SHA?.trim()) return process.env.GITHUB_SHA.trim();
+  try {
+    return execSync('git rev-parse HEAD', {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return '';
+  }
+}
+
+function resolveGitRef(): string {
+  if (process.env.VERCEL_GIT_COMMIT_REF?.trim()) return process.env.VERCEL_GIT_COMMIT_REF.trim();
+  if (process.env.GITHUB_REF_NAME?.trim()) return process.env.GITHUB_REF_NAME.trim();
+  try {
+    return execSync('git rev-parse --abbrev-ref HEAD', {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return '';
+  }
+}
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_BUILD_COMMIT: resolveGitSha(),
+    NEXT_PUBLIC_BUILD_REF: resolveGitRef(),
+    NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV || '',
+  },
   reactStrictMode: true,
   /**
    * Tree-shake barrel imports for libraries we import heavily. Next compiles

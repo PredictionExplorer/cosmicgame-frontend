@@ -70,7 +70,6 @@ const config = [
       '.next/',
       'node_modules/',
       'contracts/types/',
-      'public/paint-worklet.js',
       '__mocks__/',
       'playwright-report/',
       'coverage/',

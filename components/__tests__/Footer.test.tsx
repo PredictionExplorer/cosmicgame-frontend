@@ -44,6 +44,12 @@ describe('Footer', () => {
     expect(screen.getByText(/CC0 · Verified · Reproducible/i)).toBeInTheDocument();
   });
 
+  it('renders build commit and branch when not production deploy', () => {
+    const el = screen.getByTestId('build-commit');
+    expect(el).toHaveTextContent('deadbee');
+    expect(el).toHaveTextContent('local');
+  });
+
   it('renders the terms link', () => {
     const termsLink = screen.getByRole('link', { name: 'Terms' });
     expect(termsLink).toBeInTheDocument();
