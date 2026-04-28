@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
-import { usePublicClient } from 'wagmi';
+import { getConnectorClient } from '@wagmi/core';
+import { useConfig, useConnectorClient, usePublicClient, useWalletClient } from 'wagmi';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { activeChain } from '@/config/chains';
 import { ANCHORING_WALLET_CST_ADDRESS, ANCHORING_WALLET_RWLK_ADDRESS } from '@/config/networks';
 import {
   isUserRejection,
@@ -34,8 +36,12 @@ const ANCHORING_QUERY_KEYS = [
  */
 export function useAnchorActions() {
   const { account } = useActiveWeb3React();
+  const config = useConfig();
+  const publicClient = usePublicClient({ chainId: activeChain.id });
+  const { data: walletClient } = useWalletClient({ chainId: activeChain.id });
+  const { data: connectorClient } = useConnectorClient({ chainId: activeChain.id });
+
   const { setNotification } = useNotification();
-  const publicClient = usePublicClient();
   const queryClient = useQueryClient();
   const { fetchData: fetchStakedTokens } = useAnchoredToken();
 
@@ -70,6 +76,17 @@ export function useAnchorActions() {
     fetchStakedTokens();
   }, [queryClient, fetchStakedTokens]);
 
+  /** Same pattern as `useGestureForm`: hooks scoped to `activeChain`, then imperative fallback. */
+  const ensureSignerReady = useCallback(async () => {
+    const fromHooks = connectorClient ?? walletClient;
+    if (fromHooks) return fromHooks;
+    try {
+      return await getConnectorClient(config, { chainId: activeChain.id });
+    } catch {
+      return undefined;
+    }
+  }, [config, connectorClient, walletClient]);
+
   const approveIfNeeded = useCallback(
     async (
       nftContract: NonNullable<typeof cosmicSignatureContract | typeof rwalkContract>,
@@ -103,11 +120,29 @@ export function useAnchorActions() {
           return;
         }
 
+        if (!account) {
+          setNotification({
+            visible: true,
+            text: 'Please connect your wallet and ensure you are on the correct network.',
+            type: 'error',
+          });
+          return;
+        }
+
+        if (!(await ensureSignerReady())) {
+          setNotification({
+            visible: true,
+            text: 'Wallet is still connecting or MetaMask is on the wrong chain. Switch to the app network and try again.',
+            type: 'error',
+          });
+          return;
+        }
+
         await approveIfNeeded(nftContract, walletAddress);
 
         const hash = Array.isArray(tokenIds)
           ? await anchoringContract.write.stakeMany?.([tokenIds])
-          : await anchoringContract.write.anchor?.([tokenIds]);
+          : await anchoringContract.write.stake?.([tokenIds]);
 
         const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
 
@@ -118,8 +153,8 @@ export function useAnchorActions() {
               visible: true,
               type: 'success',
               text: Array.isArray(tokenIds)
-                ? 'The selected tokens were staked successfully!'
-                : `You have successfully staked token ${tokenIds}!`,
+                ? 'The selected tokens were anchored successfully!'
+                : `You have successfully anchored token ${tokenIds}!`,
             });
           }
         }, 2000);
@@ -131,6 +166,8 @@ export function useAnchorActions() {
       }
     },
     [
+      account,
+      ensureSignerReady,
       approveIfNeeded,
       cosmicSignatureContract,
       rwalkContract,
@@ -157,9 +194,27 @@ export function useAnchorActions() {
           return;
         }
 
+        if (!account) {
+          setNotification({
+            visible: true,
+            text: 'Please connect your wallet and ensure you are on the correct network.',
+            type: 'error',
+          });
+          return;
+        }
+
+        if (!(await ensureSignerReady())) {
+          setNotification({
+            visible: true,
+            text: 'Wallet is still connecting or MetaMask is on the wrong chain. Switch to the app network and try again.',
+            type: 'error',
+          });
+          return;
+        }
+
         const hash = Array.isArray(actionIds)
           ? await anchoringContract.write.unstakeMany?.([actionIds])
-          : await anchoringContract.write.release?.([actionIds]);
+          : await anchoringContract.write.unstake?.([actionIds]);
 
         const res = hash ? await publicClient?.waitForTransactionReceipt({ hash }) : undefined;
 
@@ -170,8 +225,8 @@ export function useAnchorActions() {
               visible: true,
               type: 'success',
               text: Array.isArray(actionIds)
-                ? 'The selected tokens were unstaked successfully!'
-                : 'You have successfully unstaked token!',
+                ? 'The selected tokens were unanchored successfully!'
+                : 'You have successfully unanchored token!',
             });
           }
         }, 2000);
@@ -183,6 +238,8 @@ export function useAnchorActions() {
       }
     },
     [
+      account,
+      ensureSignerReady,
       cstAnchoringContract,
       rwlkAnchoringContract,
       publicClient,

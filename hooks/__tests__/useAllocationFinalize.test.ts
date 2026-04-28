@@ -173,7 +173,7 @@ describe('useAllocationFinalize', () => {
     expect(mockFinalizeCycle).toHaveBeenCalledWith({ gas: BigInt(2_000_000) });
   });
 
-  it('includes NumRaffleNFTWinnersStakingRWalk in count when RWLK tokens are staked', async () => {
+  it('includes NumRaffleNFTWinnersStakingRWalk in count when RWLK tokens are anchored', async () => {
     const data = {
       ...baseData,
       MainStats: { StakeStatisticsRWalk: { TotalTokensStaked: 10 } },

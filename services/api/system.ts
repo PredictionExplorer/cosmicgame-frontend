@@ -12,7 +12,7 @@ export function get_current_time(): Promise<number> {
 /** Fetches the history of system-mode changes (maintenance, runtime, etc.). */
 export function get_system_modelist(): Promise<SystemModeChangeEvent[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('system/modelist/-1/1000000'));
+    const { data } = await axios.get(getAPIUrl('system/modelist/0/1000000'));
     return flattenTxArray<SystemModeChangeEvent>(data.SystemModeChanges);
   }, []);
 }

@@ -17,13 +17,17 @@ export function useAllocationNotification({ allocationTime }: UseAllocationNotif
   }, []);
 
   const requestNotificationPermission = useCallback(() => {
-    if ('Notification' in window && Notification.permission !== 'granted') {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          /* permission granted, nothing else to do */
-        }
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    // Only prompt in the default state. Calling requestPermission when denied
+    // spams the console ("permission has been blocked…") and has no effect.
+    if (Notification.permission !== 'default') return;
+    void Notification.requestPermission()
+      .then(() => {
+        /* granted / denied / dismissed — browser owns the outcome */
+      })
+      .catch(() => {
+        /* ignore: secure contexts / policy / user gesture requirements */
       });
-    }
   }, []);
 
   const sendNotification = useCallback((title: string, options: NotificationOptions) => {

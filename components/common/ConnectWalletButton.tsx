@@ -187,7 +187,7 @@ const ConnectWalletButton = ({
           {/* Staking */}
           <div className="px-3 py-2 space-y-1.5">
             <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
-              Staked
+              Anchored
             </p>
             <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">CST NFTs</span>

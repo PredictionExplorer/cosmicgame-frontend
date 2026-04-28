@@ -17,7 +17,7 @@ export function get_staking_cst_rewards_to_claim_by_user(
 ): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`anchoring/cst/rewards/to_claim/by_user/${address}`),
+      getAPIUrl(`staking/cst/rewards/to_claim/by_user/${address}`),
     );
     return flattenTxArray<CSTAnchorDistribution>(data.UnclaimedEthDeposits);
   }, []);
@@ -29,7 +29,7 @@ export function get_staking_cst_rewards_collected_by_user(
 ): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`anchoring/cst/rewards/collected/by_user/${address}/0/1000000`),
+      getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/0/1000000`),
     );
     return flattenTxArray<CSTAnchorDistribution>(data.CollectedStakingCSTRewards);
   }, []);
@@ -38,7 +38,7 @@ export function get_staking_cst_rewards_collected_by_user(
 /** Fetches Cosmic Signature Tokens currently staked by a wallet address. */
 export function get_staked_cst_tokens_by_user(address: string): Promise<AnchoredTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`anchoring/cst/staked_tokens/by_user/${address}`));
+    const { data } = await axios.get(getAPIUrl(`staking/cst/staked_tokens/by_user/${address}`));
     return data.StakedTokensCST as AnchoredTokenInfo[];
   }, []);
 }
@@ -50,7 +50,7 @@ export function get_cst_action_ids_by_deposit_id(
 ): Promise<ActionIdWithClaimInfo[] | null> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`anchoring/cst/rewards/action_ids_by_deposit/${user_addr}/${deposit_id}`),
+      getAPIUrl(`staking/cst/rewards/action_ids_by_deposit/${user_addr}/${deposit_id}`),
     );
     return data.ActionIdsWithClaimInfo as ActionIdWithClaimInfo[];
   }, null);
@@ -60,7 +60,7 @@ export function get_cst_action_ids_by_deposit_id(
 export function get_staking_cst_actions_by_user(address: string): Promise<AnchorAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`anchoring/cst/actions/by_user/${address}/0/1000000`),
+      getAPIUrl(`staking/cst/actions/by_user/${address}/0/1000000`),
     );
     return flattenTxArray<AnchorAction>(data.StakingCSTActions);
   }, []);
@@ -69,7 +69,7 @@ export function get_staking_cst_actions_by_user(address: string): Promise<Anchor
 /** Fetches all CST anchor/release actions globally. */
 export function get_staking_cst_actions(): Promise<AnchorAction[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('anchoring/cst/actions/global/0/1000000'));
+    const { data } = await axios.get(getAPIUrl('staking/cst/actions/global/0/1000000'));
     return flattenTxArray<AnchorAction>(data.StakingCSTActions);
   }, []);
 }
@@ -79,7 +79,7 @@ export function get_staking_cst_actions_info(
   actionId: number,
 ): Promise<CombinedAnchorRecordInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`anchoring/cst/actions/info/${actionId}`));
+    const { data } = await axios.get(getAPIUrl(`staking/cst/actions/info/${actionId}`));
     const info = data.CombinedAnchorRecordInfo;
     if (!info) return null;
     return {
@@ -93,7 +93,7 @@ export function get_staking_cst_actions_info(
 /** Fetches all CST anchoring rewards globally. */
 export function get_staking_cst_rewards(): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('anchoring/cst/rewards/global'));
+    const { data } = await axios.get(getAPIUrl('staking/cst/rewards/global'));
     return flattenTxArray<CSTAnchorDistribution>(data.StakingCSTRewards);
   }, []);
 }
@@ -101,7 +101,7 @@ export function get_staking_cst_rewards(): Promise<CSTAnchorDistribution[]> {
 /** Fetches CST anchoring rewards distributed in a specific round. */
 export function get_staking_cst_rewards_by_round(round: number): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`anchoring/cst/rewards/by_round/${round}`));
+    const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/by_round/${round}`));
     return flattenTxArray<CSTAnchorDistribution>(data.Rewards);
   }, []);
 }
@@ -111,7 +111,7 @@ export function get_staking_cst_reward_paid_records_by_user(
   address: string,
 ): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`anchoring/cst/rewards/paid/by_user/${address}`));
+    const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/paid/by_user/${address}`));
     return flattenTxArray<CSTAnchorDistribution>(data.RewardPaidRecords);
   }, []);
 }
@@ -119,7 +119,7 @@ export function get_staking_cst_reward_paid_records_by_user(
 /** Fetches all currently staked Cosmic Signature Tokens globally. */
 export function get_staked_cst_tokens(): Promise<AnchoredTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('anchoring/cst/staked_tokens/all'));
+    const { data } = await axios.get(getAPIUrl('staking/cst/staked_tokens/all'));
     return data.StakedTokensCST as AnchoredTokenInfo[];
   }, []);
 }
@@ -128,7 +128,7 @@ export function get_staked_cst_tokens(): Promise<AnchoredTokenInfo[]> {
 export function get_staking_rewards_by_user(address: string): Promise<RewardsByToken[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`anchoring/cst/rewards/by_user/by_token/summary/${address}`),
+      getAPIUrl(`staking/cst/rewards/by_user/by_token/summary/${address}`),
     );
     return data.RewardsByToken as RewardsByToken[];
   }, []);
@@ -141,7 +141,7 @@ export function get_staking_rewards_by_user_by_token_details(
 ): Promise<Record<string, unknown> | null> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`anchoring/cst/rewards/by_user/by_token/details/${address}/${tokenId}`),
+      getAPIUrl(`staking/cst/rewards/by_user/by_token/details/${address}/${tokenId}`),
     );
     const details = data.RewardsByTokenDetails;
     if (!details || typeof details !== 'object') return details;
@@ -188,7 +188,7 @@ export function get_staking_cst_by_user_by_deposit_rewards(
 ): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`anchoring/cst/rewards/by_user/by_deposit/${address}`),
+      getAPIUrl(`staking/cst/rewards/by_user/by_deposit/${address}`),
     );
     return flattenTxArray<CSTAnchorDistribution>(data.RewardsByDeposit);
   }, []);
@@ -199,7 +199,7 @@ export function get_staking_rwalk_actions_info(
   actionId: number,
 ): Promise<CombinedAnchorRecordInfo | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`anchoring/randomwalk/actions/info/${actionId}`));
+    const { data } = await axios.get(getAPIUrl(`staking/randomwalk/actions/info/${actionId}`));
     const info = data.CombinedRWalkStakingRecordInfo;
     if (!info) return null;
     return {
@@ -213,7 +213,7 @@ export function get_staking_rwalk_actions_info(
 /** Fetches all RandomWalk anchor/release actions globally. */
 export function get_staking_rwalk_actions(): Promise<AnchorAction[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('anchoring/randomwalk/actions/global/0/1000000'));
+    const { data } = await axios.get(getAPIUrl('staking/randomwalk/actions/global/0/1000000'));
     return flattenTxArray<AnchorAction>(data.GlobalStakingActionsRWalk);
   }, []);
 }
@@ -222,7 +222,7 @@ export function get_staking_rwalk_actions(): Promise<AnchorAction[]> {
 export function get_staking_rwalk_actions_by_user(address: string): Promise<AnchorAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`anchoring/randomwalk/actions/by_user/${address}/0/1000000`),
+      getAPIUrl(`staking/randomwalk/actions/by_user/${address}/0/1000000`),
     );
     return flattenTxArray<AnchorAction>(data.UserStakingActionsRWalk);
   }, []);
@@ -231,7 +231,7 @@ export function get_staking_rwalk_actions_by_user(address: string): Promise<Anch
 /** Fetches all RandomWalk anchoring reward mint records globally. */
 export function get_staking_rwalk_mints_global(): Promise<AnchorDistributionImprint[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('anchoring/randomwalk/mints/global/0/1000000'));
+    const { data } = await axios.get(getAPIUrl('staking/randomwalk/mints/global/0/1000000'));
     return flattenTxArray<AnchorDistributionImprint>(data.StakingRWalkRewardsMints);
   }, []);
 }
@@ -241,7 +241,7 @@ export function get_staking_rwalk_mints_by_user(
   address: string,
 ): Promise<AnchorDistributionImprint[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`anchoring/randomwalk/mints/by_user/${address}`));
+    const { data } = await axios.get(getAPIUrl(`staking/randomwalk/mints/by_user/${address}`));
     return flattenTxArray<AnchorDistributionImprint>(data.RWalkStakingRewardMints);
   }, []);
 }
@@ -249,7 +249,7 @@ export function get_staking_rwalk_mints_by_user(
 /** Fetches all currently staked RandomWalk NFTs globally. */
 export function get_staked_rwalk_tokens(): Promise<AnchoredTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('anchoring/randomwalk/staked_tokens/all'));
+    const { data } = await axios.get(getAPIUrl('staking/randomwalk/staked_tokens/all'));
     return data.StakedTokensRWalk as AnchoredTokenInfo[];
   }, []);
 }
@@ -258,7 +258,7 @@ export function get_staked_rwalk_tokens(): Promise<AnchoredTokenInfo[]> {
 export function get_staked_rwalk_tokens_by_user(address: string): Promise<AnchoredTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`anchoring/randomwalk/staked_tokens/by_user/${address}`),
+      getAPIUrl(`staking/randomwalk/staked_tokens/by_user/${address}`),
     );
     return data.StakedTokensRWalk as AnchoredTokenInfo[];
   }, []);

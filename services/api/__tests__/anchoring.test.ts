@@ -66,7 +66,7 @@ describe('anchoring API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xh');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*rewards.*to_claim.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*cst.*rewards.*to_claim.*by_user.*0xabc/),
       );
     });
 
@@ -91,7 +91,7 @@ describe('anchoring API', () => {
       const result = await get_staking_cst_rewards_collected_by_user('0xdef');
       expect(result).toHaveLength(1);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*rewards.*collected.*by_user.*0xdef/),
+        expect.stringMatching(/staking.*cst.*rewards.*collected.*by_user.*0xdef/),
       );
     });
 
@@ -115,7 +115,7 @@ describe('anchoring API', () => {
       const result = await get_staked_cst_tokens_by_user('0xabc');
       expect(result).toEqual(tokens);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*staked_tokens.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*cst.*staked_tokens.*by_user.*0xabc/),
       );
     });
 
@@ -139,7 +139,7 @@ describe('anchoring API', () => {
       const result = await get_cst_action_ids_by_deposit_id('0xabc', 5);
       expect(result).toEqual(ids);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*rewards.*action_ids_by_deposit.*0xabc.*5/),
+        expect.stringMatching(/staking.*cst.*rewards.*action_ids_by_deposit.*0xabc.*5/),
       );
     });
 
@@ -162,7 +162,7 @@ describe('anchoring API', () => {
       const result = await get_staking_cst_actions_by_user('0xabc');
       expect(result).toHaveLength(1);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*actions.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*cst.*actions.*by_user.*0xabc/),
       );
     });
 
@@ -185,7 +185,7 @@ describe('anchoring API', () => {
       const result = await get_staking_cst_actions();
       expect(result).toEqual([]);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*actions.*global/),
+        expect.stringMatching(/staking.*cst.*actions.*global/),
       );
     });
 
@@ -239,7 +239,7 @@ describe('anchoring API', () => {
       const result = await get_staking_cst_rewards();
       expect(result).toEqual([]);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*rewards.*global/),
+        expect.stringMatching(/staking.*cst.*rewards.*global/),
       );
     });
 
@@ -259,7 +259,7 @@ describe('anchoring API', () => {
       mockedAxios.get.mockResolvedValue({ data: { Rewards: [] } });
       await get_staking_cst_rewards_by_round(3);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*rewards.*by_round.*3/),
+        expect.stringMatching(/staking.*cst.*rewards.*by_round.*3/),
       );
     });
 
@@ -281,7 +281,7 @@ describe('anchoring API', () => {
       mockedAxios.get.mockResolvedValue({ data: { RewardPaidRecords: [] } });
       await get_staking_cst_reward_paid_records_by_user('0xabc');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*rewards.*paid.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*cst.*rewards.*paid.*by_user.*0xabc/),
       );
     });
 
@@ -305,7 +305,7 @@ describe('anchoring API', () => {
       const result = await get_staked_cst_tokens();
       expect(result).toEqual(tokens);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*staked_tokens.*all/),
+        expect.stringMatching(/staking.*cst.*staked_tokens.*all/),
       );
     });
 
@@ -327,7 +327,7 @@ describe('anchoring API', () => {
       const result = await get_staking_rewards_by_user('0xabc');
       expect(result).toEqual(rewards);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*rewards.*by_user.*by_token.*summary.*0xabc/),
+        expect.stringMatching(/staking.*cst.*rewards.*by_user.*by_token.*summary.*0xabc/),
       );
     });
 
@@ -385,7 +385,7 @@ describe('anchoring API', () => {
       mockedAxios.get.mockResolvedValue({ data: { RewardsByDeposit: [] } });
       await get_staking_cst_by_user_by_deposit_rewards('0xabc');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*cst.*rewards.*by_user.*by_deposit.*0xabc/),
+        expect.stringMatching(/staking.*cst.*rewards.*by_user.*by_deposit.*0xabc/),
       );
     });
 
@@ -442,7 +442,7 @@ describe('anchoring API', () => {
       const result = await get_staking_rwalk_actions();
       expect(result).toEqual([]);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*randomwalk.*actions.*global/),
+        expect.stringMatching(/staking.*randomwalk.*actions.*global/),
       );
     });
 
@@ -462,7 +462,7 @@ describe('anchoring API', () => {
       mockedAxios.get.mockResolvedValue({ data: { UserStakingActionsRWalk: [] } });
       await get_staking_rwalk_actions_by_user('0xabc');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*randomwalk.*actions.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*randomwalk.*actions.*by_user.*0xabc/),
       );
     });
 
@@ -485,7 +485,7 @@ describe('anchoring API', () => {
       const result = await get_staking_rwalk_mints_global();
       expect(result).toEqual([]);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*randomwalk.*mints.*global/),
+        expect.stringMatching(/staking.*randomwalk.*mints.*global/),
       );
     });
 
@@ -505,7 +505,7 @@ describe('anchoring API', () => {
       mockedAxios.get.mockResolvedValue({ data: { RWalkStakingRewardMints: [] } });
       await get_staking_rwalk_mints_by_user('0xabc');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*randomwalk.*mints.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*randomwalk.*mints.*by_user.*0xabc/),
       );
     });
 
@@ -529,7 +529,7 @@ describe('anchoring API', () => {
       const result = await get_staked_rwalk_tokens();
       expect(result).toEqual(tokens);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*randomwalk.*staked_tokens.*all/),
+        expect.stringMatching(/staking.*randomwalk.*staked_tokens.*all/),
       );
     });
 
@@ -551,7 +551,7 @@ describe('anchoring API', () => {
       const result = await get_staked_rwalk_tokens_by_user('0xabc');
       expect(result).toEqual(tokens);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/anchoring.*randomwalk.*staked_tokens.*by_user.*0xabc/),
+        expect.stringMatching(/staking.*randomwalk.*staked_tokens.*by_user.*0xabc/),
       );
     });
 

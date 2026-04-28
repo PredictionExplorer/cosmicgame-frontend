@@ -154,7 +154,7 @@ describe('GalleryPage', () => {
     expect(screen.getByRole('radio', { name: /Named/i })).toBeInTheDocument();
   });
 
-  it('filters NFTs when Staked chip is clicked', () => {
+  it('filters NFTs when Anchored chip is clicked', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
     fireEvent.click(screen.getByRole('radio', { name: /Anchored/i }));

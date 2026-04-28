@@ -73,7 +73,8 @@ describe('rounds API', () => {
 
       const result = await get_dashboard_info();
 
-      expect(result).toEqual(mockData);
+      // `normalizeDashboardWire` always sets `GestureCostEth` (from `TokenReward` or 0).
+      expect(result).toEqual({ ...mockData, GestureCostEth: 0 });
       expect(mockedAxios.get).toHaveBeenCalledTimes(1);
       expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/statistics.*dashboard/));
     });
@@ -254,7 +255,7 @@ describe('rounds API', () => {
       expect(result[0]).toHaveProperty('TxHash', '0x1');
       expect(result[1]).toHaveProperty('TxHash', '0x2');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/allocations.*history.*global/),
+        expect.stringMatching(/prizes\/history\/global/),
       );
     });
 
@@ -287,7 +288,7 @@ describe('rounds API', () => {
       expect(result).toHaveLength(1);
       expect(result![0]).toHaveProperty('TxHash', '0x3');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(new RegExp(`allocations.*history.*by_user.*${addr}`)),
+        expect.stringMatching(new RegExp(`prizes/history/by_user/${addr}`)),
       );
     });
 
@@ -412,7 +413,7 @@ describe('rounds API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/stellarSelection.*deposits.*list/),
+        expect.stringMatching(/raffle\/deposits\/list/),
       );
     });
 
@@ -443,7 +444,7 @@ describe('rounds API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0x2');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/stellarSelection.*deposits.*by_round.*10/),
+        expect.stringMatching(/raffle\/deposits\/by_round\/10/),
       );
     });
 
@@ -511,7 +512,7 @@ describe('rounds API', () => {
       const result = await unban_gesture(42);
 
       expect(result).toEqual({ success: true });
-      expect(mockedAxios.post).toHaveBeenCalledWith(expect.stringMatching(/unban_gesture/), {
+      expect(mockedAxios.post).toHaveBeenCalledWith(expect.stringMatching(/unban_bid/), {
         bid_id: 42,
       });
     });

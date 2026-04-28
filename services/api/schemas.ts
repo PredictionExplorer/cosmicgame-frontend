@@ -49,9 +49,12 @@ export type TxInfoParsed = z.infer<typeof TxInfoSchema>;
 const AnchoringStatisticsSchema = z
   .object({
     NumActiveStakers: z.number(),
-    NumDeposits: z.number(),
-    TotalRewardEth: z.number(),
-    TotalTokensMinted: z.number(),
+    /** Omitted on RWalk in Go `CGStakeStatsRWalk` (only `CGStakeStatsCST` has deposits / reward tallies). */
+    NumDeposits: z.number().optional(),
+    /** Omitted on RWalk in Go `CGStakeStatsRWalk`. */
+    TotalRewardEth: z.number().optional(),
+    /** Present on RandomWalk stats; omitted on CST in the Go `CGStakeStatsCST` struct. */
+    TotalTokensMinted: z.number().optional(),
     TotalTokensStaked: z.number(),
     UnclaimedRewardEth: z.number().optional(),
   })
@@ -143,13 +146,14 @@ const StellarSelectionNFTRecipientSchema = z
   })
   .loose();
 
+/** Backend round detail sometimes omits tx fields or nests them under `Tx` (see flattenTxArray). */
 const StellarSelectionETHDepositSchema = z
   .object({
-    EvtLogId: z.number(),
-    TxHash: z.string(),
-    TimeStamp: z.number(),
-    RoundNum: z.number(),
-    Amount: z.number(),
+    EvtLogId: z.number().optional(),
+    TxHash: z.string().optional(),
+    TimeStamp: z.number().optional(),
+    RoundNum: z.number().optional(),
+    Amount: z.number().optional(),
     WinnerAddr: AddressSchema.optional(),
     Claimed: z.boolean().optional(),
   })

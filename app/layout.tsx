@@ -87,7 +87,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const isLanding = isLandingHost(host);
 
   return (
-    <html lang="en" className={`${clashDisplay.variable} ${inter.variable}`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className={`${clashDisplay.variable} ${inter.variable}`}
+    >
       <head>
         <JsonLd data={[websiteJsonLd(), organizationJsonLd(), webApplicationJsonLd()]} />
         {GA_TRACKING_ID && (

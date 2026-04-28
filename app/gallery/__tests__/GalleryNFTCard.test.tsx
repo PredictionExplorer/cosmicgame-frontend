@@ -81,13 +81,13 @@ describe('GalleryNFTCard (grid)', () => {
     expect(screen.getByText('R7')).toBeInTheDocument();
   });
 
-  it('renders staked badge when staked', () => {
+  it('renders anchored badge when anchored', () => {
     const { container } = render(<GalleryNFTCard nft={fullNFT} index={0} variant="grid" />);
     const lockIcons = container.querySelectorAll('svg');
     expect(lockIcons.length).toBeGreaterThan(0);
   });
 
-  it('does not render staked badge when not staked', () => {
+  it('does not render anchored badge when not anchored', () => {
     render(<GalleryNFTCard nft={unnamedNFT} index={0} variant="grid" />);
     expect(screen.queryByText('R3')).toBeInTheDocument();
   });

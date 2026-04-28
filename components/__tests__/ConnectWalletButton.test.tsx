@@ -138,7 +138,7 @@ describe('ConnectWalletButton', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
-  it('shows staked token counts in dropdown', async () => {
+  it('shows anchored token counts in dropdown', async () => {
     const user = userEvent.setup();
     mockUseActiveWeb3React.mockReturnValue({
       account: '0x1234567890abcdef1234567890abcdef12345678',

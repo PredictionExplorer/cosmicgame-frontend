@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   useConfig,
   useChainId,
@@ -8,7 +8,8 @@ import {
   useSwitchChain,
 } from 'wagmi';
 import { getConnectorClient, writeContract } from '@wagmi/core';
-import { formatEther, isAddress, maxUint256, parseEther, parseUnits } from 'viem';
+import { formatEther, isAddress, maxUint256, parseEther, parseUnits, type Client } from 'viem';
+import { getChainId } from 'viem/actions';
 
 import {
   randomWalkNftAbi as NFT_ABI,
@@ -339,6 +340,47 @@ export function useGestureForm() {
   };
 
   /**
+   * Wagmi's `useChainId()` can disagree with MetaMask (e.g. hooks say Hardhat while the wallet
+   * stays on Arbitrum Sepolia). Use the wallet client's chain before sending to avoid viem
+   * `ChainMismatchError` at `writeContract` time.
+   */
+  const switchToActiveChainIfNeeded = useCallback(async (): Promise<boolean> => {
+    let signer = connectorClient ?? walletClient;
+    if (!signer) {
+      try {
+        signer = (await getConnectorClient(config, { chainId: activeChain.id })) ?? undefined;
+      } catch {
+        signer = undefined;
+      }
+    }
+    if (!signer) {
+      notify('error', 'Your wallet is not ready. Reconnect and try again.');
+      return false;
+    }
+
+    let walletChainId: number;
+    try {
+      walletChainId = await getChainId(signer as Client);
+    } catch {
+      walletChainId = chainId ?? activeChain.id;
+    }
+
+    if (walletChainId === activeChain.id) return true;
+
+    try {
+      await switchChainAsync({ chainId: activeChain.id });
+      return true;
+    } catch (err) {
+      if (isUserRejection(err)) {
+        notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
+      } else {
+        notify('error', `Please switch to ${activeChain.name} in your wallet to make a gesture.`);
+      }
+      return false;
+    }
+  }, [chainId, config, connectorClient, notify, switchChainAsync, walletClient]);
+
+  /**
    * Submit an ETH bid (with optional NFT/token donation).
    * Returns `true` on success so the caller can trigger a post-tx refresh.
    */
@@ -349,21 +391,7 @@ export function useGestureForm() {
         notify('error', 'Please connect your wallet.');
         return false;
       }
-      if (chainId != null && chainId !== activeChain.id) {
-        try {
-          await switchChainAsync({ chainId: activeChain.id });
-        } catch (err) {
-          if (isUserRejection(err)) {
-            notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
-          } else {
-            notify(
-              'error',
-              `Please switch to ${activeChain.name} in your wallet to make a gesture.`,
-            );
-          }
-          return false;
-        }
-      }
+      if (!(await switchToActiveChainIfNeeded())) return false;
       if (!cosmicGameContract) {
         notify('error', 'Please connect your wallet and ensure you are on the correct network.');
         return false;
@@ -483,21 +511,7 @@ export function useGestureForm() {
         notify('error', 'Please connect your wallet.');
         return false;
       }
-      if (chainId != null && chainId !== activeChain.id) {
-        try {
-          await switchChainAsync({ chainId: activeChain.id });
-        } catch (err) {
-          if (isUserRejection(err)) {
-            notify('info', WALLET_TRANSACTION_CANCELLED_MESSAGE);
-          } else {
-            notify(
-              'error',
-              `Please switch to ${activeChain.name} in your wallet to make a gesture.`,
-            );
-          }
-          return false;
-        }
-      }
+      if (!(await switchToActiveChainIfNeeded())) return false;
       let signerClient = client;
       if (!signerClient) {
         signerClient = (await getConnectorClient(config, { chainId: activeChain.id })) ?? undefined;

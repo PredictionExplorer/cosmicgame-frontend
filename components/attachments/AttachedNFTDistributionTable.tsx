@@ -1,6 +1,6 @@
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { memo, useMemo, useState, type FC } from 'react';
+import { useMemo, useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
 
 import {
@@ -20,29 +20,9 @@ export interface NFTDistributionRowData {
   NumDonations: number;
 }
 
-interface NFTDistributionRowProps {
-  rowData: NFTDistributionRowData;
-}
-
 interface NFTDistributionTableProps {
   list: NFTDistributionRowData[];
 }
-
-const DonatedNFTDistributionRow: FC<NFTDistributionRowProps> = memo(({ rowData }) => {
-  if (!rowData) {
-    return <TablePrimaryRow />;
-  }
-
-  return (
-    <TablePrimaryRow>
-      <TablePrimaryCell>
-        <span className="font-mono">{rowData.TokenAddr}</span>
-      </TablePrimaryCell>
-      <TablePrimaryCell align="right">{rowData.NumDonations}</TablePrimaryCell>
-    </TablePrimaryRow>
-  );
-});
-DonatedNFTDistributionRow.displayName = 'DonatedNFTDistributionRow';
 
 const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) => {
   const [page, setPage] = useState(1);
@@ -67,9 +47,20 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
             </Tr>
           </TablePrimaryHead>
           <tbody>
-            {paginatedData.map((row) => (
-              <DonatedNFTDistributionRow key={row.TokenAddr} rowData={row} />
-            ))}
+            {paginatedData.map((row, index) => {
+              const rowKey = `donated-nft-${(page - 1) * PER_PAGE + index}`;
+              if (!row) {
+                return <TablePrimaryRow key={rowKey} />;
+              }
+              return (
+                <TablePrimaryRow key={rowKey}>
+                  <TablePrimaryCell>
+                    <span className="font-mono">{row.TokenAddr}</span>
+                  </TablePrimaryCell>
+                  <TablePrimaryCell align="right">{row.NumDonations}</TablePrimaryCell>
+                </TablePrimaryRow>
+              );
+            })}
           </tbody>
         </TablePrimary>
       </TablePrimaryContainer>

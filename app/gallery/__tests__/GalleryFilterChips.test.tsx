@@ -10,7 +10,7 @@ const defaultProps = {
 beforeEach(() => jest.clearAllMocks());
 
 describe('GalleryFilterChips', () => {
-  it('renders All, Staked, and Named chips', () => {
+  it('renders All, Anchored, and Named chips', () => {
     render(<GalleryFilterChips {...defaultProps} />);
     expect(screen.getByRole('radio', { name: /All/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /Anchored/i })).toBeInTheDocument();

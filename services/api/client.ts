@@ -151,7 +151,8 @@ export const flattenRoundInfo = (roundInfo: unknown) => {
     RoundStats: RoundStats || {},
     RaffleNFTWinners: RaffleNFTWinners || [],
     StakingNFTWinners: StakingNFTWinners || [],
-    RaffleETHDeposits: RaffleETHDeposits || [],
+    /** Same nested `Tx` shape as other allocation endpoints; list/detail must match schema. */
+    RaffleETHDeposits: flattenTxArray(RaffleETHDeposits || []),
     AllPrizes: AllPrizes || [],
     EvtLogId: claimTx?.EvtLogId,
     BlockNum: claimTx?.BlockNum,

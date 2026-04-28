@@ -16,6 +16,7 @@ import {
   safeValidate,
   setValidationMode,
 } from '@/services/api/schemas';
+import { normalizeDashboardWire } from '@/services/api/rounds';
 
 // Reset validation mode between cases since it's module-level state.
 afterEach(() => setValidationMode('warn'));
@@ -79,6 +80,56 @@ describe('DashboardInfoSchema', () => {
     delete (bad as { CurRoundNum?: unknown }).CurRoundNum;
     expect(() => DashboardInfoSchema.parse(bad)).toThrow();
   });
+
+  it('accepts Go dashboard wire format after normalizeDashboardWire', () => {
+    const goLike = {
+      PrizeAmountEth: 12.34,
+      BidPriceEth: 0.056,
+      TokenReward: '100000000000000000',
+      CurNumBids: 1,
+      CurRoundNum: 2,
+      PrizeClaimTs: 3,
+      TsRoundStart: 4,
+      LastBidderAddr: '0xabc',
+      StakingAmountEth: 5,
+      NumRaffleNFTWinnersBidding: 6,
+      NumRaffleNFTWinnersStakingRWalk: 7,
+      MainStats: {
+        NumCSTokenMints: 100,
+        TotalRaffleEthDeposits: 1,
+        TotalCSTConsumedEth: 2,
+        TotalMktRewardsEth: 3,
+        NumMktRewards: 4,
+        TotalRaffleEthWithdrawn: 5,
+        NumBidsCST: 6,
+        NumUniqueBidders: 7,
+        NumUniqueWinners: 8,
+        NumUniqueDonors: 9,
+        TotalNamedTokens: 10,
+        NumUniqueStakersCST: 11,
+        NumUniqueStakersRWalk: 12,
+        StakeStatisticsCST: {
+          NumActiveStakers: 1,
+          NumDeposits: 2,
+          TotalRewardEth: 3,
+          TotalTokensStaked: 4,
+        },
+        StakeStatisticsRWalk: {
+          NumActiveStakers: 1,
+          TotalTokensMinted: 99,
+          TotalTokensStaked: 4,
+        },
+      },
+    };
+    const normalized = normalizeDashboardWire(goLike as Record<string, unknown>);
+    const parsed = DashboardInfoSchema.safeParse(normalized);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.CurPrizeAmountEth).toBe(12.34);
+      expect(parsed.data.CurBidPriceEth).toBe(0.056);
+      expect(parsed.data.GestureCostEth).toBeCloseTo(0.1);
+    }
+  });
 });
 
 describe('RoundInfoSchema', () => {
@@ -126,6 +177,28 @@ describe('RoundInfoSchema', () => {
       WinnerAddr: '0xabc',
       FutureFlag: true,
     });
+  });
+
+  it('accepts RaffleETHDeposits with only Amount (no tx row)', () => {
+    const sparse = {
+      ...sample,
+      RaffleETHDeposits: [{ Amount: 0.1 }],
+    };
+    expect(() => RoundInfoSchema.parse(sparse)).not.toThrow();
+  });
+
+  it('accepts RaffleETHDeposits with nested Tx', () => {
+    const nested = {
+      ...sample,
+      RaffleETHDeposits: [
+        {
+          Amount: 0.2,
+          RoundNum: 5,
+          Tx: { EvtLogId: 9, TxHash: '0xdep', TimeStamp: 1_700_000_001 },
+        },
+      ],
+    };
+    expect(() => RoundInfoSchema.parse(nested)).not.toThrow();
   });
 });
 

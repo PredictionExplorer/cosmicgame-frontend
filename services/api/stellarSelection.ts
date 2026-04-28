@@ -9,7 +9,7 @@ export function get_raffle_deposits_by_user(
 ): Promise<StellarSelectionETHDeposit[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`allocations/deposits/stellarSelection/by_user/${address}`),
+      getAPIUrl(`prizes/eth/raffle/by_user/${address}`),
     );
     return flattenTxArray<StellarSelectionETHDeposit>(data.UserRaffleDeposits);
   }, []);
@@ -21,7 +21,7 @@ export function get_chrono_warrior_deposits_by_user(
 ): Promise<StellarSelectionETHDeposit[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`allocations/deposits/chrono_warrior/by_user/${address}`),
+      getAPIUrl(`prizes/eth/chronowarrior/by_user/${address}`),
     );
     return flattenTxArray<StellarSelectionETHDeposit>(data.UserChronoWarriorDeposits);
   }, []);
@@ -33,7 +33,7 @@ export function get_unclaimed_raffle_deposits_by_user(
 ): Promise<StellarSelectionETHDeposit[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`allocations/deposits/unclaimed/by_user/${address}/0/1000000`),
+      getAPIUrl(`prizes/eth/unclaimed/by_user/${address}/0/1000000`),
     );
     return flattenTxArray<StellarSelectionETHDeposit>(data.UnclaimedDeposits);
   }, []);
@@ -42,7 +42,7 @@ export function get_unclaimed_raffle_deposits_by_user(
 /** Fetches all stellarSelection NFT recipients across all rounds. */
 export function get_raffle_nft_winners_list(): Promise<StellarSelectionNFTRecipient[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('stellarSelection/nft/all/list/0/1000000'));
+    const { data } = await axios.get(getAPIUrl('raffle/nft/all/list/0/1000000'));
     return flattenTxArray<StellarSelectionNFTRecipient>(data.RaffleNFTWinners);
   }, []);
 }
@@ -52,7 +52,7 @@ export function get_raffle_nft_winners_by_round(
   round: number,
 ): Promise<StellarSelectionNFTRecipient[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`stellarSelection/nft/by_round/${round}`));
+    const { data } = await axios.get(getAPIUrl(`raffle/nft/by_round/${round}`));
     return flattenTxArray<StellarSelectionNFTRecipient>(data.RaffleNFTWinners);
   }, []);
 }
@@ -62,7 +62,7 @@ export function get_raffle_nft_winnings_by_user(
   address: string,
 ): Promise<StellarSelectionNFTRecipient[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`stellarSelection/nft/by_user/${address}`));
+    const { data } = await axios.get(getAPIUrl(`raffle/nft/by_user/${address}`));
     return flattenTxArray<StellarSelectionNFTRecipient>(data.UserRaffleNFTWinnings);
   }, []);
 }

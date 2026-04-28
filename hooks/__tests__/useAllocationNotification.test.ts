@@ -91,6 +91,20 @@ describe('useAllocationNotification', () => {
 
       expect(Notification.requestPermission).not.toHaveBeenCalled();
     });
+
+    it('does not call requestPermission when denied', () => {
+      setupNotificationMock('denied');
+
+      const { result } = renderHook(() =>
+        useAllocationNotification({ allocationTime: Date.now() + 60_000 }),
+      );
+
+      act(() => {
+        result.current.requestNotificationPermission();
+      });
+
+      expect(Notification.requestPermission).not.toHaveBeenCalled();
+    });
   });
 
   describe('sendNotification', () => {

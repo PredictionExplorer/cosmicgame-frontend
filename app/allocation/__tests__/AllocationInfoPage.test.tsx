@@ -435,7 +435,7 @@ describe('AllocationInfoPage', () => {
       expect(screen.getByText('3')).toBeInTheDocument();
     });
 
-    it('displays staked tokens count', () => {
+    it('displays anchored tokens count', () => {
       renderWithData(1);
       expect(screen.getByText('100')).toBeInTheDocument();
     });

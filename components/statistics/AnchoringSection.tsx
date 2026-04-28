@@ -15,15 +15,15 @@ import { CollapsibleSection } from './CollapsibleSection';
 export interface AnchoringSectionProps {
   cstStats: {
     NumActiveStakers: number;
-    NumDeposits: number;
-    TotalRewardEth: number;
-    TotalTokensMinted: number;
+    NumDeposits?: number;
+    TotalRewardEth?: number;
+    TotalTokensMinted?: number;
     TotalTokensStaked: number;
     UnclaimedRewardEth?: number;
   };
   rwlkStats: {
     NumActiveStakers: number;
-    TotalTokensMinted: number;
+    TotalTokensMinted?: number;
     TotalTokensStaked: number;
   };
   cstAnchorActions: AnchorAction[] | null;
@@ -65,7 +65,7 @@ export function AnchoringSection({
           />
           <StatisticsItem
             title="Number of Anchor-Distribution Deposits"
-            value={cstStats.NumDeposits}
+            value={cstStats.NumDeposits ?? '—'}
             tooltip="Total distribution deposit events into the CST Anchor pool"
           />
           <StatisticsItem
@@ -73,7 +73,7 @@ export function AnchoringSection({
             value={`${(cstStats.TotalRewardEth ?? 0).toFixed(4)} ETH`}
             tooltip="Total ETH distributed as Anchor Distributions to CST anchor-holders"
           />
-          <StatisticsItem title="Total Tokens Imprinted" value={cstStats.TotalTokensMinted} />
+          <StatisticsItem title="Total Tokens Imprinted" value={cstStats.TotalTokensMinted ?? '—'} />
           <StatisticsItem
             title="Total Tokens Anchored"
             value={cstStats.TotalTokensStaked}
@@ -114,7 +114,7 @@ export function AnchoringSection({
             value={rwlkStats.NumActiveStakers}
             tooltip="Wallets currently anchoring at least one RandomWalk Token"
           />
-          <StatisticsItem title="Total Tokens Imprinted" value={rwlkStats.TotalTokensMinted} />
+          <StatisticsItem title="Total Tokens Imprinted" value={rwlkStats.TotalTokensMinted ?? '—'} />
           <StatisticsItem
             title="Total Tokens Anchored"
             value={rwlkStats.TotalTokensStaked}

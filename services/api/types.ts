@@ -36,9 +36,11 @@ export interface TxInfo {
 
 export interface AnchoringStatistics {
   NumActiveStakers: number;
-  NumDeposits: number;
-  TotalRewardEth: number;
-  TotalTokensMinted: number;
+  /** Omitted on RWalk: Go `CGStakeStatsRWalk` has no deposit / reward ETH fields. */
+  NumDeposits?: number;
+  TotalRewardEth?: number;
+  /** Omitted on CST stake stats in the Go `CGStakeStatsCST` JSON. */
+  TotalTokensMinted?: number;
   TotalTokensStaked: number;
   UnclaimedRewardEth?: number;
 }
@@ -162,12 +164,12 @@ export interface StellarSelectionNFTRecipient {
 }
 
 export interface StellarSelectionETHDeposit {
-  EvtLogId: number;
-  TxHash: string;
-  TimeStamp: number;
+  EvtLogId?: number;
+  TxHash?: string;
+  TimeStamp?: number;
   DateTime?: string;
-  RoundNum: number;
-  Amount: number;
+  RoundNum?: number;
+  Amount?: number;
   WinnerAddr?: string;
   Claimed?: boolean;
   [key: string]: unknown;

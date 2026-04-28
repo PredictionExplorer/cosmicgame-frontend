@@ -48,7 +48,7 @@ describe('CSTTable', () => {
     expect(screen.getByText(shortenHex(mockData[0]!.WinnerAddr ?? '', 6))).toBeInTheDocument();
   });
 
-  test('renders staked status correctly', () => {
+  test('renders anchored status correctly', () => {
     const mockData: CSTTokenInfo[] = [
       {
         EvtLogId: 101,

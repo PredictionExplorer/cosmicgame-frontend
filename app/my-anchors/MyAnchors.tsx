@@ -167,6 +167,7 @@ const MyAnchors = () => {
                     width={94}
                     height={60}
                     alt="cosmic signature nft"
+                    className="h-auto w-[94px] shrink-0"
                   />
                   <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
                     Cosmic Signature Anchoring
@@ -175,7 +176,13 @@ const MyAnchors = () => {
               </TabsTrigger>
               <TabsTrigger value="rwlk" className="flex-1 py-3">
                 <div className="flex items-center">
-                  <Image src="/images/rwalk.jpg" width={94} height={60} alt="RandomWalk nft" />
+                  <Image
+                    src="/images/rwalk.jpg"
+                    width={94}
+                    height={60}
+                    alt="RandomWalk nft"
+                    className="h-auto w-[94px] shrink-0"
+                  />
                   <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
                     Random Walk Anchoring
                   </span>

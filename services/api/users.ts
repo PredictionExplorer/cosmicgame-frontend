@@ -67,7 +67,7 @@ export function get_unique_bidders(): Promise<Participant[]> {
 /** Fetches the list of unique allocation-recipient addresses with win counts. */
 export function get_unique_winners(): Promise<Recipient[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/unique/recipients'));
+    const { data } = await axios.get(getAPIUrl('statistics/unique/winners'));
     return data.UniqueWinners as Recipient[];
   }, []);
 }
@@ -83,7 +83,7 @@ export function get_unique_donors(): Promise<UniqueEthDonor[]> {
 /** Fetches the list of unique CST anchorHolder addresses with anchoring stats. */
 export function get_unique_cst_stakers(): Promise<UniqueAnchorHolderCST[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/unique/anchorHolders/cst'));
+    const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/cst'));
     return data.UniqueStakersCST as UniqueAnchorHolderCST[];
   }, []);
 }
@@ -91,7 +91,7 @@ export function get_unique_cst_stakers(): Promise<UniqueAnchorHolderCST[]> {
 /** Fetches the list of unique RandomWalk anchorHolder addresses with anchoring stats. */
 export function get_unique_rwalk_stakers(): Promise<UniqueAnchorHolderRWLK[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/unique/anchorHolders/randomwalk'));
+    const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/randomwalk'));
     return data.UniqueStakersRWalk as UniqueAnchorHolderRWLK[];
   }, []);
 }
@@ -99,7 +99,7 @@ export function get_unique_rwalk_stakers(): Promise<UniqueAnchorHolderRWLK[]> {
 /** Fetches addresses that have staked both CST and RandomWalk tokens. */
 export function get_unique_both_stakers(): Promise<UniqueAnchorHolderRWLK[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('statistics/unique/anchorHolders/both'));
+    const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/both'));
     return data.UniqueStakersBoth as UniqueAnchorHolderRWLK[];
   }, []);
 }

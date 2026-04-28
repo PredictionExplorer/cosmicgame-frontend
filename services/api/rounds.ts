@@ -21,11 +21,46 @@ import type {
   GestureEthCostInfo,
 } from './types';
 
+/**
+ * Maps the live Go `/statistics/dashboard` JSON into the field names the app schema expects.
+ * Wire format uses `PrizeAmountEth`, `BidPriceEth`, `TokenReward` (wei string); lexicon/UI use
+ * `CurPrizeAmountEth`, `CurBidPriceEth`, `GestureCostEth`.
+ */
+export function normalizeDashboardWire(raw: Record<string, unknown>): Record<string, unknown> {
+  const data = { ...raw };
+
+  if (data.CurPrizeAmountEth === undefined && typeof data.PrizeAmountEth === 'number') {
+    data.CurPrizeAmountEth = data.PrizeAmountEth;
+  }
+  if (data.CurBidPriceEth === undefined && typeof data.BidPriceEth === 'number') {
+    data.CurBidPriceEth = data.BidPriceEth;
+  }
+  if (data.GestureCostEth === undefined) {
+    data.GestureCostEth = tokenRewardWeiStringToGestureCostEth(data.TokenReward);
+  }
+
+  return data;
+}
+
+function tokenRewardWeiStringToGestureCostEth(tokenReward: unknown): number {
+  if (typeof tokenReward !== 'string' || tokenReward === '' || tokenReward === 'error') {
+    return 0;
+  }
+  try {
+    const wei = BigInt(tokenReward);
+    return Number(wei) / 1e18;
+  } catch {
+    const n = Number(tokenReward);
+    return Number.isFinite(n) ? n / 1e18 : 0;
+  }
+}
+
 /** Fetches the global dashboard statistics (current round, allocation pool, bid count, etc.). */
 export function get_dashboard_info(): Promise<DashboardInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/dashboard'));
-    return safeValidate(DashboardInfoSchema, data, 'DashboardInfo') as DashboardInfo;
+    const normalized = normalizeDashboardWire(data as Record<string, unknown>);
+    return safeValidate(DashboardInfoSchema, normalized, 'DashboardInfo') as DashboardInfo;
   }, null);
 }
 
@@ -67,7 +102,7 @@ export function get_prize_time(): Promise<number> {
 /** Fetches the global allocation-claim history with flattened transaction fields. */
 export function get_claim_history(): Promise<TxInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('allocations/history/global/0/1000000'));
+    const { data } = await axios.get(getAPIUrl('prizes/history/global/0/1000000'));
     return flattenTxArray<TxInfo>(data.GlobalPrizeHistory);
   }, []);
 }
@@ -75,7 +110,7 @@ export function get_claim_history(): Promise<TxInfo[]> {
 /** Fetches allocation-claim history for a specific wallet address. */
 export function get_claim_history_by_user(address: string): Promise<WinningHistoryEntry[] | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`allocations/history/by_user/${address}/0/1000000`));
+    const { data } = await axios.get(getAPIUrl(`prizes/history/by_user/${address}/0/1000000`));
     // Backend uses `USerPrizeHistory` (typo); accept the corrected key as well.
     return flattenTxArray<WinningHistoryEntry>(data.UserPrizeHistory ?? data.USerPrizeHistory);
   }, null);
@@ -117,7 +152,7 @@ export function get_current_special_winners(): Promise<SpecialRecipients | null>
 /** Fetches all stellarSelection ETH deposits across all rounds. */
 export function get_prize_deposits_list(): Promise<TxInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('stellarSelection/deposits/list/0/1000000'));
+    const { data } = await axios.get(getAPIUrl('raffle/deposits/list/0/1000000'));
     return flattenTxArray<TxInfo>(data.RaffleDeposits);
   }, []);
 }
@@ -125,7 +160,7 @@ export function get_prize_deposits_list(): Promise<TxInfo[]> {
 /** Fetches stellarSelection ETH deposits for a specific round. */
 export function get_prize_deposits_by_round(round: number): Promise<TxInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`stellarSelection/deposits/by_round/${round}`));
+    const { data } = await axios.get(getAPIUrl(`raffle/deposits/by_round/${round}`));
     return flattenTxArray<TxInfo>(data.RaffleDeposits);
   }, []);
 }
@@ -152,7 +187,7 @@ export function ban_bid(bid_id: number, user_addr: string) {
 /** Unbans a previously banned bid (admin action). Uses Cosmic Game / Go API. */
 export function unban_gesture(bid_id: number) {
   return apiPost(async () => {
-    const { data } = await axios.post(getAPIUrl('unban_gesture'), { bid_id });
+    const { data } = await axios.post(getAPIUrl('unban_bid'), { bid_id });
     return data;
   });
 }

@@ -213,7 +213,8 @@ export function Providers({
         ? `\n  Build: ${build.shortSha}${build.ref ? ` (${build.ref})` : ''}\n  Commit: ${build.fullSha}`
         : '';
 
-    console.warn(
+    // console.log (not warn): dev-only banner; warn is forwarded as an error-looking stack in Next.
+    console.log(
       '[Cosmic Signature] Config:\n' +
         `  Network: ${process.env.NEXT_PUBLIC_NETWORK}\n` +
         `  Chain ID: ${networkConfig.chainId}\n` +

@@ -67,13 +67,13 @@ describe('CSTokensTable', () => {
     expect(screen.queryByText('CosmicToken')).not.toBeInTheDocument();
   });
 
-  it('renders Stake button for unstaked tokens', () => {
+  it('renders Anchor button for tokens that are not anchored', () => {
     const token = createToken({ Staked: false });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
     expect(screen.getByText('Anchor')).toBeInTheDocument();
   });
 
-  it('does not render Stake button for staked tokens', () => {
+  it('does not render Anchor button for anchored tokens', () => {
     const token = createToken({ Staked: true });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
     expect(screen.queryByText('Anchor')).not.toBeInTheDocument();
@@ -99,7 +99,7 @@ describe('CSTokensTable', () => {
     expect(checkboxes.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('Stake button calls handleStake with id and isRwlk=false', async () => {
+  it('Anchor button calls handleStake with id and isRwlk=false', async () => {
     const user = userEvent.setup();
     const token = createToken({ TokenId: 42, Staked: false });
     render(<CSTokensTable {...defaultProps} list={[token]} />);
@@ -111,7 +111,7 @@ describe('CSTokensTable', () => {
     });
   });
 
-  it('shows Stake Many when multiple rows selected', () => {
+  it('shows Anchor Many when multiple rows selected', () => {
     const list = [
       createToken({ TokenId: 1, EvtLogId: 1, Staked: false }),
       createToken({ TokenId: 2, EvtLogId: 2, Staked: false }),
@@ -127,7 +127,7 @@ describe('CSTokensTable', () => {
     expect(screen.getByText('Anchor Many')).toBeInTheDocument();
   });
 
-  it('Stake Many calls handleStakeMany with selected IDs and isRwlk=false flags', async () => {
+  it('Anchor Many calls handleStakeMany with selected IDs and isRwlk=false flags', async () => {
     const user = userEvent.setup();
     const list = [
       createToken({ TokenId: 10, EvtLogId: 1, Staked: false }),
@@ -149,7 +149,7 @@ describe('CSTokensTable', () => {
     });
   });
 
-  it('single Stake sets selectedTokenIds to the clicked token', async () => {
+  it('single Anchor sets selectedTokenIds to the clicked token', async () => {
     const user = userEvent.setup();
     const list = [
       createToken({ TokenId: 5, EvtLogId: 1, Staked: false }),

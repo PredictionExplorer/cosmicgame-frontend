@@ -120,6 +120,9 @@
   "resolutions": {
     "@noble/hashes": "^1.8.0"
   },
+  "overrides": {
+    "@noble/hashes": "^1.8.0"
+  },
   "lint-staged": {
     "*.{ts,tsx}": [
       "prettier --write",

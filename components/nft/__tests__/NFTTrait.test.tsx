@@ -216,7 +216,7 @@ describe('NFTTrait', () => {
     expect(screen.getByText('Eligible for Anchoring')).toBeInTheDocument();
   });
 
-  it('renders already staked badge when staked', () => {
+  it('renders already anchored badge when anchored', () => {
     withDashboard();
     withNft({ Staked: true });
     render(<NFTTrait tokenId={5} />);

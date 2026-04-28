@@ -69,7 +69,7 @@ function useTokenName(
           }
         }
       } catch (err) {
-        reportError(err, 'fetch staked token name');
+        reportError(err, 'fetch anchored token name');
       }
     };
     fetchName();

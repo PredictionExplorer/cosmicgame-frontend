@@ -58,6 +58,8 @@ jest.mock('wagmi', () => ({
     data: {
       writeContract: mockWriteContract,
       account: { address: '0xUser' as `0x${string}` },
+      /** Must match jest `activeChain.id` for `NEXT_PUBLIC_NETWORK` in jest.setup (sepolia → 421614). */
+      getChainId: jest.fn().mockResolvedValue(421614),
     },
   })),
 }));

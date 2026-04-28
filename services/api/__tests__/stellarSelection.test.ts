@@ -48,7 +48,7 @@ describe('stellarSelection API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xa');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/allocations.*deposits.*stellarSelection.*by_user.*0xabc/),
+        expect.stringMatching(/prizes\/eth\/raffle\/by_user.*0xabc/),
       );
     });
 
@@ -70,7 +70,7 @@ describe('stellarSelection API', () => {
       mockedAxios.get.mockResolvedValue({ data: { UserChronoWarriorDeposits: [] } });
       await get_chrono_warrior_deposits_by_user('0xdef');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/allocations.*deposits.*chrono_warrior.*by_user.*0xdef/),
+        expect.stringMatching(/prizes\/eth\/chronowarrior\/by_user.*0xdef/),
       );
     });
 
@@ -92,7 +92,7 @@ describe('stellarSelection API', () => {
       mockedAxios.get.mockResolvedValue({ data: { UnclaimedDeposits: [] } });
       await get_unclaimed_raffle_deposits_by_user('0xghi');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/allocations.*deposits.*unclaimed.*by_user.*0xghi/),
+        expect.stringMatching(/prizes\/eth\/unclaimed\/by_user.*0xghi/),
       );
     });
 
@@ -118,7 +118,7 @@ describe('stellarSelection API', () => {
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xb');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/stellarSelection.*nft.*all.*list/),
+        expect.stringMatching(/raffle\/nft\/all\/list/),
       );
     });
 
@@ -138,7 +138,7 @@ describe('stellarSelection API', () => {
       mockedAxios.get.mockResolvedValue({ data: { RaffleNFTWinners: [] } });
       await get_raffle_nft_winners_by_round(4);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/stellarSelection.*nft.*by_round.*4/),
+        expect.stringMatching(/raffle\/nft\/by_round\/4/),
       );
     });
 
@@ -160,7 +160,7 @@ describe('stellarSelection API', () => {
       mockedAxios.get.mockResolvedValue({ data: { UserRaffleNFTWinnings: [] } });
       await get_raffle_nft_winnings_by_user('0xwinner');
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/stellarSelection.*nft.*by_user.*0xwinner/),
+        expect.stringMatching(/raffle\/nft\/by_user.*0xwinner/),
       );
     });
 
