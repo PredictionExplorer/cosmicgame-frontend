@@ -184,8 +184,12 @@ describe('useApiQuery hooks', () => {
       );
     });
 
-    it('is enabled only when roundNum > 0', () => {
+    it('is enabled for round 0 and non-finite values are disabled', () => {
       renderHook(() => useRoundInfo(0));
+      expect(mockUseQuery.mock.calls[0][0].enabled).toBe(true);
+
+      jest.clearAllMocks();
+      renderHook(() => useRoundInfo(Number.NaN));
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(false);
 
       jest.clearAllMocks();

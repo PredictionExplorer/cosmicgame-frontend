@@ -63,6 +63,8 @@ jest.mock('../../utils/contractErrors', () => ({
   getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
 }));
 
+import { AxiosError } from 'axios';
+
 import { useAllocationFinalize } from '../useAllocationFinalize';
 import api from '../../services/api';
 import { isUserRejection, reportError } from '../../utils/errors';
@@ -205,6 +207,24 @@ describe('useAllocationFinalize', () => {
     });
 
     expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('cycle=7'));
+  });
+
+  it('redirect uses on-chain roundBefore, not dashboard CurRoundNum', async () => {
+    mockReadRoundNum.mockReset();
+    mockReadRoundNum.mockResolvedValueOnce(BigInt(3)).mockResolvedValueOnce(BigInt(4));
+
+    const { result } = renderHook(() =>
+      useAllocationFinalize({
+        data: { ...baseData, CurRoundNum: 99 } as DashboardInfo,
+        offset: 0,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.onFinalize();
+    });
+
+    expect(mockPush).toHaveBeenCalledWith(expect.stringContaining('cycle=3'));
   });
 
   // ─────────────────────────────────────────────
@@ -371,6 +391,30 @@ describe('useAllocationFinalize', () => {
       'warning',
       expect.stringContaining('Token metadata may still be updating'),
     );
+    expect(mockPush).toHaveBeenCalled();
+  });
+
+  it('post-claim api 404 does not reportError or spam notifications', async () => {
+    const api404 = new AxiosError('Not Found', '404', undefined, undefined, {
+      status: 404,
+      statusText: 'Not Found',
+      headers: {},
+      config: {} as never,
+      data: {},
+    });
+
+    mockApi.create.mockRejectedValueOnce(api404);
+
+    const { result } = renderHook(() => useAllocationFinalize({ data: baseData, offset: 0 }));
+
+    let success: boolean | undefined;
+    await act(async () => {
+      success = await result.current.onFinalize();
+    });
+
+    expect(success).toBe(true);
+    expect(mockReportError).not.toHaveBeenCalled();
+    expect(mockNotify).not.toHaveBeenCalled();
     expect(mockPush).toHaveBeenCalled();
   });
 

@@ -12,8 +12,10 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useRoundInfo: (...args: unknown[]) => mockUseRoundInfo(...args),
 }));
 
+let mockSearchParams = new URLSearchParams('cycle=5');
+
 jest.mock('next/navigation', () => ({
-  useSearchParams: () => new URLSearchParams('cycle=5'),
+  useSearchParams: () => mockSearchParams,
 }));
 
 jest.mock('@fireworks-js/react', () => ({
@@ -21,19 +23,35 @@ jest.mock('@fireworks-js/react', () => ({
   default: () => <div data-testid="fireworks" />,
 }));
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockSearchParams = new URLSearchParams('cycle=5');
+});
 
 describe('AllocationFinalizedPage', () => {
   it('shows loading state while fetching', () => {
     mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: true, error: null });
     render(<AllocationFinalizedPage />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading cycle 5…')).toBeInTheDocument();
   });
 
-  it('shows no allocation info message when data is null', () => {
+  it('shows no allocation info message when data is null and not a success redirect', () => {
     mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false, error: null });
     render(<AllocationFinalizedPage />);
     expect(screen.getByText('No allocation information.')).toBeInTheDocument();
+  });
+
+  it('shows success follow-up when message=success and API has no row', () => {
+    mockSearchParams = new URLSearchParams('cycle=0&message=success');
+    mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false, error: null });
+    render(<AllocationFinalizedPage />);
+    expect(
+      screen.getByRole('heading', { name: /You successfully completed this cycle/i }),
+    ).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: /View cycle 0 allocation details/i });
+    expect(link).toHaveAttribute('href', '/allocation/0');
+    expect(screen.getByTestId('fireworks')).toBeInTheDocument();
   });
 
   it('renders allocation info when data is loaded', () => {
@@ -58,6 +76,13 @@ describe('AllocationFinalizedPage', () => {
     mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: false, error: null });
     render(<AllocationFinalizedPage />);
     expect(mockUseRoundInfo).toHaveBeenCalledWith(5);
+  });
+
+  it('passes 0 to useRoundInfo for first cycle', () => {
+    mockSearchParams = new URLSearchParams('cycle=0');
+    mockUseRoundInfo.mockReturnValue({ data: undefined, isLoading: false, error: null });
+    render(<AllocationFinalizedPage />);
+    expect(mockUseRoundInfo).toHaveBeenCalledWith(0);
   });
 
   it('shows attached NFTs count when present', () => {
