@@ -3,6 +3,8 @@
 import { useMemo } from 'react';
 import { Trophy, Gavel, Layers, Users } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
@@ -55,23 +57,56 @@ const AllocationRecipientsPage = () => {
       >
         <p className="type-body-md text-muted-foreground">
           When a Performance Cycle finalizes, the participant who made the Final Gesture retrieves
-          the Signature Allocation &mdash; 25% of the Cycle Reserve plus a unique Cosmic Signature
-          NFT. Additional allocations flow through Stellar Selection, Anchor Distributions, public
-          goods, and protocol reserves.
+          the Signature Allocation &mdash; {protocolFacts.mainEthPercentage}% of the Cycle Reserve,
+          1,000 CST, and a unique Cosmic Signature NFT. Additional allocations flow through
+          Chrono-Warrior, Stellar Selection, Anchor Distributions, Public Goods, and the Compounding
+          Cycle Reserve.
         </p>
         <div className="space-y-3">
           {[
-            ['Signature', '30%', 'bg-[rgb(var(--aurora-cyan-rgb))]'],
-            ['Anchor', '19%', 'bg-[rgb(var(--impact-green-rgb))]'],
-            ['Stellar', '6%', 'bg-[rgb(var(--solar-gold-rgb))]'],
-            ['Public goods', '5%', 'bg-[rgb(var(--chrono-rose-rgb))]'],
-          ].map(([label, value, color]) => (
+            {
+              label: 'Signature',
+              value: `${protocolFacts.mainEthPercentage}%`,
+              width: `${protocolFacts.mainEthPercentage}%`,
+              color: 'bg-[rgb(var(--aurora-cyan-rgb))]',
+            },
+            {
+              label: 'Chrono',
+              value: `${protocolFacts.chronoWarriorEthPercentage}%`,
+              width: `${protocolFacts.chronoWarriorEthPercentage}%`,
+              color: 'bg-[rgb(var(--nebula-violet-rgb))]',
+            },
+            {
+              label: 'Stellar ETH',
+              value: `${protocolFacts.stellarSelectionEthPercentage}%`,
+              width: `${protocolFacts.stellarSelectionEthPercentage}%`,
+              color: 'bg-[rgb(var(--solar-gold-rgb))]',
+            },
+            {
+              label: 'Anchor',
+              value: `${protocolFacts.anchorDistributionPercentage}%`,
+              width: `${protocolFacts.anchorDistributionPercentage}%`,
+              color: 'bg-[rgb(var(--impact-green-rgb))]',
+            },
+            {
+              label: 'Public Goods',
+              value: `${protocolFacts.publicGoodsPercentage}%`,
+              width: `${protocolFacts.publicGoodsPercentage}%`,
+              color: 'bg-[rgb(var(--chrono-rose-rgb))]',
+            },
+            {
+              label: 'Next cycle',
+              value: `~${protocolFacts.compoundingReservePercentage}%`,
+              width: `${protocolFacts.compoundingReservePercentage}%`,
+              color: 'bg-white/40',
+            },
+          ].map(({ label, value, width, color }) => (
             <div key={label} className="grid grid-cols-[96px_1fr_44px] items-center gap-3">
               <span className="type-mono-sm text-white/55">{label}</span>
               <span className="h-2 overflow-hidden rounded-full bg-white/[0.08]">
                 <span
                   className={`block h-full rounded-full ${color}`}
-                  style={{ width: value }}
+                  style={{ width }}
                   aria-hidden
                 />
               </span>

@@ -48,9 +48,10 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       icon: <Trophy className="h-5 w-5" />,
       name: 'Signature Allocation',
       tooltip:
-        'The participant who made the Final Gesture when the countdown reaches zero may retrieve this allocation.',
+        'The participant who made the Final Gesture when the countdown reaches zero may retrieve this allocation: ETH, 1,000 CST, a Cosmic Signature NFT, and attached tokens.',
       amounts: [
         `${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`,
+        '1,000 CST',
         '1 Cosmic Signature NFT',
         'Attached tokens (if any)',
       ],

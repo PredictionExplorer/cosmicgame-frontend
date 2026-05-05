@@ -34,9 +34,9 @@ const phases = [
     Icon: Trophy,
     label: 'Cycle Finalizes',
     description:
-      'The participant who made the Final Gesture retrieves the Signature Allocation: 25% of the Cycle Reserve plus a Cosmic Signature NFT.',
+      'The participant who made the Final Gesture retrieves the Signature Allocation: 25% of the Cycle Reserve, 1,000 CST, and a Cosmic Signature NFT.',
     tooltip:
-      'The Signature Allocation retrieval happens via the protocol contract. The Cosmic Signature NFT is imprinted automatically.',
+      'The Signature Allocation retrieval happens via the protocol contract. The CST and Cosmic Signature NFT are imprinted automatically.',
   },
   {
     Icon: Ticket,

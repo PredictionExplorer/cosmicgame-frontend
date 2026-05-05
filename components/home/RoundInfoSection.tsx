@@ -85,7 +85,7 @@ export function RoundInfoSection({
       <motion.div custom={1} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
           <SectionDivider title="Allocation Tracks" className="flex-1" />
-          <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
+          <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
         </div>
         <FundDistribution data={data ?? undefined} />
       </motion.div>

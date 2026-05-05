@@ -50,14 +50,14 @@ describe('AnchorActionDetailPage', () => {
     mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
     mockUseCSTAnchorActionInfo.mockReturnValue(noData);
     render(<AnchorActionDetailPage IsRwalk={1} actionId={5} />);
-    expect(screen.getByText('Anchor Action for RandomWalk Token')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Action for RandomWalk NFT')).toBeInTheDocument();
   });
 
   it('renders CST heading when IsRwalk=0', () => {
     mockUseRWLKAnchorActionInfo.mockReturnValue(noData);
     mockUseCSTAnchorActionInfo.mockReturnValue(noData);
     render(<AnchorActionDetailPage IsRwalk={0} actionId={5} />);
-    expect(screen.getByText('Anchor Action for Cosmic Signature Token')).toBeInTheDocument();
+    expect(screen.getByText('Anchor Action for Cosmic Signature NFT')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {

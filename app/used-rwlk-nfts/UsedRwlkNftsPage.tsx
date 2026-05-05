@@ -105,7 +105,7 @@ const UsedRwlkNftsPage = () => {
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         RandomWalk NFT holders can attach their tokens to receive a 50% Gesture Cost reduction in
         Cosmic Signature. Once used, a RandomWalk NFT is recorded here. Each NFT can only be used
-        once per wallet, making the timing of its use a strategic decision.
+        once for this discount, making the timing of its use a strategic decision.
       </p>
 
       <div className="mt-12">

@@ -173,7 +173,7 @@ export const GestureStatus = ({
                 value={`${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`}
                 icon={<Trophy className="h-5 w-5" />}
                 gradient
-                tooltip="The ETH allocation the participant who makes the Final Gesture may retrieve when the cycle finalizes"
+                tooltip="The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST and a Cosmic Signature NFT"
               />
             </motion.div>
 
@@ -247,7 +247,7 @@ export const GestureStatus = ({
                         You
                       </span>
                     )}
-                    <InfoTooltip content="The participant who made the Final Gesture when the countdown reaches zero may finalize the cycle and retrieve the Signature Allocation plus a Cosmic Signature NFT." />
+                    <InfoTooltip content="The participant who made the Final Gesture when the countdown reaches zero may finalize the cycle and retrieve the Signature Allocation: ETH, 1,000 CST, and a Cosmic Signature NFT." />
                   </div>
                   <a
                     href={`/user/${data.LastBidderAddr}`}
@@ -292,7 +292,8 @@ export const GestureStatus = ({
               {data.LastBidderAddr === account ? (
                 <p className="text-sm font-medium text-emerald-400">
                   You made the most recent gesture. If no one else gestures, you receive the
-                  Signature Allocation ({(data.PrizeAmountEth ?? 0).toFixed(4)} ETH).
+                  Signature Allocation ({(data.PrizeAmountEth ?? 0).toFixed(4)} ETH, 1,000 CST, and
+                  1 Cosmic Signature NFT).
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">

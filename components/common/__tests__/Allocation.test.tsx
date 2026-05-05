@@ -79,7 +79,7 @@ describe('Allocation Breakdown', () => {
   it('shows fixed Recognition CST amount for Endurance Champion and Final CST Gesture', () => {
     render(<Prize data={mockData} />);
     const cstAmounts = screen.getAllByText('1,000 CST');
-    expect(cstAmounts.length).toBe(2);
+    expect(cstAmounts.length).toBe(3);
   });
 
   it('renders with null data without crashing', () => {

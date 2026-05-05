@@ -49,9 +49,9 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
             <TooltipTrigger asChild>
               <Link href={`/user/${FromAddr}`} className="text-inherit font-mono">
                 {addrEq(FromAddr, stakingCst)
-                  ? 'StakingWallet CST'
+                  ? 'Cosmic Signature NFT Anchoring Wallet'
                   : addrEq(FromAddr, stakingRwalk)
-                    ? 'StakingWallet RandomWalk'
+                    ? 'RandomWalk NFT Anchoring Wallet'
                     : shortenHex(FromAddr ?? '', 6)}
               </Link>
             </TooltipTrigger>
@@ -65,9 +65,9 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
             <TooltipTrigger asChild>
               <Link href={`/user/${ToAddr}`} className="text-inherit font-mono">
                 {addrEq(ToAddr, stakingCst)
-                  ? 'StakingWallet CST'
+                  ? 'Cosmic Signature NFT Anchoring Wallet'
                   : addrEq(ToAddr, stakingRwalk)
-                    ? 'StakingWallet RandomWalk'
+                    ? 'RandomWalk NFT Anchoring Wallet'
                     : shortenHex(ToAddr ?? '', 6)}
               </Link>
             </TooltipTrigger>

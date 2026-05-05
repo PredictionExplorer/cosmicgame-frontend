@@ -38,11 +38,11 @@ const defaultProps = {
   ethDurations: { AuctionDuration: 7200, ElapsedDuration: 3600 },
   cstBeginningBidPrice: 100,
   charityAddress: '0xCharity123',
-  charityPercentage: 10,
+  charityPercentage: 7,
   explorerUrl: 'https://explorer.example.com',
-  raffleEthWinners: 5,
-  raffleNftWinnersBidding: 3,
-  raffleNftWinnersStaking: 2,
+  raffleEthWinners: 3,
+  raffleNftWinnersBidding: 10,
+  raffleNftWinnersStaking: 10,
 };
 
 describe('AuctionParameters', () => {
@@ -88,7 +88,7 @@ describe('AuctionParameters', () => {
 
   it('renders public goods percentage', () => {
     render(<AuctionParameters {...defaultProps} />);
-    expect(screen.getByText('10%')).toBeInTheDocument();
+    expect(screen.getByText('7%')).toBeInTheDocument();
   });
 
   it('renders Stellar Selection stat cards', () => {
@@ -96,9 +96,8 @@ describe('AuctionParameters', () => {
     expect(screen.getByText('ETH Stellar Selection Recipients')).toBeInTheDocument();
     expect(screen.getByText('NFT Stellar Selection (Participants)')).toBeInTheDocument();
     expect(screen.getByText('NFT Stellar Selection (Anchored RWLK)')).toBeInTheDocument();
-    expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('3').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('2').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('10').length).toBeGreaterThanOrEqual(2);
   });
 
   it('renders section title', () => {

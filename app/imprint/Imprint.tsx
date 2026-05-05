@@ -95,7 +95,7 @@ const Imprint = () => {
         RandomWalk NFTs are unique digital collectibles that grant holders a strategic advantage in
         the Cosmic Signature protocol. By attaching a RandomWalk NFT to your gesture, you receive a
         50% reduction in Gesture Cost — a significant edge late in the cycle. Each RandomWalk NFT
-        can be used once per wallet, so choose your moment wisely for maximum impact.
+        can be used once for this discount, so choose your moment wisely for maximum impact.
       </p>
 
       <div className="flex flex-col items-center">

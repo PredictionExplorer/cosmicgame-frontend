@@ -67,7 +67,7 @@ export function FundDistribution({ data }: { data?: DistData }) {
       eth: (allocation * balance) / 100,
       icon: <Trophy className="h-4 w-4" />,
       tooltip:
-        'ETH retrieved by the participant who made the Final Gesture when the countdown reaches zero.',
+        'ETH retrieved by the participant who made the Final Gesture; they also receive 1,000 CST and a Cosmic Signature NFT.',
       color: 'text-[hsl(196,98%,54%)]',
       gradient: 'from-[hsl(196,98%,54%)] to-[hsl(196,98%,40%)]',
     },
@@ -106,7 +106,7 @@ export function FundDistribution({ data }: { data?: DistData }) {
       eth: (chrono * balance) / 100,
       icon: <Swords className="h-4 w-4" />,
       tooltip:
-        'Awarded to the participant who held the Endurance Champion position for the longest consecutive interval.',
+        'ETH awarded to the Chrono-Warrior, who also receives 1,000 CST and a Cosmic Signature NFT.',
       color: 'text-[hsl(0,62%,50%)]',
       gradient: 'from-[hsl(0,62%,50%)] to-[hsl(0,62%,38%)]',
     },

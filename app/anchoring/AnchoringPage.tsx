@@ -4,6 +4,8 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { Coins, Users, Layers, TrendingUp, ArrowRight } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { GlobalAnchorDistributionsTable } from '@/components/anchoring/GlobalAnchorDistributionsTable';
 import { RwalkAnchorDistributionImprintsTable } from '@/components/anchoring/RwalkAnchorDistributionImprintsTable';
 import { AnchoringHeroStats } from '@/components/anchoring/AnchoringHeroStats';
@@ -41,10 +43,11 @@ const AnchoringPage = () => {
   const statsLoading = isLoadingDashboard || isLoadingStakers;
   const error = cstError?.message || rwlkError?.message || null;
 
-  const rewardPerCST = useMemo(() => {
-    const totalAnchoredCST = dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
-    if (totalAnchoredCST > 0) {
-      return (dashboardData?.StakingAmountEth ?? 0) / totalAnchoredCST;
+  const rewardPerCosmicSignatureNft = useMemo(() => {
+    const totalAnchoredCosmicSignatureNfts =
+      dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
+    if (totalAnchoredCosmicSignatureNfts > 0) {
+      return (dashboardData?.StakingAmountEth ?? 0) / totalAnchoredCosmicSignatureNfts;
     }
     return 0;
   }, [dashboardData]);
@@ -55,13 +58,13 @@ const AnchoringPage = () => {
         label: 'Anchor Distribution Pool',
         value: formatEthValue(dashboardData?.StakingAmountEth ?? 0),
         tooltip:
-          'Total ETH currently allocated to the Anchor Distribution pool, distributed proportionally to CST anchor-holders each cycle.',
+          'Total ETH currently allocated to the Anchor Distribution pool, distributed proportionally to Cosmic Signature NFT anchor-holders each cycle.',
         icon: <Coins className="h-4 w-4" />,
         featured: true,
         gradient: true,
       },
       {
-        label: 'CST Tokens Anchored',
+        label: 'Cosmic Signature NFTs Anchored',
         value: (
           dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked ?? 0
         ).toLocaleString(),
@@ -70,7 +73,7 @@ const AnchoringPage = () => {
         icon: <Layers className="h-4 w-4" />,
       },
       {
-        label: 'RWLK Tokens Anchored',
+        label: 'RWLK NFTs Anchored',
         value: (
           dashboardData?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0
         ).toLocaleString(),
@@ -79,10 +82,11 @@ const AnchoringPage = () => {
         icon: <Layers className="h-4 w-4" />,
       },
       {
-        label: 'Distribution per CST',
-        value: rewardPerCST > 0 ? `${rewardPerCST.toFixed(6)} ETH` : '--',
+        label: 'Distribution per NFT',
+        value:
+          rewardPerCosmicSignatureNft > 0 ? `${rewardPerCosmicSignatureNft.toFixed(6)} ETH` : '--',
         tooltip:
-          'Current ETH Anchor Distribution per anchored CST token, based on the pool size divided by total anchored tokens.',
+          'Current ETH Anchor Distribution per anchored Cosmic Signature NFT, based on the pool size divided by total anchored NFTs.',
         icon: <TrendingUp className="h-4 w-4" />,
       },
       {
@@ -92,7 +96,7 @@ const AnchoringPage = () => {
         icon: <Users className="h-4 w-4" />,
       },
     ],
-    [dashboardData, rewardPerCST, uniqueStakers],
+    [dashboardData, rewardPerCosmicSignatureNft, uniqueStakers],
   );
 
   if (error) {
@@ -124,9 +128,9 @@ const AnchoringPage = () => {
         className="mb-8 grid gap-6 lg:grid-cols-[1fr_340px] lg:items-center"
       >
         <p className="type-body-md text-muted-foreground">
-          Anchor your Cosmic Signature NFTs or RandomWalk NFTs to receive ETH Anchor Distributions
-          from the protocol&apos;s Cycle Reserve. Each cycle, 19% of the contract balance is routed
-          to anchored token holders.
+          Anchor your Cosmic Signature NFTs to share {protocolFacts.anchorDistributionPercentage}%
+          of each cycle&apos;s Cycle Reserve through ETH Anchor Distributions. Anchor RandomWalk
+          NFTs to enter the Anchored-NFT Stellar Selection.
         </p>
         <div className="relative min-h-[160px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.08] bg-black/20">
           <div
@@ -139,7 +143,7 @@ const AnchoringPage = () => {
           />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="rounded-full bg-[rgb(var(--impact-green-rgb)/0.14)] px-4 py-2 text-sm font-semibold text-[rgb(var(--impact-green-rgb))]">
-              19% anchor flow
+              {protocolFacts.anchorDistributionPercentage}% anchor flow
             </div>
           </div>
         </div>
@@ -156,14 +160,15 @@ const AnchoringPage = () => {
         <div>
           <p className="text-base font-semibold text-foreground">Start Anchoring</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Anchor your NFTs to receive a share of each cycle&apos;s Anchor Distribution pool.
+            Anchor your Cosmic Signature NFTs to receive a share of each cycle&apos;s Anchor
+            Distribution pool.
           </p>
         </div>
         <ArrowRight className="h-5 w-5 text-primary opacity-60 transition-transform group-hover:translate-x-1 group-hover:opacity-100" />
       </Link>
 
       <div>
-        <SectionDivider title="CosmicSignature Token" />
+        <SectionDivider title="Cosmic Signature NFT" />
         {loading ? (
           <div className="space-y-3 py-4">
             <Skeleton className="h-10 w-full" />

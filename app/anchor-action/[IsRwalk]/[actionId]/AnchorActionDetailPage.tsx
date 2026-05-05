@@ -29,7 +29,7 @@ function AnchorActionDetailPage({ IsRwalk, actionId }: { IsRwalk: number; action
   const error = activeQuery.error?.message ?? null;
 
   const headingToken = isRwalk ? 'RandomWalk' : 'Cosmic Signature';
-  const subtitleText = `Anchor Action for ${headingToken} Token`;
+  const subtitleText = `Anchor Action for ${headingToken} NFT`;
 
   return (
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
@@ -100,7 +100,7 @@ function AnchorActionBody({
         description={
           isRwalk
             ? 'Random Walk NFT used in this action.'
-            : 'Cosmic Signature token used in this action.'
+            : 'Cosmic Signature NFT used in this action.'
         }
       >
         <div className="px-4 pb-4 pt-2 sm:px-5">

@@ -666,10 +666,14 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           <RecipientCard
             icon={<Trophy className="h-5 w-5" />}
             title="Signature Allocation"
-            tooltip="The participant who made the Final Gesture when the countdown reached zero. Retrieves the Signature Allocation in ETH plus a Cosmic Signature NFT."
+            tooltip="The participant who made the Final Gesture when the countdown reached zero. Retrieves the Signature Allocation in ETH, 1,000 CST, and a Cosmic Signature NFT."
             address={allocationInfo.WinnerAddr}
             rewards={[
               { label: 'ETH Allocation', value: `${allocationInfo.AmountEth.toFixed(4)} ETH` },
+              {
+                label: 'Recognition CST',
+                value: `${(allocationInfo.CSTAmountEth ?? 0).toFixed(4)} CST`,
+              },
             ]}
             tokenId={allocationInfo.TokenId}
             tokenLabel="Cosmic Signature NFT"

@@ -154,13 +154,13 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
         <span className="break-all">
           {history.GestureType === 1 && history.RWalkNFTId && (
             <>
-              {`Gesture was made using RandomWalk Token (ID = ${history.RWalkNFTId})`}
+              {`Gesture was made using RandomWalk NFT (ID = ${history.RWalkNFTId})`}
               <Image
                 src={getRWLKImageUrl(history.RWalkNFTId.toString().padStart(6, '0'))}
                 width={32}
                 height={32}
                 className="align-middle inline"
-                alt="RWLK Token"
+                alt="RWLK NFT"
                 unoptimized
               />
             </>

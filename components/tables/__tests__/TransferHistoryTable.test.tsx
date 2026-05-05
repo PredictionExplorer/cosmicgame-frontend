@@ -69,14 +69,14 @@ describe('TransferHistoryTable', () => {
     expect(datetimes).toHaveLength(1);
   });
 
-  it('shows "StakingWallet CST" label for CST anchoring address', () => {
+  it('shows Cosmic Signature NFT anchoring wallet label for CST anchoring address', () => {
     render(<TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_CST_LABEL })]} />);
-    expect(screen.getByText('StakingWallet CST')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
   });
 
-  it('shows "StakingWallet RandomWalk" label for RWLK anchoring address', () => {
+  it('shows RandomWalk NFT anchoring wallet label for RWLK anchoring address', () => {
     render(<TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_RWALK_LABEL })]} />);
-    expect(screen.getByText('StakingWallet RandomWalk')).toBeInTheDocument();
+    expect(screen.getByText('RandomWalk NFT Anchoring Wallet')).toBeInTheDocument();
   });
 
   it('shows shortened hex for regular addresses', () => {

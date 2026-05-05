@@ -49,35 +49,38 @@ export function AnchoringSection({
     <Tabs defaultValue="cst" className="mt-8">
       <TabsList>
         <TabsTrigger value="cst" className="text-lg font-semibold">
-          CosmicSignature Token
+          Cosmic Signature NFT
         </TabsTrigger>
         <TabsTrigger value="rwlk" className="text-lg font-semibold">
-          RandomWalk Token
+          RandomWalk NFT
         </TabsTrigger>
       </TabsList>
 
       <TabsContent value="cst" className="space-y-6 pt-4">
-        <StatisticsGroup title="CST Anchoring Overview" accentColor="blue">
+        <StatisticsGroup title="Cosmic Signature NFT Anchoring Overview" accentColor="blue">
           <StatisticsItem
             title="Number of Active Anchor-holders"
             value={cstStats.NumActiveStakers}
-            tooltip="Wallets currently anchoring at least one Cosmic Signature Token"
+            tooltip="Wallets currently anchoring at least one Cosmic Signature NFT"
           />
           <StatisticsItem
             title="Number of Anchor-Distribution Deposits"
             value={cstStats.NumDeposits ?? '—'}
-            tooltip="Total distribution deposit events into the CST Anchor pool"
+            tooltip="Total distribution deposit events into the Cosmic Signature NFT Anchor pool"
           />
           <StatisticsItem
             title="Total Anchor Distributions"
             value={`${(cstStats.TotalRewardEth ?? 0).toFixed(4)} ETH`}
-            tooltip="Total ETH distributed as Anchor Distributions to CST anchor-holders"
+            tooltip="Total ETH distributed as Anchor Distributions to Cosmic Signature NFT anchor-holders"
           />
-          <StatisticsItem title="Total Tokens Imprinted" value={cstStats.TotalTokensMinted ?? '—'} />
+          <StatisticsItem
+            title="Total Tokens Imprinted"
+            value={cstStats.TotalTokensMinted ?? '—'}
+          />
           <StatisticsItem
             title="Total Tokens Anchored"
             value={cstStats.TotalTokensStaked}
-            tooltip="Number of Cosmic Signature Tokens currently anchored in the protocol"
+            tooltip="Number of Cosmic Signature NFTs currently anchored in the protocol"
           />
           <StatisticsItem
             title="Unretrieved Anchor Distributions"
@@ -112,13 +115,16 @@ export function AnchoringSection({
           <StatisticsItem
             title="Number of Active Anchor-holders"
             value={rwlkStats.NumActiveStakers}
-            tooltip="Wallets currently anchoring at least one RandomWalk Token"
+            tooltip="Wallets currently anchoring at least one RandomWalk NFT"
           />
-          <StatisticsItem title="Total Tokens Imprinted" value={rwlkStats.TotalTokensMinted ?? '—'} />
+          <StatisticsItem
+            title="Total Tokens Imprinted"
+            value={rwlkStats.TotalTokensMinted ?? '—'}
+          />
           <StatisticsItem
             title="Total Tokens Anchored"
             value={rwlkStats.TotalTokensStaked}
-            tooltip="Number of RandomWalk Tokens currently anchored in the protocol"
+            tooltip="Number of RandomWalk NFTs currently anchored in the protocol"
           />
         </StatisticsGroup>
 

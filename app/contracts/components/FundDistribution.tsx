@@ -71,14 +71,14 @@ export function FundDistribution({
       value: prizePercentage ?? 0,
       color: SEGMENT_COLORS.allocation,
       tooltip:
-        'Percentage of the Cycle Reserve retrieved by the participant who made the Final Gesture',
+        'ETH percentage retrieved by the participant who made the Final Gesture; they also receive 1,000 CST and a Cosmic Signature NFT',
     },
     {
       label: 'Chrono-Warrior',
       value: chronoWarriorPercentage ?? 0,
       color: SEGMENT_COLORS.chrono,
       tooltip:
-        'Allocation to the participant who held the Endurance Champion position for the longest consecutive interval',
+        'ETH allocation to the Chrono-Warrior, who also receives 1,000 CST and a Cosmic Signature NFT',
     },
     {
       label: 'Stellar Selection',
@@ -107,7 +107,7 @@ export function FundDistribution({
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
           <CardTitle className="text-lg font-semibold">Allocation Tracks</CardTitle>
-          <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
+          <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
         </div>
       </CardHeader>
       <CardContent>

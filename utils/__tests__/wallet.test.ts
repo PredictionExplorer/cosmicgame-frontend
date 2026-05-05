@@ -17,8 +17,10 @@ const SAMPLE_WALLETS: AppContractAddresses = {
 };
 
 describe('isWalletAddress', () => {
-  it('returns "CST Anchoring Wallet" for the CST anchoring address', () => {
-    expect(isWalletAddress(SAMPLE_WALLETS.stakingCst, SAMPLE_WALLETS)).toBe('CST Anchoring Wallet');
+  it('returns Cosmic Signature NFT anchoring label for the CST anchoring address', () => {
+    expect(isWalletAddress(SAMPLE_WALLETS.stakingCst, SAMPLE_WALLETS)).toBe(
+      'Cosmic Signature NFT Anchoring Wallet',
+    );
   });
 
   it('returns "RandomWalk Anchoring Wallet" for the RWLK anchoring address', () => {
@@ -52,7 +54,7 @@ describe('isWalletAddress', () => {
   it('matches known wallets case-insensitively', () => {
     const lower = SAMPLE_WALLETS.stakingCst.toLowerCase();
     if (lower !== SAMPLE_WALLETS.stakingCst) {
-      expect(isWalletAddress(lower, SAMPLE_WALLETS)).toBe('CST Anchoring Wallet');
+      expect(isWalletAddress(lower, SAMPLE_WALLETS)).toBe('Cosmic Signature NFT Anchoring Wallet');
     }
   });
 });

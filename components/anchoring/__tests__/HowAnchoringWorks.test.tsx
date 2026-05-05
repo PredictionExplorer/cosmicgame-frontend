@@ -18,7 +18,7 @@ describe('HowAnchoringWorks', () => {
   it('renders all accordion trigger labels', () => {
     render(<HowAnchoringWorks />);
     expect(screen.getByText('What is Anchoring?')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature (CST) Anchoring')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Anchoring')).toBeInTheDocument();
     expect(screen.getByText('RandomWalk (RWLK) Anchoring')).toBeInTheDocument();
     expect(screen.getByText('How are distributions calculated?')).toBeInTheDocument();
   });
@@ -39,7 +39,7 @@ describe('HowAnchoringWorks', () => {
     fireEvent.click(screen.getByText('What is Anchoring?'));
     expect(screen.getByText(/Anchoring lets you dedicate your NFTs/)).toBeVisible();
 
-    fireEvent.click(screen.getByText('Cosmic Signature (CST) Anchoring'));
+    fireEvent.click(screen.getByText('Cosmic Signature NFT Anchoring'));
     expect(screen.getByText(/Anchor your Cosmic Signature NFTs/)).toBeVisible();
   });
 

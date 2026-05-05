@@ -229,7 +229,7 @@ const CurrentRoundPage = () => {
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Last Participant &mdash; Current Leader
                   </p>
-                  <InfoTooltip content="The participant who made the Final Gesture when the countdown reaches zero may retrieve the Signature Allocation plus a Cosmic Signature NFT." />
+                  <InfoTooltip content="The participant who made the Final Gesture when the countdown reaches zero may retrieve the Signature Allocation: ETH, 1,000 CST, and a Cosmic Signature NFT." />
                 </div>
                 <a
                   href={`/user/${data.LastBidderAddr}`}
@@ -290,7 +290,7 @@ const CurrentRoundPage = () => {
           label="Cycle Reserve"
           value={formatEthValue(data.PrizeAmountEth ?? 0)}
           icon={<Trophy className="h-4 w-4" />}
-          tooltip="Signature Allocation retrieved by the participant who made the Final Gesture when the countdown reaches zero."
+          tooltip="ETH portion of the Signature Allocation retrieved by the participant who made the Final Gesture. The recipient also receives 1,000 CST and a Cosmic Signature NFT."
           gradient
         />
         <StatCard

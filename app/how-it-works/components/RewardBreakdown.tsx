@@ -28,7 +28,7 @@ const rewards = [
     Icon: ImageIcon,
     title: 'Cosmic Signature NFT Chance',
     description:
-      'Up to ten participants receive a unique Cosmic Signature NFT via Stellar Selection each cycle.',
+      'Ten participants receive a unique Cosmic Signature NFT via Stellar Selection each cycle.',
     tooltip:
       'Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders receive a Cosmic Signature NFT each cycle.',
     accent: 'from-amber-400/20 to-orange-500/20',
@@ -38,7 +38,7 @@ const rewards = [
     Icon: Trophy,
     title: 'Signature Allocation',
     description:
-      'The participant who made the Final Gesture may retrieve 25% of the Cycle Reserve in ETH.',
+      'The participant who made the Final Gesture may retrieve 25% of the Cycle Reserve in ETH, 1,000 CST, and a Cosmic Signature NFT.',
     tooltip:
       'The Cycle Reserve grows from all gestures. The participant who made the Final Gesture retrieves the Signature Allocation via the protocol contract.',
     accent: 'from-emerald-400/20 to-teal-500/20',

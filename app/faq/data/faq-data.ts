@@ -52,7 +52,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'can-i-participate-without-nfts',
         question: "Can I participate if I don't own any NFTs?",
         answer:
-          'Yes. Anyone can participate in a Cosmic Signature Performance Cycle by making a gesture. Owning a Random Walk NFT simply reduces the Gesture Cost by 50% for one gesture per wallet.',
+          'Yes. Anyone can participate in a Cosmic Signature Performance Cycle by making a gesture. An unused Random Walk NFT can be attached to an ETH gesture for a 50% Gesture Cost reduction.',
       },
       {
         id: 'how-can-i-get-involved',
@@ -109,7 +109,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-does-anchoring-work',
         question: 'How does Anchoring work?',
         answer:
-          'After receiving Cosmic Signature Tokens through Recognition or gestures, you can anchor them to the protocol to receive Anchor Distributions. Anchoring pays 6% of the Cycle Reserve each cycle, distributed proportionally across all anchored tokens. Visit the My Anchors page (from your account menu) to anchor tokens.',
+          'Cosmic Signature NFTs can be anchored to the protocol to receive Anchor Distributions. Anchoring pays 6% of the Cycle Reserve each cycle, distributed proportionally across all anchored Cosmic Signature NFTs. Random Walk NFTs can also be anchored for Anchored-NFT Stellar Selection eligibility. Visit the My Anchors page (from your account menu) to manage anchors.',
       },
       {
         id: 'what-are-marketing-rewards',
@@ -260,7 +260,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'connection-with-randomwalknft',
         question: 'What is the connection with Random Walk NFT?',
         answer:
-          'Random Walk NFT holders receive a 50% Gesture-Cost reduction (one gesture per wallet). Random Walk NFT anchor-holders also receive entries into the Anchored-NFT Stellar Selection each cycle.',
+          'Random Walk NFT holders can attach an unused token to one ETH gesture for a 50% Gesture-Cost reduction. Random Walk NFT anchor-holders also receive entries into the Anchored-NFT Stellar Selection each cycle.',
       },
       {
         id: 'how-to-trade-nfts-tokens',

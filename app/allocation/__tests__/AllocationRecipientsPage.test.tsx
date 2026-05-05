@@ -1,3 +1,5 @@
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { checkA11y, render, screen } from '@/test-utils';
 
 import AllocationRecipientsPage from '../AllocationRecipientsPage';
@@ -73,6 +75,17 @@ describe('AllocationRecipientsPage', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
     render(<AllocationRecipientsPage />);
     expect(screen.getByTestId('allocation-table')).toHaveTextContent('rows: 0');
+  });
+
+  it('renders contract-aligned allocation track percentages', () => {
+    mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
+    render(<AllocationRecipientsPage />);
+    expect(screen.getByText(`${protocolFacts.mainEthPercentage}%`)).toBeInTheDocument();
+    expect(screen.getByText(`${protocolFacts.chronoWarriorEthPercentage}%`)).toBeInTheDocument();
+    expect(screen.getByText(`${protocolFacts.stellarSelectionEthPercentage}%`)).toBeInTheDocument();
+    expect(screen.getByText(`${protocolFacts.anchorDistributionPercentage}%`)).toBeInTheDocument();
+    expect(screen.getByText(`${protocolFacts.publicGoodsPercentage}%`)).toBeInTheDocument();
+    expect(screen.getByText(`~${protocolFacts.compoundingReservePercentage}%`)).toBeInTheDocument();
   });
 
   describe('summary statistics', () => {

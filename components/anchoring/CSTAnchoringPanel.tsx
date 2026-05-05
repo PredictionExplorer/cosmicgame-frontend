@@ -27,7 +27,7 @@ function SectionHeader({ title, tooltip }: { title: string; tooltip: string }) {
   );
 }
 
-/** Displays CST Anchor Distributions, actions, available tokens, and anchored tokens. */
+/** Displays Cosmic Signature NFT Anchor Distributions, actions, available tokens, and anchored tokens. */
 export function CSTAnchoringPanel({
   account,
   stakingActions,

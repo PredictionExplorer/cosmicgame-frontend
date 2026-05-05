@@ -148,7 +148,7 @@ export const landingContent = {
       {
         percent: '25%',
         title: 'Signature Allocation',
-        body: 'To the participant who made the Final Gesture. Includes 1 Cosmic Signature NFT and a Recognition CST imprint.',
+        body: 'To the participant who made the Final Gesture. Includes 1,000 CST and one Cosmic Signature NFT.',
         tone: 'primary',
       },
       {
@@ -160,7 +160,7 @@ export const landingContent = {
       {
         percent: '8%',
         title: 'Chrono-Warrior Allocation',
-        body: 'To the participant whose Endurance Window lasted longest across the cycle. Includes one Cosmic Signature NFT.',
+        body: 'To the participant whose Endurance Window lasted longest across the cycle. Includes 1,000 CST and one Cosmic Signature NFT.',
         tone: 'rose',
       },
       {
@@ -211,7 +211,7 @@ export const landingContent = {
   anchoring: {
     eyebrow: 'Anchoring',
     heading: 'Anchor Cosmic Signature NFTs to the protocol.',
-    body: 'Anchored Cosmic Signature NFTs receive a share of each cycle\u2019s ETH distribution, proportional to the number of NFTs anchored. Release the anchor whenever you like. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection.',
+    body: 'Anchored Cosmic Signature NFTs receive a proportional share of the 6% Anchor Distribution each cycle. Release the anchor whenever you like. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection.',
     bullets: [
       'Per-cycle ETH distribution for anchor-holders',
       'Release anchors at any time',
