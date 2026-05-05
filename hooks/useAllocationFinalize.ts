@@ -109,8 +109,7 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
       try {
         await api.create(Number(roundBefore), count);
       } catch (apiErr) {
-        const missingIndexer =
-          isAxiosError(apiErr) && apiErr.response?.status === 404;
+        const missingIndexer = isAxiosError(apiErr) && apiErr.response?.status === 404;
         if (!missingIndexer) {
           reportError(apiErr, 'post-claim-api');
           notify(
@@ -164,7 +163,6 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
       // Migrating to React Query would be cleaner long-term but is a larger
       // refactor (the gesture flow couples to fetchActivationTime via the
       // returned callback).
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchActivationTime();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

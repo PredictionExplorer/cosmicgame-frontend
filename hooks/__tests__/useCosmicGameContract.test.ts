@@ -1,13 +1,13 @@
 import { renderHook } from '@testing-library/react';
 
 import { cosmicGameAbi } from '@/contracts/abis';
+import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import {
   emptyContractAddresses,
   publishDashboardContractAddresses,
   getCachedDashboardContractAddresses,
 } from '@/config/networks';
-import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import useCosmicGameContract from '../useCosmicGameContract';
 import useContract from '../useContract';

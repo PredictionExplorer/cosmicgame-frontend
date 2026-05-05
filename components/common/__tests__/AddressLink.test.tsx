@@ -1,7 +1,8 @@
 import '@testing-library/jest-dom';
 
-import { AddressLink } from '@/components/common/AddressLink';
 import { TEST_MARKETING_WALLET } from '@/test-utils/contractAddressesFixture';
+
+import { AddressLink } from '@/components/common/AddressLink';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
