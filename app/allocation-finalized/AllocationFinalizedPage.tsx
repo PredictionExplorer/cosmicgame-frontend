@@ -27,24 +27,68 @@ const AllocationFinalizedPage = () => {
   const [finishFireworks, setFinishFireworks] = useState(false);
 
   const roundStr = searchParams.get('cycle');
-  const roundNum = parseInt(roundStr ?? '0');
+  const roundNum =
+    roundStr !== null && roundStr !== '' ? Number.parseInt(roundStr, 10) : Number.NaN;
+  const cycleIsValid = Number.isFinite(roundNum) && roundNum >= 0;
+  const finalizeMessage = searchParams.get('message');
+  const isClaimSuccess = finalizeMessage === 'success';
 
-  const { data: allocationInfo, isLoading: loading } = useRoundInfo(roundNum);
+  const { data: allocationInfo, isLoading: loading } = useRoundInfo(cycleIsValid ? roundNum : -1);
 
   const handleFireworksClick = () => {
     fireworksRef.current?.stop();
     setFinishFireworks(true);
   };
 
+  const breadcrumbsBase = [{ label: 'Home', href: '/' }, { label: 'Allocation finalized' }];
+
   return (
     <MainWrapper className="max-sm:pb-16">
       <div className="mx-auto max-w-3xl">
-        {loading ? (
+        {isClaimSuccess && !finishFireworks && (
+          <Fireworks
+            ref={fireworksRef}
+            options={{ opacity: 0.5 }}
+            style={{
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              position: 'fixed',
+              zIndex: 10000,
+            }}
+            onClick={handleFireworksClick}
+          />
+        )}
+
+        {!cycleIsValid ? (
           <>
             <PageHeader
-              title="Allocation retrieved"
-              subtitle="Loading cycle data\u2026"
-              breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Allocation retrieved' }]}
+              title="Allocation finalized"
+              subtitle="This page needs a valid cycle number in the URL."
+              breadcrumbs={breadcrumbsBase}
+              className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
+              align="left"
+            />
+            <div className={cn(detailPanelClass, 'p-10 text-center')}>
+              <p className="font-medium text-foreground">
+                Missing or invalid <span className="font-mono">cycle</span> query parameter.
+              </p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Open{' '}
+                <Link href="/my-allocations" className={detailLinkClass}>
+                  My Allocations
+                </Link>{' '}
+                to review completed cycles.
+              </p>
+            </div>
+          </>
+        ) : loading ? (
+          <>
+            <PageHeader
+              title="Allocation finalized"
+              subtitle={`Loading cycle ${roundNum}…`}
+              breadcrumbs={breadcrumbsBase}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
             />
@@ -55,33 +99,59 @@ const AllocationFinalizedPage = () => {
         ) : !allocationInfo ? (
           <>
             <PageHeader
-              title="Allocation retrieved"
-              breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Allocation retrieved' }]}
+              title={
+                isClaimSuccess
+                  ? 'You successfully completed this cycle'
+                  : 'Allocation finalized'
+              }
+              subtitle={
+                isClaimSuccess
+                  ? `Cycle ${roundNum} was finalized on-chain.`
+                  : undefined
+              }
+              breadcrumbs={
+                isClaimSuccess
+                  ? [
+                      { label: 'Home', href: '/' },
+                      {
+                        label: `Cycle ${roundNum}`,
+                        href: `/allocation/${roundNum}`,
+                      },
+                      { label: 'Finalized' },
+                    ]
+                  : breadcrumbsBase
+              }
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
             />
-            <div className={cn(detailPanelClass, 'p-10 text-center')}>
-              <p className="font-medium text-foreground">No allocation information.</p>
+            <div className={cn(detailPanelClass, 'space-y-6 p-10 text-center')}>
+              {isClaimSuccess ? (
+                <>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Allocation breakdown (Signature Allocation distribution, prizes, and attached
+                    tokens) is on the allocation details page for this cycle.
+                  </p>
+                  <Link
+                    href={`/allocation/${roundNum}`}
+                    className={cn(detailLinkClass, 'inline-block text-base font-medium')}
+                  >
+                    View cycle {roundNum} allocation details
+                  </Link>
+                  <p className="text-sm text-muted-foreground">
+                    You can also review everything under{' '}
+                    <Link href="/my-allocations" className={detailLinkClass}>
+                      My Allocations
+                    </Link>
+                    .
+                  </p>
+                </>
+              ) : (
+                <p className="font-medium text-foreground">No allocation information.</p>
+              )}
             </div>
           </>
         ) : (
           <>
-            {searchParams.get('message') && !finishFireworks && (
-              <Fireworks
-                ref={fireworksRef}
-                options={{ opacity: 0.5 }}
-                style={{
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  position: 'fixed',
-                  zIndex: 10000,
-                }}
-                onClick={handleFireworksClick}
-              />
-            )}
-
             <PageHeader
               title={`Congratulations! Cycle ${allocationInfo.RoundNum} Signature Allocation received.`}
               breadcrumbs={[

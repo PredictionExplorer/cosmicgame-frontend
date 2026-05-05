@@ -3,6 +3,7 @@ import { usePublicClient } from 'wagmi';
 import { useRouter } from 'next/navigation';
 
 import api from '@/services/api';
+import { isAxiosError } from '@/services/api/client';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import type { DashboardInfo } from '@/services/api/types';
 import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
@@ -97,7 +98,8 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
         return true;
       }
 
-      const claimedRound = data?.CurRoundNum ?? Number(roundBefore);
+      /** Completed cycle is the on-chain round before advance — matches `api.get_round_info`. */
+      const claimedRound = Number(roundBefore);
 
       let count = (data?.NumRaffleNFTWinnersBidding ?? 0) + 3;
       if ((data?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0) > 0) {
@@ -107,11 +109,15 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
       try {
         await api.create(Number(roundBefore), count);
       } catch (apiErr) {
-        reportError(apiErr, 'post-claim-api');
-        notify(
-          'warning',
-          'Cycle finalized on-chain. Token metadata may still be updating — check My Allocations or refresh later.',
-        );
+        const missingIndexer =
+          isAxiosError(apiErr) && apiErr.response?.status === 404;
+        if (!missingIndexer) {
+          reportError(apiErr, 'post-claim-api');
+          notify(
+            'warning',
+            'Cycle finalized on-chain. Token metadata may still be updating — check My Allocations or refresh later.',
+          );
+        }
       }
 
       const params = new URLSearchParams();
