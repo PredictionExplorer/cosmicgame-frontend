@@ -692,7 +692,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           <RecipientCard
             icon={<Crown className="h-5 w-5" />}
             title="Endurance Champion"
-            tooltip="The participant who held the most-recent-gesture position for the longest uninterrupted interval. Receives Recognition CST and a Cosmic Signature NFT."
+            tooltip="The participant who held the most-recent-gesture position for the longest uninterrupted interval. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
             address={allocationInfo.EnduranceWinnerAddr}
             rewards={[
               {
@@ -706,7 +706,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           <RecipientCard
             icon={<Coins className="h-5 w-5" />}
             title="Final CST Gesture"
-            tooltip="The participant who made the last CST gesture of the cycle. Receives Recognition CST and a Cosmic Signature NFT."
+            tooltip="The participant who made the last CST gesture of the cycle. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT."
             address={allocationInfo.LastCstBidderAddr}
             rewards={[
               {

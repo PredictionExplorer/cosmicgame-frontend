@@ -16,7 +16,6 @@ interface AllocationData {
   StakingAmountEth?: number;
   CosmicGameBalanceEth?: number;
   ChronoWarriorPercentage?: number;
-  CurNumBids?: number;
   [key: string]: unknown;
 }
 
@@ -84,7 +83,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       name: 'RandomWalk Anchor-holder',
       tooltip: 'Anchor-holders of RandomWalk NFTs may receive Cosmic Signature NFTs.',
       amounts: ['1 Cosmic Signature NFT each'],
-      recipients: `${data?.NumRaffleNFTWinnersStakingRWalk} or 0`,
+      recipients: `${data?.NumRaffleNFTWinnersStakingRWalk}`,
     },
     {
       icon: <Users className="h-5 w-5" />,
@@ -97,9 +96,10 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       icon: <Swords className="h-5 w-5" />,
       name: 'Chrono-Warrior Allocation',
       tooltip:
-        'The participant who held the Endurance Champion position for the longest consecutive interval receives a percentage of the Cycle Reserve.',
+        'The participant who held the Endurance Champion position for the longest consecutive interval receives a percentage of the Cycle Reserve and a Cosmic Signature NFT.',
       amounts: [
         `${(((data?.CosmicGameBalanceEth ?? 0) * (data?.ChronoWarriorPercentage ?? 0)) / 100).toFixed(4)} ETH`,
+        '1 Cosmic Signature NFT',
       ],
       recipients: '1',
       faqLink: '/faq#chrono-warrior',
@@ -108,8 +108,8 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       icon: <Crown className="h-5 w-5" />,
       name: 'Endurance Champion',
       tooltip:
-        'The participant who remained the most recent gesture maker for the longest consecutive interval. Receives Recognition CST and a Cosmic Signature NFT.',
-      amounts: [`${(data?.CurNumBids ?? 0) * 10} CST`, '1 Cosmic Signature NFT'],
+        'The participant who remained the most recent gesture maker for the longest consecutive interval. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT.',
+      amounts: ['1,000 CST', '1 Cosmic Signature NFT'],
       recipients: '1',
       faqLink: '/faq#endurance-champion',
     },
@@ -117,9 +117,9 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       icon: <Coins className="h-5 w-5" />,
       name: 'Final CST Gesture',
       tooltip:
-        'The participant who made the last CST gesture of the cycle receives Recognition CST and a Cosmic Signature NFT.',
-      amounts: [`${(data?.CurNumBids ?? 0) * 10} CST`, '1 Cosmic Signature NFT'],
-      recipients: '1 or 0',
+        'The participant who made the last CST gesture of the cycle receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT.',
+      amounts: ['1,000 CST', '1 Cosmic Signature NFT'],
+      recipients: '1',
     },
   ];
 

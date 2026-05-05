@@ -30,7 +30,7 @@ const rewards = [
     description:
       'Up to ten participants receive a unique Cosmic Signature NFT via Stellar Selection each cycle.',
     tooltip:
-      'Ten Stellar Selection recipients plus up to ten Random Walk NFT anchor-holders receive a Cosmic Signature NFT each cycle.',
+      'Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders receive a Cosmic Signature NFT each cycle.',
     accent: 'from-amber-400/20 to-orange-500/20',
     iconColor: 'text-amber-400',
   },

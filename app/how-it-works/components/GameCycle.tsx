@@ -42,7 +42,7 @@ const phases = [
     Icon: Ticket,
     label: 'Stellar Selections',
     description:
-      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus up to ten Anchored-NFT Stellar Selection recipients receive Cosmic Signature NFTs.',
+      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus ten Anchored-NFT Stellar Selection recipients receive Cosmic Signature NFTs.',
     tooltip:
       'Entries are recorded per gesture. More gestures means higher Selection frequency. Random Walk NFT anchor-holders have a separate Stellar Selection.',
   },
