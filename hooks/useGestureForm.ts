@@ -22,7 +22,7 @@ import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import useRWLKNFTContract from '@/hooks/useRWLKNFTContract';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { activeChain } from '@/config/chains';
-import { COSMICGAME_ADDRESS, STELLAR_SELECTION_WALLET_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { ERC721_INTERFACE_ID, GESTURE_GAS_LIMIT } from '@/config/constants';
 import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
 import { getContractErrorMessage } from '@/utils/contractErrors';
@@ -42,6 +42,7 @@ export interface EthGestureInfo {
 }
 
 export function useGestureForm() {
+  const contractAddrs = useContractAddresses();
   const config = useConfig();
   const chainId = useChainId();
   const { switchChainAsync } = useSwitchChain();
@@ -141,14 +142,14 @@ export function useGestureForm() {
       address: nftAddress as `0x${string}`,
       abi: NFT_ABI,
       functionName: 'isApprovedForAll',
-      args: [account as `0x${string}`, STELLAR_SELECTION_WALLET_ADDRESS as `0x${string}`],
+      args: [account as `0x${string}`, contractAddrs.prizesWallet as `0x${string}`],
     });
     if (!approved) {
       const hash = await writeContract(config, {
         address: nftAddress as `0x${string}`,
         abi: NFT_ABI,
         functionName: 'setApprovalForAll',
-        args: [STELLAR_SELECTION_WALLET_ADDRESS as `0x${string}`, true],
+        args: [contractAddrs.prizesWallet as `0x${string}`, true],
         account: account!,
         chainId: activeChain.id,
       });
@@ -162,7 +163,7 @@ export function useGestureForm() {
       address: tokenAddress as `0x${string}`,
       abi: ERC20_ABI,
       functionName: 'allowance',
-      args: [account as `0x${string}`, STELLAR_SELECTION_WALLET_ADDRESS as `0x${string}`],
+      args: [account as `0x${string}`, contractAddrs.prizesWallet as `0x${string}`],
     })) as bigint;
 
     if (allowance < maxUint256) {
@@ -170,7 +171,7 @@ export function useGestureForm() {
         address: tokenAddress as `0x${string}`,
         abi: ERC20_ABI,
         functionName: 'approve',
-        args: [STELLAR_SELECTION_WALLET_ADDRESS as `0x${string}`, maxUint256],
+        args: [contractAddrs.prizesWallet as `0x${string}`, maxUint256],
         account: account!,
         chainId: activeChain.id,
       });
@@ -182,7 +183,7 @@ export function useGestureForm() {
         address: tokenAddress as `0x${string}`,
         abi: ERC20_ABI,
         functionName: 'approve',
-        args: [STELLAR_SELECTION_WALLET_ADDRESS as `0x${string}`, required],
+        args: [contractAddrs.prizesWallet as `0x${string}`, required],
         account: account!,
         chainId: activeChain.id,
       });
@@ -297,7 +298,7 @@ export function useGestureForm() {
   ): Promise<bigint> => {
     try {
       const estimate = await publicClient!.estimateContractGas({
-        address: COSMICGAME_ADDRESS as `0x${string}`,
+        address: contractAddrs.cosmicGame as `0x${string}`,
         abi: cosmicGameAbi,
         functionName: fnName,
         args,
@@ -414,7 +415,7 @@ export function useGestureForm() {
           (account as `0x${string}`);
         const feeParams = await getFeeParams();
         const hash = await writeContract(config, {
-          address: COSMICGAME_ADDRESS as `0x${string}`,
+          address: contractAddrs.cosmicGame as `0x${string}`,
           abi: cosmicGameAbi,
           functionName: 'bidWithEth',
           args: [rwlkId, message],
@@ -439,7 +440,7 @@ export function useGestureForm() {
           (account as `0x${string}`);
         const feeParams = await getFeeParams();
         const hash = await writeContract(config, {
-          address: COSMICGAME_ADDRESS as `0x${string}`,
+          address: contractAddrs.cosmicGame as `0x${string}`,
           abi: cosmicGameAbi,
           functionName: 'bidWithEthAndDonateNft',
           args: donateArgs,
@@ -466,7 +467,7 @@ export function useGestureForm() {
           (account as `0x${string}`);
         const feeParams = await getFeeParams();
         const hash = await writeContract(config, {
-          address: COSMICGAME_ADDRESS as `0x${string}`,
+          address: contractAddrs.cosmicGame as `0x${string}`,
           abi: cosmicGameAbi,
           functionName: 'bidWithEthAndDonateToken',
           args: donateArgs,
@@ -548,7 +549,7 @@ export function useGestureForm() {
       if (noDonation || !contributionType) {
         const feeParams = await getFeeParams();
         const hash = await writeContract(config, {
-          address: COSMICGAME_ADDRESS as `0x${string}`,
+          address: contractAddrs.cosmicGame as `0x${string}`,
           abi: cosmicGameAbi,
           functionName: 'bidWithCst',
           args: [priceMaxLimit, message],
@@ -565,7 +566,7 @@ export function useGestureForm() {
         if (!ok) return false;
         const feeParams = await getFeeParams();
         const hash = await writeContract(config, {
-          address: COSMICGAME_ADDRESS as `0x${string}`,
+          address: contractAddrs.cosmicGame as `0x${string}`,
           abi: cosmicGameAbi,
           functionName: 'bidWithCstAndDonateNft',
           args: [priceMaxLimit, message, nftDonateAddress, nftIdNum],
@@ -580,7 +581,7 @@ export function useGestureForm() {
         if (!res.ok) return false;
         const feeParams = await getFeeParams();
         const hash = await writeContract(config, {
-          address: COSMICGAME_ADDRESS as `0x${string}`,
+          address: contractAddrs.cosmicGame as `0x${string}`,
           abi: cosmicGameAbi,
           functionName: 'bidWithCstAndDonateToken',
           args: [priceMaxLimit, message, tokenDonateAddress, res.amountWei],

@@ -2,17 +2,20 @@ import '@testing-library/jest-dom';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
-jest.mock('../../../config/networks', () => ({
-  __esModule: true,
-  MARKETING_WALLET_ADDRESS: '0xMarketingWallet',
-  networkConfig: {
-    nftApiUrl: 'http://test',
-    apiUrl: 'http://test',
-    infuraKey: '',
-    MARKET_ADDRESS: '0x0',
-    NFT_ADDRESS: '0x0',
-    COSMICGAME_ADDRESS: '0x0',
-  },
+jest.mock('../../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({
+    randomWalkNft: '0x0',
+    cosmicGame: '0x0',
+    cosmicSignature: '0x0',
+    cosmicToken: '0x0',
+    cosmicDao: '0x0',
+    charity: '0x0',
+    prizesWallet: '0x0',
+    stakingCst: '0x0',
+    stakingRwalk: '0x0',
+    marketing: '0xMarketingWallet',
+    implementation: '0x0',
+  }),
 }));
 jest.mock('../../../utils', () => ({
   shortenHex: (hex: string, length = 4) =>

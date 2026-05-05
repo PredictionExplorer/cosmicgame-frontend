@@ -1,9 +1,14 @@
 import '@testing-library/jest-dom';
 
 import { AddressLink } from '@/components/common/AddressLink';
-import { MARKETING_WALLET_ADDRESS } from '@/config/networks';
+import { TEST_MARKETING_WALLET } from '@/test-utils/contractAddressesFixture';
 
 import { checkA11y, render, screen } from '@/test-utils';
+
+jest.mock('../../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () =>
+    jest.requireActual('../../../test-utils/contractAddressesFixture').TEST_APP_CONTRACT_ADDRESSES,
+}));
 
 describe('AddressLink', () => {
   const address = '0x1234567890abcdef1234567890abcdef12345678';
@@ -24,7 +29,7 @@ describe('AddressLink', () => {
   });
 
   it('renders "Marketing Wallet" for marketing address', () => {
-    render(<AddressLink address={MARKETING_WALLET_ADDRESS} url="/user/marketing" />);
+    render(<AddressLink address={TEST_MARKETING_WALLET} url="/user/marketing" />);
     const links = screen.getAllByText('Marketing Wallet');
     expect(links.length).toBeGreaterThanOrEqual(1);
   });

@@ -23,6 +23,7 @@ import { useCSTTransfers } from '@/hooks/useApiQuery';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import type { CSTTransferRecord } from '@/services/api/types';
 import { cn } from '@/lib/utils';
 
@@ -32,6 +33,7 @@ interface TransferRow extends CSTTransferRecord {
 }
 
 const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
+  const contractAddrs = useContractAddresses();
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -50,7 +52,7 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {isWalletAddress(row.FromAddr ?? '') !== '' ? (
+        {isWalletAddress(row.FromAddr ?? '', contractAddrs) !== '' ? (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -60,7 +62,7 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {isWalletAddress(row.FromAddr ?? '')}
+                  {isWalletAddress(row.FromAddr ?? '', contractAddrs)}
                 </a>
               </TooltipTrigger>
               <TooltipContent>{row.FromAddr ?? ''}</TooltipContent>
@@ -72,7 +74,7 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        {isWalletAddress(row.ToAddr ?? '') !== '' ? (
+        {isWalletAddress(row.ToAddr ?? '', contractAddrs) !== '' ? (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -82,7 +84,7 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {isWalletAddress(row.ToAddr ?? '')}
+                  {isWalletAddress(row.ToAddr ?? '', contractAddrs)}
                 </a>
               </TooltipTrigger>
               <TooltipContent>{row.ToAddr ?? ''}</TooltipContent>

@@ -69,12 +69,11 @@ jest.mock('../../../contexts/NotificationContext', () => ({
   useNotification: () => ({ setNotification: jest.fn() }),
 }));
 jest.mock('../../../config/networks', () => ({
+  ...jest.requireActual('../../../config/networks'),
   networkConfig: {
     chainId: 421614,
     rpcUrl: 'http://test-rpc.example',
   },
-  ANCHORING_WALLET_CST_ADDRESS: '0xCST',
-  ANCHORING_WALLET_RWLK_ADDRESS: '0xRWLK',
 }));
 
 jest.mock('next/image', () => ({

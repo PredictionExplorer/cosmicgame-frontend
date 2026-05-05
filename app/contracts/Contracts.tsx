@@ -9,7 +9,8 @@ import {
   cosmicGameAbi as COSMICGAME_ABI,
 } from '@/contracts/abis';
 
-import { networkConfig, CHARITY_WALLET_ADDRESS, COSMICGAME_ADDRESS } from '@/config/networks';
+import { networkConfig } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
@@ -100,6 +101,7 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
 
 const Contracts = () => {
   const { data, isLoading: loading } = useDashboardInfo();
+  const { charity, cosmicGame } = useContractAddresses();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [charityAddress, setCharityAddress] = useState('');
@@ -119,8 +121,8 @@ const Contracts = () => {
   const [cstDutchAuctionBeginningBidPriceMinLimit, setCstDutchAuctionBeginningBidPriceMinLimit] =
     useState(0);
 
-  const charityWalletContract = useContractNoSigner(CHARITY_WALLET_ADDRESS, CHARITY_WALLET_ABI);
-  const cosmicGameContract = useContractNoSigner(COSMICGAME_ADDRESS, COSMICGAME_ABI);
+  const charityWalletContract = useContractNoSigner(charity, CHARITY_WALLET_ABI);
+  const cosmicGameContract = useContractNoSigner(cosmicGame, COSMICGAME_ABI);
 
   useEffect(() => {
     if (!cosmicGameContract) return;

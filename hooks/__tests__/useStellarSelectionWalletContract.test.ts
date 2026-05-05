@@ -2,7 +2,12 @@ import { renderHook } from '@testing-library/react';
 
 import { prizesWalletAbi } from '@/contracts/abis';
 
-import { STELLAR_SELECTION_WALLET_ADDRESS } from '@/config/networks';
+import {
+  emptyContractAddresses,
+  publishDashboardContractAddresses,
+  getCachedDashboardContractAddresses,
+} from '@/config/networks';
+import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import useStellarSelectionWalletContract from '../useStellarSelectionWalletContract';
 import useContract from '../useContract';
@@ -13,13 +18,21 @@ const mockUseContract = useContract as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  publishDashboardContractAddresses(TEST_APP_CONTRACT_ADDRESSES);
+});
+
+afterEach(() => {
+  publishDashboardContractAddresses(emptyContractAddresses());
 });
 
 describe('useStellarSelectionWalletContract', () => {
-  it('calls useContract with STELLAR_SELECTION_WALLET_ADDRESS and prizesWalletAbi', () => {
+  it('calls useContract with prizes wallet address and prizesWalletAbi', () => {
     mockUseContract.mockReturnValue(null);
     renderHook(() => useStellarSelectionWalletContract());
-    expect(mockUseContract).toHaveBeenCalledWith(STELLAR_SELECTION_WALLET_ADDRESS, prizesWalletAbi);
+    expect(mockUseContract).toHaveBeenCalledWith(
+      getCachedDashboardContractAddresses().prizesWallet,
+      prizesWalletAbi,
+    );
   });
 
   it('returns the contract from useContract', () => {
@@ -45,8 +58,9 @@ describe('useStellarSelectionWalletContract', () => {
   });
 
   it('uses a valid non-empty address', () => {
-    expect(typeof STELLAR_SELECTION_WALLET_ADDRESS).toBe('string');
-    expect(STELLAR_SELECTION_WALLET_ADDRESS.length).toBeGreaterThan(0);
+    const addr = TEST_APP_CONTRACT_ADDRESSES.prizesWallet;
+    expect(typeof addr).toBe('string');
+    expect(addr.length).toBeGreaterThan(0);
   });
 
   it('uses a non-empty ABI array', () => {

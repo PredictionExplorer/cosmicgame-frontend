@@ -2,7 +2,12 @@ import { renderHook } from '@testing-library/react';
 
 import { stakingWalletCstAbi } from '@/contracts/abis';
 
-import { ANCHORING_WALLET_CST_ADDRESS } from '@/config/networks';
+import {
+  emptyContractAddresses,
+  publishDashboardContractAddresses,
+  getCachedDashboardContractAddresses,
+} from '@/config/networks';
+import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import useAnchoringWalletCSTContract from '../useAnchoringWalletCSTContract';
 import useContract from '../useContract';
@@ -13,13 +18,21 @@ const mockUseContract = useContract as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  publishDashboardContractAddresses(TEST_APP_CONTRACT_ADDRESSES);
+});
+
+afterEach(() => {
+  publishDashboardContractAddresses(emptyContractAddresses());
 });
 
 describe('useAnchoringWalletCSTContract', () => {
-  it('calls useContract with ANCHORING_WALLET_CST_ADDRESS and stakingWalletCstAbi', () => {
+  it('calls useContract with CST anchoring wallet address and stakingWalletCstAbi', () => {
     mockUseContract.mockReturnValue(null);
     renderHook(() => useAnchoringWalletCSTContract());
-    expect(mockUseContract).toHaveBeenCalledWith(ANCHORING_WALLET_CST_ADDRESS, stakingWalletCstAbi);
+    expect(mockUseContract).toHaveBeenCalledWith(
+      getCachedDashboardContractAddresses().stakingCst,
+      stakingWalletCstAbi,
+    );
   });
 
   it('returns the contract from useContract', () => {
@@ -45,8 +58,9 @@ describe('useAnchoringWalletCSTContract', () => {
   });
 
   it('uses a valid non-empty address', () => {
-    expect(typeof ANCHORING_WALLET_CST_ADDRESS).toBe('string');
-    expect(ANCHORING_WALLET_CST_ADDRESS.length).toBeGreaterThan(0);
+    const addr = TEST_APP_CONTRACT_ADDRESSES.stakingCst;
+    expect(typeof addr).toBe('string');
+    expect(addr.length).toBeGreaterThan(0);
   });
 
   it('uses a non-empty ABI array', () => {

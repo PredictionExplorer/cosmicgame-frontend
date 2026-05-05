@@ -27,6 +27,7 @@ jest.mock('../useAllocationFinalize', () => ({ useAllocationFinalize: jest.fn() 
 jest.mock('../useAllocationNotification', () => ({ useAllocationNotification: jest.fn() }));
 
 const EXISTING_HOOK_EXPORTS = [
+  'useContractAddresses',
   'useClipboard',
   'useActiveWeb3React',
   'useCosmicGameContract',

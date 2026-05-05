@@ -1,6 +1,8 @@
 /**
- * Network configuration for Cosmic Signature. Exposes chain params, RPC, explorer,
- * API URLs, and contract addresses per environment (local, sepolia, mainnet).
+ * Network configuration for Cosmic Signature: chain params, RPC, explorer, and API URLs.
+ * Contract addresses are not configured here — they come from the dashboard API
+ * (`GET …/statistics/dashboard` → `ContractAddrs`) and are published via
+ * {@link publishDashboardContractAddresses} from `ContractAddressesProvider`.
  *
  * No defaults for network, API URL, or RPC URL — they must be set via environment
  * variables to avoid running against the wrong backend or chain.
@@ -47,19 +49,6 @@ interface NetworkConfig {
   apiUrl: string;
   nftApiUrl: string;
   infuraKey: string;
-  // Contract addresses
-  NFT_ADDRESS: string;
-  COSMICGAME_ADDRESS: string;
-  COSMIC_SIGNATURE_TOKEN_ADDRESS: string;
-  COSMIC_SIGNATURE_ADDRESS: string;
-  COSMIC_SIGNATURE_DAO_ADDRESS: string;
-  CHARITY_WALLET_ADDRESS: string;
-  STELLAR_SELECTION_WALLET_ADDRESS: string;
-  MARKETING_WALLET_ADDRESS: string;
-  ANCHORING_WALLET_CST_ADDRESS: string;
-  ANCHORING_WALLET_RWLK_ADDRESS: string;
-  IMPLEMENTATION_ADDRESS: string;
-  MARKET_ADDRESS: string;
 }
 
 const infuraKey = process.env.NEXT_PUBLIC_INFURA_KEY || '';
@@ -73,18 +62,6 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     explorerUrl: 'https://sepolia.arbiscan.io',
     nftApiUrl: 'https://nfts-local.cosmicsignature.com/',
     infuraKey,
-    NFT_ADDRESS: '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318',
-    COSMICGAME_ADDRESS: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
-    COSMIC_SIGNATURE_TOKEN_ADDRESS: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
-    COSMIC_SIGNATURE_ADDRESS: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
-    COSMIC_SIGNATURE_DAO_ADDRESS: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
-    CHARITY_WALLET_ADDRESS: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
-    STELLAR_SELECTION_WALLET_ADDRESS: '0xa513E6E4b8f2a923D98304ec87F64353C4D5C853',
-    MARKETING_WALLET_ADDRESS: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
-    ANCHORING_WALLET_CST_ADDRESS: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
-    ANCHORING_WALLET_RWLK_ADDRESS: '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e',
-    IMPLEMENTATION_ADDRESS: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-    MARKET_ADDRESS: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
   },
   sepolia: {
     chainId: 421614,
@@ -93,18 +70,6 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     explorerUrl: 'https://sepolia.arbiscan.io',
     nftApiUrl: 'https://nfts-sepolia.cosmicsignature.com/',
     infuraKey,
-    NFT_ADDRESS: '0xbB749EfF6018a9213DFbca2a20292DB1576F530d',
-    COSMICGAME_ADDRESS: '0xC801d06c9900ef0cD878Ad6f59622aAfAd8F54dE',
-    COSMIC_SIGNATURE_TOKEN_ADDRESS: '0xCF4896360C63Fef4ca60e6b4b7c2680ee366468a',
-    COSMIC_SIGNATURE_ADDRESS: '0xAbC91c97336E885872a37b3105808e894AbA744E',
-    COSMIC_SIGNATURE_DAO_ADDRESS: '0x6993054C1a08Edd7dF8B9EB1b5C29E3Af05638a0',
-    CHARITY_WALLET_ADDRESS: '0x5e1DAc81E4f32C20f496a20bcB6C6EBdd9eC5a6C',
-    STELLAR_SELECTION_WALLET_ADDRESS: '0x1d22A8AfBbC2A6d25D5c95eFC84277073b209bD6',
-    MARKETING_WALLET_ADDRESS: '0xB96Cb96f6378F8f9e6e002DB15Cd38F33d0e5648',
-    ANCHORING_WALLET_CST_ADDRESS: '0xcF1c54DFd233CD031CE5f4F79fD281A38b37AB7a',
-    ANCHORING_WALLET_RWLK_ADDRESS: '0xbE190dC5bd0f12Dbc189351B6172b6a1312d6f5C',
-    IMPLEMENTATION_ADDRESS: '0xC9eb12c122dB86e0CCC48ae62668599dcAc5E049',
-    MARKET_ADDRESS: '0x47eF85Dfb775aCE0934fBa9EEd09D22e6eC0Cc08',
   },
   mainnet: {
     chainId: 42161,
@@ -113,18 +78,6 @@ const networkDefaults: Record<NetworkName, Omit<NetworkConfig, 'apiUrl' | 'rpcUr
     explorerUrl: 'https://arbiscan.io',
     nftApiUrl: 'https://nfts.cosmicsignature.com/',
     infuraKey,
-    NFT_ADDRESS: '0x895a6F444BE4ba9d124F61DF736605792B35D66b',
-    COSMICGAME_ADDRESS: '0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2',
-    COSMIC_SIGNATURE_TOKEN_ADDRESS: '0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0',
-    COSMIC_SIGNATURE_ADDRESS: '0xbb84Be3500A63581d3F2d5AC3bdF8685AAedad25',
-    COSMIC_SIGNATURE_DAO_ADDRESS: '0xF3D52E1c681949be7E624778dB13DaD7F8c729db',
-    CHARITY_WALLET_ADDRESS: '0x96bB0ADB414d5350f435E52f94946B6C7A0760a9',
-    STELLAR_SELECTION_WALLET_ADDRESS: '0xE1b619e9B39ea4109D2F429Ea5eAA307759b0011',
-    MARKETING_WALLET_ADDRESS: '0xa3802c799f5e3D3D3562A9B513a41C6aAF92e25e',
-    ANCHORING_WALLET_CST_ADDRESS: '0x6308A405B4FF1eA890870Efe2a6D036750B81F7C',
-    ANCHORING_WALLET_RWLK_ADDRESS: '0x5EB3396092841E6c5b0b51141699F6711E830529',
-    IMPLEMENTATION_ADDRESS: '0x7739148013777c485AD9f3d971e1005Eca686661',
-    MARKET_ADDRESS: '0x47eF85Dfb775aCE0934fBa9EEd09D22e6eC0Cc08',
   },
 };
 
@@ -145,18 +98,55 @@ export const networkConfig: NetworkConfig = {
 };
 
 export const INFURA_KEY = networkConfig.infuraKey;
-export const MARKET_ADDRESS = networkConfig.MARKET_ADDRESS;
-export const NFT_ADDRESS = networkConfig.NFT_ADDRESS;
-export const COSMICGAME_ADDRESS = networkConfig.COSMICGAME_ADDRESS;
-export const COSMIC_SIGNATURE_TOKEN_ADDRESS = networkConfig.COSMIC_SIGNATURE_TOKEN_ADDRESS;
-export const COSMIC_SIGNATURE_ADDRESS = networkConfig.COSMIC_SIGNATURE_ADDRESS;
-export const COSMIC_SIGNATURE_DAO_ADDRESS = networkConfig.COSMIC_SIGNATURE_DAO_ADDRESS;
-export const CHARITY_WALLET_ADDRESS = networkConfig.CHARITY_WALLET_ADDRESS;
-export const STELLAR_SELECTION_WALLET_ADDRESS = networkConfig.STELLAR_SELECTION_WALLET_ADDRESS;
-export const MARKETING_WALLET_ADDRESS = networkConfig.MARKETING_WALLET_ADDRESS;
-export const ANCHORING_WALLET_CST_ADDRESS = networkConfig.ANCHORING_WALLET_CST_ADDRESS;
-export const ANCHORING_WALLET_RWLK_ADDRESS = networkConfig.ANCHORING_WALLET_RWLK_ADDRESS;
-export const IMPLEMENTATION_ADDRESS = networkConfig.IMPLEMENTATION_ADDRESS;
+
+/**
+ * Canonical contract addresses for hooks and RPC reads. Resolved from dashboard
+ * `ContractAddrs` plus {@link publishDashboardContractAddresses}.
+ */
+export interface AppContractAddresses {
+  randomWalkNft: string;
+  cosmicGame: string;
+  cosmicSignature: string;
+  cosmicToken: string;
+  cosmicDao: string;
+  charity: string;
+  /** Escrow holding allocation / stellar-selection prizes (`PrizesWalletAddr`). */
+  prizesWallet: string;
+  stakingCst: string;
+  stakingRwalk: string;
+  marketing: string;
+  implementation: string;
+}
+
+export function emptyContractAddresses(): AppContractAddresses {
+  return {
+    randomWalkNft: '',
+    cosmicGame: '',
+    cosmicSignature: '',
+    cosmicToken: '',
+    cosmicDao: '',
+    charity: '',
+    prizesWallet: '',
+    stakingCst: '',
+    stakingRwalk: '',
+    marketing: '',
+    implementation: '',
+  };
+}
+
+let dashboardContractSnapshot: AppContractAddresses | null = null;
+
+/**
+ * Mirrors the merged dashboard addresses for code outside React (and for hook tests).
+ * Cleared implicitly when publishing {@link emptyContractAddresses}.
+ */
+export function publishDashboardContractAddresses(addrs: AppContractAddresses): void {
+  dashboardContractSnapshot = addrs;
+}
+
+export function getCachedDashboardContractAddresses(): AppContractAddresses {
+  return dashboardContractSnapshot ?? emptyContractAddresses();
+}
 
 /**
  * RPC URL to use for viem public client (e.g. useContractNoSigner).

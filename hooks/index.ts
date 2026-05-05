@@ -1,3 +1,5 @@
+export { useContractAddresses } from '@/contexts/ContractAddressesContext';
+
 export { useClipboard } from './useClipboard';
 export { useActiveWeb3React } from './web3';
 export { default as useCosmicGameContract } from './useCosmicGameContract';

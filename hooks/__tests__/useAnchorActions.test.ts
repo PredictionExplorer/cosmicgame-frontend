@@ -111,14 +111,21 @@ jest.mock('../useAnchoringWalletRWLKContract', () => ({
   default: () => mockUseAnchoringWalletRWLKContract(),
 }));
 
-jest.mock('../../config/networks', () => {
-  const actual = jest.requireActual('../../config/networks') as Record<string, unknown>;
-  return {
-    ...actual,
-    ANCHORING_WALLET_CST_ADDRESS: '0xCstWallet',
-    ANCHORING_WALLET_RWLK_ADDRESS: '0xRwlkWallet',
-  };
-});
+jest.mock('../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({
+    randomWalkNft: '0x0',
+    cosmicGame: '0x0',
+    cosmicSignature: '0x0',
+    cosmicToken: '0x0',
+    cosmicDao: '0x0',
+    charity: '0x0',
+    prizesWallet: '0x0',
+    stakingCst: '0xCstWallet',
+    stakingRwalk: '0xRwlkWallet',
+    marketing: '0x0',
+    implementation: '0x0',
+  }),
+}));
 
 const mockIsUserRejection = jest.fn((_err: unknown) => false);
 const mockReportError = jest.fn((_err: unknown, _context?: string) => {});

@@ -2,7 +2,12 @@ import { renderHook } from '@testing-library/react';
 
 import { cosmicSignatureAbi } from '@/contracts/abis';
 
-import { COSMIC_SIGNATURE_ADDRESS } from '@/config/networks';
+import {
+  emptyContractAddresses,
+  publishDashboardContractAddresses,
+  getCachedDashboardContractAddresses,
+} from '@/config/networks';
+import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import useCosmicSignatureContract from '../useCosmicSignatureContract';
 import useContract from '../useContract';
@@ -13,13 +18,21 @@ const mockUseContract = useContract as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  publishDashboardContractAddresses(TEST_APP_CONTRACT_ADDRESSES);
+});
+
+afterEach(() => {
+  publishDashboardContractAddresses(emptyContractAddresses());
 });
 
 describe('useCosmicSignatureContract', () => {
-  it('calls useContract with COSMIC_SIGNATURE_ADDRESS and cosmicSignatureAbi', () => {
+  it('calls useContract with cosmic signature NFT address and cosmicSignatureAbi', () => {
     mockUseContract.mockReturnValue(null);
     renderHook(() => useCosmicSignatureContract());
-    expect(mockUseContract).toHaveBeenCalledWith(COSMIC_SIGNATURE_ADDRESS, cosmicSignatureAbi);
+    expect(mockUseContract).toHaveBeenCalledWith(
+      getCachedDashboardContractAddresses().cosmicSignature,
+      cosmicSignatureAbi,
+    );
   });
 
   it('returns the contract from useContract', () => {
@@ -45,8 +58,9 @@ describe('useCosmicSignatureContract', () => {
   });
 
   it('uses a valid non-empty address', () => {
-    expect(typeof COSMIC_SIGNATURE_ADDRESS).toBe('string');
-    expect(COSMIC_SIGNATURE_ADDRESS.length).toBeGreaterThan(0);
+    const addr = TEST_APP_CONTRACT_ADDRESSES.cosmicSignature;
+    expect(typeof addr).toBe('string');
+    expect(addr.length).toBeGreaterThan(0);
   });
 
   it('uses a non-empty ABI array', () => {

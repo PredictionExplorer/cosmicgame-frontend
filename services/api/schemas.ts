@@ -91,6 +91,7 @@ const ContractAddressesSchema = z
     RandomWalkAddr: AddressSchema,
     CosmicDaoAddr: AddressSchema,
     CharityWalletAddr: AddressSchema,
+    ImplementationAddr: AddressSchema.optional(),
     MarketingWalletAddr: AddressSchema,
     PrizesWalletAddr: AddressSchema,
     StakingWalletCSTAddr: AddressSchema,

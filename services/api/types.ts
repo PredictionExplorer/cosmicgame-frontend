@@ -87,6 +87,7 @@ export interface ContractAddresses {
   RandomWalkAddr: string;
   CosmicDaoAddr: string;
   CharityWalletAddr: string;
+  ImplementationAddr?: string;
   MarketingWalletAddr: string;
   PrizesWalletAddr: string;
   StakingWalletCSTAddr: string;

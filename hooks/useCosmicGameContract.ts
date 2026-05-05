@@ -1,9 +1,10 @@
 import { cosmicGameAbi } from '@/contracts/abis';
 
-import { COSMICGAME_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
 import useContract from './useContract';
 
 export default function useCosmicGameContract() {
-  return useContract(COSMICGAME_ADDRESS, cosmicGameAbi);
+  const { cosmicGame } = useContractAddresses();
+  return useContract(cosmicGame, cosmicGameAbi);
 }
