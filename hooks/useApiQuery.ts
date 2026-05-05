@@ -77,7 +77,8 @@ export function useRoundInfo(roundNum: number) {
   return useQuery<RoundInfo | null>({
     queryKey: ['roundInfo', roundNum],
     queryFn: () => api.get_round_info(roundNum),
-    enabled: roundNum > 0,
+    /** Backend serves `rounds/info/0`; the previous `> 0` guard broke first-cycle finalize UX. */
+    enabled: Number.isFinite(roundNum) && roundNum >= 0,
     staleTime: 30_000,
   });
 }
