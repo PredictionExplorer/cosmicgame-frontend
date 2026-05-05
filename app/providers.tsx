@@ -214,6 +214,7 @@ export function Providers({
         : '';
 
     // console.log (not warn): dev-only banner; warn is forwarded as an error-looking stack in Next.
+    // eslint-disable-next-line no-console -- dev/preview config banner should not look like a warning.
     console.log(
       '[Cosmic Signature] Config:\n' +
         `  Network: ${process.env.NEXT_PUBLIC_NETWORK}\n` +
