@@ -1,7 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { Sparkles } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
@@ -191,12 +193,42 @@ const GalleryPage = () => {
         subtitle="Explore the complete Cosmic Signature NFT collection imprinted across every cycle"
       />
 
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain seed
-        via three-body-problem physics simulations. Up to twelve new NFTs are imprinted every cycle
-        &mdash; one for the participant who made the Final Gesture and eleven for Stellar Selection
-        recipients. Browse, search, and filter the entire collection below.
-      </p>
+      <Surface
+        variant="nebula"
+        radius="xl"
+        padding="none"
+        className="mb-10 grid gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_360px] lg:items-center"
+      >
+        <div className="relative z-[1] max-w-3xl">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-white/70">
+            <Sparkles className="h-3.5 w-3.5 text-[rgb(var(--aurora-cyan-rgb))]" />
+            Generative archive
+          </div>
+          <p className="type-body-md text-muted-foreground">
+            Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain
+            seed via three-body-problem physics simulations. Up to twelve new NFTs are imprinted
+            every cycle &mdash; one for the Final Gesture and eleven for Stellar Selection
+            recipients.
+          </p>
+        </div>
+        <div className="relative min-h-[220px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.10] bg-black/30">
+          <Image
+            src="/images/CosmicSignatureNFT.png"
+            alt=""
+            fill
+            className="object-cover opacity-90 saturate-125"
+            sizes="(max-width: 1024px) 100vw, 360px"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_0%,rgb(13_5_33/0.18)_58%,rgb(13_5_33/0.64)_100%)]"
+          />
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-lg border border-white/10 bg-black/45 px-3 py-2 text-xs text-white/70 backdrop-blur">
+            <span className="font-mono uppercase tracking-[0.2em]">Preview</span>
+            <span>Three-body imprint</span>
+          </div>
+        </div>
+      </Surface>
 
       <GalleryHero stats={stats} loading={isLoading} />
 

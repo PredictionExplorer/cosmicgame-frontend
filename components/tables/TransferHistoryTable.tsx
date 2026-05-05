@@ -15,11 +15,16 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { ZERO_ADDRESS } from '@/config/misc';
-import { ANCHORING_WALLET_CST_ADDRESS, ANCHORING_WALLET_RWLK_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import type { CSTTransferRecord } from '@/services/api';
 
+function addrEq(a: string | undefined, b: string): boolean {
+  return !!a && !!b && a.toLowerCase() === b.toLowerCase();
+}
+
 const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
+  const { stakingCst, stakingRwalk } = useContractAddresses();
   if (!record || record.FromAddr === ZERO_ADDRESS) {
     return null;
   }
@@ -43,9 +48,9 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link href={`/user/${FromAddr}`} className="text-inherit font-mono">
-                {FromAddr === ANCHORING_WALLET_CST_ADDRESS
+                {addrEq(FromAddr, stakingCst)
                   ? 'StakingWallet CST'
-                  : FromAddr === ANCHORING_WALLET_RWLK_ADDRESS
+                  : addrEq(FromAddr, stakingRwalk)
                     ? 'StakingWallet RandomWalk'
                     : shortenHex(FromAddr ?? '', 6)}
               </Link>
@@ -59,9 +64,9 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link href={`/user/${ToAddr}`} className="text-inherit font-mono">
-                {ToAddr === ANCHORING_WALLET_CST_ADDRESS
+                {addrEq(ToAddr, stakingCst)
                   ? 'StakingWallet CST'
-                  : ToAddr === ANCHORING_WALLET_RWLK_ADDRESS
+                  : addrEq(ToAddr, stakingRwalk)
                     ? 'StakingWallet RandomWalk'
                     : shortenHex(ToAddr ?? '', 6)}
               </Link>

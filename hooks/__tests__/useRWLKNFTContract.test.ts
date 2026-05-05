@@ -2,7 +2,12 @@ import { renderHook } from '@testing-library/react';
 
 import { randomWalkNftAbi } from '@/contracts/abis';
 
-import { NFT_ADDRESS } from '@/config/networks';
+import {
+  emptyContractAddresses,
+  publishDashboardContractAddresses,
+  getCachedDashboardContractAddresses,
+} from '@/config/networks';
+import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import useRWLKNFTContract from '../useRWLKNFTContract';
 import useContract from '../useContract';
@@ -13,13 +18,21 @@ const mockUseContract = useContract as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  publishDashboardContractAddresses(TEST_APP_CONTRACT_ADDRESSES);
+});
+
+afterEach(() => {
+  publishDashboardContractAddresses(emptyContractAddresses());
 });
 
 describe('useRWLKNFTContract', () => {
-  it('calls useContract with NFT_ADDRESS and randomWalkNftAbi', () => {
+  it('calls useContract with RandomWalk NFT address and randomWalkNftAbi', () => {
     mockUseContract.mockReturnValue(null);
     renderHook(() => useRWLKNFTContract());
-    expect(mockUseContract).toHaveBeenCalledWith(NFT_ADDRESS, randomWalkNftAbi);
+    expect(mockUseContract).toHaveBeenCalledWith(
+      getCachedDashboardContractAddresses().randomWalkNft,
+      randomWalkNftAbi,
+    );
   });
 
   it('returns the contract from useContract', () => {
@@ -45,8 +58,9 @@ describe('useRWLKNFTContract', () => {
   });
 
   it('uses a valid non-empty address', () => {
-    expect(typeof NFT_ADDRESS).toBe('string');
-    expect(NFT_ADDRESS.length).toBeGreaterThan(0);
+    const addr = TEST_APP_CONTRACT_ADDRESSES.randomWalkNft;
+    expect(typeof addr).toBe('string');
+    expect(addr.length).toBeGreaterThan(0);
   });
 
   it('uses a non-empty ABI array', () => {

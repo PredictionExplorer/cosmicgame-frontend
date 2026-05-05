@@ -2,7 +2,12 @@ import { renderHook } from '@testing-library/react';
 
 import { cosmicGameAbi } from '@/contracts/abis';
 
-import { COSMICGAME_ADDRESS } from '@/config/networks';
+import {
+  emptyContractAddresses,
+  publishDashboardContractAddresses,
+  getCachedDashboardContractAddresses,
+} from '@/config/networks';
+import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import useCosmicGameContract from '../useCosmicGameContract';
 import useContract from '../useContract';
@@ -13,13 +18,21 @@ const mockUseContract = useContract as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  publishDashboardContractAddresses(TEST_APP_CONTRACT_ADDRESSES);
+});
+
+afterEach(() => {
+  publishDashboardContractAddresses(emptyContractAddresses());
 });
 
 describe('useCosmicGameContract', () => {
-  it('calls useContract with COSMICGAME_ADDRESS and cosmicGameAbi', () => {
+  it('calls useContract with cosmic game address and cosmicGameAbi', () => {
     mockUseContract.mockReturnValue(null);
     renderHook(() => useCosmicGameContract());
-    expect(mockUseContract).toHaveBeenCalledWith(COSMICGAME_ADDRESS, cosmicGameAbi);
+    expect(mockUseContract).toHaveBeenCalledWith(
+      getCachedDashboardContractAddresses().cosmicGame,
+      cosmicGameAbi,
+    );
   });
 
   it('returns the contract from useContract', () => {
@@ -45,8 +58,9 @@ describe('useCosmicGameContract', () => {
   });
 
   it('uses a valid non-empty address', () => {
-    expect(typeof COSMICGAME_ADDRESS).toBe('string');
-    expect(COSMICGAME_ADDRESS.length).toBeGreaterThan(0);
+    const addr = TEST_APP_CONTRACT_ADDRESSES.cosmicGame;
+    expect(typeof addr).toBe('string');
+    expect(addr.length).toBeGreaterThan(0);
   });
 
   it('uses a non-empty ABI array', () => {

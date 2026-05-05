@@ -47,15 +47,15 @@ const mockSetApprovalForAll = jest.fn().mockResolvedValue('0xapproveHash' as con
 const mockIsApprovedForAll = jest.fn().mockResolvedValue(false);
 
 // CST path mocks
-const mockCstStake = jest.fn().mockResolvedValue('0xstakeHash' as const);
+const mockCstAnchor = jest.fn().mockResolvedValue('0xstakeHash' as const);
 const mockCstAnchorMany = jest.fn().mockResolvedValue('0xstakeManyHash' as const);
-const mockCstUnstake = jest.fn().mockResolvedValue('0xunstakeHash' as const);
+const mockCstRelease = jest.fn().mockResolvedValue('0xunstakeHash' as const);
 const mockCstReleaseMany = jest.fn().mockResolvedValue('0xunstakeManyHash' as const);
 
 // RWLK path mocks (separate instances so tests can assert non-crossover).
-const mockRwlkStake = jest.fn().mockResolvedValue('0xstakeHash' as const);
+const mockRwlkAnchor = jest.fn().mockResolvedValue('0xstakeHash' as const);
 const mockRwlkAnchorMany = jest.fn().mockResolvedValue('0xstakeManyHash' as const);
-const mockRwlkUnstake = jest.fn().mockResolvedValue('0xunstakeHash' as const);
+const mockRwlkRelease = jest.fn().mockResolvedValue('0xunstakeHash' as const);
 const mockRwlkReleaseMany = jest.fn().mockResolvedValue('0xunstakeManyHash' as const);
 
 const mockCosmicSignatureContract = {
@@ -70,18 +70,18 @@ const mockRwalkContract = {
 
 const mockCstAnchoringContract = {
   write: {
-    stake: mockCstStake,
+    stake: mockCstAnchor,
     stakeMany: mockCstAnchorMany,
-    unstake: mockCstUnstake,
+    unstake: mockCstRelease,
     unstakeMany: mockCstReleaseMany,
   },
 };
 
 const mockRwlkAnchoringContract = {
   write: {
-    stake: mockRwlkStake,
+    stake: mockRwlkAnchor,
     stakeMany: mockRwlkAnchorMany,
-    unstake: mockRwlkUnstake,
+    unstake: mockRwlkRelease,
     unstakeMany: mockRwlkReleaseMany,
   },
 };
@@ -111,14 +111,21 @@ jest.mock('../useAnchoringWalletRWLKContract', () => ({
   default: () => mockUseAnchoringWalletRWLKContract(),
 }));
 
-jest.mock('../../config/networks', () => {
-  const actual = jest.requireActual('../../config/networks') as Record<string, unknown>;
-  return {
-    ...actual,
-    ANCHORING_WALLET_CST_ADDRESS: '0xCstWallet',
-    ANCHORING_WALLET_RWLK_ADDRESS: '0xRwlkWallet',
-  };
-});
+jest.mock('../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({
+    randomWalkNft: '0x0',
+    cosmicGame: '0x0',
+    cosmicSignature: '0x0',
+    cosmicToken: '0x0',
+    cosmicDao: '0x0',
+    charity: '0x0',
+    prizesWallet: '0x0',
+    stakingCst: '0xCstWallet',
+    stakingRwalk: '0xRwlkWallet',
+    marketing: '0x0',
+    implementation: '0x0',
+  }),
+}));
 
 const mockIsUserRejection = jest.fn((_err: unknown) => false);
 const mockReportError = jest.fn((_err: unknown, _context?: string) => {});
@@ -152,13 +159,13 @@ beforeEach(() => {
   mockWaitForTransactionReceipt.mockResolvedValue({ status: 'success' });
   mockIsApprovedForAll.mockResolvedValue(false);
   mockSetApprovalForAll.mockResolvedValue('0xapproveHash');
-  mockCstStake.mockResolvedValue('0xstakeHash');
+  mockCstAnchor.mockResolvedValue('0xstakeHash');
   mockCstAnchorMany.mockResolvedValue('0xstakeManyHash');
-  mockCstUnstake.mockResolvedValue('0xunstakeHash');
+  mockCstRelease.mockResolvedValue('0xunstakeHash');
   mockCstReleaseMany.mockResolvedValue('0xunstakeManyHash');
-  mockRwlkStake.mockResolvedValue('0xstakeHash');
+  mockRwlkAnchor.mockResolvedValue('0xstakeHash');
   mockRwlkAnchorMany.mockResolvedValue('0xstakeManyHash');
-  mockRwlkUnstake.mockResolvedValue('0xunstakeHash');
+  mockRwlkRelease.mockResolvedValue('0xunstakeHash');
   mockRwlkReleaseMany.mockResolvedValue('0xunstakeManyHash');
   mockIsUserRejection.mockReturnValue(false);
   mockGetEthErrorMessage.mockImplementation((_err, fallback) => fallback ?? 'An error occurred');
@@ -210,7 +217,7 @@ describe('useAnchorActions', () => {
       expect(mockIsApprovedForAll).toHaveBeenCalledWith(['0xUser', '0xCstWallet']);
       expect(mockSetApprovalForAll).toHaveBeenCalledWith(['0xCstWallet', true]);
       expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xapproveHash' });
-      expect(mockCstStake).toHaveBeenCalledWith([42]);
+      expect(mockCstAnchor).toHaveBeenCalledWith([42]);
       expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xstakeHash' });
 
       await flushDeferredAnchoringEffects();
@@ -227,7 +234,7 @@ describe('useAnchorActions', () => {
       });
 
       expect(mockSetApprovalForAll).not.toHaveBeenCalled();
-      expect(mockCstStake).toHaveBeenCalledWith([42]);
+      expect(mockCstAnchor).toHaveBeenCalledWith([42]);
     });
 
     it('routes to the CST contracts when isRwalk=false', async () => {
@@ -267,7 +274,7 @@ describe('useAnchorActions', () => {
       await act(async () => {
         await result.current.anchor(42, false);
       });
-      expect(mockCstStake).not.toHaveBeenCalled();
+      expect(mockCstAnchor).not.toHaveBeenCalled();
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'error',
@@ -283,7 +290,7 @@ describe('useAnchorActions', () => {
       await act(async () => {
         await result.current.anchor(42, false);
       });
-      expect(mockCstStake).not.toHaveBeenCalled();
+      expect(mockCstAnchor).not.toHaveBeenCalled();
       expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
 
@@ -300,7 +307,7 @@ describe('useAnchorActions', () => {
       expect(mockSetNotification).toHaveBeenCalledWith(
         expect.objectContaining({ text: 'Transaction cancelled by user', type: 'info' }),
       );
-      expect(mockCstStake).not.toHaveBeenCalled();
+      expect(mockCstAnchor).not.toHaveBeenCalled();
     });
 
     it('reports non-rejection approval errors', async () => {
@@ -329,7 +336,7 @@ describe('useAnchorActions', () => {
       });
 
       expect(mockCstAnchorMany).toHaveBeenCalledWith([[1, 2, 3]]);
-      expect(mockCstStake).not.toHaveBeenCalled();
+      expect(mockCstAnchor).not.toHaveBeenCalled();
     });
 
     it('uses plural success message for batch', async () => {
@@ -373,7 +380,7 @@ describe('useAnchorActions', () => {
       await act(async () => {
         await result.current.release(7, false);
       });
-      expect(mockCstUnstake).toHaveBeenCalledWith([7]);
+      expect(mockCstRelease).toHaveBeenCalledWith([7]);
       expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xunstakeHash' });
     });
 
@@ -383,7 +390,7 @@ describe('useAnchorActions', () => {
       await act(async () => {
         await result.current.release(7, false);
       });
-      expect(mockCstUnstake).not.toHaveBeenCalled();
+      expect(mockCstRelease).not.toHaveBeenCalled();
       expect(mockSetNotification).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
     });
 
@@ -400,7 +407,7 @@ describe('useAnchorActions', () => {
     });
 
     it('handles user rejection cleanly without reporting an error', async () => {
-      mockCstUnstake.mockRejectedValueOnce(new Error('user rejected'));
+      mockCstRelease.mockRejectedValueOnce(new Error('user rejected'));
       mockIsUserRejection.mockReturnValueOnce(true);
       const { result } = renderHook(() => useAnchorActions());
       await act(async () => {
@@ -420,7 +427,7 @@ describe('useAnchorActions', () => {
         await result.current.release([10, 11], false);
       });
       expect(mockCstReleaseMany).toHaveBeenCalledWith([[10, 11]]);
-      expect(mockCstUnstake).not.toHaveBeenCalled();
+      expect(mockCstRelease).not.toHaveBeenCalled();
     });
 
     it('uses plural success message for batch release', async () => {
@@ -497,7 +504,7 @@ describe('useAnchorActions', () => {
   describe('transaction receipt waiting', () => {
     it('does not emit a success notification if the tx hash is undefined', async () => {
       mockIsApprovedForAll.mockResolvedValueOnce(true);
-      mockCstStake.mockResolvedValueOnce(undefined as never);
+      mockCstAnchor.mockResolvedValueOnce(undefined as never);
       const { result } = renderHook(() => useAnchorActions());
       await act(async () => {
         await result.current.anchor(42, false);

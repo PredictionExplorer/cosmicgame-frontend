@@ -27,7 +27,7 @@ export function TablePrimaryContainer({
   return (
     <div
       className={cn(
-        'rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden',
+        'relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] bg-[linear-gradient(135deg,rgb(255_255_255/0.04),rgb(255_255_255/0.014)_48%,rgb(var(--nebula-violet-rgb)/0.05))] shadow-[0_20px_90px_-70px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-px before:bg-gradient-to-r before:from-transparent before:via-[rgb(var(--aurora-cyan-rgb)/0.55)] before:to-transparent',
         className,
       )}
       {...props}
@@ -40,14 +40,22 @@ export function TablePrimary({ className, ...props }: ComponentPropsWithoutRef<t
 }
 
 export function TablePrimaryHead({ className, ...props }: ComponentPropsWithoutRef<typeof Thead>) {
-  return <Thead className={cn('bg-muted/60 sticky top-0 z-[1]', className)} {...props} />;
+  return (
+    <Thead
+      className={cn(
+        'sticky top-0 z-[1] bg-[linear-gradient(90deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.10))] backdrop-blur-md',
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 export function TablePrimaryHeadCell({ className, ...props }: ComponentPropsWithoutRef<typeof Th>) {
   return (
     <Th
       className={cn(
-        'text-muted-foreground font-medium text-xs uppercase tracking-wider leading-[1.43] border-b border-white/[0.06] px-4 py-3 max-sm:text-[10px]',
+        'text-muted-foreground font-medium text-xs uppercase tracking-wider leading-[1.43] border-b border-white/[0.08] px-4 py-3 max-sm:text-[10px]',
         className,
       )}
       {...props}
@@ -71,7 +79,7 @@ export function TablePrimaryRow({ className, ...props }: ComponentPropsWithoutRe
   return (
     <Tr
       className={cn(
-        'border-0 transition-colors hover:bg-white/[0.04] even:bg-white/[0.015]',
+        'border-0 transition-colors hover:bg-white/[0.055] even:bg-white/[0.018]',
         className,
       )}
       {...props}
@@ -96,7 +104,7 @@ export function AppBarWrapper({
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-white/[0.06] py-4 print:static print:z-auto print:w-full',
+        'fixed top-0 left-0 right-0 z-50 border-b border-white/[0.08] bg-background/78 py-4 shadow-[0_16px_70px_-60px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-2xl print:static print:z-auto print:w-full',
         className,
       )}
       {...props}

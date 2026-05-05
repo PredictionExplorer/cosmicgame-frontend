@@ -48,7 +48,7 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
           </TablePrimaryHead>
           <tbody>
             {paginatedData.map((row, index) => {
-              const rowKey = `donated-nft-${(page - 1) * PER_PAGE + index}`;
+              const rowKey = `attached-nft-${(page - 1) * PER_PAGE + index}`;
               if (!row) {
                 return <TablePrimaryRow key={rowKey} />;
               }

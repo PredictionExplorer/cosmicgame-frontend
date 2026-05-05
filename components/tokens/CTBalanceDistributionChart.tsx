@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, LabelList, ResponsiveContainer, Cell } fro
 
 import { shortenHex } from '@/utils';
 
-import { MARKETING_WALLET_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
 /** Maximum number of individual addresses to highlight before grouping the rest */
 const DISPLAY_LIMIT = 9;
@@ -60,20 +60,23 @@ const formatLabel: import('recharts/types/component/Label').LabelFormatter = (va
  * Remaining holders are aggregated into an "Others" bucket.
  */
 export const CTBalanceDistributionChart: FC<CTBalanceDistributionChartProps> = ({ list }) => {
+  const { marketing } = useContractAddresses();
   const { processed: data, max } = useProcessedBalances(list, DISPLAY_LIMIT);
 
   const chartData = useMemo(
     () =>
       data.map((entry) => ({
         category:
-          entry.OwnerAddr === MARKETING_WALLET_ADDRESS
+          marketing &&
+          entry.OwnerAddr &&
+          entry.OwnerAddr.toLowerCase() === marketing.toLowerCase()
             ? 'Marketing Wallet'
             : entry.OwnerAddr === 'Others'
               ? 'Others'
               : shortenHex(entry.OwnerAddr, 6),
         value: entry.BalanceFloat,
       })),
-    [data],
+    [data, marketing],
   );
 
   if (chartData.length === 0) return null;

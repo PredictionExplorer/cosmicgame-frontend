@@ -7,7 +7,7 @@ import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils'
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import { COSMIC_SIGNATURE_TOKEN_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -63,6 +63,7 @@ const WinningHistoryRow = ({
   showClaimedStatus: boolean;
   showWinnerAddr: boolean;
 }) => {
+  const { cosmicToken } = useContractAddresses();
   if (!history) return <TablePrimaryRow />;
 
   const recordType = RECORD_TYPE_MAP[history.RecordType] || {
@@ -145,15 +146,15 @@ const WinningHistoryRow = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <a
-                  href={getExplorerUrl('address', COSMIC_SIGNATURE_TOKEN_ADDRESS)}
+                  href={getExplorerUrl('address', cosmicToken)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-inherit"
                 >
-                  {shortenHex(COSMIC_SIGNATURE_TOKEN_ADDRESS, 6)}
+                  {shortenHex(cosmicToken, 6)}
                 </a>
               </TooltipTrigger>
-              <TooltipContent>{COSMIC_SIGNATURE_TOKEN_ADDRESS}</TooltipContent>
+              <TooltipContent>{cosmicToken}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         ) : history.TokenAddress ? (

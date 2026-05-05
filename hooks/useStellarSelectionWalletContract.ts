@@ -1,9 +1,10 @@
 import { prizesWalletAbi } from '@/contracts/abis';
 
-import { STELLAR_SELECTION_WALLET_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
 import useContract from './useContract';
 
 export default function useStellarSelectionWalletContract() {
-  return useContract(STELLAR_SELECTION_WALLET_ADDRESS, prizesWalletAbi);
+  const { prizesWallet } = useContractAddresses();
+  return useContract(prizesWallet, prizesWalletAbi);
 }

@@ -4,7 +4,7 @@ import { useConfig, useConnectorClient, usePublicClient, useWalletClient } from 
 import { useQueryClient } from '@tanstack/react-query';
 
 import { activeChain } from '@/config/chains';
-import { ANCHORING_WALLET_CST_ADDRESS, ANCHORING_WALLET_RWLK_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import {
   isUserRejection,
   reportError,
@@ -35,6 +35,7 @@ const ANCHORING_QUERY_KEYS = [
  * Handles contract calls, receipt waiting, query invalidation, and error reporting.
  */
 export function useAnchorActions() {
+  const { stakingCst, stakingRwalk } = useContractAddresses();
   const { account } = useActiveWeb3React();
   const config = useConfig();
   const publicClient = usePublicClient({ chainId: activeChain.id });
@@ -107,9 +108,7 @@ export function useAnchorActions() {
       try {
         const nftContract = isRwalk ? rwalkContract : cosmicSignatureContract;
         const anchoringContract = isRwalk ? rwlkAnchoringContract : cstAnchoringContract;
-        const walletAddress = isRwalk
-          ? ANCHORING_WALLET_RWLK_ADDRESS
-          : ANCHORING_WALLET_CST_ADDRESS;
+        const walletAddress = isRwalk ? stakingRwalk : stakingCst;
 
         if (!nftContract || !anchoringContract) {
           setNotification({
@@ -177,6 +176,8 @@ export function useAnchorActions() {
       setNotification,
       invalidateAnchoringQueries,
       handleError,
+      stakingCst,
+      stakingRwalk,
     ],
   );
 

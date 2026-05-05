@@ -1,9 +1,10 @@
 import { randomWalkNftAbi } from '@/contracts/abis';
 
-import { NFT_ADDRESS } from '@/config/networks';
-
 import useContract from './useContract';
 
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
+
 export default function useRWLKNFTContract() {
-  return useContract(NFT_ADDRESS, randomWalkNftAbi);
+  const { randomWalkNft } = useContractAddresses();
+  return useContract(randomWalkNft, randomWalkNftAbi);
 }

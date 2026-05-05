@@ -24,7 +24,7 @@ const SampleDetailPage = () => {
   const [videoPath, setVideoPath] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const image = getAssetsUrl('cosmicsignature/sample.png');
+  const image = '/images/CosmicSignatureNFT.png';
   const video = getAssetsUrl('cosmicsignature/sample.mp4');
 
   const handlePlayVideo = (path: string) => {

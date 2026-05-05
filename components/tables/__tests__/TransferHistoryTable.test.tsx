@@ -3,10 +3,29 @@ import '@testing-library/jest-dom';
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import { ZERO_ADDRESS } from '@/config/misc';
-import { ANCHORING_WALLET_CST_ADDRESS, ANCHORING_WALLET_RWLK_ADDRESS } from '@/config/networks';
 import { TransferHistoryTable } from '@/components/tables/TransferHistoryTable';
+import {
+  TEST_STAKING_CST_LABEL,
+  TEST_STAKING_RWALK_LABEL,
+} from '@/test-utils/contractAddressesFixture';
 
 import { checkA11y, render, screen } from '@/test-utils';
+
+jest.mock('../../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({
+    stakingCst: TEST_STAKING_CST_LABEL,
+    stakingRwalk: TEST_STAKING_RWALK_LABEL,
+    randomWalkNft: '',
+    cosmicGame: '',
+    cosmicSignature: '',
+    cosmicToken: '',
+    cosmicDao: '',
+    charity: '',
+    prizesWallet: '',
+    marketing: '',
+    implementation: '',
+  }),
+}));
 
 const createRecord = (overrides = {}) => ({
   EvtLogId: 1,
@@ -52,14 +71,14 @@ describe('TransferHistoryTable', () => {
 
   it('shows "StakingWallet CST" label for CST anchoring address', () => {
     render(
-      <TransferHistoryTable list={[createRecord({ FromAddr: ANCHORING_WALLET_CST_ADDRESS })]} />,
+      <TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_CST_LABEL })]} />,
     );
     expect(screen.getByText('StakingWallet CST')).toBeInTheDocument();
   });
 
   it('shows "StakingWallet RandomWalk" label for RWLK anchoring address', () => {
     render(
-      <TransferHistoryTable list={[createRecord({ FromAddr: ANCHORING_WALLET_RWLK_ADDRESS })]} />,
+      <TransferHistoryTable list={[createRecord({ FromAddr: TEST_STAKING_RWALK_LABEL })]} />,
     );
     expect(screen.getByText('StakingWallet RandomWalk')).toBeInTheDocument();
   });

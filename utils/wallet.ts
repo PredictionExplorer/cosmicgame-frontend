@@ -1,25 +1,23 @@
 import {
-  CHARITY_WALLET_ADDRESS,
-  MARKETING_WALLET_ADDRESS,
-  STELLAR_SELECTION_WALLET_ADDRESS,
-  ANCHORING_WALLET_CST_ADDRESS,
-  ANCHORING_WALLET_RWLK_ADDRESS,
+  getCachedDashboardContractAddresses,
+  type AppContractAddresses,
 } from '@/config/networks';
 
-/** Returns a human-readable label for known system wallets, or empty string. */
-export const isWalletAddress = (address: string): string => {
-  switch (address) {
-    case ANCHORING_WALLET_CST_ADDRESS:
-      return 'CST Anchoring Wallet';
-    case ANCHORING_WALLET_RWLK_ADDRESS:
-      return 'RandomWalk Anchoring Wallet';
-    case MARKETING_WALLET_ADDRESS:
-      return 'Outreach Wallet';
-    case STELLAR_SELECTION_WALLET_ADDRESS:
-      return 'Stellar Selection Wallet';
-    case CHARITY_WALLET_ADDRESS:
-      return 'Public Goods Vault';
-    default:
-      return '';
-  }
+function addrEq(a: string, b: string): boolean {
+  return a.toLowerCase() === b.toLowerCase();
+}
+
+/**
+ * Human-readable label for known system contract/wallet addresses.
+ * Uses dashboard-merged addresses when `resolved` is passed (e.g. from `useContractAddresses()`).
+ */
+export const isWalletAddress = (address: string, resolved?: AppContractAddresses): string => {
+  if (!address) return '';
+  const addrs = resolved ?? getCachedDashboardContractAddresses();
+  if (addrEq(address, addrs.stakingCst)) return 'CST Anchoring Wallet';
+  if (addrEq(address, addrs.stakingRwalk)) return 'RandomWalk Anchoring Wallet';
+  if (addrEq(address, addrs.marketing)) return 'Outreach Wallet';
+  if (addrEq(address, addrs.prizesWallet)) return 'Stellar Selection Wallet';
+  if (addrEq(address, addrs.charity)) return 'Public Goods Vault';
+  return '';
 };

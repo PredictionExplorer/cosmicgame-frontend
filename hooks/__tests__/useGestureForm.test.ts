@@ -170,6 +170,22 @@ jest.mock('viem', () => ({
 /*  Config & utilities                                               */
 /* ────────────────────────────────────────────────────────────────── */
 
+jest.mock('../../contexts/ContractAddressesContext', () => ({
+  useContractAddresses: () => ({
+    randomWalkNft: '0x0',
+    cosmicGame: '0xCosmicGame',
+    cosmicSignature: '0x0',
+    cosmicToken: '0x0',
+    cosmicDao: '0x0',
+    charity: '0x0',
+    prizesWallet: '0xRaffle',
+    stakingCst: '0x0',
+    stakingRwalk: '0x0',
+    marketing: '0x0',
+    implementation: '0x0',
+  }),
+}));
+
 jest.mock('../../config/networks', () => ({
   networkConfig: {
     rpcUrl: 'http://127.0.0.1:8545',
@@ -177,8 +193,6 @@ jest.mock('../../config/networks', () => ({
     apiUrl: 'http://test-api.example/api/cosmicgame/',
     nftApiUrl: 'https://nfts-sepolia.cosmicsignature.com/',
   },
-  COSMICGAME_ADDRESS: '0xCosmicGame',
-  STELLAR_SELECTION_WALLET_ADDRESS: '0xRaffle',
 }));
 
 jest.mock('../../config/constants', () => ({

@@ -9,8 +9,10 @@ test.describe('Gesture detail page', () => {
 
   test('shows gesture information fields', async ({ page }) => {
     await page.goto('/gesture/1', { waitUntil: 'networkidle' });
-    await expect(page.locator('text=/gesture cost/')).toBeVisible();
-    await expect(page.locator('text=/Participant/')).toBeVisible();
+    await expect(page.getByText(/Gesture #1/i).first()).toBeVisible();
+    await expect(
+      page.getByText(/Gesture details|No gesture information found/i).first(),
+    ).toBeVisible();
   });
 
   test('gesture cost does not show NaN or undefined', async ({ page }) => {

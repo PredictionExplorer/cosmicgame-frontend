@@ -25,6 +25,13 @@ jest.mock('../../../hooks/web3', () => ({
 
 jest.mock('wagmi', () => ({
   usePublicClient: () => ({ waitForTransactionReceipt: jest.fn() }),
+  useWalletClient: () => ({ data: undefined }),
+  useConnectorClient: () => ({ data: undefined }),
+  useConfig: () => ({}),
+}));
+
+jest.mock('@wagmi/core', () => ({
+  getConnectorClient: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('@tanstack/react-query', () => ({
@@ -62,8 +69,11 @@ jest.mock('../../../contexts/NotificationContext', () => ({
   useNotification: () => ({ setNotification: jest.fn() }),
 }));
 jest.mock('../../../config/networks', () => ({
-  ANCHORING_WALLET_CST_ADDRESS: '0xCST',
-  ANCHORING_WALLET_RWLK_ADDRESS: '0xRWLK',
+  ...jest.requireActual('../../../config/networks'),
+  networkConfig: {
+    chainId: 421614,
+    rpcUrl: 'http://test-rpc.example',
+  },
 }));
 
 jest.mock('next/image', () => ({

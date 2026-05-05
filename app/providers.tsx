@@ -20,6 +20,7 @@ import { SkipLink } from '@/components/ui/skip-link';
 import { AnchoredTokenProvider } from '@/contexts/AnchoredTokenContext';
 import { SystemModeProvider } from '@/contexts/SystemModeContext';
 import { ApiDataProvider } from '@/contexts/ApiDataContext';
+import { ContractAddressesProvider } from '@/contexts/ContractAddressesContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
@@ -214,6 +215,7 @@ export function Providers({
         : '';
 
     // console.log (not warn): dev-only banner; warn is forwarded as an error-looking stack in Next.
+    // eslint-disable-next-line no-console -- dev/preview config banner should not look like a warning.
     console.log(
       '[Cosmic Signature] Config:\n' +
         `  Network: ${process.env.NEXT_PUBLIC_NETWORK}\n` +
@@ -247,61 +249,63 @@ export function Providers({
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider theme={cosmicRainbowTheme}>
-          {engineReady && (
-            <Particles
-              id="tsparticles"
-              options={particleOptions}
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                zIndex: 0,
+        <ContractAddressesProvider>
+          <RainbowKitProvider theme={cosmicRainbowTheme}>
+            {engineReady && (
+              <Particles
+                id="tsparticles"
+                options={particleOptions}
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  zIndex: 0,
+                }}
+                aria-hidden="true"
+              />
+            )}
+            <ErrorBoundary>
+              <CookiesProvider>
+                <AnchoredTokenProvider>
+                  <SystemModeProvider>
+                    <ApiDataProvider>
+                      <NotificationProvider>
+                        <SkipLink />
+                        {showAppChrome && <Header />}
+                        <ErrorBoundary>{children}</ErrorBoundary>
+                        {showAppChrome && <Footer />}
+                      </NotificationProvider>
+                    </ApiDataProvider>
+                  </SystemModeProvider>
+                </AnchoredTokenProvider>
+              </CookiesProvider>
+            </ErrorBoundary>
+            <Toaster
+              position="top-right"
+              theme="dark"
+              richColors
+              closeButton
+              toastOptions={{
+                duration: NOTIFICATION_AUTO_HIDE_MS,
+                className:
+                  'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
+                classNames: {
+                  toast: 'group',
+                  title: 'type-body-md text-foreground',
+                  description: 'type-body-sm text-muted-foreground',
+                  actionButton: 'bg-primary text-primary-foreground',
+                  cancelButton: 'bg-muted text-muted-foreground',
+                  success: 'border-[rgb(var(--impact-green-rgb)/0.4)]',
+                  error: 'border-[rgb(var(--chrono-rose-rgb)/0.4)]',
+                  warning: 'border-[rgb(var(--solar-gold-rgb)/0.4)]',
+                  info: 'border-[rgb(var(--aurora-cyan-rgb)/0.4)]',
+                },
               }}
-              aria-hidden="true"
             />
-          )}
-          <ErrorBoundary>
-            <CookiesProvider>
-              <AnchoredTokenProvider>
-                <SystemModeProvider>
-                  <ApiDataProvider>
-                    <NotificationProvider>
-                      <SkipLink />
-                      {showAppChrome && <Header />}
-                      <ErrorBoundary>{children}</ErrorBoundary>
-                      {showAppChrome && <Footer />}
-                    </NotificationProvider>
-                  </ApiDataProvider>
-                </SystemModeProvider>
-              </AnchoredTokenProvider>
-            </CookiesProvider>
-          </ErrorBoundary>
-          <Toaster
-            position="top-right"
-            theme="dark"
-            richColors
-            closeButton
-            toastOptions={{
-              duration: NOTIFICATION_AUTO_HIDE_MS,
-              className:
-                'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
-              classNames: {
-                toast: 'group',
-                title: 'type-body-md text-foreground',
-                description: 'type-body-sm text-muted-foreground',
-                actionButton: 'bg-primary text-primary-foreground',
-                cancelButton: 'bg-muted text-muted-foreground',
-                success: 'border-[rgb(var(--impact-green-rgb)/0.4)]',
-                error: 'border-[rgb(var(--chrono-rose-rgb)/0.4)]',
-                warning: 'border-[rgb(var(--solar-gold-rgb)/0.4)]',
-                info: 'border-[rgb(var(--aurora-cyan-rgb)/0.4)]',
-              },
-            }}
-          />
-        </RainbowKitProvider>
+          </RainbowKitProvider>
+        </ContractAddressesProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

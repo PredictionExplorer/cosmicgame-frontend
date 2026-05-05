@@ -1,9 +1,10 @@
 import { stakingWalletCstAbi } from '@/contracts/abis';
 
-import { ANCHORING_WALLET_CST_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
 import useContract from './useContract';
 
 export default function useAnchoringWalletCSTContract() {
-  return useContract(ANCHORING_WALLET_CST_ADDRESS, stakingWalletCstAbi);
+  const { stakingCst } = useContractAddresses();
+  return useContract(stakingCst, stakingWalletCstAbi);
 }

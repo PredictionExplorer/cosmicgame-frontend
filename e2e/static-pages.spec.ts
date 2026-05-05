@@ -3,18 +3,19 @@ import { test, expect } from '@playwright/test';
 test.describe('FAQ page', () => {
   test('renders FAQ accordions', async ({ page }) => {
     await page.goto('/faq', { waitUntil: 'networkidle' });
-    const accordions = page.locator('.MuiAccordion-root');
-    const count = await accordions.count();
-    expect(count).toBeGreaterThan(0);
+    await expect(
+      page.getByRole('button', { name: 'What is Cosmic Signature?', exact: true }),
+    ).toBeVisible();
   });
 
   test('clicking an accordion expands it', async ({ page }) => {
     await page.goto('/faq', { waitUntil: 'networkidle' });
-    const firstAccordion = page.locator('.MuiAccordionSummary-root').first();
+    const firstAccordion = page.getByRole('button', {
+      name: 'What is Cosmic Signature?',
+      exact: true,
+    });
     await firstAccordion.click();
-    await page.waitForTimeout(500);
-    const expandedContent = page.locator('.MuiAccordionDetails-root').first();
-    await expect(expandedContent).toBeVisible();
+    await expect(page.getByText(/procedural on-chain art protocol/i).first()).toBeVisible();
   });
 });
 
@@ -56,7 +57,7 @@ test.describe('Contracts page', () => {
 
   test('no undefined or null values visible', async ({ page }) => {
     await page.goto('/contracts', { waitUntil: 'networkidle' });
-    const bodyText = await page.locator('body').textContent();
+    const bodyText = await page.locator('main').textContent();
     expect(bodyText).not.toContain('undefined');
     expect(bodyText).not.toContain('null');
   });

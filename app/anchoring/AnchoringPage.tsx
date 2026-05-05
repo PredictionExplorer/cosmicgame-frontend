@@ -20,6 +20,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
+import { Surface } from '@/components/ui/surface';
 import { formatEthValue } from '@/utils/format';
 
 const AnchoringPage = () => {
@@ -116,12 +117,33 @@ const AnchoringPage = () => {
         subtitle="Overview of global anchoring activity and distribution history"
       />
 
-      <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        Anchor your Cosmic Signature NFTs or RandomWalk NFTs to receive ETH Anchor Distributions
-        from the protocol&apos;s Cycle Reserve. Each cycle, 19% of the Cosmic Signature contract
-        balance is distributed equally among all anchored token holders. The more tokens you anchor,
-        the larger your share of the Anchor Distribution pool.
-      </p>
+      <Surface
+        variant="impact"
+        radius="xl"
+        padding="lg"
+        className="mb-8 grid gap-6 lg:grid-cols-[1fr_340px] lg:items-center"
+      >
+        <p className="type-body-md text-muted-foreground">
+          Anchor your Cosmic Signature NFTs or RandomWalk NFTs to receive ETH Anchor Distributions
+          from the protocol&apos;s Cycle Reserve. Each cycle, 19% of the contract balance is routed
+          to anchored token holders.
+        </p>
+        <div className="relative min-h-[160px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.08] bg-black/20">
+          <div
+            aria-hidden
+            className="absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgb(var(--impact-green-rgb)/0.5)] shadow-[0_0_50px_rgb(var(--impact-green-rgb)/0.16)]"
+          />
+          <div
+            aria-hidden
+            className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgb(var(--aurora-cyan-rgb)/0.25)]"
+          />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="rounded-full bg-[rgb(var(--impact-green-rgb)/0.14)] px-4 py-2 text-sm font-semibold text-[rgb(var(--impact-green-rgb))]">
+              19% anchor flow
+            </div>
+          </div>
+        </div>
+      </Surface>
 
       <AnchoringHeroStats stats={heroStats} loading={statsLoading} className="mb-10" />
 

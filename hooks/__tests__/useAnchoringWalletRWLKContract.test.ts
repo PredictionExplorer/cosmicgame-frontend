@@ -2,7 +2,12 @@ import { renderHook } from '@testing-library/react';
 
 import { stakingWalletRwlkAbi } from '@/contracts/abis';
 
-import { ANCHORING_WALLET_RWLK_ADDRESS } from '@/config/networks';
+import {
+  emptyContractAddresses,
+  publishDashboardContractAddresses,
+  getCachedDashboardContractAddresses,
+} from '@/config/networks';
+import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import useAnchoringWalletRWLKContract from '../useAnchoringWalletRWLKContract';
 import useContract from '../useContract';
@@ -13,14 +18,19 @@ const mockUseContract = useContract as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();
+  publishDashboardContractAddresses(TEST_APP_CONTRACT_ADDRESSES);
+});
+
+afterEach(() => {
+  publishDashboardContractAddresses(emptyContractAddresses());
 });
 
 describe('useAnchoringWalletRWLKContract', () => {
-  it('calls useContract with ANCHORING_WALLET_RWLK_ADDRESS and stakingWalletRwlkAbi', () => {
+  it('calls useContract with RWLK anchoring wallet address and stakingWalletRwlkAbi', () => {
     mockUseContract.mockReturnValue(null);
     renderHook(() => useAnchoringWalletRWLKContract());
     expect(mockUseContract).toHaveBeenCalledWith(
-      ANCHORING_WALLET_RWLK_ADDRESS,
+      getCachedDashboardContractAddresses().stakingRwalk,
       stakingWalletRwlkAbi,
     );
   });
@@ -48,8 +58,9 @@ describe('useAnchoringWalletRWLKContract', () => {
   });
 
   it('uses a valid non-empty address', () => {
-    expect(typeof ANCHORING_WALLET_RWLK_ADDRESS).toBe('string');
-    expect(ANCHORING_WALLET_RWLK_ADDRESS.length).toBeGreaterThan(0);
+    const addr = TEST_APP_CONTRACT_ADDRESSES.stakingRwalk;
+    expect(typeof addr).toBe('string');
+    expect(addr.length).toBeGreaterThan(0);
   });
 
   it('uses a non-empty ABI array', () => {

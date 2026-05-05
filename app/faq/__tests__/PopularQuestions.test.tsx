@@ -55,7 +55,14 @@ describe('PopularQuestions', () => {
 
   it('renders 4 question cards', () => {
     render(<PopularQuestions onQuestionClick={onQuestionClick} />);
-    const cards = screen.getAllByRole('button');
+
+    const cards = [
+      screen.getByRole('button', { name: /What is Cosmic Signature\?/i }),
+      screen.getByRole('button', { name: /What is the Signature Allocation\?/i }),
+      screen.getByRole('button', { name: /How does Stellar Selection work\?/i }),
+      screen.getByRole('button', { name: /How does Anchoring work\?/i }),
+    ];
+
     expect(cards).toHaveLength(4);
   });
 

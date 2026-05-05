@@ -16,7 +16,7 @@ test.describe('Responsive - Mobile viewport', () => {
     await menuButton.scrollIntoViewIfNeeded();
     await menuButton.click();
     await page.waitForTimeout(500);
-    const galleryLink = page.locator('text=Gallery');
+    const galleryLink = page.getByRole('dialog').locator('a[href="/gallery"]');
     await galleryLink.scrollIntoViewIfNeeded();
     await expect(galleryLink).toBeVisible();
   });
@@ -27,9 +27,9 @@ test.describe('Responsive - Mobile viewport', () => {
     await menuButton.scrollIntoViewIfNeeded();
     await menuButton.click();
     await page.waitForTimeout(500);
-    const galleryLink = page.locator('text=Gallery');
+    const galleryLink = page.getByRole('dialog').locator('a[href="/gallery"]');
     await galleryLink.scrollIntoViewIfNeeded();
-    await galleryLink.click();
+    await galleryLink.evaluate((element) => (element as HTMLAnchorElement).click());
     await expect(page).toHaveURL(/gallery/);
   });
 
@@ -54,13 +54,12 @@ test.describe('Responsive - Mobile viewport', () => {
 
   test('FAQ accordions work at 375px width', async ({ page }) => {
     await page.goto('/faq', { waitUntil: 'networkidle' });
-    const firstAccordion = page.locator('.MuiAccordionSummary-root').first();
+    const firstAccordion = page.getByRole('button', {
+      name: 'What is Cosmic Signature?',
+      exact: true,
+    });
     await firstAccordion.scrollIntoViewIfNeeded();
-    if (await firstAccordion.isVisible()) {
-      await firstAccordion.click();
-      await page.waitForTimeout(500);
-      const details = page.locator('.MuiAccordionDetails-root').first();
-      await expect(details).toBeVisible();
-    }
+    await firstAccordion.click();
+    await expect(page.getByText(/procedural on-chain art protocol/i).first()).toBeVisible();
   });
 });

@@ -1,14 +1,6 @@
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
-import {
-  axios,
-  getAPIUrl,
-  getMainAPIUrl,
-  apiCall,
-  apiPost,
-  flattenTx,
-  flattenTxArray,
-} from './client';
+import { axios, getAPIUrl, apiCall, apiPost, flattenTx, flattenTxArray } from './client';
 import type {
   CSTTokenInfo,
   CSTTransferRecord,
@@ -137,10 +129,14 @@ export function get_used_rwlk_nfts(): Promise<UsedRWLKNFT[]> {
   }, []);
 }
 
-/** Triggers server-side token minting, returning the background task ID. */
+/**
+ * Triggers server-side CST image generation / token pipeline, returning the background task ID.
+ * Uses the Cosmic Game API base (`NEXT_PUBLIC_API_URL`), same as other `getAPIUrl` calls — not
+ * `nftApiUrl` (NFT CDN), which does not serve POST `cosmicgame_tokens` and returns 404 locally.
+ */
 export function create(token_id: number, count: number) {
   return apiPost(async () => {
-    const { data } = await axios.post(getMainAPIUrl('cosmicgame_tokens'), {
+    const { data } = await axios.post(getAPIUrl('cosmicgame_tokens'), {
       token_id,
       count,
     });

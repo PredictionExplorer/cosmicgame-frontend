@@ -1,12 +1,14 @@
 import { shortenHex } from '@/utils';
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { MARKETING_WALLET_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
 export const AddressLink = ({ address, url }: { address: string; url: string }) => {
-  const displayText = address === MARKETING_WALLET_ADDRESS ? 'Marketing Wallet' : address;
-  const shortText =
-    address === MARKETING_WALLET_ADDRESS ? 'Marketing Wallet' : shortenHex(address, 6);
+  const { marketing } = useContractAddresses();
+  const isMkt =
+    marketing && address && marketing.toLowerCase() === address.toLowerCase();
+  const displayText = isMkt ? 'Marketing Wallet' : address;
+  const shortText = isMkt ? 'Marketing Wallet' : shortenHex(address, 6);
 
   return (
     <>

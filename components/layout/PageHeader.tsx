@@ -45,11 +45,33 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        'mb-12 print:relative print:z-[2] print:text-foreground',
+        'relative isolate mb-14 overflow-hidden px-4 py-8 print:relative print:z-[2] print:text-foreground sm:px-6 sm:py-10',
         align === 'center' && !hasSidebar && 'text-center',
         className,
       )}
     >
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 rounded-[1.5rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.08)_42%,rgb(var(--chrono-rose-rgb)/0.06))] shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm print:hidden"
+      />
+      <div
+        aria-hidden
+        className="absolute -right-16 -top-20 -z-10 h-72 w-72 rounded-full opacity-45 blur-3xl print:hidden"
+        style={{
+          background:
+            'radial-gradient(circle, rgb(var(--aurora-cyan-rgb) / 0.22), rgb(var(--nebula-violet-rgb) / 0.18) 46%, transparent 70%)',
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute bottom-4 right-8 -z-10 hidden h-40 w-40 rounded-full opacity-30 sm:block print:hidden"
+        style={{
+          background:
+            'conic-gradient(from 120deg, transparent, rgb(var(--aurora-cyan-rgb) / 0.85), transparent 34%, rgb(var(--nebula-violet-rgb) / 0.65), transparent 68%, rgb(var(--chrono-rose-rgb) / 0.55), transparent)',
+          maskImage:
+            'radial-gradient(circle, transparent 57%, black 59%, black 62%, transparent 64%)',
+        }}
+      />
       {breadcrumbs && breadcrumbs.length > 0 ? (
         <nav
           aria-label="Breadcrumb"
@@ -81,7 +103,7 @@ export function PageHeader({
           {eyebrow ? (
             <div
               className={cn(
-                'mb-3 type-eyebrow text-muted-foreground',
+                'mb-4 type-eyebrow text-muted-foreground',
                 align === 'center' && !hasSidebar && 'flex justify-center',
               )}
             >
@@ -90,7 +112,7 @@ export function PageHeader({
           ) : null}
           <h1
             className={cn(
-              'type-display-sm text-foreground print:!text-foreground',
+              'type-display-md text-foreground print:!text-foreground',
               titleGradientVariant && '[&]:text-transparent',
             )}
           >
@@ -103,7 +125,7 @@ export function PageHeader({
           {subtitle ? (
             <p
               className={cn(
-                'mt-3 type-body-md text-muted-foreground print:!text-foreground/85',
+                'mt-4 type-body-lg text-muted-foreground print:!text-foreground/85',
                 align === 'center' && !hasSidebar && 'mx-auto max-w-2xl',
                 align === 'left' && 'max-w-2xl',
               )}

@@ -1,9 +1,10 @@
 import { stakingWalletRwlkAbi } from '@/contracts/abis';
 
-import { ANCHORING_WALLET_RWLK_ADDRESS } from '@/config/networks';
+import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
 import useContract from './useContract';
 
 export default function useAnchoringWalletRWLKContract() {
-  return useContract(ANCHORING_WALLET_RWLK_ADDRESS, stakingWalletRwlkAbi);
+  const { stakingRwalk } = useContractAddresses();
+  return useContract(stakingRwalk, stakingWalletRwlkAbi);
 }
