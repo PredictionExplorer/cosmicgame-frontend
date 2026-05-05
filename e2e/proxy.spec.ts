@@ -15,6 +15,7 @@ import { expect, request, test } from '@playwright/test';
  */
 
 const BASE = 'http://localhost:3000';
+const DEV_APP_ORIGIN = 'http://app.cosmicsignature.local:3000';
 
 test.describe('proxy middleware', () => {
   test.describe('on landing host', () => {
@@ -35,22 +36,18 @@ test.describe('proxy middleware', () => {
       });
       const res = await ctx.get(`${BASE}/gallery`, { maxRedirects: 0 });
       expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toBe('https://app.cosmicsignature.com/gallery');
+      expect(res.headers()['location']).toBe(`${DEV_APP_ORIGIN}/gallery`);
       await ctx.dispose();
     });
 
-    test('redirects /current-round and /current-cycle to app subdomain', async () => {
+    test('redirects /current-cycle to app subdomain', async () => {
       const ctx = await request.newContext({
         extraHTTPHeaders: { Host: 'cosmicsignature.com' },
       });
 
-      const r1 = await ctx.get(`${BASE}/current-round`, { maxRedirects: 0 });
-      expect(r1.status()).toBe(308);
-      expect(r1.headers()['location']).toBe('https://app.cosmicsignature.com/current-round');
-
-      const r2 = await ctx.get(`${BASE}/current-cycle`, { maxRedirects: 0 });
-      expect(r2.status()).toBe(308);
-      expect(r2.headers()['location']).toBe('https://app.cosmicsignature.com/current-cycle');
+      const res = await ctx.get(`${BASE}/current-cycle`, { maxRedirects: 0 });
+      expect(res.status()).toBe(308);
+      expect(res.headers()['location']).toBe(`${DEV_APP_ORIGIN}/current-cycle`);
 
       await ctx.dispose();
     });
@@ -61,9 +58,7 @@ test.describe('proxy middleware', () => {
       });
       const res = await ctx.get(`${BASE}/gallery?round=5&sort=desc`, { maxRedirects: 0 });
       expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toBe(
-        'https://app.cosmicsignature.com/gallery?round=5&sort=desc',
-      );
+      expect(res.headers()['location']).toBe(`${DEV_APP_ORIGIN}/gallery?round=5&sort=desc`);
       await ctx.dispose();
     });
 

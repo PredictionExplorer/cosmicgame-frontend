@@ -7,9 +7,90 @@ import { cn } from '@/lib/utils';
 
 const TooltipProvider = TooltipPrimitive.Provider;
 
-const Tooltip = TooltipPrimitive.Root;
+interface TooltipContextValue {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
 
-const TooltipTrigger = TooltipPrimitive.Trigger;
+const TooltipContext = React.createContext<TooltipContextValue | null>(null);
+
+type TooltipProps = React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root>;
+
+function Tooltip({ open: openProp, defaultOpen, onOpenChange, ...props }: TooltipProps) {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen ?? false);
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : uncontrolledOpen;
+
+  const setOpen = React.useCallback(
+    (nextOpen: boolean) => {
+      if (!isControlled) {
+        setUncontrolledOpen(nextOpen);
+      }
+
+      onOpenChange?.(nextOpen);
+    },
+    [isControlled, onOpenChange],
+  );
+
+  const contextValue = React.useMemo(() => ({ open, setOpen }), [open, setOpen]);
+
+  return (
+    <TooltipContext.Provider value={contextValue}>
+      <TooltipPrimitive.Root open={open} onOpenChange={setOpen} {...props} />
+    </TooltipContext.Provider>
+  );
+}
+
+Tooltip.displayName = TooltipPrimitive.Root.displayName;
+
+const TooltipTrigger = React.forwardRef<
+  React.ComponentRef<typeof TooltipPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Trigger>
+>(({ onPointerDown, onClickCapture, onClick, ...props }, ref) => {
+  const tooltip = React.useContext(TooltipContext);
+  const shouldSuppressClickRef = React.useRef(false);
+
+  const suppressClick = React.useCallback((event: React.MouseEvent) => {
+    if (!shouldSuppressClickRef.current) {
+      return false;
+    }
+
+    shouldSuppressClickRef.current = false;
+    event.preventDefault();
+    event.stopPropagation();
+    return true;
+  }, []);
+
+  return (
+    <TooltipPrimitive.Trigger
+      ref={ref}
+      {...props}
+      onPointerDown={(event) => {
+        if (event.pointerType === 'touch' && tooltip && !tooltip.open) {
+          tooltip.setOpen(true);
+          shouldSuppressClickRef.current = true;
+        }
+
+        onPointerDown?.(event);
+      }}
+      onClickCapture={(event) => {
+        if (suppressClick(event)) {
+          return;
+        }
+
+        onClickCapture?.(event);
+      }}
+      onClick={(event) => {
+        if (event.defaultPrevented || suppressClick(event)) {
+          return;
+        }
+
+        onClick?.(event);
+      }}
+    />
+  );
+});
+TooltipTrigger.displayName = TooltipPrimitive.Trigger.displayName;
 
 const TooltipContent = React.forwardRef<
   React.ComponentRef<typeof TooltipPrimitive.Content>,

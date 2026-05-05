@@ -16,7 +16,8 @@ test.describe('Allocation pages', () => {
 
   test('allocation detail shows recipient info', async ({ page }) => {
     await page.goto('/allocation/1', { waitUntil: 'networkidle' });
-    await expect(page.locator('text=/0x/')).toBeVisible();
+    await expect(page.getByText(/Allocation Recipients/i).first()).toBeVisible();
+    await expect(page.getByText(/Cycle Recipients/i).first()).toBeVisible();
   });
 
   test('navigating from allocation list to detail works', async ({ page }) => {

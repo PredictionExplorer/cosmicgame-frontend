@@ -11,6 +11,8 @@ import { expect, test } from '@playwright/test';
  */
 
 const LANDING_HEADERS = { 'X-Forwarded-Host': 'cosmicsignature.com' };
+const APP_ORIGIN_PATTERN =
+  /^https:\/\/app\.cosmicsignature\.com$|^http:\/\/app\.cosmicsignature\.local:3000$/;
 
 test.describe('Landing page @ cosmicsignature.com', () => {
   test.beforeEach(async ({ context }) => {
@@ -27,7 +29,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
   test('primary CTA links to the app subdomain', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const cta = page.getByRole('link', { name: /open the app/i }).first();
-    await expect(cta).toHaveAttribute('href', 'https://app.cosmicsignature.com');
+    await expect(cta).toHaveAttribute('href', APP_ORIGIN_PATTERN);
   });
 
   test('all ten landing sections are present in the DOM', async ({ page }) => {

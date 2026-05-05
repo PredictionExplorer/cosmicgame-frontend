@@ -47,10 +47,19 @@ const LatestNFTs = () => {
                 ))}
               </ul>
               <div className="text-center mt-4">
-                <Button className="mr-2" onClick={() => prev()} disabled={activePageIndex === 0}>
+                <Button
+                  className="mr-2"
+                  onClick={() => prev()}
+                  disabled={activePageIndex === 0}
+                  aria-label="Previous latest NFTs"
+                >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
-                <Button onClick={() => next()} disabled={activePageIndex === pages.length - 1}>
+                <Button
+                  onClick={() => next()}
+                  disabled={activePageIndex === pages.length - 1}
+                  aria-label="Next latest NFTs"
+                >
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>

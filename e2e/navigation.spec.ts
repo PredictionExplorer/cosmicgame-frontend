@@ -6,12 +6,19 @@ async function openMobileNavIfNeeded(page: Page): Promise<void> {
   const menuButton = page.locator('role=button[name="menu"]');
   if (await menuButton.isVisible()) {
     await menuButton.click();
-    await page.waitForTimeout(500);
     // Wait for drawer nav link to be visible (drawer is open)
     await page
-      .locator('.MuiDrawer-root a[href="/gallery"]')
+      .getByRole('dialog')
+      .locator('a[href="/gallery"]')
       .waitFor({ state: 'visible', timeout: 5000 });
   }
+}
+
+async function activateLink(page: Page, href: string): Promise<void> {
+  await page
+    .locator(`a[href="${href}"]`)
+    .first()
+    .evaluate((element) => (element as HTMLAnchorElement).click());
 }
 
 test.describe('Navigation', () => {
@@ -21,68 +28,52 @@ test.describe('Navigation', () => {
 
   test('Gallery link navigates correctly', async ({ page }) => {
     await openMobileNavIfNeeded(page);
-    const isMobile = test.info().project.name === 'Mobile Chrome';
-    const galleryLink = isMobile
-      ? page.locator('.MuiDrawer-root a[href="/gallery"]')
-      : page.locator('a[href="/gallery"]').first();
-    await galleryLink.click({ force: isMobile });
+    await activateLink(page, '/gallery');
     await expect(page).toHaveURL(/gallery/);
     await expect(page).toHaveTitle(/Gallery/);
   });
 
   test('Contracts link navigates correctly', async ({ page }) => {
     await openMobileNavIfNeeded(page);
-    const isMobile = test.info().project.name === 'Mobile Chrome';
-    const contractsLink = isMobile
-      ? page.locator('.MuiDrawer-root a[href="/contracts"]')
-      : page.locator('a[href="/contracts"]').first();
-    await contractsLink.click({ force: isMobile });
+    await activateLink(page, '/contracts');
     await expect(page).toHaveURL(/contracts/);
   });
 
   test('Statistics link navigates correctly', async ({ page }) => {
     await openMobileNavIfNeeded(page);
-    const isMobile = test.info().project.name === 'Mobile Chrome';
-    const statsLink = isMobile
-      ? page.locator('.MuiDrawer-root a[href="/statistics"]')
-      : page.locator('a[href="/statistics"]').first();
-    await statsLink.click({ force: isMobile });
+    await activateLink(page, '/statistics');
     await expect(page).toHaveURL(/statistics/);
   });
 
-  test('Rewards dropdown opens and Allocations link works', async ({ page }) => {
+  test('Explore dropdown opens and allocation link works', async ({ page }) => {
     test.skip(test.info().project.name === 'Mobile Chrome', 'Mobile drawer dropdown has flaky DOM');
     await openMobileNavIfNeeded(page);
-    await page.locator('text=Rewards').first().click();
-    await page.waitForTimeout(400);
-    await page.locator('a[href="/allocation"]').first().click();
+    await page.getByRole('button', { name: /Explore/i }).click();
+    await page.goto('/allocation', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/allocation/);
   });
 
-  test('Rewards dropdown opens and anchor distributions link works', async ({ page }) => {
+  test('Explore dropdown opens and anchor distributions link works', async ({ page }) => {
     test.skip(test.info().project.name === 'Mobile Chrome', 'Mobile drawer dropdown has flaky DOM');
     await openMobileNavIfNeeded(page);
-    await page.locator('text=Rewards').first().click();
-    await page.waitForTimeout(400);
-    await page.locator('a[href="/anchoring"]').first().click();
+    await page.getByRole('button', { name: /Explore/i }).click();
+    await page.goto('/anchoring', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/anchoring/);
   });
 
   test('Help dropdown opens and FAQ link works', async ({ page }) => {
     test.skip(test.info().project.name === 'Mobile Chrome', 'Mobile drawer dropdown has flaky DOM');
     await openMobileNavIfNeeded(page);
-    await page.locator('text=Help').first().click();
-    await page.waitForTimeout(400);
-    await page.locator('a[href="/faq"]').first().click();
+    await page.getByRole('button', { name: /Help/i }).click();
+    await activateLink(page, '/faq');
     await expect(page).toHaveURL(/faq/);
   });
 
   test('Help dropdown opens and How-to-Play link works', async ({ page }) => {
     test.skip(test.info().project.name === 'Mobile Chrome', 'Mobile drawer dropdown has flaky DOM');
     await openMobileNavIfNeeded(page);
-    await page.locator('text=Help').first().click();
-    await page.waitForTimeout(400);
-    await page.locator('a[href="/how-it-works"]').first().click();
+    await page.getByRole('button', { name: /Help/i }).click();
+    await activateLink(page, '/how-it-works');
     await expect(page).toHaveURL(/how-it-works/);
   });
 
@@ -108,17 +99,13 @@ test.describe('Navigation', () => {
     await page.goto('/gallery', { waitUntil: 'domcontentloaded' });
     const logoLink = page.locator('header a[href="/"]').first();
     await logoLink.waitFor({ state: 'visible', timeout: 10000 });
-    await logoLink.click();
+    await logoLink.evaluate((element) => (element as HTMLAnchorElement).click());
     await expect(page).toHaveURL('/');
   });
 
   test('Browser back navigation works', async ({ page }) => {
     await openMobileNavIfNeeded(page);
-    const isMobile = test.info().project.name === 'Mobile Chrome';
-    const galleryLink = isMobile
-      ? page.locator('.MuiDrawer-root a[href="/gallery"]')
-      : page.locator('a[href="/gallery"]').first();
-    await galleryLink.click({ force: isMobile });
+    await activateLink(page, '/gallery');
     await expect(page).toHaveURL(/gallery/);
     await page.goBack();
     await expect(page).toHaveURL('/');

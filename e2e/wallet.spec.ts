@@ -34,13 +34,13 @@ test.describe('Wallet connection state (disconnected)', () => {
   });
 
   test('my-winnings page handles no wallet gracefully', async ({ page }) => {
-    const response = await page.goto('/my-winnings', { waitUntil: 'domcontentloaded' });
+    const response = await page.goto('/my-allocations', { waitUntil: 'domcontentloaded' });
     expect(response?.status()).toBe(200);
     await expect(page.locator('body')).not.toHaveText('Internal Server Error');
   });
 
   test('winning-history page handles no wallet gracefully', async ({ page }) => {
-    const response = await page.goto('/winning-history', { waitUntil: 'domcontentloaded' });
+    const response = await page.goto('/recipient-history', { waitUntil: 'domcontentloaded' });
     expect(response?.status()).toBe(200);
     await expect(page.locator('body')).not.toHaveText('Internal Server Error');
   });
