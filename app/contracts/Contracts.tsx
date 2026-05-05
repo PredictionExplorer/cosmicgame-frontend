@@ -16,6 +16,7 @@ import { reportError } from '@/utils/errors';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
+import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 
 import { NetworkBadge } from './components/NetworkBadge';
 import { FundDistribution } from './components/FundDistribution';
@@ -201,7 +202,13 @@ const Contracts = () => {
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
+        eyebrow={
+          <SectionEyebrow tone="aurora" pulse>
+            Verified Contracts · Arbitrum
+          </SectionEyebrow>
+        }
         title="Contract Addresses"
+        gradientTitle="aurora"
         subtitle="On-chain addresses and configuration for the Cosmic Signature protocol. All contracts have been audited."
       >
         <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />

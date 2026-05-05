@@ -33,7 +33,26 @@ export function HeroSection({
   categoryCount,
 }: HeroSectionProps) {
   return (
-    <section aria-labelledby="faq-hero-heading" className="pb-10 text-center">
+    <section
+      aria-labelledby="faq-hero-heading"
+      className="relative overflow-hidden rounded-[2rem] border border-white/[0.08] bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.08),rgb(var(--nebula-violet-rgb)/0.08)_44%,rgb(var(--chrono-rose-rgb)/0.05))] px-5 py-12 text-center shadow-[0_24px_100px_-76px_rgb(var(--aurora-cyan-rgb)/0.85)] backdrop-blur sm:px-8"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-20 top-12 h-64 w-64 rounded-full opacity-40 blur-3xl"
+        style={{
+          background:
+            'radial-gradient(circle, rgb(var(--aurora-cyan-rgb) / 0.22), transparent 70%)',
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full opacity-45 blur-3xl"
+        style={{
+          background:
+            'radial-gradient(circle, rgb(var(--nebula-violet-rgb) / 0.25), transparent 70%)',
+        }}
+      />
       <motion.div
         custom={0}
         variants={fadeUp}
@@ -51,7 +70,7 @@ export function HeroSection({
         variants={fadeUp}
         initial="hidden"
         animate="visible"
-        className="font-display text-3xl font-bold tracking-tight md:text-5xl"
+        className="relative font-display text-3xl font-bold tracking-tight md:text-5xl"
       >
         Frequently Asked <GradientText>Questions</GradientText>
       </motion.h1>
@@ -61,13 +80,19 @@ export function HeroSection({
         variants={fadeUp}
         initial="hidden"
         animate="visible"
-        className="mx-auto mt-4 max-w-lg text-base text-muted-foreground"
+        className="relative mx-auto mt-4 max-w-lg text-base text-muted-foreground"
       >
         Everything you need to know about Cosmic Signature — from getting started to advanced game
         mechanics.
       </motion.p>
 
-      <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible" className="mt-8">
+      <motion.div
+        custom={3}
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
+        className="relative mt-8"
+      >
         <FAQSearch
           value={searchValue}
           onChange={onSearchChange}
@@ -81,7 +106,7 @@ export function HeroSection({
         variants={fadeUp}
         initial="hidden"
         animate="visible"
-        className="mx-auto mt-8 flex max-w-md items-center justify-center gap-6 text-sm text-muted-foreground sm:gap-10"
+        className="relative mx-auto mt-8 flex max-w-md items-center justify-center gap-6 text-sm text-muted-foreground sm:gap-10"
       >
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10">

@@ -25,6 +25,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { StatCard } from '@/components/ui/stat-card';
 import { SectionDivider } from '@/components/ui/section-divider';
+import { Surface } from '@/components/ui/surface';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 import { UniqueParticipantsTable, Participant } from '@/components/tables/UniqueParticipantsTable';
@@ -148,18 +149,32 @@ const Statistics = () => {
       />
 
       {/* Link to current cycle */}
-      <Link
-        href="/current-cycle"
-        className="gradient-border-card mb-12 flex items-center justify-between rounded-xl border border-primary/20 bg-gradient-to-r from-primary/[0.06] via-accent/[0.04] to-primary/[0.06] p-4 group hover:from-primary/[0.08] hover:to-primary/[0.08] transition-all"
+      <Surface
+        asChild
+        variant="aurora"
+        radius="lg"
+        padding="none"
+        interactive
+        className="mb-12 block no-underline"
       >
-        <div>
-          <p className="text-sm font-medium text-white">Looking for current cycle data?</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            View gesture history, leaderboards, and live cycle details
-          </p>
-        </div>
-        <ArrowRight className="h-5 w-5 text-primary group-hover:translate-x-0.5 transition-transform" />
-      </Link>
+        <Link href="/current-cycle" className="group">
+          <div className="flex items-center justify-between gap-4 p-5">
+            <div>
+              <p className="text-base font-semibold text-white">Looking for current cycle data?</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                View gesture history, leaderboards, and live cycle details
+              </p>
+            </div>
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[rgb(var(--aurora-cyan-rgb)/0.25)] bg-[rgb(var(--aurora-cyan-rgb)/0.10)]">
+              <ArrowRight className="h-5 w-5 text-primary transition-transform group-hover:translate-x-0.5" />
+            </div>
+          </div>
+          <div
+            aria-hidden
+            className="h-1 bg-gradient-to-r from-[rgb(var(--aurora-cyan-rgb))] via-[rgb(var(--nebula-violet-rgb))] to-[rgb(var(--chrono-rose-rgb))] opacity-70"
+          />
+        </Link>
+      </Surface>
 
       {/* 1 \u2500\u2500 Hero Stat Cards \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-12">

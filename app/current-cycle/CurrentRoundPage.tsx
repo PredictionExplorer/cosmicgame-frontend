@@ -160,7 +160,15 @@ const CurrentRoundPage = () => {
 
       {/* ===== HERO SECTION ===== */}
       {/* No gradient-border-card (mask pseudo): Chrome/Skia PDF often drops nested content in that compositing path. */}
-      <div className="flex flex-col gap-6 rounded-2xl border border-white/[0.1] bg-gradient-to-b from-primary/[0.06] to-transparent p-6 sm:p-8 mb-8 print:overflow-visible">
+      <div className="relative mb-8 flex flex-col gap-6 overflow-hidden rounded-2xl border border-white/[0.1] bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.11),rgb(var(--nebula-violet-rgb)/0.08)_46%,transparent)] p-6 shadow-[0_24px_100px_-72px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm print:overflow-visible sm:p-8">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full opacity-40 blur-3xl"
+          style={{
+            background:
+              'radial-gradient(circle, rgb(var(--aurora-cyan-rgb) / 0.22), rgb(var(--nebula-violet-rgb) / 0.18) 48%, transparent 70%)',
+          }}
+        />
         {/* Header row: LIVE badge + round info */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
