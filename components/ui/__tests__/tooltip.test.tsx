@@ -40,13 +40,13 @@ describe('Tooltip', () => {
   });
 
   it('opens a non-focusable trigger on the first touch tap', async () => {
-    renderTooltip(<span>Round badge</span>, 'Minted in game round 7');
+    renderTooltip(<span>Round badge</span>, 'Imprinted in cycle 7');
 
     const trigger = screen.getByText('Round badge');
     touchPointerDown(trigger);
     fireEvent.click(trigger);
 
-    expect(await screen.findByRole('tooltip')).toHaveTextContent('Minted in game round 7');
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Imprinted in cycle 7');
   });
 
   it('preserves caller pointer handlers while opening on touch', async () => {
