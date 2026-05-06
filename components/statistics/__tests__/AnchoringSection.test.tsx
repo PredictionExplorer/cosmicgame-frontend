@@ -83,7 +83,7 @@ describe('AnchoringSection', () => {
 
   it('wraps CST stats in a StatisticsGroup', () => {
     render(<AnchoringSection {...defaultProps} />);
-    expect(screen.getByText('CST Anchoring Overview')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Anchoring Overview')).toBeInTheDocument();
   });
 
   it('wraps tables in CollapsibleSections', () => {
@@ -105,8 +105,8 @@ describe('AnchoringSection', () => {
 
   it('renders tab triggers', () => {
     render(<AnchoringSection {...defaultProps} />);
-    expect(screen.getByText('CosmicSignature Token')).toBeInTheDocument();
-    expect(screen.getByText('RandomWalk Token')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT')).toBeInTheDocument();
+    expect(screen.getByText('RandomWalk NFT')).toBeInTheDocument();
   });
 
   it('renders tooltips on anchoring metrics', () => {

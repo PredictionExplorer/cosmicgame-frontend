@@ -15,15 +15,15 @@ const baseStats: AnchoringStatItem[] = [
     gradient: true,
   },
   {
-    label: 'CST Tokens Anchored',
+    label: 'Cosmic Signature NFTs Anchored',
     value: '42',
-    tooltip: 'Total CST tokens anchored.',
+    tooltip: 'Total Cosmic Signature NFTs anchored.',
     icon: <Users className="h-4 w-4" />,
   },
   {
-    label: 'RWLK Tokens Anchored',
+    label: 'RWLK NFTs Anchored',
     value: '7',
-    tooltip: 'Total RWLK tokens anchored.',
+    tooltip: 'Total RWLK NFTs anchored.',
   },
 ];
 
@@ -32,9 +32,9 @@ describe('AnchoringHeroStats', () => {
     render(<AnchoringHeroStats stats={baseStats} />);
     expect(screen.getByText('Anchor Distribution Pool')).toBeInTheDocument();
     expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
-    expect(screen.getByText('CST Tokens Anchored')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFTs Anchored')).toBeInTheDocument();
     expect(screen.getByText('42')).toBeInTheDocument();
-    expect(screen.getByText('RWLK Tokens Anchored')).toBeInTheDocument();
+    expect(screen.getByText('RWLK NFTs Anchored')).toBeInTheDocument();
     expect(screen.getByText('7')).toBeInTheDocument();
   });
 
@@ -67,7 +67,7 @@ describe('AnchoringHeroStats', () => {
 
   it('renders stat without icon', () => {
     render(<AnchoringHeroStats stats={[baseStats[2]!]} />);
-    expect(screen.getByText('RWLK Tokens Anchored')).toBeInTheDocument();
+    expect(screen.getByText('RWLK NFTs Anchored')).toBeInTheDocument();
     expect(screen.getByText('7')).toBeInTheDocument();
   });
 

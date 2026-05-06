@@ -52,7 +52,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'can-i-participate-without-nfts',
         question: "Can I participate if I don't own any NFTs?",
         answer:
-          'Yes. Anyone can participate in a Cosmic Signature Performance Cycle by making a gesture. Owning a Random Walk NFT simply reduces the Gesture Cost by 50% for one gesture per wallet.',
+          'Yes. Anyone can participate in a Cosmic Signature Performance Cycle by making a gesture. An unused Random Walk NFT can be attached to an ETH gesture for a 50% Gesture Cost reduction.',
       },
       {
         id: 'how-can-i-get-involved',
@@ -97,7 +97,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-does-the-stellarSelection-work',
         question: 'How does Stellar Selection work?',
         answer:
-          'Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects participants from the entry pool: three participants share 4% of the Cycle Reserve in ETH, ten participants each receive a Cosmic Signature NFT, and up to ten anchor-holders of Random Walk NFTs also receive Cosmic Signature NFTs. Selection frequency increases with the number of gestures you make.',
+          'Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects participants from the entry pool: three participants share 4% of the Cycle Reserve in ETH, ten participants each receive a Cosmic Signature NFT, and ten anchor-holders of Random Walk NFTs also receive Cosmic Signature NFTs. Selection frequency increases with the number of gestures you make.',
       },
       {
         id: 'how-do-i-claim-my-allocation',
@@ -109,7 +109,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-does-anchoring-work',
         question: 'How does Anchoring work?',
         answer:
-          'After receiving Cosmic Signature Tokens through Recognition or gestures, you can anchor them to the protocol to receive Anchor Distributions. Anchoring pays 6% of the Cycle Reserve each cycle, distributed proportionally across all anchored tokens. Visit the My Anchors page (from your account menu) to anchor tokens.',
+          'Cosmic Signature NFTs can be anchored to the protocol to receive Anchor Distributions. Anchoring pays 6% of the Cycle Reserve each cycle, distributed proportionally across all anchored Cosmic Signature NFTs. Random Walk NFTs can also be anchored for Anchored-NFT Stellar Selection eligibility. Visit the My Anchors page (from your account menu) to manage anchors.',
       },
       {
         id: 'what-are-marketing-rewards',
@@ -121,7 +121,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-many-nfts-minted',
         question: 'How many Cosmic Signature NFTs are imprinted each cycle?',
         answer:
-          'Up to 12 Cosmic Signature NFTs are imprinted each cycle \u2014 one for the Signature Allocation recipient, and one for each of the eleven Stellar Selection recipients.',
+          'In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted: one for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ten for NFT Stellar Selection recipients, and ten for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection.',
       },
       {
         id: 'what-happens-to-remaining-eth',
@@ -159,14 +159,21 @@ export const faqCategories: FAQCategory[] = [
         id: 'what-is-endurance-champion',
         question: 'What is an Endurance Champion?',
         answer:
-          'The participant who remained the most recent gesture maker for the longest consecutive interval within a cycle (the longest gap before another gesture arrived).',
+          'The participant who remained the most recent gesture maker for the longest consecutive interval within a cycle (the longest gap before another gesture arrived). When the cycle finalizes, the Endurance Champion receives a Recognition CST imprint of 1,000 CST and one Cosmic Signature NFT.',
         hashAnchor: 'endurance-champion',
+      },
+      {
+        id: 'what-is-final-cst-gesture',
+        question: 'What is the Final CST Gesture?',
+        answer:
+          'The Final CST Gesture is the last gesture made with Cosmic Signature Tokens (CST) during a cycle. When the cycle finalizes, the participant who made it receives a Recognition CST imprint of 1,000 CST and one Cosmic Signature NFT.',
+        hashAnchor: 'final-cst-gesture',
       },
       {
         id: 'what-is-chrono-warrior',
         question: 'What is a Chrono-Warrior?',
         answer:
-          'The participant who held the Endurance Champion position for the longest consecutive interval. Analogous to the Endurance Champion being the longest-reigning recent gesture maker, the Chrono-Warrior is the longest-reigning Endurance Champion.',
+          'The participant who held the Endurance Champion position for the longest consecutive interval. Analogous to the Endurance Champion being the longest-reigning recent gesture maker, the Chrono-Warrior is the longest-reigning Endurance Champion. When the cycle finalizes, the Chrono-Warrior receives 8% of the Cycle Reserve in ETH and one Cosmic Signature NFT.',
         hashAnchor: 'chrono-warrior',
       },
       {
@@ -253,7 +260,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'connection-with-randomwalknft',
         question: 'What is the connection with Random Walk NFT?',
         answer:
-          'Random Walk NFT holders receive a 50% Gesture-Cost reduction (one gesture per wallet). Random Walk NFT anchor-holders also receive entries into the Anchored-NFT Stellar Selection each cycle.',
+          'Random Walk NFT holders can attach an unused token to one ETH gesture for a 50% Gesture-Cost reduction. Random Walk NFT anchor-holders also receive entries into the Anchored-NFT Stellar Selection each cycle.',
       },
       {
         id: 'how-to-trade-nfts-tokens',

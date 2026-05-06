@@ -19,25 +19,25 @@ const ANCHORING_FAQ = [
     id: 'what-is-anchoring',
     question: 'What is Anchoring?',
     answer:
-      'Anchoring lets you dedicate your NFTs to the protocol to receive a share of ETH Anchor Distributions. The more tokens you anchor, the larger your share of each distribution. You can release an anchor at any time to reclaim your NFTs and retrieve accumulated distributions.',
+      'Anchoring lets you dedicate your NFTs to the protocol. Cosmic Signature NFT anchors receive ETH Anchor Distributions, while RandomWalk NFT anchors enter Anchored-NFT Stellar Selection. You can release an anchor at any time to reclaim your NFTs and retrieve accumulated distributions.',
   },
   {
     id: 'cst-anchoring',
-    question: 'Cosmic Signature (CST) Anchoring',
+    question: 'Cosmic Signature NFT Anchoring',
     answer:
-      'Anchor your Cosmic Signature NFTs to receive ETH from the Anchor Distribution pool. Each cycle, a portion of the Cycle Reserve is distributed proportionally among all CST anchor-holders based on how many tokens they have anchored. Distributions accumulate automatically and can be retrieved when you release an anchor.',
+      'Anchor your Cosmic Signature NFTs to receive ETH from the Anchor Distribution pool. Each cycle, 6% of the Cycle Reserve is distributed proportionally among all Cosmic Signature NFT anchor-holders based on how many NFTs they have anchored. Distributions accumulate automatically and can be retrieved when you release an anchor.',
   },
   {
     id: 'rwlk-anchoring',
     question: 'RandomWalk (RWLK) Anchoring',
     answer:
-      'Anchor your RandomWalk NFTs to take part in RWLK allocation imprints. When a RandomWalk allocation event occurs, one of the anchored RWLK tokens is selected at random through on-chain selection to receive a newly imprinted token.',
+      'Anchor your RandomWalk NFTs to take part in Anchored-NFT Stellar Selection. Each cycle, ten RandomWalk NFT anchor-holders are selected through on-chain random selection to receive newly imprinted Cosmic Signature NFTs.',
   },
   {
     id: 'rewards-calculation',
     question: 'How are distributions calculated?',
     answer:
-      'CST Anchor Distributions are proportional: if you have anchored 10 out of 100 total anchored tokens, you receive 10% of each distribution deposit. RWLK allocations use an on-chain random-selection mechanism where a single anchored token is selected per allocation event. In both cases, anchoring more tokens increases your expected distributions.',
+      'Cosmic Signature NFT Anchor Distributions are proportional: if you have anchored 10 out of 100 total anchored NFTs, you receive 10% of each distribution deposit. RandomWalk NFT allocations use an on-chain random-selection mechanism for Anchored-NFT Stellar Selection. In both cases, anchoring more NFTs increases your expected distributions.',
   },
 ] as const;
 

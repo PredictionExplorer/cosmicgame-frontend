@@ -1,7 +1,4 @@
-import {
-  getCachedDashboardContractAddresses,
-  type AppContractAddresses,
-} from '@/config/networks';
+import { getCachedDashboardContractAddresses, type AppContractAddresses } from '@/config/networks';
 
 function addrEq(a: string, b: string): boolean {
   return a.toLowerCase() === b.toLowerCase();
@@ -14,7 +11,7 @@ function addrEq(a: string, b: string): boolean {
 export const isWalletAddress = (address: string, resolved?: AppContractAddresses): string => {
   if (!address) return '';
   const addrs = resolved ?? getCachedDashboardContractAddresses();
-  if (addrEq(address, addrs.stakingCst)) return 'CST Anchoring Wallet';
+  if (addrEq(address, addrs.stakingCst)) return 'Cosmic Signature NFT Anchoring Wallet';
   if (addrEq(address, addrs.stakingRwalk)) return 'RandomWalk Anchoring Wallet';
   if (addrEq(address, addrs.marketing)) return 'Outreach Wallet';
   if (addrEq(address, addrs.prizesWallet)) return 'Stellar Selection Wallet';

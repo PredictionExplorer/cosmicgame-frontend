@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 import type { DashboardInfo } from '@/services/api/types';
 
 import { act, renderHook } from '@/test-utils';
@@ -62,8 +64,6 @@ jest.mock('../../utils/errors', () => ({
 jest.mock('../../utils/contractErrors', () => ({
   getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
 }));
-
-import { AxiosError } from 'axios';
 
 import { useAllocationFinalize } from '../useAllocationFinalize';
 import api from '../../services/api';

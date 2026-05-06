@@ -119,8 +119,8 @@ jest.mock('../../../components/statistics/StatisticsItem', () => ({
 jest.mock('../../../components/statistics/AnchoringSection', () => ({
   AnchoringSection: () => (
     <div data-testid="anchoring-section">
-      <span>CosmicSignature Token</span>
-      <span>RandomWalk Token</span>
+      <span>Cosmic Signature NFT</span>
+      <span>RandomWalk NFT</span>
       <span>Number of Active Anchor-Holders</span>
     </div>
   ),
@@ -318,8 +318,8 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('CosmicSignature Token')).toBeInTheDocument();
-    expect(screen.getByText('RandomWalk Token')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT')).toBeInTheDocument();
+    expect(screen.getByText('RandomWalk NFT')).toBeInTheDocument();
   });
 
   it('renders CST anchoring statistics', () => {
@@ -385,7 +385,7 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Active CST Anchor-holders')).toBeInTheDocument();
+    expect(screen.getByText('Active Cosmic Signature NFT Anchor-holders')).toBeInTheDocument();
     expect(screen.getByText('Active RWLK Anchor-holders')).toBeInTheDocument();
     expect(screen.getByText('Total Anchor Distributions')).toBeInTheDocument();
   });

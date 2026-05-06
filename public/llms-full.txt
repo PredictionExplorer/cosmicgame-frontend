@@ -17,7 +17,7 @@ The NFT artwork is derived from the three-body problem in physics — simulating
 - **How It Works** (https://www.cosmicsignature.com/how-it-works): Step-by-step guide covering protocol mechanics, gesture submission, allocation tracks, and tips
 - **FAQ** (https://www.cosmicsignature.com/faq): Questions organized into categories covering getting started, allocations, cycle mechanics, tokens, technical details, and Cosmic Council coordination
 - **Statistics** (https://www.cosmicsignature.com/statistics): Protocol analytics including cycle history, gesture volumes, allocation distribution, and participant stats
-- **Anchoring** (https://www.cosmicsignature.com/anchoring): Anchor COSMIC NFTs (CST) to receive ongoing Anchor Distributions from each Cycle Reserve
+- **Anchoring** (https://www.cosmicsignature.com/anchoring): Anchor Cosmic Signature NFTs to receive ongoing Anchor Distributions from each Cycle Reserve
 - **Allocations** (https://www.cosmicsignature.com/allocation): Current and historical Cycle Reserve details
 - **Contracts** (https://www.cosmicsignature.com/contracts): Smart contract addresses, ABIs, and fund distribution breakdown
 - **Outreach** (https://www.cosmicsignature.com/marketing): Outreach Allocation program for community contributors
@@ -27,7 +27,7 @@ The NFT artwork is derived from the three-body problem in physics — simulating
 ### User Pages
 
 - **My Tokens** (https://www.cosmicsignature.com/my-tokens): View your owned COSMIC NFTs
-- **My Anchors** (https://www.cosmicsignature.com/my-anchors): Manage your anchored tokens and view Anchor Distributions
+- **My Anchors** (https://www.cosmicsignature.com/my-anchors): Manage your anchored Cosmic Signature and RandomWalk NFTs and view Anchor Distributions
 - **My Allocations** (https://www.cosmicsignature.com/my-allocations): Track your allocations across cycles
 - **My Statistics** (https://www.cosmicsignature.com/my-statistics): Personal participation statistics
 
@@ -50,32 +50,38 @@ The NFT artwork is derived from the three-body problem in physics — simulating
 3. The participant who makes the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation
 4. Gestures can be made with ETH or Cosmic Signature Tokens (CST, ERC-20)
 5. CST gestures use a Calibration Window — the CST Gesture Cost drifts downward continuously within its own window
-6. Random Walk NFT holders can attach their token to a gesture for a 50% reduction in Gesture Cost (once per wallet)
+6. Random Walk NFT holders can attach an unused token to an ETH gesture for a 50% reduction in Gesture Cost (each Random Walk NFT can be used once for this discount)
 
 ### Allocation Distribution Per Cycle
 
-- **25%** — Signature Allocation (participant who made the Final Gesture)
-- **19%** — Anchor Distributions (distributed to all anchor-holders)
-- **10%** — Public Goods Allocation (beneficiary coordinated by the Cosmic Council)
-- **6%** — Stellar Selection allocations (four randomly selected participants share this reserve)
-- **Remaining** — Carries forward into the next Cycle Reserve
+- **25%** — Signature Allocation for the participant who made the Final Gesture
+- **8%** — Chrono-Warrior ETH allocation
+- **4%** — ETH Stellar Selection, split across three randomly selected gesture entries
+- **6%** — Anchor Distribution for Cosmic Signature NFT anchor-holders
+- **7%** — Public Goods Allocation, currently forwarded to Protocol Guild
+- **~50%** — Compounding Cycle Reserve that carries forward into the next cycle
 
 ### Per-Gesture Imprints
 
 - 100 CST (Cosmic Signature Tokens) imprinted per gesture
 - One Stellar Selection entry for end-of-cycle selections
-- Eligibility to be an Allocation Recipient for a COSMIC NFT
+- Eligibility for end-of-cycle allocation tracks
 
 ### NFTs Imprinted Per Cycle
 
-12 COSMIC NFTs are imprinted each cycle:
-- 1 for the Signature Allocation Recipient
-- 11 for Stellar Selection recipients (5 gesture-based + 4 RandomWalk anchor-holder + 2 additional)
+In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted:
+- 1 for the Signature Allocation recipient
+- 1 for the Final CST Gesture recipient
+- 1 for the Endurance Champion
+- 1 for the Chrono-Warrior
+- 10 for NFT Stellar Selection recipients
+- 10 for RandomWalk NFT anchor-holders selected through Anchored-NFT Stellar Selection
 
 ### Special Titles
 
-- **Endurance Champion**: The participant who remained the Last Participant for the longest consecutive period
-- **Chrono Warrior**: The participant who held the Endurance Champion title for the longest consecutive period
+- **Endurance Champion**: The participant who remained the most recent gesture maker for the longest single continuous interval. Receives 1,000 CST and 1 Cosmic Signature NFT.
+- **Chrono-Warrior**: The participant who held the Endurance Champion position for the longest continuous interval. Receives 8% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT.
+- **Final CST Gesture recipient**: The participant who made the last CST gesture of the cycle. Receives 1,000 CST and 1 Cosmic Signature NFT.
 
 ### Time Mechanics
 
@@ -102,13 +108,13 @@ The NFT artwork is derived from the three-body problem in physics — simulating
 ### RandomWalkNFT
 
 - Partner NFT project
-- Holders receive a 50% Gesture Cost reduction in Cosmic Signature (one-time per wallet)
-- Can be anchored to the protocol for additional Stellar Selection entries
+- Holders can attach an unused token to an ETH gesture for a 50% Gesture Cost reduction; each RandomWalkNFT can be used once for this discount
+- Can be anchored to the protocol for Anchored-NFT Stellar Selection eligibility
 
 ## Technical Architecture
 
 - **Blockchain**: Arbitrum (Ethereum Layer 2 rollup)
-- **Smart Contracts**: Solidity, immutable after ownership renunciation
+- **Smart Contracts**: Solidity contracts with owner-controlled parameters until ownership is renounced
 - **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS
 - **Wallet Integration**: RainbowKit, wagmi, supporting MetaMask, Coinbase Wallet, WalletConnect
 - **Data**: TanStack React Query for real-time data fetching
@@ -116,7 +122,7 @@ The NFT artwork is derived from the three-body problem in physics — simulating
 
 ## Coordination & Trust
 
-- The team can adjust protocol parameters only during cycle activation windows
+- Most protocol parameter changes are restricted to inactive intervals before a cycle activates; the delay before the next cycle can be adjusted separately
 - Once stable, ownership will be permanently renounced via renounceOwnership()
 - After renunciation, protocol rules become immutable
 - All smart contracts are open-source and verifiable
@@ -148,16 +154,16 @@ A: Yes, anyone can participate by making a gesture. You do not need to own an NF
 ### Allocations
 
 Q: What is the Signature Allocation?
-A: The Signature Allocation includes a unique COSMIC NFT, 25% of the Cycle Reserve (ETH), and any attached tokens (ERC-20/ERC-721) from other projects.
+A: The Signature Allocation includes 25% of the Cycle Reserve in ETH, 1,000 CST, a unique Cosmic Signature NFT, and any attached tokens (ERC-20/ERC-721) from other projects.
 
 Q: What do I receive for each gesture?
-A: Each gesture yields three things: 100 CST (Cosmic Signature Tokens), one Stellar Selection entry for end-of-cycle selections, and eligibility to be an Allocation Recipient for a COSMIC NFT.
+A: Each gesture imprints 100 CST (Cosmic Signature Tokens), records one Stellar Selection entry for end-of-cycle selections, and contributes to Endurance Champion and Chrono-Warrior timing.
 
 Q: How does Stellar Selection work?
-A: Each gesture also acts as a Stellar Selection entry. At the end of each cycle, the smart contract selects four entries to share 6% of the Cycle Reserve. Additionally, five participants receive a COSMIC NFT, and four RandomWalk anchor-holders also receive an NFT.
+A: Each gesture records one Stellar Selection entry. At finalization, three ETH Stellar Selection recipients share 4% of the Cycle Reserve, ten NFT Stellar Selection recipients receive Cosmic Signature NFTs, and ten RandomWalk NFT anchor-holders receive Cosmic Signature NFTs through Anchored-NFT Stellar Selection.
 
 Q: How does anchoring work?
-A: After receiving Cosmic Signature Tokens from Stellar Selections, you can anchor them and continue receiving Anchor Distributions. Anchoring distributes 19% of the protocol contract balance each cycle, shared equally among all anchored-token owners.
+A: Cosmic Signature NFT anchor-holders share the 6% Anchor Distribution each cycle, proportional to the number of NFTs anchored. RandomWalk NFT anchor-holders are eligible for Anchored-NFT Stellar Selection.
 
 ### Cycle Mechanics
 
@@ -168,10 +174,10 @@ Q: What is CST-based gesturing?
 A: When you gesture with ETH, you are imprinted with 100 CST. These tokens can be used to make another gesture through the Calibration Window, where the CST Gesture Cost decreases over time if no gestures are made.
 
 Q: What is an Endurance Champion?
-A: The participant who remained the Last Participant for the longest consecutive period of time.
+A: The participant who remained the most recent gesture maker for the longest single continuous interval. Receives 1,000 CST and one Cosmic Signature NFT when the cycle finalizes.
 
-Q: What is a Chrono Warrior?
-A: The participant who held the Endurance Champion title for the longest consecutive period of time.
+Q: What is a Chrono-Warrior?
+A: The participant who held the Endurance Champion position for the longest continuous interval. Receives 8% of the Cycle Reserve, 1,000 CST, and one Cosmic Signature NFT when the cycle finalizes.
 
 ### Tokens & NFTs
 

@@ -34,15 +34,15 @@ const phases = [
     Icon: Trophy,
     label: 'Cycle Finalizes',
     description:
-      'The participant who made the Final Gesture retrieves the Signature Allocation: 25% of the Cycle Reserve plus a Cosmic Signature NFT.',
+      'The participant who made the Final Gesture retrieves the Signature Allocation: 25% of the Cycle Reserve, 1,000 CST, and a Cosmic Signature NFT.',
     tooltip:
-      'The Signature Allocation retrieval happens via the protocol contract. The Cosmic Signature NFT is imprinted automatically.',
+      'The Signature Allocation retrieval happens via the protocol contract. The CST and Cosmic Signature NFT are imprinted automatically.',
   },
   {
     Icon: Ticket,
     label: 'Stellar Selections',
     description:
-      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus up to ten Anchored-NFT Stellar Selection recipients receive Cosmic Signature NFTs.',
+      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten NFT Stellar Selection recipients plus ten Anchored-NFT Stellar Selection recipients receive Cosmic Signature NFTs.',
     tooltip:
       'Entries are recorded per gesture. More gestures means higher Selection frequency. Random Walk NFT anchor-holders have a separate Stellar Selection.',
   },

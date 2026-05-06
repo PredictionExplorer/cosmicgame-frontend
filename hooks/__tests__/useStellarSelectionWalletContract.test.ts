@@ -1,13 +1,13 @@
 import { renderHook } from '@testing-library/react';
 
 import { prizesWalletAbi } from '@/contracts/abis';
+import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import {
   emptyContractAddresses,
   publishDashboardContractAddresses,
   getCachedDashboardContractAddresses,
 } from '@/config/networks';
-import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import useStellarSelectionWalletContract from '../useStellarSelectionWalletContract';
 import useContract from '../useContract';
@@ -26,7 +26,7 @@ afterEach(() => {
 });
 
 describe('useStellarSelectionWalletContract', () => {
-  it('calls useContract with prizes wallet address and prizesWalletAbi', () => {
+  it('calls useContract with stellar selection wallet address and ABI', () => {
     mockUseContract.mockReturnValue(null);
     renderHook(() => useStellarSelectionWalletContract());
     expect(mockUseContract).toHaveBeenCalledWith(

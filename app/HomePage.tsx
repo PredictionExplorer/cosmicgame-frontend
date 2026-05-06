@@ -96,7 +96,6 @@ const HomePage = () => {
         // loads. The lint rule flags setState-in-effect as an anti-pattern,
         // but this is a genuine "compute once from async data" — useMemo
         // would re-roll on every dashboardData fetch.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setBannerTokenId(Math.floor(Math.random() * count));
       } else {
         setBannerTokenId(-1);

@@ -23,13 +23,18 @@ Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants
 
 - Each cycle opens with a Calibration Window where Gesture Cost descends over roughly two days
 - Every gesture increases the Gesture Cost by ~1% and extends the Cycle Finalization Time by about an hour
-- The participant who made the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation (25% of the Cycle Reserve)
+- The participant who made the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation (25% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT)
 - Every gesture imprints 100 CST tokens and a Stellar Selection entry
-- 12 COSMIC NFTs are imprinted per cycle
-- Stellar Selection recipients share 6% of the Cycle Reserve
+- In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted
+- Three ETH Stellar Selection recipients share 4% of the Cycle Reserve
+- Ten NFT Stellar Selection recipients and ten RandomWalk NFT anchor-holders receive Cosmic Signature NFTs
+- The Chrono-Warrior receives 8% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT
+- The Endurance Champion and Final CST Gesture recipient each receive 1,000 CST and 1 Cosmic Signature NFT
+- Anchor Distributions route 6% of the Cycle Reserve to Cosmic Signature NFT anchor-holders
 - 7% of each Cycle Reserve is forwarded to Protocol Guild (public goods)
 - Participants can make gestures with ETH or CST tokens (CST uses its own Calibration Window)
-- RandomWalkNFT holders receive a 50% Gesture-Cost reduction
+- RandomWalkNFT holders can attach an unused token to an ETH gesture for a 50% Gesture-Cost reduction; each RandomWalkNFT can be used once for this discount
+- RandomWalkNFTs can also be anchored for Anchored-NFT Stellar Selection eligibility
 
 ## Tokens
 
@@ -45,7 +50,7 @@ Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants
 ## Technical
 
 - Blockchain: Arbitrum (Ethereum Layer 2)
-- Smart contracts: Immutable, open-source, formally verified
+- Smart contracts: Open-source, formally verified Solidity contracts with owner-controlled parameters until ownership is renounced
 - NFT art: Generated from on-chain seeds using an open-source Rust program
 - Frontend: Next.js, React, TypeScript
 

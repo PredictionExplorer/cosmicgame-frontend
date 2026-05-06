@@ -41,7 +41,7 @@ const steps = [
       'Every gesture imprints 100 CST and records a Stellar Selection entry automatically.',
     ],
     tooltip:
-      'The Random Walk NFT 50% cost reduction can only be used once per wallet \u2014 choose your moment wisely.',
+      'Each Random Walk NFT can be used once for the 50% cost reduction \u2014 choose your moment wisely.',
   },
 ] as const;
 

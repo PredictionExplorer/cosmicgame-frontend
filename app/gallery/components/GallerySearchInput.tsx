@@ -31,7 +31,6 @@ export function GallerySearchInput({
   // input on every keystroke since the parent updates value via the same
   // debounce pipeline.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocal(value);
   }, [value]);
 

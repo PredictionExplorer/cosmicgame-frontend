@@ -218,9 +218,9 @@ export default function MyWinnings() {
           )}
         </section>
 
-        {/* CST Anchoring */}
+        {/* Cosmic Signature NFT Anchoring */}
         <section>
-          <SectionDivider title="CST Anchor Distributions" className="mb-6" />
+          <SectionDivider title="Cosmic Signature NFT Anchor Distributions" className="mb-6" />
           <UnretrievedCSTAnchorDistributionsTable user={account} />
         </section>
 

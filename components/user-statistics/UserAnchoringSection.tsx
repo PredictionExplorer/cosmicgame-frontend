@@ -126,10 +126,10 @@ export function UserAnchoringSection({
                   tooltip="Number of times you have released anchored Cosmic Signature NFTs."
                 />
                 <StatCard
-                  label="Tokens with Distributions"
+                  label="NFTs with Distributions"
                   value={cstAnchorDistributions.length.toLocaleString()}
                   icon={<Layers className="h-3.5 w-3.5" />}
-                  tooltip="Number of anchored tokens that have accumulated Anchor Distributions."
+                  tooltip="Number of anchored Cosmic Signature NFTs that have accumulated Anchor Distributions."
                 />
                 <StatCard
                   label="Total Distributions"
@@ -189,7 +189,7 @@ export function UserAnchoringSection({
             <EmptyState
               icon={<Layers className="h-8 w-8 text-muted-foreground/50" />}
               title="No RandomWalk anchoring yet"
-              description="Anchor your RandomWalk NFTs to take part in random allocation imprints."
+              description="Anchor your RandomWalk NFTs to take part in Anchored-NFT Stellar Selection."
             />
           ) : (
             <>
@@ -207,17 +207,17 @@ export function UserAnchoringSection({
                   tooltip="Number of times you have released anchored RandomWalk NFTs."
                 />
                 <StatCard
-                  label="Tokens Anchored"
+                  label="NFTs Anchored"
                   value={(rwlkStats?.TotalTokensStaked ?? 0).toLocaleString()}
                   icon={<Layers className="h-3.5 w-3.5" />}
                   tooltip="Total RandomWalk NFTs currently anchored."
                   featured
                 />
                 <StatCard
-                  label="Tokens Imprinted"
+                  label="NFTs Imprinted"
                   value={(rwlkStats?.TotalTokensMinted ?? 0).toLocaleString()}
                   icon={<Gift className="h-3.5 w-3.5" />}
-                  tooltip="Cosmic Signature tokens received through RandomWalk anchor allocation imprints."
+                  tooltip="Cosmic Signature NFTs received through Anchored-NFT Stellar Selection."
                 />
               </div>
 
@@ -230,7 +230,7 @@ export function UserAnchoringSection({
                 </div>
                 <div>
                   <h6 className="text-sm font-medium uppercase tracking-wider text-muted-foreground mb-4">
-                    Anchor Allocation Tokens
+                    Anchored-NFT Stellar Selection
                   </h6>
                   <RwalkAnchorDistributionImprintsTable list={rwlkImprints} />
                 </div>

@@ -85,9 +85,9 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
       category: 'wallet',
     },
     {
-      name: 'CST Anchoring Wallet',
+      name: 'Cosmic Signature NFT Anchoring Wallet',
       address: addrs.StakingWalletCSTAddr ?? '',
-      description: 'Anchoring contract for Cosmic Signature Tokens',
+      description: 'Anchoring contract for Cosmic Signature NFTs',
       category: 'anchoring',
     },
     {

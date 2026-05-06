@@ -284,7 +284,7 @@ const Statistics = () => {
                 }
               />
               <StatisticsItem
-                title="RandomWalk Tokens Used"
+                title="RandomWalk NFTs Used"
                 value={
                   <Link className="text-inherit" href="/used-rwlk-nfts">
                     {data.NumRwalkTokensUsed as ReactNode}
@@ -495,7 +495,7 @@ const Statistics = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-8">
             <StatCard
-              label="Active CST Anchor-holders"
+              label="Active Cosmic Signature NFT Anchor-holders"
               value={data.MainStats.StakeStatisticsCST.NumActiveStakers}
               icon={<Lock className="h-4 w-4" />}
               tooltip="Wallets currently anchoring at least one Cosmic Signature NFT"
@@ -505,7 +505,7 @@ const Statistics = () => {
               label="Active RWLK Anchor-holders"
               value={data.MainStats.StakeStatisticsRWalk.NumActiveStakers}
               icon={<Activity className="h-4 w-4" />}
-              tooltip="Wallets currently anchoring at least one RandomWalk Token"
+              tooltip="Wallets currently anchoring at least one RandomWalk NFT"
               featured
             />
             <StatCard

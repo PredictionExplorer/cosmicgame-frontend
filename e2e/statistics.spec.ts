@@ -26,9 +26,9 @@ test.describe('Statistics page', () => {
     await expect(page.getByText(/Community & Participation/i).first()).toBeVisible();
   });
 
-  test('CosmicSignature / RandomWalk tabs work', async ({ page }) => {
-    const cstTab = page.locator('role=tab', { hasText: 'CosmicSignature Token' });
-    const rwalkTab = page.locator('role=tab', { hasText: 'RandomWalk Token' });
+  test('Cosmic Signature / RandomWalk tabs work', async ({ page }) => {
+    const cstTab = page.locator('role=tab', { hasText: 'Cosmic Signature NFT' });
+    const rwalkTab = page.locator('role=tab', { hasText: 'RandomWalk NFT' });
     await ensureVisible(cstTab);
 
     if (await cstTab.isVisible()) {

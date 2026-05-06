@@ -108,7 +108,7 @@ export const dappContent = {
     mint: {
       title: 'Imprint RandomWalk NFT \u00b7 Cosmic Signature',
       description:
-        'Imprint a RandomWalk NFT on Cosmic Signature and unlock a 50% Gesture Cost discount. RandomWalk NFTs are unique generative collectibles that augment a cycle strategy.',
+        'Imprint a RandomWalk NFT on Cosmic Signature. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% Gesture Cost discount.',
     },
     systemEvent: {
       title: 'System Events \u00b7 Cosmic Signature',
@@ -198,7 +198,7 @@ export const dappContent = {
     usedRwlkNfts: {
       title: 'Used RandomWalk NFTs \u00b7 Cosmic Signature',
       description:
-        'RandomWalk NFTs already used for a 50% Gesture Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once per wallet.',
+        'RandomWalk NFTs already used for a 50% Gesture Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once for this discount.',
     },
     siteMap: {
       title: 'Site Map \u00b7 Cosmic Signature',
@@ -298,38 +298,38 @@ export const dappContent = {
     },
 
     anchoring: {
-      cstAnchorHoldersLabel: 'Active CST Anchor-holders',
+      cstAnchorHoldersLabel: 'Active Cosmic Signature NFT Anchor-holders',
       cstAnchorHoldersTooltip: 'Wallets currently anchoring at least one Cosmic Signature NFT',
       rwlkAnchorHoldersLabel: 'Active RWLK Anchor-holders',
-      rwlkAnchorHoldersTooltip: 'Wallets currently anchoring at least one RandomWalk Token',
+      rwlkAnchorHoldersTooltip: 'Wallets currently anchoring at least one RandomWalk NFT',
       totalDistributionsLabel: 'Total Anchor Distributions',
       totalDistributionsTooltip: 'Total ETH distributed to Cosmic Signature NFT anchor-holders',
-      cstOverview: 'CST Anchoring Overview',
+      cstOverview: 'Cosmic Signature NFT Anchoring Overview',
       rwlkOverview: 'RWLK Anchoring Overview',
       numActiveAnchorHolders: 'Number of Active Anchor-holders',
       numActiveAnchorHoldersTooltipCst:
-        'Wallets currently anchoring at least one Cosmic Signature Token',
-      numActiveAnchorHoldersTooltipRwlk:
-        'Wallets currently anchoring at least one RandomWalk Token',
+        'Wallets currently anchoring at least one Cosmic Signature NFT',
+      numActiveAnchorHoldersTooltipRwlk: 'Wallets currently anchoring at least one RandomWalk NFT',
       numDistributionDeposits: 'Number of Anchor-Distribution Deposits',
-      numDistributionDepositsTooltip: 'Total distribution deposit events into the CST Anchor pool',
+      numDistributionDepositsTooltip:
+        'Total distribution deposit events into the Cosmic Signature NFT Anchor pool',
       totalDistributions: 'Total Anchor Distributions',
       totalDistributionsTooltipCst:
-        'Total ETH distributed as Anchor Distributions to CST anchor-holders',
+        'Total ETH distributed as Anchor Distributions to Cosmic Signature NFT anchor-holders',
       totalTokensImprinted: 'Total Tokens Imprinted',
       totalTokensAnchored: 'Total Tokens Anchored',
       totalTokensAnchoredTooltipCst:
-        'Number of Cosmic Signature Tokens currently anchored in the protocol',
+        'Number of Cosmic Signature NFTs currently anchored in the protocol',
       totalTokensAnchoredTooltipRwlk:
-        'Number of RandomWalk Tokens currently anchored in the protocol',
+        'Number of RandomWalk NFTs currently anchored in the protocol',
       unretrievedDistributions: 'Unretrieved Anchor Distributions',
       unretrievedDistributionsTooltip:
         'Anchor Distributions allocated but not yet retrieved by anchor-holders',
       anchorReleaseActions: 'Anchor / Release Actions',
       anchoredTokens: 'Anchored Tokens',
       uniqueAnchorHolders: 'Unique Anchor-holders',
-      cosmicSignatureToken: 'Cosmic Signature Token',
-      randomWalkToken: 'RandomWalk Token',
+      cosmicSignatureToken: 'Cosmic Signature NFT',
+      randomWalkToken: 'RandomWalk NFT',
     },
 
     allocationEconomy: {
@@ -361,7 +361,7 @@ export const dappContent = {
       outreachReserveTooltip:
         'CST forwarded to ecosystem contributors who help promote the protocol',
       outreachTransactions: 'Outreach Transactions',
-      randomWalkTokensUsed: 'RandomWalk Tokens Used',
+      randomWalkTokensUsed: 'RandomWalk NFTs Used',
       randomWalkTokensUsedTooltip: 'RandomWalk NFTs attached to gestures for cost reduction',
       namedTokens: 'Named Tokens',
       namedTokensTooltip: 'Cosmic Signature NFTs that have been given a custom name by their owner',

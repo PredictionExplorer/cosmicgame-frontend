@@ -4,10 +4,10 @@ import { FundDistribution } from '../FundDistribution';
 
 const createData = (overrides = {}) => ({
   PrizePercentage: 25,
-  RafflePercentage: 10,
-  CharityPercentage: 10,
-  StakingPercentage: 5,
-  ChronoWarriorPercentage: 5,
+  RafflePercentage: 4,
+  CharityPercentage: 7,
+  StakingPercentage: 6,
+  ChronoWarriorPercentage: 8,
   CosmicGameBalanceEth: 10,
   ...overrides,
 });
@@ -31,25 +31,27 @@ describe('FundDistribution', () => {
   it('renders percentage values for each category', () => {
     render(<FundDistribution data={createData()} />);
     expect(screen.getByText(/^25%/)).toBeInTheDocument();
-    expect(screen.getByText(/^45%/)).toBeInTheDocument();
-    // 10% appears twice (Raffle and Charity)
-    expect(screen.getAllByText(/^10%/)).toHaveLength(2);
-    // 5% appears twice (Staking and Chrono-Warrior)
-    expect(screen.getAllByText(/^5%/)).toHaveLength(2);
+    expect(screen.getByText(/^50%/)).toBeInTheDocument();
+    expect(screen.getByText(/^8%/)).toBeInTheDocument();
+    expect(screen.getByText(/^7%/)).toBeInTheDocument();
+    expect(screen.getByText(/^6%/)).toBeInTheDocument();
+    expect(screen.getByText(/^4%/)).toBeInTheDocument();
   });
 
   it('renders ETH amounts', () => {
     render(<FundDistribution data={createData({ CosmicGameBalanceEth: 100 })} />);
     expect(screen.getByText(/25\.0000 ETH/)).toBeInTheDocument();
-    expect(screen.getByText(/45\.0000 ETH/)).toBeInTheDocument();
-    // 10.0000 ETH appears twice (Raffle and Charity)
-    expect(screen.getAllByText(/10\.0000 ETH/)).toHaveLength(2);
+    expect(screen.getByText(/50\.0000 ETH/)).toBeInTheDocument();
+    expect(screen.getByText(/8\.0000 ETH/)).toBeInTheDocument();
+    expect(screen.getByText(/7\.0000 ETH/)).toBeInTheDocument();
+    expect(screen.getByText(/6\.0000 ETH/)).toBeInTheDocument();
+    expect(screen.getByText(/4\.0000 ETH/)).toBeInTheDocument();
   });
 
   it('computes Next round as the remainder', () => {
     render(<FundDistribution data={createData()} />);
-    // 100 - 25 - 10 - 10 - 5 - 5 = 45%
-    expect(screen.getByText(/45%/)).toBeInTheDocument();
+    // 100 - 25 - 4 - 7 - 6 - 8 = 50%
+    expect(screen.getByText(/50%/)).toBeInTheDocument();
   });
 
   it('handles undefined data gracefully', () => {

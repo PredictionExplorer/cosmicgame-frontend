@@ -24,10 +24,10 @@ jest.mock('framer-motion', () => ({
 
 const defaultProps = {
   prizePercentage: 25,
-  chronoWarriorPercentage: 10,
-  stellarSelectionPercentage: 25,
-  stakingPercentage: 30,
-  charityPercentage: 10,
+  chronoWarriorPercentage: 8,
+  stellarSelectionPercentage: 4,
+  stakingPercentage: 6,
+  charityPercentage: 7,
 };
 
 describe('FundDistribution', () => {
@@ -42,11 +42,11 @@ describe('FundDistribution', () => {
 
   it('renders percentage values for each segment', () => {
     render(<FundDistribution {...defaultProps} />);
-    const values25 = screen.getAllByText('25%');
-    expect(values25.length).toBe(2);
-    const values10 = screen.getAllByText('10%');
-    expect(values10.length).toBe(2);
-    expect(screen.getByText('30%')).toBeInTheDocument();
+    expect(screen.getByText('25%')).toBeInTheDocument();
+    expect(screen.getByText('8%')).toBeInTheDocument();
+    expect(screen.getByText('4%')).toBeInTheDocument();
+    expect(screen.getByText('6%')).toBeInTheDocument();
+    expect(screen.getByText('7%')).toBeInTheDocument();
   });
 
   it('renders the Allocation Tracks title', () => {

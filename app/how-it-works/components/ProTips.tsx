@@ -20,7 +20,7 @@ const tips = [
     description:
       'Holding a Random Walk NFT grants a one-time 50% cost reduction on your ETH gesture.',
     tooltip:
-      'The cost reduction can only be used once per wallet. Save it for a higher-cost gesture to maximize the effect.',
+      'Each Random Walk NFT can be used once for the cost reduction. Save it for a higher-cost gesture to maximize the effect.',
   },
   {
     Icon: Ticket,
@@ -28,7 +28,7 @@ const tips = [
     description:
       'Each gesture records one Stellar Selection entry. More gestures means higher Selection frequency.',
     tooltip:
-      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten more recipients receive Cosmic Signature NFTs.',
+      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders receive Cosmic Signature NFTs.',
   },
   {
     Icon: Shield,

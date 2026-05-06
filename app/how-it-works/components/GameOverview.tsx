@@ -31,7 +31,7 @@ const cards = [
     description:
       'Participate in allocations when the cycle finalizes \u2014 Signature Allocation, Stellar Selections, Anchor Distributions, and more.',
     tooltip:
-      'The participant who made the Final Gesture receives 25% of the Cycle Reserve. Stellar Selection recipients, Anchor-holders, and other participants also receive allocations.',
+      'The participant who made the Final Gesture receives 25% of the Cycle Reserve, 1,000 CST, and a Cosmic Signature NFT. Stellar Selection recipients, anchor-holders, and other participants also receive allocations.',
     Icon: Trophy,
   },
 ] as const;

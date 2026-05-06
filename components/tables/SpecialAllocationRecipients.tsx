@@ -91,7 +91,7 @@ export const SpecialAllocationRecipients = () => {
       icon: <Crown className="h-5 w-5" />,
       title: 'Endurance Champion',
       tooltip:
-        'The participant who remained the most recent gesture maker for the longest consecutive interval. Receives Recognition CST and a Cosmic Signature NFT.',
+        'The participant who remained the most recent gesture maker for the longest consecutive interval. Receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT.',
       address: specialWinners?.EnduranceChampionAddress,
       extra: hasEndurance && (specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
         <div className="mt-3 flex items-center gap-2">
@@ -113,7 +113,7 @@ export const SpecialAllocationRecipients = () => {
       icon: <Swords className="h-5 w-5" />,
       title: 'Chrono-Warrior',
       tooltip:
-        'The participant who held the Endurance Champion position for the longest consecutive interval. Receives a percentage of the Cycle Reserve.',
+        'The participant who held the Endurance Champion position for the longest consecutive interval. Receives a percentage of the Cycle Reserve and a Cosmic Signature NFT.',
       address: specialWinners?.EnduranceChampionAddress,
       extra: hasEndurance && (specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
         <div className="mt-3">
@@ -131,7 +131,7 @@ export const SpecialAllocationRecipients = () => {
       icon: <Coins className="h-5 w-5" />,
       title: 'Final CST Gesture',
       tooltip:
-        'The participant who made the last CST gesture of the cycle receives Recognition CST and a Cosmic Signature NFT.',
+        'The participant who made the last CST gesture of the cycle receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT.',
       address: specialWinners?.LastCstBidderAddress,
       extra: null,
       accent: false,

@@ -220,7 +220,7 @@ describe('Contracts', () => {
     render(<Contracts />);
     expect(screen.getByText('Cosmic Signature Token')).toBeInTheDocument();
     expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
-    expect(screen.getByText('CST Anchoring Wallet')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
   });
 
   it('renders calibration parameters section', () => {

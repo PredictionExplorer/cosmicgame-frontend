@@ -98,12 +98,12 @@ describe('AnchoringPage', () => {
     expect(screen.getByTestId('stat-Anchor Distribution Pool')).toHaveTextContent(
       'Anchor Distribution Pool',
     );
-    expect(screen.getByTestId('stat-CST Tokens Anchored')).toHaveTextContent('CST Tokens Anchored');
-    expect(screen.getByTestId('stat-RWLK Tokens Anchored')).toHaveTextContent(
-      'RWLK Tokens Anchored',
+    expect(screen.getByTestId('stat-Cosmic Signature NFTs Anchored')).toHaveTextContent(
+      'Cosmic Signature NFTs Anchored',
     );
-    expect(screen.getByTestId('stat-Distribution per CST')).toHaveTextContent(
-      'Distribution per CST',
+    expect(screen.getByTestId('stat-RWLK NFTs Anchored')).toHaveTextContent('RWLK NFTs Anchored');
+    expect(screen.getByTestId('stat-Distribution per NFT')).toHaveTextContent(
+      'Distribution per NFT',
     );
     expect(screen.getByTestId('stat-Unique Anchor-holders')).toHaveTextContent(
       'Unique Anchor-holders',
@@ -198,7 +198,7 @@ describe('AnchoringPage', () => {
   it('renders section headings', () => {
     setupDefaults();
     render(<AnchoringPage />);
-    expect(screen.getByText('CosmicSignature Token')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT')).toBeInTheDocument();
     expect(screen.getByText('RandomWalk NFT')).toBeInTheDocument();
   });
 

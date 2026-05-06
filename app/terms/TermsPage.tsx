@@ -71,7 +71,7 @@ const sections = [
     content: [
       {
         subtitle: 'Allocation Distribution',
-        text: 'Allocations are distributed automatically according to the smart contract rules. The current allocation structure includes the Signature Allocation (25% ETH + Cosmic Signature NFT), Endurance Champion (Recognition CST + Cosmic Signature NFT), Final CST Gesture (Recognition CST + Cosmic Signature NFT), Chrono-Warrior (8% ETH), ETH Stellar Selection (4% ETH) and NFT Stellar Selection (up to 20 Cosmic Signature NFTs), Anchor Distribution (6% ETH), and Public Goods (7% ETH to Protocol Guild).',
+        text: 'Allocations are distributed automatically according to the smart contract rules. The current allocation structure includes the Signature Allocation (25% ETH + 1,000 Recognition CST + Cosmic Signature NFT), Endurance Champion (1,000 Recognition CST + Cosmic Signature NFT), Final CST Gesture (1,000 Recognition CST + Cosmic Signature NFT), Chrono-Warrior (8% ETH + Cosmic Signature NFT), ETH Stellar Selection (4% ETH) and NFT Stellar Selection (20 Cosmic Signature NFTs), Anchor Distribution (6% ETH), and Public Goods (7% ETH to Protocol Guild).',
       },
       {
         subtitle: 'Retrieving Allocations',

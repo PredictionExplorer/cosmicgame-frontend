@@ -85,7 +85,7 @@ export function RoundInfoSection({
       <motion.div custom={1} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
           <SectionDivider title="Allocation Tracks" className="flex-1" />
-          <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
+          <InfoTooltip content="How the Cycle Reserve distributes across allocation tracks: Signature Allocation, Chrono-Warrior, Stellar Selection, Public Goods, Anchor Distribution, and the Compounding Cycle Reserve." />
         </div>
         <FundDistribution data={data ?? undefined} />
       </motion.div>
@@ -116,7 +116,7 @@ export function RoundInfoSection({
       <motion.div custom={4} variants={sectionFade} initial="hidden" animate="visible">
         <div className="flex items-center gap-2 mb-6">
           <SectionDivider title="Endurance Champions" className="flex-1" />
-          <InfoTooltip content="Participants ranked by how long they remained the most-recent gesture maker. The one with the longest consecutive interval receives Recognition CST and a Cosmic Signature NFT." />
+          <InfoTooltip content="Participants ranked by how long they remained the most-recent gesture maker. The one with the longest consecutive interval receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT." />
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(45,93%,52%)]/40">
           <EnduranceChampionsTable championList={championList} />

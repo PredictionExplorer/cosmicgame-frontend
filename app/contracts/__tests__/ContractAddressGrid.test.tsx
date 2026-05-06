@@ -45,9 +45,9 @@ const contracts: ContractEntry[] = [
     category: 'wallet',
   },
   {
-    name: 'CST Anchoring Wallet',
+    name: 'Cosmic Signature NFT Anchoring Wallet',
     address: '0xDDD',
-    description: 'CST Anchoring',
+    description: 'Cosmic Signature NFT Anchoring',
     category: 'anchoring',
   },
 ];
@@ -65,7 +65,7 @@ describe('ContractAddressGrid', () => {
     expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature')).toBeInTheDocument();
     expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
-    expect(screen.getByText('CST Anchoring Wallet')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
   });
 
   it('renders category group dividers', () => {
@@ -83,7 +83,7 @@ describe('ContractAddressGrid', () => {
 
   it('filters contracts by search term (address)', () => {
     render(<ContractAddressGrid {...defaultProps} searchTerm="0xDDD" />);
-    expect(screen.getByText('CST Anchoring Wallet')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
     expect(screen.queryByText('Cosmic Game')).not.toBeInTheDocument();
   });
 

@@ -13,7 +13,6 @@ const mockData = {
   StakingAmountEth: 0.75,
   CosmicGameBalanceEth: 10,
   ChronoWarriorPercentage: 5,
-  CurNumBids: 100,
 };
 
 describe('Allocation Breakdown', () => {
@@ -67,7 +66,8 @@ describe('Allocation Breakdown', () => {
     render(<Prize data={mockData} />);
     expect(screen.getByText('5 recipients')).toBeInTheDocument();
     expect(screen.getByText('3 recipients')).toBeInTheDocument();
-    expect(screen.getByText('2 or 0 recipients')).toBeInTheDocument();
+    expect(screen.getByText('2 recipients')).toBeInTheDocument();
+    expect(screen.getAllByText('1 recipient')).toHaveLength(5);
   });
 
   it('calculates Chrono-Warrior ETH correctly', () => {
@@ -76,10 +76,10 @@ describe('Allocation Breakdown', () => {
     expect(screen.getByText(`${expected} ETH`)).toBeInTheDocument();
   });
 
-  it('calculates CST amounts from gesture count', () => {
+  it('shows fixed Recognition CST amount for Endurance Champion and Final CST Gesture', () => {
     render(<Prize data={mockData} />);
-    const cstAmounts = screen.getAllByText('1000 CST');
-    expect(cstAmounts.length).toBe(2);
+    const cstAmounts = screen.getAllByText('1,000 CST');
+    expect(cstAmounts.length).toBe(3);
   });
 
   it('renders with null data without crashing', () => {

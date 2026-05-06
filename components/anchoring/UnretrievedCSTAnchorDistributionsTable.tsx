@@ -161,7 +161,6 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
       // The first fetcher updates local state from an async API response.
       // Migrating to React Query is a separate refactor; this is a data-
       // fetch effect.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchUnretrievedCstAnchorDistributions();
     }
     fetchCstWithRewards();

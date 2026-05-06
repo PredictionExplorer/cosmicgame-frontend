@@ -1,13 +1,13 @@
 import { renderHook } from '@testing-library/react';
 
 import { stakingWalletRwlkAbi } from '@/contracts/abis';
+import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import {
   emptyContractAddresses,
   publishDashboardContractAddresses,
   getCachedDashboardContractAddresses,
 } from '@/config/networks';
-import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import useAnchoringWalletRWLKContract from '../useAnchoringWalletRWLKContract';
 import useContract from '../useContract';

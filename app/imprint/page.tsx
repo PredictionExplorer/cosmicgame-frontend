@@ -6,7 +6,7 @@ import Imprint from './Imprint';
 
 export const metadata: Metadata = createMetadata(
   'Imprint RandomWalk NFT | Cosmic Signature',
-  'Imprint a RandomWalk NFT on Cosmic Signature and unlock a 50% Gesture-Cost discount. RandomWalk NFTs are unique generative collectibles that augment a cycle strategy.',
+  'Imprint a RandomWalk NFT on Cosmic Signature. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% Gesture-Cost discount.',
   undefined,
   '/imprint',
 );
