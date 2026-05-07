@@ -74,6 +74,10 @@ const config = [
       'playwright-report/',
       'coverage/',
       'commitlint.config.mjs',
+      // Claude/Cursor tooling state: worktrees here are duplicate source
+      // trees, transcripts/hooks/skills are non-source artifacts. None of it
+      // should be linted as production code.
+      '.claude/',
     ],
   },
 ];
