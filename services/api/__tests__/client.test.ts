@@ -3,6 +3,7 @@
 import { AxiosError } from 'axios';
 
 import {
+  axios as clientAxios,
   flattenTx,
   flattenTxArray,
   flattenRoundInfo,
@@ -225,6 +226,22 @@ describe('apiPost', () => {
 });
 
 describe('client helper functions', () => {
+  describe('axios response interceptor', () => {
+    it('throws backend envelope errors returned through axios', async () => {
+      await expect(
+        clientAxios.get('/api/cosmicgame/test', {
+          adapter: async (config) => ({
+            data: { status: 0, error: 'backend rejected payload' },
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config,
+          }),
+        }),
+      ).rejects.toThrow('backend rejected payload');
+    });
+  });
+
   describe('flattenTx', () => {
     it('flattens object with Tx field', () => {
       const input = {
@@ -273,6 +290,18 @@ describe('client helper functions', () => {
     it('returns primitive unchanged', () => {
       expect(flattenTx(42)).toBe(42);
       expect(flattenTx('string')).toBe('string');
+    });
+
+    it('keeps __proto__ payloads as data and does not pollute Object.prototype', () => {
+      const input = JSON.parse(
+        '{"EvtLogId":1,"__proto__":{"polluted":true},"Tx":{"TxHash":"0xabc","__proto__":{"txPolluted":true}}}',
+      );
+
+      const result = flattenTx(input) as Record<string, unknown>;
+
+      expect(result).toHaveProperty('TxHash', '0xabc');
+      expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+      expect(({} as Record<string, unknown>).txPolluted).toBeUndefined();
     });
   });
 
@@ -365,6 +394,15 @@ describe('client helper functions', () => {
     it('returns primitive unchanged', () => {
       expect(normalizeFieldNames(42)).toBe(42);
     });
+
+    it('normalizes malicious JSON without prototype pollution', () => {
+      const input = JSON.parse('{"TokenAddress":"0x123","__proto__":{"polluted":true}}');
+
+      const result = normalizeFieldNames(input) as Record<string, unknown>;
+
+      expect(result).toHaveProperty('TokenAddr', '0x123');
+      expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    });
   });
 
   describe('normalizeFieldNamesArray', () => {
@@ -406,6 +444,13 @@ describe('client helper functions', () => {
 
       expect(result).toBe(cosmicGameBaseUrl);
     });
+
+    it('joins base and leading-slash paths with exactly one slash', () => {
+      const result = getAPIUrl('/rounds/list/0/100');
+      const expectedBase = cosmicGameBaseUrl.replace(/\/+$/, '');
+
+      expect(result).toBe(`${expectedBase}/rounds/list/0/100`);
+    });
   });
 
   describe('getMainAPIUrl', () => {
@@ -425,6 +470,13 @@ describe('client helper functions', () => {
       const result = getMainAPIUrl('');
 
       expect(result).toBe(baseUrl);
+    });
+
+    it('joins base and leading-slash paths with exactly one slash', () => {
+      const result = getMainAPIUrl('/get_banned_bids');
+      const expectedBase = baseUrl.replace(/\/+$/, '');
+
+      expect(result).toBe(`${expectedBase}/get_banned_bids`);
     });
   });
 

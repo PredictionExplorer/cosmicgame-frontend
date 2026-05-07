@@ -88,7 +88,13 @@ export const getAPIUrl = (url: string) => {
 
 /** Builds a direct URL targeting the main NFT/token API. */
 export const getMainAPIUrl = (url: string) => {
-  return baseUrl + url;
+  if (url === '') {
+    return baseUrl;
+  }
+  const base = (baseUrl || '').replace(/\/+$/, '');
+  const path = (url || '').replace(/^\/+/, '');
+  if (!base) return `/${path}`;
+  return `${base}/${path}`;
 };
 
 /** Hoists nested `Tx` fields (EvtLogId, BlockNum, TxHash, etc.) to the top level of a record. */

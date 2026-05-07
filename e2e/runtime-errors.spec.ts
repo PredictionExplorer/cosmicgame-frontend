@@ -62,6 +62,14 @@ async function collectErrors(page: Page, url: string): Promise<PageError[]> {
 }
 
 test.describe('Runtime error detection', () => {
+  test('home page server-rendered shell responds and hydrates', async ({ page }) => {
+    const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    expect(response?.status()).toBe(200);
+    await expect(page.locator('text=/Cycle #/').first()).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('body')).not.toHaveText('Internal Server Error');
+  });
+
   for (const route of routes) {
     test(`${route} has no runtime errors`, async ({ page }) => {
       const errors = await collectErrors(page, route);
