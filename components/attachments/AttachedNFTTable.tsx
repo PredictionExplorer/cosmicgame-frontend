@@ -14,7 +14,7 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import NFTImage from '@/components/nft/NFTImage';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
@@ -99,21 +99,19 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
       </TablePrimaryCell>
 
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href={`/user/${nft.DonorAddr}`}
-                className="text-inherit text-[inherit] font-mono"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shortenHex(nft.DonorAddr, 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{nft.DonorAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={`/user/${nft.DonorAddr}`}
+              className="text-inherit text-[inherit] font-mono"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {shortenHex(nft.DonorAddr, 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>{nft.DonorAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
@@ -128,21 +126,19 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
       </TablePrimaryCell>
 
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <a
-                href={getExplorerUrl('address', nft.TokenAddr)}
-                className="text-inherit text-[inherit] font-mono"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shortenHex(nft.TokenAddr, 6)}
-              </a>
-            </TooltipTrigger>
-            <TooltipContent>{nft.TokenAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <a
+              href={getExplorerUrl('address', nft.TokenAddr)}
+              className="text-inherit text-[inherit] font-mono"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {shortenHex(nft.TokenAddr, 6)}
+            </a>
+          </TooltipTrigger>
+          <TooltipContent>{nft.TokenAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">

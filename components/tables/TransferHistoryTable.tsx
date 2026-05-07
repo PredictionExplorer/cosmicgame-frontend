@@ -5,7 +5,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -44,36 +44,32 @@ const TransferHistoryRow = ({ record }: { record: CSTTransferRecord }) => {
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/user/${FromAddr}`} className="text-inherit font-mono">
-                {addrEq(FromAddr, stakingCst)
-                  ? 'Cosmic Signature NFT Anchoring Wallet'
-                  : addrEq(FromAddr, stakingRwalk)
-                    ? 'RandomWalk NFT Anchoring Wallet'
-                    : shortenHex(FromAddr ?? '', 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{FromAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={`/user/${FromAddr}`} className="text-inherit font-mono">
+              {addrEq(FromAddr, stakingCst)
+                ? 'Cosmic Signature NFT Anchoring Wallet'
+                : addrEq(FromAddr, stakingRwalk)
+                  ? 'RandomWalk NFT Anchoring Wallet'
+                  : shortenHex(FromAddr ?? '', 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>{FromAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/user/${ToAddr}`} className="text-inherit font-mono">
-                {addrEq(ToAddr, stakingCst)
-                  ? 'Cosmic Signature NFT Anchoring Wallet'
-                  : addrEq(ToAddr, stakingRwalk)
-                    ? 'RandomWalk NFT Anchoring Wallet'
-                    : shortenHex(ToAddr ?? '', 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{ToAddr ?? ''}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={`/user/${ToAddr}`} className="text-inherit font-mono">
+              {addrEq(ToAddr, stakingCst)
+                ? 'Cosmic Signature NFT Anchoring Wallet'
+                : addrEq(ToAddr, stakingRwalk)
+                  ? 'RandomWalk NFT Anchoring Wallet'
+                  : shortenHex(ToAddr ?? '', 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>{ToAddr ?? ''}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
     </TablePrimaryRow>
   );

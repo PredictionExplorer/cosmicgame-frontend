@@ -8,6 +8,7 @@ import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { DataTable, type DataTableColumn } from '@/components/tables/DataTable';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { RoundInfo } from '@/services/api';
 
 const PER_PAGE = 10;
@@ -46,12 +47,18 @@ const columns: DataTableColumn<RoundInfo>[] = [
     width: '7%',
     accessor: (r) => r.WinnerAddr,
     render: (r) => (
-      // Native `title` attribute keeps the full-address hover hint without
-      // adding a focusable Tooltip child to the role=button row, which would
-      // violate WCAG nested-interactive.
-      <span className="font-mono" title={r.WinnerAddr || undefined}>
-        {r.WinnerAddr ? shortenHex(r.WinnerAddr, 6) : '-'}
-      </span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="font-mono">{r.WinnerAddr ? shortenHex(r.WinnerAddr, 6) : '-'}</span>
+        </TooltipTrigger>
+        {r.WinnerAddr ? (
+          <TooltipContent>
+            <p className="max-w-[280px] break-all font-mono text-xs leading-relaxed">
+              {r.WinnerAddr}
+            </p>
+          </TooltipContent>
+        ) : null}
+      </Tooltip>
     ),
     tooltip: 'The wallet address of the Signature Allocation recipient.',
   },

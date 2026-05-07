@@ -5,7 +5,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import {
@@ -77,16 +77,14 @@ const WinningHistoryRow = ({
         <div className="flex items-center">
           {recordType.icon}&nbsp;<span>{recordType.text}</span>&nbsp;
           {!history.Claimed && showClaimedStatus && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button className="inline-flex items-center justify-center h-6 w-6 rounded-full hover:bg-white/10">
-                    <AlertTriangle className="h-4 w-4 text-destructive" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Unclaimed, go to Pending Winnings to claim.</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="inline-flex items-center justify-center h-6 w-6 rounded-full hover:bg-white/10">
+                  <AlertTriangle className="h-4 w-4 text-destructive" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Unclaimed, go to Pending Winnings to claim.</TooltipContent>
+            </Tooltip>
           )}
         </div>
       </TablePrimaryCell>
@@ -103,21 +101,19 @@ const WinningHistoryRow = ({
       {showWinnerAddr && (
         <TablePrimaryCell align="center">
           {history.WinnerAddr ? (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <a
-                    href={`/user/${history.WinnerAddr}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-inherit"
-                  >
-                    {shortenHex(history.WinnerAddr, 6)}
-                  </a>
-                </TooltipTrigger>
-                <TooltipContent>{history.WinnerAddr}</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <a
+                  href={`/user/${history.WinnerAddr}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-inherit"
+                >
+                  {shortenHex(history.WinnerAddr, 6)}
+                </a>
+              </TooltipTrigger>
+              <TooltipContent>{history.WinnerAddr}</TooltipContent>
+            </Tooltip>
           ) : (
             ' '
           )}
@@ -142,37 +138,33 @@ const WinningHistoryRow = ({
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.RecordType === 1 ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  href={getExplorerUrl('address', cosmicToken)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-inherit"
-                >
-                  {shortenHex(cosmicToken, 6)}
-                </a>
-              </TooltipTrigger>
-              <TooltipContent>{cosmicToken}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={getExplorerUrl('address', cosmicToken)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-inherit"
+              >
+                {shortenHex(cosmicToken, 6)}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{cosmicToken}</TooltipContent>
+          </Tooltip>
         ) : history.TokenAddress ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  href={getExplorerUrl('address', history.TokenAddress)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-inherit"
-                >
-                  {shortenHex(history.TokenAddress, 6)}
-                </a>
-              </TooltipTrigger>
-              <TooltipContent>{history.TokenAddress}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                href={getExplorerUrl('address', history.TokenAddress)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-inherit"
+              >
+                {shortenHex(history.TokenAddress, 6)}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{history.TokenAddress}</TooltipContent>
+          </Tooltip>
         ) : (
           ' '
         )}

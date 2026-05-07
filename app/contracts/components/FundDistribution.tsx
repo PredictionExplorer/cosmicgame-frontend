@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface FundSegment {
   label: string;
@@ -120,18 +121,25 @@ export function FundDistribution({
             if (segment.value <= 0) return null;
             const widthPercent = total > 0 ? (segment.value / total) * 100 : 0;
             return (
-              <motion.div
-                key={segment.label}
-                className={cn(
-                  segment.color,
-                  'relative h-full',
-                  i > 0 && 'border-l border-black/20',
-                )}
-                initial={{ width: 0 }}
-                animate={{ width: `${widthPercent}%` }}
-                transition={{ duration: 0.8, delay: i * 0.1, ease: 'easeOut' as const }}
-                title={`${segment.label}: ${segment.value}%`}
-              />
+              <Tooltip key={segment.label}>
+                <TooltipTrigger asChild>
+                  <motion.div
+                    className={cn(
+                      segment.color,
+                      'relative h-full',
+                      i > 0 && 'border-l border-black/20',
+                    )}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${widthPercent}%` }}
+                    transition={{ duration: 0.8, delay: i * 0.1, ease: 'easeOut' as const }}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-[220px] text-xs leading-relaxed">
+                    {segment.label}: {segment.value}%
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             );
           })}
         </div>

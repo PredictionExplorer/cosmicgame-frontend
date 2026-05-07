@@ -17,6 +17,7 @@ import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { SkipLink } from '@/components/ui/skip-link';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { AnchoredTokenProvider } from '@/contexts/AnchoredTokenContext';
 import { SystemModeProvider } from '@/contexts/SystemModeContext';
 import { ApiDataProvider } from '@/contexts/ApiDataContext';
@@ -272,10 +273,12 @@ export function Providers({
                   <SystemModeProvider>
                     <ApiDataProvider>
                       <NotificationProvider>
-                        <SkipLink />
-                        {showAppChrome && <Header />}
-                        <ErrorBoundary>{children}</ErrorBoundary>
-                        {showAppChrome && <Footer />}
+                        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+                          <SkipLink />
+                          {showAppChrome && <Header />}
+                          <ErrorBoundary>{children}</ErrorBoundary>
+                          {showAppChrome && <Footer />}
+                        </TooltipProvider>
                       </NotificationProvider>
                     </ApiDataProvider>
                   </SystemModeProvider>

@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface GalleryPaginationProps {
   currentPage: number;
@@ -100,33 +100,31 @@ export function GalleryPagination({
         </div>
       )}
 
-      <TooltipProvider delayDuration={300}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="order-3 flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Per page</span>
-              <Select value={String(perPage)} onValueChange={(v) => onPerPageChange(Number(v))}>
-                <SelectTrigger
-                  className="w-[70px] h-8 text-xs border-white/[0.06] bg-white/[0.03]"
-                  aria-label="Items per page"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {perPageOptions.map((opt) => (
-                    <SelectItem key={opt} value={String(opt)}>
-                      {opt}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <p>Number of NFTs displayed per page</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="order-3 flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Per page</span>
+            <Select value={String(perPage)} onValueChange={(v) => onPerPageChange(Number(v))}>
+              <SelectTrigger
+                className="w-[70px] h-8 text-xs border-white/[0.06] bg-white/[0.03]"
+                aria-label="Items per page"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {perPageOptions.map((opt) => (
+                  <SelectItem key={opt} value={String(opt)}>
+                    {opt}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">
+          <p>Number of NFTs displayed per page</p>
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 }

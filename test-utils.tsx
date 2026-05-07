@@ -3,6 +3,8 @@ import { render, type RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { axe } from 'jest-axe';
 
+import { TooltipProvider } from '@/components/ui/tooltip';
+
 export function createTestQueryClient() {
   return new QueryClient({
     defaultOptions: {
@@ -15,12 +17,16 @@ export function createTestQueryClient() {
 }
 
 function AllProviders({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  return <TooltipProvider delayDuration={0}>{children}</TooltipProvider>;
 }
 
 function QueryWrapper({ children }: { children: ReactNode }) {
   const client = createTestQueryClient();
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+  return (
+    <TooltipProvider delayDuration={0}>
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    </TooltipProvider>
+  );
 }
 
 const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>

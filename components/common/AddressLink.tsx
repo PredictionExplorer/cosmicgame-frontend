@@ -1,12 +1,11 @@
 import { shortenHex } from '@/utils';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 
 export const AddressLink = ({ address, url }: { address: string; url: string }) => {
   const { marketing } = useContractAddresses();
-  const isMkt =
-    marketing && address && marketing.toLowerCase() === address.toLowerCase();
+  const isMkt = marketing && address && marketing.toLowerCase() === address.toLowerCase();
   const displayText = isMkt ? 'Marketing Wallet' : address;
   const shortText = isMkt ? 'Marketing Wallet' : shortenHex(address, 6);
 
@@ -14,21 +13,19 @@ export const AddressLink = ({ address, url }: { address: string; url: string }) 
     <>
       {/* Mobile: tooltip with shortened address */}
       <span className="sm:hidden">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono [color:inherit] [font-size:inherit]"
-              >
-                {shortText}
-              </a>
-            </TooltipTrigger>
-            <TooltipContent>{address}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono [color:inherit] [font-size:inherit]"
+            >
+              {shortText}
+            </a>
+          </TooltipTrigger>
+          <TooltipContent>{address}</TooltipContent>
+        </Tooltip>
       </span>
 
       {/* Desktop: full address */}

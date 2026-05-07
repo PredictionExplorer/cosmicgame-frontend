@@ -5,7 +5,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -76,16 +76,14 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/user/${WinnerAddr}`} className="text-inherit font-mono">
-                {shortenHex(WinnerAddr, 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{WinnerAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={`/user/${WinnerAddr}`} className="text-inherit font-mono">
+              {shortenHex(WinnerAddr, 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>{WinnerAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         <Link href={`/allocation/${RoundNum}`} className="text-inherit">

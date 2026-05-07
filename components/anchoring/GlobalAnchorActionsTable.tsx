@@ -16,7 +16,7 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface RowData {
   EvtLogId: string | number;
@@ -65,18 +65,16 @@ const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/user/${row.StakerAddr}`} className="text-inherit font-mono">
-                {shortenHex(row.StakerAddr, 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{row.StakerAddr}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={`/user/${row.StakerAddr}`} className="text-inherit font-mono">
+              {shortenHex(row.StakerAddr, 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{row.StakerAddr}</p>
+          </TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{row.NumStakedNFTs}</TablePrimaryCell>

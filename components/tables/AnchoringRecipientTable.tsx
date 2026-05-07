@@ -5,7 +5,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -35,16 +35,14 @@ const RecipientRow = ({ recipient }: { recipient: CSTAnchorDistribution }) => {
         </a>
       </TablePrimaryCell>
       <TablePrimaryCell align="left">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/user/${recipient.StakerAddr}`} className="text-inherit font-mono">
-                {shortenHex(recipient.StakerAddr ?? '', 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{recipient.StakerAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={`/user/${recipient.StakerAddr}`} className="text-inherit font-mono">
+              {shortenHex(recipient.StakerAddr ?? '', 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>{recipient.StakerAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{recipient.StakerNumStakedNFTs}</TablePrimaryCell>
       <TablePrimaryCell align="right">

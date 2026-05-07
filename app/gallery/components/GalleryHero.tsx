@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Gem, Lock, Tag, Trophy } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export interface GalleryStats {
   total: number;
@@ -83,27 +83,25 @@ const statCards: {
 
 export function GalleryHero({ stats, loading }: GalleryHeroProps) {
   return (
-    <TooltipProvider delayDuration={300}>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-10">
-        {statCards.map((card, index) => (
-          <motion.div
-            key={card.key}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.1, ease: 'easeOut' }}
-          >
-            <StatCard
-              value={stats[card.key]}
-              label={card.label}
-              icon={card.icon}
-              tooltip={card.tooltip}
-              gradient={card.gradient}
-              loading={loading}
-            />
-          </motion.div>
-        ))}
-      </div>
-    </TooltipProvider>
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-10">
+      {statCards.map((card, index) => (
+        <motion.div
+          key={card.key}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: index * 0.1, ease: 'easeOut' }}
+        >
+          <StatCard
+            value={stats[card.key]}
+            label={card.label}
+            icon={card.icon}
+            tooltip={card.tooltip}
+            gradient={card.gradient}
+            loading={loading}
+          />
+        </motion.div>
+      ))}
+    </div>
   );
 }
 

@@ -74,9 +74,9 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
  * Closes any visible tooltip. We press Escape (which Radix Tooltip dismisses
  * on, regardless of whether the popper was opened via hover, focus, or tap)
  * AND move the pointer to the corner so a hover-opened popper isn't
- * immediately reopened on the next iteration. Each `InfoTooltip` mounts its
- * own `TooltipProvider`, so opening another tooltip does NOT auto-close the
- * previous one — which is why we have to dismiss explicitly between asserts.
+ * immediately reopened on the next iteration. Dismissing explicitly also keeps
+ * the next assertion from accidentally matching stale tooltip content while
+ * animations are settling.
  */
 async function dismissOpenTooltips(page: Page): Promise<void> {
   await page.mouse.move(0, 0);

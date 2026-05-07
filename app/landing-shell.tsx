@@ -35,6 +35,7 @@ import { Toaster } from 'sonner';
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
 import ErrorBoundary from '@/components/layout/ErrorBoundary';
 import { SkipLink } from '@/components/ui/skip-link';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 
 export function LandingShell({ children }: { children: ReactNode }) {
@@ -45,19 +46,21 @@ export function LandingShell({ children }: { children: ReactNode }) {
   return (
     <ErrorBoundary>
       <CookiesProvider>
-        <SkipLink />
-        <ErrorBoundary>{children}</ErrorBoundary>
-        <Toaster
-          position="top-right"
-          theme="dark"
-          richColors
-          closeButton
-          toastOptions={{
-            duration: NOTIFICATION_AUTO_HIDE_MS,
-            className:
-              'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
-          }}
-        />
+        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+          <SkipLink />
+          <ErrorBoundary>{children}</ErrorBoundary>
+          <Toaster
+            position="top-right"
+            theme="dark"
+            richColors
+            closeButton
+            toastOptions={{
+              duration: NOTIFICATION_AUTO_HIDE_MS,
+              className:
+                'border border-white/[0.08] bg-card/95 backdrop-blur-md shadow-[var(--elevation-3)]',
+            }}
+          />
+        </TooltipProvider>
       </CookiesProvider>
     </ErrorBoundary>
   );

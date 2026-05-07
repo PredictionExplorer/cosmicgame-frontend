@@ -49,6 +49,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/ui/stat-card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SectionDivider } from '@/components/ui/section-divider';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import StellarSelectionRecipientTable from '@/components/tables/StellarSelectionRecipientTable';
 import GestureHistoryTable from '@/components/tables/GestureHistoryTable';
@@ -325,13 +326,18 @@ function AllocationDistributionBar({ segments }: { segments: DistributionSegment
           const pct = (seg.value / total) * 100;
           if (pct < 0.5) return null;
           return (
-            <div
-              key={seg.label}
-              className={cn('relative transition-all duration-300', seg.color)}
-              style={{ width: `${pct}%` }}
-              title={seg.tooltip}
-              data-testid={`distribution-segment-${seg.label.toLowerCase().replace(/\s+/g, '-')}`}
-            />
+            <Tooltip key={seg.label}>
+              <TooltipTrigger asChild>
+                <div
+                  className={cn('relative transition-all duration-300', seg.color)}
+                  style={{ width: `${pct}%` }}
+                  data-testid={`distribution-segment-${seg.label.toLowerCase().replace(/\s+/g, '-')}`}
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-[280px] text-xs leading-relaxed">{seg.tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
           );
         })}
       </motion.div>

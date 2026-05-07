@@ -5,7 +5,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -65,16 +65,14 @@ function StellarSelectionAllocationRow({
         </Link>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/user/${WinnerAddr}`} className="text-inherit text-[inherit]">
-                {shortenHex(WinnerAddr, 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{WinnerAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={`/user/${WinnerAddr}`} className="text-inherit text-[inherit]">
+              {shortenHex(WinnerAddr, 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>{WinnerAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {roundTimeout ? (

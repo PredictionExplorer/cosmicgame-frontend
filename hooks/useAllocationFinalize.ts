@@ -78,10 +78,10 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
     setIsClaiming(true);
     try {
       const roundBefore = (await cosmicGameContract.read.roundNum?.()) as bigint;
-      const lastCstBidderAddress =
+      const finalCstGestureParticipant =
         ((await cosmicGameContract.read.lastCstBidderAddress?.()) as string | undefined) ??
         zeroAddress;
-      const hasFinalCstGesture = lastCstBidderAddress !== zeroAddress;
+      const hasFinalCstGesture = finalCstGestureParticipant !== zeroAddress;
 
       let gasLimit = GAS_FLOOR;
       try {

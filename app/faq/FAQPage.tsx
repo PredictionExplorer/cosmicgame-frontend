@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { TooltipProvider } from '@/components/ui/tooltip';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionDivider } from '@/components/ui/section-divider';
 
@@ -145,66 +144,64 @@ const FAQPage = () => {
   const isSearching = debouncedSearch.trim().length > 0;
 
   return (
-    <TooltipProvider delayDuration={150}>
-      <PageShell variant="marketing" backdrop="signature">
-        <HeroSection
-          searchValue={searchInput}
-          onSearchChange={setSearchInput}
-          resultCount={resultCount}
-          totalCount={totalCount}
-          categoryCount={faqCategories.length}
+    <PageShell variant="marketing" backdrop="signature">
+      <HeroSection
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
+        resultCount={resultCount}
+        totalCount={totalCount}
+        categoryCount={faqCategories.length}
+      />
+
+      {!isSearching && (
+        <>
+          <SectionDivider />
+          <PopularQuestions onQuestionClick={handlePopularClick} />
+        </>
+      )}
+
+      <SectionDivider />
+
+      {!isSearching && (
+        <CategoryNav
+          categories={faqCategories}
+          activeCategory={activeCategory}
+          onCategoryClick={setActiveCategory}
         />
+      )}
 
-        {!isSearching && (
-          <>
-            <SectionDivider />
-            <PopularQuestions onQuestionClick={handlePopularClick} />
-          </>
-        )}
-
-        <SectionDivider />
-
-        {!isSearching && (
-          <CategoryNav
-            categories={faqCategories}
-            activeCategory={activeCategory}
-            onCategoryClick={setActiveCategory}
+      <div className="mt-6 space-y-12">
+        {filteredCategories.map((cat) => (
+          <FAQCategorySection
+            key={cat.id}
+            ref={setCategoryRef(cat.id)}
+            category={cat}
+            searchQuery={debouncedSearch}
+            expandedItems={expandedItems}
+            onItemToggle={handleItemToggle}
+            onExpandAll={handleExpandAll}
           />
+        ))}
+
+        {isSearching && filteredCategories.length === 0 && (
+          <div className="py-16 text-center">
+            <p className="text-lg font-medium text-muted-foreground">No questions found</p>
+            <p className="mt-2 text-sm text-muted-foreground/60">
+              Try a different search term or{' '}
+              <button
+                onClick={() => setSearchInput('')}
+                className="text-primary underline-offset-2 hover:underline"
+              >
+                clear the search
+              </button>
+            </p>
+          </div>
         )}
+      </div>
 
-        <div className="mt-6 space-y-12">
-          {filteredCategories.map((cat) => (
-            <FAQCategorySection
-              key={cat.id}
-              ref={setCategoryRef(cat.id)}
-              category={cat}
-              searchQuery={debouncedSearch}
-              expandedItems={expandedItems}
-              onItemToggle={handleItemToggle}
-              onExpandAll={handleExpandAll}
-            />
-          ))}
-
-          {isSearching && filteredCategories.length === 0 && (
-            <div className="py-16 text-center">
-              <p className="text-lg font-medium text-muted-foreground">No questions found</p>
-              <p className="mt-2 text-sm text-muted-foreground/60">
-                Try a different search term or{' '}
-                <button
-                  onClick={() => setSearchInput('')}
-                  className="text-primary underline-offset-2 hover:underline"
-                >
-                  clear the search
-                </button>
-              </p>
-            </div>
-          )}
-        </div>
-
-        <SectionDivider className="mt-12" />
-        <ContactCTA />
-      </PageShell>
-    </TooltipProvider>
+      <SectionDivider className="mt-12" />
+      <ContactCTA />
+    </PageShell>
   );
 };
 

@@ -20,7 +20,7 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { useCSTTransfers } from '@/hooks/useApiQuery';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
@@ -53,21 +53,19 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
 
       <TablePrimaryCell align="center">
         {isWalletAddress(row.FromAddr ?? '', contractAddrs) !== '' ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  className="text-inherit text-[length:inherit] font-mono"
-                  href={`/user/${row.FromAddr}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {isWalletAddress(row.FromAddr ?? '', contractAddrs)}
-                </a>
-              </TooltipTrigger>
-              <TooltipContent>{row.FromAddr ?? ''}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                className="text-inherit text-[length:inherit] font-mono"
+                href={`/user/${row.FromAddr}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {isWalletAddress(row.FromAddr ?? '', contractAddrs)}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{row.FromAddr ?? ''}</TooltipContent>
+          </Tooltip>
         ) : (
           <AddressLink address={row.FromAddr ?? ''} url={`/user/${row.FromAddr}`} />
         )}
@@ -75,21 +73,19 @@ const CosmicSignatureTransferRow = ({ row }: { row: TransferRow }) => {
 
       <TablePrimaryCell align="center">
         {isWalletAddress(row.ToAddr ?? '', contractAddrs) !== '' ? (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  className="text-inherit text-[length:inherit] font-mono"
-                  href={`/user/${row.ToAddr}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {isWalletAddress(row.ToAddr ?? '', contractAddrs)}
-                </a>
-              </TooltipTrigger>
-              <TooltipContent>{row.ToAddr ?? ''}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <a
+                className="text-inherit text-[length:inherit] font-mono"
+                href={`/user/${row.ToAddr}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {isWalletAddress(row.ToAddr ?? '', contractAddrs)}
+              </a>
+            </TooltipTrigger>
+            <TooltipContent>{row.ToAddr ?? ''}</TooltipContent>
+          </Tooltip>
         ) : (
           <AddressLink address={row.ToAddr ?? ''} url={`/user/${row.ToAddr}`} />
         )}

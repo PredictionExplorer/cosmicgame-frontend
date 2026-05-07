@@ -95,11 +95,14 @@ TooltipTrigger.displayName = TooltipPrimitive.Trigger.displayName;
 /**
  * `TooltipContent` is rendered through a `TooltipPrimitive.Portal` so the popper
  * escapes the trigger's render tree. Without a portal, the content gets clipped
- * by ancestors with `overflow: hidden` (e.g. the `StatCard` on `/contracts`) and
- * confined to local stacking contexts spawned by `transform`, `filter`, or
- * `backdrop-filter` ancestors — which manifests as tooltips that look "blocked
- * by other elements." Portaling to the document root makes z-index global and
- * exempts the tooltip from any ancestor clipping or stacking-context isolation.
+ * by ancestors with `overflow: hidden` (e.g. `StatCard`) and confined to local
+ * stacking contexts spawned by `transform`, `filter`, or `backdrop-filter`
+ * ancestors. Portaling to the document root makes z-index global and exempts
+ * the tooltip from ancestor clipping.
+ *
+ * Tooltips rely on an ancestor `TooltipProvider` for consistent delay behavior.
+ * The app and landing shells provide one root provider; tests that render these
+ * primitives in isolation should wrap them in `TooltipProvider` explicitly.
  */
 const TooltipContent = React.forwardRef<
   React.ComponentRef<typeof TooltipPrimitive.Content>,

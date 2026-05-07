@@ -5,7 +5,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { shortenHex } from '@/utils';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -37,16 +37,14 @@ const UniqueAnchorHoldersCSTRow = ({ row }: { row: UniqueAnchorHolderCST }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/user/${StakerAddr}`} className="text-inherit font-mono">
-                {shortenHex(StakerAddr, 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{StakerAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={`/user/${StakerAddr}`} className="text-inherit font-mono">
+              {shortenHex(StakerAddr, 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>{StakerAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{NumStakeActions}</TablePrimaryCell>
       <TablePrimaryCell align="center">{NumUnstakeActions}</TablePrimaryCell>

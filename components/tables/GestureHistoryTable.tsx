@@ -15,7 +15,7 @@ import {
 } from '@/utils';
 import ERC20_ABI from '@/contracts/CosmicToken.json';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimaryContainer,
   TablePrimaryCell,
@@ -137,14 +137,12 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
         {convertTimestampToDateTime(history.TimeStamp, true)}
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="font-mono">{shortenHex(history.BidderAddr, 6)}</span>
-            </TooltipTrigger>
-            <TooltipContent>{history.BidderAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="font-mono">{shortenHex(history.BidderAddr, 6)}</span>
+          </TooltipTrigger>
+          <TooltipContent>{history.BidderAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="right">{price}</TablePrimaryCell>
       {showRound && <TablePrimaryCell align="center">{history.RoundNum}</TablePrimaryCell>}
@@ -194,16 +192,14 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
       </TablePrimaryCell>
       <TablePrimaryCell>
         {!isBanned && history.Message && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="max-w-[180px] overflow-hidden whitespace-nowrap inline-block text-ellipsis leading-none">
-                  {history.Message}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>{history.Message}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="max-w-[180px] overflow-hidden whitespace-nowrap inline-block text-ellipsis leading-none">
+                {history.Message}
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{history.Message}</TooltipContent>
+          </Tooltip>
         )}{' '}
       </TablePrimaryCell>
     </TablePrimaryRow>

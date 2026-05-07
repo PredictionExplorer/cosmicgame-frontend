@@ -16,7 +16,7 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { CSTTokenInfo } from '@/services/api';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
@@ -62,16 +62,14 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link href={`/user/${nft.WinnerAddr}`} className="text-inherit font-mono">
-                {shortenHex(nft.WinnerAddr ?? '', 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{nft.WinnerAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link href={`/user/${nft.WinnerAddr}`} className="text-inherit font-mono">
+              {shortenHex(nft.WinnerAddr ?? '', 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>{nft.WinnerAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{nft.Staked ? 'Yes' : 'No'}</TablePrimaryCell>

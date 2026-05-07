@@ -7,7 +7,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime, formatSeconds } from '@/utils';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -32,16 +32,14 @@ const AdminEventsRow = ({ row }: { row?: AdminEventRow }) => {
     <TablePrimaryRow className={cn(row.TransferType > 0 && 'bg-white/[0.06]')}>
       <TablePrimaryCell>
         {ADMIN_EVENTS[row.RecordType]?.name}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="ml-2 inline-flex align-middle">
-                <AlertCircle className="h-4 w-4" />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>{ADMIN_EVENTS[row.RecordType]?.description}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="ml-2 inline-flex align-middle">
+              <AlertCircle className="h-4 w-4" />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>{ADMIN_EVENTS[row.RecordType]?.description}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell>
         <a

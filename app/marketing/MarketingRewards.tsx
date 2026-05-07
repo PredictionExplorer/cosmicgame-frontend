@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react';
 
-import { TooltipProvider } from '@/components/ui/tooltip';
 import { PageShell } from '@/components/ui/page-shell';
 import { Spinner } from '@/components/ui/spinner';
 import { useMarketingRewards } from '@/hooks/useApiQuery';
@@ -46,20 +45,18 @@ const MarketingRewards = () => {
   }
 
   return (
-    <TooltipProvider delayDuration={200}>
-      <PageShell variant="data" backdrop="signature">
-        <MarketingHero />
-        <MarketingStats
-          totalRewardsEth={totalRewardsEth}
-          activeMarketers={activeMarketers}
-          rewardTransactions={rewardTransactions}
-        />
-        <HowItWorks />
-        <TopMarketersLeaderboard rewards={rewards} />
-        <RewardsHistorySection rewards={rewards} />
-        <MarketingCTA />
-      </PageShell>
-    </TooltipProvider>
+    <PageShell variant="data" backdrop="signature">
+      <MarketingHero />
+      <MarketingStats
+        totalRewardsEth={totalRewardsEth}
+        activeMarketers={activeMarketers}
+        rewardTransactions={rewardTransactions}
+      />
+      <HowItWorks />
+      <TopMarketersLeaderboard rewards={rewards} />
+      <RewardsHistorySection rewards={rewards} />
+      <MarketingCTA />
+    </PageShell>
   );
 };
 

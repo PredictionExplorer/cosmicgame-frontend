@@ -192,7 +192,11 @@ describe('InfoTooltip', () => {
   });
 
   it('opens from the accessible button on touch', async () => {
-    render(<InfoTooltip content="Mobile users can read this help text." />);
+    render(
+      <TooltipProvider delayDuration={0}>
+        <InfoTooltip content="Mobile users can read this help text." />
+      </TooltipProvider>,
+    );
 
     const trigger = screen.getByRole('button', { name: 'Show more information' });
     touchPointerDown(trigger);
@@ -203,11 +207,52 @@ describe('InfoTooltip', () => {
     );
   });
 
+  it('inherits timing from a shared root provider instead of mounting its own provider', async () => {
+    render(
+      <TooltipProvider delayDuration={0} skipDelayDuration={0}>
+        <InfoTooltip content="Shared provider tooltip A" ariaLabel="Open A" />
+        <InfoTooltip content="Shared provider tooltip B" ariaLabel="Open B" />
+      </TooltipProvider>,
+    );
+
+    const triggerA = screen.getByRole('button', { name: 'Open A' });
+    touchPointerDown(triggerA);
+    fireEvent.click(triggerA);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Shared provider tooltip A');
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+
+    const triggerB = screen.getByRole('button', { name: 'Open B' });
+    touchPointerDown(triggerB);
+    fireEvent.click(triggerB);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Shared provider tooltip B');
+  });
+
+  it('uses the widened default max width for readable long-form content', async () => {
+    render(
+      <TooltipProvider delayDuration={0}>
+        <InfoTooltip content="This is long-form tooltip content that should have a readable default line length." />
+      </TooltipProvider>,
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Show more information' });
+    touchPointerDown(trigger);
+    fireEvent.click(trigger);
+
+    const [tooltipCopy] = await screen.findAllByText(/long-form tooltip content/);
+    expect(tooltipCopy).toHaveStyle({
+      maxWidth: '280px',
+    });
+  });
+
   it('renders open content even when the trigger sits in an overflow:hidden ancestor', async () => {
     render(
-      <div style={{ overflow: 'hidden', width: 80, height: 20 }}>
-        <InfoTooltip content="Escapes clipped ancestor" />
-      </div>,
+      <TooltipProvider delayDuration={0}>
+        <div style={{ overflow: 'hidden', width: 80, height: 20 }}>
+          <InfoTooltip content="Escapes clipped ancestor" />
+        </div>
+      </TooltipProvider>,
     );
 
     const trigger = screen.getByRole('button', { name: 'Show more information' });

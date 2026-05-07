@@ -11,7 +11,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CustomTextField } from '@/components/styled';
 import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
 import type { DashboardInfo } from '@/services/api/types';
@@ -121,19 +121,17 @@ export function GestureForm({
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
           <div className="flex items-center gap-2 mb-2">
             <h6 className="text-sm font-semibold">Your Random Walk NFTs</h6>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className="h-3.5 w-3.5 text-muted-foreground/50" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-[200px]">
-                    Attach a RandomWalk NFT to your gesture to receive a 50% cost reduction. Each
-                    NFT can only be used once.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-3.5 w-3.5 text-muted-foreground/50" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-[240px]">
+                  Attach a RandomWalk NFT to your gesture to receive a 50% cost reduction. Each NFT
+                  can only be used once.
+                </p>
+              </TooltipContent>
+            </Tooltip>
           </div>
           <PaginationRWLKGrid
             loading={false}

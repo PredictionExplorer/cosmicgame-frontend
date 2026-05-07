@@ -4,7 +4,7 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { getExplorerUrl, convertTimestampToDateTime } from '@/utils';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import {
   TablePrimaryContainer,
@@ -134,16 +134,14 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
             : 'ETH Gesture'}
       </TablePrimaryCell>
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="max-w-[180px] overflow-hidden whitespace-nowrap inline-block text-ellipsis leading-none">
-                {history.Message}
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>{history.Message || ''}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="max-w-[180px] overflow-hidden whitespace-nowrap inline-block text-ellipsis leading-none">
+              {history.Message}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>{history.Message || ''}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {isBanned ? (

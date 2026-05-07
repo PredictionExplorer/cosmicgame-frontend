@@ -13,7 +13,7 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
@@ -72,21 +72,19 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
       </TablePrimaryCell>
 
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <a
-                href={getExplorerUrl('address', token.TokenAddr)}
-                className="text-inherit text-[inherit] font-mono"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shortenHex(token.TokenAddr, 6)}
-              </a>
-            </TooltipTrigger>
-            <TooltipContent>{token.TokenAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <a
+              href={getExplorerUrl('address', token.TokenAddr)}
+              className="text-inherit text-[inherit] font-mono"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {shortenHex(token.TokenAddr, 6)}
+            </a>
+          </TooltipTrigger>
+          <TooltipContent>{token.TokenAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{token.AmountDonatedEth.toFixed(2)}</TablePrimaryCell>
@@ -94,21 +92,19 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
       <TablePrimaryCell align="center">{token.AmountClaimedEth.toFixed(2)}</TablePrimaryCell>
 
       <TablePrimaryCell>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href={`/user/${token.WinnerAddr}`}
-                className="text-inherit text-[inherit] font-mono"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {shortenHex(token.WinnerAddr, 6)}
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>{token.WinnerAddr}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link
+              href={`/user/${token.WinnerAddr}`}
+              className="text-inherit text-[inherit] font-mono"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {shortenHex(token.WinnerAddr, 6)}
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent>{token.WinnerAddr}</TooltipContent>
+        </Tooltip>
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{token.Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
