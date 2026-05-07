@@ -10,6 +10,8 @@ const config: Config = {
     '<rootDir>/e2e/',
     '<rootDir>/.claude/',
   ],
+  modulePathIgnorePatterns: ['<rootDir>/.claude/'],
+  watchPathIgnorePatterns: ['<rootDir>/.claude/'],
   testEnvironment: 'jsdom',
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': '<rootDir>/__mocks__/styleMock.ts',

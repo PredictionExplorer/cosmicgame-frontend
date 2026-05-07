@@ -43,6 +43,35 @@ describe('next.config', () => {
     expect(config).toHaveProperty('turbopack');
   });
 
+  describe('rewrites', () => {
+    const originalUpstream = process.env.COSMICGAME_API_UPSTREAM;
+
+    afterEach(() => {
+      if (originalUpstream === undefined) {
+        delete process.env.COSMICGAME_API_UPSTREAM;
+      } else {
+        process.env.COSMICGAME_API_UPSTREAM = originalUpstream;
+      }
+    });
+
+    it('does not proxy Cosmic Game API requests when no upstream is configured', async () => {
+      delete process.env.COSMICGAME_API_UPSTREAM;
+
+      await expect((config as NextConfig).rewrites!()).resolves.toEqual([]);
+    });
+
+    it('proxies same-origin Cosmic Game API requests to the configured upstream', async () => {
+      process.env.COSMICGAME_API_UPSTREAM = 'http://127.0.0.1:8099/';
+
+      await expect((config as NextConfig).rewrites!()).resolves.toEqual([
+        {
+          source: '/api/cosmicgame/:path*',
+          destination: 'http://127.0.0.1:8099/api/cosmicgame/:path*',
+        },
+      ]);
+    });
+  });
+
   describe('webpack customizations', () => {
     const webpackFn = (config as NextConfig).webpack!;
     const baseConfig = {
