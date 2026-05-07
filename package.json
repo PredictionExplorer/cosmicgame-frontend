@@ -125,11 +125,17 @@
     "flatted": "^3.4.2",
     "follow-redirects": "^1.16.0",
     "h3": "^1.15.9",
+    "anymatch/picomatch": "^2.3.2",
+    "@rollup/plugin-commonjs/picomatch": "^4.0.4",
+    "@rollup/pluginutils/picomatch": "^4.0.4",
+    "fdir/picomatch": "^4.0.4",
+    "minimatch/brace-expansion": "^5.0.5",
     "postcss": "^8.5.10",
     "smol-toml": "^1.6.1",
     "socket.io-parser": "^4.2.6",
     "srvx": "^0.11.13",
     "tar": "^7.5.11",
+    "rpc-websockets/uuid": "^11.1.1",
     "yaml": "^2.8.3"
   },
   "overrides": {
@@ -139,7 +145,25 @@
     "flatted": "^3.4.2",
     "follow-redirects": "^1.16.0",
     "h3": "^1.15.9",
+    "anymatch": {
+      "picomatch": "^2.3.2"
+    },
+    "@rollup/plugin-commonjs": {
+      "picomatch": "^4.0.4"
+    },
+    "@rollup/pluginutils": {
+      "picomatch": "^4.0.4"
+    },
+    "fdir": {
+      "picomatch": "^4.0.4"
+    },
+    "minimatch": {
+      "brace-expansion": "^5.0.5"
+    },
     "postcss": "^8.5.10",
+    "rpc-websockets": {
+      "uuid": "^11.1.1"
+    },
     "smol-toml": "^1.6.1",
     "socket.io-parser": "^4.2.6",
     "srvx": "^0.11.13",

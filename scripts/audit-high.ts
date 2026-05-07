@@ -15,6 +15,9 @@ interface NpmAuditVulnerability {
 
 interface NpmAuditReport {
   vulnerabilities?: Record<string, NpmAuditVulnerability>;
+  metadata?: {
+    vulnerabilities?: Record<string, number>;
+  };
 }
 
 const repoRoot = process.cwd();
@@ -27,9 +30,9 @@ function advisoryId(url: string): string | null {
   return url.match(/GHSA-[a-z0-9-]+/i)?.[0] ?? null;
 }
 
-function runNpmAudit(): NpmAuditReport {
+function runNpmAudit(args: string[] = []): NpmAuditReport {
   try {
-    return JSON.parse(execFileSync('npm', ['audit', '--json'], { encoding: 'utf8' }));
+    return JSON.parse(execFileSync('npm', ['audit', ...args, '--json'], { encoding: 'utf8' }));
   } catch (error) {
     const stdout = (error as { stdout?: string }).stdout;
     if (!stdout) throw error;
@@ -38,6 +41,19 @@ function runNpmAudit(): NpmAuditReport {
 }
 
 const report = runNpmAudit();
+const productionReport = runNpmAudit(['--omit=dev']);
+const productionTotal = productionReport.metadata?.vulnerabilities?.total ?? 0;
+
+if (productionTotal > 0) {
+  console.error(`Production dependency audit found ${productionTotal} advisories.`);
+  for (const [name, vulnerability] of Object.entries(productionReport.vulnerabilities ?? {})) {
+    console.error(
+      `- ${name}: ${vulnerability.via.map((via) => (typeof via === 'string' ? via : via.title)).join('; ')}`,
+    );
+  }
+  process.exit(1);
+}
+
 const vulnerabilities = report.vulnerabilities ?? {};
 const advisories = new Map<string, NpmAuditAdvisory>();
 
@@ -73,5 +89,5 @@ if (unacceptedHighs.length > 0) {
 }
 
 console.warn(
-  `Dependency audit passed: ${advisories.size} advisories found, all high/critical advisories are documented.`,
+  `Dependency audit passed: 0 production advisories; ${advisories.size} dev/tooling advisories found, all high/critical advisories are documented.`,
 );
