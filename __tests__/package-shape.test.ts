@@ -31,9 +31,9 @@ function walkFiles(dir: string): string[] {
 }
 
 describe('package shape', () => {
-  it('keeps the Vercel CLI out of production dependencies', () => {
+  it('does not install the Vercel CLI as an app dependency', () => {
     expect(packageJson.dependencies).not.toHaveProperty('vercel');
-    expect(packageJson.devDependencies).toHaveProperty('vercel');
+    expect(packageJson.devDependencies).not.toHaveProperty('vercel');
   });
 
   it('does not import the Vercel CLI from runtime source', () => {

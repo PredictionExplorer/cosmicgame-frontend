@@ -9,6 +9,8 @@ is not attacker-controlled in the deployed dapp.
 ## Dependency Audit Policy
 
 - Direct runtime dependencies with high or critical advisories are not accepted.
+- Deployment CLIs should not be installed as project dependencies unless a
+  checked-in npm script requires them.
 - Accepted advisories must include an id, package, severity, scope, and reason.
 - Accepted advisories should be revisited when the owning top-level package
   releases a compatible patch.
@@ -21,9 +23,9 @@ is not attacker-controlled in the deployed dapp.
 
 - package: `@tootallnate/once`
 - severity: low
-- scope: `vercel` CLI development dependency
-- reason: This package is only reached through local/deploy tooling. The app
-  does not expose attacker-controlled Node HTTP parser state to this dependency.
+- scope: transitive development tooling
+- reason: This package is only reached through local tooling. The app does not
+  expose attacker-controlled Node HTTP parser state to this dependency.
 
 ### GHSA-2g4f-4pwh-qvx6
 
@@ -37,9 +39,9 @@ is not attacker-controlled in the deployed dapp.
 
 - package: `basic-ftp`
 - severity: high
-- scope: `vercel` CLI development dependency
-- reason: The DoS requires connecting the CLI to a malicious FTP server. The
-  frontend does not use FTP in production.
+- scope: transitive development tooling
+- reason: The DoS requires connecting tooling to a malicious FTP server. The
+  frontend does not use FTP.
 
 ### GHSA-f886-m6hf-6m8v
 
@@ -126,7 +128,7 @@ is not attacker-controlled in the deployed dapp.
 
 - package: `undici`
 - severity: high
-- scope: WalletConnect/Reown and Vercel transitive helpers
+- scope: transitive tooling helpers
 - reason: The high-impact WebSocket decompression path is not used by the dapp
   runtime. Compatible direct runtime dependencies have been patched; remaining
   paths are transitive helper code.
@@ -135,7 +137,7 @@ is not attacker-controlled in the deployed dapp.
 
 - package: `undici`
 - severity: high
-- scope: WalletConnect/Reown and Vercel transitive helpers
+- scope: transitive tooling helpers
 - reason: The invalid WebSocket extension negotiation path is not used by the
   dapp runtime. Compatible direct runtime dependencies have been patched;
   remaining paths are transitive helper code.
@@ -144,7 +146,7 @@ is not attacker-controlled in the deployed dapp.
 
 - package: `undici`
 - severity: low
-- scope: WalletConnect/Reown and Vercel transitive helpers
+- scope: transitive tooling helpers
 - reason: Remaining paths are not exposed to attacker-controlled certificate
   data by the frontend runtime.
 
@@ -152,7 +154,7 @@ is not attacker-controlled in the deployed dapp.
 
 - package: `undici`
 - severity: moderate
-- scope: WalletConnect/Reown and Vercel transitive helpers
+- scope: transitive tooling helpers
 - reason: Remaining paths are not used for attacker-controlled HTTP upgrade
   requests in the frontend runtime.
 
@@ -160,7 +162,7 @@ is not attacker-controlled in the deployed dapp.
 
 - package: `undici`
 - severity: moderate
-- scope: WalletConnect/Reown and Vercel transitive helpers
+- scope: transitive tooling helpers
 - reason: Remaining paths are not used for attacker-controlled raw HTTP
   request/response construction in the frontend runtime.
 
@@ -168,7 +170,7 @@ is not attacker-controlled in the deployed dapp.
 
 - package: `undici`
 - severity: moderate
-- scope: WalletConnect/Reown and Vercel transitive helpers
+- scope: transitive tooling helpers
 - reason: Remaining paths do not fetch attacker-controlled compressed payloads
   in the frontend runtime.
 
@@ -176,7 +178,7 @@ is not attacker-controlled in the deployed dapp.
 
 - package: `undici`
 - severity: moderate
-- scope: WalletConnect/Reown and Vercel transitive helpers
+- scope: transitive tooling helpers
 - reason: Remaining paths are not used as cryptographic randomness sources by
   the frontend runtime.
 
