@@ -50,7 +50,7 @@ const footerLinks: Record<string, { label: string; href: string; external?: bool
   Community: [
     { label: 'Twitter / X', href: 'https://x.com/CosmicSignature', external: true },
     { label: 'Discord', href: 'https://discord.gg/bGnPn96Qwt', external: true },
-    { label: 'Landing Site', href: 'https://cosmicsignature.com', external: true },
+    { label: 'Discover', href: 'https://cosmicsignature.com', external: true },
   ],
 };
 

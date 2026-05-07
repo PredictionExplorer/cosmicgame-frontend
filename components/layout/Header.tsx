@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, type FC } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Menu } from 'lucide-react';
+import { ArrowUpRight, Menu } from 'lucide-react';
 import { formatEther } from 'viem';
 
 import { cn } from '@/lib/utils';
@@ -126,9 +126,11 @@ const Header: FC = () => {
         href="https://cosmicsignature.com"
         className="hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-white/70 transition hover:border-[oklch(84.7%_0.149_213)]/40 hover:bg-white/10 hover:text-white xl:inline-flex"
         rel="noopener"
+        aria-label="Discover Cosmic Signature"
       >
         <span className="h-1.5 w-1.5 rounded-full bg-[oklch(84.7%_0.149_213)]" aria-hidden />
-        Protocol site
+        Discover
+        <ArrowUpRight className="h-3 w-3 opacity-70" aria-hidden />
       </a>
 
       <ConnectWalletButton
@@ -224,10 +226,11 @@ const Header: FC = () => {
 
               <Separator className="my-2" />
 
-              {/* Protocol site cross-host link */}
+              {/* Cross-host link to the marketing site */}
               <a
                 href="https://cosmicsignature.com"
                 rel="noopener"
+                aria-label="Discover Cosmic Signature"
                 className="mx-4 mt-2 inline-flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70 transition hover:border-[oklch(84.7%_0.149_213)]/40 hover:bg-white/10 hover:text-white"
               >
                 <span className="flex items-center gap-2">
@@ -235,9 +238,9 @@ const Header: FC = () => {
                     className="h-1.5 w-1.5 rounded-full bg-[oklch(84.7%_0.149_213)]"
                     aria-hidden
                   />
-                  Protocol site
+                  Discover
                 </span>
-                <span aria-hidden>&rarr;</span>
+                <ArrowUpRight className="h-4 w-4 opacity-70" aria-hidden />
               </a>
 
               {account && (

@@ -111,8 +111,8 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     expect(description!).not.toMatch(/strategy bidding game/i);
   });
 
-  test('header has a cross-host link to the protocol site', async ({ page }) => {
-    // On desktop viewports the "Protocol site" chip is visible. On mobile,
+  test('header has a cross-host Discover link to the marketing site', async ({ page }) => {
+    // On desktop viewports the "Discover" chip is visible. On mobile,
     // it lives inside the drawer. Assert at least the anchor exists.
     const links = page.locator('a[href="https://cosmicsignature.com"]');
     const count = await links.count();

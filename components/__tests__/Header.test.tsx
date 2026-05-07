@@ -75,11 +75,11 @@ describe('Header', () => {
     expect(screen.getByText('Help')).toBeInTheDocument();
   });
 
-  it('renders the cross-host link to the protocol site', () => {
+  it('renders the cross-host Discover link to the marketing site', () => {
     render(<Header />);
-    const link = screen.getByText(/protocol site/i);
-    expect(link).toBeInTheDocument();
-    expect(link.closest('a')).toHaveAttribute('href', 'https://cosmicsignature.com');
+    const link = screen.getByRole('link', { name: /discover cosmic signature/i });
+    expect(link).toHaveAttribute('href', 'https://cosmicsignature.com');
+    expect(link).toHaveTextContent(/discover/i);
   });
 
   it('does not render a maintenance banner when systemMode is 0', () => {
