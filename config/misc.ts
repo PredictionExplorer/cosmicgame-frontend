@@ -114,9 +114,10 @@ export const ADMIN_EVENTS = [
       'The value for the increment of allocation time after every gesture has been changed.',
   },
   {
-    name: 'InitialSecondsUntilPrizeChanged',
-    type: 'time',
-    description: 'The initial value of the time until allocation has been changed.',
+    name: 'InitialDurationUntilMainPrizeDivisorChanged',
+    type: 'number',
+    description:
+      'The divisor used to derive the initial Cycle Finalization Time (mainPrizeTimeIncrementInMicroSeconds / divisor) has been changed.',
   },
   {
     name: 'TreasurerAddressChanged',

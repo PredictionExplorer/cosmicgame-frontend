@@ -108,6 +108,7 @@ const Contracts = () => {
   const [priceIncrease, setPriceIncrease] = useState(0);
   const [timeIncrease, setTimeIncrease] = useState(0);
   const [timeIncrement, setTimeIncrement] = useState(0);
+  const [initialIncrement, setInitialIncrement] = useState(0);
   const [msgMaxLen, setMsgMaxLen] = useState(0);
   const [cstRewardAmountForBidding, setCstRewardAmountForBidding] = useState(0);
   const [cstDutchAuctionDurations, setCstDutchAuctionDurations] = useState({
@@ -154,6 +155,14 @@ const Contracts = () => {
       const v = await cosmicGameContract.read.mainPrizeTimeIncrementInMicroSeconds?.();
       setTimeIncrement(Number(v ?? 0) / 1_000_000);
     }, 'mainPrizeTimeIncrementInMicroSeconds');
+
+    // Read the resolved initial duration (seconds) directly from the contract instead of the
+    // legacy `InitialSecondsUntilPrize` API field, which actually carries the raw
+    // `initialDurationUntilMainPrizeDivisor` and is not seconds.
+    safeCall(async () => {
+      const v = await cosmicGameContract.read.getInitialDurationUntilMainPrize?.();
+      setInitialIncrement(Number(v ?? 0));
+    }, 'getInitialDurationUntilMainPrize');
 
     safeCall(async () => {
       const v = await cosmicGameContract.read.cstRewardAmountForBidding?.();
@@ -247,7 +256,7 @@ const Contracts = () => {
             cstRewardPerBid={cstRewardAmountForBidding}
             maxMessageLength={msgMaxLen}
             claimTimeout={data?.TimeoutClaimPrize ?? 0}
-            initialIncrement={data?.InitialSecondsUntilPrize ?? 0}
+            initialIncrement={initialIncrement}
             loading={loading}
           />
         </motion.section>

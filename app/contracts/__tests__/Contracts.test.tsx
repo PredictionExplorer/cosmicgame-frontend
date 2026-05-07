@@ -148,7 +148,6 @@ const makeDashboardData = (overrides = {}) => ({
   NumRaffleNFTRecipientsBidding: 3,
   NumRaffleNFTRecipientsStakingRWalk: 2,
   TimeoutClaimPrize: 86400,
-  InitialSecondsUntilPrize: 43200,
   ContractAddrs: {
     CosmicGameAddr: '0xGameAddr',
     CosmicTokenAddr: '0xTokenAddr',

@@ -121,6 +121,13 @@ export interface DashboardInfo {
   CharityPercentage?: number;
   RoundStartCSTAuctionLength?: number;
   TimeoutClaimPrize?: number;
+  /**
+   * @deprecated Misnamed. The backend exposes this field carrying the raw on-chain
+   * `initialDurationUntilMainPrizeDivisor` (a unitless divisor), NOT a number of seconds.
+   * The actual initial duration in seconds is `mainPrizeTimeIncrementInMicroSeconds / divisor`,
+   * available on-chain via `getInitialDurationUntilMainPrize()`. Read that getter directly
+   * instead of treating this value as a duration. See `app/contracts/Contracts.tsx`.
+   */
   InitialSecondsUntilPrize?: number;
   PrizeAmountEth?: number;
   RaffleAmountEth?: number;
