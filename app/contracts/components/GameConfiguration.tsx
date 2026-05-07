@@ -64,7 +64,7 @@ export function GameConfiguration({
       label: 'Time Increment',
       value: timeIncrement > 0 ? formatSeconds(timeIncrement) : '--',
       icon: <Clock className="h-4 w-4" />,
-      tooltip: `Each gesture adds this much time to the Cycle Finalization Time. The increment grows by ${timeIncrease}% with each gesture.`,
+      tooltip: `Each gesture adds this much time to the Cycle Finalization Time. The increment grows by ${timeIncrease}% with each cycle.`,
       featured: true,
     },
     {

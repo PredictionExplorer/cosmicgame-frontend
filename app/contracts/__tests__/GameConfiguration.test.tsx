@@ -108,7 +108,8 @@ describe('GameConfiguration tooltips', () => {
     },
     {
       label: 'Time Increment',
-      tooltip: /Each gesture adds this much time to the Cycle Finalization Time/,
+      tooltip:
+        /Each gesture adds this much time to the Cycle Finalization Time\. The increment grows by 1% with each cycle\./,
     },
     {
       label: 'Participation CST per Gesture',

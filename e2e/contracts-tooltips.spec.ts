@@ -21,7 +21,8 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
   },
   {
     label: 'Time Increment',
-    expected: /Each gesture adds this much time to the Cycle Finalization Time/,
+    expected:
+      /Each gesture adds this much time to the Cycle Finalization Time\. The increment grows by \d+(?:\.\d+)?% with each cycle\./,
   },
   {
     label: 'Participation CST per Gesture',
