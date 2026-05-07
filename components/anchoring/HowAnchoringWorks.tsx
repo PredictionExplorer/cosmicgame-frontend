@@ -31,7 +31,7 @@ const ANCHORING_FAQ = [
     id: 'rwlk-anchoring',
     question: 'RandomWalk (RWLK) Anchoring',
     answer:
-      'Anchor your RandomWalk NFTs to take part in Anchored-NFT Stellar Selection. Each cycle, ten RandomWalk NFT anchor-holders are selected through on-chain random selection to receive newly imprinted Cosmic Signature NFTs.',
+      'Anchor your RandomWalk NFTs to take part in Anchored-NFT Stellar Selection. Each cycle, ten RandomWalk NFT anchor-holders are selected through on-chain random selection to each receive 1,000 CST and one newly imprinted Cosmic Signature NFT.',
   },
   {
     id: 'rewards-calculation',

@@ -1,5 +1,7 @@
 import { Rocket, Trophy, Gamepad2, Gem, Layers, ShieldCheck, type LucideIcon } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 export interface FAQItem {
   id: string;
   question: string;
@@ -96,8 +98,7 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'how-does-the-stellarSelection-work',
         question: 'How does Stellar Selection work?',
-        answer:
-          'Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects participants from the entry pool: three participants share 4% of the Cycle Reserve in ETH, ten participants each receive a Cosmic Signature NFT, and ten anchor-holders of Random Walk NFTs also receive Cosmic Signature NFTs. Selection frequency increases with the number of gestures you make.',
+        answer: `Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects participants from the entry pool: ${protocolFacts.ethStellarSelectionRecipients} participants share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.nftStellarSelectionRecipients} participants each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} anchor-holders of Random Walk NFTs also receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and Cosmic Signature NFTs. Selection frequency increases with the number of gestures you make.`,
       },
       {
         id: 'how-do-i-claim-my-allocation',
@@ -114,14 +115,12 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'what-are-marketing-rewards',
         question: 'What is the Outreach Reserve?',
-        answer:
-          'You can receive Cosmic Signature Tokens (ERC-20) for helping promote the protocol. The Outreach Reserve is allocated per cycle and distributed to ecosystem contributors. Contact the Outreach Custodian via Discord for guidance.',
+        answer: `You can receive Cosmic Signature Tokens (ERC-20) for helping promote the protocol. The Outreach Reserve imprints ${protocolFacts.outreachReserveCst.toLocaleString()} CST per cycle and distributes it to ecosystem contributors. Contact the Outreach Custodian via Discord for guidance.`,
       },
       {
         id: 'how-many-nfts-minted',
         question: 'How many Cosmic Signature NFTs are imprinted each cycle?',
-        answer:
-          'In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted: one for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ten for NFT Stellar Selection recipients, and ten for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection.',
+        answer: `In the vast majority of cycles, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs are imprinted: one for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ${protocolFacts.nftStellarSelectionRecipients} for NFT Stellar Selection recipients, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection. Each of those ${protocolFacts.typicalNftsPerCycle} NFT allocations also includes ${protocolFacts.specialAllocationCst.toLocaleString()} CST.`,
       },
       {
         id: 'what-happens-to-remaining-eth',
@@ -172,8 +171,7 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'what-is-chrono-warrior',
         question: 'What is a Chrono-Warrior?',
-        answer:
-          'The participant who held the Endurance Champion position for the longest consecutive interval. Analogous to the Endurance Champion being the longest-reigning recent gesture maker, the Chrono-Warrior is the longest-reigning Endurance Champion. When the cycle finalizes, the Chrono-Warrior receives 8% of the Cycle Reserve in ETH and one Cosmic Signature NFT.',
+        answer: `The participant who held the Endurance Champion position for the longest consecutive interval. Analogous to the Endurance Champion being the longest-reigning recent gesture maker, the Chrono-Warrior is the longest-reigning Endurance Champion. When the cycle finalizes, the Chrono-Warrior receives ${protocolFacts.chronoWarriorEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.specialAllocationCst.toLocaleString()} CST, and one Cosmic Signature NFT.`,
         hashAnchor: 'chrono-warrior',
       },
       {

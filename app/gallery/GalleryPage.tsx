@@ -206,9 +206,9 @@ const GalleryPage = () => {
           </div>
           <p className="type-body-md text-muted-foreground">
             Each Cosmic Signature NFT is a unique piece of generative art derived from an on-chain
-            seed via three-body-problem physics simulations. Up to twelve new NFTs are imprinted
-            every cycle &mdash; one for the Final Gesture and eleven for Stellar Selection
-            recipients.
+            seed via three-body-problem physics simulations. In a typical cycle, 24 new NFTs are
+            imprinted: four role NFTs, ten participant Stellar Selection NFTs, and ten Anchored-NFT
+            Stellar Selection NFTs for RandomWalk NFT anchor-holders.
           </p>
         </div>
         <div className="relative min-h-[220px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.10] bg-black/30">

@@ -28,9 +28,9 @@ const rewards = [
     Icon: ImageIcon,
     title: 'Cosmic Signature NFT Chance',
     description:
-      'Ten participants receive a unique Cosmic Signature NFT via Stellar Selection each cycle.',
+      'Ten participants receive 1,000 CST and a unique Cosmic Signature NFT via Stellar Selection each cycle.',
     tooltip:
-      'Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders receive a Cosmic Signature NFT each cycle.',
+      'Ten Stellar Selection recipients plus ten Random Walk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT each cycle.',
     accent: 'from-amber-400/20 to-orange-500/20',
     iconColor: 'text-amber-400',
   },

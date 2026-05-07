@@ -28,7 +28,8 @@ interface AllocationCardData {
   name: string;
   tooltip: string;
   amounts: string[];
-  recipients: string;
+  recipients?: string;
+  recipientLabel?: string;
   faqLink?: string;
   featured?: boolean;
 }
@@ -75,15 +76,16 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       icon: <ImageIcon className="h-5 w-5" />,
       name: 'NFT Stellar Selection',
       tooltip:
-        'Participants are selected at random from the cycle entries to receive Cosmic Signature NFTs.',
-      amounts: ['1 Cosmic Signature NFT each'],
+        'Participants are selected at random from the cycle entries to receive Recognition CST and Cosmic Signature NFTs.',
+      amounts: ['1,000 CST each', '1 Cosmic Signature NFT each'],
       recipients: `${data?.NumRaffleNFTWinnersBidding}`,
     },
     {
       icon: <Layers className="h-5 w-5" />,
       name: 'RandomWalk Anchor-holder',
-      tooltip: 'Anchor-holders of RandomWalk NFTs may receive Cosmic Signature NFTs.',
-      amounts: ['1 Cosmic Signature NFT each'],
+      tooltip:
+        'Anchor-holders of RandomWalk NFTs may receive Recognition CST and Cosmic Signature NFTs.',
+      amounts: ['1,000 CST each', '1 Cosmic Signature NFT each'],
       recipients: `${data?.NumRaffleNFTWinnersStakingRWalk}`,
     },
     {
@@ -91,7 +93,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       name: 'Cosmic Signature Anchor',
       tooltip: 'Anchor-holders of Cosmic Signature NFTs share the per-cycle Anchor Distribution.',
       amounts: [`${(data?.StakingAmountEth ?? 0).toFixed(4)} ETH`],
-      recipients: '1',
+      recipientLabel: 'Proportional · all anchor-holders',
     },
     {
       icon: <Swords className="h-5 w-5" />,
@@ -100,6 +102,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
         'The participant who held the Endurance Champion position for the longest consecutive interval receives a percentage of the Cycle Reserve and a Cosmic Signature NFT.',
       amounts: [
         `${(((data?.CosmicGameBalanceEth ?? 0) * (data?.ChronoWarriorPercentage ?? 0)) / 100).toFixed(4)} ETH`,
+        '1,000 CST',
         '1 Cosmic Signature NFT',
       ],
       recipients: '1',
@@ -196,7 +199,8 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                 </div>
                 <div className="mt-2.5 flex items-center gap-1.5">
                   <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                    {allocation.recipients} recipient{allocation.recipients === '1' ? '' : 's'}
+                    {allocation.recipientLabel ??
+                      `${allocation.recipients} recipient${allocation.recipients === '1' ? '' : 's'}`}
                   </span>
                 </div>
               </div>

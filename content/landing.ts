@@ -21,6 +21,8 @@
  * "earnings", "income".
  */
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { APP_ORIGIN } from '@/lib/hostRouting';
 
 export const landingContent = {
@@ -160,7 +162,7 @@ export const landingContent = {
       {
         percent: '8%',
         title: 'Chrono-Warrior Allocation',
-        body: 'To the participant whose Endurance Window lasted longest across the cycle. Includes 1,000 CST and one Cosmic Signature NFT.',
+        body: `To the participant who held the Endurance Champion position for the longest consecutive interval. Includes ${protocolFacts.specialAllocationCst.toLocaleString()} CST and one Cosmic Signature NFT.`,
         tone: 'rose',
       },
       {
@@ -184,13 +186,13 @@ export const landingContent = {
       {
         percent: '10 NFTs',
         title: 'NFT Stellar Selection \u2014 Participants',
-        body: 'Ten Cosmic Signature NFTs imprinted to randomly selected participants from the cycle.',
+        body: `Ten randomly selected participants each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and one Cosmic Signature NFT.`,
         tone: 'default',
       },
       {
         percent: '10 NFTs',
         title: 'Anchored-NFT Stellar Selection',
-        body: 'Ten Cosmic Signature NFTs imprinted to randomly selected anchor-holders of Random Walk NFTs.',
+        body: `Ten randomly selected Random Walk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and one Cosmic Signature NFT.`,
         tone: 'default',
       },
       {
@@ -211,7 +213,7 @@ export const landingContent = {
   anchoring: {
     eyebrow: 'Anchoring',
     heading: 'Anchor Cosmic Signature NFTs to the protocol.',
-    body: 'Anchored Cosmic Signature NFTs receive a proportional share of the 6% Anchor Distribution each cycle. Release the anchor whenever you like. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection.',
+    body: `Anchored Cosmic Signature NFTs receive a proportional share of the ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution each cycle. Release the anchor whenever you like. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection, where selected anchor-holders receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT.`,
     bullets: [
       'Per-cycle ETH distribution for anchor-holders',
       'Release anchors at any time',

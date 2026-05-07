@@ -60,6 +60,7 @@ The NFT artwork is derived from the three-body problem in physics — simulating
 - **6%** — Anchor Distribution for Cosmic Signature NFT anchor-holders
 - **7%** — Public Goods Allocation, currently forwarded to Protocol Guild
 - **~50%** — Compounding Cycle Reserve that carries forward into the next cycle
+- **3,000 CST** — Outreach Reserve imprinted for ecosystem contributors
 
 ### Per-Gesture Imprints
 
@@ -69,13 +70,16 @@ The NFT artwork is derived from the three-body problem in physics — simulating
 
 ### NFTs Imprinted Per Cycle
 
-In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted:
+In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted. Each NFT allocation is paired with 1,000 CST, for 24,000 CST attached to NFT allocations:
+
 - 1 for the Signature Allocation recipient
 - 1 for the Final CST Gesture recipient
 - 1 for the Endurance Champion
 - 1 for the Chrono-Warrior
 - 10 for NFT Stellar Selection recipients
 - 10 for RandomWalk NFT anchor-holders selected through Anchored-NFT Stellar Selection
+
+Together with the 3,000 CST Outreach Reserve, typical per-cycle CST imprints total 27,000 CST.
 
 ### Special Titles
 
@@ -160,7 +164,7 @@ Q: What do I receive for each gesture?
 A: Each gesture imprints 100 CST (Cosmic Signature Tokens), records one Stellar Selection entry for end-of-cycle selections, and contributes to Endurance Champion and Chrono-Warrior timing.
 
 Q: How does Stellar Selection work?
-A: Each gesture records one Stellar Selection entry. At finalization, three ETH Stellar Selection recipients share 4% of the Cycle Reserve, ten NFT Stellar Selection recipients receive Cosmic Signature NFTs, and ten RandomWalk NFT anchor-holders receive Cosmic Signature NFTs through Anchored-NFT Stellar Selection.
+A: Each gesture records one Stellar Selection entry. At finalization, three ETH Stellar Selection recipients share 4% of the Cycle Reserve, ten NFT Stellar Selection recipients each receive 1,000 CST and a Cosmic Signature NFT, and ten RandomWalk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT through Anchored-NFT Stellar Selection.
 
 Q: How does anchoring work?
 A: Cosmic Signature NFT anchor-holders share the 6% Anchor Distribution each cycle, proportional to the number of NFTs anchored. RandomWalk NFT anchor-holders are eligible for Anchored-NFT Stellar Selection.

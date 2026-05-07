@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { FileText, AlertTriangle, Scale, Shield, Users, Coins } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { Badge } from '@/components/ui/badge';
@@ -71,7 +73,51 @@ const sections = [
     content: [
       {
         subtitle: 'Allocation Distribution',
-        text: 'Allocations are distributed automatically according to the smart contract rules. The current allocation structure includes the Signature Allocation (25% ETH + 1,000 Recognition CST + Cosmic Signature NFT), Endurance Champion (1,000 Recognition CST + Cosmic Signature NFT), Final CST Gesture (1,000 Recognition CST + Cosmic Signature NFT), Chrono-Warrior (8% ETH + Cosmic Signature NFT), ETH Stellar Selection (4% ETH) and NFT Stellar Selection (20 Cosmic Signature NFTs), Anchor Distribution (6% ETH), and Public Goods (7% ETH to Protocol Guild).',
+        text: `Allocations are distributed automatically according to the smart contract rules. In a typical cycle, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs and ${protocolFacts.typicalCstImprintsPerCycle.toLocaleString()} CST are imprinted across the allocation tracks below.`,
+      },
+      {
+        subtitle: 'Signature Allocation',
+        text: `The participant who made the Final Gesture may retrieve ${protocolFacts.mainEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST, one Cosmic Signature NFT, and attached tokens from the cycle, if any.`,
+      },
+      {
+        subtitle: 'Chrono-Warrior',
+        text: `The participant who held the Endurance Champion position for the longest consecutive interval receives ${protocolFacts.chronoWarriorEthPercentage}% ETH, ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST, and one Cosmic Signature NFT.`,
+      },
+      {
+        subtitle: 'Endurance Champion',
+        text: `The participant with the longest uninterrupted most-recent-gesture interval receives ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST and one Cosmic Signature NFT.`,
+      },
+      {
+        subtitle: 'Final CST Gesture',
+        text: `The participant who made the last CST gesture of the cycle receives ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST and one Cosmic Signature NFT.`,
+      },
+      {
+        subtitle: 'ETH Stellar Selection',
+        text: `${protocolFacts.ethStellarSelectionRecipients} selected participants share ${protocolFacts.stellarSelectionEthPercentage}% ETH from the Cycle Reserve.`,
+      },
+      {
+        subtitle: 'NFT Stellar Selection',
+        text: `${protocolFacts.nftStellarSelectionRecipients} selected participants each receive ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST and one Cosmic Signature NFT.`,
+      },
+      {
+        subtitle: 'Anchored-NFT Stellar Selection',
+        text: `${protocolFacts.anchoredRwlkNftSelectionRecipients} selected RandomWalk NFT anchor-holders each receive ${protocolFacts.specialAllocationCst.toLocaleString()} Recognition CST and one Cosmic Signature NFT.`,
+      },
+      {
+        subtitle: 'Anchor Distribution',
+        text: `${protocolFacts.anchorDistributionPercentage}% ETH is distributed proportionally across all anchored Cosmic Signature NFTs.`,
+      },
+      {
+        subtitle: 'Public Goods',
+        text: `${protocolFacts.publicGoodsPercentage}% ETH is forwarded to Protocol Guild, the current Public Goods Beneficiary.`,
+      },
+      {
+        subtitle: 'Compounding Cycle Reserve',
+        text: `Approximately ${protocolFacts.compoundingReservePercentage}% of the Cycle Reserve rolls forward into the next Performance Cycle.`,
+      },
+      {
+        subtitle: 'Outreach Reserve',
+        text: `${protocolFacts.outreachReserveCst.toLocaleString()} CST per cycle is imprinted for outreach distributions and ecosystem contributors.`,
       },
       {
         subtitle: 'Retrieving Allocations',
@@ -198,9 +244,9 @@ export default function TermsPage() {
               <p className="leading-relaxed">
                 All content on Cosmic Signature, including but not limited to text, graphics, logos,
                 and software, is the property of Cosmic Signature or its licensors and is protected
-                by copyright and other intellectual property laws. NFTs awarded through the game
-                grant you ownership of the specific token, but not the underlying intellectual
-                property unless explicitly stated.
+                by copyright and other intellectual property laws. NFTs received through the
+                protocol grant you ownership of the specific token, but not the underlying
+                intellectual property unless explicitly stated.
               </p>
             </div>
 

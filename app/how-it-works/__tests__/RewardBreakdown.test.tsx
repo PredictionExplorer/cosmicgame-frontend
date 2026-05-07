@@ -63,7 +63,9 @@ describe('RewardBreakdown', () => {
       screen.getByText(/Every gesture imprints 100 Cosmic Signature Tokens/),
     ).toBeInTheDocument();
     expect(screen.getByText(/records an entry in Stellar Selection/)).toBeInTheDocument();
-    expect(screen.getByText(/receive a unique Cosmic Signature NFT/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/receive 1,000 CST and a unique Cosmic Signature NFT/),
+    ).toBeInTheDocument();
     expect(screen.getByText(/25% of the Cycle Reserve/)).toBeInTheDocument();
   });
 

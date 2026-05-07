@@ -28,7 +28,7 @@ const tips = [
     description:
       'Each gesture records one Stellar Selection entry. More gestures means higher Selection frequency.',
     tooltip:
-      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders receive Cosmic Signature NFTs.',
+      'Three ETH Stellar Selection recipients share 4% of the Cycle Reserve. Ten participant NFT recipients and ten Random Walk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT.',
   },
   {
     Icon: Shield,

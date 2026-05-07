@@ -113,7 +113,7 @@ export const SpecialAllocationRecipients = () => {
       icon: <Swords className="h-5 w-5" />,
       title: 'Chrono-Warrior',
       tooltip:
-        'The participant who held the Endurance Champion position for the longest consecutive interval. Receives a percentage of the Cycle Reserve and a Cosmic Signature NFT.',
+        'The participant who held the Endurance Champion position for the longest consecutive interval. Receives 8% of the Cycle Reserve, 1,000 CST, and a Cosmic Signature NFT.',
       address: specialWinners?.EnduranceChampionAddress,
       extra: hasEndurance && (specialWinners?.EnduranceChampionDuration ?? 0) > 0 && (
         <div className="mt-3">

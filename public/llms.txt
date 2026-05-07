@@ -25,13 +25,14 @@ Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants
 - Every gesture increases the Gesture Cost by ~1% and extends the Cycle Finalization Time by about an hour
 - The participant who made the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation (25% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT)
 - Every gesture imprints 100 CST tokens and a Stellar Selection entry
-- In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted
+- In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted and paired with 24,000 CST
 - Three ETH Stellar Selection recipients share 4% of the Cycle Reserve
-- Ten NFT Stellar Selection recipients and ten RandomWalk NFT anchor-holders receive Cosmic Signature NFTs
+- Ten NFT Stellar Selection recipients and ten RandomWalk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT
 - The Chrono-Warrior receives 8% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT
 - The Endurance Champion and Final CST Gesture recipient each receive 1,000 CST and 1 Cosmic Signature NFT
 - Anchor Distributions route 6% of the Cycle Reserve to Cosmic Signature NFT anchor-holders
 - 7% of each Cycle Reserve is forwarded to Protocol Guild (public goods)
+- Outreach Reserve imprints 3,000 CST per cycle, bringing typical per-cycle CST imprints to 27,000 CST
 - Participants can make gestures with ETH or CST tokens (CST uses its own Calibration Window)
 - RandomWalkNFT holders can attach an unused token to an ETH gesture for a 50% Gesture-Cost reduction; each RandomWalkNFT can be used once for this discount
 - RandomWalkNFTs can also be anchored for Anchored-NFT Stellar Selection eligibility

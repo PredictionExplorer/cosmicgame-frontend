@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { usePublicClient } from 'wagmi';
 import { useRouter } from 'next/navigation';
+import { zeroAddress } from 'viem';
 
 import api from '@/services/api';
 import { isAxiosError } from '@/services/api/client';
@@ -77,6 +78,10 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
     setIsClaiming(true);
     try {
       const roundBefore = (await cosmicGameContract.read.roundNum?.()) as bigint;
+      const lastCstBidderAddress =
+        ((await cosmicGameContract.read.lastCstBidderAddress?.()) as string | undefined) ??
+        zeroAddress;
+      const hasFinalCstGesture = lastCstBidderAddress !== zeroAddress;
 
       let gasLimit = GAS_FLOOR;
       try {
@@ -101,7 +106,7 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
       /** Completed cycle is the on-chain round before advance — matches `api.get_round_info`. */
       const claimedRound = Number(roundBefore);
 
-      let count = (data?.NumRaffleNFTWinnersBidding ?? 0) + 3;
+      let count = (data?.NumRaffleNFTWinnersBidding ?? 0) + 3 + (hasFinalCstGesture ? 1 : 0);
       if ((data?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0) > 0) {
         count += data?.NumRaffleNFTWinnersStakingRWalk ?? 0;
       }

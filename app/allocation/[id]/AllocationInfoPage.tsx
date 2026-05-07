@@ -682,12 +682,16 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           <RecipientCard
             icon={<Swords className="h-5 w-5" />}
             title="Chrono-Warrior"
-            tooltip="The participant who accumulated the longest total time as Endurance Champion. Retrieves a share of the Cycle Reserve plus a Cosmic Signature NFT."
+            tooltip="The participant who held the Endurance Champion position for the longest consecutive interval. Retrieves ETH, Recognition CST, and a Cosmic Signature NFT."
             address={allocationInfo.ChronoWarriorAddr}
             rewards={[
               {
                 label: 'ETH Allocation',
                 value: `${allocationInfo.ChronoWarriorAmountEth.toFixed(4)} ETH`,
+              },
+              {
+                label: 'Recognition CST',
+                value: `${(allocationInfo.ChronoWarriorCstAmountEth ?? 0).toFixed(4)} CST`,
               },
             ]}
             tokenId={allocationInfo.ChronoWarriorNftTokenId}

@@ -67,7 +67,8 @@ describe('Allocation Breakdown', () => {
     expect(screen.getByText('5 recipients')).toBeInTheDocument();
     expect(screen.getByText('3 recipients')).toBeInTheDocument();
     expect(screen.getByText('2 recipients')).toBeInTheDocument();
-    expect(screen.getAllByText('1 recipient')).toHaveLength(5);
+    expect(screen.getAllByText('1 recipient')).toHaveLength(4);
+    expect(screen.getByText('Proportional · all anchor-holders')).toBeInTheDocument();
   });
 
   it('calculates Chrono-Warrior ETH correctly', () => {
@@ -79,7 +80,16 @@ describe('Allocation Breakdown', () => {
   it('shows fixed Recognition CST amount for Endurance Champion and Final CST Gesture', () => {
     render(<Prize data={mockData} />);
     const cstAmounts = screen.getAllByText('1,000 CST');
-    expect(cstAmounts.length).toBe(3);
+    expect(cstAmounts.length).toBe(4);
+    expect(screen.getAllByText('1,000 CST each')).toHaveLength(2);
+  });
+
+  it('shows Chrono-Warrior ETH, CST, and NFT pieces', () => {
+    render(<Prize data={mockData} />);
+    expect(screen.getByText('Chrono-Warrior Allocation')).toBeInTheDocument();
+    expect(screen.getByText('0.5000 ETH')).toBeInTheDocument();
+    expect(screen.getAllByText('1,000 CST')).toHaveLength(4);
+    expect(screen.getAllByText('1 Cosmic Signature NFT')).toHaveLength(4);
   });
 
   it('renders with null data without crashing', () => {
