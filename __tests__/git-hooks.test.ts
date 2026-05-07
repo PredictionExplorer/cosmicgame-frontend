@@ -39,15 +39,15 @@ describe('git hooks', () => {
     });
 
     it('runs the test suite', () => {
-      expect(content).toContain('yarn test');
+      expect(content).toContain('npm run test:coverage');
     });
 
     it('runs type-check before tests (fail-fast)', () => {
-      expect(content).toMatch(/type-check\s*&&\s*yarn test/);
+      expect(content).toMatch(/type-check\s*&&\s*npm run audit:high\s*&&\s*npm run test:coverage/);
     });
 
-    it('is not a bare yarn test without type-checking', () => {
-      expect(content).not.toBe('yarn test');
+    it('is not a bare test command without type-checking', () => {
+      expect(content).not.toMatch(/^(yarn|npm run) test$/);
     });
 
     it('is a single-line script', () => {
@@ -55,15 +55,19 @@ describe('git hooks', () => {
     });
 
     it('runs tests with coverage collection', () => {
-      expect(content).toContain('--coverage');
+      expect(content).toContain('npm run test:coverage');
     });
 
-    it('uses --coverage flag on the test command', () => {
-      expect(content).toMatch(/yarn test\s+--coverage/);
+    it('uses the coverage test script', () => {
+      expect(content).toMatch(/npm run test:coverage/);
     });
 
-    it('does not run bare yarn test without coverage', () => {
-      expect(content).not.toMatch(/yarn test\s*$/);
+    it('does not run bare test without coverage', () => {
+      expect(content).not.toMatch(/(?:yarn|npm run) test\s*$/);
+    });
+
+    it('runs the dependency audit gate before coverage', () => {
+      expect(content).toMatch(/audit:high\s*&&\s*npm run test:coverage/);
     });
   });
 
@@ -208,7 +212,7 @@ describe('git hooks', () => {
 
     it('pre-push hook and jest config both reference coverage', () => {
       const hookContent = readHook('pre-push');
-      expect(hookContent).toContain('--coverage');
+      expect(hookContent).toContain('npm run test:coverage');
       expect(jestConfig).toContain('coverageThreshold');
     });
   });

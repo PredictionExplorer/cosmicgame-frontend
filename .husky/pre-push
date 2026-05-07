@@ -1,1 +1,1 @@
-yarn lexicon:scan && yarn lint && yarn type-check && yarn test --coverage && yarn build
+npm run lexicon:scan && npm run lint && npm run type-check && npm run audit:high && npm run test:coverage && npm run build
