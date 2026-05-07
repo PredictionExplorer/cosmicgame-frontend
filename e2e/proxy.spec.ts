@@ -15,7 +15,24 @@ import { expect, request, test } from '@playwright/test';
  */
 
 const BASE = 'http://localhost:3000';
-const DEV_APP_ORIGIN = 'http://app.cosmicsignature.local:3000';
+
+/**
+ * The proxy middleware bakes the redirect target into the build via
+ * `lib/hostRouting.ts`'s `APP_ORIGIN`, which switches on `NODE_ENV` at compile
+ * time so static landing-page links can be pre-rendered. As a result, the
+ * Location header is `http://app.cosmicsignature.local:3000` under `next dev`
+ * and `https://app.cosmicsignature.com` under `next start` (and CI). Both are
+ * acceptable; we just need to verify the redirect hits an app origin and
+ * preserves the path + query string. This mirrors the pattern in
+ * `e2e/landing.spec.ts`.
+ */
+const APP_ORIGIN_PREFIX_PATTERN =
+  /^https:\/\/app\.cosmicsignature\.com|^http:\/\/app\.cosmicsignature\.local:3000/;
+
+function expectedAppLocation(pathAndQuery: string): RegExp {
+  const escaped = pathAndQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`${APP_ORIGIN_PREFIX_PATTERN.source}${escaped}$`);
+}
 
 test.describe('proxy middleware', () => {
   test.describe('on landing host', () => {
@@ -36,7 +53,7 @@ test.describe('proxy middleware', () => {
       });
       const res = await ctx.get(`${BASE}/gallery`, { maxRedirects: 0 });
       expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toBe(`${DEV_APP_ORIGIN}/gallery`);
+      expect(res.headers()['location']).toMatch(expectedAppLocation('/gallery'));
       await ctx.dispose();
     });
 
@@ -47,7 +64,7 @@ test.describe('proxy middleware', () => {
 
       const res = await ctx.get(`${BASE}/current-cycle`, { maxRedirects: 0 });
       expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toBe(`${DEV_APP_ORIGIN}/current-cycle`);
+      expect(res.headers()['location']).toMatch(expectedAppLocation('/current-cycle'));
 
       await ctx.dispose();
     });
@@ -58,7 +75,7 @@ test.describe('proxy middleware', () => {
       });
       const res = await ctx.get(`${BASE}/gallery?round=5&sort=desc`, { maxRedirects: 0 });
       expect(res.status()).toBe(308);
-      expect(res.headers()['location']).toBe(`${DEV_APP_ORIGIN}/gallery?round=5&sort=desc`);
+      expect(res.headers()['location']).toMatch(expectedAppLocation('/gallery?round=5&sort=desc'));
       await ctx.dispose();
     });
 
