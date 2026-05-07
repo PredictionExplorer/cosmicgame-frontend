@@ -49,6 +49,31 @@ describe('ContractAddressCard', () => {
     expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
   });
 
+  it('opens the tooltip with the description on touch tap', async () => {
+    render(<ContractAddressCard {...defaultProps} />);
+    const trigger = screen.getByRole('button', { name: 'Show more information' });
+    const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'pointerType', { value: 'touch' });
+    fireEvent(trigger, event);
+    fireEvent.click(trigger);
+
+    const popper = await screen.findByRole('tooltip');
+    expect(popper).toHaveTextContent('The main game contract');
+  });
+
+  it('renders the open tooltip outside the card subtree (portaled out of the row)', async () => {
+    const { container } = render(<ContractAddressCard {...defaultProps} />);
+    const trigger = screen.getByRole('button', { name: 'Show more information' });
+    const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'pointerType', { value: 'touch' });
+    fireEvent(trigger, event);
+    fireEvent.click(trigger);
+
+    const popper = await screen.findByRole('tooltip');
+    expect(container.contains(popper)).toBe(false);
+    expect(document.body.contains(popper)).toBe(true);
+  });
+
   it('opens explorer link in new tab', () => {
     render(<ContractAddressCard {...defaultProps} />);
     const link = screen.getByLabelText('View Cosmic Game on block explorer');

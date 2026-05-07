@@ -1,4 +1,4 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { fireEvent, render, screen, checkA11y } from '@/test-utils';
 
 import { FundDistribution } from '../components/FundDistribution';
 
@@ -89,5 +89,71 @@ describe('FundDistribution', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(<FundDistribution {...defaultProps} />);
     await checkA11y(container);
+  });
+});
+
+describe('FundDistribution tooltips', () => {
+  function openTooltipNextTo(label: string): HTMLElement {
+    const labelNode = screen.getByText(label);
+    const row = labelNode.parentElement;
+    if (!row) {
+      throw new Error(`Could not find tooltip row for label "${label}"`);
+    }
+    const trigger = row.querySelector<HTMLElement>('button[aria-label="Show more information"]');
+    if (!trigger) {
+      throw new Error(`Could not find tooltip trigger next to label "${label}"`);
+    }
+    const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'pointerType', { value: 'touch' });
+    fireEvent(trigger, event);
+    fireEvent.click(trigger);
+    return trigger;
+  }
+
+  const SEGMENT_TOOLTIPS: Array<{ label: string; tooltip: string | RegExp }> = [
+    {
+      label: 'Signature Allocation',
+      tooltip: /participant who made the Final Gesture/,
+    },
+    {
+      label: 'Chrono-Warrior',
+      tooltip: /ETH allocation to the Chrono-Warrior/,
+    },
+    {
+      label: 'Stellar Selection',
+      tooltip: /Portion distributed to randomly selected participants/,
+    },
+    {
+      label: 'Anchor Distribution',
+      tooltip: /Distributions to anchor-holders proportional to their anchored token count/,
+    },
+    {
+      label: 'Public Goods',
+      tooltip: /Forwarded to the Public Goods Beneficiary/,
+    },
+  ];
+
+  it.each(SEGMENT_TOOLTIPS)(
+    'wires the "$label" segment to its expected tooltip copy',
+    async ({ label, tooltip }) => {
+      render(<FundDistribution {...defaultProps} />);
+      openTooltipNextTo(label);
+      const popper = await screen.findByRole('tooltip');
+      expect(popper.textContent ?? '').toMatch(tooltip);
+    },
+  );
+
+  it('exposes one tooltip trigger per segment plus one for the section title', () => {
+    render(<FundDistribution {...defaultProps} />);
+    const triggers = screen.getAllByRole('button', { name: 'Show more information' });
+    expect(triggers).toHaveLength(SEGMENT_TOOLTIPS.length + 1);
+  });
+
+  it('opens the tooltip popper outside the FundDistribution render subtree (portaled)', async () => {
+    const { container } = render(<FundDistribution {...defaultProps} />);
+    openTooltipNextTo('Signature Allocation');
+    const popper = await screen.findByRole('tooltip');
+    expect(container.contains(popper)).toBe(false);
+    expect(document.body.contains(popper)).toBe(true);
   });
 });

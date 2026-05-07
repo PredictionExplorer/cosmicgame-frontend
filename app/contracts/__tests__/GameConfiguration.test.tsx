@@ -1,4 +1,4 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { fireEvent, render, screen, checkA11y } from '@/test-utils';
 
 import { GameConfiguration } from '../components/GameConfiguration';
 
@@ -97,5 +97,84 @@ describe('GameConfiguration', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(<GameConfiguration {...defaultProps} />);
     await checkA11y(container);
+  });
+});
+
+describe('GameConfiguration tooltips', () => {
+  const STAT_TOOLTIPS: Array<{ label: string; tooltip: string | RegExp }> = [
+    {
+      label: 'Gesture-Cost Drift',
+      tooltip: /Each gesture increases the next Gesture Cost by this percentage/,
+    },
+    {
+      label: 'Time Increment',
+      tooltip: /Each gesture adds this much time to the Cycle Finalization Time/,
+    },
+    {
+      label: 'Participation CST per Gesture',
+      tooltip: /Cosmic Signature Tokens imprinted with each gesture/,
+    },
+    {
+      label: 'Finalization Timeout',
+      tooltip: /Time the Final Gesture participant has to finalize the cycle/,
+    },
+    {
+      label: 'Initial Time Increment',
+      tooltip: /The initial Cycle Finalization Time added when the first gesture is made/,
+    },
+    {
+      label: 'Max Message Length',
+      tooltip: /Maximum character length allowed in gesture messages/,
+    },
+  ];
+
+  function openTooltipNextTo(label: string): HTMLElement {
+    // The InfoTooltip renders an accessible button labelled "Show more
+    // information" right next to its label inside a flex row. Anchor the lookup
+    // on the label, then walk up to the row and find the trigger so we exercise
+    // the actual UX (label-tooltip pairing) rather than relying on order.
+    const labelNode = screen.getByText(label);
+    const row = labelNode.parentElement;
+    if (!row) {
+      throw new Error(`Could not find tooltip row for label "${label}"`);
+    }
+    const trigger = row.querySelector<HTMLElement>('button[aria-label="Show more information"]');
+    if (!trigger) {
+      throw new Error(`Could not find tooltip trigger next to label "${label}"`);
+    }
+    const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'pointerType', { value: 'touch' });
+    fireEvent(trigger, event);
+    fireEvent.click(trigger);
+    return trigger;
+  }
+
+  it.each(STAT_TOOLTIPS)(
+    'wires the "$label" card to its expected tooltip copy',
+    async ({ label, tooltip }) => {
+      render(<GameConfiguration {...defaultProps} />);
+      openTooltipNextTo(label);
+      const popper = await screen.findByRole('tooltip');
+      expect(popper.textContent ?? '').toMatch(tooltip);
+    },
+  );
+
+  it('exposes one accessible tooltip trigger per stat card', () => {
+    render(<GameConfiguration {...defaultProps} />);
+    const triggers = screen.getAllByRole('button', { name: 'Show more information' });
+    expect(triggers).toHaveLength(STAT_TOOLTIPS.length);
+  });
+
+  it('renders the open tooltip popper outside the StatCard render subtree (portaled)', async () => {
+    const { container } = render(<GameConfiguration {...defaultProps} />);
+    openTooltipNextTo('Initial Time Increment');
+    const popper = await screen.findByRole('tooltip');
+
+    // Portaling lifts the tooltip out of the StatCard's `overflow-hidden` and
+    // backdrop-filter stacking context, so the popper must NOT be a descendant
+    // of the rendered component subtree. It still has to be in the document so
+    // assistive tech can reach it.
+    expect(container.contains(popper)).toBe(false);
+    expect(document.body.contains(popper)).toBe(true);
   });
 });

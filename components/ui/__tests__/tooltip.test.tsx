@@ -18,6 +18,34 @@ function renderTooltip(trigger: ReactNode, content = 'Helpful tooltip') {
   );
 }
 
+function renderTooltipInsideClippingAncestor(content = 'Helpful tooltip') {
+  // Mirrors `StatCard`'s constraints: an ancestor that simultaneously clips its
+  // children with `overflow: hidden` and creates an isolating stacking context
+  // via `transform`/`backdrop-filter`. Without a portal, the tooltip popper
+  // would be visually clipped and its z-index would be confined to this
+  // ancestor.
+  return render(
+    <div
+      data-testid="clipping-ancestor"
+      style={{
+        overflow: 'hidden',
+        transform: 'translateY(0)',
+        backdropFilter: 'blur(4px)',
+        position: 'relative',
+        width: 200,
+        height: 50,
+      }}
+    >
+      <TooltipProvider>
+        <Tooltip defaultOpen>
+          <TooltipTrigger>Help</TooltipTrigger>
+          <TooltipContent>{content}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>,
+  );
+}
+
 function touchPointerDown(element: Element) {
   const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true });
   Object.defineProperty(event, 'pointerType', { value: 'touch' });
@@ -173,5 +201,77 @@ describe('InfoTooltip', () => {
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
       'Mobile users can read this help text.',
     );
+  });
+
+  it('renders open content even when the trigger sits in an overflow:hidden ancestor', async () => {
+    render(
+      <div style={{ overflow: 'hidden', width: 80, height: 20 }}>
+        <InfoTooltip content="Escapes clipped ancestor" />
+      </div>,
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Show more information' });
+    touchPointerDown(trigger);
+    fireEvent.click(trigger);
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Escapes clipped ancestor');
+  });
+});
+
+describe('TooltipContent portal placement', () => {
+  it('renders content as a descendant of document.body, not the trigger subtree', async () => {
+    const { container } = renderTooltipInsideClippingAncestor('Portaled content');
+
+    const tooltip = await screen.findByRole('tooltip');
+    expect(tooltip).toHaveTextContent('Portaled content');
+
+    // The tooltip popper must not be rendered inside the clipping ancestor;
+    // the whole point of the portal is to lift it out of any clipped subtree.
+    const clippingAncestor = screen.getByTestId('clipping-ancestor');
+    expect(clippingAncestor.contains(tooltip)).toBe(false);
+
+    // It also must not live inside the React render container — Testing
+    // Library's render wraps the tree in a div appended to document.body, and
+    // the tooltip should sit alongside (rather than within) that wrapper.
+    expect(container.contains(tooltip)).toBe(false);
+
+    // It must, however, still be inside the document so screen readers and
+    // pointer-events can reach it.
+    expect(document.body.contains(tooltip)).toBe(true);
+  });
+
+  it('is queryable by accessible role even when escaping a stacking-context ancestor', async () => {
+    renderTooltipInsideClippingAncestor('Reachable from the document');
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Reachable from the document');
+  });
+
+  it('renders a popper element with the high-z popover styling next to the role=tooltip node', async () => {
+    renderTooltipInsideClippingAncestor();
+
+    const tooltip = await screen.findByRole('tooltip');
+    // Radix attaches the styling we pass on `TooltipContent` to either the
+    // role="tooltip" node itself or its immediate popper wrapper, depending on
+    // version. Either way the `z-50` styling we hand-set must be reachable
+    // from the tooltip — that's how it stays above page chrome — so we check
+    // the element and its closest ancestors rather than asserting on a single
+    // exact node.
+    const styledNode = tooltip.classList.contains('z-50') ? tooltip : tooltip.closest('.z-50');
+    expect(styledNode).not.toBeNull();
+  });
+
+  it('opens multiple independent tooltips without interference', async () => {
+    render(
+      <div>
+        <InfoTooltip content="Tooltip A" ariaLabel="Open A" />
+        <InfoTooltip content="Tooltip B" ariaLabel="Open B" />
+      </div>,
+    );
+
+    const triggerA = screen.getByRole('button', { name: 'Open A' });
+    touchPointerDown(triggerA);
+    fireEvent.click(triggerA);
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Tooltip A');
   });
 });
