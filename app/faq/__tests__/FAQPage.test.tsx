@@ -45,10 +45,7 @@ Object.assign(navigator, {
 
 beforeEach(() => {
   window.scrollTo = jest.fn();
-  Object.defineProperty(window, 'location', {
-    writable: true,
-    value: { ...window.location, hash: '' },
-  });
+  window.history.replaceState(null, '', '/faq');
 });
 
 describe('FAQPage', () => {
