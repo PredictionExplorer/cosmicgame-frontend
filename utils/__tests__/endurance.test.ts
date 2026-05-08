@@ -165,7 +165,7 @@ describe('getEnduranceChampions', () => {
     });
   });
 
-  it('keeps chrono warrior deterministic for an ongoing last-bidder champion', () => {
+  it('keeps chrono warrior deterministic for an ongoing latest-participant champion', () => {
     const gestures = [
       { TimeStamp: 1_000, BidderAddr: '0xA' },
       { TimeStamp: 1_010, BidderAddr: '0xB' },

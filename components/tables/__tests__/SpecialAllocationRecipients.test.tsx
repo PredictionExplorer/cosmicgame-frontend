@@ -27,10 +27,10 @@ const baseChampions: ChampionsState = {
   lastCst: {
     address: lastCstAddress,
   },
-  lastBidder: {
+  latestGesture: {
     address: enduranceAddress,
     holdDuration: 3600,
-    lastBidTime: 1000,
+    latestGestureTime: 1000,
   },
   raw: null,
 };

@@ -15,10 +15,10 @@ export interface ChampionRoleState {
   isLive: boolean;
 }
 
-export interface LastBidderState {
+export interface LatestGestureState {
   address: string | null;
   holdDuration: number;
-  lastBidTime: number | null;
+  latestGestureTime: number | null;
 }
 
 export interface ChampionsState {
@@ -29,7 +29,7 @@ export interface ChampionsState {
   lastCst: {
     address: string | null;
   };
-  lastBidder: LastBidderState;
+  latestGesture: LatestGestureState;
   raw: SpecialRecipients | null | undefined;
 }
 
@@ -70,16 +70,18 @@ export function deriveChampionsState({
   const nowSec = Math.floor(nowMs / 1000);
   const enduranceAddress = cleanAddress(data?.EnduranceChampionAddress);
   const chronoAddress = cleanAddress(data?.ChronoWarriorAddress);
-  const lastBidderAddress = cleanAddress(data?.LastBidderAddress);
+  const latestGestureAddress = cleanAddress(data?.LastBidderAddress);
   const lastCstAddress = cleanAddress(data?.LastCstBidderAddress);
-  const lastBidTime = nonNegativeSeconds(data?.LastBidderLastBidTime);
+  const latestGestureTime = nonNegativeSeconds(data?.LastBidderLastBidTime);
 
   const enduranceLockedDuration = nonNegativeSeconds(data?.EnduranceChampionDuration);
   const chronoLockedDuration = nonNegativeSeconds(data?.ChronoWarriorDuration);
   const holdDuration =
-    lastBidTime > 0 && nowSec >= lastBidTime ? Math.max(0, nowSec - lastBidTime) : 0;
+    latestGestureTime > 0 && nowSec >= latestGestureTime
+      ? Math.max(0, nowSec - latestGestureTime)
+      : 0;
 
-  const enduranceIsLive = sameAddress(enduranceAddress, lastBidderAddress);
+  const enduranceIsLive = sameAddress(enduranceAddress, latestGestureAddress);
   const enduranceDuration = enduranceIsLive
     ? Math.max(enduranceLockedDuration, holdDuration)
     : enduranceLockedDuration;
@@ -109,10 +111,10 @@ export function deriveChampionsState({
     lastCst: {
       address: lastCstAddress,
     },
-    lastBidder: {
-      address: lastBidderAddress,
+    latestGesture: {
+      address: latestGestureAddress,
       holdDuration,
-      lastBidTime: lastBidTime > 0 ? lastBidTime : null,
+      latestGestureTime: latestGestureTime > 0 ? latestGestureTime : null,
     },
     raw: data,
   };

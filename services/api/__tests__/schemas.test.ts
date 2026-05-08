@@ -259,7 +259,7 @@ describe('SpecialRecipientsSchema', () => {
     LastCstBidderAddress: '0xC83aa25FA5829c789DF2AC5976b4A26d49c648FF',
   };
 
-  it('accepts the live current-special-winners payload', () => {
+  it('accepts the live current-special-recipients payload', () => {
     const parsed = SpecialRecipientsSchema.parse(livePayload);
     expect(parsed.ChronoWarriorAddress).toBe(livePayload.ChronoWarriorAddress);
     expect(parsed.LastBidderLastBidTime).toBe(1778207543);

@@ -96,10 +96,12 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     page,
     request,
   }) => {
+    // lexicon-allow-start: production backend route is sealed
     const response = await request.get(
       'https://nfts.cosmicsignature.com/api/cosmicgame/bid/current_special_winners',
     );
-    test.skip(!response.ok(), 'Production current special winners endpoint unavailable');
+    // lexicon-allow-end
+    test.skip(!response.ok(), 'Production current special recipients endpoint unavailable');
 
     const data = (await response.json()) as {
       ChronoWarriorAddress?: string;

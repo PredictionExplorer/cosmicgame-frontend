@@ -125,7 +125,7 @@ describe('EnduranceChampionsTable', () => {
     expect(userLink).toBeInTheDocument();
   });
 
-  it('marks the row matching the latest bidder as live', () => {
+  it('marks the row matching the latest participant as live', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
     render(
       <EnduranceChampionsTable
@@ -149,12 +149,12 @@ describe('EnduranceChampionsTable', () => {
     expect(screen.getByText('Live')).toBeInTheDocument();
   });
 
-  it('does not mark rows live without a latest bidder address', () => {
+  it('does not mark rows live without a latest participant address', () => {
     render(<EnduranceChampionsTable championList={[createChampion()]} />);
     expect(screen.queryByText('Live')).not.toBeInTheDocument();
   });
 
-  it('marks only the matching latest-bidder row as live in a multi-row table', () => {
+  it('marks only the matching latest-participant row as live in a multi-row table', () => {
     const liveAddr = '0x' + 'a'.repeat(40);
     const otherAddr = '0x' + 'b'.repeat(40);
 

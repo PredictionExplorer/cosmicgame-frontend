@@ -48,7 +48,7 @@ describe('deriveChampionsState', () => {
     expect(state.lastCst.address).toBeNull();
   });
 
-  it('grows endurance only when the endurance champion is the last bidder', () => {
+  it('grows endurance only when the endurance champion is the latest participant', () => {
     const liveState = deriveChampionsState({ data: baseSnapshot, nowMs: 1_100_000 });
     expect(liveState.endurance.isLive).toBe(true);
     expect(liveState.endurance.duration).toBe(200);
@@ -119,7 +119,7 @@ describe('deriveChampionsState', () => {
     expect(state.endurance.isLive).toBe(false);
     expect(state.chrono.address).toBeNull();
     expect(state.chrono.isLive).toBe(false);
-    expect(state.lastBidder.address).toBeNull();
+    expect(state.latestGesture.address).toBeNull();
     expect(state.lastCst.address).toBeNull();
   });
 
@@ -134,7 +134,7 @@ describe('deriveChampionsState', () => {
     });
 
     expect(state.endurance.isLive).toBe(true);
-    expect(state.lastBidder.holdDuration).toBe(200);
+    expect(state.latestGesture.holdDuration).toBe(200);
     expect(state.endurance.duration).toBe(500);
   });
 
@@ -147,7 +147,7 @@ describe('deriveChampionsState', () => {
       nowMs: 1_100_000,
     });
 
-    expect(state.lastBidder.holdDuration).toBe(0);
+    expect(state.latestGesture.holdDuration).toBe(0);
     expect(state.endurance.duration).toBe(baseSnapshot.EnduranceChampionDuration);
   });
 
