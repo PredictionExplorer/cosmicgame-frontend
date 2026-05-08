@@ -1,7 +1,17 @@
 'use client';
 
 import { type FC } from 'react';
-import { Trophy, Shuffle, ImageIcon, Layers, Swords, Crown, Coins, Users } from 'lucide-react';
+import {
+  Trophy,
+  Shuffle,
+  ImageIcon,
+  Layers,
+  Swords,
+  Crown,
+  Coins,
+  Users,
+  Sprout,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
@@ -16,6 +26,7 @@ interface AllocationData {
   StakingAmountEth?: number;
   CosmicGameBalanceEth?: number;
   ChronoWarriorPercentage?: number;
+  CharityPercentage?: number;
   [key: string]: unknown;
 }
 
@@ -32,6 +43,7 @@ interface AllocationCardData {
   recipientLabel?: string;
   faqLink?: string;
   featured?: boolean;
+  impact?: boolean;
 }
 
 const cardVariants = {
@@ -61,6 +73,17 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
       faqLink: '/faq#main-allocation',
       // lexicon-allow-end
       featured: true,
+    },
+    {
+      icon: <Sprout className="h-5 w-5" />,
+      name: 'Public Goods',
+      tooltip: `${data?.CharityPercentage ?? 0}% of every Cycle Reserve is forwarded to Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.`,
+      amounts: [
+        `${(((data?.CosmicGameBalanceEth ?? 0) * (data?.CharityPercentage ?? 0)) / 100).toFixed(4)} ETH`,
+      ],
+      recipientLabel: 'Protocol Guild',
+      faqLink: '/faq',
+      impact: true,
     },
     {
       icon: <Shuffle className="h-5 w-5" />,
@@ -143,18 +166,22 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
             animate="visible"
             className={cn(
               'group relative rounded-xl border p-4 transition-all duration-300 hover:bg-white/[0.04]',
-              allocation.featured
-                ? 'gradient-border-card gradient-border-card-accent bg-white/[0.03] sm:col-span-2 lg:col-span-2'
-                : 'border-white/[0.06] bg-white/[0.02]',
+              allocation.impact
+                ? 'border-[oklch(77.1%_0.163_161)]/30 bg-[rgb(var(--impact-green-rgb)/0.04)] glow-impact'
+                : allocation.featured
+                  ? 'gradient-border-card gradient-border-card-accent bg-white/[0.03] sm:col-span-2 lg:col-span-2'
+                  : 'border-white/[0.06] bg-white/[0.02]',
             )}
           >
             <div className="flex items-start gap-3">
               <div
                 className={cn(
                   'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors',
-                  allocation.featured
-                    ? 'bg-gradient-to-br from-primary/20 to-accent/20 text-primary'
-                    : 'bg-white/[0.06] text-muted-foreground group-hover:text-primary',
+                  allocation.impact
+                    ? 'bg-[rgb(var(--impact-green-rgb)/0.12)] text-[rgb(var(--impact-green-rgb))]'
+                    : allocation.featured
+                      ? 'bg-gradient-to-br from-primary/20 to-accent/20 text-primary'
+                      : 'bg-white/[0.06] text-muted-foreground group-hover:text-primary',
                 )}
               >
                 {allocation.icon}
@@ -164,7 +191,7 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                   <span
                     className={cn(
                       'text-sm font-semibold',
-                      allocation.featured ? 'text-white' : 'text-white/90',
+                      allocation.featured || allocation.impact ? 'text-white' : 'text-white/90',
                     )}
                   >
                     {allocation.faqLink ? (
@@ -188,9 +215,11 @@ const Allocation: FC<AllocationProps> = ({ data }) => {
                       key={amount}
                       className={cn(
                         'text-sm',
-                        allocation.featured
-                          ? 'font-medium bg-gradient-to-r from-[#35C9FF] to-[#AC56FF] bg-clip-text text-transparent'
-                          : 'text-muted-foreground',
+                        allocation.impact
+                          ? 'font-medium text-[rgb(var(--impact-green-rgb))]'
+                          : allocation.featured
+                            ? 'font-medium bg-gradient-to-r from-[#35C9FF] to-[#AC56FF] bg-clip-text text-transparent'
+                            : 'text-muted-foreground',
                       )}
                     >
                       {amount}

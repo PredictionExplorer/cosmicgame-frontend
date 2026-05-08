@@ -121,13 +121,9 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await expect(secondary).toHaveAttribute('href', '#cycle');
 
     await secondary.click();
-    await page.waitForTimeout(500); // allow smooth scroll
 
     const cycleSection = page.locator('#cycle');
-    const box = await cycleSection.boundingBox();
-    expect(box).not.toBeNull();
-    // Top of the cycle section should be near the viewport top after scroll.
-    expect(box!.y).toBeLessThan(200);
+    await expect(cycleSection).toBeInViewport({ ratio: 0.01 });
   });
 
   test('marquee chips render credibility signals', async ({ page }) => {

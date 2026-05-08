@@ -22,6 +22,7 @@ import { reportError } from '@/utils/errors';
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import { GestureStatus } from '@/components/common/GestureStatus';
 import { GestureForm } from '@/components/home/GestureForm';
+import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
 import Allocation from '@/components/common/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
@@ -405,6 +406,19 @@ const HomePage = () => {
             className="print-motion-visible"
           >
             <Allocation data={data} />
+          </motion.div>
+        )}
+
+        {/* ===== PUBLIC GOODS IMPACT ===== */}
+        {data && (
+          <motion.div
+            variants={sectionFade}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.45 }}
+            className="print-motion-visible"
+          >
+            <PublicGoodsImpactCard data={data} />
           </motion.div>
         )}
 

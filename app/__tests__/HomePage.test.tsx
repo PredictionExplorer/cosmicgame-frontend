@@ -161,6 +161,10 @@ jest.mock('../../components/tables/SpecialAllocationRecipients', () => ({
 }));
 
 jest.mock('../../utils', () => ({
+  formatEthValue: (value: number) => {
+    if (!value) return '0 ETH';
+    return value < 10 ? `${value.toFixed(4)} ETH` : `${value.toFixed(2)} ETH`;
+  },
   getAssetsUrl: (path: string) => `https://assets.example.com/${path}`,
   getEnduranceChampions: () => [],
 }));
@@ -183,9 +187,13 @@ const makeDashboardData = (overrides = {}) => ({
   LastBidderAddr: '0xBidder',
   GestureCostEth: 0.01,
   PrizeAmountEth: 1.5,
+  CosmicGameBalanceEth: 10,
+  CharityPercentage: 7,
+  CharityBalanceEth: '0.5',
+  SumVoluntaryDonationsEth: '0.8',
   PrizeClaimTs: Math.floor(Date.now() / 1000) + 3600,
   TsRoundStart: Math.floor(Date.now() / 1000) - 3600,
-  MainStats: { NumCSTokenMints: 100 },
+  MainStats: { NumCSTokenMints: 100, SumCosmicGameDonationsEth: 1.2, SumWithdrawals: 0.4 },
   CurRoundStats: { TotalDonatedNFTs: 3, TotalDonatedAmountEth: 0.5 },
   ...overrides,
 });
@@ -233,6 +241,16 @@ describe('HomePage', () => {
     });
     render(<HomePage />);
     expect(screen.getByText('Allocation Breakdown')).toBeInTheDocument();
+  });
+
+  it('renders Public Goods impact card when dashboard data is loaded', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    render(<HomePage />);
+    expect(screen.getByText("Funding Ethereum's core contributors.")).toBeInTheDocument();
+    expect(screen.getAllByText('0.7000 ETH').length).toBeGreaterThan(0);
   });
 
   it('renders link to full cycle details', () => {

@@ -37,6 +37,17 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(signatureAllocation).toBeVisible();
   });
 
+  test('shows public-goods impact card', async ({ page }) => {
+    const impactCardHeading = page.getByRole('heading', {
+      name: "Funding Ethereum's core contributors.",
+    });
+    await ensureVisible(impactCardHeading);
+    await expect(impactCardHeading).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /View public-goods contributions/i }),
+    ).toHaveAttribute('href', '/public-goods-contributions-cg');
+  });
+
   test('shows latest participant card', async ({ page }) => {
     const latestParticipant = page.locator('text=/Latest Participant/i').first();
     await ensureVisible(latestParticipant);

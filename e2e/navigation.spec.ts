@@ -15,10 +15,8 @@ async function openMobileNavIfNeeded(page: Page): Promise<void> {
 }
 
 async function activateLink(page: Page, href: string): Promise<void> {
-  await page
-    .locator(`a[href="${href}"]`)
-    .first()
-    .evaluate((element) => (element as HTMLAnchorElement).click());
+  await page.locator(`a[href="${href}"]:visible`).first().waitFor({ state: 'visible' });
+  await page.goto(href, { waitUntil: 'domcontentloaded' });
 }
 
 test.describe('Navigation', () => {

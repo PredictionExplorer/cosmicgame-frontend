@@ -13,6 +13,7 @@ const mockData = {
   StakingAmountEth: 0.75,
   CosmicGameBalanceEth: 10,
   ChronoWarriorPercentage: 5,
+  CharityPercentage: 7,
 };
 
 describe('Allocation Breakdown', () => {
@@ -42,7 +43,7 @@ describe('Allocation Breakdown', () => {
   it('sets target="_blank" on all FAQ links', () => {
     render(<Prize data={mockData} />);
     const links = screen.getAllByRole('link');
-    expect(links.length).toBe(3);
+    expect(links.length).toBe(4);
     for (const link of links) {
       expect(link).toHaveAttribute('target', '_blank');
     }
@@ -60,6 +61,14 @@ describe('Allocation Breakdown', () => {
     render(<Prize data={mockData} />);
     expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
     expect(screen.getByText('0.7500 ETH')).toBeInTheDocument();
+  });
+
+  it('renders Public Goods with current-cycle amount and Protocol Guild label', () => {
+    render(<Prize data={mockData} />);
+    const publicGoods = screen.getByText('Public Goods');
+    expect(publicGoods.closest('a')).toHaveAttribute('href', '/faq');
+    expect(screen.getByText('0.7000 ETH')).toBeInTheDocument();
+    expect(screen.getByText('Protocol Guild')).toBeInTheDocument();
   });
 
   it('displays Stellar Selection recipient counts', () => {
