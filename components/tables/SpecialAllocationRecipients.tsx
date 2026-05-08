@@ -38,7 +38,7 @@ function StatusChip({ isLive }: { isLive: boolean }) {
       className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
     >
       <Lock className="h-3 w-3" />
-      Locked record
+      Record standing
     </span>
   );
 }
@@ -173,24 +173,20 @@ function LatestGestureProgress({
     );
   }
 
-  if (latestGesture.isEnduranceChampion) {
-    return (
-      <div
-        data-testid="latest-participant-status"
-        className="mt-3 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-3 py-2 text-xs text-emerald-300"
-      >
-        Current Endurance Champion
-      </div>
-    );
-  }
-
   const progress = Math.floor(latestGesture.progressToEnduranceChampion);
+  const isComplete = latestGesture.isExtendingEnduranceRecord;
+  const remainingCopy = latestGesture.isCurrentEnduranceChampion
+    ? `Needs ${formatSeconds(latestGesture.secondsUntilEnduranceChampion)} more to extend record`
+    : `Needs ${formatSeconds(latestGesture.secondsUntilEnduranceChampion)} more to become Endurance Champion`;
 
   return (
     <div className="mt-3 rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2">
       <div className="flex items-center justify-between gap-3">
-        <span data-testid="latest-participant-remaining" className="text-xs text-muted-foreground">
-          Needs {formatSeconds(latestGesture.secondsUntilEnduranceChampion)} more
+        <span
+          data-testid="latest-participant-remaining"
+          className={cn('text-xs', isComplete ? 'text-emerald-300' : 'text-muted-foreground')}
+        >
+          {isComplete ? 'Extending Endurance Champion record' : remainingCopy}
         </span>
         <span className="font-mono text-xs tabular-nums text-primary">{progress}%</span>
       </div>

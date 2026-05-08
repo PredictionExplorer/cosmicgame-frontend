@@ -19,7 +19,8 @@ export interface LatestGestureState {
   address: string | null;
   holdDuration: number;
   latestGestureTime: number | null;
-  isEnduranceChampion: boolean;
+  isCurrentEnduranceChampion: boolean;
+  isExtendingEnduranceRecord: boolean;
   durationToBeat: number;
   secondsUntilEnduranceChampion: number;
   progressToEnduranceChampion: number;
@@ -90,21 +91,20 @@ export function deriveChampionsState({
       ? Math.max(0, nowSec - latestGestureTime)
       : 0;
 
-  const enduranceIsLive = sameAddress(enduranceAddress, latestGestureAddress);
-  const enduranceDuration = enduranceIsLive
-    ? Math.max(enduranceLockedDuration, holdDuration)
-    : enduranceLockedDuration;
-  const latestIsEnduranceChampion = sameAddress(latestGestureAddress, enduranceAddress);
+  const latestMatchesEndurance = sameAddress(latestGestureAddress, enduranceAddress);
+  const enduranceIsLive = latestMatchesEndurance && holdDuration > enduranceLockedDuration;
+  const enduranceDuration = enduranceIsLive ? holdDuration : enduranceLockedDuration;
   const hasLatestGesture = !!latestGestureAddress;
-  const durationToBeat =
-    hasLatestGesture && !latestIsEnduranceChampion && enduranceAddress ? enduranceDuration + 1 : 0;
+  const hasEnduranceRecord = !!enduranceAddress;
+  const durationToBeat = hasLatestGesture && hasEnduranceRecord ? enduranceLockedDuration + 1 : 0;
   const secondsUntilEnduranceChampion =
     durationToBeat > 0 ? Math.max(0, durationToBeat - holdDuration) : 0;
-  const progressToEnduranceChampion = latestIsEnduranceChampion
-    ? 100
-    : durationToBeat > 0
-      ? clampProgress((holdDuration / durationToBeat) * 100)
-      : 0;
+  const progressToEnduranceChampion =
+    durationToBeat > 0 && holdDuration >= durationToBeat
+      ? 100
+      : durationToBeat > 0
+        ? clampProgress((holdDuration / durationToBeat) * 100)
+        : 0;
 
   const chronoIsLive = sameAddress(chronoAddress, enduranceAddress);
   const chronoExtension =
@@ -135,7 +135,8 @@ export function deriveChampionsState({
       address: latestGestureAddress,
       holdDuration,
       latestGestureTime: latestGestureTime > 0 ? latestGestureTime : null,
-      isEnduranceChampion: latestIsEnduranceChampion,
+      isCurrentEnduranceChampion: latestMatchesEndurance,
+      isExtendingEnduranceRecord: enduranceIsLive,
       durationToBeat,
       secondsUntilEnduranceChampion,
       progressToEnduranceChampion,

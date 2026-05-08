@@ -31,8 +31,9 @@ const baseChampions: ChampionsState = {
     address: enduranceAddress,
     holdDuration: 3600,
     latestGestureTime: 1000,
-    isEnduranceChampion: true,
-    durationToBeat: 0,
+    isCurrentEnduranceChampion: true,
+    isExtendingEnduranceRecord: true,
+    durationToBeat: 3001,
     secondsUntilEnduranceChampion: 0,
     progressToEnduranceChampion: 100,
   },
@@ -73,17 +74,17 @@ describe('SpecialAllocationRecipients', () => {
     expect(links.some((l) => l.getAttribute('href') === `/user/${lastCstAddress}`)).toBe(true);
   });
 
-  it('renders the Latest Participant card with current hold and achieved state', () => {
+  it('renders the Latest Participant card with current hold and extending state', () => {
     render(<SpecialAllocationRecipients />);
 
     const latestCard = screen.getByTestId('special-allocation-card-latest-participant');
     expect(latestCard).toHaveTextContent(enduranceAddress);
     expect(latestCard).toHaveTextContent('Current hold');
     expect(latestCard).toHaveTextContent('1h');
-    expect(latestCard).toHaveTextContent('Current Endurance Champion');
+    expect(latestCard).toHaveTextContent('Extending Endurance Champion record');
   });
 
-  it('shows remaining time and accessible progress when latest participant is still challenging', () => {
+  it('shows remaining time and accessible progress when a different latest participant is still challenging', () => {
     const latestAddress = '0x4444444444444444444444444444444444444444';
     mockUseChampions.mockReturnValue({
       ...baseChampions,
@@ -96,7 +97,8 @@ describe('SpecialAllocationRecipients', () => {
         address: latestAddress,
         holdDuration: 60,
         latestGestureTime: 1040,
-        isEnduranceChampion: false,
+        isCurrentEnduranceChampion: false,
+        isExtendingEnduranceRecord: false,
         durationToBeat: 101,
         secondsUntilEnduranceChampion: 41,
         progressToEnduranceChampion: 59.4,
@@ -107,13 +109,48 @@ describe('SpecialAllocationRecipients', () => {
 
     const latestCard = screen.getByTestId('special-allocation-card-latest-participant');
     expect(latestCard).toHaveTextContent(latestAddress);
-    expect(screen.getByTestId('latest-participant-remaining')).toHaveTextContent('Needs 41s more');
+    expect(screen.getByTestId('latest-participant-remaining')).toHaveTextContent(
+      'Needs 41s more to become Endurance Champion',
+    );
 
     const progress = screen.getByRole('progressbar', {
       name: 'Progress toward Endurance Champion',
     });
     expect(progress).toHaveAttribute('aria-valuenow', '59');
     expect(progress).toHaveAttribute('aria-valuemax', '100');
+  });
+
+  it('shows a progress bar without live-growing the endurance card when the same participant is under threshold', () => {
+    mockUseChampions.mockReturnValue({
+      ...baseChampions,
+      endurance: {
+        ...baseChampions.endurance,
+        isLive: false,
+        duration: 500,
+      },
+      latestGesture: {
+        ...baseChampions.latestGesture,
+        holdDuration: 200,
+        isCurrentEnduranceChampion: true,
+        isExtendingEnduranceRecord: false,
+        durationToBeat: 501,
+        secondsUntilEnduranceChampion: 301,
+        progressToEnduranceChampion: 39.9,
+      },
+    });
+
+    render(<SpecialAllocationRecipients />);
+
+    const enduranceCard = screen.getByTestId('special-allocation-card-endurance-champion');
+    expect(enduranceCard).not.toHaveTextContent('Live - growing');
+    expect(enduranceCard).toHaveTextContent('Record standing');
+
+    expect(screen.getByTestId('latest-participant-remaining')).toHaveTextContent(
+      'Needs 5m 1s more to extend record',
+    );
+    expect(
+      screen.getByRole('progressbar', { name: 'Progress toward Endurance Champion' }),
+    ).toHaveAttribute('aria-valuenow', '39');
   });
 
   it('uses the Chrono-Warrior address rather than the Endurance Champion address', () => {
@@ -128,7 +165,7 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients />);
 
     expect(screen.getAllByTestId('champion-live-chip').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByTestId('champion-locked-chip')).toHaveTextContent('Locked record');
+    expect(screen.getByTestId('champion-locked-chip')).toHaveTextContent('Record standing');
   });
 
   it('renders distinct duration labels and formatted durations for both timed roles', () => {
@@ -148,7 +185,7 @@ describe('SpecialAllocationRecipients', () => {
 
     const cstCard = screen.getByTestId('special-allocation-card-final-cst-gesture');
     expect(cstCard).not.toHaveTextContent('Live - growing');
-    expect(cstCard).not.toHaveTextContent('Locked record');
+    expect(cstCard).not.toHaveTextContent('Record standing');
   });
 
   it('renders empty role copy when addresses are unavailable', () => {
@@ -160,7 +197,8 @@ describe('SpecialAllocationRecipients', () => {
         address: null,
         holdDuration: 0,
         latestGestureTime: null,
-        isEnduranceChampion: false,
+        isCurrentEnduranceChampion: false,
+        isExtendingEnduranceRecord: false,
         durationToBeat: 0,
         secondsUntilEnduranceChampion: 0,
         progressToEnduranceChampion: 0,
@@ -184,7 +222,8 @@ describe('SpecialAllocationRecipients', () => {
       endurance: { ...baseChampions.endurance, address: null, duration: 0, isLive: false },
       latestGesture: {
         ...baseChampions.latestGesture,
-        isEnduranceChampion: false,
+        isCurrentEnduranceChampion: false,
+        isExtendingEnduranceRecord: false,
         durationToBeat: 0,
         secondsUntilEnduranceChampion: 0,
         progressToEnduranceChampion: 0,
