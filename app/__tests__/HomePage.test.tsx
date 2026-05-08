@@ -146,8 +146,17 @@ jest.mock('../../components/nft/NFTImage', () => ({
 }));
 
 jest.mock('../../components/tables/SpecialAllocationRecipients', () => ({
-  SpecialAllocationRecipients: () => (
-    <div data-testid="special-allocation-recipients">SpecialAllocationRecipients</div>
+  SpecialAllocationRecipients: (props: {
+    currentAccount?: string | null;
+    latestMessage?: string;
+  }) => (
+    <div
+      data-testid="special-allocation-recipients"
+      data-account={props.currentAccount ?? ''}
+      data-message={props.latestMessage ?? ''}
+    >
+      SpecialAllocationRecipients
+    </div>
   ),
 }));
 
@@ -163,6 +172,7 @@ jest.mock('../../utils/errors', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount = '0xUser';
+  mockUseGestureListByCycle.mockReturnValue({ data: undefined });
 });
 
 /* ── helpers ────────────────────────────────────────────────────── */
@@ -275,6 +285,26 @@ describe('HomePage', () => {
     });
     render(<HomePage />);
     expect(screen.getByTestId('special-allocation-recipients')).toBeInTheDocument();
+  });
+
+  it('passes account and latest message to SpecialAllocationRecipients', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ TsRoundStart: 1700000000 }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [{ BidderAddr: '0xBidder', TimeStamp: 1700000001, Message: 'hello cosmos' }],
+    });
+
+    render(<HomePage />);
+    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
+      'data-account',
+      '0xUser',
+    );
+    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
+      'data-message',
+      'hello cosmos',
+    );
   });
 
   it('renders gesture button text', () => {

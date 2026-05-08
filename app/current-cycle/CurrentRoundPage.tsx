@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Countdown from 'react-countdown';
 import { zeroAddress } from 'viem';
@@ -14,8 +14,6 @@ import {
   Coins,
   ImageIcon,
   Radio,
-  User,
-  MessageSquare,
   Zap,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -24,8 +22,6 @@ import {
   getEnduranceChampions,
   formatEthValue,
   convertTimestampToDateTime,
-  calculateTimeDiff,
-  shortenHex,
   getStableClientTargetTime,
 } from '@/utils';
 
@@ -96,23 +92,6 @@ const CurrentRoundPage = () => {
     const champions = getEnduranceChampions(bidListData, 0, Math.floor(nowMs / 1000));
     return [...champions].sort((a, b) => b.chronoWarrior - a.chronoWarrior);
   }, [bidListData, nowMs]);
-
-  const [lastBidderElapsed, setLastBidderElapsed] = useState('');
-
-  const offset = useMemo(() => {
-    if (currentTimeRaw == null) return 0;
-    return currentTimeRaw * 1000 - mountTime;
-  }, [currentTimeRaw, mountTime]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (curGestureList.length) {
-        const lastGestureTime = curGestureList[0]!.TimeStamp;
-        setLastBidderElapsed(calculateTimeDiff(lastGestureTime - offset / 1000));
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [curGestureList, offset]);
 
   const [curPage, setCurPage] = useState(1);
   const [donatedTokensTab, setDonatedTokensTab] = useState(0);
@@ -222,46 +201,10 @@ const CurrentRoundPage = () => {
           </div>
         )}
 
-        {/* Last participant card */}
-        {hasLastParticipant && (
-          <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-accent/10">
-                <User className="h-4 w-4 text-accent" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Last Participant &mdash; Current Leader
-                  </p>
-                  <InfoTooltip content="The participant who made the Final Gesture when the countdown reaches zero may retrieve the Signature Allocation: ETH, 1,000 CST, and a Cosmic Signature NFT." />
-                </div>
-                <a
-                  href={`/user/${data.LastBidderAddr}`}
-                  className="mt-0.5 text-sm font-mono text-white hover:text-primary transition-colors truncate block"
-                >
-                  {shortenHex(data.LastBidderAddr, 8)}
-                </a>
-              </div>
-              {lastBidderElapsed !== '' && (
-                <span className="text-xs text-muted-foreground whitespace-nowrap">
-                  {lastBidderElapsed} ago
-                </span>
-              )}
-            </div>
-            {!!(curGestureList.length && curGestureList[0]?.Message !== '') && (
-              <div className="mt-3 flex items-start gap-2 rounded-lg bg-white/[0.03] p-3">
-                <MessageSquare className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/50 shrink-0" />
-                <p className="break-words text-sm text-amber-300/90">
-                  &ldquo;{curGestureList[0]?.Message}&rdquo;
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Special Allocation Leaders */}
-        {hasLastParticipant && <SpecialAllocationRecipients />}
+        {hasLastParticipant && (
+          <SpecialAllocationRecipients latestMessage={curGestureList[0]?.Message ?? ''} />
+        )}
 
         {/* CTA Button */}
         <div className="flex justify-center">

@@ -75,13 +75,20 @@ describe('SpecialAllocationRecipients', () => {
   });
 
   it('renders the Latest Participant card with current hold and extending state', () => {
-    render(<SpecialAllocationRecipients />);
+    render(
+      <SpecialAllocationRecipients
+        currentAccount={enduranceAddress}
+        latestMessage="Signal received"
+      />,
+    );
 
     const latestCard = screen.getByTestId('special-allocation-card-latest-participant');
     expect(latestCard).toHaveTextContent(enduranceAddress);
+    expect(latestCard).toHaveTextContent('You');
     expect(latestCard).toHaveTextContent('Current hold');
     expect(latestCard).toHaveTextContent('1h');
     expect(latestCard).toHaveTextContent('Extending Endurance Champion record');
+    expect(screen.getByTestId('latest-participant-message')).toHaveTextContent('Signal received');
   });
 
   it('shows remaining time and accessible progress when a different latest participant is still challenging', () => {

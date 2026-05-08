@@ -1,19 +1,18 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { formatEther, zeroAddress } from 'viem';
 import Countdown from 'react-countdown';
-import { Trophy, Coins, User, MessageSquare, Zap, TrendingUp } from 'lucide-react';
+import { Trophy, Coins, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import { calculateTimeDiff, convertTimestampToDateTime } from '@/utils';
+import { convertTimestampToDateTime } from '@/utils';
 
-import { cn } from '@/lib/utils';
 import { StatCard } from '@/components/ui/stat-card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
-import { useCurrentTime, useUserInfo, useCTPrice } from '@/hooks/useApiQuery';
+import { useUserInfo, useCTPrice } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 
 import Counter from './Counter';
@@ -55,20 +54,11 @@ export const GestureStatus = ({
   ethGestureInfo,
   allocationTime,
 }: GestureStatusProps) => {
-  const [_roundStarted, setRoundStarted] = useState('');
-  const [lastBidderElapsed, setLastBidderElapsed] = useState('');
-
   const { account } = useActiveWeb3React();
-  const { data: currentTimeRaw } = useCurrentTime();
   const { data: userInfoRaw } = useUserInfo(account);
   const { data: ctPriceRaw } = useCTPrice();
 
   const now = useNow(1000);
-
-  const offset = useMemo(() => {
-    if (currentTimeRaw == null) return 0;
-    return currentTimeRaw * 1000 - now;
-  }, [currentTimeRaw, now]);
 
   const winProbability = useMemo(() => {
     if (!account || !data || !curGestureList.length) return null;
@@ -101,19 +91,6 @@ export const GestureStatus = ({
       SecondsElapsed: parseInt(String(ctPriceRaw.SecondsElapsed)),
     };
   }, [ctPriceRaw]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (data != null) {
-        setRoundStarted(calculateTimeDiff(data.TsRoundStart - offset / 1000));
-      }
-      if (curGestureList.length) {
-        const lastGestureTime = curGestureList[0]!.TimeStamp;
-        setLastBidderElapsed(calculateTimeDiff(lastGestureTime - offset / 1000));
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [data, curGestureList, offset]);
 
   if (loading) return null;
 
@@ -214,70 +191,6 @@ export const GestureStatus = ({
               </>
             )}
           </div>
-
-          {/* Last bidder */}
-          {data.LastBidderAddr !== zeroAddress && (
-            <motion.div
-              custom={4}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              className={cn(
-                'rounded-xl border p-4 transition-colors',
-                data.LastBidderAddr === account
-                  ? 'border-emerald-500/30 bg-emerald-500/[0.04]'
-                  : 'border-white/[0.06] bg-white/[0.03]',
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={cn(
-                    'flex h-9 w-9 items-center justify-center rounded-full',
-                    data.LastBidderAddr === account ? 'bg-emerald-500/15' : 'bg-accent/10',
-                  )}
-                >
-                  <User
-                    className={cn(
-                      'h-4 w-4',
-                      data.LastBidderAddr === account ? 'text-emerald-400' : 'text-accent',
-                    )}
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Last Participant
-                    </p>
-                    {data.LastBidderAddr === account && (
-                      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
-                        You
-                      </span>
-                    )}
-                    <InfoTooltip content="The participant who made the Final Gesture when the countdown reaches zero may finalize the cycle and retrieve the Signature Allocation: ETH, 1,000 CST, and a Cosmic Signature NFT." />
-                  </div>
-                  <a
-                    href={`/user/${data.LastBidderAddr}`}
-                    className="mt-0.5 block break-all text-sm font-mono text-white transition-colors hover:text-primary"
-                  >
-                    {data.LastBidderAddr}
-                  </a>
-                </div>
-                {lastBidderElapsed !== '' && (
-                  <span className="text-xs text-muted-foreground whitespace-nowrap">
-                    {lastBidderElapsed} ago
-                  </span>
-                )}
-              </div>
-              {!!(curGestureList.length && curGestureList[0]?.Message !== '') && (
-                <div className="mt-3 flex items-start gap-2 rounded-lg bg-white/[0.03] p-3">
-                  <MessageSquare className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/50 shrink-0" />
-                  <p className="break-words text-sm text-amber-300/90">
-                    &ldquo;{curGestureList[0]?.Message}&rdquo;
-                  </p>
-                </div>
-              )}
-            </motion.div>
-          )}
 
           {/* Win probability */}
           {curGestureList.length > 0 && winProbability && data && (

@@ -43,13 +43,16 @@ jest.mock('../../../components/home/RoundInfoSection', () => ({
 }));
 
 jest.mock('../../../components/tables/SpecialAllocationRecipients', () => ({
-  SpecialAllocationRecipients: () => (
-    <div data-testid="special-allocation-recipients">Special Allocations</div>
+  SpecialAllocationRecipients: (props: { latestMessage?: string }) => (
+    <div data-testid="special-allocation-recipients" data-message={props.latestMessage ?? ''}>
+      Special Allocations
+    </div>
   ),
 }));
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockUseGestureListByCycle.mockReturnValue({ data: [] });
   mockCountdownProps.length = 0;
 });
 
@@ -189,11 +192,10 @@ describe('CurrentRoundPage', () => {
     expect(screen.queryByText('Cycle Closed')).not.toBeInTheDocument();
   });
 
-  it('renders last participant address', () => {
+  it('does not render duplicate standalone latest participant card', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
-    expect(screen.getByText('Last Participant — Current Leader')).toBeInTheDocument();
-    expect(screen.getByText(/0xAbCdEf12/)).toBeInTheDocument();
+    expect(screen.queryByText('Last Participant — Current Leader')).not.toBeInTheDocument();
   });
 
   it('does not show last participant when address is zero', () => {
@@ -206,6 +208,18 @@ describe('CurrentRoundPage', () => {
     setupLoaded();
     render(<CurrentRoundPage />);
     expect(screen.getByTestId('special-allocation-recipients')).toBeInTheDocument();
+  });
+
+  it('passes the latest gesture message to SpecialAllocationRecipients', () => {
+    setupLoaded();
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [{ BidderAddr: baseDashboardData.LastBidderAddr, TimeStamp: NOW_SEC, Message: 'gm' }],
+    });
+    render(<CurrentRoundPage />);
+    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
+      'data-message',
+      'gm',
+    );
   });
 
   it('does not render SpecialAllocationRecipients when no last participant', () => {

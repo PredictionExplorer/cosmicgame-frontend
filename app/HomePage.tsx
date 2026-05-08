@@ -281,7 +281,10 @@ const HomePage = () => {
           <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3 print:grid-cols-1">
             {/* min-w-0 + print col fixes: home PDF often uses narrow width; col-span-2 can collapse badly in Skia */}
             <div className="min-w-0 lg:col-span-2 print:col-auto">
-              <SpecialAllocationRecipients />
+              <SpecialAllocationRecipients
+                currentAccount={account}
+                latestMessage={curGestureList[0]?.Message ?? ''}
+              />
             </div>
             <div className="hidden min-w-0 lg:block print:hidden">
               <Link

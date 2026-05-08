@@ -37,10 +37,10 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(signatureAllocation).toBeVisible();
   });
 
-  test('shows last gesture address', async ({ page }) => {
-    const lastParticipant = page.locator('text=/Last Participant/i').first();
-    await ensureVisible(lastParticipant);
-    await expect(lastParticipant).toBeVisible();
+  test('shows latest participant card', async ({ page }) => {
+    const latestParticipant = page.locator('text=/Latest Participant/i').first();
+    await ensureVisible(latestParticipant);
+    await expect(latestParticipant).toBeVisible();
   });
 
   test('shows special allocation recipients section', async ({ page }) => {

@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Coins, Crown, Lock, Swords, User, Zap } from 'lucide-react';
+import { Coins, Crown, Lock, MessageSquare, Swords, User, Zap } from 'lucide-react';
 
 import { formatSeconds } from '@/utils';
 
@@ -21,6 +21,12 @@ interface RoleCardConfig {
   emptyText: string;
   accent?: 'primary' | 'emerald' | 'muted';
   extra?: ReactNode;
+  badge?: ReactNode;
+}
+
+interface SpecialAllocationRecipientsProps {
+  currentAccount?: string | null;
+  latestMessage?: string | null;
 }
 
 function StatusChip({ isLive }: { isLive: boolean }) {
@@ -76,6 +82,7 @@ function RoleCard({
   emptyText,
   accent = 'muted',
   extra,
+  badge,
 }: RoleCardConfig) {
   return (
     <div
@@ -120,6 +127,7 @@ function RoleCard({
               <InfoTooltip content={tooltip} />
             </span>
             {isLive !== undefined && <StatusChip isLive={isLive} />}
+            {badge}
           </div>
 
           {address ? (
@@ -210,6 +218,22 @@ function LatestGestureProgress({
   );
 }
 
+function LatestParticipantMessage({ message }: { message: string }) {
+  return (
+    <div
+      data-testid="latest-participant-message"
+      className="mt-3 flex items-start gap-2 rounded-lg bg-white/[0.03] p-3"
+    >
+      <MessageSquare className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/50 shrink-0" />
+      <p className="break-words text-sm text-amber-300/90">&ldquo;{message}&rdquo;</p>
+    </div>
+  );
+}
+
+function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
+  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
+}
+
 /**
  * Minimal static markup only for @media print / Save as PDF. Chrome’s Skia pipeline often drops
  * the interactive layout on the home page (`/`) even when on-screen CSS looks fine; this block is
@@ -273,8 +297,13 @@ function SpecialAllocationLeadersPrintFallback({ state }: { state: ChampionsStat
   );
 }
 
-export const SpecialAllocationRecipients = () => {
+export const SpecialAllocationRecipients = ({
+  currentAccount = null,
+  latestMessage = null,
+}: SpecialAllocationRecipientsProps = {}) => {
   const champions = useChampions();
+  const isCurrentAccountLatest = sameAddress(currentAccount, champions.latestGesture.address);
+  const cleanLatestMessage = latestMessage?.trim() ?? '';
 
   const cards: RoleCardConfig[] = [
     {
@@ -289,11 +318,19 @@ export const SpecialAllocationRecipients = () => {
       isLive: champions.latestGesture.address ? true : undefined,
       emptyText: 'No latest gesture yet',
       accent: champions.latestGesture.address ? 'emerald' : 'muted',
+      badge: isCurrentAccountLatest ? (
+        <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-400">
+          You
+        </span>
+      ) : null,
       extra: champions.latestGesture.address ? (
-        <LatestGestureProgress
-          latestGesture={champions.latestGesture}
-          hasEnduranceRecord={!!champions.endurance.address}
-        />
+        <>
+          <LatestGestureProgress
+            latestGesture={champions.latestGesture}
+            hasEnduranceRecord={!!champions.endurance.address}
+          />
+          {cleanLatestMessage && <LatestParticipantMessage message={cleanLatestMessage} />}
+        </>
       ) : null,
     },
     {

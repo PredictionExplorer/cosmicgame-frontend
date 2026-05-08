@@ -80,7 +80,7 @@ describe('GestureStatus', () => {
     expect(screen.getByText(/Calibration Window/)).toBeInTheDocument();
   });
 
-  it('displays Signature Allocation and last participant info', () => {
+  it('displays Signature Allocation and gesture cost info', () => {
     render(
       <GestureStatus
         {...baseProps}
@@ -90,9 +90,9 @@ describe('GestureStatus', () => {
       />,
     );
     expect(screen.getByText('10.5000 ETH')).toBeInTheDocument();
-    expect(screen.getByText(/0xBidder/)).toBeInTheDocument();
     expect(screen.getByText('0.01000 ETH')).toBeInTheDocument();
     expect(screen.getByText('0.00500 ETH')).toBeInTheDocument();
+    expect(screen.queryByText('Last Participant')).not.toBeInTheDocument();
   });
 
   it('uses smooth countdown props for cycle finalization countdown', () => {
