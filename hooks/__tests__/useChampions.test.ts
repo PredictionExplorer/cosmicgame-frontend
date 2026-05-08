@@ -46,6 +46,9 @@ describe('deriveChampionsState', () => {
     expect(state.endurance.duration).toBe(0);
     expect(state.chrono.address).toBeNull();
     expect(state.lastCst.address).toBeNull();
+    expect(state.latestGesture.durationToBeat).toBe(0);
+    expect(state.latestGesture.secondsUntilEnduranceChampion).toBe(0);
+    expect(state.latestGesture.progressToEnduranceChampion).toBe(0);
   });
 
   it('grows endurance only when the endurance champion is the latest participant', () => {
@@ -62,6 +65,52 @@ describe('deriveChampionsState', () => {
     });
     expect(lockedState.endurance.isLive).toBe(false);
     expect(lockedState.endurance.duration).toBe(100);
+  });
+
+  it('computes latest participant progress toward the endurance record', () => {
+    const state = deriveChampionsState({
+      data: {
+        ...baseSnapshot,
+        LastBidderAddress: '0x3333333333333333333333333333333333333333',
+        LastBidderLastBidTime: 1_040,
+      },
+      nowMs: 1_100_000,
+    });
+
+    expect(state.latestGesture.isEnduranceChampion).toBe(false);
+    expect(state.latestGesture.holdDuration).toBe(60);
+    expect(state.latestGesture.durationToBeat).toBe(101);
+    expect(state.latestGesture.secondsUntilEnduranceChampion).toBe(41);
+    expect(state.latestGesture.progressToEnduranceChampion).toBeCloseTo(59.4, 1);
+  });
+
+  it('models the strict endurance threshold as current record plus one second', () => {
+    const tiedState = deriveChampionsState({
+      data: {
+        ...baseSnapshot,
+        LastBidderAddress: '0x3333333333333333333333333333333333333333',
+        LastBidderLastBidTime: 1_000,
+      },
+      nowMs: 1_100_000,
+    });
+
+    expect(tiedState.latestGesture.holdDuration).toBe(100);
+    expect(tiedState.latestGesture.durationToBeat).toBe(101);
+    expect(tiedState.latestGesture.secondsUntilEnduranceChampion).toBe(1);
+    expect(tiedState.latestGesture.progressToEnduranceChampion).toBeLessThan(100);
+
+    const thresholdState = deriveChampionsState({
+      data: {
+        ...baseSnapshot,
+        LastBidderAddress: '0x3333333333333333333333333333333333333333',
+        LastBidderLastBidTime: 999,
+      },
+      nowMs: 1_100_000,
+    });
+
+    expect(thresholdState.latestGesture.holdDuration).toBe(101);
+    expect(thresholdState.latestGesture.secondsUntilEnduranceChampion).toBe(0);
+    expect(thresholdState.latestGesture.progressToEnduranceChampion).toBe(99.9);
   });
 
   it('extends chrono only while chrono warrior and endurance champion match', () => {
@@ -120,6 +169,9 @@ describe('deriveChampionsState', () => {
     expect(state.chrono.address).toBeNull();
     expect(state.chrono.isLive).toBe(false);
     expect(state.latestGesture.address).toBeNull();
+    expect(state.latestGesture.durationToBeat).toBe(0);
+    expect(state.latestGesture.secondsUntilEnduranceChampion).toBe(0);
+    expect(state.latestGesture.progressToEnduranceChampion).toBe(0);
     expect(state.lastCst.address).toBeNull();
   });
 
@@ -136,12 +188,16 @@ describe('deriveChampionsState', () => {
     expect(state.endurance.isLive).toBe(true);
     expect(state.latestGesture.holdDuration).toBe(200);
     expect(state.endurance.duration).toBe(500);
+    expect(state.latestGesture.isEnduranceChampion).toBe(true);
+    expect(state.latestGesture.secondsUntilEnduranceChampion).toBe(0);
+    expect(state.latestGesture.progressToEnduranceChampion).toBe(100);
   });
 
   it('does not create negative hold durations when the backend timestamp is ahead of the client', () => {
     const state = deriveChampionsState({
       data: {
         ...baseSnapshot,
+        LastBidderAddress: '0x3333333333333333333333333333333333333333',
         LastBidderLastBidTime: 1_200,
       },
       nowMs: 1_100_000,
@@ -149,6 +205,8 @@ describe('deriveChampionsState', () => {
 
     expect(state.latestGesture.holdDuration).toBe(0);
     expect(state.endurance.duration).toBe(baseSnapshot.EnduranceChampionDuration);
+    expect(state.latestGesture.secondsUntilEnduranceChampion).toBe(101);
+    expect(state.latestGesture.progressToEnduranceChampion).toBe(0);
   });
 
   it('does not extend chrono when query dataUpdatedAt is in the future', () => {
@@ -177,6 +235,7 @@ describe('useChampions', () => {
     expect(result.current.endurance.duration).toBe(200);
     expect(result.current.chrono.duration).toBe(55);
     expect(result.current.lastCst.address).toBe(baseSnapshot.LastCstBidderAddress);
+    expect(result.current.latestGesture.isEnduranceChampion).toBe(true);
   });
 
   it('passes loading state through when data is unavailable', () => {

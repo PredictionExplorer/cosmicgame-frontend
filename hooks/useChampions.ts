@@ -19,6 +19,10 @@ export interface LatestGestureState {
   address: string | null;
   holdDuration: number;
   latestGestureTime: number | null;
+  isEnduranceChampion: boolean;
+  durationToBeat: number;
+  secondsUntilEnduranceChampion: number;
+  progressToEnduranceChampion: number;
 }
 
 export interface ChampionsState {
@@ -53,6 +57,11 @@ function nonNegativeSeconds(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 }
 
+function clampProgress(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(99.9, Math.max(0, value));
+}
+
 /**
  * Derives the frontend's live champion state from the backend's indexed snapshot.
  *
@@ -85,6 +94,17 @@ export function deriveChampionsState({
   const enduranceDuration = enduranceIsLive
     ? Math.max(enduranceLockedDuration, holdDuration)
     : enduranceLockedDuration;
+  const latestIsEnduranceChampion = sameAddress(latestGestureAddress, enduranceAddress);
+  const hasLatestGesture = !!latestGestureAddress;
+  const durationToBeat =
+    hasLatestGesture && !latestIsEnduranceChampion && enduranceAddress ? enduranceDuration + 1 : 0;
+  const secondsUntilEnduranceChampion =
+    durationToBeat > 0 ? Math.max(0, durationToBeat - holdDuration) : 0;
+  const progressToEnduranceChampion = latestIsEnduranceChampion
+    ? 100
+    : durationToBeat > 0
+      ? clampProgress((holdDuration / durationToBeat) * 100)
+      : 0;
 
   const chronoIsLive = sameAddress(chronoAddress, enduranceAddress);
   const chronoExtension =
@@ -115,6 +135,10 @@ export function deriveChampionsState({
       address: latestGestureAddress,
       holdDuration,
       latestGestureTime: latestGestureTime > 0 ? latestGestureTime : null,
+      isEnduranceChampion: latestIsEnduranceChampion,
+      durationToBeat,
+      secondsUntilEnduranceChampion,
+      progressToEnduranceChampion,
     },
     raw: data,
   };

@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Coins, Crown, Lock, Swords, Zap } from 'lucide-react';
+import { Coins, Crown, Lock, Swords, User, Zap } from 'lucide-react';
 
 import { formatSeconds } from '@/utils';
 
@@ -10,7 +10,7 @@ import { useChampions, type ChampionsState } from '@/hooks/useChampions';
 import { cn } from '@/lib/utils';
 
 interface RoleCardConfig {
-  key: 'endurance' | 'chrono' | 'lastcst';
+  key: 'latest' | 'endurance' | 'chrono' | 'lastcst';
   icon: ReactNode;
   title: string;
   tooltip: string;
@@ -20,6 +20,7 @@ interface RoleCardConfig {
   durationLabel?: string;
   emptyText: string;
   accent?: 'primary' | 'emerald' | 'muted';
+  extra?: ReactNode;
 }
 
 function StatusChip({ isLive }: { isLive: boolean }) {
@@ -74,6 +75,7 @@ function RoleCard({
   isLive,
   emptyText,
   accent = 'muted',
+  extra,
 }: RoleCardConfig) {
   return (
     <div
@@ -146,8 +148,68 @@ function RoleCard({
               </p>
             </div>
           )}
+          {extra}
         </div>
       </div>
+    </div>
+  );
+}
+
+function LatestGestureProgress({
+  latestGesture,
+  hasEnduranceRecord,
+}: {
+  latestGesture: ChampionsState['latestGesture'];
+  hasEnduranceRecord: boolean;
+}) {
+  if (!hasEnduranceRecord) {
+    return (
+      <div
+        data-testid="latest-participant-status"
+        className="mt-3 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-3 py-2 text-xs text-emerald-300"
+      >
+        First endurance record forming
+      </div>
+    );
+  }
+
+  if (latestGesture.isEnduranceChampion) {
+    return (
+      <div
+        data-testid="latest-participant-status"
+        className="mt-3 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.06] px-3 py-2 text-xs text-emerald-300"
+      >
+        Current Endurance Champion
+      </div>
+    );
+  }
+
+  const progress = Math.floor(latestGesture.progressToEnduranceChampion);
+
+  return (
+    <div className="mt-3 rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2">
+      <div className="flex items-center justify-between gap-3">
+        <span data-testid="latest-participant-remaining" className="text-xs text-muted-foreground">
+          Needs {formatSeconds(latestGesture.secondsUntilEnduranceChampion)} more
+        </span>
+        <span className="font-mono text-xs tabular-nums text-primary">{progress}%</span>
+      </div>
+      <div
+        role="progressbar"
+        aria-label="Progress toward Endurance Champion"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={progress}
+        className="mt-2 h-2 overflow-hidden rounded-full bg-white/[0.08]"
+      >
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
+          style={{ width: `${latestGesture.progressToEnduranceChampion}%` }}
+        />
+      </div>
+      <p className="mt-1 text-[11px] text-muted-foreground">
+        {formatSeconds(latestGesture.holdDuration)} of {formatSeconds(latestGesture.durationToBeat)}
+      </p>
     </div>
   );
 }
@@ -167,6 +229,19 @@ function SpecialAllocationLeadersPrintFallback({ state }: { state: ChampionsStat
         Special Allocation Leaders
       </h3>
       <dl className="space-y-4">
+        <div>
+          <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
+            Latest Participant
+          </dt>
+          <dd className="mt-1 break-all font-mono text-xs leading-relaxed">
+            {state.latestGesture.address ?? '-'}
+          </dd>
+          {state.latestGesture.holdDuration > 0 && (
+            <dd className="mt-1 text-xs">
+              Current hold: {formatSeconds(state.latestGesture.holdDuration)}
+            </dd>
+          )}
+        </div>
         <div>
           <dt className="text-xs font-bold uppercase tracking-wide text-foreground/90">
             Endurance Champion
@@ -206,6 +281,25 @@ export const SpecialAllocationRecipients = () => {
   const champions = useChampions();
 
   const cards: RoleCardConfig[] = [
+    {
+      key: 'latest',
+      icon: <User className="h-5 w-5" />,
+      title: 'Latest Participant',
+      tooltip:
+        'The latest gesture maker is building an endurance window. They must hold the position longer than the current Endurance Champion window to take the lead.',
+      address: champions.latestGesture.address,
+      duration: champions.latestGesture.address ? champions.latestGesture.holdDuration : undefined,
+      durationLabel: 'Current hold',
+      isLive: champions.latestGesture.address ? true : undefined,
+      emptyText: 'No latest gesture yet',
+      accent: champions.latestGesture.address ? 'emerald' : 'muted',
+      extra: champions.latestGesture.address ? (
+        <LatestGestureProgress
+          latestGesture={champions.latestGesture}
+          hasEnduranceRecord={!!champions.endurance.address}
+        />
+      ) : null,
+    },
     {
       key: 'endurance',
       icon: <Crown className="h-5 w-5" />,

@@ -31,6 +31,10 @@ const baseChampions: ChampionsState = {
     address: enduranceAddress,
     holdDuration: 3600,
     latestGestureTime: 1000,
+    isEnduranceChampion: true,
+    durationToBeat: 0,
+    secondsUntilEnduranceChampion: 0,
+    progressToEnduranceChampion: 100,
   },
   raw: null,
 };
@@ -52,8 +56,9 @@ describe('SpecialAllocationRecipients', () => {
     );
   });
 
-  it('renders all three allocation category labels', () => {
+  it('renders all four allocation category labels', () => {
     render(<SpecialAllocationRecipients />);
+    expect(screen.getByText('Latest Participant')).toBeInTheDocument();
     expect(screen.getByText('Endurance Champion')).toBeInTheDocument();
     expect(screen.getByText('Chrono-Warrior')).toBeInTheDocument();
     expect(screen.getByText('Final CST Gesture')).toBeInTheDocument();
@@ -68,6 +73,49 @@ describe('SpecialAllocationRecipients', () => {
     expect(links.some((l) => l.getAttribute('href') === `/user/${lastCstAddress}`)).toBe(true);
   });
 
+  it('renders the Latest Participant card with current hold and achieved state', () => {
+    render(<SpecialAllocationRecipients />);
+
+    const latestCard = screen.getByTestId('special-allocation-card-latest-participant');
+    expect(latestCard).toHaveTextContent(enduranceAddress);
+    expect(latestCard).toHaveTextContent('Current hold');
+    expect(latestCard).toHaveTextContent('1h');
+    expect(latestCard).toHaveTextContent('Current Endurance Champion');
+  });
+
+  it('shows remaining time and accessible progress when latest participant is still challenging', () => {
+    const latestAddress = '0x4444444444444444444444444444444444444444';
+    mockUseChampions.mockReturnValue({
+      ...baseChampions,
+      endurance: {
+        ...baseChampions.endurance,
+        isLive: false,
+        duration: 100,
+      },
+      latestGesture: {
+        address: latestAddress,
+        holdDuration: 60,
+        latestGestureTime: 1040,
+        isEnduranceChampion: false,
+        durationToBeat: 101,
+        secondsUntilEnduranceChampion: 41,
+        progressToEnduranceChampion: 59.4,
+      },
+    });
+
+    render(<SpecialAllocationRecipients />);
+
+    const latestCard = screen.getByTestId('special-allocation-card-latest-participant');
+    expect(latestCard).toHaveTextContent(latestAddress);
+    expect(screen.getByTestId('latest-participant-remaining')).toHaveTextContent('Needs 41s more');
+
+    const progress = screen.getByRole('progressbar', {
+      name: 'Progress toward Endurance Champion',
+    });
+    expect(progress).toHaveAttribute('aria-valuenow', '59');
+    expect(progress).toHaveAttribute('aria-valuemax', '100');
+  });
+
   it('uses the Chrono-Warrior address rather than the Endurance Champion address', () => {
     render(<SpecialAllocationRecipients />);
 
@@ -79,7 +127,7 @@ describe('SpecialAllocationRecipients', () => {
   it('shows live and locked status chips for timed roles', () => {
     render(<SpecialAllocationRecipients />);
 
-    expect(screen.getByTestId('champion-live-chip')).toHaveTextContent('Live - growing');
+    expect(screen.getAllByTestId('champion-live-chip').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByTestId('champion-locked-chip')).toHaveTextContent('Locked record');
   });
 
@@ -107,6 +155,16 @@ describe('SpecialAllocationRecipients', () => {
     mockUseChampions.mockReturnValue({
       ...baseChampions,
       hasData: true,
+      latestGesture: {
+        ...baseChampions.latestGesture,
+        address: null,
+        holdDuration: 0,
+        latestGestureTime: null,
+        isEnduranceChampion: false,
+        durationToBeat: 0,
+        secondsUntilEnduranceChampion: 0,
+        progressToEnduranceChampion: 0,
+      },
       endurance: { ...baseChampions.endurance, address: null, duration: 0, isLive: false },
       chrono: { ...baseChampions.chrono, address: null, duration: 0, isLive: false },
       lastCst: { address: null },
@@ -114,9 +172,28 @@ describe('SpecialAllocationRecipients', () => {
 
     render(<SpecialAllocationRecipients />);
 
+    expect(screen.getByText('No latest gesture yet')).toBeInTheDocument();
     expect(screen.getByText('No endurance record yet')).toBeInTheDocument();
     expect(screen.getByText('No Chrono-Warrior record yet')).toBeInTheDocument();
     expect(screen.getByText('Awaiting first CST gesture')).toBeInTheDocument();
+  });
+
+  it('shows first-record copy when latest participant exists before an endurance record', () => {
+    mockUseChampions.mockReturnValue({
+      ...baseChampions,
+      endurance: { ...baseChampions.endurance, address: null, duration: 0, isLive: false },
+      latestGesture: {
+        ...baseChampions.latestGesture,
+        isEnduranceChampion: false,
+        durationToBeat: 0,
+        secondsUntilEnduranceChampion: 0,
+        progressToEnduranceChampion: 0,
+      },
+    });
+
+    render(<SpecialAllocationRecipients />);
+
+    expect(screen.getByText('First endurance record forming')).toBeInTheDocument();
   });
 
   it('renders loading cards when the champions query is loading', () => {
@@ -127,7 +204,7 @@ describe('SpecialAllocationRecipients', () => {
     });
 
     const { container } = render(<SpecialAllocationRecipients />);
-    expect(container.querySelectorAll('[data-special-allocation-card]')).toHaveLength(3);
+    expect(container.querySelectorAll('[data-special-allocation-card]')).toHaveLength(4);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
