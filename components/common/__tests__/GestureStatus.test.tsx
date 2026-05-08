@@ -2,6 +2,7 @@ import { checkA11y, render, screen } from '@/test-utils';
 
 import { GestureStatus } from '../GestureStatus';
 
+const mockCountdownProps: Array<Record<string, unknown>> = [];
 const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
 const mockUseUserInfo = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCTPrice = jest.fn().mockReturnValue({ data: undefined });
@@ -18,14 +19,20 @@ jest.mock('../../../hooks/web3', () => ({
 
 jest.mock('react-countdown', () => ({
   __esModule: true,
-  default: () => <div data-testid="countdown" />,
+  default: (props: Record<string, unknown>) => {
+    mockCountdownProps.push(props);
+    return <div data-testid="countdown" />;
+  },
 }));
 jest.mock('../Counter', () => ({
   __esModule: true,
   default: () => <div data-testid="counter" />,
 }));
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockCountdownProps.length = 0;
+});
 
 const baseProps = {
   data: null,
@@ -86,6 +93,26 @@ describe('GestureStatus', () => {
     expect(screen.getByText(/0xBidder/)).toBeInTheDocument();
     expect(screen.getByText('0.01000 ETH')).toBeInTheDocument();
     expect(screen.getByText('0.00500 ETH')).toBeInTheDocument();
+  });
+
+  it('uses smooth countdown props for cycle finalization countdown', () => {
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={activeData as never}
+        allocationTime={Date.now() + 60000}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+      />,
+    );
+
+    expect(mockCountdownProps).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          intervalDelay: 100,
+          precision: 1,
+        }),
+      ]),
+    );
   });
 
   it('shows cycle closed when finalization time has passed', () => {

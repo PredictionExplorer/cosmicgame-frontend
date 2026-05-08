@@ -33,3 +33,27 @@ export function getRelativeTime(timestamp: number, nowSeconds?: number): string 
   const years = Math.floor(diff / YEAR);
   return years === 1 ? '1 year ago' : `${years} years ago`;
 }
+
+interface StableClientTargetTimeArgs {
+  targetServerTimeSec: number | null | undefined;
+  currentServerTimeSec: number | null | undefined;
+  currentServerTimeUpdatedAtMs?: number;
+  fallbackNowMs?: number;
+}
+
+/**
+ * Converts a server-side target timestamp into a stable client epoch-ms target.
+ * The result is anchored to the time the server clock sample was fetched, so it
+ * does not drift forward as the local client clock ticks between API refetches.
+ */
+export function getStableClientTargetTime({
+  targetServerTimeSec,
+  currentServerTimeSec,
+  currentServerTimeUpdatedAtMs = 0,
+  fallbackNowMs = Date.now(),
+}: StableClientTargetTimeArgs): number {
+  if (targetServerTimeSec == null || currentServerTimeSec == null) return 0;
+
+  const anchorMs = currentServerTimeUpdatedAtMs > 0 ? currentServerTimeUpdatedAtMs : fallbackNowMs;
+  return anchorMs + (targetServerTimeSec - currentServerTimeSec) * 1000;
+}

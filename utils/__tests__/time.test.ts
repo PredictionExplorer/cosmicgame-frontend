@@ -1,3 +1,61 @@
+import { getStableClientTargetTime } from '@/utils/time';
+
+describe('getStableClientTargetTime', () => {
+  it('anchors the client target to the server-time query update moment', () => {
+    const result = getStableClientTargetTime({
+      targetServerTimeSec: 1_300,
+      currentServerTimeSec: 1_000,
+      currentServerTimeUpdatedAtMs: 50_000,
+    });
+
+    expect(result).toBe(350_000);
+  });
+
+  it('does not drift when local time advances between refetches', () => {
+    const first = getStableClientTargetTime({
+      targetServerTimeSec: 1_300,
+      currentServerTimeSec: 1_000,
+      currentServerTimeUpdatedAtMs: 50_000,
+      fallbackNowMs: 60_000,
+    });
+    const later = getStableClientTargetTime({
+      targetServerTimeSec: 1_300,
+      currentServerTimeSec: 1_000,
+      currentServerTimeUpdatedAtMs: 50_000,
+      fallbackNowMs: 80_000,
+    });
+
+    expect(later).toBe(first);
+  });
+
+  it('uses fallbackNowMs when the query update time is unavailable', () => {
+    expect(
+      getStableClientTargetTime({
+        targetServerTimeSec: 1_030,
+        currentServerTimeSec: 1_000,
+        currentServerTimeUpdatedAtMs: 0,
+        fallbackNowMs: 10_000,
+      }),
+    ).toBe(40_000);
+  });
+
+  it('returns 0 when server timestamps are incomplete', () => {
+    expect(
+      getStableClientTargetTime({
+        targetServerTimeSec: undefined,
+        currentServerTimeSec: 1_000,
+        currentServerTimeUpdatedAtMs: 10_000,
+      }),
+    ).toBe(0);
+    expect(
+      getStableClientTargetTime({
+        targetServerTimeSec: 1_000,
+        currentServerTimeSec: undefined,
+        currentServerTimeUpdatedAtMs: 10_000,
+      }),
+    ).toBe(0);
+  });
+});
 import { getRelativeTime } from '../time';
 
 const NOW = 1_700_000_000;

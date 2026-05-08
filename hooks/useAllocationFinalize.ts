@@ -12,7 +12,7 @@ import { getContractErrorMessage } from '@/utils/contractErrors';
 import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
 import { useAllocationTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
-import { useNow } from '@/hooks/useNow';
+import { getStableClientTargetTime } from '@/utils/time';
 
 const GAS_EXTRA = BigInt(1_000_000);
 const GAS_FLOOR = BigInt(2_000_000);
@@ -29,15 +29,16 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
   const { notify, notifyErrorFromEthers } = useNotify();
 
   const { data: prizeTimeRaw } = useAllocationTime();
-  const { data: currentTimeRaw } = useCurrentTime();
+  const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
   const { data: claimHistoryRaw } = useClaimHistory();
-  const now = useNow(1000);
 
   const allocationTime = useMemo(() => {
-    if (prizeTimeRaw == null || currentTimeRaw == null) return 0;
-    const diff = currentTimeRaw * 1000 - now;
-    return prizeTimeRaw * 1000 - diff;
-  }, [prizeTimeRaw, currentTimeRaw, now]);
+    return getStableClientTargetTime({
+      targetServerTimeSec: prizeTimeRaw,
+      currentServerTimeSec: currentTimeRaw,
+      currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
+    });
+  }, [prizeTimeRaw, currentTimeRaw, currentTimeUpdatedAt]);
 
   const claimHistory =
     (claimHistoryRaw as

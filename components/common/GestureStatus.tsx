@@ -151,7 +151,13 @@ export const GestureStatus = ({
                     className="ml-1.5"
                   />
                 </p>
-                <Countdown key={0} date={allocationTime} renderer={Counter} />
+                <Countdown
+                  key={0}
+                  date={allocationTime}
+                  renderer={Counter}
+                  intervalDelay={100}
+                  precision={1}
+                />
               </motion.div>
             ) : (
               <motion.div

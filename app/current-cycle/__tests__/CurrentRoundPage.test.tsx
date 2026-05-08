@@ -9,6 +9,7 @@ const mockUseDonationsCGWithInfoByRound = jest.fn().mockReturnValue({ data: [] }
 const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: [] });
 const mockUseAllocationTime = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
+const mockCountdownProps: Array<Record<string, unknown>> = [];
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -22,9 +23,10 @@ jest.mock('../../../hooks/useApiQuery', () => ({
 
 jest.mock('react-countdown', () => ({
   __esModule: true,
-  default: ({ date }: { date: number }) => (
-    <div data-testid="countdown">countdown-target:{date}</div>
-  ),
+  default: (props: { date: number }) => {
+    mockCountdownProps.push(props as Record<string, unknown>);
+    return <div data-testid="countdown">countdown-target:{props.date}</div>;
+  },
 }));
 
 jest.mock('../../../components/common/Counter', () => ({
@@ -46,7 +48,10 @@ jest.mock('../../../components/tables/SpecialAllocationRecipients', () => ({
   ),
 }));
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockCountdownProps.length = 0;
+});
 
 const NOW_SEC = Math.floor(Date.now() / 1000);
 
@@ -148,18 +153,26 @@ describe('CurrentRoundPage', () => {
     const futureTime = NOW_SEC + 3600;
     setupLoaded();
     mockUseAllocationTime.mockReturnValue({ data: futureTime });
-    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
+    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
     render(<CurrentRoundPage />);
 
     expect(screen.getByText('Cycle finalizes in')).toBeInTheDocument();
     expect(screen.getByTestId('countdown')).toBeInTheDocument();
+    expect(mockCountdownProps).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          intervalDelay: 100,
+          precision: 1,
+        }),
+      ]),
+    );
   });
 
   it('renders "Cycle Closed" state when countdown has passed', () => {
     const pastTime = NOW_SEC - 60;
     setupLoaded();
     mockUseAllocationTime.mockReturnValue({ data: pastTime });
-    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
+    mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
     render(<CurrentRoundPage />);
 
     expect(screen.getByText('Cycle Closed')).toBeInTheDocument();

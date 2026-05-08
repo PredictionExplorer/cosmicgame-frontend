@@ -26,6 +26,7 @@ import {
   convertTimestampToDateTime,
   calculateTimeDiff,
   shortenHex,
+  getStableClientTargetTime,
 } from '@/utils';
 
 import { PageShell } from '@/components/ui/page-shell';
@@ -64,7 +65,7 @@ const sectionFade = {
 const CurrentRoundPage = () => {
   const { data: dashboardData, isLoading, isError } = useDashboardInfo();
   const { data: prizeTimeRaw } = useAllocationTime();
-  const { data: currentTimeRaw } = useCurrentTime();
+  const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
   const round = dashboardData?.CurRoundNum ?? -1;
 
   const { data: bidListData } = useGestureListByCycle(round, 'desc');
@@ -82,10 +83,13 @@ const CurrentRoundPage = () => {
   const nowMs = useNow(1000);
 
   const allocationTime = useMemo(() => {
-    if (prizeTimeRaw == null || currentTimeRaw == null) return 0;
-    const diff = currentTimeRaw * 1000 - mountTime;
-    return prizeTimeRaw * 1000 - diff;
-  }, [prizeTimeRaw, currentTimeRaw, mountTime]);
+    return getStableClientTargetTime({
+      targetServerTimeSec: prizeTimeRaw,
+      currentServerTimeSec: currentTimeRaw,
+      currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
+      fallbackNowMs: mountTime,
+    });
+  }, [prizeTimeRaw, currentTimeRaw, currentTimeUpdatedAt, mountTime]);
 
   const championList = useMemo(() => {
     if (!bidListData) return null;
@@ -142,9 +146,8 @@ const CurrentRoundPage = () => {
 
   const hasStarted = data.TsRoundStart !== 0;
   const hasLastParticipant = data.LastBidderAddr !== zeroAddress;
-  const isCountdownActive = hasLastParticipant && allocationTime > mountTime;
-  const isGesturesExhausted =
-    hasLastParticipant && allocationTime > 0 && allocationTime <= mountTime;
+  const isCountdownActive = hasLastParticipant && allocationTime > nowMs;
+  const isGesturesExhausted = hasLastParticipant && allocationTime > 0 && allocationTime <= nowMs;
 
   const charityAmount =
     (Number(data.CosmicGameBalanceEth) || 0) * ((data.CharityPercentage ?? 0) / 100);
@@ -207,7 +210,7 @@ const CurrentRoundPage = () => {
                 className="ml-1.5"
               />
             </p>
-            <Countdown date={allocationTime} renderer={Counter} />
+            <Countdown date={allocationTime} renderer={Counter} intervalDelay={100} precision={1} />
           </div>
         )}
 

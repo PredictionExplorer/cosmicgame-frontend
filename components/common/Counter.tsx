@@ -39,9 +39,21 @@ function getTimeUnits(days: number, hours: number, minutes: number, seconds: num
   return units;
 }
 
-const Counter = ({ days, hours, minutes, seconds, size = 'md' }: CounterProps) => {
+const Counter = ({
+  days,
+  hours,
+  minutes,
+  seconds,
+  milliseconds = 0,
+  total,
+  size = 'md',
+}: CounterProps) => {
   const padZero = (value: number): string => value.toString().padStart(2, '0');
   const totalSeconds = days * 86400 + hours * 3600 + minutes * 60 + seconds;
+  const derivedTotalMs = totalSeconds * 1000 + milliseconds;
+  const totalMs = total > 0 ? total : derivedTotalMs;
+  const showTenths = totalMs > 0 && totalMs < 60_000;
+  const tenths = Math.floor(milliseconds / 100);
   const isUrgent = totalSeconds < 3600 && totalSeconds > 0;
   const isCritical = totalSeconds < 300 && totalSeconds > 0;
   const s = sizeClasses[size];
@@ -88,6 +100,11 @@ const Counter = ({ days, hours, minutes, seconds, size = 'md' }: CounterProps) =
                   }
                 >
                   {padZero(value)}
+                  {label === 'SEC' && showTenths && (
+                    <span data-testid="countdown-tenths" className="text-[0.6em] opacity-80">
+                      .{tenths}
+                    </span>
+                  )}
                 </motion.span>
               </AnimatePresence>
             </div>

@@ -108,6 +108,38 @@ describe('Counter', () => {
     expect(colonTexts.length).toBe(3);
   });
 
+  it('renders tenths when less than one minute remains', () => {
+    render(
+      <Counter
+        {...baseProps}
+        total={12_900}
+        days={0}
+        hours={0}
+        minutes={0}
+        seconds={12}
+        milliseconds={900}
+      />,
+    );
+
+    expect(screen.getByTestId('countdown-tenths')).toHaveTextContent('.9');
+  });
+
+  it('does not render tenths for longer durations', () => {
+    render(
+      <Counter
+        {...baseProps}
+        total={60_000}
+        days={0}
+        hours={0}
+        minutes={1}
+        seconds={0}
+        milliseconds={900}
+      />,
+    );
+
+    expect(screen.queryByTestId('countdown-tenths')).not.toBeInTheDocument();
+  });
+
   it('renders with size="sm"', () => {
     const { container } = render(
       <Counter {...baseProps} days={0} hours={1} minutes={30} seconds={0} size="sm" />,

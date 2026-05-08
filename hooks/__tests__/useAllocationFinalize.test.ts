@@ -66,11 +66,14 @@ jest.mock('../../utils/contractErrors', () => ({
 }));
 
 import { useAllocationFinalize } from '../useAllocationFinalize';
+import { useAllocationTime, useCurrentTime } from '../useApiQuery';
 import api from '../../services/api';
 import { isUserRejection, reportError } from '../../utils/errors';
 import useCosmicGameContract from '../../hooks/useCosmicGameContract';
 
 const mockApi = api as jest.Mocked<typeof api>;
+const mockUseAllocationTime = useAllocationTime as jest.MockedFunction<typeof useAllocationTime>;
+const mockUseCurrentTime = useCurrentTime as jest.MockedFunction<typeof useCurrentTime>;
 const mockIsUserRejection = isUserRejection as jest.MockedFunction<typeof isUserRejection>;
 const mockReportError = reportError as jest.MockedFunction<typeof reportError>;
 const mockUseCosmicGameContract = useCosmicGameContract as jest.Mock;
@@ -84,6 +87,10 @@ beforeEach(() => {
   mockGetContractErrorMessage.mockReturnValue(null);
   mockUsePublicClient.mockReturnValue({ waitForTransactionReceipt: mockWaitForReceipt });
   mockWaitForReceipt.mockResolvedValue({ status: 'success' });
+  mockUseAllocationTime.mockReturnValue({ data: 1000 } as ReturnType<typeof useAllocationTime>);
+  mockUseCurrentTime.mockReturnValue({
+    data: Math.floor(Date.now() / 1000),
+  } as ReturnType<typeof useCurrentTime>);
 });
 
 const baseData = {
@@ -112,6 +119,23 @@ describe('useAllocationFinalize', () => {
     expect(result!.current.isClaiming).toBe(false);
     expect(typeof result!.current.onFinalize).toBe('function');
     expect(typeof result!.current.fetchActivationTime).toBe('function');
+  });
+
+  it('keeps allocationTime stable between server time refetches', () => {
+    mockUseAllocationTime.mockReturnValue({ data: 1_300 } as ReturnType<typeof useAllocationTime>);
+    mockUseCurrentTime.mockReturnValue({
+      data: 1_000,
+      dataUpdatedAt: 50_000,
+    } as ReturnType<typeof useCurrentTime>);
+
+    const { result, rerender } = renderHook(() =>
+      useAllocationFinalize({ data: baseData, offset: 0 }),
+    );
+    const initial = result.current.allocationTime;
+
+    expect(initial).toBe(350_000);
+    rerender();
+    expect(result.current.allocationTime).toBe(initial);
   });
 
   // ─────────────────────────────────────────────
