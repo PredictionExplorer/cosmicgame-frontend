@@ -125,6 +125,55 @@ describe('EnduranceChampionsTable', () => {
     expect(userLink).toBeInTheDocument();
   });
 
+  it('marks the row matching the latest bidder as live', () => {
+    const addr = '0x1234567890abcdef1234567890abcdef12345678';
+    render(
+      <EnduranceChampionsTable
+        championList={[createChampion({ participant: addr })]}
+        lastBidderAddress={addr}
+      />,
+    );
+
+    expect(screen.getByText('Live')).toBeInTheDocument();
+  });
+
+  it('matches the live row case-insensitively', () => {
+    const addr = '0xABCDEFabcdefABCDEFabcdefABCDEFabcdefABCD';
+    render(
+      <EnduranceChampionsTable
+        championList={[createChampion({ participant: addr.toLowerCase() })]}
+        lastBidderAddress={addr}
+      />,
+    );
+
+    expect(screen.getByText('Live')).toBeInTheDocument();
+  });
+
+  it('does not mark rows live without a latest bidder address', () => {
+    render(<EnduranceChampionsTable championList={[createChampion()]} />);
+    expect(screen.queryByText('Live')).not.toBeInTheDocument();
+  });
+
+  it('marks only the matching latest-bidder row as live in a multi-row table', () => {
+    const liveAddr = '0x' + 'a'.repeat(40);
+    const otherAddr = '0x' + 'b'.repeat(40);
+
+    render(
+      <EnduranceChampionsTable
+        championList={[
+          createChampion({ participant: liveAddr, championTime: 300 }),
+          createChampion({ participant: otherAddr, championTime: 200 }),
+        ]}
+        lastBidderAddress={liveAddr}
+      />,
+    );
+
+    expect(screen.getAllByText('Live')).toHaveLength(1);
+    const rows = screen.getAllByRole('row').filter((r) => r.querySelector('td'));
+    expect(rows[0]).toHaveTextContent('Live');
+    expect(rows[1]).not.toHaveTextContent('Live');
+  });
+
   it('sort resets to desc when switching columns', () => {
     const list = [
       createChampion({ participant: '0x' + '1'.repeat(40), championTime: 100, chronoWarrior: 50 }),

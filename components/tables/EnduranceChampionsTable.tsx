@@ -15,6 +15,7 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface EnduranceChampion {
   participant: string;
@@ -24,9 +25,10 @@ interface EnduranceChampion {
 
 interface ChampionRowProps {
   row: EnduranceChampion;
+  isLive?: boolean;
 }
 
-const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row }) => {
+const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row, isLive = false }) => {
   if (!row) {
     return <TablePrimaryRow />;
   }
@@ -34,7 +36,15 @@ const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row }) => {
   return (
     <TablePrimaryRow>
       <TablePrimaryCell align="left">
-        <AddressLink address={row.participant} url={`/user/${row.participant}`} />
+        <div className="flex flex-wrap items-center gap-2">
+          <AddressLink address={row.participant} url={`/user/${row.participant}`} />
+          {isLive && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
+              Live
+              <InfoTooltip content="This participant is also the latest gesture maker, so this endurance window is still growing." />
+            </span>
+          )}
+        </div>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{formatSeconds(row.championTime)}</TablePrimaryCell>
       <TablePrimaryCell align="center">{formatSeconds(row.chronoWarrior || 0)}</TablePrimaryCell>
@@ -44,6 +54,7 @@ const EnduranceChampionsRow: FC<ChampionRowProps> = ({ row }) => {
 
 interface ChampionsTableProps {
   championList: EnduranceChampion[] | null;
+  lastBidderAddress?: string | null;
 }
 
 const SortIcon = ({
@@ -63,7 +74,11 @@ const SortIcon = ({
   );
 };
 
-const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList }) => {
+function sameAddress(left: string | null | undefined, right: string | null | undefined): boolean {
+  return !!left && !!right && left.toLowerCase() === right.toLowerCase();
+}
+
+const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList, lastBidderAddress }) => {
   const [sortField, setSortField] = useState<'championTime' | 'chronoWarrior'>('championTime');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState<number>(1);
@@ -143,7 +158,11 @@ const EnduranceChampionsTable: FC<ChampionsTableProps> = ({ championList }) => {
           </TablePrimaryHead>
           <tbody>
             {paginatedList.map((row, index) => (
-              <EnduranceChampionsRow key={`${row.participant}-${index}-${page}`} row={row} />
+              <EnduranceChampionsRow
+                key={`${row.participant}-${index}-${page}`}
+                row={row}
+                isLive={sameAddress(row.participant, lastBidderAddress)}
+              />
             ))}
           </tbody>
         </TablePrimary>

@@ -485,6 +485,10 @@ export interface CharityWithdrawal {
 export interface SpecialRecipients {
   EnduranceChampionAddress?: string;
   EnduranceChampionDuration?: number;
+  ChronoWarriorAddress?: string;
+  ChronoWarriorDuration?: number;
+  LastBidderAddress?: string;
+  LastBidderLastBidTime?: number;
   LastCstBidderAddress?: string;
   [key: string]: unknown;
 }

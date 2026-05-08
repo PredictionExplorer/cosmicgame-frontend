@@ -14,4 +14,5 @@ export { useNotify } from './useNotify';
 export { useGestureForm } from './useGestureForm';
 export { useAllocationFinalize } from './useAllocationFinalize';
 export { useAllocationNotification } from './useAllocationNotification';
+export { useChampions } from './useChampions';
 export * from './useApiQuery';

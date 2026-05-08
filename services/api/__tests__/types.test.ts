@@ -92,10 +92,18 @@ describe('API types', () => {
       const sw: SpecialRecipients = {
         EnduranceChampionAddress: '0x123',
         EnduranceChampionDuration: 3600,
+        ChronoWarriorAddress: '0x789',
+        ChronoWarriorDuration: 7200,
+        LastBidderAddress: '0xabc',
+        LastBidderLastBidTime: 1_778_207_543,
         LastCstBidderAddress: '0x456',
       };
       expect(sw.EnduranceChampionAddress).toBe('0x123');
       expect(sw.EnduranceChampionDuration).toBe(3600);
+      expect(sw.ChronoWarriorAddress).toBe('0x789');
+      expect(sw.ChronoWarriorDuration).toBe(7200);
+      expect(sw.LastBidderAddress).toBe('0xabc');
+      expect(sw.LastBidderLastBidTime).toBe(1_778_207_543);
     });
 
     it('allows all fields to be optional', () => {

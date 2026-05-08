@@ -47,6 +47,7 @@ import {
   useAllocationTime,
   useCurrentTime,
 } from '@/hooks/useApiQuery';
+import { useNow } from '@/hooks/useNow';
 
 type EthDonation = import('@/components/tables/EthDonationTable').EthDonation;
 type DonatedERC20 = import('@/components/attachments/AttachedERC20Table').DonatedERC20Token;
@@ -78,6 +79,7 @@ const CurrentRoundPage = () => {
   const donatedERC20Tokens = (erc20DonationsData ?? []) as DonatedERC20[];
 
   const [mountTime] = useState(() => Date.now());
+  const nowMs = useNow(1000);
 
   const allocationTime = useMemo(() => {
     if (prizeTimeRaw == null || currentTimeRaw == null) return 0;
@@ -87,9 +89,9 @@ const CurrentRoundPage = () => {
 
   const championList = useMemo(() => {
     if (!bidListData) return null;
-    const champions = getEnduranceChampions(bidListData);
+    const champions = getEnduranceChampions(bidListData, 0, Math.floor(nowMs / 1000));
     return [...champions].sort((a, b) => b.chronoWarrior - a.chronoWarrior);
-  }, [bidListData]);
+  }, [bidListData, nowMs]);
 
   const [lastBidderElapsed, setLastBidderElapsed] = useState('');
 

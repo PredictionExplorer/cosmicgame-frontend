@@ -28,8 +28,9 @@ interface EnduranceRecord {
 export const getEnduranceChampions = (
   gestureList: GestureEntry[],
   roundEndTimeStamp: number = 0,
+  nowTimeStamp: number = Math.floor(Date.now() / 1000),
 ): EnduranceChampion[] => {
-  const currentTime = roundEndTimeStamp > 0 ? roundEndTimeStamp : Math.floor(Date.now() / 1000);
+  const currentTime = roundEndTimeStamp > 0 ? roundEndTimeStamp : nowTimeStamp;
 
   if (!gestureList || gestureList.length === 0) {
     return [];

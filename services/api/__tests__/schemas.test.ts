@@ -10,6 +10,7 @@ import {
   DashboardInfoSchema,
   GestureInfoSchema,
   RoundInfoSchema,
+  SpecialRecipientsSchema,
   UserBalanceSchema,
   UserInfoSchema,
   getValidationMode,
@@ -244,6 +245,49 @@ describe('UserInfoSchema + UserBalanceSchema', () => {
 
   it('rejects UserBalance with number fields (must be string)', () => {
     expect(() => UserBalanceSchema.parse({ ETH_Balance: 1.5, CosmicTokenBalance: 1000 })).toThrow();
+  });
+});
+
+describe('SpecialRecipientsSchema', () => {
+  const livePayload = {
+    ChronoWarriorAddress: '0x30E6E8EEEC88aA8Ea35B54807671458B3F01665e',
+    ChronoWarriorDuration: 1551,
+    EnduranceChampionAddress: '0x30E6E8EEEC88aA8Ea35B54807671458B3F01665e',
+    EnduranceChampionDuration: 704,
+    LastBidderAddress: '0x4A9A3815060C3Bd08fb4d44C9e74513874771b0C',
+    LastBidderLastBidTime: 1778207543,
+    LastCstBidderAddress: '0xC83aa25FA5829c789DF2AC5976b4A26d49c648FF',
+  };
+
+  it('accepts the live current-special-winners payload', () => {
+    const parsed = SpecialRecipientsSchema.parse(livePayload);
+    expect(parsed.ChronoWarriorAddress).toBe(livePayload.ChronoWarriorAddress);
+    expect(parsed.LastBidderLastBidTime).toBe(1778207543);
+  });
+
+  it('passes through future backend fields', () => {
+    const parsed = SpecialRecipientsSchema.parse({ ...livePayload, FutureChampionField: 'ok' });
+    expect((parsed as Record<string, unknown>).FutureChampionField).toBe('ok');
+  });
+
+  it('rejects corrupted duration fields', () => {
+    expect(() =>
+      SpecialRecipientsSchema.parse({ ...livePayload, ChronoWarriorDuration: '1551' }),
+    ).toThrow();
+  });
+
+  it('safeValidate preserves bad payloads in warn mode', () => {
+    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const bad = { ...livePayload, LastBidderLastBidTime: 'bad' };
+      expect(safeValidate(SpecialRecipientsSchema, bad, 'SpecialRecipients')).toBe(bad);
+      expect(spy).toHaveBeenCalledWith(
+        expect.stringContaining('[schema:SpecialRecipients]'),
+        expect.any(Error),
+      );
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
 

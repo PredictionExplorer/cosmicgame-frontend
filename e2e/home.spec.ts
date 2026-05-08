@@ -92,6 +92,34 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(page.getByText(/Chrono-Warrior|Chrono Warrior/i).first()).toBeVisible();
   });
 
+  test('Chrono-Warrior card uses its own address when leaders differ', async ({
+    page,
+    request,
+  }) => {
+    const response = await request.get(
+      'https://nfts.cosmicsignature.com/api/cosmicgame/bid/current_special_winners',
+    );
+    test.skip(!response.ok(), 'Production current special winners endpoint unavailable');
+
+    const data = (await response.json()) as {
+      ChronoWarriorAddress?: string;
+      EnduranceChampionAddress?: string;
+    };
+    const chronoAddress = data.ChronoWarriorAddress ?? '';
+    const enduranceAddress = data.EnduranceChampionAddress ?? '';
+    test.skip(
+      !chronoAddress ||
+        !enduranceAddress ||
+        chronoAddress.toLowerCase() === enduranceAddress.toLowerCase(),
+      'Current backend reports matching Chrono-Warrior and Endurance Champion addresses',
+    );
+
+    const chronoCard = page.getByTestId('special-allocation-card-chrono-warrior').first();
+    await ensureVisible(chronoCard);
+    await expect(chronoCard).toContainText(chronoAddress);
+    await expect(chronoCard).not.toContainText(enduranceAddress);
+  });
+
   test('Recipient History section renders', async ({ page }) => {
     const section = page.getByText(/Gesture history, leaderboards/i).first();
     await ensureVisible(section);

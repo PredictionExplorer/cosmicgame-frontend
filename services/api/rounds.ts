@@ -9,7 +9,12 @@ import {
   flattenTxArray,
   flattenRoundInfo,
 } from './client';
-import { DashboardInfoSchema, RoundInfoSchema, safeValidate } from './schemas';
+import {
+  DashboardInfoSchema,
+  RoundInfoSchema,
+  SpecialRecipientsSchema,
+  safeValidate,
+} from './schemas';
 import type {
   DashboardInfo,
   RoundInfo,
@@ -145,7 +150,11 @@ export function get_bid_list_by_round(round: number, sortDir: string): Promise<G
 export function get_current_special_winners(): Promise<SpecialRecipients | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('bid/current_special_winners'));
-    return data as SpecialRecipients;
+    return safeValidate(
+      SpecialRecipientsSchema,
+      data,
+      'SpecialRecipients[current]',
+    ) as SpecialRecipients;
   }, null);
 }
 

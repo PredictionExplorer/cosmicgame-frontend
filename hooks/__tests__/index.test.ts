@@ -25,6 +25,7 @@ jest.mock('../useNotify', () => ({ useNotify: jest.fn() }));
 jest.mock('../useGestureForm', () => ({ useGestureForm: jest.fn() }));
 jest.mock('../useAllocationFinalize', () => ({ useAllocationFinalize: jest.fn() }));
 jest.mock('../useAllocationNotification', () => ({ useAllocationNotification: jest.fn() }));
+jest.mock('../useChampions', () => ({ useChampions: jest.fn() }));
 
 const EXISTING_HOOK_EXPORTS = [
   'useContractAddresses',
@@ -42,6 +43,7 @@ const EXISTING_HOOK_EXPORTS = [
   'useGestureForm',
   'useAllocationFinalize',
   'useAllocationNotification',
+  'useChampions',
 ] as const;
 
 const USE_API_QUERY_EXPORTS = [
@@ -150,7 +152,7 @@ describe('hooks barrel (hooks/index.ts)', () => {
     expect(typeof (barrel as Record<string, unknown>)[name]).toBe('function');
   });
 
-  it('exports the expected total count (15 existing + 92 useApiQuery = 107)', () => {
+  it('exports the expected total count', () => {
     const exportedKeys = Object.keys(barrel);
     expect(exportedKeys.length).toBe(EXISTING_HOOK_EXPORTS.length + USE_API_QUERY_EXPORTS.length);
   });

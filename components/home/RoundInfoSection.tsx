@@ -119,7 +119,10 @@ export function RoundInfoSection({
           <InfoTooltip content="Participants ranked by how long they remained the most-recent gesture maker. The one with the longest consecutive interval receives a Recognition CST imprint of 1,000 CST and a Cosmic Signature NFT." />
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden border-l-2 border-l-[hsl(45,93%,52%)]/40">
-          <EnduranceChampionsTable championList={championList} />
+          <EnduranceChampionsTable
+            championList={championList}
+            lastBidderAddress={data?.LastBidderAddr ?? null}
+          />
         </div>
       </motion.div>
 

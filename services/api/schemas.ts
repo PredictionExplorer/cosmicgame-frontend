@@ -239,6 +239,23 @@ export const UserBalanceSchema = z
   .loose();
 
 /* ------------------------------------------------------------------------- *
+ *  Special Winners
+ * ------------------------------------------------------------------------- */
+
+export const SpecialRecipientsSchema = z
+  .object({
+    EnduranceChampionAddress: AddressSchema.optional(),
+    EnduranceChampionDuration: z.number().optional(),
+    ChronoWarriorAddress: AddressSchema.optional(),
+    ChronoWarriorDuration: z.number().optional(),
+    LastBidderAddress: AddressSchema.optional(),
+    LastBidderLastBidTime: z.number().optional(),
+    LastCstBidderAddress: AddressSchema.optional(),
+  })
+  .loose();
+export type SpecialRecipientsParsed = z.infer<typeof SpecialRecipientsSchema>;
+
+/* ------------------------------------------------------------------------- *
  *  Validation helpers
  * ------------------------------------------------------------------------- */
 

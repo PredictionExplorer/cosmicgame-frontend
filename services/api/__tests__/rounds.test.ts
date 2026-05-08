@@ -380,12 +380,22 @@ describe('rounds API', () => {
 
   describe('get_current_special_winners', () => {
     it('returns special recipients on success', async () => {
-      const recipients = { EnduranceChampion: '0x1', ChronoWarrior: '0x2' };
+      const recipients = {
+        ChronoWarriorAddress: '0x30E6E8EEEC88aA8Ea35B54807671458B3F01665e',
+        ChronoWarriorDuration: 1551,
+        EnduranceChampionAddress: '0x30E6E8EEEC88aA8Ea35B54807671458B3F01665e',
+        EnduranceChampionDuration: 704,
+        LastBidderAddress: '0x4A9A3815060C3Bd08fb4d44C9e74513874771b0C',
+        LastBidderLastBidTime: 1778207543,
+        LastCstBidderAddress: '0xC83aa25FA5829c789DF2AC5976b4A26d49c648FF',
+      };
       mockedAxios.get.mockResolvedValue({ data: recipients });
 
       const result = await get_current_special_winners();
 
       expect(result).toEqual(recipients);
+      expect(result?.ChronoWarriorAddress).toBe(recipients.ChronoWarriorAddress);
+      expect(result?.LastBidderLastBidTime).toBe(1778207543);
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringMatching(/bid.*current_special_winners/),
       );
@@ -412,9 +422,7 @@ describe('rounds API', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0x1');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/raffle\/deposits\/list/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/raffle\/deposits\/list/));
     });
 
     it('returns empty array when RaffleDeposits is missing', async () => {

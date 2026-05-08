@@ -33,6 +33,37 @@ describe('getEnduranceChampions', () => {
     expect(result[0]!.championTime).toBeLessThanOrEqual(102);
   });
 
+  it('uses explicit nowTimeStamp when roundEndTimeStamp is 0', () => {
+    const gestures = [{ TimeStamp: 1_000, BidderAddr: '0xBob' }];
+    const result = getEnduranceChampions(gestures, 0, 1_250);
+
+    expect(result).toEqual([
+      {
+        participant: '0xBob',
+        championTime: 250,
+        chronoWarrior: 0,
+      },
+    ]);
+  });
+
+  it('prefers explicit roundEndTimeStamp over nowTimeStamp for finalized cycles', () => {
+    const gestures = [{ TimeStamp: 1_000, BidderAddr: '0xBob' }];
+    const result = getEnduranceChampions(gestures, 1_100, 1_500);
+
+    expect(result[0]!.championTime).toBe(100);
+  });
+
+  it('does not mutate the original gesture list while sorting', () => {
+    const gestures = [
+      { TimeStamp: 1_200, BidderAddr: '0xBob' },
+      { TimeStamp: 1_000, BidderAddr: '0xAlice' },
+    ];
+
+    getEnduranceChampions(gestures, 0, 1_300);
+
+    expect(gestures.map((g) => g.BidderAddr)).toEqual(['0xBob', '0xAlice']);
+  });
+
   it('computes champion from two gestures', () => {
     const gestures = [
       { TimeStamp: 1000, BidderAddr: '0xAlice' },
@@ -96,6 +127,31 @@ describe('getEnduranceChampions', () => {
     expect(result[0]!.championTime).toBe(1000);
   });
 
+  it('keeps the earlier champion when a later window ties the record', () => {
+    const gestures = [
+      { TimeStamp: 1_000, BidderAddr: '0xA' },
+      { TimeStamp: 1_100, BidderAddr: '0xB' },
+      { TimeStamp: 1_200, BidderAddr: '0xC' },
+    ];
+    const result = getEnduranceChampions(gestures, 1_300);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]!.participant).toBe('0xA');
+    expect(result[0]!.championTime).toBe(100);
+  });
+
+  it('handles same-address consecutive gestures as separate uninterrupted windows', () => {
+    const gestures = [
+      { TimeStamp: 1_000, BidderAddr: '0xA' },
+      { TimeStamp: 1_030, BidderAddr: '0xA' },
+      { TimeStamp: 1_100, BidderAddr: '0xB' },
+    ];
+    const result = getEnduranceChampions(gestures, 1_110);
+
+    expect(result.map((c) => c.participant)).toEqual(['0xA', '0xA']);
+    expect(result.map((c) => c.championTime)).toEqual([30, 70]);
+  });
+
   it('computes chronoWarrior values', () => {
     const gestures = [
       { TimeStamp: 1000, BidderAddr: '0xA' },
@@ -107,6 +163,20 @@ describe('getEnduranceChampions', () => {
     result.forEach((c: EnduranceChampion) => {
       expect(c.chronoWarrior).toBeGreaterThanOrEqual(0);
     });
+  });
+
+  it('keeps chrono warrior deterministic for an ongoing last-bidder champion', () => {
+    const gestures = [
+      { TimeStamp: 1_000, BidderAddr: '0xA' },
+      { TimeStamp: 1_010, BidderAddr: '0xB' },
+      { TimeStamp: 1_050, BidderAddr: '0xC' },
+    ];
+    const result = getEnduranceChampions(gestures, 0, 1_100);
+
+    const ongoingChampion = result[result.length - 1]!;
+    expect(ongoingChampion.participant).toBe('0xC');
+    expect(ongoingChampion.championTime).toBe(50);
+    expect(ongoingChampion.chronoWarrior).toBeGreaterThanOrEqual(0);
   });
 
   it('returns objects with participant, championTime, chronoWarrior fields only', () => {
