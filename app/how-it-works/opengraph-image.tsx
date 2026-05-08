@@ -5,14 +5,15 @@ import { COSMIC_OG_SIZE, CosmicOgCard } from '@/lib/og/CosmicOgCard';
 export const runtime = 'edge';
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
-export const alt = 'Cosmic Signature \u2014 Every Gesture Shapes the Signature.';
+export const alt = 'Cosmic Signature \u2014 How It Works';
 
 export default function Image() {
   return new ImageResponse(
     <CosmicOgCard
-      eyebrow="Cosmic Signature"
-      title="Every Gesture Shapes the Signature."
-      subhead="A procedural on-chain art protocol on Arbitrum."
+      eyebrow="How It Works"
+      title="From Calibration to Allocation, in four stages."
+      subhead="Open the cycle. Make a gesture. Finalize. The protocol distributes the reserve."
+      chips={['Calibration', 'Gestures', 'Allocations']}
     />,
     size,
   );

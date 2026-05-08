@@ -1,31 +1,36 @@
 import type { Metadata } from 'next';
 
-import { logoImgUrl } from './index';
-
 const SITE_URL = 'https://www.cosmicsignature.com';
 
 /**
- * Builds App Router Metadata for a page with OpenGraph + Twitter meta tags
- * and a self-referencing canonical URL.
+ * Builds App Router Metadata with OpenGraph + Twitter tags and an
+ * optional canonical URL.
  *
- * Pass a custom `imageUrl` for pages that feature a specific token image;
- * all other pages default to the site logo.
- *
- * Pass `path` (e.g. "/faq") to generate a canonical URL. When omitted the
- * canonical is not set (root layout already sets metadataBase).
+ * When `imageUrl` is omitted, no `og:image` / `twitter:image` is set;
+ * Next.js then resolves the nearest `opengraph-image.tsx` PNG. Pass
+ * `imageUrl` only when a page has its own asset (e.g. `/detail/[id]`
+ * surfaces the actual NFT PNG). Pass `path` (e.g. "/faq") to add a
+ * self-referencing canonical URL.
  */
 export function createMetadata(
   title: string,
   description: string,
-  imageUrl: string = logoImgUrl,
+  imageUrl?: string,
   path?: string,
 ): Metadata {
-  const metadata: Metadata = {
+  const openGraph: NonNullable<Metadata['openGraph']> = { title, description };
+  const twitter: NonNullable<Metadata['twitter']> = {
+    card: 'summary_large_image',
     title,
     description,
-    openGraph: { title, description, images: [imageUrl] },
-    twitter: { card: 'summary_large_image', title, description, images: [imageUrl] },
   };
+
+  if (imageUrl !== undefined) {
+    openGraph.images = [imageUrl];
+    twitter.images = [imageUrl];
+  }
+
+  const metadata: Metadata = { title, description, openGraph, twitter };
 
   if (path !== undefined) {
     metadata.alternates = { canonical: `${SITE_URL}${path}` };

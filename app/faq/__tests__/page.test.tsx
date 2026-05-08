@@ -64,10 +64,13 @@ describe('app/faq/page.tsx', () => {
       );
     });
 
-    it('includes openGraph images with default logo', () => {
-      const og = metadata.openGraph as { images: string[] };
-      expect(og.images).toHaveLength(1);
-      expect(og.images[0]).toMatch(/logo\.(svg|png)/);
+    // The og:image is now resolved from `app/faq/opengraph-image.tsx`
+    // via Next.js's file-system convention, which produces a real PNG
+    // through `next/og`. Setting `metadata.openGraph.images` here would
+    // override that file with whatever was passed (previously an SVG,
+    // which Discord / Slack / X / Facebook / LinkedIn all reject).
+    it('does not set openGraph.images so the file-system PNG is used', () => {
+      expect((metadata.openGraph as { images?: unknown }).images).toBeUndefined();
     });
 
     it('includes twitter card metadata', () => {
@@ -79,10 +82,8 @@ describe('app/faq/page.tsx', () => {
       );
     });
 
-    it('uses the same default image for twitter as openGraph', () => {
-      const og = metadata.openGraph as { images: string[] };
-      const tw = metadata.twitter as { images: string[] };
-      expect(tw.images).toEqual(og.images);
+    it('does not set twitter.images so the file-system PNG is used', () => {
+      expect((metadata.twitter as { images?: unknown }).images).toBeUndefined();
     });
   });
 

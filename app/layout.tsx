@@ -3,8 +3,6 @@ import { Suspense, type ReactNode } from 'react';
 import Script from 'next/script';
 import { headers } from 'next/headers';
 
-import { logoImgUrl } from '@/utils';
-
 import { isLandingHost } from '@/lib/hostRouting';
 import { clashDisplay, inter } from '@/lib/fonts';
 import { GA_TRACKING_ID } from '@/utils/analytics';
@@ -20,9 +18,18 @@ import { Analytics } from './analytics';
 import '@/styles/global.css';
 
 const defaultTitle = 'Cosmic Signature';
+// Default OG/Twitter title is intentionally punchier than the document
+// title — most embed cards crop after ~70 chars and we want the
+// brand-line tagline visible in Discord/Slack/X previews.
+const defaultOgTitle = 'Cosmic Signature \u2014 Every Gesture Shapes the Signature.';
 const defaultDescription =
-  'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle\u2019s final Signature, and the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild.';
+  'A procedural on-chain art protocol on Arbitrum. Every gesture you make shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.';
 
+// `openGraph.images` and `twitter.images` are intentionally not set here.
+// Next.js auto-populates them from the file-system convention
+// (`app/opengraph-image.tsx`), which produces a real PNG via `next/og`.
+// SVG og:image is rejected by Discord, Slack, X, Facebook, and LinkedIn,
+// which is why the previous `logoImgUrl` (an SVG) failed to preview.
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.cosmicsignature.com'),
   title: { default: defaultTitle, template: '%s' },
@@ -42,17 +49,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: defaultTitle,
-    title: defaultTitle,
+    title: defaultOgTitle,
     description: defaultDescription,
-    images: [logoImgUrl],
     locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
     site: '@CosmicSignature',
-    title: defaultTitle,
+    title: defaultOgTitle,
     description: defaultDescription,
-    images: [logoImgUrl],
   },
   keywords: [
     'Cosmic Signature',
