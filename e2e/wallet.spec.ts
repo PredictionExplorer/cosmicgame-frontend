@@ -8,6 +8,19 @@ async function openMobileMenuIfNeeded(page: Page) {
   }
 }
 
+async function openWalletModal(page: Page) {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  await openMobileMenuIfNeeded(page);
+
+  const connectBtn = page.getByRole('button', { name: /connect/i }).first();
+  await connectBtn.scrollIntoViewIfNeeded();
+  await connectBtn.click();
+
+  const dialog = page.getByRole('dialog', { name: /connect a wallet/i }).first();
+  await expect(dialog).toBeVisible({ timeout: 10000 });
+  return dialog;
+}
+
 test.describe('Wallet connection state (disconnected)', () => {
   test('Connect Wallet is visible in the mobile header without opening the menu', async ({
     page,
@@ -30,18 +43,13 @@ test.describe('Wallet connection state (disconnected)', () => {
     await expect(connectBtn).toBeVisible();
   });
 
-  test('Connect Wallet opens a connector modal', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle' });
-    await openMobileMenuIfNeeded(page);
+  test('Connect Wallet opens all expected connector options', async ({ page }) => {
+    const dialog = await openWalletModal(page);
 
-    const connectBtn = page.getByRole('button', { name: /connect/i }).first();
-    await connectBtn.scrollIntoViewIfNeeded();
-    await connectBtn.click();
-
-    await expect(page.getByRole('dialog').first()).toBeVisible({ timeout: 10000 });
-    await expect(
-      page.getByText(/MetaMask|WalletConnect|Coinbase|Injected|Browser Wallet/i).first(),
-    ).toBeVisible({ timeout: 10000 });
+    await expect(dialog.getByRole('button', { name: /^Rainbow$/i })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /^Base Account$/i })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /^MetaMask$/i })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /^WalletConnect$/i })).toBeVisible();
   });
 
   test('home page shows a connect prompt in the gesture area before wallet connection', async ({

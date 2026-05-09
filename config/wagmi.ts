@@ -79,13 +79,8 @@ if (typeof globalThis.indexedDB === 'undefined') {
   };
 }
 
-// RainbowKit requires a projectId. Use a real ID from cloud.walletconnect.com for local + prod.
-// If unset we pass a placeholder so the app still runs; injected wallets work.
-export const isPlaceholderWalletConnectId =
-  !process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
-const projectId =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim() ||
-  'placeholder_get_real_id_from_cloud_walletconnect_com';
+// RainbowKit requires a real Reown/WalletConnect project ID for QR and mobile flows.
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim() ?? '';
 
 /**
  * Use RPC proxy when the node doesn't support CORS (e.g. self-hosted).
@@ -108,14 +103,17 @@ const transportUrl = useRpcProxy
 export const wagmiConfig = getDefaultConfig({
   appName: 'Cosmic Signature',
   projectId,
-  chains: [
-    activeChain,
-    ...(activeChain.id === localChain.id ? [] : [localChain]),
-  ] as [Chain, ...Chain[]],
+  chains: [activeChain, ...(activeChain.id === localChain.id ? [] : [localChain])] as [
+    Chain,
+    ...Chain[],
+  ],
   transports: {
     [activeChain.id]: http(transportUrl || undefined),
     [localChain.id]: http(
-      typeof window !== 'undefined' && rpcUrl && !rpcUrl.includes('infura.io') && !rpcUrl.includes('alchemy.com')
+      typeof window !== 'undefined' &&
+        rpcUrl &&
+        !rpcUrl.includes('infura.io') &&
+        !rpcUrl.includes('alchemy.com')
         ? `${window.location.origin}/api/rpc`
         : rpcUrl || 'http://127.0.0.1:8545',
     ),

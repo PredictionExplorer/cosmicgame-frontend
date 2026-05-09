@@ -2,7 +2,7 @@ import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { http } from 'wagmi';
 
 import { activeChain, localChain } from '../chains';
-import { isPlaceholderWalletConnectId, wagmiConfig } from '../wagmi';
+import { wagmiConfig } from '../wagmi';
 
 jest.mock('@rainbow-me/rainbowkit', () => ({
   getDefaultConfig: jest.fn((config) => ({ kind: 'wagmi-config', ...config })),
@@ -38,13 +38,12 @@ describe('wagmi wallet configuration', () => {
     expect(mockHttp).toHaveBeenCalled();
   });
 
-  it('falls back to the placeholder WalletConnect project id only when env is missing', () => {
+  it('passes the configured WalletConnect project id without a placeholder fallback', () => {
     const configArg = mockGetDefaultConfig.mock.calls[0]?.[0];
 
-    expect(typeof configArg?.projectId).toBe('string');
-    expect(configArg?.projectId.length).toBeGreaterThan(0);
-    expect(isPlaceholderWalletConnectId).toBe(
-      !process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim(),
+    expect(configArg?.projectId).toBe(
+      process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim() ?? '',
     );
+    expect(configArg?.projectId).not.toBe('placeholder_get_real_id_from_cloud_walletconnect_com');
   });
 });

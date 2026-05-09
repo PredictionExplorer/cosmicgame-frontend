@@ -19,6 +19,8 @@ process.env.NEXT_PUBLIC_NETWORK = process.env.NEXT_PUBLIC_NETWORK || 'sepolia';
 process.env.NEXT_PUBLIC_API_URL =
   process.env.NEXT_PUBLIC_API_URL || 'http://test-api.example/api/cosmicgame/';
 process.env.NEXT_PUBLIC_RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545';
+process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID =
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'test-walletconnect-project-id';
 
 // Build stamp (mirrors next.config `env`); Preview/local show footer line in tests.
 process.env.NEXT_PUBLIC_BUILD_COMMIT =

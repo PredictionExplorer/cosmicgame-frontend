@@ -4,8 +4,9 @@
  * (`GET …/statistics/dashboard` → `ContractAddrs`) and are published via
  * {@link publishDashboardContractAddresses} from `ContractAddressesProvider`.
  *
- * No defaults for network, API URL, or RPC URL — they must be set via environment
- * variables to avoid running against the wrong backend or chain.
+ * No defaults for network, API URL, RPC URL, or WalletConnect project ID — they
+ * must be set via environment variables to avoid running against the wrong
+ * backend, chain, or wallet connection project.
  */
 export type NetworkName = 'local' | 'sepolia' | 'mainnet';
 
@@ -13,6 +14,7 @@ export const REQUIRED_ENV_VARS = [
   'NEXT_PUBLIC_NETWORK',
   'NEXT_PUBLIC_API_URL',
   'NEXT_PUBLIC_RPC_URL',
+  'NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID',
 ] as const;
 
 export interface EnvValidation {
@@ -26,6 +28,7 @@ export function getEnvValidation(): EnvValidation {
   const network = process.env.NEXT_PUBLIC_NETWORK?.trim();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
   const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL?.trim();
+  const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim();
 
   if (!network) missing.push('NEXT_PUBLIC_NETWORK');
   else if (network !== 'local' && network !== 'sepolia' && network !== 'mainnet') {
@@ -33,6 +36,7 @@ export function getEnvValidation(): EnvValidation {
   }
   if (!apiUrl) missing.push('NEXT_PUBLIC_API_URL');
   if (!rpcUrl) missing.push('NEXT_PUBLIC_RPC_URL');
+  if (!walletConnectProjectId) missing.push('NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID');
 
   return {
     valid: missing.length === 0,

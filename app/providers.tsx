@@ -9,7 +9,7 @@ import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
 
-import { wagmiConfig, isPlaceholderWalletConnectId } from '@/config/wagmi';
+import { wagmiConfig } from '@/config/wagmi';
 import { cosmicRainbowTheme } from '@/config/rainbowkit-theme';
 import { networkConfig, getEnvValidation } from '@/config/networks';
 import { NOTIFICATION_AUTO_HIDE_MS } from '@/config/constants';
@@ -111,40 +111,6 @@ const particleOptions: ISourceOptions = {
 };
 
 const envValidation = getEnvValidation();
-
-// When using placeholder WalletConnect project ID, intercept their API calls so the SDK
-// doesn't log 403/400 (project-limits, pulse batch, etc.).
-if (
-  typeof window !== 'undefined' &&
-  isPlaceholderWalletConnectId &&
-  !(window as unknown as { __wcPatched?: boolean }).__wcPatched
-) {
-  (window as unknown as { __wcPatched?: boolean }).__wcPatched = true;
-  const isWcUrl = (url: string) =>
-    url.includes('api.web3modal.org') || url.includes('pulse.walletconnect.org');
-
-  const origFetch = window.fetch;
-  window.fetch = function (input: RequestInfo | URL, init?: RequestInit) {
-    const url =
-      typeof input === 'string' ? input : input instanceof Request ? input.url : String(input);
-    if (isWcUrl(url)) {
-      // project-limits expects planLimits.tier; return a minimal valid shape to avoid SDK destructuring errors
-      const body = url.includes('project-limits')
-        ? JSON.stringify({ planLimits: { tier: 'free' } })
-        : '{}';
-      return Promise.resolve(
-        new Response(body, { status: 200, headers: { 'Content-Type': 'application/json' } }),
-      );
-    }
-    return origFetch.call(window, input, init);
-  };
-
-  const origSendBeacon = navigator.sendBeacon.bind(navigator);
-  navigator.sendBeacon = function (url: string | URL, body?: BodyInit | null) {
-    if (isWcUrl(typeof url === 'string' ? url : url.href)) return true;
-    return origSendBeacon(url, body);
-  };
-}
 
 function EnvErrorScreen({ missing }: { missing: string[] }) {
   return (
