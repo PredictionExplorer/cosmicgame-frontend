@@ -148,7 +148,7 @@ const Header: FC = () => {
 
   const renderMobile = () => {
     return (
-      <nav className="flex items-center">
+      <nav className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
@@ -177,6 +177,19 @@ const Header: FC = () => {
             className="h-10 w-auto max-h-10 object-contain"
           />
         </Link>
+
+        <div className="ml-auto max-w-[12rem] overflow-hidden">
+          <ConnectWalletButton
+            isMobileView
+            balance={balance}
+            loading={loading}
+            stakedTokenCount={{
+              cst: anchoredCSTokens?.length,
+              rwalk: anchoredRWLKTokens?.length,
+            }}
+            hasUnclaimedRewards={hasUnclaimedRewards}
+          />
+        </div>
 
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
           <SheetContent side="left" className="w-[280px] p-0 sm:max-w-[280px]">

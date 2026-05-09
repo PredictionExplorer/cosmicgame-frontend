@@ -82,6 +82,15 @@ describe('Header', () => {
     expect(link).toHaveTextContent(/discover/i);
   });
 
+  it('shows a mobile wallet connect button without opening the drawer', async () => {
+    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 });
+
+    render(<Header />);
+
+    expect(await screen.findByRole('button', { name: 'Connect Wallet' })).toBeVisible();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('does not render a maintenance banner when systemMode is 0', () => {
     render(<Header />);
     expect(screen.queryByText(/MAINTENANCE/)).not.toBeInTheDocument();

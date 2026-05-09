@@ -5,7 +5,7 @@
 import type { ReactNode } from 'react';
 
 module.exports = {
-  ConnectButton: () => null,
+  ConnectButton: () => <button type="button">Connect Wallet</button>,
   RainbowKitProvider: ({ children }: { children: ReactNode }) => children,
   darkTheme: () => ({}),
   getDefaultConfig: () => ({}),

@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 
 import { getAssetsUrl } from '@/utils';
 
+import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { StyledCard } from '@/components/styled';
@@ -179,7 +180,7 @@ const HomePage = () => {
   const canGesture = allocationTime > now || data?.LastBidderAddr !== account;
   const canClaim = !(allocationTime > now || data?.LastBidderAddr === zeroAddress || loading);
   const claimWait = allocationTime + timeoutFinalize * 1000;
-  const isActive = account !== null && activationTime < now / 1000;
+  const isRoundActive = activationTime < now / 1000;
 
   const landingHost = hostname !== null && isLandingHost(hostname);
   if (hostname === null) {
@@ -314,7 +315,7 @@ const HomePage = () => {
         )}
 
         {/* ===== BID ACTION AREA ===== */}
-        {!loading && isActive && (
+        {!loading && isRoundActive && (
           <motion.div
             variants={sectionFade}
             initial="hidden"
@@ -330,72 +331,98 @@ const HomePage = () => {
                 Choose a gesture method and participate in the active cycle.
               </p>
 
-              <GestureForm {...gestureForm} data={data} />
+              {account ? (
+                <>
+                  <GestureForm {...gestureForm} data={data} />
 
-              <div className="mt-6 space-y-4">
-                {canGesture && (
-                  <Button
-                    size="lg"
-                    onClick={handleGesture}
-                    className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
-                    disabled={
-                      isGesturing ||
-                      (gestureType === 'RandomWalk' && rwlkId === -1) ||
-                      gestureType === ''
-                    }
-                  >
-                    {isGesturing ? (
-                      <span className="flex items-center gap-2">
-                        <Spinner size="sm" /> Processing...
-                      </span>
-                    ) : (
+                  <div className="mt-6 space-y-4">
+                    {canGesture && (
+                      <Button
+                        size="lg"
+                        onClick={handleGesture}
+                        className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
+                        disabled={
+                          isGesturing ||
+                          (gestureType === 'RandomWalk' && rwlkId === -1) ||
+                          gestureType === ''
+                        }
+                      >
+                        {isGesturing ? (
+                          <span className="flex items-center gap-2">
+                            <Spinner size="sm" /> Processing...
+                          </span>
+                        ) : (
+                          <>
+                            {getGestureLabel()} <ArrowRight className="ml-2 h-5 w-5" />
+                          </>
+                        )}
+                      </Button>
+                    )}
+                    {canClaim && (
                       <>
-                        {getGestureLabel()} <ArrowRight className="ml-2 h-5 w-5" />
+                        <Button
+                          size="lg"
+                          onClick={handleFinalize}
+                          className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
+                          disabled={
+                            isClaiming || (data?.LastBidderAddr !== account && claimWait > now)
+                          }
+                        >
+                          {isClaiming ? (
+                            <span className="flex items-center gap-2">
+                              <Spinner size="sm" /> Processing...
+                            </span>
+                          ) : (
+                            <>
+                              Finalize Cycle
+                              <span className="flex items-center">
+                                {claimWait > now && data?.LastBidderAddr !== account && (
+                                  <>
+                                    &nbsp;available in &nbsp;
+                                    <Countdown date={claimWait} />
+                                  </>
+                                )}
+                                &nbsp;
+                                <ArrowRight className="h-[22px] w-[22px]" />
+                              </span>
+                            </>
+                          )}
+                        </Button>
+                        {data?.LastBidderAddr !== account && claimWait > now && (
+                          <p className="text-sm italic text-right text-primary">
+                            Please wait for the participant who made the Final Gesture to finalize
+                            the cycle.
+                          </p>
+                        )}
                       </>
                     )}
-                  </Button>
-                )}
-                {canClaim && (
-                  <>
-                    <Button
-                      size="lg"
-                      onClick={handleFinalize}
-                      className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
-                      disabled={isClaiming || (data?.LastBidderAddr !== account && claimWait > now)}
-                    >
-                      {isClaiming ? (
-                        <span className="flex items-center gap-2">
-                          <Spinner size="sm" /> Processing...
-                        </span>
-                      ) : (
-                        <>
-                          Finalize Cycle
-                          <span className="flex items-center">
-                            {claimWait > now && data?.LastBidderAddr !== account && (
-                              <>
-                                &nbsp;available in &nbsp;
-                                <Countdown date={claimWait} />
-                              </>
-                            )}
-                            &nbsp;
-                            <ArrowRight className="h-[22px] w-[22px]" />
-                          </span>
-                        </>
-                      )}
-                    </Button>
-                    {data?.LastBidderAddr !== account && claimWait > now && (
-                      <p className="text-sm italic text-right text-primary">
-                        Please wait for the participant who made the Final Gesture to finalize the
-                        cycle.
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
+                  </div>
+                </>
+              ) : (
+                <div
+                  data-testid="connect-to-gesture"
+                  className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
+                >
+                  <h3 className="font-display text-lg font-semibold tracking-tight">
+                    Connect to make a gesture
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Connect MetaMask or another wallet to choose a gesture method and participate in
+                    the active cycle.
+                  </p>
+                  <div className="mt-4">
+                    <ConnectWalletButton
+                      isMobileView={false}
+                      loading={false}
+                      balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
+                      stakedTokenCount={{ cst: 0, rwalk: 0 }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
-
         {/* ===== PRIZE BREAKDOWN ===== */}
         {data && (
           <motion.div

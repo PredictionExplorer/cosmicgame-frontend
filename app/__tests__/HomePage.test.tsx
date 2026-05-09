@@ -2,6 +2,8 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import HomePage from '../HomePage';
 
+jest.mock('@rainbow-me/rainbowkit');
+
 /* ── useApiQuery hooks ──────────────────────────────────────────── */
 
 const mockUseDashboardInfo = jest.fn().mockReturnValue({ data: undefined, isLoading: false });
@@ -286,7 +288,7 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
   });
 
-  it('does not render GestureForm when account is null', () => {
+  it('shows a connect-first gesture prompt when account is null', () => {
     mockAccount = null;
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
@@ -294,6 +296,9 @@ describe('HomePage', () => {
     });
     render(<HomePage />);
     expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
+    expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
+    expect(screen.getByText('Connect to make a gesture')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Connect Wallet' })).toBeInTheDocument();
   });
 
   it('renders SpecialAllocationRecipients when TsRoundStart is nonzero', () => {
