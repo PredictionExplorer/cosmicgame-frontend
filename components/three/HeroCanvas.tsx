@@ -30,7 +30,7 @@ export function HeroCanvas() {
   }
 
   return (
-    <div className="absolute inset-0 h-full w-full">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full">
       <Canvas
         dpr={[1, 1.5]}
         gl={{

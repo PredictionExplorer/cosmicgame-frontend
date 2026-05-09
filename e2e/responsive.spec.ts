@@ -29,7 +29,7 @@ test.describe('Responsive - Mobile viewport', () => {
     await page.waitForTimeout(500);
     const galleryLink = page.getByRole('dialog').locator('a[href="/gallery"]');
     await galleryLink.scrollIntoViewIfNeeded();
-    await galleryLink.evaluate((element) => (element as HTMLAnchorElement).click());
+    await galleryLink.click();
     await expect(page).toHaveURL(/gallery/);
   });
 

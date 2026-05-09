@@ -103,34 +103,32 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(page.getByText(/Chrono-Warrior|Chrono Warrior/i).first()).toBeVisible();
   });
 
-  test('Chrono-Warrior card uses its own address when leaders differ', async ({
-    page,
-    request,
-  }) => {
-    // lexicon-allow-start: production backend route is sealed
-    const response = await request.get(
-      'https://nfts.cosmicsignature.com/api/cosmicgame/bid/current_special_winners',
-    );
-    // lexicon-allow-end
-    test.skip(!response.ok(), 'Production current special recipients endpoint unavailable');
-
-    const data = (await response.json()) as {
-      ChronoWarriorAddress?: string;
-      EnduranceChampionAddress?: string;
+  test('Chrono-Warrior card uses its own address when leaders differ', async ({ page }) => {
+    const data = {
+      ChronoWarriorAddress: '0x2222222222222222222222222222222222222222',
+      ChronoWarriorDuration: 7200,
+      EnduranceChampionAddress: '0x1111111111111111111111111111111111111111',
+      EnduranceChampionDuration: 3600,
+      LastBidderAddress: '0x3333333333333333333333333333333333333333',
+      LastBidderLastBidTime: Math.floor(Date.now() / 1000) - 60,
+      LastCstBidderAddress: '0x4444444444444444444444444444444444444444',
     };
-    const chronoAddress = data.ChronoWarriorAddress ?? '';
-    const enduranceAddress = data.EnduranceChampionAddress ?? '';
-    test.skip(
-      !chronoAddress ||
-        !enduranceAddress ||
-        chronoAddress.toLowerCase() === enduranceAddress.toLowerCase(),
-      'Current backend reports matching Chrono-Warrior and Endurance Champion addresses',
-    );
+
+    await page.route(/\/api\/cosmicgame\/bid\/current_special_winners(?:\?.*)?$/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(data),
+      });
+    });
+    await page.reload({ waitUntil: 'networkidle' });
 
     const chronoCard = page.getByTestId('special-allocation-card-chrono-warrior').first();
+    const enduranceCard = page.getByTestId('special-allocation-card-endurance-champion').first();
     await ensureVisible(chronoCard);
-    await expect(chronoCard).toContainText(chronoAddress);
-    await expect(chronoCard).not.toContainText(enduranceAddress);
+    await expect(chronoCard).toContainText(data.ChronoWarriorAddress);
+    await expect(chronoCard).not.toContainText(data.EnduranceChampionAddress);
+    await expect(enduranceCard).toContainText(data.EnduranceChampionAddress);
   });
 
   test('Recipient History section renders', async ({ page }) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, type ReactNode } from 'react';
+import { memo, useState, useEffect, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import type { ISourceOptions } from '@tsparticles/engine';
 import { WagmiProvider } from 'wagmi';
@@ -36,6 +36,17 @@ const Particles = dynamic(
   { ssr: false },
 );
 
+const ParticleBackdrop = memo(function ParticleBackdrop() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 -z-10 touch-none [contain:strict] motion-reduce:hidden print:hidden"
+    >
+      <Particles id="tsparticles" options={particleOptions} className="h-full w-full" />
+    </div>
+  );
+});
+
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
@@ -49,12 +60,15 @@ function makeQueryClient() {
 }
 
 const particleOptions: ISourceOptions = {
+  fullScreen: { enable: false },
   background: { color: { value: 'transparent' } },
   fpsLimit: 60,
   interactivity: {
+    detectsOn: 'window',
     events: {
-      onHover: { enable: true, mode: 'grab' },
+      onHover: { enable: false },
       onClick: { enable: false },
+      resize: { enable: true },
     },
     modes: {
       grab: { distance: 120, links: { opacity: 0.22 } },
@@ -252,21 +266,7 @@ export function Providers({
       <QueryClientProvider client={queryClient}>
         <ContractAddressesProvider>
           <RainbowKitProvider theme={cosmicRainbowTheme}>
-            {engineReady && (
-              <Particles
-                id="tsparticles"
-                options={particleOptions}
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  zIndex: 0,
-                }}
-                aria-hidden="true"
-              />
-            )}
+            {engineReady && <ParticleBackdrop />}
             <ErrorBoundary>
               <CookiesProvider>
                 <AnchoredTokenProvider>

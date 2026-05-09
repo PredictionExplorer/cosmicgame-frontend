@@ -13,9 +13,31 @@ const mockLoadSlim = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('next/dynamic', () =>
   jest.fn(() => {
-    const MockParticles = (props: Record<string, unknown>) => (
-      <div data-testid="particles" {...props} />
-    );
+    const MockParticles = (props: Record<string, unknown>) => {
+      const options = props.options as
+        | {
+            fullScreen?: { enable?: boolean };
+            interactivity?: {
+              detectsOn?: string;
+              events?: {
+                onHover?: { enable?: boolean };
+                onClick?: { enable?: boolean };
+              };
+            };
+          }
+        | undefined;
+
+      return (
+        <div
+          data-testid="particles"
+          data-fullscreen-enabled={String(options?.fullScreen?.enable)}
+          data-detects-on={options?.interactivity?.detectsOn}
+          data-hover-enabled={String(options?.interactivity?.events?.onHover?.enable)}
+          data-click-enabled={String(options?.interactivity?.events?.onClick?.enable)}
+          {...props}
+        />
+      );
+    };
     MockParticles.displayName = 'MockParticles';
     return MockParticles;
   }),
@@ -266,7 +288,7 @@ describe('Providers', () => {
     });
   });
 
-  it('passes aria-hidden to particles for accessibility', async () => {
+  it('wraps particles in an inert aria-hidden backdrop', async () => {
     mockInitParticlesEngine.mockImplementation(async (cb) => {
       await cb({});
     });
@@ -277,7 +299,34 @@ describe('Providers', () => {
       </Providers>,
     );
     await waitFor(() => {
-      expect(screen.getByTestId('particles')).toHaveAttribute('aria-hidden', 'true');
+      const backdrop = screen.getByTestId('particles').parentElement;
+      expect(backdrop).toHaveAttribute('aria-hidden', 'true');
+      expect(backdrop).toHaveClass(
+        'pointer-events-none',
+        'fixed',
+        'inset-0',
+        '-z-10',
+        'touch-none',
+      );
+    });
+  });
+
+  it('configures particles as non-fullscreen and non-interactive', async () => {
+    mockInitParticlesEngine.mockImplementation(async (cb) => {
+      await cb({});
+    });
+
+    render(
+      <Providers>
+        <div>Content</div>
+      </Providers>,
+    );
+    await waitFor(() => {
+      const particles = screen.getByTestId('particles');
+      expect(particles).toHaveAttribute('data-fullscreen-enabled', 'false');
+      expect(particles).toHaveAttribute('data-detects-on', 'window');
+      expect(particles).toHaveAttribute('data-hover-enabled', 'false');
+      expect(particles).toHaveAttribute('data-click-enabled', 'false');
     });
   });
 
