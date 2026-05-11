@@ -61,6 +61,20 @@ describe('useAllocationNotification', () => {
 
       expect(mockReportError).toHaveBeenCalledWith(playError, 'notification audio error');
     });
+
+    it('does not report autoplay policy failures (NotAllowedError)', async () => {
+      mockPlay.mockRejectedValueOnce(new DOMException('must interact', 'NotAllowedError'));
+
+      const { result } = renderHook(() =>
+        useAllocationNotification({ allocationTime: Date.now() + 60_000 }),
+      );
+
+      await act(async () => {
+        await result.current.playAudio();
+      });
+
+      expect(mockReportError).not.toHaveBeenCalled();
+    });
   });
 
   describe('requestNotificationPermission', () => {
