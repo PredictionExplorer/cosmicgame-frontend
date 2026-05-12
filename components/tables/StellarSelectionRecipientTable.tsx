@@ -47,8 +47,8 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
   useEffect(() => {
     const fetchCycleTimeoutTimesToRetrieveAllocations = async () => {
       const cycleTimeoutTimesToRetrieveAllocations =
-        await stellarSelectionWalletContract!.read.cycleTimeoutTimesToRetrieveAllocations?.([
-          RoundNum,
+        await stellarSelectionWalletContract!.read.roundTimeoutTimesToWithdrawPrizes([
+          BigInt(RoundNum),
         ]);
       setRoundTimeoutTimesToWithdrawPrizes(Number(cycleTimeoutTimesToRetrieveAllocations ?? 0));
     };

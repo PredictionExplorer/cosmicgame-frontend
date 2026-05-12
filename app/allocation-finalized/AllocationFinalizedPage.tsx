@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Fireworks, { FireworksHandlers } from '@fireworks-js/react';
+import { usePublicClient } from 'wagmi';
 
 import {
   DefinitionList,
@@ -14,13 +15,20 @@ import {
 } from '@/components/detail-page/DetailPageChrome';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { MainWrapper } from '@/components/styled';
+import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import { useRoundInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
 
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
+/** Poll interval while waiting for the next round to become active (chain activation time). */
+const ACTIVATION_POLL_MS = 4000;
+
 const AllocationFinalizedPage = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const publicClient = usePublicClient();
+  const cosmicGameContract = useCosmicGameContract();
 
   const fireworksRef = useRef<FireworksHandlers>(null);
 
@@ -34,6 +42,42 @@ const AllocationFinalizedPage = () => {
   const isClaimSuccess = finalizeMessage === 'success';
 
   const { data: allocationInfo, isLoading: loading } = useRoundInfo(cycleIsValid ? roundNum : -1);
+
+  /**
+   * After `claimMainPrize`, the chain is on the next round; `roundActivationTime()` is when that
+   * round becomes playable. While `block.timestamp < activation`, stay on this congratulations URL;
+   * once `block.timestamp >= activation`, send players to home so the dashboard shows the live round.
+   */
+  useEffect(() => {
+    if (!isClaimSuccess || !cycleIsValid || !publicClient || !cosmicGameContract) return;
+
+    let cancelled = false;
+
+    const maybeRedirectWhenRoundActive = async () => {
+      try {
+        const activationTime = await cosmicGameContract.read.roundActivationTime?.();
+        const block = await publicClient.getBlock({ blockTag: 'latest' });
+        if (cancelled || activationTime === undefined || block === null) return;
+
+        const activationSec = Number(activationTime);
+        const blockSec = Number(block.timestamp);
+        if (!Number.isFinite(activationSec) || activationSec <= 0) return;
+
+        if (blockSec >= activationSec) {
+          router.replace('/');
+        }
+      } catch {
+        /* transient RPC or contract read failure — next poll retries */
+      }
+    };
+
+    void maybeRedirectWhenRoundActive();
+    const id = window.setInterval(() => void maybeRedirectWhenRoundActive(), ACTIVATION_POLL_MS);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [isClaimSuccess, cycleIsValid, publicClient, cosmicGameContract, router]);
 
   const handleFireworksClick = () => {
     fireworksRef.current?.stop();

@@ -1,4 +1,4 @@
-import { checkA11y, render, screen } from '@/test-utils';
+import { act, checkA11y, render, screen, waitFor } from '@/test-utils';
 
 import AllocationFinalizedPage from '../AllocationFinalizedPage';
 
@@ -12,10 +12,34 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useRoundInfo: (...args: unknown[]) => mockUseRoundInfo(...args),
 }));
 
+const mockReplace = jest.fn();
+const mockGetBlock = jest.fn().mockResolvedValue({ timestamp: 50n });
+const mockRoundActivationTime = jest.fn().mockResolvedValue(100n);
+
+jest.mock('wagmi', () => ({
+  usePublicClient: () => ({
+    getBlock: (...args: unknown[]) => mockGetBlock(...args),
+  }),
+}));
+
+jest.mock('../../../hooks/useCosmicGameContract', () => ({
+  __esModule: true,
+  default: () => ({
+    read: {
+      roundActivationTime: (...args: unknown[]) => mockRoundActivationTime(...args),
+    },
+  }),
+}));
+
 let mockSearchParams = new URLSearchParams('cycle=5');
 
 jest.mock('next/navigation', () => ({
   useSearchParams: () => mockSearchParams,
+  useRouter: () => ({
+    replace: mockReplace,
+    push: jest.fn(),
+    prefetch: jest.fn(),
+  }),
 }));
 
 jest.mock('@fireworks-js/react', () => ({
@@ -26,6 +50,8 @@ jest.mock('@fireworks-js/react', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockSearchParams = new URLSearchParams('cycle=5');
+  mockGetBlock.mockResolvedValue({ timestamp: 50n });
+  mockRoundActivationTime.mockResolvedValue(100n);
 });
 
 describe('AllocationFinalizedPage', () => {
@@ -103,5 +129,51 @@ describe('AllocationFinalizedPage', () => {
   it('has no accessibility violations', async () => {
     const { container } = render(<AllocationFinalizedPage />);
     await checkA11y(container);
+  });
+
+  it('redirects to home when message=success and latest block time >= roundActivationTime', async () => {
+    mockSearchParams = new URLSearchParams('cycle=3&message=success');
+    mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false, error: null });
+    mockRoundActivationTime.mockResolvedValue(100n);
+    mockGetBlock.mockResolvedValue({ timestamp: 200n });
+
+    render(<AllocationFinalizedPage />);
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith('/');
+    });
+  });
+
+  it('does not redirect when chain time is still before activation', async () => {
+    mockSearchParams = new URLSearchParams('cycle=3&message=success');
+    mockUseRoundInfo.mockReturnValue({ data: null, isLoading: false, error: null });
+    mockRoundActivationTime.mockResolvedValue(1_000_000n);
+    mockGetBlock.mockResolvedValue({ timestamp: 100n });
+
+    render(<AllocationFinalizedPage />);
+
+    await act(async () => {
+      await new Promise((r) => {
+        setTimeout(r, 50);
+      });
+    });
+
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
+
+  it('does not redirect when message is not success', async () => {
+    mockSearchParams = new URLSearchParams('cycle=3');
+    mockRoundActivationTime.mockResolvedValue(1n);
+    mockGetBlock.mockResolvedValue({ timestamp: 9_999_999n });
+
+    render(<AllocationFinalizedPage />);
+
+    await act(async () => {
+      await new Promise((r) => {
+        setTimeout(r, 50);
+      });
+    });
+
+    expect(mockReplace).not.toHaveBeenCalled();
   });
 });

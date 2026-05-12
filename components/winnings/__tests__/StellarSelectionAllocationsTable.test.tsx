@@ -24,7 +24,7 @@ jest.mock('../../../hooks/useStellarSelectionWalletContract', () => ({
   __esModule: true,
   default: () => ({
     read: {
-      cycleTimeoutTimesToRetrieveAllocations: jest.fn().mockResolvedValue(0),
+      roundTimeoutTimesToWithdrawPrizes: jest.fn().mockResolvedValue(0),
     },
   }),
 }));

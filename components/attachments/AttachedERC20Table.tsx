@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import {
   TablePrimary,
@@ -16,36 +16,26 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
-import api from '@/services/api';
 import type { DonatedERC20Token } from '@/services/api/types';
 
 export type { DonatedERC20Token };
 
 interface TokenRowProps {
-  currentTime: number;
   token: DonatedERC20Token;
   handleClaim: ((roundNum: number, tokenAddr: string, amount: string) => void) | null;
 }
 
-const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
-  const [cycleTimeoutTimesToRetrieveAllocations, setRoundTimeoutTimesToWithdrawPrizes] =
-    useState(0);
-  const stellarSelectionWalletContract = useStellarSelectionWalletContract();
-
-  useEffect(() => {
-    if (!stellarSelectionWalletContract) return;
-    const fetchCycleTimeoutTimesToRetrieveAllocations = async () => {
-      const cycleTimeoutTimesToRetrieveAllocations =
-        await stellarSelectionWalletContract.read.cycleTimeoutTimesToRetrieveAllocations?.([
-          token.RoundNum,
-        ]);
-      setRoundTimeoutTimesToWithdrawPrizes(Number(cycleTimeoutTimesToRetrieveAllocations ?? 0));
-    };
-    fetchCycleTimeoutTimesToRetrieveAllocations();
-  }, [stellarSelectionWalletContract, token.RoundNum]);
-
+const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
   if (!token) return <TablePrimaryRow />;
+
+  const donatedEth =
+    typeof token.AmountDonatedEth === 'number' && Number.isFinite(token.AmountDonatedEth)
+      ? token.AmountDonatedEth
+      : 0;
+  const claimedEth =
+    typeof token.AmountClaimedEth === 'number' && Number.isFinite(token.AmountClaimedEth)
+      ? token.AmountClaimedEth
+      : 0;
 
   return (
     <TablePrimaryRow>
@@ -87,36 +77,33 @@ const TokenRow = ({ currentTime, token, handleClaim }: TokenRowProps) => {
         </Tooltip>
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{token.AmountDonatedEth.toFixed(2)}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{donatedEth.toFixed(2)}</TablePrimaryCell>
 
-      <TablePrimaryCell align="center">{token.AmountClaimedEth.toFixed(2)}</TablePrimaryCell>
+      <TablePrimaryCell align="center">{claimedEth.toFixed(2)}</TablePrimaryCell>
 
       <TablePrimaryCell>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
-              href={`/user/${token.WinnerAddr}`}
-              className="text-inherit text-[inherit] font-mono"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {shortenHex(token.WinnerAddr, 6)}
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent>{token.WinnerAddr}</TooltipContent>
-        </Tooltip>
+        {token.WinnerAddr ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                href={`/user/${token.WinnerAddr}`}
+                className="text-inherit text-[inherit] font-mono"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {shortenHex(token.WinnerAddr, 6)}
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>{token.WinnerAddr}</TooltipContent>
+          </Tooltip>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
       </TablePrimaryCell>
 
       <TablePrimaryCell align="center">{token.Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
 
-      <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(cycleTimeoutTimesToRetrieveAllocations)}{' '}
-        {cycleTimeoutTimesToRetrieveAllocations < currentTime
-          ? '(Expired)'
-          : `(${formatSeconds(cycleTimeoutTimesToRetrieveAllocations - currentTime)} left)`}
-      </TablePrimaryCell>
-
-      {handleClaim && cycleTimeoutTimesToRetrieveAllocations < currentTime && (
+      {handleClaim && (
         <TablePrimaryCell>
           {!token.Claimed && (
             <Button
@@ -142,17 +129,6 @@ interface DonatedERC20TableProps {
 const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
   const perPage = 5;
   const [page, setPage] = useState<number>(1);
-  const [currentTime, setCurrentTime] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const currentTime = await api.get_current_time();
-      setCurrentTime(currentTime);
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
 
   if (!list || list.length === 0) {
     return <p>No attached ERC20 tokens yet.</p>;
@@ -171,7 +147,6 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
               <TablePrimaryHeadCell>Retrieved Amount</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Retrieved</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
               {handleClaim && (
                 <TablePrimaryHeadCell>
                   <span className="sr-only">Actions</span>
@@ -181,12 +156,7 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
           </TablePrimaryHead>
           <tbody>
             {list.slice((page - 1) * perPage, page * perPage).map((token, i) => (
-              <TokenRow
-                key={page * perPage + i}
-                currentTime={currentTime}
-                token={token}
-                handleClaim={handleClaim}
-              />
+              <TokenRow key={page * perPage + i} token={token} handleClaim={handleClaim} />
             ))}
           </tbody>
         </TablePrimary>

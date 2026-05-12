@@ -2,15 +2,6 @@ import '@testing-library/jest-dom';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
-jest.mock('../../../hooks/useStellarSelectionWalletContract', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-jest.mock('../../../services/api', () => ({
-  __esModule: true,
-  default: { get_current_time: jest.fn().mockResolvedValue(1700000000) },
-}));
-
 import DonatedERC20Table from '../AttachedERC20Table';
 
 const createToken = (overrides = {}) => ({
@@ -46,7 +37,6 @@ describe('DonatedERC20Table', () => {
       'Retrieved Amount',
       'Recipient',
       'Retrieved',
-      'Expiration Date',
     ]) {
       expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
@@ -65,8 +55,20 @@ describe('DonatedERC20Table', () => {
     expect(screen.getByText('Yes')).toBeInTheDocument();
   });
 
-  it('does not render extra column when handleClaim is null', () => {
+  it('does not render Claim when handleClaim is null', () => {
     render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
+    expect(screen.queryByTestId('Claim Button')).not.toBeInTheDocument();
+  });
+
+  it('renders Claim when handleClaim is set and token is not claimed', () => {
+    render(<DonatedERC20Table list={[createToken()]} handleClaim={jest.fn()} />);
+    expect(screen.getByTestId('Claim Button')).toBeInTheDocument();
+  });
+
+  it('does not render Claim when token is already claimed', () => {
+    render(
+      <DonatedERC20Table list={[createToken({ Claimed: true })]} handleClaim={jest.fn()} />,
+    );
     expect(screen.queryByTestId('Claim Button')).not.toBeInTheDocument();
   });
 

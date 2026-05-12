@@ -106,7 +106,7 @@ export function StellarSelectionAllocationsTable({ list }: { list: StellarSelect
     const fetchTimeouts = async () => {
       const results = await Promise.allSettled(
         uniqueRounds.map((r) =>
-          stellarSelectionWalletContract.read.cycleTimeoutTimesToRetrieveAllocations?.([r]),
+          stellarSelectionWalletContract.read.roundTimeoutTimesToWithdrawPrizes([BigInt(r)]),
         ),
       );
       const map: Record<number, number> = {};

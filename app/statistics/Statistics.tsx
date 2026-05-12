@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -51,12 +51,16 @@ import {
   useGlobalAnchoredCSTokens,
   useGlobalAnchoredRWLKTokens,
   useSystemModelist,
+  useDonationsNFTByRound,
+  useDonationsERC20ByRound,
 } from '@/hooks/useApiQuery';
+import type { AttachedNFT, DonatedERC20Token } from '@/services/api/types';
 import { StatisticsItem } from '@/components/statistics/StatisticsItem';
 import { StatisticsGroup } from '@/components/statistics/StatisticsGroup';
 import { CollapsibleSection } from '@/components/statistics/CollapsibleSection';
 import { AnchoringSection } from '@/components/statistics/AnchoringSection';
 import { DonatedNFTsGrid } from '@/components/statistics/DonatedNFTsGrid';
+import { DonatedTokensSection } from '@/components/home/DonatedTokensSection';
 import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHoldersCSTTable';
 import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
 
@@ -78,6 +82,11 @@ const Statistics = () => {
   const { data: systemModeChangesData } = useSystemModelist();
 
   const data = dashboardData ?? null;
+  const curRoundNum = data?.CurRoundNum ?? -1;
+  const [attachedTokensTab, setAttachedTokensTab] = useState(0);
+  const [attachedTokensNftPage, setAttachedTokensNftPage] = useState(1);
+  const { data: curRoundNftDonations } = useDonationsNFTByRound(curRoundNum);
+  const { data: curRoundErc20Donations } = useDonationsERC20ByRound(curRoundNum);
 
   const uniqueParticipants = useMemo(() => {
     if (!uniqueBiddersData) return [];
@@ -533,6 +542,19 @@ const Statistics = () => {
 
         {/* 6 ── Donated NFTs Grid ────────────────────────────────── */}
         <DonatedNFTsGrid nftDonations={nftDonations} />
+
+        {/* 6b ── Current cycle attached tokens (ERC721 + ERC20, same as current-cycle page) ── */}
+        <div className="mt-10">
+          <DonatedTokensSection
+            donatedNFTs={(curRoundNftDonations ?? []) as AttachedNFT[]}
+            donatedERC20Tokens={(curRoundErc20Donations ?? []) as DonatedERC20Token[]}
+            donatedTokensTab={attachedTokensTab}
+            onTabChange={(_e, v) => setAttachedTokensTab(v)}
+            curPage={attachedTokensNftPage}
+            setCurPage={setAttachedTokensNftPage}
+            perPage={12}
+          />
+        </div>
 
         {/* 7 ── Round Activations ────────────────────────────────── */}
         <div>

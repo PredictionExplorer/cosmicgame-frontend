@@ -493,10 +493,10 @@ describe('donations API', () => {
 
   describe('get_donations_erc20_by_round', () => {
     it('calls correct endpoint', async () => {
-      mockedAxios.get.mockResolvedValue({ data: { DonationsERC20ByRoundDetailed: [] } });
+      mockedAxios.get.mockResolvedValue({ data: { DonationsERC20ByRoundAll: [] } });
       await get_donations_erc20_by_round(6);
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/donations.*erc20.*by_round.*detailed.*6/),
+        expect.stringMatching(/donations.*erc20.*by_round.*all.*6/),
       );
     });
 
@@ -508,6 +508,26 @@ describe('donations API', () => {
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
       await expect(get_donations_erc20_by_round(6)).rejects.toThrow('Network response was not OK');
+    });
+
+    it('maps AmountEth onto AmountDonatedEth when AmountDonatedEth is absent', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          DonationsERC20ByRoundAll: [
+            {
+              RoundNum: 6,
+              TokenAddr: '0x1111111111111111111111111111111111111111',
+              AmountEth: 1.25,
+              Tx: TX,
+            },
+          ],
+        },
+      });
+      const result = await get_donations_erc20_by_round(6);
+      expect(result).toHaveLength(1);
+      expect(result[0].AmountDonatedEth).toBe(1.25);
+      expect(result[0].AmountClaimedEth).toBe(0);
+      expect(result[0].WinnerAddr).toBe('');
     });
   });
 

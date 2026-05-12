@@ -3,7 +3,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import {
   TablePrimary,
@@ -18,7 +18,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import NFTImage from '@/components/nft/NFTImage';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
 import { reportError } from '@/utils/errors';
 
 export interface NFTRecord {
@@ -49,22 +48,6 @@ interface DonatedNFTTableProps {
 
 const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
   const [tokenURI, setTokenURI] = useState<{ image?: string; external_url?: string } | null>(null);
-
-  const [cycleTimeoutTimesToRetrieveAllocations, setRoundTimeoutTimesToWithdrawPrizes] =
-    useState(0);
-  const stellarSelectionWalletContract = useStellarSelectionWalletContract();
-
-  useEffect(() => {
-    if (!stellarSelectionWalletContract) return;
-    const fetchCycleTimeoutTimesToRetrieveAllocations = async () => {
-      const cycleTimeoutTimesToRetrieveAllocations =
-        await stellarSelectionWalletContract.read.cycleTimeoutTimesToRetrieveAllocations?.([
-          nft.RoundNum,
-        ]);
-      setRoundTimeoutTimesToWithdrawPrizes(Number(cycleTimeoutTimesToRetrieveAllocations ?? 0));
-    };
-    fetchCycleTimeoutTimesToRetrieveAllocations();
-  }, [stellarSelectionWalletContract, nft.RoundNum]);
 
   useEffect(() => {
     const fetchTokenMetadata = async () => {
@@ -156,15 +139,6 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         )}
       </TablePrimaryCell>
 
-      {/* eslint-disable react-hooks/purity */}
-      <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(cycleTimeoutTimesToRetrieveAllocations)}{' '}
-        {cycleTimeoutTimesToRetrieveAllocations < Date.now() / 1000
-          ? '(Expired)'
-          : `(${formatSeconds(cycleTimeoutTimesToRetrieveAllocations - Math.ceil(Date.now() / 1000))})`}
-      </TablePrimaryCell>
-      {/* eslint-enable react-hooks/purity */}
-
       <TablePrimaryCell className="w-[130px]">
         {tokenURI?.image ? (
           <a href={tokenURI.external_url} target="_blank" rel="noopener noreferrer">
@@ -211,7 +185,6 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
               <TablePrimaryHeadCell>Round #</TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="left">Token Address</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
               <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
               {handleClaim && (
                 <TablePrimaryHeadCell>

@@ -22,6 +22,8 @@ const mockUseGlobalAnchoredCSTokens = jest.fn().mockReturnValue({ data: undefine
 const mockUseGlobalAnchoredRWLKTokens = jest.fn().mockReturnValue({ data: undefined });
 const mockUseSystemModelist = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCTPrice = jest.fn().mockReturnValue({ data: undefined });
+const mockUseDonationsNFTByRound = jest.fn().mockReturnValue({ data: undefined });
+const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: undefined });
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -40,6 +42,8 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useGlobalAnchoredRWLKTokens: (...args: unknown[]) => mockUseGlobalAnchoredRWLKTokens(...args),
   useSystemModelist: (...args: unknown[]) => mockUseSystemModelist(...args),
   useCTPrice: (...args: unknown[]) => mockUseCTPrice(...args),
+  useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
+  useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
 }));
 
 /* ── next/link ──────────────────────────────────────────────────── */
@@ -131,6 +135,9 @@ jest.mock('../../../components/statistics/DonatedNFTsGrid', () => ({
       {nftDonations.length === 0 && <p>No NFTs have been attached yet.</p>}
     </div>
   ),
+}));
+jest.mock('../../../components/home/DonatedTokensSection', () => ({
+  DonatedTokensSection: () => <div data-testid="current-cycle-attached-tokens" />,
 }));
 jest.mock('../../../components/statistics/StatisticsGroup', () => ({
   StatisticsGroup: ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -342,6 +349,19 @@ describe('Statistics', () => {
     mockUseDonationsNFTList.mockReturnValue({ data: [] });
     render(<Statistics />);
     expect(screen.getByText('No NFTs have been attached yet.')).toBeInTheDocument();
+  });
+
+  it('renders current cycle attached tokens section below the donated NFTs grid', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
+    mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
+    render(<Statistics />);
+    expect(screen.getByTestId('attached-nfts-grid')).toBeInTheDocument();
+    expect(screen.getByTestId('current-cycle-attached-tokens')).toBeInTheDocument();
   });
 
   it('renders contract balance stat card', () => {

@@ -349,14 +349,14 @@ describe('tokens API', () => {
       expect(result).toBe(-1);
     });
 
-    it('throws on any error (no 400 fallback)', async () => {
+    it('rejects with the axios error (no apiPost wrapper)', async () => {
       mockedAxios.post.mockRejectedValue(make400());
-      await expect(create(1, 5)).rejects.toThrow('Network response was not OK');
+      await expect(create(1, 5)).rejects.toThrow('Bad Request');
     });
 
-    it('throws on network error', async () => {
+    it('rejects on network error', async () => {
       mockedAxios.post.mockRejectedValue(new Error('fail'));
-      await expect(create(1, 5)).rejects.toThrow('Network response was not OK');
+      await expect(create(1, 5)).rejects.toThrow('fail');
     });
   });
 });

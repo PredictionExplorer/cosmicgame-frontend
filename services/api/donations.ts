@@ -17,6 +17,46 @@ import type {
   NFTDonationStatsEntry,
 } from './types';
 
+function toFiniteNumber(v: unknown): number {
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+  if (typeof v === 'string' && v.trim() !== '') {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  }
+  return 0;
+}
+
+/**
+ * Per-donation ERC20 rows from `by_round/all` expose `AmountEth` (and optional claim fields).
+ * {@link AttachedERC20Table} expects summarized fields (`AmountDonatedEth`, etc.).
+ */
+function mapErc20DonationRowForTable(row: DonatedERC20Token): DonatedERC20Token {
+  const rawDonated = row.AmountDonatedEth;
+  const donated =
+    typeof rawDonated === 'number' && Number.isFinite(rawDonated)
+      ? rawDonated
+      : toFiniteNumber(row.AmountEth);
+  const claimed = toFiniteNumber(row.AmountClaimedEth);
+  const winner =
+    typeof row.WinnerAddr === 'string' && row.WinnerAddr.length > 0 ? row.WinnerAddr : '';
+  let diff = row.DonateClaimDiffEth;
+  if (diff == null || String(diff) === '') {
+    const amt = row.Amount;
+    diff = amt != null && String(amt) !== '' ? String(amt) : '0';
+  } else {
+    diff = String(diff);
+  }
+
+  return {
+    ...row,
+    AmountDonatedEth: donated,
+    AmountClaimedEth: claimed,
+    Claimed: Boolean(row.Claimed),
+    WinnerAddr: winner,
+    DonateClaimDiffEth: diff,
+  };
+}
+
 /** Fetches all direct Cosmic Game ETH donations (simple records without extra info). */
 export function get_donations_cg_simple_list(): Promise<ETHDonation[]> {
   return apiCall(async () => {
@@ -185,13 +225,14 @@ export function get_unclaimed_donated_nft_by_user(address: string): Promise<Atta
   }, []);
 }
 
-/** Fetches detailed ERC-20 token donations for a specific round with normalized field names. */
+/** Fetches ERC-20 token donations for a round (includes rows before main-prize claim; optional winner when claim exists). */
 export function get_donations_erc20_by_round(round: number): Promise<DonatedERC20Token[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`donations/erc20/by_round/detailed/${round}`));
-    return normalizeFieldNamesArray(
-      flattenTxArray<DonatedERC20Token>(data.DonationsERC20ByRoundDetailed),
+    const { data } = await axios.get(getAPIUrl(`donations/erc20/by_round/all/${round}`));
+    const rows = normalizeFieldNamesArray(
+      flattenTxArray<DonatedERC20Token>(data.DonationsERC20ByRoundAll),
     ) as DonatedERC20Token[];
+    return rows.map(mapErc20DonationRowForTable);
   }, []);
 }
 

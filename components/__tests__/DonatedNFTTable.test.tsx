@@ -8,14 +8,6 @@ import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 import { render, screen, waitFor, fireEvent, checkA11y } from '@/test-utils';
 
 jest.mock('axios');
-jest.mock('../../hooks/useStellarSelectionWalletContract', () => ({
-  __esModule: true,
-  default: () => ({
-    read: {
-      cycleTimeoutTimesToRetrieveAllocations: () => Promise.resolve(0),
-    },
-  }),
-}));
 
 describe('AttachedNFTTable', () => {
   beforeEach(() => {
