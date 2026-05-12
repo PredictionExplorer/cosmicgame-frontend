@@ -5,7 +5,7 @@ import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 
-import { render, screen, waitFor, fireEvent, checkA11y } from '@/test-utils';
+import { render, screen, waitFor, fireEvent, within, checkA11y } from '@/test-utils';
 
 jest.mock('axios');
 
@@ -46,13 +46,14 @@ describe('AttachedNFTTable', () => {
       },
     ];
     render(<AttachedNFTTable list={mockData} handleClaim={jest.fn()} claimingTokens={[]} />);
+    const interactive = within(screen.getAllByRole('table')[0]!);
     expect(
-      screen.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
+      interactive.getByText(convertTimestampToDateTime(mockData[0]!.TimeStamp)),
     ).toBeInTheDocument();
-    expect(screen.getByText(shortenHex(mockData[0]!.DonorAddr, 6))).toBeInTheDocument();
-    expect(screen.getByText(mockData[0]!.RoundNum)).toBeInTheDocument();
-    expect(screen.getByText(shortenHex(mockData[0]!.TokenAddr, 6))).toBeInTheDocument();
-    expect(screen.getByText(String(mockData[0]!.NFTTokenId))).toBeInTheDocument();
+    expect(interactive.getByText(shortenHex(mockData[0]!.DonorAddr, 6))).toBeInTheDocument();
+    expect(interactive.getByText(String(mockData[0]!.RoundNum))).toBeInTheDocument();
+    expect(interactive.getByText(shortenHex(mockData[0]!.TokenAddr, 6))).toBeInTheDocument();
+    expect(interactive.getByText(String(mockData[0]!.NFTTokenId))).toBeInTheDocument();
 
     await waitFor(() => {
       const src = screen.getByAltText('NFT').getAttribute('src') ?? '';

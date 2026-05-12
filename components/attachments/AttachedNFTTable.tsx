@@ -174,41 +174,100 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
     return <p>No attached NFTs yet.</p>;
   }
 
+  const pageSlice = list.slice((page - 1) * perPage, page * perPage);
+
   return (
     <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Contributor Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round #</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Token Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
-              {handleClaim && (
-                <TablePrimaryHeadCell>
-                  <span className="sr-only">Actions</span>
-                </TablePrimaryHeadCell>
-              )}
-            </Tr>
-          </TablePrimaryHead>
-          <tbody>
-            {list.slice((page - 1) * perPage, page * perPage).map((nft, i) => (
-              <NFTRow
-                key={page * perPage + i}
-                nft={nft}
-                handleClaim={handleClaim}
-                claimingTokens={claimingTokens}
-              />
-            ))}
-          </tbody>
-        </TablePrimary>
-      </TablePrimaryContainer>
+      <div className="print:hidden">
+        <TablePrimaryContainer>
+          <TablePrimary>
+            <TablePrimaryHead>
+              <Tr>
+                <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">Contributor Address</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Round #</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">Token Address</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
+                {handleClaim && (
+                  <TablePrimaryHeadCell>
+                    <span className="sr-only">Actions</span>
+                  </TablePrimaryHeadCell>
+                )}
+              </Tr>
+            </TablePrimaryHead>
+            <tbody>
+              {pageSlice.map((nft, i) => (
+                <NFTRow
+                  key={page * perPage + i}
+                  nft={nft}
+                  handleClaim={handleClaim}
+                  claimingTokens={claimingTokens}
+                />
+              ))}
+            </tbody>
+          </TablePrimary>
+        </TablePrimaryContainer>
 
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
+        <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
+      </div>
+      <AttachedNFTPrintFallback list={list} />
     </>
   );
 };
+
+/** Plain table for Save as PDF (Skia often drops responsive-table output). */
+function AttachedNFTPrintFallback({ list }: { list: NFTRecord[] }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="hidden rounded-md border-2 border-foreground/40 bg-background p-4 text-sm text-foreground shadow-none [print-color-adjust:exact] print:block"
+      data-attached-nft-print
+    >
+      <table className="w-full border-collapse border border-foreground/25 text-xs">
+        <thead>
+          <tr>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Datetime
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Contributor Address
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Round #
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Token Address
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Token ID
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Token URI
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((nft) => (
+            <tr key={String(nft.RecordId)}>
+              <td className="border border-foreground/15 p-2">
+                {convertTimestampToDateTime(nft.TimeStamp)}
+              </td>
+              <td className="border border-foreground/15 p-2 font-mono break-all">{nft.DonorAddr}</td>
+              <td className="border border-foreground/15 p-2 text-center">{nft.RoundNum}</td>
+              <td className="border border-foreground/15 p-2 font-mono break-all">{nft.TokenAddr}</td>
+              <td className="border border-foreground/15 p-2 text-center">
+                {String(nft.NFTTokenId ?? nft.TokenId ?? '—')}
+              </td>
+              <td className="border border-foreground/15 p-2 break-all">
+                {nft.NFTTokenURI ?? '—'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default DonatedNFTTable;

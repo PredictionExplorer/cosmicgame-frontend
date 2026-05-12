@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, within, checkA11y } from '@/test-utils';
 
 import DonatedERC20Table from '../AttachedERC20Table';
 
@@ -29,6 +29,7 @@ describe('DonatedERC20Table', () => {
 
   it('renders table headers', () => {
     render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
+    const table = screen.getAllByRole('table')[0]!;
     for (const header of [
       'Datetime',
       'Cycle #',
@@ -38,21 +39,22 @@ describe('DonatedERC20Table', () => {
       'Recipient',
       'Retrieved',
     ]) {
-      expect(screen.getAllByText(header).length).toBeGreaterThanOrEqual(1);
+      expect(within(table).getAllByText(header).length).toBeGreaterThanOrEqual(1);
     }
   });
 
   it('renders token data', () => {
     render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
-    expect(screen.getAllByText('1').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('5.25')).toBeInTheDocument();
-    expect(screen.getByText('1.50')).toBeInTheDocument();
-    expect(screen.getByText('No')).toBeInTheDocument();
+    const table = screen.getAllByRole('table')[0]!;
+    expect(within(table).getAllByText('1').length).toBeGreaterThanOrEqual(1);
+    expect(within(table).getByText('5.25')).toBeInTheDocument();
+    expect(within(table).getByText('1.50')).toBeInTheDocument();
+    expect(within(table).getByText('No')).toBeInTheDocument();
   });
 
   it('shows Yes for claimed tokens', () => {
     render(<DonatedERC20Table list={[createToken({ Claimed: true })]} handleClaim={null} />);
-    expect(screen.getByText('Yes')).toBeInTheDocument();
+    expect(within(screen.getAllByRole('table')[0]!).getByText('Yes')).toBeInTheDocument();
   });
 
   it('does not render Claim when handleClaim is null', () => {
@@ -77,7 +79,12 @@ describe('DonatedERC20Table', () => {
       createToken({ EvtLogId: i + 1, RoundNum: i + 1 }),
     );
     render(<DonatedERC20Table list={list} handleClaim={null} />);
-    expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
+    expect(within(screen.getAllByRole('table')[0]!).getAllByText('5').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('includes a print-only PDF fallback in the DOM', () => {
+    const { container } = render(<DonatedERC20Table list={[createToken()]} handleClaim={null} />);
+    expect(container.querySelector('[data-attached-erc20-print]')).toBeTruthy();
   });
 
   it('has no accessibility violations', async () => {

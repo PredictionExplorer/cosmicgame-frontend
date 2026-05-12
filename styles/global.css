@@ -376,6 +376,58 @@
     z-index: 1;
     color: hsl(var(--foreground));
   }
+
+  /*
+   * react-super-responsive-table: `@media screen and (max-width: 40em)` can still match
+   * Chrome’s print/PDF layout pass when the page width is narrow, which turns thead into
+   * `position: absolute; top: -9999px` and breaks table geometry — tables often render empty.
+   * Force normal table layout and readable ink on paper/PDF.
+   */
+  .responsiveTable {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .responsiveTable thead {
+    display: table-header-group !important;
+  }
+
+  .responsiveTable tbody {
+    display: table-row-group !important;
+  }
+
+  .responsiveTable thead tr,
+  .responsiveTable tbody tr {
+    display: table-row !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+  }
+
+  .responsiveTable th,
+  .responsiveTable td {
+    display: table-cell !important;
+    position: static !important;
+    color: hsl(var(--foreground)) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .responsiveTable td.pivoted {
+    padding-left: 1rem !important;
+    text-align: inherit !important;
+  }
+
+  .responsiveTable td .tdBefore {
+    display: none !important;
+  }
+
+  .responsiveTable a {
+    color: hsl(var(--foreground)) !important;
+    text-decoration: underline !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

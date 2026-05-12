@@ -134,37 +134,116 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
     return <p>No attached ERC20 tokens yet.</p>;
   }
 
+  const pageSlice = list.slice((page - 1) * perPage, page * perPage);
+
   return (
     <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Cycle #</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Token Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Attached Amount</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Retrieved Amount</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Retrieved</TablePrimaryHeadCell>
-              {handleClaim && (
-                <TablePrimaryHeadCell>
-                  <span className="sr-only">Actions</span>
-                </TablePrimaryHeadCell>
-              )}
-            </Tr>
-          </TablePrimaryHead>
-          <tbody>
-            {list.slice((page - 1) * perPage, page * perPage).map((token, i) => (
-              <TokenRow key={page * perPage + i} token={token} handleClaim={handleClaim} />
-            ))}
-          </tbody>
-        </TablePrimary>
-      </TablePrimaryContainer>
+      <div className="print:hidden">
+        <TablePrimaryContainer>
+          <TablePrimary>
+            <TablePrimaryHead>
+              <Tr>
+                <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Cycle #</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">Token Address</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Attached Amount</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Retrieved Amount</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Retrieved</TablePrimaryHeadCell>
+                {handleClaim && (
+                  <TablePrimaryHeadCell>
+                    <span className="sr-only">Actions</span>
+                  </TablePrimaryHeadCell>
+                )}
+              </Tr>
+            </TablePrimaryHead>
+            <tbody>
+              {pageSlice.map((token, i) => (
+                <TokenRow key={page * perPage + i} token={token} handleClaim={handleClaim} />
+              ))}
+            </tbody>
+          </TablePrimary>
+        </TablePrimaryContainer>
 
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
+        <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
+      </div>
+      <AttachedERC20PrintFallback list={list} />
     </>
   );
 };
+
+/** Plain table for Save as PDF (Skia often drops responsive-table output). */
+function AttachedERC20PrintFallback({ list }: { list: DonatedERC20Token[] }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="hidden rounded-md border-2 border-foreground/40 bg-background p-4 text-sm text-foreground shadow-none [print-color-adjust:exact] print:block"
+      data-attached-erc20-print
+    >
+      <table className="w-full border-collapse border border-foreground/25 text-xs">
+        <thead>
+          <tr>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Datetime
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Cycle #
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Token Address
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Attached Amount
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Retrieved Amount
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Recipient
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Retrieved
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((token) => {
+            const donatedEth =
+              typeof token.AmountDonatedEth === 'number' && Number.isFinite(token.AmountDonatedEth)
+                ? token.AmountDonatedEth
+                : 0;
+            const claimedEth =
+              typeof token.AmountClaimedEth === 'number' && Number.isFinite(token.AmountClaimedEth)
+                ? token.AmountClaimedEth
+                : 0;
+            return (
+              <tr key={`${token.EvtLogId}-${token.TxHash}-${token.TokenAddr}`}>
+                <td className="border border-foreground/15 p-2">
+                  {convertTimestampToDateTime(token.TimeStamp)}
+                </td>
+                <td className="border border-foreground/15 p-2 text-center">{token.RoundNum}</td>
+                <td className="border border-foreground/15 p-2 font-mono break-all">
+                  {token.TokenAddr}
+                </td>
+                <td className="border border-foreground/15 p-2 text-center">
+                  {donatedEth.toFixed(2)}
+                </td>
+                <td className="border border-foreground/15 p-2 text-center">
+                  {claimedEth.toFixed(2)}
+                </td>
+                <td className="border border-foreground/15 p-2 font-mono break-all">
+                  {token.WinnerAddr || '—'}
+                </td>
+                <td className="border border-foreground/15 p-2 text-center">
+                  {token.Claimed ? 'Yes' : 'No'}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default DonatedERC20Table;

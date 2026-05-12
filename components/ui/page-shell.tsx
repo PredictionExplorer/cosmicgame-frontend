@@ -13,7 +13,7 @@ import { AmbientBackdrop, type AmbientBackdropProps } from '@/components/ui/ambi
  */
 
 const shellVariants = cva(
-  'relative z-[1] mx-auto w-full overflow-hidden leading-normal min-h-[calc(100vh-100px)]',
+  'relative z-[1] mx-auto w-full overflow-hidden print:overflow-visible leading-normal min-h-[calc(100vh-100px)]',
   {
     variants: {
       variant: {

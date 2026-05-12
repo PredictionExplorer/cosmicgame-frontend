@@ -93,6 +93,87 @@ function StellarSelectionAllocationRow({
   /* eslint-enable react-hooks/purity */
 }
 
+/**
+ * Chrome’s Skia PDF pipeline often drops `react-super-responsive-table` output even when the
+ * on-screen layout looks fine. Plain HTML + `hidden print:block` mirrors
+ * {@link SpecialAllocationRecipients}’s print fallback.
+ */
+function StellarSelectionAllocationsPrintFallback({
+  list,
+  roundTimeouts,
+}: {
+  list: StellarSelectionAllocation[];
+  roundTimeouts: Record<number, number>;
+}) {
+  if (list.length === 0) return null;
+
+  const nowSec = Math.ceil(Date.now() / 1000);
+
+  return (
+    <div
+      aria-hidden="true"
+      className="hidden rounded-md border-2 border-foreground/40 bg-background p-4 text-sm text-foreground shadow-none [print-color-adjust:exact] print:block"
+      data-stellar-selection-allocations-print
+    >
+      <table className="w-full border-collapse border border-foreground/25 text-xs">
+        <thead>
+          <tr>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Datetime
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Cycle
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Recipient
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Expiration Date
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Amount (ETH)
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Retrieved
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((w) => {
+            const rt = roundTimeouts[w.RoundNum] ?? 0;
+            const isExpired = rt > 0 && rt < Date.now() / 1000;
+            const expirationLabel =
+              rt > 0
+                ? `${convertTimestampToDateTime(rt)}${
+                    isExpired ? ' (Expired)' : ` (${formatSeconds(rt - nowSec)})`
+                  }`
+                : '—';
+
+            return (
+              <tr key={w.EvtLogId}>
+                <td className="border border-foreground/15 p-2">
+                  {convertTimestampToDateTime(w.TimeStamp)}
+                </td>
+                <td className="border border-foreground/15 p-2 text-center">{w.RoundNum}</td>
+                <td className="border border-foreground/15 p-2 font-mono">
+                  {shortenHex(w.WinnerAddr, 6)}
+                </td>
+                <td className="border border-foreground/15 p-2 text-center">{expirationLabel}</td>
+                <td className="border border-foreground/15 p-2 text-center">
+                  {w.Amount.toFixed(7)}
+                </td>
+                <td className="border border-foreground/15 p-2 text-center">
+                  {w.Claimed ? 'Yes' : 'No'}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 /** Table of stellarSelection ETH winnings with expiration countdown. */
 export function StellarSelectionAllocationsTable({ list }: { list: StellarSelectionAllocation[] }) {
   const stellarSelectionWalletContract = useStellarSelectionWalletContract();
@@ -106,7 +187,9 @@ export function StellarSelectionAllocationsTable({ list }: { list: StellarSelect
     const fetchTimeouts = async () => {
       const results = await Promise.allSettled(
         uniqueRounds.map((r) =>
-          stellarSelectionWalletContract.read.roundTimeoutTimesToWithdrawPrizes([BigInt(r)]),
+          stellarSelectionWalletContract.read.roundTimeoutTimesToWithdrawPrizes?.([
+            BigInt(r),
+          ]) ?? Promise.resolve(0n),
         ),
       );
       const map: Record<number, number> = {};
@@ -122,28 +205,33 @@ export function StellarSelectionAllocationsTable({ list }: { list: StellarSelect
   }, [stellarSelectionWalletContract, list]);
 
   return (
-    <TablePrimaryContainer>
-      <TablePrimary>
-        <TablePrimaryHead>
-          <Tr>
-            <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Amount (ETH)</TablePrimaryHeadCell>
-            <TablePrimaryHeadCell>Retrieved</TablePrimaryHeadCell>
-          </Tr>
-        </TablePrimaryHead>
-        <Tbody>
-          {list.map((winning) => (
-            <StellarSelectionAllocationRow
-              key={winning.EvtLogId}
-              winning={winning}
-              roundTimeout={roundTimeouts[winning.RoundNum] ?? 0}
-            />
-          ))}
-        </Tbody>
-      </TablePrimary>
-    </TablePrimaryContainer>
+    <>
+      <div className="print:hidden">
+        <TablePrimaryContainer>
+          <TablePrimary>
+            <TablePrimaryHead>
+              <Tr>
+                <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Amount (ETH)</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Retrieved</TablePrimaryHeadCell>
+              </Tr>
+            </TablePrimaryHead>
+            <Tbody>
+              {list.map((winning) => (
+                <StellarSelectionAllocationRow
+                  key={winning.EvtLogId}
+                  winning={winning}
+                  roundTimeout={roundTimeouts[winning.RoundNum] ?? 0}
+                />
+              ))}
+            </Tbody>
+          </TablePrimary>
+        </TablePrimaryContainer>
+      </div>
+      <StellarSelectionAllocationsPrintFallback list={list} roundTimeouts={roundTimeouts} />
+    </>
   );
 }
