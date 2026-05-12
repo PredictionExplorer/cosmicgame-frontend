@@ -24,6 +24,7 @@ import { SectionDivider } from '@/components/ui/section-divider';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { Surface } from '@/components/ui/surface';
 import { formatEthValue } from '@/utils/format';
+import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 
 const AnchoringPage = () => {
   const {
@@ -43,14 +44,14 @@ const AnchoringPage = () => {
   const statsLoading = isLoadingDashboard || isLoadingStakers;
   const error = cstError?.message || rwlkError?.message || null;
 
-  const rewardPerCosmicSignatureNft = useMemo(() => {
-    const totalAnchoredCosmicSignatureNfts =
-      dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
-    if (totalAnchoredCosmicSignatureNfts > 0) {
-      return (dashboardData?.StakingAmountEth ?? 0) / totalAnchoredCosmicSignatureNfts;
-    }
-    return 0;
-  }, [dashboardData]);
+  const distributionPerNft = useMemo(
+    () =>
+      formatDistributionPerAnchoredNftEth(
+        dashboardData?.StakingAmountEth,
+        dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
+      ),
+    [dashboardData],
+  );
 
   const heroStats = useMemo(
     () => [
@@ -83,10 +84,10 @@ const AnchoringPage = () => {
       },
       {
         label: 'Distribution per NFT',
-        value:
-          rewardPerCosmicSignatureNft > 0 ? `${rewardPerCosmicSignatureNft.toFixed(6)} ETH` : '--',
+        value: distributionPerNft.value,
         tooltip:
-          'Current ETH Anchor Distribution per anchored Cosmic Signature NFT, based on the pool size divided by total anchored NFTs.',
+          'Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.' +
+          distributionPerNft.tooltipSuffix,
         icon: <TrendingUp className="h-4 w-4" />,
       },
       {
@@ -96,7 +97,7 @@ const AnchoringPage = () => {
         icon: <Users className="h-4 w-4" />,
       },
     ],
-    [dashboardData, rewardPerCosmicSignatureNft, uniqueStakers],
+    [dashboardData, distributionPerNft, uniqueStakers],
   );
 
   if (error) {
