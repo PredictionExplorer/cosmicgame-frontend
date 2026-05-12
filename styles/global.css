@@ -343,6 +343,80 @@
     visibility: visible !important;
   }
 
+  /*
+   * My Statistics hero: ensure stat values render as ink (featured uses text-white on screen).
+   * Activity overview: keep the card visible; do not force transform:none on all descendants —
+   * Chrome print can collapse flex text when every nested node is reset that way.
+   */
+  [data-testid='hero-stats'],
+  [data-testid='hero-stats'] > div {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+  }
+
+  [data-testid='hero-stats'] .stat-card-value {
+    color: hsl(var(--foreground)) !important;
+    -webkit-text-fill-color: hsl(var(--foreground)) !important;
+    background-image: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+    opacity: 1 !important;
+  }
+
+  [data-testid='activity-summary'] {
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    overflow: visible !important;
+    max-height: none !important;
+  }
+
+  /*
+   * Activity Overview (My Statistics): Skia PDF often drops text that sits under
+   * backdrop-filter + overflow-hidden on the Card, or mis-lays out sm:divide-x grids.
+   */
+  [data-testid='activity-summary'] .activity-overview-card {
+    overflow: visible !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    background-color: hsl(var(--background)) !important;
+    background-image: none !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  [data-testid='activity-summary'] .activity-overview-grid {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  [data-testid='activity-summary'] .activity-overview-grid > .activity-overview-group {
+    display: block !important;
+    width: 100% !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  [data-testid='activity-summary'] .activity-overview-heading,
+  [data-testid='activity-summary'] .activity-overview-group-title,
+  [data-testid='activity-summary'] .activity-overview-label {
+    color: hsl(var(--foreground)) !important;
+    -webkit-text-fill-color: hsl(var(--foreground)) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  [data-testid='activity-summary'] .activity-stat-value {
+    color: hsl(var(--foreground)) !important;
+    -webkit-text-fill-color: hsl(var(--foreground)) !important;
+    opacity: 1 !important;
+  }
+
   /* Special Prize Leaders: mask-free borders only; force legible text in Skia PDF */
   [data-special-prize-leaders] {
     position: relative;

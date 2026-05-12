@@ -77,7 +77,7 @@ export function StatCard({
         'hover:bg-white/[0.06] hover:-translate-y-0.5 hover:border-white/[0.14]',
         'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent',
         'after:pointer-events-none after:absolute after:-right-10 after:-top-12 after:h-28 after:w-28 after:rounded-full after:opacity-0 after:blur-2xl after:transition-opacity after:duration-300 after:content-[""] hover:after:opacity-100',
-        'print:backdrop-blur-none print:hover:translate-y-0',
+        'print:overflow-visible print:backdrop-blur-none print:hover:translate-y-0 print:[&::after]:hidden',
         featured
           ? 'gradient-border-card gradient-border-card-accent bg-white/[0.04] bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.07)_50%,rgb(var(--chrono-rose-rgb)/0.06))] print:border print:border-border'
           : 'border-white/[0.06] bg-white/[0.03] bg-[linear-gradient(135deg,rgb(255_255_255/0.04),rgb(255_255_255/0.016)_50%,rgb(var(--nebula-violet-rgb)/0.04))]',
@@ -112,10 +112,11 @@ export function StatCard({
       ) : (
         <div
           className={cn(
-            'relative z-[1] mt-3 text-xl font-bold tracking-tight tabular-nums text-foreground',
+            'stat-card-value relative z-[1] mt-3 text-xl font-bold tracking-tight tabular-nums text-foreground',
+            'print:!text-foreground print:!shadow-none print:[-webkit-text-fill-color:hsl(var(--foreground))]',
             gradient &&
-              'bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent print:!bg-none print:!bg-clip-border print:!text-foreground print:!shadow-none print:[-webkit-text-fill-color:hsl(var(--foreground))]',
-            featured && !gradient && 'text-white print:text-foreground',
+              'bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent print:!bg-none print:!bg-clip-border',
+            featured && !gradient && 'text-white print:!text-foreground',
           )}
           style={gradient ? { textShadow: '0 0 30px rgba(21, 191, 253, 0.15)' } : undefined}
         >
