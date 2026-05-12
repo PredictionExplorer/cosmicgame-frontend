@@ -52,6 +52,15 @@ describe('stellarSelection API', () => {
       );
     });
 
+    it('accepts RaffleDeposits key from primary Go JSON API', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { RaffleDeposits: [{ EvtLogId: 2, Tx: TX }] },
+      });
+      const result = await get_raffle_deposits_by_user('0xabc');
+      expect(result).toHaveLength(1);
+      expect(result[0]).toHaveProperty('TxHash', '0xa');
+    });
+
     it('returns empty array on 400', async () => {
       mockedAxios.get.mockRejectedValue(make400());
       expect(await get_raffle_deposits_by_user('0xabc')).toEqual([]);
@@ -72,6 +81,15 @@ describe('stellarSelection API', () => {
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringMatching(/prizes\/eth\/chronowarrior\/by_user.*0xdef/),
       );
+    });
+
+    it('accepts ChronoWarriorDeposits key from primary Go JSON API', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: { ChronoWarriorDeposits: [{ EvtLogId: 3, Tx: TX }] },
+      });
+      const result = await get_chrono_warrior_deposits_by_user('0xdef');
+      expect(result).toHaveLength(1);
+      expect(result[0]).toHaveProperty('TxHash', '0xa');
     });
 
     it('returns empty array on 400', async () => {
