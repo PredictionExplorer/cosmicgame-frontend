@@ -3,6 +3,7 @@
 import { memo, useState, useEffect, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import type { ISourceOptions } from '@tsparticles/engine';
+import { offchainLookupSignature } from 'viem/utils';
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
@@ -30,6 +31,10 @@ import { getClientBuildInfo } from '@/lib/buildInfo';
 // Wallet UI stylesheet — kept scoped to Providers (the app-only tree) so
 // the landing host never ships it.
 import '@rainbow-me/rainbowkit/styles.css';
+
+// Viem's `call()` dynamically imports CCIP helpers on revert paths; that async chunk
+// can fail after deploys or HMR and surfaces as a misleading contract read error.
+void offchainLookupSignature;
 
 const Particles = dynamic(
   () => import('@tsparticles/react').then((mod) => ({ default: mod.default })),

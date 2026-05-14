@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Gavel, Ticket, Layers } from 'lucide-react';
 
 import { formatEthValue } from '@/utils';
@@ -11,15 +10,6 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 import type { UserProfileInfo } from './UserStatsSection';
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, ease: 'easeOut' as const, delay: 0.25 },
-  },
-};
-
 interface StatPair {
   label: string;
   value: string | number;
@@ -28,12 +18,16 @@ interface StatPair {
 
 function MiniStat({ label, value, tooltip }: StatPair) {
   return (
-    <div className="flex items-baseline justify-between gap-2">
-      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+    <div className="flex items-baseline justify-between gap-2" title={tooltip}>
+      <span className="activity-overview-label flex min-w-0 flex-1 items-center gap-1 text-xs text-muted-foreground print:!text-foreground/80">
         {label}
-        <InfoTooltip content={tooltip} />
+        <span className="print:hidden">
+          <InfoTooltip content={tooltip} />
+        </span>
       </span>
-      <span className="text-sm font-semibold tabular-nums">{value}</span>
+      <span className="activity-stat-value shrink-0 text-sm font-semibold tabular-nums text-foreground print:!text-foreground">
+        {value}
+      </span>
     </div>
   );
 }
@@ -50,8 +44,8 @@ function StatGroup({
   className?: string;
 }) {
   return (
-    <div className={cn('space-y-2.5', className)}>
-      <div className="flex items-center gap-2 text-sm font-medium text-primary">
+    <div className={cn('activity-overview-group space-y-2.5 print:!pl-0', className)}>
+      <div className="activity-overview-group-title flex items-center gap-2 text-sm font-medium text-primary print:!text-foreground">
         {icon}
         {title}
       </div>
@@ -78,15 +72,18 @@ export function ActivitySummary({
     (rwlk?.TotalNumStakeActions ?? 0) + (rwlk?.TotalNumUnstakeActions ?? 0);
 
   return (
-    <motion.div variants={fadeIn} initial="hidden" animate="visible">
+    <div className="print-motion-visible print:overflow-visible" data-testid="activity-summary">
       <Card
-        className={cn('gradient-border-card p-5 backdrop-blur-sm bg-white/[0.02]', className)}
-        data-testid="activity-summary"
+        className={cn(
+          'activity-overview-card gradient-border-card p-5 backdrop-blur-sm bg-white/[0.02]',
+          'print:!overflow-visible print:!border-border print:!bg-background print:!shadow-none print:!backdrop-blur-none',
+          className,
+        )}
       >
-        <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-4">
+        <h3 className="activity-overview-heading mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground print:!text-foreground/80">
           Activity Overview
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:divide-x sm:divide-white/[0.06]">
+        <div className="activity-overview-grid grid grid-cols-1 gap-6 sm:grid-cols-3 sm:divide-x sm:divide-white/[0.06] print:!block print:space-y-5 print:!divide-none">
           <StatGroup
             icon={<Gavel className="h-3.5 w-3.5" />}
             title="Gestures"
@@ -139,6 +136,6 @@ export function ActivitySummary({
           />
         </div>
       </Card>
-    </motion.div>
+    </div>
   );
 }

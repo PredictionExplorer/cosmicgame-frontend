@@ -371,6 +371,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           />
 
           <motion.section
+            className="print-motion-visible"
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -383,6 +384,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           </motion.section>
 
           <motion.section
+            className="print-motion-visible"
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -399,6 +401,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           </motion.section>
 
           <motion.section
+            className="print-motion-visible"
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -420,6 +423,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           </motion.section>
 
           <motion.section
+            className="print-motion-visible"
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -433,6 +437,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
 
           {marketingRewards.length > 0 && (
             <motion.section
+              className="print-motion-visible"
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -446,6 +451,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
           )}
 
           <motion.section
+            className="print-motion-visible"
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"

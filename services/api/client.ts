@@ -234,7 +234,9 @@ export async function apiCall<T>(fn: () => Promise<T>, fallback: T): Promise<T> 
     return await fn();
   } catch (err: unknown) {
     const status = isAxiosError(err) ? err.response?.status : undefined;
-    if (status === 400 || status === 403) return fallback;
+    // 400/403: client not allowed or bad request. 404: missing resource or
+    // endpoint not deployed — common for optional list reads; use fallback.
+    if (status === 400 || status === 403 || status === 404) return fallback;
     reportError(err, 'apiCall');
     throw new Error('Network response was not OK');
   }

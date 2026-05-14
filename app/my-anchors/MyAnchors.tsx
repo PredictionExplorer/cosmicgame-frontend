@@ -26,6 +26,7 @@ import { StatCardSkeleton } from '@/components/ui/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 
 const MyAnchors = () => {
   const { account } = useActiveWeb3React();
@@ -43,13 +44,14 @@ const MyAnchors = () => {
 
   const CSTokens = useMemo(() => cstTokensRaw.filter((x) => !x.WasUnstaked), [cstTokensRaw]);
 
-  const rewardPerCST = useMemo(() => {
-    const totalAnchoredCST = dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked || 0;
-    if (totalAnchoredCST > 0) {
-      return (dashboardData?.StakingAmountEth ?? 0) / totalAnchoredCST;
-    }
-    return 0;
-  }, [dashboardData]);
+  const distributionPerCST = useMemo(
+    () =>
+      formatDistributionPerAnchoredNftEth(
+        dashboardData?.StakingAmountEth,
+        dashboardData?.MainStats?.StakeStatisticsCST?.TotalTokensStaked,
+      ),
+    [dashboardData],
+  );
 
   const loading =
     loadingDashboard ||
@@ -94,13 +96,14 @@ const MyAnchors = () => {
       },
       {
         label: 'Distribution per CST',
-        value: rewardPerCST > 0 ? `${rewardPerCST.toFixed(6)} ETH` : '--',
+        value: distributionPerCST.value,
         tooltip:
-          'Current ETH Anchor Distribution per anchored CST token, calculated as the total anchoring pool divided by the number of anchored tokens.',
+          'Current ETH Anchor Distribution per anchored CST token, calculated as the total anchoring pool (on-chain) divided by the indexed number of anchored CST NFTs.' +
+          distributionPerCST.tooltipSuffix,
         icon: <TrendingUp className="h-4 w-4" />,
       },
     ],
-    [anchoredCSTokens, anchoredRWLKTokens, unclaimedRewardEth, rewardPerCST],
+    [anchoredCSTokens, anchoredRWLKTokens, unclaimedRewardEth, distributionPerCST],
   );
 
   useEffect(() => {

@@ -11,7 +11,7 @@ const fadeIn = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.35, ease: 'easeOut' as const, delay: 0.35 },
+    transition: { duration: 0.35, ease: 'easeOut' as const },
   },
 };
 
@@ -61,9 +61,9 @@ export function QuickActions({ address, className }: QuickActionsProps) {
 
   return (
     <motion.div
-      className={cn('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3', className)}
+      className={cn('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 print-motion-visible', className)}
       variants={fadeIn}
-      initial="hidden"
+      initial={false}
       animate="visible"
       data-testid="quick-actions"
     >

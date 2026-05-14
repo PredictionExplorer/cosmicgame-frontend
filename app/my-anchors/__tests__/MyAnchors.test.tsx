@@ -167,6 +167,22 @@ describe('MyAnchors', () => {
     expect(screen.getByTestId('stat-Distribution per CST')).toBeInTheDocument();
   });
 
+  it('shows pool ETH in Distribution per CST when indexed TotalTokensStaked is zero', async () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: {
+        MainStats: {
+          StakeStatisticsCST: { TotalTokensStaked: 0 },
+          StakeStatisticsRWalk: { TotalTokensStaked: 0 },
+        },
+        StakingAmountEth: 0.22579451528661923,
+      },
+      isLoading: false,
+    });
+    render(<MyAnchors />);
+    await waitFor(() => {});
+    expect(screen.getByTestId('stat-Distribution per CST')).toHaveTextContent('0.225795 ETH');
+  });
+
   it('renders page title', async () => {
     mockUseDashboardInfo.mockReturnValue({ data: null, isLoading: false });
     mockAccount = null;

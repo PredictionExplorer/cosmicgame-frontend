@@ -27,7 +27,7 @@ export function TablePrimaryContainer({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] bg-[linear-gradient(135deg,rgb(255_255_255/0.04),rgb(255_255_255/0.014)_48%,rgb(var(--nebula-violet-rgb)/0.05))] shadow-[0_20px_90px_-70px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-px before:bg-gradient-to-r before:from-transparent before:via-[rgb(var(--aurora-cyan-rgb)/0.55)] before:to-transparent',
+        'relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] bg-[linear-gradient(135deg,rgb(255_255_255/0.04),rgb(255_255_255/0.014)_48%,rgb(var(--nebula-violet-rgb)/0.05))] shadow-[0_20px_90px_-70px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-px before:bg-gradient-to-r before:from-transparent before:via-[rgb(var(--aurora-cyan-rgb)/0.55)] before:to-transparent print:overflow-visible print:shadow-none print:backdrop-blur-none',
         className,
       )}
       {...props}
@@ -43,7 +43,7 @@ export function TablePrimaryHead({ className, ...props }: ComponentPropsWithoutR
   return (
     <Thead
       className={cn(
-        'sticky top-0 z-[1] bg-[linear-gradient(90deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.10))] backdrop-blur-md',
+        'sticky top-0 z-[1] bg-[linear-gradient(90deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.10))] backdrop-blur-md print:static print:backdrop-blur-none print:[background-image:none] print:bg-transparent',
         className,
       )}
       {...props}
@@ -55,7 +55,7 @@ export function TablePrimaryHeadCell({ className, ...props }: ComponentPropsWith
   return (
     <Th
       className={cn(
-        'text-muted-foreground font-medium text-xs uppercase tracking-wider leading-[1.43] border-b border-white/[0.08] px-4 py-3 max-sm:text-[10px]',
+        'text-muted-foreground font-medium text-xs uppercase tracking-wider leading-[1.43] border-b border-white/[0.08] px-4 py-3 max-sm:text-[10px] print:!text-foreground',
         className,
       )}
       {...props}
@@ -67,7 +67,7 @@ export function TablePrimaryCell({ className, ...props }: ComponentPropsWithoutR
   return (
     <Td
       className={cn(
-        'font-normal text-muted-foreground leading-[1.43] border-b border-white/[0.03] px-4 py-3.5 text-sm max-sm:text-xs',
+        'font-normal text-muted-foreground leading-[1.43] border-b border-white/[0.03] px-4 py-3.5 text-sm max-sm:text-xs print:!text-foreground',
         className,
       )}
       {...props}

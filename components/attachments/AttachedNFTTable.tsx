@@ -3,7 +3,7 @@ import axios from 'axios';
 import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime, formatSeconds, shortenHex } from '@/utils';
+import { getExplorerUrl, convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import {
   TablePrimary,
@@ -18,7 +18,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import NFTImage from '@/components/nft/NFTImage';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
 import { reportError } from '@/utils/errors';
 
 export interface NFTRecord {
@@ -49,22 +48,6 @@ interface DonatedNFTTableProps {
 
 const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
   const [tokenURI, setTokenURI] = useState<{ image?: string; external_url?: string } | null>(null);
-
-  const [cycleTimeoutTimesToRetrieveAllocations, setRoundTimeoutTimesToWithdrawPrizes] =
-    useState(0);
-  const stellarSelectionWalletContract = useStellarSelectionWalletContract();
-
-  useEffect(() => {
-    if (!stellarSelectionWalletContract) return;
-    const fetchCycleTimeoutTimesToRetrieveAllocations = async () => {
-      const cycleTimeoutTimesToRetrieveAllocations =
-        await stellarSelectionWalletContract.read.cycleTimeoutTimesToRetrieveAllocations?.([
-          nft.RoundNum,
-        ]);
-      setRoundTimeoutTimesToWithdrawPrizes(Number(cycleTimeoutTimesToRetrieveAllocations ?? 0));
-    };
-    fetchCycleTimeoutTimesToRetrieveAllocations();
-  }, [stellarSelectionWalletContract, nft.RoundNum]);
 
   useEffect(() => {
     const fetchTokenMetadata = async () => {
@@ -156,15 +139,6 @@ const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
         )}
       </TablePrimaryCell>
 
-      {/* eslint-disable react-hooks/purity */}
-      <TablePrimaryCell align="center">
-        {convertTimestampToDateTime(cycleTimeoutTimesToRetrieveAllocations)}{' '}
-        {cycleTimeoutTimesToRetrieveAllocations < Date.now() / 1000
-          ? '(Expired)'
-          : `(${formatSeconds(cycleTimeoutTimesToRetrieveAllocations - Math.ceil(Date.now() / 1000))})`}
-      </TablePrimaryCell>
-      {/* eslint-enable react-hooks/purity */}
-
       <TablePrimaryCell className="w-[130px]">
         {tokenURI?.image ? (
           <a href={tokenURI.external_url} target="_blank" rel="noopener noreferrer">
@@ -200,42 +174,100 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
     return <p>No attached NFTs yet.</p>;
   }
 
+  const pageSlice = list.slice((page - 1) * perPage, page * perPage);
+
   return (
     <>
-      <TablePrimaryContainer>
-        <TablePrimary>
-          <TablePrimaryHead>
-            <Tr>
-              <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Contributor Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Round #</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="left">Token Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Expiration Date</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
-              {handleClaim && (
-                <TablePrimaryHeadCell>
-                  <span className="sr-only">Actions</span>
-                </TablePrimaryHeadCell>
-              )}
-            </Tr>
-          </TablePrimaryHead>
-          <tbody>
-            {list.slice((page - 1) * perPage, page * perPage).map((nft, i) => (
-              <NFTRow
-                key={page * perPage + i}
-                nft={nft}
-                handleClaim={handleClaim}
-                claimingTokens={claimingTokens}
-              />
-            ))}
-          </tbody>
-        </TablePrimary>
-      </TablePrimaryContainer>
+      <div className="print:hidden">
+        <TablePrimaryContainer>
+          <TablePrimary>
+            <TablePrimaryHead>
+              <Tr>
+                <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">Contributor Address</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Round #</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell align="left">Token Address</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
+                <TablePrimaryHeadCell>Token Image</TablePrimaryHeadCell>
+                {handleClaim && (
+                  <TablePrimaryHeadCell>
+                    <span className="sr-only">Actions</span>
+                  </TablePrimaryHeadCell>
+                )}
+              </Tr>
+            </TablePrimaryHead>
+            <tbody>
+              {pageSlice.map((nft, i) => (
+                <NFTRow
+                  key={page * perPage + i}
+                  nft={nft}
+                  handleClaim={handleClaim}
+                  claimingTokens={claimingTokens}
+                />
+              ))}
+            </tbody>
+          </TablePrimary>
+        </TablePrimaryContainer>
 
-      <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
+        <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
+      </div>
+      <AttachedNFTPrintFallback list={list} />
     </>
   );
 };
+
+/** Plain table for Save as PDF (Skia often drops responsive-table output). */
+function AttachedNFTPrintFallback({ list }: { list: NFTRecord[] }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="hidden rounded-md border-2 border-foreground/40 bg-background p-4 text-sm text-foreground shadow-none [print-color-adjust:exact] print:block"
+      data-attached-nft-print
+    >
+      <table className="w-full border-collapse border border-foreground/25 text-xs">
+        <thead>
+          <tr>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Datetime
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Contributor Address
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Round #
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Token Address
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-center font-semibold">
+              Token ID
+            </th>
+            <th scope="col" className="border border-foreground/20 p-2 text-left font-semibold">
+              Token URI
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((nft) => (
+            <tr key={String(nft.RecordId)}>
+              <td className="border border-foreground/15 p-2">
+                {convertTimestampToDateTime(nft.TimeStamp)}
+              </td>
+              <td className="border border-foreground/15 p-2 font-mono break-all">{nft.DonorAddr}</td>
+              <td className="border border-foreground/15 p-2 text-center">{nft.RoundNum}</td>
+              <td className="border border-foreground/15 p-2 font-mono break-all">{nft.TokenAddr}</td>
+              <td className="border border-foreground/15 p-2 text-center">
+                {String(nft.NFTTokenId ?? nft.TokenId ?? '—')}
+              </td>
+              <td className="border border-foreground/15 p-2 break-all">
+                {nft.NFTTokenURI ?? '—'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default DonatedNFTTable;

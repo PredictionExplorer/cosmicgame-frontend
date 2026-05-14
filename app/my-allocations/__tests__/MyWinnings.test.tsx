@@ -59,7 +59,7 @@ jest.mock('../../../hooks/useStellarSelectionWalletContract', () => ({
       claimDonatedToken: jest.fn(),
       claimManyDonatedTokens: jest.fn(),
     },
-    read: { cycleTimeoutTimesToRetrieveAllocations: jest.fn() },
+    read: { roundTimeoutTimesToWithdrawPrizes: jest.fn() },
   }),
 }));
 

@@ -11,7 +11,10 @@ export function get_raffle_deposits_by_user(
     const { data } = await axios.get(
       getAPIUrl(`prizes/eth/raffle/by_user/${address}`),
     );
-    return flattenTxArray<StellarSelectionETHDeposit>(data.UserRaffleDeposits);
+    const d = data as Record<string, unknown>;
+    /** Primary JSON API uses `RaffleDeposits`; older/alternate route uses `UserRaffleDeposits`. */
+    const list = d.UserRaffleDeposits ?? d.RaffleDeposits;
+    return flattenTxArray<StellarSelectionETHDeposit>(list);
   }, []);
 }
 
@@ -23,7 +26,9 @@ export function get_chrono_warrior_deposits_by_user(
     const { data } = await axios.get(
       getAPIUrl(`prizes/eth/chronowarrior/by_user/${address}`),
     );
-    return flattenTxArray<StellarSelectionETHDeposit>(data.UserChronoWarriorDeposits);
+    const d = data as Record<string, unknown>;
+    const list = d.UserChronoWarriorDeposits ?? d.ChronoWarriorDeposits;
+    return flattenTxArray<StellarSelectionETHDeposit>(list);
   }, []);
 }
 

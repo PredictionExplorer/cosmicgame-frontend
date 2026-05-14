@@ -1,4 +1,4 @@
-import { render, screen, waitFor, checkA11y } from '@/test-utils';
+import { render, screen, waitFor, within, checkA11y } from '@/test-utils';
 
 import {
   StellarSelectionAllocationsTable,
@@ -24,7 +24,7 @@ jest.mock('../../../hooks/useStellarSelectionWalletContract', () => ({
   __esModule: true,
   default: () => ({
     read: {
-      cycleTimeoutTimesToRetrieveAllocations: jest.fn().mockResolvedValue(0),
+      roundTimeoutTimesToWithdrawPrizes: jest.fn().mockResolvedValue(0),
     },
   }),
 }));
@@ -78,15 +78,16 @@ describe('StellarSelectionAllocationsTable', () => {
 
   it('renders a winning row with correct data', async () => {
     await renderAndFlush([winning]);
-    expect(screen.getByText('date-1700000000')).toBeInTheDocument();
-    expect(screen.getByText('42')).toBeInTheDocument();
-    expect(screen.getByText('1.2345678')).toBeInTheDocument();
-    expect(screen.getByText('No')).toBeInTheDocument();
+    const interactive = within(screen.getByTestId('table-primary'));
+    expect(interactive.getByText('date-1700000000')).toBeInTheDocument();
+    expect(interactive.getByText('42')).toBeInTheDocument();
+    expect(interactive.getByText('1.2345678')).toBeInTheDocument();
+    expect(interactive.getByText('No')).toBeInTheDocument();
   });
 
   it('shows "Yes" for claimed winnings', async () => {
     await renderAndFlush([{ ...winning, Claimed: true }]);
-    expect(screen.getByText('Yes')).toBeInTheDocument();
+    expect(within(screen.getByTestId('table-primary')).getByText('Yes')).toBeInTheDocument();
   });
 
   it('renders multiple rows', async () => {
@@ -96,9 +97,10 @@ describe('StellarSelectionAllocationsTable', () => {
       { ...winning, EvtLogId: 3, RoundNum: 44 },
     ];
     await renderAndFlush(list);
-    expect(screen.getByText('42')).toBeInTheDocument();
-    expect(screen.getByText('43')).toBeInTheDocument();
-    expect(screen.getByText('44')).toBeInTheDocument();
+    const interactive = within(screen.getByTestId('table-primary'));
+    expect(interactive.getByText('42')).toBeInTheDocument();
+    expect(interactive.getByText('43')).toBeInTheDocument();
+    expect(interactive.getByText('44')).toBeInTheDocument();
   });
 
   it('renders empty table when list is empty', async () => {
@@ -108,7 +110,7 @@ describe('StellarSelectionAllocationsTable', () => {
 
   it('links round number to /allocation/{round}', async () => {
     await renderAndFlush([winning]);
-    const roundLink = screen.getByText('42').closest('a');
+    const roundLink = within(screen.getByTestId('table-primary')).getByText('42').closest('a');
     expect(roundLink).toHaveAttribute('href', '/allocation/42');
   });
 

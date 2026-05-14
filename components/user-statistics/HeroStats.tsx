@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { Wallet, Coins, Trophy, Gem, Gavel, TrendingUp } from 'lucide-react';
 
 import { formatEthValue } from '@/utils';
@@ -10,16 +9,6 @@ import { cn } from '@/lib/utils';
 import { StatCard, StatCardSkeleton } from '@/components/ui/stat-card';
 
 import type { UserProfileInfo } from './UserStatsSection';
-
-const containerVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.07 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' as const } },
-};
 
 export interface HeroStatsProps {
   userInfo: UserProfileInfo;
@@ -114,15 +103,12 @@ export function HeroStats({
   }
 
   return (
-    <motion.div
-      className={cn('grid grid-cols-2 lg:grid-cols-3 gap-4', className)}
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+    <div
+      className={cn('grid grid-cols-2 lg:grid-cols-3 gap-4 print-motion-visible', className)}
       data-testid="hero-stats"
     >
       {stats.map((stat) => (
-        <motion.div key={stat.label} variants={itemVariants}>
+        <div key={stat.label}>
           <StatCard
             label={stat.label}
             value={stat.value}
@@ -131,8 +117,8 @@ export function HeroStats({
             featured={stat.featured}
             gradient={stat.gradient}
           />
-        </motion.div>
+        </div>
       ))}
-    </motion.div>
+    </div>
   );
 }

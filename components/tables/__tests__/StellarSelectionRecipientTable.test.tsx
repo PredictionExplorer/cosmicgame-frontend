@@ -5,7 +5,7 @@ import { checkA11y, render, screen } from '@/test-utils';
 jest.mock('../../../hooks/useStellarSelectionWalletContract', () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    read: { cycleTimeoutTimesToRetrieveAllocations: jest.fn().mockResolvedValue(BigInt(0)) },
+    read: { roundTimeoutTimesToWithdrawPrizes: jest.fn().mockResolvedValue(BigInt(0)) },
   })),
 }));
 

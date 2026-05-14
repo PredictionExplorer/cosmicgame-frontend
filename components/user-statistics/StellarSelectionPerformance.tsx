@@ -40,9 +40,14 @@ function ProbabilityBar({
         </span>
         <span className="font-semibold tabular-nums">{display}</span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-white/[0.06]">
+      <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/[0.06]">
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 hidden h-full rounded-full bg-gradient-to-r from-primary to-accent print:block"
+          style={{ width: `${Math.min(pct, 100)}%` }}
+          aria-hidden
+        />
         <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
+          className="h-full rounded-full bg-gradient-to-r from-primary to-accent print:hidden"
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(pct, 100)}%` }}
           transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
@@ -111,9 +116,9 @@ export function StellarSelectionPerformance({
 
   return (
     <motion.div
-      className={cn('space-y-6', className)}
+      className={cn('space-y-6 print-motion-visible', className)}
       variants={fadeIn}
-      initial="hidden"
+      initial={false}
       animate="visible"
       data-testid="stellar-selection-performance"
     >

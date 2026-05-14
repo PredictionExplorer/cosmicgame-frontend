@@ -2,13 +2,8 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import ChangedParameters from '../ChangedParameters';
 
-const mockUseActiveWeb3React = jest.fn();
 const mockUseSystemModelist = jest.fn();
 const mockUseSystemEvents = jest.fn();
-
-jest.mock('../../../hooks/web3', () => ({
-  useActiveWeb3React: () => mockUseActiveWeb3React(),
-}));
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useSystemModelist: (...args: unknown[]) => mockUseSystemModelist(...args),
@@ -25,25 +20,29 @@ beforeEach(() => jest.clearAllMocks());
 
 describe('ChangedParameters', () => {
   it('renders the heading', () => {
-    mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseSystemModelist.mockReturnValue({ data: null, isLoading: false });
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
     render(<ChangedParameters />);
-    expect(screen.getByText('Changed Parameters')).toBeInTheDocument();
+    expect(screen.getByText('Coordination Changes')).toBeInTheDocument();
   });
 
-  it('shows login prompt when no account', () => {
-    mockUseActiveWeb3React.mockReturnValue({ account: null });
-    mockUseSystemModelist.mockReturnValue({ data: null, isLoading: false });
-    mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
+  it('renders events table without a connected wallet', () => {
+    mockUseSystemModelist.mockReturnValue({
+      data: [{ EvtLogId: 100 }],
+      isLoading: false,
+    });
+    mockUseSystemEvents.mockReturnValue({
+      data: [{ id: 1 }],
+      isLoading: false,
+    });
     render(<ChangedParameters />);
+    expect(screen.getByTestId('events-table')).toHaveTextContent('rows: 1');
     expect(
-      screen.getByText('Please login to Metamask to see your allocations.'),
-    ).toBeInTheDocument();
+      screen.queryByText('Please login to Metamask to see your allocations.'),
+    ).not.toBeInTheDocument();
   });
 
   it('shows loading state', () => {
-    mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseSystemModelist.mockReturnValue({ data: null, isLoading: true });
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
     render(<ChangedParameters />);
@@ -51,7 +50,6 @@ describe('ChangedParameters', () => {
   });
 
   it('renders events table when loaded', () => {
-    mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseSystemModelist.mockReturnValue({
       data: [{ EvtLogId: 100 }],
       isLoading: false,
@@ -65,7 +63,6 @@ describe('ChangedParameters', () => {
   });
 
   it('passes startId from modeList to useSystemEvents', () => {
-    mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseSystemModelist.mockReturnValue({
       data: [{ EvtLogId: 42 }],
       isLoading: false,
@@ -76,7 +73,6 @@ describe('ChangedParameters', () => {
   });
 
   it('passes -1 as startId when modeList is null', () => {
-    mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseSystemModelist.mockReturnValue({ data: null, isLoading: false });
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
     render(<ChangedParameters />);
@@ -84,7 +80,6 @@ describe('ChangedParameters', () => {
   });
 
   it('has no accessibility violations', async () => {
-    mockUseActiveWeb3React.mockReturnValue({ account: '0xABC' });
     mockUseSystemModelist.mockReturnValue({ data: [{ EvtLogId: 1 }], isLoading: false });
     mockUseSystemEvents.mockReturnValue({ data: [], isLoading: false });
     const { container } = render(<ChangedParameters />);

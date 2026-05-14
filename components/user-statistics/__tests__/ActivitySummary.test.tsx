@@ -2,19 +2,6 @@ import { render, screen, checkA11y } from '@/test-utils';
 
 import { ActivitySummary, type ActivitySummaryProps } from '../ActivitySummary';
 
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div
-        data-testid={props['data-testid'] as string | undefined}
-        className={props.className as string | undefined}
-      >
-        {children}
-      </div>
-    ),
-  },
-}));
-
 jest.mock('../../../utils', () => ({
   formatEthValue: (v: number) => `${v.toFixed(4)} ETH`,
 }));
