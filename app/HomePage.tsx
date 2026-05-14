@@ -299,7 +299,9 @@ const HomePage = () => {
                       src={
                         bannerToken.seed === ''
                           ? '/images/qmark.png'
-                          : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
+                          : bannerToken.seed === 'sample'
+                            ? '/images/CosmicSignatureNFT.png'
+                            : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
                       }
                       priority
                       sizes="(max-width: 768px) 100vw, 500px"

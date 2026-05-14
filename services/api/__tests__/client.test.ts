@@ -52,6 +52,17 @@ const makeAxios403 = (): AxiosError => {
   return err;
 };
 
+const makeAxios404 = (): AxiosError => {
+  const err = new AxiosError('Not Found', 'ERR_BAD_REQUEST', undefined, undefined, {
+    status: 404,
+    statusText: 'Not Found',
+    headers: {},
+    config: {} as never,
+    data: {},
+  });
+  return err;
+};
+
 const makeAxios500 = (): AxiosError => {
   const err = new AxiosError('Server Error', 'ERR_BAD_RESPONSE', undefined, undefined, {
     status: 500,
@@ -145,10 +156,24 @@ describe('apiCall', () => {
     expect(mockReportError).toHaveBeenCalledWith(original, 'apiCall');
   });
 
-  it('throws for non-400 Axios status codes', async () => {
-    const err = new AxiosError('Not Found', 'ERR_BAD_REQUEST', undefined, undefined, {
-      status: 404,
-      statusText: 'Not Found',
+  it('returns [] fallback on Axios 404', async () => {
+    const result = await apiCall(async () => {
+      throw makeAxios404();
+    }, [] as number[]);
+    expect(result).toEqual([]);
+  });
+
+  it('does not report 404 errors to Sentry', async () => {
+    await apiCall(async () => {
+      throw makeAxios404();
+    }, []);
+    expect(mockReportError).not.toHaveBeenCalled();
+  });
+
+  it('throws for Axios 401 errors and reports to Sentry', async () => {
+    const err = new AxiosError('Unauthorized', 'ERR_BAD_REQUEST', undefined, undefined, {
+      status: 401,
+      statusText: 'Unauthorized',
       headers: {},
       config: {} as never,
       data: {},

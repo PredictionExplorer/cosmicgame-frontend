@@ -45,17 +45,18 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
   const stellarSelectionWalletContract = useStellarSelectionWalletContract();
 
   useEffect(() => {
+    const contract = stellarSelectionWalletContract;
+    if (!contract) return;
+
     const fetchCycleTimeoutTimesToRetrieveAllocations = async () => {
-      const cycleTimeoutTimesToRetrieveAllocations =
-        await stellarSelectionWalletContract!.read.roundTimeoutTimesToWithdrawPrizes([
-          BigInt(RoundNum),
-        ]);
+      const cycleTimeoutTimesToRetrieveAllocations = await (
+        contract.read.roundTimeoutTimesToWithdrawPrizes?.([BigInt(RoundNum)]) ??
+        Promise.resolve(0n)
+      );
       setRoundTimeoutTimesToWithdrawPrizes(Number(cycleTimeoutTimesToRetrieveAllocations ?? 0));
     };
 
-    if (stellarSelectionWalletContract) {
-      fetchCycleTimeoutTimesToRetrieveAllocations();
-    }
+    void fetchCycleTimeoutTimesToRetrieveAllocations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stellarSelectionWalletContract]);
 

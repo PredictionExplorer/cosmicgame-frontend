@@ -152,24 +152,36 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
 
   const fetchActivationTime = useCallback(async () => {
     if (!cosmicGameContract) return;
-    const time = await cosmicGameContract.read.roundActivationTime?.();
-    setActivationTime(Number(time ?? 0) - offset / 1000);
+    try {
+      const time = await cosmicGameContract.read.roundActivationTime?.();
+      if (!mountedRef.current) return;
+      setActivationTime(Number(time ?? 0) - offset / 1000);
+    } catch (err) {
+      reportError(err, 'fetchActivationTime');
+      if (mountedRef.current) setActivationTime(0);
+    }
   }, [cosmicGameContract, offset]);
 
   useEffect(() => {
     const fetchTimeoutFinalize = async () => {
       if (!cosmicGameContract) return;
-      const timeout = await cosmicGameContract.read.timeoutDurationToClaimMainPrize?.();
-      setTimeoutClaimPrize(Number(timeout ?? 0));
+      try {
+        const timeout = await cosmicGameContract.read.timeoutDurationToClaimMainPrize?.();
+        if (!mountedRef.current) return;
+        setTimeoutClaimPrize(Number(timeout ?? 0));
+      } catch (err) {
+        reportError(err, 'fetchTimeoutFinalize');
+        if (mountedRef.current) setTimeoutClaimPrize(0);
+      }
     };
 
     if (cosmicGameContract) {
-      fetchTimeoutFinalize();
+      void fetchTimeoutFinalize();
       // Setting activation time state from a one-shot async contract read.
       // Migrating to React Query would be cleaner long-term but is a larger
       // refactor (the gesture flow couples to fetchActivationTime via the
       // returned callback).
-      fetchActivationTime();
+      void fetchActivationTime();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cosmicGameContract, offset]);
