@@ -7,6 +7,8 @@ import {
   apiPost,
   flattenTx,
   flattenTxArray,
+  flattenGesture,
+  flattenGestureArray,
   flattenRoundInfo,
 } from './client';
 import {
@@ -125,7 +127,7 @@ export function get_claim_history_by_user(address: string): Promise<WinningHisto
 export function get_bid_list(): Promise<GestureInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('bid/list/all/0/1000000'));
-    return flattenTxArray<GestureInfo>(data.Gestures);
+    return flattenGestureArray<GestureInfo>(data.Gestures ?? data.Bids);
   }, []);
 }
 
@@ -133,7 +135,7 @@ export function get_bid_list(): Promise<GestureInfo[]> {
 export function get_bid_info(evtLogID: number): Promise<GestureInfo | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`bid/info/${evtLogID}`));
-    return flattenTx(data.GestureInfo) as GestureInfo | null;
+    return flattenGesture<GestureInfo>(data.GestureInfo ?? data.BidInfo);
   }, null);
 }
 
@@ -142,7 +144,7 @@ export function get_bid_list_by_round(round: number, sortDir: string): Promise<G
   return apiCall(async () => {
     const dir = sortDir === 'asc' ? 0 : 1;
     const { data } = await axios.get(getAPIUrl(`bid/list/by_round/${round}/${dir}/0/1000000`));
-    return flattenTxArray<GestureInfo>(data.BidsByRound);
+    return flattenGestureArray<GestureInfo>(data.BidsByRound);
   }, []);
 }
 

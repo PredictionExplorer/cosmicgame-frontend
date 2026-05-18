@@ -6,6 +6,8 @@ import {
   axios as clientAxios,
   flattenTx,
   flattenTxArray,
+  normalizeGestureRecord,
+  flattenGestureArray,
   flattenRoundInfo,
   normalizeFieldNames,
   normalizeFieldNamesArray,
@@ -382,6 +384,47 @@ describe('client helper functions', () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toHaveProperty('TxHash', '0xa');
       expect(result[1]).toEqual({ EvtLogId: 2 });
+    });
+  });
+
+  describe('normalizeGestureRecord', () => {
+    it('maps BidType to GestureType and aliases price fields', () => {
+      const result = normalizeGestureRecord({
+        BidType: 2,
+        CstPriceEth: 12.5,
+        EthPriceEth: -1,
+        Tx: {
+          EvtLogId: 1,
+          BlockNum: 1,
+          TxId: 1,
+          TxHash: '0xabc',
+          TimeStamp: 1,
+          DateTime: '',
+        },
+      }) as Record<string, unknown>;
+
+      expect(result.GestureType).toBe(2);
+      expect(result.NumCSTokensEth).toBe(12.5);
+      expect(result.GestureCostEth).toBeUndefined();
+    });
+
+    it('preserves an explicit GestureType', () => {
+      const result = normalizeGestureRecord({ GestureType: 0, BidType: 2 }) as Record<
+        string,
+        unknown
+      >;
+
+      expect(result.GestureType).toBe(0);
+    });
+  });
+
+  describe('flattenGestureArray', () => {
+    it('normalizes every bid in the array', () => {
+      const result = flattenGestureArray<{ GestureType: number }>([
+        { BidType: 1, EthPriceEth: 0.05 },
+      ]);
+
+      expect(result[0]?.GestureType).toBe(1);
     });
   });
 

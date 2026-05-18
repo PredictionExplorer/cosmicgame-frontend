@@ -49,6 +49,29 @@ describe('GestureHistoryTable', () => {
     expect(screen.getByText(mockData[0]!.Message)).toBeInTheDocument();
   });
 
+  test('shows CST cost and gesture type for CST bids', () => {
+    render(
+      <GestureHistoryTable
+        gestureHistory={[
+          {
+            EvtLogId: 2,
+            TimeStamp: 1701346718,
+            BidderAddr: '0x555eced709352759Ed0f1317dfC0a5FEf1310e60',
+            GestureType: 2,
+            CstPriceEth: 25.5,
+            EthPriceEth: -1,
+            RoundNum: 0,
+            Message: 'CST bid',
+          },
+        ]}
+        showRound={false}
+      />,
+    );
+
+    expect(screen.getByText('25.5000 CST')).toBeInTheDocument();
+    expect(screen.getByText('CST')).toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<GestureHistoryTable gestureHistory={[]} />);
     await checkA11y(container);

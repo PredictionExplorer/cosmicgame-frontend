@@ -58,25 +58,25 @@ describe('BanGestureTable', () => {
     expect(screen.getByText('No gesture history yet.')).toBeInTheDocument();
   });
 
-  it('renders gesture type "ETH gesture" for GestureType 0', async () => {
+  it('renders gesture type ETH for GestureType 0', async () => {
     await act(async () => {
       render(<BanGestureTable gestureHistory={[createGestureHistory({ GestureType: 0 })]} />);
     });
-    expect(screen.getAllByText('ETH Gesture').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('ETH').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders gesture type "RWLK Token Gesture" for GestureType 1', async () => {
+  it('renders gesture type RWLK for GestureType 1', async () => {
     await act(async () => {
       render(<BanGestureTable gestureHistory={[createGestureHistory({ GestureType: 1 })]} />);
     });
-    expect(screen.getAllByText('RWLK Token Gesture').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('RWLK').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('renders gesture type "CST gesture" for GestureType 2', async () => {
+  it('renders gesture type CST for GestureType 2', async () => {
     await act(async () => {
       render(<BanGestureTable gestureHistory={[createGestureHistory({ GestureType: 2 })]} />);
     });
-    expect(screen.getAllByText('CST Gesture').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('CST').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders Ban button for non-banned gestures', async () => {

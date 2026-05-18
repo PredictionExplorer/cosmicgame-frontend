@@ -69,10 +69,21 @@ const gestureTypeStyles: Record<number, string> = {
 };
 
 const gestureTypeLabels: Record<number, string> = {
-  2: 'CST Gesture',
-  1: 'RWLK Token Gesture',
-  0: 'ETH Gesture',
+  2: 'CST',
+  1: 'RWLK',
+  0: 'ETH',
 };
+
+function resolveGestureType(history: GestureHistory): number | undefined {
+  if (typeof history.GestureType === 'number') return history.GestureType;
+  const bidType = (history as GestureHistory & { BidType?: number }).BidType;
+  return typeof bidType === 'number' ? bidType : undefined;
+}
+
+function formatGestureCostAmount(amount: number | undefined): string {
+  if (amount == null || amount < 0) return '—';
+  return amount < 1 ? amount.toFixed(7) : amount.toFixed(4);
+}
 
 const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRowProps) => {
   const router = useRouter();
@@ -111,21 +122,16 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
 
   if (!history) return <TablePrimaryRow />;
 
-  const backgroundStyle = gestureTypeStyles[history.GestureType] || 'rgba(0,0,0,0.1)';
-  const gestureTypeLabel = gestureTypeLabels[history.GestureType] || 'Unknown Gesture';
+  const gestureType = resolveGestureType(history);
+  const backgroundStyle =
+    (gestureType !== undefined && gestureTypeStyles[gestureType]) || 'rgba(0,0,0,0.1)';
+  const gestureTypeLabel =
+    (gestureType !== undefined && gestureTypeLabels[gestureType]) || 'Unknown';
 
   const price =
-    history.GestureType === 2
-      ? `${
-          (history.CstPriceEth || 0) < 1
-            ? (history.CstPriceEth || 0).toFixed(7)
-            : (history.CstPriceEth || 0).toFixed(4)
-        } CST`
-      : `${
-          (history.EthPriceEth || 0) < 1
-            ? (history.EthPriceEth || 0).toFixed(7)
-            : (history.EthPriceEth || 0).toFixed(4)
-        } ETH`;
+    gestureType === 2
+      ? `${formatGestureCostAmount(history.CstPriceEth)} CST`
+      : `${formatGestureCostAmount(history.EthPriceEth)} ETH`;
 
   return (
     <TablePrimaryRow
@@ -150,7 +156,7 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
       <TablePrimaryCell align="center">{formatSeconds(gestureDuration)}</TablePrimaryCell>
       <TablePrimaryCell>
         <span className="break-all">
-          {history.GestureType === 1 && history.RWalkNFTId && (
+          {gestureType === 1 && history.RWalkNFTId && (
             <>
               {`Gesture was made using RandomWalk NFT (ID = ${history.RWalkNFTId})`}
               <Image
@@ -165,8 +171,8 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
           )}
           {(!!history.NFTDonationTokenAddr || !!history.DonatedERC20TokenAddr) && (
             <>
-              {history.GestureType === 2 && 'Gesture was made using Cosmic Signature Tokens'}
-              {history.GestureType === 0 && 'Gesture was made using ETH'}
+              {gestureType === 2 && 'Gesture was made using Cosmic Signature Tokens'}
+              {gestureType === 0 && 'Gesture was made using ETH'}
               {!!history.NFTDonationTokenAddr &&
                 ` and a token (${shortenHex(
                   history.NFTDonationTokenAddr,

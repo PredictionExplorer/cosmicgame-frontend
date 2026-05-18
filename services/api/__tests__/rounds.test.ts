@@ -336,6 +336,35 @@ describe('rounds API', () => {
   });
 
   describe('get_bid_list_by_round', () => {
+    it('maps backend BidType to GestureType', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          BidsByRound: [
+            {
+              BidType: 2,
+              CstPriceEth: 40,
+              EthPriceEth: -1,
+              BidderAddr: '0x1',
+              RoundNum: 0,
+              Tx: {
+                EvtLogId: 1,
+                BlockNum: 1,
+                TxId: 1,
+                TxHash: '0x1',
+                TimeStamp: 1,
+                DateTime: '',
+              },
+            },
+          ],
+        },
+      });
+
+      const result = await get_bid_list_by_round(0, 'desc');
+
+      expect(result[0]?.GestureType).toBe(2);
+      expect(result[0]?.NumCSTokensEth).toBe(40);
+    });
+
     it('maps "asc" sort direction to 0', async () => {
       mockedAxios.get.mockResolvedValue({ data: { BidsByRound: [mockTx(1)] } });
 

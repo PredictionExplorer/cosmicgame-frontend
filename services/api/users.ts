@@ -1,6 +1,6 @@
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
-import { axios, getAPIUrl, apiCall, flattenTxArray } from './client';
+import { axios, getAPIUrl, apiCall, flattenGestureArray, flattenTxArray } from './client';
 import type {
   UserInfoWithLists,
   UserBalance,
@@ -20,7 +20,7 @@ export function get_user_info(address: string): Promise<UserInfoWithLists | null
     if (data) {
       return {
         ...data,
-        Gestures: flattenTxArray(data.Gestures || []),
+        Gestures: flattenGestureArray(data.Gestures ?? data.Bids ?? []),
         PrizeHistory: flattenTxArray(data.PrizeHistory || []),
         CosmicSignatureTokensOwned: flattenTxArray(data.CosmicSignatureTokensOwned || []),
         CurrentlyStakedTokens: flattenTxArray(data.CurrentlyStakedTokens || []),

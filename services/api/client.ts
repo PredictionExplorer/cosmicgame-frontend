@@ -123,6 +123,53 @@ export const flattenTxArray = <T>(items: unknown): T[] => {
   return items.map((item) => flattenTx(item)) as T[];
 };
 
+/**
+ * Maps Go bid records (`BidType`, `EthPriceEth`, `CstPriceEth`) to frontend gesture fields.
+ * Backend bid_type: 0 = ETH, 1 = RandomWalk, 2 = CST.
+ */
+export const normalizeGestureRecord = (item: unknown) => {
+  const flat = flattenTx(item);
+  if (!flat || typeof flat !== 'object') return flat;
+
+  const rec = { ...(flat as Record<string, unknown>) };
+  const bidType = rec.BidType;
+  if (rec.GestureType === undefined && typeof bidType === 'number') {
+    rec.GestureType = bidType;
+  }
+
+  const gestureType = rec.GestureType;
+  if (typeof gestureType === 'number') {
+    if (
+      rec.NumCSTokensEth === undefined &&
+      typeof rec.CstPriceEth === 'number' &&
+      rec.CstPriceEth >= 0
+    ) {
+      rec.NumCSTokensEth = rec.CstPriceEth;
+    }
+    if (
+      rec.GestureCostEth === undefined &&
+      typeof rec.EthPriceEth === 'number' &&
+      rec.EthPriceEth >= 0
+    ) {
+      rec.GestureCostEth = rec.EthPriceEth;
+    }
+  }
+
+  return rec;
+};
+
+/** Flattens and normalizes bid/gesture records from the Cosmic Game API. */
+export const flattenGesture = <T>(item: unknown): T | null => {
+  if (item == null) return null;
+  return normalizeGestureRecord(item) as T;
+};
+
+/** Applies {@link normalizeGestureRecord} to every element of an array. */
+export const flattenGestureArray = <T>(items: unknown): T[] => {
+  if (!Array.isArray(items)) return [] as T[];
+  return items.map((item) => normalizeGestureRecord(item)) as T[];
+};
+
 /** Flattens a raw round response into a single {@link RoundInfo} by extracting nested allocation, charity, anchoring, and tx fields. */
 export const flattenRoundInfo = (roundInfo: unknown) => {
   if (!roundInfo || typeof roundInfo !== 'object') return null;

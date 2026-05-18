@@ -128,10 +128,10 @@ const HistoryRow = ({ history, isBanned, updateBannedList }: HistoryRowProps) =>
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.GestureType === 2
-          ? 'CST Gesture'
+          ? 'CST'
           : history.GestureType === 1
-            ? 'RWLK Token Gesture'
-            : 'ETH Gesture'}
+            ? 'RWLK'
+            : 'ETH'}
       </TablePrimaryCell>
       <TablePrimaryCell>
         <Tooltip>
