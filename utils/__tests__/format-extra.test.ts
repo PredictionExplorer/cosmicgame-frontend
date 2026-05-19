@@ -1,4 +1,14 @@
-import { formatSeconds, calculateTimeDiff, formatEthValue, formatCSTValue } from '../format';
+import {
+  formatSeconds,
+  calculateTimeDiff,
+  formatEthValue,
+  formatCSTValue,
+  toYyyymmdd,
+  fromYyyymmdd,
+  supplyHistoryBootstrapRange,
+  supplyHistoryDateBounds,
+  formatYyyymmddLabel,
+} from '../format';
 
 describe('formatSeconds edge cases', () => {
   it('returns "1m " for exactly 60 seconds', () => {
@@ -87,5 +97,38 @@ describe('formatCSTValue', () => {
 
   it('returns 2 decimals for values 10 or greater', () => {
     expect(formatCSTValue(42.12345)).toBe('42.12 CST');
+  });
+});
+
+describe('YYYYMMDD date helpers', () => {
+  it('converts ISO date to YYYYMMDD', () => {
+    expect(toYyyymmdd('2026-05-06')).toBe('20260506');
+  });
+
+  it('converts YYYYMMDD to ISO date', () => {
+    expect(fromYyyymmdd('20260506')).toBe('2026-05-06');
+  });
+
+  it('formats YYYYMMDD label', () => {
+    expect(formatYyyymmddLabel('20260506')).toBe('May 6, 2026');
+  });
+
+  it('returns bootstrap range from epoch to today', () => {
+    const range = supplyHistoryBootstrapRange();
+    expect(range.from).toBe('19700101');
+    expect(range.to).toMatch(/^\d{8}$/);
+  });
+
+  it('returns min and max dates from supply history records', () => {
+    const bounds = supplyHistoryDateBounds([
+      { Date: '20260315' },
+      { Date: '20260101' },
+      { Date: '20260210' },
+    ]);
+    expect(bounds).toEqual({ from: '20260101', to: '20260315' });
+  });
+
+  it('returns null bounds for empty records', () => {
+    expect(supplyHistoryDateBounds([])).toBeNull();
   });
 });

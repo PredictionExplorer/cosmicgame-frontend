@@ -93,3 +93,78 @@ export const formatCSTValue = (value: number): string => {
   if (!value) return '0 CST';
   return value < 10 ? `${value.toFixed(4)} CST` : `${value.toFixed(2)} CST`;
 };
+
+/** Converts HTML date input value (YYYY-MM-DD) to API date param (YYYYMMDD). */
+export function toYyyymmdd(isoDate: string): string {
+  return isoDate.replace(/-/g, '');
+}
+
+/** Converts API date param (YYYYMMDD) to HTML date input value (YYYY-MM-DD). */
+export function fromYyyymmdd(yyyymmdd: string): string {
+  if (yyyymmdd.length !== 8) return yyyymmdd;
+  return `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`;
+}
+
+const MONTH_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+/** Formats YYYYMMDD for chart axis / tooltip labels. */
+export function formatYyyymmddLabel(yyyymmdd: string): string {
+  if (yyyymmdd.length !== 8) return yyyymmdd;
+  const year = Number(yyyymmdd.slice(0, 4));
+  const month = Number(yyyymmdd.slice(4, 6)) - 1;
+  const day = Number(yyyymmdd.slice(6, 8));
+  const monthName = MONTH_LABELS[month] ?? '';
+  return `${monthName} ${day}, ${year}`;
+}
+
+/** Returns UTC YYYYMMDD for today minus `days` calendar days. */
+export function yyyymmddDaysAgoUtc(days: number): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - days);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}${m}${day}`;
+}
+
+/** Returns UTC YYYYMMDD for today. */
+export function yyyymmddTodayUtc(): string {
+  return yyyymmddDaysAgoUtc(0);
+}
+
+/** Wide date range used to bootstrap CST supply history (all available days). */
+export function supplyHistoryBootstrapRange(): { from: string; to: string } {
+  return { from: '19700101', to: yyyymmddTodayUtc() };
+}
+
+/** Min/max YYYYMMDD dates from supply history API rows. */
+export function supplyHistoryDateBounds(
+  records: readonly { Date: string }[],
+): { from: string; to: string } | null {
+  if (records.length === 0) return null;
+  const first = records[0];
+  if (!first) return null;
+  let from = first.Date;
+  let to = first.Date;
+  for (let i = 1; i < records.length; i++) {
+    const row = records[i];
+    if (!row) continue;
+    const date = row.Date;
+    if (date < from) from = date;
+    if (date > to) to = date;
+  }
+  return { from, to };
+}

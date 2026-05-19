@@ -336,6 +336,37 @@ export interface CTBalanceDistribution {
   BalanceFloat: number;
 }
 
+/** One calendar day's CST supply aggregates from total_supply_history_by_date. */
+export interface CTTotalSupplyHistoryByDateRecord {
+  Date: string;
+  DateTime: string;
+  TimeStamp: number;
+  NumBids: number;
+  MintAmount?: string;
+  MintAmountEth: number;
+  BurnAmount?: string;
+  BurnAmountEth: number;
+  Amount?: string;
+  AmountEth: number;
+  TotalSupply?: string;
+  TotalSupplyEth: number;
+}
+
+/** One bid's running CST total supply from total_supply_history_by_bid. */
+export interface CTTotalSupplyHistoryByBidRecord extends TxInfo {
+  BidInfoId: number;
+  BidType: number;
+  BidderAddr?: string;
+  MintAmount?: string;
+  MintAmountEth: number;
+  BurnAmount?: string;
+  BurnAmountEth: number;
+  Amount?: string;
+  AmountEth: number;
+  TotalSupply?: string;
+  TotalSupplyEth: number;
+}
+
 export interface NameHistoryRecord extends TxInfo {
   TokenName: string;
   TokenId?: number;

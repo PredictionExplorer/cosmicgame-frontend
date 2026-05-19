@@ -6,6 +6,8 @@ import type {
   CSTTransferRecord,
   TokenDistribution,
   CTBalanceDistribution,
+  CTTotalSupplyHistoryByBidRecord,
+  CTTotalSupplyHistoryByDateRecord,
   NameHistoryRecord,
   UsedRWLKNFT,
   TxInfo,
@@ -82,6 +84,27 @@ export function get_ct_balances_distribution(): Promise<CTBalanceDistribution[]>
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('ct/balances'));
     return data.CosmicTokenBalances;
+  }, []);
+}
+
+/** Fetches daily CST total supply history between two dates (YYYYMMDD, inclusive). */
+export function get_ct_total_supply_history_by_date(
+  fromDate: string,
+  toDate: string,
+): Promise<CTTotalSupplyHistoryByDateRecord[]> {
+  return apiCall(async () => {
+    const { data } = await axios.get(
+      getAPIUrl(`ct/total_supply_history_by_date/${fromDate}/${toDate}`),
+    );
+    return (data.TotalSupplyHistory ?? []) as CTTotalSupplyHistoryByDateRecord[];
+  }, []);
+}
+
+/** Fetches per-bid CST total supply history (running cumulative supply after each bid). */
+export function get_ct_total_supply_history_by_bid(): Promise<CTTotalSupplyHistoryByBidRecord[]> {
+  return apiCall(async () => {
+    const { data } = await axios.get(getAPIUrl('ct/total_supply_history_by_bid'));
+    return flattenTxArray<CTTotalSupplyHistoryByBidRecord>(data.TotalSupplyHistory);
   }, []);
 }
 

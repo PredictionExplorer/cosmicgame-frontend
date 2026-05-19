@@ -12,6 +12,8 @@ import {
   get_cst_transfers,
   get_cst_distribution,
   get_ct_balances_distribution,
+  get_ct_total_supply_history_by_bid,
+  get_ct_total_supply_history_by_date,
   get_ct_transfers,
   get_ct_ownership_transfers,
   get_ct_price,
@@ -227,6 +229,40 @@ describe('tokens API', () => {
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
       await expect(get_ct_balances_distribution()).rejects.toThrow('Network response was not OK');
+    });
+  });
+
+  describe('get_ct_total_supply_history_by_bid', () => {
+    it('returns history on success', async () => {
+      const history = [{ BidInfoId: 1, TotalSupplyEth: 50 }];
+      mockedAxios.get.mockResolvedValue({ data: { TotalSupplyHistory: history } });
+      const result = await get_ct_total_supply_history_by_bid();
+      expect(result).toEqual(history);
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        expect.stringMatching(/ct.*total_supply_history_by_bid/),
+      );
+    });
+
+    it('returns empty array on 400', async () => {
+      mockedAxios.get.mockRejectedValue(make400());
+      expect(await get_ct_total_supply_history_by_bid()).toEqual([]);
+    });
+  });
+
+  describe('get_ct_total_supply_history_by_date', () => {
+    it('returns history on success', async () => {
+      const history = [{ Date: '20260506', TotalSupplyEth: 100 }];
+      mockedAxios.get.mockResolvedValue({ data: { TotalSupplyHistory: history } });
+      const result = await get_ct_total_supply_history_by_date('20260506', '20260531');
+      expect(result).toEqual(history);
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        expect.stringMatching(/ct.*total_supply_history_by_date.*20260506.*20260531/),
+      );
+    });
+
+    it('returns empty array on 400', async () => {
+      mockedAxios.get.mockRejectedValue(make400());
+      expect(await get_ct_total_supply_history_by_date('20260501', '20260531')).toEqual([]);
     });
   });
 

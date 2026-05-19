@@ -34,6 +34,7 @@ import AttachedNFTDistributionTable from '@/components/attachments/AttachedNFTDi
 import { CSTokenDistributionTable } from '@/components/tokens/CSTokenDistributionTable';
 import { CTBalanceDistributionTable } from '@/components/tokens/CTBalanceDistributionTable';
 import { CTBalanceDistributionChart } from '@/components/tokens/CTBalanceDistributionChart';
+import { CSTTotalSupplyHistorySection } from '@/components/tokens/CSTTotalSupplyHistorySection';
 import { SystemModesTable, EventRow } from '@/components/tables/SystemModesTable';
 import { UniqueEthDonorsTable, UniqueEthDonor } from '@/components/tables/UniqueEthDonorsTable';
 import {
@@ -494,6 +495,13 @@ const Statistics = () => {
               <div className="mt-4">
                 <CTBalanceDistributionTable list={ctBalanceDistribution.slice(0, 20)} />
               </div>
+            </CollapsibleSection>
+            <CollapsibleSection
+              title="CST Total Supply"
+              icon={<TrendingUp className="h-3.5 w-3.5" />}
+              defaultOpen
+            >
+              <CSTTotalSupplyHistorySection />
             </CollapsibleSection>
           </div>
         </div>

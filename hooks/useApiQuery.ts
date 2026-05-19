@@ -17,6 +17,8 @@ import type {
   CSTTokenInfo,
   CSTTransferRecord,
   CTBalanceDistribution,
+  CTTotalSupplyHistoryByBidRecord,
+  CTTotalSupplyHistoryByDateRecord,
   CTPriceInfo,
   DashboardInfo,
   DonatedERC20Token,
@@ -270,6 +272,28 @@ export function useCTBalancesDistribution() {
   return useQuery<CTBalanceDistribution[]>({
     queryKey: ['ctBalancesDistribution'],
     queryFn: () => api.get_ct_balances_distribution(),
+    staleTime: 60_000,
+  });
+}
+
+export function useCTTotalSupplyHistoryByDate(
+  fromDate: string,
+  toDate: string,
+  enabled = true,
+) {
+  return useQuery<CTTotalSupplyHistoryByDateRecord[]>({
+    queryKey: ['ctTotalSupplyHistoryByDate', fromDate, toDate],
+    queryFn: () => api.get_ct_total_supply_history_by_date(fromDate, toDate),
+    enabled: enabled && Boolean(fromDate) && Boolean(toDate),
+    staleTime: 60_000,
+  });
+}
+
+export function useCTTotalSupplyHistoryByBid(enabled = true) {
+  return useQuery<CTTotalSupplyHistoryByBidRecord[]>({
+    queryKey: ['ctTotalSupplyHistoryByBid'],
+    queryFn: () => api.get_ct_total_supply_history_by_bid(),
+    enabled,
     staleTime: 60_000,
   });
 }

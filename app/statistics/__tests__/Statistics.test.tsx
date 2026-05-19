@@ -102,6 +102,9 @@ jest.mock('../../../components/tokens/CTBalanceDistributionTable', () => ({
 jest.mock('../../../components/tokens/CTBalanceDistributionChart', () => ({
   CTBalanceDistributionChart: () => <div data-testid="ct-balance-distribution-chart" />,
 }));
+jest.mock('../../../components/tokens/CSTTotalSupplyHistorySection', () => ({
+  CSTTotalSupplyHistorySection: () => <div data-testid="cst-total-supply-history-section" />,
+}));
 jest.mock('../../../components/statistics/StatisticsItem', () => ({
   StatisticsItem: ({
     title,
@@ -396,6 +399,17 @@ describe('Statistics', () => {
     expect(screen.getByText('Cosmic Signature NFT Holders')).toBeInTheDocument();
     expect(screen.getByText('CST (ERC-20) Holders')).toBeInTheDocument();
     expect(screen.getByText('Attached Token Distribution')).toBeInTheDocument();
+  });
+
+  it('renders CST total supply by date section', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+    expect(screen.getByText('CST Total Supply')).toBeInTheDocument();
+    expect(screen.getByTestId('cst-total-supply-history-section')).toBeInTheDocument();
   });
 
   it('renders anchoring section with stat cards', () => {
