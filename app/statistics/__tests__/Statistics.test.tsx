@@ -16,6 +16,7 @@ const mockUseUniqueDonors = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsNFTList = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCSTDistribution = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCTBalancesDistribution = jest.fn().mockReturnValue({ data: undefined });
+const mockUseCTStatistics = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCSTAnchorActions = jest.fn().mockReturnValue({ data: undefined });
 const mockUseRWLKAnchorActions = jest.fn().mockReturnValue({ data: undefined });
 const mockUseGlobalAnchoredCSTokens = jest.fn().mockReturnValue({ data: undefined });
@@ -36,6 +37,7 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useDonationsNFTList: (...args: unknown[]) => mockUseDonationsNFTList(...args),
   useCSTDistribution: (...args: unknown[]) => mockUseCSTDistribution(...args),
   useCTBalancesDistribution: (...args: unknown[]) => mockUseCTBalancesDistribution(...args),
+  useCTStatistics: (...args: unknown[]) => mockUseCTStatistics(...args),
   useCSTAnchorActions: (...args: unknown[]) => mockUseCSTAnchorActions(...args),
   useRWLKAnchorActions: (...args: unknown[]) => mockUseRWLKAnchorActions(...args),
   useGlobalAnchoredCSTokens: (...args: unknown[]) => mockUseGlobalAnchoredCSTokens(...args),
@@ -279,6 +281,22 @@ describe('Statistics', () => {
     expect(screen.getByText('Allocation Economy')).toBeInTheDocument();
     expect(screen.getByText('Token Economy')).toBeInTheDocument();
     expect(screen.getByText('Public Goods & Contributions')).toBeInTheDocument();
+  });
+
+  it('renders Token Economy total supply stat', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    mockUseCTStatistics.mockReturnValue({
+      data: { TotalSupplyEth: 40590.44, TotalSupply: '40590440000000000000000', TotalHolders: 100 },
+    });
+    render(<Statistics />);
+    expect(screen.getByText('Total Supply (ERC-20)')).toBeInTheDocument();
+    expect(
+      screen.getByText('Current total supply of Cosmic Signature Tokens (CST) in circulation'),
+    ).toBeInTheDocument();
   });
 
   it('renders link to current round page', () => {

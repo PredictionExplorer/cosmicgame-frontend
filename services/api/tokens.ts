@@ -6,6 +6,7 @@ import type {
   CSTTransferRecord,
   TokenDistribution,
   CTBalanceDistribution,
+  CTStatistics,
   CTTotalSupplyHistoryByBidRecord,
   CTTotalSupplyHistoryByDateRecord,
   NameHistoryRecord,
@@ -85,6 +86,14 @@ export function get_ct_balances_distribution(): Promise<CTBalanceDistribution[]>
     const { data } = await axios.get(getAPIUrl('ct/balances'));
     return data.CosmicTokenBalances;
   }, []);
+}
+
+/** Fetches aggregated CST (ERC-20) token statistics including total supply. */
+export function get_ct_statistics(): Promise<CTStatistics | null> {
+  return apiCall(async () => {
+    const { data } = await axios.get(getAPIUrl('ct/statistics'));
+    return (data.Statistics ?? null) as CTStatistics | null;
+  }, null);
 }
 
 /** Fetches daily CST total supply history between two dates (YYYYMMDD, inclusive). */

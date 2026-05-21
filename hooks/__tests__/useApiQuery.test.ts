@@ -26,6 +26,7 @@ import {
   useCSTTransfers,
   useCSTDistribution,
   useCTBalancesDistribution,
+  useCTStatistics,
   useCTTransfers,
   useCTOwnershipTransfers,
   useCTPrice,
@@ -576,6 +577,21 @@ describe('useApiQuery hooks', () => {
 
     it('has staleTime of 60s', () => {
       renderHook(() => useCTBalancesDistribution());
+      expect(getOptions().staleTime).toBe(60_000);
+    });
+  });
+
+  describe('useCTStatistics', () => {
+    it('calls useQuery with the correct query key', () => {
+      renderHook(() => useCTStatistics());
+
+      expect(mockUseQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: ['ctStatistics'] }),
+      );
+    });
+
+    it('has staleTime of 60s', () => {
+      renderHook(() => useCTStatistics());
       expect(getOptions().staleTime).toBe(60_000);
     });
   });

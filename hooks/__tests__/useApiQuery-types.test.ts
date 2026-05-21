@@ -32,6 +32,9 @@ import {
   useCSTTransfers,
   useCSTDistribution,
   useCTBalancesDistribution,
+  useCTStatistics,
+  useCTTotalSupplyHistoryByDate,
+  useCTTotalSupplyHistoryByBid,
   useCTTransfers,
   useCTOwnershipTransfers,
   useCTPrice,
@@ -148,6 +151,9 @@ describe('useApiQuery hook generics — every hook passes a type to useQuery<T>'
     ['useCSTTransfers', () => useCSTTransfers('0xabc')],
     ['useCSTDistribution', () => useCSTDistribution()],
     ['useCTBalancesDistribution', () => useCTBalancesDistribution()],
+    ['useCTStatistics', () => useCTStatistics()],
+    ['useCTTotalSupplyHistoryByDate', () => useCTTotalSupplyHistoryByDate('20260101', '20260131')],
+    ['useCTTotalSupplyHistoryByBid', () => useCTTotalSupplyHistoryByBid()],
     ['useCTTransfers', () => useCTTransfers('0xabc')],
     ['useCTOwnershipTransfers', () => useCTOwnershipTransfers(1)],
     ['useCTPrice', () => useCTPrice()],
@@ -239,8 +245,8 @@ describe('useApiQuery hook generics — every hook passes a type to useQuery<T>'
     ['useSystemEvents', () => useSystemEvents(0, 100)],
   ];
 
-  it('covers all 92 hooks', () => {
-    expect(HOOKS_WITH_GENERICS.length).toBe(92);
+  it('covers all 95 hooks', () => {
+    expect(HOOKS_WITH_GENERICS.length).toBe(95);
   });
 
   it.each(HOOKS_WITH_GENERICS)('%s calls useQuery with a queryFn', (name, hook) => {

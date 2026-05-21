@@ -12,6 +12,7 @@ import {
   get_cst_transfers,
   get_cst_distribution,
   get_ct_balances_distribution,
+  get_ct_statistics,
   get_ct_total_supply_history_by_bid,
   get_ct_total_supply_history_by_date,
   get_ct_transfers,
@@ -229,6 +230,26 @@ describe('tokens API', () => {
     it('throws on network error', async () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
       await expect(get_ct_balances_distribution()).rejects.toThrow('Network response was not OK');
+    });
+  });
+
+  describe('get_ct_statistics', () => {
+    it('returns statistics on success', async () => {
+      const stats = { TotalSupplyEth: 40590.44, TotalSupply: '40590440000000000000000', TotalHolders: 100 };
+      mockedAxios.get.mockResolvedValue({ data: { Statistics: stats } });
+      const result = await get_ct_statistics();
+      expect(result).toEqual(stats);
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/ct.*statistics/));
+    });
+
+    it('returns null on 400', async () => {
+      mockedAxios.get.mockRejectedValue(make400());
+      expect(await get_ct_statistics()).toBeNull();
+    });
+
+    it('throws on network error', async () => {
+      mockedAxios.get.mockRejectedValue(new Error('fail'));
+      await expect(get_ct_statistics()).rejects.toThrow('Network response was not OK');
     });
   });
 

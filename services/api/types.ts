@@ -336,6 +336,25 @@ export interface CTBalanceDistribution {
   BalanceFloat: number;
 }
 
+/** Aggregated CST (ERC-20) statistics from GET /ct/statistics. */
+export interface CTStatistics {
+  TotalSupply: string;
+  TotalSupplyEth: number;
+  TotalHolders: number;
+  EarnedFromBidding?: string;
+  EarnedFromBiddingEth?: number;
+  DistributedToMarketers?: string;
+  DistributedToMarketersEth?: number;
+  GivenAsMainPrizes?: string;
+  GivenAsMainPrizesEth?: number;
+  GivenAsRafflePrizes?: string;
+  GivenAsRafflePrizesEth?: number;
+  GivenAsChronoWarriorPrizes?: string;
+  GivenAsChronoWarriorPrizesEth?: number;
+  ConsumedInBids?: string;
+  ConsumedInBidsEth?: number;
+}
+
 /** One calendar day's CST supply aggregates from total_supply_history_by_date. */
 export interface CTTotalSupplyHistoryByDateRecord {
   Date: string;

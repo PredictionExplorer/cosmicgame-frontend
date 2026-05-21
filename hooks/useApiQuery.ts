@@ -17,6 +17,7 @@ import type {
   CSTTokenInfo,
   CSTTransferRecord,
   CTBalanceDistribution,
+  CTStatistics,
   CTTotalSupplyHistoryByBidRecord,
   CTTotalSupplyHistoryByDateRecord,
   CTPriceInfo,
@@ -272,6 +273,14 @@ export function useCTBalancesDistribution() {
   return useQuery<CTBalanceDistribution[]>({
     queryKey: ['ctBalancesDistribution'],
     queryFn: () => api.get_ct_balances_distribution(),
+    staleTime: 60_000,
+  });
+}
+
+export function useCTStatistics() {
+  return useQuery<CTStatistics | null>({
+    queryKey: ['ctStatistics'],
+    queryFn: () => api.get_ct_statistics(),
     staleTime: 60_000,
   });
 }

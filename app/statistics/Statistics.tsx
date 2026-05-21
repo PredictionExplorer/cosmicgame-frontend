@@ -47,6 +47,7 @@ import {
   useDonationsNFTList,
   useCSTDistribution,
   useCTBalancesDistribution,
+  useCTStatistics,
   useCSTAnchorActions,
   useRWLKAnchorActions,
   useGlobalAnchoredCSTokens,
@@ -76,6 +77,7 @@ const Statistics = () => {
   const { data: nftDonationsData } = useDonationsNFTList();
   const { data: cstDistributionData } = useCSTDistribution();
   const { data: ctBalanceDistributionData } = useCTBalancesDistribution();
+  const { data: ctStatisticsData } = useCTStatistics();
   const { data: cstAnchorActionsData } = useCSTAnchorActions();
   const { data: rwlkAnchorActionsData } = useRWLKAnchorActions();
   const { data: stakedCSTokensData } = useGlobalAnchoredCSTokens();
@@ -261,6 +263,11 @@ const Statistics = () => {
               icon={<Coins className="h-4 w-4" />}
               accentColor="purple"
             >
+              <StatisticsItem
+                title="Total Supply (ERC-20)"
+                value={formatCSTValue(ctStatisticsData?.TotalSupplyEth ?? 0)}
+                tooltip="Current total supply of Cosmic Signature Tokens (CST) in circulation"
+              />
               <StatisticsItem
                 title="NFTs Imprinted"
                 value={
