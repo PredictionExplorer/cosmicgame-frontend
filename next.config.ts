@@ -75,17 +75,35 @@ const nextConfig: NextConfig = {
    * use same-origin NEXT_PUBLIC_API_URL (e.g. http://localhost:3000/api/
    * cosmicgame) and avoid CORS / mixed-content. Set
    * COSMICGAME_API_UPSTREAM=http://127.0.0.1:8099 (no path) in .env.local.
+   *
+   * FAQ bot routes are rewritten separately when AI_BOT_BACKEND_URL (or
+   * FAQ_BOT_UPSTREAM_URL) is set, so /faq/* can reach the Python backend
+   * even if the Go websrv has not been redeployed with the FAQ proxy yet.
    */
   async rewrites() {
+    const rewrites: { source: string; destination: string }[] = [];
+
+    const faqUpstream =
+      process.env.AI_BOT_BACKEND_URL?.trim() || process.env.FAQ_BOT_UPSTREAM_URL?.trim();
+    if (faqUpstream) {
+      const faq = faqUpstream.replace(/\/+$/, '');
+      rewrites.push(
+        { source: '/api/cosmicgame/faq/health', destination: `${faq}/health` },
+        { source: '/api/cosmicgame/faq/query', destination: `${faq}/api/query` },
+        { source: '/api/cosmicgame/faq/reindex', destination: `${faq}/api/reindex` },
+      );
+    }
+
     const upstream = process.env.COSMICGAME_API_UPSTREAM?.trim();
-    if (!upstream) return [];
-    const base = upstream.replace(/\/+$/, '');
-    return [
-      {
+    if (upstream) {
+      const base = upstream.replace(/\/+$/, '');
+      rewrites.push({
         source: '/api/cosmicgame/:path*',
         destination: `${base}/api/cosmicgame/:path*`,
-      },
-    ];
+      });
+    }
+
+    return rewrites;
   },
   images: {
     remotePatterns: [

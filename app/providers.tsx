@@ -24,6 +24,7 @@ import { SystemModeProvider } from '@/contexts/SystemModeContext';
 import { ApiDataProvider } from '@/contexts/ApiDataContext';
 import { ContractAddressesProvider } from '@/contexts/ContractAddressesContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
+import { FaqBotWidget } from '@/components/faq-bot/FaqBotWidget';
 import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
@@ -256,6 +257,7 @@ export function Providers({
                           {showAppChrome && <Header />}
                           <ErrorBoundary>{children}</ErrorBoundary>
                           {showAppChrome && <Footer />}
+                          {showAppChrome && <FaqBotWidget />}
                         </TooltipProvider>
                       </NotificationProvider>
                     </ApiDataProvider>

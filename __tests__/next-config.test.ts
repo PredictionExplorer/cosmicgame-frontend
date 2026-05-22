@@ -45,6 +45,7 @@ describe('next.config', () => {
 
   describe('rewrites', () => {
     const originalUpstream = process.env.COSMICGAME_API_UPSTREAM;
+    const originalFaqUpstream = process.env.AI_BOT_BACKEND_URL;
 
     afterEach(() => {
       if (originalUpstream === undefined) {
@@ -52,10 +53,16 @@ describe('next.config', () => {
       } else {
         process.env.COSMICGAME_API_UPSTREAM = originalUpstream;
       }
+      if (originalFaqUpstream === undefined) {
+        delete process.env.AI_BOT_BACKEND_URL;
+      } else {
+        process.env.AI_BOT_BACKEND_URL = originalFaqUpstream;
+      }
     });
 
     it('does not proxy Cosmic Game API requests when no upstream is configured', async () => {
       delete process.env.COSMICGAME_API_UPSTREAM;
+      delete process.env.AI_BOT_BACKEND_URL;
 
       await expect((config as NextConfig).rewrites!()).resolves.toEqual([]);
     });
@@ -64,6 +71,21 @@ describe('next.config', () => {
       process.env.COSMICGAME_API_UPSTREAM = 'http://127.0.0.1:8099/';
 
       await expect((config as NextConfig).rewrites!()).resolves.toEqual([
+        {
+          source: '/api/cosmicgame/:path*',
+          destination: 'http://127.0.0.1:8099/api/cosmicgame/:path*',
+        },
+      ]);
+    });
+
+    it('proxies FAQ bot routes before the Cosmic Game catch-all when AI_BOT_BACKEND_URL is set', async () => {
+      process.env.AI_BOT_BACKEND_URL = 'http://127.0.0.1:8000';
+      process.env.COSMICGAME_API_UPSTREAM = 'http://127.0.0.1:8099';
+
+      await expect((config as NextConfig).rewrites!()).resolves.toEqual([
+        { source: '/api/cosmicgame/faq/health', destination: 'http://127.0.0.1:8000/health' },
+        { source: '/api/cosmicgame/faq/query', destination: 'http://127.0.0.1:8000/api/query' },
+        { source: '/api/cosmicgame/faq/reindex', destination: 'http://127.0.0.1:8000/api/reindex' },
         {
           source: '/api/cosmicgame/:path*',
           destination: 'http://127.0.0.1:8099/api/cosmicgame/:path*',
