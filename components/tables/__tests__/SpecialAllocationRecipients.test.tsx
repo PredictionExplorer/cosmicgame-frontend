@@ -23,7 +23,7 @@ const baseChampions: ChampionsState = {
     duration: 1800,
     lockedDuration: 1800,
     isLive: false,
-    statusText: 'Snapshot only',
+    statusText: 'Record standing',
     sourceText: 'Snapshot only',
     hasLiveDetails: false,
   },
@@ -176,7 +176,7 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients />);
 
     expect(screen.getAllByTestId('champion-live-chip').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByTestId('champion-locked-chip')).toHaveTextContent('Snapshot only');
+    expect(screen.getByTestId('champion-locked-chip')).toHaveTextContent('Record standing');
   });
 
   it('renders distinct duration labels and formatted durations for both timed roles', () => {
@@ -191,14 +191,15 @@ describe('SpecialAllocationRecipients', () => {
     expect(chronoCard).toHaveTextContent('30m');
   });
 
-  it('shows snapshot-only chrono details when live segment data is unavailable', () => {
+  it('shows confirmed chrono details without exposing data source', () => {
     render(<SpecialAllocationRecipients />);
 
     const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
-    expect(chronoCard).toHaveTextContent('Snapshot only');
-    expect(chronoCard).toHaveTextContent('confirmed duration, no local growth inferred');
+    expect(chronoCard).not.toHaveTextContent('Snapshot only');
+    expect(chronoCard).not.toHaveTextContent('Source');
+    expect(chronoCard).toHaveTextContent('Confirmed duration; no local growth inferred');
+    expect(chronoCard).toHaveTextContent('Chrono Reign');
     expect(chronoCard).not.toHaveTextContent('Live - growing');
-    expect(screen.getByTestId('chrono-source-status')).toHaveTextContent('Snapshot only');
   });
 
   it('shows source-backed chrono growth details', () => {
@@ -220,7 +221,7 @@ describe('SpecialAllocationRecipients', () => {
 
     const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
     expect(chronoCard).toHaveTextContent('Growing now');
-    expect(screen.getByTestId('chrono-source-status')).toHaveTextContent('Chain verified');
+    expect(chronoCard).not.toHaveTextContent('Chain verified');
     expect(screen.getByTestId('chrono-current-segment')).toHaveTextContent('31m 40s');
     expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('May close in');
     expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('5m');
@@ -242,7 +243,7 @@ describe('SpecialAllocationRecipients', () => {
 
     render(<SpecialAllocationRecipients />);
 
-    expect(screen.getByTestId('chrono-source-status')).toHaveTextContent('API confirmed');
+    expect(screen.queryByTestId('chrono-source-status')).not.toBeInTheDocument();
     expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('Starts growing in');
     expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('10m 1s');
   });

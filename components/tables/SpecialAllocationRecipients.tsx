@@ -232,13 +232,41 @@ function LatestParticipantMessage({ message }: { message: string }) {
   );
 }
 
-function DetailMetric({ label, value, testId }: { label: string; value: string; testId?: string }) {
+function DetailMetric({
+  label,
+  value,
+  testId,
+  tone = 'muted',
+}: {
+  label: string;
+  value: string;
+  testId?: string;
+  tone?: 'muted' | 'primary' | 'emerald';
+}) {
   return (
     <div
       data-testid={testId}
-      className="mt-2 rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2"
+      className={cn(
+        'mt-2 rounded-lg border px-3 py-2',
+        tone === 'primary'
+          ? 'border-primary/20 bg-primary/[0.055] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'
+          : tone === 'emerald'
+            ? 'border-emerald-400/20 bg-emerald-400/[0.055]'
+            : 'border-white/[0.06] bg-black/10',
+      )}
     >
-      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p
+        className={cn(
+          'text-[11px] uppercase tracking-wider',
+          tone === 'primary'
+            ? 'text-primary/90'
+            : tone === 'emerald'
+              ? 'text-emerald-300'
+              : 'text-muted-foreground',
+        )}
+      >
+        {label}
+      </p>
       <p className="mt-0.5 text-xs text-foreground">{value}</p>
     </div>
   );
@@ -250,8 +278,8 @@ function ChronoWarriorDetails({ chrono }: { chrono: ChampionsState['chrono'] }) 
   const nextMetric = (() => {
     if (!chrono.hasLiveDetails) {
       return {
-        label: 'Live detail',
-        value: 'Snapshot only - confirmed duration, no local growth inferred',
+        label: 'Record status',
+        value: 'Confirmed duration; no local growth inferred',
       };
     }
     if (chrono.isLive) {
@@ -272,20 +300,30 @@ function ChronoWarriorDetails({ chrono }: { chrono: ChampionsState['chrono'] }) 
   })();
 
   return (
-    <div data-testid="chrono-warrior-details" className="mt-3 space-y-2">
-      <DetailMetric
-        testId="chrono-source-status"
-        label="Source"
-        value={chrono.sourceText ?? 'Snapshot only'}
-      />
+    <div
+      data-testid="chrono-warrior-details"
+      className="mt-3 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/[0.08] via-accent/[0.045] to-transparent p-3 shadow-[0_0_30px_-20px_rgba(21,191,253,0.8)]"
+    >
+      <div className="mb-2 flex items-center gap-2">
+        <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(21,191,253,0.9)]" />
+        <p className="text-[11px] font-medium uppercase tracking-wider text-primary/90">
+          Chrono Reign
+        </p>
+      </div>
       {chrono.currentSegmentDuration !== undefined && (
         <DetailMetric
           testId="chrono-current-segment"
           label="Current reign segment"
           value={formatSeconds(chrono.currentSegmentDuration)}
+          tone="primary"
         />
       )}
-      <DetailMetric testId="chrono-next-change" label={nextMetric.label} value={nextMetric.value} />
+      <DetailMetric
+        testId="chrono-next-change"
+        label={nextMetric.label}
+        value={nextMetric.value}
+        tone={chrono.isLive ? 'emerald' : 'primary'}
+      />
       <p className="text-[11px] leading-relaxed text-muted-foreground">
         Chrono-Warrior measures continuous time as Endurance Champion. The same wallet can start a
         new segment after beating its own Endurance record.

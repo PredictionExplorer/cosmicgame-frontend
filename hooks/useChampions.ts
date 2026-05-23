@@ -171,11 +171,7 @@ export function deriveChampionsState({
       : undefined;
   const willStopGrowingIn =
     chronoIsLive && durationToBeat > 0 ? Math.max(0, durationToBeat - holdDuration) : undefined;
-  const chronoStatusText = chronoIsLive
-    ? 'Growing now'
-    : hasChronoSegmentData
-      ? 'Record standing'
-      : 'Snapshot only';
+  const chronoStatusText = chronoIsLive ? 'Growing now' : 'Record standing';
 
   return {
     isLoading,

@@ -184,7 +184,7 @@ describe('deriveChampionsState', () => {
 
     expect(state.chrono.isLive).toBe(false);
     expect(state.chrono.duration).toBe(50);
-    expect(state.chrono.statusText).toBe('Snapshot only');
+    expect(state.chrono.statusText).toBe('Record standing');
     expect(state.chrono.startsGrowingIn).toBeUndefined();
   });
 
