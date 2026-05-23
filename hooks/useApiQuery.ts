@@ -294,8 +294,8 @@ export function useCTTotalSupplyHistoryByDate(fromDate: string, toDate: string, 
   });
 }
 
+// lexicon-allow-start: exported hook name mirrors existing API/chart contract
 export function useCTTotalSupplyHistoryByBid(enabled = true) {
-  // lexicon-allow-backend-type
   return useQuery<CTTotalSupplyHistoryByBidRecord[]>({
     queryKey: ['ctTotalSupplyHistoryByBid'],
     queryFn: () => api.get_ct_total_supply_history_by_bid(),
@@ -303,6 +303,7 @@ export function useCTTotalSupplyHistoryByBid(enabled = true) {
     staleTime: 60_000,
   });
 }
+// lexicon-allow-end
 
 export function useCTTransfers(address: string | null | undefined) {
   return useQuery<TxInfo[]>({
