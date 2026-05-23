@@ -108,6 +108,12 @@ export function normalizeSpecialAllocationSnapshot({
   };
 }
 
+export function keepPreviousSpecialAllocationChainSnapshot(
+  previousData: ChainSpecialAllocationSnapshot | null | undefined,
+) {
+  return previousData;
+}
+
 export async function fetchChainSpecialAllocationSnapshot({
   publicClient,
   cosmicGameAddress,
@@ -209,6 +215,7 @@ export function useSpecialAllocationSnapshot(): {
   const chainQuery = useQuery<ChainSpecialAllocationSnapshot | null>({
     queryKey: ['specialAllocationChainSnapshot', cosmicGame, apiQuery.dataUpdatedAt],
     enabled: shouldReadChain,
+    placeholderData: keepPreviousSpecialAllocationChainSnapshot,
     staleTime: 15_000,
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,

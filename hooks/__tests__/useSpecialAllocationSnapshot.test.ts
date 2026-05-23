@@ -1,5 +1,6 @@
 import {
   hasApiV2SpecialAllocationData,
+  keepPreviousSpecialAllocationChainSnapshot,
   normalizeSpecialAllocationSnapshot,
 } from '@/hooks/useSpecialAllocationSnapshot';
 import type { SpecialRecipients } from '@/services/api/types';
@@ -81,5 +82,45 @@ describe('special allocation snapshot normalization', () => {
     expect(snapshot?.source).toBe('api-v1');
     expect(snapshot?.ChronoWarriorDuration).toBe(apiV1.ChronoWarriorDuration);
     expect(snapshot?.hasChronoSegmentData).toBe(false);
+  });
+
+  it('keeps previous chain data available while a refreshed chain read is loading', () => {
+    const previousChainData = {
+      data: {
+        EnduranceChampionStartTimeStamp: 800,
+        PrevEnduranceChampionDuration: 100,
+        ChronoWarriorDuration: 60,
+        StoredChronoWarriorDuration: 50,
+        ChronoWarriorIsLive: true,
+        SourceBlockTimeStamp: 1_000,
+      },
+    };
+
+    expect(keepPreviousSpecialAllocationChainSnapshot(previousChainData)).toBe(previousChainData);
+  });
+
+  it('preserves source-backed chrono details during an API refresh when previous chain data is reused', () => {
+    const previousChainData = {
+      data: {
+        EnduranceChampionStartTimeStamp: 800,
+        PrevEnduranceChampionDuration: 100,
+        ChronoWarriorDuration: 60,
+        StoredChronoWarriorDuration: 50,
+        ChronoWarriorIsLive: true,
+        SourceBlockTimeStamp: 1_000,
+      },
+    };
+
+    const snapshot = normalizeSpecialAllocationSnapshot({
+      apiData: { ...apiV1, ChronoWarriorDuration: 50 },
+      chainData: keepPreviousSpecialAllocationChainSnapshot(previousChainData),
+      apiReceivedAtMs: 40_000,
+      chainReceivedAtMs: 12_000,
+    });
+
+    expect(snapshot?.source).toBe('api-v1+chain');
+    expect(snapshot?.hasChronoSegmentData).toBe(true);
+    expect(snapshot?.ChronoWarriorDuration).toBe(60);
+    expect(snapshot?.StoredChronoWarriorDuration).toBe(50);
   });
 });
