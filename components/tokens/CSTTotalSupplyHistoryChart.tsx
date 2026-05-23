@@ -120,6 +120,7 @@ export const CSTTotalSupplyHistoryChart: FC<CSTTotalSupplyHistoryChartProps> = (
     const bounds = supplyHistoryDateBounds(data);
     if (!bounds) return;
     rangeInitialized.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initialize controls from first loaded dataset once.
     setAppliedFrom(bounds.from);
     setAppliedTo(bounds.to);
     setDraftFrom(fromYyyymmdd(bounds.from));

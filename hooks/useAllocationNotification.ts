@@ -86,6 +86,7 @@ export function useAllocationNotification({ allocationTime }: UseAllocationNotif
       const el =
         notificationSoundRef.current ??
         (notificationSoundRef.current = new Audio(NOTIFICATION_SRC));
+      // eslint-disable-next-line react-hooks/immutability -- reset the owned audio element before playback.
       el.currentTime = 0;
       await el.play();
     } catch (error) {

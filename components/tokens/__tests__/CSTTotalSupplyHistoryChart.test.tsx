@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { CSTTotalSupplyHistoryChart, toChartPoints } from '../CSTTotalSupplyHistoryChart';
 import type { CTTotalSupplyHistoryByDateRecord } from '@/services/api/types';
+
+import { CSTTotalSupplyHistoryChart, toChartPoints } from '../CSTTotalSupplyHistoryChart';
 
 const mockUseCTTotalSupplyHistoryByDate = jest.fn();
 

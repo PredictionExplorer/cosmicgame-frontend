@@ -5,7 +5,6 @@ import {
   getAPIUrl,
   apiCall,
   apiPost,
-  flattenTx,
   flattenTxArray,
   flattenGesture,
   flattenGestureArray,

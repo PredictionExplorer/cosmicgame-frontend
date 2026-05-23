@@ -105,9 +105,8 @@ function StellarSelectionAllocationsPrintFallback({
   list: StellarSelectionAllocation[];
   roundTimeouts: Record<number, number>;
 }) {
+  const [nowSec] = useState(() => Math.ceil(Date.now() / 1000));
   if (list.length === 0) return null;
-
-  const nowSec = Math.ceil(Date.now() / 1000);
 
   return (
     <div
@@ -141,7 +140,7 @@ function StellarSelectionAllocationsPrintFallback({
         <tbody>
           {list.map((w) => {
             const rt = roundTimeouts[w.RoundNum] ?? 0;
-            const isExpired = rt > 0 && rt < Date.now() / 1000;
+            const isExpired = rt > 0 && rt < nowSec;
             const expirationLabel =
               rt > 0
                 ? `${convertTimestampToDateTime(rt)}${
@@ -186,10 +185,10 @@ export function StellarSelectionAllocationsTable({ list }: { list: StellarSelect
 
     const fetchTimeouts = async () => {
       const results = await Promise.allSettled(
-        uniqueRounds.map((r) =>
-          stellarSelectionWalletContract.read.roundTimeoutTimesToWithdrawPrizes?.([
-            BigInt(r),
-          ]) ?? Promise.resolve(0n),
+        uniqueRounds.map(
+          (r) =>
+            stellarSelectionWalletContract.read.roundTimeoutTimesToWithdrawPrizes?.([BigInt(r)]) ??
+            Promise.resolve(0n),
         ),
       );
       const map: Record<number, number> = {};

@@ -4,11 +4,10 @@ import { useEffect, useMemo, useState, type FC } from 'react';
 import dayjs, { type Dayjs } from 'dayjs';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
-import { formatYyyymmddLabel, toYyyymmdd } from '@/utils/format';
-
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { formatYyyymmddLabel, toYyyymmdd } from '@/utils/format';
 
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
@@ -31,12 +30,7 @@ type CalendarPanelProps = {
   onSelect: (day: Dayjs) => void;
 };
 
-function CalendarPanel({
-  viewMonth,
-  onViewMonthChange,
-  selected,
-  onSelect,
-}: CalendarPanelProps) {
+function CalendarPanel({ viewMonth, onViewMonthChange, selected, onSelect }: CalendarPanelProps) {
   const days = useMemo(() => buildMonthGrid(viewMonth), [viewMonth]);
 
   return (
@@ -121,6 +115,7 @@ export const DatePicker: FC<DatePickerProps> = ({ id, label, value, onChange, cl
 
   useEffect(() => {
     if (open && value) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync visible month when opening an existing value.
       setViewMonth(dayjs(value).startOf('month'));
     }
   }, [open, value]);
