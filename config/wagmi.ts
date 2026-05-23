@@ -2,9 +2,16 @@
  * Wagmi + RainbowKit config for wallet connection. Uses the active chain from
  * config/chains and RPC from config/networks.
  */
-import { http } from 'wagmi';
+import { createConnector, http } from 'wagmi';
 import type { Chain } from 'viem';
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { injected } from 'wagmi/connectors';
+import { getDefaultConfig, type Wallet, type WalletList } from '@rainbow-me/rainbowkit';
+import {
+  baseAccount,
+  coinbaseWallet,
+  rainbowWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
 
 import { networkConfig } from './networks';
 import { activeChain, localChain } from './chains';
@@ -82,6 +89,56 @@ if (typeof globalThis.indexedDB === 'undefined') {
 // RainbowKit requires a real Reown/WalletConnect project ID for QR and mobile flows.
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID?.trim() ?? '';
 
+type InjectedEthereumProvider = {
+  isMetaMask?: boolean;
+  providers?: InjectedEthereumProvider[];
+};
+
+function getInjectedMetaMaskProvider(windowObject?: Window): InjectedEthereumProvider | undefined {
+  const ethereum = windowObject?.ethereum as InjectedEthereumProvider | undefined;
+  if (!ethereum) return undefined;
+  if (ethereum.isMetaMask) return ethereum;
+  return ethereum.providers?.find((provider) => provider.isMetaMask);
+}
+
+export function injectedMetaMaskWallet(): Wallet {
+  return {
+    id: 'metaMask',
+    name: 'MetaMask',
+    rdns: 'io.metamask',
+    iconUrl:
+      'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23f6851b%22/%3E%3Cpath fill=%22%23fff%22 d=%22M17 18l11 8 4 10 4-10 11-8-5 20-10 8-10-8z%22/%3E%3C/svg%3E',
+    iconBackground: '#f6851b',
+    installed:
+      typeof window !== 'undefined' && getInjectedMetaMaskProvider(window) ? true : undefined,
+    downloadUrls: {
+      browserExtension: 'https://metamask.io/download/',
+    },
+    createConnector: (walletDetails) => {
+      const injectedConnector = injected({
+        shimDisconnect: true,
+        unstable_shimAsyncInject: 1_000,
+        target: 'metaMask',
+      });
+      return createConnector((config) => ({
+        ...injectedConnector(config),
+        ...walletDetails,
+      }));
+    },
+  };
+}
+
+export const walletList: WalletList = [
+  {
+    groupName: 'Popular',
+    wallets: [rainbowWallet, baseAccount, injectedMetaMaskWallet, walletConnectWallet],
+  },
+  {
+    groupName: 'More',
+    wallets: [coinbaseWallet],
+  },
+];
+
 /**
  * Use RPC proxy when the node doesn't support CORS (e.g. self-hosted).
  * Infura/Alchemy have CORS; custom IPs need the proxy.
@@ -103,6 +160,7 @@ const transportUrl = useRpcProxy
 export const wagmiConfig = getDefaultConfig({
   appName: 'Cosmic Signature',
   projectId,
+  wallets: walletList,
   chains: [activeChain, ...(activeChain.id === localChain.id ? [] : [localChain])] as [
     Chain,
     ...Chain[],

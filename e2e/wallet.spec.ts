@@ -21,6 +21,56 @@ async function openWalletModal(page: Page) {
   return dialog;
 }
 
+async function installMockMetaMask(page: Page) {
+  await page.addInitScript(() => {
+    const mockWindow = window as Window & { __mockEthereumRequests?: string[] };
+    const listeners: Record<string, Array<(...args: unknown[]) => void>> = {};
+    const provider = {
+      isMetaMask: true as const,
+      selectedAddress: null as string | null,
+      chainId: '0xa4b1',
+      request: async ({
+        method,
+        params,
+      }: {
+        method: string;
+        params?: Array<{ chainId?: string }>;
+      }) => {
+        mockWindow.__mockEthereumRequests = [...(mockWindow.__mockEthereumRequests ?? []), method];
+        if (method === 'eth_accounts') {
+          return provider.selectedAddress ? [provider.selectedAddress] : [];
+        }
+        if (method === 'eth_requestAccounts') {
+          provider.selectedAddress = '0x1234567890abcdef1234567890abcdef12345678';
+          return [provider.selectedAddress];
+        }
+        if (method === 'eth_chainId') return provider.chainId;
+        if (method === 'wallet_switchEthereumChain') {
+          provider.chainId = params?.[0]?.chainId ?? provider.chainId;
+          return null;
+        }
+        if (method === 'wallet_addEthereumChain') return null;
+        if (method === 'net_version') return '42161';
+        return null;
+      },
+      on: (event: string, callback: (...args: unknown[]) => void) => {
+        listeners[event] = [...(listeners[event] ?? []), callback];
+      },
+      removeListener: (event: string, callback: (...args: unknown[]) => void) => {
+        listeners[event] = (listeners[event] ?? []).filter((listener) => listener !== callback);
+      },
+    };
+    (window as unknown as { ethereum: typeof provider }).ethereum = provider;
+    window.dispatchEvent(new Event('ethereum#initialized'));
+  });
+}
+
+declare global {
+  interface Window {
+    __mockEthereumRequests?: string[];
+  }
+}
+
 test.describe('Wallet connection state (disconnected)', () => {
   test('Connect Wallet is visible in the mobile header without opening the menu', async ({
     page,
@@ -50,6 +100,24 @@ test.describe('Wallet connection state (disconnected)', () => {
     await expect(dialog.getByRole('button', { name: /^Base Account$/i })).toBeVisible();
     await expect(dialog.getByRole('button', { name: /^MetaMask$/i })).toBeVisible();
     await expect(dialog.getByRole('button', { name: /^WalletConnect$/i })).toBeVisible();
+  });
+
+  test('MetaMask connects through injected provider without loading MetaMask SDK', async ({
+    page,
+  }) => {
+    const pageErrors: string[] = [];
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+    await installMockMetaMask(page);
+
+    const dialog = await openWalletModal(page);
+    await dialog.getByRole('button', { name: /^MetaMask$/i }).click();
+
+    await expect(page.getByText(/0x1234\.{4}5678/).first()).toBeVisible({ timeout: 10_000 });
+    await expect
+      .poll(() => page.evaluate(() => window.__mockEthereumRequests ?? []))
+      .toContain('eth_requestAccounts');
+    expect(pageErrors.join('\n')).not.toContain('@metamask/sdk');
+    expect(pageErrors.join('\n')).not.toContain('Cannot find module');
   });
 
   test('home page shows a connect prompt in the gesture area before wallet connection', async ({
