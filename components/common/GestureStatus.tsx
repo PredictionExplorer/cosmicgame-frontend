@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { formatEther, zeroAddress } from 'viem';
 import Countdown from 'react-countdown';
 import { Trophy, Coins, Zap, TrendingUp } from 'lucide-react';
@@ -8,12 +8,12 @@ import { motion } from 'framer-motion';
 
 import { convertTimestampToDateTime } from '@/utils';
 
-import { StatCard } from '@/components/ui/stat-card';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
 import { useUserInfo, useCTPrice } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
+import { cn } from '@/lib/utils';
 
 import Counter from './Counter';
 
@@ -45,6 +45,93 @@ const fadeUp = {
     transition: { delay: i * 0.08, duration: 0.4, ease: 'easeOut' as const },
   }),
 };
+
+type GestureMetricTone = 'signature' | 'eth' | 'randomwalk' | 'cst';
+
+const gestureMetricTone: Record<
+  GestureMetricTone,
+  { card: string; icon: string; glow: string; value: string }
+> = {
+  signature: {
+    card: 'border-primary/25 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.055)_55%,rgb(var(--chrono-rose-rgb)/0.055))]',
+    icon: 'bg-primary/15 text-primary',
+    glow: 'after:bg-[rgb(var(--aurora-cyan-rgb)/0.45)]',
+    value:
+      'bg-gradient-to-r from-[#35C9FF] via-[#7DD3FC] to-[#AC56FF] bg-clip-text text-transparent',
+  },
+  eth: {
+    card: 'border-[rgb(var(--solar-gold-rgb)/0.24)] bg-[linear-gradient(135deg,rgb(var(--solar-gold-rgb)/0.10),rgb(255_255_255/0.025)_60%,transparent)]',
+    icon: 'bg-[rgb(var(--solar-gold-rgb)/0.15)] text-[rgb(var(--solar-gold-rgb))]',
+    glow: 'after:bg-[rgb(var(--solar-gold-rgb)/0.42)]',
+    value: 'text-[rgb(var(--solar-gold-rgb))]',
+  },
+  randomwalk: {
+    card: 'border-[rgb(var(--nebula-violet-rgb)/0.24)] bg-[linear-gradient(135deg,rgb(var(--nebula-violet-rgb)/0.11),rgb(var(--aurora-cyan-rgb)/0.035)_65%,transparent)]',
+    icon: 'bg-[rgb(var(--nebula-violet-rgb)/0.16)] text-[rgb(var(--nebula-violet-rgb))]',
+    glow: 'after:bg-[rgb(var(--nebula-violet-rgb)/0.45)]',
+    value: 'text-[rgb(var(--nebula-violet-rgb))]',
+  },
+  cst: {
+    card: 'border-[rgb(var(--impact-green-rgb)/0.24)] bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.10),rgb(var(--aurora-cyan-rgb)/0.035)_62%,transparent)]',
+    icon: 'bg-[rgb(var(--impact-green-rgb)/0.14)] text-[rgb(var(--impact-green-rgb))]',
+    glow: 'after:bg-[rgb(var(--impact-green-rgb)/0.42)]',
+    value: 'text-[rgb(var(--impact-green-rgb))]',
+  },
+};
+
+function GestureMetricCard({
+  label,
+  value,
+  icon,
+  tooltip,
+  tone,
+}: {
+  label: string;
+  value: ReactNode;
+  icon?: ReactNode;
+  tooltip?: string;
+  tone: GestureMetricTone;
+}) {
+  const palette = gestureMetricTone[tone];
+
+  return (
+    <div
+      className={cn(
+        'group relative flex h-full min-h-[132px] flex-col justify-between overflow-hidden rounded-xl border p-4 backdrop-blur-sm transition-all duration-300',
+        'hover:-translate-y-0.5 hover:border-white/[0.16] hover:bg-white/[0.055]',
+        'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/25 before:to-transparent',
+        'after:pointer-events-none after:absolute after:-right-10 after:-top-12 after:h-28 after:w-28 after:rounded-full after:opacity-0 after:blur-2xl after:transition-opacity after:duration-300 after:content-[""] group-hover:after:opacity-100',
+        palette.card,
+        palette.glow,
+      )}
+    >
+      <div className="relative z-[1] flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <p className="type-eyebrow text-muted-foreground print:!text-foreground/80">{label}</p>
+          {tooltip ? <InfoTooltip content={tooltip} /> : null}
+        </div>
+        {icon ? (
+          <div
+            className={cn(
+              'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors',
+              palette.icon,
+            )}
+          >
+            {icon}
+          </div>
+        ) : null}
+      </div>
+      <div
+        className={cn(
+          'relative z-[1] mt-4 text-xl font-bold tracking-tight tabular-nums',
+          palette.value,
+        )}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
 
 export const GestureStatus = ({
   data,
@@ -149,42 +236,71 @@ export const GestureStatus = ({
             ))}
 
           {/* Allocation + bid prices row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible">
-              <StatCard
+          <div className="grid grid-cols-2 items-stretch gap-3 sm:grid-cols-4">
+            <motion.div
+              custom={0}
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className="h-full"
+            >
+              <GestureMetricCard
                 label="Signature Allocation"
                 value={`${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`}
                 icon={<Trophy className="h-5 w-5" />}
-                gradient
+                tone="signature"
                 tooltip="The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST and a Cosmic Signature NFT"
               />
             </motion.div>
 
             {data.LastBidderAddr !== zeroAddress && (
               <>
-                <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible">
-                  <StatCard
+                <motion.div
+                  custom={1}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                  className="h-full"
+                >
+                  <GestureMetricCard
                     label="ETH Gesture"
                     value={`${(ethGestureInfo?.ETHPrice ?? 0).toFixed(5)} ETH`}
                     icon={<Coins className="h-4 w-4" />}
+                    tone="eth"
                     tooltip="Current cost to make a gesture with ETH"
                   />
                 </motion.div>
-                <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible">
-                  <StatCard
+                <motion.div
+                  custom={2}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                  className="h-full"
+                >
+                  <GestureMetricCard
                     label="RandomWalk Gesture"
                     value={`${((ethGestureInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH`}
+                    icon={<TrendingUp className="h-4 w-4" />}
+                    tone="randomwalk"
                     tooltip="50% cost reduction when attaching a RandomWalk NFT to your gesture"
                   />
                 </motion.div>
-                <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
-                  <StatCard
+                <motion.div
+                  custom={3}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate="visible"
+                  className="h-full"
+                >
+                  <GestureMetricCard
                     label="CST Gesture"
                     value={
                       cstGestureData?.CSTPrice > 0
                         ? `${cstGestureData.CSTPrice.toFixed(4)} CST`
                         : 'FREE'
                     }
+                    icon={<Zap className="h-4 w-4" />}
+                    tone="cst"
                     tooltip="Gesture with CST. Cost descends over time via the Calibration Window — can become free."
                   />
                 </motion.div>
