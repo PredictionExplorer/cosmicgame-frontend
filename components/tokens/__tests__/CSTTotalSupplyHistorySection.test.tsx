@@ -1,3 +1,5 @@
+// lexicon-allow-start: mocked component test ids preserve existing component contract
+
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -18,16 +20,18 @@ describe('CSTTotalSupplyHistorySection', () => {
     render(<CSTTotalSupplyHistorySection />);
     expect(screen.getByTestId('cst-total-supply-history-section')).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /by date/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /by bid/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /by gesture/i })).toBeInTheDocument();
     expect(screen.getByTestId('cst-total-supply-history-chart')).toBeInTheDocument();
     expect(screen.queryByTestId('cst-total-supply-history-by-bid-chart')).not.toBeInTheDocument();
   });
 
-  it('shows only the bid chart when By bid tab is selected', async () => {
+  it('shows only the gesture chart when By gesture tab is selected', async () => {
     const user = userEvent.setup();
     render(<CSTTotalSupplyHistorySection />);
-    await user.click(screen.getByRole('tab', { name: /by bid/i }));
+    await user.click(screen.getByRole('tab', { name: /by gesture/i }));
     expect(screen.queryByTestId('cst-total-supply-history-chart')).not.toBeInTheDocument();
     expect(screen.getByTestId('cst-total-supply-history-by-bid-chart')).toBeInTheDocument();
   });
 });
+
+// lexicon-allow-end

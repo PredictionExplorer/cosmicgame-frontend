@@ -76,8 +76,8 @@ const gestureTypeLabels: Record<number, string> = {
 
 function resolveGestureType(history: GestureHistory): number | undefined {
   if (typeof history.GestureType === 'number') return history.GestureType;
-  const bidType = (history as GestureHistory & { BidType?: number }).BidType;
-  return typeof bidType === 'number' ? bidType : undefined;
+  const backendGestureType = (history as GestureHistory & { BidType?: number }).BidType;
+  return typeof backendGestureType === 'number' ? backendGestureType : undefined;
 }
 
 function formatGestureCostAmount(amount: number | undefined): string {

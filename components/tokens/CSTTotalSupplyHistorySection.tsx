@@ -13,12 +13,12 @@ export const CSTTotalSupplyHistorySection: FC = () => {
     <Tabs defaultValue="date" className="w-full" data-testid="cst-total-supply-history-section">
       <TabsList className="grid w-full max-w-md grid-cols-2">
         <TabsTrigger value="date">By date</TabsTrigger>
-        <TabsTrigger value="bid">By bid</TabsTrigger>
+        <TabsTrigger value="gesture">By gesture</TabsTrigger>
       </TabsList>
       <TabsContent value="date" className="mt-6">
         <CSTTotalSupplyHistoryChart />
       </TabsContent>
-      <TabsContent value="bid" className="mt-6">
+      <TabsContent value="gesture" className="mt-6">
         <CSTTotalSupplyHistoryByBidChart />
       </TabsContent>
     </Tabs>

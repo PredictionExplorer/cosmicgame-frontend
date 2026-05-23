@@ -1,5 +1,7 @@
 'use client';
 
+// lexicon-allow-start: component name and backend field names preserve existing API/chart contract
+
 import { useMemo, type FC } from 'react';
 import {
   LineChart,
@@ -10,10 +12,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { useCTTotalSupplyHistoryByBid } from '@/hooks/useApiQuery';
-import type { CTTotalSupplyHistoryByBidRecord } from '@/services/api/types';
+
 import { formatCSTValue } from '@/utils';
 
+import { useCTTotalSupplyHistoryByBid } from '@/hooks/useApiQuery';
+import type { CTTotalSupplyHistoryByBidRecord } from '@/services/api/types';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 
@@ -159,3 +162,5 @@ export const CSTTotalSupplyHistoryByBidChart: FC<CSTTotalSupplyHistoryByBidChart
     </div>
   );
 };
+
+// lexicon-allow-end

@@ -1,3 +1,5 @@
+// lexicon-allow-start: test imports preserve existing component/API names
+
 import { render, screen } from '@testing-library/react';
 
 import type { CTTotalSupplyHistoryByBidRecord } from '@/services/api/types';
@@ -85,3 +87,5 @@ describe('CSTTotalSupplyHistoryByBidChart', () => {
     expect(mockUseCTTotalSupplyHistoryByBid).toHaveBeenCalledWith(false);
   });
 });
+
+// lexicon-allow-end

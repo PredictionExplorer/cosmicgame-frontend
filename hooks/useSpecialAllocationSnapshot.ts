@@ -29,7 +29,7 @@ interface ChainSpecialAllocationSnapshot {
   };
 }
 
-type BiddersInfoResult =
+type ParticipantInfoResult =
   | readonly [bigint, bigint, bigint]
   | {
       totalSpentEthAmount?: bigint;
@@ -54,8 +54,8 @@ function cleanAddress(value: unknown): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
-function bidderLastBidTime(result: unknown): number | undefined {
-  const info = result as BiddersInfoResult;
+function latestParticipantLastGestureTime(result: unknown): number | undefined {
+  const info = result as ParticipantInfoResult;
   if (Array.isArray(info)) {
     return bigintToSafeNumber((info as readonly unknown[])[2]);
   }
@@ -154,12 +154,12 @@ export async function fetchChainSpecialAllocationSnapshot({
   ] = champions as readonly [`0x${string}`, bigint, `0x${string}`, bigint];
 
   const roundNumber = bigintToSafeNumber(roundNum);
-  const lastBidder = cleanAddress(lastBidderAddress);
-  let lastBidderLastBidTime: number | undefined;
+  const latestParticipant = cleanAddress(lastBidderAddress);
+  let latestParticipantLastGestureTimeValue: number | undefined;
 
-  if (roundNumber !== undefined && lastBidder && lastBidder !== ZERO_ADDRESS) {
-    const info = await read('biddersInfo', [BigInt(roundNumber), lastBidder]);
-    lastBidderLastBidTime = bidderLastBidTime(info);
+  if (roundNumber !== undefined && latestParticipant && latestParticipant !== ZERO_ADDRESS) {
+    const info = await read('biddersInfo', [BigInt(roundNumber), latestParticipant]);
+    latestParticipantLastGestureTimeValue = latestParticipantLastGestureTime(info);
   }
 
   const sourceBlockNumber = bigintToSafeNumber(block.number);
@@ -185,8 +185,8 @@ export async function fetchChainSpecialAllocationSnapshot({
           ? currentChronoSegmentDuration > storedChronoDuration
           : undefined,
       StoredChronoWarriorDuration: storedChronoDuration,
-      LastBidderAddress: lastBidder,
-      LastBidderLastBidTime: lastBidderLastBidTime,
+      LastBidderAddress: latestParticipant,
+      LastBidderLastBidTime: latestParticipantLastGestureTimeValue,
       LastCstBidderAddress: cleanAddress(lastCstBidderAddress),
       RoundNum: roundNumber,
       SourceBlockNumber: sourceBlockNumber,

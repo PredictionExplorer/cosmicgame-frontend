@@ -285,11 +285,7 @@ export function useCTStatistics() {
   });
 }
 
-export function useCTTotalSupplyHistoryByDate(
-  fromDate: string,
-  toDate: string,
-  enabled = true,
-) {
+export function useCTTotalSupplyHistoryByDate(fromDate: string, toDate: string, enabled = true) {
   return useQuery<CTTotalSupplyHistoryByDateRecord[]>({
     queryKey: ['ctTotalSupplyHistoryByDate', fromDate, toDate],
     queryFn: () => api.get_ct_total_supply_history_by_date(fromDate, toDate),
@@ -299,6 +295,7 @@ export function useCTTotalSupplyHistoryByDate(
 }
 
 export function useCTTotalSupplyHistoryByBid(enabled = true) {
+  // lexicon-allow-backend-type
   return useQuery<CTTotalSupplyHistoryByBidRecord[]>({
     queryKey: ['ctTotalSupplyHistoryByBid'],
     queryFn: () => api.get_ct_total_supply_history_by_bid(),

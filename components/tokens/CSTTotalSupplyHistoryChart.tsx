@@ -10,8 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { useCTTotalSupplyHistoryByDate } from '@/hooks/useApiQuery';
-import type { CTTotalSupplyHistoryByDateRecord } from '@/services/api/types';
+
 import {
   formatCSTValue,
   formatYyyymmddLabel,
@@ -21,6 +20,8 @@ import {
   toYyyymmdd,
 } from '@/utils';
 
+import { useCTTotalSupplyHistoryByDate } from '@/hooks/useApiQuery';
+import type { CTTotalSupplyHistoryByDateRecord } from '@/services/api/types';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Spinner } from '@/components/ui/spinner';
@@ -82,7 +83,7 @@ function SupplyTooltip({ active, payload }: SupplyTooltipProps) {
           <dd className="text-white">{formatCSTValue(point.amountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Num bids</dt>
+          <dt>Num gestures</dt>
           <dd className="text-white">{point.numBids}</dd>
         </div>
       </dl>

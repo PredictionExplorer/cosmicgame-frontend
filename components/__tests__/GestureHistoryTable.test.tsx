@@ -1,3 +1,5 @@
+// lexicon-allow-start: test fixture names preserve legacy event terminology
+
 import '@testing-library/jest-dom';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
@@ -77,3 +79,5 @@ describe('GestureHistoryTable', () => {
     await checkA11y(container);
   });
 });
+
+// lexicon-allow-end

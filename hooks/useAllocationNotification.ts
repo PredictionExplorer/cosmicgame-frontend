@@ -75,7 +75,7 @@ export function useAllocationNotification({ allocationTime }: UseAllocationNotif
   const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
   const unlockOnceRef = useRef(false);
 
-  const primeBidSoundOnUserGesture = useCallback(async () => {
+  const primeAllocationSoundOnUserGesture = useCallback(async () => {
     if (unlockOnceRef.current) return;
     unlockOnceRef.current = true;
     await unlockPlayback(notificationSoundRef);
@@ -97,7 +97,7 @@ export function useAllocationNotification({ allocationTime }: UseAllocationNotif
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const onGesture = () => {
-      void primeBidSoundOnUserGesture();
+      void primeAllocationSoundOnUserGesture();
     };
     window.addEventListener('pointerdown', onGesture, { capture: true, passive: true });
     window.addEventListener('keydown', onGesture, { capture: true });
@@ -105,7 +105,7 @@ export function useAllocationNotification({ allocationTime }: UseAllocationNotif
       window.removeEventListener('pointerdown', onGesture, { capture: true });
       window.removeEventListener('keydown', onGesture, { capture: true });
     };
-  }, [primeBidSoundOnUserGesture]);
+  }, [primeAllocationSoundOnUserGesture]);
 
   const requestNotificationPermission = useCallback(() => {
     if (typeof window === 'undefined' || !('Notification' in window)) return;

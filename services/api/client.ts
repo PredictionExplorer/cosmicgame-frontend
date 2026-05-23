@@ -132,9 +132,9 @@ export const normalizeGestureRecord = (item: unknown) => {
   if (!flat || typeof flat !== 'object') return flat;
 
   const rec = { ...(flat as Record<string, unknown>) };
-  const bidType = rec.BidType;
-  if (rec.GestureType === undefined && typeof bidType === 'number') {
-    rec.GestureType = bidType;
+  const backendGestureType = rec.BidType;
+  if (rec.GestureType === undefined && typeof backendGestureType === 'number') {
+    rec.GestureType = backendGestureType;
   }
 
   const gestureType = rec.GestureType;

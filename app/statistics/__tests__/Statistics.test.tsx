@@ -1,3 +1,5 @@
+// lexicon-allow-start: test descriptions cover legacy UI wording
+
 import { checkA11y, render, screen } from '@/test-utils';
 
 import Statistics from '../Statistics';
@@ -554,3 +556,5 @@ describe('Statistics', () => {
     await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });
+
+// lexicon-allow-end
