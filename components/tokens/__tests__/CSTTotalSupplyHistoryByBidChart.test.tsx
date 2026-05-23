@@ -1,10 +1,11 @@
 import { render, screen } from '@testing-library/react';
 
+import type { CTTotalSupplyHistoryByBidRecord } from '@/services/api/types';
+
 import {
   CSTTotalSupplyHistoryByBidChart,
   toBidChartPoints,
 } from '../CSTTotalSupplyHistoryByBidChart';
-import type { CTTotalSupplyHistoryByBidRecord } from '@/services/api/types';
 
 const mockUseCTTotalSupplyHistoryByBid = jest.fn();
 
@@ -27,6 +28,11 @@ jest.mock('recharts', () => ({
 }));
 
 const sampleRecord: CTTotalSupplyHistoryByBidRecord = {
+  EvtLogId: 1,
+  BlockNum: 1,
+  TxId: 1,
+  TxHash: '0xa',
+  TimeStamp: 1,
   BidInfoId: 42,
   BidType: 2,
   MintAmountEth: 5,

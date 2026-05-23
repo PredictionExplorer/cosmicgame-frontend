@@ -246,11 +246,19 @@ export const SpecialRecipientsSchema = z
   .object({
     EnduranceChampionAddress: AddressSchema.optional(),
     EnduranceChampionDuration: z.number().optional(),
+    EnduranceChampionStartTimeStamp: z.number().optional(),
+    PrevEnduranceChampionDuration: z.number().optional(),
     ChronoWarriorAddress: AddressSchema.optional(),
     ChronoWarriorDuration: z.number().optional(),
+    ChronoWarriorIsLive: z.boolean().optional(),
     LastBidderAddress: AddressSchema.optional(),
     LastBidderLastBidTime: z.number().optional(),
     LastCstBidderAddress: AddressSchema.optional(),
+    LastCstBidderLastBidTime: z.number().optional(),
+    LastCstBidEventLogId: z.number().optional(),
+    RoundNum: z.number().optional(),
+    SourceBlockNumber: z.number().optional(),
+    SourceBlockTimeStamp: z.number().optional(),
   })
   .loose();
 export type SpecialRecipientsParsed = z.infer<typeof SpecialRecipientsSchema>;

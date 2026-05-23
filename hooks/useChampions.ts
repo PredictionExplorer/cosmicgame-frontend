@@ -2,7 +2,10 @@
 
 import { useMemo } from 'react';
 
-import { useCurrentSpecialRecipients } from '@/hooks/useApiQuery';
+import {
+  useSpecialAllocationSnapshot,
+  type SpecialAllocationSnapshot,
+} from '@/hooks/useSpecialAllocationSnapshot';
 import { useNow } from '@/hooks/useNow';
 import type { SpecialRecipients } from '@/services/api/types';
 
@@ -13,6 +16,12 @@ export interface ChampionRoleState {
   duration: number;
   lockedDuration: number;
   isLive: boolean;
+  statusText?: string;
+  sourceText?: string;
+  currentSegmentDuration?: number;
+  startsGrowingIn?: number;
+  willStopGrowingIn?: number;
+  hasLiveDetails?: boolean;
 }
 
 export interface LatestGestureState {
@@ -36,13 +45,13 @@ export interface ChampionsState {
   };
   latestGesture: LatestGestureState;
   raw: SpecialRecipients | null | undefined;
+  source: 'api-v2' | 'api-v1+chain' | 'api-v1' | 'none';
 }
 
 interface DeriveChampionsStateArgs {
-  data: SpecialRecipients | null | undefined;
+  data: SpecialAllocationSnapshot | SpecialRecipients | null | undefined;
   isLoading?: boolean;
   nowMs: number;
-  dataUpdatedAt?: number;
 }
 
 function cleanAddress(address: string | null | undefined): string | null {
@@ -63,19 +72,43 @@ function clampProgress(value: number): number {
   return Math.min(99.9, Math.max(0, value));
 }
 
+function isSnapshot(
+  data: SpecialAllocationSnapshot | SpecialRecipients,
+): data is SpecialAllocationSnapshot {
+  return typeof (data as SpecialAllocationSnapshot).source === 'string';
+}
+
+function sourceNowSeconds(
+  data: SpecialAllocationSnapshot | SpecialRecipients | null | undefined,
+  nowMs: number,
+): number | null {
+  if (!data || !isSnapshot(data) || !nonNegativeSeconds(data.SourceBlockTimeStamp)) return null;
+  const sourceTime = nonNegativeSeconds(data.SourceBlockTimeStamp);
+  const elapsed =
+    data.receivedAtMs > 0 && nowMs >= data.receivedAtMs
+      ? Math.floor((nowMs - data.receivedAtMs) / 1000)
+      : 0;
+  return sourceTime + elapsed;
+}
+
+function sourceText(source: ChampionsState['source']): string {
+  if (source === 'api-v2') return 'API confirmed';
+  if (source === 'api-v1+chain') return 'Chain verified';
+  if (source === 'api-v1') return 'Snapshot only';
+  return 'No source';
+}
+
 /**
- * Derives the frontend's live champion state from the backend's indexed snapshot.
+ * Derives source-backed live champion state from the API-first snapshot.
  *
- * The backend already exposes the same conceptual surface as the on-chain
- * `tryGetCurrentChampions()` read. This function preserves the stored durations
- * when a role is no longer live, and only extends a timer when the address
- * relationship proves the record is still actively growing.
+ * Latest Participant and Endurance Champion can be extrapolated from the V1 API.
+ * Chrono-Warrior requires the contract segment fields supplied by API V2 or the
+ * public-chain fallback; otherwise it remains a confirmed snapshot value.
  */
 export function deriveChampionsState({
   data,
   isLoading = false,
   nowMs,
-  dataUpdatedAt = 0,
 }: DeriveChampionsStateArgs): ChampionsState {
   const nowSec = Math.floor(nowMs / 1000);
   const enduranceAddress = cleanAddress(data?.EnduranceChampionAddress);
@@ -106,12 +139,43 @@ export function deriveChampionsState({
         ? clampProgress((holdDuration / durationToBeat) * 100)
         : 0;
 
-  const chronoIsLive = sameAddress(chronoAddress, enduranceAddress);
-  const chronoExtension =
-    chronoIsLive && dataUpdatedAt > 0 && nowMs >= dataUpdatedAt
-      ? Math.floor((nowMs - dataUpdatedAt) / 1000)
-      : 0;
-  const chronoDuration = chronoLockedDuration + chronoExtension;
+  const source = data && isSnapshot(data) ? data.source : data ? 'api-v1' : 'none';
+  const hasChronoSegmentData = !!(data && isSnapshot(data) && data.hasChronoSegmentData);
+  const sourceNowSec = sourceNowSeconds(data, nowMs);
+  const chronoSegmentStart =
+    nonNegativeSeconds(data?.EnduranceChampionStartTimeStamp) +
+    nonNegativeSeconds(data?.PrevEnduranceChampionDuration);
+  const currentChronoSegmentDuration =
+    hasChronoSegmentData && sourceNowSec !== null && chronoSegmentStart > 0
+      ? Math.max(0, sourceNowSec - chronoSegmentStart)
+      : undefined;
+  const storedChronoDuration =
+    data && isSnapshot(data) && typeof data.StoredChronoWarriorDuration === 'number'
+      ? nonNegativeSeconds(data.StoredChronoWarriorDuration)
+      : chronoLockedDuration;
+  const chronoSegmentBeatsRecord =
+    hasChronoSegmentData &&
+    currentChronoSegmentDuration !== undefined &&
+    currentChronoSegmentDuration > storedChronoDuration;
+  const chronoIsLive =
+    hasChronoSegmentData &&
+    (chronoSegmentBeatsRecord ||
+      (typeof data?.ChronoWarriorIsLive === 'boolean' && data.ChronoWarriorIsLive));
+  const chronoDuration =
+    chronoIsLive && currentChronoSegmentDuration !== undefined
+      ? Math.max(chronoLockedDuration, currentChronoSegmentDuration)
+      : chronoLockedDuration;
+  const startsGrowingIn =
+    hasChronoSegmentData && !chronoIsLive && currentChronoSegmentDuration !== undefined
+      ? Math.max(0, chronoLockedDuration + 1 - currentChronoSegmentDuration)
+      : undefined;
+  const willStopGrowingIn =
+    chronoIsLive && durationToBeat > 0 ? Math.max(0, durationToBeat - holdDuration) : undefined;
+  const chronoStatusText = chronoIsLive
+    ? 'Growing now'
+    : hasChronoSegmentData
+      ? 'Record standing'
+      : 'Snapshot only';
 
   return {
     isLoading,
@@ -127,6 +191,12 @@ export function deriveChampionsState({
       duration: chronoDuration,
       lockedDuration: chronoLockedDuration,
       isLive: chronoIsLive,
+      statusText: chronoStatusText,
+      sourceText: sourceText(source),
+      currentSegmentDuration: currentChronoSegmentDuration,
+      startsGrowingIn,
+      willStopGrowingIn,
+      hasLiveDetails: hasChronoSegmentData,
     },
     lastCst: {
       address: lastCstAddress,
@@ -142,22 +212,22 @@ export function deriveChampionsState({
       progressToEnduranceChampion,
     },
     raw: data,
+    source,
   };
 }
 
 /** Reads the current special-recipient snapshot and adds precise live timer semantics for UI. */
 export function useChampions(): ChampionsState {
-  const query = useCurrentSpecialRecipients();
+  const { snapshot, isLoading } = useSpecialAllocationSnapshot();
   const nowMs = useNow(1000);
 
   return useMemo(
     () =>
       deriveChampionsState({
-        data: query.data,
-        isLoading: query.isLoading,
+        data: snapshot,
+        isLoading,
         nowMs,
-        dataUpdatedAt: query.dataUpdatedAt,
       }),
-    [query.data, query.dataUpdatedAt, query.isLoading, nowMs],
+    [snapshot, isLoading, nowMs],
   );
 }

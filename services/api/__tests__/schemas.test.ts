@@ -270,6 +270,24 @@ describe('SpecialRecipientsSchema', () => {
     expect((parsed as Record<string, unknown>).FutureChampionField).toBe('ok');
   });
 
+  it('accepts source-backed V2 champion segment fields', () => {
+    const parsed = SpecialRecipientsSchema.parse({
+      ...livePayload,
+      EnduranceChampionStartTimeStamp: 1778207000,
+      PrevEnduranceChampionDuration: 704,
+      ChronoWarriorIsLive: false,
+      LastCstBidderLastBidTime: 1778207010,
+      LastCstBidEventLogId: 123,
+      RoundNum: 0,
+      SourceBlockNumber: 465857123,
+      SourceBlockTimeStamp: 1779544720,
+    });
+
+    expect(parsed.EnduranceChampionStartTimeStamp).toBe(1778207000);
+    expect(parsed.ChronoWarriorIsLive).toBe(false);
+    expect(parsed.SourceBlockTimeStamp).toBe(1779544720);
+  });
+
   it('rejects corrupted duration fields', () => {
     expect(() =>
       SpecialRecipientsSchema.parse({ ...livePayload, ChronoWarriorDuration: '1551' }),

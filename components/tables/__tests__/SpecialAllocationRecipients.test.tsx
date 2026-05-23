@@ -23,6 +23,9 @@ const baseChampions: ChampionsState = {
     duration: 1800,
     lockedDuration: 1800,
     isLive: false,
+    statusText: 'Snapshot only',
+    sourceText: 'Snapshot only',
+    hasLiveDetails: false,
   },
   lastCst: {
     address: lastCstAddress,
@@ -38,6 +41,7 @@ const baseChampions: ChampionsState = {
     progressToEnduranceChampion: 100,
   },
   raw: null,
+  source: 'api-v1',
 };
 
 const mockUseChampions = jest.fn(() => baseChampions);
@@ -172,7 +176,7 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients />);
 
     expect(screen.getAllByTestId('champion-live-chip').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByTestId('champion-locked-chip')).toHaveTextContent('Record standing');
+    expect(screen.getByTestId('champion-locked-chip')).toHaveTextContent('Snapshot only');
   });
 
   it('renders distinct duration labels and formatted durations for both timed roles', () => {
@@ -185,6 +189,62 @@ describe('SpecialAllocationRecipients', () => {
     const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
     expect(chronoCard).toHaveTextContent('Champion reign');
     expect(chronoCard).toHaveTextContent('30m');
+  });
+
+  it('shows snapshot-only chrono details when live segment data is unavailable', () => {
+    render(<SpecialAllocationRecipients />);
+
+    const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
+    expect(chronoCard).toHaveTextContent('Snapshot only');
+    expect(chronoCard).toHaveTextContent('confirmed duration, no local growth inferred');
+    expect(chronoCard).not.toHaveTextContent('Live - growing');
+    expect(screen.getByTestId('chrono-source-status')).toHaveTextContent('Snapshot only');
+  });
+
+  it('shows source-backed chrono growth details', () => {
+    mockUseChampions.mockReturnValue({
+      ...baseChampions,
+      chrono: {
+        ...baseChampions.chrono,
+        isLive: true,
+        statusText: 'Growing now',
+        sourceText: 'Chain verified',
+        hasLiveDetails: true,
+        currentSegmentDuration: 1900,
+        willStopGrowingIn: 300,
+      },
+      source: 'api-v1+chain',
+    });
+
+    render(<SpecialAllocationRecipients />);
+
+    const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
+    expect(chronoCard).toHaveTextContent('Growing now');
+    expect(screen.getByTestId('chrono-source-status')).toHaveTextContent('Chain verified');
+    expect(screen.getByTestId('chrono-current-segment')).toHaveTextContent('31m 40s');
+    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('May close in');
+    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('5m');
+  });
+
+  it('shows chrono start countdown when source-backed segment is below record', () => {
+    mockUseChampions.mockReturnValue({
+      ...baseChampions,
+      chrono: {
+        ...baseChampions.chrono,
+        statusText: 'Record standing',
+        sourceText: 'API confirmed',
+        hasLiveDetails: true,
+        currentSegmentDuration: 1200,
+        startsGrowingIn: 601,
+      },
+      source: 'api-v2',
+    });
+
+    render(<SpecialAllocationRecipients />);
+
+    expect(screen.getByTestId('chrono-source-status')).toHaveTextContent('API confirmed');
+    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('Starts growing in');
+    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('10m 1s');
   });
 
   it('does not render a live or locked timer badge on the Final CST card', () => {

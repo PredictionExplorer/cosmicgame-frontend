@@ -17,6 +17,7 @@ interface RoleCardConfig {
   address: string | null;
   duration?: number;
   isLive?: boolean;
+  statusText?: string;
   durationLabel?: string;
   emptyText: string;
   accent?: 'primary' | 'emerald' | 'muted';
@@ -29,14 +30,14 @@ interface SpecialAllocationRecipientsProps {
   latestMessage?: string | null;
 }
 
-function StatusChip({ isLive }: { isLive: boolean }) {
+function StatusChip({ isLive, statusText }: { isLive: boolean; statusText?: string }) {
   return isLive ? (
     <span
       data-testid="champion-live-chip"
       className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300"
     >
       <Zap className="h-3 w-3" />
-      Live - growing
+      {statusText ?? 'Live - growing'}
     </span>
   ) : (
     <span
@@ -44,7 +45,7 @@ function StatusChip({ isLive }: { isLive: boolean }) {
       className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
     >
       <Lock className="h-3 w-3" />
-      Record standing
+      {statusText ?? 'Record standing'}
     </span>
   );
 }
@@ -79,6 +80,7 @@ function RoleCard({
   duration,
   durationLabel,
   isLive,
+  statusText,
   emptyText,
   accent = 'muted',
   extra,
@@ -126,7 +128,7 @@ function RoleCard({
             <span className="print:hidden">
               <InfoTooltip content={tooltip} />
             </span>
-            {isLive !== undefined && <StatusChip isLive={isLive} />}
+            {isLive !== undefined && <StatusChip isLive={isLive} statusText={statusText} />}
             {badge}
           </div>
 
@@ -226,6 +228,68 @@ function LatestParticipantMessage({ message }: { message: string }) {
     >
       <MessageSquare className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/50 shrink-0" />
       <p className="break-words text-sm text-amber-300/90">&ldquo;{message}&rdquo;</p>
+    </div>
+  );
+}
+
+function DetailMetric({ label, value, testId }: { label: string; value: string; testId?: string }) {
+  return (
+    <div
+      data-testid={testId}
+      className="mt-2 rounded-lg border border-white/[0.06] bg-black/10 px-3 py-2"
+    >
+      <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="mt-0.5 text-xs text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function ChronoWarriorDetails({ chrono }: { chrono: ChampionsState['chrono'] }) {
+  if (!chrono.address) return null;
+
+  const nextMetric = (() => {
+    if (!chrono.hasLiveDetails) {
+      return {
+        label: 'Live detail',
+        value: 'Snapshot only - confirmed duration, no local growth inferred',
+      };
+    }
+    if (chrono.isLive) {
+      return chrono.willStopGrowingIn !== undefined && chrono.willStopGrowingIn > 0
+        ? {
+            label: 'May close in',
+            value: `${formatSeconds(chrono.willStopGrowingIn)} if the latest hold beats Endurance`,
+          }
+        : { label: 'Status', value: 'Growing now' };
+    }
+    return {
+      label: 'Starts growing in',
+      value:
+        chrono.startsGrowingIn !== undefined
+          ? formatSeconds(chrono.startsGrowingIn)
+          : 'Waiting for current reign to beat the record',
+    };
+  })();
+
+  return (
+    <div data-testid="chrono-warrior-details" className="mt-3 space-y-2">
+      <DetailMetric
+        testId="chrono-source-status"
+        label="Source"
+        value={chrono.sourceText ?? 'Snapshot only'}
+      />
+      {chrono.currentSegmentDuration !== undefined && (
+        <DetailMetric
+          testId="chrono-current-segment"
+          label="Current reign segment"
+          value={formatSeconds(chrono.currentSegmentDuration)}
+        />
+      )}
+      <DetailMetric testId="chrono-next-change" label={nextMetric.label} value={nextMetric.value} />
+      <p className="text-[11px] leading-relaxed text-muted-foreground">
+        Chrono-Warrior measures continuous time as Endurance Champion. The same wallet can start a
+        new segment after beating its own Endurance record.
+      </p>
     </div>
   );
 }
@@ -345,6 +409,11 @@ export const SpecialAllocationRecipients = ({
       isLive: champions.endurance.isLive,
       emptyText: 'No endurance record yet',
       accent: champions.endurance.isLive ? 'emerald' : 'muted',
+      extra: champions.endurance.address ? (
+        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+          Longest single latest-participant window, not cumulative time.
+        </p>
+      ) : null,
     },
     {
       key: 'chrono',
@@ -356,8 +425,10 @@ export const SpecialAllocationRecipients = ({
       duration: champions.chrono.duration,
       durationLabel: 'Champion reign',
       isLive: champions.chrono.isLive,
+      statusText: champions.chrono.statusText,
       emptyText: 'No Chrono-Warrior record yet',
       accent: 'primary',
+      extra: <ChronoWarriorDetails chrono={champions.chrono} />,
     },
     {
       key: 'lastcst',
@@ -368,6 +439,11 @@ export const SpecialAllocationRecipients = ({
       address: champions.lastCst.address,
       emptyText: 'Awaiting first CST gesture',
       accent: 'muted',
+      extra: champions.lastCst.address ? (
+        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+          Only CST gestures update this role; ETH and Random Walk gestures do not.
+        </p>
+      ) : null,
     },
   ];
 

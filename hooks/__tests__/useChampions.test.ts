@@ -1,21 +1,22 @@
 import { renderHook } from '@testing-library/react';
 
 import { deriveChampionsState, useChampions } from '@/hooks/useChampions';
+import type { SpecialAllocationSnapshot } from '@/hooks/useSpecialAllocationSnapshot';
 import type { SpecialRecipients } from '@/services/api/types';
 
-import { useCurrentSpecialRecipients } from '../useApiQuery';
+import { useSpecialAllocationSnapshot } from '../useSpecialAllocationSnapshot';
 import { useNow } from '../useNow';
 
-jest.mock('../useApiQuery', () => ({
-  useCurrentSpecialRecipients: jest.fn(),
+jest.mock('../useSpecialAllocationSnapshot', () => ({
+  useSpecialAllocationSnapshot: jest.fn(),
 }));
 
 jest.mock('../useNow', () => ({
   useNow: jest.fn(),
 }));
 
-const mockUseCurrentSpecialRecipients = useCurrentSpecialRecipients as jest.MockedFunction<
-  typeof useCurrentSpecialRecipients
+const mockUseSpecialAllocationSnapshot = useSpecialAllocationSnapshot as jest.MockedFunction<
+  typeof useSpecialAllocationSnapshot
 >;
 const mockUseNow = useNow as jest.MockedFunction<typeof useNow>;
 
@@ -29,12 +30,23 @@ const baseSnapshot: SpecialRecipients = {
   LastCstBidderAddress: '0x2222222222222222222222222222222222222222',
 };
 
-function mockChampionQuery(data: SpecialRecipients | null | undefined, dataUpdatedAt = 1_095_000) {
-  mockUseCurrentSpecialRecipients.mockReturnValue({
-    data,
-    dataUpdatedAt,
+function snapshot(data: SpecialRecipients, overrides: Partial<SpecialAllocationSnapshot> = {}) {
+  return {
+    ...data,
+    source: 'api-v1',
+    receivedAtMs: 1_095_000,
+    hasChronoSegmentData: false,
+    hasFinalCstTime: false,
+    ...overrides,
+  } as SpecialAllocationSnapshot;
+}
+
+function mockChampionQuery(data: SpecialAllocationSnapshot | null | undefined) {
+  mockUseSpecialAllocationSnapshot.mockReturnValue({
+    snapshot: data ?? null,
     isLoading: false,
-  } as ReturnType<typeof useCurrentSpecialRecipients>);
+    raw: data,
+  } as ReturnType<typeof useSpecialAllocationSnapshot>);
 }
 
 describe('deriveChampionsState', () => {
@@ -164,25 +176,56 @@ describe('deriveChampionsState', () => {
     expect(state.latestGesture.progressToEnduranceChampion).toBe(100);
   });
 
-  it('extends chrono only while chrono warrior and endurance champion match', () => {
-    const liveState = deriveChampionsState({
+  it('does not grow chrono from address equality without segment data', () => {
+    const state = deriveChampionsState({
       data: baseSnapshot,
       nowMs: 1_100_000,
-      dataUpdatedAt: 1_095_000,
     });
-    expect(liveState.chrono.isLive).toBe(true);
-    expect(liveState.chrono.duration).toBe(55);
 
-    const lockedState = deriveChampionsState({
-      data: {
-        ...baseSnapshot,
-        ChronoWarriorAddress: '0x4444444444444444444444444444444444444444',
-      },
+    expect(state.chrono.isLive).toBe(false);
+    expect(state.chrono.duration).toBe(50);
+    expect(state.chrono.statusText).toBe('Snapshot only');
+    expect(state.chrono.startsGrowingIn).toBeUndefined();
+  });
+
+  it('marks chrono live only when source-backed segment duration beats the record', () => {
+    const liveState = deriveChampionsState({
+      data: snapshot(baseSnapshot, {
+        source: 'api-v1+chain',
+        receivedAtMs: 1_095_000,
+        hasChronoSegmentData: true,
+        EnduranceChampionStartTimeStamp: 800,
+        PrevEnduranceChampionDuration: 100,
+        SourceBlockTimeStamp: 1_000,
+        StoredChronoWarriorDuration: 50,
+      }),
       nowMs: 1_100_000,
-      dataUpdatedAt: 1_095_000,
     });
-    expect(lockedState.chrono.isLive).toBe(false);
-    expect(lockedState.chrono.duration).toBe(50);
+
+    expect(liveState.chrono.isLive).toBe(true);
+    expect(liveState.chrono.duration).toBe(105);
+    expect(liveState.chrono.currentSegmentDuration).toBe(105);
+    expect(liveState.chrono.sourceText).toBe('Chain verified');
+  });
+
+  it('shows when chrono starts growing if the source-backed segment is below record', () => {
+    const state = deriveChampionsState({
+      data: snapshot(baseSnapshot, {
+        source: 'api-v2',
+        receivedAtMs: 1_000_000,
+        hasChronoSegmentData: true,
+        EnduranceChampionStartTimeStamp: 800,
+        PrevEnduranceChampionDuration: 100,
+        SourceBlockTimeStamp: 940,
+        ChronoWarriorIsLive: false,
+      }),
+      nowMs: 1_000_000,
+    });
+
+    expect(state.chrono.isLive).toBe(false);
+    expect(state.chrono.duration).toBe(50);
+    expect(state.chrono.currentSegmentDuration).toBe(40);
+    expect(state.chrono.startsGrowingIn).toBe(11);
   });
 
   it('compares addresses case-insensitively', () => {
@@ -194,11 +237,10 @@ describe('deriveChampionsState', () => {
         ChronoWarriorAddress: '0xabcdef0000000000000000000000000000000000',
       },
       nowMs: 1_100_000,
-      dataUpdatedAt: 1_099_000,
     });
 
     expect(state.endurance.isLive).toBe(true);
-    expect(state.chrono.isLive).toBe(true);
+    expect(state.chrono.isLive).toBe(false);
   });
 
   it('normalizes zero addresses to empty UI state', () => {
@@ -261,15 +303,22 @@ describe('deriveChampionsState', () => {
     expect(state.latestGesture.progressToEnduranceChampion).toBe(0);
   });
 
-  it('does not extend chrono when query dataUpdatedAt is in the future', () => {
+  it('does not extend chrono when source receive time is in the future', () => {
     const state = deriveChampionsState({
-      data: baseSnapshot,
+      data: snapshot(baseSnapshot, {
+        source: 'api-v1+chain',
+        receivedAtMs: 1_200_000,
+        hasChronoSegmentData: true,
+        EnduranceChampionStartTimeStamp: 800,
+        PrevEnduranceChampionDuration: 100,
+        SourceBlockTimeStamp: 1_000,
+        StoredChronoWarriorDuration: 50,
+      }),
       nowMs: 1_100_000,
-      dataUpdatedAt: 1_200_000,
     });
 
     expect(state.chrono.isLive).toBe(true);
-    expect(state.chrono.duration).toBe(baseSnapshot.ChronoWarriorDuration);
+    expect(state.chrono.duration).toBe(100);
   });
 });
 
@@ -279,24 +328,24 @@ describe('useChampions', () => {
     mockUseNow.mockReturnValue(1_100_000);
   });
 
-  it('derives state from useCurrentSpecialRecipients and useNow', () => {
-    mockChampionQuery(baseSnapshot, 1_095_000);
+  it('derives state from useSpecialAllocationSnapshot and useNow', () => {
+    mockChampionQuery(snapshot(baseSnapshot));
 
     const { result } = renderHook(() => useChampions());
 
     expect(result.current.endurance.duration).toBe(200);
-    expect(result.current.chrono.duration).toBe(55);
+    expect(result.current.chrono.duration).toBe(50);
     expect(result.current.lastCst.address).toBe(baseSnapshot.LastCstBidderAddress);
     expect(result.current.latestGesture.isCurrentEnduranceChampion).toBe(true);
     expect(result.current.latestGesture.isExtendingEnduranceRecord).toBe(true);
   });
 
   it('passes loading state through when data is unavailable', () => {
-    mockUseCurrentSpecialRecipients.mockReturnValue({
-      data: undefined,
-      dataUpdatedAt: 0,
+    mockUseSpecialAllocationSnapshot.mockReturnValue({
+      snapshot: null,
       isLoading: true,
-    } as ReturnType<typeof useCurrentSpecialRecipients>);
+      raw: undefined,
+    } as ReturnType<typeof useSpecialAllocationSnapshot>);
 
     const { result } = renderHook(() => useChampions());
 

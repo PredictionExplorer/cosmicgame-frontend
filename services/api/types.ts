@@ -535,11 +535,19 @@ export interface CharityWithdrawal {
 export interface SpecialRecipients {
   EnduranceChampionAddress?: string;
   EnduranceChampionDuration?: number;
+  EnduranceChampionStartTimeStamp?: number;
+  PrevEnduranceChampionDuration?: number;
   ChronoWarriorAddress?: string;
   ChronoWarriorDuration?: number;
+  ChronoWarriorIsLive?: boolean;
   LastBidderAddress?: string;
   LastBidderLastBidTime?: number;
   LastCstBidderAddress?: string;
+  LastCstBidderLastBidTime?: number;
+  LastCstBidEventLogId?: number;
+  RoundNum?: number;
+  SourceBlockNumber?: number;
+  SourceBlockTimeStamp?: number;
   [key: string]: unknown;
 }
 
