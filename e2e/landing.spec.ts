@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 /**
  * End-to-end tests for the landing site at cosmicsignature.com.
@@ -13,10 +13,55 @@ import { expect, test } from '@playwright/test';
 const LANDING_HEADERS = { 'X-Forwarded-Host': 'cosmicsignature.com' };
 const APP_ORIGIN_PATTERN =
   /^https:\/\/app\.cosmicsignature\.com$|^http:\/\/app\.cosmicsignature\.local:3000$/;
+const MOCK_NOW_SECONDS = 1_700_000_000;
+const MOCK_CYCLE_FINALIZATION_SECONDS = MOCK_NOW_SECONDS + 7_265;
+
+async function mockLandingCycleApi(page: Page) {
+  await page.route('**/api/cosmicgame/time/current', (route) =>
+    route.fulfill({ json: { CurrentTimeStamp: MOCK_NOW_SECONDS } }),
+  );
+  await page.route('**/api/cosmicgame/rounds/current/time', (route) =>
+    route.fulfill({ json: { CurRoundPrizeTime: MOCK_CYCLE_FINALIZATION_SECONDS } }),
+  );
+  await page.route('**/api/cosmicgame/statistics/dashboard', (route) =>
+    route.fulfill({
+      json: {
+        CurRoundNum: 42,
+        CurNumBids: 128,
+        PrizeAmountEth: 2.5,
+        PrizeClaimTs: 0,
+        TsRoundStart: MOCK_NOW_SECONDS - 3600,
+        LastBidderAddr: '0x1111111111111111111111111111111111111111',
+        GestureCostEth: 0.01,
+        StakingAmountEth: 0,
+        MainStats: {
+          NumCSTokenMints: 100,
+          TotalRaffleEthDeposits: 0,
+          TotalCSTConsumedEth: 0,
+          TotalMktRewardsEth: 0,
+          NumMktRewards: 0,
+          TotalRaffleEthWithdrawn: 0,
+          NumBidsCST: 0,
+          NumUniqueBidders: 12,
+          NumUniqueWinners: 0,
+          NumUniqueDonors: 0,
+          TotalNamedTokens: 0,
+          NumUniqueStakersCST: 0,
+          NumUniqueStakersRWalk: 0,
+          StakeStatisticsCST: { NumActiveStakers: 0, TotalTokensStaked: 0 },
+          StakeStatisticsRWalk: { NumActiveStakers: 0, TotalTokensStaked: 0 },
+        },
+        NumRaffleNFTWinnersBidding: 0,
+        NumRaffleNFTWinnersStakingRWalk: 0,
+      },
+    }),
+  );
+}
 
 test.describe('Landing page @ cosmicsignature.com', () => {
-  test.beforeEach(async ({ context }) => {
+  test.beforeEach(async ({ context, page }) => {
     await context.setExtraHTTPHeaders(LANDING_HEADERS);
+    await mockLandingCycleApi(page);
   });
 
   test('renders the hero headline with lexicon-safe copy', async ({ page }) => {
@@ -30,6 +75,20 @@ test.describe('Landing page @ cosmicsignature.com', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const cta = page.getByRole('link', { name: /open the app/i }).first();
     await expect(cta).toHaveAttribute('href', APP_ORIGIN_PATTERN);
+  });
+
+  test('renders the live Event Horizon cycle timer in the hero', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    const timer = page.getByLabel('Live Performance Cycle countdown');
+    await expect(timer).toBeVisible({ timeout: 10_000 });
+    await expect(timer.getByText('Live cycle clock')).toBeVisible();
+    await expect(timer.getByRole('heading', { name: /Cycle #42 finalizes in/i })).toBeVisible();
+    await expect(timer.getByText('128 Gestures')).toBeVisible();
+    await expect(timer.getByText('Same clock as the app')).toBeVisible();
+
+    const liveCycleLink = timer.getByRole('link', { name: /open live cycle/i });
+    await expect(liveCycleLink).toHaveAttribute('href', APP_ORIGIN_PATTERN);
   });
 
   test('all ten landing sections are present in the DOM', async ({ page }) => {

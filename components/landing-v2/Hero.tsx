@@ -9,8 +9,8 @@ import { landingContent } from '@/content/landing';
 
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
 
+import { EventHorizonCountdown } from './EventHorizonCountdown';
 import { GradientText } from './GradientText';
-import { LaunchCountdown } from './LaunchCountdown';
 
 const HeroCanvas = dynamic(
   () => import('@/components/three/HeroCanvas').then((m) => m.HeroCanvas),
@@ -63,7 +63,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="mt-10"
           >
-            <LaunchCountdown />
+            <EventHorizonCountdown />
           </motion.div>
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">

@@ -11,6 +11,12 @@ jest.mock('next/dynamic', () => () => {
   return Stub;
 });
 
+jest.mock('../EventHorizonCountdown', () => ({
+  EventHorizonCountdown: () => (
+    <section aria-label="Live Performance Cycle countdown" data-testid="event-horizon-countdown" />
+  ),
+}));
+
 describe('<Hero />', () => {
   it('renders the lexicon-safe headline', () => {
     render(<Hero />);
@@ -30,6 +36,12 @@ describe('<Hero />', () => {
     render(<Hero />);
     const secondaryCta = screen.getByRole('link', { name: /explore the cycle/i });
     expect(secondaryCta).toHaveAttribute('href', '#cycle');
+  });
+
+  it('renders the live Event Horizon countdown inside the hero', () => {
+    render(<Hero />);
+    expect(screen.getByTestId('event-horizon-countdown')).toBeInTheDocument();
+    expect(screen.getByLabelText('Live Performance Cycle countdown')).toBeInTheDocument();
   });
 
   it('renders the scroll-to-cycle chevron with an accessible label', () => {

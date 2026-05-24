@@ -22,21 +22,47 @@ async function activateLink(page: Page, href: string): Promise<void> {
   if (isMobileViewport) {
     link = page.getByRole('dialog').locator(`a[href="${href}"]:visible`).first();
   } else {
-    const menuLink = page.locator(`[role="menu"] a[href="${href}"]:visible`).first();
-    link = (await menuLink.isVisible().catch(() => false))
-      ? menuLink
-      : page.locator(`header a[href="${href}"]:visible, a[href="${href}"]:visible`).first();
+    link = page.locator(`header a[href="${href}"]:visible`).first();
+    if (!(await link.isVisible().catch(() => false))) {
+      const openMenuLink = page.locator(`[role="menu"] a[href="${href}"]:visible`).first();
+      if (await openMenuLink.isVisible().catch(() => false)) {
+        link = openMenuLink;
+      }
+    }
+    if (!(await link.isVisible().catch(() => false))) {
+      for (const name of [/Explore/i, /Help/i]) {
+        const trigger = page.getByRole('button', { name }).first();
+        if (!(await trigger.isVisible().catch(() => false))) continue;
+        await trigger.click();
+        const menuLink = page.locator(`[role="menu"] a[href="${href}"]:visible`).first();
+        await menuLink.waitFor({ state: 'visible', timeout: 2000 }).catch(() => undefined);
+        if (await menuLink.isVisible().catch(() => false)) {
+          link = menuLink;
+          break;
+        }
+      }
+    }
   }
   await link.waitFor({ state: 'visible' });
   await link.click();
 }
 
-async function openNavGroupIfPresent(page: Page, name: RegExp): Promise<void> {
+async function openNavGroupIfPresent(
+  page: Page,
+  name: RegExp,
+  expectedHref?: string,
+): Promise<void> {
   const isMobileViewport = await page.evaluate(() => window.innerWidth < 1024);
   const root = isMobileViewport ? page.getByRole('dialog') : page;
   const groupButton = root.getByRole('button', { name }).first();
   if (await groupButton.isVisible().catch(() => false)) {
     await groupButton.click();
+    if (!isMobileViewport && expectedHref) {
+      await page
+        .locator(`[role="menu"] a[href="${expectedHref}"]:visible`)
+        .first()
+        .waitFor({ state: 'visible', timeout: 5000 });
+    }
   }
 }
 
@@ -60,34 +86,35 @@ test.describe('Navigation', () => {
 
   test('Statistics link navigates correctly', async ({ page }) => {
     await openMobileNavIfNeeded(page);
+    await openNavGroupIfPresent(page, /Explore/i, '/statistics');
     await activateLink(page, '/statistics');
     await expect(page).toHaveURL(/statistics/);
   });
 
   test('Explore dropdown opens and allocation link works', async ({ page }) => {
     await openMobileNavIfNeeded(page);
-    await openNavGroupIfPresent(page, /Explore/i);
+    await openNavGroupIfPresent(page, /Explore/i, '/allocation');
     await activateLink(page, '/allocation');
     await expect(page).toHaveURL(/allocation/);
   });
 
   test('Explore dropdown opens and anchor distributions link works', async ({ page }) => {
     await openMobileNavIfNeeded(page);
-    await openNavGroupIfPresent(page, /Explore/i);
+    await openNavGroupIfPresent(page, /Explore/i, '/anchoring');
     await activateLink(page, '/anchoring');
     await expect(page).toHaveURL(/anchoring/);
   });
 
   test('Help dropdown opens and FAQ link works', async ({ page }) => {
     await openMobileNavIfNeeded(page);
-    await openNavGroupIfPresent(page, /Help/i);
+    await openNavGroupIfPresent(page, /Help/i, '/faq');
     await activateLink(page, '/faq');
     await expect(page).toHaveURL(/faq/);
   });
 
   test('Help dropdown opens and How-to-Play link works', async ({ page }) => {
     await openMobileNavIfNeeded(page);
-    await openNavGroupIfPresent(page, /Help/i);
+    await openNavGroupIfPresent(page, /Help/i, '/how-it-works');
     await activateLink(page, '/how-it-works');
     await expect(page).toHaveURL(/how-it-works/);
   });
