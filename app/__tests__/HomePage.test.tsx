@@ -496,7 +496,7 @@ describe('HomePage', () => {
     expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
   });
 
-  it('prevents RandomWalk gestures until the player selects a token', async () => {
+  it('prevents RandomWalk gestures until the participant selects a token', async () => {
     const user = userEvent.setup();
     mockGestureForm.gestureType = 'RandomWalk';
     mockGestureForm.rwlkId = -1;
