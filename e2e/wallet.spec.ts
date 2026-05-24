@@ -10,9 +10,13 @@ async function openMobileMenuIfNeeded(page: Page) {
 
 async function openWalletModal(page: Page) {
   await page.goto('/', { waitUntil: 'networkidle' });
-  await openMobileMenuIfNeeded(page);
 
-  const connectBtn = page.getByRole('button', { name: /connect/i }).first();
+  let connectBtn = page.getByRole('button', { name: /connect/i }).first();
+  if (!(await connectBtn.isVisible())) {
+    await openMobileMenuIfNeeded(page);
+    connectBtn = page.getByRole('button', { name: /connect/i }).first();
+  }
+
   await connectBtn.scrollIntoViewIfNeeded();
   await connectBtn.click();
 

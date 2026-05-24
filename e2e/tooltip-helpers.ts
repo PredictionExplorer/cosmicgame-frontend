@@ -21,23 +21,65 @@ export function tooltipTriggerForLabel(page: Page, label: string): Locator {
 }
 
 export async function openTooltip(trigger: Locator): Promise<void> {
-  await trigger.hover();
-  await trigger.page().waitForTimeout(250);
-  if ((await trigger.page().getByRole('tooltip').count()) > 0) {
-    return;
+  const page = trigger.page();
+  const coarsePointer = await page.evaluate(() => window.matchMedia('(pointer: coarse)').matches);
+  const tooltipIsVisible = async () =>
+    page
+      .getByRole('tooltip')
+      .first()
+      .isVisible()
+      .catch(() => false);
+
+  if (!coarsePointer) {
+    await trigger.hover({ force: true });
+    await page.waitForTimeout(250);
+    if (await tooltipIsVisible()) {
+      return;
+    }
+
+    await trigger.focus();
+    await page.waitForTimeout(250);
+    if (await tooltipIsVisible()) {
+      return;
+    }
   }
 
   // Mobile Chrome emulation can miss hover-open on the first attempt. The app's
   // InfoTooltip trigger supports touch pointerdown explicitly, and because
   // these label-based triggers are buttons (not navigation links), the fallback
   // is safe and deterministic.
-  await trigger.dispatchEvent('pointerdown', {
-    bubbles: true,
-    cancelable: true,
-    pointerType: 'touch',
+  if (coarsePointer) {
+    await trigger.tap({ force: true });
+    await page.waitForTimeout(150);
+    if (await tooltipIsVisible()) {
+      return;
+    }
+  }
+
+  await trigger.evaluate((element) => {
+    element.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        cancelable: true,
+        pointerType: 'touch',
+      }),
+    );
   });
-  await trigger.click();
-  await trigger.page().waitForTimeout(150);
+  await page.waitForTimeout(150);
+  if (await tooltipIsVisible()) {
+    return;
+  }
+
+  await trigger.focus();
+  await page.waitForTimeout(150);
+  if (await tooltipIsVisible()) {
+    return;
+  }
+
+  if (coarsePointer) {
+    await trigger.click({ force: true });
+    await page.waitForTimeout(150);
+  }
 }
 
 export async function expectTooltipFullyVisible(page: Page, expected: RegExp): Promise<void> {
@@ -65,7 +107,9 @@ export async function expectLabelTooltip(
   { label, expected }: TooltipExpectation,
 ): Promise<void> {
   const trigger = tooltipTriggerForLabel(page, label);
-  await trigger.scrollIntoViewIfNeeded();
+  await trigger.evaluate((element) => {
+    element.scrollIntoView({ block: 'center', inline: 'center' });
+  });
   await expect(trigger, `trigger for "${label}" must be visible`).toBeVisible();
   await openTooltip(trigger);
   await expectTooltipFullyVisible(page, expected);

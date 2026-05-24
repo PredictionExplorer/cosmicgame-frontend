@@ -3,26 +3,23 @@
 import { useState, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
-import { ArrowRight, Radio } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Countdown from 'react-countdown';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 
-import { getAssetsUrl } from '@/utils';
-
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { StyledCard } from '@/components/styled';
 import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
-import NFTImage from '@/components/nft/NFTImage';
 import { reportError } from '@/utils/errors';
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import { GestureStatus } from '@/components/common/GestureStatus';
 import { GestureForm } from '@/components/home/GestureForm';
+import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
 import Allocation from '@/components/common/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
@@ -212,60 +209,11 @@ const HomePage = () => {
           </div>
         )}
 
-        <section aria-label="About Cosmic Signature" className="mb-10">
-          <h1 className="sr-only">
-            Cosmic Signature — Procedural On-Chain Art Protocol on Arbitrum
-          </h1>
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-3xl">
-            Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make
-            gestures during a Performance Cycle; every gesture shapes the cycle&apos;s final
-            Signature and imprints Participation CST. When the cycle finalizes, the protocol
-            distributes its reserves across more than ten allocation tracks — including Protocol
-            Guild, the public-goods funding mechanism for Ethereum&apos;s core contributors.
-          </p>
-        </section>
-
-        {/* ===== LIVE ROUND BAR ===== */}
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="print-motion-visible mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] px-5 py-3.5 backdrop-blur-sm"
-        >
-          <div className="flex items-center gap-3">
-            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-              <Radio className="h-4 w-4 text-primary" />
-              <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-live-dot" />
-            </div>
-            {data && (
-              <div>
-                <h1 className="font-display text-lg font-bold tracking-tight sm:text-xl">
-                  Cycle #{data.CurRoundNum}
-                </h1>
-                <p className="text-[11px] text-muted-foreground">
-                  {data.CurNumBids} gesture{data.CurNumBids !== 1 ? 's' : ''} made
-                </p>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-4">
-            {(data?.CurRoundNum ?? 0) > 1 && (
-              <Link
-                href={`/allocation/${(data?.CurRoundNum ?? 0) - 1}`}
-                className="hidden sm:inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
-              >
-                Cycle {(data?.CurRoundNum ?? 0) - 1} allocations
-                <ArrowRight className="h-3 w-3" />
-              </Link>
-            )}
-            <Link
-              href="/coordination-changes"
-              className="text-xs text-muted-foreground/60 hover:text-primary transition-colors"
-            >
-              Parameters
-            </Link>
-          </div>
-        </motion.div>
+        <HomeObservatoryHero
+          data={data}
+          bannerToken={bannerToken}
+          canOpenGesturePanel={!loading && isRoundActive}
+        />
 
         {/* ===== BIDDING STATUS (countdown + stats) ===== */}
         <GestureStatus
@@ -277,41 +225,16 @@ const HomePage = () => {
           allocationTime={allocationTime}
         />
 
-        {/* ===== SPECIAL PRIZE LEADERS + NFT PREVIEW ===== */}
+        {/* ===== SPECIAL ALLOCATION LEADERS ===== */}
         {data?.TsRoundStart !== 0 && (
           /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
-          <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3 print:grid-cols-1">
-            {/* min-w-0 + print col fixes: home PDF often uses narrow width; col-span-2 can collapse badly in Skia */}
-            <div className="min-w-0 lg:col-span-2 print:col-auto">
+          <div className="mt-8">
+            {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
+            <div className="min-w-0 print:col-auto">
               <SpecialAllocationRecipients
                 currentAccount={account}
                 latestMessage={curGestureList[0]?.Message ?? ''}
               />
-            </div>
-            <div className="hidden min-w-0 lg:block print:hidden">
-              <Link
-                href={bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample'}
-                className="block group"
-              >
-                <StyledCard className="overflow-hidden rounded-xl border border-white/[0.06]">
-                  <div className="transition-transform duration-300 group-hover:scale-[1.02]">
-                    <NFTImage
-                      src={
-                        bannerToken.seed === ''
-                          ? '/images/qmark.png'
-                          : bannerToken.seed === 'sample'
-                            ? '/images/CosmicSignatureNFT.png'
-                            : getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`)
-                      }
-                      priority
-                      sizes="(max-width: 768px) 100vw, 500px"
-                    />
-                  </div>
-                  <div className="p-3 text-center">
-                    <p className="text-xs text-muted-foreground">Sample COSMIC NFT</p>
-                  </div>
-                </StyledCard>
-              </Link>
             </div>
           </div>
         )}
@@ -319,6 +242,7 @@ const HomePage = () => {
         {/* ===== BID ACTION AREA ===== */}
         {!loading && isRoundActive && (
           <motion.div
+            id="make-gesture"
             variants={sectionFade}
             initial="hidden"
             animate="visible"

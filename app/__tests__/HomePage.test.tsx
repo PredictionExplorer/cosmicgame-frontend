@@ -1,4 +1,6 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import userEvent from '@testing-library/user-event';
+
+import { render, screen, within, checkA11y } from '@/test-utils';
 
 import HomePage from '../HomePage';
 
@@ -101,6 +103,8 @@ jest.mock('wagmi', () => ({
 
 /* ── next / react-query ─────────────────────────────────────────── */
 
+const mockInvalidateQueries = jest.fn();
+
 jest.mock('next/navigation', () => ({
   useSearchParams: () => ({ get: jest.fn().mockReturnValue(null) }),
 }));
@@ -114,7 +118,7 @@ jest.mock('next/link', () => ({
 
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
-  useQueryClient: () => ({ invalidateQueries: jest.fn() }),
+  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
 }));
 
 /* ── child components ───────────────────────────────────────────── */
@@ -178,7 +182,40 @@ jest.mock('../../utils/errors', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount = '0xUser';
+  Object.assign(mockGestureForm, {
+    gestureType: 'ETH',
+    contributionType: 'NFT',
+    cstGestureData: { AuctionDuration: 3600, CSTPrice: 1, SecondsElapsed: 1800 },
+    ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
+    message: '',
+    nftDonateAddress: '',
+    nftId: '',
+    tokenDonateAddress: '',
+    tokenAmount: '',
+    rwlkId: -1,
+    gestureCostPlus: 2,
+    isGesturing: false,
+    advancedExpanded: false,
+    rwlknftIds: [],
+  });
+  mockGestureForm.onGesture.mockResolvedValue(true);
+  mockGestureForm.onGestureWithCST.mockResolvedValue(true);
+  Object.assign(mockAllocationFinalize, {
+    allocationTime: Date.now() + 60_000,
+    timeoutFinalize: 600,
+    isClaiming: false,
+    activationTime: 0,
+    claimHistory: null,
+  });
+  mockAllocationFinalize.fetchActivationTime.mockResolvedValue(0);
+  mockAllocationFinalize.onFinalize.mockResolvedValue(true);
+  mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false });
   mockUseGestureListByCycle.mockReturnValue({ data: undefined });
+  mockUseCurrentTime.mockReturnValue({
+    data: Math.floor(Date.now() / 1000),
+    isLoading: false,
+  });
+  mockUseCSTInfo.mockReturnValue({ data: undefined });
 });
 
 /* ── helpers ────────────────────────────────────────────────────── */
@@ -203,6 +240,77 @@ const makeDashboardData = (overrides = {}) => ({
 /* ── Tests ──────────────────────────────────────────────────────── */
 
 describe('HomePage', () => {
+  it('renders a premium observatory hero with live cycle data and protocol story', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7, CurNumBids: 42, PrizeAmountEth: 2.75 }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Shape the next Cosmic Signature' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Live on Arbitrum')).toBeInTheDocument();
+    expect(screen.getByText('Gestures shape the art')).toBeInTheDocument();
+    expect(screen.getByText('CST records participation')).toBeInTheDocument();
+    expect(screen.getByText('Allocations fund public goods')).toBeInTheDocument();
+
+    const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
+    expect(within(observatory).getByRole('heading', { name: 'Cycle #7' })).toBeInTheDocument();
+    expect(within(observatory).getByText('42')).toBeInTheDocument();
+    expect(within(observatory).getByText('2.7500 ETH')).toBeInTheDocument();
+    expect(within(observatory).getByText('7%')).toBeInTheDocument();
+  });
+
+  it('keeps the hero artwork visible and linked on the main game page', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    expect(screen.getByRole('link', { name: 'View Cosmic Signature art' })).toHaveAttribute(
+      'href',
+      '/detail/sample',
+    );
+    expect(screen.getByTestId('nft-image')).toHaveAttribute(
+      'alt',
+      'Cosmic Signature artwork preview',
+    );
+  });
+
+  it('links the hero primary action to the gesture panel when the cycle is active', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    expect(screen.getByRole('link', { name: /Make a Gesture/ })).toHaveAttribute(
+      'href',
+      '#make-gesture',
+    );
+  });
+
+  it('links the hero primary action to cycle details before gestures are open', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+    mockAllocationFinalize.activationTime = Math.floor(Date.now() / 1000) + 3600;
+
+    render(<HomePage />);
+
+    expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Explore Current Cycle/ })).toHaveAttribute(
+      'href',
+      '/current-cycle',
+    );
+  });
+
   it('shows loading overlay when dashboard is loading', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<HomePage />);
@@ -301,6 +409,24 @@ describe('HomePage', () => {
     expect(screen.getByRole('button', { name: 'Connect Wallet' })).toBeInTheDocument();
   });
 
+  it('switches from wallet prompt to game controls after the wallet connects', () => {
+    mockAccount = null;
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    const { rerender } = render(<HomePage />);
+    expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
+
+    mockAccount = '0xUser';
+    rerender(<HomePage />);
+
+    expect(screen.queryByTestId('connect-to-gesture')).not.toBeInTheDocument();
+    expect(screen.getByTestId('gesture-form')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Gesture with ETH/ })).toBeEnabled();
+  });
+
   it('renders SpecialAllocationRecipients when TsRoundStart is nonzero', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ TsRoundStart: 1700000000 }),
@@ -341,6 +467,52 @@ describe('HomePage', () => {
     expect(gestureButton).toBeDefined();
   });
 
+  it('submits an ETH gesture from a connected wallet', async () => {
+    const user = userEvent.setup();
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+    await user.click(screen.getByRole('button', { name: /Gesture with ETH \(0\.01020 ETH\)/ }));
+
+    expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1);
+    expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
+  });
+
+  it('submits a CST gesture through the CST interaction path', async () => {
+    const user = userEvent.setup();
+    mockGestureForm.gestureType = 'CST';
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+    await user.click(screen.getByRole('button', { name: /Gesture with CST \(1\.00 CST\)/ }));
+
+    expect(mockGestureForm.onGestureWithCST).toHaveBeenCalledTimes(1);
+    expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
+  });
+
+  it('prevents RandomWalk gestures until the player selects a token', async () => {
+    const user = userEvent.setup();
+    mockGestureForm.gestureType = 'RandomWalk';
+    mockGestureForm.rwlkId = -1;
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+    const gestureButton = screen.getByRole('button', { name: 'Gesture with RandomWalk' });
+
+    expect(gestureButton).toBeDisabled();
+    await user.click(gestureButton);
+    expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
+  });
+
   it('renders finalize cycle button when data is available', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
@@ -349,6 +521,20 @@ describe('HomePage', () => {
     render(<HomePage />);
     const finalizeButton = screen.queryByText(/Finalize Cycle/);
     expect(finalizeButton || screen.queryByTestId('gesture-status')).toBeTruthy();
+  });
+
+  it('lets an eligible connected wallet finalize the cycle', async () => {
+    const user = userEvent.setup();
+    mockAllocationFinalize.allocationTime = Date.now() - 1_000;
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ LastBidderAddr: '0xUser' }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+    await user.click(screen.getByRole('button', { name: /Finalize Cycle/ }));
+
+    expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1);
   });
 
   it('renders previous cycle link with correct cycle number', () => {
