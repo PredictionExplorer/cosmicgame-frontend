@@ -19,9 +19,17 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('shows cycle info', async ({ page }) => {
-    const cycleInfo = page.locator('text=/Cycle #/');
+    const cycleInfo = page.getByRole('region', { name: 'Current cycle observatory' });
     await ensureVisible(cycleInfo);
     await expect(cycleInfo).toBeVisible();
+    await expect(cycleInfo.getByRole('heading', { name: /Cycle #/ })).toBeVisible();
+  });
+
+  test('shows the Chrono Core timer at the top of the game page', async ({ page }) => {
+    const chronoCore = page.getByTestId('chrono-core-timer');
+    await expect(chronoCore).toBeVisible({ timeout: 15000 });
+    await expect(chronoCore.getByText('Cycle Finalization Time')).toBeVisible();
+    await expect(chronoCore.getByRole('timer')).toBeVisible();
   });
 
   test('shows gesture cost', async ({ page }) => {

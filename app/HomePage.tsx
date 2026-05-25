@@ -18,6 +18,7 @@ import { useActiveWeb3React } from '@/hooks/web3';
 import { reportError } from '@/utils/errors';
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import { GestureStatus } from '@/components/common/GestureStatus';
+import { ChronoCoreTimer } from '@/components/home/ChronoCoreTimer';
 import { GestureForm } from '@/components/home/GestureForm';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
@@ -209,6 +210,15 @@ const HomePage = () => {
           </div>
         )}
 
+        <ChronoCoreTimer
+          data={data}
+          loading={loading}
+          allocationTime={allocationTime}
+          activationTime={activationTime}
+          now={now}
+          canOpenGesturePanel={!loading && isRoundActive}
+        />
+
         <HomeObservatoryHero
           data={data}
           bannerToken={bannerToken}
@@ -223,6 +233,7 @@ const HomePage = () => {
           curGestureList={curGestureList}
           ethGestureInfo={ethGestureInfo}
           allocationTime={allocationTime}
+          suppressPrimaryTimer
         />
 
         {/* ===== SPECIAL ALLOCATION LEADERS ===== */}

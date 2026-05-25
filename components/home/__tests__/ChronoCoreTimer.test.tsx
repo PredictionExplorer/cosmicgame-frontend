@@ -1,0 +1,135 @@
+import type { DashboardInfo } from '@/services/api';
+
+import { render, screen, checkA11y } from '@/test-utils';
+
+import { ChronoCoreTimer, getChronoCorePhase } from '../ChronoCoreTimer';
+
+const mockCountdownProps: Array<Record<string, unknown>> = [];
+
+jest.mock('react-countdown', () => ({
+  __esModule: true,
+  default: (props: Record<string, unknown>) => {
+    mockCountdownProps.push(props);
+    return <div data-testid="chrono-countdown" />;
+  },
+}));
+
+jest.mock('../../common/Counter', () => ({
+  __esModule: true,
+  default: ({ size }: { size?: string }) => <div data-testid="counter">Counter {size}</div>,
+}));
+
+const NOW = 1_700_000_000_000;
+const ZERO = '0x0000000000000000000000000000000000000000';
+
+function dashboard(overrides: Partial<DashboardInfo> = {}): DashboardInfo {
+  return {
+    CurRoundNum: 9,
+    CurNumBids: 27,
+    CurPrizeAmountEth: 2,
+    PrizeAmountEth: 2.5,
+    PrizeClaimTs: 0,
+    TsRoundStart: Math.floor(NOW / 1000) - 3600,
+    LastBidderAddr: '0x1111111111111111111111111111111111111111',
+    GestureCostEth: 0.01,
+    StakingAmountEth: 0,
+    MainStats: { NumCSTokenMints: 100 },
+    NumRaffleNFTWinnersBidding: 0,
+    NumRaffleNFTWinnersStakingRWalk: 0,
+    ...overrides,
+  } as DashboardInfo;
+}
+
+const baseProps = {
+  data: dashboard(),
+  loading: false,
+  allocationTime: NOW + 13 * 60 * 60 * 1000,
+  activationTime: 0,
+  now: NOW,
+  canOpenGesturePanel: true,
+};
+
+describe('getChronoCorePhase', () => {
+  it.each([
+    ['loading', { loading: true }],
+    ['unavailable', { data: null }],
+    ['pre-activation', { activationTime: NOW / 1000 + 60 }],
+    ['waiting', { data: dashboard({ TsRoundStart: 0, LastBidderAddr: ZERO }) }],
+    ['stable', { allocationTime: NOW + 13 * 60 * 60 * 1000 }],
+    ['approach', { allocationTime: NOW + 12 * 60 * 60 * 1000 }],
+    ['final-hour', { allocationTime: NOW + 60 * 60 * 1000 }],
+    ['final-ten', { allocationTime: NOW + 10 * 60 * 1000 }],
+    ['final-minute', { allocationTime: NOW + 60 * 1000 }],
+    ['ready', { allocationTime: NOW - 1 }],
+  ] as const)('returns %s phase', (phase, overrides) => {
+    expect(getChronoCorePhase({ ...baseProps, ...overrides })).toBe(phase);
+  });
+});
+
+describe('<ChronoCoreTimer />', () => {
+  beforeEach(() => {
+    mockCountdownProps.length = 0;
+  });
+
+  it('renders the stable top HUD with large smooth countdown props', () => {
+    render(<ChronoCoreTimer {...baseProps} />);
+
+    const timer = screen.getByTestId('chrono-core-timer');
+    expect(timer).toHaveAttribute('data-phase', 'stable');
+    expect(screen.getByRole('heading', { name: 'Cycle #9 finalizes in' })).toBeInTheDocument();
+    expect(screen.getByText('27')).toBeInTheDocument();
+    expect(screen.getByText('2.5000 ETH')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Make a Gesture/ })).toHaveAttribute(
+      'href',
+      '#make-gesture',
+    );
+    expect(mockCountdownProps).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          intervalDelay: 100,
+          precision: 1,
+        }),
+      ]),
+    );
+  });
+
+  it('uses critical final-minute copy and keeps the timer accessible', () => {
+    render(<ChronoCoreTimer {...baseProps} allocationTime={NOW + 30_000} />);
+
+    const timer = screen.getByTestId('chrono-core-timer');
+    expect(timer).toHaveAttribute('data-phase', 'final-minute');
+    expect(
+      screen.getByRole('heading', { name: 'Cycle #9 is in the last moments' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('timer')).toHaveAccessibleName('Cycle #9 is in the last moments');
+  });
+
+  it('shows ready-to-finalize state when the target has passed', () => {
+    render(<ChronoCoreTimer {...baseProps} allocationTime={NOW - 1} />);
+
+    expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute('data-phase', 'ready');
+    expect(screen.getByText('00:00')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Finalize Cycle/ })).toHaveAttribute(
+      'href',
+      '#make-gesture',
+    );
+  });
+
+  it('shows first-gesture waiting state without rendering the countdown component', () => {
+    render(
+      <ChronoCoreTimer
+        {...baseProps}
+        data={dashboard({ TsRoundStart: 0, LastBidderAddr: ZERO })}
+      />,
+    );
+
+    expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute('data-phase', 'waiting');
+    expect(screen.getByText('Awaiting Gesture')).toBeInTheDocument();
+    expect(mockCountdownProps).toHaveLength(0);
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(<ChronoCoreTimer {...baseProps} />);
+    await checkA11y(container);
+  });
+});

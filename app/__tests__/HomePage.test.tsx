@@ -240,6 +240,20 @@ const makeDashboardData = (overrides = {}) => ({
 /* ── Tests ──────────────────────────────────────────────────────── */
 
 describe('HomePage', () => {
+  it('renders the Chrono Core timer above the observatory hero', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7, CurNumBids: 42, PrizeAmountEth: 2.75 }),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    const chronoCore = screen.getByTestId('chrono-core-timer');
+    const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
+    expect(chronoCore).toHaveAttribute('data-phase', 'final-minute');
+    expect(chronoCore.compareDocumentPosition(observatory)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
   it('renders a premium observatory hero with live cycle data and protocol story', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7, CurNumBids: 42, PrizeAmountEth: 2.75 }),
@@ -289,10 +303,11 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    expect(screen.getByRole('link', { name: /Make a Gesture/ })).toHaveAttribute(
-      'href',
-      '#make-gesture',
-    );
+    const links = screen.getAllByRole('link', { name: /Make a Gesture/ });
+    expect(links.length).toBeGreaterThanOrEqual(1);
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', '#make-gesture');
+    }
   });
 
   it('links the hero primary action to cycle details before gestures are open', () => {
@@ -305,10 +320,11 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Explore Current Cycle/ })).toHaveAttribute(
-      'href',
-      '/current-cycle',
-    );
+    const links = screen.getAllByRole('link', { name: /Explore Current Cycle/ });
+    expect(links.length).toBeGreaterThanOrEqual(1);
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', '/current-cycle');
+    }
   });
 
   it('shows loading overlay when dashboard is loading', () => {
@@ -525,14 +541,21 @@ describe('HomePage', () => {
 
   it('lets an eligible connected wallet finalize the cycle', async () => {
     const user = userEvent.setup();
+    const finalGestureParticipant = '0x1234567890abcdef1234567890abcdef12345678';
+    mockAccount = finalGestureParticipant;
     mockAllocationFinalize.allocationTime = Date.now() - 1_000;
+    mockAllocationFinalize.timeoutFinalize = 0;
     mockUseDashboardInfo.mockReturnValue({
-      data: makeDashboardData({ LastBidderAddr: '0xUser' }),
+      data: makeDashboardData({ LastBidderAddr: finalGestureParticipant }),
       isLoading: false,
     });
 
     render(<HomePage />);
-    await user.click(screen.getByRole('button', { name: /Finalize Cycle/ }));
+    const finalizeButton = screen
+      .getAllByRole('button')
+      .find((button) => button.textContent?.includes('Finalize Cycle'));
+    expect(finalizeButton).toBeDefined();
+    await user.click(finalizeButton!);
 
     expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1);
   });

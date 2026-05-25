@@ -115,6 +115,23 @@ describe('GestureStatus', () => {
     );
   });
 
+  it('suppresses the primary countdown while preserving metric cards', () => {
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={activeData as never}
+        allocationTime={Date.now() + 60000}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+        suppressPrimaryTimer
+      />,
+    );
+
+    expect(screen.queryByText('Cycle finalizes in')).not.toBeInTheDocument();
+    expect(mockCountdownProps).toHaveLength(0);
+    expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
+    expect(screen.getByText('ETH Gesture')).toBeInTheDocument();
+  });
+
   it('shows cycle closed when finalization time has passed', () => {
     render(
       <GestureStatus

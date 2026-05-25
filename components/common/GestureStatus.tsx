@@ -35,6 +35,7 @@ interface GestureStatusProps {
   curGestureList: GestureInfo[];
   ethGestureInfo: EthGestureInfo | null;
   allocationTime: number;
+  suppressPrimaryTimer?: boolean;
 }
 
 const fadeUp = {
@@ -140,6 +141,7 @@ export const GestureStatus = ({
   curGestureList,
   ethGestureInfo,
   allocationTime,
+  suppressPrimaryTimer = false,
 }: GestureStatusProps) => {
   const { account } = useActiveWeb3React();
   const { data: userInfoRaw } = useUserInfo(account);
@@ -188,7 +190,10 @@ export const GestureStatus = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 text-center"
+          className={cn(
+            'rounded-xl border border-white/[0.06] bg-white/[0.03] p-6 text-center',
+            suppressPrimaryTimer && 'sr-only',
+          )}
         >
           <p className="text-sm text-muted-foreground">
             Cycle {data.CurRoundNum} opens at {convertTimestampToDateTime(activationTime, true)}
@@ -200,7 +205,8 @@ export const GestureStatus = ({
       ) : data && data.TsRoundStart !== 0 ? (
         <>
           {/* Countdown / Exhausted */}
-          {data.LastBidderAddr !== zeroAddress &&
+          {!suppressPrimaryTimer &&
+            data.LastBidderAddr !== zeroAddress &&
             (allocationTime > now ? (
               <motion.div
                 initial={{ opacity: 0, y: -8 }}

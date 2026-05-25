@@ -30,15 +30,23 @@ async function activateLink(page: Page, href: string): Promise<void> {
       }
     }
     if (!(await link.isVisible().catch(() => false))) {
-      for (const name of [/Explore/i, /Help/i]) {
-        const trigger = page.getByRole('button', { name }).first();
-        if (!(await trigger.isVisible().catch(() => false))) continue;
-        await trigger.click();
+      const groupName =
+        href === '/faq' || href === '/how-it-works'
+          ? /Help/i
+          : ['/allocation', '/anchoring', '/marketing', '/statistics', '/contracts'].includes(href)
+            ? /Explore/i
+            : null;
+      if (groupName) {
+        const trigger = page.getByRole('button', { name: groupName }).first();
+        await trigger.waitFor({ state: 'visible', timeout: 10000 });
         const menuLink = page.locator(`[role="menu"] a[href="${href}"]:visible`).first();
-        await menuLink.waitFor({ state: 'visible', timeout: 2000 }).catch(() => undefined);
-        if (await menuLink.isVisible().catch(() => false)) {
-          link = menuLink;
-          break;
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+          await trigger.click();
+          await menuLink.waitFor({ state: 'visible', timeout: 3000 }).catch(() => undefined);
+          if (await menuLink.isVisible().catch(() => false)) {
+            link = menuLink;
+            break;
+          }
         }
       }
     }
@@ -61,7 +69,8 @@ async function openNavGroupIfPresent(
       await page
         .locator(`[role="menu"] a[href="${expectedHref}"]:visible`)
         .first()
-        .waitFor({ state: 'visible', timeout: 5000 });
+        .waitFor({ state: 'visible', timeout: 5000 })
+        .catch(() => undefined);
     }
   }
 }
