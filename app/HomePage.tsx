@@ -240,11 +240,6 @@ const HomePage = () => {
           canOpenGesturePanel={!loading && isRoundActive}
         />
 
-        <AttachedNFTAllocationShowcase
-          nfts={donatedNFTs}
-          cycleNumber={round >= 0 ? round : undefined}
-        />
-
         {/* ===== BIDDING STATUS (countdown + stats) ===== */}
         <GestureStatus
           data={data}
@@ -396,6 +391,11 @@ const HomePage = () => {
             <Allocation data={data} />
           </motion.div>
         )}
+
+        <AttachedNFTAllocationShowcase
+          nfts={donatedNFTs}
+          cycleNumber={round >= 0 ? round : undefined}
+        />
 
         {/* ===== PUBLIC GOODS IMPACT ===== */}
         {data && (

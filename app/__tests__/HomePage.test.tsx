@@ -374,8 +374,12 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(7);
-    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-count', '2');
-    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-cycle', '7');
+    const showcase = screen.getByTestId('attached-nft-showcase');
+    expect(showcase).toHaveAttribute('data-count', '2');
+    expect(showcase).toHaveAttribute('data-cycle', '7');
+    expect(screen.getByText('Allocation Breakdown').compareDocumentPosition(showcase)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 
   it('does not render the attached NFT showcase when the current cycle has none', () => {
