@@ -1,6 +1,29 @@
 import type { Metadata } from 'next';
 
-const SITE_URL = 'https://www.cosmicsignature.com';
+import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
+
+export type CanonicalHost = 'app' | 'landing';
+
+const CANONICAL_ORIGINS: Record<CanonicalHost, string> = {
+  app: APP_ORIGIN,
+  landing: LANDING_ORIGIN,
+};
+
+interface MetadataOptions {
+  canonicalHost?: CanonicalHost;
+}
+
+function normalizeCanonicalPath(path: string): string {
+  const [pathname = '/', query = ''] = path.split('?');
+  const normalizedPath =
+    pathname === '' ? '/' : pathname.startsWith('/') ? pathname : `/${pathname}`;
+
+  if (!query) return normalizedPath;
+
+  // Keep metadata canonicals clean. View-state query parameters are handled by
+  // the app, but crawlers should consolidate signals on the base URL.
+  return normalizedPath;
+}
 
 /**
  * Builds App Router Metadata with OpenGraph + Twitter tags and an
@@ -17,6 +40,7 @@ export function createMetadata(
   description: string,
   imageUrl?: string,
   path?: string,
+  options: MetadataOptions = {},
 ): Metadata {
   const openGraph: NonNullable<Metadata['openGraph']> = { title, description };
   const twitter: NonNullable<Metadata['twitter']> = {
@@ -33,7 +57,8 @@ export function createMetadata(
   const metadata: Metadata = { title, description, openGraph, twitter };
 
   if (path !== undefined) {
-    metadata.alternates = { canonical: `${SITE_URL}${path}` };
+    const origin = CANONICAL_ORIGINS[options.canonicalHost ?? 'app'];
+    metadata.alternates = { canonical: `${origin}${normalizeCanonicalPath(path)}` };
   }
 
   return metadata;

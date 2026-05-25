@@ -28,10 +28,17 @@ const BASE = 'http://localhost:3000';
  */
 const APP_ORIGIN_PREFIX_PATTERN =
   /^https:\/\/app\.cosmicsignature\.com|^http:\/\/app\.cosmicsignature\.local:3000/;
+const LANDING_ORIGIN_PREFIX_PATTERN =
+  /^https:\/\/cosmicsignature\.com|^http:\/\/cosmicsignature\.local:3000/;
 
 function expectedAppLocation(pathAndQuery: string): RegExp {
   const escaped = pathAndQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`${APP_ORIGIN_PREFIX_PATTERN.source}${escaped}$`);
+}
+
+function expectedLandingLocation(pathAndQuery: string): RegExp {
+  const escaped = pathAndQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`${LANDING_ORIGIN_PREFIX_PATTERN.source}${escaped}$`);
 }
 
 test.describe('proxy middleware', () => {
@@ -79,6 +86,15 @@ test.describe('proxy middleware', () => {
       await ctx.dispose();
     });
 
+    test('serves apex-only learn pages on the landing host', async () => {
+      const ctx = await request.newContext({
+        extraHTTPHeaders: { Host: 'cosmicsignature.com' },
+      });
+      const res = await ctx.get(`${BASE}/learn/what-is-cosmic-signature`, { maxRedirects: 0 });
+      expect(res.status()).toBe(200);
+      await ctx.dispose();
+    });
+
     test('308-redirects direct /landing-site access to / (canonicalization)', async () => {
       const ctx = await request.newContext({
         extraHTTPHeaders: { Host: 'cosmicsignature.com' },
@@ -89,6 +105,16 @@ test.describe('proxy middleware', () => {
       // URL in the search index for this content.
       expect(res.status()).toBe(308);
       expect(res.headers()['location']).toMatch(/\/$/);
+      await ctx.dispose();
+    });
+
+    test('redirects www landing host to apex canonical host', async () => {
+      const ctx = await request.newContext({
+        extraHTTPHeaders: { Host: 'www.cosmicsignature.com' },
+      });
+      const res = await ctx.get(`${BASE}/gallery?round=5`, { maxRedirects: 0 });
+      expect(res.status()).toBe(308);
+      expect(res.headers()['location']).toMatch(expectedLandingLocation('/gallery?round=5'));
       await ctx.dispose();
     });
   });
@@ -151,6 +177,16 @@ test.describe('proxy middleware', () => {
       expect(res.status()).toBe(200);
       await ctx.dispose();
     });
+
+    test('redirects landing-only content back to the apex host', async () => {
+      const ctx = await request.newContext({
+        extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
+      });
+      const res = await ctx.get(`${BASE}/about`, { maxRedirects: 0 });
+      expect(res.status()).toBe(308);
+      expect(res.headers()['location']).toMatch(expectedLandingLocation('/about'));
+      await ctx.dispose();
+    });
   });
 
   test.describe('host-aware robots.txt', () => {
@@ -161,7 +197,9 @@ test.describe('proxy middleware', () => {
       const res = await ctx.get(`${BASE}/robots.txt`);
       expect(res.status()).toBe(200);
       const body = await res.text();
-      expect(body).toContain('Sitemap: https://www.cosmicsignature.com/sitemap.xml');
+      expect(body).toMatch(
+        /Sitemap: (https:\/\/cosmicsignature\.com|http:\/\/cosmicsignature\.local:3000)\/sitemap\.xml/,
+      );
       await ctx.dispose();
     });
 
@@ -172,7 +210,9 @@ test.describe('proxy middleware', () => {
       const res = await ctx.get(`${BASE}/robots.txt`);
       expect(res.status()).toBe(200);
       const body = await res.text();
-      expect(body).toContain('Sitemap: https://app.cosmicsignature.com/sitemap.xml');
+      expect(body).toMatch(
+        /Sitemap: (https:\/\/app\.cosmicsignature\.com|http:\/\/app\.cosmicsignature\.local:3000)\/sitemap\.xml/,
+      );
       expect(body).toContain('/admin/');
       expect(body).toContain('/api/');
       await ctx.dispose();

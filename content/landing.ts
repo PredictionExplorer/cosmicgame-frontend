@@ -27,7 +27,7 @@ import { APP_ORIGIN } from '@/lib/hostRouting';
 
 export const landingContent = {
   meta: {
-    title: 'Cosmic Signature — Procedural On-Chain Art Protocol',
+    title: 'Cosmic Signature: Procedural On-Chain Art Protocol on Arbitrum',
     description:
       'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Every gesture shapes the cycle\u2019s final Signature, and the protocol redistributes its reserves across everyone who shaped the outcome \u2014 including the infrastructure Ethereum itself depends on.',
     keywords: [
@@ -46,9 +46,9 @@ export const landingContent = {
 
   hero: {
     eyebrow: 'Procedural on-chain art protocol \u00b7 Arbitrum',
-    headline: 'Every Gesture Shapes the Signature.',
+    headline: 'Cosmic Signature: Procedural On-Chain Art on Arbitrum',
     subhead:
-      'A procedural on-chain art protocol on Arbitrum. Make a gesture during a Performance Cycle, and every gesture shapes the cycle\u2019s final Signature. When the cycle closes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including the infrastructure Ethereum itself depends on.',
+      'Every Gesture Shapes the Signature. Make a gesture during a Performance Cycle, and every gesture shapes the cycle\u2019s final Signature. When the cycle closes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including the infrastructure Ethereum itself depends on.',
     primaryCta: { label: 'Open the App', href: APP_ORIGIN },
     secondaryCta: { label: 'Explore the Cycle', href: '#cycle' },
     marqueeChips: [
@@ -340,6 +340,8 @@ export const landingContent = {
         heading: 'Protocol',
         links: [
           { label: 'Open the App', href: APP_ORIGIN },
+          { label: 'About', href: '/about' },
+          { label: 'Learn', href: '/learn' },
           { label: 'Documentation', href: `${APP_ORIGIN}/how-it-works` },
           { label: 'Contracts', href: `${APP_ORIGIN}/contracts` },
           { label: 'Source Code', href: `${APP_ORIGIN}/code` },

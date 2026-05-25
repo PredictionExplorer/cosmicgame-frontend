@@ -21,7 +21,6 @@ import {
 import { formatCSTValue, formatEthValue } from '@/utils';
 
 import { PageHeader } from '@/components/layout/PageHeader';
-import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { StatCard } from '@/components/ui/stat-card';
 import { SectionDivider } from '@/components/ui/section-divider';
@@ -126,30 +125,27 @@ const Statistics = () => {
 
   if (dashboardLoading) {
     return (
-      <PageShell variant="data">
-        <div className="flex items-center justify-center py-32">
-          <Spinner size="lg" />
-        </div>
-      </PageShell>
+      <div className="flex items-center justify-center py-32">
+        <Spinner size="lg" />
+      </div>
     );
   }
 
   if (isError || !data) {
     return (
-      <PageShell variant="data">
-        <ErrorState
-          title="Failed to load statistics"
-          message="Please refresh the page to try again."
-          onRetry={() => window.location.reload()}
-        />
-      </PageShell>
+      <ErrorState
+        title="Failed to load statistics"
+        message="Please refresh the page to try again."
+        onRetry={() => window.location.reload()}
+      />
     );
   }
 
   return (
-    <PageShell variant="data" backdrop="signature">
+    <>
       <PageHeader
         align="left"
+        titleLevel={2}
         eyebrow={
           <SectionEyebrow tone="aurora" pulse>
             Protocol Metrics · Live
@@ -589,7 +585,7 @@ const Statistics = () => {
           )}
         </CollapsibleSection>
       </section>
-    </PageShell>
+    </>
   );
 };
 

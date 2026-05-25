@@ -1,10 +1,12 @@
 import { headers } from 'next/headers';
 import type { MetadataRoute } from 'next';
 
-import { isAppHost, normalizeHost } from '@/lib/hostRouting';
+import { learnArticles } from '@/content/learn';
 
-const LANDING_URL = 'https://www.cosmicsignature.com';
-const APP_URL = 'https://app.cosmicsignature.com';
+import { APP_ORIGIN, LANDING_ORIGIN, isAppHost, normalizeHost } from '@/lib/hostRouting';
+
+const LANDING_URL = LANDING_ORIGIN;
+const APP_URL = APP_ORIGIN;
 
 type Freq = MetadataRoute.Sitemap[number]['changeFrequency'];
 
@@ -18,7 +20,18 @@ interface SitemapEntry {
  * Landing sitemap: only the root and legal pages. Deep dApp routes live
  * on app.cosmicsignature.com and are listed in that host's sitemap.
  */
-const landingPages: SitemapEntry[] = [{ path: '', priority: 1.0, changeFrequency: 'weekly' }];
+const landingPages: SitemapEntry[] = [
+  { path: '', priority: 1.0, changeFrequency: 'weekly' },
+  { path: '/about', priority: 0.8, changeFrequency: 'monthly' },
+  { path: '/learn', priority: 0.8, changeFrequency: 'weekly' },
+  ...learnArticles.map(
+    (article): SitemapEntry => ({
+      path: `/learn/${article.slug}`,
+      priority: 0.7,
+      changeFrequency: 'monthly',
+    }),
+  ),
+];
 
 /**
  * App sitemap: cosmic-lexicon-only URLs. No legacy paths; this is a
@@ -37,6 +50,8 @@ const appPages: SitemapEntry[] = [
   { path: '/imprint', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/contracts', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/code', priority: 0.5, changeFrequency: 'monthly' },
+  { path: '/terms', priority: 0.5, changeFrequency: 'monthly' },
+  { path: '/privacy', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/eth-contribution', priority: 0.6, changeFrequency: 'daily' },
   { path: '/attached-nfts', priority: 0.6, changeFrequency: 'daily' },
   { path: '/recipient-history', priority: 0.7, changeFrequency: 'daily' },

@@ -3,7 +3,7 @@ import { Suspense, type ReactNode } from 'react';
 import Script from 'next/script';
 import { headers } from 'next/headers';
 
-import { isLandingHost } from '@/lib/hostRouting';
+import { LANDING_ORIGIN, isLandingHost } from '@/lib/hostRouting';
 import { clashDisplay, inter } from '@/lib/fonts';
 import { GA_TRACKING_ID } from '@/utils/analytics';
 import { JsonLd, websiteJsonLd, organizationJsonLd, webApplicationJsonLd } from '@/utils/jsonLd';
@@ -31,7 +31,7 @@ const defaultDescription =
 // SVG og:image is rejected by Discord, Slack, X, Facebook, and LinkedIn,
 // which is why the previous `logoImgUrl` (an SVG) failed to preview.
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.cosmicsignature.com'),
+  metadataBase: new URL(LANDING_ORIGIN),
   title: { default: defaultTitle, template: '%s' },
   description: defaultDescription,
   icons: {
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     google: 'ZUw5gzqw7CFIEZgCJ2pLy-MhDe7Fdotpc31fS75v3dE',
   },
   alternates: {
-    canonical: 'https://www.cosmicsignature.com',
+    canonical: LANDING_ORIGIN,
   },
   openGraph: {
     type: 'website',

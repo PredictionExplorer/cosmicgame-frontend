@@ -2,6 +2,7 @@ const IS_DEV = process.env.NODE_ENV === 'development';
 
 const BASE_LANDING_HOSTS = ['cosmicsignature.com', 'www.cosmicsignature.com'];
 const BASE_APP_HOSTS = ['app.cosmicsignature.com'];
+const LEGACY_WWW_LANDING_HOST = 'www.cosmicsignature.com';
 
 /**
  * Dev-only hosts for local browser testing via /etc/hosts entries.
@@ -30,7 +31,7 @@ export const APP_ORIGIN = IS_DEV
 
 export const LANDING_ORIGIN = IS_DEV
   ? 'http://cosmicsignature.local:3000'
-  : 'https://www.cosmicsignature.com';
+  : 'https://cosmicsignature.com';
 
 export function normalizeHost(host: string | null | undefined): string {
   if (!host) {
@@ -43,6 +44,10 @@ export function normalizeHost(host: string | null | undefined): string {
 export function isLandingHost(host: string | null | undefined): boolean {
   const normalized = normalizeHost(host);
   return LANDING_HOSTS.has(normalized);
+}
+
+export function isLegacyWwwLandingHost(host: string | null | undefined): boolean {
+  return normalizeHost(host) === LEGACY_WWW_LANDING_HOST;
 }
 
 export function isAppHost(host: string | null | undefined): boolean {
@@ -94,9 +99,18 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/user',
 ];
 
+export const LANDING_ONLY_PATH_PREFIXES: readonly string[] = ['/about', '/learn'];
+
 export function isAppOnlyPath(pathname: string): boolean {
   if (!pathname || pathname === '/') return false;
   return APP_ONLY_PATH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
+export function isLandingOnlyPath(pathname: string): boolean {
+  if (!pathname || pathname === '/') return false;
+  return LANDING_ONLY_PATH_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 }

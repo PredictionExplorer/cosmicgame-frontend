@@ -35,6 +35,16 @@ describe('SiteMapPage', () => {
   it('renders all system links', () => {
     render(<SiteMapPage />);
     const expectedLinks = [
+      { label: 'About Cosmic Signature', href: 'https://cosmicsignature.com/about' },
+      { label: 'Cosmic Signature Learn Hub', href: 'https://cosmicsignature.com/learn' },
+      {
+        label: 'What Is Cosmic Signature?',
+        href: 'https://cosmicsignature.com/learn/what-is-cosmic-signature',
+      },
+      {
+        label: 'Three-Body NFT Art Guide',
+        href: 'https://cosmicsignature.com/learn/three-body-nft-art',
+      },
       { label: 'Cosmic Signature Gallery', href: '/gallery' },
       { label: 'Cycles Completed', href: '/allocation' },
       { label: 'Anchor Distributions', href: '/anchoring' },
@@ -53,7 +63,7 @@ describe('SiteMapPage', () => {
     render(<SiteMapPage />);
     const main = screen.getByRole('main');
     const links = within(main).getAllByRole('link');
-    expect(links).toHaveLength(14);
+    expect(links).toHaveLength(18);
   });
 
   it('has no accessibility violations', async () => {

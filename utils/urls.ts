@@ -1,4 +1,5 @@
 import { networkConfig } from '@/config/networks';
+import { LANDING_ORIGIN } from '@/lib/hostRouting';
 
 const EXPLORER_BASE = networkConfig.explorerUrl.replace(/\/$/, '');
 
@@ -35,7 +36,7 @@ export const getOriginUrl = (url: string): string => {
 };
 
 /** Same origin as root `metadataBase` — marketing/branding, not chain-specific. */
-const CANONICAL_SITE_ORIGIN = 'https://www.cosmicsignature.com';
+const CANONICAL_SITE_ORIGIN = LANDING_ORIGIN;
 
 /** Site branding logo (`public/images/logo.svg`). Not on the NFT CDN. */
 export const logoImgUrl = `${CANONICAL_SITE_ORIGIN}/images/logo.svg`;

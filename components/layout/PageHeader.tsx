@@ -25,6 +25,8 @@ interface PageHeaderProps {
   meta?: ReactNode;
   /** Apply the signature gradient to the title text. */
   gradientTitle?: boolean | 'signature' | 'nebula' | 'aurora';
+  /** Use h2 when a page already renders a server-visible h1 for crawlers. */
+  titleLevel?: 1 | 2;
 }
 
 export function PageHeader({
@@ -38,8 +40,10 @@ export function PageHeader({
   actions,
   meta,
   gradientTitle = false,
+  titleLevel = 1,
 }: PageHeaderProps) {
   const hasSidebar = Boolean(actions);
+  const TitleTag = titleLevel === 2 ? 'h2' : 'h1';
   const titleGradientVariant =
     gradientTitle === true ? 'signature' : gradientTitle === false ? null : gradientTitle;
   return (
@@ -110,7 +114,7 @@ export function PageHeader({
               {eyebrow}
             </div>
           ) : null}
-          <h1
+          <TitleTag
             className={cn(
               'type-display-md text-foreground print:!text-foreground',
               titleGradientVariant && '[&]:text-transparent',
@@ -121,7 +125,7 @@ export function PageHeader({
             ) : (
               title
             )}
-          </h1>
+          </TitleTag>
           {subtitle ? (
             <p
               className={cn(

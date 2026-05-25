@@ -14,19 +14,23 @@ jest.mock('next/headers', () => ({
 describe('sitemap (host-aware)', () => {
   describe('on landing host', () => {
     beforeEach(() => {
-      mockHost = 'www.cosmicsignature.com';
+      mockHost = 'cosmicsignature.com';
     });
 
-    it('returns a minimal sitemap with just the root', async () => {
+    it('returns a content sitemap for the apex landing host', async () => {
       const entries = await sitemap();
       expect(Array.isArray(entries)).toBe(true);
-      expect(entries.length).toBe(1);
-      expect(entries[0]!.url).toBe('https://www.cosmicsignature.com');
+      expect(entries.length).toBeGreaterThan(10);
+      const urls = entries.map((entry) => entry.url);
+      expect(urls).toContain('https://cosmicsignature.com');
+      expect(urls).toContain('https://cosmicsignature.com/about');
+      expect(urls).toContain('https://cosmicsignature.com/learn');
+      expect(urls).toContain('https://cosmicsignature.com/learn/what-is-cosmic-signature');
     });
 
     it('root uses landing base URL', async () => {
       const entries = await sitemap();
-      expect(entries[0]!.url).toBe('https://www.cosmicsignature.com');
+      expect(entries[0]!.url).toBe('https://cosmicsignature.com');
     });
   });
 
@@ -121,6 +125,8 @@ describe('sitemap (host-aware)', () => {
       expect(urls).toContain('https://app.cosmicsignature.com/faq');
       expect(urls).toContain('https://app.cosmicsignature.com/statistics');
       expect(urls).toContain('https://app.cosmicsignature.com/contracts');
+      expect(urls).toContain('https://app.cosmicsignature.com/terms');
+      expect(urls).toContain('https://app.cosmicsignature.com/privacy');
     });
 
     it('home page has highest priority', async () => {

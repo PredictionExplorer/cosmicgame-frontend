@@ -1,6 +1,6 @@
 import robots from '@/app/robots';
 
-let mockHost = 'www.cosmicsignature.com';
+let mockHost = 'cosmicsignature.com';
 
 jest.mock('next/headers', () => ({
   headers: async () => ({
@@ -14,7 +14,7 @@ jest.mock('next/headers', () => ({
 describe('robots (host-aware)', () => {
   describe('on landing host', () => {
     beforeEach(() => {
-      mockHost = 'www.cosmicsignature.com';
+      mockHost = 'cosmicsignature.com';
     });
 
     it('returns rules array', async () => {
@@ -58,21 +58,26 @@ describe('robots (host-aware)', () => {
       const aiRule = rules.find((r) => Array.isArray(r.userAgent));
       expect(aiRule).toBeDefined();
       const agents = aiRule!.userAgent as string[];
+      expect(agents).toContain('OAI-SearchBot');
       expect(agents).toContain('GPTBot');
       expect(agents).toContain('ChatGPT-User');
+      expect(agents).toContain('Claude-SearchBot');
+      expect(agents).toContain('Claude-User');
+      expect(agents).toContain('ClaudeBot');
       expect(agents).toContain('Claude-Web');
       expect(agents).toContain('PerplexityBot');
+      expect(agents).toContain('Perplexity-User');
       expect(agents).toContain('Google-Extended');
     });
 
     it('references the landing sitemap', async () => {
       const result = await robots();
-      expect(result.sitemap).toBe('https://www.cosmicsignature.com/sitemap.xml');
+      expect(result.sitemap).toBe('https://cosmicsignature.com/sitemap.xml');
     });
 
     it('specifies the landing host', async () => {
       const result = await robots();
-      expect(result.host).toBe('https://www.cosmicsignature.com');
+      expect(result.host).toBe('https://cosmicsignature.com');
     });
   });
 

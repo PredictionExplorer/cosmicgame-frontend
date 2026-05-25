@@ -38,6 +38,8 @@ const footerLinks: Record<string, { label: string; href: string; external?: bool
     { label: 'Source Code', href: '/code' },
   ],
   Resources: [
+    { label: 'About', href: 'https://cosmicsignature.com/about', external: true },
+    { label: 'Learn', href: 'https://cosmicsignature.com/learn', external: true },
     { label: 'How It Works', href: '/how-it-works' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Site Map', href: '/site-map' },

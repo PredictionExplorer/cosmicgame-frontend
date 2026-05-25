@@ -65,7 +65,7 @@ describe('createMetadata', () => {
     const result = createMetadata('Title', 'Desc', undefined, '/faq');
 
     expect(result.alternates).toEqual({
-      canonical: 'https://www.cosmicsignature.com/faq',
+      canonical: 'https://app.cosmicsignature.com/faq',
     });
   });
 
@@ -73,7 +73,7 @@ describe('createMetadata', () => {
     const result = createMetadata('Title', 'Desc', undefined, '/');
 
     expect(result.alternates).toEqual({
-      canonical: 'https://www.cosmicsignature.com/',
+      canonical: 'https://app.cosmicsignature.com/',
     });
   });
 
@@ -81,7 +81,7 @@ describe('createMetadata', () => {
     const result = createMetadata('Title', 'Desc', 'https://img.com/pic.png', '/detail/42');
 
     expect(result.alternates).toEqual({
-      canonical: 'https://www.cosmicsignature.com/detail/42',
+      canonical: 'https://app.cosmicsignature.com/detail/42',
     });
   });
 
@@ -91,14 +91,32 @@ describe('createMetadata', () => {
     expect((result.openGraph as { images: string[] }).images).toEqual(['https://img.com/x.png']);
     expect((result.twitter as { images: string[] }).images).toEqual(['https://img.com/x.png']);
     expect(result.alternates).toEqual({
-      canonical: 'https://www.cosmicsignature.com/foo',
+      canonical: 'https://app.cosmicsignature.com/foo',
     });
   });
 
   it('appends paths with trailing slashes verbatim (no normalization surprises)', () => {
     const result = createMetadata('T', 'D', undefined, '/anchoring/');
     expect(result.alternates).toEqual({
-      canonical: 'https://www.cosmicsignature.com/anchoring/',
+      canonical: 'https://app.cosmicsignature.com/anchoring/',
+    });
+  });
+
+  it('can generate a landing-host canonical', () => {
+    const result = createMetadata('T', 'D', undefined, '/learn/what-is-cosmic-signature', {
+      canonicalHost: 'landing',
+    });
+
+    expect(result.alternates).toEqual({
+      canonical: 'https://cosmicsignature.com/learn/what-is-cosmic-signature',
+    });
+  });
+
+  it('strips query strings from canonical paths', () => {
+    const result = createMetadata('T', 'D', undefined, '/gallery?page=1&sort=newest');
+
+    expect(result.alternates).toEqual({
+      canonical: 'https://app.cosmicsignature.com/gallery',
     });
   });
 

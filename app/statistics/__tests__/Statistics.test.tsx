@@ -264,7 +264,7 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByRole('heading', { name: 'Statistics', level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Statistics', level: 2 })).toBeInTheDocument();
     expect(screen.getByText('Total Cycles')).toBeInTheDocument();
     const roundValues = screen.getAllByText('5');
     expect(roundValues.length).toBeGreaterThanOrEqual(1);

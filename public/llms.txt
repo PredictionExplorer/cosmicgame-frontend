@@ -6,18 +6,25 @@
 
 Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; when the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks — including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors. The protocol runs on Arbitrum, a Layer 2 scaling solution for Ethereum, providing fast and low-cost transactions.
 
+Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology.
+
 ## Key Pages
 
-- [Home](https://www.cosmicsignature.com/): Live gesture interface and active cycle status
-- [Gallery](https://www.cosmicsignature.com/gallery): Browse all imprinted COSMIC NFTs
-- [How It Works](https://www.cosmicsignature.com/how-it-works): Complete guide to protocol mechanics
-- [FAQ](https://www.cosmicsignature.com/faq): Frequently asked questions
-- [Statistics](https://www.cosmicsignature.com/statistics): Protocol statistics and analytics
-- [Anchoring](https://www.cosmicsignature.com/anchoring): Anchor COSMIC NFTs to receive Anchor Distributions
-- [Allocation](https://www.cosmicsignature.com/allocation): Current Cycle Reserve and allocation tracks
-- [Contracts](https://www.cosmicsignature.com/contracts): Smart contract details and addresses
-- [Outreach](https://www.cosmicsignature.com/marketing): Outreach allocation program
-- [Imprint](https://www.cosmicsignature.com/imprint): Imprint new tokens
+- [Marketing Home](https://cosmicsignature.com/): Overview of Cosmic Signature as a procedural on-chain art protocol
+- [About](https://cosmicsignature.com/about): Entity home for Cosmic Signature
+- [What is Cosmic Signature?](https://cosmicsignature.com/learn/what-is-cosmic-signature): Plain-English overview
+- [Three-Body NFT Art](https://cosmicsignature.com/learn/three-body-nft-art): Technical explanation of deterministic art generation
+- [App](https://app.cosmicsignature.com/): Live gesture interface and active cycle status
+- [Gallery](https://app.cosmicsignature.com/gallery): Browse all imprinted Cosmic Signature NFTs
+- [How It Works](https://app.cosmicsignature.com/how-it-works): Complete guide to protocol mechanics
+- [FAQ](https://app.cosmicsignature.com/faq): Frequently asked questions
+- [Statistics](https://app.cosmicsignature.com/statistics): Protocol statistics and analytics
+- [Anchoring](https://app.cosmicsignature.com/anchoring): Anchor Cosmic Signature NFTs to receive Anchor Distributions
+- [Allocation](https://app.cosmicsignature.com/allocation): Current Cycle Reserve and allocation tracks
+- [Contracts](https://app.cosmicsignature.com/contracts): Smart contract details and addresses
+- [Source Code](https://app.cosmicsignature.com/code): Source code and verification resources
+- [Outreach](https://app.cosmicsignature.com/marketing): Outreach allocation program
+- [Imprint](https://app.cosmicsignature.com/imprint): Imprint new tokens
 
 ## Protocol Mechanics
 
@@ -40,7 +47,7 @@ Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants
 ## Tokens
 
 - **CST (Cosmic Signature Token)**: ERC-20 coordination and utility token
-- **COSMIC NFT**: ERC-721 generative art based on three-body problem physics
+- **Cosmic Signature NFT**: ERC-721 generative art based on three-body problem physics
 - **RandomWalkNFT**: Partner NFT offering Gesture-Cost reductions
 
 ## Community
@@ -57,4 +64,4 @@ Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants
 
 ## Optional
 
-- [Full documentation](https://www.cosmicsignature.com/llms-full.txt)
+- [Full documentation](https://cosmicsignature.com/llms-full.txt)

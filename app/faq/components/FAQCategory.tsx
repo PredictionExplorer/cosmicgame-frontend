@@ -188,7 +188,7 @@ export const FAQCategorySection = forwardRef<HTMLElement, FAQCategoryProps>(
               <AccordionTrigger className="py-4 text-left text-[15px] font-semibold leading-snug hover:no-underline sm:text-base [&>svg]:text-muted-foreground/40">
                 {searchQuery ? highlightSearch(item.question, searchQuery) : item.question}
               </AccordionTrigger>
-              <AccordionContent className="pb-5">
+              <AccordionContent forceMount className="pb-5">
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {searchQuery
                     ? highlightSearch(item.answer, searchQuery)

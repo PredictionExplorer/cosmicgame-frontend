@@ -1,6 +1,15 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { APP_ORIGIN, isAppOnlyPath, isLandingHost, normalizeHost } from '@/lib/hostRouting';
+import {
+  APP_ORIGIN,
+  LANDING_ORIGIN,
+  isAppOnlyPath,
+  isAppHost,
+  isLandingHost,
+  isLandingOnlyPath,
+  isLegacyWwwLandingHost,
+  normalizeHost,
+} from '@/lib/hostRouting';
 
 export const config = {
   matcher: [
@@ -16,6 +25,11 @@ export default function middleware(req: NextRequest) {
   const hostHeader = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
   const host = normalizeHost(hostHeader);
   const { pathname, search } = req.nextUrl;
+
+  if (isLegacyWwwLandingHost(host)) {
+    const publicPathname = pathname.startsWith('/landing-site') ? '/' : pathname;
+    return NextResponse.redirect(`${LANDING_ORIGIN}${publicPathname}${search}`, 308);
+  }
 
   // `/landing-site` is an INTERNAL route — the landing lives publicly only at
   // cosmicsignature.com/. Any direct external request is either canonicalized
@@ -41,6 +55,10 @@ export default function middleware(req: NextRequest) {
       const target = `${APP_ORIGIN}${pathname}${search}`;
       return NextResponse.redirect(target, 308);
     }
+  }
+
+  if (isAppHost(host) && isLandingOnlyPath(pathname)) {
+    return NextResponse.redirect(`${LANDING_ORIGIN}${pathname}${search}`, 308);
   }
 
   return NextResponse.next();

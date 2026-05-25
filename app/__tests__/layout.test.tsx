@@ -38,7 +38,7 @@ describe('RootLayout metadata', () => {
   });
 
   it('exports metadata with metadataBase', () => {
-    expect(metadata.metadataBase).toEqual(new URL('https://www.cosmicsignature.com'));
+    expect(metadata.metadataBase).toEqual(new URL('https://cosmicsignature.com'));
   });
 
   it('exports metadata with openGraph', () => {
@@ -122,7 +122,7 @@ describe('RootLayout metadata', () => {
 
   it('sets the canonical URL to the marketing host (not the app subdomain)', () => {
     expect(metadata.alternates).toEqual(
-      expect.objectContaining({ canonical: 'https://www.cosmicsignature.com' }),
+      expect.objectContaining({ canonical: 'https://cosmicsignature.com' }),
     );
   });
 

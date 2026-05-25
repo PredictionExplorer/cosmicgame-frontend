@@ -67,8 +67,9 @@ test.describe('Landing page @ cosmicsignature.com', () => {
   test('renders the hero headline with lexicon-safe copy', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     const h1 = page.getByRole('heading', { level: 1 });
-    await expect(h1).toContainText(/Every Gesture Shapes the/i);
-    await expect(h1).toContainText(/Signature/i);
+    await expect(h1).toContainText(/Cosmic Signature/i);
+    await expect(h1).toContainText(/Procedural On-Chain Art/i);
+    await expect(h1).toContainText(/Arbitrum/i);
   });
 
   test('primary CTA links to the app subdomain', async ({ page }) => {

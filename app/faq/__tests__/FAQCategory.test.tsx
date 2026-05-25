@@ -111,6 +111,13 @@ describe('FAQCategorySection', () => {
     expect(screen.getByText('What is an Endurance Champion?')).toBeInTheDocument();
   });
 
+  it('keeps answer text mounted for crawlers even when accordions are collapsed', () => {
+    const { container } = renderFAQCategory({ expandedItems: [] });
+
+    expect(container).toHaveTextContent(/A Calibration Window.*Gesture Cost over time\./);
+    expect(container).toHaveTextContent('Anchoring pays a share of each cycle distribution.');
+  });
+
   it('expands items that are in expandedItems', () => {
     renderFAQCategory({ expandedItems: ['q1', 'q3'] });
     const q1Content = document.getElementById('q1')?.closest('[data-state]');
@@ -173,7 +180,7 @@ describe('FAQCategorySection', () => {
 
   it('renders "Copy link" button in expanded items', async () => {
     renderFAQCategory({ expandedItems: ['q1'] });
-    const copyBtn = screen.getByRole('button', { name: 'Copy link to this question' });
+    const copyBtn = screen.getAllByRole('button', { name: 'Copy link to this question' })[0]!;
     expect(copyBtn).toBeInTheDocument();
     expect(copyBtn).toHaveTextContent('Copy link');
   });

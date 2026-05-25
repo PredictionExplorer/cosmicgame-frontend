@@ -31,4 +31,14 @@ describe('LLM-facing protocol docs', () => {
     expect(content).toContain('each RandomWalkNFT can be used once');
     expect(content).not.toMatch(/once per wallet/i);
   });
+
+  it.each(docs)('%s uses canonical apex and app hosts correctly', (_fileName, content) => {
+    expect(content).toContain('https://cosmicsignature.com/');
+    expect(content).toContain('https://app.cosmicsignature.com/');
+    expect(content).not.toContain('https://www.cosmicsignature.com');
+  });
+
+  it.each(docs)('%s includes AI-facing disambiguation language', (_fileName, content) => {
+    expect(content).toMatch(/not related to the COSMIC cancer mutation database/i);
+  });
 });

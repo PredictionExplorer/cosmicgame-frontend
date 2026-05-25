@@ -39,7 +39,8 @@ describe('JSON-LD generators', () => {
 
     it('includes site name and URL', () => {
       expect(result.name).toBe('Cosmic Signature');
-      expect(result.url).toBe('https://www.cosmicsignature.com');
+      expect(result.url).toBe('https://cosmicsignature.com/');
+      expect(result['@id']).toBe('https://cosmicsignature.com/#website');
     });
 
     it('includes a SearchAction', () => {
@@ -63,8 +64,9 @@ describe('JSON-LD generators', () => {
 
     it('includes name, URL, and logo', () => {
       expect(result.name).toBe('Cosmic Signature');
-      expect(result.url).toBe('https://www.cosmicsignature.com');
-      expect(result.logo).toBe('https://www.cosmicsignature.com/images/logo.svg');
+      expect(result.url).toBe('https://cosmicsignature.com/');
+      expect(result.logo).toBe('https://cosmicsignature.com/images/logo.svg');
+      expect(result['@id']).toBe('https://cosmicsignature.com/#organization');
     });
 
     it('includes social media profiles', () => {
@@ -190,8 +192,21 @@ describe('JSON-LD generators', () => {
     });
 
     it('builds full URLs from paths', () => {
-      expect(result.itemListElement[0]!.item).toBe('https://www.cosmicsignature.com/');
-      expect(result.itemListElement[1]!.item).toBe('https://www.cosmicsignature.com/gallery');
+      expect(result.itemListElement[0]!.item).toBe('https://app.cosmicsignature.com/');
+      expect(result.itemListElement[1]!.item).toBe('https://app.cosmicsignature.com/gallery');
+    });
+
+    it('can build landing-host breadcrumb URLs', () => {
+      const landingResult = breadcrumbJsonLd(
+        [
+          { name: 'Home', path: '/' },
+          { name: 'Learn', path: '/learn' },
+        ],
+        'https://cosmicsignature.com',
+      );
+
+      expect(landingResult.itemListElement[0]!.item).toBe('https://cosmicsignature.com/');
+      expect(landingResult.itemListElement[1]!.item).toBe('https://cosmicsignature.com/learn');
     });
 
     it('preserves segment names verbatim', () => {

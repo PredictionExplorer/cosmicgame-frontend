@@ -31,6 +31,8 @@ const getNAVs = (status: ClaimStatus | null, account: string | null) => {
       title: 'Help',
       route: '#',
       children: [
+        { title: 'About Cosmic Signature', route: 'https://cosmicsignature.com/about' },
+        { title: 'Learn Hub', route: 'https://cosmicsignature.com/learn' },
         { title: 'How It Works', route: '/how-it-works' },
         { title: 'FAQ', route: '/faq' },
       ],

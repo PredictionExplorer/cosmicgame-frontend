@@ -50,7 +50,8 @@ export function Hero() {
             className="mt-8 text-balance text-5xl font-semibold leading-[0.98] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-[92px]"
             style={{ fontFamily: 'var(--font-family-display)' }}
           >
-            Every Gesture Shapes the <GradientText variant="signature">Signature.</GradientText>
+            Cosmic Signature: Procedural On-Chain Art on{' '}
+            <GradientText variant="signature">Arbitrum</GradientText>
           </h1>
 
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl">

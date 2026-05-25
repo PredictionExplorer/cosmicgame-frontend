@@ -1,8 +1,12 @@
 import {
   APP_ONLY_PATH_PREFIXES,
+  LANDING_ORIGIN,
+  LANDING_ONLY_PATH_PREFIXES,
   isAppHost,
   isAppOnlyPath,
   isLandingHost,
+  isLandingOnlyPath,
+  isLegacyWwwLandingHost,
   normalizeHost,
 } from '@/lib/hostRouting';
 
@@ -74,6 +78,18 @@ describe('hostRouting', () => {
 
     it('returns false for localhost in production-like test env', () => {
       expect(isLandingHost('localhost')).toBe(false);
+    });
+  });
+
+  describe('canonical landing origin', () => {
+    it('uses the apex domain as the canonical marketing origin', () => {
+      expect(LANDING_ORIGIN).toBe('https://cosmicsignature.com');
+    });
+
+    it('recognizes the legacy www landing host for redirects', () => {
+      expect(isLegacyWwwLandingHost('www.cosmicsignature.com')).toBe(true);
+      expect(isLegacyWwwLandingHost('cosmicsignature.com')).toBe(false);
+      expect(isLegacyWwwLandingHost('app.cosmicsignature.com')).toBe(false);
     });
   });
 
@@ -293,6 +309,21 @@ describe('hostRouting', () => {
       expect(isAppOnlyPath('/gesture')).toBe(true);
       expect(isAppOnlyPath('/gesture')).toBe(true);
       expect(isAppOnlyPath('/current-cycle')).toBe(true);
+    });
+  });
+
+  describe('isLandingOnlyPath', () => {
+    it('keeps learn and about pages canonical on the landing host', () => {
+      expect(LANDING_ONLY_PATH_PREFIXES).toEqual(['/about', '/learn']);
+      expect(isLandingOnlyPath('/about')).toBe(true);
+      expect(isLandingOnlyPath('/learn')).toBe(true);
+      expect(isLandingOnlyPath('/learn/what-is-cosmic-signature')).toBe(true);
+    });
+
+    it('does not classify app routes as landing-only', () => {
+      expect(isLandingOnlyPath('/statistics')).toBe(false);
+      expect(isLandingOnlyPath('/gallery')).toBe(false);
+      expect(isLandingOnlyPath('/faq')).toBe(false);
     });
   });
 });

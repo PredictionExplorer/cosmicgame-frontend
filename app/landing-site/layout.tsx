@@ -3,16 +3,17 @@ import type { ReactNode } from 'react';
 
 import { landingContent } from '@/content/landing';
 
+import { LANDING_ORIGIN } from '@/lib/hostRouting';
 import { JsonLd, artProtocolJsonLd, organizationJsonLd, websiteJsonLd } from '@/utils/jsonLd';
 
 const { meta } = landingContent;
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.cosmicsignature.com'),
+  metadataBase: new URL(LANDING_ORIGIN),
   title: { default: meta.title, template: '%s \u00b7 Cosmic Signature' },
   description: meta.description,
   keywords: [...meta.keywords],
-  alternates: { canonical: 'https://www.cosmicsignature.com' },
+  alternates: { canonical: LANDING_ORIGIN },
   openGraph: {
     type: 'website',
     siteName: 'Cosmic Signature',

@@ -4,7 +4,7 @@
  * Landing-host client shell.
  *
  * The root layout renders this on the marketing host (cosmicsignature.com,
- * www.cosmicsignature.com) INSTEAD of the full-featured <Providers> used
+ * cosmicsignature.com) INSTEAD of the full-featured <Providers> used
  * on app.cosmicsignature.com. That keeps every Web3-specific dependency
  * — wagmi, viem, RainbowKit, WalletConnect, Coinbase SDK, MetaMask SDK —
  * out of the landing page's client bundle.

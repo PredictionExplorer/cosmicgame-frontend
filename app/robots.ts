@@ -1,18 +1,23 @@
 import { headers } from 'next/headers';
 import type { MetadataRoute } from 'next';
 
-import { isAppHost, normalizeHost } from '@/lib/hostRouting';
+import { APP_ORIGIN, LANDING_ORIGIN, isAppHost, normalizeHost } from '@/lib/hostRouting';
 
-const LANDING_URL = 'https://www.cosmicsignature.com';
-const APP_URL = 'https://app.cosmicsignature.com';
+const LANDING_URL = LANDING_ORIGIN;
+const APP_URL = APP_ORIGIN;
 
 const AI_BOTS = [
+  'OAI-SearchBot',
   'GPTBot',
   'ChatGPT-User',
+  'Claude-SearchBot',
+  'Claude-User',
+  'ClaudeBot',
   'Claude-Web',
   'Anthropic',
   'anthropic-ai',
   'PerplexityBot',
+  'Perplexity-User',
   'Google-Extended',
   'Applebot-Extended',
   'Bytespider',

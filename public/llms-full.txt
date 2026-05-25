@@ -8,38 +8,46 @@ Cosmic Signature combines generative on-chain art with coordinated community par
 
 The NFT artwork is derived from the three-body problem in physics — simulating the motion of three planets in space and tracing their trajectories, producing unique, reproducible visuals. Every NFT is imprinted with a seed stored in the smart contract, and the image and video are produced from that seed using an open-source Rust program.
 
+Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology.
+
 ## Website Structure
 
 ### Main Pages
 
-- **Home** (https://www.cosmicsignature.com/): Live gesture interface showing the active cycle, Cycle Reserve, countdown timer, recent gestures, and gesture submission form
-- **Gallery** (https://www.cosmicsignature.com/gallery): Browse and search all imprinted COSMIC NFTs with filtering and pagination
-- **How It Works** (https://www.cosmicsignature.com/how-it-works): Step-by-step guide covering protocol mechanics, gesture submission, allocation tracks, and tips
-- **FAQ** (https://www.cosmicsignature.com/faq): Questions organized into categories covering getting started, allocations, cycle mechanics, tokens, technical details, and Cosmic Council coordination
-- **Statistics** (https://www.cosmicsignature.com/statistics): Protocol analytics including cycle history, gesture volumes, allocation distribution, and participant stats
-- **Anchoring** (https://www.cosmicsignature.com/anchoring): Anchor Cosmic Signature NFTs to receive ongoing Anchor Distributions from each Cycle Reserve
-- **Allocations** (https://www.cosmicsignature.com/allocation): Current and historical Cycle Reserve details
-- **Contracts** (https://www.cosmicsignature.com/contracts): Smart contract addresses, ABIs, and fund distribution breakdown
-- **Outreach** (https://www.cosmicsignature.com/marketing): Outreach Allocation program for community contributors
-- **Imprint** (https://www.cosmicsignature.com/imprint): Interface for imprinting new tokens
-- **Current Cycle** (https://www.cosmicsignature.com/current-cycle): Detailed view of the active cycle including gesture history, leaderboards, contributions, and allocation distribution
+- **Marketing Home** (https://cosmicsignature.com/): Overview of Cosmic Signature as a procedural on-chain art protocol
+- **About** (https://cosmicsignature.com/about): Entity home for Cosmic Signature, including official links and disambiguation
+- **Learn Hub** (https://cosmicsignature.com/learn): Evergreen explanations for search engines, AI systems, and new readers
+- **What Is Cosmic Signature?** (https://cosmicsignature.com/learn/what-is-cosmic-signature): Plain-English overview of the protocol
+- **Three-Body NFT Art** (https://cosmicsignature.com/learn/three-body-nft-art): Technical explanation of deterministic art generation
+- **App Home** (https://app.cosmicsignature.com/): Live gesture interface showing the active cycle, Cycle Reserve, countdown timer, recent gestures, and gesture submission form
+- **Gallery** (https://app.cosmicsignature.com/gallery): Browse and search all imprinted Cosmic Signature NFTs with filtering and pagination
+- **How It Works** (https://app.cosmicsignature.com/how-it-works): Step-by-step guide covering protocol mechanics, gesture submission, allocation tracks, and tips
+- **FAQ** (https://app.cosmicsignature.com/faq): Questions organized into categories covering getting started, allocations, cycle mechanics, tokens, technical details, and Cosmic Council coordination
+- **Statistics** (https://app.cosmicsignature.com/statistics): Protocol analytics including cycle history, gesture volumes, allocation distribution, and participant stats
+- **Anchoring** (https://app.cosmicsignature.com/anchoring): Anchor Cosmic Signature NFTs to receive ongoing Anchor Distributions from each Cycle Reserve
+- **Allocations** (https://app.cosmicsignature.com/allocation): Current and historical Cycle Reserve details
+- **Contracts** (https://app.cosmicsignature.com/contracts): Smart contract addresses, ABIs, and fund distribution breakdown
+- **Source Code** (https://app.cosmicsignature.com/code): Source code and verification resources
+- **Outreach** (https://app.cosmicsignature.com/marketing): Outreach Allocation program for community contributors
+- **Imprint** (https://app.cosmicsignature.com/imprint): Interface for imprinting new tokens
+- **Current Cycle** (https://app.cosmicsignature.com/current-cycle): Detailed view of the active cycle including gesture history, leaderboards, contributions, and allocation distribution
 
 ### User Pages
 
-- **My Tokens** (https://www.cosmicsignature.com/my-tokens): View your owned COSMIC NFTs
-- **My Anchors** (https://www.cosmicsignature.com/my-anchors): Manage your anchored Cosmic Signature and RandomWalk NFTs and view Anchor Distributions
-- **My Allocations** (https://www.cosmicsignature.com/my-allocations): Track your allocations across cycles
-- **My Statistics** (https://www.cosmicsignature.com/my-statistics): Personal participation statistics
+- **My Tokens** (https://app.cosmicsignature.com/my-tokens): View your owned Cosmic Signature NFTs
+- **My Anchors** (https://app.cosmicsignature.com/my-anchors): Manage your anchored Cosmic Signature and RandomWalk NFTs and view Anchor Distributions
+- **My Allocations** (https://app.cosmicsignature.com/my-allocations): Track your allocations across cycles
+- **My Statistics** (https://app.cosmicsignature.com/my-statistics): Personal participation statistics
 
 ### Data Pages
 
-- **Recipient History** (https://www.cosmicsignature.com/recipient-history): Complete history of all cycle recipients
-- **Named NFTs** (https://www.cosmicsignature.com/named-nfts): NFTs that have been given custom names
-- **Attached NFTs** (https://www.cosmicsignature.com/attached-nfts): History of NFTs attached to gestures
-- **ETH Contributions** (https://www.cosmicsignature.com/eth-contribution): History of ETH contributions
-- **Allocation Finalized** (https://www.cosmicsignature.com/allocation-finalized): Record of finalized allocations
-- **Public Goods Contributions** (https://www.cosmicsignature.com/public-goods-contributions-cg): Public Goods Allocation records
-- **Public Goods Retrievals** (https://www.cosmicsignature.com/public-goods-retrievals): Retrieval records from the Public Goods Vault
+- **Recipient History** (https://app.cosmicsignature.com/recipient-history): Complete history of all cycle recipients
+- **Named NFTs** (https://app.cosmicsignature.com/named-nfts): NFTs that have been given custom names
+- **Attached NFTs** (https://app.cosmicsignature.com/attached-nfts): History of NFTs attached to gestures
+- **ETH Contributions** (https://app.cosmicsignature.com/eth-contribution): History of ETH contributions
+- **Allocation Finalized** (https://app.cosmicsignature.com/allocation-finalized): Record of finalized allocations
+- **Public Goods Contributions** (https://app.cosmicsignature.com/public-goods-contributions-cg): Public Goods Allocation records
+- **Public Goods Retrievals** (https://app.cosmicsignature.com/public-goods-retrievals): Retrieval records from the Public Goods Vault
 
 ## Protocol Mechanics — Detailed
 
@@ -137,7 +145,8 @@ Together with the 3,000 CST Outreach Reserve, typical per-cycle CST imprints tot
 
 - **Twitter/X**: https://x.com/CosmicSignature
 - **Discord**: https://discord.gg/bGnPn96Qwt
-- **Website**: https://www.cosmicsignature.com
+- **Website**: https://cosmicsignature.com
+- **App**: https://app.cosmicsignature.com
 
 ## Frequently Asked Questions
 

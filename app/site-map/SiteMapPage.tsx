@@ -15,6 +15,16 @@ const perUserLinks = [
 ];
 
 const systemLinks = [
+  { href: 'https://cosmicsignature.com/about', label: 'About Cosmic Signature' },
+  { href: 'https://cosmicsignature.com/learn', label: 'Cosmic Signature Learn Hub' },
+  {
+    href: 'https://cosmicsignature.com/learn/what-is-cosmic-signature',
+    label: 'What Is Cosmic Signature?',
+  },
+  {
+    href: 'https://cosmicsignature.com/learn/three-body-nft-art',
+    label: 'Three-Body NFT Art Guide',
+  },
   { href: '/gallery', label: 'Cosmic Signature Gallery' },
   { href: '/allocation', label: 'Cycles Completed' },
   { href: '/anchoring', label: 'Anchor Distributions' },

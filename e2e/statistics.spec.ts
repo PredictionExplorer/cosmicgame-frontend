@@ -11,7 +11,7 @@ test.describe('Statistics page', () => {
   });
 
   test('shows Current Round Statistics', async ({ page }) => {
-    const currentRound = page.getByRole('heading', { name: /Statistics/i });
+    const currentRound = page.getByRole('heading', { name: 'Statistics', exact: true });
     await ensureVisible(currentRound);
     await expect(currentRound).toBeVisible({ timeout: 15000 });
     await expect(page.getByText(/Total Cycles/i).first()).toBeVisible();

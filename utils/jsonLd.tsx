@@ -1,10 +1,12 @@
+import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
+
 interface FAQItem {
   question: string;
   answer: string;
 }
 
-const SITE_URL = 'https://www.cosmicsignature.com';
-const APP_URL = 'https://app.cosmicsignature.com';
+const SITE_URL = LANDING_ORIGIN;
+const APP_URL = APP_ORIGIN;
 const SITE_NAME = 'Cosmic Signature';
 const SITE_LOGO_URL = `${SITE_URL}/images/logo.svg`;
 
@@ -20,9 +22,13 @@ export function websiteJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
     name: SITE_NAME,
-    url: SITE_URL,
+    url: `${SITE_URL}/`,
     description: PROTOCOL_DESCRIPTION,
+    publisher: {
+      '@id': `${SITE_URL}/#organization`,
+    },
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -38,8 +44,9 @@ export function organizationJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
+    '@id': `${SITE_URL}/#organization`,
     name: SITE_NAME,
-    url: SITE_URL,
+    url: `${SITE_URL}/`,
     logo: SITE_LOGO_URL,
     sameAs: ['https://x.com/CosmicSignature', 'https://discord.gg/bGnPn96Qwt'],
     description: PROTOCOL_DESCRIPTION,
@@ -50,8 +57,9 @@ export function webApplicationJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
+    '@id': `${APP_URL}/#webapp`,
     name: SITE_NAME,
-    url: APP_URL,
+    url: `${APP_URL}/`,
     applicationCategory: 'EntertainmentApplication',
     operatingSystem: 'Any',
     browserRequirements: 'Requires a Web3-compatible browser or wallet extension',
@@ -69,8 +77,9 @@ export function artProtocolJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
+    '@id': `${SITE_URL}/#art-protocol`,
     name: SITE_NAME,
-    url: SITE_URL,
+    url: `${SITE_URL}/`,
     image: SITE_LOGO_URL,
     license: 'https://creativecommons.org/publicdomain/zero/1.0/',
     creditText: 'Cosmic Signature Protocol',
@@ -104,7 +113,8 @@ export function faqPageJsonLd(items: FAQItem[]) {
   };
 }
 
-export function breadcrumbJsonLd(segments: BreadcrumbSegment[]) {
+export function breadcrumbJsonLd(segments: BreadcrumbSegment[], baseUrl: string = APP_URL) {
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -112,7 +122,7 @@ export function breadcrumbJsonLd(segments: BreadcrumbSegment[]) {
       '@type': 'ListItem',
       position: index + 1,
       name: segment.name,
-      item: `${SITE_URL}${segment.path}`,
+      item: segment.path.startsWith('http') ? segment.path : `${normalizedBaseUrl}${segment.path}`,
     })),
   };
 }
