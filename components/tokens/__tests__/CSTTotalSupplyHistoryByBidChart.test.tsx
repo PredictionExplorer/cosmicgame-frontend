@@ -79,7 +79,7 @@ describe('CSTTotalSupplyHistoryByBidChart', () => {
       refetch: jest.fn(),
     });
     render(<CSTTotalSupplyHistoryByBidChart />);
-    expect(screen.getByText(/no supply history by bid/i)).toBeInTheDocument();
+    expect(screen.getByText(/no supply history by gesture/i)).toBeInTheDocument();
   });
 
   it('passes enabled flag to hook', () => {

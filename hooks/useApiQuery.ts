@@ -22,6 +22,10 @@ import type {
   CTTotalSupplyHistoryByDateRecord,
   CTPriceInfo,
   DashboardInfo,
+  BidFrequencyBucket,
+  BiddingActivityResponse,
+  BidTimeBounds,
+  TopBidderActivePeriodsResponse,
   DonatedERC20Token,
   AttachedNFT,
   ETHDonation,
@@ -300,6 +304,58 @@ export function useCTTotalSupplyHistoryByBid(enabled = true) {
     queryKey: ['ctTotalSupplyHistoryByBid'],
     queryFn: () => api.get_ct_total_supply_history_by_bid(),
     enabled,
+    staleTime: 60_000,
+  });
+}
+// lexicon-allow-end
+
+export function useBidTimeBounds(enabled = true) {
+  return useQuery<BidTimeBounds>({
+    queryKey: ['bidTimeBounds'],
+    queryFn: () => api.get_bid_time_bounds(),
+    enabled,
+    staleTime: 300_000,
+  });
+}
+
+export function useBiddingActivity(
+  initTs: number,
+  finTs: number,
+  intervalSecs: number,
+  enabled = true,
+) {
+  return useQuery<BiddingActivityResponse>({
+    queryKey: ['biddingActivity', initTs, finTs, intervalSecs],
+    queryFn: () => api.get_bidding_activity(initTs, finTs, intervalSecs),
+    enabled: enabled && initTs > 0 && finTs > initTs && intervalSecs > 0,
+    staleTime: 60_000,
+  });
+}
+
+export function useBidFrequency(
+  initTs: number,
+  finTs: number,
+  intervalSecs: number,
+  enabled = true,
+) {
+  return useQuery<BidFrequencyBucket[]>({
+    queryKey: ['bidFrequency', initTs, finTs, intervalSecs],
+    queryFn: () => api.get_bid_frequency(initTs, finTs, intervalSecs),
+    enabled: enabled && initTs > 0 && finTs > initTs && intervalSecs > 0,
+    staleTime: 60_000,
+  });
+}
+
+export function useTopBidderActivePeriods(
+  topN: number,
+  initTs: number,
+  finTs: number,
+  enabled = true,
+) {
+  return useQuery<TopBidderActivePeriodsResponse>({
+    queryKey: ['topBidderActivePeriods', topN, initTs, finTs],
+    queryFn: () => api.get_top_bidder_active_periods(topN, initTs, finTs),
+    enabled: enabled && initTs > 0 && finTs > initTs && topN > 0,
     staleTime: 60_000,
   });
 }

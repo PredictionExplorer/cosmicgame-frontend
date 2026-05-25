@@ -726,4 +726,64 @@ export interface ActionIdWithClaimInfo {
   [key: string]: unknown;
 }
 
+// ---------------------------------------------------------------------------
+// Bidding analytics
+// ---------------------------------------------------------------------------
+
+export interface BidFrequencyBucket {
+  BucketTs: number;
+  NumBids: number;
+  UniqueBidders: number;
+}
+
+export interface BidSpike {
+  Index: number;
+  StartTs: number;
+  EndTs: number;
+  PeakTs: number;
+  PeakNumBids: number;
+  TotalBids: number;
+  BucketCount: number;
+}
+
+export interface TopBidderInfo {
+  BidderAid: number;
+  BidderAddr: string;
+  NumBids: number;
+}
+
+export interface BidderActivePeriod {
+  BidderAid: number;
+  BidderAddr: string;
+  PeriodStart: number;
+  PeriodEnd: number;
+  NumBids: number;
+  DurationSecs: number;
+}
+
+export interface BiddingActivityResponse {
+  InitTs: number;
+  FinTs: number;
+  Interval: number;
+  FrequencyHistory: BidFrequencyBucket[];
+  Spikes: BidSpike[];
+  RecentSpikeIndex: number;
+  RecentWindowSecs: number;
+}
+
+export interface BidTimeBounds {
+  MinTs: number;
+  MaxTs: number;
+}
+
+export interface TopBidderActivePeriodsResponse {
+  InitTs: number;
+  FinTs: number;
+  TopN: number;
+  GapHours: number;
+  MinBids: number;
+  TopBidders: TopBidderInfo[];
+  ActivePeriods: BidderActivePeriod[];
+}
+
 // lexicon-allow-end

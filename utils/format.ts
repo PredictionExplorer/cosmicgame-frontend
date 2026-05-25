@@ -145,6 +145,20 @@ export function yyyymmddTodayUtc(): string {
   return yyyymmddDaysAgoUtc(0);
 }
 
+/** Formats a Unix timestamp (seconds) for chart axis / tooltip labels. */
+export function formatUnixTsLabel(ts: number, withTime = false): string {
+  const d = new Date(ts * 1000);
+  const month = MONTH_LABELS[d.getUTCMonth()] ?? '';
+  const day = d.getUTCDate();
+  const year = d.getUTCFullYear();
+  if (!withTime) {
+    return `${month} ${day}, ${year}`;
+  }
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const mm = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${month} ${day}, ${year} ${hh}:${mm} UTC`;
+}
+
 /** Wide date range used to bootstrap CST supply history (all available days). */
 export function supplyHistoryBootstrapRange(): { from: string; to: string } {
   return { from: '19700101', to: yyyymmddTodayUtc() };

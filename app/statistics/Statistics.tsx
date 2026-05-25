@@ -62,6 +62,7 @@ import { CollapsibleSection } from '@/components/statistics/CollapsibleSection';
 import { AnchoringSection } from '@/components/statistics/AnchoringSection';
 import { DonatedNFTsGrid } from '@/components/statistics/DonatedNFTsGrid';
 import { DonatedTokensSection } from '@/components/home/DonatedTokensSection';
+import { BiddingActivitySection } from '@/components/statistics/BiddingActivitySection';
 import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHoldersCSTTable';
 import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
 
@@ -584,6 +585,8 @@ const Statistics = () => {
             <SystemModesTable list={systemModeChanges ?? []} />
           )}
         </CollapsibleSection>
+
+        <BiddingActivitySection />
       </section>
     </>
   );

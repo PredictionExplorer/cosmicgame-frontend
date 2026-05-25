@@ -6,6 +6,7 @@ import * as users from './users';
 import * as stellarSelection from './stellarSelection';
 import * as marketing from './marketing';
 import * as system from './system';
+import * as biddingStats from './bidding-stats';
 
 const api = {
   ...rounds,
@@ -16,6 +17,7 @@ const api = {
   ...stellarSelection,
   ...marketing,
   ...system,
+  ...biddingStats,
 };
 
 export default api;

@@ -71,7 +71,7 @@ function SupplyByBidTooltip({ active, payload }: SupplyByBidTooltipProps) {
   return (
     <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
       <p className="mb-2 font-medium text-white">
-        Bid {point.bidNum}
+        Gesture {point.bidNum}
         {point.dateTime ? ` · ${point.dateTime}` : ''}
       </p>
       <dl className="space-y-1 text-muted-foreground">
@@ -92,11 +92,11 @@ function SupplyByBidTooltip({ active, payload }: SupplyByBidTooltipProps) {
           <dd className="text-white">{formatCSTValue(point.amountEth)}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Bid type</dt>
+          <dt>Gesture type</dt>
           <dd className="text-white">{point.bidTypeLabel}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>Bid info id</dt>
+          <dt>Gesture info id</dt>
           <dd className="text-white">{point.bidInfoId}</dd>
         </div>
       </dl>
@@ -126,11 +126,11 @@ export const CSTTotalSupplyHistoryByBidChart: FC<CSTTotalSupplyHistoryByBidChart
       ) : isError ? (
         <ErrorState
           title="Failed to load supply history"
-          message="Could not fetch CST total supply by bid."
+          message="Could not fetch CST total supply by gesture."
           onRetry={() => refetch()}
         />
       ) : chartData.length === 0 ? (
-        <p className="py-8 text-center text-sm text-muted-foreground">No supply history by bid.</p>
+        <p className="py-8 text-center text-sm text-muted-foreground">No supply history by gesture.</p>
       ) : (
         <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
           <LineChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
