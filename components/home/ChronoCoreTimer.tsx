@@ -251,7 +251,7 @@ export function ChronoCoreTimer({
             >
               {showCountdown ? (
                 <Countdown
-                  key={`${phase}-${targetMs}`}
+                  key={phase}
                   date={targetMs}
                   renderer={renderMonumentCounter}
                   intervalDelay={100}

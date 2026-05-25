@@ -5,10 +5,15 @@ import { render, screen, checkA11y } from '@/test-utils';
 import { ChronoCoreTimer, getChronoCorePhase } from '../ChronoCoreTimer';
 
 const mockCountdownProps: Array<Record<string, unknown>> = [];
+let mockCountdownMounts = 0;
 
 jest.mock('react-countdown', () => ({
   __esModule: true,
-  default: (props: Record<string, unknown>) => {
+  default: function MockCountdown(props: Record<string, unknown>) {
+    const React = jest.requireActual('react') as typeof import('react');
+    React.useEffect(() => {
+      mockCountdownMounts += 1;
+    }, []);
     mockCountdownProps.push(props);
     return <div data-testid="chrono-countdown" />;
   },
@@ -69,6 +74,7 @@ describe('getChronoCorePhase', () => {
 describe('<ChronoCoreTimer />', () => {
   beforeEach(() => {
     mockCountdownProps.length = 0;
+    mockCountdownMounts = 0;
   });
 
   it('renders the clean monument clock with large smooth countdown props', () => {
@@ -92,6 +98,18 @@ describe('<ChronoCoreTimer />', () => {
           precision: 1,
         }),
       ]),
+    );
+  });
+
+  it('keeps the countdown mounted when the target time refreshes in the same phase', () => {
+    const { rerender } = render(<ChronoCoreTimer {...baseProps} />);
+
+    expect(mockCountdownMounts).toBe(1);
+    rerender(<ChronoCoreTimer {...baseProps} allocationTime={baseProps.allocationTime + 5_000} />);
+
+    expect(mockCountdownMounts).toBe(1);
+    expect(mockCountdownProps.at(-1)).toEqual(
+      expect.objectContaining({ date: baseProps.allocationTime + 5_000 }),
     );
   });
 

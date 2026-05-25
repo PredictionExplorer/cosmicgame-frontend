@@ -154,6 +154,13 @@ describe('Counter', () => {
     expect(container.querySelector('[class*="text-5xl"]')).toBeInTheDocument();
   });
 
+  it('renders with size="xl" for the game-page monument timer', () => {
+    const { container } = render(
+      <Counter {...baseProps} days={0} hours={1} minutes={30} seconds={0} size="xl" />,
+    );
+    expect(container.querySelector('[class*="lg:text-8xl"]')).toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <Counter {...baseProps} days={1} hours={2} minutes={30} seconds={45} />,

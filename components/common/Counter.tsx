@@ -64,6 +64,7 @@ const Counter = ({
   const isCritical = totalSeconds < 300 && totalSeconds > 0;
   const s = sizeClasses[size];
   const timeUnits = getTimeUnits(days, hours, minutes, seconds);
+  const isMonument = size === 'xl';
 
   return (
     <div className={cn('flex items-center justify-center', s.gap)}>
@@ -84,10 +85,12 @@ const Counter = ({
               <AnimatePresence mode="popLayout">
                 <motion.span
                   key={value}
-                  initial={{ y: -8, opacity: 0, filter: 'blur(4px)' }}
+                  initial={isMonument ? false : { y: -8, opacity: 0, filter: 'blur(4px)' }}
                   animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }}
-                  exit={{ y: 8, opacity: 0, filter: 'blur(4px)' }}
-                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  exit={
+                    isMonument ? { y: 0, opacity: 1 } : { y: 8, opacity: 0, filter: 'blur(4px)' }
+                  }
+                  transition={isMonument ? { duration: 0.08 } : { duration: 0.25, ease: 'easeOut' }}
                   className={cn(
                     'block font-display font-bold tabular-nums tracking-tight',
                     s.digit,
