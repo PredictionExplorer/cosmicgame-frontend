@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import Countdown from 'react-countdown';
 import { zeroAddress } from 'viem';
 import {
   ArrowLeft,
@@ -33,6 +32,7 @@ import { ErrorState } from '@/components/ui/error-state';
 import { Button } from '@/components/ui/button';
 import { RoundInfoSection } from '@/components/home/RoundInfoSection';
 import Counter from '@/components/common/Counter';
+import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import type { AttachedNFT as DonatedNFTType } from '@/services/api/types';
 import {
@@ -78,13 +78,29 @@ const CurrentRoundPage = () => {
   const [mountTime] = useState(() => Date.now());
   const nowMs = useNow(1000);
 
-  const allocationTime = useMemo(() => {
-    return getStableClientTargetTime({
+  const [allocationTime, setAllocationTime] = useState(() =>
+    getStableClientTargetTime({
       targetServerTimeSec: prizeTimeRaw,
       currentServerTimeSec: currentTimeRaw,
       currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
       fallbackNowMs: mountTime,
-    });
+    }),
+  );
+
+  useEffect(() => {
+    const updateId = window.setTimeout(() => {
+      setAllocationTime((previousTargetMs) =>
+        getStableClientTargetTime({
+          targetServerTimeSec: prizeTimeRaw,
+          currentServerTimeSec: currentTimeRaw,
+          currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
+          fallbackNowMs: mountTime,
+          previousTargetMs,
+          correctionToleranceMs: 1500,
+        }),
+      );
+    }, 0);
+    return () => window.clearTimeout(updateId);
   }, [prizeTimeRaw, currentTimeRaw, currentTimeUpdatedAt, mountTime]);
 
   const championList = useMemo(() => {
@@ -189,7 +205,7 @@ const CurrentRoundPage = () => {
                 className="ml-1.5"
               />
             </p>
-            <Countdown date={allocationTime} renderer={Counter} intervalDelay={100} precision={1} />
+            <SmoothCountdown date={allocationTime} renderer={Counter} />
           </div>
         )}
 

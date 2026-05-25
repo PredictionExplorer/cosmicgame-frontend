@@ -125,7 +125,12 @@ export function deriveChampionsState({
       : 0;
 
   const latestMatchesEndurance = sameAddress(latestGestureAddress, enduranceAddress);
-  const enduranceIsLive = latestMatchesEndurance && holdDuration > enduranceLockedDuration;
+  const latestBeatsEnduranceRecord =
+    !!latestGestureAddress && holdDuration > enduranceLockedDuration;
+  const effectiveEnduranceAddress = latestBeatsEnduranceRecord
+    ? latestGestureAddress
+    : enduranceAddress;
+  const enduranceIsLive = latestBeatsEnduranceRecord;
   const enduranceDuration = enduranceIsLive ? holdDuration : enduranceLockedDuration;
   const hasLatestGesture = !!latestGestureAddress;
   const hasEnduranceRecord = !!enduranceAddress;
@@ -142,9 +147,14 @@ export function deriveChampionsState({
   const source = data && isSnapshot(data) ? data.source : data ? 'api-v1' : 'none';
   const hasChronoSegmentData = !!(data && isSnapshot(data) && data.hasChronoSegmentData);
   const sourceNowSec = sourceNowSeconds(data, nowMs);
-  const chronoSegmentStart =
+  const sourceChronoSegmentStart =
     nonNegativeSeconds(data?.EnduranceChampionStartTimeStamp) +
     nonNegativeSeconds(data?.PrevEnduranceChampionDuration);
+  const localChronoSegmentStart =
+    latestBeatsEnduranceRecord && !latestMatchesEndurance && latestGestureTime > 0
+      ? latestGestureTime + enduranceLockedDuration + 1
+      : 0;
+  const chronoSegmentStart = localChronoSegmentStart || sourceChronoSegmentStart;
   const currentChronoSegmentDuration =
     hasChronoSegmentData && sourceNowSec !== null && chronoSegmentStart > 0
       ? Math.max(0, sourceNowSec - chronoSegmentStart)
@@ -161,6 +171,10 @@ export function deriveChampionsState({
     hasChronoSegmentData &&
     (chronoSegmentBeatsRecord ||
       (typeof data?.ChronoWarriorIsLive === 'boolean' && data.ChronoWarriorIsLive));
+  const effectiveChronoAddress =
+    chronoSegmentBeatsRecord && effectiveEnduranceAddress
+      ? effectiveEnduranceAddress
+      : chronoAddress;
   const chronoDuration =
     chronoIsLive && currentChronoSegmentDuration !== undefined
       ? Math.max(chronoLockedDuration, currentChronoSegmentDuration)
@@ -177,13 +191,13 @@ export function deriveChampionsState({
     isLoading,
     hasData: !!data,
     endurance: {
-      address: enduranceAddress,
+      address: effectiveEnduranceAddress,
       duration: enduranceDuration,
       lockedDuration: enduranceLockedDuration,
       isLive: enduranceIsLive,
     },
     chrono: {
-      address: chronoAddress,
+      address: effectiveChronoAddress,
       duration: chronoDuration,
       lockedDuration: chronoLockedDuration,
       isLive: chronoIsLive,
@@ -201,7 +215,7 @@ export function deriveChampionsState({
       address: latestGestureAddress,
       holdDuration,
       latestGestureTime: latestGestureTime > 0 ? latestGestureTime : null,
-      isCurrentEnduranceChampion: latestMatchesEndurance,
+      isCurrentEnduranceChampion: latestMatchesEndurance || latestBeatsEnduranceRecord,
       isExtendingEnduranceRecord: enduranceIsLive,
       durationToBeat,
       secondsUntilEnduranceChampion,

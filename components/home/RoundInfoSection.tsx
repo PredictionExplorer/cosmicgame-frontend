@@ -1,6 +1,6 @@
 'use client';
 
-import { type SyntheticEvent, type ComponentProps, useMemo, useState } from 'react';
+import { type SyntheticEvent, type ComponentProps, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Wallet, Clock, Users } from 'lucide-react';
 
@@ -16,6 +16,7 @@ import { FundDistribution } from '@/components/tokens/FundDistribution';
 import { DonatedTokensSection } from '@/components/home/DonatedTokensSection';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { useNow } from '@/hooks/useNow';
 import {
   Accordion,
   AccordionItem,
@@ -66,13 +67,13 @@ export function RoundInfoSection({
     return addrs.size;
   }, [curGestureList]);
 
-  const [mountTimeSec] = useState(() => Math.floor(Date.now() / 1000));
+  const nowMs = useNow(1000);
 
   const roundDuration = useMemo(() => {
     if (!data?.TsRoundStart) return '';
-    const elapsed = mountTimeSec - data.TsRoundStart;
+    const elapsed = Math.floor(nowMs / 1000) - data.TsRoundStart;
     return elapsed > 0 ? formatSeconds(elapsed) : '';
-  }, [data, mountTimeSec]);
+  }, [data, nowMs]);
 
   return (
     <div className="space-y-16">

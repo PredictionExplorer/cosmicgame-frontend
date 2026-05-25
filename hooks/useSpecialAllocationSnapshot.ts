@@ -27,6 +27,7 @@ interface ChainSpecialAllocationSnapshot {
   data: Partial<SpecialRecipients> & {
     StoredChronoWarriorDuration?: number;
   };
+  receivedAtMs?: number;
 }
 
 type ParticipantInfoResult =
@@ -101,7 +102,9 @@ export function normalizeSpecialAllocationSnapshot({
   return {
     ...merged,
     source: hasApiV2 ? 'api-v2' : shouldUseChain ? 'api-v1+chain' : 'api-v1',
-    receivedAtMs: shouldUseChain ? (chainReceivedAtMs ?? apiReceivedAtMs) : apiReceivedAtMs,
+    receivedAtMs: shouldUseChain
+      ? (chainData?.receivedAtMs ?? chainReceivedAtMs ?? apiReceivedAtMs)
+      : apiReceivedAtMs,
     hasChronoSegmentData,
     hasFinalCstTime: isFiniteNumber(merged.LastCstBidderLastBidTime),
     StoredChronoWarriorDuration: merged.StoredChronoWarriorDuration,
@@ -198,6 +201,7 @@ export async function fetchChainSpecialAllocationSnapshot({
       SourceBlockNumber: sourceBlockNumber,
       SourceBlockTimeStamp: sourceBlockTimeStamp,
     },
+    receivedAtMs: Date.now(),
   };
 }
 

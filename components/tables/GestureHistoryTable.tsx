@@ -26,6 +26,7 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { useBannedGestures } from '@/hooks/useApiQuery';
+import { useNow } from '@/hooks/useNow';
 
 interface GestureHistory {
   EvtLogId: number;
@@ -55,6 +56,7 @@ interface HistoryTableProps {
   perPage: number;
   curPage: number;
   showRound: boolean;
+  nowSec: number;
 }
 
 interface GestureHistoryTableProps {
@@ -212,7 +214,13 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
   );
 };
 
-const HistoryTable = ({ gestureHistory, perPage, curPage, showRound }: HistoryTableProps) => {
+const HistoryTable = ({
+  gestureHistory,
+  perPage,
+  curPage,
+  showRound,
+  nowSec,
+}: HistoryTableProps) => {
   const { data: bannedBids } = useBannedGestures();
   const bannedList = bannedBids?.map((x: { bid_id: number }) => x.bid_id) ?? [];
 
@@ -243,12 +251,11 @@ const HistoryTable = ({ gestureHistory, perPage, curPage, showRound }: HistoryTa
             <TablePrimaryHeadCell align="left">Message</TablePrimaryHeadCell>
           </Tr>
         </TablePrimaryHead>
-        {/* eslint-disable react-hooks/purity */}
         <tbody>
           {displayedGestures.map((history, index) => {
             const gestureDuration =
               (curPage - 1) * perPage + index === 0
-                ? Date.now() / 1000 - history.TimeStamp
+                ? nowSec - history.TimeStamp
                 : (gestureHistory[(curPage - 1) * perPage + index - 1]?.TimeStamp ??
                     history.TimeStamp) - history.TimeStamp;
 
@@ -263,7 +270,6 @@ const HistoryTable = ({ gestureHistory, perPage, curPage, showRound }: HistoryTa
             );
           })}
         </tbody>
-        {/* eslint-enable react-hooks/purity */}
       </TablePrimary>
     </TablePrimaryContainer>
   );
@@ -272,6 +278,7 @@ const HistoryTable = ({ gestureHistory, perPage, curPage, showRound }: HistoryTa
 const GestureHistoryTable = ({ gestureHistory, showRound = true }: GestureHistoryTableProps) => {
   const perPage = 5;
   const [curPage, setCurrentPage] = useState(1);
+  const nowSec = Math.floor(useNow(1000) / 1000);
 
   return (
     <div className="mt-4">
@@ -282,6 +289,7 @@ const GestureHistoryTable = ({ gestureHistory, showRound = true }: GestureHistor
             perPage={perPage}
             curPage={curPage}
             showRound={showRound}
+            nowSec={nowSec}
           />
           <CustomPagination
             page={curPage}

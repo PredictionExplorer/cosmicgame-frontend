@@ -21,9 +21,8 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
 }));
 
-jest.mock('react-countdown', () => ({
-  __esModule: true,
-  default: (props: { date: number }) => {
+jest.mock('../../../components/common/SmoothCountdown', () => ({
+  SmoothCountdown: (props: { date: number }) => {
     mockCountdownProps.push(props as Record<string, unknown>);
     return <div data-testid="countdown">countdown-target:{props.date}</div>;
   },
@@ -162,12 +161,7 @@ describe('CurrentRoundPage', () => {
     expect(screen.getByText('Cycle finalizes in')).toBeInTheDocument();
     expect(screen.getByTestId('countdown')).toBeInTheDocument();
     expect(mockCountdownProps).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          intervalDelay: 100,
-          precision: 1,
-        }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ date: expect.any(Number) })]),
     );
   });
 

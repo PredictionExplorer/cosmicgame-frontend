@@ -495,6 +495,8 @@ describe('HomePage', () => {
 
     expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1);
     expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
+    expect(mockInvalidateQueries).toHaveBeenCalledWith({ queryKey: ['currentSpecialWinners'] });
+    expect(mockGestureForm.setMessage).toHaveBeenCalledWith('');
   });
 
   it('submits a CST gesture through the CST interaction path', async () => {

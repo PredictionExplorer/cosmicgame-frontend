@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePublicClient } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { zeroAddress } from 'viem';
@@ -32,12 +32,27 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
   const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
   const { data: claimHistoryRaw } = useClaimHistory();
 
-  const allocationTime = useMemo(() => {
-    return getStableClientTargetTime({
+  const [allocationTime, setAllocationTime] = useState(() =>
+    getStableClientTargetTime({
       targetServerTimeSec: prizeTimeRaw,
       currentServerTimeSec: currentTimeRaw,
       currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
-    });
+    }),
+  );
+
+  useEffect(() => {
+    const updateId = window.setTimeout(() => {
+      setAllocationTime((previousTargetMs) =>
+        getStableClientTargetTime({
+          targetServerTimeSec: prizeTimeRaw,
+          currentServerTimeSec: currentTimeRaw,
+          currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
+          previousTargetMs,
+          correctionToleranceMs: 1500,
+        }),
+      );
+    }, 0);
+    return () => window.clearTimeout(updateId);
   }, [prizeTimeRaw, currentTimeRaw, currentTimeUpdatedAt]);
 
   const claimHistory =

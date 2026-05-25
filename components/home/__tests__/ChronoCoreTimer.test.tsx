@@ -7,9 +7,8 @@ import { ChronoCoreTimer, getChronoCorePhase } from '../ChronoCoreTimer';
 const mockCountdownProps: Array<Record<string, unknown>> = [];
 let mockCountdownMounts = 0;
 
-jest.mock('react-countdown', () => ({
-  __esModule: true,
-  default: function MockCountdown(props: Record<string, unknown>) {
+jest.mock('../../common/SmoothCountdown', () => ({
+  SmoothCountdown: function MockSmoothCountdown(props: Record<string, unknown>) {
     const React = jest.requireActual('react') as typeof import('react');
     React.useEffect(() => {
       mockCountdownMounts += 1;
@@ -94,12 +93,7 @@ describe('<ChronoCoreTimer />', () => {
       '#make-gesture',
     );
     expect(mockCountdownProps).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          intervalDelay: 100,
-          precision: 1,
-        }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ date: baseProps.allocationTime })]),
     );
   });
 

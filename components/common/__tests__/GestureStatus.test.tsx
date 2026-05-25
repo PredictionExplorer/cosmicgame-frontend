@@ -17,9 +17,8 @@ jest.mock('../../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: '0xUser' }),
 }));
 
-jest.mock('react-countdown', () => ({
-  __esModule: true,
-  default: (props: Record<string, unknown>) => {
+jest.mock('../SmoothCountdown', () => ({
+  SmoothCountdown: (props: Record<string, unknown>) => {
     mockCountdownProps.push(props);
     return <div data-testid="countdown" />;
   },
@@ -106,12 +105,7 @@ describe('GestureStatus', () => {
     );
 
     expect(mockCountdownProps).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          intervalDelay: 100,
-          precision: 1,
-        }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ date: expect.any(Number) })]),
     );
   });
 

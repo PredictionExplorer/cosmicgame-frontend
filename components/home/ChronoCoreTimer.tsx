@@ -1,11 +1,11 @@
 'use client';
 
-import Countdown from 'react-countdown';
 import type { CountdownRenderProps } from 'react-countdown';
 import Link from 'next/link';
 import { ArrowRight, Clock3 } from 'lucide-react';
 
 import Counter from '@/components/common/Counter';
+import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Surface } from '@/components/ui/surface';
 import { cn } from '@/lib/utils';
@@ -250,13 +250,7 @@ export function ChronoCoreTimer({
               aria-label={`${view.label}. ${view.status}`}
             >
               {showCountdown ? (
-                <Countdown
-                  key={phase}
-                  date={targetMs}
-                  renderer={renderMonumentCounter}
-                  intervalDelay={100}
-                  precision={1}
-                />
+                <SmoothCountdown date={targetMs} renderer={renderMonumentCounter} />
               ) : (
                 <div className="flex min-h-[112px] items-center justify-center">
                   <p className="font-display text-4xl font-bold tracking-tight text-gradient-signature sm:text-6xl">

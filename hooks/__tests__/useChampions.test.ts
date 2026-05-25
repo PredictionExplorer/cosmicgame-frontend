@@ -75,8 +75,9 @@ describe('deriveChampionsState', () => {
       },
       nowMs: 1_100_000,
     });
-    expect(lockedState.endurance.isLive).toBe(false);
-    expect(lockedState.endurance.duration).toBe(100);
+    expect(lockedState.endurance.address).toBe('0x3333333333333333333333333333333333333333');
+    expect(lockedState.endurance.isLive).toBe(true);
+    expect(lockedState.endurance.duration).toBe(200);
   });
 
   it('computes latest participant progress toward the endurance record', () => {
@@ -176,6 +177,35 @@ describe('deriveChampionsState', () => {
     expect(state.latestGesture.progressToEnduranceChampion).toBe(100);
   });
 
+  it('promotes a different latest participant to live endurance at the strict threshold', () => {
+    const challenger = '0x3333333333333333333333333333333333333333';
+    const tiedState = deriveChampionsState({
+      data: {
+        ...baseSnapshot,
+        LastBidderAddress: challenger,
+        LastBidderLastBidTime: 1_000,
+      },
+      nowMs: 1_100_000,
+    });
+
+    expect(tiedState.endurance.address).toBe(baseSnapshot.EnduranceChampionAddress);
+    expect(tiedState.endurance.isLive).toBe(false);
+
+    const winningState = deriveChampionsState({
+      data: {
+        ...baseSnapshot,
+        LastBidderAddress: challenger,
+        LastBidderLastBidTime: 999,
+      },
+      nowMs: 1_100_000,
+    });
+
+    expect(winningState.endurance.address).toBe(challenger);
+    expect(winningState.endurance.duration).toBe(101);
+    expect(winningState.endurance.isLive).toBe(true);
+    expect(winningState.latestGesture.isCurrentEnduranceChampion).toBe(true);
+  });
+
   it('does not grow chrono from address equality without segment data', () => {
     const state = deriveChampionsState({
       data: baseSnapshot,
@@ -206,6 +236,36 @@ describe('deriveChampionsState', () => {
     expect(liveState.chrono.duration).toBe(105);
     expect(liveState.chrono.currentSegmentDuration).toBe(105);
     expect(liveState.chrono.sourceText).toBe('Chain verified');
+  });
+
+  it('switches chrono ownership to the effective live endurance owner when the segment wins', () => {
+    const challenger = '0x3333333333333333333333333333333333333333';
+    const state = deriveChampionsState({
+      data: snapshot(
+        {
+          ...baseSnapshot,
+          EnduranceChampionDuration: 100,
+          ChronoWarriorDuration: 50,
+          ChronoWarriorAddress: '0x4444444444444444444444444444444444444444',
+          LastBidderAddress: challenger,
+          LastBidderLastBidTime: 900,
+        },
+        {
+          source: 'api-v1+chain',
+          receivedAtMs: 1_000_000,
+          hasChronoSegmentData: true,
+          EnduranceChampionStartTimeStamp: 700,
+          PrevEnduranceChampionDuration: 100,
+          SourceBlockTimeStamp: 1_000,
+          StoredChronoWarriorDuration: 50,
+        },
+      ),
+      nowMs: 1_100_000,
+    });
+
+    expect(state.endurance.address).toBe(challenger);
+    expect(state.chrono.address).toBe(challenger);
+    expect(state.chrono.isLive).toBe(true);
   });
 
   it('shows when chrono starts growing if the source-backed segment is below record', () => {

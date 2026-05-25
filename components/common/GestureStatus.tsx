@@ -2,7 +2,6 @@
 
 import { useMemo, type ReactNode } from 'react';
 import { formatEther, zeroAddress } from 'viem';
-import Countdown from 'react-countdown';
 import { Trophy, Coins, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -16,6 +15,7 @@ import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
 
 import Counter from './Counter';
+import { SmoothCountdown } from './SmoothCountdown';
 
 interface EthGestureInfo {
   ETHPrice: number;
@@ -199,7 +199,7 @@ export const GestureStatus = ({
             Cycle {data.CurRoundNum} opens at {convertTimestampToDateTime(activationTime, true)}
           </p>
           <div className="mt-4">
-            <Countdown key={3} date={activationTime * 1000} renderer={Counter} />
+            <SmoothCountdown date={activationTime * 1000} renderer={Counter} />
           </div>
         </motion.div>
       ) : data && data.TsRoundStart !== 0 ? (
@@ -221,13 +221,7 @@ export const GestureStatus = ({
                     className="ml-1.5"
                   />
                 </p>
-                <Countdown
-                  key={0}
-                  date={allocationTime}
-                  renderer={Counter}
-                  intervalDelay={100}
-                  precision={1}
-                />
+                <SmoothCountdown date={allocationTime} renderer={Counter} />
               </motion.div>
             ) : (
               <motion.div

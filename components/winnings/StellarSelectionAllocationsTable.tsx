@@ -15,6 +15,7 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
+import { useNow } from '@/hooks/useNow';
 
 /** A single stellarSelection ETH winning entry. */
 export interface StellarSelectionAllocation {
@@ -36,11 +37,11 @@ function StellarSelectionAllocationRow({
   roundTimeout: number;
 }) {
   const { TxHash, TimeStamp, RoundNum, Amount, WinnerAddr, Claimed } = winning;
+  const nowSec = Math.ceil(useNow(1000) / 1000);
 
   if (!winning) return <TablePrimaryRow />;
 
-  /* eslint-disable react-hooks/purity */
-  const isExpired = roundTimeout > 0 && roundTimeout < Date.now() / 1000;
+  const isExpired = roundTimeout > 0 && roundTimeout < nowSec;
 
   return (
     <TablePrimaryRow>
@@ -78,9 +79,7 @@ function StellarSelectionAllocationRow({
         {roundTimeout ? (
           <>
             {convertTimestampToDateTime(roundTimeout)}{' '}
-            {isExpired
-              ? '(Expired)'
-              : `(${formatSeconds(roundTimeout - Math.ceil(Date.now() / 1000))})`}
+            {isExpired ? '(Expired)' : `(${formatSeconds(roundTimeout - nowSec)})`}
           </>
         ) : (
           ' '
@@ -90,7 +89,6 @@ function StellarSelectionAllocationRow({
       <TablePrimaryCell align="center">{Claimed ? 'Yes' : 'No'}</TablePrimaryCell>
     </TablePrimaryRow>
   );
-  /* eslint-enable react-hooks/purity */
 }
 
 /**

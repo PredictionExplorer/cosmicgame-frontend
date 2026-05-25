@@ -39,6 +39,30 @@ describe('getStableClientTargetTime', () => {
     ).toBe(40_000);
   });
 
+  it('keeps the previous target for tiny server-clock corrections', () => {
+    expect(
+      getStableClientTargetTime({
+        targetServerTimeSec: 1_300,
+        currentServerTimeSec: 1_000,
+        currentServerTimeUpdatedAtMs: 50_900,
+        previousTargetMs: 350_000,
+        correctionToleranceMs: 1500,
+      }),
+    ).toBe(350_000);
+  });
+
+  it('accepts meaningful target changes instead of clamping real extensions', () => {
+    expect(
+      getStableClientTargetTime({
+        targetServerTimeSec: 1_305,
+        currentServerTimeSec: 1_000,
+        currentServerTimeUpdatedAtMs: 50_000,
+        previousTargetMs: 350_000,
+        correctionToleranceMs: 1500,
+      }),
+    ).toBe(355_000);
+  });
+
   it('returns 0 when server timestamps are incomplete', () => {
     expect(
       getStableClientTargetTime({

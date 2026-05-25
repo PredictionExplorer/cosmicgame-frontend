@@ -24,6 +24,7 @@ import { SystemModeProvider } from '@/contexts/SystemModeContext';
 import { ApiDataProvider } from '@/contexts/ApiDataContext';
 import { ContractAddressesProvider } from '@/contexts/ContractAddressesContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
+import { useLiveGameDataRefresh } from '@/hooks/useLiveGameDataRefresh';
 import { reportError } from '@/utils/errors';
 import { installGlobalErrorHandlers } from '@/utils/globalErrorHandlers';
 import { getClientBuildInfo } from '@/lib/buildInfo';
@@ -62,6 +63,11 @@ function makeQueryClient() {
       },
     },
   });
+}
+
+function LiveGameDataRefresh() {
+  useLiveGameDataRefresh();
+  return null;
 }
 
 const particleOptions: ISourceOptions = {
@@ -236,6 +242,7 @@ export function Providers({
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <ContractAddressesProvider>
+          <LiveGameDataRefresh />
           <RainbowKitProvider theme={cosmicRainbowTheme}>
             {engineReady && <ParticleBackdrop />}
             <ErrorBoundary>

@@ -39,6 +39,8 @@ interface StableClientTargetTimeArgs {
   currentServerTimeSec: number | null | undefined;
   currentServerTimeUpdatedAtMs?: number;
   fallbackNowMs?: number;
+  previousTargetMs?: number;
+  correctionToleranceMs?: number;
 }
 
 /**
@@ -51,9 +53,19 @@ export function getStableClientTargetTime({
   currentServerTimeSec,
   currentServerTimeUpdatedAtMs = 0,
   fallbackNowMs = Date.now(),
+  previousTargetMs = 0,
+  correctionToleranceMs = 0,
 }: StableClientTargetTimeArgs): number {
   if (targetServerTimeSec == null || currentServerTimeSec == null) return 0;
 
   const anchorMs = currentServerTimeUpdatedAtMs > 0 ? currentServerTimeUpdatedAtMs : fallbackNowMs;
-  return anchorMs + (targetServerTimeSec - currentServerTimeSec) * 1000;
+  const targetMs = anchorMs + (targetServerTimeSec - currentServerTimeSec) * 1000;
+  if (
+    previousTargetMs > 0 &&
+    correctionToleranceMs > 0 &&
+    Math.abs(targetMs - previousTargetMs) <= correctionToleranceMs
+  ) {
+    return previousTargetMs;
+  }
+  return targetMs;
 }

@@ -4,18 +4,21 @@ import { useState, useEffect, useMemo, useRef, useSyncExternalStore } from 'reac
 import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
 import { ArrowRight } from 'lucide-react';
-import Countdown from 'react-countdown';
+import type { CountdownRenderProps } from 'react-countdown';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 
+import { formatSeconds } from '@/utils';
+
+import { reportError } from '@/utils/errors';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
+import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { PageShell } from '@/components/ui/page-shell';
 import { useActiveWeb3React } from '@/hooks/web3';
-import { reportError } from '@/utils/errors';
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import { GestureStatus } from '@/components/common/GestureStatus';
 import { ChronoCoreTimer } from '@/components/home/ChronoCoreTimer';
@@ -26,6 +29,7 @@ import Allocation from '@/components/common/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
+import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useNow } from '@/hooks/useNow';
 import {
   useDashboardInfo,
@@ -56,6 +60,10 @@ const sectionFade = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
+function renderInlineCountdown({ total }: CountdownRenderProps) {
+  return <span className="font-mono tabular-nums">{formatSeconds(Math.ceil(total / 1000))}</span>;
+}
+
 const HomePage = () => {
   const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
@@ -68,7 +76,7 @@ const HomePage = () => {
   );
 
   const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo();
-  const { data: currentTimeData } = useCurrentTime();
+  const { data: currentTimeData, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
 
   const round = dashboardData?.CurRoundNum ?? -1;
   const { data: bidListData } = useGestureListByCycle(round, 'desc');
@@ -80,11 +88,13 @@ const HomePage = () => {
   // Re-renders every second so countdown comparisons (allocationTime > now,
   // claimWait > now, activationTime check) update without bare Date.now().
   const now = useNow(1000);
+  const [currentTimeFallbackMs] = useState(() => Date.now());
 
   const offset = useMemo(() => {
     if (currentTimeData == null) return 0;
-    return currentTimeData * 1000 - now;
-  }, [currentTimeData, now]);
+    const sampledAtMs = currentTimeUpdatedAt || currentTimeFallbackMs;
+    return currentTimeData * 1000 - sampledAtMs;
+  }, [currentTimeData, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
   const [bannerTokenId, setBannerTokenId] = useState<number | null>(null);
 
@@ -137,11 +147,12 @@ const HomePage = () => {
   const { fetchActivationTime, allocationTime, timeoutFinalize, isClaiming, activationTime } =
     allocationFinalize;
 
-  const withPostTxRefresh = (afterMs = 1500, activationMs = 3000) => {
+  const withPostTxRefresh = (retryMs = 1500, activationMs = 3000) => {
+    void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'refresh live data'));
+    gestureForm.setMessage('');
     setTimeout(() => {
-      queryClient.invalidateQueries();
-      gestureForm.setMessage('');
-    }, afterMs);
+      void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'retry live data'));
+    }, retryMs);
     setTimeout(() => {
       fetchActivationTime().catch((e) => reportError(e, 'fetchActivationTime'));
     }, activationMs);
@@ -316,7 +327,11 @@ const HomePage = () => {
                                 {claimWait > now && data?.LastBidderAddr !== account && (
                                   <>
                                     &nbsp;available in &nbsp;
-                                    <Countdown date={claimWait} />
+                                    <SmoothCountdown
+                                      date={claimWait}
+                                      renderer={renderInlineCountdown}
+                                      intervalMs={1000}
+                                    />
                                   </>
                                 )}
                                 &nbsp;
