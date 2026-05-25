@@ -113,7 +113,7 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
     case 'approach':
       return {
         label: 'Under 12 hours',
-        status: 'Each Gesture can extend the timer.',
+        status: 'Each Gesture extends the Cycle Finalization Time.',
         toneClass:
           'border-primary/35 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--nebula-violet-rgb)/0.14))]',
         haloClass: 'border-primary/30 bg-primary/[0.045]',
@@ -166,7 +166,7 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
     default:
       return {
         label: 'Time left',
-        status: 'Each Gesture can extend the timer.',
+        status: 'Each Gesture extends the Cycle Finalization Time.',
         toneClass:
           'border-primary/25 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.12),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--nebula-violet-rgb)/0.13))]',
         haloClass: 'border-primary/25 bg-primary/[0.035]',

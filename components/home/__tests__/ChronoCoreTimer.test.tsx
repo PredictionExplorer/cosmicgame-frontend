@@ -83,7 +83,9 @@ describe('<ChronoCoreTimer />', () => {
     const timer = screen.getByTestId('chrono-core-timer');
     expect(timer).toHaveAttribute('data-phase', 'stable');
     expect(screen.getByText('Time left in this cycle')).toBeInTheDocument();
-    expect(screen.getByText('Each Gesture can extend the timer.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Each Gesture extends the Cycle Finalization Time.'),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Protocol clock locked')).not.toBeInTheDocument();
     expect(screen.queryByText('Chrono Core')).not.toBeInTheDocument();
     expect(screen.queryByText('2.5000 ETH')).not.toBeInTheDocument();

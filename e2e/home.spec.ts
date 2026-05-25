@@ -30,7 +30,9 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await expect(chronoCore).toBeVisible({ timeout: 15000 });
     await expect(chronoCore.getByText('Time left in this cycle')).toBeVisible();
     await expect(
-      chronoCore.getByText(/Each Gesture can extend the timer|Cycle ready to finalize/),
+      chronoCore.getByText(
+        /Each Gesture extends the Cycle Finalization Time|Cycle ready to finalize/,
+      ),
     ).toBeVisible();
     await expect(chronoCore.getByRole('timer')).toBeVisible();
   });
