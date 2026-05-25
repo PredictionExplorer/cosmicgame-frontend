@@ -132,7 +132,13 @@ jest.mock('../../components/home/GestureForm', () => ({
 }));
 
 jest.mock('../../components/attachments/DonatedNFTPrizeShowcase', () => ({
-  DonatedNFTPrizeShowcase: ({ nfts, cycleNumber }: { nfts: unknown[]; cycleNumber?: number }) =>
+  AttachedNFTAllocationShowcase: ({
+    nfts,
+    cycleNumber,
+  }: {
+    nfts: unknown[];
+    cycleNumber?: number;
+  }) =>
     nfts.length > 0 ? (
       <section
         data-testid="attached-nft-showcase"

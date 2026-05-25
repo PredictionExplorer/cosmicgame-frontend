@@ -25,7 +25,7 @@ import { ChronoCoreTimer } from '@/components/home/ChronoCoreTimer';
 import { GestureForm } from '@/components/home/GestureForm';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
-import { DonatedNFTPrizeShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
+import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import Allocation from '@/components/common/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
@@ -240,7 +240,10 @@ const HomePage = () => {
           canOpenGesturePanel={!loading && isRoundActive}
         />
 
-        <DonatedNFTPrizeShowcase nfts={donatedNFTs} cycleNumber={round >= 0 ? round : undefined} />
+        <AttachedNFTAllocationShowcase
+          nfts={donatedNFTs}
+          cycleNumber={round >= 0 ? round : undefined}
+        />
 
         {/* ===== BIDDING STATUS (countdown + stats) ===== */}
         <GestureStatus

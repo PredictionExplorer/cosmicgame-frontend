@@ -21,24 +21,24 @@ import {
 import { useAttachedNftMetadata } from './useAttachedNftMetadata';
 import { useNFTCollectionEstimate } from './useNFTCollectionEstimate';
 
-interface DonatedNFTPrizeShowcaseProps {
+interface AttachedNFTAllocationShowcaseProps {
   nfts: AttachedNFT[];
   cycleNumber?: number;
   className?: string;
 }
 
-export function DonatedNFTPrizeShowcase({
+export function AttachedNFTAllocationShowcase({
   nfts,
   cycleNumber,
   className,
-}: DonatedNFTPrizeShowcaseProps) {
+}: AttachedNFTAllocationShowcaseProps) {
   if (nfts.length === 0) return null;
 
   const hasMultiple = nfts.length > 1;
 
   return (
     <section
-      aria-labelledby="attached-nft-prize-title"
+      aria-labelledby="attached-nft-allocation-title"
       className={cn('print-motion-visible my-8', className)}
     >
       <Surface variant="gradient-border-accent" radius="xl" padding="none" className="isolate">
@@ -53,7 +53,7 @@ export function DonatedNFTPrizeShowcase({
                 Included in Signature Allocation
               </div>
               <h2
-                id="attached-nft-prize-title"
+                id="attached-nft-allocation-title"
                 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl"
               >
                 {hasMultiple
@@ -62,8 +62,8 @@ export function DonatedNFTPrizeShowcase({
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
                 {hasMultiple
-                  ? `The Final Gesture winner receives all ${nfts.length} attached NFTs when Cycle #${cycleNumber ?? nfts[0]?.RoundNum ?? 'current'} finalizes.`
-                  : `The Final Gesture winner receives this attached NFT when Cycle #${cycleNumber ?? nfts[0]?.RoundNum ?? 'current'} finalizes.`}
+                  ? `The Final Gesture participant receives all ${nfts.length} attached NFTs when Cycle #${cycleNumber ?? nfts[0]?.RoundNum ?? 'current'} finalizes.`
+                  : `The Final Gesture participant receives this attached NFT when Cycle #${cycleNumber ?? nfts[0]?.RoundNum ?? 'current'} finalizes.`}
               </p>
             </div>
 
@@ -71,7 +71,7 @@ export function DonatedNFTPrizeShowcase({
               <Gift className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Attached Prize
+                  Attached Allocation
                 </p>
                 <p className="text-sm font-bold text-white">
                   {nfts.length} ERC-721 token{nfts.length === 1 ? '' : 's'}
@@ -89,7 +89,7 @@ export function DonatedNFTPrizeShowcase({
             )}
           >
             {nfts.slice(0, 4).map((nft, index) => (
-              <DonatedNFTPrizeCard
+              <AttachedNFTAllocationCard
                 key={String(
                   nft.RecordId ?? `${nft.TokenAddr}-${getAttachedNftTokenId(nft) ?? index}`,
                 )}
@@ -111,7 +111,7 @@ export function DonatedNFTPrizeShowcase({
   );
 }
 
-function DonatedNFTPrizeCard({ nft, featured }: { nft: AttachedNFT; featured: boolean }) {
+function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featured: boolean }) {
   const { data: metadata, isError } = useAttachedNftMetadata(nft.NFTTokenURI);
   const tokenId = getAttachedNftTokenId(nft);
   const primaryLink = resolveAttachedNftLink({ nft, metadata });
@@ -125,7 +125,7 @@ function DonatedNFTPrizeCard({ nft, featured }: { nft: AttachedNFT; featured: bo
 
   const title = metadata?.name ?? (tokenId ? `NFT #${tokenId}` : 'Attached NFT');
   const subtitle = metadata?.collection_name ?? metadata?.platform ?? 'Community-attached ERC-721';
-  const imageAlt = metadata?.name ? `Attached NFT ${metadata.name}` : 'Attached NFT prize';
+  const imageAlt = metadata?.name ? `Attached NFT ${metadata.name}` : 'Attached NFT allocation';
 
   return (
     <article
@@ -165,7 +165,7 @@ function DonatedNFTPrizeCard({ nft, featured }: { nft: AttachedNFT; featured: bo
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                Winner receives
+                Recipient receives
               </span>
               {estimate ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--solar-gold-rgb)/0.25)] bg-[rgb(var(--solar-gold-rgb)/0.10)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--solar-gold-rgb))]">
@@ -183,7 +183,7 @@ function DonatedNFTPrizeCard({ nft, featured }: { nft: AttachedNFT; featured: bo
             {isError ? (
               <p className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs text-muted-foreground">
                 <ImageOff className="h-3.5 w-3.5" />
-                Metadata unavailable. The attached NFT is still part of the cycle prize.
+                Metadata unavailable. The attached NFT is still part of this cycle allocation.
               </p>
             ) : metadata?.description && featured ? (
               <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">

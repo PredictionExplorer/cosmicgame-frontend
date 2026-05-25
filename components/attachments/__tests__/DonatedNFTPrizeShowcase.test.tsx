@@ -4,7 +4,7 @@ import type { AttachedNFT } from '@/services/api/types';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
-import { DonatedNFTPrizeShowcase } from '../DonatedNFTPrizeShowcase';
+import { AttachedNFTAllocationShowcase } from '../DonatedNFTPrizeShowcase';
 
 jest.mock('../../nft/NFTImage', () => ({
   __esModule: true,
@@ -24,7 +24,7 @@ jest.mock('../useNFTCollectionEstimate', () => ({
 }));
 
 const CONTRACT = '0x1234567890abcdef1234567890abcdef12345678';
-const DONOR = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
+const CONTRIBUTOR = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
 
 function createNft(overrides: Partial<AttachedNFT> = {}): AttachedNFT {
   return {
@@ -36,7 +36,7 @@ function createNft(overrides: Partial<AttachedNFT> = {}): AttachedNFT {
     DateTime: '2023-11-14T00:00:00Z',
     RecordId: 1,
     RoundNum: 42,
-    DonorAddr: DONOR,
+    DonorAddr: CONTRIBUTOR,
     TokenAddr: CONTRACT,
     NFTTokenId: 123,
     NFTTokenURI: 'https://metadata.example/123',
@@ -62,27 +62,27 @@ beforeEach(() => {
   mockUseNFTCollectionEstimate.mockReturnValue({ data: null });
 });
 
-describe('DonatedNFTPrizeShowcase', () => {
+describe('AttachedNFTAllocationShowcase', () => {
   it('renders nothing when there are no NFTs', () => {
-    const { container } = render(<DonatedNFTPrizeShowcase nfts={[]} cycleNumber={42} />);
+    const { container } = render(<AttachedNFTAllocationShowcase nfts={[]} cycleNumber={42} />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders single NFT winner copy prominently', () => {
-    render(<DonatedNFTPrizeShowcase nfts={[createNft()]} cycleNumber={42} />);
+  it('renders single NFT allocation copy prominently', () => {
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
     expect(screen.getByText('Bonus NFT attached to this cycle')).toBeInTheDocument();
     expect(
       screen.getByText(
-        'The Final Gesture winner receives this attached NFT when Cycle #42 finalizes.',
+        'The Final Gesture participant receives this attached NFT when Cycle #42 finalizes.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('Included in Signature Allocation')).toBeInTheDocument();
   });
 
-  it('renders multiple NFT winner copy and count', () => {
+  it('renders multiple NFT allocation copy and count', () => {
     render(
-      <DonatedNFTPrizeShowcase
+      <AttachedNFTAllocationShowcase
         nfts={[createNft(), createNft({ RecordId: 2, NFTTokenId: 456 })]}
         cycleNumber={42}
       />,
@@ -91,14 +91,14 @@ describe('DonatedNFTPrizeShowcase', () => {
     expect(screen.getByText('Bonus NFTs attached to this cycle')).toBeInTheDocument();
     expect(
       screen.getByText(
-        'The Final Gesture winner receives all 2 attached NFTs when Cycle #42 finalizes.',
+        'The Final Gesture participant receives all 2 attached NFTs when Cycle #42 finalizes.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('2 ERC-721 tokens')).toBeInTheDocument();
   });
 
-  it('displays metadata image, title, collection, token id, donor, and actions', () => {
-    render(<DonatedNFTPrizeShowcase nfts={[createNft()]} cycleNumber={42} />);
+  it('displays metadata image, title, collection, token id, contributor, and actions', () => {
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
     expect(screen.getByAltText('Attached NFT Chromie Squiggle #123')).toHaveAttribute(
       'src',
@@ -120,7 +120,10 @@ describe('DonatedNFTPrizeShowcase', () => {
       'href',
       expect.stringContaining(CONTRACT),
     );
-    expect(screen.getByRole('link', { name: /0xabcd/i })).toHaveAttribute('href', `/user/${DONOR}`);
+    expect(screen.getByRole('link', { name: /0xabcd/i })).toHaveAttribute(
+      'href',
+      `/user/${CONTRIBUTOR}`,
+    );
   });
 
   it('falls back to OpenSea as the primary action when project link is unavailable', () => {
@@ -132,7 +135,7 @@ describe('DonatedNFTPrizeShowcase', () => {
       isError: false,
     });
 
-    render(<DonatedNFTPrizeShowcase nfts={[createNft()]} cycleNumber={42} />);
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
     expect(
       screen
@@ -143,22 +146,27 @@ describe('DonatedNFTPrizeShowcase', () => {
     ).toBe(true);
   });
 
-  it('keeps the prize visible when metadata fails', () => {
+  it('keeps the allocation visible when metadata fails', () => {
     mockUseAttachedNftMetadata.mockReturnValue({ data: null, isError: true });
 
-    render(<DonatedNFTPrizeShowcase nfts={[createNft()]} cycleNumber={42} />);
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
-    expect(screen.getByAltText('Attached NFT prize')).toHaveAttribute('src', '/images/qmark.png');
+    expect(screen.getByAltText('Attached NFT allocation')).toHaveAttribute(
+      'src',
+      '/images/qmark.png',
+    );
     expect(screen.getByText('NFT #123')).toBeInTheDocument();
     expect(
-      screen.getByText('Metadata unavailable. The attached NFT is still part of the cycle prize.'),
+      screen.getByText(
+        'Metadata unavailable. The attached NFT is still part of this cycle allocation.',
+      ),
     ).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: /View on OpenSea/i }).length).toBeGreaterThan(0);
   });
 
   it('handles missing token id without hiding the card', () => {
     render(
-      <DonatedNFTPrizeShowcase
+      <AttachedNFTAllocationShowcase
         nfts={[createNft({ NFTTokenId: undefined, TokenId: undefined })]}
         cycleNumber={42}
       />,
@@ -180,7 +188,7 @@ describe('DonatedNFTPrizeShowcase', () => {
       },
     });
 
-    render(<DonatedNFTPrizeShowcase nfts={[createNft()]} cycleNumber={42} />);
+    render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
     expect(screen.getByText(/Floor ~0.420 ETH/)).toBeInTheDocument();
   });
@@ -190,7 +198,7 @@ describe('DonatedNFTPrizeShowcase', () => {
       createNft({ RecordId: index + 1, NFTTokenId: index + 1 }),
     );
 
-    render(<DonatedNFTPrizeShowcase nfts={nfts} cycleNumber={42} />);
+    render(<AttachedNFTAllocationShowcase nfts={nfts} cycleNumber={42} />);
 
     expect(screen.getAllByTestId('nft-image')).toHaveLength(4);
     expect(
@@ -199,7 +207,9 @@ describe('DonatedNFTPrizeShowcase', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(<DonatedNFTPrizeShowcase nfts={[createNft()]} cycleNumber={42} />);
+    const { container } = render(
+      <AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />,
+    );
     await checkA11y(container);
   });
 });
