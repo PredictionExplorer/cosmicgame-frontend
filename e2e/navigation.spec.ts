@@ -148,9 +148,9 @@ test.describe('Navigation', () => {
 
   test('Logo link navigates to home', async ({ page }) => {
     await page.goto('/gallery', { waitUntil: 'domcontentloaded' });
-    const logoLink = page.locator('header a[href="/"]').first();
+    const logoLink = page.locator('header a[href="/"]:visible').first();
     await logoLink.waitFor({ state: 'visible', timeout: 10000 });
-    await logoLink.click();
+    await Promise.all([page.waitForURL('/'), logoLink.click()]);
     await expect(page).toHaveURL('/');
   });
 

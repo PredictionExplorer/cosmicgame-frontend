@@ -543,7 +543,7 @@ describe('HomePage', () => {
     const user = userEvent.setup();
     const finalGestureParticipant = '0x1234567890abcdef1234567890abcdef12345678';
     mockAccount = finalGestureParticipant;
-    mockAllocationFinalize.allocationTime = Date.now() - 1_000;
+    mockAllocationFinalize.allocationTime = 1;
     mockAllocationFinalize.timeoutFinalize = 0;
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ LastBidderAddr: finalGestureParticipant }),
@@ -551,11 +551,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    const finalizeButton = screen
-      .getAllByRole('button')
-      .find((button) => button.textContent?.includes('Finalize Cycle'));
-    expect(finalizeButton).toBeDefined();
-    await user.click(finalizeButton!);
+    await user.click(screen.getByRole('button', { name: /Finalize Cycle/ }));
 
     expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1);
   });

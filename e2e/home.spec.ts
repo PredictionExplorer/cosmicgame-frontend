@@ -28,7 +28,10 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   test('shows the Chrono Core timer at the top of the game page', async ({ page }) => {
     const chronoCore = page.getByTestId('chrono-core-timer');
     await expect(chronoCore).toBeVisible({ timeout: 15000 });
-    await expect(chronoCore.getByText('Cycle Finalization Time')).toBeVisible();
+    await expect(chronoCore.getByText('Time left in this cycle')).toBeVisible();
+    await expect(
+      chronoCore.getByText(/Each Gesture can extend the timer|Cycle ready to finalize/),
+    ).toBeVisible();
     await expect(chronoCore.getByRole('timer')).toBeVisible();
   });
 

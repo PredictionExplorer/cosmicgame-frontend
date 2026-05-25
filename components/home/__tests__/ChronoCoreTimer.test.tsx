@@ -71,14 +71,16 @@ describe('<ChronoCoreTimer />', () => {
     mockCountdownProps.length = 0;
   });
 
-  it('renders the stable top HUD with large smooth countdown props', () => {
+  it('renders the clean monument clock with large smooth countdown props', () => {
     render(<ChronoCoreTimer {...baseProps} />);
 
     const timer = screen.getByTestId('chrono-core-timer');
     expect(timer).toHaveAttribute('data-phase', 'stable');
-    expect(screen.getByRole('heading', { name: 'Cycle #9 finalizes in' })).toBeInTheDocument();
-    expect(screen.getByText('27')).toBeInTheDocument();
-    expect(screen.getByText('2.5000 ETH')).toBeInTheDocument();
+    expect(screen.getByText('Time left in this cycle')).toBeInTheDocument();
+    expect(screen.getByText('Each Gesture can extend the timer.')).toBeInTheDocument();
+    expect(screen.queryByText('Protocol clock locked')).not.toBeInTheDocument();
+    expect(screen.queryByText('Chrono Core')).not.toBeInTheDocument();
+    expect(screen.queryByText('2.5000 ETH')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Make a Gesture/ })).toHaveAttribute(
       'href',
       '#make-gesture',
@@ -98,10 +100,10 @@ describe('<ChronoCoreTimer />', () => {
 
     const timer = screen.getByTestId('chrono-core-timer');
     expect(timer).toHaveAttribute('data-phase', 'final-minute');
-    expect(
-      screen.getByRole('heading', { name: 'Cycle #9 is in the last moments' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('timer')).toHaveAccessibleName('Cycle #9 is in the last moments');
+    expect(screen.getByText('Final minute. Tenths are live.')).toBeInTheDocument();
+    expect(screen.getByRole('timer')).toHaveAccessibleName(
+      'Final minute. Final minute. Tenths are live.',
+    );
   });
 
   it('shows ready-to-finalize state when the target has passed', () => {
@@ -109,6 +111,7 @@ describe('<ChronoCoreTimer />', () => {
 
     expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute('data-phase', 'ready');
     expect(screen.getByText('00:00')).toBeInTheDocument();
+    expect(screen.getByText('Cycle ready to finalize.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Finalize Cycle/ })).toHaveAttribute(
       'href',
       '#make-gesture',
