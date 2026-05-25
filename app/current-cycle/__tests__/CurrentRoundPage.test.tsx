@@ -35,10 +35,27 @@ jest.mock('../../../components/common/Counter', () => ({
 
 jest.mock('../../../components/home/RoundInfoSection', () => ({
   RoundInfoSection: (props: Record<string, unknown>) => (
-    <div data-testid="round-info-section" data-round={props.data ? 'loaded' : 'none'}>
+    <div
+      data-testid="round-info-section"
+      data-round={props.data ? 'loaded' : 'none'}
+      data-nfts={(props.donatedNFTs as unknown[] | undefined)?.length ?? 0}
+    >
       RoundInfoSection
     </div>
   ),
+}));
+
+jest.mock('../../../components/attachments/DonatedNFTPrizeShowcase', () => ({
+  DonatedNFTPrizeShowcase: ({ nfts, cycleNumber }: { nfts: unknown[]; cycleNumber?: number }) =>
+    nfts.length > 0 ? (
+      <section
+        data-testid="attached-nft-showcase"
+        data-count={nfts.length}
+        data-cycle={cycleNumber}
+      >
+        Attached NFT Showcase
+      </section>
+    ) : null,
 }));
 
 jest.mock('../../../components/tables/SpecialAllocationRecipients', () => ({
@@ -52,6 +69,9 @@ jest.mock('../../../components/tables/SpecialAllocationRecipients', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseGestureListByCycle.mockReturnValue({ data: [] });
+  mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
+  mockUseDonationsCGWithInfoByRound.mockReturnValue({ data: [] });
+  mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
   mockCountdownProps.length = 0;
 });
 
@@ -242,6 +262,39 @@ describe('CurrentRoundPage', () => {
     render(<CurrentRoundPage />);
     const section = screen.getByTestId('round-info-section');
     expect(section).toHaveAttribute('data-round', 'loaded');
+  });
+
+  it('renders the attached NFT showcase near the top when current-cycle NFTs exist', () => {
+    setupLoaded();
+    mockUseDonationsNFTByRound.mockReturnValue({
+      data: [{ RecordId: 1 }, { RecordId: 2 }],
+    });
+
+    render(<CurrentRoundPage />);
+
+    expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(42);
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-count', '2');
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-cycle', '42');
+  });
+
+  it('does not render the attached NFT showcase when no current-cycle NFTs exist', () => {
+    setupLoaded();
+    mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
+
+    render(<CurrentRoundPage />);
+
+    expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
+  });
+
+  it('still passes attached NFTs to detailed RoundInfoSection', () => {
+    setupLoaded();
+    mockUseDonationsNFTByRound.mockReturnValue({
+      data: [{ RecordId: 1 }, { RecordId: 2 }, { RecordId: 3 }],
+    });
+
+    render(<CurrentRoundPage />);
+
+    expect(screen.getByTestId('round-info-section')).toHaveAttribute('data-nfts', '3');
   });
 
   it('renders singular gesture text for 1 gesture', () => {

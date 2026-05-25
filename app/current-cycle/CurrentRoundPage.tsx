@@ -30,6 +30,7 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 import { Button } from '@/components/ui/button';
+import { DonatedNFTPrizeShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import { RoundInfoSection } from '@/components/home/RoundInfoSection';
 import Counter from '@/components/common/Counter';
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
@@ -235,6 +236,12 @@ const CurrentRoundPage = () => {
           </Button>
         </div>
       </div>
+
+      <DonatedNFTPrizeShowcase
+        nfts={donatedNFTs}
+        cycleNumber={data.CurRoundNum}
+        className="mb-12"
+      />
 
       {/* ===== ENHANCED STAT CARDS ===== */}
       <motion.div

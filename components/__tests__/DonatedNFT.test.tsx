@@ -1,21 +1,25 @@
 import '@testing-library/jest-dom';
-import axios from 'axios';
 
 import AttachedNFT from '@/components/attachments/AttachedNFT';
 
-import { act, render, screen, waitFor, checkA11y } from '@/test-utils';
+import { act, renderWithQuery, screen, waitFor, checkA11y } from '@/test-utils';
 
-jest.mock('axios');
+const mockUseAttachedNftMetadata = jest.fn();
+jest.mock('../attachments/useAttachedNftMetadata', () => ({
+  useAttachedNftMetadata: (...args: unknown[]) => mockUseAttachedNftMetadata(...args),
+}));
 
 describe('AttachedNFT', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseAttachedNftMetadata.mockReturnValue({ data: null, isError: false });
   });
 
   test('with mock data', async () => {
     const mockImageUrl = 'https://example.com/nft-image.png';
-    (axios.get as jest.Mock).mockResolvedValue({
+    mockUseAttachedNftMetadata.mockReturnValue({
       data: { image: mockImageUrl, external_url: 'https://example.com' },
+      isError: false,
     });
 
     const mockData = {
@@ -35,20 +39,25 @@ describe('AttachedNFT', () => {
       NFTTokenURI: 'https://token.artblocks.io/13000081',
       Index: 44,
     };
-    render(<AttachedNFT nft={mockData} />);
+    renderWithQuery(<AttachedNFT nft={mockData} />);
     expect(screen.getByTestId('NFTTokenId')).toHaveTextContent(String(mockData.NFTTokenId));
 
     await waitFor(() => {
-      const src = screen.getByAltText('NFT').getAttribute('src') ?? '';
+      const src = screen.getByAltText('Attached NFT').getAttribute('src') ?? '';
       // Next/Image rewrites through /_next/image?url=... — decode to compare.
       const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
       expect(decoded).toEqual(mockImageUrl);
     });
+    expect(screen.getByRole('link', { name: /View attached NFT/i })).toHaveAttribute(
+      'href',
+      'https://example.com/',
+    );
   });
 
   it('has no accessibility violations', async () => {
-    (axios.get as jest.Mock).mockResolvedValue({
+    mockUseAttachedNftMetadata.mockReturnValue({
       data: { image: 'https://example.com/nft.png', external_url: 'https://example.com' },
+      isError: false,
     });
 
     const mockData = {
@@ -70,9 +79,39 @@ describe('AttachedNFT', () => {
     };
     let container: HTMLElement;
     await act(async () => {
-      const result = render(<AttachedNFT nft={mockData} />);
+      const result = renderWithQuery(<AttachedNFT nft={mockData} />);
       container = result.container;
     });
     await checkA11y(container!);
+  });
+
+  it('falls back to a safe link and placeholder when metadata fails', async () => {
+    mockUseAttachedNftMetadata.mockReturnValue({ data: null, isError: true });
+
+    const mockData = {
+      RecordId: 1,
+      EvtLogId: 1,
+      BlockNum: 1,
+      TxId: 1,
+      TxHash: '0xabc',
+      TimeStamp: 1701346718,
+      DateTime: '2023-11-30T12:18:38Z',
+      RoundNum: 1,
+      DonorAddr: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+      TokenAddr: '0x3Aa5ebB10DC797CAC828524e59A333d0A371443c',
+      NFTTokenId: 1,
+      NFTTokenURI: 'https://token.artblocks.io/1',
+      Index: 0,
+    };
+
+    renderWithQuery(<AttachedNFT nft={mockData} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: /View attached NFT 1/i })).toHaveAttribute(
+        'href',
+        expect.stringContaining('testnets.opensea.io/assets/arbitrum-sepolia'),
+      );
+    });
+    expect(screen.getByTestId('NFTTokenId')).toHaveTextContent('#1');
   });
 });

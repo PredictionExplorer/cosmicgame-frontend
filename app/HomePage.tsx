@@ -25,6 +25,7 @@ import { ChronoCoreTimer } from '@/components/home/ChronoCoreTimer';
 import { GestureForm } from '@/components/home/GestureForm';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
+import { DonatedNFTPrizeShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
 import Allocation from '@/components/common/Allocation';
 import { useGestureForm } from '@/hooks/useGestureForm';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
@@ -36,6 +37,7 @@ import {
   useGestureListByCycle,
   useCurrentTime,
   useCSTInfo,
+  useDonationsNFTByRound,
 } from '@/hooks/useApiQuery';
 import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/activationTime';
 import { isLandingHost } from '@/lib/hostRouting';
@@ -80,10 +82,12 @@ const HomePage = () => {
 
   const round = dashboardData?.CurRoundNum ?? -1;
   const { data: bidListData } = useGestureListByCycle(round, 'desc');
+  const { data: nftDonationsData } = useDonationsNFTByRound(round);
 
   const data = dashboardData ?? null;
   const loading = dashboardLoading;
   const curGestureList = bidListData ?? [];
+  const donatedNFTs = nftDonationsData ?? [];
 
   // Re-renders every second so countdown comparisons (allocationTime > now,
   // claimWait > now, activationTime check) update without bare Date.now().
@@ -235,6 +239,8 @@ const HomePage = () => {
           bannerToken={bannerToken}
           canOpenGesturePanel={!loading && isRoundActive}
         />
+
+        <DonatedNFTPrizeShowcase nfts={donatedNFTs} cycleNumber={round >= 0 ? round : undefined} />
 
         {/* ===== BIDDING STATUS (countdown + stats) ===== */}
         <GestureStatus

@@ -131,6 +131,19 @@ jest.mock('../../components/home/GestureForm', () => ({
   GestureForm: () => <div data-testid="gesture-form">GestureForm</div>,
 }));
 
+jest.mock('../../components/attachments/DonatedNFTPrizeShowcase', () => ({
+  DonatedNFTPrizeShowcase: ({ nfts, cycleNumber }: { nfts: unknown[]; cycleNumber?: number }) =>
+    nfts.length > 0 ? (
+      <section
+        data-testid="attached-nft-showcase"
+        data-count={nfts.length}
+        data-cycle={cycleNumber}
+      >
+        Attached NFT Showcase
+      </section>
+    ) : null,
+}));
+
 jest.mock('../../components/home/RoundInfoSection', () => ({
   RoundInfoSection: () => <div data-testid="round-info-section">RoundInfoSection</div>,
 }));
@@ -211,6 +224,7 @@ beforeEach(() => {
   mockAllocationFinalize.onFinalize.mockResolvedValue(true);
   mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false });
   mockUseGestureListByCycle.mockReturnValue({ data: undefined });
+  mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
   mockUseCurrentTime.mockReturnValue({
     data: Math.floor(Date.now() / 1000),
     isLoading: false,
@@ -340,6 +354,35 @@ describe('HomePage', () => {
     });
     render(<HomePage />);
     expect(screen.getByTestId('gesture-status')).toBeInTheDocument();
+  });
+
+  it('requests current-cycle attached NFTs and renders the showcase when present', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7 }),
+      isLoading: false,
+    });
+    mockUseDonationsNFTByRound.mockReturnValue({
+      data: [{ RecordId: 1 }, { RecordId: 2 }],
+    });
+
+    render(<HomePage />);
+
+    expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(7);
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-count', '2');
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-cycle', '7');
+  });
+
+  it('does not render the attached NFT showcase when the current cycle has none', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7 }),
+      isLoading: false,
+    });
+    mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
+
+    render(<HomePage />);
+
+    expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(7);
+    expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
   });
 
   it('renders GestureForm when user is active and not loading', () => {

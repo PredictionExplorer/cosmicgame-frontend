@@ -1,65 +1,70 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-
 import { StyledCard } from '@/components/styled';
-import { reportError } from '@/utils/errors';
 import NFTImage from '@/components/nft/NFTImage';
+import type { AttachedNFT as AttachedNFTRecord } from '@/services/api/types';
+import { cn } from '@/lib/utils';
 
-interface NFT {
-  NFTTokenId?: number | string;
-  NFTTokenURI?: string;
+import { getAttachedNftTokenId, resolveAttachedNftLink } from './attachedNftLinks';
+import { useAttachedNftMetadata } from './useAttachedNftMetadata';
+
+type NFT = Partial<
+  Pick<AttachedNFTRecord, 'TokenAddr' | 'NFTTokenId' | 'NFTTokenURI' | 'TokenId'>
+> & {
   [key: string]: unknown;
-}
-
-interface TokenURI {
-  image?: string;
-  external_url?: string;
-}
+};
 
 interface DonatedNFTProps {
   nft: NFT;
 }
 
 const DonatedNFT = ({ nft }: DonatedNFTProps) => {
-  const [tokenURI, setTokenURI] = useState<TokenURI | null>(null);
-
-  useEffect(() => {
-    const fetchTokenData = async () => {
-      try {
-        const { data } = await axios.get<TokenURI>(nft.NFTTokenURI!);
-        setTokenURI(data);
-      } catch (error) {
-        reportError(error, 'fetch attached NFT token URI');
-      }
-    };
-
-    if (nft.NFTTokenURI) {
-      fetchTokenData();
-    }
-  }, [nft.NFTTokenURI]);
+  const { data: tokenURI } = useAttachedNftMetadata(nft.NFTTokenURI);
+  const link = resolveAttachedNftLink({ nft, metadata: tokenURI });
+  const tokenId = getAttachedNftTokenId(nft);
+  const label = tokenURI?.name
+    ? `View attached NFT ${tokenURI.name}`
+    : tokenId
+      ? `View attached NFT ${tokenId}`
+      : link.label;
+  const image = (
+    <NFTImage
+      src={tokenURI?.image}
+      alt={tokenURI?.name ? `Attached NFT ${tokenURI.name}` : 'Attached NFT'}
+    />
+  );
 
   return (
     <StyledCard>
-      <button
-        type="button"
-        className="block w-full cursor-pointer bg-transparent border-0 p-0 text-left"
-        onClick={() => {
-          if (tokenURI?.external_url) {
-            window.open(tokenURI.external_url, '_blank', 'noopener');
-          }
-        }}
-      >
-        <NFTImage src={tokenURI?.image} />
-      </button>
+      {link.href ? (
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={label}
+          className="group block w-full text-left"
+        >
+          {image}
+        </a>
+      ) : (
+        <div aria-label={label} className="block w-full text-left">
+          {image}
+        </div>
+      )}
 
       <div className="flex absolute inset-4 justify-between pointer-events-none">
         <span
           className="text-xs [text-shadow:0px_0px_8px_var(--background)]"
           data-testid="NFTTokenId"
         >
-          #{nft.NFTTokenId}
+          {tokenId ? `#${tokenId}` : 'Unknown token'}
         </span>
-        <span className="text-primary [text-shadow:0px_0px_8px_var(--background)]">Attached</span>
+        <span
+          className={cn(
+            'text-primary [text-shadow:0px_0px_8px_var(--background)]',
+            !link.href && 'text-muted-foreground',
+          )}
+        >
+          Attached
+        </span>
       </div>
     </StyledCard>
   );
