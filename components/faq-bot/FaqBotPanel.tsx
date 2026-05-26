@@ -1,12 +1,14 @@
 'use client';
 
-import { X } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { Check, Copy, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 import { FaqBotChat } from './FaqBotChat';
+import { formatFaqConversation, hasCopyableConversation } from './formatConversation';
 import type { UseFaqBotSessionResult } from './useFaqBotSession';
 
 export interface FaqBotPanelProps {
@@ -16,7 +18,20 @@ export interface FaqBotPanelProps {
 }
 
 export function FaqBotPanel({ open, onClose, session }: FaqBotPanelProps) {
-  const { healthStatus, healthLabel } = session;
+  const { healthStatus, healthLabel, messages, sessionId } = session;
+  const [copied, setCopied] = useState(false);
+  const canCopy = hasCopyableConversation(messages);
+
+  const handleCopy = useCallback(async () => {
+    if (!canCopy) return;
+    try {
+      await navigator.clipboard.writeText(formatFaqConversation(messages, sessionId));
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard failures are rare; avoid noisy UI for a secondary action.
+    }
+  }, [canCopy, messages, sessionId]);
 
   return (
     <AnimatePresence>
@@ -71,16 +86,34 @@ export function FaqBotPanel({ open, onClose, session }: FaqBotPanelProps) {
                   {healthLabel}
                 </p>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="shrink-0 text-muted-foreground hover:text-foreground"
-                aria-label="Close"
-                onClick={onClose}
-              >
-                <X className="size-4" />
-              </Button>
+              <div className="flex shrink-0 items-center gap-0.5">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    'size-8 text-muted-foreground opacity-35 transition-opacity hover:opacity-100',
+                    !canCopy && 'pointer-events-none opacity-20',
+                    copied && 'opacity-70 text-primary',
+                  )}
+                  aria-label={copied ? 'Conversation copied' : 'Copy conversation'}
+                  title={canCopy ? 'Copy conversation' : 'Send a message to copy'}
+                  disabled={!canCopy}
+                  onClick={() => void handleCopy()}
+                >
+                  {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+                  aria-label="Close"
+                  onClick={onClose}
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
             </header>
 
             <FaqBotChat session={session} active={open} />

@@ -7,7 +7,7 @@ import { FaqBotError, faqHealth, faqQuery } from '@/services/api/faqBot';
 import type { FaqMessage } from './types';
 
 const WELCOME_MESSAGE =
-  "Hi — I'm the Cosmic Signature assistant. Ask about bidding, contracts, prizes, or live game stats.";
+  "Hi — I'm the Cosmic Signature assistant. Ask about gestures, contracts, prizes, or live game stats.";
 
 function nextMessageId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
