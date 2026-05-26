@@ -36,6 +36,7 @@ interface GestureStatusProps {
   ethGestureInfo: EthGestureInfo | null;
   allocationTime: number;
   suppressPrimaryTimer?: boolean;
+  attachedNFTCount?: number;
 }
 
 const fadeUp = {
@@ -142,6 +143,7 @@ export const GestureStatus = ({
   ethGestureInfo,
   allocationTime,
   suppressPrimaryTimer = false,
+  attachedNFTCount = 0,
 }: GestureStatusProps) => {
   const { account } = useActiveWeb3React();
   const { data: userInfoRaw } = useUserInfo(account);
@@ -149,7 +151,7 @@ export const GestureStatus = ({
 
   const now = useNow(1000);
 
-  const winProbability = useMemo(() => {
+  const selectionFrequency = useMemo(() => {
     if (!account || !data || !curGestureList.length) return null;
     const Gestures = (userInfoRaw?.Gestures as GestureInfo[] | undefined) || [];
     if (!Gestures.length) return null;
@@ -171,6 +173,20 @@ export const GestureStatus = ({
         ) * 100,
     };
   }, [account, data, userInfoRaw, curGestureList]);
+
+  const attachedNFTAllocationCopy =
+    attachedNFTCount > 1
+      ? `, plus all ${attachedNFTCount} attached NFTs shown below`
+      : attachedNFTCount === 1
+        ? ', plus the attached NFT shown below'
+        : '';
+
+  const attachedNFTTooltipCopy =
+    attachedNFTCount > 1
+      ? `, and all ${attachedNFTCount} attached NFTs`
+      : attachedNFTCount === 1
+        ? ', and the attached NFT'
+        : '';
 
   const cstGestureData = useMemo(() => {
     if (!ctPriceRaw) return { AuctionDuration: 0, CSTPrice: 0, SecondsElapsed: 0 };
@@ -249,7 +265,7 @@ export const GestureStatus = ({
                 value={`${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`}
                 icon={<Trophy className="h-5 w-5" />}
                 tone="signature"
-                tooltip="The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST and a Cosmic Signature NFT"
+                tooltip={`The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT${attachedNFTTooltipCopy}.`}
               />
             </motion.div>
 
@@ -308,8 +324,8 @@ export const GestureStatus = ({
             )}
           </div>
 
-          {/* Win probability */}
-          {curGestureList.length > 0 && winProbability && data && (
+          {/* Selection frequency */}
+          {curGestureList.length > 0 && selectionFrequency && data && (
             <motion.div
               custom={5}
               variants={fadeUp}
@@ -320,15 +336,15 @@ export const GestureStatus = ({
               <div className="flex items-center gap-1.5">
                 <TrendingUp className="h-4 w-4 text-primary/70" />
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Your Chances
+                  Your Cycle Standing
                 </p>
-                <InfoTooltip content="Your Stellar Selection frequency based on the number of gestures you've made this cycle." />
+                <InfoTooltip content="Shows your current Final Gesture standing and Stellar Selection frequency based on your gestures this cycle." />
               </div>
               {data.LastBidderAddr === account ? (
                 <p className="text-sm font-medium text-emerald-400">
                   You made the most recent gesture. If no one else gestures, you receive the
-                  Signature Allocation ({(data.PrizeAmountEth ?? 0).toFixed(4)} ETH, 1,000 CST, and
-                  1 Cosmic Signature NFT).
+                  Signature Allocation ({(data.PrizeAmountEth ?? 0).toFixed(4)} ETH, 1,000 CST, 1
+                  Cosmic Signature NFT{attachedNFTAllocationCopy}).
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">
@@ -341,13 +357,13 @@ export const GestureStatus = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">ETH Stellar Selection</span>
                     <span className="font-medium text-primary">
-                      {winProbability.stellarEth.toFixed(1)}%
+                      {selectionFrequency.stellarEth.toFixed(1)}%
                     </span>
                   </div>
                   <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${Math.min(winProbability.stellarEth, 100)}%` }}
+                      animate={{ width: `${Math.min(selectionFrequency.stellarEth, 100)}%` }}
                       transition={{ duration: 0.8, ease: 'easeOut' }}
                       className="h-full rounded-full bg-gradient-to-r from-primary to-primary/60"
                     />
@@ -357,13 +373,13 @@ export const GestureStatus = ({
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">NFT Stellar Selection</span>
                     <span className="font-medium text-accent">
-                      {winProbability.nft.toFixed(1)}%
+                      {selectionFrequency.nft.toFixed(1)}%
                     </span>
                   </div>
                   <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
-                      animate={{ width: `${Math.min(winProbability.nft, 100)}%` }}
+                      animate={{ width: `${Math.min(selectionFrequency.nft, 100)}%` }}
                       transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
                       className="h-full rounded-full bg-gradient-to-r from-accent to-accent/60"
                     />

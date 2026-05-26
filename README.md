@@ -1,6 +1,6 @@
 # Cosmic Signature Frontend
 
-A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. Players bid with ETH for a chance to win prizes, collect NFTs, and participate in staking and raffles.
+A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. Participants make gestures with ETH, collect NFTs, and participate in staking and allocation tracks.
 
 ## Tech Stack
 
@@ -67,15 +67,15 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 
 ## Environment Variables
 
-| Variable                               | Required      | Default             | Description                                                 |
-| -------------------------------------- | ------------- | ------------------- | ----------------------------------------------------------- |
-| `NEXT_PUBLIC_NETWORK`                  | No            | `sepolia`           | Network: `local`, `sepolia`, or `mainnet`                   |
-| `NEXT_PUBLIC_INFURA_KEY`               | Yes (mainnet) | —                   | Infura API key for Arbitrum mainnet RPC                     |
-| `NEXT_PUBLIC_RPC_URL`                  | No            | Per-network default | Override the RPC endpoint                                   |
-| `NEXT_PUBLIC_API_URL`                  | No            | Per-network default | Override the backend API URL                                |
-| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Yes           | —                   | WalletConnect project ID from cloud.walletconnect.com       |
-| `NEXT_PUBLIC_GA4_MEASUREMENT_ID`       | No            | —                   | Google Analytics 4 measurement ID                           |
-| `NEXT_PUBLIC_SENTRY_DSN`               | No            | —                   | Sentry DSN for error reporting                              |
+| Variable                               | Required      | Default             | Description                                           |
+| -------------------------------------- | ------------- | ------------------- | ----------------------------------------------------- |
+| `NEXT_PUBLIC_NETWORK`                  | No            | `sepolia`           | Network: `local`, `sepolia`, or `mainnet`             |
+| `NEXT_PUBLIC_INFURA_KEY`               | Yes (mainnet) | —                   | Infura API key for Arbitrum mainnet RPC               |
+| `NEXT_PUBLIC_RPC_URL`                  | No            | Per-network default | Override the RPC endpoint                             |
+| `NEXT_PUBLIC_API_URL`                  | No            | Per-network default | Override the backend API URL                          |
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Yes           | —                   | WalletConnect project ID from cloud.walletconnect.com |
+| `NEXT_PUBLIC_GA4_MEASUREMENT_ID`       | No            | —                   | Google Analytics 4 measurement ID                     |
+| `NEXT_PUBLIC_SENTRY_DSN`               | No            | —                   | Sentry DSN for error reporting                        |
 
 ## Project Structure
 

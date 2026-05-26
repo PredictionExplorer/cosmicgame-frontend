@@ -53,7 +53,7 @@ describe('RewardBreakdown', () => {
     renderWithTooltip(<RewardBreakdown />);
     expect(screen.getByText('100 Participation CST')).toBeInTheDocument();
     expect(screen.getByText('Stellar Selection Entry')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature NFT Chance')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Selection')).toBeInTheDocument();
     expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
   });
 

@@ -82,7 +82,7 @@ const MyAnchors = () => {
         label: 'Your Anchored RWLK',
         value: anchoredRWLKTokens.length.toLocaleString(),
         tooltip:
-          'Number of RandomWalk NFTs you currently have anchored. Each anchored RWLK has a chance to receive an allocation imprint.',
+          'Number of RandomWalk NFTs you currently have anchored. Each anchored RWLK is eligible to receive an allocation imprint.',
         icon: <Layers className="h-4 w-4" />,
       },
       {

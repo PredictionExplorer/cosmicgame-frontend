@@ -26,7 +26,7 @@ const rewards = [
   },
   {
     Icon: ImageIcon,
-    title: 'Cosmic Signature NFT Chance',
+    title: 'Cosmic Signature NFT Selection',
     description:
       'Ten participants receive 1,000 CST and a unique Cosmic Signature NFT via Stellar Selection each cycle.',
     tooltip:

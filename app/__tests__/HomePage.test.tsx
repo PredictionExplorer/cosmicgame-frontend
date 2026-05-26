@@ -123,8 +123,14 @@ jest.mock('@tanstack/react-query', () => ({
 
 /* ── child components ───────────────────────────────────────────── */
 
+const mockGestureStatus = jest.fn((props: Record<string, unknown>) => (
+  <div data-testid="gesture-status" data-attached-nft-count={String(props.attachedNFTCount ?? 0)}>
+    GestureStatus
+  </div>
+));
+
 jest.mock('../../components/common/GestureStatus', () => ({
-  GestureStatus: () => <div data-testid="gesture-status">GestureStatus</div>,
+  GestureStatus: (props: Record<string, unknown>) => mockGestureStatus(props),
 }));
 
 jest.mock('../../components/home/GestureForm', () => ({
@@ -374,6 +380,9 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(7);
+    const gestureStatusProps =
+      mockGestureStatus.mock.calls[mockGestureStatus.mock.calls.length - 1]?.[0];
+    expect(gestureStatusProps).toEqual(expect.objectContaining({ attachedNFTCount: 2 }));
     const showcase = screen.getByTestId('attached-nft-showcase');
     expect(showcase).toHaveAttribute('data-count', '2');
     expect(showcase).toHaveAttribute('data-cycle', '7');

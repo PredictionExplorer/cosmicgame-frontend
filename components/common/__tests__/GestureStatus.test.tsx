@@ -126,6 +126,69 @@ describe('GestureStatus', () => {
     expect(screen.getByText('ETH Gesture')).toBeInTheDocument();
   });
 
+  it('shows cycle standing copy without gambling-adjacent chance wording', () => {
+    mockUseUserInfo.mockReturnValueOnce({
+      data: { Gestures: [{ RoundNum: 5 }] },
+    });
+
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
+        allocationTime={Date.now() + 60000}
+        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+      />,
+    );
+
+    expect(screen.getByText('Your Cycle Standing')).toBeInTheDocument();
+    expect(screen.queryByText('Your Chances')).not.toBeInTheDocument();
+  });
+
+  it('includes attached NFTs in the latest gesture maker Signature Allocation copy', () => {
+    mockUseUserInfo.mockReturnValueOnce({
+      data: { Gestures: [{ RoundNum: 5 }] },
+    });
+
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
+        allocationTime={Date.now() + 60000}
+        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+        attachedNFTCount={3}
+      />,
+    );
+
+    expect(screen.getByText(/You made the most recent gesture/)).toHaveTextContent(
+      'Signature Allocation (10.5000 ETH, 1,000 CST, 1 Cosmic Signature NFT, plus all 3 attached NFTs shown below).',
+    );
+  });
+
+  it('omits attached NFT copy when no attached NFTs are available', () => {
+    mockUseUserInfo.mockReturnValueOnce({
+      data: { Gestures: [{ RoundNum: 5 }] },
+    });
+
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
+        allocationTime={Date.now() + 60000}
+        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+      />,
+    );
+
+    expect(screen.getByText(/You made the most recent gesture/)).toHaveTextContent(
+      'Signature Allocation (10.5000 ETH, 1,000 CST, 1 Cosmic Signature NFT).',
+    );
+    expect(screen.getByText(/You made the most recent gesture/)).not.toHaveTextContent(
+      'attached NFT',
+    );
+  });
+
   it('shows cycle closed when finalization time has passed', () => {
     render(
       <GestureStatus

@@ -249,6 +249,7 @@ const HomePage = () => {
           ethGestureInfo={ethGestureInfo}
           allocationTime={allocationTime}
           suppressPrimaryTimer
+          attachedNFTCount={donatedNFTs.length}
         />
 
         {/* ===== SPECIAL ALLOCATION LEADERS ===== */}
