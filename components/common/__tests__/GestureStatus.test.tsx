@@ -126,7 +126,7 @@ describe('GestureStatus', () => {
     expect(screen.getByText('ETH Gesture')).toBeInTheDocument();
   });
 
-  it('shows cycle standing copy without gambling-adjacent chance wording', () => {
+  it('shows cycle standing copy without restricted chance wording', () => {
     mockUseUserInfo.mockReturnValueOnce({
       data: { Gestures: [{ RoundNum: 5 }] },
     });
