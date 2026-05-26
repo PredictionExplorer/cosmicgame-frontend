@@ -1,5 +1,6 @@
 'use client';
 
+// lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { useMemo, useState, type FC, type MouseEvent } from 'react';
 import Link from 'next/link';
 
@@ -217,3 +218,4 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
     </div>
   );
 };
+// lexicon-allow-end

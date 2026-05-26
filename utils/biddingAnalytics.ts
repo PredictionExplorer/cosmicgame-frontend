@@ -1,3 +1,4 @@
+// lexicon-allow-start: backend analytics wire names and sealed field names
 import type {
   BidFrequencyBucket,
   BidSpike,
@@ -80,9 +81,10 @@ export function buildFrequencyBuckets(
   if (intervalSecs <= 0 || finTs <= initTs) return [];
 
   const bucketStart = alignBucketTs(initTs, intervalSecs);
-  const bucketEnd = intervalSecs === 3600 || intervalSecs === 86400
-    ? alignBucketTs(finTs, intervalSecs) + intervalSecs
-    : finTs;
+  const bucketEnd =
+    intervalSecs === 3600 || intervalSecs === 86400
+      ? alignBucketTs(finTs, intervalSecs) + intervalSecs
+      : finTs;
 
   const bucketMap = new Map<number, { numBids: number; bidders: Set<string> }>();
   for (let ts = bucketStart; ts < bucketEnd; ts += intervalSecs) {
@@ -109,17 +111,13 @@ export function buildFrequencyBuckets(
 }
 
 /** Detect merged bid-frequency spikes (mirrors backend DetectBidSpikes). */
-export function detectBidSpikes(
-  buckets: BidFrequencyBucket[],
-  intervalSecs: number,
-): BidSpike[] {
+export function detectBidSpikes(buckets: BidFrequencyBucket[], intervalSecs: number): BidSpike[] {
   if (buckets.length === 0) return [];
 
   const counts = buckets.map((b) => b.NumBids);
   const sum = counts.reduce((acc, c) => acc + c, 0);
   const mean = sum / counts.length;
-  const variance =
-    counts.reduce((acc, c) => acc + (c - mean) ** 2, 0) / counts.length;
+  const variance = counts.reduce((acc, c) => acc + (c - mean) ** 2, 0) / counts.length;
   const stddev = Math.sqrt(variance);
 
   let threshold = mean + 2 * stddev;
@@ -298,13 +296,7 @@ export function buildTopBidderActivePeriodsResponse(
     GapHours: gapHours,
     MinBids: minBids,
     TopBidders: topBidders,
-    ActivePeriods: computeActivePeriods(
-      gestures,
-      topBidders,
-      initTs,
-      finTs,
-      gapHours,
-      minBids,
-    ),
+    ActivePeriods: computeActivePeriods(gestures, topBidders, initTs, finTs, gapHours, minBids),
   };
 }
+// lexicon-allow-end

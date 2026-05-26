@@ -1,5 +1,6 @@
 'use client';
 
+// lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { useMemo, useState, type FC } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -164,3 +165,4 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
     </div>
   );
 };
+// lexicon-allow-end

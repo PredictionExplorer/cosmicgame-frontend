@@ -309,6 +309,7 @@ export function useCTTotalSupplyHistoryByBid(enabled = true) {
 }
 // lexicon-allow-end
 
+// lexicon-allow-start: backend analytics query names and sealed wire fields
 export function useBidTimeBounds(enabled = true) {
   return useQuery<BidTimeBounds>({
     queryKey: ['bidTimeBounds'],

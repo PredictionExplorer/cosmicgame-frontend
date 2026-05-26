@@ -1,5 +1,6 @@
 'use client';
 
+// lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { BarChart3, Flame, Users } from 'lucide-react';
 
 import { SectionDivider } from '@/components/ui/section-divider';
@@ -42,3 +43,4 @@ export function BiddingActivitySection() {
     </div>
   );
 }
+// lexicon-allow-end

@@ -1,3 +1,4 @@
+// lexicon-allow-start: backend endpoint names and sealed wire names
 import {
   buildBiddingActivityResponse,
   buildFrequencyBuckets,
@@ -141,3 +142,4 @@ export async function get_top_bidder_active_periods(
     );
   }
 }
+// lexicon-allow-end

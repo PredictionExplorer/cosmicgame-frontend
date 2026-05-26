@@ -1,5 +1,6 @@
 'use client';
 
+// lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { useMemo, useState, type FC } from 'react';
 import {
   BarChart,
@@ -269,3 +270,4 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
     </div>
   );
 };
+// lexicon-allow-end
