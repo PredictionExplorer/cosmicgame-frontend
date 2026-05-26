@@ -1,18 +1,12 @@
 'use client';
 
 import { useMemo, useState, type FC } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 import { formatUnixTsLabel } from '@/utils';
+
 import { useBidFrequency, useBidTimeBounds } from '@/hooks/useApiQuery';
+import { useNow } from '@/hooks/useNow';
 import type { BidFrequencyBucket } from '@/services/api/types';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -77,10 +71,10 @@ type BidFrequencyChartProps = {
 export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }) => {
   const [interval, setInterval] = useState<IntervalOption>('day');
   const { data: bounds } = useBidTimeBounds(enabled);
+  const nowSec = Math.floor(useNow(60_000) / 1000);
 
   const { initTs, finTs, intervalSecs } = useMemo(() => {
-    const now = Math.floor(Date.now() / 1000);
-    const maxTs = bounds?.MaxTs && bounds.MaxTs > 0 ? bounds.MaxTs : now;
+    const maxTs = bounds?.MaxTs && bounds.MaxTs > 0 ? bounds.MaxTs : nowSec;
     const minTs = bounds?.MinTs && bounds.MinTs > 0 ? bounds.MinTs : maxTs - DEFAULT_LOOKBACK_SECS;
     const lookbackStart = Math.max(minTs, maxTs - DEFAULT_LOOKBACK_SECS);
     return {
@@ -88,7 +82,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
       finTs: maxTs + (interval === 'hour' ? HOUR_SECS : DAY_SECS),
       intervalSecs: interval === 'hour' ? HOUR_SECS : DAY_SECS,
     };
-  }, [bounds, interval]);
+  }, [bounds, interval, nowSec]);
 
   const { data, isLoading, isError, refetch } = useBidFrequency(
     initTs,
@@ -97,10 +91,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
     enabled,
   );
 
-  const chartData = useMemo(
-    () => toChartPoints(data ?? [], interval === 'hour'),
-    [data, interval],
-  );
+  const chartData = useMemo(() => toChartPoints(data ?? [], interval === 'hour'), [data, interval]);
 
   return (
     <div className="space-y-4" data-testid="bid-frequency-chart">
@@ -156,12 +147,17 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
                 width={40}
               />
               <Tooltip content={<FrequencyTooltip />} />
-              <Bar dataKey="numBids" fill={BAR_COLOR} radius={[2, 2, 0, 0]} isAnimationActive={false} />
+              <Bar
+                dataKey="numBids"
+                fill={BAR_COLOR}
+                radius={[2, 2, 0, 0]}
+                isAnimationActive={false}
+              />
             </BarChart>
           </ResponsiveContainer>
           <p className="text-xs text-muted-foreground">
-            Gestures in the first hour after each cycle opens are excluded — opening activity
-            is unusually concentrated and would otherwise skew this chart.
+            Gestures in the first hour after each cycle opens are excluded — opening activity is
+            unusually concentrated and would otherwise skew this chart.
           </p>
         </>
       )}

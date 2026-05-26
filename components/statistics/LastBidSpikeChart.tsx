@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type FC } from 'react';
+import { useMemo, useState, type FC } from 'react';
 import {
   BarChart,
   Bar,
@@ -14,7 +14,9 @@ import {
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { formatUnixTsLabel } from '@/utils';
+
 import { useBiddingActivity, useBidFrequency, useBidTimeBounds } from '@/hooks/useApiQuery';
+import { useNow } from '@/hooks/useNow';
 import type { BidFrequencyBucket, BidSpike } from '@/services/api/types';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -78,14 +80,14 @@ type LastBidSpikeChartProps = {
 /** Hourly frequency chart focused on gesture spikes, with navigation between detected spikes. */
 export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }) => {
   const { data: bounds } = useBidTimeBounds(enabled);
+  const nowSec = Math.floor(useNow(60_000) / 1000);
 
   const { initTs, finTs } = useMemo(() => {
-    const now = Math.floor(Date.now() / 1000);
-    const maxTs = bounds?.MaxTs && bounds.MaxTs > 0 ? bounds.MaxTs : now;
+    const maxTs = bounds?.MaxTs && bounds.MaxTs > 0 ? bounds.MaxTs : nowSec;
     const minTs = bounds?.MinTs && bounds.MinTs > 0 ? bounds.MinTs : maxTs - DEFAULT_LOOKBACK_SECS;
     const lookbackStart = Math.max(minTs, maxTs - DEFAULT_LOOKBACK_SECS);
     return { initTs: lookbackStart, finTs: maxTs + SPIKE_INTERVAL_SECS };
-  }, [bounds]);
+  }, [bounds, nowSec]);
 
   const { data, isLoading, isError, refetch } = useBiddingActivity(
     initTs,
@@ -97,16 +99,8 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
   const spikes = data?.Spikes ?? [];
   const recentSpikeIndex = data?.RecentSpikeIndex ?? -1;
 
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [initialized, setInitialized] = useState(false);
-
-  useEffect(() => {
-    if (initialized || isLoading) return;
-    if (recentSpikeIndex >= 0) {
-      setSelectedIndex(recentSpikeIndex);
-    }
-    setInitialized(true);
-  }, [initialized, isLoading, recentSpikeIndex]);
+  const [selectedIndexOverride, setSelectedIndexOverride] = useState<number | null>(null);
+  const selectedIndex = selectedIndexOverride ?? (recentSpikeIndex >= 0 ? recentSpikeIndex : null);
 
   const selectedSpike = selectedIndex !== null ? spikes[selectedIndex] : undefined;
 
@@ -129,21 +123,17 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
 
   const chartData = useMemo(() => toChartPoints(windowFrequency ?? []), [windowFrequency]);
 
-  const spikeLabelStart = selectedSpike
-    ? formatUnixTsLabel(selectedSpike.StartTs, true)
-    : '';
-  const spikeLabelEnd = selectedSpike
-    ? formatUnixTsLabel(selectedSpike.EndTs, true)
-    : '';
+  const spikeLabelStart = selectedSpike ? formatUnixTsLabel(selectedSpike.StartTs, true) : '';
+  const spikeLabelEnd = selectedSpike ? formatUnixTsLabel(selectedSpike.EndTs, true) : '';
 
   const goPrev = () => {
     if (selectedIndex === null || selectedIndex <= 0) return;
-    setSelectedIndex(selectedIndex - 1);
+    setSelectedIndexOverride(selectedIndex - 1);
   };
 
   const goNext = () => {
     if (selectedIndex === null || selectedIndex >= spikes.length - 1) return;
-    setSelectedIndex(selectedIndex + 1);
+    setSelectedIndexOverride(selectedIndex + 1);
   };
 
   const showEmptyRecent =
@@ -166,7 +156,7 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
                 type="button"
                 size="sm"
                 variant={selectedIndex === spike.Index ? 'default' : 'outline'}
-                onClick={() => setSelectedIndex(spike.Index)}
+                onClick={() => setSelectedIndexOverride(spike.Index)}
                 className="font-mono text-xs"
               >
                 #{spike.Index + 1}
@@ -267,8 +257,8 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
             </BarChart>
           </ResponsiveContainer>
           <p className="text-xs text-muted-foreground">
-            Gestures in the first hour after each cycle opens are excluded — opening activity
-            is unusually concentrated and would otherwise skew this chart.
+            Gestures in the first hour after each cycle opens are excluded — opening activity is
+            unusually concentrated and would otherwise skew this chart.
           </p>
         </div>
       ) : (

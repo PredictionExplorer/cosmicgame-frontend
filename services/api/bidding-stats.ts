@@ -1,6 +1,3 @@
-import { axios, getAPIUrl, isAxiosError } from './client';
-import { get_bid_list } from './rounds';
-import { get_unique_bidders } from './users';
 import {
   buildBiddingActivityResponse,
   buildFrequencyBuckets,
@@ -10,12 +7,16 @@ import {
   excludeCycleOpenHour,
   type GestureTimingPoint,
 } from '@/utils/biddingAnalytics';
+
+import { axios, getAPIUrl, isAxiosError } from './client';
+import { get_bid_list } from './rounds';
 import type {
   BidFrequencyBucket,
   BiddingActivityResponse,
   BidTimeBounds,
   TopBidderActivePeriodsResponse,
 } from './types';
+import { get_unique_bidders } from './users';
 
 let cachedGesturesPromise: ReturnType<typeof get_bid_list> | null = null;
 let cachedBiddersPromise: ReturnType<typeof get_unique_bidders> | null = null;

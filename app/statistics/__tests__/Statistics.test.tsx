@@ -27,6 +27,16 @@ const mockUseSystemModelist = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCTPrice = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsNFTByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: undefined });
+const mockUseBidTimeBounds = jest.fn().mockReturnValue({ data: undefined });
+const mockUseBiddingActivity = jest
+  .fn()
+  .mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: jest.fn() });
+const mockUseBidFrequency = jest
+  .fn()
+  .mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: jest.fn() });
+const mockUseTopBidderActivePeriods = jest
+  .fn()
+  .mockReturnValue({ data: undefined, isLoading: false, isError: false, refetch: jest.fn() });
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -48,6 +58,10 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useCTPrice: (...args: unknown[]) => mockUseCTPrice(...args),
   useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
+  useBidTimeBounds: (...args: unknown[]) => mockUseBidTimeBounds(...args),
+  useBiddingActivity: (...args: unknown[]) => mockUseBiddingActivity(...args),
+  useBidFrequency: (...args: unknown[]) => mockUseBidFrequency(...args),
+  useTopBidderActivePeriods: (...args: unknown[]) => mockUseTopBidderActivePeriods(...args),
 }));
 
 /* ── next/link ──────────────────────────────────────────────────── */

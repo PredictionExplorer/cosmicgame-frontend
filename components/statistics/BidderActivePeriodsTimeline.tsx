@@ -4,7 +4,9 @@ import { useMemo, useState, type FC, type MouseEvent } from 'react';
 import Link from 'next/link';
 
 import { formatUnixTsLabel, shortenHex } from '@/utils';
+
 import { useTopBidderActivePeriods, useBidTimeBounds } from '@/hooks/useApiQuery';
+import { useNow } from '@/hooks/useNow';
 import type { BidderActivePeriod, TopBidderInfo } from '@/services/api/types';
 import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
@@ -42,13 +44,13 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
   enabled = true,
 }) => {
   const { data: bounds } = useBidTimeBounds(enabled);
+  const nowSec = Math.floor(useNow(60_000) / 1000);
 
   const { initTs, finTs } = useMemo(() => {
-    const now = Math.floor(Date.now() / 1000);
-    const maxTs = bounds?.MaxTs && bounds.MaxTs > 0 ? bounds.MaxTs : now;
+    const maxTs = bounds?.MaxTs && bounds.MaxTs > 0 ? bounds.MaxTs : nowSec;
     const minTs = bounds?.MinTs && bounds.MinTs > 0 ? bounds.MinTs : maxTs - 365 * 86400;
     return { initTs: minTs, finTs: maxTs + 3600 };
-  }, [bounds]);
+  }, [bounds, nowSec]);
 
   const { data, isLoading, isError, refetch } = useTopBidderActivePeriods(
     TOP_N,
@@ -113,10 +115,7 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
         </p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-white/[0.06] bg-black/20">
-          <div
-            className="relative min-w-full"
-            style={{ minWidth: LABEL_WIDTH + CHART_MIN_WIDTH }}
-          >
+          <div className="relative min-w-full" style={{ minWidth: LABEL_WIDTH + CHART_MIN_WIDTH }}>
             <div
               className="grid border-b border-white/[0.06] text-[10px] text-muted-foreground"
               style={{ gridTemplateColumns: `${LABEL_WIDTH}px 1fr` }}
@@ -207,8 +206,8 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
                   → {formatUnixTsLabel(hover.period.PeriodEnd, true)}
                 </p>
                 <p className="text-muted-foreground">
-                  {hover.period.NumBids} gestures ·{' '}
-                  {Math.round(hover.period.DurationSecs / 60)} min span
+                  {hover.period.NumBids} gestures · {Math.round(hover.period.DurationSecs / 60)} min
+                  span
                 </p>
               </div>
             ) : null}

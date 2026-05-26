@@ -140,6 +140,10 @@ const USE_API_QUERY_EXPORTS = [
   'useMarketingRewards',
   'useMarketingRewardsByUser',
   'useCurrentTime',
+  'useBidTimeBounds',
+  'useBiddingActivity',
+  'useBidFrequency',
+  'useTopBidderActivePeriods',
   'useSystemModelist',
   'useSystemEvents',
 ] as const;
