@@ -1,10 +1,14 @@
 import type { FaqMessage, FaqMessageRole } from './types';
 
 function roleLabel(role: FaqMessageRole): string {
-  if (role === 'user') return 'USER';
-  if (role === 'bot') return 'ASSISTANT';
-  if (role === 'error') return 'ERROR';
-  return role.toUpperCase();
+  switch (role) {
+    case 'user':
+      return 'USER';
+    case 'bot':
+      return 'ASSISTANT';
+    case 'error':
+      return 'ERROR';
+  }
 }
 
 export function hasCopyableConversation(messages: FaqMessage[]): boolean {
