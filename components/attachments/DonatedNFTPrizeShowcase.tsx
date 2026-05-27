@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { formatUnits } from 'viem';
-import { Coins, ExternalLink, Gift, ImageOff, ShieldCheck, Sparkles } from 'lucide-react';
+import { ExternalLink, Gift, ImageOff, ShieldCheck, Sparkles } from 'lucide-react';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -22,6 +22,7 @@ import {
 import { useAttachedNftMetadata } from './useAttachedNftMetadata';
 import { useAttachedErc20Metadata } from './useAttachedErc20Metadata';
 import { useNFTCollectionEstimate } from './useNFTCollectionEstimate';
+import { TokenLogo } from './TokenLogo';
 
 const MAX_NFT_PREVIEW = 4;
 const MAX_ERC20_PREVIEW = 4;
@@ -331,6 +332,7 @@ function AttachedERC20AllocationCard({
   const amount = getAttachedErc20Amount(token, metadata?.decimals ?? 18);
   const tokenName = metadata?.name || 'Attached ERC20 token';
   const explorerHref = token.TokenAddr ? getExplorerUrl('token', token.TokenAddr) : '';
+  const logoSource = metadata?.logoSource ?? 'curated token metadata';
 
   return (
     <article
@@ -343,14 +345,7 @@ function AttachedERC20AllocationCard({
       <div
         className={cn('grid h-full gap-4', featured ? 'lg:grid-cols-[220px_minmax(0,1fr)]' : '')}
       >
-        <div className="flex min-h-[168px] items-center justify-center rounded-xl border border-white/[0.08] bg-black/25 p-5">
-          <div className="relative flex h-28 w-28 items-center justify-center rounded-full border border-[rgb(var(--impact-green-rgb)/0.24)] bg-[radial-gradient(circle,rgb(var(--impact-green-rgb)/0.24),rgb(var(--aurora-cyan-rgb)/0.10)_56%,transparent)] shadow-[0_0_55px_-24px_rgb(var(--impact-green-rgb)/0.9)]">
-            <Coins className="h-12 w-12 text-[rgb(var(--impact-green-rgb))]" />
-            <span className="absolute -bottom-2 rounded-full border border-white/[0.08] bg-background/80 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur">
-              ERC20
-            </span>
-          </div>
-        </div>
+        <TokenLogo logoURI={metadata?.logoURI} symbol={symbol} name={tokenName} />
 
         <div className="flex min-w-0 flex-col justify-between gap-4">
           <div>
@@ -361,7 +356,13 @@ function AttachedERC20AllocationCard({
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
                 ERC20 token deposit
-                <InfoTooltip content="This ERC20 token deposit is attached to the cycle and goes to the Signature Allocation recipient when finalized." />
+                <InfoTooltip
+                  content={
+                    metadata?.logoURI
+                      ? `Logo from ${logoSource}; verify the token address before assigning value.`
+                      : 'This ERC20 token deposit is attached to the cycle and goes to the Signature Allocation recipient when finalized.'
+                  }
+                />
               </span>
             </div>
 

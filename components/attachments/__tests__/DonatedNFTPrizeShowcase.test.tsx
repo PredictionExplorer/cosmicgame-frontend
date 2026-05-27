@@ -89,6 +89,8 @@ beforeEach(() => {
       name: 'Galaxy Credits',
       symbol: 'GLXY',
       decimals: 18,
+      logoURI: 'https://cdn.example/glxy.png',
+      logoSource: 'Token List',
     },
   });
   mockUseNFTCollectionEstimate.mockReturnValue({ data: null });
@@ -143,6 +145,10 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.getByText('1 ERC-20 deposit')).toBeInTheDocument();
     expect(screen.getByText('1250.5 GLXY')).toBeInTheDocument();
     expect(screen.getByText('Galaxy Credits')).toBeInTheDocument();
+    expect(screen.getByAltText('GLXY token logo')).toHaveAttribute(
+      'src',
+      'https://cdn.example/glxy.png',
+    );
     expect(screen.getByRole('link', { name: /View GLXY token/i })).toHaveAttribute(
       'href',
       expect.stringContaining(ERC20_CONTRACT),
@@ -284,10 +290,27 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     render(<AttachedNFTAllocationShowcase nfts={[]} erc20Tokens={tokens} cycleNumber={42} />);
 
-    expect(screen.getAllByText('ERC20')).toHaveLength(4);
+    expect(screen.getAllByAltText('GLXY token logo')).toHaveLength(4);
     expect(
       screen.getByText('Plus 2 more attached ERC20 token deposits in the full cycle details.'),
     ).toBeInTheDocument();
+  });
+
+  it('falls back to a generated ERC20 badge when logo metadata is unavailable', () => {
+    mockUseAttachedErc20Metadata.mockReturnValue({
+      data: {
+        name: 'Galaxy Credits',
+        symbol: 'GLXY',
+        decimals: 18,
+      },
+    });
+
+    render(
+      <AttachedNFTAllocationShowcase nfts={[]} erc20Tokens={[createErc20()]} cycleNumber={42} />,
+    );
+
+    expect(screen.queryByAltText('GLXY token logo')).not.toBeInTheDocument();
+    expect(screen.getByText('GLXY')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
