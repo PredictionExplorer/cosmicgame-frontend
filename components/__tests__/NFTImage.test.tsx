@@ -78,15 +78,11 @@ describe('NFTImage', () => {
     expect(img.getAttribute('src')).toBe(externalSrc);
   });
 
-  test('keeps optimization for allowlisted hosts', () => {
+  test('bypasses optimization for Cosmic Signature NFT CDN hosts', () => {
     const localSrc = 'https://nfts.cosmicsignature.com/some-token.png';
     render(<NFTImage src={localSrc} />);
     const img = screen.getByAltText('NFT');
-    // Allowlisted hosts keep going through /_next/image — the raw src
-    // isn't returned verbatim; the original URL is encoded as a query.
-    const rawSrc = img.getAttribute('src') ?? '';
-    expect(rawSrc).not.toBe(localSrc);
-    expect(extractOptimizedUrl(rawSrc)).toContain(localSrc);
+    expect(img.getAttribute('src')).toBe(localSrc);
   });
 
   it('has no accessibility violations', async () => {

@@ -6,7 +6,7 @@ import {
   getEthErrorMessage,
   reportError,
 } from '@/utils/errors';
-import { isContractRevertError } from '@/utils/contractErrors';
+import { isContractRevertError, isEmptyContractReadError } from '@/utils/contractErrors';
 
 jest.mock('@sentry/nextjs', () => ({
   captureException: jest.fn(),
@@ -158,6 +158,24 @@ describe('isContractRevertError', () => {
 
   it('returns false for a non-Error object with matching name', () => {
     expect(isContractRevertError({ name: 'ContractFunctionExecutionError' })).toBe(false);
+  });
+});
+
+describe('isEmptyContractReadError', () => {
+  it('detects viem zero-data read errors', () => {
+    expect(
+      isEmptyContractReadError(new Error('Cannot decode zero data ("0x") with ABI parameters.')),
+    ).toBe(true);
+  });
+
+  it('detects nested zero-data read errors', () => {
+    const err = new Error('outer') as Error & { cause?: unknown };
+    err.cause = new Error('returned no data ("0x")');
+    expect(isEmptyContractReadError(err)).toBe(true);
+  });
+
+  it('returns false for unrelated errors', () => {
+    expect(isEmptyContractReadError(new Error('contract reverted'))).toBe(false);
   });
 });
 

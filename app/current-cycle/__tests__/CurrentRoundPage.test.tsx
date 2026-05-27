@@ -39,6 +39,7 @@ jest.mock('../../../components/home/RoundInfoSection', () => ({
       data-testid="round-info-section"
       data-round={props.data ? 'loaded' : 'none'}
       data-nfts={(props.donatedNFTs as unknown[] | undefined)?.length ?? 0}
+      data-erc20={(props.donatedERC20Tokens as unknown[] | undefined)?.length ?? 0}
     >
       RoundInfoSection
     </div>
@@ -48,15 +49,18 @@ jest.mock('../../../components/home/RoundInfoSection', () => ({
 jest.mock('../../../components/attachments/DonatedNFTPrizeShowcase', () => ({
   AttachedNFTAllocationShowcase: ({
     nfts,
+    erc20Tokens = [],
     cycleNumber,
   }: {
     nfts: unknown[];
+    erc20Tokens?: unknown[];
     cycleNumber?: number;
   }) =>
-    nfts.length > 0 ? (
+    nfts.length > 0 || erc20Tokens.length > 0 ? (
       <section
         data-testid="attached-nft-showcase"
         data-count={nfts.length}
+        data-erc20-count={erc20Tokens.length}
         data-cycle={cycleNumber}
       >
         Attached NFT Showcase
@@ -280,6 +284,21 @@ describe('CurrentRoundPage', () => {
 
     expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(42);
     expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-count', '2');
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-erc20-count', '0');
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-cycle', '42');
+  });
+
+  it('renders the attached showcase near the top when current-cycle ERC20 tokens exist', () => {
+    setupLoaded();
+    mockUseDonationsERC20ByRound.mockReturnValue({
+      data: [{ EvtLogId: 1, TokenAddr: '0xToken', AmountDonatedEth: 5 }],
+    });
+
+    render(<CurrentRoundPage />);
+
+    expect(mockUseDonationsERC20ByRound).toHaveBeenCalledWith(42);
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-count', '0');
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-erc20-count', '1');
     expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-cycle', '42');
   });
 
@@ -301,6 +320,20 @@ describe('CurrentRoundPage', () => {
     render(<CurrentRoundPage />);
 
     expect(screen.getByTestId('round-info-section')).toHaveAttribute('data-nfts', '3');
+  });
+
+  it('still passes attached ERC20 tokens to detailed RoundInfoSection', () => {
+    setupLoaded();
+    mockUseDonationsERC20ByRound.mockReturnValue({
+      data: [
+        { EvtLogId: 1, TokenAddr: '0xToken1', AmountDonatedEth: 5 },
+        { EvtLogId: 2, TokenAddr: '0xToken2', AmountDonatedEth: 9 },
+      ],
+    });
+
+    render(<CurrentRoundPage />);
+
+    expect(screen.getByTestId('round-info-section')).toHaveAttribute('data-erc20', '2');
   });
 
   it('renders singular gesture text for 1 gesture', () => {

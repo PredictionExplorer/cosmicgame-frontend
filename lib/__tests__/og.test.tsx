@@ -188,18 +188,14 @@ const DYNAMIC_OG_MODULES: ReadonlyArray<readonly [string, () => Promise<unknown>
 ];
 
 describe('static-tier opengraph-image module shape', () => {
-  it.each(STATIC_OG_MODULES)(
-    '%s exports the canonical edge-runtime fields',
-    async (_label, load) => {
-      const mod = (await load()) as OgModule;
-      expect(mod.runtime).toBe('edge');
-      expect(mod.contentType).toBe('image/png');
-      expect(mod.size).toEqual(COSMIC_OG_SIZE);
-      expect(typeof mod.alt).toBe('string');
-      expect(mod.alt.length).toBeGreaterThan(0);
-      expect(typeof mod.default).toBe('function');
-    },
-  );
+  it.each(STATIC_OG_MODULES)('%s exports the canonical image fields', async (_label, load) => {
+    const mod = (await load()) as OgModule;
+    expect(mod.contentType).toBe('image/png');
+    expect(mod.size).toEqual(COSMIC_OG_SIZE);
+    expect(typeof mod.alt).toBe('string');
+    expect(mod.alt.length).toBeGreaterThan(0);
+    expect(typeof mod.default).toBe('function');
+  });
 
   it.each(STATIC_OG_MODULES)(
     '%s default() invokes ImageResponse with CosmicOgCard',
@@ -293,18 +289,14 @@ describe('static-tier opengraph-image content', () => {
 // ---------------------------------------------------------------------------
 
 describe('dynamic-tier opengraph-image module shape', () => {
-  it.each(DYNAMIC_OG_MODULES)(
-    '%s exports the canonical edge-runtime fields',
-    async (_label, load) => {
-      const mod = (await load()) as OgModule;
-      expect(mod.runtime).toBe('edge');
-      expect(mod.contentType).toBe('image/png');
-      expect(mod.size).toEqual(COSMIC_OG_SIZE);
-      expect(typeof mod.alt).toBe('string');
-      expect(mod.alt).toMatch(/Cosmic Signature/);
-      expect(typeof mod.default).toBe('function');
-    },
-  );
+  it.each(DYNAMIC_OG_MODULES)('%s exports the canonical image fields', async (_label, load) => {
+    const mod = (await load()) as OgModule;
+    expect(mod.contentType).toBe('image/png');
+    expect(mod.size).toEqual(COSMIC_OG_SIZE);
+    expect(typeof mod.alt).toBe('string');
+    expect(mod.alt).toMatch(/Cosmic Signature/);
+    expect(typeof mod.default).toBe('function');
+  });
 });
 
 describe('allocation/[id] dynamic OG card', () => {
@@ -408,11 +400,6 @@ describe('user/[address] dynamic OG card', () => {
 
 describe('cross-cutting OG invariants', () => {
   const ALL_OG_MODULES = [...STATIC_OG_MODULES, ...DYNAMIC_OG_MODULES];
-
-  it.each(ALL_OG_MODULES)('%s declares the edge runtime', async (_label, load) => {
-    const mod = (await load()) as OgModule;
-    expect(mod.runtime).toBe('edge');
-  });
 
   it.each(ALL_OG_MODULES)('%s emits image/png', async (_label, load) => {
     const mod = (await load()) as OgModule;

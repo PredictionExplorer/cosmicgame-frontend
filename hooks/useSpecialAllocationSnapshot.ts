@@ -11,6 +11,7 @@ import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { useCurrentSpecialRecipients } from '@/hooks/useApiQuery';
 import type { SpecialRecipients } from '@/services/api/types';
+import { isEmptyContractReadError } from '@/utils/contractErrors';
 import { reportError } from '@/utils/errors';
 
 export type SpecialAllocationSource = 'api-v2' | 'api-v1+chain' | 'api-v1';
@@ -230,7 +231,9 @@ export function useSpecialAllocationSnapshot(): {
           cosmicGameAddress: cosmicGame,
         });
       } catch (error) {
-        reportError(error, 'special allocation chain fallback');
+        if (!isEmptyContractReadError(error)) {
+          reportError(error, 'special allocation chain fallback');
+        }
         return null;
       }
     },

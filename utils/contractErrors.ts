@@ -15,6 +15,31 @@ export function isContractRevertError(err: unknown): boolean {
   return err instanceof Error && err.name === 'ContractFunctionExecutionError';
 }
 
+/** Detects reads against addresses with no bytecode in local/e2e environments. */
+export function isEmptyContractReadError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+
+  const message = err.message;
+  if (
+    message.includes('Cannot decode zero data ("0x")') ||
+    message.includes('returned no data ("0x")')
+  ) {
+    return true;
+  }
+
+  const walkable = err as Error & { cause?: unknown; walk?: (fn: (e: Error) => boolean) => Error };
+  if (typeof walkable.walk === 'function') {
+    try {
+      const inner = walkable.walk((e: Error) => isEmptyContractReadError(e));
+      if (inner) return true;
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return isEmptyContractReadError(walkable.cause);
+}
+
 const CUSTOM_ERROR_MESSAGES: Record<string, string> = {
   InsufficientReceivedBidAmount:
     'The current Gesture Cost is greater than the amount you transferred.',

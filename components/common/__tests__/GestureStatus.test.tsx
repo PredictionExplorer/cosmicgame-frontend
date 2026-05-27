@@ -1,3 +1,5 @@
+import userEvent from '@testing-library/user-event';
+
 import { checkA11y, render, screen } from '@/test-utils';
 
 import { GestureStatus } from '../GestureStatus';
@@ -166,6 +168,49 @@ describe('GestureStatus', () => {
     );
   });
 
+  it('includes attached ERC20 tokens in the latest gesture maker Signature Allocation copy', () => {
+    mockUseUserInfo.mockReturnValueOnce({
+      data: { Gestures: [{ RoundNum: 5 }] },
+    });
+
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
+        allocationTime={Date.now() + 60000}
+        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+        attachedERC20Count={2}
+      />,
+    );
+
+    expect(screen.getByText(/You made the most recent gesture/)).toHaveTextContent(
+      'Signature Allocation (10.5000 ETH, 1,000 CST, 1 Cosmic Signature NFT, plus all 2 attached ERC20 token deposits shown below).',
+    );
+  });
+
+  it('combines attached NFTs and ERC20 tokens in the latest gesture maker copy', () => {
+    mockUseUserInfo.mockReturnValueOnce({
+      data: { Gestures: [{ RoundNum: 5 }] },
+    });
+
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={{ ...activeData, LastBidderAddr: '0xUser' } as never}
+        allocationTime={Date.now() + 60000}
+        curGestureList={[{ RoundNum: 5 } as never, { RoundNum: 5 } as never]}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+        attachedNFTCount={3}
+        attachedERC20Count={1}
+      />,
+    );
+
+    expect(screen.getByText(/You made the most recent gesture/)).toHaveTextContent(
+      'Signature Allocation (10.5000 ETH, 1,000 CST, 1 Cosmic Signature NFT, plus all 3 attached NFTs and the attached ERC20 token deposit shown below).',
+    );
+  });
+
   it('omits attached NFT copy when no attached NFTs are available', () => {
     mockUseUserInfo.mockReturnValueOnce({
       data: { Gestures: [{ RoundNum: 5 }] },
@@ -187,6 +232,30 @@ describe('GestureStatus', () => {
     expect(screen.getByText(/You made the most recent gesture/)).not.toHaveTextContent(
       'attached NFT',
     );
+    expect(screen.getByText(/You made the most recent gesture/)).not.toHaveTextContent(
+      'attached ERC20',
+    );
+  });
+
+  it('includes attached ERC20 tokens in the Signature Allocation tooltip copy', async () => {
+    const user = userEvent.setup();
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={activeData as never}
+        allocationTime={Date.now() + 60000}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+        attachedERC20Count={1}
+      />,
+    );
+
+    await user.hover(screen.getAllByRole('button', { name: 'Show more information' })[1]!);
+
+    expect(
+      await screen.findAllByText(
+        'The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT, and the attached ERC20 token deposit.',
+      ),
+    ).not.toHaveLength(0);
   });
 
   it('shows cycle closed when finalization time has passed', () => {

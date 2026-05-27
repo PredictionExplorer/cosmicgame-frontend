@@ -124,7 +124,11 @@ jest.mock('@tanstack/react-query', () => ({
 /* ── child components ───────────────────────────────────────────── */
 
 const mockGestureStatus = jest.fn((props: Record<string, unknown>) => (
-  <div data-testid="gesture-status" data-attached-nft-count={String(props.attachedNFTCount ?? 0)}>
+  <div
+    data-testid="gesture-status"
+    data-attached-nft-count={String(props.attachedNFTCount ?? 0)}
+    data-attached-erc20-count={String(props.attachedERC20Count ?? 0)}
+  >
     GestureStatus
   </div>
 ));
@@ -140,15 +144,18 @@ jest.mock('../../components/home/GestureForm', () => ({
 jest.mock('../../components/attachments/DonatedNFTPrizeShowcase', () => ({
   AttachedNFTAllocationShowcase: ({
     nfts,
+    erc20Tokens = [],
     cycleNumber,
   }: {
     nfts: unknown[];
+    erc20Tokens?: unknown[];
     cycleNumber?: number;
   }) =>
-    nfts.length > 0 ? (
+    nfts.length > 0 || erc20Tokens.length > 0 ? (
       <section
         data-testid="attached-nft-showcase"
         data-count={nfts.length}
+        data-erc20-count={erc20Tokens.length}
         data-cycle={cycleNumber}
       >
         Attached NFT Showcase
@@ -237,6 +244,7 @@ beforeEach(() => {
   mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: false });
   mockUseGestureListByCycle.mockReturnValue({ data: undefined });
   mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
+  mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
   mockUseCurrentTime.mockReturnValue({
     data: Math.floor(Date.now() / 1000),
     isLoading: false,
@@ -380,15 +388,42 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(mockUseDonationsNFTByRound).toHaveBeenCalledWith(7);
+    expect(mockUseDonationsERC20ByRound).toHaveBeenCalledWith(7);
     const gestureStatusProps =
       mockGestureStatus.mock.calls[mockGestureStatus.mock.calls.length - 1]?.[0];
-    expect(gestureStatusProps).toEqual(expect.objectContaining({ attachedNFTCount: 2 }));
+    expect(gestureStatusProps).toEqual(
+      expect.objectContaining({ attachedNFTCount: 2, attachedERC20Count: 0 }),
+    );
     const showcase = screen.getByTestId('attached-nft-showcase');
     expect(showcase).toHaveAttribute('data-count', '2');
+    expect(showcase).toHaveAttribute('data-erc20-count', '0');
     expect(showcase).toHaveAttribute('data-cycle', '7');
     expect(screen.getByText('Allocation Breakdown').compareDocumentPosition(showcase)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
+  });
+
+  it('requests current-cycle attached ERC20 tokens and renders the showcase when present', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7 }),
+      isLoading: false,
+    });
+    mockUseDonationsERC20ByRound.mockReturnValue({
+      data: [{ EvtLogId: 1, TokenAddr: '0xToken', AmountDonatedEth: 5 }],
+    });
+
+    render(<HomePage />);
+
+    expect(mockUseDonationsERC20ByRound).toHaveBeenCalledWith(7);
+    const gestureStatusProps =
+      mockGestureStatus.mock.calls[mockGestureStatus.mock.calls.length - 1]?.[0];
+    expect(gestureStatusProps).toEqual(
+      expect.objectContaining({ attachedNFTCount: 0, attachedERC20Count: 1 }),
+    );
+    const showcase = screen.getByTestId('attached-nft-showcase');
+    expect(showcase).toHaveAttribute('data-count', '0');
+    expect(showcase).toHaveAttribute('data-erc20-count', '1');
+    expect(showcase).toHaveAttribute('data-cycle', '7');
   });
 
   it('does not render the attached NFT showcase when the current cycle has none', () => {

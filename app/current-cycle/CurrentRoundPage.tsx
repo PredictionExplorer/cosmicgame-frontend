@@ -239,6 +239,7 @@ const CurrentRoundPage = () => {
 
       <AttachedNFTAllocationShowcase
         nfts={donatedNFTs}
+        erc20Tokens={donatedERC20Tokens}
         cycleNumber={data.CurRoundNum}
         className="mb-12"
       />

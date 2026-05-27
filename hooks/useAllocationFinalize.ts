@@ -8,7 +8,7 @@ import { isAxiosError } from '@/services/api/client';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
 import type { DashboardInfo } from '@/services/api/types';
 import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
-import { getContractErrorMessage } from '@/utils/contractErrors';
+import { getContractErrorMessage, isEmptyContractReadError } from '@/utils/contractErrors';
 import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
 import { useAllocationTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
@@ -172,7 +172,9 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
       if (!mountedRef.current) return;
       setActivationTime(Number(time ?? 0) - offset / 1000);
     } catch (err) {
-      reportError(err, 'fetchActivationTime');
+      if (!isEmptyContractReadError(err)) {
+        reportError(err, 'fetchActivationTime');
+      }
       if (mountedRef.current) setActivationTime(0);
     }
   }, [cosmicGameContract, offset]);
@@ -185,7 +187,9 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
         if (!mountedRef.current) return;
         setTimeoutClaimPrize(Number(timeout ?? 0));
       } catch (err) {
-        reportError(err, 'fetchTimeoutFinalize');
+        if (!isEmptyContractReadError(err)) {
+          reportError(err, 'fetchTimeoutFinalize');
+        }
         if (mountedRef.current) setTimeoutClaimPrize(0);
       }
     };

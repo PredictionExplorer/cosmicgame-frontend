@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import type { AttachedNFT } from '@/services/api/types';
+import type { AttachedNFT, DonatedERC20Token } from '@/services/api/types';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
@@ -23,8 +23,14 @@ jest.mock('../useNFTCollectionEstimate', () => ({
   useNFTCollectionEstimate: (...args: unknown[]) => mockUseNFTCollectionEstimate(...args),
 }));
 
+const mockUseAttachedErc20Metadata = jest.fn();
+jest.mock('../useAttachedErc20Metadata', () => ({
+  useAttachedErc20Metadata: (...args: unknown[]) => mockUseAttachedErc20Metadata(...args),
+}));
+
 const CONTRACT = '0x1234567890abcdef1234567890abcdef12345678';
 const CONTRIBUTOR = '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd';
+const ERC20_CONTRACT = '0x2222222222222222222222222222222222222222';
 
 function createNft(overrides: Partial<AttachedNFT> = {}): AttachedNFT {
   return {
@@ -45,6 +51,25 @@ function createNft(overrides: Partial<AttachedNFT> = {}): AttachedNFT {
   };
 }
 
+function createErc20(overrides: Partial<DonatedERC20Token> = {}): DonatedERC20Token {
+  return {
+    EvtLogId: 101,
+    BlockNum: 1,
+    TxId: 1,
+    TxHash: '0xerc20hash',
+    TimeStamp: 1700000000,
+    DateTime: '2023-11-14T00:00:00Z',
+    RoundNum: 42,
+    TokenAddr: ERC20_CONTRACT,
+    AmountDonatedEth: 1250.5,
+    AmountClaimedEth: 0,
+    WinnerAddr: '',
+    DonorAddr: CONTRIBUTOR,
+    Claimed: false,
+    ...overrides,
+  };
+}
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseAttachedNftMetadata.mockReturnValue({
@@ -59,11 +84,18 @@ beforeEach(() => {
     },
     isError: false,
   });
+  mockUseAttachedErc20Metadata.mockReturnValue({
+    data: {
+      name: 'Galaxy Credits',
+      symbol: 'GLXY',
+      decimals: 18,
+    },
+  });
   mockUseNFTCollectionEstimate.mockReturnValue({ data: null });
 });
 
 describe('AttachedNFTAllocationShowcase', () => {
-  it('renders nothing when there are no NFTs', () => {
+  it('renders nothing when there are no attached assets', () => {
     const { container } = render(<AttachedNFTAllocationShowcase nfts={[]} cycleNumber={42} />);
     expect(container).toBeEmptyDOMElement();
   });
@@ -71,10 +103,10 @@ describe('AttachedNFTAllocationShowcase', () => {
   it('renders single NFT allocation copy prominently', () => {
     render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
-    expect(screen.getByText('Bonus NFT attached to this cycle')).toBeInTheDocument();
+    expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
     expect(
       screen.getByText(
-        'The Final Gesture participant receives this attached NFT when Cycle #42 finalizes.',
+        'The Final Gesture participant receives the attached NFT when Cycle #42 finalizes.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('Included in Signature Allocation')).toBeInTheDocument();
@@ -88,13 +120,52 @@ describe('AttachedNFTAllocationShowcase', () => {
       />,
     );
 
-    expect(screen.getByText('Bonus NFTs attached to this cycle')).toBeInTheDocument();
+    expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
     expect(
       screen.getByText(
         'The Final Gesture participant receives all 2 attached NFTs when Cycle #42 finalizes.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('2 ERC-721 tokens')).toBeInTheDocument();
+  });
+
+  it('renders ERC20-only allocation copy, amount, metadata, and explorer action', () => {
+    render(
+      <AttachedNFTAllocationShowcase nfts={[]} erc20Tokens={[createErc20()]} cycleNumber={42} />,
+    );
+
+    expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'The Final Gesture participant receives the attached ERC20 token deposit when Cycle #42 finalizes.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText('1 ERC-20 deposit')).toBeInTheDocument();
+    expect(screen.getByText('1250.5 GLXY')).toBeInTheDocument();
+    expect(screen.getByText('Galaxy Credits')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /View GLXY token/i })).toHaveAttribute(
+      'href',
+      expect.stringContaining(ERC20_CONTRACT),
+    );
+  });
+
+  it('renders mixed NFT and ERC20 allocation copy with combined counts', () => {
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[createNft(), createNft({ RecordId: 2, NFTTokenId: 456 })]}
+        erc20Tokens={[createErc20(), createErc20({ EvtLogId: 102, AmountDonatedEth: 5 })]}
+        cycleNumber={42}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        'The Final Gesture participant receives all 2 attached NFTs and all 2 attached ERC20 token deposits when Cycle #42 finalizes.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText('2 ERC-721 tokens + 2 ERC-20 deposits')).toBeInTheDocument();
+    expect(screen.getByText('1250.5 GLXY')).toBeInTheDocument();
+    expect(screen.getByText('5 GLXY')).toBeInTheDocument();
   });
 
   it('displays metadata image, title, collection, token id, contributor, and actions', () => {
@@ -206,9 +277,26 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
   });
 
+  it('limits the ERC20 preview and links users to full details copy', () => {
+    const tokens = Array.from({ length: 6 }, (_, index) =>
+      createErc20({ EvtLogId: index + 1, AmountDonatedEth: index + 1 }),
+    );
+
+    render(<AttachedNFTAllocationShowcase nfts={[]} erc20Tokens={tokens} cycleNumber={42} />);
+
+    expect(screen.getAllByText('ERC20')).toHaveLength(4);
+    expect(
+      screen.getByText('Plus 2 more attached ERC20 token deposits in the full cycle details.'),
+    ).toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
-      <AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />,
+      <AttachedNFTAllocationShowcase
+        nfts={[createNft()]}
+        erc20Tokens={[createErc20()]}
+        cycleNumber={42}
+      />,
     );
     await checkA11y(container);
   });

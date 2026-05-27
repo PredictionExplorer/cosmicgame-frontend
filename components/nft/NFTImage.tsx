@@ -5,24 +5,8 @@ import { cn } from '@/lib/utils';
 
 const FALLBACK_SRC = '/images/qmark.png';
 
-// Hosts we trust the Next image optimizer to fetch from (mirrors
-// next.config.ts → images.remotePatterns). Donated NFTs can come from
-// arbitrary marketplace CDNs (Art Blocks media-proxy, IPFS gateways, etc.)
-// — for those we set `unoptimized` so next/image bypasses the allowlist
-// instead of throwing at render time and exploding the page.
-const ALLOWLISTED_HOSTS = new Set<string>([
-  'nfts.cosmicsignature.com',
-  'nfts-sepolia.cosmicsignature.com',
-  'nfts-local.cosmicsignature.com',
-]);
-
-function isOptimizableHost(src: string): boolean {
-  if (!src.startsWith('http')) return true; // local /public asset
-  try {
-    return ALLOWLISTED_HOSTS.has(new URL(src).hostname);
-  } catch {
-    return false;
-  }
+function shouldBypassOptimizer(src: string): boolean {
+  return src.startsWith('http');
 }
 
 interface NFTImageProps {
@@ -59,7 +43,7 @@ const NFTImage = ({
   }
 
   const finalSrc = hasError ? FALLBACK_SRC : src || FALLBACK_SRC;
-  const unoptimized = !isOptimizableHost(finalSrc);
+  const unoptimized = shouldBypassOptimizer(finalSrc);
 
   return (
     <Image

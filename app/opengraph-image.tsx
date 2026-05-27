@@ -10,7 +10,6 @@ import { COSMIC_OG_SIZE, CosmicOgCard } from '@/lib/og/CosmicOgCard';
  * Facebook / LinkedIn previews for the canonical site root and every
  * unspecialized dApp page.
  */
-export const runtime = 'edge';
 export const contentType = 'image/png';
 export const size = COSMIC_OG_SIZE;
 export const alt = 'Cosmic Signature \u2014 Every Gesture Shapes the Signature.';

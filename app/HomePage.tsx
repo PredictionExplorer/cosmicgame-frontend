@@ -38,6 +38,7 @@ import {
   useCurrentTime,
   useCSTInfo,
   useDonationsNFTByRound,
+  useDonationsERC20ByRound,
 } from '@/hooks/useApiQuery';
 import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/activationTime';
 import { isLandingHost } from '@/lib/hostRouting';
@@ -83,11 +84,13 @@ const HomePage = () => {
   const round = dashboardData?.CurRoundNum ?? -1;
   const { data: bidListData } = useGestureListByCycle(round, 'desc');
   const { data: nftDonationsData } = useDonationsNFTByRound(round);
+  const { data: erc20DonationsData } = useDonationsERC20ByRound(round);
 
   const data = dashboardData ?? null;
   const loading = dashboardLoading;
   const curGestureList = bidListData ?? [];
   const donatedNFTs = nftDonationsData ?? [];
+  const donatedERC20Tokens = erc20DonationsData ?? [];
 
   // Re-renders every second so countdown comparisons (allocationTime > now,
   // claimWait > now, activationTime check) update without bare Date.now().
@@ -250,6 +253,7 @@ const HomePage = () => {
           allocationTime={allocationTime}
           suppressPrimaryTimer
           attachedNFTCount={donatedNFTs.length}
+          attachedERC20Count={donatedERC20Tokens.length}
         />
 
         {/* ===== SPECIAL ALLOCATION LEADERS ===== */}
@@ -395,6 +399,7 @@ const HomePage = () => {
 
         <AttachedNFTAllocationShowcase
           nfts={donatedNFTs}
+          erc20Tokens={donatedERC20Tokens}
           cycleNumber={round >= 0 ? round : undefined}
         />
 

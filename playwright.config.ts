@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
+if (process.env.FORCE_COLOR && process.env.NO_COLOR) {
+  delete process.env.NO_COLOR;
+}
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -28,9 +32,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev -- -p 3000',
+    command:
+      'PLAYWRIGHT=1 YARN_IGNORE_ENGINES=1 yarn build && PLAYWRIGHT=1 YARN_IGNORE_ENGINES=1 yarn start -p 3000',
     port: 3000,
-    reuseExistingServer: true,
-    timeout: 60_000,
+    reuseExistingServer: false,
+    timeout: 120_000,
   },
 });

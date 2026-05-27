@@ -37,6 +37,7 @@ interface GestureStatusProps {
   allocationTime: number;
   suppressPrimaryTimer?: boolean;
   attachedNFTCount?: number;
+  attachedERC20Count?: number;
 }
 
 const fadeUp = {
@@ -135,6 +136,43 @@ function GestureMetricCard({
   );
 }
 
+function formatAttachedAssetPart(
+  count: number,
+  singularLabel: string,
+  pluralLabel: string,
+  includeAllForPlural = true,
+) {
+  if (count === 0) return '';
+  if (count === 1) return `the attached ${singularLabel}`;
+  return `${includeAllForPlural ? 'all ' : ''}${count} attached ${pluralLabel}`;
+}
+
+function joinAssetParts(parts: string[]) {
+  if (parts.length === 0) return '';
+  if (parts.length === 1) return parts[0];
+  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+function formatAttachedAssetStatusCopy(nftCount: number, erc20Count: number) {
+  const parts = [
+    formatAttachedAssetPart(nftCount, 'NFT', 'NFTs'),
+    formatAttachedAssetPart(erc20Count, 'ERC20 token deposit', 'ERC20 token deposits'),
+  ].filter(Boolean);
+
+  if (parts.length === 0) return '';
+  return `, plus ${joinAssetParts(parts)} shown below`;
+}
+
+function formatAttachedAssetTooltipCopy(nftCount: number, erc20Count: number) {
+  const parts = [
+    formatAttachedAssetPart(nftCount, 'NFT', 'NFTs'),
+    formatAttachedAssetPart(erc20Count, 'ERC20 token deposit', 'ERC20 token deposits'),
+  ].filter(Boolean);
+
+  if (parts.length === 0) return '';
+  return `, and ${joinAssetParts(parts)}`;
+}
+
 export const GestureStatus = ({
   data,
   loading,
@@ -144,6 +182,7 @@ export const GestureStatus = ({
   allocationTime,
   suppressPrimaryTimer = false,
   attachedNFTCount = 0,
+  attachedERC20Count = 0,
 }: GestureStatusProps) => {
   const { account } = useActiveWeb3React();
   const { data: userInfoRaw } = useUserInfo(account);
@@ -174,19 +213,14 @@ export const GestureStatus = ({
     };
   }, [account, data, userInfoRaw, curGestureList]);
 
-  const attachedNFTAllocationCopy =
-    attachedNFTCount > 1
-      ? `, plus all ${attachedNFTCount} attached NFTs shown below`
-      : attachedNFTCount === 1
-        ? ', plus the attached NFT shown below'
-        : '';
-
-  const attachedNFTTooltipCopy =
-    attachedNFTCount > 1
-      ? `, and all ${attachedNFTCount} attached NFTs`
-      : attachedNFTCount === 1
-        ? ', and the attached NFT'
-        : '';
+  const attachedAssetAllocationCopy = formatAttachedAssetStatusCopy(
+    attachedNFTCount,
+    attachedERC20Count,
+  );
+  const attachedAssetTooltipCopy = formatAttachedAssetTooltipCopy(
+    attachedNFTCount,
+    attachedERC20Count,
+  );
 
   const cstGestureData = useMemo(() => {
     if (!ctPriceRaw) return { AuctionDuration: 0, CSTPrice: 0, SecondsElapsed: 0 };
@@ -265,7 +299,7 @@ export const GestureStatus = ({
                 value={`${(data?.PrizeAmountEth ?? 0).toFixed(4)} ETH`}
                 icon={<Trophy className="h-5 w-5" />}
                 tone="signature"
-                tooltip={`The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT${attachedNFTTooltipCopy}.`}
+                tooltip={`The ETH portion of the Signature Allocation; the recipient also receives 1,000 CST, a Cosmic Signature NFT${attachedAssetTooltipCopy}.`}
               />
             </motion.div>
 
@@ -344,7 +378,7 @@ export const GestureStatus = ({
                 <p className="text-sm font-medium text-emerald-400">
                   You made the most recent gesture. If no one else gestures, you receive the
                   Signature Allocation ({(data.PrizeAmountEth ?? 0).toFixed(4)} ETH, 1,000 CST, 1
-                  Cosmic Signature NFT{attachedNFTAllocationCopy}).
+                  Cosmic Signature NFT{attachedAssetAllocationCopy}).
                 </p>
               ) : (
                 <p className="text-sm text-muted-foreground">
