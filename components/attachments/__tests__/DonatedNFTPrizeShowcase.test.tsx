@@ -108,10 +108,12 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
     expect(
       screen.getByText(
-        'The Final Gesture participant receives the attached NFT when Cycle #42 finalizes.',
+        /Final Gesture participant receives the attached NFT when Cycle #42 finalizes/i,
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('Included in Signature Allocation')).toBeInTheDocument();
+    expect(screen.getByText('Bonus Receipt')).toBeInTheDocument();
+    expect(screen.getByText('All visible')).toBeInTheDocument();
   });
 
   it('renders multiple NFT allocation copy and count', () => {
@@ -125,7 +127,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
     expect(
       screen.getByText(
-        'The Final Gesture participant receives all 2 attached NFTs when Cycle #42 finalizes.',
+        /Final Gesture participant receives all 2 attached NFTs when Cycle #42 finalizes/i,
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('2 ERC-721 tokens')).toBeInTheDocument();
@@ -139,12 +141,14 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
     expect(
       screen.getByText(
-        'The Final Gesture participant receives the attached ERC20 token deposit when Cycle #42 finalizes.',
+        /Final Gesture participant receives the attached ERC-20 token deposit when Cycle #42 finalizes/i,
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('1 ERC-20 deposit')).toBeInTheDocument();
+    expect(screen.getByText('ERC-20 deposit')).toBeInTheDocument();
     expect(screen.getByText('1250.5 GLXY')).toBeInTheDocument();
     expect(screen.getByText('Galaxy Credits')).toBeInTheDocument();
+    expect(screen.getAllByText('Pending finalization').length).toBeGreaterThan(0);
     expect(screen.getByAltText('GLXY token logo')).toHaveAttribute(
       'src',
       'https://cdn.example/glxy.png',
@@ -166,12 +170,30 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     expect(
       screen.getByText(
-        'The Final Gesture participant receives all 2 attached NFTs and all 2 attached ERC20 token deposits when Cycle #42 finalizes.',
+        /Final Gesture participant receives all 2 attached NFTs and all 2 attached ERC-20 token deposits when Cycle #42 finalizes/i,
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('2 ERC-721 tokens + 2 ERC-20 deposits')).toBeInTheDocument();
     expect(screen.getByText('1250.5 GLXY')).toBeInTheDocument();
     expect(screen.getByText('5 GLXY')).toBeInTheDocument();
+  });
+
+  it('uses the same Recipient receives treatment for NFTs and ERC20 deposits', () => {
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[createNft()]}
+        erc20Tokens={[createErc20()]}
+        cycleNumber={42}
+      />,
+    );
+
+    const recipientBadges = screen.getAllByTestId('recipient-receives-badge');
+    expect(recipientBadges).toHaveLength(2);
+    expect(new Set(recipientBadges.map((badge) => badge.className)).size).toBe(1);
+    recipientBadges.forEach((badge) => {
+      expect(badge).toHaveClass('text-primary');
+      expect(badge).toHaveClass('bg-primary/10');
+    });
   });
 
   it('displays metadata image, title, collection, token id, contributor, and actions', () => {
@@ -184,6 +206,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.getByText('Chromie Squiggle #123')).toBeInTheDocument();
     expect(screen.getByText('Chromie Squiggle')).toBeInTheDocument();
     expect(screen.getByText('#123')).toBeInTheDocument();
+    expect(screen.getAllByText('Final Gesture').length).toBeGreaterThan(0);
     expect(
       screen
         .getAllByRole('link', { name: /View NFT/i })
@@ -279,8 +302,11 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     expect(screen.getAllByTestId('nft-image')).toHaveLength(4);
     expect(
-      screen.getByText('Plus 2 more attached NFTs in the full cycle details.'),
+      screen.getByText(
+        'Showing the featured receipt preview. Plus 2 more attached NFTs in the full cycle details.',
+      ),
     ).toBeInTheDocument();
+    expect(screen.getByText('4 of 6')).toBeInTheDocument();
   });
 
   it('limits the ERC20 preview and links users to full details copy', () => {
@@ -292,8 +318,11 @@ describe('AttachedNFTAllocationShowcase', () => {
 
     expect(screen.getAllByAltText('GLXY token logo')).toHaveLength(4);
     expect(
-      screen.getByText('Plus 2 more attached ERC20 token deposits in the full cycle details.'),
+      screen.getByText(
+        'Showing the featured receipt preview. Plus 2 more attached ERC-20 token deposits in the full cycle details.',
+      ),
     ).toBeInTheDocument();
+    expect(screen.getByText('4 of 6')).toBeInTheDocument();
   });
 
   it('falls back to a generated ERC20 badge when logo metadata is unavailable', () => {

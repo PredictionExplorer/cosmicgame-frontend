@@ -3,7 +3,15 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { formatUnits } from 'viem';
-import { ExternalLink, Gift, ImageOff, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  Gift,
+  ImageOff,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -27,6 +35,21 @@ import { TokenLogo } from './TokenLogo';
 const MAX_NFT_PREVIEW = 4;
 const MAX_ERC20_PREVIEW = 4;
 
+type AssetTone = 'nft' | 'erc20';
+
+const assetTones: Record<AssetTone, { card: string; media: string; chip: string }> = {
+  nft: {
+    card: 'bg-[linear-gradient(135deg,rgb(255_255_255/0.046),rgb(255_255_255/0.016)_50%,rgb(var(--nebula-violet-rgb)/0.075))]',
+    media: 'shadow-[0_0_70px_-36px_rgb(var(--nebula-violet-rgb)/0.9)]',
+    chip: 'border-[rgb(var(--nebula-violet-rgb)/0.24)] bg-[rgb(var(--nebula-violet-rgb)/0.10)] text-[rgb(var(--stellar-white-rgb))]',
+  },
+  erc20: {
+    card: 'bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.085),rgb(255_255_255/0.018)_54%,rgb(var(--aurora-cyan-rgb)/0.07))]',
+    media: 'shadow-[0_0_70px_-36px_rgb(var(--impact-green-rgb)/0.9)]',
+    chip: 'border-[rgb(var(--impact-green-rgb)/0.22)] bg-[rgb(var(--impact-green-rgb)/0.10)] text-[rgb(var(--impact-green-rgb))]',
+  },
+};
+
 interface AttachedNFTAllocationShowcaseProps {
   nfts: AttachedNFT[];
   erc20Tokens?: DonatedERC20Token[];
@@ -46,8 +69,10 @@ export function AttachedNFTAllocationShowcase({
   const previewNfts = nfts.slice(0, MAX_NFT_PREVIEW);
   const previewErc20Tokens = erc20Tokens.slice(0, MAX_ERC20_PREVIEW);
   const totalPreviewCount = previewNfts.length + previewErc20Tokens.length;
+  const totalAssetCount = nfts.length + erc20Tokens.length;
   const allocationSummary = formatAllocationSummary(nfts.length, erc20Tokens.length);
   const receiptCopy = formatReceiptCopy(nfts.length, erc20Tokens.length);
+  const previewCopy = formatPreviewCopy(totalPreviewCount, totalAssetCount);
   const remainderCopy = formatRemainderCopy(
     nfts.length - previewNfts.length,
     erc20Tokens.length - previewErc20Tokens.length,
@@ -61,6 +86,7 @@ export function AttachedNFTAllocationShowcase({
       <Surface variant="gradient-border-accent" radius="xl" padding="none" className="isolate">
         <div className="pointer-events-none absolute -left-20 top-10 h-52 w-52 rounded-full bg-[rgb(var(--solar-gold-rgb)/0.16)] blur-3xl" />
         <div className="pointer-events-none absolute -right-20 -top-16 h-64 w-64 rounded-full bg-primary/18 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-1/2 h-32 w-3/5 -translate-x-1/2 bg-[radial-gradient(ellipse,rgb(var(--aurora-cyan-rgb)/0.14),transparent_68%)] blur-2xl" />
 
         <div className="relative p-5 sm:p-7 lg:p-8">
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
@@ -76,20 +102,28 @@ export function AttachedNFTAllocationShowcase({
                 Bonus assets attached to this cycle
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                The Final Gesture participant receives {receiptCopy} when Cycle #{cycleLabel}{' '}
-                finalizes.
+                A compact receipt for the community-attached assets that travel with the Signature
+                Allocation. The Final Gesture participant receives {receiptCopy} when Cycle #
+                {cycleLabel} finalizes.
               </p>
             </div>
 
-            <div className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3">
+            <div className="flex items-center gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 shadow-[0_18px_70px_-48px_rgb(var(--aurora-cyan-rgb)/0.9)]">
               <Gift className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Attached Allocation
+                  Bonus Receipt
                 </p>
                 <p className="text-sm font-bold text-white">{allocationSummary}</p>
               </div>
             </div>
+          </div>
+
+          <div className="mb-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryChip label="Assets included" value={String(totalAssetCount)} />
+            <SummaryChip label="Cycle" value={`#${cycleLabel}`} />
+            <SummaryChip label="Preview" value={previewCopy} />
+            <SummaryChip label="Recipient rule" value="Final Gesture" />
           </div>
 
           <div
@@ -119,7 +153,9 @@ export function AttachedNFTAllocationShowcase({
           </div>
 
           {remainderCopy ? (
-            <p className="mt-4 text-sm text-muted-foreground">{remainderCopy}</p>
+            <p className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3 text-sm text-muted-foreground">
+              {remainderCopy}
+            </p>
           ) : null}
         </div>
       </Surface>
@@ -145,11 +181,16 @@ function formatReceiptCopy(nftCount: number, erc20Count: number) {
 
   if (nftCount === 1) parts.push('the attached NFT');
   if (nftCount > 1) parts.push(`all ${nftCount} attached NFTs`);
-  if (erc20Count === 1) parts.push('the attached ERC20 token deposit');
-  if (erc20Count > 1) parts.push(`all ${erc20Count} attached ERC20 token deposits`);
+  if (erc20Count === 1) parts.push('the attached ERC-20 token deposit');
+  if (erc20Count > 1) parts.push(`all ${erc20Count} attached ERC-20 token deposits`);
 
   if (parts.length === 1) return parts[0];
   return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+function formatPreviewCopy(visibleCount: number, totalCount: number) {
+  if (visibleCount >= totalCount) return 'All visible';
+  return `${visibleCount} of ${totalCount}`;
 }
 
 function formatRemainderCopy(hiddenNftCount: number, hiddenErc20Count: number) {
@@ -159,12 +200,12 @@ function formatRemainderCopy(hiddenNftCount: number, hiddenErc20Count: number) {
   }
   if (hiddenErc20Count > 0) {
     parts.push(
-      `${hiddenErc20Count} more attached ERC20 token deposit${hiddenErc20Count === 1 ? '' : 's'}`,
+      `${hiddenErc20Count} more attached ERC-20 token deposit${hiddenErc20Count === 1 ? '' : 's'}`,
     );
   }
   if (parts.length === 0) return '';
   const joined = parts.length === 1 ? parts[0] : `${parts[0]} and ${parts[1]}`;
-  return `Plus ${joined} in the full cycle details.`;
+  return `Showing the featured receipt preview. Plus ${joined} in the full cycle details.`;
 }
 
 function formatDisplayDecimal(value: string) {
@@ -204,6 +245,91 @@ function getAttachedErc20Amount(token: DonatedERC20Token, decimals: number) {
   return 'Unknown amount';
 }
 
+function SummaryChip({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.025] px-3 py-2.5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 truncate text-sm font-semibold text-white">{value}</p>
+    </div>
+  );
+}
+
+function AssetCardShell({
+  tone,
+  featured,
+  children,
+}: {
+  tone: AssetTone;
+  featured: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <article
+      className={cn(
+        'group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4 transition-all duration-300',
+        'hover:-translate-y-0.5 hover:border-white/[0.14] hover:bg-white/[0.05]',
+        'before:pointer-events-none before:absolute before:inset-x-5 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent',
+        assetTones[tone].card,
+        featured && 'md:col-span-2 xl:col-span-1',
+      )}
+    >
+      {children}
+    </article>
+  );
+}
+
+function RecipientBadge() {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary"
+      data-testid="recipient-receives-badge"
+    >
+      <ShieldCheck className="h-3.5 w-3.5" />
+      Recipient receives
+    </span>
+  );
+}
+
+function AssetTypeBadge({
+  tone,
+  children,
+  tooltip,
+}: {
+  tone: AssetTone;
+  children: ReactNode;
+  tooltip?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
+        assetTones[tone].chip,
+      )}
+    >
+      {children}
+      {tooltip ? <InfoTooltip content={tooltip} /> : null}
+    </span>
+  );
+}
+
+function StatusBadge({ claimed }: { claimed?: boolean }) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
+        claimed
+          ? 'border-[rgb(var(--impact-green-rgb)/0.24)] bg-[rgb(var(--impact-green-rgb)/0.10)] text-[rgb(var(--impact-green-rgb))]'
+          : 'border-white/[0.08] bg-white/[0.035] text-muted-foreground',
+      )}
+    >
+      {claimed ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+      {claimed ? 'Retrieved' : 'Pending finalization'}
+    </span>
+  );
+}
+
 function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featured: boolean }) {
   const { data: metadata, isError } = useAttachedNftMetadata(nft.NFTTokenURI);
   const tokenId = getAttachedNftTokenId(nft);
@@ -221,13 +347,7 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
   const imageAlt = metadata?.name ? `Attached NFT ${metadata.name}` : 'Attached NFT allocation';
 
   return (
-    <article
-      className={cn(
-        'relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4',
-        'bg-[linear-gradient(135deg,rgb(255_255_255/0.045),rgb(255_255_255/0.016)_50%,rgb(var(--nebula-violet-rgb)/0.06))]',
-        featured && 'md:col-span-2 xl:col-span-1',
-      )}
-    >
+    <AssetCardShell tone="nft" featured={featured}>
       <div className={cn('grid gap-4', featured ? 'lg:grid-cols-[minmax(0,1fr)_320px]' : '')}>
         <div>
           {primaryLink.href ? (
@@ -235,7 +355,10 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
               href={primaryLink.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="group block overflow-hidden rounded-xl border border-white/[0.08] bg-black/25"
+              className={cn(
+                'group/media block overflow-hidden rounded-xl border border-white/[0.08] bg-black/25',
+                assetTones.nft.media,
+              )}
               aria-label={`${primaryLink.label}: ${title}`}
             >
               <NFTImage
@@ -243,11 +366,16 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
                 alt={imageAlt}
                 priority={featured}
                 sizes={featured ? '(max-width: 1024px) 100vw, 720px' : '360px'}
-                className="transition-transform duration-500 group-hover:scale-[1.025]"
+                className="transition-transform duration-500 group-hover/media:scale-[1.025]"
               />
             </a>
           ) : (
-            <div className="overflow-hidden rounded-xl border border-white/[0.08] bg-black/25">
+            <div
+              className={cn(
+                'overflow-hidden rounded-xl border border-white/[0.08] bg-black/25',
+                assetTones.nft.media,
+              )}
+            >
               <NFTImage src={metadata?.image} alt={imageAlt} priority={featured} />
             </div>
           )}
@@ -256,10 +384,8 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
         <div className="flex min-w-0 flex-col justify-between gap-4">
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Recipient receives
-              </span>
+              <RecipientBadge />
+              <AssetTypeBadge tone="nft">ERC-721</AssetTypeBadge>
               {estimate ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--solar-gold-rgb)/0.25)] bg-[rgb(var(--solar-gold-rgb)/0.10)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--solar-gold-rgb))]">
                   Floor ~{estimate.floorPriceEth.toFixed(3)} {estimate.currency}
@@ -287,8 +413,8 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
 
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <Fact label="Token ID" value={tokenId ? `#${tokenId}` : 'Unknown'} />
-              <Fact
+              <AssetFact label="Token ID" value={tokenId ? `#${tokenId}` : 'Unknown'} />
+              <AssetFact
                 label="Attached by"
                 value={
                   nft.DonorAddr ? (
@@ -300,23 +426,23 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
                   )
                 }
               />
+              <AssetFact label="Cycle" value={`#${nft.RoundNum}`} />
+              <AssetFact label="Recipient" value="Final Gesture" />
             </div>
 
             <div className="flex flex-wrap gap-2">
               {primaryLink.href ? (
-                <ExternalAction href={primaryLink.href} label={primaryLink.label} primary />
+                <AssetAction href={primaryLink.href} label={primaryLink.label} primary />
               ) : null}
               {openSeaUrl && primaryLink.href !== openSeaUrl ? (
-                <ExternalAction href={openSeaUrl} label="OpenSea" />
+                <AssetAction href={openSeaUrl} label="OpenSea" />
               ) : null}
-              {explorerLink.href ? (
-                <ExternalAction href={explorerLink.href} label="Explorer" />
-              ) : null}
+              {explorerLink.href ? <AssetAction href={explorerLink.href} label="Explorer" /> : null}
             </div>
           </div>
         </div>
       </div>
-    </article>
+    </AssetCardShell>
   );
 }
 
@@ -333,37 +459,35 @@ function AttachedERC20AllocationCard({
   const tokenName = metadata?.name || 'Attached ERC20 token';
   const explorerHref = token.TokenAddr ? getExplorerUrl('token', token.TokenAddr) : '';
   const logoSource = metadata?.logoSource ?? 'curated token metadata';
+  const statusLabel = token.Claimed ? 'Retrieved' : 'Pending finalization';
 
   return (
-    <article
-      className={cn(
-        'relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4',
-        'bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.095),rgb(255_255_255/0.018)_52%,rgb(var(--aurora-cyan-rgb)/0.075))]',
-        featured && 'md:col-span-2 xl:col-span-1',
-      )}
-    >
+    <AssetCardShell tone="erc20" featured={featured}>
       <div
         className={cn('grid h-full gap-4', featured ? 'lg:grid-cols-[220px_minmax(0,1fr)]' : '')}
       >
-        <TokenLogo logoURI={metadata?.logoURI} symbol={symbol} name={tokenName} />
+        <TokenLogo
+          logoURI={metadata?.logoURI}
+          symbol={symbol}
+          name={tokenName}
+          className={assetTones.erc20.media}
+        />
 
         <div className="flex min-w-0 flex-col justify-between gap-4">
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--impact-green-rgb)/0.24)] bg-[rgb(var(--impact-green-rgb)/0.10)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(var(--impact-green-rgb))]">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Recipient receives
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-                ERC20 token deposit
-                <InfoTooltip
-                  content={
-                    metadata?.logoURI
-                      ? `Logo from ${logoSource}; verify the token address before assigning value.`
-                      : 'This ERC20 token deposit is attached to the cycle and goes to the Signature Allocation recipient when finalized.'
-                  }
-                />
-              </span>
+              <RecipientBadge />
+              <AssetTypeBadge
+                tone="erc20"
+                tooltip={
+                  metadata?.logoURI
+                    ? `Logo from ${logoSource}; verify the token address before assigning value.`
+                    : 'This ERC-20 token deposit is attached to the cycle and goes to the Signature Allocation recipient when finalized.'
+                }
+              >
+                ERC-20 deposit
+              </AssetTypeBadge>
+              <StatusBadge claimed={token.Claimed} />
             </div>
 
             <h3 className="font-display text-2xl font-bold tracking-tight text-white">
@@ -374,7 +498,7 @@ function AttachedERC20AllocationCard({
 
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <Fact
+              <AssetFact
                 label="Token"
                 value={
                   explorerHref ? (
@@ -391,8 +515,8 @@ function AttachedERC20AllocationCard({
                   )
                 }
               />
-              <Fact label="Cycle" value={`#${token.RoundNum}`} />
-              <Fact
+              <AssetFact label="Cycle" value={`#${token.RoundNum}`} />
+              <AssetFact
                 label="Attached by"
                 value={
                   token.DonorAddr ? (
@@ -404,7 +528,7 @@ function AttachedERC20AllocationCard({
                   )
                 }
               />
-              <Fact
+              <AssetFact
                 label="Recipient"
                 value={
                   token.WinnerAddr ? (
@@ -416,23 +540,24 @@ function AttachedERC20AllocationCard({
                   )
                 }
               />
+              <AssetFact label="Status" value={statusLabel} />
             </div>
 
             <div className="flex flex-wrap gap-2">
               {explorerHref ? (
-                <ExternalAction href={explorerHref} label={`View ${symbol} token`} primary />
+                <AssetAction href={explorerHref} label={`View ${symbol} token`} primary />
               ) : null}
             </div>
           </div>
         </div>
       </div>
-    </article>
+    </AssetCardShell>
   );
 }
 
-function Fact({ label, value }: { label: string; value: ReactNode }) {
+function AssetFact({ label, value }: { label: string; value: ReactNode }) {
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 transition-colors group-hover:bg-white/[0.045]">
       <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
         {label}
       </p>
@@ -441,7 +566,7 @@ function Fact({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
-function ExternalAction({
+function AssetAction({
   href,
   label,
   primary = false,
