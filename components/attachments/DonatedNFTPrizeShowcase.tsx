@@ -3,15 +3,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { formatUnits } from 'viem';
-import {
-  CheckCircle2,
-  Clock,
-  ExternalLink,
-  Gift,
-  ImageOff,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react';
+import { ExternalLink, Gift, ImageOff, ShieldCheck, Sparkles } from 'lucide-react';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -314,22 +306,6 @@ function AssetTypeBadge({
   );
 }
 
-function StatusBadge({ claimed }: { claimed?: boolean }) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
-        claimed
-          ? 'border-[rgb(var(--impact-green-rgb)/0.24)] bg-[rgb(var(--impact-green-rgb)/0.10)] text-[rgb(var(--impact-green-rgb))]'
-          : 'border-white/[0.08] bg-white/[0.035] text-muted-foreground',
-      )}
-    >
-      {claimed ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
-      {claimed ? 'Retrieved' : 'Pending finalization'}
-    </span>
-  );
-}
-
 function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featured: boolean }) {
   const { data: metadata, isError } = useAttachedNftMetadata(nft.NFTTokenURI);
   const tokenId = getAttachedNftTokenId(nft);
@@ -345,38 +321,41 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
   const title = metadata?.name ?? (tokenId ? `NFT #${tokenId}` : 'Attached NFT');
   const subtitle = metadata?.collection_name ?? metadata?.platform ?? 'Community-attached ERC-721';
   const imageAlt = metadata?.name ? `Attached NFT ${metadata.name}` : 'Attached NFT allocation';
+  const mediaClassName = cn(
+    'group/media mx-auto flex aspect-[4/3] max-h-[420px] w-full max-w-3xl items-center justify-center overflow-hidden rounded-xl border border-white/[0.08] bg-black/25 p-2',
+    assetTones.nft.media,
+  );
 
   return (
     <AssetCardShell tone="nft" featured={featured}>
-      <div className={cn('grid gap-4', featured ? 'lg:grid-cols-[minmax(0,1fr)_320px]' : '')}>
+      <div className="flex h-full flex-col gap-4">
         <div>
           {primaryLink.href ? (
             <a
               href={primaryLink.href}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn(
-                'group/media block overflow-hidden rounded-xl border border-white/[0.08] bg-black/25',
-                assetTones.nft.media,
-              )}
+              className={mediaClassName}
               aria-label={`${primaryLink.label}: ${title}`}
+              data-testid="nft-allocation-media"
             >
               <NFTImage
                 src={metadata?.image}
                 alt={imageAlt}
                 priority={featured}
-                sizes={featured ? '(max-width: 1024px) 100vw, 720px' : '360px'}
-                className="transition-transform duration-500 group-hover/media:scale-[1.025]"
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px"
+                className="max-h-[396px] transition-transform duration-500 group-hover/media:scale-[1.025]"
               />
             </a>
           ) : (
-            <div
-              className={cn(
-                'overflow-hidden rounded-xl border border-white/[0.08] bg-black/25',
-                assetTones.nft.media,
-              )}
-            >
-              <NFTImage src={metadata?.image} alt={imageAlt} priority={featured} />
+            <div className={mediaClassName} data-testid="nft-allocation-media">
+              <NFTImage
+                src={metadata?.image}
+                alt={imageAlt}
+                priority={featured}
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 720px"
+                className="max-h-[396px]"
+              />
             </div>
           )}
         </div>
@@ -459,7 +438,6 @@ function AttachedERC20AllocationCard({
   const tokenName = metadata?.name || 'Attached ERC20 token';
   const explorerHref = token.TokenAddr ? getExplorerUrl('token', token.TokenAddr) : '';
   const logoSource = metadata?.logoSource ?? 'curated token metadata';
-  const statusLabel = token.Claimed ? 'Retrieved' : 'Pending finalization';
 
   return (
     <AssetCardShell tone="erc20" featured={featured}>
@@ -487,11 +465,17 @@ function AttachedERC20AllocationCard({
               >
                 ERC-20 deposit
               </AssetTypeBadge>
-              <StatusBadge claimed={token.Claimed} />
             </div>
 
-            <h3 className="font-display text-2xl font-bold tracking-tight text-white">
-              {amount} {symbol}
+            <h3
+              className="mt-4 inline-flex max-w-full items-baseline gap-2 rounded-2xl border border-[rgb(var(--impact-green-rgb)/0.24)] bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.13),rgb(var(--aurora-cyan-rgb)/0.08))] px-4 py-3 shadow-[0_0_70px_-34px_rgb(var(--impact-green-rgb)/0.9)]"
+              data-testid="erc20-attached-amount"
+              aria-label={`${amount} ${symbol}`}
+            >
+              <span className="font-display text-3xl font-bold tracking-tight bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[rgb(var(--aurora-cyan-rgb))] to-primary bg-clip-text text-transparent sm:text-4xl">
+                {amount}
+              </span>{' '}
+              <span className="text-base font-semibold text-white/85 sm:text-lg">{symbol}</span>
             </h3>
             <p className="mt-1 truncate text-sm text-muted-foreground">{tokenName}</p>
           </div>
@@ -540,7 +524,6 @@ function AttachedERC20AllocationCard({
                   )
                 }
               />
-              <AssetFact label="Status" value={statusLabel} />
             </div>
 
             <div className="flex flex-wrap gap-2">

@@ -146,9 +146,13 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('1 ERC-20 deposit')).toBeInTheDocument();
     expect(screen.getByText('ERC-20 deposit')).toBeInTheDocument();
-    expect(screen.getByText('1250.5 GLXY')).toBeInTheDocument();
+    const amount = screen.getByTestId('erc20-attached-amount');
+    expect(amount).toHaveTextContent('1250.5 GLXY');
+    expect(amount.className).toContain('shadow-[0_0_70px_-34px');
+    expect(amount.querySelector('span')?.className).toContain('text-transparent');
     expect(screen.getByText('Galaxy Credits')).toBeInTheDocument();
-    expect(screen.getAllByText('Pending finalization').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Pending finalization')).not.toBeInTheDocument();
+    expect(screen.queryByText('Retrieved')).not.toBeInTheDocument();
     expect(screen.getByAltText('GLXY token logo')).toHaveAttribute(
       'src',
       'https://cdn.example/glxy.png',
@@ -174,8 +178,25 @@ describe('AttachedNFTAllocationShowcase', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('2 ERC-721 tokens + 2 ERC-20 deposits')).toBeInTheDocument();
-    expect(screen.getByText('1250.5 GLXY')).toBeInTheDocument();
-    expect(screen.getByText('5 GLXY')).toBeInTheDocument();
+    const amounts = screen.getAllByTestId('erc20-attached-amount');
+    expect(amounts).toHaveLength(2);
+    expect(amounts[0]).toHaveTextContent('1250.5 GLXY');
+    expect(amounts[1]).toHaveTextContent('5 GLXY');
+  });
+
+  it('does not show ERC20 lifecycle status copy even when the token has been retrieved', () => {
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[]}
+        erc20Tokens={[createErc20({ Claimed: true, WinnerAddr: CONTRIBUTOR })]}
+        cycleNumber={42}
+      />,
+    );
+
+    expect(screen.queryByText('Status')).not.toBeInTheDocument();
+    expect(screen.queryByText('Pending finalization')).not.toBeInTheDocument();
+    expect(screen.queryByText('Retrieved')).not.toBeInTheDocument();
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1250.5 GLXY');
   });
 
   it('uses the same Recipient receives treatment for NFTs and ERC20 deposits', () => {
@@ -224,6 +245,27 @@ describe('AttachedNFTAllocationShowcase', () => {
       'href',
       `/user/${CONTRIBUTOR}`,
     );
+  });
+
+  it('uses the same bounded NFT media layout for featured and regular NFT cards', () => {
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[
+          createNft({ RecordId: 1, NFTTokenId: 123 }),
+          createNft({ RecordId: 2, NFTTokenId: 456 }),
+        ]}
+        cycleNumber={42}
+      />,
+    );
+
+    const media = screen.getAllByTestId('nft-allocation-media');
+    expect(media).toHaveLength(2);
+    expect(new Set(media.map((element) => element.className)).size).toBe(1);
+    media.forEach((element) => {
+      expect(element.className).toContain('aspect-[4/3]');
+      expect(element.className).toContain('max-h-[420px]');
+      expect(element.className).toContain('max-w-3xl');
+    });
   });
 
   it('falls back to OpenSea as the primary action when project link is unavailable', () => {
@@ -339,7 +381,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     );
 
     expect(screen.queryByAltText('GLXY token logo')).not.toBeInTheDocument();
-    expect(screen.getByText('GLXY')).toBeInTheDocument();
+    expect(screen.getAllByText('GLXY').length).toBeGreaterThan(0);
   });
 
   it('has no accessibility violations', async () => {
