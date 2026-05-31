@@ -1,4 +1,4 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { render, screen, within, checkA11y } from '@/test-utils';
 
 import GesturePage from '../[id]/GesturePage';
 
@@ -98,7 +98,54 @@ describe('GesturePage', () => {
       isLoading: false,
     });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('50.00 CST')).toBeInTheDocument();
+    expect(screen.getByText('50.0000 CST')).toBeInTheDocument();
+  });
+
+  it('renders live-shape CST cost and Participation CST for gesture 18482', () => {
+    mockUseGestureInfo.mockReturnValue({
+      data: {
+        ...baseGestureInfo,
+        GestureType: 2,
+        CstCost: 411.52783099128,
+        NumCSTokensEth: 411.52783099128,
+        NumCSTTokensEth: 411.52783099128,
+        CstPriceEth: 411.52783099128,
+        ParticipationCST: 100,
+        CSTRewardEth: 100,
+        ERC20RewardAmountEth: 100,
+      },
+      isLoading: false,
+    });
+
+    render(<GesturePage gestureId={18482} />);
+
+    const costSection = screen.getByRole('region', { name: 'Cost and Participation CST' });
+    expect(within(costSection).getByText('411.5278 CST')).toBeInTheDocument();
+    expect(within(costSection).getByText('Participation CST')).toBeInTheDocument();
+    expect(within(costSection).getByText('100.00 CST')).toBeInTheDocument();
+    expect(within(costSection).queryByText('0.00 CST')).not.toBeInTheDocument();
+  });
+
+  it('shows explicit missing values instead of fake zeroes', () => {
+    mockUseGestureInfo.mockReturnValue({
+      data: {
+        ...baseGestureInfo,
+        GestureType: 2,
+        CstCost: undefined,
+        NumCSTokensEth: undefined,
+        NumCSTTokensEth: undefined,
+        CstPriceEth: undefined,
+        ParticipationCST: undefined,
+        CSTRewardEth: undefined,
+        ERC20RewardAmountEth: undefined,
+      },
+      isLoading: false,
+    });
+
+    render(<GesturePage gestureId={18482} />);
+
+    const costSection = screen.getByRole('region', { name: 'Cost and Participation CST' });
+    expect(within(costSection).getAllByText('—')).toHaveLength(2);
   });
 
   it('renders message', () => {

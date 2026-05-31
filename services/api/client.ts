@@ -139,6 +139,35 @@ export const normalizeGestureRecord = (item: unknown) => {
 
   const gestureType = rec.GestureType;
   if (typeof gestureType === 'number') {
+    const cstCost =
+      typeof rec.CstCost === 'number'
+        ? rec.CstCost
+        : typeof rec.NumCSTokensEth === 'number'
+          ? rec.NumCSTokensEth
+          : typeof rec.NumCSTTokensEth === 'number'
+            ? rec.NumCSTTokensEth
+            : typeof rec.CstPriceEth === 'number' && rec.CstPriceEth >= 0
+              ? rec.CstPriceEth
+              : undefined;
+    if (cstCost !== undefined) {
+      rec.CstCost = cstCost;
+      rec.NumCSTokensEth = cstCost;
+      rec.NumCSTTokensEth = cstCost;
+    }
+
+    const participationCST =
+      typeof rec.ParticipationCST === 'number'
+        ? rec.ParticipationCST
+        : typeof rec.CSTRewardEth === 'number'
+          ? rec.CSTRewardEth
+          : typeof rec.ERC20RewardAmountEth === 'number'
+            ? rec.ERC20RewardAmountEth
+            : undefined;
+    if (participationCST !== undefined && participationCST >= 0) {
+      rec.ParticipationCST = participationCST;
+      if (rec.ERC20RewardAmountEth === undefined) rec.ERC20RewardAmountEth = participationCST;
+    }
+
     if (
       rec.NumCSTokensEth === undefined &&
       typeof rec.CstPriceEth === 'number' &&

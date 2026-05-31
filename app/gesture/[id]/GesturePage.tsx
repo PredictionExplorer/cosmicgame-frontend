@@ -19,6 +19,7 @@ import RandomWalkNFT from '@/components/nft/RandomWalkNFT';
 import NFTImage from '@/components/nft/NFTImage';
 import { useGestureInfo } from '@/hooks/useApiQuery';
 import { cn } from '@/lib/utils';
+import type { GestureInfo } from '@/services/api';
 
 interface NFTTokenURI {
   image?: string;
@@ -27,6 +28,53 @@ interface NFTTokenURI {
   platform?: string;
   description?: string;
   [key: string]: unknown;
+}
+
+function firstNonNegativeNumber(...values: Array<number | undefined>): number | undefined {
+  return values.find((value) => typeof value === 'number' && Number.isFinite(value) && value >= 0);
+}
+
+function formatAmount(
+  amount: number | undefined,
+  unit: string,
+  decimals: { fractional: number; standard: number },
+): string {
+  if (amount === undefined) return '—';
+  const precision = amount > 0 && amount < 1 ? decimals.fractional : decimals.standard;
+  return `${amount.toFixed(precision)} ${unit}`;
+}
+
+function getCstGestureCost(gestureInfo: GestureInfo): number | undefined {
+  return firstNonNegativeNumber(
+    gestureInfo.CstCost,
+    gestureInfo.NumCSTokensEth,
+    gestureInfo.NumCSTTokensEth,
+    gestureInfo.CstPriceEth,
+  );
+}
+
+function getEthGestureCost(gestureInfo: GestureInfo): number | undefined {
+  return firstNonNegativeNumber(gestureInfo.GestureCostEth, gestureInfo.EthPriceEth);
+}
+
+function getParticipationCST(gestureInfo: GestureInfo): number | undefined {
+  return firstNonNegativeNumber(
+    gestureInfo.ParticipationCST,
+    gestureInfo.CSTRewardEth,
+    gestureInfo.ERC20RewardAmountEth,
+  );
+}
+
+function formatGestureCost(gestureInfo: GestureInfo): string {
+  if (gestureInfo.GestureType === 2) {
+    return formatAmount(getCstGestureCost(gestureInfo), 'CST', { fractional: 7, standard: 4 });
+  }
+
+  return formatAmount(getEthGestureCost(gestureInfo), 'ETH', { fractional: 7, standard: 2 });
+}
+
+function formatParticipationCST(gestureInfo: GestureInfo): string {
+  return formatAmount(getParticipationCST(gestureInfo), 'CST', { fractional: 7, standard: 2 });
 }
 
 const GesturePage = ({ gestureId }: { gestureId: number }) => {
@@ -120,24 +168,12 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
               <DefinitionList>
                 <DetailRow label="Gesture cost">
                   <span className="font-mono tabular-nums text-foreground">
-                    {gestureInfo.GestureType === 2
-                      ? `${
-                          (gestureInfo.NumCSTTokensEth ?? 0) > 0 &&
-                          (gestureInfo.NumCSTTokensEth ?? 0) < 1
-                            ? (gestureInfo.NumCSTTokensEth ?? 0).toFixed(7)
-                            : (gestureInfo.NumCSTTokensEth ?? 0).toFixed(2)
-                        } CST`
-                      : `${
-                          (gestureInfo.GestureCostEth ?? 0) > 0 &&
-                          (gestureInfo.GestureCostEth ?? 0) < 1
-                            ? (gestureInfo.GestureCostEth ?? 0).toFixed(7)
-                            : (gestureInfo.GestureCostEth ?? 0).toFixed(2)
-                        } ETH`}
+                    {formatGestureCost(gestureInfo)}
                   </span>
                 </DetailRow>
-                <DetailRow label="Participation CST (ETH value)">
+                <DetailRow label="Participation CST">
                   <span className="font-mono tabular-nums">
-                    {(gestureInfo.ERC20RewardAmountEth ?? 0).toFixed(2)} ETH
+                    {formatParticipationCST(gestureInfo)}
                   </span>
                 </DetailRow>
               </DefinitionList>

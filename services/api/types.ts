@@ -250,11 +250,19 @@ export interface GestureInfo extends TxInfo {
   Message?: string;
   GestureType: number;
   GestureCostEth: number;
+  /** Canonical CST token amount paid for CST gestures. */
+  CstCost?: number;
+  /** Canonical Participation CST token amount imprinted by this gesture. */
+  ParticipationCST?: number;
+  /** Legacy CST cost alias preserved for existing table/page consumers. */
   NumCSTokensEth?: number;
+  /** @deprecated Typo-compatible CST cost alias; prefer `CstCost` or `NumCSTokensEth`. */
   NumCSTTokensEth?: number;
   NFTDonationTokenId?: number;
   NFTTokenURI?: string;
+  /** Legacy Participation CST alias from older UI/API wiring. */
   ERC20RewardAmountEth?: number;
+  CSTRewardEth?: number;
   EthPriceEth?: number;
   CstPriceEth?: number;
   RWalkNFTId?: number;

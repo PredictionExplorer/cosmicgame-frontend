@@ -319,6 +319,37 @@ describe('rounds API', () => {
       expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/bid.*info.*7/));
     });
 
+    it('normalizes CST cost and reward fields for bid detail payloads', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          BidInfo: {
+            BidType: 2,
+            CstPriceEth: 411.52783099128,
+            CSTRewardEth: 100,
+            EthPriceEth: -1e-18,
+            BidderAddr: '0x1',
+            RoundNum: 0,
+            Tx: {
+              EvtLogId: 18482,
+              BlockNum: 467848129,
+              TxId: 5441,
+              TxHash: '0x45',
+              TimeStamp: 1780045566,
+              DateTime: '2026-05-29T09:06:06Z',
+            },
+          },
+        },
+      });
+
+      const result = await get_bid_info(18482);
+
+      expect(result?.GestureType).toBe(2);
+      expect(result?.CstCost).toBe(411.52783099128);
+      expect(result?.NumCSTokensEth).toBe(411.52783099128);
+      expect(result?.NumCSTTokensEth).toBe(411.52783099128);
+      expect(result?.ParticipationCST).toBe(100);
+    });
+
     it('returns null when GestureInfo is null', async () => {
       mockedAxios.get.mockResolvedValue({ data: { GestureInfo: null } });
       expect(await get_bid_info(99)).toBeNull();
@@ -343,6 +374,7 @@ describe('rounds API', () => {
             {
               BidType: 2,
               CstPriceEth: 40,
+              CSTRewardEth: 100,
               EthPriceEth: -1,
               BidderAddr: '0x1',
               RoundNum: 0,
@@ -362,7 +394,10 @@ describe('rounds API', () => {
       const result = await get_bid_list_by_round(0, 'desc');
 
       expect(result[0]?.GestureType).toBe(2);
+      expect(result[0]?.CstCost).toBe(40);
       expect(result[0]?.NumCSTokensEth).toBe(40);
+      expect(result[0]?.NumCSTTokensEth).toBe(40);
+      expect(result[0]?.ParticipationCST).toBe(100);
     });
 
     it('maps "asc" sort direction to 0', async () => {

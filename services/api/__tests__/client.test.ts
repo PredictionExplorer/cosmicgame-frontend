@@ -388,10 +388,11 @@ describe('client helper functions', () => {
   });
 
   describe('normalizeGestureRecord', () => {
-    it('maps BidType to GestureType and aliases price fields', () => {
+    it('maps BidType to GestureType and aliases CST price and reward fields', () => {
       const result = normalizeGestureRecord({
         BidType: 2,
         CstPriceEth: 12.5,
+        CSTRewardEth: 100,
         EthPriceEth: -1,
         Tx: {
           EvtLogId: 1,
@@ -404,8 +405,40 @@ describe('client helper functions', () => {
       }) as Record<string, unknown>;
 
       expect(result.GestureType).toBe(2);
+      expect(result.CstCost).toBe(12.5);
       expect(result.NumCSTokensEth).toBe(12.5);
+      expect(result.NumCSTTokensEth).toBe(12.5);
+      expect(result.ParticipationCST).toBe(100);
+      expect(result.ERC20RewardAmountEth).toBe(100);
       expect(result.GestureCostEth).toBeUndefined();
+    });
+
+    it('keeps legacy CST cost aliases compatible', () => {
+      const fromCanonical = normalizeGestureRecord({
+        GestureType: 2,
+        NumCSTokensEth: 33,
+      }) as Record<string, unknown>;
+      const fromTypoAlias = normalizeGestureRecord({
+        GestureType: 2,
+        NumCSTTokensEth: 44,
+      }) as Record<string, unknown>;
+
+      expect(fromCanonical.CstCost).toBe(33);
+      expect(fromCanonical.NumCSTTokensEth).toBe(33);
+      expect(fromTypoAlias.CstCost).toBe(44);
+      expect(fromTypoAlias.NumCSTokensEth).toBe(44);
+    });
+
+    it('continues to map ETH price fields for non-CST gestures', () => {
+      const result = normalizeGestureRecord({
+        BidType: 0,
+        EthPriceEth: 0.125,
+        CstPriceEth: -1,
+      }) as Record<string, unknown>;
+
+      expect(result.GestureType).toBe(0);
+      expect(result.GestureCostEth).toBe(0.125);
+      expect(result.CstCost).toBeUndefined();
     });
 
     it('preserves an explicit GestureType', () => {

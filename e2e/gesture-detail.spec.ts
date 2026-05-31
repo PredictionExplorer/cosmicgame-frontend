@@ -38,4 +38,53 @@ test.describe('Gesture detail page', () => {
       expect(response?.status()).toBe(200);
     }
   });
+
+  test('shows nonzero CST cost and Participation CST for live-shaped CST payload', async ({
+    page,
+  }) => {
+    // lexicon-allow-start: mocked backend route and wire keys are sealed API contracts.
+    await page.route('**/api/cosmicgame/bid/info/18482', (route) =>
+      route.fulfill({
+        json: {
+          BidInfo: {
+            Tx: {
+              EvtLogId: 18482,
+              BlockNum: 467848129,
+              TxId: 5441,
+              TxHash: '0x45d7ecb96a242458dd991de97272332c0dc02fdac341af3a0cf549c4f30b0582',
+              TimeStamp: 1780045566,
+              DateTime: '2026-05-29T09:06:06Z',
+            },
+            BidderAddr: '0x76Cd6127403163a2a74Aa4b6968579DC6435034e',
+            EthPriceEth: -1e-18,
+            CstPriceEth: 411.52783099128,
+            RoundNum: 0,
+            BidType: 2,
+            CSTRewardEth: 100,
+            RWalkNFTId: -1,
+            NFTDonationTokenId: -1,
+            NFTDonationTokenAddr: '',
+            NFTTokenURI: '',
+            Message:
+              "Let's talk about the rewards system of Cosmic signature is quite different from other projects",
+            DonatedERC20TokenAddr: '',
+            DonatedERC20TokenAmount: '',
+            DonatedERC20TokenAmountEth: 0,
+          },
+          error: '',
+          status: 1,
+        },
+      }),
+    );
+    // lexicon-allow-end
+
+    await page.goto('/gesture/18482', { waitUntil: 'networkidle' });
+
+    const section = page.getByRole('region', { name: 'Cost and Participation CST' });
+    await expect(section).toContainText('411.5278 CST');
+    await expect(section).toContainText('Participation CST');
+    await expect(section).toContainText('100.00 CST');
+    const sectionText = await section.innerText();
+    expect(sectionText).not.toMatch(/Gesture cost\s*0\.00 CST/);
+  });
 });
