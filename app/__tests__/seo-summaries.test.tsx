@@ -40,6 +40,10 @@ describe('server-visible SEO summaries', () => {
   it('renders an app home H1 and crawlable app links before hydration', async () => {
     render(await AppHomeSeoSummary());
 
+    expect(screen.getByRole('region', { name: 'Cosmic Signature App' })).toHaveAttribute(
+      'aria-labelledby',
+      'app-home-seo-heading',
+    );
     expect(
       screen.getByRole('heading', { level: 1, name: 'Cosmic Signature App' }),
     ).toBeInTheDocument();
@@ -47,6 +51,18 @@ describe('server-visible SEO summaries', () => {
       'href',
       '/statistics',
     );
+  });
+
+  it('keeps the app home summary clear of fixed app chrome', async () => {
+    render(await AppHomeSeoSummary());
+
+    const summary = screen.getByRole('region', { name: 'Cosmic Signature App' });
+
+    expect(summary).toHaveClass('pt-40');
+    expect(summary).toHaveClass('max-sm:pt-36');
+    expect(summary).toHaveClass('lg:pt-72');
+    expect(summary).toHaveClass('print:pt-0');
+    expect(summary).not.toHaveClass('mt-8');
   });
 
   it('renders crawler-visible statistics facts and related links', async () => {

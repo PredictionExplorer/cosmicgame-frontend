@@ -21,7 +21,7 @@ export async function AppHomeSeoSummary() {
   return (
     <section
       aria-labelledby="app-home-seo-heading"
-      className="mx-auto mt-8 max-w-7xl px-4 sm:px-6 lg:px-8"
+      className="mx-auto max-w-7xl px-4 pt-40 max-sm:pt-36 sm:px-6 lg:px-8 lg:pt-72 print:pt-0"
     >
       <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 shadow-[0_24px_80px_-56px_rgb(var(--aurora-cyan-rgb)/0.8)] backdrop-blur-sm sm:p-8">
         <p className="type-eyebrow text-muted-foreground">Live protocol app · Arbitrum</p>
