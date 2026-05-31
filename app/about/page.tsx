@@ -117,6 +117,38 @@ export default function AboutPage() {
               GitHub
             </a>
           </li>
+          <li>
+            <a
+              href={`${APP_ORIGIN}/faq`}
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              FAQ
+            </a>
+          </li>
+          <li>
+            <a
+              href={`${APP_ORIGIN}/terms`}
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Terms of Service
+            </a>
+          </li>
+          <li>
+            <a
+              href={`${APP_ORIGIN}/privacy`}
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Privacy Policy
+            </a>
+          </li>
+          <li>
+            <a
+              href="mailto:support@cosmicsignature.com"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              support@cosmicsignature.com
+            </a>
+          </li>
         </ul>
       </section>
     </main>

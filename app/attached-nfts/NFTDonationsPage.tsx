@@ -18,6 +18,7 @@ const NFTDonationsPage = () => {
           <SectionEyebrow tone="impact">Attached NFTs · {nftDonations?.length ?? 0}</SectionEyebrow>
         }
         title="Attached NFT Contributions"
+        titleLevel={2}
         gradientTitle="signature"
         subtitle="NFTs attached to gestures by community members across cycles"
       />

@@ -31,7 +31,7 @@ describe('learnArticles', () => {
       const words = [article.summary, ...article.sections.flatMap((section) => section.body)].join(
         ' ',
       );
-      expect(words.split(/\s+/).filter(Boolean).length).toBeGreaterThanOrEqual(250);
+      expect(words.split(/\s+/).filter(Boolean).length).toBeGreaterThanOrEqual(450);
     }
   });
 

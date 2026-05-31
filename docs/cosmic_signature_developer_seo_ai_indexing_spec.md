@@ -1,6 +1,6 @@
 # Cosmic Signature — SEO & AI Indexing: Status & Remaining Work
 
-**Last verified:** 2026-05-31 (live site + code audit)
+**Last verified:** 2026-05-31 (code implementation + test audit)
 **Scope:** Site-side changes only — code and hosting/CDN config. Excludes off-site promotion, Search Console / Bing Webmaster submission, social posting, paid links, and PR.
 
 This document started life as an implementation spec. **Most of it is now built and live.** It has been rewritten as a _living status doc_ so anyone improving SEO further can see, at a glance: what is done, what was proven by testing, and what is still open.
@@ -11,6 +11,20 @@ This document started life as an implementation spec. **Most of it is now built 
 - **🟡 Partial** — implemented but with a gap worth closing.
 - **❌ Open** — not done / needs work.
 - File references like [`utils/seo.ts`](../utils/seo.ts) point to the implementation.
+
+## 2026-05-31 implementation update
+
+The remaining repository-implementable SEO backlog has been substantially implemented:
+
+- Added a shared route policy in [`lib/seoRoutes.ts`](../lib/seoRoutes.ts) and refactored [`app/sitemap.ts`](../app/sitemap.ts) around it.
+- Removed wallet/demo URLs from the XML sitemap and marked [`/recipient-history`](../app/recipient-history/page.tsx) and [`/detail/sample`](../app/detail/sample/page.tsx) `noindex,follow`.
+- Added server-rendered crawler summaries to the public app data routes via [`app/PublicDataRouteSeoSummary.tsx`](../app/PublicDataRouteSeoSummary.tsx).
+- Fixed structured-data accuracy in [`utils/jsonLd.tsx`](../utils/jsonLd.tsx): no false zero-price Offers, GitHub in `Organization.sameAs`, and no WebApplication schema on the landing host.
+- Enriched custom Open Graph image metadata in [`utils/seo.ts`](../utils/seo.ts) with width, height, and alt text.
+- Softened unsupported audit claims, fixed the broken IPFS gateway URL, added GitHub/source links, added homepage/FAQ biology disambiguation, and expanded [`content/learn.ts`](../content/learn.ts).
+- Added SEO policy, structured-data, IndexNow, sitemap, raw-HTML, and SSR summary tests.
+
+Still external / not fully provable from repo code: Vercel `www` domain status, WAF/CDN crawler logs, Search Console/Bing submission, and the larger route-group migration needed to remove root-layout `headers()` dynamic rendering.
 
 ---
 
@@ -52,18 +66,18 @@ All checks below were run with `curl` against the **raw HTML** (no JavaScript ex
 
 ### robots, sitemaps, redirects, status codes
 
-| Check                                               | Result                                                                                                                               |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `robots.txt` (both hosts)                           | ✅ Valid; correct per-host `Sitemap:` + `Host:`; AI/search bots enumerated and allowed; sensible `Disallow` per host                 |
-| `sitemap.xml` — landing                             | ✅ 13 URLs: `/`, `/about`, `/learn` + all 10 `/learn/*` articles                                                                     |
-| `sitemap.xml` — app                                 | 🟡 29 URLs (several thin/placeholder — see [§4](#high--affects-what-gets-indexed--trust))                                            |
-| `llms.txt` (both hosts)                             | ✅ 200; includes the biology disambiguation line; `llms-full.txt` also present                                                       |
-| `http://…` → `https://…`                            | ✅ 308                                                                                                                               |
-| `https://www.cosmicsignature.com/` → apex           | 🟡 **307 (temporary)** — should be 301/308 permanent                                                                                 |
-| cross-host paths (e.g. landing `/faq` → app `/faq`) | ✅ 308                                                                                                                               |
-| unknown route (e.g. `/this-does-not-exist`)         | ✅ Real **404** + "Page Not Found" H1 (no soft-404)                                                                                  |
-| `X-Robots-Tag` on public pages                      | ✅ None present (good)                                                                                                               |
-| `Cache-Control` on app `/` and `/statistics`        | 🟡 `private, no-cache, no-store` — pages render per-request, not CDN-cached (see [§4 Performance](#performance-and-core-web-vitals)) |
+| Check                                               | Result                                                                                                                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `robots.txt` (both hosts)                           | ✅ Valid; correct per-host `Sitemap:` + `Host:`; AI/search bots enumerated and allowed; sensible `Disallow` per host                                   |
+| `sitemap.xml` — landing                             | ✅ 13 URLs: `/`, `/about`, `/learn` + all 10 `/learn/*` articles                                                                                       |
+| `sitemap.xml` — app                                 | ✅ 27 URLs; wallet-personal `/recipient-history` and demo `/detail/sample` are removed; app routes come from [`lib/seoRoutes.ts`](../lib/seoRoutes.ts) |
+| `llms.txt` (both hosts)                             | ✅ 200; includes the biology disambiguation line; `llms-full.txt` also present                                                                         |
+| `http://…` → `https://…`                            | ✅ 308                                                                                                                                                 |
+| `https://www.cosmicsignature.com/` → apex           | 🟡 **307 (temporary)** — should be 301/308 permanent                                                                                                   |
+| cross-host paths (e.g. landing `/faq` → app `/faq`) | ✅ 308                                                                                                                                                 |
+| unknown route (e.g. `/this-does-not-exist`)         | ✅ Real **404** + "Page Not Found" H1 (no soft-404)                                                                                                    |
+| `X-Robots-Tag` on public pages                      | ✅ None present (good)                                                                                                                                 |
+| `Cache-Control` on app `/` and `/statistics`        | 🟡 `private, no-cache, no-store` — pages render per-request, not CDN-cached (see [§4 Performance](#performance-and-core-web-vitals))                   |
 
 > **Still to confirm off-box:** WAF/CDN behavior toward real crawler user-agents can only be verified from Vercel/CDN logs. See [§6](#6-off-box-verification-not-doable-from-the-repo).
 
@@ -74,7 +88,7 @@ All checks below were run with `curl` against the **raw HTML** (no JavaScript ex
 | #   | Area                              | Status | One-line summary                                                                                                                                                                                                          |
 | --- | --------------------------------- | :----: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | P0  | Canonical URLs & redirects        |   ✅   | Absolute self-canonicals, trailing slash normalized, query stripped ([`utils/seo.ts`](../utils/seo.ts)); 308 host/protocol redirects. _(www→apex is 307 — backlog #8.)_                                                   |
-| P1  | Important pages server-rendered   |   🟡   | Home/FAQ/statistics/how-it-works/contracts/code/gallery/current-cycle render real HTML. **15 app data-table routes are client-only yet indexed (backlog #1).**                                                            |
+| P1  | Important pages server-rendered   |   ✅   | Public sitemap routes now have server-visible content. Data routes use [`app/PublicDataRouteSeoSummary.tsx`](../app/PublicDataRouteSeoSummary.tsx) before client hydration.                                               |
 | P2  | Homepage entity signal            |   ✅   | Brand-first H1 live; poetic line kept as subhead. _(Minor: 2 of 8 entity terms fall past first ~150 words; disambiguation line not on home/FAQ — backlog #10.)_                                                           |
 | P3  | FAQ crawlable Q&A                 |   ✅   | 58 Q&A / 6 categories, Radix `forceMount` keeps answers in DOM, `FAQPage` JSON-LD from same source ([`app/faq/`](../app/faq)).                                                                                            |
 | P4  | Statistics page fixed             |   ✅   | Async server `StatisticsSeoSummary` with cycle/gestures/reserves/NFTs + "Last updated UTC" + source + links + fallback ([`app/statistics/`](../app/statistics)).                                                          |
@@ -83,20 +97,20 @@ All checks below were run with `curl` against the **raw HTML** (no JavaScript ex
 | P7  | Titles / descriptions / H1 map    |   ✅   | Implemented via `createMetadata`; live values match the planned map verbatim.                                                                                                                                             |
 | P8  | Robots per host                   |   ✅   | Per-host `robots.ts`; AI/search bots allowed; sitemap referenced.                                                                                                                                                         |
 | P9  | CDN/WAF crawler access            |   🟡   | No challenge/CAPTCHA/wallet-gate observed on public pages; **full WAF audit must be done from logs ([§6](#6-off-box-verification-not-doable-from-the-repo)).**                                                            |
-| P10 | XML + HTML sitemaps               |   🟡   | Both hosts + `/site-map`. **Includes thin/placeholder URLs; single hardcoded `lastmod`; `priority`/`changefreq` present (Google ignores) — backlog #1–3, #9.**                                                            |
+| P10 | XML + HTML sitemaps               |   ✅   | Both hosts + `/site-map`; XML URLs are generated from [`lib/seoRoutes.ts`](../lib/seoRoutes.ts), noindex/demo routes are excluded, and learn articles use article update dates.                                           |
 | P11 | Internal linking                  |   ✅   | Real `<a>`/`next/link`, descriptive anchors. _(Minor: landing home has no direct `/statistics` or `/gallery` link — backlog #13.)_                                                                                        |
-| P12 | Structured data                   |   🟡   | Broad coverage, stable `@id`s. **Accuracy defects: `price:0` Offers, WebApplication on landing home, double-emit, missing GitHub — backlog #6.**                                                                          |
+| P12 | Structured data                   |   ✅   | Broad coverage, stable `@id`s. Removed misleading zero-price Offers, stopped WebApplication schema on the landing host, avoided landing duplicate org/site emission, and added GitHub to `sameAs`.                        |
 | P13 | AI files (`llms.txt`)             |   ✅   | `llms.txt` + `llms-full.txt` on both hosts. _(IndexNow & `.md` mirrors not done — optional, P23.)_                                                                                                                        |
 | P14 | Snippet / robots meta             |   ✅   | `index,follow,max-snippet:-1,max-image-preview:large`; no `noindex`/`nosnippet`/`X-Robots-Tag` on public pages.                                                                                                           |
 | P15 | Images / OG / video               |   ✅   | OG = real PNG 1200×630 + alt; hero `priority` + alt; gallery explanatory text + per-item alt. _(Per-page string `og:image` lacks width/height/alt — backlog #13.)_                                                        |
 | P16 | Performance / Core Web Vitals     |   🟡   | Real routes; web3 bundle excluded from landing. **`headers()` in root layout forces dynamic rendering for all pages — no static/CDN caching ([§4 Performance](#performance-and-core-web-vitals)).**                       |
-| P17 | HTTP status / 404                 |   🟡   | Real 404 verified live. **Soft-404 on `/detail/[id]` (200 for invalid token, indexable) — backlog #4.**                                                                                                                   |
+| P17 | HTTP status / 404                 |   ✅   | Real 404 verified live. Invalid non-numeric `/detail/[id]` values now call `notFound()`; missing API-token 404 responses also return the real not-found page.                                                             |
 | P18 | Trust / security content          |   🟡   | Pages present; non-investment language strong; risky words clean. **Audit-claim inconsistency; addresses API-gated; broken IPFS link — backlog #5, #7.**                                                                  |
 | P19 | Accessibility / semantic HTML     |   ✅   | `lang="en"`, header/nav/main/footer, skip link, one H1, keyboard accordions, decorative canvas `aria-hidden`.                                                                                                             |
-| P20 | Index/noindex matrix              |   🟡   | Good noindex coverage, **enforced by [`app/__tests__/seo-policy.test.ts`](../app/__tests__/seo-policy.test.ts)**. **But thin/personal/placeholder routes still indexed — backlog #1–3.**                                  |
+| P20 | Index/noindex matrix              |   ✅   | Enforced by [`app/__tests__/seo-policy.test.ts`](../app/__tests__/seo-policy.test.ts). Wallet, admin, dynamic, and demo routes are noindex or omitted from XML sitemaps as appropriate.                                   |
 | P21 | Next.js patterns                  |   ✅   | `createMetadata`, `revalidate`, `sitemap()`/`robots()` route handlers.                                                                                                                                                    |
-| P22 | Dev QA checklist                  |   🟡   | Live curl checks pass; the "thin render" check flags the 15 client-only routes. Codify with [§5 Tests](#5-suggested-tests).                                                                                               |
-| P23 | IndexNow (optional)               |   ❌   | Not implemented (optional).                                                                                                                                                                                               |
+| P22 | Dev QA checklist                  |   ✅   | Codified with expanded Jest SEO tests and [`e2e/seo-raw-html.spec.ts`](../e2e/seo-raw-html.spec.ts).                                                                                                                      |
+| P23 | IndexNow (optional)               |   🟡   | Env-gated helper and submit script added ([`utils/indexNow.ts`](../utils/indexNow.ts), [`scripts/indexnow-submit.ts`](../scripts/indexnow-submit.ts)); activation still requires a real IndexNow key.                     |
 
 ### Things confirmed working well (don't regress these)
 
@@ -115,61 +129,59 @@ Ordered by SEO/trust impact. Each item: **what → where → why → fix.**
 
 ### High — affects what gets indexed / trust
 
-**1. 15 indexable app routes have no server-rendered content** (client-only data tables): `anchoring`, `allocation`, `marketing`, `imprint`, `eth-contribution`, `attached-nfts`, `allocation-finalized`, `named-nfts`, `used-rwlk-nfts`, `coordination-changes`, `public-goods-contributions-cg`, `public-goods-contributions-voluntary`, `public-goods-retrievals`.
+**1. ✅ Done — public app data routes now have server-rendered content**: `anchoring`, `allocation`, `marketing`, `imprint`, `eth-contribution`, `attached-nfts`, `allocation-finalized`, `named-nfts`, `used-rwlk-nfts`, `coordination-changes`, `public-goods-contributions-cg`, `public-goods-contributions-voluntary`, `public-goods-retrievals`.
 
 - **Where:** these dirs under [`app/`](../app); listed in [`app/sitemap.ts`](../app/sitemap.ts).
 - **Why:** to a non-JS crawler they're a thin header + empty table — the exact problem fixed for `/statistics`. Only `current-cycle`, `gallery`, `statistics` (+ home/contracts/code) have a `*SeoSummary`.
-- **Fix:** add an SSR summary (mirror [`app/statistics/StatisticsSeoSummary.tsx`](../app/statistics/StatisticsSeoSummary.tsx)) **or** mark `noindex` and remove from the sitemap.
+- **Fix implemented:** added [`app/PublicDataRouteSeoSummary.tsx`](../app/PublicDataRouteSeoSummary.tsx) and inserted it before the client data tables.
 
-**2. `/recipient-history` is a wallet-personal view** ("My Allocation History" / "Please connect your wallet") but is `index:true` and sitemapped.
+**2. ✅ Done — `/recipient-history` is a wallet-personal view** ("My Allocation History" / "Please connect your wallet") and is now `noindex,follow` and absent from the sitemap.
 
 - **Where:** [`app/recipient-history/`](../app/recipient-history).
-- **Fix:** `createMetadata(..., { index: false })` and drop from the sitemap.
+- **Fix implemented:** `createMetadata(..., { index: false })` and route policy exclusion.
 
-**3. `/detail/sample` is a hardcoded demo placeholder** ("Static sample values for this demo page") but is `index:true` and sitemapped.
+**3. ✅ Done — `/detail/sample` is a hardcoded demo placeholder** ("Static sample values for this demo page") and is now `noindex,follow` and absent from the sitemap.
 
 - **Where:** [`app/detail/sample/`](../app/detail/sample), [`app/sitemap.ts`](../app/sitemap.ts).
-- **Fix:** remove from sitemap and/or `noindex`.
+- **Fix implemented:** removed from sitemap and marked noindex.
 
-**4. Soft-404 on `/detail/[id]`** — renders "Invalid Token Id" at HTTP 200 for missing/invalid tokens and is indexable.
+**4. ✅ Done — soft-404 on `/detail/[id]`** — invalid non-numeric IDs now call `notFound()`, and API 404s for missing tokens also return the real 404 page.
 
 - **Where:** [`app/detail/[id]/DetailPage.tsx`](../app/detail/[id]/DetailPage.tsx).
-- **Fix:** call `notFound()` when the token doesn't exist (returns a real 404 via `app/not-found.tsx`).
+- **Fix implemented:** [`app/detail/[id]/page.tsx`](../app/detail/[id]/page.tsx) validates IDs and calls `notFound()` when appropriate.
 
-**5. Audit-claim inconsistency** (trust/accuracy): marketing/FAQ/contracts state "All contracts have been audited… Certora… Slither in CI" as fact, while the dedicated `/audits` page links nothing and says reports come "when published."
+**5. ✅ Done — audit-claim inconsistency softened** (trust/accuracy): marketing/FAQ/contracts no longer state unpublished audit/formal-verification claims as fact.
 
 - **Where:** [`content/landing.ts`](../content/landing.ts) (≈ lines 262, 270), [`app/faq/data/faq-data.ts`](../app/faq/data/faq-data.ts) (≈ line 341), [`app/contracts/Contracts.tsx`](../app/contracts/Contracts.tsx) (≈ line 224) vs [`app/audits/page.tsx`](../app/audits/page.tsx).
-- **Fix:** either link the actual audit/verification reports on `/audits`, or soften the claims until published.
+- **Fix implemented:** softened the claims until actual reports are published.
 
 ### Medium
 
-**6. Structured-data accuracy** in [`utils/jsonLd.tsx`](../utils/jsonLd.tsx):
+**6. ✅ Done — structured-data accuracy** in [`utils/jsonLd.tsx`](../utils/jsonLd.tsx):
 
-- `WebApplication` and `Product` Offers hardcode `price:'0'` — asserts free participation/mint, which isn't true and isn't shown on the page (gestures cost ETH).
-- `WebApplication` is emitted on the **landing** home where there is no app UI.
-- `Organization` + `WebSite` are **double-emitted** on the landing home (root layout + landing-site layout).
-- `Organization.sameAs` omits the real GitHub org URL (used elsewhere on the site).
-- **Why:** structured data must match visible content; mismatches can be ignored by Google or flagged.
+- Removed `price:'0'` Offers from `WebApplication` and `Product`.
+- `WebApplication` is emitted only on the app host.
+- Landing host no longer double-emits root Organization/WebSite JSON-LD.
+- `Organization.sameAs` includes the GitHub org URL.
 
-**7. Contracts / source trust links** (P18):
+**7. ✅ Done — contracts / source trust links** (P18):
 
-- `/contracts` addresses come from a live API at render time — a transient failure yields an **address-less** page. Verified addresses already exist in [`content/protocol-facts.ts`](../content/protocol-facts.ts) but aren't rendered as a fallback.
-- `/code` links a **broken IPFS URL** (`cloudflare-ipfs.com/ipfs:/…`); no app-host trust page links GitHub.
-- **Fix:** render a hardcoded address fallback; fix the source link; add a GitHub link.
+- `/contracts` server summary now falls back to verified proxy/implementation addresses from [`content/protocol-facts.ts`](../content/protocol-facts.ts).
+- `/code` uses a valid IPFS gateway URL and links the GitHub organization.
 
 **8. `www → apex` redirect is 307 (temporary)** — make it 301/308 permanent (Vercel domain config) so canonical signals consolidate.
 
 ### Low / hygiene
 
-**9. Sitemap hygiene** ([`app/sitemap.ts`](../app/sitemap.ts)): set accurate per-page `lastmod` (currently one hardcoded date for all pages, incl. hourly stats); `priority`/`changefreq` can be dropped (Google ignores them).
+**9. ✅ Done / partial by design — sitemap hygiene** ([`app/sitemap.ts`](../app/sitemap.ts)): route entries now come from [`lib/seoRoutes.ts`](../lib/seoRoutes.ts), noindex/demo URLs are excluded, and learn article `lastmod` values use article update dates. `priority`/`changefreq` remain for compatibility with existing consumers, though Google ignores them.
 
-**10. Disambiguation line** (not the COSMIC cancer/biology database) appears only on `/about`, one learn article, and `llms.txt` — add it to the homepage and/or FAQ HTML.
+**10. ✅ Done — disambiguation line** (not the COSMIC cancer/biology database) now appears on `/about`, landing home, FAQ, one learn article, and `llms.txt`.
 
-**11. `/learn` depth** — expand articles toward 700–1,500 words of _unique_ content and reduce the shared boilerplate repeated across all 10.
+**11. 🟡 Improved — `/learn` depth** — articles were expanded with topic-specific sections and the test threshold was raised. They are more substantial than before, but some are still below the ideal 700–1,500 word long-form target.
 
-**12. `/about`** — add FAQ/Terms/Privacy links and an explicit support/contact channel.
+**12. ✅ Done — `/about`** — FAQ/Terms/Privacy links and `support@cosmicsignature.com` were added.
 
-**13. Small fixes** — per-page `og:image` set as a bare string ([`utils/seo.ts`](../utils/seo.ts)) lacks `width`/`height`/`alt`; `app/not-found.tsx` prints a literal `—` escape instead of an em-dash; landing home lacks direct `/statistics` + `/gallery` links.
+**13. ✅ Done / partial** — per-page `og:image` now includes width/height/alt in [`utils/seo.ts`](../utils/seo.ts), and landing home links directly to `/statistics` + `/gallery`. The 404 copy is already rendering an em dash correctly in code.
 
 ### <a id="performance-and-core-web-vitals"></a>Performance and Core Web Vitals (P16)
 
@@ -181,21 +193,21 @@ The root layout's `headers()` call (host detection) opts the **whole app into dy
 
 ---
 
-## 5. Suggested tests
+## 5. Tests added / still useful
 
-Add these to lock in current behavior and catch regressions. The project already has Jest (unit) and Playwright (e2e) — extend both. Where a test would fail **today**, it's marked 🔴: land it alongside the matching backlog fix.
+The project has Jest (unit) and Playwright (e2e). The key SEO checks from the original suggestion list are now implemented or partially implemented.
 
-### A. Extend the unit policy test — [`app/__tests__/seo-policy.test.ts`](../app/__tests__/seo-policy.test.ts)
+### A. ✅ Extended unit policy test — [`app/__tests__/seo-policy.test.ts`](../app/__tests__/seo-policy.test.ts)
 
-| Test                  | Asserts                                                                                                                                                                         |         Today          |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------: |
-| Sitemap ⊆ indexable   | every path in `app/sitemap.ts` (app + landing) resolves to a route whose metadata is **not** `index:false`                                                                      | 🔴 (passes after #1–3) |
-| SSR-content allowlist | every **app** sitemap path is either in an explicit "has SSR summary / is a content page" allowlist or is excluded — fails when a new client-only route is added to the sitemap |           🔴           |
-| Unique metadata       | no two pages share the same `<title>` or meta description                                                                                                                       |       ✅ likely        |
-| noindex coverage      | wallet/personal/admin/dynamic-detail routes (`my-*`, `user/*`, `admin/*`, `recipient-history`, `detail/sample`, `system-event/*`, `gesture/*`) are `index:false`                |     🔴 until #2–3      |
-| JSON-LD sanity        | `organizationJsonLd().sameAs` includes the GitHub URL; no `Offer` claims `price:'0'` unless the page shows a $0 price                                                           |      🔴 until #6       |
+| Test                  | Asserts                                                                              |           Today            |
+| --------------------- | ------------------------------------------------------------------------------------ | :------------------------: |
+| Sitemap ⊆ indexable   | every app sitemap route is indexable and server-visible                              |             ✅             |
+| SSR-content allowlist | every app sitemap route has `hasServerVisibleContent:true` in route policy           |             ✅             |
+| Unique metadata       | no two pages share the same `<title>` or meta description                            | Not separately implemented |
+| noindex coverage      | wallet/personal/admin/demo/dynamic routes are noindex or omitted from XML sitemap    |             ✅             |
+| JSON-LD sanity        | `organizationJsonLd().sameAs` includes GitHub; no misleading zero-price Offer claims |             ✅             |
 
-### B. Raw-HTML crawlability — Playwright `request` (no JS), one assertion set per public URL
+### B. ✅ Raw-HTML crawlability — [`e2e/seo-raw-html.spec.ts`](../e2e/seo-raw-html.spec.ts)
 
 The highest-value addition: it tests what non-rendering crawlers see. Use `request.get()` (not `page.goto`) so JavaScript never runs.
 

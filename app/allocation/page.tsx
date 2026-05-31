@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
+import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
+
 import AllocationRecipientsPage from './AllocationRecipientsPage';
 
 export const metadata: Metadata = createMetadata(
@@ -12,5 +14,10 @@ export const metadata: Metadata = createMetadata(
 );
 
 export default function Page() {
-  return <AllocationRecipientsPage />;
+  return (
+    <>
+      <PublicDataRouteSeoSummary route="allocation" />
+      <AllocationRecipientsPage />
+    </>
+  );
 }

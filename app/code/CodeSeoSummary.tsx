@@ -24,10 +24,18 @@ export function CodeSeoSummary() {
         <ul className="flex flex-wrap gap-3 text-sm">
           <li>
             <a
-              href="https://cloudflare-ipfs.com/ipfs:/QmWEao2HjCvyHJSbYnWLyZj8HfFardxzuNh7AUk1jgyXTm"
+              href="https://ipfs.io/ipfs/QmWEao2HjCvyHJSbYnWLyZj8HfFardxzuNh7AUk1jgyXTm"
               className="text-primary underline-offset-4 hover:underline"
             >
               Open the published IPFS source artifact
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/PredictionExplorer"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Open the GitHub organization
             </a>
           </li>
           <li>

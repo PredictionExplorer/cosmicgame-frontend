@@ -15,6 +15,7 @@ const CharityDepositsVoluntary = () => {
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Voluntary Public-Goods Contributions"
+        titleLevel={2}
         subtitle="Community members' voluntary contributions to the Public Goods Vault"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">

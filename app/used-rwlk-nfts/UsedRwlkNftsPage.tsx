@@ -99,6 +99,7 @@ const UsedRwlkNftsPage = () => {
         align="left"
         eyebrow={<SectionEyebrow tone="nebula">Used RWLK · {list.length}</SectionEyebrow>}
         title="Used Random Walk NFTs"
+        titleLevel={2}
         gradientTitle="signature"
         subtitle="Random Walk NFTs that have been anchored to gestures"
       />

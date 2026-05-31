@@ -88,6 +88,7 @@ const Imprint = () => {
     <PageShell variant="form">
       <PageHeader
         title="Imprint Random Walk NFT"
+        titleLevel={2}
         subtitle="Own a Random Walk NFT and receive a 50% reduction in Gesture Cost"
       />
 

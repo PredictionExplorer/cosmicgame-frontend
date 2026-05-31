@@ -109,7 +109,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       className={`${clashDisplay.variable} ${inter.variable}`}
     >
       <head>
-        <JsonLd data={[websiteJsonLd(), organizationJsonLd(), webApplicationJsonLd()]} />
+        {!isLanding ? (
+          <JsonLd data={[websiteJsonLd(), organizationJsonLd(), webApplicationJsonLd()]} />
+        ) : null}
         {GA_TRACKING_ID && (
           <>
             <Script

@@ -9,6 +9,7 @@ export const metadata: Metadata = createMetadata(
   'View your complete allocation history in Cosmic Signature, including Signature Allocations, ETH Stellar Selection distributions, Cosmic Signature NFTs, and Anchor Distributions.',
   undefined,
   '/recipient-history',
+  { index: false },
 );
 
 export default function Page() {

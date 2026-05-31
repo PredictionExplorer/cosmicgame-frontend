@@ -14,6 +14,7 @@ const CharityWithdrawals = () => {
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Public Goods Retrievals"
+        titleLevel={2}
         subtitle="Funds retrieved from the Public Goods Vault"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">

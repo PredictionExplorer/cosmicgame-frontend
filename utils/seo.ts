@@ -8,6 +8,8 @@ const CANONICAL_ORIGINS: Record<CanonicalHost, string> = {
   app: APP_ORIGIN,
   landing: LANDING_ORIGIN,
 };
+const OPEN_GRAPH_IMAGE_WIDTH = 1200;
+const OPEN_GRAPH_IMAGE_HEIGHT = 630;
 
 interface MetadataOptions {
   canonicalHost?: CanonicalHost;
@@ -59,7 +61,14 @@ export function createMetadata(
   };
 
   if (imageUrl !== undefined) {
-    openGraph.images = [imageUrl];
+    openGraph.images = [
+      {
+        url: imageUrl,
+        width: OPEN_GRAPH_IMAGE_WIDTH,
+        height: OPEN_GRAPH_IMAGE_HEIGHT,
+        alt: title,
+      },
+    ];
     twitter.images = [imageUrl];
   }
 

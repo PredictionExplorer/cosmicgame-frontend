@@ -39,6 +39,12 @@ export const faqCategories: FAQCategory[] = [
           'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; every gesture shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including Protocol Guild, the funding mechanism for 170+ Ethereum core contributors.',
       },
       {
+        id: 'is-cosmic-signature-related-to-biology',
+        question: 'Is Cosmic Signature related to the COSMIC biology database?',
+        answer:
+          'No. Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC mutational signatures in biology. It is an on-chain art protocol and app focused on deterministic three-body NFT art.',
+      },
+      {
         id: 'how-does-the-bidding-game-work',
         question: 'How does a Performance Cycle work?',
         answer:
@@ -338,7 +344,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'game-security',
         question: 'How is the protocol\u2019s security ensured?',
         answer:
-          'Cosmic Signature contracts are formally verified with Certora, reviewed by Slither, and built on OpenZeppelin foundations. Every contract is CC0-licensed so the community can audit and reproduce behavior independently.',
+          'Cosmic Signature publishes contract addresses, source-code resources, and verification context so the community can inspect behavior independently. Formal audit reports and verification notes should be read from the Audits page as they are published or updated.',
       },
       {
         id: 'fees-involved',

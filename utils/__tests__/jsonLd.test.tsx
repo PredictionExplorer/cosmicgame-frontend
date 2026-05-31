@@ -13,6 +13,7 @@ describe('JSON-LD builders', () => {
         '@type': 'Organization',
         '@id': 'https://cosmicsignature.com/#organization',
         url: 'https://cosmicsignature.com/',
+        sameAs: expect.arrayContaining(['https://github.com/PredictionExplorer']),
       }),
     );
     expect(websiteJsonLd()).toEqual(

@@ -76,7 +76,6 @@ describe('sitemap (host-aware)', () => {
       expect(urls).toContain('https://app.cosmicsignature.com/current-cycle');
       expect(urls).toContain('https://app.cosmicsignature.com/anchoring');
       expect(urls).toContain('https://app.cosmicsignature.com/allocation');
-      expect(urls).toContain('https://app.cosmicsignature.com/recipient-history');
       expect(urls).toContain('https://app.cosmicsignature.com/allocation-finalized');
       expect(urls).toContain('https://app.cosmicsignature.com/coordination-changes');
       expect(urls).toContain('https://app.cosmicsignature.com/eth-contribution');
@@ -85,6 +84,8 @@ describe('sitemap (host-aware)', () => {
         'https://app.cosmicsignature.com/public-goods-contributions-voluntary',
       );
       expect(urls).toContain('https://app.cosmicsignature.com/public-goods-retrievals');
+      expect(urls).not.toContain('https://app.cosmicsignature.com/recipient-history');
+      expect(urls).not.toContain('https://app.cosmicsignature.com/detail/sample');
 
       // Legacy (pre-migration) paths are absent.
       // lexicon-allow-start: legacy URL paths must literally appear here to verify they're absent from the sitemap
@@ -181,7 +182,7 @@ describe('sitemap (host-aware)', () => {
       }
     });
 
-    it('uses a stable content date instead of request time for lastModified', async () => {
+    it('uses route policy dates instead of request time for lastModified', async () => {
       const entries = await sitemap();
       for (const entry of entries) {
         expect((entry.lastModified as Date).toISOString()).toBe('2026-05-31T00:00:00.000Z');

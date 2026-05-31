@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit",
     "test": "jest",
     "test:coverage": "jest --coverage",
+    "test:seo": "jest app/__tests__/seo-policy.test.ts app/__tests__/seo-summaries.test.tsx utils/__tests__/seo.test.ts utils/__tests__/jsonLd.test.ts utils/__tests__/jsonLd.test.tsx utils/__tests__/indexNow.test.ts content/__tests__/learn.test.ts public/__tests__/llms.test.ts && playwright test e2e/seo-raw-html.spec.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
@@ -18,6 +19,7 @@
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
     "audit:high": "tsx scripts/audit-high.ts",
+    "indexnow:submit": "tsx scripts/indexnow-submit.ts",
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
     "prepare": "husky"
   },

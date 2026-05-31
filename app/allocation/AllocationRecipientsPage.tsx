@@ -45,6 +45,7 @@ const AllocationRecipientsPage = () => {
           </SectionEyebrow>
         }
         title="Allocation Recipients"
+        titleLevel={2}
         gradientTitle="signature"
         subtitle="Browse the complete history of allocation recipients, cycle statistics, and allocation distributions across all finalized Performance Cycles."
       />

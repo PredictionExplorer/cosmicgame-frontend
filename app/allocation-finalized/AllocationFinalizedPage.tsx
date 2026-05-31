@@ -113,6 +113,7 @@ const AllocationFinalizedPage = () => {
               breadcrumbs={breadcrumbsBase}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
+              titleLevel={2}
             />
             <div className={cn(detailPanelClass, 'p-10 text-center')}>
               <p className="font-medium text-foreground">
@@ -135,6 +136,7 @@ const AllocationFinalizedPage = () => {
               breadcrumbs={breadcrumbsBase}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
+              titleLevel={2}
             />
             <div className={cn(detailPanelClass, 'p-10 text-center')}>
               <p className="text-sm font-medium text-muted-foreground">Loading...</p>
@@ -144,15 +146,9 @@ const AllocationFinalizedPage = () => {
           <>
             <PageHeader
               title={
-                isClaimSuccess
-                  ? 'You successfully completed this cycle'
-                  : 'Allocation finalized'
+                isClaimSuccess ? 'You successfully completed this cycle' : 'Allocation finalized'
               }
-              subtitle={
-                isClaimSuccess
-                  ? `Cycle ${roundNum} was finalized on-chain.`
-                  : undefined
-              }
+              subtitle={isClaimSuccess ? `Cycle ${roundNum} was finalized on-chain.` : undefined}
               breadcrumbs={
                 isClaimSuccess
                   ? [
@@ -167,6 +163,7 @@ const AllocationFinalizedPage = () => {
               }
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
+              titleLevel={2}
             />
             <div className={cn(detailPanelClass, 'space-y-6 p-10 text-center')}>
               {isClaimSuccess ? (
@@ -205,6 +202,7 @@ const AllocationFinalizedPage = () => {
               ]}
               className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
               align="left"
+              titleLevel={2}
             />
 
             <SectionCard

@@ -24,7 +24,11 @@ describe('createMetadata', () => {
     const customUrl = 'https://example.com/custom.png';
     const result = createMetadata('Title', 'Desc', customUrl);
 
-    expect(result.openGraph).toEqual(expect.objectContaining({ images: [customUrl] }));
+    expect(result.openGraph).toEqual(
+      expect.objectContaining({
+        images: [{ url: customUrl, width: 1200, height: 630, alt: 'Title' }],
+      }),
+    );
     expect(result.twitter).toEqual(expect.objectContaining({ images: [customUrl] }));
   });
 
@@ -88,7 +92,9 @@ describe('createMetadata', () => {
   it('preserves both image and canonical when both are provided', () => {
     const result = createMetadata('T', 'D', 'https://img.com/x.png', '/foo');
 
-    expect((result.openGraph as { images: string[] }).images).toEqual(['https://img.com/x.png']);
+    expect((result.openGraph as { images: unknown[] }).images).toEqual([
+      { url: 'https://img.com/x.png', width: 1200, height: 630, alt: 'T' },
+    ]);
     expect((result.twitter as { images: string[] }).images).toEqual(['https://img.com/x.png']);
     expect(result.alternates).toEqual({
       canonical: 'https://app.cosmicsignature.com/foo',
@@ -146,7 +152,9 @@ describe('createMetadata', () => {
     // Empty string is `!== undefined`, so the contract is "use it" — but
     // an empty src is meaningless to crawlers. We document the existing
     // behavior here so any change is intentional.
-    expect((result.openGraph as { images: string[] }).images).toEqual(['']);
+    expect((result.openGraph as { images: unknown[] }).images).toEqual([
+      { url: '', width: 1200, height: 630, alt: 'T' },
+    ]);
   });
 
   it('handles unicode characters in title and description', () => {

@@ -15,6 +15,7 @@ const CharityCGDeposits = () => {
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Protocol Public-Goods Contributions"
+        titleLevel={2}
         subtitle="Automatic forwards from the Cosmic Signature protocol to the Public Goods Vault"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">

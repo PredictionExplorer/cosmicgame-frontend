@@ -1,4 +1,13 @@
+import { metadata as sampleDetailMetadata } from '@/app/detail/sample/page';
+import { metadata as recipientHistoryMetadata } from '@/app/recipient-history/page';
+
+import { appSitemapRoutes, dynamicNoindexRoutePrefixes, noindexAppRoutes } from '@/lib/seoRoutes';
 import { createMetadata } from '@/utils/seo';
+
+jest.mock('../detail/sample/SampleDetailPage', () => ({
+  __esModule: true,
+  default: () => null,
+}));
 
 function expectIndexable(metadata: { robots?: unknown }) {
   expect(metadata.robots).toEqual(
@@ -59,5 +68,34 @@ describe('SEO route policy', () => {
     expect(metadata.alternates).toEqual({
       canonical: 'https://app.cosmicsignature.com/user/0x0000000000000000000000000000000000000000',
     });
+  });
+
+  it('keeps noindex routes out of the app sitemap', () => {
+    const sitemapPaths = new Set(appSitemapRoutes.map((route) => route.path));
+
+    for (const route of noindexAppRoutes) {
+      expect(route.index).toBe(false);
+      expect(route.includeInSitemap).toBe(false);
+      expect(sitemapPaths).not.toContain(route.path);
+    }
+  });
+
+  it('marks wallet-personal and demo detail routes as noindex', () => {
+    expectNoIndex(recipientHistoryMetadata);
+    expectNoIndex(sampleDetailMetadata);
+  });
+
+  it('requires every app sitemap route to be indexable and server-visible', () => {
+    for (const route of appSitemapRoutes) {
+      expect(route.index).toBe(true);
+      expect(route.includeInSitemap).toBe(true);
+      expect(route.hasServerVisibleContent).toBe(true);
+    }
+  });
+
+  it('tracks dynamic noindex route prefixes for policy coverage', () => {
+    expect(dynamicNoindexRoutePrefixes).toEqual(
+      expect.arrayContaining(['/gesture/', '/user/', '/system-event/', '/marketing/']),
+    );
   });
 });

@@ -48,7 +48,11 @@ export function organizationJsonLd() {
     name: SITE_NAME,
     url: `${SITE_URL}/`,
     logo: SITE_LOGO_URL,
-    sameAs: ['https://x.com/CosmicSignature', 'https://discord.gg/bGnPn96Qwt'],
+    sameAs: [
+      'https://x.com/CosmicSignature',
+      'https://discord.gg/bGnPn96Qwt',
+      'https://github.com/PredictionExplorer',
+    ],
     description: PROTOCOL_DESCRIPTION,
   };
 }
@@ -63,11 +67,6 @@ export function webApplicationJsonLd() {
     applicationCategory: 'EntertainmentApplication',
     operatingSystem: 'Any',
     browserRequirements: 'Requires a Web3-compatible browser or wallet extension',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'ETH',
-    },
     description:
       'A procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; the protocol distributes allocations across more than ten tracks when the cycle finalizes.',
   };
@@ -199,12 +198,6 @@ export function nftProductJsonLd({
       name: SITE_NAME,
     },
     category: 'Digital Collectible',
-    offers: {
-      '@type': 'Offer',
-      availability: 'https://schema.org/InStock',
-      priceCurrency: 'ETH',
-      price: '0',
-    },
   };
 }
 

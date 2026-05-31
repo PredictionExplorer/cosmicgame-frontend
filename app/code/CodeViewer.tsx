@@ -35,9 +35,16 @@ const CodeViewer = () => (
             can also find it on IPFS:
           </p>
           <p className="text-base">
-            <StyledLink href="https://cloudflare-ipfs.com/ipfs:/QmWEao2HjCvyHJSbYnWLyZj8HfFardxzuNh7AUk1jgyXTm">
+            <StyledLink href="https://ipfs.io/ipfs/QmWEao2HjCvyHJSbYnWLyZj8HfFardxzuNh7AUk1jgyXTm">
               ipfs:/QmWEao2HjCvyHJSbYnWLyZj8HfFardxzuNh7AUk1jgyXTm
             </StyledLink>
+          </p>
+          <p className="mt-3 text-base">
+            The public GitHub organization is available at{' '}
+            <StyledLink href="https://github.com/PredictionExplorer">
+              github.com/PredictionExplorer
+            </StyledLink>
+            .
           </p>
         </div>
       </div>

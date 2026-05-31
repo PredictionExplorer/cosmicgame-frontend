@@ -76,6 +76,7 @@ const NamedNFTsPage = () => {
         align="left"
         eyebrow={<SectionEyebrow tone="aurora">Named Tokens · {list.length}</SectionEyebrow>}
         title="Named Cosmic Signature Tokens"
+        titleLevel={2}
         gradientTitle="signature"
         subtitle="Browse tokens that have been given custom names"
       />

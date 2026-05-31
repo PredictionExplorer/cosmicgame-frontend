@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { networkConfig } from '@/config/networks';
 import { get_dashboard_info } from '@/services/api/rounds';
 
@@ -23,7 +25,11 @@ function isAddress(value: unknown): value is string {
 
 export async function ContractsSeoSummary() {
   const data = await get_dashboard_info();
-  const entries = Object.entries(data?.ContractAddrs ?? {})
+  const fallbackAddrs = {
+    CosmicGameAddr: protocolFacts.contractAddresses.proxy,
+    ImplementationAddr: protocolFacts.contractAddresses.implementation,
+  };
+  const entries = Object.entries({ ...fallbackAddrs, ...(data?.ContractAddrs ?? {}) })
     .filter((entry): entry is [string, string] => isAddress(entry[1]))
     .map(([key, address]) => ({
       key,
@@ -46,6 +52,13 @@ export async function ContractsSeoSummary() {
         researchers, search engines, and AI systems can connect the app experience to verifiable
         on-chain protocol records.
       </p>
+      {!data?.ContractAddrs ? (
+        <p className="mt-4 rounded-xl border border-white/[0.06] bg-black/20 p-4 text-sm text-muted-foreground">
+          Live contract address data is temporarily unavailable in this server snapshot. The
+          verified protocol proxy and implementation addresses below are the static fallback from
+          the frontend protocol facts.
+        </p>
+      ) : null}
       {entries.length > 0 ? (
         <dl className="mt-6 grid gap-3 md:grid-cols-2">
           {entries.slice(0, 10).map(({ key, label, address, explorerUrl }) => (

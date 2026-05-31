@@ -3,6 +3,8 @@ import { Suspense } from 'react';
 
 import { createMetadata } from '@/utils/seo';
 
+import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
+
 import AllocationFinalizedPage from './AllocationFinalizedPage';
 
 export const metadata: Metadata = createMetadata(
@@ -14,8 +16,11 @@ export const metadata: Metadata = createMetadata(
 
 export default function Page() {
   return (
-    <Suspense>
-      <AllocationFinalizedPage />
-    </Suspense>
+    <>
+      <PublicDataRouteSeoSummary route="allocation-finalized" />
+      <Suspense>
+        <AllocationFinalizedPage />
+      </Suspense>
+    </>
   );
 }

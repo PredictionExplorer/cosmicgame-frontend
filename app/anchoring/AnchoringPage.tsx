@@ -118,6 +118,7 @@ const AnchoringPage = () => {
           </SectionEyebrow>
         }
         title="Anchor Distributions"
+        titleLevel={2}
         gradientTitle="signature"
         subtitle="Overview of global anchoring activity and distribution history"
       />

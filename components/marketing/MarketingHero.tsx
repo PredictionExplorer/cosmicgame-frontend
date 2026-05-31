@@ -23,12 +23,12 @@ export function MarketingHero() {
         className="pointer-events-none absolute inset-0 -z-10 rounded-2xl border border-white/[0.06]"
       />
 
-      <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+      <h2 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
         Earn Rewards by{' '}
         <span className="bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent">
           Spreading the Word
         </span>
-      </h1>
+      </h2>
 
       <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
         Promote Cosmic Signature and receive CST distributions for every verified outreach activity.

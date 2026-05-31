@@ -15,13 +15,14 @@ function ChangedParameters() {
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="Coordination Changes"
+        titleLevel={2}
         subtitle="History of protocol parameter changes and admin events"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         The Cosmic Signature protocol parameters can be adjusted by the contract owner during cycle
         activation windows. This log provides full transparency into every change, including Gesture
-        Cost step-ups, time additions, and Anchor Distribution settings. Once ownership is renounced,
-        all parameters become permanently immutable.
+        Cost step-ups, time additions, and Anchor Distribution settings. Once ownership is
+        renounced, all parameters become permanently immutable.
       </p>
       {loading ? (
         <h6 className="text-lg font-semibold">Loading...</h6>

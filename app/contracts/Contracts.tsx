@@ -221,7 +221,7 @@ const Contracts = () => {
         title="Contract Addresses"
         titleLevel={2}
         gradientTitle="aurora"
-        subtitle="On-chain addresses and configuration for the Cosmic Signature protocol. All contracts have been audited."
+        subtitle="On-chain addresses, configuration, source links, and verification context for the Cosmic Signature protocol."
       >
         <NetworkBadge chainName={networkConfig.chainName} chainId={networkConfig.chainId} />
       </PageHeader>

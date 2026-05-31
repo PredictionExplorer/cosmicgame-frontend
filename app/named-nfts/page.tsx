@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
+import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
+
 import NamedNFTsPage from './NamedNFTsPage';
 
 export const metadata: Metadata = createMetadata(
@@ -12,5 +14,10 @@ export const metadata: Metadata = createMetadata(
 );
 
 export default function Page() {
-  return <NamedNFTsPage />;
+  return (
+    <>
+      <PublicDataRouteSeoSummary route="named-nfts" />
+      <NamedNFTsPage />
+    </>
+  );
 }

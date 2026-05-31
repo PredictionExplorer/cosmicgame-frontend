@@ -11,6 +11,7 @@ export const metadata: Metadata = createMetadata(
   'Discover the unique attributes and ownership history of Cosmic Signature Token, an exclusive digital collectible from the Cosmic Signature protocol.',
   undefined,
   '/detail/sample',
+  { index: false },
 );
 
 export default function Page() {

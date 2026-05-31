@@ -13,6 +13,10 @@
  * - 27,000 CST = 24 NFT-paired 1,000 CST imprints + 3,000 CST outreach.
  */
 export const protocolFacts = {
+  contractAddresses: {
+    proxy: '0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2',
+    implementation: '0x7739148013777c485AD9f3d971e1005Eca686661',
+  },
   mainEthPercentage: 25,
   chronoWarriorEthPercentage: 8,
   stellarSelectionEthPercentage: 4,

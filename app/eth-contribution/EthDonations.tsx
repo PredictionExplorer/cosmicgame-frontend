@@ -97,6 +97,7 @@ const EthDonations = () => {
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         title="ETH Contributions"
+        titleLevel={2}
         subtitle="Contribute ETH directly to the Cosmic Signature Public Goods Vault"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">

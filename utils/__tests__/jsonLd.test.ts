@@ -74,6 +74,7 @@ describe('JSON-LD generators', () => {
         expect.arrayContaining([
           expect.stringContaining('x.com'),
           expect.stringContaining('discord.gg'),
+          expect.stringContaining('github.com/PredictionExplorer'),
         ]),
       );
     });
@@ -95,9 +96,8 @@ describe('JSON-LD generators', () => {
       expect(result.applicationCategory).toBe('EntertainmentApplication');
     });
 
-    it('includes an offer', () => {
-      expect(result.offers).toBeDefined();
-      expect(result.offers['@type']).toBe('Offer');
+    it('does not claim free participation with an Offer price', () => {
+      expect(result).not.toHaveProperty('offers');
     });
 
     it('has lexicon-safe description', () => {
@@ -244,6 +244,10 @@ describe('JSON-LD generators', () => {
 
     it('includes Digital Collectible category', () => {
       expect(result.category).toBe('Digital Collectible');
+    });
+
+    it('does not claim the NFT is available for a zero-price offer', () => {
+      expect(result).not.toHaveProperty('offers');
     });
   });
 });

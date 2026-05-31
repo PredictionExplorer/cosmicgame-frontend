@@ -8,6 +8,7 @@ import { ArrowRight, ChevronDown } from 'lucide-react';
 import { landingContent } from '@/content/landing';
 
 import { ReducedMotionFallback } from '@/components/three/ReducedMotionFallback';
+import { APP_ORIGIN } from '@/lib/hostRouting';
 
 import { EventHorizonCountdown } from './EventHorizonCountdown';
 import { GradientText } from './GradientText';
@@ -57,6 +58,10 @@ export function Hero() {
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl">
             {hero.subhead}
           </p>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/55">
+            Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
+            mutational signatures in biology. It is an on-chain art protocol and app.
+          </p>
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -85,6 +90,18 @@ export function Hero() {
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-4 text-base font-medium text-white backdrop-blur-md transition hover:bg-white/10"
             >
               {hero.secondaryCta.label}
+            </Link>
+            <Link
+              href={`${APP_ORIGIN}/statistics`}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 text-sm font-medium text-white/80 backdrop-blur-md transition hover:bg-white/10 hover:text-white"
+            >
+              Protocol statistics
+            </Link>
+            <Link
+              href={`${APP_ORIGIN}/gallery`}
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 text-sm font-medium text-white/80 backdrop-blur-md transition hover:bg-white/10 hover:text-white"
+            >
+              NFT gallery
             </Link>
           </div>
         </motion.div>
