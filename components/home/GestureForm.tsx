@@ -151,10 +151,29 @@ export function GestureForm({
       )}
 
       <div>
-        <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2 block">
-          Message{' '}
-          <span className="normal-case tracking-normal opacity-50">(optional, 280 chars)</span>
-        </Label>
+        <div className="mb-2 flex items-center gap-2">
+          <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Message{' '}
+            <span className="normal-case tracking-normal opacity-50">(optional, 280 chars)</span>
+          </Label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                aria-label="How gesture messages work"
+                className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
+                <Info className="h-3.5 w-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-[260px]">
+                Leave a message to appear in Gesture Chat. Your message is recorded on-chain with
+                your gesture and remains on the blockchain permanently.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
         <textarea
           placeholder="Leave a message with your gesture..."
           value={message}

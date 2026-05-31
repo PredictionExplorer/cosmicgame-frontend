@@ -105,6 +105,16 @@ describe('GestureForm', () => {
     expect(defaultProps.setMessage).toHaveBeenCalledWith('hello world');
   });
 
+  it('explains that gesture messages appear in chat and stay on-chain', async () => {
+    const user = userEvent.setup();
+    render(<GestureForm {...defaultProps} />);
+
+    await user.hover(screen.getByRole('button', { name: 'How gesture messages work' }));
+
+    expect(await screen.findAllByText(/appear in Gesture Chat/)).not.toHaveLength(0);
+    expect(screen.getAllByText(/blockchain permanently/).length).toBeGreaterThan(0);
+  });
+
   it('Advanced options accordion toggles', () => {
     const { rerender } = render(<GestureForm {...defaultProps} advancedExpanded={false} />);
     expect(screen.getByText('Advanced Options')).toBeInTheDocument();
