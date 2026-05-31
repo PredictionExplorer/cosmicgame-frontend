@@ -13,6 +13,7 @@ const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: undefined })
 const mockUseDonationsNFTByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsCGWithInfoByRound = jest.fn().mockReturnValue({ data: undefined });
 const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: undefined });
+const mockUseBannedGestures = jest.fn().mockReturnValue({ data: [] });
 const mockUseCurrentTime = jest.fn().mockReturnValue({
   data: Math.floor(Date.now() / 1000),
   isLoading: false,
@@ -25,6 +26,7 @@ jest.mock('../../hooks/useApiQuery', () => ({
   useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
   useDonationsCGWithInfoByRound: (...args: unknown[]) => mockUseDonationsCGWithInfoByRound(...args),
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
+  useBannedGestures: (...args: unknown[]) => mockUseBannedGestures(...args),
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
   useCSTInfo: (...args: unknown[]) => mockUseCSTInfo(...args),
 }));
@@ -199,12 +201,37 @@ jest.mock('../../components/tables/SpecialAllocationRecipients', () => ({
 }));
 
 jest.mock('../../utils', () => ({
+  convertTimestampToDateTime: (timestamp: number, showSecond: boolean = false): string => {
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const date = new Date(timestamp * 1000);
+    const month = monthNames[date.getMonth()];
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${month} ${day}, ${hours}:${minutes}${showSecond ? `:${seconds}` : ''}`;
+  },
   formatEthValue: (value: number) => {
     if (!value) return '0 ETH';
     return value < 10 ? `${value.toFixed(4)} ETH` : `${value.toFixed(2)} ETH`;
   },
   getAssetsUrl: (path: string) => `https://assets.example.com/${path}`,
   getEnduranceChampions: () => [],
+  shortenHex: (hex: string, length = 4) =>
+    hex ? `${hex.substring(0, length + 2)}....${hex.substring(hex.length - length)}` : '',
 }));
 
 jest.mock('../../utils/errors', () => ({
@@ -245,6 +272,7 @@ beforeEach(() => {
   mockUseGestureListByCycle.mockReturnValue({ data: undefined });
   mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
   mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
+  mockUseBannedGestures.mockReturnValue({ data: [] });
   mockUseCurrentTime.mockReturnValue({
     data: Math.floor(Date.now() / 1000),
     isLoading: false,
@@ -374,6 +402,82 @@ describe('HomePage', () => {
     });
     render(<HomePage />);
     expect(screen.getByTestId('gesture-status')).toBeInTheDocument();
+  });
+
+  it('renders current-cycle gesture messages in the chat panel', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7 }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 1,
+          TimeStamp: 1_700_000_000,
+          DateTime: '',
+          BidderAddr: '0x1111111111111111111111111111111111111111',
+          RoundNum: 7,
+          GestureType: 0,
+          GestureCostEth: 0.1,
+          Message: 'Older current-cycle signal',
+        },
+        {
+          EvtLogId: 2,
+          TimeStamp: 1_700_000_300,
+          DateTime: '',
+          BidderAddr: '0x2222222222222222222222222222222222222222',
+          RoundNum: 7,
+          GestureType: 0,
+          GestureCostEth: 0.2,
+          Message: 'Newest current-cycle signal',
+        },
+        {
+          EvtLogId: 3,
+          TimeStamp: 1_700_000_400,
+          DateTime: '',
+          BidderAddr: '0x3333333333333333333333333333333333333333',
+          RoundNum: 7,
+          GestureType: 0,
+          GestureCostEth: 0.3,
+          Message: '',
+        },
+      ],
+    });
+
+    render(<HomePage />);
+
+    expect(mockUseGestureListByCycle).toHaveBeenCalledWith(7, 'desc');
+    const chat = screen.getByTestId('gesture-message-chat');
+    expect(within(chat).getByText('Newest current-cycle signal')).toBeInTheDocument();
+    expect(within(chat).getByText('Older current-cycle signal')).toBeInTheDocument();
+    expect(within(chat).queryByRole('link', { name: 'Open gesture 3' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the gesture chat in the page when the current cycle has no messages', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7 }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({ data: [] });
+
+    render(<HomePage />);
+
+    const chat = screen.getByTestId('gesture-message-chat');
+    expect(within(chat).getByText('No gesture messages yet')).toBeInTheDocument();
+  });
+
+  it('places the gesture chat after the primary current-cycle content in the responsive layout', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    const status = screen.getByTestId('gesture-status');
+    const chat = screen.getByTestId('gesture-message-chat');
+    expect(status.compareDocumentPosition(chat)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(chat.parentElement).toHaveClass('xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]');
   });
 
   it('requests current-cycle attached NFTs and renders the showcase when present', () => {

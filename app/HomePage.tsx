@@ -23,6 +23,7 @@ import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocati
 import { GestureStatus } from '@/components/common/GestureStatus';
 import { ChronoCoreTimer } from '@/components/home/ChronoCoreTimer';
 import { GestureForm } from '@/components/home/GestureForm';
+import { GestureMessageChat } from '@/components/home/GestureMessageChat';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { PublicGoodsImpactCard } from '@/components/home/PublicGoodsImpactCard';
 import { AttachedNFTAllocationShowcase } from '@/components/attachments/DonatedNFTPrizeShowcase';
@@ -243,200 +244,210 @@ const HomePage = () => {
           canOpenGesturePanel={!loading && isRoundActive}
         />
 
-        {/* ===== BIDDING STATUS (countdown + stats) ===== */}
-        <GestureStatus
-          data={data}
-          loading={loading}
-          activationTime={activationTime}
-          curGestureList={curGestureList}
-          ethGestureInfo={ethGestureInfo}
-          allocationTime={allocationTime}
-          suppressPrimaryTimer
-          attachedNFTCount={donatedNFTs.length}
-          attachedERC20Count={donatedERC20Tokens.length}
-        />
+        <div className="mt-8 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]">
+          <div className="min-w-0">
+            {/* ===== BIDDING STATUS (countdown + stats) ===== */}
+            <GestureStatus
+              data={data}
+              loading={loading}
+              activationTime={activationTime}
+              curGestureList={curGestureList}
+              ethGestureInfo={ethGestureInfo}
+              allocationTime={allocationTime}
+              suppressPrimaryTimer
+              attachedNFTCount={donatedNFTs.length}
+              attachedERC20Count={donatedERC20Tokens.length}
+            />
 
-        {/* ===== SPECIAL ALLOCATION LEADERS ===== */}
-        {data?.TsRoundStart !== 0 && (
-          /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
-          <div className="mt-8">
-            {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
-            <div className="min-w-0 print:col-auto">
-              <SpecialAllocationRecipients
-                currentAccount={account}
-                latestMessage={curGestureList[0]?.Message ?? ''}
-              />
-            </div>
-          </div>
-        )}
+            {/* ===== SPECIAL ALLOCATION LEADERS ===== */}
+            {data?.TsRoundStart !== 0 && (
+              /* Plain div (no Framer Motion): motion’s inline opacity/transform often stays invisible in print */
+              <div className="mt-8">
+                {/* min-w-0 + print fixes: home PDF often uses narrow width and can collapse badly in Skia */}
+                <div className="min-w-0 print:col-auto">
+                  <SpecialAllocationRecipients
+                    currentAccount={account}
+                    latestMessage={curGestureList[0]?.Message ?? ''}
+                  />
+                </div>
+              </div>
+            )}
 
-        {/* ===== BID ACTION AREA ===== */}
-        {!loading && isRoundActive && (
-          <motion.div
-            id="make-gesture"
-            variants={sectionFade}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.3 }}
-            className="print-motion-visible mt-10"
-          >
-            <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
-              <h2 className="font-display text-xl font-bold tracking-tight mb-1">
-                Make Your Gesture
-              </h2>
-              <p className="text-sm text-muted-foreground mb-6">
-                Choose a gesture method and participate in the active cycle.
-              </p>
+            {/* ===== BID ACTION AREA ===== */}
+            {!loading && isRoundActive && (
+              <motion.div
+                id="make-gesture"
+                variants={sectionFade}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.3 }}
+                className="print-motion-visible mt-10"
+              >
+                <div className="gradient-border-card rounded-2xl bg-white/[0.015] p-6 sm:p-8">
+                  <h2 className="font-display text-xl font-bold tracking-tight mb-1">
+                    Make Your Gesture
+                  </h2>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Choose a gesture method and participate in the active cycle.
+                  </p>
 
-              {account ? (
-                <>
-                  <GestureForm {...gestureForm} data={data} />
+                  {account ? (
+                    <>
+                      <GestureForm {...gestureForm} data={data} />
 
-                  <div className="mt-6 space-y-4">
-                    {canGesture && (
-                      <Button
-                        size="lg"
-                        onClick={handleGesture}
-                        className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
-                        disabled={
-                          isGesturing ||
-                          (gestureType === 'RandomWalk' && rwlkId === -1) ||
-                          gestureType === ''
-                        }
-                      >
-                        {isGesturing ? (
-                          <span className="flex items-center gap-2">
-                            <Spinner size="sm" /> Processing...
-                          </span>
-                        ) : (
+                      <div className="mt-6 space-y-4">
+                        {canGesture && (
+                          <Button
+                            size="lg"
+                            onClick={handleGesture}
+                            className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
+                            disabled={
+                              isGesturing ||
+                              (gestureType === 'RandomWalk' && rwlkId === -1) ||
+                              gestureType === ''
+                            }
+                          >
+                            {isGesturing ? (
+                              <span className="flex items-center gap-2">
+                                <Spinner size="sm" /> Processing...
+                              </span>
+                            ) : (
+                              <>
+                                {getGestureLabel()} <ArrowRight className="ml-2 h-5 w-5" />
+                              </>
+                            )}
+                          </Button>
+                        )}
+                        {canClaim && (
                           <>
-                            {getGestureLabel()} <ArrowRight className="ml-2 h-5 w-5" />
+                            <Button
+                              size="lg"
+                              onClick={handleFinalize}
+                              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
+                              disabled={
+                                isClaiming || (data?.LastBidderAddr !== account && claimWait > now)
+                              }
+                            >
+                              {isClaiming ? (
+                                <span className="flex items-center gap-2">
+                                  <Spinner size="sm" /> Processing...
+                                </span>
+                              ) : (
+                                <>
+                                  Finalize Cycle
+                                  <span className="flex items-center">
+                                    {claimWait > now && data?.LastBidderAddr !== account && (
+                                      <>
+                                        &nbsp;available in &nbsp;
+                                        <SmoothCountdown
+                                          date={claimWait}
+                                          renderer={renderInlineCountdown}
+                                          intervalMs={1000}
+                                        />
+                                      </>
+                                    )}
+                                    &nbsp;
+                                    <ArrowRight className="h-[22px] w-[22px]" />
+                                  </span>
+                                </>
+                              )}
+                            </Button>
+                            {data?.LastBidderAddr !== account && claimWait > now && (
+                              <p className="text-sm italic text-right text-primary">
+                                Please wait for the participant who made the Final Gesture to
+                                finalize the cycle.
+                              </p>
+                            )}
                           </>
                         )}
-                      </Button>
-                    )}
-                    {canClaim && (
-                      <>
-                        <Button
-                          size="lg"
-                          onClick={handleFinalize}
-                          className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 text-white border-0 font-semibold text-base h-12"
-                          disabled={
-                            isClaiming || (data?.LastBidderAddr !== account && claimWait > now)
-                          }
-                        >
-                          {isClaiming ? (
-                            <span className="flex items-center gap-2">
-                              <Spinner size="sm" /> Processing...
-                            </span>
-                          ) : (
-                            <>
-                              Finalize Cycle
-                              <span className="flex items-center">
-                                {claimWait > now && data?.LastBidderAddr !== account && (
-                                  <>
-                                    &nbsp;available in &nbsp;
-                                    <SmoothCountdown
-                                      date={claimWait}
-                                      renderer={renderInlineCountdown}
-                                      intervalMs={1000}
-                                    />
-                                  </>
-                                )}
-                                &nbsp;
-                                <ArrowRight className="h-[22px] w-[22px]" />
-                              </span>
-                            </>
-                          )}
-                        </Button>
-                        {data?.LastBidderAddr !== account && claimWait > now && (
-                          <p className="text-sm italic text-right text-primary">
-                            Please wait for the participant who made the Final Gesture to finalize
-                            the cycle.
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <div
-                  data-testid="connect-to-gesture"
-                  className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
-                >
-                  <h3 className="font-display text-lg font-semibold tracking-tight">
-                    Connect to make a gesture
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Connect MetaMask or another wallet to choose a gesture method and participate in
-                    the active cycle.
-                  </p>
-                  <div className="mt-4">
-                    <ConnectWalletButton
-                      isMobileView={false}
-                      loading={false}
-                      balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
-                      stakedTokenCount={{ cst: 0, rwalk: 0 }}
-                    />
-                  </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div
+                      data-testid="connect-to-gesture"
+                      className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
+                    >
+                      <h3 className="font-display text-lg font-semibold tracking-tight">
+                        Connect to make a gesture
+                      </h3>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Connect MetaMask or another wallet to choose a gesture method and
+                        participate in the active cycle.
+                      </p>
+                      <div className="mt-4">
+                        <ConnectWalletButton
+                          isMobileView={false}
+                          loading={false}
+                          balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
+                          stakedTokenCount={{ cst: 0, rwalk: 0 }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-        {/* ===== PRIZE BREAKDOWN ===== */}
-        {data && (
-          <motion.div
-            variants={sectionFade}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.4 }}
-            className="print-motion-visible"
-          >
-            <Allocation data={data} />
-          </motion.div>
-        )}
+              </motion.div>
+            )}
+            {/* ===== PRIZE BREAKDOWN ===== */}
+            {data && (
+              <motion.div
+                variants={sectionFade}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.4 }}
+                className="print-motion-visible"
+              >
+                <Allocation data={data} />
+              </motion.div>
+            )}
 
-        <AttachedNFTAllocationShowcase
-          nfts={donatedNFTs}
-          erc20Tokens={donatedERC20Tokens}
-          cycleNumber={round >= 0 ? round : undefined}
-        />
+            <AttachedNFTAllocationShowcase
+              nfts={donatedNFTs}
+              erc20Tokens={donatedERC20Tokens}
+              cycleNumber={round >= 0 ? round : undefined}
+            />
 
-        {/* ===== PUBLIC GOODS IMPACT ===== */}
-        {data && (
-          <motion.div
-            variants={sectionFade}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.45 }}
-            className="print-motion-visible"
-          >
-            <PublicGoodsImpactCard data={data} />
-          </motion.div>
-        )}
+            {/* ===== PUBLIC GOODS IMPACT ===== */}
+            {data && (
+              <motion.div
+                variants={sectionFade}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.45 }}
+                className="print-motion-visible"
+              >
+                <PublicGoodsImpactCard data={data} />
+              </motion.div>
+            )}
 
-        {/* ===== FULL ROUND DETAILS LINK ===== */}
-        <motion.div
-          variants={sectionFade}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.5 }}
-          className="print-motion-visible"
-        >
-          <Link
-            href="/current-cycle"
-            className="mt-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 group hover:bg-white/[0.04] transition-all duration-300"
-          >
-            <div>
-              <p className="text-sm font-medium text-white">View Full Cycle Details</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Gesture history, leaderboards, contributions, and allocation distribution
-              </p>
-            </div>
-            <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-          </Link>
-        </motion.div>
+            {/* ===== FULL ROUND DETAILS LINK ===== */}
+            <motion.div
+              variants={sectionFade}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.5 }}
+              className="print-motion-visible"
+            >
+              <Link
+                href="/current-cycle"
+                className="mt-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 group hover:bg-white/[0.04] transition-all duration-300"
+              >
+                <div>
+                  <p className="text-sm font-medium text-white">View Full Cycle Details</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Gesture history, leaderboards, contributions, and allocation distribution
+                  </p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+              </Link>
+            </motion.div>
+          </div>
+
+          <GestureMessageChat
+            gestures={curGestureList}
+            cycleNumber={round >= 0 ? round : undefined}
+            className="min-h-[30rem] xl:sticky xl:top-28"
+          />
+        </div>
       </PageShell>
 
       <LatestNFTs />

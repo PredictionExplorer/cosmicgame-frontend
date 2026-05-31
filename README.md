@@ -105,6 +105,7 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 ## Architecture
 
 - **Data Fetching:** All API calls go through React Query hooks defined in `hooks/useApiQuery.ts`, providing automatic caching, background refetching, and deduplication. The API layer in `services/api/` handles HTTP requests via Axios.
+- **Gesture Message Chat:** The home-page chat panel is current-cycle scoped and reuses `useGestureListByCycle(round, 'desc')`; see `docs/gesture-message-chat.md` for behavior, moderation, and tests.
 - **Error Handling:** All errors are reported to Sentry via `utils/errors.ts`. Wallet errors use `isUserRejection()` to silently handle user-cancelled transactions.
 - **SEO:** OpenGraph metadata is generated per-page using `createMetadata()` from `utils/seo.ts`.
 - **State:** Wallet state via wagmi, server state via React Query, shared app state via React contexts.
