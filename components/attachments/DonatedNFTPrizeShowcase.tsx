@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { formatUnits } from 'viem';
-import { ExternalLink, Gift, ImageOff, ShieldCheck, Sparkles } from 'lucide-react';
+import { ExternalLink, Gift, ImageOff, Sparkles } from 'lucide-react';
 
 import { getExplorerUrl, shortenHex } from '@/utils';
 
@@ -272,18 +272,6 @@ function AssetCardShell({
   );
 }
 
-function RecipientBadge() {
-  return (
-    <span
-      className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-primary"
-      data-testid="recipient-receives-badge"
-    >
-      <ShieldCheck className="h-3.5 w-3.5" />
-      Recipient receives
-    </span>
-  );
-}
-
 function AssetTypeBadge({
   tone,
   children,
@@ -363,7 +351,6 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
         <div className="flex min-w-0 flex-col justify-between gap-4">
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <RecipientBadge />
               <AssetTypeBadge tone="nft">ERC-721</AssetTypeBadge>
               {estimate ? (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--solar-gold-rgb)/0.25)] bg-[rgb(var(--solar-gold-rgb)/0.10)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--solar-gold-rgb))]">
@@ -405,7 +392,6 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
                   )
                 }
               />
-              <AssetFact label="Recipient" value="Final Gesture" />
             </div>
 
             <div className="flex flex-wrap gap-2">
@@ -453,7 +439,6 @@ function AttachedERC20AllocationCard({
         <div className="flex min-w-0 flex-col justify-between gap-4">
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <RecipientBadge />
               <AssetTypeBadge
                 tone="erc20"
                 tooltip={
@@ -507,18 +492,6 @@ function AttachedERC20AllocationCard({
                     </Link>
                   ) : (
                     'Unknown'
-                  )
-                }
-              />
-              <AssetFact
-                label="Recipient"
-                value={
-                  token.WinnerAddr ? (
-                    <Link href={`/user/${token.WinnerAddr}`} className="hover:text-primary">
-                      {shortenHex(token.WinnerAddr, 5)}
-                    </Link>
-                  ) : (
-                    'Final Gesture'
                   )
                 }
               />

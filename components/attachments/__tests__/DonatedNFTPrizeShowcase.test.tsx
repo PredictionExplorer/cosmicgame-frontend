@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import type { AttachedNFT, DonatedERC20Token } from '@/services/api/types';
 
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 import { AttachedNFTAllocationShowcase } from '../DonatedNFTPrizeShowcase';
 
@@ -70,6 +70,15 @@ function createErc20(overrides: Partial<DonatedERC20Token> = {}): DonatedERC20To
   };
 }
 
+function expectSingleRecipientRuleSummary() {
+  expect(screen.getAllByText('Recipient rule')).toHaveLength(1);
+  expect(screen.getAllByText('Final Gesture')).toHaveLength(1);
+
+  const recipientRuleChip = screen.getByText('Recipient rule').closest('div');
+  expect(recipientRuleChip).not.toBeNull();
+  expect(within(recipientRuleChip as HTMLElement).getByText('Final Gesture')).toBeInTheDocument();
+}
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockUseAttachedNftMetadata.mockReturnValue({
@@ -114,6 +123,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.getByText('Included in Signature Allocation')).toBeInTheDocument();
     expect(screen.getByText('Bonus Receipt')).toBeInTheDocument();
     expect(screen.getByText('All visible')).toBeInTheDocument();
+    expectSingleRecipientRuleSummary();
   });
 
   it('renders multiple NFT allocation copy and count', () => {
@@ -131,6 +141,7 @@ describe('AttachedNFTAllocationShowcase', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('2 ERC-721 tokens')).toBeInTheDocument();
+    expectSingleRecipientRuleSummary();
   });
 
   it('renders ERC20-only allocation copy, amount, metadata, and explorer action', () => {
@@ -161,6 +172,7 @@ describe('AttachedNFTAllocationShowcase', () => {
       'href',
       expect.stringContaining(ERC20_CONTRACT),
     );
+    expectSingleRecipientRuleSummary();
   });
 
   it('renders mixed NFT and ERC20 allocation copy with combined counts', () => {
@@ -182,6 +194,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(amounts).toHaveLength(2);
     expect(amounts[0]).toHaveTextContent('1250.5 GLXY');
     expect(amounts[1]).toHaveTextContent('5 GLXY');
+    expectSingleRecipientRuleSummary();
   });
 
   it('does not show ERC20 lifecycle status copy even when the token has been retrieved', () => {
@@ -196,10 +209,12 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.queryByText('Status')).not.toBeInTheDocument();
     expect(screen.queryByText('Pending finalization')).not.toBeInTheDocument();
     expect(screen.queryByText('Retrieved')).not.toBeInTheDocument();
+    expect(screen.queryByText('Recipient')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /0xabcd/i })).toHaveLength(1);
     expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1250.5 GLXY');
   });
 
-  it('uses the same Recipient receives treatment for NFTs and ERC20 deposits', () => {
+  it('keeps recipient copy at the section level instead of repeating it per asset card', () => {
     render(
       <AttachedNFTAllocationShowcase
         nfts={[createNft()]}
@@ -208,13 +223,18 @@ describe('AttachedNFTAllocationShowcase', () => {
       />,
     );
 
-    const recipientBadges = screen.getAllByTestId('recipient-receives-badge');
-    expect(recipientBadges).toHaveLength(2);
-    expect(new Set(recipientBadges.map((badge) => badge.className)).size).toBe(1);
-    recipientBadges.forEach((badge) => {
-      expect(badge).toHaveClass('text-primary');
-      expect(badge).toHaveClass('bg-primary/10');
-    });
+    expect(
+      screen.getByText(
+        /Final Gesture participant receives the attached NFT and the attached ERC-20 token deposit when Cycle #42 finalizes/i,
+      ),
+    ).toBeInTheDocument();
+    expectSingleRecipientRuleSummary();
+    expect(screen.queryByTestId('recipient-receives-badge')).not.toBeInTheDocument();
+    expect(screen.queryByText('Recipient receives')).not.toBeInTheDocument();
+    expect(screen.queryByText('Recipient')).not.toBeInTheDocument();
+    expect(screen.getByText('Token ID')).toBeInTheDocument();
+    expect(screen.getByText('Token')).toBeInTheDocument();
+    expect(screen.getAllByText('Attached by')).toHaveLength(2);
   });
 
   it('displays metadata image, title, collection, token id, contributor, and actions', () => {
@@ -227,7 +247,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.getByText('Chromie Squiggle #123')).toBeInTheDocument();
     expect(screen.getByText('Chromie Squiggle')).toBeInTheDocument();
     expect(screen.getByText('#123')).toBeInTheDocument();
-    expect(screen.getAllByText('Final Gesture').length).toBeGreaterThan(0);
+    expectSingleRecipientRuleSummary();
     expect(
       screen
         .getAllByRole('link', { name: /View NFT/i })
@@ -349,6 +369,7 @@ describe('AttachedNFTAllocationShowcase', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('4 of 6')).toBeInTheDocument();
+    expectSingleRecipientRuleSummary();
   });
 
   it('limits the ERC20 preview and links users to full details copy', () => {
@@ -365,6 +386,7 @@ describe('AttachedNFTAllocationShowcase', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('4 of 6')).toBeInTheDocument();
+    expectSingleRecipientRuleSummary();
   });
 
   it('falls back to a generated ERC20 badge when logo metadata is unavailable', () => {
