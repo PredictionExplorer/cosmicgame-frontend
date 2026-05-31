@@ -1,3 +1,5 @@
+import userEvent from '@testing-library/user-event';
+
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import type { GestureInfo } from '@/services/api';
@@ -68,6 +70,17 @@ describe('GestureMessageChat', () => {
     expect(within(items[0]!).getByText('Newest message')).toBeInTheDocument();
     expect(within(items[1]!).getByText('Middle message')).toBeInTheDocument();
     expect(within(items[2]!).getByText('Older message')).toBeInTheDocument();
+  });
+
+  it('explains how to join the chat through a tooltip', async () => {
+    const user = userEvent.setup();
+    render(<GestureMessageChat gestures={[makeGesture({ Message: 'hello cosmos' })]} />);
+
+    await user.hover(screen.getByRole('button', { name: 'How to join Gesture Chat' }));
+
+    expect(
+      await screen.findAllByText(/Make a gesture and leave an optional message/),
+    ).not.toHaveLength(0);
   });
 
   it('renders the address, date, time, and message body', () => {

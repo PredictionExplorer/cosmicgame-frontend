@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { MessageCircle, Radio } from 'lucide-react';
+import { Info, MessageCircle, Radio } from 'lucide-react';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
@@ -84,12 +84,31 @@ export function GestureMessageChat({ gestures, cycleNumber, className }: Gesture
                   </span>
                   Live Feed
                 </div>
-                <h2
-                  id="gesture-message-chat-title"
-                  className="font-display text-xl font-bold tracking-tight"
-                >
-                  Gesture Chat
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2
+                    id="gesture-message-chat-title"
+                    className="font-display text-xl font-bold tracking-tight"
+                  >
+                    Gesture Chat
+                  </h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="How to join Gesture Chat"
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      >
+                        <Info className="h-3.5 w-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-[240px]">
+                        Want to join the chat? Make a gesture and leave an optional message.
+                        Messages attached to gestures appear here.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {cycleNumber != null ? `Cycle #${cycleNumber}` : 'Current cycle'} messages from
                   gestures.
