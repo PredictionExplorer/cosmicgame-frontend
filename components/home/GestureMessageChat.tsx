@@ -74,7 +74,7 @@ export function GestureMessageChat({ gestures, cycleNumber, className }: Gesture
         <div className="pointer-events-none absolute -left-12 bottom-0 h-36 w-36 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.18)] blur-3xl" />
 
         <div className="relative z-[1] flex h-full min-h-0 flex-col">
-          <div className="border-b border-white/[0.07] p-5">
+          <div className="border-b border-white/[0.07] p-5 xl:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -120,7 +120,10 @@ export function GestureMessageChat({ gestures, cycleNumber, className }: Gesture
             </div>
           </div>
 
-          <div className="relative z-[1] flex-1 overflow-y-auto p-4 lg:max-h-[calc(100vh-13rem)]">
+          <div
+            data-testid="gesture-message-chat-scroll"
+            className="relative z-[1] flex-1 overflow-y-auto p-4 lg:max-h-[calc(100vh-13rem)] xl:p-5 xl:max-h-[calc(100vh-14rem)] 2xl:max-h-[calc(100vh-15rem)]"
+          >
             {messages.length > 0 ? (
               <ol className="space-y-3" aria-live="polite">
                 {messages.map(({ gesture, message }, index) => {
@@ -134,7 +137,7 @@ export function GestureMessageChat({ gestures, cycleNumber, className }: Gesture
                     <li key={messageKey}>
                       <article
                         className={cn(
-                          'rounded-2xl border p-4 transition-colors',
+                          'rounded-2xl border p-4 transition-colors 2xl:p-5',
                           isNewest
                             ? 'border-primary/25 bg-primary/[0.075] shadow-[0_18px_70px_-54px_rgb(var(--aurora-cyan-rgb)/0.9)]'
                             : 'border-white/[0.06] bg-white/[0.03]',

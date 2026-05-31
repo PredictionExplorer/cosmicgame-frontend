@@ -222,7 +222,11 @@ const HomePage = () => {
 
   return (
     <>
-      <PageShell variant="data" backdrop="signature">
+      <PageShell
+        variant="data"
+        backdrop="signature"
+        className="xl:max-w-[92rem] 2xl:max-w-[108rem] 2xl:px-10"
+      >
         {loading && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <Spinner size="lg" className="text-white" />
@@ -244,8 +248,11 @@ const HomePage = () => {
           canOpenGesturePanel={!loading && isRoundActive}
         />
 
-        <div className="mt-8 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]">
-          <div className="min-w-0">
+        <div
+          data-testid="home-current-cycle-layout"
+          className="mt-8 grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(28rem,36rem)] 2xl:grid-cols-[minmax(0,1.08fr)_minmax(34rem,42rem)] 2xl:gap-10"
+        >
+          <div data-testid="home-primary-column" className="min-w-0">
             {/* ===== BIDDING STATUS (countdown + stats) ===== */}
             <GestureStatus
               data={data}
@@ -418,6 +425,14 @@ const HomePage = () => {
                 <PublicGoodsImpactCard data={data} />
               </motion.div>
             )}
+          </div>
+
+          <div data-testid="home-chat-column" className="min-w-0 xl:space-y-6">
+            <GestureMessageChat
+              gestures={curGestureList}
+              cycleNumber={round >= 0 ? round : undefined}
+              className="min-h-[30rem] xl:sticky xl:top-24 xl:min-h-[38rem] 2xl:min-h-[42rem]"
+            />
 
             {/* ===== FULL ROUND DETAILS LINK ===== */}
             <motion.div
@@ -429,24 +444,23 @@ const HomePage = () => {
             >
               <Link
                 href="/current-cycle"
-                className="mt-10 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5 group hover:bg-white/[0.04] transition-all duration-300"
+                data-testid="cycle-details-link-card"
+                className="group relative isolate flex items-center justify-between overflow-hidden rounded-2xl border border-primary/15 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(255_255_255/0.035)_48%,rgb(var(--nebula-violet-rgb)/0.12))] p-5 shadow-[0_24px_90px_-58px_rgb(var(--aurora-cyan-rgb)/0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-white/[0.055]"
               >
-                <div>
-                  <p className="text-sm font-medium text-white">View Full Cycle Details</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                <span className="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-primary/20 blur-3xl" />
+                <span className="pointer-events-none absolute -bottom-14 left-8 h-28 w-28 rounded-full bg-[rgb(var(--nebula-violet-rgb)/0.18)] blur-3xl" />
+                <span className="relative min-w-0">
+                  <span className="block text-sm font-semibold text-white">
+                    View Full Cycle Details
+                  </span>
+                  <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
                     Gesture history, leaderboards, contributions, and allocation distribution
-                  </p>
-                </div>
-                <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </span>
+                </span>
+                <ArrowRight className="relative h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
               </Link>
             </motion.div>
           </div>
-
-          <GestureMessageChat
-            gestures={curGestureList}
-            cycleNumber={round >= 0 ? round : undefined}
-            className="min-h-[30rem] xl:sticky xl:top-28"
-          />
         </div>
       </PageShell>
 

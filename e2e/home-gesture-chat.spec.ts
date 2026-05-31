@@ -204,12 +204,17 @@ test.describe('home gesture chat', () => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const chat = page.getByTestId('gesture-message-chat');
+    const primaryColumn = page.getByTestId('home-primary-column');
     await expect(chat).toBeVisible();
 
     const viewport = page.viewportSize();
+    const primaryBox = await primaryColumn.boundingBox();
     const box = await chat.boundingBox();
     expect(viewport).not.toBeNull();
+    expect(primaryBox).not.toBeNull();
     expect(box).not.toBeNull();
     expect(box!.x).toBeGreaterThan(viewport!.width / 2);
+    expect(box!.width).toBeGreaterThan(500);
+    expect(primaryBox!.x + primaryBox!.width).toBeLessThanOrEqual(box!.x);
   });
 });

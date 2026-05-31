@@ -139,6 +139,25 @@ describe('GestureMessageChat', () => {
     ).toBeInTheDocument();
   });
 
+  it('exposes spacious desktop scroll and message layout classes', () => {
+    const participant = '0x4444444444444444444444444444444444444444';
+
+    render(
+      <GestureMessageChat
+        gestures={[
+          makeGesture({ EvtLogId: 12, BidderAddr: participant, Message: 'Wide rail ready' }),
+        ]}
+      />,
+    );
+
+    expect(screen.getByTestId('gesture-message-chat-scroll')).toHaveClass(
+      'xl:p-5',
+      'xl:max-h-[calc(100vh-14rem)]',
+      '2xl:max-h-[calc(100vh-15rem)]',
+    );
+    expect(screen.getByLabelText(`Gesture message from ${participant}`)).toHaveClass('2xl:p-5');
+  });
+
   it('excludes messages for banned gestures', () => {
     mockUseBannedGestures.mockReturnValue({ data: [{ bid_id: 2 }] });
 

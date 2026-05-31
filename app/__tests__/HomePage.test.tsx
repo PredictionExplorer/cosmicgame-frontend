@@ -476,8 +476,33 @@ describe('HomePage', () => {
 
     const status = screen.getByTestId('gesture-status');
     const chat = screen.getByTestId('gesture-message-chat');
+    const layout = screen.getByTestId('home-current-cycle-layout');
+    const primaryColumn = screen.getByTestId('home-primary-column');
+    const chatColumn = screen.getByTestId('home-chat-column');
+
     expect(status.compareDocumentPosition(chat)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(chat.parentElement).toHaveClass('xl:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)]');
+    expect(layout).toHaveClass('xl:grid-cols-[minmax(0,1fr)_minmax(28rem,36rem)]');
+    expect(layout).toHaveClass('2xl:grid-cols-[minmax(0,1.08fr)_minmax(34rem,42rem)]');
+    expect(primaryColumn).toContainElement(status);
+    expect(chatColumn).toContainElement(chat);
+    expect(chat).toHaveClass('xl:sticky', 'xl:top-24', 'xl:min-h-[38rem]', '2xl:min-h-[42rem]');
+  });
+
+  it('uses a wider home shell and keeps desktop support actions in the chat rail', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    const { container } = render(<HomePage />);
+
+    const main = container.querySelector('main');
+    const chatColumn = screen.getByTestId('home-chat-column');
+    const cycleDetailsLink = screen.getByTestId('cycle-details-link-card');
+
+    expect(main).toHaveClass('xl:max-w-[92rem]', '2xl:max-w-[108rem]', '2xl:px-10');
+    expect(chatColumn).toContainElement(cycleDetailsLink);
+    expect(cycleDetailsLink).toHaveAttribute('href', '/current-cycle');
   });
 
   it('requests current-cycle attached NFTs and renders the showcase when present', () => {

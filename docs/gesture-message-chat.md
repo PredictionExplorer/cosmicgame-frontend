@@ -36,10 +36,11 @@ The panel uses `useBannedGestures()` and hides messages whose `EvtLogId` is pres
 
 ## Layout Notes
 
-The home page keeps the timer and hero full width. Below the hero, the page switches to a responsive two-column layout:
+The home page keeps the timer and hero full width. Below the hero, the page switches to a responsive two-column layout that expands beyond the default data-page width on large screens:
 
-- Main content: status, special allocation leaders, gesture form, allocation breakdown, attachments, public goods, and cycle details link.
-- Right rail: `GestureMessageChat`, sticky on desktop with internal scrolling.
+- Main content: status, special allocation leaders, gesture form, allocation breakdown, attachments, and public goods.
+- Right rail: `GestureMessageChat`, sticky on desktop with internal scrolling, plus the full-cycle details card below it.
+- Large screens use a wider rail (`28rem-36rem` at `xl`, `34rem-42rem` at `2xl`) so the feed and supporting actions fill the available right-side space instead of feeling like a narrow sidebar.
 
 On tablet and mobile, the grid stacks so the chat remains part of the document flow and does not cover gesture controls.
 
@@ -57,7 +58,7 @@ Component coverage lives in `components/home/__tests__/GestureMessageChat.test.t
 
 Home-page integration coverage lives in `app/__tests__/HomePage.test.tsx` and verifies the panel receives the current-cycle gesture feed and stays in the responsive layout.
 
-E2E coverage lives in `e2e/home-gesture-chat.spec.ts` and mocks current-cycle API responses to verify the panel renders the expected messages and docks on the desktop right rail.
+E2E coverage lives in `e2e/home-gesture-chat.spec.ts` and mocks current-cycle API responses to verify the panel renders the expected messages, docks on the desktop right rail, stays wider than the old rail, and does not overlap the primary column.
 
 ## Validation Commands
 
