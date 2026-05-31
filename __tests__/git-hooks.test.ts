@@ -43,7 +43,9 @@ describe('git hooks', () => {
     });
 
     it('runs type-check before tests (fail-fast)', () => {
-      expect(content).toMatch(/type-check\s*&&\s*npm run audit:high\s*&&\s*npm run test:coverage/);
+      expect(content).toMatch(
+        /type-check\s*&&\s*npm run audit:high\s*&&\s*NODE_OPTIONS=--no-warnings npm run test:coverage/,
+      );
     });
 
     it('is not a bare test command without type-checking', () => {
@@ -67,7 +69,11 @@ describe('git hooks', () => {
     });
 
     it('runs the dependency audit gate before coverage', () => {
-      expect(content).toMatch(/audit:high\s*&&\s*npm run test:coverage/);
+      expect(content).toMatch(/audit:high\s*&&\s*NODE_OPTIONS=--no-warnings npm run test:coverage/);
+    });
+
+    it('suppresses noisy Node runtime warnings during coverage', () => {
+      expect(content).toContain('NODE_OPTIONS=--no-warnings npm run test:coverage');
     });
   });
 
