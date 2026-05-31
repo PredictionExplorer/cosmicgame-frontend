@@ -405,7 +405,6 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
                   )
                 }
               />
-              <AssetFact label="Cycle" value={`#${nft.RoundNum}`} />
               <AssetFact label="Recipient" value="Final Gesture" />
             </div>
 
@@ -499,7 +498,6 @@ function AttachedERC20AllocationCard({
                   )
                 }
               />
-              <AssetFact label="Cycle" value={`#${token.RoundNum}`} />
               <AssetFact
                 label="Attached by"
                 value={
