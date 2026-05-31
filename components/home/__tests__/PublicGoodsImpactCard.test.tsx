@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 
 import type { DashboardInfo } from '@/services/api';
 
-import { render, screen } from '@/test-utils';
+import { checkA11y, render, screen } from '@/test-utils';
 
 import { PublicGoodsImpactCard } from '../PublicGoodsImpactCard';
 
@@ -29,6 +29,32 @@ describe('PublicGoodsImpactCard', () => {
     render(<PublicGoodsImpactCard data={dashboardData} />);
     expect(screen.getByText('8.6415 ETH')).toBeInTheDocument();
     expect(screen.getByText(/7% of every Performance Cycle/)).toBeInTheDocument();
+  });
+
+  it('uses the full-width default layout by default', () => {
+    render(<PublicGoodsImpactCard data={dashboardData} />);
+
+    const card = screen.getByTestId('public-goods-impact-card');
+    expect(card).toHaveAttribute('data-variant', 'default');
+    expect(card).toHaveClass('mt-10', 'p-6', 'sm:p-8');
+  });
+
+  it('supports a compact rail layout without changing content or accessibility hooks', () => {
+    render(
+      <PublicGoodsImpactCard data={dashboardData} variant="rail" className="rail-companion-card" />,
+    );
+
+    const card = screen.getByTestId('public-goods-impact-card');
+    expect(card).toHaveAttribute('data-variant', 'rail');
+    expect(card).toHaveClass('p-5', 'sm:p-6', 'rail-companion-card');
+    expect(card).not.toHaveClass('mt-10');
+    expect(
+      screen.getByRole('heading', { name: "Funding Ethereum's core contributors." }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /View public-goods contributions/ })).toHaveAttribute(
+      'href',
+      '/public-goods-contributions-cg',
+    );
   });
 
   it('renders supporting public-goods totals', () => {
@@ -66,5 +92,10 @@ describe('PublicGoodsImpactCard', () => {
       />,
     );
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('has no accessibility violations in the rail layout', async () => {
+    const { container } = render(<PublicGoodsImpactCard data={dashboardData} variant="rail" />);
+    await checkA11y(container);
   });
 });

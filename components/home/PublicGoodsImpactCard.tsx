@@ -8,9 +8,12 @@ import { formatEthValue } from '@/utils';
 
 import type { DashboardInfo } from '@/services/api';
 import { StatCard } from '@/components/ui/stat-card';
+import { cn } from '@/lib/utils';
 
 interface PublicGoodsImpactCardProps {
   data: DashboardInfo | null;
+  variant?: 'default' | 'rail';
+  className?: string;
 }
 
 const toNumber = (value: unknown): number => {
@@ -18,7 +21,11 @@ const toNumber = (value: unknown): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
-export function PublicGoodsImpactCard({ data }: PublicGoodsImpactCardProps) {
+export function PublicGoodsImpactCard({
+  data,
+  variant = 'default',
+  className,
+}: PublicGoodsImpactCardProps) {
   const percentage = toNumber(data?.CharityPercentage);
 
   if (!data || percentage <= 0) {
@@ -35,8 +42,14 @@ export function PublicGoodsImpactCard({ data }: PublicGoodsImpactCardProps) {
 
   return (
     <section
+      data-testid="public-goods-impact-card"
+      data-variant={variant}
       aria-labelledby="public-goods-impact-heading"
-      className="relative mt-10 overflow-hidden rounded-2xl border border-[oklch(77.1%_0.163_161)]/20 p-6 glow-impact sm:p-8"
+      className={cn(
+        'relative overflow-hidden rounded-2xl border border-[oklch(77.1%_0.163_161)]/20 glow-impact',
+        variant === 'rail' ? 'p-5 sm:p-6' : 'mt-10 p-6 sm:p-8',
+        className,
+      )}
       style={{
         background:
           'linear-gradient(155deg, rgba(0, 214, 143, 0.08) 0%, rgba(0, 229, 255, 0.06) 45%, rgba(13, 5, 33, 0.9) 100%)',
@@ -47,14 +60,22 @@ export function PublicGoodsImpactCard({ data }: PublicGoodsImpactCardProps) {
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_65%_at_100%_0%,rgb(var(--impact-green-rgb)/0.16),transparent_70%)]"
       />
 
-      <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+      <div
+        className={cn(
+          'relative grid gap-8',
+          variant === 'rail' ? 'gap-6' : 'lg:grid-cols-[1.1fr_0.9fr] lg:items-center',
+        )}
+      >
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[rgb(var(--impact-green-rgb))]">
             Public Goods
           </p>
           <h2
             id="public-goods-impact-heading"
-            className="mt-3 font-display text-2xl font-bold tracking-tight text-white sm:text-3xl"
+            className={cn(
+              'mt-3 font-display font-bold tracking-tight text-white',
+              variant === 'rail' ? 'text-2xl' : 'text-2xl sm:text-3xl',
+            )}
           >
             Funding Ethereum&apos;s core contributors.
           </h2>
@@ -62,7 +83,12 @@ export function PublicGoodsImpactCard({ data }: PublicGoodsImpactCardProps) {
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
               This cycle
             </p>
-            <p className="mt-2 font-display text-5xl font-bold leading-none text-gradient-aurora sm:text-6xl">
+            <p
+              className={cn(
+                'mt-2 font-display font-bold leading-none text-gradient-aurora',
+                variant === 'rail' ? 'text-5xl' : 'text-5xl sm:text-6xl',
+              )}
+            >
               {currentCycleEth.toFixed(4)} ETH
             </p>
           </div>
@@ -79,7 +105,12 @@ export function PublicGoodsImpactCard({ data }: PublicGoodsImpactCardProps) {
           </Link>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+        <div
+          className={cn(
+            'grid gap-3',
+            variant === 'rail' ? 'sm:grid-cols-3 xl:grid-cols-1' : 'sm:grid-cols-3 lg:grid-cols-1',
+          )}
+        >
           <StatCard
             label="Lifetime Contributed"
             value={formatEthValue(lifetimeContributedEth)}

@@ -205,16 +205,31 @@ test.describe('home gesture chat', () => {
 
     const chat = page.getByTestId('gesture-message-chat');
     const primaryColumn = page.getByTestId('home-primary-column');
+    const cycleDetails = page.getByTestId('cycle-details-link-card');
+    const publicGoods = page.getByTestId('public-goods-impact-card');
     await expect(chat).toBeVisible();
+    await expect(cycleDetails).toBeVisible();
+    await expect(publicGoods).toBeVisible();
 
     const viewport = page.viewportSize();
     const primaryBox = await primaryColumn.boundingBox();
+    const cycleDetailsBox = await cycleDetails.boundingBox();
+    const publicGoodsBox = await publicGoods.boundingBox();
     const box = await chat.boundingBox();
     expect(viewport).not.toBeNull();
     expect(primaryBox).not.toBeNull();
     expect(box).not.toBeNull();
+    expect(cycleDetailsBox).not.toBeNull();
+    expect(publicGoodsBox).not.toBeNull();
     expect(box!.x).toBeGreaterThan(viewport!.width / 2);
     expect(box!.width).toBeGreaterThan(500);
     expect(primaryBox!.x + primaryBox!.width).toBeLessThanOrEqual(box!.x);
+    expect(cycleDetailsBox!.y).toBeGreaterThan(box!.y + box!.height);
+    expect(publicGoodsBox!.y).toBeGreaterThan(cycleDetailsBox!.y + cycleDetailsBox!.height);
+    expect(Math.abs(cycleDetailsBox!.x - box!.x)).toBeLessThanOrEqual(2);
+    expect(Math.abs(publicGoodsBox!.x - box!.x)).toBeLessThanOrEqual(2);
+    expect(Math.abs(cycleDetailsBox!.width - box!.width)).toBeLessThanOrEqual(2);
+    expect(Math.abs(publicGoodsBox!.width - box!.width)).toBeLessThanOrEqual(2);
+    expect(primaryBox!.x + primaryBox!.width).toBeLessThanOrEqual(publicGoodsBox!.x);
   });
 });

@@ -148,10 +148,12 @@ jest.mock('../../components/attachments/DonatedNFTPrizeShowcase', () => ({
     nfts,
     erc20Tokens = [],
     cycleNumber,
+    variant = 'default',
   }: {
     nfts: unknown[];
     erc20Tokens?: unknown[];
     cycleNumber?: number;
+    variant?: 'default' | 'rail';
   }) =>
     nfts.length > 0 || erc20Tokens.length > 0 ? (
       <section
@@ -159,6 +161,7 @@ jest.mock('../../components/attachments/DonatedNFTPrizeShowcase', () => ({
         data-count={nfts.length}
         data-erc20-count={erc20Tokens.length}
         data-cycle={cycleNumber}
+        data-variant={variant}
       >
         Attached NFT Showcase
       </section>
@@ -475,6 +478,9 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     const status = screen.getByTestId('gesture-status');
+    const leaders = screen.getByTestId('special-allocation-recipients');
+    const form = screen.getByTestId('gesture-form');
+    const allocationHeading = screen.getByText('Allocation Breakdown');
     const chat = screen.getByTestId('gesture-message-chat');
     const layout = screen.getByTestId('home-current-cycle-layout');
     const primaryColumn = screen.getByTestId('home-primary-column');
@@ -484,11 +490,14 @@ describe('HomePage', () => {
     expect(layout).toHaveClass('xl:grid-cols-[minmax(0,1fr)_minmax(28rem,36rem)]');
     expect(layout).toHaveClass('2xl:grid-cols-[minmax(0,1.08fr)_minmax(34rem,42rem)]');
     expect(primaryColumn).toContainElement(status);
+    expect(primaryColumn).toContainElement(leaders);
+    expect(primaryColumn).toContainElement(form);
+    expect(primaryColumn).toContainElement(allocationHeading);
     expect(chatColumn).toContainElement(chat);
     expect(chat).toHaveClass('xl:sticky', 'xl:top-24', 'xl:min-h-[38rem]', '2xl:min-h-[42rem]');
   });
 
-  it('uses a wider home shell and keeps desktop support actions in the chat rail', () => {
+  it('uses a wider home shell and keeps desktop companion actions in the chat rail', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -499,10 +508,64 @@ describe('HomePage', () => {
     const main = container.querySelector('main');
     const chatColumn = screen.getByTestId('home-chat-column');
     const cycleDetailsLink = screen.getByTestId('cycle-details-link-card');
+    const publicGoods = screen.getByTestId('public-goods-impact-card');
 
     expect(main).toHaveClass('xl:max-w-[92rem]', '2xl:max-w-[108rem]', '2xl:px-10');
     expect(chatColumn).toContainElement(cycleDetailsLink);
+    expect(chatColumn).toContainElement(publicGoods);
     expect(cycleDetailsLink).toHaveAttribute('href', '/current-cycle');
+    expect(publicGoods).toHaveAttribute('data-variant', 'rail');
+  });
+
+  it('fills the chat rail with attached assets when the current cycle has them', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7 }),
+      isLoading: false,
+    });
+    mockUseDonationsNFTByRound.mockReturnValue({
+      data: [{ RecordId: 1 }, { RecordId: 2 }],
+    });
+    mockUseDonationsERC20ByRound.mockReturnValue({
+      data: [{ EvtLogId: 1, TokenAddr: '0xToken', AmountDonatedEth: 5 }],
+    });
+
+    render(<HomePage />);
+
+    const primaryColumn = screen.getByTestId('home-primary-column');
+    const chatColumn = screen.getByTestId('home-chat-column');
+    const showcase = screen.getByTestId('attached-nft-showcase');
+    const gestureStatusProps =
+      mockGestureStatus.mock.calls[mockGestureStatus.mock.calls.length - 1]?.[0];
+
+    expect(gestureStatusProps).toEqual(
+      expect.objectContaining({ attachedNFTCount: 2, attachedERC20Count: 1 }),
+    );
+    expect(chatColumn).toContainElement(showcase);
+    expect(primaryColumn).not.toContainElement(showcase);
+    expect(showcase).toHaveAttribute('data-count', '2');
+    expect(showcase).toHaveAttribute('data-erc20-count', '1');
+    expect(showcase).toHaveAttribute('data-cycle', '7');
+    expect(showcase).toHaveAttribute('data-variant', 'rail');
+  });
+
+  it('does not render empty rail placeholders when optional rail content is absent', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CharityPercentage: 0 }),
+      isLoading: false,
+    });
+    mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
+    mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
+
+    render(<HomePage />);
+
+    const chatColumn = screen.getByTestId('home-chat-column');
+
+    expect(chatColumn).toContainElement(screen.getByTestId('gesture-message-chat'));
+    expect(chatColumn).toContainElement(screen.getByTestId('cycle-details-link-card'));
+    expect(screen.queryByTestId('home-rail-public-goods')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('home-rail-attached-assets')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('public-goods-impact-card')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('attached-nft-showcase')).not.toBeInTheDocument();
   });
 
   it('requests current-cycle attached NFTs and renders the showcase when present', () => {

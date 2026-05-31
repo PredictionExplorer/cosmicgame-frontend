@@ -47,6 +47,7 @@ interface AttachedNFTAllocationShowcaseProps {
   erc20Tokens?: DonatedERC20Token[];
   cycleNumber?: number;
   className?: string;
+  variant?: 'default' | 'rail';
 }
 
 export function AttachedNFTAllocationShowcase({
@@ -54,6 +55,7 @@ export function AttachedNFTAllocationShowcase({
   erc20Tokens = [],
   cycleNumber,
   className,
+  variant = 'default',
 }: AttachedNFTAllocationShowcaseProps) {
   if (nfts.length === 0 && erc20Tokens.length === 0) return null;
 
@@ -72,15 +74,17 @@ export function AttachedNFTAllocationShowcase({
 
   return (
     <section
+      data-testid="attached-nft-showcase"
+      data-variant={variant}
       aria-labelledby="attached-nft-allocation-title"
-      className={cn('print-motion-visible my-8', className)}
+      className={cn('print-motion-visible', variant === 'rail' ? 'my-0' : 'my-8', className)}
     >
       <Surface variant="gradient-border-accent" radius="xl" padding="none" className="isolate">
         <div className="pointer-events-none absolute -left-20 top-10 h-52 w-52 rounded-full bg-[rgb(var(--solar-gold-rgb)/0.16)] blur-3xl" />
         <div className="pointer-events-none absolute -right-20 -top-16 h-64 w-64 rounded-full bg-primary/18 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-1/2 h-32 w-3/5 -translate-x-1/2 bg-[radial-gradient(ellipse,rgb(var(--aurora-cyan-rgb)/0.14),transparent_68%)] blur-2xl" />
 
-        <div className="relative p-5 sm:p-7 lg:p-8">
+        <div className={cn('relative p-5', variant === 'rail' ? 'sm:p-6' : 'sm:p-7 lg:p-8')}>
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-3xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--solar-gold-rgb)/0.22)] bg-[rgb(var(--solar-gold-rgb)/0.10)] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[rgb(var(--solar-gold-rgb))]">
@@ -89,7 +93,10 @@ export function AttachedNFTAllocationShowcase({
               </div>
               <h2
                 id="attached-nft-allocation-title"
-                className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl"
+                className={cn(
+                  'font-display text-2xl font-bold tracking-tight text-white',
+                  variant === 'default' && 'sm:text-3xl',
+                )}
               >
                 Bonus assets attached to this cycle
               </h2>
@@ -111,7 +118,12 @@ export function AttachedNFTAllocationShowcase({
             </div>
           </div>
 
-          <div className="mb-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <div
+            className={cn(
+              'mb-6 grid gap-2 sm:grid-cols-2',
+              variant === 'default' ? 'lg:grid-cols-4' : 'xl:grid-cols-2 2xl:grid-cols-4',
+            )}
+          >
             <SummaryChip label="Assets included" value={String(totalAssetCount)} />
             <SummaryChip label="Cycle" value={`#${cycleLabel}`} />
             <SummaryChip label="Preview" value={previewCopy} />
@@ -123,7 +135,9 @@ export function AttachedNFTAllocationShowcase({
               'grid gap-4',
               totalPreviewCount === 1
                 ? 'grid-cols-1'
-                : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]',
+                : variant === 'rail'
+                  ? 'grid-cols-1'
+                  : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]',
             )}
           >
             {previewNfts.map((nft, index) => (
@@ -133,6 +147,7 @@ export function AttachedNFTAllocationShowcase({
                 )}
                 nft={nft}
                 featured={index === 0}
+                variant={variant}
               />
             ))}
             {previewErc20Tokens.map((token, index) => (
@@ -140,6 +155,7 @@ export function AttachedNFTAllocationShowcase({
                 key={String(token.EvtLogId ?? `${token.TokenAddr}-${token.RoundNum}-${index}`)}
                 token={token}
                 featured={previewNfts.length === 0 && index === 0}
+                variant={variant}
               />
             ))}
           </div>
@@ -251,10 +267,12 @@ function SummaryChip({ label, value }: { label: string; value: string }) {
 function AssetCardShell({
   tone,
   featured,
+  variant,
   children,
 }: {
   tone: AssetTone;
   featured: boolean;
+  variant: AttachedNFTAllocationShowcaseProps['variant'];
   children: ReactNode;
 }) {
   return (
@@ -264,7 +282,7 @@ function AssetCardShell({
         'hover:-translate-y-0.5 hover:border-white/[0.14] hover:bg-white/[0.05]',
         'before:pointer-events-none before:absolute before:inset-x-5 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-white/30 before:to-transparent',
         assetTones[tone].card,
-        featured && 'md:col-span-2 xl:col-span-1',
+        featured && variant === 'default' && 'md:col-span-2 xl:col-span-1',
       )}
     >
       {children}
@@ -294,7 +312,15 @@ function AssetTypeBadge({
   );
 }
 
-function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featured: boolean }) {
+function AttachedNFTAllocationCard({
+  nft,
+  featured,
+  variant,
+}: {
+  nft: AttachedNFT;
+  featured: boolean;
+  variant: AttachedNFTAllocationShowcaseProps['variant'];
+}) {
   const { data: metadata, isError } = useAttachedNftMetadata(nft.NFTTokenURI);
   const tokenId = getAttachedNftTokenId(nft);
   const primaryLink = resolveAttachedNftLink({ nft, metadata });
@@ -315,7 +341,7 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
   );
 
   return (
-    <AssetCardShell tone="nft" featured={featured}>
+    <AssetCardShell tone="nft" featured={featured} variant={variant}>
       <div className="flex h-full flex-col gap-4">
         <div>
           {primaryLink.href ? (
@@ -413,9 +439,11 @@ function AttachedNFTAllocationCard({ nft, featured }: { nft: AttachedNFT; featur
 function AttachedERC20AllocationCard({
   token,
   featured,
+  variant,
 }: {
   token: DonatedERC20Token;
   featured: boolean;
+  variant: AttachedNFTAllocationShowcaseProps['variant'];
 }) {
   const { data: metadata } = useAttachedErc20Metadata(token.TokenAddr);
   const symbol = metadata?.symbol || 'ERC20';
@@ -425,9 +453,12 @@ function AttachedERC20AllocationCard({
   const logoSource = metadata?.logoSource ?? 'curated token metadata';
 
   return (
-    <AssetCardShell tone="erc20" featured={featured}>
+    <AssetCardShell tone="erc20" featured={featured} variant={variant}>
       <div
-        className={cn('grid h-full gap-4', featured ? 'lg:grid-cols-[220px_minmax(0,1fr)]' : '')}
+        className={cn(
+          'grid h-full gap-4',
+          featured && variant === 'default' ? 'lg:grid-cols-[220px_minmax(0,1fr)]' : '',
+        )}
       >
         <TokenLogo
           logoURI={metadata?.logoURI}

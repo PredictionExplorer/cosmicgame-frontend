@@ -198,6 +198,8 @@ const HomePage = () => {
   const canClaim = !(allocationTime > now || data?.LastBidderAddr === zeroAddress || loading);
   const claimWait = allocationTime + timeoutFinalize * 1000;
   const isRoundActive = activationTime < now / 1000;
+  const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
+  const hasPublicGoodsImpact = Number(data?.CharityPercentage ?? 0) > 0;
 
   const landingHost = hostname !== null && isLandingHost(hostname);
   if (hostname === null) {
@@ -406,28 +408,9 @@ const HomePage = () => {
                 <Allocation data={data} />
               </motion.div>
             )}
-
-            <AttachedNFTAllocationShowcase
-              nfts={donatedNFTs}
-              erc20Tokens={donatedERC20Tokens}
-              cycleNumber={round >= 0 ? round : undefined}
-            />
-
-            {/* ===== PUBLIC GOODS IMPACT ===== */}
-            {data && (
-              <motion.div
-                variants={sectionFade}
-                initial="hidden"
-                animate="visible"
-                transition={{ delay: 0.45 }}
-                className="print-motion-visible"
-              >
-                <PublicGoodsImpactCard data={data} />
-              </motion.div>
-            )}
           </div>
 
-          <div data-testid="home-chat-column" className="min-w-0 xl:space-y-6">
+          <div data-testid="home-chat-column" className="min-w-0 space-y-6">
             <GestureMessageChat
               gestures={curGestureList}
               cycleNumber={round >= 0 ? round : undefined}
@@ -460,6 +443,39 @@ const HomePage = () => {
                 <ArrowRight className="relative h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
               </Link>
             </motion.div>
+
+            {/* ===== PUBLIC GOODS IMPACT ===== */}
+            {data && hasPublicGoodsImpact && (
+              <motion.div
+                data-testid="home-rail-public-goods"
+                variants={sectionFade}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.45 }}
+                className="print-motion-visible"
+              >
+                <PublicGoodsImpactCard data={data} variant="rail" />
+              </motion.div>
+            )}
+
+            {/* ===== ATTACHED ASSET RECEIPT ===== */}
+            {hasAttachedAssets && (
+              <motion.div
+                data-testid="home-rail-attached-assets"
+                variants={sectionFade}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.48 }}
+                className="print-motion-visible"
+              >
+                <AttachedNFTAllocationShowcase
+                  nfts={donatedNFTs}
+                  erc20Tokens={donatedERC20Tokens}
+                  cycleNumber={round >= 0 ? round : undefined}
+                  variant="rail"
+                />
+              </motion.div>
+            )}
           </div>
         </div>
       </PageShell>

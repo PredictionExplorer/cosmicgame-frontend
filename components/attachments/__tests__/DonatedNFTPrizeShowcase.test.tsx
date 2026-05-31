@@ -114,6 +114,7 @@ describe('AttachedNFTAllocationShowcase', () => {
   it('renders single NFT allocation copy prominently', () => {
     render(<AttachedNFTAllocationShowcase nfts={[createNft()]} cycleNumber={42} />);
 
+    expect(screen.getByTestId('attached-nft-showcase')).toHaveAttribute('data-variant', 'default');
     expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -123,6 +124,28 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(screen.getByText('Included in Signature Allocation')).toBeInTheDocument();
     expect(screen.getByText('Bonus Receipt')).toBeInTheDocument();
     expect(screen.getByText('All visible')).toBeInTheDocument();
+    expectSingleRecipientRuleSummary();
+  });
+
+  it('supports a compact rail variant for the large-screen chat companion stack', () => {
+    render(
+      <AttachedNFTAllocationShowcase
+        nfts={[createNft(), createNft({ RecordId: 2, NFTTokenId: 456 })]}
+        erc20Tokens={[createErc20()]}
+        cycleNumber={42}
+        variant="rail"
+        className="rail-assets"
+      />,
+    );
+
+    const showcase = screen.getByTestId('attached-nft-showcase');
+    expect(showcase).toHaveAttribute('data-variant', 'rail');
+    expect(showcase).toHaveClass('my-0', 'rail-assets');
+    expect(showcase).not.toHaveClass('my-8');
+    expect(screen.getByText('2 ERC-721 tokens + 1 ERC-20 deposit')).toBeInTheDocument();
+    expect(screen.getByText('Bonus assets attached to this cycle')).toBeInTheDocument();
+    expect(screen.getAllByTestId('nft-allocation-media')).toHaveLength(2);
+    expect(screen.getByTestId('erc20-attached-amount')).toHaveTextContent('1250.5 GLXY');
     expectSingleRecipientRuleSummary();
   });
 
