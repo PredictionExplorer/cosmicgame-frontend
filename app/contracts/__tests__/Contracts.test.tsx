@@ -175,7 +175,7 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     expect(
-      screen.getByRole('heading', { name: 'Contract Addresses', level: 1 }),
+      screen.getByRole('heading', { name: 'Contract Addresses', level: 2 }),
     ).toBeInTheDocument();
   });
 

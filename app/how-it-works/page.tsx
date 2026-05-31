@@ -5,7 +5,7 @@ import { createMetadata } from '@/utils/seo';
 import HowToPlayPage from './HowToPlayPage';
 
 export const metadata: Metadata = createMetadata(
-  'How It Works | Cosmic Signature',
+  'How Cosmic Signature Works | Performance Cycles, Gestures, and NFTs',
   'Learn how a Cosmic Signature Performance Cycle unfolds \u2014 from the Calibration Window through Gestures to final allocation distribution.',
   undefined,
   '/how-it-works',

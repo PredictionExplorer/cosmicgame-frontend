@@ -4,10 +4,20 @@ import { createMetadata } from '@/utils/seo';
 
 import UserStellarSelectionETHPage from './UserStellarSelectionETHPage';
 
-export const metadata: Metadata = createMetadata(
-  'Stellar Selection ETH | Cosmic Signature',
-  'All ETH allocations this participant received through Stellar Selection. Track random-selection allocations across completed cycles.',
-);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ address: string }>;
+}): Promise<Metadata> {
+  const { address } = await params;
+  return createMetadata(
+    'Stellar Selection ETH | Cosmic Signature',
+    'All ETH allocations this participant received through Stellar Selection. Track random-selection allocations across completed cycles.',
+    undefined,
+    `/user/stellar-selection-eth/${address}`,
+    { index: false },
+  );
+}
 
 export default async function Page({ params }: { params: Promise<{ address: string }> }) {
   const { address } = await params;

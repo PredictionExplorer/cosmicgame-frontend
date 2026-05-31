@@ -203,7 +203,7 @@ test.describe('proxy middleware', () => {
       await ctx.dispose();
     });
 
-    test('app host has minimal disallow (only admin/api)', async () => {
+    test('app host disallows crawl-waste paths without hiding noindex pages', async () => {
       const ctx = await request.newContext({
         extraHTTPHeaders: { Host: 'app.cosmicsignature.com' },
       });
@@ -213,8 +213,12 @@ test.describe('proxy middleware', () => {
       expect(body).toMatch(
         /Sitemap: (https:\/\/app\.cosmicsignature\.com|http:\/\/app\.cosmicsignature\.local:3000)\/sitemap\.xml/,
       );
-      expect(body).toContain('/admin/');
       expect(body).toContain('/api/');
+      expect(body).toContain('/internal/');
+      expect(body).toContain('/debug/');
+      expect(body).toContain('/wallet/');
+      expect(body).toContain('/account/');
+      expect(body).not.toContain('/admin/');
       await ctx.dispose();
     });
   });

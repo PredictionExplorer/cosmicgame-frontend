@@ -54,9 +54,7 @@ describe('HeroSection', () => {
 
   it('renders the heading', () => {
     render(<HeroSection {...defaultProps} />);
-    expect(
-      screen.getByRole('heading', { name: /Frequently Asked Questions/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Cosmic Signature FAQ/i })).toBeInTheDocument();
   });
 
   it('renders "Knowledge Base" badge', () => {

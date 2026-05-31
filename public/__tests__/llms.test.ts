@@ -41,4 +41,10 @@ describe('LLM-facing protocol docs', () => {
   it.each(docs)('%s includes AI-facing disambiguation language', (_fileName, content) => {
     expect(content).toMatch(/not related to the COSMIC cancer mutation database/i);
   });
+
+  it.each(docs)('%s links the canonical trust and risk pages', (_fileName, content) => {
+    expect(content).toContain('https://app.cosmicsignature.com/security');
+    expect(content).toContain('https://app.cosmicsignature.com/audits');
+    expect(content).toContain('https://app.cosmicsignature.com/risk-disclosures');
+  });
 });

@@ -9,6 +9,7 @@ export const metadata: Metadata = createMetadata(
   'Manage your anchored NFTs on Cosmic Signature. View your anchor status, Anchor Distributions, and history across each Performance Cycle.',
   undefined,
   '/my-anchors',
+  { index: false },
 );
 
 export default function Page() {

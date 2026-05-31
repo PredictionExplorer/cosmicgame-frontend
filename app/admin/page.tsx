@@ -9,6 +9,7 @@ export const metadata: Metadata = createMetadata(
   'Administrative controls for the Cosmic Signature protocol. Manage protocol parameters, contract settings, and system configuration.',
   undefined,
   '/admin',
+  { index: false },
 );
 
 export default function Page() {

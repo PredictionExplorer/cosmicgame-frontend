@@ -2,15 +2,21 @@ import type { Metadata } from 'next';
 
 import { createMetadata } from '@/utils/seo';
 
+import { CodeSeoSummary } from './CodeSeoSummary';
 import CodeViewer from './CodeViewer';
 
 export const metadata: Metadata = createMetadata(
-  'Code | Cosmic Signature',
-  'View and explore the open-source code behind Cosmic Signature. The generative NFT art is created from on-chain seeds using a Rust program based on three-body problem physics.',
+  'Cosmic Signature Source Code | CC0 On-Chain Art Protocol',
+  'Explore the Cosmic Signature source code, rendering pipeline, contract repository, verification workflow, and CC0 public-domain license.',
   undefined,
   '/code',
 );
 
 export default function Page() {
-  return <CodeViewer />;
+  return (
+    <>
+      <CodeSeoSummary />
+      <CodeViewer />
+    </>
+  );
 }

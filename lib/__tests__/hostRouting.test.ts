@@ -149,6 +149,9 @@ describe('hostRouting', () => {
           '/anchoring',
           '/gallery',
           '/current-cycle',
+          '/security',
+          '/audits',
+          '/risk-disclosures',
           '/faq',
           '/admin',
         ]),
@@ -252,9 +255,15 @@ describe('hostRouting', () => {
         '/public-goods-contributions-voluntary',
         '/public-goods-retrievals',
         '/recipient-history',
+        '/privacy',
+        '/risk-disclosures',
+        '/audits',
+        '/security',
         '/site-map',
+        '/source-code',
         '/statistics',
         '/system-event',
+        '/terms',
         '/used-rwlk-nfts',
         '/user',
       ];
@@ -274,6 +283,9 @@ describe('hostRouting', () => {
     it.each([
       '/gallery',
       '/current-cycle',
+      '/security',
+      '/audits',
+      '/risk-disclosures',
       '/faq',
       '/anchoring',
       '/gesture/1',
@@ -295,7 +307,7 @@ describe('hostRouting', () => {
 
     it('returns false for unrelated paths', () => {
       expect(isAppOnlyPath('/about')).toBe(false);
-      expect(isAppOnlyPath('/terms')).toBe(false);
+      expect(isAppOnlyPath('/learn/what-is-cosmic-signature')).toBe(false);
     });
 
     it('returns false for a path that starts similarly but is not a prefix match', () => {

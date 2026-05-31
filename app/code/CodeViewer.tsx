@@ -24,6 +24,7 @@ const CodeViewer = () => (
   <PageShell variant="data" backdrop="signature">
     <PageHeader
       title="Code Viewer"
+      titleLevel={2}
       subtitle="View the generation code that converts seeds into images"
     />
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

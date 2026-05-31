@@ -53,10 +53,15 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     '/my-',
     '/public-goods-',
     '/recipient-history',
+    '/privacy',
+    '/risk-disclosures',
+    '/audits',
+    '/security',
     '/statistics',
+    '/terms',
   ];
 
-  const appDisallow = ['/admin/', '/api/', '/landing-site'];
+  const appDisallow = ['/api/', '/internal/', '/debug/', '/wallet/', '/account/', '/landing-site'];
 
   const disallow = onAppHost ? appDisallow : landingDisallow;
 

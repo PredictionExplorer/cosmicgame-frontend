@@ -72,7 +72,7 @@ export function HeroSection({
         animate="visible"
         className="relative font-display text-3xl font-bold tracking-tight md:text-5xl"
       >
-        Frequently Asked <GradientText>Questions</GradientText>
+        Cosmic Signature <GradientText>FAQ</GradientText>
       </motion.h1>
 
       <motion.p

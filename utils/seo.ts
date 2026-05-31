@@ -11,12 +11,21 @@ const CANONICAL_ORIGINS: Record<CanonicalHost, string> = {
 
 interface MetadataOptions {
   canonicalHost?: CanonicalHost;
+  /**
+   * Public indexable pages should be explicit about snippets/previews. Private,
+   * wallet-specific, admin, and thin utility routes should pass `false` so the
+   * directive is generated consistently across the app.
+   */
+  index?: boolean;
 }
 
 function normalizeCanonicalPath(path: string): string {
   const [pathname = '/', query = ''] = path.split('?');
+  const prefixedPath = pathname === '' ? '/' : pathname.startsWith('/') ? pathname : `/${pathname}`;
   const normalizedPath =
-    pathname === '' ? '/' : pathname.startsWith('/') ? pathname : `/${pathname}`;
+    prefixedPath.length > 1 && prefixedPath.endsWith('/')
+      ? prefixedPath.replace(/\/+$/, '')
+      : prefixedPath;
 
   if (!query) return normalizedPath;
 
@@ -54,7 +63,33 @@ export function createMetadata(
     twitter.images = [imageUrl];
   }
 
-  const metadata: Metadata = { title, description, openGraph, twitter };
+  const index = options.index ?? true;
+  const metadata: Metadata = {
+    title,
+    description,
+    openGraph,
+    twitter,
+    robots: index
+      ? {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            'max-snippet': -1,
+            'max-image-preview': 'large',
+            'max-video-preview': -1,
+          },
+        }
+      : {
+          index: false,
+          follow: true,
+          googleBot: {
+            index: false,
+            follow: true,
+          },
+        },
+  };
 
   if (path !== undefined) {
     const origin = CANONICAL_ORIGINS[options.canonicalHost ?? 'app'];

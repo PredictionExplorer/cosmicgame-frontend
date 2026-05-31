@@ -328,7 +328,7 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Shape the next Cosmic Signature' }),
+      screen.getByRole('heading', { level: 2, name: 'Shape the next Cosmic Signature' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Live on Arbitrum')).toBeInTheDocument();
     expect(screen.getByText('Gestures shape the art')).toBeInTheDocument();

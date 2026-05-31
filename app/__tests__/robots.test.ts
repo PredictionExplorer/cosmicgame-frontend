@@ -96,7 +96,7 @@ describe('robots (host-aware)', () => {
       expect(result.host).toBe('https://app.cosmicsignature.com');
     });
 
-    it('has minimal disallow (no gallery/anchoring exclusions)', async () => {
+    it('does not block noindex pages whose meta directives crawlers must read', async () => {
       const result = await robots();
       const rules = Array.isArray(result.rules) ? result.rules : [result.rules];
       const wildcardRule = rules.find((r) => r.userAgent === '*')!;
@@ -105,7 +105,17 @@ describe('robots (host-aware)', () => {
         : [wildcardRule.disallow];
       // `/landing-site` is the internal Next route for the marketing host;
       // we still tell crawlers not to index it from the app host either.
-      expect(disallow).toEqual(['/admin/', '/api/', '/landing-site']);
+      expect(disallow).toEqual([
+        '/api/',
+        '/internal/',
+        '/debug/',
+        '/wallet/',
+        '/account/',
+        '/landing-site',
+      ]);
+      expect(disallow).not.toContain('/admin/');
+      expect(disallow).not.toContain('/my-tokens');
+      expect(disallow).not.toContain('/user/');
     });
   });
 });

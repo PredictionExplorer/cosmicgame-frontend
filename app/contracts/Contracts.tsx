@@ -219,6 +219,7 @@ const Contracts = () => {
           </SectionEyebrow>
         }
         title="Contract Addresses"
+        titleLevel={2}
         gradientTitle="aurora"
         subtitle="On-chain addresses and configuration for the Cosmic Signature protocol. All contracts have been audited."
       >

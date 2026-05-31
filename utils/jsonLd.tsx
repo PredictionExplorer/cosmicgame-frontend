@@ -73,6 +73,55 @@ export function webApplicationJsonLd() {
   };
 }
 
+export function webPageJsonLd({
+  name,
+  description,
+  url,
+}: {
+  name: string;
+  description: string;
+  url: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name,
+    description,
+    url,
+    publisher: {
+      '@id': `${SITE_URL}/#organization`,
+    },
+  };
+}
+
+export function datasetJsonLd({
+  name,
+  description,
+  url,
+  dateModified,
+}: {
+  name: string;
+  description: string;
+  url: string;
+  dateModified: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name,
+    description,
+    url,
+    dateModified,
+    creator: {
+      '@id': `${SITE_URL}/#organization`,
+    },
+    publisher: {
+      '@id': `${SITE_URL}/#organization`,
+    },
+    isAccessibleForFree: true,
+  };
+}
+
 export function artProtocolJsonLd() {
   return {
     '@context': 'https://schema.org',

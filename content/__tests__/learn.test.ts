@@ -21,8 +21,17 @@ describe('learnArticles', () => {
       expect(article.h1.length).toBeGreaterThan(10);
       expect(article.summary).toContain('Cosmic Signature');
       expect(article.updated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(article.sections.length).toBeGreaterThanOrEqual(1);
+      expect(article.sections.length).toBeGreaterThanOrEqual(3);
       expect(article.related.length).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  it('keeps every article substantial enough for crawler-visible answer extraction', () => {
+    for (const article of learnArticles) {
+      const words = [article.summary, ...article.sections.flatMap((section) => section.body)].join(
+        ' ',
+      );
+      expect(words.split(/\s+/).filter(Boolean).length).toBeGreaterThanOrEqual(250);
     }
   });
 

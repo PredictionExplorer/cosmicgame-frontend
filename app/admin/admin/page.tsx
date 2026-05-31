@@ -9,6 +9,7 @@ export const metadata: Metadata = createMetadata(
   'Administrative settings and contract management',
   undefined,
   '/admin/admin',
+  { index: false },
 );
 
 export default function Page() {

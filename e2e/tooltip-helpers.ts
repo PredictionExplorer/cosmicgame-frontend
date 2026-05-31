@@ -83,7 +83,7 @@ export async function openTooltip(trigger: Locator): Promise<void> {
 }
 
 export async function expectTooltipFullyVisible(page: Page, expected: RegExp): Promise<void> {
-  const popper = page.getByRole('tooltip').first();
+  const popper = page.getByRole('tooltip', { name: expected }).first();
   await expect(popper).toBeVisible();
   await expect(popper).toContainText(expected);
 
@@ -106,6 +106,7 @@ export async function expectLabelTooltip(
   page: Page,
   { label, expected }: TooltipExpectation,
 ): Promise<void> {
+  await dismissOpenTooltips(page);
   const trigger = tooltipTriggerForLabel(page, label);
   await trigger.evaluate((element) => {
     element.scrollIntoView({ block: 'center', inline: 'center' });

@@ -47,7 +47,7 @@ describe('HowToPlayPage', () => {
   it('renders the hero section', () => {
     render(<HowToPlayPage />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Gesture. Endure. Shape the Signature.',
+      'How Cosmic Signature Works',
     );
   });
 

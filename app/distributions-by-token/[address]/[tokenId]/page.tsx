@@ -4,10 +4,20 @@ import { createMetadata } from '@/utils/seo';
 
 import RewardsByTokenPage from './RewardsByTokenPage';
 
-export const metadata: Metadata = createMetadata(
-  'Distributions By Token | Cosmic Signature',
-  'Anchor Distribution details for a specific Cosmic Signature NFT \u2014 per-cycle ETH distribution history, retrieval status, and cumulative allocations.',
-);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ address: string; tokenId: string }>;
+}): Promise<Metadata> {
+  const { address, tokenId } = await params;
+  return createMetadata(
+    'Distributions By Token | Cosmic Signature',
+    'Anchor Distribution details for a specific Cosmic Signature NFT \u2014 per-cycle ETH distribution history, retrieval status, and cumulative allocations.',
+    undefined,
+    `/distributions-by-token/${address}/${tokenId}`,
+    { index: false },
+  );
+}
 
 export default async function Page({
   params,

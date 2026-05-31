@@ -113,7 +113,7 @@ export function HomeObservatoryHero({
 
             <motion.div variants={itemVariants}>
               <GradientText
-                as="h1"
+                as="h2"
                 id="home-observatory-title"
                 className="font-display text-4xl font-bold leading-[0.96] tracking-tight sm:text-5xl lg:text-6xl"
               >

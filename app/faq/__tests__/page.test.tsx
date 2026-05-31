@@ -44,12 +44,12 @@ Object.assign(navigator, {
 describe('app/faq/page.tsx', () => {
   describe('metadata', () => {
     it('has the correct title', () => {
-      expect(metadata.title).toBe('FAQ | Cosmic Signature');
+      expect(metadata.title).toBe('Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol');
     });
 
     it('has the correct description', () => {
       expect(metadata.description).toContain('Cosmic Signature');
-      expect(metadata.description).toMatch(/clarifications|performance cycles|gestures/i);
+      expect(metadata.description).toMatch(/answers|performance cycles|gestures/i);
     });
 
     it('does not contain the "Frequenly" typo', () => {
@@ -59,7 +59,7 @@ describe('app/faq/page.tsx', () => {
     it('includes openGraph with matching title and description', () => {
       expect(metadata.openGraph).toEqual(
         expect.objectContaining({
-          title: 'FAQ | Cosmic Signature',
+          title: 'Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol',
         }),
       );
     });
@@ -77,7 +77,7 @@ describe('app/faq/page.tsx', () => {
       expect(metadata.twitter).toEqual(
         expect.objectContaining({
           card: 'summary_large_image',
-          title: 'FAQ | Cosmic Signature',
+          title: 'Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol',
         }),
       );
     });
@@ -95,9 +95,7 @@ describe('app/faq/page.tsx', () => {
 
     it('renders the FAQPage component', () => {
       render(<Page />);
-      expect(
-        screen.getByRole('heading', { name: /frequently asked questions/i }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: /cosmic signature faq/i })).toBeInTheDocument();
     });
 
     it('has no accessibility violations', async () => {

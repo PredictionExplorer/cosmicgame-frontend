@@ -7,6 +7,7 @@ import { APP_ORIGIN, LANDING_ORIGIN, isAppHost, normalizeHost } from '@/lib/host
 
 const LANDING_URL = LANDING_ORIGIN;
 const APP_URL = APP_ORIGIN;
+const CONTENT_LAST_MODIFIED = new Date('2026-05-31');
 
 type Freq = MetadataRoute.Sitemap[number]['changeFrequency'];
 
@@ -50,6 +51,9 @@ const appPages: SitemapEntry[] = [
   { path: '/imprint', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/contracts', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/code', priority: 0.5, changeFrequency: 'monthly' },
+  { path: '/security', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/audits', priority: 0.6, changeFrequency: 'monthly' },
+  { path: '/risk-disclosures', priority: 0.6, changeFrequency: 'monthly' },
   { path: '/terms', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/privacy', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/eth-contribution', priority: 0.6, changeFrequency: 'daily' },
@@ -69,7 +73,7 @@ const appPages: SitemapEntry[] = [
 function renderSitemap(baseUrl: string, pages: SitemapEntry[]): MetadataRoute.Sitemap {
   return pages.map(({ path, priority, changeFrequency }) => ({
     url: `${baseUrl}${path}`,
-    lastModified: new Date(),
+    lastModified: CONTENT_LAST_MODIFIED,
     changeFrequency,
     priority,
   }));

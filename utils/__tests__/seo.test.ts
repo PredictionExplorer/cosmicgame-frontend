@@ -95,10 +95,10 @@ describe('createMetadata', () => {
     });
   });
 
-  it('appends paths with trailing slashes verbatim (no normalization surprises)', () => {
+  it('normalizes non-root trailing slashes in canonical paths', () => {
     const result = createMetadata('T', 'D', undefined, '/anchoring/');
     expect(result.alternates).toEqual({
-      canonical: 'https://app.cosmicsignature.com/anchoring/',
+      canonical: 'https://app.cosmicsignature.com/anchoring',
     });
   });
 
@@ -162,5 +162,34 @@ describe('createMetadata', () => {
   it('omits canonical when path is explicitly undefined', () => {
     const result = createMetadata('T', 'D', undefined, undefined);
     expect(result.alternates).toBeUndefined();
+  });
+
+  it('adds indexable robots directives by default', () => {
+    const result = createMetadata('T', 'D', undefined, '/faq');
+
+    expect(result.robots).toEqual({
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-snippet': -1,
+        'max-image-preview': 'large',
+        'max-video-preview': -1,
+      },
+    });
+  });
+
+  it('can mark thin or private pages as noindex,follow', () => {
+    const result = createMetadata('T', 'D', undefined, '/my-tokens', { index: false });
+
+    expect(result.robots).toEqual({
+      index: false,
+      follow: true,
+      googleBot: {
+        index: false,
+        follow: true,
+      },
+    });
   });
 });

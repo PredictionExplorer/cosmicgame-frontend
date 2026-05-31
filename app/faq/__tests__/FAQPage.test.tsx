@@ -51,9 +51,7 @@ beforeEach(() => {
 describe('FAQPage', () => {
   it('renders the hero heading', () => {
     render(<FAQPage />);
-    expect(
-      screen.getByRole('heading', { name: /frequently asked questions/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /cosmic signature faq/i })).toBeInTheDocument();
   });
 
   it('renders all 6 category sections', () => {

@@ -5,6 +5,7 @@ import axios from 'axios';
 import { cosmicGameBaseUrl } from '@/services/api';
 import { createMetadata } from '@/utils/seo';
 
+import { AppHomeSeoSummary } from './AppHomeSeoSummary';
 import HomePage from './HomePage';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -22,8 +23,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function Page() {
   return (
-    <Suspense>
-      <HomePage />
-    </Suspense>
+    <>
+      <AppHomeSeoSummary />
+      <Suspense>
+        <HomePage />
+      </Suspense>
+    </>
   );
 }

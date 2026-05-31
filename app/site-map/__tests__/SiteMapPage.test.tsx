@@ -10,7 +10,7 @@ describe('SiteMapPage', () => {
 
   it('renders the per-user section heading', () => {
     render(<SiteMapPage />);
-    expect(screen.getByText('Per-user information')).toBeInTheDocument();
+    expect(screen.getByText('Personal App Tools')).toBeInTheDocument();
   });
 
   it('renders all per-user links', () => {
@@ -18,18 +18,17 @@ describe('SiteMapPage', () => {
     const expectedLinks = [
       { label: 'My Tokens', href: '/my-tokens' },
       { label: 'My Unretrieved Allocations', href: '/my-allocations' },
-      { label: 'History of My Allocations', href: '/recipient-history' },
       { label: 'My Anchors', href: '/my-anchors' },
     ];
     for (const { label, href } of expectedLinks) {
-      const link = screen.getByRole('link', { name: label });
+      const link = screen.getByRole('link', { name: new RegExp(label) });
       expect(link).toHaveAttribute('href', href);
     }
   });
 
   it('renders the system section heading', () => {
     render(<SiteMapPage />);
-    expect(screen.getByText('Overall system information')).toBeInTheDocument();
+    expect(screen.getByText('Public Protocol Pages')).toBeInTheDocument();
   });
 
   it('renders all system links', () => {
@@ -46,15 +45,17 @@ describe('SiteMapPage', () => {
         href: 'https://cosmicsignature.com/learn/three-body-nft-art',
       },
       { label: 'Cosmic Signature Gallery', href: '/gallery' },
-      { label: 'Cycles Completed', href: '/allocation' },
-      { label: 'Anchor Distributions', href: '/anchoring' },
-      { label: 'Outreach Allocations', href: '/marketing' },
-      { label: 'System Statistics', href: '/statistics' },
-      { label: 'Contract Addresses', href: '/contracts' },
-      { label: 'FAQ', href: '/faq' },
+      { label: 'Current Performance Cycle', href: '/current-cycle' },
+      { label: 'Protocol Statistics', href: '/statistics' },
+      { label: 'Cosmic Signature Contracts', href: '/contracts' },
+      { label: 'Source Code', href: '/code' },
+      { label: 'Security', href: '/security' },
+      { label: 'Audits', href: '/audits' },
+      { label: 'Risk Disclosures', href: '/risk-disclosures' },
+      { label: 'Cosmic Signature FAQ', href: '/faq' },
     ];
     for (const { label, href } of expectedLinks) {
-      const link = screen.getByRole('link', { name: label });
+      const link = screen.getByRole('link', { name: new RegExp(label) });
       expect(link).toHaveAttribute('href', href);
     }
   });
@@ -63,7 +64,7 @@ describe('SiteMapPage', () => {
     render(<SiteMapPage />);
     const main = screen.getByRole('main');
     const links = within(main).getAllByRole('link');
-    expect(links).toHaveLength(18);
+    expect(links).toHaveLength(19);
   });
 
   it('has no accessibility violations', async () => {

@@ -4,10 +4,20 @@ import { createMetadata } from '@/utils/seo';
 
 import AnchorActionDetailPage from './AnchorActionDetailPage';
 
-export const metadata: Metadata = createMetadata(
-  'Anchor Action Detail | Cosmic Signature',
-  'Details of a specific anchor action in Cosmic Signature \u2014 token type, anchored amounts, and distribution retrieval status.',
-);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ IsRwalk: string; actionId: string }>;
+}): Promise<Metadata> {
+  const { IsRwalk, actionId } = await params;
+  return createMetadata(
+    'Anchor Action Detail | Cosmic Signature',
+    'Details of a specific anchor action in Cosmic Signature \u2014 token type, anchored amounts, and distribution retrieval status.',
+    undefined,
+    `/anchor-action/${IsRwalk}/${actionId}`,
+    { index: false },
+  );
+}
 
 export default async function Page({
   params,

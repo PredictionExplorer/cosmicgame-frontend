@@ -9,6 +9,7 @@ export const metadata: Metadata = createMetadata(
   'View and retrieve your pending ETH allocations, Stellar Selection distributions, Anchor Distributions, and attached assets from the Cosmic Signature protocol.',
   undefined,
   '/my-allocations',
+  { index: false },
 );
 
 export default function Page() {

@@ -178,9 +178,9 @@ const CurrentRoundPage = () => {
               <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-live-dot" />
             </div>
             <div>
-              <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+              <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
                 Cycle #{data.CurRoundNum}
-              </h1>
+              </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Opened {roundStarted} &bull; {data.CurNumBids} gesture
                 {data.CurNumBids !== 1 ? 's' : ''} made

@@ -9,6 +9,7 @@ export const metadata: Metadata = createMetadata(
   "Track your performance with Cosmic Signature's My Statistics page. View detailed gesture history, anchor status, distributions, and more. Stay informed and optimize your participation in our on-chain protocol.",
   undefined,
   '/my-statistics',
+  { index: false },
 );
 
 export default function Page() {

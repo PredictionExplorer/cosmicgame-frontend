@@ -9,6 +9,7 @@ export const metadata: Metadata = createMetadata(
   'Manage your digital assets on the My Tokens page at Cosmic Signature. View your token balance, transaction history, and ownership details. Keep track of your NFTs and tokens effortlessly.',
   undefined,
   '/my-tokens',
+  { index: false },
 );
 
 export default function Page() {

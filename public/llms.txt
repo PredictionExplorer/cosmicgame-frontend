@@ -23,6 +23,9 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - [Allocation](https://app.cosmicsignature.com/allocation): Current Cycle Reserve and allocation tracks
 - [Contracts](https://app.cosmicsignature.com/contracts): Smart contract details and addresses
 - [Source Code](https://app.cosmicsignature.com/code): Source code and verification resources
+- [Security](https://app.cosmicsignature.com/security): Security model, verification resources, and participant safety notes
+- [Audits](https://app.cosmicsignature.com/audits): Audit status and formal verification context
+- [Risk Disclosures](https://app.cosmicsignature.com/risk-disclosures): Non-investment language, blockchain risks, and participant clarity
 - [Outreach](https://app.cosmicsignature.com/marketing): Outreach allocation program
 - [Imprint](https://app.cosmicsignature.com/imprint): Imprint new tokens
 

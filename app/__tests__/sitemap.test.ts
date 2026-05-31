@@ -125,8 +125,12 @@ describe('sitemap (host-aware)', () => {
       expect(urls).toContain('https://app.cosmicsignature.com/faq');
       expect(urls).toContain('https://app.cosmicsignature.com/statistics');
       expect(urls).toContain('https://app.cosmicsignature.com/contracts');
+      expect(urls).toContain('https://app.cosmicsignature.com/security');
+      expect(urls).toContain('https://app.cosmicsignature.com/audits');
+      expect(urls).toContain('https://app.cosmicsignature.com/risk-disclosures');
       expect(urls).toContain('https://app.cosmicsignature.com/terms');
       expect(urls).toContain('https://app.cosmicsignature.com/privacy');
+      expect(urls).not.toContain('https://app.cosmicsignature.com/source-code');
     });
 
     it('home page has highest priority', async () => {
@@ -174,6 +178,13 @@ describe('sitemap (host-aware)', () => {
       for (const entry of entries) {
         expect(entry.priority).toBeGreaterThanOrEqual(0);
         expect(entry.priority).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it('uses a stable content date instead of request time for lastModified', async () => {
+      const entries = await sitemap();
+      for (const entry of entries) {
+        expect((entry.lastModified as Date).toISOString()).toBe('2026-05-31T00:00:00.000Z');
       }
     });
   });

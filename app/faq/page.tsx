@@ -7,8 +7,8 @@ import { getAllItems } from './data/faq-data';
 import FAQPage from './FAQPage';
 
 export const metadata: Metadata = createMetadata(
-  'FAQ | Cosmic Signature',
-  'Clarifications about Cosmic Signature — Performance Cycles, gestures, allocation tracks, Anchoring, Cosmic Signature NFTs, Arbitrum, and Protocol Coordination.',
+  'Cosmic Signature FAQ | Arbitrum On-Chain Art Protocol',
+  'Answers to common questions about Cosmic Signature, Performance Cycles, gestures, CST, three-body NFT art, Arbitrum, anchoring, contracts, and protocol security.',
   undefined,
   '/faq',
 );

@@ -189,6 +189,7 @@ const GalleryPage = () => {
           </SectionEyebrow>
         }
         title="NFT Gallery"
+        titleLevel={2}
         gradientTitle="signature"
         subtitle="Explore the complete Cosmic Signature NFT collection imprinted across every cycle"
       />
