@@ -277,6 +277,7 @@ const HomePage = () => {
                   <SpecialAllocationRecipients
                     currentAccount={account}
                     latestMessage={curGestureList[0]?.Message ?? ''}
+                    latestGesture={curGestureList[0] ?? null}
                   />
                 </div>
               </div>

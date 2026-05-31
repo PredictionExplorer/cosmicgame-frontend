@@ -3,11 +3,12 @@
 import type { ReactNode } from 'react';
 import { Coins, Crown, Lock, MessageSquare, Swords, User, Zap } from 'lucide-react';
 
-import { formatSeconds } from '@/utils';
+import { convertTimestampToDateTime, formatSeconds } from '@/utils';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useChampions, type ChampionsState } from '@/hooks/useChampions';
 import { cn } from '@/lib/utils';
+import type { GestureInfo } from '@/services/api/types';
 
 interface RoleCardConfig {
   key: 'latest' | 'endurance' | 'chrono' | 'lastcst';
@@ -28,6 +29,7 @@ interface RoleCardConfig {
 interface SpecialAllocationRecipientsProps {
   currentAccount?: string | null;
   latestMessage?: string | null;
+  latestGesture?: GestureInfo | null;
 }
 
 function StatusChip({ isLive, statusText }: { isLive: boolean; statusText?: string }) {
@@ -232,6 +234,80 @@ function LatestParticipantMessage({ message }: { message: string }) {
   );
 }
 
+function firstNonNegativeNumber(...values: unknown[]): number | undefined {
+  return values.find(
+    (value): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0,
+  );
+}
+
+function resolveGestureType(gesture: GestureInfo): number | undefined {
+  if (typeof gesture.GestureType === 'number') return gesture.GestureType;
+  const backendGestureType = (gesture as GestureInfo & { BidType?: unknown }).BidType;
+  return typeof backendGestureType === 'number' ? backendGestureType : undefined;
+}
+
+function formatGestureAmount(amount: number | undefined, unit: 'ETH' | 'CST'): string {
+  if (amount === undefined) return 'Unavailable';
+  return `${amount.toFixed(amount > 0 && amount < 1 ? 7 : 4)} ${unit}`;
+}
+
+function getCstGestureCost(gesture: GestureInfo): number | undefined {
+  return firstNonNegativeNumber(
+    gesture.CstCost,
+    gesture.NumCSTokensEth,
+    gesture.NumCSTTokensEth,
+    gesture.CstPriceEth,
+  );
+}
+
+function getEthGestureCost(gesture: GestureInfo): number | undefined {
+  return firstNonNegativeNumber(gesture.GestureCostEth, gesture.EthPriceEth);
+}
+
+function formatLatestGesturePayment(gesture: GestureInfo): string {
+  return resolveGestureType(gesture) === 2
+    ? formatGestureAmount(getCstGestureCost(gesture), 'CST')
+    : formatGestureAmount(getEthGestureCost(gesture), 'ETH');
+}
+
+function formatGestureMethod(gesture: GestureInfo): string {
+  switch (resolveGestureType(gesture)) {
+    case 0:
+      return 'ETH';
+    case 1:
+      return 'Random Walk';
+    case 2:
+      return 'CST';
+    default:
+      return 'Unknown';
+  }
+}
+
+function hasRandomWalkToken(gesture: GestureInfo): boolean {
+  return typeof gesture.RWalkNFTId === 'number' && gesture.RWalkNFTId >= 0;
+}
+
+function formatRandomWalkStatus(gesture: GestureInfo): string {
+  if (hasRandomWalkToken(gesture)) return `Yes, token #${gesture.RWalkNFTId}`;
+  return resolveGestureType(gesture) === 1 ? 'Yes' : 'No';
+}
+
+function formatGestureTime(gesture: GestureInfo): string {
+  return typeof gesture.TimeStamp === 'number' && Number.isFinite(gesture.TimeStamp)
+    ? convertTimestampToDateTime(gesture.TimeStamp, true)
+    : 'Unavailable';
+}
+
+function formatAttachedAssets(gesture: GestureInfo): string {
+  const assets = [
+    gesture.NFTDonationTokenAddr && gesture.NFTDonationTokenId !== -1 ? 'NFT' : '',
+    gesture.DonatedERC20TokenAddr ? 'ERC20' : '',
+  ].filter(Boolean);
+
+  if (assets.length === 0) return 'None';
+  return assets.join(' + ');
+}
+
 function DetailMetric({
   label,
   value,
@@ -268,6 +344,55 @@ function DetailMetric({
         {label}
       </p>
       <p className="mt-0.5 text-xs text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function LatestGestureDetails({
+  latestGesture,
+  latestAddress,
+}: {
+  latestGesture?: GestureInfo | null;
+  latestAddress: string | null;
+}) {
+  if (!latestGesture || !sameAddress(latestGesture.BidderAddr, latestAddress)) return null;
+
+  return (
+    <div
+      data-testid="latest-participant-gesture-details"
+      className="mt-3 rounded-xl border border-emerald-400/20 bg-gradient-to-br from-emerald-400/[0.07] via-white/[0.025] to-transparent p-3 shadow-[0_0_30px_-22px_rgba(52,211,153,0.75)]"
+    >
+      <div className="mb-2 flex items-center gap-2">
+        <div className="h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]" />
+        <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300">
+          Last Gesture
+        </p>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <DetailMetric
+          testId="latest-participant-paid-amount"
+          label="Amount paid"
+          value={formatLatestGesturePayment(latestGesture)}
+          tone="emerald"
+        />
+        <DetailMetric label="Method" value={formatGestureMethod(latestGesture)} />
+        <DetailMetric
+          testId="latest-participant-random-walk"
+          label="Random Walk"
+          value={formatRandomWalkStatus(latestGesture)}
+        />
+        <DetailMetric label="Gesture time" value={formatGestureTime(latestGesture)} />
+        <DetailMetric
+          testId="latest-participant-gesture-id"
+          label="Gesture ID"
+          value={
+            typeof latestGesture.EvtLogId === 'number'
+              ? `#${latestGesture.EvtLogId}`
+              : 'Unavailable'
+          }
+        />
+        <DetailMetric label="Attached assets" value={formatAttachedAssets(latestGesture)} />
+      </div>
     </div>
   );
 }
@@ -402,6 +527,7 @@ function SpecialAllocationLeadersPrintFallback({ state }: { state: ChampionsStat
 export const SpecialAllocationRecipients = ({
   currentAccount = null,
   latestMessage = null,
+  latestGesture = null,
 }: SpecialAllocationRecipientsProps = {}) => {
   const champions = useChampions();
   const isCurrentAccountLatest = sameAddress(currentAccount, champions.latestGesture.address);
@@ -430,6 +556,10 @@ export const SpecialAllocationRecipients = ({
           <LatestGestureProgress
             latestGesture={champions.latestGesture}
             hasEnduranceRecord={!!champions.endurance.address}
+          />
+          <LatestGestureDetails
+            latestGesture={latestGesture}
+            latestAddress={champions.latestGesture.address}
           />
           {cleanLatestMessage && <LatestParticipantMessage message={cleanLatestMessage} />}
         </>

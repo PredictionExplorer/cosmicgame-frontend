@@ -192,11 +192,14 @@ jest.mock('../../components/tables/SpecialAllocationRecipients', () => ({
   SpecialAllocationRecipients: (props: {
     currentAccount?: string | null;
     latestMessage?: string;
+    latestGesture?: { EvtLogId?: number; BidderAddr?: string } | null;
   }) => (
     <div
       data-testid="special-allocation-recipients"
       data-account={props.currentAccount ?? ''}
       data-message={props.latestMessage ?? ''}
+      data-latest-gesture-id={props.latestGesture?.EvtLogId ?? ''}
+      data-latest-gesture-address={props.latestGesture?.BidderAddr ?? ''}
     >
       SpecialAllocationRecipients
     </div>
@@ -747,7 +750,14 @@ describe('HomePage', () => {
       isLoading: false,
     });
     mockUseGestureListByCycle.mockReturnValue({
-      data: [{ BidderAddr: '0xBidder', TimeStamp: 1700000001, Message: 'hello cosmos' }],
+      data: [
+        {
+          EvtLogId: 99,
+          BidderAddr: '0xBidder',
+          TimeStamp: 1700000001,
+          Message: 'hello cosmos',
+        },
+      ],
     });
 
     render(<HomePage />);
@@ -758,6 +768,14 @@ describe('HomePage', () => {
     expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
       'data-message',
       'hello cosmos',
+    );
+    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
+      'data-latest-gesture-id',
+      '99',
+    );
+    expect(screen.getByTestId('special-allocation-recipients')).toHaveAttribute(
+      'data-latest-gesture-address',
+      '0xBidder',
     );
   });
 

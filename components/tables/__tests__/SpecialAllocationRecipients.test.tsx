@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import type { ChampionsState } from '@/hooks/useChampions';
+import type { GestureInfo } from '@/services/api/types';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
@@ -49,6 +50,22 @@ jest.mock('../../../hooks/useChampions', () => ({
   useChampions: () => mockUseChampions(),
 }));
 
+function makeLatestGesture(overrides: Partial<GestureInfo> = {}): GestureInfo {
+  return {
+    EvtLogId: 101,
+    BlockNum: 1,
+    TxId: 1,
+    TxHash: '0xgesture',
+    TimeStamp: 1_701_346_718,
+    DateTime: '',
+    RoundNum: 5,
+    BidderAddr: enduranceAddress,
+    GestureType: 0,
+    GestureCostEth: 0.123456789,
+    ...overrides,
+  };
+}
+
 describe('SpecialAllocationRecipients', () => {
   beforeEach(() => {
     mockUseChampions.mockReturnValue(baseChampions);
@@ -93,6 +110,73 @@ describe('SpecialAllocationRecipients', () => {
     expect(latestCard).toHaveTextContent('1h');
     expect(latestCard).toHaveTextContent('Extending Endurance Champion record');
     expect(screen.getByTestId('latest-participant-message')).toHaveTextContent('Signal received');
+  });
+
+  it('shows ETH payment details for the latest participant gesture', () => {
+    render(<SpecialAllocationRecipients latestGesture={makeLatestGesture()} />);
+
+    const details = screen.getByTestId('latest-participant-gesture-details');
+    expect(details).toHaveTextContent('Last Gesture');
+    expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('0.1234568 ETH');
+    expect(details).toHaveTextContent('Method');
+    expect(details).toHaveTextContent('ETH');
+    expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent('No');
+    expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#101');
+    expect(details).toHaveTextContent('Attached assets');
+    expect(details).toHaveTextContent('None');
+  });
+
+  it('shows CST payment details for the latest participant gesture', () => {
+    render(
+      <SpecialAllocationRecipients
+        latestGesture={makeLatestGesture({
+          GestureType: 2,
+          GestureCostEth: 0,
+          CstPriceEth: 25.5,
+        })}
+      />,
+    );
+
+    const details = screen.getByTestId('latest-participant-gesture-details');
+    expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('25.5000 CST');
+    expect(details).toHaveTextContent('CST');
+    expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent('No');
+  });
+
+  it('shows Random Walk token involvement and attached assets for the latest participant gesture', () => {
+    render(
+      <SpecialAllocationRecipients
+        latestGesture={makeLatestGesture({
+          GestureType: 1,
+          GestureCostEth: 0.05,
+          EthPriceEth: 0.05,
+          RWalkNFTId: 123,
+          NFTDonationTokenAddr: '0xNFT',
+          NFTDonationTokenId: 7,
+          DonatedERC20TokenAddr: '0xERC20',
+        })}
+      />,
+    );
+
+    const details = screen.getByTestId('latest-participant-gesture-details');
+    expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('0.0500000 ETH');
+    expect(details).toHaveTextContent('Random Walk');
+    expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent(
+      'Yes, token #123',
+    );
+    expect(details).toHaveTextContent('NFT + ERC20');
+  });
+
+  it('does not show latest gesture details when the gesture belongs to another participant', () => {
+    render(
+      <SpecialAllocationRecipients
+        latestGesture={makeLatestGesture({
+          BidderAddr: '0x4444444444444444444444444444444444444444',
+        })}
+      />,
+    );
+
+    expect(screen.queryByTestId('latest-participant-gesture-details')).not.toBeInTheDocument();
   });
 
   it('shows remaining time and accessible progress when a different latest participant is still challenging', () => {
