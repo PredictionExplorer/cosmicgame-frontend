@@ -47,11 +47,17 @@ export function AnchoringSection({
 }: AnchoringSectionProps) {
   return (
     <Tabs defaultValue="cst" className="mt-8">
-      <TabsList>
-        <TabsTrigger value="cst" className="text-lg font-semibold">
+      <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 p-1 sm:inline-flex sm:w-auto sm:flex-nowrap">
+        <TabsTrigger
+          value="cst"
+          className="min-w-0 flex-1 whitespace-normal px-2 py-2 text-center text-sm font-semibold leading-tight sm:flex-none sm:whitespace-nowrap sm:px-3 sm:py-1.5 sm:text-lg"
+        >
           Cosmic Signature NFT
         </TabsTrigger>
-        <TabsTrigger value="rwlk" className="text-lg font-semibold">
+        <TabsTrigger
+          value="rwlk"
+          className="min-w-0 flex-1 whitespace-normal px-2 py-2 text-center text-sm font-semibold leading-tight sm:flex-none sm:whitespace-nowrap sm:px-3 sm:py-1.5 sm:text-lg"
+        >
           RandomWalk NFT
         </TabsTrigger>
       </TabsList>

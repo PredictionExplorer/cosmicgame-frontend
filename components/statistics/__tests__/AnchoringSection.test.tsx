@@ -1,11 +1,10 @@
-import { render, screen, checkA11y } from '@/test-utils';
+import { fireEvent, render, screen, checkA11y } from '@/test-utils';
 
 import { AnchoringSection, type AnchoringSectionProps } from '../AnchoringSection';
 
-jest.mock('../../anchoring/GlobalAnchorActionsTable', () => ({
-  GlobalAnchorActionsTable: ({ IsRWLK }: { IsRWLK: boolean }) => (
-    <div data-testid="global-anchor-actions">IsRWLK={String(IsRWLK)}</div>
-  ),
+const mockPush = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush, prefetch: jest.fn() }),
 }));
 jest.mock('../../anchoring/GlobalAnchoredTokensTable', () => ({
   GlobalAnchoredTokensTable: ({ IsRWLK }: { IsRWLK: boolean }) => (
@@ -74,6 +73,22 @@ const defaultProps: AnchoringSectionProps = {
   uniqueRWLKAnchorHolders: [],
 };
 
+const createAnchorAction = (
+  overrides = {},
+): NonNullable<AnchoringSectionProps['cstAnchorActions']>[number] =>
+  ({
+    EvtLogId: 1,
+    ActionId: 10,
+    TimeStamp: 1701346718,
+    ActionType: 0,
+    TokenId: 42,
+    StakerAddr: '0x1234567890abcdef1234567890abcdef12345678',
+    NumStakedNFTs: 5,
+    ...overrides,
+  }) as NonNullable<AnchoringSectionProps['cstAnchorActions']>[number];
+
+beforeEach(() => jest.clearAllMocks());
+
 describe('AnchoringSection', () => {
   it('renders CST anchoring stats', () => {
     render(<AnchoringSection {...defaultProps} />);
@@ -93,9 +108,17 @@ describe('AnchoringSection', () => {
   });
 
   it('renders anchor-action table for CST', () => {
-    render(<AnchoringSection {...defaultProps} />);
-    const tables = screen.getAllByTestId('global-anchor-actions');
-    expect(tables[0]).toHaveTextContent('IsRWLK=false');
+    render(<AnchoringSection {...defaultProps} cstAnchorActions={[createAnchorAction()]} />);
+    expect(screen.getAllByText('Anchor Datetime').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Datetime').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Anchor').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('navigates from a CST anchor-action row', () => {
+    render(<AnchoringSection {...defaultProps} cstAnchorActions={[createAnchorAction()]} />);
+    const row = screen.getAllByText('Anchor')[0]!.closest('tr');
+    fireEvent.click(row!);
+    expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/10');
   });
 
   it('shows loading when cstAnchorActions is null', () => {
@@ -105,8 +128,11 @@ describe('AnchoringSection', () => {
 
   it('renders tab triggers', () => {
     render(<AnchoringSection {...defaultProps} />);
-    expect(screen.getByText('Cosmic Signature NFT')).toBeInTheDocument();
-    expect(screen.getByText('RandomWalk NFT')).toBeInTheDocument();
+    const cstTab = screen.getByRole('tab', { name: 'Cosmic Signature NFT' });
+    const rwlkTab = screen.getByRole('tab', { name: 'RandomWalk NFT' });
+    expect(cstTab).toHaveClass('whitespace-normal');
+    expect(rwlkTab).toHaveClass('whitespace-normal');
+    expect(screen.getByRole('tablist')).toHaveClass('flex-wrap');
   });
 
   it('renders tooltips on anchoring metrics', () => {

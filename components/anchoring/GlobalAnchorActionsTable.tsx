@@ -14,9 +14,18 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
+  TableResponsiveHeaderLabel,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+
+const responsiveHeaders = [
+  { desktop: 'Anchor Datetime', mobile: 'Datetime', align: 'left' as const },
+  { desktop: 'Action Type', mobile: 'Type' },
+  { desktop: 'Token ID', mobile: 'Token' },
+  { desktop: 'Anchor-holder Address', mobile: 'Holder' },
+  { desktop: 'Number of NFTs', mobile: 'NFTs' },
+];
 
 interface RowData {
   EvtLogId: string | number;
@@ -67,7 +76,10 @@ const GlobalAnchorActionsRow: FC<GlobalAnchorActionsRowProps> = ({ row, IsRWLK }
       <TablePrimaryCell align="center">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link href={`/user/${row.StakerAddr}`} className="text-inherit font-mono">
+            <Link
+              href={`/user/${row.StakerAddr}`}
+              className="inline-block max-w-full break-all text-inherit font-mono"
+            >
               {shortenHex(row.StakerAddr, 6)}
             </Link>
           </TooltipTrigger>
@@ -102,7 +114,7 @@ export const GlobalAnchorActionsTable: FC<GlobalAnchorActionsTableProps> = ({ li
   return (
     <>
       <TablePrimaryContainer>
-        <TablePrimary>
+        <TablePrimary className="sm:min-w-[720px] lg:min-w-0">
           <colgroup>
             <col width="25%" />
             <col width="15%" />
@@ -113,11 +125,11 @@ export const GlobalAnchorActionsTable: FC<GlobalAnchorActionsTableProps> = ({ li
 
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Anchor Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Action Type</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Anchor-holder Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Number of NFTs</TablePrimaryHeadCell>
+              {responsiveHeaders.map((header) => (
+                <TablePrimaryHeadCell key={header.desktop} align={header.align}>
+                  <TableResponsiveHeaderLabel desktop={header.desktop} mobile={header.mobile} />
+                </TablePrimaryHeadCell>
+              ))}
             </Tr>
           </TablePrimaryHead>
 

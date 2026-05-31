@@ -33,7 +33,7 @@ export function CollapsibleSection({
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors hover:bg-white/[0.04]"
+        className="flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:bg-white/[0.04] sm:px-5"
       >
         <div className="flex items-center gap-2.5">
           {icon && (
@@ -59,7 +59,7 @@ export function CollapsibleSection({
         )}
       >
         <div className="overflow-hidden">
-          <div className="border-t border-white/[0.06] px-5 py-4">{children}</div>
+          <div className="border-t border-white/[0.06] px-3 py-3 sm:px-5 sm:py-4">{children}</div>
         </div>
       </div>
     </div>

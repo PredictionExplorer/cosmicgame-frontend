@@ -68,7 +68,7 @@ export const CustomPagination = ({
 
   return (
     <div
-      className={`mt-4 flex flex-wrap items-center ${showGoToInput ? 'justify-end' : 'justify-center'}`}
+      className={`mt-4 flex flex-wrap items-center gap-2 ${showGoToInput ? 'justify-center sm:justify-end' : 'justify-center'}`}
     >
       <Pagination>
         <PaginationContent>
@@ -87,7 +87,7 @@ export const CustomPagination = ({
       </Pagination>
 
       {showGoToInput && (
-        <div className="my-1 ml-8 flex items-center">
+        <div className="my-1 flex items-center sm:ml-8">
           <span className="mr-2 text-sm">Go to page:</span>
           <Input
             type="number"

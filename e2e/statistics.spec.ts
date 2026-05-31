@@ -38,6 +38,28 @@ test.describe('Statistics page', () => {
     }
   });
 
+  test('Anchor / Release Actions section renders usable content', async ({ page }) => {
+    const anchoring = page.getByText('Anchoring', { exact: true }).first();
+    await ensureVisible(anchoring);
+    await expect(anchoring).toBeVisible();
+
+    const actionsToggle = page.getByRole('button', { name: /Anchor \/ Release Actions/i }).first();
+    await ensureVisible(actionsToggle);
+    await expect(actionsToggle).toBeVisible();
+    if ((await actionsToggle.getAttribute('aria-expanded')) === 'false') {
+      await actionsToggle.click();
+    }
+
+    const actionRows = page.locator('table tbody tr').filter({ hasText: /Anchor|Release/i });
+    if ((await actionRows.count()) > 0) {
+      const firstRow = actionRows.first();
+      await ensureVisible(firstRow);
+      await expect(firstRow).toBeVisible();
+    } else {
+      await expect(page.getByText(/No actions yet\.|Loading\.\.\./i).first()).toBeVisible();
+    }
+  });
+
   test('unique participants section has data', async ({ page }) => {
     const uniqueParticipants = page.getByText(/Unique Participants/i).first();
     await ensureVisible(uniqueParticipants);

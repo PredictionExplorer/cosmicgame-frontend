@@ -31,8 +31,20 @@ function advisoryId(url: string): string | null {
 }
 
 function runNpmAudit(args: string[] = []): NpmAuditReport {
+  const env = { ...process.env };
+  for (const key of [
+    'npm_config_argv',
+    'npm_config_ignore_engines',
+    'npm_config_version_commit_hooks',
+    'npm_config_version_git_message',
+    'npm_config_version_git_tag',
+    'npm_config_version_tag_prefix',
+  ]) {
+    delete env[key];
+  }
+
   try {
-    return JSON.parse(execFileSync('npm', ['audit', ...args, '--json'], { encoding: 'utf8' }));
+    return JSON.parse(execFileSync('npm', ['audit', ...args, '--json'], { encoding: 'utf8', env }));
   } catch (error) {
     const stdout = (error as { stdout?: string }).stdout;
     if (!stdout) throw error;
@@ -88,6 +100,6 @@ if (unacceptedHighs.length > 0) {
   process.exit(1);
 }
 
-console.warn(
-  `Dependency audit passed: 0 production advisories; ${advisories.size} dev/tooling advisories found, all high/critical advisories are documented.`,
+process.stdout.write(
+  `Dependency audit passed: 0 production advisories; ${advisories.size} dev/tooling advisories found, all high/critical advisories are documented.\n`,
 );

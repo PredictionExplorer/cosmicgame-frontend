@@ -27,7 +27,7 @@ export function TablePrimaryContainer({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] bg-[linear-gradient(135deg,rgb(255_255_255/0.04),rgb(255_255_255/0.014)_48%,rgb(var(--nebula-violet-rgb)/0.05))] shadow-[0_20px_90px_-70px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-px before:bg-gradient-to-r before:from-transparent before:via-[rgb(var(--aurora-cyan-rgb)/0.55)] before:to-transparent print:overflow-visible print:shadow-none print:backdrop-blur-none',
+        'relative overflow-x-auto overflow-y-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] bg-[linear-gradient(135deg,rgb(255_255_255/0.04),rgb(255_255_255/0.014)_48%,rgb(var(--nebula-violet-rgb)/0.05))] shadow-[0_20px_90px_-70px_rgb(var(--aurora-cyan-rgb)/0.9)] backdrop-blur-sm before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-[2] before:h-px before:bg-gradient-to-r before:from-transparent before:via-[rgb(var(--aurora-cyan-rgb)/0.55)] before:to-transparent print:overflow-visible print:shadow-none print:backdrop-blur-none',
         className,
       )}
       {...props}
@@ -60,6 +60,21 @@ export function TablePrimaryHeadCell({ className, ...props }: ComponentPropsWith
       )}
       {...props}
     />
+  );
+}
+
+export function TableResponsiveHeaderLabel({
+  desktop,
+  mobile,
+}: {
+  desktop: string;
+  mobile: string;
+}) {
+  return (
+    <>
+      <span className="sm:hidden">{mobile}</span>
+      <span className="hidden sm:inline">{desktop}</span>
+    </>
   );
 }
 

@@ -49,6 +49,18 @@ describe('GlobalAnchorActionsTable', () => {
     }
   });
 
+  it('renders compact mobile header labels for pivoted rows', () => {
+    render(<GlobalAnchorActionsTable list={[createRow()]} IsRWLK={false} />);
+    for (const label of ['Datetime', 'Type', 'Token', 'Holder', 'NFTs']) {
+      expect(screen.getAllByText(label).length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('sets a medium-screen minimum width so the table can scroll instead of cramping', () => {
+    const { container } = render(<GlobalAnchorActionsTable list={[createRow()]} IsRWLK={false} />);
+    expect(container.querySelector('table')).toHaveClass('sm:min-w-[720px]');
+  });
+
   it('renders row data correctly', () => {
     render(<GlobalAnchorActionsTable list={[createRow()]} IsRWLK={false} />);
     expect(
@@ -59,7 +71,7 @@ describe('GlobalAnchorActionsTable', () => {
     expect(screen.getAllByText('5').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('displays Unstake for ActionType 1', () => {
+  it('displays Release for ActionType 1', () => {
     render(<GlobalAnchorActionsTable list={[createRow({ ActionType: 1 })]} IsRWLK={false} />);
     expect(screen.getAllByText('Release').length).toBeGreaterThanOrEqual(1);
   });
@@ -67,7 +79,18 @@ describe('GlobalAnchorActionsTable', () => {
   it('shows shortened anchorHolder address', () => {
     const addr = '0x1234567890abcdef1234567890abcdef12345678';
     render(<GlobalAnchorActionsTable list={[createRow({ StakerAddr: addr })]} IsRWLK={false} />);
-    expect(screen.getByText(shortenHex(addr, 6))).toBeInTheDocument();
+    const addressLink = screen.getByText(shortenHex(addr, 6)).closest('a');
+    expect(addressLink).toBeInTheDocument();
+    expect(addressLink).toHaveClass('break-all');
+    expect(addressLink).toHaveAttribute('href', `/user/${addr}`);
+  });
+
+  it('links RWLK token IDs to the RandomWalk detail site', () => {
+    render(<GlobalAnchorActionsTable list={[createRow({ TokenId: 99 })]} IsRWLK={true} />);
+    expect(screen.getByRole('link', { name: '99' })).toHaveAttribute(
+      'href',
+      'https://randomwalknft.com/detail/99',
+    );
   });
 
   it('renders only first page of results (perPage=5)', () => {

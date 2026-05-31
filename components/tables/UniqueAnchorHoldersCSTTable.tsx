@@ -13,11 +13,22 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
+  TableResponsiveHeaderLabel,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import type { UniqueAnchorHolderCST } from '@/services/api/types';
 
 export type { UniqueAnchorHolderCST };
+
+const responsiveHeaders = [
+  { desktop: 'Anchor-holder Address', mobile: 'Holder', align: 'left' as const },
+  { desktop: 'Num Anchor Actions', mobile: 'Anchors' },
+  { desktop: 'Num Release Actions', mobile: 'Releases' },
+  { desktop: 'Total Imprinted Tokens', mobile: 'Imprinted' },
+  { desktop: 'Total Anchored Tokens', mobile: 'Anchored' },
+  { desktop: 'Total Distribution (ETH)', mobile: 'Distributed', align: 'right' as const },
+  { desktop: 'Unretrieved Distribution (ETH)', mobile: 'Unretrieved', align: 'right' as const },
+];
 
 const UniqueAnchorHoldersCSTRow = ({ row }: { row: UniqueAnchorHolderCST }) => {
   if (!row) {
@@ -67,18 +78,14 @@ export const UniqueAnchorHoldersCSTTable = ({ list }: { list: UniqueAnchorHolder
   return (
     <>
       <TablePrimaryContainer>
-        <TablePrimary>
+        <TablePrimary className="sm:min-w-[860px] xl:min-w-0">
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Anchor-holder Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Num Anchor Actions</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Num Release Actions</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Imprinted Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Anchored Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Total Distribution (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">
-                Unretrieved Distribution (ETH)
-              </TablePrimaryHeadCell>
+              {responsiveHeaders.map((header) => (
+                <TablePrimaryHeadCell key={header.desktop} align={header.align}>
+                  <TableResponsiveHeaderLabel desktop={header.desktop} mobile={header.mobile} />
+                </TablePrimaryHeadCell>
+              ))}
             </Tr>
           </TablePrimaryHead>
           <tbody>

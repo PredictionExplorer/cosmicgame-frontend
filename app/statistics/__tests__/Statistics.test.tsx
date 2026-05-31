@@ -142,11 +142,26 @@ jest.mock('../../../components/statistics/StatisticsItem', () => ({
   CountdownRenderer: () => <span data-testid="countdown-renderer" />,
 }));
 jest.mock('../../../components/statistics/AnchoringSection', () => ({
-  AnchoringSection: () => (
+  AnchoringSection: ({
+    cstAnchorActions,
+    rwlkAnchorActions,
+  }: {
+    cstAnchorActions: { ActionType: number; ActionId: number | string }[] | null;
+    rwlkAnchorActions: { ActionType: number; ActionId: number | string }[] | null;
+  }) => (
     <div data-testid="anchoring-section">
       <span>Cosmic Signature NFT</span>
       <span>RandomWalk NFT</span>
-      <span>Number of Active Anchor-Holders</span>
+      <span>Number of Active Anchor-holders</span>
+      <span>Anchor / Release Actions</span>
+      {cstAnchorActions?.map((action) => (
+        <span key={`cst-${action.ActionId}`}>{action.ActionType === 0 ? 'Anchor' : 'Release'}</span>
+      ))}
+      {rwlkAnchorActions?.map((action) => (
+        <span key={`rwlk-${action.ActionId}`}>
+          RWLK {action.ActionType === 0 ? 'Anchor' : 'Release'}
+        </span>
+      ))}
     </div>
   ),
 }));
@@ -189,7 +204,11 @@ jest.mock('viem', () => ({
   formatEther: (v: bigint) => (Number(v) / 1e18).toString(),
 }));
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockUseCSTAnchorActions.mockReturnValue({ data: undefined });
+  mockUseRWLKAnchorActions.mockReturnValue({ data: undefined });
+});
 
 /* ── helpers ────────────────────────────────────────────────────── */
 
@@ -373,8 +392,47 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    const activeAnchorHoldersLabels = screen.getAllByText('Number of Active Anchor-Holders');
+    const activeAnchorHoldersLabels = screen.getAllByText('Number of Active Anchor-holders');
     expect(activeAnchorHoldersLabels.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('passes anchor-action data into the anchoring section', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    mockUseCSTAnchorActions.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 1,
+          ActionId: 10,
+          TimeStamp: 1701346718,
+          ActionType: 0,
+          TokenId: 42,
+          StakerAddr: '0x1234567890abcdef1234567890abcdef12345678',
+          NumStakedNFTs: 5,
+        },
+      ],
+    });
+    mockUseRWLKAnchorActions.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 2,
+          ActionId: 11,
+          TimeStamp: 1701346718,
+          ActionType: 1,
+          TokenId: 99,
+          StakerAddr: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+          NumStakedNFTs: 2,
+        },
+      ],
+    });
+
+    render(<Statistics />);
+    expect(screen.getByText('Anchor / Release Actions')).toBeInTheDocument();
+    expect(screen.getByText('Anchor')).toBeInTheDocument();
+    expect(screen.getByText('RWLK Release')).toBeInTheDocument();
   });
 
   it('shows "no attached NFTs" message when list is empty', () => {

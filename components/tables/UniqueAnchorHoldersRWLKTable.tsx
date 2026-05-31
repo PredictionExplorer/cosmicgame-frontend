@@ -9,12 +9,21 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
+  TableResponsiveHeaderLabel,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 import type { UniqueAnchorHolderRWLK } from '@/services/api/types';
 
 export type { UniqueAnchorHolderRWLK };
+
+const responsiveHeaders = [
+  { desktop: 'Anchor-holder Address', mobile: 'Holder', align: 'left' as const },
+  { desktop: 'Num Anchor Actions', mobile: 'Anchors' },
+  { desktop: 'Num Release Actions', mobile: 'Releases' },
+  { desktop: 'Total Anchored Tokens', mobile: 'Anchored' },
+  { desktop: 'Total Imprinted Tokens', mobile: 'Imprinted' },
+];
 
 const UniqueAnchorHoldersRWLKRow = ({ row }: { row: UniqueAnchorHolderRWLK }) => {
   if (!row) {
@@ -53,14 +62,14 @@ export const UniqueAnchorHoldersRWLKTable = ({ list }: { list: UniqueAnchorHolde
   return (
     <>
       <TablePrimaryContainer>
-        <TablePrimary>
+        <TablePrimary className="sm:min-w-[720px] xl:min-w-0">
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Anchor-holder Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Num Anchor Actions</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Num Release Actions</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Anchored Tokens</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Total Imprinted Tokens</TablePrimaryHeadCell>
+              {responsiveHeaders.map((header) => (
+                <TablePrimaryHeadCell key={header.desktop} align={header.align}>
+                  <TableResponsiveHeaderLabel desktop={header.desktop} mobile={header.mobile} />
+                </TablePrimaryHeadCell>
+              ))}
             </Tr>
           </TablePrimaryHead>
           <tbody>

@@ -142,26 +142,31 @@
   .responsiveTable td.pivoted {
     padding-top: 10px;
     padding-bottom: 10px;
-    padding-left: 110px !important;
+    padding-left: clamp(6.25rem, 32vw, 7.5rem) !important;
+    padding-right: 10px !important;
     font-weight: 400;
     font-size: 13px;
     width: 100%;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
   .responsiveTable td .tdBefore {
     top: 0;
     left: 0 !important;
     bottom: 0;
-    width: 100px !important;
+    width: clamp(5.5rem, 30vw, 6.75rem) !important;
     background-color: rgba(255, 255, 255, 0.06);
     color: rgba(255, 255, 255, 0.5);
     font-weight: 500 !important;
     font-size: 10px;
+    line-height: 1.25;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 10px 8px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    overflow-wrap: anywhere;
   }
 }
 

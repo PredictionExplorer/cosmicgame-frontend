@@ -13,10 +13,18 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
+  TableResponsiveHeaderLabel,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
 import type { AnchoredTokenInfo } from '@/services/api';
+
+const responsiveHeaders = [
+  { desktop: 'Anchor Datetime', mobile: 'Datetime', align: 'left' as const },
+  { desktop: 'Action ID', mobile: 'Action' },
+  { desktop: 'Token ID', mobile: 'Token' },
+  { desktop: 'Anchor-holder Address', mobile: 'Holder' },
+];
 
 interface GlobalAnchoredTokensRowProps {
   row: AnchoredTokenInfo;
@@ -83,13 +91,14 @@ export const GlobalAnchoredTokensTable: FC<GlobalAnchoredTokensTableProps> = ({ 
   return (
     <>
       <TablePrimaryContainer>
-        <TablePrimary>
+        <TablePrimary className="sm:min-w-[640px] lg:min-w-0">
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Anchor Datetime</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Action ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Anchor-holder Address</TablePrimaryHeadCell>
+              {responsiveHeaders.map((header) => (
+                <TablePrimaryHeadCell key={header.desktop} align={header.align}>
+                  <TableResponsiveHeaderLabel desktop={header.desktop} mobile={header.mobile} />
+                </TablePrimaryHeadCell>
+              ))}
             </Tr>
           </TablePrimaryHead>
 
