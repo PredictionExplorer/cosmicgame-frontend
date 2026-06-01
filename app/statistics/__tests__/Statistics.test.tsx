@@ -1,6 +1,6 @@
 // lexicon-allow-start: test descriptions cover legacy UI wording
 
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, render, screen, within } from '@/test-utils';
 
 import Statistics from '../Statistics';
 
@@ -218,6 +218,7 @@ const makeDashboardData = (overrides = {}) => ({
   LastBidderAddr: '0xBidder',
   GestureCostEth: 0.01,
   PrizeAmountEth: 1.5,
+  StakingAmountEth: 4.2,
   PrizeClaimTs: 0,
   TsRoundStart: Math.floor(Date.now() / 1000) - 3600,
   TotalPrizes: 12,
@@ -345,6 +346,52 @@ describe('Statistics', () => {
     expect(screen.getByRole('link', { name: /current cycle data/ })).toHaveAttribute(
       'href',
       '/current-cycle',
+    );
+  });
+
+  it('promotes anchoring totals near the top of the page', () => {
+    const dashboardData = makeDashboardData();
+    mockUseDashboardInfo.mockReturnValue({
+      data: {
+        ...dashboardData,
+        StakingAmountEth: 4.2,
+        MainStats: {
+          ...dashboardData.MainStats,
+          StakeStatisticsCST: {
+            ...dashboardData.MainStats.StakeStatisticsCST,
+            NumActiveStakers: 6,
+            TotalTokensStaked: 42,
+          },
+          StakeStatisticsRWalk: {
+            ...dashboardData.MainStats.StakeStatisticsRWalk,
+            NumActiveStakers: 4,
+            TotalTokensStaked: 7,
+          },
+        },
+      },
+      isLoading: false,
+      isError: false,
+    });
+
+    render(<Statistics />);
+
+    const snapshot = within(screen.getByTestId('anchoring-at-a-glance'));
+    expect(
+      snapshot.getByRole('heading', { name: 'Anchoring at a Glance', level: 3 }),
+    ).toBeInTheDocument();
+    expect(snapshot.getByText('Cosmic Signature NFTs Anchored')).toBeInTheDocument();
+    expect(snapshot.getByText('42')).toBeInTheDocument();
+    expect(snapshot.getByText('RandomWalk NFTs Anchored')).toBeInTheDocument();
+    expect(snapshot.getByText('7')).toBeInTheDocument();
+    expect(snapshot.getByText('Anchor Distribution Pool')).toBeInTheDocument();
+    expect(snapshot.getByText('4.2000 ETH')).toBeInTheDocument();
+    expect(snapshot.getByText('Distribution per CST NFT')).toBeInTheDocument();
+    expect(snapshot.getByText('0.100000 ETH')).toBeInTheDocument();
+    expect(snapshot.getByText('Active Anchor-holders')).toBeInTheDocument();
+    expect(snapshot.getByText('10')).toBeInTheDocument();
+    expect(snapshot.getByRole('link', { name: /view anchor history/i })).toHaveAttribute(
+      'href',
+      '/anchoring',
     );
   });
 
@@ -504,16 +551,16 @@ describe('Statistics', () => {
     expect(screen.getByTestId('cst-total-supply-history-section')).toBeInTheDocument();
   });
 
-  it('renders anchoring section with stat cards', () => {
+  it('renders the detailed anchoring drill-down below the promoted snapshot', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Active Cosmic Signature NFT Anchor-holders')).toBeInTheDocument();
-    expect(screen.getByText('Active RWLK Anchor-holders')).toBeInTheDocument();
-    expect(screen.getByText('Total Anchor Distributions')).toBeInTheDocument();
+    expect(screen.getByText('Anchoring')).toBeInTheDocument();
+    expect(screen.getByText(/inspect anchor\/release actions/)).toBeInTheDocument();
+    expect(screen.getByTestId('anchoring-section')).toBeInTheDocument();
   });
 
   it('renders system events section divider', () => {

@@ -20,6 +20,7 @@ import {
 
 import { formatCSTValue, formatEthValue } from '@/utils';
 
+import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { StatCard } from '@/components/ui/stat-card';
@@ -63,6 +64,10 @@ import { AnchoringSection } from '@/components/statistics/AnchoringSection';
 import { DonatedNFTsGrid } from '@/components/statistics/DonatedNFTsGrid';
 import { DonatedTokensSection } from '@/components/home/DonatedTokensSection';
 import { BiddingActivitySection } from '@/components/statistics/BiddingActivitySection';
+import {
+  AnchoringHeroStats,
+  type AnchoringStatItem,
+} from '@/components/anchoring/AnchoringHeroStats';
 import type { UniqueAnchorHolderCST } from '@/components/tables/UniqueAnchorHoldersCSTTable';
 import type { UniqueAnchorHolderRWLK } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
 
@@ -142,6 +147,57 @@ const Statistics = () => {
     );
   }
 
+  const cstAnchorStats = data.MainStats.StakeStatisticsCST;
+  const rwlkAnchorStats = data.MainStats.StakeStatisticsRWalk;
+  const distributionPerCst = formatDistributionPerAnchoredNftEth(
+    data.StakingAmountEth,
+    cstAnchorStats.TotalTokensStaked,
+  );
+  const totalActiveAnchorHolders =
+    cstAnchorStats.NumActiveStakers + rwlkAnchorStats.NumActiveStakers;
+
+  const anchoringSnapshotStats: AnchoringStatItem[] = [
+    {
+      label: 'Cosmic Signature NFTs Anchored',
+      value: cstAnchorStats.TotalTokensStaked.toLocaleString(),
+      tooltip:
+        'Total number of Cosmic Signature NFTs currently anchored in the protocol and sharing Anchor Distributions.',
+      icon: <Lock className="h-4 w-4" />,
+      featured: true,
+    },
+    {
+      label: 'RandomWalk NFTs Anchored',
+      value: rwlkAnchorStats.TotalTokensStaked.toLocaleString(),
+      tooltip:
+        'Total number of RandomWalk NFTs currently anchored and eligible for Anchored-NFT Stellar Selection.',
+      icon: <Activity className="h-4 w-4" />,
+      featured: true,
+    },
+    {
+      label: 'Anchor Distribution Pool',
+      value: formatEthValue(data.StakingAmountEth ?? 0),
+      tooltip:
+        'ETH currently allocated to the Anchor Distribution pool for Cosmic Signature NFT anchor-holders.',
+      icon: <Coins className="h-4 w-4" />,
+      gradient: true,
+    },
+    {
+      label: 'Distribution per CST NFT',
+      value: distributionPerCst.value,
+      tooltip:
+        'Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.' +
+        distributionPerCst.tooltipSuffix,
+      icon: <TrendingUp className="h-4 w-4" />,
+    },
+    {
+      label: 'Active Anchor-holders',
+      value: totalActiveAnchorHolders.toLocaleString(),
+      tooltip:
+        'Combined active wallets currently anchoring at least one Cosmic Signature NFT or RandomWalk NFT.',
+      icon: <Users className="h-4 w-4" />,
+    },
+  ];
+
   return (
     <>
       <PageHeader
@@ -186,6 +242,41 @@ const Statistics = () => {
       </Surface>
 
       {/* 1 \u2500\u2500 Hero Stat Cards \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */}
+      <Surface
+        variant="gradient-border-accent"
+        radius="xl"
+        padding="lg"
+        className="mb-12"
+        data-testid="anchoring-at-a-glance"
+      >
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <SectionEyebrow tone="impact" className="mb-3">
+              Anchoring · Live
+            </SectionEyebrow>
+            <h3 className="text-2xl font-semibold tracking-tight text-white">
+              Anchoring at a Glance
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Anchored tokens are a core part of Cosmic Signature: CST NFTs share ETH Anchor
+              Distributions, while RandomWalk NFTs participate in Anchored-NFT Stellar Selection.
+            </p>
+          </div>
+          <Link
+            href="/anchoring"
+            className="group inline-flex items-center gap-2 self-start rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary no-underline transition-colors hover:border-primary/45 hover:bg-primary/15 lg:self-auto"
+          >
+            View anchor history
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+
+        <AnchoringHeroStats
+          stats={anchoringSnapshotStats}
+          className="mt-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5"
+        />
+      </Surface>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-12">
         <StatCard
           label="Total Cycles"
@@ -514,34 +605,17 @@ const Statistics = () => {
         <div>
           <SectionDivider title="Anchoring" className="mb-6" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-8">
-            <StatCard
-              label="Active Cosmic Signature NFT Anchor-holders"
-              value={data.MainStats.StakeStatisticsCST.NumActiveStakers}
-              icon={<Lock className="h-4 w-4" />}
-              tooltip="Wallets currently anchoring at least one Cosmic Signature NFT"
-              featured
-            />
-            <StatCard
-              label="Active RWLK Anchor-holders"
-              value={data.MainStats.StakeStatisticsRWalk.NumActiveStakers}
-              icon={<Activity className="h-4 w-4" />}
-              tooltip="Wallets currently anchoring at least one RandomWalk NFT"
-              featured
-            />
-            <StatCard
-              label="Total Anchor Distributions"
-              value={formatEthValue(data.MainStats.StakeStatisticsCST.TotalRewardEth ?? 0)}
-              icon={<TrendingUp className="h-4 w-4" />}
-              tooltip="Total ETH distributed to Cosmic Signature NFT anchor-holders"
-              gradient
-            />
-          </div>
+          <Surface variant="glass" radius="lg" padding="md" className="mb-6">
+            <p className="text-sm leading-6 text-muted-foreground">
+              Use the tabs below to inspect anchor/release actions, currently anchored tokens, and
+              the unique wallets behind the global anchoring totals.
+            </p>
+          </Surface>
 
           <div className="gradient-border-card rounded-xl bg-white/[0.02] p-1">
             <AnchoringSection
-              cstStats={data.MainStats.StakeStatisticsCST}
-              rwlkStats={data.MainStats.StakeStatisticsRWalk}
+              cstStats={cstAnchorStats}
+              rwlkStats={rwlkAnchorStats}
               cstAnchorActions={cstAnchorActions}
               rwlkAnchorActions={rwlkAnchorActions}
               anchoredCSTokens={anchoredCSTokens}
