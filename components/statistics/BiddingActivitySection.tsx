@@ -3,6 +3,8 @@
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
 import { BarChart3, Flame, Users } from 'lucide-react';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import { SectionDivider } from '@/components/ui/section-divider';
 import { CollapsibleSection } from '@/components/statistics/CollapsibleSection';
 import { BidFrequencyChart } from '@/components/statistics/BidFrequencyChart';
@@ -18,7 +20,7 @@ export function BiddingActivitySection() {
       <div className="space-y-4">
         <CollapsibleSection
           title="Gesture Frequency Over Time"
-          description="Indexed gesture counts grouped over time to show protocol activity patterns."
+          tooltip={statisticsCopy.sections.gestureFrequency}
           icon={<BarChart3 className="h-3.5 w-3.5" />}
           defaultOpen
         >
@@ -27,7 +29,7 @@ export function BiddingActivitySection() {
 
         <CollapsibleSection
           title="Gesture Spikes"
-          description="Periods where gesture activity changed quickly compared with surrounding activity."
+          tooltip={statisticsCopy.sections.gestureSpikes}
           icon={<Flame className="h-3.5 w-3.5" />}
           defaultOpen
         >
@@ -36,7 +38,7 @@ export function BiddingActivitySection() {
 
         <CollapsibleSection
           title="Top 20 Participant Active Periods"
-          description="The longest indexed active participation windows for the most active wallets."
+          tooltip={statisticsCopy.sections.participantActivePeriods}
           icon={<Users className="h-3.5 w-3.5" />}
           defaultOpen
         >

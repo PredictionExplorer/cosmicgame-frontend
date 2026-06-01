@@ -319,28 +319,28 @@ const Statistics = () => {
               tooltip={statisticsCopy.groups.allocationEconomy}
             >
               <StatisticsItem
-                title="Num Allocations Distributed"
+                title={statisticsCopy.metrics.numAllocationsDistributed.label}
                 value={
                   <Link href="/allocation" className="text-inherit">
                     {totalAllocationsDistributed as ReactNode}
                   </Link>
                 }
-                tooltip="COUNT(*) from cg_prize when available; otherwise aggregated recipient allocation counts"
+                tooltip={statisticsCopy.metrics.numAllocationsDistributed.tooltip}
               />
               <StatisticsItem
-                title="Total Signature Allocations Distributed"
+                title={statisticsCopy.metrics.totalSignatureAllocationsDistributed.label}
                 value={formatEthValue(Number(data.TotalPrizesPaidAmountEth) || 0)}
-                tooltip="Total ETH distributed as Signature Allocations to cycle recipients"
+                tooltip={statisticsCopy.metrics.totalSignatureAllocationsDistributed.tooltip}
               />
               <StatisticsItem
-                title="Stellar Selection ETH Deposited"
+                title={statisticsCopy.metrics.stellarSelectionEthDeposited.label}
                 value={formatEthValue(data.MainStats.TotalRaffleEthDeposits)}
-                tooltip="Total ETH allocated to Stellar Selection pools across all cycles"
+                tooltip={statisticsCopy.metrics.stellarSelectionEthDeposited.tooltip}
               />
               <StatisticsItem
-                title="Stellar Selection ETH Retrieved"
+                title={statisticsCopy.metrics.stellarSelectionEthRetrieved.label}
                 value={formatEthValue(data.MainStats.TotalRaffleEthWithdrawn)}
-                tooltip="Total ETH retrieved by recipients from Stellar Selection pools"
+                tooltip={statisticsCopy.metrics.stellarSelectionEthRetrieved.tooltip}
               />
               {(data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0) > 0 && (
                 <p className="text-sm text-primary mt-2">{`${data.MainStats.NumWinnersWithPendingRaffleWithdrawal} recipients have yet to retrieve funds totaling ${formatEthValue(data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn)} ETH`}</p>
@@ -420,9 +420,9 @@ const Statistics = () => {
               tooltip={statisticsCopy.groups.publicGoods}
             >
               <StatisticsItem
-                title="Public Goods Balance"
+                title={statisticsCopy.metrics.publicGoodsBalance.label}
                 value={formatEthValue(Number(data.CharityBalanceEth) || 0)}
-                tooltip="ETH allocated to the Public Goods Beneficiary, accumulated from protocol flows"
+                tooltip={statisticsCopy.metrics.publicGoodsBalance.tooltip}
               />
               <StatisticsItem
                 title="Protocol Contract Balance"
@@ -439,7 +439,7 @@ const Statistics = () => {
                 tooltip={statisticsCopy.metrics.attachedNfts.tooltip}
               />
               <StatisticsItem
-                title="Total Contributed ETH"
+                title={statisticsCopy.metrics.totalContributedEth.label}
                 value={
                   <Link
                     className="text-inherit"
@@ -450,53 +450,56 @@ const Statistics = () => {
                     {formatEthValue(data.MainStats.TotalEthDonatedAmountEth ?? 0)}
                   </Link>
                 }
-                tooltip="Total ETH contributed to the protocol across all cycles"
+                tooltip={statisticsCopy.metrics.totalContributedEth.tooltip}
               />
               {(data.MainStats.NumCosmicGameDonations ?? 0) > 0 && (
                 <>
                   <StatisticsItem
-                    title="Protocol Contributions"
+                    title={statisticsCopy.metrics.protocolContributions.label}
                     value={
                       <Link className="text-inherit" href="/public-goods-contributions-cg">
                         {data.MainStats.NumCosmicGameDonations}
                       </Link>
                     }
+                    tooltip={statisticsCopy.metrics.protocolContributions.tooltip}
                   />
                   <StatisticsItem
-                    title="Protocol Contributions Sum"
+                    title={statisticsCopy.metrics.protocolContributionsSum.label}
                     value={
                       <Link className="text-inherit" href="/public-goods-contributions-cg">
                         {formatEthValue(data.MainStats.SumCosmicGameDonationsEth ?? 0)}
                       </Link>
                     }
+                    tooltip={statisticsCopy.metrics.protocolContributionsSum.tooltip}
                   />
                 </>
               )}
               {(Number(data.SumVoluntaryDonationsEth) || 0) > 0 && (
                 <StatisticsItem
-                  title="Voluntary Contributions"
+                  title={statisticsCopy.metrics.voluntaryContributions.label}
                   value={
                     <Link className="text-inherit" href="/public-goods-contributions-voluntary">
                       {`${data.NumVoluntaryDonations} totaling ${(Number(data.SumVoluntaryDonationsEth) || 0).toFixed(4)} ETH`}
                     </Link>
                   }
-                  tooltip="Contributions made voluntarily by community members"
+                  tooltip={statisticsCopy.metrics.voluntaryContributions.tooltip}
                 />
               )}
               {(data.MainStats.NumWithdrawals ?? 0) > 0 && (
                 <StatisticsItem
-                  title="Public Goods Retrievals"
+                  title={statisticsCopy.metrics.publicGoodsRetrievals.label}
                   value={
                     <Link className="text-inherit" href="/public-goods-retrievals">
                       {data.MainStats.NumWithdrawals}
                     </Link>
                   }
+                  tooltip={statisticsCopy.metrics.publicGoodsRetrievals.tooltip}
                 />
               )}
               <StatisticsItem
-                title="Total Public Goods Retrieved"
+                title={statisticsCopy.metrics.totalPublicGoodsRetrieved.label}
                 value={formatEthValue(data.MainStats.SumWithdrawals ?? 0)}
-                tooltip="Total ETH retrieved from the Public Goods Vault"
+                tooltip={statisticsCopy.metrics.totalPublicGoodsRetrieved.tooltip}
               />
             </StatisticsGroup>
           </div>
@@ -534,13 +537,25 @@ const Statistics = () => {
           </div>
 
           <div className="space-y-8">
-            <CollapsibleSection title="Unique Participants" defaultOpen>
+            <CollapsibleSection
+              title="Unique Participants"
+              tooltip={statisticsCopy.sections.uniqueParticipants}
+              defaultOpen
+            >
               <UniqueParticipantsTable list={uniqueParticipants} />
             </CollapsibleSection>
-            <CollapsibleSection title="Unique Recipients" defaultOpen>
+            <CollapsibleSection
+              title="Unique Recipients"
+              tooltip={statisticsCopy.sections.uniqueRecipients}
+              defaultOpen
+            >
               <UniqueRecipientsTable list={uniqueRecipients} />
             </CollapsibleSection>
-            <CollapsibleSection title="Unique ETH Contributors" defaultOpen>
+            <CollapsibleSection
+              title="Unique ETH Contributors"
+              tooltip={statisticsCopy.sections.uniqueEthContributors}
+              defaultOpen
+            >
               <UniqueEthDonorsTable list={uniqueDonors} />
             </CollapsibleSection>
           </div>
@@ -576,7 +591,7 @@ const Statistics = () => {
           <div className="space-y-8">
             <CollapsibleSection
               title="Attached Token Distribution"
-              description={statisticsCopy.sections.attachedTokenDistribution}
+              tooltip={statisticsCopy.sections.attachedTokenDistribution}
               defaultOpen={false}
               icon={<Gift className="h-3.5 w-3.5" />}
             >
@@ -584,14 +599,14 @@ const Statistics = () => {
             </CollapsibleSection>
             <CollapsibleSection
               title="Cosmic Signature Token (ERC-721)"
-              description={statisticsCopy.sections.cosmicSignatureTokenDistribution}
+              tooltip={statisticsCopy.sections.cosmicSignatureTokenDistribution}
               icon={<Layers className="h-3.5 w-3.5" />}
             >
               <CSTokenDistributionTable list={cstDistribution} />
             </CollapsibleSection>
             <CollapsibleSection
               title="CST (ERC-20) Balance Distribution"
-              description={statisticsCopy.sections.cstBalanceDistribution}
+              tooltip={statisticsCopy.sections.cstBalanceDistribution}
               icon={<Coins className="h-3.5 w-3.5" />}
             >
               <CTBalanceDistributionChart list={ctBalanceDistribution} />
@@ -601,7 +616,7 @@ const Statistics = () => {
             </CollapsibleSection>
             <CollapsibleSection
               title="CST Total Supply"
-              description={statisticsCopy.sections.cstTotalSupply}
+              tooltip={statisticsCopy.sections.cstTotalSupply}
               icon={<TrendingUp className="h-3.5 w-3.5" />}
               defaultOpen
             >
@@ -657,7 +672,7 @@ const Statistics = () => {
         </div>
         <CollapsibleSection
           title="Cycle Activations"
-          description={statisticsCopy.sections.cycleActivations}
+          tooltip={statisticsCopy.sections.cycleActivations}
           defaultOpen={false}
           icon={<Activity className="h-3.5 w-3.5" />}
         >

@@ -130,16 +130,17 @@ describe('GameConfiguration tooltips', () => {
   ];
 
   function openTooltipNextTo(label: string): HTMLElement {
-    // The InfoTooltip renders an accessible button labelled "Show more
-    // information" right next to its label inside a flex row. Anchor the lookup
-    // on the label, then walk up to the row and find the trigger so we exercise
-    // the actual UX (label-tooltip pairing) rather than relying on order.
+    // Anchor the lookup on the label, then walk up to the row and find the
+    // trigger so we exercise the actual UX (label-tooltip pairing) rather than
+    // relying on order.
     const labelNode = screen.getByText(label);
     const row = labelNode.parentElement;
     if (!row) {
       throw new Error(`Could not find tooltip row for label "${label}"`);
     }
-    const trigger = row.querySelector<HTMLElement>('button[aria-label="Show more information"]');
+    const trigger = row.querySelector<HTMLElement>(
+      'button[aria-label="Show more information"], button[aria-label^="More information about"]',
+    );
     if (!trigger) {
       throw new Error(`Could not find tooltip trigger next to label "${label}"`);
     }
@@ -162,7 +163,7 @@ describe('GameConfiguration tooltips', () => {
 
   it('exposes one accessible tooltip trigger per stat card', () => {
     render(<GameConfiguration {...defaultProps} />);
-    const triggers = screen.getAllByRole('button', { name: 'Show more information' });
+    const triggers = screen.getAllByRole('button', { name: /information/i });
     expect(triggers).toHaveLength(STAT_TOOLTIPS.length);
   });
 

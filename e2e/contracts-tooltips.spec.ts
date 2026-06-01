@@ -87,17 +87,18 @@ async function dismissOpenTooltips(page: Page): Promise<void> {
 
 /**
  * Given a card label, returns the trigger button that opens its tooltip. Each
- * label lives inline with its `InfoTooltip` trigger inside a flex row, so
- * going up one DOM level from the label and finding the
- * `[aria-label="Show more information"]` button within the same row pairs the
- * label with its tooltip the way a sighted user would.
+ * label lives inline with its `InfoTooltip` trigger inside a flex row, so going
+ * up one DOM level from the label and finding the contextual info button within
+ * the same row pairs the label with its tooltip the way a sighted user would.
  */
 function tooltipTriggerForLabel(page: Page, label: string): Locator {
   return page
     .getByText(label, { exact: true })
     .first()
     .locator('xpath=..')
-    .locator('button[aria-label="Show more information"]')
+    .locator(
+      'button[aria-label="Show more information"], button[aria-label^="More information about"]',
+    )
     .first();
 }
 
@@ -199,13 +200,13 @@ test.describe('/contracts tooltips', () => {
     expect(popperContext.wrapperHeight).toBeGreaterThan(10);
   });
 
-  test('every "Show more information" button on the page has a working tooltip', async ({
-    page,
-  }) => {
+  test('every information button on the page has a working tooltip', async ({ page }) => {
     // Bound the test by counting triggers on the page. We loop a max of N to
     // keep the test from running forever if the page grows; we just want a
     // sanity-check that no trigger silently fails to open.
-    const triggers = page.getByRole('button', { name: 'Show more information' });
+    const triggers = page.locator(
+      'button[aria-label="Show more information"], button[aria-label^="More information about"]',
+    );
     const count = await triggers.count();
     expect(count, 'expected at least one tooltip trigger on /contracts').toBeGreaterThan(0);
 

@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { Sparkles } from 'lucide-react';
+import userEvent from '@testing-library/user-event';
 
 import { StatCard, StatCardSkeleton } from '@/components/ui/stat-card';
 
@@ -45,6 +46,17 @@ describe('StatCard', () => {
       />,
     );
     expect(screen.getByText(/-4\.0%/)).toBeInTheDocument();
+  });
+
+  it('opens a contextual tooltip when provided', async () => {
+    const user = userEvent.setup();
+    render(<StatCard label="Contract Balance" value="1 ETH" tooltip="ETH held by the contract." />);
+
+    await user.hover(
+      screen.getByRole('button', { name: 'More information about Contract Balance' }),
+    );
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('ETH held by the contract.');
   });
 
   it('has no accessibility violations', async () => {

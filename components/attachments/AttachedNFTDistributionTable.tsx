@@ -3,6 +3,8 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { useMemo, useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -12,6 +14,7 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 
 const PER_PAGE = 5;
 
@@ -42,8 +45,18 @@ const DonatedNFTDistributionTable: FC<NFTDistributionTableProps> = ({ list }) =>
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Contract Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Number of NFTs</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                <TableHeaderHelp
+                  desktop="Contract Address"
+                  tooltip={statisticsCopy.tables.attachedNftContractAddress}
+                />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                <TableHeaderHelp
+                  desktop="Number of NFTs"
+                  tooltip={statisticsCopy.tables.attachedNftCount}
+                />
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

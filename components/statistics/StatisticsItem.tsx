@@ -14,7 +14,7 @@ export const StatisticsItem = ({ title, value, tooltip }: StatisticsItemProps) =
   <div className="rounded-lg px-3 py-2.5 transition-colors hover:bg-white/[0.03]">
     <p className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
       <span>{title}</span>
-      {tooltip && <InfoTooltip content={tooltip} />}
+      {tooltip && <InfoTooltip content={tooltip} label={title} />}
     </p>
     <p className="text-sm font-semibold">{value}</p>
   </div>

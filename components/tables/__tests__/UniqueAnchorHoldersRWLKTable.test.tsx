@@ -34,7 +34,7 @@ describe('UniqueAnchorHoldersRWLKTable', () => {
   it('adds help triggers to RandomWalk anchor-holder headers', () => {
     render(<UniqueAnchorHoldersRWLKTable list={[createAnchorHolder()]} />);
     expect(
-      screen.getAllByRole('button', { name: 'Show more information' }).length,
+      screen.getAllByRole('button', { name: /^Explain column:/ }).length,
     ).toBeGreaterThanOrEqual(5);
     expect(statisticsCopy.tables.totalAnchoredTokens).toMatch(/anchored-token/);
   });

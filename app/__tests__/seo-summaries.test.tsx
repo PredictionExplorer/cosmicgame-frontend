@@ -153,8 +153,23 @@ describe('server-visible SEO summaries', () => {
     expect(
       screen.getByText(statisticsCopy.metrics.cosmicSignatureNftsImprinted.label),
     ).toBeInTheDocument();
+    for (const metric of [
+      statisticsCopy.metrics.activePerformanceCycle,
+      statisticsCopy.metrics.activeCycleGestures,
+      statisticsCopy.metrics.contractBalance,
+      statisticsCopy.metrics.cosmicSignatureNftsImprinted,
+    ]) {
+      expect(screen.getByText(metric.seoDescription)).toBeInTheDocument();
+    }
     expect(
-      screen.getByText(statisticsCopy.metrics.cosmicSignatureNftsImprinted.seoDescription),
+      screen.getByRole('button', {
+        name: `More information about ${statisticsCopy.metrics.activePerformanceCycle.label}`,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: `More information about ${statisticsCopy.metrics.cosmicSignatureNftsImprinted.label}`,
+      }),
     ).toBeInTheDocument();
   });
 

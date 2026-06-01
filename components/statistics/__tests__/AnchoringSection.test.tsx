@@ -54,9 +54,18 @@ jest.mock('../StatisticsGroup', () => ({
   ),
 }));
 jest.mock('../CollapsibleSection', () => ({
-  CollapsibleSection: ({ title, children }: { title: string; children: React.ReactNode }) => (
+  CollapsibleSection: ({
+    title,
+    children,
+    tooltip,
+  }: {
+    title: string;
+    children: React.ReactNode;
+    tooltip?: string;
+  }) => (
     <div data-testid="collapsible-section">
       <span>{title}</span>
+      {tooltip && <span data-testid="section-tooltip">{tooltip}</span>}
       {children}
     </div>
   ),
@@ -160,6 +169,17 @@ describe('AnchoringSection', () => {
   it('explains anchoring overview groups', () => {
     render(<AnchoringSection {...defaultProps} />);
     expect(screen.getByText(statisticsCopy.anchoring.cstGroup)).toBeInTheDocument();
+  });
+
+  it('explains anchoring drill-down collapsibles', () => {
+    render(<AnchoringSection {...defaultProps} />);
+    expect(
+      screen.getAllByText(statisticsCopy.sections.anchorReleaseActions).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getAllByText(statisticsCopy.sections.anchoredTokens).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(statisticsCopy.sections.uniqueAnchorHolders).length).toBeGreaterThan(
+      0,
+    );
   });
 
   it('has no accessibility violations', async () => {

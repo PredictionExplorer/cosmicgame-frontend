@@ -1,12 +1,8 @@
+import userEvent from '@testing-library/user-event';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { StatisticsItem, CountdownRenderer } from '../StatisticsItem';
-
-jest.mock('../../ui/info-tooltip', () => ({
-  InfoTooltip: ({ content }: { content: string }) => (
-    <span data-testid="info-tooltip">{content}</span>
-  ),
-}));
 
 describe('StatisticsItem', () => {
   it('renders title and value', () => {
@@ -25,15 +21,18 @@ describe('StatisticsItem', () => {
     expect(screen.getByText('42')).toBeInTheDocument();
   });
 
-  it('renders tooltip when provided', () => {
+  it('opens a contextual tooltip when provided', async () => {
+    const user = userEvent.setup();
     render(<StatisticsItem title="Balance" value="1.5 ETH" tooltip="Total ETH in contract" />);
-    expect(screen.getByTestId('info-tooltip')).toBeInTheDocument();
-    expect(screen.getByText('Total ETH in contract')).toBeInTheDocument();
+
+    await user.hover(screen.getByRole('button', { name: 'More information about Balance' }));
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Total ETH in contract');
   });
 
   it('does not render tooltip when not provided', () => {
     render(<StatisticsItem title="Count" value={42} />);
-    expect(screen.queryByTestId('info-tooltip')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /more information/i })).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

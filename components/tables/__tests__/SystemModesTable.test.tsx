@@ -40,7 +40,7 @@ describe('SystemModesTable', () => {
   it('adds help triggers to system event headers', () => {
     render(<SystemModesTable list={[createEvent()]} />);
     expect(
-      screen.getAllByRole('button', { name: 'Show more information' }).length,
+      screen.getAllByRole('button', { name: /^Explain column:/ }).length,
     ).toBeGreaterThanOrEqual(3);
     expect(statisticsCopy.tables.systemEnded).toMatch(/replaced/);
   });

@@ -103,10 +103,12 @@ describe('CollapsibleSection', () => {
       </CollapsibleSection>,
     );
 
-    const toggle = screen.getByRole('button', { name: /Cycle Activations/i });
+    const toggle = screen.getByRole('button', { name: 'Cycle Activations' });
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
 
-    await user.hover(screen.getByRole('button', { name: 'Show more information' }));
+    await user.hover(
+      screen.getByRole('button', { name: 'More information about Cycle Activations' }),
+    );
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent('System event windows.');
     expect(toggle).toHaveAttribute('aria-expanded', 'true');

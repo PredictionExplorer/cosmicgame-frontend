@@ -93,7 +93,7 @@ export function StatCard({
       <div className="relative z-[1] flex items-start justify-between gap-2">
         <div className="flex items-center gap-1.5">
           <p className="type-eyebrow text-muted-foreground print:!text-foreground/80">{label}</p>
-          {tooltip ? <InfoTooltip content={tooltip} /> : null}
+          {tooltip ? <InfoTooltip content={tooltip} label={label} /> : null}
         </div>
         {icon ? (
           <div

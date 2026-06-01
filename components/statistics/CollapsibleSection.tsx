@@ -65,7 +65,9 @@ export function CollapsibleSection({
             )}
           />
         </button>
-        {tooltip ? <InfoTooltip content={tooltip} className="mt-0.5 shrink-0" /> : null}
+        {tooltip ? (
+          <InfoTooltip content={tooltip} label={title} className="mt-0.5 shrink-0" />
+        ) : null}
       </div>
       <div
         className={cn(

@@ -1,5 +1,16 @@
 export const statisticsCopy = {
   metrics: {
+    activePerformanceCycle: {
+      label: 'Active Performance Cycle',
+      tooltip: 'The current Performance Cycle number indexed by the public Cosmic Signature API.',
+      seoDescription:
+        'Current Performance Cycle number indexed from Cosmic Signature activity on Arbitrum.',
+    },
+    activeCycleGestures: {
+      label: 'Active Cycle Gestures',
+      tooltip: 'Number of indexed gestures made in the active Performance Cycle so far.',
+      seoDescription: 'Indexed gesture count for the active Performance Cycle.',
+    },
     totalCycles: {
       label: 'Total Cycles',
       tooltip: 'Total Performance Cycles completed or currently indexed since protocol launch.',
@@ -19,8 +30,30 @@ export const statisticsCopy = {
     },
     contractBalance: {
       label: 'Contract Balance',
+      seoLabel: 'Protocol Contract Balance',
       tooltip:
         'ETH currently held by the Cosmic Signature protocol contract before future allocations, retrievals, or cycle transitions.',
+      seoDescription:
+        'ETH currently held by the Cosmic Signature protocol contract before future allocation flows.',
+    },
+    numAllocationsDistributed: {
+      label: 'Num Allocations Distributed',
+      tooltip:
+        'Indexed allocation-record count. Uses cg_prize rows when available, otherwise falls back to aggregated recipient allocation totals.',
+    },
+    totalSignatureAllocationsDistributed: {
+      label: 'Total Signature Allocations Distributed',
+      tooltip:
+        'Total ETH distributed through Signature Allocations to final-gesture recipients across indexed cycles.',
+    },
+    stellarSelectionEthDeposited: {
+      label: 'Stellar Selection ETH Deposited',
+      tooltip:
+        'Total ETH allocated into Stellar Selection pools across indexed Performance Cycles.',
+    },
+    stellarSelectionEthRetrieved: {
+      label: 'Stellar Selection ETH Retrieved',
+      tooltip: 'Total ETH retrieved by selected recipients from Stellar Selection pools.',
     },
     totalSupplyErc20: {
       label: 'Total Supply (ERC-20)',
@@ -83,6 +116,38 @@ export const statisticsCopy = {
       label: 'Attached NFTs',
       tooltip: 'ERC-721 tokens attached to gestures by participants and indexed by the app.',
     },
+    publicGoodsBalance: {
+      label: 'Public Goods Balance',
+      tooltip:
+        'ETH allocated to the Public Goods Beneficiary and still reflected in indexed protocol balances.',
+    },
+    totalContributedEth: {
+      label: 'Total Contributed ETH',
+      tooltip: 'Total ETH contributed to the protocol across all indexed cycles.',
+    },
+    protocolContributions: {
+      label: 'Protocol Contributions',
+      tooltip:
+        'Number of indexed public-goods contribution transactions sent through the Cosmic Signature protocol.',
+    },
+    protocolContributionsSum: {
+      label: 'Protocol Contributions Sum',
+      tooltip:
+        'Total ETH contributed through indexed Cosmic Signature protocol public-goods contribution transactions.',
+    },
+    voluntaryContributions: {
+      label: 'Voluntary Contributions',
+      tooltip:
+        'ETH contributions made voluntarily by community members outside required cycle flows.',
+    },
+    publicGoodsRetrievals: {
+      label: 'Public Goods Retrievals',
+      tooltip: 'Number of indexed retrieval transactions from the Public Goods Vault.',
+    },
+    totalPublicGoodsRetrieved: {
+      label: 'Total Public Goods Retrieved',
+      tooltip: 'Total ETH retrieved from the Public Goods Vault.',
+    },
   },
   groups: {
     allocationEconomy:
@@ -102,12 +167,34 @@ export const statisticsCopy = {
       'Historical CST ERC-20 supply changes, including imprints and consumption over time.',
     cycleActivations:
       'System event windows that show when protocol cycles or modes became active and ended.',
+    uniqueParticipants: 'Wallets with at least one indexed gesture, sorted by gesture count.',
+    uniqueRecipients: 'Wallets that received indexed protocol allocations.',
+    uniqueEthContributors: 'Wallets that contributed ETH to the protocol.',
+    anchorReleaseActions: 'Chronological anchor and release actions for the selected NFT type.',
+    anchoredTokens: 'Tokens currently anchored in the selected anchoring wallet.',
+    uniqueAnchorHolders: 'Wallets that have anchored or released the selected NFT type.',
+    gestureFrequency:
+      'Indexed gesture counts grouped over time to show protocol activity patterns.',
+    gestureSpikes:
+      'Periods where gesture activity changed quickly compared with surrounding activity.',
+    participantActivePeriods:
+      'The longest indexed active participation windows for the most active wallets.',
   },
   anchoring: {
+    cstActiveAnchorHolders: 'Wallets currently anchoring at least one Cosmic Signature NFT.',
+    cstAnchorDistributionDeposits:
+      'Total deposit events into the Cosmic Signature NFT Anchor Distribution pool.',
+    cstTotalAnchorDistributions:
+      'Total ETH distributed as Anchor Distributions to Cosmic Signature NFT anchor-holders.',
     cstTotalTokensImprinted:
       'Total Cosmic Signature NFTs imprinted for wallets that have participated in Cosmic Signature NFT anchoring.',
+    cstTotalTokensAnchored: 'Number of Cosmic Signature NFTs currently anchored in the protocol.',
+    cstUnretrievedAnchorDistributions:
+      'Anchor Distributions allocated but not yet retrieved by Cosmic Signature NFT anchor-holders.',
+    rwlkActiveAnchorHolders: 'Wallets currently anchoring at least one RandomWalk NFT.',
     rwlkTotalTokensImprinted:
       'Total Cosmic Signature NFT allocation tokens imprinted for RandomWalk NFT anchor-holders through Anchored-NFT Stellar Selection.',
+    rwlkTotalTokensAnchored: 'Number of RandomWalk NFTs currently anchored in the protocol.',
     cstGroup:
       'Cosmic Signature NFT anchoring shares ETH Anchor Distributions among currently anchored Cosmic Signature NFTs.',
     rwlkGroup:
@@ -139,5 +226,7 @@ export const statisticsCopy = {
     systemRound: 'Cycle or deployment context for this system event.',
     systemStarted: 'Timestamp when this system event became active.',
     systemEnded: 'Timestamp when the next system event replaced this one.',
+    attachedNftContractAddress: 'ERC-721 contract address for tokens attached to gestures.',
+    attachedNftCount: 'Number of NFTs from this contract that have been attached to gestures.',
   },
 } as const;

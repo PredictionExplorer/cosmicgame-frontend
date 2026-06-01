@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { statisticsCopy } from '@/content/statistics-copy';
 
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { get_dashboard_info } from '@/services/api/rounds';
 
 const numberFormatter = new Intl.NumberFormat('en-US');
@@ -21,6 +22,26 @@ function formatEth(value: unknown): string {
 
 function formatUpdatedAt(date: Date): string {
   return date.toISOString().replace('T', ' ').slice(0, 16) + ' UTC';
+}
+
+interface SummaryMetricProps {
+  label: string;
+  value: string;
+  tooltip: string;
+  description: string;
+}
+
+function SummaryMetric({ label, value, tooltip, description }: SummaryMetricProps) {
+  return (
+    <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
+      <dt className="flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+        <span>{label}</span>
+        <InfoTooltip content={tooltip} label={label} />
+      </dt>
+      <dd className="mt-2 text-2xl font-semibold text-foreground">{value}</dd>
+      <dd className="sr-only">{description}</dd>
+    </div>
+  );
 }
 
 export async function StatisticsSeoSummary() {
@@ -52,41 +73,30 @@ export async function StatisticsSeoSummary() {
       </p>
 
       <dl className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
-          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Active Performance Cycle
-          </dt>
-          <dd className="mt-2 text-2xl font-semibold text-foreground">
-            {formatNumber(data?.CurRoundNum)}
-          </dd>
-        </div>
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
-          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Active Cycle Gestures
-          </dt>
-          <dd className="mt-2 text-2xl font-semibold text-foreground">
-            {formatNumber(data?.CurNumBids)}
-          </dd>
-        </div>
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
-          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Protocol Contract Balance
-          </dt>
-          <dd className="mt-2 text-2xl font-semibold text-foreground">
-            {formatEth(data?.CosmicGameBalanceEth)}
-          </dd>
-        </div>
-        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
-          <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            {statisticsCopy.metrics.cosmicSignatureNftsImprinted.label}
-          </dt>
-          <dd className="mt-2 text-2xl font-semibold text-foreground">
-            {formatNumber(mainStats?.NumCSTokenMints)}
-          </dd>
-          <dd className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            {statisticsCopy.metrics.cosmicSignatureNftsImprinted.seoDescription}
-          </dd>
-        </div>
+        <SummaryMetric
+          label={statisticsCopy.metrics.activePerformanceCycle.label}
+          value={formatNumber(data?.CurRoundNum)}
+          tooltip={statisticsCopy.metrics.activePerformanceCycle.tooltip}
+          description={statisticsCopy.metrics.activePerformanceCycle.seoDescription}
+        />
+        <SummaryMetric
+          label={statisticsCopy.metrics.activeCycleGestures.label}
+          value={formatNumber(data?.CurNumBids)}
+          tooltip={statisticsCopy.metrics.activeCycleGestures.tooltip}
+          description={statisticsCopy.metrics.activeCycleGestures.seoDescription}
+        />
+        <SummaryMetric
+          label={statisticsCopy.metrics.contractBalance.seoLabel}
+          value={formatEth(data?.CosmicGameBalanceEth)}
+          tooltip={statisticsCopy.metrics.contractBalance.tooltip}
+          description={statisticsCopy.metrics.contractBalance.seoDescription}
+        />
+        <SummaryMetric
+          label={statisticsCopy.metrics.cosmicSignatureNftsImprinted.label}
+          value={formatNumber(mainStats?.NumCSTokenMints)}
+          tooltip={statisticsCopy.metrics.cosmicSignatureNftsImprinted.tooltip}
+          description={statisticsCopy.metrics.cosmicSignatureNftsImprinted.seoDescription}
+        />
       </dl>
 
       <p className="mt-6 type-body-sm text-muted-foreground">

@@ -99,7 +99,9 @@ describe('FundDistribution tooltips', () => {
     if (!row) {
       throw new Error(`Could not find tooltip row for label "${label}"`);
     }
-    const trigger = row.querySelector<HTMLElement>('button[aria-label="Show more information"]');
+    const trigger = row.querySelector<HTMLElement>(
+      'button[aria-label="Show more information"], button[aria-label^="More information about"]',
+    );
     if (!trigger) {
       throw new Error(`Could not find tooltip trigger next to label "${label}"`);
     }
@@ -145,7 +147,7 @@ describe('FundDistribution tooltips', () => {
 
   it('exposes one tooltip trigger per segment plus one for the section title', () => {
     render(<FundDistribution {...defaultProps} />);
-    const triggers = screen.getAllByRole('button', { name: 'Show more information' });
+    const triggers = screen.getAllByRole('button', { name: /information/i });
     expect(triggers).toHaveLength(SEGMENT_TOOLTIPS.length + 1);
   });
 

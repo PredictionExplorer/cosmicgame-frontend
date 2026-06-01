@@ -199,14 +199,17 @@ jest.mock('../../../components/statistics/CollapsibleSection', () => ({
     title,
     children,
     description,
+    tooltip,
   }: {
     title: string;
     children: React.ReactNode;
     description?: string;
+    tooltip?: string;
   }) => (
     <div data-testid="collapsible-section">
       <span>{title}</span>
       {description && <span data-testid="section-description">{description}</span>}
+      {tooltip && <span data-testid="section-tooltip">{tooltip}</span>}
       {children}
     </div>
   ),
@@ -664,8 +667,18 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Protocol Contributions')).toBeInTheDocument();
-    expect(screen.getByText('Protocol Contributions Sum')).toBeInTheDocument();
+    expect(
+      screen.getByText(statisticsCopy.metrics.protocolContributions.label),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(statisticsCopy.metrics.protocolContributions.tooltip),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(statisticsCopy.metrics.protocolContributionsSum.label),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(statisticsCopy.metrics.protocolContributionsSum.tooltip),
+    ).toBeInTheDocument();
   });
 
   it('renders voluntary contributions when present', () => {
@@ -678,7 +691,12 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Voluntary Contributions')).toBeInTheDocument();
+    expect(
+      screen.getByText(statisticsCopy.metrics.voluntaryContributions.label),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(statisticsCopy.metrics.voluntaryContributions.tooltip),
+    ).toBeInTheDocument();
   });
 
   it('renders public-goods retrievals when present', () => {
@@ -693,7 +711,12 @@ describe('Statistics', () => {
       isError: false,
     });
     render(<Statistics />);
-    expect(screen.getByText('Public Goods Retrievals')).toBeInTheDocument();
+    expect(
+      screen.getByText(statisticsCopy.metrics.publicGoodsRetrievals.label),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(statisticsCopy.metrics.publicGoodsRetrievals.tooltip),
+    ).toBeInTheDocument();
   });
 
   it('renders pending stellar-selection retrieval message when applicable', () => {

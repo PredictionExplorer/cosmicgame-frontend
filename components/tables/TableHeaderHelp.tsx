@@ -11,7 +11,11 @@ export function TableHeaderHelp({ desktop, mobile = desktop, tooltip }: TableHea
   return (
     <span className="inline-flex items-center gap-1.5">
       <TableResponsiveHeaderLabel desktop={desktop} mobile={mobile} />
-      <InfoTooltip content={tooltip} iconClassName="h-3 w-3" />
+      <InfoTooltip
+        content={tooltip}
+        ariaLabel={`Explain column: ${desktop}`}
+        iconClassName="h-3 w-3"
+      />
     </span>
   );
 }

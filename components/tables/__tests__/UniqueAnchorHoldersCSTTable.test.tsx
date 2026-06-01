@@ -39,7 +39,7 @@ describe('UniqueAnchorHoldersCSTTable', () => {
   it('adds help triggers to anchor-holder table headers', () => {
     render(<UniqueAnchorHoldersCSTTable list={[createAnchorHolder()]} />);
     expect(
-      screen.getAllByRole('button', { name: 'Show more information' }).length,
+      screen.getAllByRole('button', { name: /^Explain column:/ }).length,
     ).toBeGreaterThanOrEqual(7);
     expect(statisticsCopy.tables.totalImprintedTokens).toMatch(/imprinted/);
   });

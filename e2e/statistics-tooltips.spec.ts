@@ -1,8 +1,24 @@
 import { test } from '@playwright/test';
 
-import { expectAllLabelTooltips } from './tooltip-helpers';
+import { expectAllLabelTooltips, expectLabelTooltip } from './tooltip-helpers';
 
 const STATISTICS_TOOLTIPS = [
+  {
+    label: 'Active Performance Cycle',
+    expected: /current Performance Cycle number indexed/,
+  },
+  {
+    label: 'Active Cycle Gestures',
+    expected: /indexed gestures made in the active Performance Cycle/,
+  },
+  {
+    label: 'Protocol Contract Balance',
+    expected: /ETH currently held by the Cosmic Signature protocol contract/,
+  },
+  {
+    label: 'Cosmic Signature NFTs Imprinted',
+    expected: /Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted/,
+  },
   {
     label: 'Total Cycles',
     expected: /Total Performance Cycles completed or currently indexed/,
@@ -40,6 +56,14 @@ const STATISTICS_TOOLTIPS = [
     expected: /CST imprinted for outreach and ecosystem contributors/,
   },
   {
+    label: 'Allocation Economy',
+    expected: /Cumulative allocation records and ETH flows/,
+  },
+  {
+    label: 'Cycle Activations',
+    expected: /System event windows that show when protocol cycles/,
+  },
+  {
     label: 'RandomWalk NFTs Used',
     expected: /attached to ETH gestures for a one-time Gesture Cost reduction/,
   },
@@ -57,5 +81,14 @@ test.describe('/statistics tooltips', () => {
 
   test('opens representative statistics tooltips across overview groups', async ({ page }) => {
     await expectAllLabelTooltips(page, STATISTICS_TOOLTIPS);
+  });
+
+  test('opens a representative table header tooltip', async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'Desktop Chrome', 'Table headers collapse on mobile.');
+
+    await expectLabelTooltip(page, {
+      label: 'Participant Address',
+      expected: /Wallet address that made at least one indexed gesture/,
+    });
   });
 });

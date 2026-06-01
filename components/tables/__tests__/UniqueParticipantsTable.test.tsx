@@ -30,7 +30,7 @@ describe('UniqueParticipantsTable', () => {
   it('renders header help triggers for confusing columns', () => {
     render(<UniqueParticipantsTable list={[createParticipant()]} />);
     expect(
-      screen.getAllByRole('button', { name: 'Show more information' }).length,
+      screen.getAllByRole('button', { name: /^Explain column:/ }).length,
     ).toBeGreaterThanOrEqual(3);
     expect(statisticsCopy.tables.numberOfGestures).toMatch(/gestures/);
   });

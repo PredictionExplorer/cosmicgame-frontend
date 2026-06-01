@@ -73,17 +73,17 @@ export function AnchoringSection({
           <StatisticsItem
             title="Number of Active Anchor-holders"
             value={cstStats.NumActiveStakers}
-            tooltip="Wallets currently anchoring at least one Cosmic Signature NFT"
+            tooltip={statisticsCopy.anchoring.cstActiveAnchorHolders}
           />
           <StatisticsItem
             title="Number of Anchor-Distribution Deposits"
             value={cstStats.NumDeposits ?? '—'}
-            tooltip="Total distribution deposit events into the Cosmic Signature NFT Anchor pool"
+            tooltip={statisticsCopy.anchoring.cstAnchorDistributionDeposits}
           />
           <StatisticsItem
             title="Total Anchor Distributions"
             value={`${(cstStats.TotalRewardEth ?? 0).toFixed(4)} ETH`}
-            tooltip="Total ETH distributed as Anchor Distributions to Cosmic Signature NFT anchor-holders"
+            tooltip={statisticsCopy.anchoring.cstTotalAnchorDistributions}
           />
           <StatisticsItem
             title="Total Tokens Imprinted"
@@ -93,16 +93,19 @@ export function AnchoringSection({
           <StatisticsItem
             title="Total Tokens Anchored"
             value={cstStats.TotalTokensStaked}
-            tooltip="Number of Cosmic Signature NFTs currently anchored in the protocol"
+            tooltip={statisticsCopy.anchoring.cstTotalTokensAnchored}
           />
           <StatisticsItem
             title="Unretrieved Anchor Distributions"
             value={`${(cstStats.UnclaimedRewardEth ?? 0).toFixed(4)} ETH`}
-            tooltip="Anchor Distributions allocated but not yet retrieved by anchor-holders"
+            tooltip={statisticsCopy.anchoring.cstUnretrievedAnchorDistributions}
           />
         </StatisticsGroup>
 
-        <CollapsibleSection title="Anchor / Release Actions">
+        <CollapsibleSection
+          title="Anchor / Release Actions"
+          tooltip={statisticsCopy.sections.anchorReleaseActions}
+        >
           {cstAnchorActions === null ? (
             <p className="text-lg font-semibold">Loading...</p>
           ) : (
@@ -110,7 +113,10 @@ export function AnchoringSection({
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Anchored Tokens">
+        <CollapsibleSection
+          title="Anchored Tokens"
+          tooltip={statisticsCopy.sections.anchoredTokens}
+        >
           {anchoredCSTokens === null ? (
             <p className="text-lg font-semibold">Loading...</p>
           ) : (
@@ -118,7 +124,10 @@ export function AnchoringSection({
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Unique Anchor-holders">
+        <CollapsibleSection
+          title="Unique Anchor-holders"
+          tooltip={statisticsCopy.sections.uniqueAnchorHolders}
+        >
           <UniqueAnchorHoldersCSTTable list={uniqueCSTAnchorHolders} />
         </CollapsibleSection>
       </TabsContent>
@@ -132,7 +141,7 @@ export function AnchoringSection({
           <StatisticsItem
             title="Number of Active Anchor-holders"
             value={rwlkStats.NumActiveStakers}
-            tooltip="Wallets currently anchoring at least one RandomWalk NFT"
+            tooltip={statisticsCopy.anchoring.rwlkActiveAnchorHolders}
           />
           <StatisticsItem
             title="Total Tokens Imprinted"
@@ -142,11 +151,14 @@ export function AnchoringSection({
           <StatisticsItem
             title="Total Tokens Anchored"
             value={rwlkStats.TotalTokensStaked}
-            tooltip="Number of RandomWalk NFTs currently anchored in the protocol"
+            tooltip={statisticsCopy.anchoring.rwlkTotalTokensAnchored}
           />
         </StatisticsGroup>
 
-        <CollapsibleSection title="Anchor / Release Actions">
+        <CollapsibleSection
+          title="Anchor / Release Actions"
+          tooltip={statisticsCopy.sections.anchorReleaseActions}
+        >
           {rwlkAnchorActions === null ? (
             <p className="text-lg font-semibold">Loading...</p>
           ) : (
@@ -154,7 +166,10 @@ export function AnchoringSection({
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Anchored Tokens">
+        <CollapsibleSection
+          title="Anchored Tokens"
+          tooltip={statisticsCopy.sections.anchoredTokens}
+        >
           {anchoredRWLKTokens === null ? (
             <p className="text-lg font-semibold">Loading...</p>
           ) : (
@@ -162,7 +177,10 @@ export function AnchoringSection({
           )}
         </CollapsibleSection>
 
-        <CollapsibleSection title="Unique Anchor-holders">
+        <CollapsibleSection
+          title="Unique Anchor-holders"
+          tooltip={statisticsCopy.sections.uniqueAnchorHolders}
+        >
           <UniqueAnchorHoldersRWLKTable list={uniqueRWLKAnchorHolders} />
         </CollapsibleSection>
       </TabsContent>

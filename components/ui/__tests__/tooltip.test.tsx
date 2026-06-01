@@ -191,6 +191,14 @@ describe('InfoTooltip', () => {
     expect(screen.getByRole('button', { name: 'Explain cycle timing' })).toBeInTheDocument();
   });
 
+  it('derives a contextual trigger label from the related metric label', () => {
+    render(<InfoTooltip content="Extra context" label="Total Cycles" />);
+
+    expect(
+      screen.getByRole('button', { name: 'More information about Total Cycles' }),
+    ).toBeInTheDocument();
+  });
+
   it('opens from the accessible button on touch', async () => {
     render(
       <TooltipProvider delayDuration={0}>

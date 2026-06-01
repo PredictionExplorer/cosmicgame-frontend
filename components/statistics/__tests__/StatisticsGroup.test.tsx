@@ -94,7 +94,7 @@ describe('StatisticsGroup', () => {
       </StatisticsGroup>,
     );
 
-    await user.hover(screen.getByRole('button', { name: 'Show more information' }));
+    await user.hover(screen.getByRole('button', { name: 'More information about Tokens' }));
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
       'CST and NFT counters use different token standards.',

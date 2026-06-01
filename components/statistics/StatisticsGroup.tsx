@@ -58,7 +58,7 @@ export function StatisticsGroup({
           <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             {title}
           </h4>
-          {tooltip ? <InfoTooltip content={tooltip} /> : null}
+          {tooltip ? <InfoTooltip content={tooltip} label={title} /> : null}
         </div>
       </div>
       <div className="px-3 py-2">{children}</div>

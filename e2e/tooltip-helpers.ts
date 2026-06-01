@@ -12,11 +12,17 @@ export async function dismissOpenTooltips(page: Page): Promise<void> {
 }
 
 export function tooltipTriggerForLabel(page: Page, label: string): Locator {
+  const tooltipButtonSelector = [
+    'button[aria-label="Show more information"]',
+    'button[aria-label^="More information about"]',
+    'button[aria-label^="Explain column:"]',
+  ].join(', ');
+
   return page
     .getByText(label, { exact: true })
     .first()
-    .locator('xpath=ancestor::*[.//button[@aria-label="Show more information"]][1]')
-    .locator('button[aria-label="Show more information"]')
+    .locator('xpath=ancestor::*[.//button][1]')
+    .locator(tooltipButtonSelector)
     .first();
 }
 
@@ -49,10 +55,16 @@ export async function openTooltip(trigger: Locator): Promise<void> {
   // these label-based triggers are buttons (not navigation links), the fallback
   // is safe and deterministic.
   if (coarsePointer) {
-    await trigger.tap({ force: true });
-    await page.waitForTimeout(150);
-    if (await tooltipIsVisible()) {
-      return;
+    try {
+      await trigger.tap({ force: true });
+      await page.waitForTimeout(150);
+      if (await tooltipIsVisible()) {
+        return;
+      }
+    } catch {
+      // Some responsive table header clones can resolve just outside the
+      // mobile viewport. Dispatching the touch event below still exercises the
+      // same app tooltip handler without depending on physical tap geometry.
     }
   }
 
