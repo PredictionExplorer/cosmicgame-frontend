@@ -1,4 +1,5 @@
 import { Trophy } from 'lucide-react';
+import userEvent from '@testing-library/user-event';
 
 import { render, screen, checkA11y } from '@/test-utils';
 
@@ -83,6 +84,21 @@ describe('StatisticsGroup', () => {
     );
     const heading = screen.getByText('Heading');
     expect(heading.tagName).toBe('H4');
+  });
+
+  it('opens a group tooltip when provided', async () => {
+    const user = userEvent.setup();
+    render(
+      <StatisticsGroup title="Tokens" tooltip="CST and NFT counters use different token standards.">
+        <p>Content</p>
+      </StatisticsGroup>,
+    );
+
+    await user.hover(screen.getByRole('button', { name: 'Show more information' }));
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'CST and NFT counters use different token standards.',
+    );
   });
 
   it('has no accessibility violations', async () => {

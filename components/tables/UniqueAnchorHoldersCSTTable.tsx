@@ -4,6 +4,7 @@ import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { shortenHex } from '@/utils';
+import { statisticsCopy } from '@/content/statistics-copy';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
@@ -13,21 +14,52 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-  TableResponsiveHeaderLabel,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { UniqueAnchorHolderCST } from '@/services/api/types';
 
 export type { UniqueAnchorHolderCST };
 
 const responsiveHeaders = [
-  { desktop: 'Anchor-holder Address', mobile: 'Holder', align: 'left' as const },
-  { desktop: 'Num Anchor Actions', mobile: 'Anchors' },
-  { desktop: 'Num Release Actions', mobile: 'Releases' },
-  { desktop: 'Total Imprinted Tokens', mobile: 'Imprinted' },
-  { desktop: 'Total Anchored Tokens', mobile: 'Anchored' },
-  { desktop: 'Total Distribution (ETH)', mobile: 'Distributed', align: 'right' as const },
-  { desktop: 'Unretrieved Distribution (ETH)', mobile: 'Unretrieved', align: 'right' as const },
+  {
+    desktop: 'Anchor-holder Address',
+    mobile: 'Holder',
+    align: 'left' as const,
+    tooltip: statisticsCopy.tables.anchorHolderAddress,
+  },
+  {
+    desktop: 'Num Anchor Actions',
+    mobile: 'Anchors',
+    tooltip: statisticsCopy.tables.numAnchorActions,
+  },
+  {
+    desktop: 'Num Release Actions',
+    mobile: 'Releases',
+    tooltip: statisticsCopy.tables.numReleaseActions,
+  },
+  {
+    desktop: 'Total Imprinted Tokens',
+    mobile: 'Imprinted',
+    tooltip: statisticsCopy.tables.totalImprintedTokens,
+  },
+  {
+    desktop: 'Total Anchored Tokens',
+    mobile: 'Anchored',
+    tooltip: statisticsCopy.tables.totalAnchoredTokens,
+  },
+  {
+    desktop: 'Total Distribution (ETH)',
+    mobile: 'Distributed',
+    align: 'right' as const,
+    tooltip: statisticsCopy.tables.totalDistributionEth,
+  },
+  {
+    desktop: 'Unretrieved Distribution (ETH)',
+    mobile: 'Unretrieved',
+    align: 'right' as const,
+    tooltip: statisticsCopy.tables.unretrievedDistributionEth,
+  },
 ];
 
 const UniqueAnchorHoldersCSTRow = ({ row }: { row: UniqueAnchorHolderCST }) => {
@@ -83,7 +115,11 @@ export const UniqueAnchorHoldersCSTTable = ({ list }: { list: UniqueAnchorHolder
             <Tr>
               {responsiveHeaders.map((header) => (
                 <TablePrimaryHeadCell key={header.desktop} align={header.align}>
-                  <TableResponsiveHeaderLabel desktop={header.desktop} mobile={header.mobile} />
+                  <TableHeaderHelp
+                    desktop={header.desktop}
+                    mobile={header.mobile}
+                    tooltip={header.tooltip}
+                  />
                 </TablePrimaryHeadCell>
               ))}
             </Tr>

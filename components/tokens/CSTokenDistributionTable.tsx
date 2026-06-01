@@ -1,5 +1,9 @@
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
 import { useMemo, useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
+
+import { statisticsCopy } from '@/content/statistics-copy';
 
 import {
   TablePrimary,
@@ -9,9 +13,9 @@ import {
   TablePrimaryHeadCell,
   TablePrimaryRow,
 } from '@/components/styled';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 
 interface TokenDistribution {
   OwnerAddr: string;
@@ -61,8 +65,18 @@ export const CSTokenDistributionTable: FC<CSTokenDistributionTableProps> = ({
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Owner Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Number of Tokens Owned</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                <TableHeaderHelp
+                  desktop="Owner Address"
+                  tooltip={statisticsCopy.tables.ownerAddress}
+                />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                <TableHeaderHelp
+                  desktop="Number of Tokens Owned"
+                  tooltip={statisticsCopy.tables.numberOfTokensOwned}
+                />
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

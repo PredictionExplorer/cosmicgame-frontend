@@ -1,5 +1,7 @@
 import '@testing-library/jest-dom';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import { UniqueAnchorHoldersRWLKTable } from '@/components/tables/UniqueAnchorHoldersRWLKTable';
 
 import { checkA11y, render, screen } from '@/test-utils';
@@ -27,6 +29,14 @@ describe('UniqueAnchorHoldersRWLKTable', () => {
     expect(screen.getAllByText('Num Release Actions').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Total Anchored Tokens').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Total Imprinted Tokens').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('adds help triggers to RandomWalk anchor-holder headers', () => {
+    render(<UniqueAnchorHoldersRWLKTable list={[createAnchorHolder()]} />);
+    expect(
+      screen.getAllByRole('button', { name: 'Show more information' }).length,
+    ).toBeGreaterThanOrEqual(5);
+    expect(statisticsCopy.tables.totalAnchoredTokens).toMatch(/anchored-token/);
   });
 
   it('renders anchor-holder data', () => {

@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 
 import { shortenHex } from '@/utils';
+import { statisticsCopy } from '@/content/statistics-copy';
 
 import { UniqueAnchorHoldersCSTTable } from '@/components/tables/UniqueAnchorHoldersCSTTable';
 
@@ -33,6 +34,14 @@ describe('UniqueAnchorHoldersCSTTable', () => {
     expect(screen.getAllByText('Total Anchored Tokens').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Total Distribution (ETH)').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Unretrieved Distribution (ETH)').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('adds help triggers to anchor-holder table headers', () => {
+    render(<UniqueAnchorHoldersCSTTable list={[createAnchorHolder()]} />);
+    expect(
+      screen.getAllByRole('button', { name: 'Show more information' }).length,
+    ).toBeGreaterThanOrEqual(7);
+    expect(statisticsCopy.tables.totalImprintedTokens).toMatch(/imprinted/);
   });
 
   it('renders anchor-holder data', () => {

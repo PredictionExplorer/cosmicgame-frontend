@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import { get_dashboard_info } from '@/services/api/rounds';
 
 const numberFormatter = new Intl.NumberFormat('en-US');
@@ -76,10 +78,13 @@ export async function StatisticsSeoSummary() {
         </div>
         <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
           <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Cosmic Signature NFT Imprints
+            {statisticsCopy.metrics.cosmicSignatureNftsImprinted.label}
           </dt>
           <dd className="mt-2 text-2xl font-semibold text-foreground">
             {formatNumber(mainStats?.NumCSTokenMints)}
+          </dd>
+          <dd className="mt-2 text-xs leading-relaxed text-muted-foreground">
+            {statisticsCopy.metrics.cosmicSignatureNftsImprinted.seoDescription}
           </dd>
         </div>
       </dl>

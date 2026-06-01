@@ -18,6 +18,7 @@ export function BiddingActivitySection() {
       <div className="space-y-4">
         <CollapsibleSection
           title="Gesture Frequency Over Time"
+          description="Indexed gesture counts grouped over time to show protocol activity patterns."
           icon={<BarChart3 className="h-3.5 w-3.5" />}
           defaultOpen
         >
@@ -26,6 +27,7 @@ export function BiddingActivitySection() {
 
         <CollapsibleSection
           title="Gesture Spikes"
+          description="Periods where gesture activity changed quickly compared with surrounding activity."
           icon={<Flame className="h-3.5 w-3.5" />}
           defaultOpen
         >
@@ -34,6 +36,7 @@ export function BiddingActivitySection() {
 
         <CollapsibleSection
           title="Top 20 Participant Active Periods"
+          description="The longest indexed active participation windows for the most active wallets."
           icon={<Users className="h-3.5 w-3.5" />}
           defaultOpen
         >

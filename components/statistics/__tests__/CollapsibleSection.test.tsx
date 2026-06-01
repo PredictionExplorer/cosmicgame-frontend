@@ -85,6 +85,33 @@ describe('CollapsibleSection', () => {
     expect(heading.tagName).toBe('H4');
   });
 
+  it('renders an optional description below the title', () => {
+    render(
+      <CollapsibleSection title="CST Total Supply" description="Historical CST supply changes.">
+        <p>Content</p>
+      </CollapsibleSection>,
+    );
+
+    expect(screen.getByText('Historical CST supply changes.')).toBeInTheDocument();
+  });
+
+  it('opens an optional header tooltip without toggling the section', async () => {
+    const user = userEvent.setup();
+    render(
+      <CollapsibleSection title="Cycle Activations" tooltip="System event windows." defaultOpen>
+        <p>Content</p>
+      </CollapsibleSection>,
+    );
+
+    const toggle = screen.getByRole('button', { name: /Cycle Activations/i });
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+
+    await user.hover(screen.getByRole('button', { name: 'Show more information' }));
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('System event windows.');
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  });
+
   it('toggle button is keyboard accessible', async () => {
     const user = userEvent.setup();
     render(

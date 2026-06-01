@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 export interface StatisticsGroupProps {
   title: string;
@@ -8,6 +9,7 @@ export interface StatisticsGroupProps {
   children: ReactNode;
   className?: string;
   accentColor?: 'blue' | 'purple' | 'emerald' | 'amber';
+  tooltip?: string;
 }
 
 const accentBorderMap: Record<string, string> = {
@@ -30,6 +32,7 @@ export function StatisticsGroup({
   children,
   className,
   accentColor,
+  tooltip,
 }: StatisticsGroupProps) {
   return (
     <div
@@ -51,9 +54,12 @@ export function StatisticsGroup({
             {icon}
           </div>
         )}
-        <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          {title}
-        </h4>
+        <div className="flex min-w-0 items-center gap-1.5">
+          <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            {title}
+          </h4>
+          {tooltip ? <InfoTooltip content={tooltip} /> : null}
+        </div>
       </div>
       <div className="px-3 py-2">{children}</div>
     </div>

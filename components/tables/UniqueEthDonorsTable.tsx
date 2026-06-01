@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -12,6 +14,7 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { UniqueEthDonor } from '@/services/api/types';
 
 export type { UniqueEthDonor };
@@ -46,10 +49,23 @@ export const UniqueEthDonorsTable = ({ list }: { list: UniqueEthDonor[] }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Contributor Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell>Number of Contributions</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                <TableHeaderHelp
+                  desktop="Contributor Address"
+                  tooltip={statisticsCopy.tables.contributorAddress}
+                />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell>
+                <TableHeaderHelp
+                  desktop="Number of Contributions"
+                  tooltip={statisticsCopy.tables.numberOfContributions}
+                />
+              </TablePrimaryHeadCell>
               <TablePrimaryHeadCell align="right">
-                Total Contributed Amount (ETH)
+                <TableHeaderHelp
+                  desktop="Total Contributed Amount (ETH)"
+                  tooltip={statisticsCopy.tables.totalContributedEth}
+                />
               </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>

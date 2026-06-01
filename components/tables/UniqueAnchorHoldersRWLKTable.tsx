@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -9,20 +11,41 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-  TableResponsiveHeaderLabel,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { UniqueAnchorHolderRWLK } from '@/services/api/types';
 
 export type { UniqueAnchorHolderRWLK };
 
 const responsiveHeaders = [
-  { desktop: 'Anchor-holder Address', mobile: 'Holder', align: 'left' as const },
-  { desktop: 'Num Anchor Actions', mobile: 'Anchors' },
-  { desktop: 'Num Release Actions', mobile: 'Releases' },
-  { desktop: 'Total Anchored Tokens', mobile: 'Anchored' },
-  { desktop: 'Total Imprinted Tokens', mobile: 'Imprinted' },
+  {
+    desktop: 'Anchor-holder Address',
+    mobile: 'Holder',
+    align: 'left' as const,
+    tooltip: statisticsCopy.tables.anchorHolderAddress,
+  },
+  {
+    desktop: 'Num Anchor Actions',
+    mobile: 'Anchors',
+    tooltip: statisticsCopy.tables.numAnchorActions,
+  },
+  {
+    desktop: 'Num Release Actions',
+    mobile: 'Releases',
+    tooltip: statisticsCopy.tables.numReleaseActions,
+  },
+  {
+    desktop: 'Total Anchored Tokens',
+    mobile: 'Anchored',
+    tooltip: statisticsCopy.tables.totalAnchoredTokens,
+  },
+  {
+    desktop: 'Total Imprinted Tokens',
+    mobile: 'Imprinted',
+    tooltip: statisticsCopy.tables.totalImprintedTokens,
+  },
 ];
 
 const UniqueAnchorHoldersRWLKRow = ({ row }: { row: UniqueAnchorHolderRWLK }) => {
@@ -67,7 +90,11 @@ export const UniqueAnchorHoldersRWLKTable = ({ list }: { list: UniqueAnchorHolde
             <Tr>
               {responsiveHeaders.map((header) => (
                 <TablePrimaryHeadCell key={header.desktop} align={header.align}>
-                  <TableResponsiveHeaderLabel desktop={header.desktop} mobile={header.mobile} />
+                  <TableHeaderHelp
+                    desktop={header.desktop}
+                    mobile={header.mobile}
+                    tooltip={header.tooltip}
+                  />
                 </TablePrimaryHeadCell>
               ))}
             </Tr>

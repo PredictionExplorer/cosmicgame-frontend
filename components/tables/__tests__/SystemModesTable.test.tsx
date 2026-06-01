@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent } from '@testing-library/react';
 
 import { convertTimestampToDateTime } from '@/utils';
+import { statisticsCopy } from '@/content/statistics-copy';
 
 import { checkA11y, render, screen } from '@/test-utils';
 
@@ -34,6 +35,14 @@ describe('SystemModesTable', () => {
     expect(screen.getAllByText('Round').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Started').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Ended').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('adds help triggers to system event headers', () => {
+    render(<SystemModesTable list={[createEvent()]} />);
+    expect(
+      screen.getAllByRole('button', { name: 'Show more information' }).length,
+    ).toBeGreaterThanOrEqual(3);
+    expect(statisticsCopy.tables.systemEnded).toMatch(/replaced/);
   });
 
   it('shows "Deployment" for RoundNum 0', () => {

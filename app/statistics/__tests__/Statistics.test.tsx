@@ -1,5 +1,7 @@
 // lexicon-allow-start: test descriptions cover legacy UI wording
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import { checkA11y, render, screen, within } from '@/test-utils';
 
 import Statistics from '../Statistics';
@@ -176,17 +178,35 @@ jest.mock('../../../components/home/DonatedTokensSection', () => ({
   DonatedTokensSection: () => <div data-testid="current-cycle-attached-tokens" />,
 }));
 jest.mock('../../../components/statistics/StatisticsGroup', () => ({
-  StatisticsGroup: ({ title, children }: { title: string; children: React.ReactNode }) => (
+  StatisticsGroup: ({
+    title,
+    children,
+    tooltip,
+  }: {
+    title: string;
+    children: React.ReactNode;
+    tooltip?: string;
+  }) => (
     <div data-testid="statistics-group">
       <span>{title}</span>
+      {tooltip && <span data-testid="group-tooltip">{tooltip}</span>}
       {children}
     </div>
   ),
 }));
 jest.mock('../../../components/statistics/CollapsibleSection', () => ({
-  CollapsibleSection: ({ title, children }: { title: string; children: React.ReactNode }) => (
+  CollapsibleSection: ({
+    title,
+    children,
+    description,
+  }: {
+    title: string;
+    children: React.ReactNode;
+    description?: string;
+  }) => (
     <div data-testid="collapsible-section">
       <span>{title}</span>
+      {description && <span data-testid="section-description">{description}</span>}
       {children}
     </div>
   ),
@@ -330,9 +350,35 @@ describe('Statistics', () => {
     });
     render(<Statistics />);
     expect(screen.getByText('Total Supply (ERC-20)')).toBeInTheDocument();
+    expect(screen.getByText(statisticsCopy.metrics.totalSupplyErc20.tooltip)).toBeInTheDocument();
+  });
+
+  it('uses explicit copy for Cosmic Signature NFT imprint counters', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+
     expect(
-      screen.getByText('Current total supply of Cosmic Signature Tokens (CST) in circulation'),
-    ).toBeInTheDocument();
+      screen.getAllByText(statisticsCopy.metrics.cosmicSignatureNftsImprinted.shortLabel).length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(statisticsCopy.metrics.cosmicSignatureNftsImprinted.tooltip).length,
+    ).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders group and section explanations', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+      isError: false,
+    });
+    render(<Statistics />);
+
+    expect(screen.getByText(statisticsCopy.groups.tokenEconomy)).toBeInTheDocument();
+    expect(screen.getByText(statisticsCopy.sections.cstTotalSupply)).toBeInTheDocument();
   });
 
   it('renders link to current round page', () => {

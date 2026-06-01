@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime } from '@/utils';
+import { statisticsCopy } from '@/content/statistics-copy';
 
 import {
   TablePrimary,
@@ -13,17 +14,26 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-  TableResponsiveHeaderLabel,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { AnchoredTokenInfo } from '@/services/api';
 
 const responsiveHeaders = [
-  { desktop: 'Anchor Datetime', mobile: 'Datetime', align: 'left' as const },
-  { desktop: 'Action ID', mobile: 'Action' },
-  { desktop: 'Token ID', mobile: 'Token' },
-  { desktop: 'Anchor-holder Address', mobile: 'Holder' },
+  {
+    desktop: 'Anchor Datetime',
+    mobile: 'Datetime',
+    align: 'left' as const,
+    tooltip: 'Timestamp when the token was anchored.',
+  },
+  { desktop: 'Action ID', mobile: 'Action', tooltip: 'Anchor action record linked to this token.' },
+  { desktop: 'Token ID', mobile: 'Token', tooltip: 'Anchored token identifier.' },
+  {
+    desktop: 'Anchor-holder Address',
+    mobile: 'Holder',
+    tooltip: statisticsCopy.tables.anchorHolderAddress,
+  },
 ];
 
 interface GlobalAnchoredTokensRowProps {
@@ -96,7 +106,11 @@ export const GlobalAnchoredTokensTable: FC<GlobalAnchoredTokensTableProps> = ({ 
             <Tr>
               {responsiveHeaders.map((header) => (
                 <TablePrimaryHeadCell key={header.desktop} align={header.align}>
-                  <TableResponsiveHeaderLabel desktop={header.desktop} mobile={header.mobile} />
+                  <TableHeaderHelp
+                    desktop={header.desktop}
+                    mobile={header.mobile}
+                    tooltip={header.tooltip}
+                  />
                 </TablePrimaryHeadCell>
               ))}
             </Tr>

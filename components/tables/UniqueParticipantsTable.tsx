@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -12,6 +14,7 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { Participant } from '@/services/api/types';
 
 export type { Participant };
@@ -61,9 +64,24 @@ export const UniqueParticipantsTable = ({ list }: UniqueParticipantsTableProps) 
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Participant Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Number of Gestures</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Max Gesture (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                <TableHeaderHelp
+                  desktop="Participant Address"
+                  tooltip={statisticsCopy.tables.participantAddress}
+                />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                <TableHeaderHelp
+                  desktop="Number of Gestures"
+                  tooltip={statisticsCopy.tables.numberOfGestures}
+                />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                <TableHeaderHelp
+                  desktop="Max Gesture (ETH)"
+                  tooltip={statisticsCopy.tables.maxGestureEth}
+                />
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

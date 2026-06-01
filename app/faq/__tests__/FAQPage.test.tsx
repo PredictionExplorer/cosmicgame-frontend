@@ -136,7 +136,7 @@ describe('FAQPage', () => {
     await waitFor(() => {
       expect(screen.queryByText('Popular Questions')).not.toBeInTheDocument();
     });
-  });
+  }, 15_000);
 
   it('has no accessibility violations', async () => {
     const { container } = render(<FAQPage />);

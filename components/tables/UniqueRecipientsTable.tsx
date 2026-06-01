@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -12,6 +14,7 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { Recipient } from '@/services/api/types';
 
 export type { Recipient };
@@ -55,10 +58,30 @@ export const UniqueRecipientsTable = ({ list }: UniqueRecipientsTableProps) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Recipient Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Allocations Received</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Max Allocation (ETH)</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Allocations Sum (ETH)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                <TableHeaderHelp
+                  desktop="Recipient Address"
+                  tooltip={statisticsCopy.tables.recipientAddress}
+                />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                <TableHeaderHelp
+                  desktop="Allocations Received"
+                  tooltip={statisticsCopy.tables.allocationsReceived}
+                />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                <TableHeaderHelp
+                  desktop="Max Allocation (ETH)"
+                  tooltip={statisticsCopy.tables.maxAllocationEth}
+                />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                <TableHeaderHelp
+                  desktop="Allocations Sum (ETH)"
+                  tooltip={statisticsCopy.tables.allocationsSumEth}
+                />
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

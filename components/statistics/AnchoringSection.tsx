@@ -1,3 +1,5 @@
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GlobalAnchorActionsTable } from '@/components/anchoring/GlobalAnchorActionsTable';
 import { GlobalAnchoredTokensTable } from '@/components/anchoring/GlobalAnchoredTokensTable';
@@ -63,7 +65,11 @@ export function AnchoringSection({
       </TabsList>
 
       <TabsContent value="cst" className="space-y-6 pt-4">
-        <StatisticsGroup title="Cosmic Signature NFT Anchoring Overview" accentColor="blue">
+        <StatisticsGroup
+          title="Cosmic Signature NFT Anchoring Overview"
+          accentColor="blue"
+          tooltip={statisticsCopy.anchoring.cstGroup}
+        >
           <StatisticsItem
             title="Number of Active Anchor-holders"
             value={cstStats.NumActiveStakers}
@@ -82,6 +88,7 @@ export function AnchoringSection({
           <StatisticsItem
             title="Total Tokens Imprinted"
             value={cstStats.TotalTokensMinted ?? '—'}
+            tooltip={statisticsCopy.anchoring.cstTotalTokensImprinted}
           />
           <StatisticsItem
             title="Total Tokens Anchored"
@@ -117,7 +124,11 @@ export function AnchoringSection({
       </TabsContent>
 
       <TabsContent value="rwlk" className="space-y-6 pt-4">
-        <StatisticsGroup title="RWLK Anchoring Overview" accentColor="purple">
+        <StatisticsGroup
+          title="RWLK Anchoring Overview"
+          accentColor="purple"
+          tooltip={statisticsCopy.anchoring.rwlkGroup}
+        >
           <StatisticsItem
             title="Number of Active Anchor-holders"
             value={rwlkStats.NumActiveStakers}
@@ -126,6 +137,7 @@ export function AnchoringSection({
           <StatisticsItem
             title="Total Tokens Imprinted"
             value={rwlkStats.TotalTokensMinted ?? '—'}
+            tooltip={statisticsCopy.anchoring.rwlkTotalTokensImprinted}
           />
           <StatisticsItem
             title="Total Tokens Anchored"

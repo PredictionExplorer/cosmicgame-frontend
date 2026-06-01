@@ -5,27 +5,27 @@ import { expectAllLabelTooltips } from './tooltip-helpers';
 const STATISTICS_TOOLTIPS = [
   {
     label: 'Total Cycles',
-    expected: /Total Performance Cycles completed since launch/,
+    expected: /Total Performance Cycles completed or currently indexed/,
   },
   {
     label: 'Allocations Distributed',
-    expected: /Rows in cg_prize/,
+    expected: /Indexed allocation records across all cycles/,
   },
   {
     label: 'NFTs Imprinted',
-    expected: /Total Cosmic Signature NFTs/,
+    expected: /Cumulative count of Cosmic Signature NFT ERC-721 tokens imprinted/,
   },
   {
     label: 'Contract Balance',
-    expected: /ETH held by the protocol smart contract/,
+    expected: /ETH currently held by the Cosmic Signature protocol contract/,
   },
   {
     label: 'Unique Participants',
-    expected: /Total unique wallet addresses that have made at least one gesture/,
+    expected: /Unique wallet addresses that have made at least one indexed gesture/,
   },
   {
     label: 'Unique Recipients',
-    expected: /retrieved at least one Signature Allocation/,
+    expected: /received at least one indexed allocation/,
   },
   {
     label: 'Unique ETH Contributors',
@@ -33,7 +33,19 @@ const STATISTICS_TOOLTIPS = [
   },
   {
     label: 'Unique Anchor-holders',
-    expected: /Combined unique CST and RandomWalk token anchor-holders/,
+    expected: /Combined unique wallets that have anchored Cosmic Signature NFTs or RandomWalk NFTs/,
+  },
+  {
+    label: 'Outreach Reserve',
+    expected: /CST imprinted for outreach and ecosystem contributors/,
+  },
+  {
+    label: 'RandomWalk NFTs Used',
+    expected: /attached to ETH gestures for a one-time Gesture Cost reduction/,
+  },
+  {
+    label: 'Total Tokens Imprinted',
+    expected: /Total Cosmic Signature NFTs imprinted for wallets/,
   },
 ];
 

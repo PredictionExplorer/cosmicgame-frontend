@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
+import { statisticsCopy } from '@/content/statistics-copy';
 
 import {
   TablePrimary,
@@ -14,17 +15,34 @@ import {
   TablePrimaryHead,
   TablePrimaryHeadCell,
   TablePrimaryRow,
-  TableResponsiveHeaderLabel,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 
 const responsiveHeaders = [
-  { desktop: 'Anchor Datetime', mobile: 'Datetime', align: 'left' as const },
-  { desktop: 'Action Type', mobile: 'Type' },
-  { desktop: 'Token ID', mobile: 'Token' },
-  { desktop: 'Anchor-holder Address', mobile: 'Holder' },
-  { desktop: 'Number of NFTs', mobile: 'NFTs' },
+  {
+    desktop: 'Anchor Datetime',
+    mobile: 'Datetime',
+    align: 'left' as const,
+    tooltip: 'Timestamp when the anchor or release action was indexed.',
+  },
+  {
+    desktop: 'Action Type',
+    mobile: 'Type',
+    tooltip: 'Whether this row anchored or released NFTs.',
+  },
+  {
+    desktop: 'Token ID',
+    mobile: 'Token',
+    tooltip: 'Token involved in the anchor or release action.',
+  },
+  {
+    desktop: 'Anchor-holder Address',
+    mobile: 'Holder',
+    tooltip: statisticsCopy.tables.anchorHolderAddress,
+  },
+  { desktop: 'Number of NFTs', mobile: 'NFTs', tooltip: 'Anchored NFT count after this action.' },
 ];
 
 interface RowData {
@@ -127,7 +145,11 @@ export const GlobalAnchorActionsTable: FC<GlobalAnchorActionsTableProps> = ({ li
             <Tr>
               {responsiveHeaders.map((header) => (
                 <TablePrimaryHeadCell key={header.desktop} align={header.align}>
-                  <TableResponsiveHeaderLabel desktop={header.desktop} mobile={header.mobile} />
+                  <TableHeaderHelp
+                    desktop={header.desktop}
+                    mobile={header.mobile}
+                    tooltip={header.tooltip}
+                  />
                 </TablePrimaryHeadCell>
               ))}
             </Tr>

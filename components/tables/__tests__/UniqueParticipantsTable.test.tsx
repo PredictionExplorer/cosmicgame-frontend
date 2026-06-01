@@ -1,5 +1,7 @@
 import '@testing-library/jest-dom';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import { UniqueParticipantsTable } from '@/components/tables/UniqueParticipantsTable';
 
 import { checkA11y, render, screen } from '@/test-utils';
@@ -23,6 +25,14 @@ describe('UniqueParticipantsTable', () => {
     expect(screen.getAllByText('Participant Address').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Number of Gestures').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Max Gesture (ETH)').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders header help triggers for confusing columns', () => {
+    render(<UniqueParticipantsTable list={[createParticipant()]} />);
+    expect(
+      screen.getAllByRole('button', { name: 'Show more information' }).length,
+    ).toBeGreaterThanOrEqual(3);
+    expect(statisticsCopy.tables.numberOfGestures).toMatch(/gestures/);
   });
 
   it('renders participant data', () => {

@@ -1,3 +1,5 @@
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import { fireEvent, render, screen, checkA11y } from '@/test-utils';
 
 import { AnchoringSection, type AnchoringSectionProps } from '../AnchoringSection';
@@ -35,9 +37,18 @@ jest.mock('../StatisticsItem', () => ({
   ),
 }));
 jest.mock('../StatisticsGroup', () => ({
-  StatisticsGroup: ({ title, children }: { title: string; children: React.ReactNode }) => (
+  StatisticsGroup: ({
+    title,
+    children,
+    tooltip,
+  }: {
+    title: string;
+    children: React.ReactNode;
+    tooltip?: string;
+  }) => (
     <div data-testid="statistics-group">
       <span>{title}</span>
+      {tooltip && <span data-testid="group-tooltip">{tooltip}</span>}
       {children}
     </div>
   ),
@@ -139,6 +150,16 @@ describe('AnchoringSection', () => {
     render(<AnchoringSection {...defaultProps} />);
     const tooltips = screen.getAllByTestId('anchoring-tooltip');
     expect(tooltips.length).toBeGreaterThan(0);
+  });
+
+  it('explains imprinted-token anchoring counters', () => {
+    render(<AnchoringSection {...defaultProps} />);
+    expect(screen.getByText(statisticsCopy.anchoring.cstTotalTokensImprinted)).toBeInTheDocument();
+  });
+
+  it('explains anchoring overview groups', () => {
+    render(<AnchoringSection {...defaultProps} />);
+    expect(screen.getByText(statisticsCopy.anchoring.cstGroup)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

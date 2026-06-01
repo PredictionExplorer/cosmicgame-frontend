@@ -4,6 +4,7 @@ import { ContractsSeoSummary } from '@/app/contracts/ContractsSeoSummary';
 import { CurrentCycleSeoSummary } from '@/app/current-cycle/CurrentCycleSeoSummary';
 import { GallerySeoSummary } from '@/app/gallery/GallerySeoSummary';
 import { StatisticsSeoSummary } from '@/app/statistics/StatisticsSeoSummary';
+import { statisticsCopy } from '@/content/statistics-copy';
 
 import { render, screen } from '@/test-utils';
 
@@ -149,6 +150,12 @@ describe('server-visible SEO summaries', () => {
       'href',
       '/contracts',
     );
+    expect(
+      screen.getByText(statisticsCopy.metrics.cosmicSignatureNftsImprinted.label),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(statisticsCopy.metrics.cosmicSignatureNftsImprinted.seoDescription),
+    ).toBeInTheDocument();
   });
 
   it('renders contract addresses in raw server content', async () => {

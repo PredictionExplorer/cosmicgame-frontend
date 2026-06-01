@@ -3,6 +3,8 @@ import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { memo, useMemo, useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
 
+import { statisticsCopy } from '@/content/statistics-copy';
+
 import {
   TablePrimary,
   TablePrimaryCell,
@@ -13,6 +15,7 @@ import {
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { AddressLink } from '@/components/common/AddressLink';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 
 export interface BalanceRow {
   OwnerAddr: string;
@@ -56,8 +59,18 @@ export const CTBalanceDistributionTable: FC<TableProps> = ({ list }) => {
         <TablePrimary>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="left">Owner Address</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="right">Balance (CST)</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="left">
+                <TableHeaderHelp
+                  desktop="Owner Address"
+                  tooltip={statisticsCopy.tables.ownerAddress}
+                />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="right">
+                <TableHeaderHelp
+                  desktop="Balance (CST)"
+                  tooltip={statisticsCopy.tables.cstBalance}
+                />
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
 

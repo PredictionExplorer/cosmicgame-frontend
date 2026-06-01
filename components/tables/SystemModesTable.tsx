@@ -4,6 +4,7 @@ import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { convertTimestampToDateTime } from '@/utils';
+import { statisticsCopy } from '@/content/statistics-copy';
 
 import {
   TablePrimary,
@@ -14,6 +15,7 @@ import {
   TablePrimaryRow,
 } from '@/components/styled';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import { TableHeaderHelp } from '@/components/tables/TableHeaderHelp';
 import type { SystemModeChangeEvent } from '@/services/api/types';
 
 type EventRow = SystemModeChangeEvent;
@@ -73,9 +75,15 @@ export const SystemModesTable = ({ list }: SystemModesTableProps) => {
           </colgroup>
           <TablePrimaryHead>
             <Tr>
-              <TablePrimaryHeadCell align="center">Round</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Started</TablePrimaryHeadCell>
-              <TablePrimaryHeadCell align="center">Ended</TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                <TableHeaderHelp desktop="Round" tooltip={statisticsCopy.tables.systemRound} />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                <TableHeaderHelp desktop="Started" tooltip={statisticsCopy.tables.systemStarted} />
+              </TablePrimaryHeadCell>
+              <TablePrimaryHeadCell align="center">
+                <TableHeaderHelp desktop="Ended" tooltip={statisticsCopy.tables.systemEnded} />
+              </TablePrimaryHeadCell>
             </Tr>
           </TablePrimaryHead>
           <tbody>

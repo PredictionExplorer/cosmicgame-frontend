@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import { formatCSTValue, formatEthValue } from '@/utils';
+import { statisticsCopy } from '@/content/statistics-copy';
 
 import { formatDistributionPerAnchoredNftEth } from '@/utils/anchoringStats';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -279,28 +280,28 @@ const Statistics = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-12">
         <StatCard
-          label="Total Cycles"
+          label={statisticsCopy.metrics.totalCycles.label}
           value={data.CurRoundNum}
           icon={<Hash className="h-4 w-4" />}
-          tooltip="Total Performance Cycles completed since launch"
+          tooltip={statisticsCopy.metrics.totalCycles.tooltip}
         />
         <StatCard
-          label="Allocations Distributed"
+          label={statisticsCopy.metrics.allocationsDistributed.label}
           value={totalAllocationsDistributed as ReactNode}
           icon={<Trophy className="h-4 w-4" />}
-          tooltip="Rows in cg_prize (every allocation slot). Includes protocol markers that are not attributed to a single recipient (e.g. Anchor Distribution deposits per cycle)."
+          tooltip={statisticsCopy.metrics.allocationsDistributed.tooltip}
         />
         <StatCard
-          label="NFTs Imprinted"
+          label={statisticsCopy.metrics.cosmicSignatureNftsImprinted.shortLabel}
           value={data.MainStats.NumCSTokenMints}
           icon={<Layers className="h-4 w-4" />}
-          tooltip="Total Cosmic Signature NFTs (ERC-721) imprinted across all cycles"
+          tooltip={statisticsCopy.metrics.cosmicSignatureNftsImprinted.tooltip}
         />
         <StatCard
-          label="Contract Balance"
+          label={statisticsCopy.metrics.contractBalance.label}
           value={formatEthValue(data.CosmicGameBalanceEth ?? 0)}
           icon={<Wallet className="h-4 w-4" />}
-          tooltip="ETH held by the protocol smart contract, used to fund allocations and Stellar Selection"
+          tooltip={statisticsCopy.metrics.contractBalance.tooltip}
           gradient
         />
       </div>
@@ -315,6 +316,7 @@ const Statistics = () => {
               title="Allocation Economy"
               icon={<Trophy className="h-4 w-4" />}
               accentColor="blue"
+              tooltip={statisticsCopy.groups.allocationEconomy}
             >
               <StatisticsItem
                 title="Num Allocations Distributed"
@@ -350,61 +352,63 @@ const Statistics = () => {
               title="Token Economy"
               icon={<Coins className="h-4 w-4" />}
               accentColor="purple"
+              tooltip={statisticsCopy.groups.tokenEconomy}
             >
               <StatisticsItem
-                title="Total Supply (ERC-20)"
+                title={statisticsCopy.metrics.totalSupplyErc20.label}
                 value={formatCSTValue(ctStatisticsData?.TotalSupplyEth ?? 0)}
-                tooltip="Current total supply of Cosmic Signature Tokens (CST) in circulation"
+                tooltip={statisticsCopy.metrics.totalSupplyErc20.tooltip}
               />
               <StatisticsItem
-                title="NFTs Imprinted"
+                title={statisticsCopy.metrics.cosmicSignatureNftsImprinted.shortLabel}
                 value={
                   <Link href="/gallery" className="text-inherit">
                     {data.MainStats.NumCSTokenMints}
                   </Link>
                 }
-                tooltip="Total Cosmic Signature NFTs (ERC-721) imprinted"
+                tooltip={statisticsCopy.metrics.cosmicSignatureNftsImprinted.tooltip}
               />
               <StatisticsItem
-                title="Total CST Consumed"
+                title={statisticsCopy.metrics.totalCstConsumed.label}
                 value={formatCSTValue(data.MainStats.TotalCSTConsumedEth)}
-                tooltip="Cosmic Signature Tokens consumed by participants when gesturing with CST"
+                tooltip={statisticsCopy.metrics.totalCstConsumed.tooltip}
               />
               <StatisticsItem
-                title="Gestures with CST"
+                title={statisticsCopy.metrics.cstGestures.label}
                 value={data.MainStats.NumBidsCST}
-                tooltip="Number of gestures made using Cosmic Signature Tokens instead of ETH"
+                tooltip={statisticsCopy.metrics.cstGestures.tooltip}
               />
               <StatisticsItem
-                title="Outreach Reserve"
+                title={statisticsCopy.metrics.outreachReserve.label}
                 value={formatCSTValue(data.MainStats.TotalMktRewardsEth)}
-                tooltip="CST forwarded to ecosystem contributors who help promote the protocol"
+                tooltip={statisticsCopy.metrics.outreachReserve.tooltip}
               />
               <StatisticsItem
-                title="Outreach Transactions"
+                title={statisticsCopy.metrics.outreachTransactions.label}
                 value={
                   <Link className="text-inherit" href="/marketing">
                     {data.MainStats.NumMktRewards}
                   </Link>
                 }
+                tooltip={statisticsCopy.metrics.outreachTransactions.tooltip}
               />
               <StatisticsItem
-                title="RandomWalk NFTs Used"
+                title={statisticsCopy.metrics.randomWalkNftsUsed.label}
                 value={
                   <Link className="text-inherit" href="/used-rwlk-nfts">
                     {data.NumRwalkTokensUsed as ReactNode}
                   </Link>
                 }
-                tooltip="RandomWalk NFTs attached to gestures for cost reduction"
+                tooltip={statisticsCopy.metrics.randomWalkNftsUsed.tooltip}
               />
               <StatisticsItem
-                title="Named Tokens"
+                title={statisticsCopy.metrics.namedTokens.label}
                 value={
                   <Link className="text-inherit" href="/named-nfts">
                     {data.MainStats.TotalNamedTokens}
                   </Link>
                 }
-                tooltip="Cosmic Signature NFTs that have been given a custom name by their owner"
+                tooltip={statisticsCopy.metrics.namedTokens.tooltip}
               />
             </StatisticsGroup>
 
@@ -413,6 +417,7 @@ const Statistics = () => {
               title="Public Goods & Contributions"
               icon={<Heart className="h-4 w-4" />}
               accentColor="emerald"
+              tooltip={statisticsCopy.groups.publicGoods}
             >
               <StatisticsItem
                 title="Public Goods Balance"
@@ -422,16 +427,16 @@ const Statistics = () => {
               <StatisticsItem
                 title="Protocol Contract Balance"
                 value={`${(data.CosmicGameBalanceEth ?? 0).toFixed(4)} ETH`}
-                tooltip="ETH held by the Cosmic Signature protocol smart contract"
+                tooltip={statisticsCopy.metrics.contractBalance.tooltip}
               />
               <StatisticsItem
-                title="Attached NFTs"
+                title={statisticsCopy.metrics.attachedNfts.label}
                 value={
                   <Link className="text-inherit" href="/attached-nfts">
                     {data.NumDonatedNFTs as ReactNode}
                   </Link>
                 }
-                tooltip="ERC-721 tokens attached to gestures by community members"
+                tooltip={statisticsCopy.metrics.attachedNfts.tooltip}
               />
               <StatisticsItem
                 title="Total Contributed ETH"
@@ -503,28 +508,28 @@ const Statistics = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             <StatCard
-              label="Unique Participants"
+              label={statisticsCopy.metrics.uniqueParticipants.label}
               value={data.MainStats.NumUniqueBidders}
               icon={<Users className="h-4 w-4" />}
-              tooltip="Total unique wallet addresses that have made at least one gesture"
+              tooltip={statisticsCopy.metrics.uniqueParticipants.tooltip}
             />
             <StatCard
-              label="Unique Recipients"
+              label={statisticsCopy.metrics.uniqueRecipients.label}
               value={data.MainStats.NumUniqueWinners}
               icon={<Award className="h-4 w-4" />}
-              tooltip="Total unique wallet addresses that have retrieved at least one Signature Allocation"
+              tooltip={statisticsCopy.metrics.uniqueRecipients.tooltip}
             />
             <StatCard
-              label="Unique ETH Contributors"
+              label={statisticsCopy.metrics.uniqueEthContributors.label}
               value={data.MainStats.NumUniqueDonors}
               icon={<Gift className="h-4 w-4" />}
-              tooltip="Unique addresses that have contributed ETH to the protocol"
+              tooltip={statisticsCopy.metrics.uniqueEthContributors.tooltip}
             />
             <StatCard
-              label="Unique Anchor-holders"
+              label={statisticsCopy.metrics.uniqueAnchorHolders.label}
               value={data.MainStats.NumUniqueStakersCST + data.MainStats.NumUniqueStakersRWalk}
               icon={<TrendingUp className="h-4 w-4" />}
-              tooltip="Combined unique CST and RandomWalk token anchor-holders"
+              tooltip={statisticsCopy.metrics.uniqueAnchorHolders.tooltip}
             />
           </div>
 
@@ -547,23 +552,23 @@ const Statistics = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-8">
             <StatCard
-              label="Cosmic Signature NFT Holders"
+              label={statisticsCopy.metrics.cosmicSignatureNftHolders.label}
               value={cstDistribution.length}
               icon={<Users className="h-4 w-4" />}
-              tooltip="Unique wallet addresses holding Cosmic Signature NFTs (ERC-721)"
+              tooltip={statisticsCopy.metrics.cosmicSignatureNftHolders.tooltip}
               featured
             />
             <StatCard
-              label="CST (ERC-20) Holders"
+              label={statisticsCopy.metrics.cstErc20Holders.label}
               value={ctBalanceDistribution.length}
               icon={<Coins className="h-4 w-4" />}
-              tooltip="Unique wallet addresses holding CST tokens (ERC-20)"
+              tooltip={statisticsCopy.metrics.cstErc20Holders.tooltip}
             />
             <StatCard
-              label="Attached NFTs"
+              label={statisticsCopy.metrics.attachedNfts.label}
               value={data.NumDonatedNFTs as ReactNode}
               icon={<Gift className="h-4 w-4" />}
-              tooltip="Total ERC-721 tokens attached to gestures by community members"
+              tooltip={statisticsCopy.metrics.attachedNfts.tooltip}
               featured
             />
           </div>
@@ -571,6 +576,7 @@ const Statistics = () => {
           <div className="space-y-8">
             <CollapsibleSection
               title="Attached Token Distribution"
+              description={statisticsCopy.sections.attachedTokenDistribution}
               defaultOpen={false}
               icon={<Gift className="h-3.5 w-3.5" />}
             >
@@ -578,12 +584,14 @@ const Statistics = () => {
             </CollapsibleSection>
             <CollapsibleSection
               title="Cosmic Signature Token (ERC-721)"
+              description={statisticsCopy.sections.cosmicSignatureTokenDistribution}
               icon={<Layers className="h-3.5 w-3.5" />}
             >
               <CSTokenDistributionTable list={cstDistribution} />
             </CollapsibleSection>
             <CollapsibleSection
               title="CST (ERC-20) Balance Distribution"
+              description={statisticsCopy.sections.cstBalanceDistribution}
               icon={<Coins className="h-3.5 w-3.5" />}
             >
               <CTBalanceDistributionChart list={ctBalanceDistribution} />
@@ -593,6 +601,7 @@ const Statistics = () => {
             </CollapsibleSection>
             <CollapsibleSection
               title="CST Total Supply"
+              description={statisticsCopy.sections.cstTotalSupply}
               icon={<TrendingUp className="h-3.5 w-3.5" />}
               defaultOpen
             >
@@ -648,6 +657,7 @@ const Statistics = () => {
         </div>
         <CollapsibleSection
           title="Cycle Activations"
+          description={statisticsCopy.sections.cycleActivations}
           defaultOpen={false}
           icon={<Activity className="h-3.5 w-3.5" />}
         >
