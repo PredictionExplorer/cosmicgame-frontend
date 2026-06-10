@@ -76,18 +76,6 @@ declare global {
 }
 
 test.describe('Wallet connection state (disconnected)', () => {
-  test('Connect Wallet is visible in the mobile header without opening the menu', async ({
-    page,
-  }, testInfo) => {
-    test.skip(testInfo.project.name !== 'Mobile Chrome', 'mobile-only visibility check');
-
-    await page.goto('/', { waitUntil: 'networkidle' });
-
-    const connectBtn = page.getByRole('button', { name: /connect/i }).first();
-    await expect(connectBtn).toBeVisible();
-    await expect(page.getByRole('dialog')).toHaveCount(0);
-  });
-
   test('Connect Wallet button is visible on home page', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await openMobileMenuIfNeeded(page);

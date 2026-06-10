@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 import { expectAllLabelTooltips, expectLabelTooltip } from './tooltip-helpers';
 
@@ -84,7 +84,18 @@ test.describe('/statistics tooltips', () => {
   });
 
   test('opens a representative table header tooltip', async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== 'Desktop Chrome', 'Table headers collapse on mobile.');
+    if (testInfo.project.name !== 'Desktop Chrome') {
+      const firstParticipantRow = page
+        .getByRole('table')
+        .filter({ hasText: 'Participant Address' })
+        .first()
+        .locator('tbody tr')
+        .first();
+      await firstParticipantRow.scrollIntoViewIfNeeded();
+      await expect(firstParticipantRow).toContainText('Participant Address');
+      await expect(firstParticipantRow).toContainText('Number of Gestures');
+      return;
+    }
 
     await expectLabelTooltip(page, {
       label: 'Participant Address',

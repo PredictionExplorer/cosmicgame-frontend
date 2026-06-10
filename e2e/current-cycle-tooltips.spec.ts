@@ -40,11 +40,7 @@ test.describe('/current-cycle tooltips', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
   });
 
-  test('opens every documented tooltip on the current-cycle page', async ({ page }, testInfo) => {
-    test.skip(
-      testInfo.project.name === 'Mobile Chrome',
-      'Mobile coverage is handled by the targeted Total Gestures regression below.',
-    );
+  test('opens every documented tooltip on the current-cycle page', async ({ page }) => {
     await expectAllLabelTooltips(page, CURRENT_CYCLE_TOOLTIPS);
   });
 

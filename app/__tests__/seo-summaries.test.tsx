@@ -1,10 +1,11 @@
-import { AppHomeSeoSummary } from '@/app/AppHomeSeoSummary';
 import { PublicDataRouteSeoSummary } from '@/app/PublicDataRouteSeoSummary';
 import { ContractsSeoSummary } from '@/app/contracts/ContractsSeoSummary';
 import { CurrentCycleSeoSummary } from '@/app/current-cycle/CurrentCycleSeoSummary';
 import { GallerySeoSummary } from '@/app/gallery/GallerySeoSummary';
 import { StatisticsSeoSummary } from '@/app/statistics/StatisticsSeoSummary';
 import { statisticsCopy } from '@/content/statistics-copy';
+
+import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 
 import { render, screen } from '@/test-utils';
 
@@ -111,32 +112,27 @@ describe('server-visible SEO summaries', () => {
     mockUsedRwlkNfts.mockResolvedValue([{}] as Awaited<ReturnType<typeof get_used_rwlk_nfts>>);
   });
 
-  it('renders an app home H1 and crawlable app links before hydration', async () => {
-    render(await AppHomeSeoSummary());
+  it('renders the app home H1 and crawlable app links in the live hero', () => {
+    render(
+      <HomeObservatoryHero
+        data={dashboard as Parameters<typeof HomeObservatoryHero>[0]['data']}
+        bannerToken={{ seed: 'sample', id: -1 }}
+        canOpenGesturePanel
+      />,
+    );
 
-    expect(screen.getByRole('region', { name: 'Cosmic Signature App' })).toHaveAttribute(
+    expect(screen.getByRole('region', { name: 'Shape the next Cosmic Signature' })).toHaveAttribute(
       'aria-labelledby',
-      'app-home-seo-heading',
+      'home-observatory-title',
     );
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Cosmic Signature App' }),
+      screen.getByRole('heading', { level: 1, name: 'Shape the next Cosmic Signature' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /protocol statistics/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /make a gesture/i })).toHaveAttribute(
       'href',
-      '/statistics',
+      '#make-gesture',
     );
-  });
-
-  it('keeps the app home summary clear of fixed app chrome', async () => {
-    render(await AppHomeSeoSummary());
-
-    const summary = screen.getByRole('region', { name: 'Cosmic Signature App' });
-
-    expect(summary).toHaveClass('pt-40');
-    expect(summary).toHaveClass('max-sm:pt-36');
-    expect(summary).toHaveClass('lg:pt-72');
-    expect(summary).toHaveClass('print:pt-0');
-    expect(summary).not.toHaveClass('mt-8');
+    expect(screen.getByText('17')).toBeInTheDocument();
   });
 
   it('renders crawler-visible statistics facts and related links', async () => {

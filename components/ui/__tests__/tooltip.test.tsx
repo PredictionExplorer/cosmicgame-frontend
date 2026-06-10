@@ -182,7 +182,9 @@ describe('InfoTooltip', () => {
   it('uses an accessible button trigger by default', () => {
     render(<InfoTooltip content="Extra context" />);
 
-    expect(screen.getByRole('button', { name: 'Show more information' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'More information: Extra context' }),
+    ).toBeInTheDocument();
   });
 
   it('allows callers to customize the trigger label', () => {
@@ -206,7 +208,9 @@ describe('InfoTooltip', () => {
       </TooltipProvider>,
     );
 
-    const trigger = screen.getByRole('button', { name: 'Show more information' });
+    const trigger = screen.getByRole('button', {
+      name: 'More information: Mobile users can read this help text.',
+    });
     touchPointerDown(trigger);
     fireEvent.click(trigger);
 
@@ -244,7 +248,9 @@ describe('InfoTooltip', () => {
       </TooltipProvider>,
     );
 
-    const trigger = screen.getByRole('button', { name: 'Show more information' });
+    const trigger = screen.getByRole('button', {
+      name: 'More information: This is long-form tooltip content that should have a readable default...',
+    });
     touchPointerDown(trigger);
     fireEvent.click(trigger);
 
@@ -263,7 +269,9 @@ describe('InfoTooltip', () => {
       </TooltipProvider>,
     );
 
-    const trigger = screen.getByRole('button', { name: 'Show more information' });
+    const trigger = screen.getByRole('button', {
+      name: 'More information: Escapes clipped ancestor',
+    });
     touchPointerDown(trigger);
     fireEvent.click(trigger);
 

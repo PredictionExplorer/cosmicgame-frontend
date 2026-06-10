@@ -24,8 +24,10 @@ export function InfoTooltip({
   ariaLabel,
   label,
 }: InfoTooltipProps) {
+  const defaultAriaLabel = content.length > 72 ? `${content.slice(0, 69).trimEnd()}...` : content;
   const resolvedAriaLabel =
-    ariaLabel ?? (label ? `More information about ${label}` : 'Show more information');
+    ariaLabel ??
+    (label ? `More information about ${label}` : `More information: ${defaultAriaLabel}`);
 
   return (
     <Tooltip>

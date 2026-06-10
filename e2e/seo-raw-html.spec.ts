@@ -7,7 +7,7 @@ const publicPages = [
   { path: '/', host: LANDING_HOST, h1: 'Cosmic Signature:' },
   { path: '/about', host: LANDING_HOST, h1: 'About Cosmic Signature' },
   { path: '/learn', host: LANDING_HOST, h1: 'Learn Cosmic Signature' },
-  { path: '/', host: APP_HOST, h1: 'Cosmic Signature App' },
+  { path: '/', host: APP_HOST, h1: 'Shape the next Cosmic Signature' },
   { path: '/statistics', host: APP_HOST, h1: 'Cosmic Signature Protocol Statistics' },
   { path: '/faq', host: APP_HOST, h1: 'Cosmic Signature FAQ' },
   { path: '/anchoring', host: APP_HOST, h1: 'Anchor Distributions' },

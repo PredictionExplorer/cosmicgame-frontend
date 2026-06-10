@@ -60,13 +60,15 @@ import type {
 // Rounds & Bidding
 // ---------------------------------------------------------------------------
 
-export function useDashboardInfo() {
+export function useDashboardInfo(initialData?: DashboardInfo | null) {
   return useQuery<DashboardInfo | null>({
     queryKey: ['dashboardInfo'],
     queryFn: () => api.get_dashboard_info(),
     refetchInterval: 12_000,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
     staleTime: 5_000,
+    initialData,
   });
 }
 
@@ -97,6 +99,7 @@ export function useAllocationTime() {
     staleTime: 5_000,
     refetchInterval: 10_000,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -124,6 +127,7 @@ export function useGestureList() {
     staleTime: 10_000,
     refetchInterval: 15_000,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -142,6 +146,7 @@ export function useGestureListByCycle(round: number, sortDir: string = 'desc') {
     queryFn: () => api.get_bid_list_by_round(round, sortDir),
     enabled: round >= 0,
     staleTime: 15_000,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -152,6 +157,7 @@ export function useCurrentSpecialRecipients() {
     staleTime: 15_000,
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -187,6 +193,7 @@ export function useGestureEthCost() {
     staleTime: 10_000,
     refetchInterval: 15_000,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -197,6 +204,7 @@ export function useTimeUntilAllocation() {
     staleTime: 5_000,
     refetchInterval: 10_000,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -990,6 +998,7 @@ export function useCurrentTime() {
     staleTime: 5_000,
     refetchInterval: 12_000,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
 }
 

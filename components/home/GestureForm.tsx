@@ -43,6 +43,7 @@ interface GestureFormProps {
   rwlknftIds: number[];
   cstGestureData: CSTGestureData;
   ethGestureInfo: EthGestureInfo | null;
+  previewMode?: boolean;
 }
 
 const gestureOptions = [
@@ -77,6 +78,7 @@ export function GestureForm({
   rwlknftIds,
   cstGestureData,
   ethGestureInfo,
+  previewMode = false,
 }: GestureFormProps) {
   const showAll = data?.LastBidderAddr !== zeroAddress;
   const visibleOptions = showAll ? gestureOptions : gestureOptions.filter((o) => o.value === 'ETH');
@@ -96,6 +98,7 @@ export function GestureForm({
                 setRwlkId(-1);
                 setBidType(opt.value);
               }}
+              aria-pressed={gestureType === opt.value}
               className={cn(
                 'flex-1 rounded-lg border px-3 py-2.5 text-center transition-all',
                 gestureType === opt.value
@@ -122,8 +125,14 @@ export function GestureForm({
           <div className="flex items-center gap-2 mb-2">
             <h6 className="text-sm font-semibold">Your Random Walk NFTs</h6>
             <Tooltip>
-              <TooltipTrigger>
-                <Info className="h-3.5 w-3.5 text-muted-foreground/50" />
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="About RandomWalk gesture discounts"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground/60 transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  <Info className="h-3.5 w-3.5" />
+                </button>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-[240px]">
@@ -148,6 +157,13 @@ export function GestureForm({
           auctionDuration={cstGestureData.AuctionDuration}
           endedMessage="Calibration Window ended — you can gesture for free."
         />
+      )}
+
+      {previewMode && (
+        <div className="rounded-xl border border-primary/20 bg-primary/[0.06] p-4 text-sm leading-relaxed text-muted-foreground">
+          Preview the live gesture options here. Connect a wallet to write your message, attach
+          assets, and submit the gesture on Arbitrum.
+        </div>
       )}
 
       <div>
@@ -179,6 +195,7 @@ export function GestureForm({
           value={message}
           maxLength={280}
           rows={3}
+          disabled={previewMode}
           className="w-full flex min-h-[72px] rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
           onChange={(e) => setMessage(e.target.value)}
         />
@@ -188,10 +205,13 @@ export function GestureForm({
         type="single"
         collapsible
         value={advancedExpanded ? 'advanced' : ''}
-        onValueChange={(val) => setAdvancedExpanded(val === 'advanced')}
+        onValueChange={(val) => !previewMode && setAdvancedExpanded(val === 'advanced')}
       >
         <AccordionItem value="advanced" className="border-white/[0.06]">
-          <AccordionTrigger className="text-sm text-muted-foreground hover:text-white">
+          <AccordionTrigger
+            disabled={previewMode}
+            className="text-sm text-muted-foreground hover:text-white"
+          >
             <span className="flex items-center gap-2">
               <Settings2 className="h-4 w-4" />
               Advanced Options
@@ -229,6 +249,7 @@ export function GestureForm({
                       placeholder="0x..."
                       value={tokenDonateAddress}
                       onChange={(e) => setTokenDonateAddress(e.target.value)}
+                      disabled={previewMode}
                       className="w-full max-w-md font-mono text-sm"
                       spellCheck={false}
                       autoComplete="off"
@@ -241,6 +262,7 @@ export function GestureForm({
                       type="number"
                       value={tokenAmount}
                       onChange={(e) => setTokenAmount(e.target.value)}
+                      disabled={previewMode}
                       className="font-mono text-sm tabular-nums"
                     />
                   </div>
@@ -256,6 +278,7 @@ export function GestureForm({
                       placeholder="0x..."
                       value={nftDonateAddress}
                       onChange={(e) => setNftDonateAddress(e.target.value)}
+                      disabled={previewMode}
                       className="w-full max-w-md font-mono text-sm"
                       spellCheck={false}
                       autoComplete="off"
@@ -269,6 +292,7 @@ export function GestureForm({
                       min={0}
                       value={nftId}
                       onChange={(e) => setNftId(e.target.value)}
+                      disabled={previewMode}
                       className="font-mono text-sm tabular-nums"
                     />
                   </div>
@@ -292,6 +316,7 @@ export function GestureForm({
                           min={0}
                           max={50}
                           className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
+                          disabled={previewMode}
                           onChange={(e) => {
                             const value = Number(e.target.value);
                             if (value <= 50) setBidPricePlus(value);

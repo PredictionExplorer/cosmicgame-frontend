@@ -10,7 +10,7 @@ import {
   Check,
 } from 'lucide-react';
 import { useState } from 'react';
-import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
+import dynamic from 'next/dynamic';
 
 import { shortenHex } from '@/utils';
 
@@ -23,6 +23,22 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MobileWallet, NavLink } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
+
+const RainbowConnectButton = dynamic(
+  () => import('@rainbow-me/rainbowkit').then((mod) => mod.ConnectButton),
+  {
+    ssr: false,
+    loading: () => (
+      <button
+        type="button"
+        disabled
+        className="inline-flex h-10 items-center justify-center rounded-md bg-primary/80 px-4 text-sm font-semibold text-primary-foreground"
+      >
+        Connect Wallet
+      </button>
+    ),
+  },
+);
 
 interface Balance {
   ETH: number;

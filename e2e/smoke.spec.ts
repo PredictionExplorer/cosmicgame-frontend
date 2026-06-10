@@ -33,11 +33,8 @@ const dynamicRoutes = [
   '/gesture/1',
   '/allocation/1',
   '/detail/1',
+  '/detail/sample',
   '/user/0x1b2E85De21C7CF4bD1787c6Ac4bd505e83b62Ba5',
-];
-
-const knownBrokenRoutes = [
-  '/detail/sample', // Uses window during SSR -- pre-existing bug
 ];
 
 test.describe('Smoke tests - every page loads without errors', () => {
@@ -55,10 +52,6 @@ test.describe('Smoke tests - every page loads without errors', () => {
       expect(response?.status()).toBe(200);
       await expect(page.locator('body')).not.toHaveText('Internal Server Error');
     });
-  }
-
-  for (const route of knownBrokenRoutes) {
-    test.skip(`${route} has known SSR issue`, () => {});
   }
 
   test('404 page renders for unknown routes', async ({ page }) => {

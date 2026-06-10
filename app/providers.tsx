@@ -70,6 +70,16 @@ function LiveGameDataRefresh() {
   return null;
 }
 
+function scheduleIdleTask(task: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
+  if (typeof window.requestIdleCallback === 'function') {
+    const idleId = window.requestIdleCallback(task, { timeout: 2_500 });
+    return () => window.cancelIdleCallback(idleId);
+  }
+  const timeoutId = window.setTimeout(task, 1);
+  return () => window.clearTimeout(timeoutId);
+}
+
 const particleOptions: ISourceOptions = {
   fullScreen: { enable: false },
   background: { color: { value: 'transparent' } },
@@ -220,18 +230,26 @@ export function Providers({
   }, []);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const { initParticlesEngine } = await import('@tsparticles/react');
-        const { loadSlim } = await import('@tsparticles/slim');
-        await initParticlesEngine(async (engine) => {
-          await loadSlim(engine);
-        });
-        setEngineReady(true);
-      } catch (err) {
-        reportError(err, 'particlesInit');
-      }
-    })();
+    let cancelled = false;
+    const cancelIdleTask = scheduleIdleTask(() => {
+      void (async () => {
+        try {
+          const { initParticlesEngine } = await import('@tsparticles/react');
+          const { loadSlim } = await import('@tsparticles/slim');
+          await initParticlesEngine(async (engine) => {
+            await loadSlim(engine);
+          });
+          if (cancelled) return;
+          setEngineReady(true);
+        } catch (err) {
+          reportError(err, 'particlesInit');
+        }
+      })();
+    });
+    return () => {
+      cancelled = true;
+      cancelIdleTask();
+    };
   }, []);
 
   if (!envValidation.valid) {

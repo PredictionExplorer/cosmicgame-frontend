@@ -196,11 +196,7 @@ test.describe('home gesture chat', () => {
     await expect(firstMessage).toContainText('Newest message from a gesture');
   });
 
-  test('docks the chat on the right side of the desktop home layout', async ({
-    page,
-  }, testInfo) => {
-    test.skip(testInfo.project.name !== 'Desktop Chrome', 'Desktop layout assertion.');
-
+  test('positions the chat appropriately for the current viewport', async ({ page }, testInfo) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
     const chat = page.getByTestId('gesture-message-chat');
@@ -221,6 +217,15 @@ test.describe('home gesture chat', () => {
     expect(box).not.toBeNull();
     expect(cycleDetailsBox).not.toBeNull();
     expect(publicGoodsBox).not.toBeNull();
+
+    if (testInfo.project.name !== 'Desktop Chrome') {
+      expect(box!.width).toBeLessThanOrEqual(viewport!.width);
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(cycleDetailsBox!.y).toBeGreaterThan(box!.y + box!.height);
+      expect(publicGoodsBox!.y).toBeGreaterThan(cycleDetailsBox!.y + cycleDetailsBox!.height);
+      return;
+    }
+
     expect(box!.x).toBeGreaterThan(viewport!.width / 2);
     expect(box!.width).toBeGreaterThan(500);
     expect(primaryBox!.x + primaryBox!.width).toBeLessThanOrEqual(box!.x);

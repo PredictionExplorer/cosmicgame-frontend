@@ -48,6 +48,7 @@ export function useLiveGameDataRefresh() {
         abi: cosmicGameAbi,
         eventName: 'BidPlaced',
         onLogs: () => {
+          window.dispatchEvent(new CustomEvent('cosmic:bid-placed'));
           void invalidateLiveGameQueries(queryClient);
         },
       });

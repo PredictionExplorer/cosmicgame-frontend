@@ -24,10 +24,12 @@ export default defineConfig({
   projects: [
     {
       name: 'Desktop Chrome',
+      testIgnore: ['**/*.mobile.spec.ts', '**/mobile-gesture.spec.ts'],
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'Mobile Chrome',
+      testIgnore: ['**/*.desktop.spec.ts'],
       use: { ...devices['Pixel 5'] },
     },
   ],

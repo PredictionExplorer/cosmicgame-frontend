@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import { cn } from '@/lib/utils';
 
-const FALLBACK_SRC = '/images/qmark.png';
+const FALLBACK_SRC = '/images/qmark-preview.png';
 
 function shouldBypassOptimizer(src: string): boolean {
   return src.startsWith('http');

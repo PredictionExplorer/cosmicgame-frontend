@@ -1,9 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Mobile gesture touch handling', () => {
-  test.beforeEach(async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== 'Mobile Chrome', 'mobile-only regression');
-
+  test.beforeEach(async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.locator('#tsparticles').waitFor({ state: 'attached', timeout: 15_000 });
   });

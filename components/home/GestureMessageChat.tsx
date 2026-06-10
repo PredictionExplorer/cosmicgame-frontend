@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Surface } from '@/components/ui/surface';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useBannedGestures } from '@/hooks/useApiQuery';
+import { useLivePulse } from '@/hooks/useLivePulse';
 import { cn } from '@/lib/utils';
 import type { GestureInfo } from '@/services/api';
 
@@ -15,6 +16,7 @@ interface GestureMessageChatProps {
   gestures: GestureInfo[];
   cycleNumber?: number;
   className?: string;
+  pulseKey?: number;
 }
 
 interface GestureChatMessage {
@@ -50,7 +52,12 @@ function getGestureChatMessages(
 }
 
 /** Displays current-cycle gesture messages as a moderated, newest-first chat feed. */
-export function GestureMessageChat({ gestures, cycleNumber, className }: GestureMessageChatProps) {
+export function GestureMessageChat({
+  gestures,
+  cycleNumber,
+  className,
+  pulseKey = 0,
+}: GestureMessageChatProps) {
   const { data: bannedGestures } = useBannedGestures();
   const bannedGestureIds = useMemo(
     () => new Set((bannedGestures ?? []).map((gesture) => gesture.bid_id)),
@@ -60,6 +67,7 @@ export function GestureMessageChat({ gestures, cycleNumber, className }: Gesture
     () => getGestureChatMessages(gestures, bannedGestureIds),
     [gestures, bannedGestureIds],
   );
+  const isPulsing = useLivePulse(pulseKey);
 
   return (
     <Surface
@@ -67,7 +75,7 @@ export function GestureMessageChat({ gestures, cycleNumber, className }: Gesture
       variant="glass-bordered"
       radius="xl"
       padding="none"
-      className={cn('print:break-inside-avoid', className)}
+      className={cn('print:break-inside-avoid', isPulsing && 'animate-live-flash', className)}
     >
       <aside aria-labelledby="gesture-message-chat-title" data-testid="gesture-message-chat">
         <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />

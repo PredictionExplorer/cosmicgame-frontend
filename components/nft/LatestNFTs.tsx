@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { useSnapCarousel } from 'react-snap-carousel';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -17,7 +18,7 @@ const LatestNFTs = () => {
     <div className="bg-[#101441]">
       <div className="container mx-auto px-2.5 py-20 md:pb-[150px]">
         <div className="flex items-center justify-center flex-wrap">
-          <h4 className="text-2xl font-semibold text-foreground">Latest NFT&apos;s</h4>
+          <h2 className="text-2xl font-semibold text-foreground">Latest NFTs</h2>
         </div>
         <div className="text-center mb-14">
           <Image src="/images/divider.svg" width={93} height={3} alt="divider" />
@@ -66,7 +67,18 @@ const LatestNFTs = () => {
             </div>
           </>
         ) : (
-          <p className="text-center mt-8 text-foreground">There is no NFT yet.</p>
+          <div className="mx-auto mt-8 max-w-lg rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 text-center">
+            <h3 className="font-display text-lg font-semibold text-foreground">
+              No Cosmic Signature NFTs have been imprinted yet.
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              The gallery will fill as Performance Cycles finalize and new deterministic three-body
+              artworks are created.
+            </p>
+            <Button asChild variant="secondary" size="sm" className="mt-4">
+              <Link href="/gallery">Open the gallery</Link>
+            </Button>
+          </div>
         )}
       </div>
     </div>

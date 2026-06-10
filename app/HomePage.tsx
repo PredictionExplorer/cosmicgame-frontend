@@ -1,16 +1,16 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Radio } from 'lucide-react';
 import type { CountdownRenderProps } from 'react-countdown';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
 
-import { formatSeconds } from '@/utils';
+import { formatSeconds, shortenHex } from '@/utils';
 
 import { reportError } from '@/utils/errors';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
@@ -18,10 +18,12 @@ import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { PageShell } from '@/components/ui/page-shell';
+import { Skeleton, SkeletonText } from '@/components/ui/skeleton';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import { GestureStatus } from '@/components/common/GestureStatus';
 import { ChronoCoreTimer } from '@/components/home/ChronoCoreTimer';
+import { CyclePhaseGuide } from '@/components/home/CyclePhaseGuide';
 import { GestureForm } from '@/components/home/GestureForm';
 import { GestureMessageChat } from '@/components/home/GestureMessageChat';
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
@@ -32,6 +34,7 @@ import { useGestureForm } from '@/hooks/useGestureForm';
 import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useAllocationNotification } from '@/hooks/useAllocationNotification';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
+import { useLivePulse } from '@/hooks/useLivePulse';
 import { useNow } from '@/hooks/useNow';
 import {
   useDashboardInfo,
@@ -45,14 +48,7 @@ import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/acti
 import { isLandingHost } from '@/lib/hostRouting';
 import { LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO } from '@/lib/landingFlags';
 import { RootLandingPage } from '@/components/landing/RootLandingPage';
-
-// Hostname is stable for the session — no subscription needed. Returning
-// the same string from getSnapshot satisfies useSyncExternalStore's
-// stable-reference contract.
-const subscribeNoop = (): (() => void) => () => {};
-const getHostnameSnapshot = (): string | null =>
-  typeof window === 'undefined' ? null : window.location.hostname;
-const getHostnameServerSnapshot = (): string | null => null;
+import type { DashboardInfo, GestureInfo } from '@/services/api';
 
 const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
   ssr: false,
@@ -68,18 +64,83 @@ function renderInlineCountdown({ total }: CountdownRenderProps) {
   return <span className="font-mono tabular-nums">{formatSeconds(Math.ceil(total / 1000))}</span>;
 }
 
-const HomePage = () => {
+function getGestureKindLabel(gestureType: unknown): string {
+  if (gestureType === 2) return 'CST gesture';
+  if (gestureType === 1) return 'RandomWalk gesture';
+  return 'ETH gesture';
+}
+
+function formatRelativeGestureAge(timestamp: unknown, nowMs: number): string {
+  const numericTimestamp = Number(timestamp);
+  if (!Number.isFinite(numericTimestamp) || numericTimestamp <= 0) return 'just now';
+  const elapsedSeconds = Math.max(0, Math.floor((nowMs - numericTimestamp * 1000) / 1000));
+  if (elapsedSeconds < 60) return `${elapsedSeconds}s ago`;
+  const elapsedMinutes = Math.floor(elapsedSeconds / 60);
+  if (elapsedMinutes < 60) return `${elapsedMinutes}m ago`;
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) return `${elapsedHours}h ago`;
+  return `${Math.floor(elapsedHours / 24)}d ago`;
+}
+
+function LatestGestureTicker({
+  gesture,
+  pulseKey,
+}: {
+  gesture: GestureInfo | null;
+  pulseKey: number;
+}) {
+  const nowMs = useNow(15_000);
+  const isPulsing = useLivePulse(pulseKey);
+
+  if (!gesture) return null;
+
+  return (
+    <Link
+      href={`/gesture/${gesture.EvtLogId}`}
+      className={`mt-4 flex items-center justify-between gap-3 rounded-2xl border border-primary/15 bg-primary/[0.055] px-4 py-3 text-sm transition-colors hover:border-primary/35 hover:bg-primary/[0.08] ${
+        isPulsing ? 'animate-live-flash' : ''
+      }`}
+      aria-label={`Open latest gesture ${gesture.EvtLogId}`}
+    >
+      <span className="flex min-w-0 items-center gap-3">
+        <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary ring-1 ring-primary/20">
+          <Radio className="h-4 w-4" />
+          {isPulsing && (
+            <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-emerald-300" />
+          )}
+        </span>
+        <span className="min-w-0">
+          <span className="block truncate font-medium text-foreground">
+            {shortenHex(gesture.BidderAddr, 6)} made a {getGestureKindLabel(gesture.GestureType)}
+          </span>
+          <span className="mt-0.5 block text-xs text-muted-foreground">
+            {formatRelativeGestureAge(gesture.TimeStamp, nowMs)}
+          </span>
+        </span>
+      </span>
+      <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+    </Link>
+  );
+}
+
+interface HomePageProps {
+  initialDashboardData?: DashboardInfo | null;
+  initialHostname?: string | null;
+}
+
+const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomePageProps) => {
   const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
 
-  const hostname = useSyncExternalStore(
-    subscribeNoop,
-    getHostnameSnapshot,
-    getHostnameServerSnapshot,
-  );
+  const [hostname, setHostname] = useState<string | null>(initialHostname);
 
-  const { data: dashboardData, isLoading: dashboardLoading } = useDashboardInfo();
+  useEffect(() => {
+    setHostname(window.location.hostname);
+  }, []);
+
+  const { data: dashboardData, isLoading: dashboardLoading } =
+    useDashboardInfo(initialDashboardData);
   const { data: currentTimeData, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
 
   const round = dashboardData?.CurRoundNum ?? -1;
@@ -105,6 +166,7 @@ const HomePage = () => {
   }, [currentTimeData, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
   const [bannerTokenId, setBannerTokenId] = useState<number | null>(null);
+  const [bidPulseKey, setBidPulseKey] = useState(0);
 
   useEffect(() => {
     if (dashboardData && bannerTokenId === null) {
@@ -166,9 +228,23 @@ const HomePage = () => {
     }, activationMs);
   };
 
+  const optimisticallyRecordGesture = () => {
+    queryClient.setQueryData<DashboardInfo | null>(['dashboardInfo'], (current) => {
+      if (!current) return current;
+      return {
+        ...current,
+        CurNumBids: (current.CurNumBids ?? 0) + 1,
+        LastBidderAddr: account ?? current.LastBidderAddr,
+      };
+    });
+    setBidPulseKey((value) => value + 1);
+  };
+
   const handleGesture = async () => {
-    if (await (gestureType === 'CST' ? gestureForm.onGestureWithCST() : gestureForm.onGesture()))
+    if (await (gestureType === 'CST' ? gestureForm.onGestureWithCST() : gestureForm.onGesture())) {
+      optimisticallyRecordGesture();
       withPostTxRefresh();
+    }
   };
   const handleFinalize = async () => {
     if (await allocationFinalize.onFinalize()) withPostTxRefresh(1000, 3000);
@@ -182,6 +258,12 @@ const HomePage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, requestNotificationPermission]);
+
+  useEffect(() => {
+    const handleBidPlaced = () => setBidPulseKey((value) => value + 1);
+    window.addEventListener('cosmic:bid-placed', handleBidPlaced);
+    return () => window.removeEventListener('cosmic:bid-placed', handleBidPlaced);
+  }, []);
 
   const getGestureLabel = () => {
     const adj = (ethGestureInfo?.ETHPrice ?? 0) * (1 + gestureCostPlus / 100);
@@ -223,17 +305,17 @@ const HomePage = () => {
   }
 
   return (
-    <>
+    <LazyMotion features={domAnimation}>
       <PageShell
         variant="data"
         backdrop="signature"
         className="xl:max-w-[92rem] 2xl:max-w-[108rem] 2xl:px-10"
       >
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <Spinner size="lg" className="text-white" />
-          </div>
-        )}
+        <HomeObservatoryHero
+          data={data}
+          bannerToken={bannerToken}
+          canOpenGesturePanel={!loading && isRoundActive}
+        />
 
         <ChronoCoreTimer
           data={data}
@@ -244,10 +326,12 @@ const HomePage = () => {
           canOpenGesturePanel={!loading && isRoundActive}
         />
 
-        <HomeObservatoryHero
+        <CyclePhaseGuide
           data={data}
-          bannerToken={bannerToken}
-          canOpenGesturePanel={!loading && isRoundActive}
+          loading={loading}
+          allocationTime={allocationTime}
+          activationTime={activationTime}
+          now={now}
         />
 
         <div
@@ -267,6 +351,7 @@ const HomePage = () => {
               attachedNFTCount={donatedNFTs.length}
               attachedERC20Count={donatedERC20Tokens.length}
             />
+            <LatestGestureTicker gesture={curGestureList[0] ?? null} pulseKey={bidPulseKey} />
 
             {/* ===== SPECIAL ALLOCATION LEADERS ===== */}
             {data?.TsRoundStart !== 0 && (
@@ -284,8 +369,8 @@ const HomePage = () => {
             )}
 
             {/* ===== BID ACTION AREA ===== */}
-            {!loading && isRoundActive && (
-              <motion.div
+            {(loading || isRoundActive) && (
+              <m.div
                 id="make-gesture"
                 variants={sectionFade}
                 initial="hidden"
@@ -301,7 +386,18 @@ const HomePage = () => {
                     Choose a gesture method and participate in the active cycle.
                   </p>
 
-                  {account ? (
+                  {loading ? (
+                    <div className="space-y-5" role="status" aria-label="Loading gesture form">
+                      <SkeletonText lines={2} lastLineWidth="42%" />
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        <Skeleton className="h-16 rounded-lg" />
+                        <Skeleton className="h-16 rounded-lg" />
+                        <Skeleton className="h-16 rounded-lg" />
+                      </div>
+                      <Skeleton className="h-24 rounded-lg" />
+                      <Skeleton className="h-12 rounded-md" />
+                    </div>
+                  ) : account ? (
                     <>
                       <GestureForm {...gestureForm} data={data} />
 
@@ -373,33 +469,33 @@ const HomePage = () => {
                       </div>
                     </>
                   ) : (
-                    <div
-                      data-testid="connect-to-gesture"
-                      className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5"
-                    >
-                      <h3 className="font-display text-lg font-semibold tracking-tight">
-                        Connect to make a gesture
-                      </h3>
-                      <p className="mt-2 text-sm text-muted-foreground">
-                        Connect MetaMask or another wallet to choose a gesture method and
-                        participate in the active cycle.
-                      </p>
-                      <div className="mt-4">
-                        <ConnectWalletButton
-                          isMobileView={false}
-                          loading={false}
-                          balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
-                          stakedTokenCount={{ cst: 0, rwalk: 0 }}
-                        />
+                    <div data-testid="connect-to-gesture" className="space-y-5">
+                      <GestureForm {...gestureForm} data={data} previewMode />
+                      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+                        <h3 className="font-display text-lg font-semibold tracking-tight">
+                          Connect to submit your gesture
+                        </h3>
+                        <p className="mt-2 text-sm text-muted-foreground">
+                          Review the live gesture methods and costs above, then connect MetaMask or
+                          another wallet to submit on Arbitrum.
+                        </p>
+                        <div className="mt-4">
+                          <ConnectWalletButton
+                            isMobileView={false}
+                            loading={false}
+                            balance={{ ETH: 0, CosmicToken: 0, CosmicSignature: 0, RWLK: 0 }}
+                            stakedTokenCount={{ cst: 0, rwalk: 0 }}
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
                 </div>
-              </motion.div>
+              </m.div>
             )}
             {/* ===== PRIZE BREAKDOWN ===== */}
             {data && (
-              <motion.div
+              <m.div
                 variants={sectionFade}
                 initial="hidden"
                 animate="visible"
@@ -407,7 +503,7 @@ const HomePage = () => {
                 className="print-motion-visible"
               >
                 <Allocation data={data} />
-              </motion.div>
+              </m.div>
             )}
           </div>
 
@@ -419,7 +515,7 @@ const HomePage = () => {
             />
 
             {/* ===== FULL ROUND DETAILS LINK ===== */}
-            <motion.div
+            <m.div
               variants={sectionFade}
               initial="hidden"
               animate="visible"
@@ -443,11 +539,11 @@ const HomePage = () => {
                 </span>
                 <ArrowRight className="relative h-5 w-5 shrink-0 text-muted-foreground transition-all group-hover:translate-x-1 group-hover:text-primary" />
               </Link>
-            </motion.div>
+            </m.div>
 
             {/* ===== PUBLIC GOODS IMPACT ===== */}
             {data && hasPublicGoodsImpact && (
-              <motion.div
+              <m.div
                 data-testid="home-rail-public-goods"
                 variants={sectionFade}
                 initial="hidden"
@@ -456,12 +552,12 @@ const HomePage = () => {
                 className="print-motion-visible"
               >
                 <PublicGoodsImpactCard data={data} variant="rail" />
-              </motion.div>
+              </m.div>
             )}
 
             {/* ===== ATTACHED ASSET RECEIPT ===== */}
             {hasAttachedAssets && (
-              <motion.div
+              <m.div
                 data-testid="home-rail-attached-assets"
                 variants={sectionFade}
                 initial="hidden"
@@ -475,14 +571,28 @@ const HomePage = () => {
                   cycleNumber={round >= 0 ? round : undefined}
                   variant="rail"
                 />
-              </motion.div>
+              </m.div>
             )}
           </div>
         </div>
       </PageShell>
 
+      {!loading && isRoundActive && (
+        <div className="fixed inset-x-3 bottom-3 z-40 sm:hidden">
+          <Button
+            asChild
+            size="lg"
+            className="h-12 w-full rounded-full shadow-[0_20px_70px_-30px_rgb(var(--aurora-cyan-rgb)/1)]"
+          >
+            <Link href="#make-gesture">
+              {account ? 'Make a Gesture' : 'Preview Gesture Options'}
+            </Link>
+          </Button>
+        </div>
+      )}
+
       <LatestNFTs />
-    </>
+    </LazyMotion>
   );
 };
 
