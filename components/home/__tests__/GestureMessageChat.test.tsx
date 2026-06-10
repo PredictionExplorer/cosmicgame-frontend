@@ -174,7 +174,7 @@ describe('GestureMessageChat', () => {
     expect(screen.queryByText('Hidden message')).not.toBeInTheDocument();
   });
 
-  it('flashes the live pulse when a new bid event increments the pulse key', () => {
+  it('flashes the live pulse when a new gesture event increments the pulse key', () => {
     jest.useFakeTimers();
     try {
       const { rerender } = render(

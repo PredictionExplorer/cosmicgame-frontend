@@ -120,7 +120,7 @@ The app serves two hosts from one codebase: the marketing site (`cosmicsignature
 
 - **Data fetching:** All backend reads go through React Query hooks in `hooks/useApiQuery.ts` (caching, polling, focus refetch). The HTTP layer in `services/api/` uses Axios with an envelope-validating interceptor; list endpoints accept an optional `ApiPageWindow` for server-side pagination (`pagedPath` in `services/api/client.ts`).
 - **Contracts:** ABIs are generated into `contracts/generated.ts` via `yarn contracts:generate` (wagmi CLI). `contracts/abis.ts` re-exports them widened to viem's `Abi` for existing call sites; import from `contracts/generated` for fully literal types.
-- **Live updates:** `hooks/useLiveGameDataRefresh.ts` watches the on-chain `BidPlaced` event, invalidates live queries, and dispatches a `cosmic:bid-placed` window event that drives UI pulses (gesture chat, latest-gesture ticker).
+- **Live updates:** `hooks/useLiveGameDataRefresh.ts` watches the on-chain `BidPlaced` event, invalidates live queries, and dispatches a `cosmic:gesture-placed` window event that drives UI pulses (gesture chat, latest-gesture ticker).
 - **Gesture Message Chat:** The home-page chat panel is current-cycle scoped and reuses `useGestureListByCycle(round, 'desc')`; see `docs/gesture-message-chat.md`.
 - **Error handling:** Errors are reported to Sentry via `utils/errors.ts`. Wallet errors use `isUserRejection()` to silently handle user-cancelled transactions.
 - **SEO:** Per-page metadata via `createMetadata()` (`utils/seo.ts`), JSON-LD via `utils/jsonLd.tsx`, host-aware sitemap/robots, dynamic OG images.

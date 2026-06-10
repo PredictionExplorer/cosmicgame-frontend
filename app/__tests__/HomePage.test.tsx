@@ -836,7 +836,7 @@ describe('HomePage', () => {
     );
   });
 
-  it('pulses live surfaces when a cosmic:bid-placed event arrives', async () => {
+  it('pulses live surfaces when a cosmic:gesture-placed event arrives', async () => {
     jest.useFakeTimers();
     try {
       mockUseDashboardInfo.mockReturnValue({
@@ -862,7 +862,7 @@ describe('HomePage', () => {
       expect(ticker).not.toHaveClass('animate-live-flash');
 
       act(() => {
-        window.dispatchEvent(new Event('cosmic:bid-placed'));
+        window.dispatchEvent(new Event('cosmic:gesture-placed'));
       });
 
       expect(ticker).toHaveClass('animate-live-flash');

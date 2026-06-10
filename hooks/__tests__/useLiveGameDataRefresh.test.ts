@@ -73,9 +73,9 @@ describe('useLiveGameDataRefresh', () => {
     expect(unwatch).toHaveBeenCalledTimes(1);
   });
 
-  it('dispatches a cosmic:bid-placed window event when a gesture lands', () => {
-    const onBidPlaced = jest.fn();
-    window.addEventListener('cosmic:bid-placed', onBidPlaced);
+  it('dispatches a cosmic:gesture-placed window event when a gesture lands', () => {
+    const onGesturePlaced = jest.fn();
+    window.addEventListener('cosmic:gesture-placed', onGesturePlaced);
 
     const watchContractEvent = jest.fn(({ onLogs }) => {
       onLogs([]);
@@ -88,8 +88,8 @@ describe('useLiveGameDataRefresh', () => {
 
     renderHook(() => useLiveGameDataRefresh());
 
-    expect(onBidPlaced).toHaveBeenCalledTimes(1);
-    window.removeEventListener('cosmic:bid-placed', onBidPlaced);
+    expect(onGesturePlaced).toHaveBeenCalledTimes(1);
+    window.removeEventListener('cosmic:gesture-placed', onGesturePlaced);
   });
 
   it('no-ops without a public client or contract address', () => {

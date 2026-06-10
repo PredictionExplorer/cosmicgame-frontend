@@ -166,7 +166,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   }, [currentTimeData, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
   const [bannerTokenId, setBannerTokenId] = useState<number | null>(null);
-  const [bidPulseKey, setBidPulseKey] = useState(0);
+  const [gesturePulseKey, setGesturePulseKey] = useState(0);
 
   useEffect(() => {
     if (dashboardData && bannerTokenId === null) {
@@ -237,7 +237,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
         LastBidderAddr: account ?? current.LastBidderAddr,
       };
     });
-    setBidPulseKey((value) => value + 1);
+    setGesturePulseKey((value) => value + 1);
   };
 
   const handleGesture = async () => {
@@ -260,9 +260,9 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   }, [searchParams, requestNotificationPermission]);
 
   useEffect(() => {
-    const handleBidPlaced = () => setBidPulseKey((value) => value + 1);
-    window.addEventListener('cosmic:bid-placed', handleBidPlaced);
-    return () => window.removeEventListener('cosmic:bid-placed', handleBidPlaced);
+    const handleGesturePlaced = () => setGesturePulseKey((value) => value + 1);
+    window.addEventListener('cosmic:gesture-placed', handleGesturePlaced);
+    return () => window.removeEventListener('cosmic:gesture-placed', handleGesturePlaced);
   }, []);
 
   const getGestureLabel = () => {
@@ -351,7 +351,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
               attachedNFTCount={donatedNFTs.length}
               attachedERC20Count={donatedERC20Tokens.length}
             />
-            <LatestGestureTicker gesture={curGestureList[0] ?? null} pulseKey={bidPulseKey} />
+            <LatestGestureTicker gesture={curGestureList[0] ?? null} pulseKey={gesturePulseKey} />
 
             {/* ===== SPECIAL ALLOCATION LEADERS ===== */}
             {data?.TsRoundStart !== 0 && (
@@ -518,7 +518,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
             <GestureMessageChat
               gestures={curGestureList}
               cycleNumber={round >= 0 ? round : undefined}
-              pulseKey={bidPulseKey}
+              pulseKey={gesturePulseKey}
               className="min-h-[30rem] xl:sticky xl:top-24 xl:min-h-[38rem] 2xl:min-h-[42rem]"
             />
 
