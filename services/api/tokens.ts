@@ -1,6 +1,14 @@
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
-import { axios, getAPIUrl, apiCall, flattenTx, flattenTxArray } from './client';
+import {
+  axios,
+  getAPIUrl,
+  apiCall,
+  flattenTx,
+  flattenTxArray,
+  pagedPath,
+  type ApiPageWindow,
+} from './client';
 import type {
   CSTTokenInfo,
   CSTTransferRecord,
@@ -16,18 +24,21 @@ import type {
   TokenImprintInfo,
 } from './types';
 
-/** Fetches all Cosmic Signature Tokens with flattened transaction fields. */
-export function get_cst_list(): Promise<CSTTokenInfo[]> {
+/** Fetches Cosmic Signature Tokens with flattened transaction fields (optionally paged). */
+export function get_cst_list(page?: ApiPageWindow): Promise<CSTTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('cst/list/all/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`cst/list/all/${pagedPath(page)}`));
     return flattenTxArray<CSTTokenInfo>(data.CosmicSignatureTokenList);
   }, []);
 }
 
-/** Fetches Cosmic Signature Tokens owned by a specific wallet address. */
-export function get_cst_tokens_by_user(address: string): Promise<CSTTokenInfo[]> {
+/** Fetches Cosmic Signature Tokens owned by a specific wallet address (optionally paged). */
+export function get_cst_tokens_by_user(
+  address: string,
+  page?: ApiPageWindow,
+): Promise<CSTTokenInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`cst/list/by_user/${address}/0/1000000`));
+    const { data } = await axios.get(getAPIUrl(`cst/list/by_user/${address}/${pagedPath(page)}`));
     return flattenTxArray<CSTTokenInfo>(data.UserTokens);
   }, []);
 }
@@ -64,10 +75,15 @@ export function get_named_nfts(): Promise<CSTTokenInfo[]> {
   }, []);
 }
 
-/** Fetches Cosmic Signature Token transfer history for a wallet address. */
-export function get_cst_transfers(address: string): Promise<CSTTransferRecord[]> {
+/** Fetches Cosmic Signature Token transfer history for a wallet address (optionally paged). */
+export function get_cst_transfers(
+  address: string,
+  page?: ApiPageWindow,
+): Promise<CSTTransferRecord[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`cst/transfers/by_user/${address}/0/1000000`));
+    const { data } = await axios.get(
+      getAPIUrl(`cst/transfers/by_user/${address}/${pagedPath(page)}`),
+    );
     return flattenTxArray<CSTTransferRecord>(data.CosmicSignatureTransfers);
   }, []);
 }
@@ -117,18 +133,23 @@ export function get_ct_total_supply_history_by_bid(): Promise<CTTotalSupplyHisto
   }, []);
 }
 
-/** Fetches Cosmic Token (ERC-20) transfer history for a wallet address. */
-export function get_ct_transfers(address: string): Promise<TxInfo[]> {
+/** Fetches Cosmic Token (ERC-20) transfer history for a wallet address (optionally paged). */
+export function get_ct_transfers(address: string, page?: ApiPageWindow): Promise<TxInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`ct/transfers/by_user/${address}/0/1000000`));
+    const { data } = await axios.get(
+      getAPIUrl(`ct/transfers/by_user/${address}/${pagedPath(page)}`),
+    );
     return flattenTxArray<TxInfo>(data.CosmicTokenTransfers);
   }, []);
 }
 
-/** Fetches the full ownership-transfer history for a single Cosmic Signature Token. */
-export function get_ct_ownership_transfers(token_id: number): Promise<CSTTransferRecord[]> {
+/** Fetches the ownership-transfer history for a single Cosmic Signature Token (optionally paged). */
+export function get_ct_ownership_transfers(
+  token_id: number,
+  page?: ApiPageWindow,
+): Promise<CSTTransferRecord[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`cst/transfers/all/${token_id}/0/1000000`));
+    const { data } = await axios.get(getAPIUrl(`cst/transfers/all/${token_id}/${pagedPath(page)}`));
     return flattenTxArray<CSTTransferRecord>(data.TokenTransfers);
   }, []);
 }

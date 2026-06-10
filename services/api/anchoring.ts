@@ -1,4 +1,12 @@
-import { axios, getAPIUrl, apiCall, flattenTx, flattenTxArray } from './client';
+import {
+  axios,
+  getAPIUrl,
+  apiCall,
+  flattenTx,
+  flattenTxArray,
+  pagedPath,
+  type ApiPageWindow,
+} from './client';
 import type {
   ActionIdWithClaimInfo,
   CSTAnchorDistribution,
@@ -16,20 +24,19 @@ export function get_staking_cst_rewards_to_claim_by_user(
   address: string,
 ): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(
-      getAPIUrl(`staking/cst/rewards/to_claim/by_user/${address}`),
-    );
+    const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/to_claim/by_user/${address}`));
     return flattenTxArray<CSTAnchorDistribution>(data.UnclaimedEthDeposits);
   }, []);
 }
 
-/** Fetches already-collected CST anchoring rewards for a wallet address. */
+/** Fetches already-collected CST anchoring rewards for a wallet address (optionally paged). */
 export function get_staking_cst_rewards_collected_by_user(
   address: string,
+  page?: ApiPageWindow,
 ): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/0/1000000`),
+      getAPIUrl(`staking/cst/rewards/collected/by_user/${address}/${pagedPath(page)}`),
     );
     return flattenTxArray<CSTAnchorDistribution>(data.CollectedStakingCSTRewards);
   }, []);
@@ -56,20 +63,23 @@ export function get_cst_action_ids_by_deposit_id(
   }, null);
 }
 
-/** Fetches CST anchor/release actions performed by a wallet address. */
-export function get_staking_cst_actions_by_user(address: string): Promise<AnchorAction[]> {
+/** Fetches CST anchor/release actions performed by a wallet address (optionally paged). */
+export function get_staking_cst_actions_by_user(
+  address: string,
+  page?: ApiPageWindow,
+): Promise<AnchorAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`staking/cst/actions/by_user/${address}/0/1000000`),
+      getAPIUrl(`staking/cst/actions/by_user/${address}/${pagedPath(page)}`),
     );
     return flattenTxArray<AnchorAction>(data.StakingCSTActions);
   }, []);
 }
 
-/** Fetches all CST anchor/release actions globally. */
-export function get_staking_cst_actions(): Promise<AnchorAction[]> {
+/** Fetches CST anchor/release actions globally (optionally paged). */
+export function get_staking_cst_actions(page?: ApiPageWindow): Promise<AnchorAction[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('staking/cst/actions/global/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`staking/cst/actions/global/${pagedPath(page)}`));
     return flattenTxArray<AnchorAction>(data.StakingCSTActions);
   }, []);
 }
@@ -210,28 +220,37 @@ export function get_staking_rwalk_actions_info(
   }, null);
 }
 
-/** Fetches all RandomWalk anchor/release actions globally. */
-export function get_staking_rwalk_actions(): Promise<AnchorAction[]> {
+/** Fetches RandomWalk anchor/release actions globally (optionally paged). */
+export function get_staking_rwalk_actions(page?: ApiPageWindow): Promise<AnchorAction[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('staking/randomwalk/actions/global/0/1000000'));
+    const { data } = await axios.get(
+      getAPIUrl(`staking/randomwalk/actions/global/${pagedPath(page)}`),
+    );
     return flattenTxArray<AnchorAction>(data.GlobalStakingActionsRWalk);
   }, []);
 }
 
-/** Fetches RandomWalk anchor/release actions performed by a wallet address. */
-export function get_staking_rwalk_actions_by_user(address: string): Promise<AnchorAction[]> {
+/** Fetches RandomWalk anchor/release actions performed by a wallet address (optionally paged). */
+export function get_staking_rwalk_actions_by_user(
+  address: string,
+  page?: ApiPageWindow,
+): Promise<AnchorAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(
-      getAPIUrl(`staking/randomwalk/actions/by_user/${address}/0/1000000`),
+      getAPIUrl(`staking/randomwalk/actions/by_user/${address}/${pagedPath(page)}`),
     );
     return flattenTxArray<AnchorAction>(data.UserStakingActionsRWalk);
   }, []);
 }
 
-/** Fetches all RandomWalk anchoring reward mint records globally. */
-export function get_staking_rwalk_mints_global(): Promise<AnchorDistributionImprint[]> {
+/** Fetches RandomWalk anchoring reward mint records globally (optionally paged). */
+export function get_staking_rwalk_mints_global(
+  page?: ApiPageWindow,
+): Promise<AnchorDistributionImprint[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('staking/randomwalk/mints/global/0/1000000'));
+    const { data } = await axios.get(
+      getAPIUrl(`staking/randomwalk/mints/global/${pagedPath(page)}`),
+    );
     return flattenTxArray<AnchorDistributionImprint>(data.StakingRWalkRewardsMints);
   }, []);
 }

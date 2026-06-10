@@ -10,7 +10,9 @@ import {
   Check,
 } from 'lucide-react';
 import { useState } from 'react';
-import dynamic from 'next/dynamic';
+// Static import is fine for bundle size: providers.tsx already imports
+// RainbowKitProvider statically, so the rainbowkit module ships regardless.
+import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 
 import { shortenHex } from '@/utils';
 
@@ -23,22 +25,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MobileWallet, NavLink } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
-
-const RainbowConnectButton = dynamic(
-  () => import('@rainbow-me/rainbowkit').then((mod) => mod.ConnectButton),
-  {
-    ssr: false,
-    loading: () => (
-      <button
-        type="button"
-        disabled
-        className="inline-flex h-10 items-center justify-center rounded-md bg-primary/80 px-4 text-sm font-semibold text-primary-foreground"
-      >
-        Connect Wallet
-      </button>
-    ),
-  },
-);
 
 interface Balance {
   ETH: number;

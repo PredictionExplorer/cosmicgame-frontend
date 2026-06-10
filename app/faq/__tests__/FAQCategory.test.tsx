@@ -188,9 +188,7 @@ describe('FAQCategorySection', () => {
   it('renders tooltips for technical terms when not searching', () => {
     renderFAQCategory({ searchQuery: '', expandedItems: ['q1'] });
 
-    expect(screen.getAllByRole('button', { name: 'Show more information' }).length).toBeGreaterThan(
-      0,
-    );
+    expect(screen.getAllByRole('button', { name: /^More information/ }).length).toBeGreaterThan(0);
   });
 
   it('sets correct id attribute for deep linking', () => {

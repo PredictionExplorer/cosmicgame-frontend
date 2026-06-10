@@ -51,7 +51,7 @@ describe('ContractAddressCard', () => {
 
   it('opens the tooltip with the description on touch tap', async () => {
     render(<ContractAddressCard {...defaultProps} />);
-    const trigger = screen.getByRole('button', { name: 'Show more information' });
+    const trigger = screen.getByRole('button', { name: /^More information/ });
     const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'pointerType', { value: 'touch' });
     fireEvent(trigger, event);
@@ -63,7 +63,7 @@ describe('ContractAddressCard', () => {
 
   it('renders the open tooltip outside the card subtree (portaled out of the row)', async () => {
     const { container } = render(<ContractAddressCard {...defaultProps} />);
-    const trigger = screen.getByRole('button', { name: 'Show more information' });
+    const trigger = screen.getByRole('button', { name: /^More information/ });
     const event = new MouseEvent('pointerdown', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'pointerType', { value: 'touch' });
     fireEvent(trigger, event);

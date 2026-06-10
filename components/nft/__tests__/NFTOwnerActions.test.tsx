@@ -39,22 +39,22 @@ describe('NFTOwnerActions', () => {
 
   it('renders transfer section with Transfer button', () => {
     render(<NFTOwnerActions {...defaultProps} />);
-    expect(screen.getByRole('button', { name: /Transfer/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Transfer' })).toBeInTheDocument();
   });
 
   it('disables Transfer button when disabled prop is true', () => {
     render(<NFTOwnerActions {...defaultProps} disabled={true} />);
-    expect(screen.getByRole('button', { name: /Transfer/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Transfer' })).toBeDisabled();
   });
 
   it('enables Transfer button when disabled prop is false', () => {
     render(<NFTOwnerActions {...defaultProps} disabled={false} />);
-    expect(screen.getByRole('button', { name: /Transfer/i })).not.toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Transfer' })).not.toBeDisabled();
   });
 
   it('calls onTransfer when Transfer is clicked', () => {
     render(<NFTOwnerActions {...defaultProps} disabled={false} />);
-    fireEvent.click(screen.getByRole('button', { name: /Transfer/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Transfer' }));
     expect(defaultProps.onTransfer).toHaveBeenCalledTimes(1);
   });
 

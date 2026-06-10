@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { render, screen, within, checkA11y } from '@/test-utils';
+import { render, screen, within, act, checkA11y } from '@/test-utils';
 
 import HomePage from '../HomePage';
 
@@ -106,6 +106,7 @@ jest.mock('wagmi', () => ({
 /* ── next / react-query ─────────────────────────────────────────── */
 
 const mockInvalidateQueries = jest.fn();
+const mockSetQueryData = jest.fn();
 
 jest.mock('next/navigation', () => ({
   useSearchParams: () => ({ get: jest.fn().mockReturnValue(null) }),
@@ -120,7 +121,10 @@ jest.mock('next/link', () => ({
 
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
-  useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
+  useQueryClient: () => ({
+    invalidateQueries: mockInvalidateQueries,
+    setQueryData: mockSetQueryData,
+  }),
 }));
 
 /* ── child components ───────────────────────────────────────────── */
@@ -140,7 +144,11 @@ jest.mock('../../components/common/GestureStatus', () => ({
 }));
 
 jest.mock('../../components/home/GestureForm', () => ({
-  GestureForm: () => <div data-testid="gesture-form">GestureForm</div>,
+  GestureForm: ({ previewMode = false }: { previewMode?: boolean }) => (
+    <div data-testid="gesture-form" data-preview={String(previewMode)}>
+      GestureForm
+    </div>
+  ),
 }));
 
 jest.mock('../../components/attachments/DonatedNFTPrizeShowcase', () => ({
@@ -308,7 +316,7 @@ const makeDashboardData = (overrides = {}) => ({
 /* ── Tests ──────────────────────────────────────────────────────── */
 
 describe('HomePage', () => {
-  it('renders the Chrono Core timer above the observatory hero', () => {
+  it('renders the observatory hero above the Chrono Core timer', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData({ CurRoundNum: 7, CurNumBids: 42, PrizeAmountEth: 2.75 }),
       isLoading: false,
@@ -319,7 +327,23 @@ describe('HomePage', () => {
     const chronoCore = screen.getByTestId('chrono-core-timer');
     const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
     expect(chronoCore).toHaveAttribute('data-phase', 'final-minute');
-    expect(chronoCore.compareDocumentPosition(observatory)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(observatory.compareDocumentPosition(chronoCore)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it('renders the cycle phase guide between the timer and the gesture area', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    const chronoCore = screen.getByTestId('chrono-core-timer');
+    const phaseGuide = screen.getByRole('heading', {
+      name: 'Where this Performance Cycle is now',
+    });
+    expect(chronoCore.compareDocumentPosition(phaseGuide)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(screen.getByRole('list', { name: 'Performance Cycle phases' })).toBeInTheDocument();
   });
 
   it('renders a premium observatory hero with live cycle data and protocol story', () => {
@@ -331,7 +355,7 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Shape the next Cosmic Signature' }),
+      screen.getByRole('heading', { level: 1, name: 'Shape the next Cosmic Signature' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Live on Arbitrum')).toBeInTheDocument();
     expect(screen.getByText('Gestures shape the art')).toBeInTheDocument();
@@ -395,10 +419,11 @@ describe('HomePage', () => {
     }
   });
 
-  it('shows loading overlay when dashboard is loading', () => {
+  it('shows gesture form skeletons instead of a blocking overlay while loading', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<HomePage />);
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Loading gesture form' })).toBeInTheDocument();
+    expect(screen.getByTestId('gesture-form-skeleton')).toBeInTheDocument();
   });
 
   it('renders GestureStatus component with data', () => {
@@ -704,20 +729,20 @@ describe('HomePage', () => {
     expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
   });
 
-  it('shows a connect-first gesture prompt when account is null', () => {
+  it('shows a gesture form preview with a connect prompt when account is null', async () => {
     mockAccount = null;
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
     render(<HomePage />);
-    expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
     expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
-    expect(screen.getByText('Connect to make a gesture')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Connect Wallet' })).toBeInTheDocument();
+    expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-preview', 'true');
+    expect(screen.getByText('Connect to submit your gesture')).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Connect Wallet' })).toBeInTheDocument();
   });
 
-  it('switches from wallet prompt to game controls after the wallet connects', () => {
+  it('switches from the preview to live game controls after the wallet connects', () => {
     mockAccount = null;
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
@@ -726,13 +751,150 @@ describe('HomePage', () => {
 
     const { rerender } = render(<HomePage />);
     expect(screen.getByTestId('connect-to-gesture')).toBeInTheDocument();
+    expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-preview', 'true');
 
     mockAccount = '0xUser';
     rerender(<HomePage />);
 
     expect(screen.queryByTestId('connect-to-gesture')).not.toBeInTheDocument();
-    expect(screen.getByTestId('gesture-form')).toBeInTheDocument();
+    expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-preview', 'false');
     expect(screen.getByRole('button', { name: /Gesture with ETH/ })).toBeEnabled();
+  });
+
+  it('shows a sticky mobile gesture CTA labelled for the wallet state', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    const { rerender } = render(<HomePage />);
+    // Hero CTA + sticky mobile CTA both target the gesture panel when connected.
+    const gestureLinks = screen.getAllByRole('link', { name: 'Make a Gesture' });
+    expect(gestureLinks.length).toBeGreaterThanOrEqual(2);
+    for (const link of gestureLinks) {
+      expect(link).toHaveAttribute('href', '#make-gesture');
+    }
+
+    mockAccount = null;
+    rerender(<HomePage />);
+    expect(screen.getByRole('link', { name: 'Preview Gesture Options' })).toHaveAttribute(
+      'href',
+      '#make-gesture',
+    );
+  });
+
+  it('renders a latest-gesture ticker linking to the most recent gesture', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7 }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 42,
+          // 150s in the past: lands mid-window for the "2m ago" bucket, so the
+          // shared useNow ticker being up to ~15s stale cannot flip the label.
+          TimeStamp: Math.floor(Date.now() / 1000) - 150,
+          BidderAddr: '0x1111111111111111111111111111111111111111',
+          RoundNum: 7,
+          GestureType: 0,
+          Message: '',
+        },
+      ],
+    });
+
+    render(<HomePage />);
+
+    const ticker = screen.getByRole('link', { name: 'Open latest gesture 42' });
+    expect(ticker).toHaveAttribute('href', '/gesture/42');
+    expect(ticker).toHaveTextContent(/made an ETH gesture/);
+    expect(ticker).toHaveTextContent(/2m ago/);
+  });
+
+  it('labels CST and RandomWalk gestures in the ticker', () => {
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ CurRoundNum: 7 }),
+      isLoading: false,
+    });
+    mockUseGestureListByCycle.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 43,
+          TimeStamp: Math.floor(Date.now() / 1000),
+          BidderAddr: '0x2222222222222222222222222222222222222222',
+          RoundNum: 7,
+          GestureType: 2,
+          Message: '',
+        },
+      ],
+    });
+
+    render(<HomePage />);
+
+    expect(screen.getByRole('link', { name: 'Open latest gesture 43' })).toHaveTextContent(
+      /made a CST gesture/,
+    );
+  });
+
+  it('pulses live surfaces when a cosmic:bid-placed event arrives', async () => {
+    jest.useFakeTimers();
+    try {
+      mockUseDashboardInfo.mockReturnValue({
+        data: makeDashboardData({ CurRoundNum: 7 }),
+        isLoading: false,
+      });
+      mockUseGestureListByCycle.mockReturnValue({
+        data: [
+          {
+            EvtLogId: 44,
+            TimeStamp: Math.floor(Date.now() / 1000),
+            BidderAddr: '0x3333333333333333333333333333333333333333',
+            RoundNum: 7,
+            GestureType: 0,
+            Message: '',
+          },
+        ],
+      });
+
+      render(<HomePage />);
+
+      const ticker = screen.getByRole('link', { name: 'Open latest gesture 44' });
+      expect(ticker).not.toHaveClass('animate-live-flash');
+
+      act(() => {
+        window.dispatchEvent(new Event('cosmic:bid-placed'));
+      });
+
+      expect(ticker).toHaveClass('animate-live-flash');
+      expect(screen.getByTestId('gesture-message-chat')).toHaveClass('animate-live-flash');
+
+      act(() => {
+        jest.advanceTimersByTime(950);
+      });
+      expect(ticker).not.toHaveClass('animate-live-flash');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('optimistically records the gesture in the dashboard cache after submitting', async () => {
+    const user = userEvent.setup();
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+    await user.click(screen.getByRole('button', { name: /Gesture with ETH/ }));
+
+    expect(mockSetQueryData).toHaveBeenCalledWith(['dashboardInfo'], expect.any(Function));
+    const updater = mockSetQueryData.mock.calls[0]![1] as (
+      current: Record<string, unknown> | null,
+    ) => Record<string, unknown> | null;
+    expect(updater(null)).toBeNull();
+    expect(updater({ CurNumBids: 10, LastBidderAddr: '0xBidder' })).toEqual(
+      expect.objectContaining({ CurNumBids: 11, LastBidderAddr: '0xUser' }),
+    );
   });
 
   it('renders SpecialAllocationRecipients when TsRoundStart is nonzero', () => {
@@ -876,10 +1038,10 @@ describe('HomePage', () => {
     expect(link).toHaveAttribute('href', '/allocation/9');
   });
 
-  it('renders loading spinner and hides GestureForm when loading', () => {
+  it('renders loading skeletons and hides GestureForm when loading', () => {
     mockUseDashboardInfo.mockReturnValue({ data: undefined, isLoading: true });
     render(<HomePage />);
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Loading gesture form' })).toBeInTheDocument();
     expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
   });
 

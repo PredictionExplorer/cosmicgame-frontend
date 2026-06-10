@@ -86,6 +86,26 @@ export const getAPIUrl = (url: string) => {
   return `${base}/${path}`;
 };
 
+/** Pagination window for Go API list endpoints (`.../{offset}/{limit}` path segments). */
+export interface ApiPageWindow {
+  offset?: number;
+  limit?: number;
+}
+
+/**
+ * Historical default window: effectively "fetch everything". List endpoints
+ * accept an explicit {@link ApiPageWindow} so callers can page server-side
+ * as datasets grow, without changing default behavior.
+ */
+export const DEFAULT_API_PAGE_LIMIT = 1_000_000;
+
+/** Builds the trailing `{offset}/{limit}` segment for paged Go API endpoints. */
+export const pagedPath = (page?: ApiPageWindow): string => {
+  const offset = Math.max(0, Math.trunc(page?.offset ?? 0));
+  const limit = Math.max(1, Math.trunc(page?.limit ?? DEFAULT_API_PAGE_LIMIT));
+  return `${offset}/${limit}`;
+};
+
 /** Builds a direct URL targeting the main NFT/token API. */
 export const getMainAPIUrl = (url: string) => {
   if (url === '') {

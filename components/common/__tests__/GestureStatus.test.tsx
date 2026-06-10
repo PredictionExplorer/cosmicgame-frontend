@@ -249,7 +249,7 @@ describe('GestureStatus', () => {
       />,
     );
 
-    await user.hover(screen.getAllByRole('button', { name: 'Show more information' })[1]!);
+    await user.hover(screen.getAllByRole('button', { name: /^More information/ })[1]!);
 
     expect(
       await screen.findAllByText(

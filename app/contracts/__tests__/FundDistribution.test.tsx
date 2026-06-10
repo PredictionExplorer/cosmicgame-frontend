@@ -99,9 +99,7 @@ describe('FundDistribution tooltips', () => {
     if (!row) {
       throw new Error(`Could not find tooltip row for label "${label}"`);
     }
-    const trigger = row.querySelector<HTMLElement>(
-      'button[aria-label="Show more information"], button[aria-label^="More information about"]',
-    );
+    const trigger = row.querySelector<HTMLElement>('button[aria-label^="More information"]');
     if (!trigger) {
       throw new Error(`Could not find tooltip trigger next to label "${label}"`);
     }

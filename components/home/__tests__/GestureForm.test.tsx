@@ -256,6 +256,78 @@ describe('GestureForm', () => {
     ).toBeInTheDocument();
   });
 
+  it('marks the selected gesture method with aria-pressed', () => {
+    render(<GestureForm {...defaultProps} gestureType="ETH" />);
+
+    expect(screen.getByRole('button', { name: /ETH Pay with Ether/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: /RandomWalk 50% discount/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+  });
+
+  it('labels the RandomWalk discount tooltip trigger', () => {
+    render(<GestureForm {...defaultProps} gestureType="RandomWalk" />);
+
+    expect(
+      screen.getByRole('button', { name: 'About RandomWalk gesture discounts' }),
+    ).toBeInTheDocument();
+  });
+
+  describe('preview mode (disconnected wallet)', () => {
+    it('shows the connect explainer banner', () => {
+      render(<GestureForm {...defaultProps} previewMode />);
+
+      expect(screen.getByText(/Preview the live gesture options here/)).toBeInTheDocument();
+      expect(screen.getByText(/Connect a wallet/)).toBeInTheDocument();
+    });
+
+    it('keeps the gesture method picker interactive for exploration', async () => {
+      const user = userEvent.setup();
+      render(<GestureForm {...defaultProps} previewMode gestureType="ETH" />);
+
+      await user.click(screen.getByText('RandomWalk'));
+
+      expect(defaultProps.setBidType).toHaveBeenCalledWith('RandomWalk');
+    });
+
+    it('disables the message textarea', () => {
+      render(<GestureForm {...defaultProps} previewMode />);
+
+      expect(screen.getByPlaceholderText('Leave a message with your gesture...')).toBeDisabled();
+    });
+
+    it('disables the advanced options accordion trigger', () => {
+      render(<GestureForm {...defaultProps} previewMode />);
+
+      expect(screen.getByRole('button', { name: /Advanced Options/ })).toBeDisabled();
+    });
+
+    it('disables attachment inputs when advanced options are expanded', () => {
+      render(<GestureForm {...defaultProps} previewMode advancedExpanded contributionType="NFT" />);
+
+      expect(screen.getByPlaceholderText('0x...')).toBeDisabled();
+      expect(screen.getByPlaceholderText('Token ID')).toBeDisabled();
+    });
+
+    it('does not show the preview banner for connected users', () => {
+      render(<GestureForm {...defaultProps} />);
+
+      expect(screen.queryByText(/Preview the live gesture options here/)).not.toBeInTheDocument();
+      expect(
+        screen.getByPlaceholderText('Leave a message with your gesture...'),
+      ).not.toBeDisabled();
+    });
+
+    it('has no accessibility violations in preview mode', async () => {
+      const { container } = render(<GestureForm {...defaultProps} previewMode />);
+      await checkA11y(container);
+    });
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<GestureForm {...defaultProps} />);
     await checkA11y(container);

@@ -1,16 +1,19 @@
 # Cosmic Signature Frontend
 
-A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. Participants make gestures with ETH, collect NFTs, and participate in staking and allocation tracks.
+The web frontend for Cosmic Signature — a procedural on-chain art protocol on Arbitrum. Participants make gestures during Performance Cycles, explore deterministic three-body NFT art, anchor tokens, and review protocol allocations.
+
+The app serves two hosts from one codebase: the marketing site (`cosmicsignature.com`) and the live dApp (`app.cosmicsignature.com`). Host routing lives in `proxy.ts`; the marketing shell deliberately excludes the Web3 stack to keep its bundle small.
 
 ## Tech Stack
 
-- **Framework:** Next.js 16 (App Router) with TypeScript 5.9
-- **UI:** React 19, MUI 7, Tailwind CSS v4
-- **Web3:** wagmi v3, viem v2, RainbowKit v2, Porto (WebAuthn account abstraction)
-- **Data:** TanStack React Query v5 for all data fetching, Axios for direct API access
-- **Charts:** Kendo React Charts
-- **Testing:** Jest (unit), Playwright (E2E)
-- **Quality:** ESLint 9 (flat config), Prettier, Husky, lint-staged, commitlint
+- **Framework:** Next.js 16 (App Router) with TypeScript 5.9 (strict)
+- **UI:** React 19, Tailwind CSS v4, Radix UI primitives (shadcn-style components in `components/ui/`), Framer Motion, lucide-react icons
+- **Web3:** wagmi v3, viem v2, RainbowKit v2; typed ABIs generated with `@wagmi/cli`
+- **Data:** TanStack React Query v5 for all data fetching, Axios for HTTP, Zod for runtime API validation
+- **Charts:** Recharts
+- **3D / effects:** three.js + react-three-fiber (marketing hero), tsparticles (app backdrop, idle-deferred)
+- **Testing:** Jest + React Testing Library (unit), Playwright (E2E), jest-axe / axe-core (a11y)
+- **Quality:** ESLint 9 (flat config), Prettier, Husky, lint-staged, commitlint, Sentry
 
 ## Prerequisites
 
@@ -53,17 +56,23 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 
 ## Scripts
 
-| Script                 | Description                         |
-| ---------------------- | ----------------------------------- |
-| `yarn dev`             | Start development server            |
-| `yarn build`           | Create production build             |
-| `yarn start`           | Run production server               |
-| `yarn lint`            | Run ESLint                          |
-| `yarn test`            | Run unit tests (Jest)               |
-| `yarn test:coverage`   | Run unit tests with coverage report |
-| `yarn test:e2e`        | Run end-to-end tests (Playwright)   |
-| `yarn test:e2e:ui`     | Run E2E tests with Playwright UI    |
-| `yarn test:e2e:headed` | Run E2E tests in headed browser     |
+| Script                    | Description                                             |
+| ------------------------- | ------------------------------------------------------- |
+| `yarn dev`                | Start development server                                |
+| `yarn build`              | Create production build                                 |
+| `yarn start`              | Run production server                                   |
+| `yarn lint`               | Run ESLint (zero warnings allowed)                      |
+| `yarn type-check`         | Run the TypeScript compiler without emitting            |
+| `yarn test`               | Run unit tests (Jest)                                   |
+| `yarn test:coverage`      | Run unit tests with coverage report                     |
+| `yarn test:seo`           | Run the SEO test subset (unit + raw-HTML e2e)           |
+| `yarn test:e2e`           | Run end-to-end tests (Playwright)                       |
+| `yarn test:e2e:ui`        | Run E2E tests with Playwright UI                        |
+| `yarn test:e2e:headed`    | Run E2E tests in headed browser                         |
+| `yarn analyze`            | Production build with bundle analyzer                   |
+| `yarn bundle:budget`      | Check app-home JS gzip size against budget (post-build) |
+| `yarn contracts:generate` | Regenerate typed ABIs from `contracts/*.json`           |
+| `yarn lexicon:scan`       | Enforce domain terminology in UI copy                   |
 
 ## Environment Variables
 
@@ -72,42 +81,49 @@ A Next.js web application for the Cosmic Signature blockchain game on Arbitrum. 
 | `NEXT_PUBLIC_NETWORK`                  | No            | `sepolia`           | Network: `local`, `sepolia`, or `mainnet`             |
 | `NEXT_PUBLIC_INFURA_KEY`               | Yes (mainnet) | —                   | Infura API key for Arbitrum mainnet RPC               |
 | `NEXT_PUBLIC_RPC_URL`                  | No            | Per-network default | Override the RPC endpoint                             |
-| `NEXT_PUBLIC_API_URL`                  | No            | Per-network default | Override the backend API URL                          |
+| `NEXT_PUBLIC_API_URL`                  | No            | Per-network default | Backend API URL (must include `/api/cosmicgame`)      |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Yes           | —                   | WalletConnect project ID from cloud.walletconnect.com |
 | `NEXT_PUBLIC_GA4_MEASUREMENT_ID`       | No            | —                   | Google Analytics 4 measurement ID                     |
 | `NEXT_PUBLIC_SENTRY_DSN`               | No            | —                   | Sentry DSN for error reporting                        |
+| `COSMICGAME_API_UPSTREAM`              | No            | —                   | Enables same-origin `/api/cosmicgame/*` proxying      |
 
 ## Project Structure
 
 ```
-├── app/              Next.js App Router pages, layouts, and API routes
+├── app/              Next.js App Router pages, layouts, API routes, OG images
 ├── components/
-│   ├── common/       Shared UI components (VideoPlayerDialog, BiddingStatus, etc.)
-│   ├── donations/    Donation-related components
-│   ├── home/         Homepage sections (DonatedTokensSection, WinningHistorySection)
+│   ├── ui/           Design system (Radix wrappers: button, card, tooltip, skeleton, ...)
+│   ├── common/       Shared game UI (ConnectWalletButton, GestureStatus, Allocation)
+│   ├── home/         Homepage sections (GestureForm, ChronoCoreTimer, CyclePhaseGuide)
 │   ├── layout/       Header, Footer, ErrorBoundary
-│   ├── nft/          NFT display (NFTTrait, NFTImage, LatestNFTs, PaginationGrid)
-│   ├── staking/      Staking tables and actions
-│   ├── styled/       MUI styled components
-│   ├── tables/       Data tables (bidding, charity, raffle, etc.)
-│   └── tokens/       Token-related components
-├── config/           App configuration (wagmi, networks, constants, nav, styles)
-├── contexts/         React context providers (API data, staking, system mode, notifications)
-├── contracts/        Solidity ABI JSON files and typed ABI barrel
+│   ├── nft/          NFT display (NFTTrait, NFTImage, LatestNFTs, grids)
+│   ├── anchoring/    Anchoring (staking) tables and actions
+│   ├── attachments/  Attached NFT / ERC-20 showcases
+│   ├── tables/       Data tables (gestures, allocations, recipients, ...)
+│   ├── landing-v2/   Marketing-site sections
+│   └── statistics/   Protocol statistics views
+├── config/           App configuration (wagmi, networks, chains, constants, nav)
+├── contexts/         React context providers (contract addresses, API data, system mode)
+├── contracts/        Solidity ABI JSON files + generated typed ABIs (generated.ts, abis.ts)
+├── content/          Typed page copy (landing, learn articles, statistics copy)
 ├── e2e/              Playwright end-to-end test specs
-├── hooks/            Custom React hooks (contract interactions, Web3, React Query API hooks)
+├── hooks/            Custom React hooks (contract interactions, React Query API hooks)
+├── lib/              Fonts, host routing, SEO routes, utilities
 ├── public/           Static assets (fonts, images)
-├── services/api/     API client with typed domain modules (rounds, tokens, staking, etc.)
-├── styles/           Global CSS
-└── utils/            Utility modules (format, urls, wallet, endurance, errors, seo)
+├── scripts/          CLI tooling (bundle budget, lexicon scan, IndexNow)
+├── services/api/     API client with typed domain modules (rounds, tokens, anchoring, ...)
+├── styles/           Global CSS, design tokens, typography
+└── utils/            Utility modules (format, urls, errors, seo, jsonLd)
 ```
 
 ## Architecture
 
-- **Data Fetching:** All API calls go through React Query hooks defined in `hooks/useApiQuery.ts`, providing automatic caching, background refetching, and deduplication. The API layer in `services/api/` handles HTTP requests via Axios.
-- **Gesture Message Chat:** The home-page chat panel is current-cycle scoped and reuses `useGestureListByCycle(round, 'desc')`; see `docs/gesture-message-chat.md` for behavior, moderation, and tests.
-- **Error Handling:** All errors are reported to Sentry via `utils/errors.ts`. Wallet errors use `isUserRejection()` to silently handle user-cancelled transactions.
-- **SEO:** OpenGraph metadata is generated per-page using `createMetadata()` from `utils/seo.ts`.
+- **Data fetching:** All backend reads go through React Query hooks in `hooks/useApiQuery.ts` (caching, polling, focus refetch). The HTTP layer in `services/api/` uses Axios with an envelope-validating interceptor; list endpoints accept an optional `ApiPageWindow` for server-side pagination (`pagedPath` in `services/api/client.ts`).
+- **Contracts:** ABIs are generated into `contracts/generated.ts` via `yarn contracts:generate` (wagmi CLI). `contracts/abis.ts` re-exports them widened to viem's `Abi` for existing call sites; import from `contracts/generated` for fully literal types.
+- **Live updates:** `hooks/useLiveGameDataRefresh.ts` watches the on-chain `BidPlaced` event, invalidates live queries, and dispatches a `cosmic:bid-placed` window event that drives UI pulses (gesture chat, latest-gesture ticker).
+- **Gesture Message Chat:** The home-page chat panel is current-cycle scoped and reuses `useGestureListByCycle(round, 'desc')`; see `docs/gesture-message-chat.md`.
+- **Error handling:** Errors are reported to Sentry via `utils/errors.ts`. Wallet errors use `isUserRejection()` to silently handle user-cancelled transactions.
+- **SEO:** Per-page metadata via `createMetadata()` (`utils/seo.ts`), JSON-LD via `utils/jsonLd.tsx`, host-aware sitemap/robots, dynamic OG images.
 - **State:** Wallet state via wagmi, server state via React Query, shared app state via React contexts.
 
 ## Networks
@@ -118,7 +134,7 @@ The app supports three networks configured in `config/networks.ts`:
 - **sepolia** — Arbitrum Sepolia testnet (chain ID 421614)
 - **mainnet** — Arbitrum One (chain ID 42161)
 
-Contract addresses are defined per-network. Switch networks via the `NEXT_PUBLIC_NETWORK` env var.
+Contract addresses come from the backend dashboard API at runtime (`contexts/ContractAddressesContext.tsx`). Switch networks via the `NEXT_PUBLIC_NETWORK` env var.
 
 ## Development
 
@@ -128,7 +144,7 @@ Contract addresses are defined per-network. Switch networks via the `NEXT_PUBLIC
 yarn lint
 ```
 
-ESLint uses the modern flat config format (`eslint.config.mjs`) with `eslint-config-next/core-web-vitals`, strict TypeScript rules, and import ordering.
+ESLint uses the modern flat config format (`eslint.config.mjs`) with `eslint-config-next/core-web-vitals`, strict TypeScript rules, and import ordering. The repo enforces zero warnings.
 
 ### Commit Conventions
 

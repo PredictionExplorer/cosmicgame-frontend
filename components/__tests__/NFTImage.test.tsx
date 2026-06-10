@@ -28,11 +28,11 @@ describe('NFTImage', () => {
     expect(extractOptimizedUrl(src)).toContain(mockData);
   });
 
-  test('with no src', () => {
+  test('with no src falls back to the lightweight placeholder', () => {
     const mockData = '';
     render(<NFTImage src={mockData} />);
     const src = screen.getByAltText('NFT').getAttribute('src');
-    expect(extractOptimizedUrl(src)).toContain('/images/qmark.png');
+    expect(extractOptimizedUrl(src)).toContain('/images/qmark-preview.png');
   });
 
   test('shows fallback on image error', () => {
@@ -42,7 +42,13 @@ describe('NFTImage', () => {
     expect(extractOptimizedUrl(img.getAttribute('src'))).toContain(brokenSrc);
 
     fireEvent.error(img);
-    expect(extractOptimizedUrl(img.getAttribute('src'))).toContain('/images/qmark.png');
+    expect(extractOptimizedUrl(img.getAttribute('src'))).toContain('/images/qmark-preview.png');
+  });
+
+  test('never references the full-resolution qmark asset as fallback', () => {
+    render(<NFTImage src="" />);
+    const src = screen.getByAltText('NFT').getAttribute('src');
+    expect(extractOptimizedUrl(src)).not.toBe('/images/qmark.png');
   });
 
   test('defaults to lazy loading for below-the-fold use', () => {

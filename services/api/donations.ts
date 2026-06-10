@@ -8,6 +8,8 @@ import {
   flattenTxArray,
   normalizeFieldNames,
   normalizeFieldNamesArray,
+  pagedPath,
+  type ApiPageWindow,
 } from './client';
 import type {
   CharityWithdrawal,
@@ -57,10 +59,10 @@ function mapErc20DonationRowForTable(row: DonatedERC20Token): DonatedERC20Token 
   };
 }
 
-/** Fetches all direct Cosmic Game ETH donations (simple records without extra info). */
-export function get_donations_cg_simple_list(): Promise<ETHDonation[]> {
+/** Fetches direct Cosmic Game ETH donations without extra info (optionally paged). */
+export function get_donations_cg_simple_list(page?: ApiPageWindow): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/eth/simple/list/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`donations/eth/simple/list/${pagedPath(page)}`));
     return flattenTxArray<ETHDonation>(data.DirectCGDonations);
   }, []);
 }
@@ -73,10 +75,10 @@ export function get_donations_cg_simple_by_round(round: number): Promise<ETHDona
   }, []);
 }
 
-/** Fetches all direct Cosmic Game ETH donations with extended donor/round info. */
-export function get_donations_cg_with_info_list(): Promise<ETHDonation[]> {
+/** Fetches direct Cosmic Game ETH donations with extended donor/round info (optionally paged). */
+export function get_donations_cg_with_info_list(page?: ApiPageWindow): Promise<ETHDonation[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/eth/with_info/list/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`donations/eth/with_info/list/${pagedPath(page)}`));
     return flattenTxArray<ETHDonation>(data.DirectCGDonations);
   }, []);
 }
@@ -153,10 +155,10 @@ export function get_charity_withdrawals(): Promise<CharityWithdrawal[]> {
   }, []);
 }
 
-/** Fetches all donated NFTs with normalized field names. */
-export function get_donations_nft_list(): Promise<AttachedNFT[]> {
+/** Fetches donated NFTs with normalized field names (optionally paged). */
+export function get_donations_nft_list(page?: ApiPageWindow): Promise<AttachedNFT[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/nft/list/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`donations/nft/list/${pagedPath(page)}`));
     return normalizeFieldNamesArray(
       flattenTxArray<AttachedNFT>(data.NFTDonations),
     ) as AttachedNFT[];
@@ -171,10 +173,12 @@ export function get_donated_nft_info(record_id: number): Promise<AttachedNFT | n
   }, null);
 }
 
-/** Fetches all donated NFT claim records globally. */
-export function get_donated_nft_claims_all(): Promise<AttachedNFT[]> {
+/** Fetches donated NFT claim records globally (optionally paged; historical cap 100k). */
+export function get_donated_nft_claims_all(page?: ApiPageWindow): Promise<AttachedNFT[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('donations/nft/claims/0/100000'));
+    const { data } = await axios.get(
+      getAPIUrl(`donations/nft/claims/${pagedPath({ limit: 100_000, ...page })}`),
+    );
     return flattenTxArray<AttachedNFT>(data.DonatedNFTClaims);
   }, []);
 }

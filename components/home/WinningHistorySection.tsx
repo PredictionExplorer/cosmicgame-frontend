@@ -30,7 +30,7 @@ export function WinningHistorySection({
 }: WinningHistorySectionProps) {
   const imageSrc =
     bannerTokenSeed === ''
-      ? '/images/qmark.png'
+      ? '/images/qmark-preview.png'
       : getAssetsUrl(`cosmicsignature/${bannerTokenSeed}.png`);
 
   return (

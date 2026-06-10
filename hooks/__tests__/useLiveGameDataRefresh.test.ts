@@ -73,6 +73,25 @@ describe('useLiveGameDataRefresh', () => {
     expect(unwatch).toHaveBeenCalledTimes(1);
   });
 
+  it('dispatches a cosmic:bid-placed window event when a gesture lands', () => {
+    const onBidPlaced = jest.fn();
+    window.addEventListener('cosmic:bid-placed', onBidPlaced);
+
+    const watchContractEvent = jest.fn(({ onLogs }) => {
+      onLogs([]);
+      return jest.fn();
+    });
+    mockUsePublicClient.mockReturnValue({ watchContractEvent } as never);
+    mockUseQueryClient.mockReturnValue({
+      invalidateQueries: jest.fn().mockResolvedValue(undefined),
+    } as never);
+
+    renderHook(() => useLiveGameDataRefresh());
+
+    expect(onBidPlaced).toHaveBeenCalledTimes(1);
+    window.removeEventListener('cosmic:bid-placed', onBidPlaced);
+  });
+
   it('no-ops without a public client or contract address', () => {
     mockUsePublicClient.mockReturnValue(undefined as never);
     mockUseContractAddresses.mockReturnValue({ cosmicGame: '' } as never);

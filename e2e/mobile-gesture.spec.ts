@@ -97,10 +97,13 @@ test.describe('Mobile gesture touch handling', () => {
   });
 
   test('gesture method controls accept real touch taps when rendered', async ({ page }) => {
-    const ethOption = page.getByRole('button', { name: /ETH/i }).first();
+    // Target the gesture method button precisely: a loose /ETH/i name also
+    // matches info-tooltip triggers whose labels mention ETH.
+    const ethOption = page.getByRole('button', { name: /pay with ether/i }).first();
     if (await ethOption.isVisible({ timeout: 5_000 }).catch(() => false)) {
       await ethOption.tap();
       await expect(ethOption).toBeVisible();
+      await expect(ethOption).toHaveAttribute('aria-pressed', 'true');
     }
   });
 });

@@ -9,6 +9,8 @@ import {
   flattenGesture,
   flattenGestureArray,
   flattenRoundInfo,
+  pagedPath,
+  type ApiPageWindow,
 } from './client';
 import {
   DashboardInfoSchema,
@@ -70,10 +72,10 @@ export function get_dashboard_info(): Promise<DashboardInfo | null> {
   }, null);
 }
 
-/** Fetches all rounds with flattened allocation, charity, and anchoring fields. */
-export function get_round_list(): Promise<RoundInfo[]> {
+/** Fetches rounds with flattened allocation, charity, and anchoring fields (optionally paged). */
+export function get_round_list(page?: ApiPageWindow): Promise<RoundInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('rounds/list/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`rounds/list/${pagedPath(page)}`));
     const rounds = (data.Rounds || [])
       .map(flattenRoundInfo)
       .filter((r: RoundInfo | null): r is RoundInfo => r !== null);
@@ -105,27 +107,32 @@ export function get_prize_time(): Promise<number> {
   }, 0);
 }
 
-/** Fetches the global allocation-claim history with flattened transaction fields. */
-export function get_claim_history(): Promise<TxInfo[]> {
+/** Fetches the global allocation-claim history with flattened transaction fields (optionally paged). */
+export function get_claim_history(page?: ApiPageWindow): Promise<TxInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('prizes/history/global/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`prizes/history/global/${pagedPath(page)}`));
     return flattenTxArray<TxInfo>(data.GlobalPrizeHistory);
   }, []);
 }
 
-/** Fetches allocation-claim history for a specific wallet address. */
-export function get_claim_history_by_user(address: string): Promise<WinningHistoryEntry[] | null> {
+/** Fetches allocation-claim history for a specific wallet address (optionally paged). */
+export function get_claim_history_by_user(
+  address: string,
+  page?: ApiPageWindow,
+): Promise<WinningHistoryEntry[] | null> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl(`prizes/history/by_user/${address}/0/1000000`));
+    const { data } = await axios.get(
+      getAPIUrl(`prizes/history/by_user/${address}/${pagedPath(page)}`),
+    );
     // Backend uses `USerPrizeHistory` (typo); accept the corrected key as well.
     return flattenTxArray<WinningHistoryEntry>(data.UserPrizeHistory ?? data.USerPrizeHistory);
   }, null);
 }
 
-/** Fetches all gestures across all rounds with flattened transaction fields. */
-export function get_bid_list(): Promise<GestureInfo[]> {
+/** Fetches gestures across all rounds with flattened transaction fields (optionally paged). */
+export function get_bid_list(page?: ApiPageWindow): Promise<GestureInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('bid/list/all/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`bid/list/all/${pagedPath(page)}`));
     return flattenGestureArray<GestureInfo>(data.Gestures ?? data.Bids);
   }, []);
 }
@@ -139,10 +146,16 @@ export function get_bid_info(evtLogID: number): Promise<GestureInfo | null> {
 }
 
 /** Fetches gestures for a given round, sorted by the specified direction (`"asc"` or `"desc"`). */
-export function get_bid_list_by_round(round: number, sortDir: string): Promise<GestureInfo[]> {
+export function get_bid_list_by_round(
+  round: number,
+  sortDir: string,
+  page?: ApiPageWindow,
+): Promise<GestureInfo[]> {
   return apiCall(async () => {
     const dir = sortDir === 'asc' ? 0 : 1;
-    const { data } = await axios.get(getAPIUrl(`bid/list/by_round/${round}/${dir}/0/1000000`));
+    const { data } = await axios.get(
+      getAPIUrl(`bid/list/by_round/${round}/${dir}/${pagedPath(page)}`),
+    );
     return flattenGestureArray<GestureInfo>(data.BidsByRound);
   }, []);
 }
@@ -159,10 +172,10 @@ export function get_current_special_winners(): Promise<SpecialRecipients | null>
   }, null);
 }
 
-/** Fetches all stellarSelection ETH deposits across all rounds. */
-export function get_prize_deposits_list(): Promise<TxInfo[]> {
+/** Fetches stellarSelection ETH deposits across all rounds (optionally paged). */
+export function get_prize_deposits_list(page?: ApiPageWindow): Promise<TxInfo[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('raffle/deposits/list/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`raffle/deposits/list/${pagedPath(page)}`));
     return flattenTxArray<TxInfo>(data.RaffleDeposits);
   }, []);
 }

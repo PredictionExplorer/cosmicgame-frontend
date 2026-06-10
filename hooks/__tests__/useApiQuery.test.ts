@@ -156,6 +156,50 @@ describe('useApiQuery hooks', () => {
 
       expect(result.current).toEqual({ data: { TotalRounds: 5 }, isLoading: false, error: null });
     });
+
+    it('passes server-provided initial data through to useQuery', () => {
+      const initial = { CurRoundNum: 3, CurNumBids: 12 };
+      renderHook(() => useDashboardInfo(initial as never));
+
+      expect(getOptions().initialData).toBe(initial);
+    });
+
+    it('leaves initialData undefined when no server data is provided', () => {
+      renderHook(() => useDashboardInfo());
+
+      expect(getOptions().initialData).toBeUndefined();
+    });
+
+    it('normalizes a failed (null) server fetch to undefined so the client still loads', () => {
+      renderHook(() => useDashboardInfo(null));
+
+      expect(getOptions().initialData).toBeUndefined();
+    });
+  });
+
+  describe('live freshness (refetchOnWindowFocus)', () => {
+    const liveHookCases: Array<[string, () => unknown]> = [
+      ['useDashboardInfo', () => useDashboardInfo()],
+      ['useAllocationTime', () => useAllocationTime()],
+      ['useGestureList', () => useGestureList()],
+      ['useGestureListByCycle', () => useGestureListByCycle(1)],
+      ['useCurrentSpecialRecipients', () => useCurrentSpecialRecipients()],
+      ['useGestureEthCost', () => useGestureEthCost()],
+      ['useTimeUntilAllocation', () => useTimeUntilAllocation()],
+      ['useCurrentTime', () => useCurrentTime()],
+    ];
+
+    it.each(liveHookCases)('%s refetches on window focus', (_name, hook) => {
+      renderHook(hook);
+
+      expect(getOptions().refetchOnWindowFocus).toBe(true);
+    });
+
+    it('does not force focus refetch for slow-moving queries', () => {
+      renderHook(() => useRoundList());
+
+      expect(getOptions().refetchOnWindowFocus).toBeUndefined();
+    });
   });
 
   describe('useRoundList', () => {

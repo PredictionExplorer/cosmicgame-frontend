@@ -68,7 +68,9 @@ export function useDashboardInfo(initialData?: DashboardInfo | null) {
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
     staleTime: 5_000,
-    initialData,
+    // A failed server-side fetch arrives as `null`; normalize it to undefined
+    // so the query still starts in a loading state and fetches immediately.
+    initialData: initialData ?? undefined,
   });
 }
 

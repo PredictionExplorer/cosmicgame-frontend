@@ -1,4 +1,5 @@
-import { axios, getAPIUrl, apiCall, flattenTxArray } from './client';
+import { axios, getAPIUrl, apiCall, flattenTxArray, pagedPath } from './client';
+import type { ApiPageWindow } from './client';
 import type { SystemModeChangeEvent, AdminEventRow } from './types';
 
 /** Fetches the current server timestamp (Unix seconds). */
@@ -9,10 +10,10 @@ export function get_current_time(): Promise<number> {
   }, 0);
 }
 
-/** Fetches the history of system-mode changes (maintenance, runtime, etc.). */
-export function get_system_modelist(): Promise<SystemModeChangeEvent[]> {
+/** Fetches the history of system-mode changes, optionally paged (maintenance, runtime, etc.). */
+export function get_system_modelist(page?: ApiPageWindow): Promise<SystemModeChangeEvent[]> {
   return apiCall(async () => {
-    const { data } = await axios.get(getAPIUrl('system/modelist/0/1000000'));
+    const { data } = await axios.get(getAPIUrl(`system/modelist/${pagedPath(page)}`));
     return flattenTxArray<SystemModeChangeEvent>(data.SystemModeChanges);
   }, []);
 }

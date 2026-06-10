@@ -21,5 +21,6 @@ const api = {
 };
 
 export default api;
-export { cosmicGameBaseUrl } from './client';
+export { cosmicGameBaseUrl, pagedPath, DEFAULT_API_PAGE_LIMIT } from './client';
+export type { ApiPageWindow } from './client';
 export * from './types';

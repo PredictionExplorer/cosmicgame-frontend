@@ -4,7 +4,7 @@ import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import type { GestureInfo } from '@/services/api';
 
-import { render, screen, within, checkA11y } from '@/test-utils';
+import { render, screen, within, act, checkA11y } from '@/test-utils';
 
 import { GestureMessageChat } from '../GestureMessageChat';
 
@@ -172,6 +172,38 @@ describe('GestureMessageChat', () => {
 
     expect(screen.getByText('Visible message')).toBeInTheDocument();
     expect(screen.queryByText('Hidden message')).not.toBeInTheDocument();
+  });
+
+  it('flashes the live pulse when a new bid event increments the pulse key', () => {
+    jest.useFakeTimers();
+    try {
+      const { rerender } = render(
+        <GestureMessageChat gestures={[makeGesture({ Message: 'hello cosmos' })]} pulseKey={0} />,
+      );
+
+      const chat = screen.getByTestId('gesture-message-chat');
+      expect(chat).not.toHaveClass('animate-live-flash');
+
+      rerender(
+        <GestureMessageChat gestures={[makeGesture({ Message: 'hello cosmos' })]} pulseKey={1} />,
+      );
+      expect(chat).toHaveClass('animate-live-flash');
+
+      act(() => {
+        jest.advanceTimersByTime(950);
+      });
+      expect(chat).not.toHaveClass('animate-live-flash');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('does not flash on first render even with a positive pulse key', () => {
+    render(
+      <GestureMessageChat gestures={[makeGesture({ Message: 'hello cosmos' })]} pulseKey={4} />,
+    );
+
+    expect(screen.getByTestId('gesture-message-chat')).not.toHaveClass('animate-live-flash');
   });
 
   it('has no accessibility violations', async () => {

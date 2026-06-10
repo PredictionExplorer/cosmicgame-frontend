@@ -117,7 +117,7 @@ test.describe('Wallet connection state (disconnected)', () => {
   }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
 
-    await expect(page.getByText('Connect to make a gesture')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('Connect to submit your gesture')).toBeVisible({ timeout: 15000 });
     await expect(page.getByRole('button', { name: /connect/i }).first()).toBeVisible();
   });
 

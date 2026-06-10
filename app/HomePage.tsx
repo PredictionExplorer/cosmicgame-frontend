@@ -18,7 +18,7 @@ import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { PageShell } from '@/components/ui/page-shell';
-import { Skeleton, SkeletonText } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useActiveWeb3React } from '@/hooks/web3';
 import { SpecialAllocationRecipients } from '@/components/tables/SpecialAllocationRecipients';
 import { GestureStatus } from '@/components/common/GestureStatus';
@@ -65,9 +65,9 @@ function renderInlineCountdown({ total }: CountdownRenderProps) {
 }
 
 function getGestureKindLabel(gestureType: unknown): string {
-  if (gestureType === 2) return 'CST gesture';
-  if (gestureType === 1) return 'RandomWalk gesture';
-  return 'ETH gesture';
+  if (gestureType === 2) return 'a CST gesture';
+  if (gestureType === 1) return 'a RandomWalk gesture';
+  return 'an ETH gesture';
 }
 
 function formatRelativeGestureAge(timestamp: unknown, nowMs: number): string {
@@ -111,7 +111,7 @@ function LatestGestureTicker({
         </span>
         <span className="min-w-0">
           <span className="block truncate font-medium text-foreground">
-            {shortenHex(gesture.BidderAddr, 6)} made a {getGestureKindLabel(gesture.GestureType)}
+            {shortenHex(gesture.BidderAddr, 6)} made {getGestureKindLabel(gesture.GestureType)}
           </span>
           <span className="mt-0.5 block text-xs text-muted-foreground">
             {formatRelativeGestureAge(gesture.TimeStamp, nowMs)}
@@ -387,8 +387,15 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                   </p>
 
                   {loading ? (
-                    <div className="space-y-5" role="status" aria-label="Loading gesture form">
-                      <SkeletonText lines={2} lastLineWidth="42%" />
+                    <div
+                      className="space-y-5"
+                      role="status"
+                      aria-label="Loading gesture form"
+                      data-testid="gesture-form-skeleton"
+                    >
+                      {/* Plain Skeletons only: nesting SkeletonText would add a second role="status". */}
+                      <Skeleton className="h-3 w-3/4" />
+                      <Skeleton className="h-3 w-2/5" />
                       <div className="grid gap-2 sm:grid-cols-3">
                         <Skeleton className="h-16 rounded-lg" />
                         <Skeleton className="h-16 rounded-lg" />
@@ -511,6 +518,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
             <GestureMessageChat
               gestures={curGestureList}
               cycleNumber={round >= 0 ? round : undefined}
+              pulseKey={bidPulseKey}
               className="min-h-[30rem] xl:sticky xl:top-24 xl:min-h-[38rem] 2xl:min-h-[42rem]"
             />
 

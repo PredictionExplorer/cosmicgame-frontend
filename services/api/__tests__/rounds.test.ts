@@ -114,6 +114,20 @@ describe('rounds API', () => {
       expect(await get_round_list()).toEqual([]);
     });
 
+    it('defaults to the full window and honors explicit pagination', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { Rounds: [] } });
+
+      await get_round_list();
+      expect(mockedAxios.get).toHaveBeenLastCalledWith(
+        expect.stringMatching(/rounds\/list\/0\/1000000$/),
+      );
+
+      await get_round_list({ offset: 10, limit: 25 });
+      expect(mockedAxios.get).toHaveBeenLastCalledWith(
+        expect.stringMatching(/rounds\/list\/10\/25$/),
+      );
+    });
+
     it('returns empty array on 400 response', async () => {
       mockedAxios.get.mockRejectedValue(make400());
       expect(await get_round_list()).toEqual([]);
@@ -428,6 +442,16 @@ describe('rounds API', () => {
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
         expect.stringMatching(/by_round.*1.*1.*0.*1000000/),
+      );
+    });
+
+    it('honors an explicit server-side pagination window', async () => {
+      mockedAxios.get.mockResolvedValue({ data: { BidsByRound: [] } });
+
+      await get_bid_list_by_round(5, 'asc', { offset: 40, limit: 20 });
+
+      expect(mockedAxios.get).toHaveBeenCalledWith(
+        expect.stringMatching(/bid\/list\/by_round\/5\/0\/40\/20$/),
       );
     });
 

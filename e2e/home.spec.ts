@@ -104,7 +104,7 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   });
 
   test('NFT grid shows items', async ({ page }) => {
-    const latestNfts = page.locator("text=/Latest NFT's/i").first();
+    const latestNfts = page.locator('text=/Latest NFTs/i').first();
     await ensureVisible(latestNfts);
     await expect(latestNfts).toBeVisible();
   });

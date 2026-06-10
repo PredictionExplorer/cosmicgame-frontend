@@ -18,6 +18,8 @@ import {
   apiCall,
   apiPost,
   assertApiEnvelope,
+  pagedPath,
+  DEFAULT_API_PAGE_LIMIT,
 } from '@/services/api/client';
 
 import { reportError } from '../../../utils/errors';
@@ -249,6 +251,26 @@ describe('apiPost', () => {
       expect((err as Error).message).toBe('Network response was not OK');
     }
     expect(mockReportError).toHaveBeenCalledWith(original, 'apiPost');
+  });
+});
+
+describe('pagedPath', () => {
+  it('defaults to the historical fetch-everything window', () => {
+    expect(pagedPath()).toBe(`0/${DEFAULT_API_PAGE_LIMIT}`);
+    expect(pagedPath({})).toBe(`0/${DEFAULT_API_PAGE_LIMIT}`);
+  });
+
+  it('builds an explicit offset/limit window', () => {
+    expect(pagedPath({ offset: 200, limit: 50 })).toBe('200/50');
+  });
+
+  it('keeps the default limit when only an offset is provided', () => {
+    expect(pagedPath({ offset: 25 })).toBe(`25/${DEFAULT_API_PAGE_LIMIT}`);
+  });
+
+  it('clamps negative and fractional windows to sane values', () => {
+    expect(pagedPath({ offset: -5, limit: -10 })).toBe('0/1');
+    expect(pagedPath({ offset: 1.9, limit: 10.7 })).toBe('1/10');
   });
 });
 

@@ -201,6 +201,34 @@ describe('InfoTooltip', () => {
     ).toBeInTheDocument();
   });
 
+  it('derives unique trigger labels from content so duplicate generic names cannot occur', () => {
+    render(
+      <>
+        <InfoTooltip content="First metric explanation" />
+        <InfoTooltip content="Second metric explanation" />
+      </>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'More information: First metric explanation' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'More information: Second metric explanation' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Show more information' })).not.toBeInTheDocument();
+  });
+
+  it('truncates very long content when deriving the default trigger label', () => {
+    const longContent =
+      'This explanation is intentionally extremely long so that the accessible name needs truncation to stay readable for screen reader users.';
+    render(<InfoTooltip content={longContent} />);
+
+    const trigger = screen.getByRole('button', { name: /^More information: This explanation/ });
+    const ariaLabel = trigger.getAttribute('aria-label')!;
+    expect(ariaLabel.endsWith('...')).toBe(true);
+    expect(ariaLabel.length).toBeLessThanOrEqual('More information: '.length + 72);
+  });
+
   it('opens from the accessible button on touch', async () => {
     render(
       <TooltipProvider delayDuration={0}>
@@ -249,7 +277,7 @@ describe('InfoTooltip', () => {
     );
 
     const trigger = screen.getByRole('button', {
-      name: 'More information: This is long-form tooltip content that should have a readable default...',
+      name: /^More information: This is long-form tooltip content/,
     });
     touchPointerDown(trigger);
     fireEvent.click(trigger);

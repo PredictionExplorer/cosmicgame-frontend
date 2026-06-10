@@ -13,8 +13,7 @@ export async function dismissOpenTooltips(page: Page): Promise<void> {
 
 export function tooltipTriggerForLabel(page: Page, label: string): Locator {
   const tooltipButtonSelector = [
-    'button[aria-label="Show more information"]',
-    'button[aria-label^="More information about"]',
+    'button[aria-label^="More information"]',
     'button[aria-label^="Explain column:"]',
   ].join(', ');
 
