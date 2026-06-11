@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { zeroAddress } from 'viem';
 import {
@@ -17,12 +17,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import {
-  getEnduranceChampions,
-  formatEthValue,
-  convertTimestampToDateTime,
-  getStableClientTargetTime,
-} from '@/utils';
+import { getEnduranceChampions, formatEthValue, convertTimestampToDateTime } from '@/utils';
 
 import { PageShell } from '@/components/ui/page-shell';
 import { StatCard } from '@/components/ui/stat-card';
@@ -42,9 +37,9 @@ import {
   useDonationsNFTByRound,
   useDonationsCGWithInfoByRound,
   useDonationsERC20ByRound,
-  useAllocationTime,
   useCurrentTime,
 } from '@/hooks/useApiQuery';
+import { useAllocationFinalize } from '@/hooks/useAllocationFinalize';
 import { useNow } from '@/hooks/useNow';
 
 type EthDonation = import('@/components/tables/EthDonationTable').EthDonation;
@@ -61,7 +56,6 @@ const sectionFade = {
 
 const CurrentRoundPage = () => {
   const { data: dashboardData, isLoading, isError } = useDashboardInfo();
-  const { data: prizeTimeRaw } = useAllocationTime();
   const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
   const round = dashboardData?.CurRoundNum ?? -1;
 
@@ -76,33 +70,16 @@ const CurrentRoundPage = () => {
   const ethDonations = (ethDonationsRawData ?? []) as EthDonation[];
   const donatedERC20Tokens = (erc20DonationsData ?? []) as DonatedERC20[];
 
-  const [mountTime] = useState(() => Date.now());
+  const [currentTimeFallbackMs] = useState(() => Date.now());
   const nowMs = useNow(1000);
 
-  const [allocationTime, setAllocationTime] = useState(() =>
-    getStableClientTargetTime({
-      targetServerTimeSec: prizeTimeRaw,
-      currentServerTimeSec: currentTimeRaw,
-      currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
-      fallbackNowMs: mountTime,
-    }),
-  );
+  const offset = useMemo(() => {
+    if (currentTimeRaw == null) return 0;
+    const sampledAtMs = currentTimeUpdatedAt || currentTimeFallbackMs;
+    return currentTimeRaw * 1000 - sampledAtMs;
+  }, [currentTimeRaw, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
-  useEffect(() => {
-    const updateId = window.setTimeout(() => {
-      setAllocationTime((previousTargetMs) =>
-        getStableClientTargetTime({
-          targetServerTimeSec: prizeTimeRaw,
-          currentServerTimeSec: currentTimeRaw,
-          currentServerTimeUpdatedAtMs: currentTimeUpdatedAt,
-          fallbackNowMs: mountTime,
-          previousTargetMs,
-          correctionToleranceMs: 1500,
-        }),
-      );
-    }, 0);
-    return () => window.clearTimeout(updateId);
-  }, [prizeTimeRaw, currentTimeRaw, currentTimeUpdatedAt, mountTime]);
+  const { allocationTime, activationTime } = useAllocationFinalize({ data, offset });
 
   const championList = useMemo(() => {
     if (!bidListData) return null;
@@ -142,6 +119,7 @@ const CurrentRoundPage = () => {
 
   const hasStarted = data.TsRoundStart !== 0;
   const hasLastParticipant = data.LastBidderAddr !== zeroAddress;
+  const isPreActivation = activationTime > nowMs / 1000;
   const isCountdownActive = hasLastParticipant && allocationTime > nowMs;
   const isGesturesExhausted = hasLastParticipant && allocationTime > 0 && allocationTime <= nowMs;
 
@@ -189,15 +167,39 @@ const CurrentRoundPage = () => {
           </div>
           <span
             data-testid="live-badge"
-            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-400"
+            className={
+              isPreActivation
+                ? 'inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary'
+                : 'inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-400'
+            }
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-live-dot" />
-            Live
+            <span
+              className={
+                isPreActivation
+                  ? 'h-1.5 w-1.5 rounded-full bg-primary animate-pulse'
+                  : 'h-1.5 w-1.5 rounded-full bg-emerald-400 animate-live-dot'
+              }
+            />
+            {isPreActivation ? 'Opening soon' : 'Live'}
           </span>
         </div>
 
+        {/* Pre-activation countdown */}
+        {isPreActivation && (
+          <div className="text-center">
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
+              Cycle opens in
+            </p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Cycle {data.CurRoundNum} opens at{' '}
+              {convertTimestampToDateTime(activationTime, true)}
+            </p>
+            <SmoothCountdown date={activationTime * 1000} renderer={Counter} />
+          </div>
+        )}
+
         {/* Countdown or Closed state */}
-        {hasStarted && isCountdownActive && (
+        {!isPreActivation && hasStarted && isCountdownActive && (
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
               Cycle finalizes in
@@ -210,7 +212,7 @@ const CurrentRoundPage = () => {
           </div>
         )}
 
-        {hasStarted && isGesturesExhausted && (
+        {!isPreActivation && hasStarted && isGesturesExhausted && (
           <div className="text-center rounded-xl bg-primary/[0.06] p-5 animate-pulse-glow">
             <Zap className="mx-auto h-7 w-7 text-primary mb-2" />
             <p className="font-display text-lg font-bold text-primary">Cycle Closed</p>

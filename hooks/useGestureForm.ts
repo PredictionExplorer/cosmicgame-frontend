@@ -14,7 +14,6 @@ import { getChainId } from 'viem/actions';
 import {
   randomWalkNftAbi as NFT_ABI,
   cosmicTokenAbi as ERC20_ABI,
-  cosmicGameAbi,
 } from '@/contracts/abis';
 
 import api from '@/services/api';
@@ -26,6 +25,11 @@ import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { ERC721_INTERFACE_ID, GESTURE_GAS_LIMIT } from '@/config/constants';
 import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
 import { getContractErrorMessage } from '@/utils/contractErrors';
+import {
+  type CosmicGameBidFunctionName,
+  pickBidWriteAbi,
+  withBidArgsV1ThenV2,
+} from '@/utils/cosmicGameContractCompat';
 import { useNotify } from '@/hooks/useNotify';
 import { useCTPrice, useGestureEthCost, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 
@@ -208,7 +212,8 @@ export function useGestureForm() {
   const hasEthBalance = async (amount: bigint) => {
     try {
       const bal = await publicClient!.getBalance({ address: account as `0x${string}` });
-      return bal >= amount;
+      const ok = bal >= amount;
+      return ok;
     } catch (e) {
       reportError(e, 'check ETH balance');
       return false;
@@ -292,20 +297,22 @@ export function useGestureForm() {
   };
 
   const estimateDonationGas = async (
-    fnName: string,
-    args: unknown[],
+    fnName: CosmicGameBidFunctionName,
+    args: readonly unknown[],
     value: bigint,
   ): Promise<bigint> => {
-    try {
-      const estimate = await publicClient!.estimateContractGas({
+    const estimate = async (callArgs: readonly unknown[]) =>
+      publicClient!.estimateContractGas({
         address: contractAddrs.cosmicGame as `0x${string}`,
-        abi: cosmicGameAbi,
+        abi: pickBidWriteAbi(fnName, callArgs),
         functionName: fnName,
-        args,
+        args: callArgs as unknown[],
         value,
         account: account as `0x${string}`,
       });
-      return estimate * 2n;
+
+    try {
+      return (await withBidArgsV1ThenV2(fnName, args, estimate)) * 2n;
     } catch {
       return GESTURE_GAS_LIMIT;
     }
@@ -340,6 +347,27 @@ export function useGestureForm() {
     return {};
   };
 
+  const writeBid = async (
+    functionName: CosmicGameBidFunctionName,
+    args: readonly unknown[],
+    signerAddress: `0x${string}`,
+    feeParams: Awaited<ReturnType<typeof getFeeParams>>,
+    options?: { value?: bigint; gas?: bigint },
+  ) =>
+    withBidArgsV1ThenV2(functionName, args, async (callArgs) =>
+      writeContract(config, {
+        address: contractAddrs.cosmicGame as `0x${string}`,
+        abi: pickBidWriteAbi(functionName, callArgs),
+        functionName,
+        args: callArgs as unknown[],
+        account: signerAddress,
+        chainId: activeChain.id,
+        ...feeParams,
+        ...(options?.value !== undefined ? { value: options.value } : {}),
+        ...(options?.gas !== undefined ? { gas: options.gas } : {}),
+      }),
+    );
+
   /**
    * Wagmi's `useChainId()` can disagree with MetaMask (e.g. hooks say Hardhat while the wallet
    * stays on Arbitrum Sepolia). Use the wallet client's chain before sending to avoid viem
@@ -350,7 +378,7 @@ export function useGestureForm() {
     if (!signer) {
       try {
         signer = (await getConnectorClient(config, { chainId: activeChain.id })) ?? undefined;
-      } catch {
+      } catch (err) {
         signer = undefined;
       }
     }
@@ -362,11 +390,13 @@ export function useGestureForm() {
     let walletChainId: number;
     try {
       walletChainId = await getChainId(signer as Client);
-    } catch {
+    } catch (err) {
       walletChainId = chainId ?? activeChain.id;
     }
 
-    if (walletChainId === activeChain.id) return true;
+    if (walletChainId === activeChain.id) {
+      return true;
+    }
 
     try {
       await switchChainAsync({ chainId: activeChain.id });
@@ -392,7 +422,9 @@ export function useGestureForm() {
         notify('error', 'Please connect your wallet.');
         return false;
       }
-      if (!(await switchToActiveChainIfNeeded())) return false;
+      if (!(await switchToActiveChainIfNeeded())) {
+        return false;
+      }
       if (!cosmicGameContract) {
         notify('error', 'Please connect your wallet and ensure you are on the correct network.');
         return false;
@@ -414,17 +446,13 @@ export function useGestureForm() {
           (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
           (account as `0x${string}`);
         const feeParams = await getFeeParams();
-        const hash = await writeContract(config, {
-          address: contractAddrs.cosmicGame as `0x${string}`,
-          abi: cosmicGameAbi,
-          functionName: 'bidWithEth',
-          args: [rwlkId, message],
-          account: signerAddress,
-          value: ethGestureCost,
-          gas: GESTURE_GAS_LIMIT,
-          chainId: activeChain.id,
-          ...feeParams,
-        });
+        const hash = await writeBid(
+          'bidWithEth',
+          [rwlkId, message],
+          signerAddress,
+          feeParams,
+          { value: ethGestureCost, gas: GESTURE_GAS_LIMIT },
+        );
         await handleTx(Promise.resolve(hash));
         return true;
       }
@@ -432,31 +460,31 @@ export function useGestureForm() {
       if (contributionType === 'NFT') {
         const nftIdNum = Number(nftId);
         const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
-        if (!ok) return false;
-        const donateArgs = [rwlkId, message, nftDonateAddress, nftIdNum];
+        if (!ok) {
+          return false;
+        }
+        const donateArgs = [rwlkId, message, nftDonateAddress, nftIdNum] as const;
         const gas = await estimateDonationGas('bidWithEthAndDonateNft', donateArgs, ethGestureCost);
         const signerAddress =
           (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
           (account as `0x${string}`);
         const feeParams = await getFeeParams();
-        const hash = await writeContract(config, {
-          address: contractAddrs.cosmicGame as `0x${string}`,
-          abi: cosmicGameAbi,
-          functionName: 'bidWithEthAndDonateNft',
-          args: donateArgs,
-          account: signerAddress,
-          value: ethGestureCost,
-          gas,
-          chainId: activeChain.id,
-          ...feeParams,
-        });
+        const hash = await writeBid(
+          'bidWithEthAndDonateNft',
+          donateArgs,
+          signerAddress,
+          feeParams,
+          { value: ethGestureCost, gas },
+        );
         await handleTx(Promise.resolve(hash));
         setNftId('');
         setNftDonateAddress('');
       } else {
         const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
-        if (!res.ok) return false;
-        const donateArgs = [rwlkId, message, tokenDonateAddress, res.amountWei];
+        if (!res.ok) {
+          return false;
+        }
+        const donateArgs = [rwlkId, message, tokenDonateAddress, res.amountWei] as const;
         const gas = await estimateDonationGas(
           'bidWithEthAndDonateToken',
           donateArgs,
@@ -466,22 +494,17 @@ export function useGestureForm() {
           (client as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
           (account as `0x${string}`);
         const feeParams = await getFeeParams();
-        const hash = await writeContract(config, {
-          address: contractAddrs.cosmicGame as `0x${string}`,
-          abi: cosmicGameAbi,
-          functionName: 'bidWithEthAndDonateToken',
-          args: donateArgs,
-          account: signerAddress,
-          value: ethGestureCost,
-          gas,
-          chainId: activeChain.id,
-          ...feeParams,
-        });
+        const hash = await writeBid(
+          'bidWithEthAndDonateToken',
+          donateArgs,
+          signerAddress,
+          feeParams,
+          { value: ethGestureCost, gas },
+        );
         await handleTx(Promise.resolve(hash));
         setTokenAmount('');
         setTokenDonateAddress('');
       }
-
       return true;
     } catch (err: unknown) {
       if (isUserRejection(err)) {
@@ -512,7 +535,9 @@ export function useGestureForm() {
         notify('error', 'Please connect your wallet.');
         return false;
       }
-      if (!(await switchToActiveChainIfNeeded())) return false;
+      if (!(await switchToActiveChainIfNeeded())) {
+        return false;
+      }
       let signerClient = client;
       if (!signerClient) {
         signerClient = (await getConnectorClient(config, { chainId: activeChain.id })) ?? undefined;
@@ -548,14 +573,12 @@ export function useGestureForm() {
 
       if (noDonation || !contributionType) {
         const feeParams = await getFeeParams();
-        const hash = await writeContract(config, {
-          address: contractAddrs.cosmicGame as `0x${string}`,
-          abi: cosmicGameAbi,
-          functionName: 'bidWithCst',
-          args: [priceMaxLimit, message],
-          account: signerAddress,
-          ...feeParams,
-        });
+        const hash = await writeBid(
+          'bidWithCst',
+          [priceMaxLimit, message],
+          signerAddress,
+          feeParams,
+        );
         await handleTx(Promise.resolve(hash));
         return true;
       }
@@ -565,14 +588,12 @@ export function useGestureForm() {
         const ok = await withNftDonation(nftDonateAddress!, nftIdNum);
         if (!ok) return false;
         const feeParams = await getFeeParams();
-        const hash = await writeContract(config, {
-          address: contractAddrs.cosmicGame as `0x${string}`,
-          abi: cosmicGameAbi,
-          functionName: 'bidWithCstAndDonateNft',
-          args: [priceMaxLimit, message, nftDonateAddress, nftIdNum],
-          account: signerAddress,
-          ...feeParams,
-        });
+        const hash = await writeBid(
+          'bidWithCstAndDonateNft',
+          [priceMaxLimit, message, nftDonateAddress, nftIdNum],
+          signerAddress,
+          feeParams,
+        );
         await handleTx(Promise.resolve(hash));
         setNftId('');
         setNftDonateAddress('');
@@ -580,19 +601,16 @@ export function useGestureForm() {
         const res = await withTokenDonation(tokenDonateAddress!, tokenAmount!);
         if (!res.ok) return false;
         const feeParams = await getFeeParams();
-        const hash = await writeContract(config, {
-          address: contractAddrs.cosmicGame as `0x${string}`,
-          abi: cosmicGameAbi,
-          functionName: 'bidWithCstAndDonateToken',
-          args: [priceMaxLimit, message, tokenDonateAddress, res.amountWei],
-          account: signerAddress,
-          ...feeParams,
-        });
+        const hash = await writeBid(
+          'bidWithCstAndDonateToken',
+          [priceMaxLimit, message, tokenDonateAddress, res.amountWei],
+          signerAddress,
+          feeParams,
+        );
         await handleTx(Promise.resolve(hash));
         setTokenAmount('');
         setTokenDonateAddress('');
       }
-
       return true;
     } catch (err: unknown) {
       if (isUserRejection(err)) {

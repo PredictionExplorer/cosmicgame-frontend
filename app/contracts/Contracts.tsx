@@ -14,6 +14,7 @@ import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { PageShell } from '@/components/ui/page-shell';
 import { useDashboardInfo } from '@/hooks/useApiQuery';
 import { reportError } from '@/utils/errors';
+import { readCosmicGameWithFallback } from '@/utils/cosmicGameContractCompat';
 import useContractNoSigner from '@/hooks/useContractNoSigner';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
@@ -165,8 +166,12 @@ const Contracts = () => {
     }, 'getInitialDurationUntilMainPrize');
 
     safeCall(async () => {
-      const v = await cosmicGameContract.read.cstRewardAmountForBidding?.();
-      setCstRewardAmountForBidding(Number(formatEther((v ?? 0n) as bigint)));
+      const v = await readCosmicGameWithFallback<bigint>([
+        () => cosmicGameContract.read.cstRewardAmountForBidding?.() as Promise<bigint | undefined>,
+        () => cosmicGameContract.read.bidCstRewardAmount?.() as Promise<bigint | undefined>,
+        () => cosmicGameContract.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
+      ]);
+      setCstRewardAmountForBidding(Number(formatEther(v ?? 0n)));
     }, 'cstRewardAmountForBidding');
 
     safeCall(async () => {

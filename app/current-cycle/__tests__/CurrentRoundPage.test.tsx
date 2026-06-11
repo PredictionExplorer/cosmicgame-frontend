@@ -7,8 +7,11 @@ const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: [] });
 const mockUseDonationsNFTByRound = jest.fn().mockReturnValue({ data: [] });
 const mockUseDonationsCGWithInfoByRound = jest.fn().mockReturnValue({ data: [] });
 const mockUseDonationsERC20ByRound = jest.fn().mockReturnValue({ data: [] });
-const mockUseAllocationTime = jest.fn().mockReturnValue({ data: undefined });
 const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
+const mockUseAllocationFinalize = jest.fn().mockReturnValue({
+  allocationTime: 0,
+  activationTime: 0,
+});
 const mockCountdownProps: Array<Record<string, unknown>> = [];
 
 jest.mock('../../../hooks/useApiQuery', () => ({
@@ -17,8 +20,11 @@ jest.mock('../../../hooks/useApiQuery', () => ({
   useDonationsNFTByRound: (...args: unknown[]) => mockUseDonationsNFTByRound(...args),
   useDonationsCGWithInfoByRound: (...args: unknown[]) => mockUseDonationsCGWithInfoByRound(...args),
   useDonationsERC20ByRound: (...args: unknown[]) => mockUseDonationsERC20ByRound(...args),
-  useAllocationTime: (...args: unknown[]) => mockUseAllocationTime(...args),
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
+}));
+
+jest.mock('../../../hooks/useAllocationFinalize', () => ({
+  useAllocationFinalize: (...args: unknown[]) => mockUseAllocationFinalize(...args),
 }));
 
 jest.mock('../../../components/common/SmoothCountdown', () => ({
@@ -82,6 +88,10 @@ beforeEach(() => {
   mockUseDonationsNFTByRound.mockReturnValue({ data: [] });
   mockUseDonationsCGWithInfoByRound.mockReturnValue({ data: [] });
   mockUseDonationsERC20ByRound.mockReturnValue({ data: [] });
+  mockUseAllocationFinalize.mockReturnValue({
+    allocationTime: 0,
+    activationTime: 0,
+  });
   mockCountdownProps.length = 0;
 });
 
@@ -181,24 +191,49 @@ describe('CurrentRoundPage', () => {
     expect(screen.getByText('2.0000 ETH')).toBeInTheDocument();
   });
 
+  it('renders pre-activation countdown when the cycle has not opened yet', () => {
+    const activationSec = NOW_SEC + 3600;
+    setupLoaded({ TsRoundStart: 0 });
+    mockUseAllocationFinalize.mockReturnValue({
+      allocationTime: 0,
+      activationTime: activationSec,
+    });
+    render(<CurrentRoundPage />);
+
+    expect(screen.getByText('Opening soon')).toBeInTheDocument();
+    expect(screen.getByText('Cycle opens in')).toBeInTheDocument();
+    expect(screen.getByText(/Cycle 42 opens at/)).toBeInTheDocument();
+    expect(screen.getByTestId('countdown')).toBeInTheDocument();
+    expect(mockCountdownProps).toEqual(
+      expect.arrayContaining([expect.objectContaining({ date: activationSec * 1000 })]),
+    );
+    expect(screen.queryByText('Cycle finalizes in')).not.toBeInTheDocument();
+  });
+
   it('renders countdown timer when allocation time is in the future', () => {
-    const futureTime = NOW_SEC + 3600;
+    const futureTimeMs = (NOW_SEC + 3600) * 1000;
     setupLoaded();
-    mockUseAllocationTime.mockReturnValue({ data: futureTime });
+    mockUseAllocationFinalize.mockReturnValue({
+      allocationTime: futureTimeMs,
+      activationTime: NOW_SEC - 60,
+    });
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
     render(<CurrentRoundPage />);
 
     expect(screen.getByText('Cycle finalizes in')).toBeInTheDocument();
     expect(screen.getByTestId('countdown')).toBeInTheDocument();
     expect(mockCountdownProps).toEqual(
-      expect.arrayContaining([expect.objectContaining({ date: expect.any(Number) })]),
+      expect.arrayContaining([expect.objectContaining({ date: futureTimeMs })]),
     );
   });
 
   it('renders "Cycle Closed" state when countdown has passed', () => {
-    const pastTime = NOW_SEC - 60;
+    const pastTimeMs = (NOW_SEC - 60) * 1000;
     setupLoaded();
-    mockUseAllocationTime.mockReturnValue({ data: pastTime });
+    mockUseAllocationFinalize.mockReturnValue({
+      allocationTime: pastTimeMs,
+      activationTime: NOW_SEC - 3600,
+    });
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
     render(<CurrentRoundPage />);
 
@@ -208,7 +243,10 @@ describe('CurrentRoundPage', () => {
 
   it('does not show countdown or exhausted state when no last participant', () => {
     setupLoaded({ LastBidderAddr: '0x0000000000000000000000000000000000000000' });
-    mockUseAllocationTime.mockReturnValue({ data: NOW_SEC + 3600 });
+    mockUseAllocationFinalize.mockReturnValue({
+      allocationTime: (NOW_SEC + 3600) * 1000,
+      activationTime: NOW_SEC - 60,
+    });
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     render(<CurrentRoundPage />);
 
@@ -344,7 +382,10 @@ describe('CurrentRoundPage', () => {
 
   it('has no accessibility violations', async () => {
     setupLoaded();
-    mockUseAllocationTime.mockReturnValue({ data: NOW_SEC + 3600 });
+    mockUseAllocationFinalize.mockReturnValue({
+      allocationTime: (NOW_SEC + 3600) * 1000,
+      activationTime: NOW_SEC - 60,
+    });
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC });
     const { container } = render(<CurrentRoundPage />);
     await checkA11y(container);

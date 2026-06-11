@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { zeroAddress } from 'viem';
 import { ArrowRight, Radio } from 'lucide-react';
@@ -13,6 +13,7 @@ import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { formatSeconds, shortenHex } from '@/utils';
 
 import { reportError } from '@/utils/errors';
+import { useNotify } from '@/hooks/useNotify';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { Button } from '@/components/ui/button';
@@ -132,6 +133,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   const searchParams = useSearchParams();
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
+  const { notify } = useNotify();
 
   const [hostname, setHostname] = useState<string | null>(initialHostname);
 
@@ -280,6 +282,73 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   const canClaim = !(allocationTime > now || data?.LastBidderAddr === zeroAddress || loading);
   const claimWait = allocationTime + timeoutFinalize * 1000;
   const isRoundActive = activationTime < now / 1000;
+  const cycleTimerEnded = allocationTime <= now;
+
+  const scrollToGestureForm = () => {
+    const el = document.getElementById('make-gesture');
+    if (el && typeof el.scrollIntoView === 'function') {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handlePrimaryCtaClick = useCallback(async () => {
+    scrollToGestureForm();
+
+    if (!isRoundActive) {
+      notify('info', 'This cycle is not active yet.');
+      return;
+    }
+    if (!account) {
+      notify('info', 'Connect your wallet below, then confirm your gesture in Rabby.');
+      return;
+    }
+
+    if (cycleTimerEnded && canClaim) {
+      const canFinalizeNow = data?.LastBidderAddr === account || claimWait <= now;
+      if (canFinalizeNow) {
+        await handleFinalize();
+      } else {
+        notify(
+          'info',
+          'Please wait for the participant who made the final gesture to finalize the cycle.',
+        );
+      }
+      return;
+    }
+
+    if (!canGesture) {
+      notify('info', 'You made the final gesture for this cycle. Finalize when the timer ends.');
+      return;
+    }
+
+    const buttonDisabled =
+      isGesturing ||
+      (gestureType === 'RandomWalk' && rwlkId === -1) ||
+      gestureType === '';
+    if (buttonDisabled) {
+      if (gestureType === 'RandomWalk' && rwlkId === -1) {
+        notify('info', 'Select a RandomWalk token before making your gesture.');
+      }
+      return;
+    }
+
+    await handleGesture();
+  }, [
+    account,
+    canClaim,
+    canGesture,
+    claimWait,
+    cycleTimerEnded,
+    data?.LastBidderAddr,
+    gestureType,
+    handleFinalize,
+    handleGesture,
+    isGesturing,
+    isRoundActive,
+    notify,
+    rwlkId,
+  ]);
+
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
   const hasPublicGoodsImpact = Number(data?.CharityPercentage ?? 0) > 0;
 
@@ -315,6 +384,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
           data={data}
           bannerToken={bannerToken}
           canOpenGesturePanel={!loading && isRoundActive}
+          onPrimaryCtaClick={handlePrimaryCtaClick}
         />
 
         <ChronoCoreTimer
@@ -324,6 +394,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
           activationTime={activationTime}
           now={now}
           canOpenGesturePanel={!loading && isRoundActive}
+          onPrimaryCtaClick={handlePrimaryCtaClick}
         />
 
         <CyclePhaseGuide
@@ -411,6 +482,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                       <div className="mt-6 space-y-4">
                         {canGesture && (
                           <Button
+                            id="gesture-submit"
                             size="lg"
                             onClick={handleGesture}
                             className="w-full bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold text-base h-12"
@@ -430,6 +502,12 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                               </>
                             )}
                           </Button>
+                        )}
+                        {account && !canGesture && cycleTimerEnded === false && (
+                          <p className="text-sm text-muted-foreground">
+                            You made the final gesture for this cycle. When the timer ends, use
+                            Finalize Cycle below.
+                          </p>
                         )}
                         {canClaim && (
                           <>

@@ -24,6 +24,8 @@ interface HomeObservatoryHeroProps {
   data: DashboardInfo | null;
   bannerToken: BannerToken;
   canOpenGesturePanel: boolean;
+  /** When set, primary CTA submits a gesture (or finalize) instead of only scrolling. */
+  onPrimaryCtaClick?: () => void;
 }
 
 const storyCards = [
@@ -104,6 +106,7 @@ export function HomeObservatoryHero({
   data,
   bannerToken,
   canOpenGesturePanel,
+  onPrimaryCtaClick,
 }: HomeObservatoryHeroProps) {
   const sectionVariants = useMotionVariants(fadeRise);
   const staggerVariants = useMotionVariants(fadeRiseStagger);
@@ -192,12 +195,19 @@ export function HomeObservatoryHero({
               </m.div>
 
               <m.div variants={itemVariants} className="mt-7 flex flex-wrap items-center gap-3">
-                <Button asChild size="lg" className="h-11 px-5">
-                  <Link href={primaryCtaHref}>
+                {onPrimaryCtaClick && primaryCtaHref === '#make-gesture' ? (
+                  <Button type="button" size="lg" className="h-11 px-5" onClick={onPrimaryCtaClick}>
                     {primaryCtaLabel}
                     <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </Button>
+                  </Button>
+                ) : (
+                  <Button asChild size="lg" className="h-11 px-5">
+                    <Link href={primaryCtaHref}>
+                      {primaryCtaLabel}
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                )}
                 <Button asChild variant="secondary" size="lg" className="h-11 px-5">
                   <Link href="/current-cycle">View Cycle Details</Link>
                 </Button>

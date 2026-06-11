@@ -9,6 +9,7 @@ import { getDefaultConfig, type Wallet, type WalletList } from '@rainbow-me/rain
 import {
   baseAccount,
   coinbaseWallet,
+  rabbyWallet,
   rainbowWallet,
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
@@ -131,7 +132,7 @@ export function injectedMetaMaskWallet(): Wallet {
 export const walletList: WalletList = [
   {
     groupName: 'Popular',
-    wallets: [rainbowWallet, baseAccount, injectedMetaMaskWallet, walletConnectWallet],
+    wallets: [rabbyWallet, rainbowWallet, baseAccount, injectedMetaMaskWallet, walletConnectWallet],
   },
   {
     groupName: 'More',

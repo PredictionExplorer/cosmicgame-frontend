@@ -32,6 +32,8 @@ interface ChronoCoreTimerProps {
   activationTime: number;
   now: number;
   canOpenGesturePanel: boolean;
+  /** When set, primary CTA submits a gesture (or finalize) instead of only scrolling. */
+  onPrimaryCtaClick?: () => void;
 }
 
 interface PhaseView {
@@ -187,6 +189,7 @@ export function ChronoCoreTimer({
   activationTime,
   now,
   canOpenGesturePanel,
+  onPrimaryCtaClick,
 }: ChronoCoreTimerProps) {
   const phase = getChronoCorePhase({ data, loading, allocationTime, activationTime, now });
   const view = viewForPhase(phase);
@@ -263,13 +266,24 @@ export function ChronoCoreTimer({
 
           <div className="mt-5 flex flex-col items-center justify-center gap-3 text-sm text-muted-foreground sm:flex-row">
             <span>{view.status}</span>
-            <Link
-              href={primaryHref}
-              className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-foreground"
-            >
-              {primaryLabel}
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
+            {onPrimaryCtaClick && primaryHref === '#make-gesture' ? (
+              <button
+                type="button"
+                onClick={onPrimaryCtaClick}
+                className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-foreground"
+              >
+                {primaryLabel}
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </button>
+            ) : (
+              <Link
+                href={primaryHref}
+                className="inline-flex items-center gap-2 font-semibold text-primary transition hover:text-foreground"
+              >
+                {primaryLabel}
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+            )}
           </div>
         </div>
       </Surface>

@@ -91,6 +91,11 @@ jest.mock('../../hooks/useAllocationNotification', () => ({
   }),
 }));
 
+const mockNotify = jest.fn();
+jest.mock('../../hooks/useNotify', () => ({
+  useNotify: () => ({ notify: mockNotify, notifyErrorFromEthers: jest.fn() }),
+}));
+
 /* ── wagmi / web3 ───────────────────────────────────────────────── */
 
 let mockAccount: string | null = '0xUser';
@@ -387,7 +392,8 @@ describe('HomePage', () => {
     );
   });
 
-  it('links the hero primary action to the gesture panel when the cycle is active', () => {
+  it('hero primary action submits a gesture when the cycle is active', async () => {
+    const user = userEvent.setup();
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
@@ -395,11 +401,11 @@ describe('HomePage', () => {
 
     render(<HomePage />);
 
-    const links = screen.getAllByRole('link', { name: /Make a Gesture/ });
-    expect(links.length).toBeGreaterThanOrEqual(1);
-    for (const link of links) {
-      expect(link).toHaveAttribute('href', '#make-gesture');
-    }
+    const buttons = screen.getAllByRole('button', { name: /Make a Gesture/ });
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
+    await user.click(buttons[0]!);
+
+    expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1);
   });
 
   it('links the hero primary action to cycle details before gestures are open', () => {
@@ -768,12 +774,12 @@ describe('HomePage', () => {
     });
 
     const { rerender } = render(<HomePage />);
-    // Hero CTA + sticky mobile CTA both target the gesture panel when connected.
-    const gestureLinks = screen.getAllByRole('link', { name: 'Make a Gesture' });
-    expect(gestureLinks.length).toBeGreaterThanOrEqual(2);
-    for (const link of gestureLinks) {
-      expect(link).toHaveAttribute('href', '#make-gesture');
-    }
+    // Hero + chrono timer use gesture-submit buttons; sticky mobile CTA remains a link.
+    expect(screen.getAllByRole('button', { name: 'Make a Gesture' }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('link', { name: 'Make a Gesture' })).toHaveAttribute(
+      'href',
+      '#make-gesture',
+    );
 
     mockAccount = null;
     rerender(<HomePage />);
@@ -1022,7 +1028,8 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    await user.click(screen.getByRole('button', { name: /Finalize Cycle/ }));
+    const finalizeButtons = screen.getAllByRole('button', { name: /Finalize Cycle/ });
+    await user.click(finalizeButtons[finalizeButtons.length - 1]!);
 
     expect(mockAllocationFinalize.onFinalize).toHaveBeenCalledTimes(1);
   });
