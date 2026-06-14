@@ -68,6 +68,15 @@ is not attacker-controlled in the deployed dapp.
 - reason: The ReDoS requires attacker-controlled glob patterns. Our patterns are
   fixed in repository configuration.
 
+### GHSA-gv7w-rqvm-qjhr
+
+- package: `esbuild`
+- severity: high
+- scope: build and test tooling
+- reason: The missing binary-integrity verification affects esbuild's Deno
+  module download path. This frontend uses esbuild through local npm tooling
+  (`@wagmi/cli` and `tsx`), not as deployed runtime code.
+
 ### GHSA-23c5-xmqv-rm74
 
 - package: `minimatch`
