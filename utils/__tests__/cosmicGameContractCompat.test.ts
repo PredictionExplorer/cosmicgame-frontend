@@ -1,14 +1,15 @@
-import {
-  BID_CST_REWARD_AMOUNT_MIN_LIMIT_V2,
-  bidArgsForV2,
-  isUnrecognizedSelectorError,
-  normalizeV1BidArgs,
-  pickBidWriteAbi,
-  preferV2BidArgsFirst,
-  readCosmicGameWithFallback,
-  withBidArgsV1ThenV2,
-} from '../cosmicGameContractCompat';
 import type { AbiFunction } from 'viem';
+
+import {
+  GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2,
+  gestureArgsForV2,
+  isUnrecognizedSelectorError,
+  normalizeV1GestureArgs,
+  pickGestureWriteAbi,
+  preferV2GestureArgsFirst,
+  readCosmicGameWithFallback,
+  withGestureArgsV1ThenV2,
+} from '../cosmicGameContractCompat';
 
 describe('cosmicGameContractCompat', () => {
   const selectorError = new Error(
@@ -27,13 +28,13 @@ describe('cosmicGameContractCompat', () => {
     expect(isUnrecognizedSelectorError(new Error('insufficient funds'))).toBe(false);
   });
 
-  test('normalizeV1BidArgs coerces randomWalk id to bigint', () => {
-    expect(normalizeV1BidArgs('bidWithEth', [-1, 'hello'])).toEqual([-1n, 'hello']);
+  test('normalizeV1GestureArgs coerces randomWalk id to bigint', () => {
+    expect(normalizeV1GestureArgs('bidWithEth', [-1, 'hello'])).toEqual([-1n, 'hello']);
   });
 
-  test('pickBidWriteAbi selects overload by argument count', () => {
-    const v1 = pickBidWriteAbi('bidWithEth', [-1n, 'hello']);
-    const v2 = pickBidWriteAbi('bidWithEth', [-1n, 'hello', 0n]);
+  test('pickGestureWriteAbi selects overload by argument count', () => {
+    const v1 = pickGestureWriteAbi('bidWithEth', [-1n, 'hello']);
+    const v2 = pickGestureWriteAbi('bidWithEth', [-1n, 'hello', 0n]);
     expect(v1).toHaveLength(1);
     expect(v2).toHaveLength(1);
     expect((v1[0] as AbiFunction).inputs?.length).toBe(2);
@@ -50,27 +51,31 @@ describe('cosmicGameContractCompat', () => {
     expect(result).toBe(130n * 10n ** 18n);
   });
 
-  test('bidArgsForV2 inserts min limit after message', () => {
-    expect(bidArgsForV2('bidWithEth', [-1, 'hello'])).toEqual([
+  test('gestureArgsForV2 inserts min limit after message', () => {
+    expect(gestureArgsForV2('bidWithEth', [-1, 'hello'])).toEqual([
       -1,
       'hello',
-      BID_CST_REWARD_AMOUNT_MIN_LIMIT_V2,
+      GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2,
     ]);
-    expect(
-      bidArgsForV2('bidWithEthAndDonateToken', [-1, 'hello', '0xabc', 123n]),
-    ).toEqual([-1, 'hello', BID_CST_REWARD_AMOUNT_MIN_LIMIT_V2, '0xabc', 123n]);
+    expect(gestureArgsForV2('bidWithEthAndDonateToken', [-1, 'hello', '0xabc', 123n])).toEqual([
+      -1,
+      'hello',
+      GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2,
+      '0xabc',
+      123n,
+    ]);
   });
 
-  test('withBidArgsV1ThenV2 retries with V2 args on selector error', async () => {
+  test('withGestureArgsV1ThenV2 retries with V2 args on selector error', async () => {
     const calls: unknown[][] = [];
-    const result = await withBidArgsV1ThenV2('bidWithCst', [100n, 'msg'], async (args) => {
+    const result = await withGestureArgsV1ThenV2('bidWithCst', [100n, 'msg'], async (args) => {
       calls.push([...args]);
       if (args.length === 2) throw selectorError;
       return '0xok';
     });
     expect(result).toBe('0xok');
-    const expectedV2 = [100n, 'msg', BID_CST_REWARD_AMOUNT_MIN_LIMIT_V2];
-    if (preferV2BidArgsFirst()) {
+    const expectedV2 = [100n, 'msg', GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2];
+    if (preferV2GestureArgsFirst()) {
       expect(calls).toEqual([expectedV2, [100n, 'msg']]);
     } else {
       expect(calls).toEqual([[100n, 'msg'], expectedV2]);

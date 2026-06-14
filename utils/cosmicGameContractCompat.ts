@@ -6,18 +6,20 @@
  * V2 when the node reports an unrecognized selector.
  */
 
-import { networkConfig } from '@/config/networks';
+import type { Abi, AbiFunction } from 'viem';
 
 import cosmicGameJson from '@/contracts/CosmicGame.json';
 
-import type { Abi, AbiFunction } from 'viem';
+import { networkConfig } from '@/config/networks';
+
+
 
 const cosmicGameAbiFull = cosmicGameJson as Abi;
 
-/** Default min CST reward accepted on V2 bid entrypoints (0 = accept contract value). */
-export const BID_CST_REWARD_AMOUNT_MIN_LIMIT_V2 = 0n;
+/** Default min CST reward accepted on V2 gesture entrypoints (0 = accept contract value). */
+export const GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2 = 0n;
 
-export type CosmicGameBidFunctionName =
+export type CosmicGameGestureFunctionName =
   | 'bidWithEth'
   | 'bidWithEthAndDonateNft'
   | 'bidWithEthAndDonateToken'
@@ -85,13 +87,13 @@ export async function readCosmicGameWithFallback<T>(
 }
 
 /** Local Hardhat stack runs V2 after populate-old-v2; try V2 args first to avoid Rabby simulating a doomed V1 call. */
-export function preferV2BidArgsFirst(): boolean {
+export function preferV2GestureArgsFirst(): boolean {
   return networkConfig.chainId === 31337;
 }
 
 /** Narrow ABI slice for a single bid overload (avoids duplicate-name encoding ambiguity). */
-export function pickBidWriteAbi(
-  functionName: CosmicGameBidFunctionName,
+export function pickGestureWriteAbi(
+  functionName: CosmicGameGestureFunctionName,
   callArgs: readonly unknown[],
 ): Abi {
   const match = cosmicGameAbiFull.find(
@@ -104,8 +106,8 @@ export function pickBidWriteAbi(
 }
 
 /** Coerce gesture args to viem-friendly shapes before encoding. */
-export function normalizeV1BidArgs(
-  functionName: CosmicGameBidFunctionName,
+export function normalizeV1GestureArgs(
+  functionName: CosmicGameGestureFunctionName,
   v1Args: readonly unknown[],
 ): readonly unknown[] {
   switch (functionName) {
@@ -125,11 +127,11 @@ export function normalizeV1BidArgs(
 }
 
 /** Insert V2 `bidCstRewardAmountMinLimit_` after the message argument. */
-export function bidArgsForV2(
-  functionName: CosmicGameBidFunctionName,
+export function gestureArgsForV2(
+  functionName: CosmicGameGestureFunctionName,
   v1Args: readonly unknown[],
 ): readonly unknown[] {
-  const minLimit = BID_CST_REWARD_AMOUNT_MIN_LIMIT_V2;
+  const minLimit = GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2;
   switch (functionName) {
     case 'bidWithEth':
       return [v1Args[0], v1Args[1], minLimit];
@@ -151,16 +153,14 @@ export function bidArgsForV2(
  * Run an async action with V1/V2 args, retrying the alternate shape on unrecognized selector.
  * On local Hardhat (chain 31337), V2 is tried first because populate-old-v2 upgrades the proxy.
  */
-export async function withBidArgsV1ThenV2<T>(
-  functionName: CosmicGameBidFunctionName,
+export async function withGestureArgsV1ThenV2<T>(
+  functionName: CosmicGameGestureFunctionName,
   v1Args: readonly unknown[],
   run: (args: readonly unknown[]) => Promise<T>,
 ): Promise<T> {
-  const normalized = normalizeV1BidArgs(functionName, v1Args);
-  const v2Args = bidArgsForV2(functionName, normalized);
-  const attempts = preferV2BidArgsFirst()
-    ? [v2Args, normalized]
-    : [normalized, v2Args];
+  const normalized = normalizeV1GestureArgs(functionName, v1Args);
+  const v2Args = gestureArgsForV2(functionName, normalized);
+  const attempts = preferV2GestureArgsFirst() ? [v2Args, normalized] : [normalized, v2Args];
 
   let lastSelectorError: unknown;
   for (const args of attempts) {
