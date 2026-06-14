@@ -25,6 +25,7 @@ jest.mock('wagmi/connectors', () => ({
 jest.mock('@rainbow-me/rainbowkit/wallets', () => ({
   baseAccount: jest.fn(() => ({ id: 'baseAccount', name: 'Base Account' })),
   coinbaseWallet: jest.fn(() => ({ id: 'coinbase', name: 'Coinbase Wallet' })),
+  rabbyWallet: jest.fn(() => ({ id: 'rabby', name: 'Rabby Wallet' })),
   rainbowWallet: jest.fn(() => ({ id: 'rainbow', name: 'Rainbow' })),
   walletConnectWallet: jest.fn(() => ({ id: 'walletConnect', name: 'WalletConnect' })),
 }));
@@ -75,7 +76,7 @@ describe('wagmi wallet configuration', () => {
     );
 
     expect(walletIds).toEqual(
-      expect.arrayContaining(['rainbow', 'baseAccount', 'metaMask', 'walletConnect']),
+      expect.arrayContaining(['rabby', 'rainbow', 'baseAccount', 'metaMask', 'walletConnect']),
     );
     expect(configArg?.wallets?.[0]?.groupName).toBe('Popular');
   });
