@@ -125,7 +125,7 @@ describe('FundDistribution tooltips', () => {
     },
     {
       label: 'Anchor Distribution',
-      tooltip: /Distributions to anchor-holders proportional to their anchored token count/,
+      tooltip: /ETH Anchor Distributions to Cosmic Signature NFT anchor-holders/,
     },
     {
       label: 'Public Goods',

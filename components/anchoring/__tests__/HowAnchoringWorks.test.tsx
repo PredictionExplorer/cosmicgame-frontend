@@ -25,19 +25,19 @@ describe('HowAnchoringWorks', () => {
 
   it('does not show content before expanding', () => {
     render(<HowAnchoringWorks />);
-    expect(screen.queryByText(/Anchoring lets you dedicate your NFTs/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Anchoring lets you dedicate NFTs/)).not.toBeInTheDocument();
   });
 
   it('shows content after clicking a trigger', () => {
     render(<HowAnchoringWorks />);
     fireEvent.click(screen.getByText('What is Anchoring?'));
-    expect(screen.getByText(/Anchoring lets you dedicate your NFTs/)).toBeVisible();
+    expect(screen.getByText(/Anchoring lets you dedicate NFTs/)).toBeVisible();
   });
 
   it('collapses previously open item when another is clicked', () => {
     render(<HowAnchoringWorks />);
     fireEvent.click(screen.getByText('What is Anchoring?'));
-    expect(screen.getByText(/Anchoring lets you dedicate your NFTs/)).toBeVisible();
+    expect(screen.getByText(/Anchoring lets you dedicate NFTs/)).toBeVisible();
 
     fireEvent.click(screen.getByText('Cosmic Signature NFT Anchoring'));
     expect(screen.getByText(/Anchor your Cosmic Signature NFTs/)).toBeVisible();

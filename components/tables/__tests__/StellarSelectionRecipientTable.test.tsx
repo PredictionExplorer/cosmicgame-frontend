@@ -76,7 +76,7 @@ describe('StellarSelectionRecipientTable', () => {
     expect(screen.getAllByText('ETH Deposit').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('shows "Cosmic Signature Anchor Stellar Selection Token" for IsStaker && !IsRwalk', () => {
+  it('shows "Cosmic Signature NFT Stellar Selection" for IsStaker && !IsRwalk', () => {
     render(
       <StellarSelectionRecipientTable
         RaffleETHDeposits={[createDeposit()]}
@@ -84,11 +84,11 @@ describe('StellarSelectionRecipientTable', () => {
       />,
     );
     expect(
-      screen.getAllByText('Cosmic Signature Anchor Stellar Selection Token').length,
+      screen.getAllByText('Cosmic Signature NFT Stellar Selection').length,
     ).toBeGreaterThanOrEqual(1);
   });
 
-  it('shows "Random Walk Anchor Stellar Selection Token" for IsStaker && IsRwalk', () => {
+  it('shows "Anchored-NFT Stellar Selection Cosmic Signature NFT" for IsStaker && IsRwalk', () => {
     render(
       <StellarSelectionRecipientTable
         RaffleETHDeposits={[createDeposit()]}
@@ -96,7 +96,7 @@ describe('StellarSelectionRecipientTable', () => {
       />,
     );
     expect(
-      screen.getAllByText('Random Walk Anchor Stellar Selection Token').length,
+      screen.getAllByText('Anchored-NFT Stellar Selection Cosmic Signature NFT').length,
     ).toBeGreaterThanOrEqual(1);
   });
 
