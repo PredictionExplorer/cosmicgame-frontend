@@ -4,7 +4,7 @@ import { extname, join, relative } from 'path';
 const SCANNED_ROOTS = ['app', 'components', 'content', 'public'] as const;
 const TEXT_EXTENSIONS = new Set(['.md', '.ts', '.tsx', '.txt']);
 
-const FORBIDDEN_TERMS: Array<{ pattern: RegExp; reason: string }> = [
+const DISALLOWED_TERMS: Array<{ pattern: RegExp; reason: string }> = [
   {
     pattern: /\bCST NFTs?\b/i,
     reason: 'CST is the ERC-20 token; anchorable ERC-721 assets are Cosmic Signature NFTs.',
@@ -113,7 +113,7 @@ describe('asset terminology', () => {
       const content = readFileSync(file, 'utf8');
       const relPath = relative(process.cwd(), file);
 
-      return FORBIDDEN_TERMS.flatMap(({ pattern, reason }) => {
+      return DISALLOWED_TERMS.flatMap(({ pattern, reason }) => {
         const match = content.match(pattern);
         return match ? [`${relPath}: "${match[0]}" - ${reason}`] : [];
       });

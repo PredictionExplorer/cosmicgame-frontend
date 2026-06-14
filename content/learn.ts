@@ -233,7 +233,7 @@ const baseLearnArticles: LearnArticle[] = [
     updated: '2026-05-25',
     schemaType: 'Article',
     summary:
-      'Anchoring connects NFTs back to the protocol: Cosmic Signature NFTs earn ETH Anchor Distributions, while RandomWalk NFTs enter Anchored-NFT Stellar Selection.',
+      'Anchoring connects NFTs back to the protocol: Cosmic Signature NFTs receive ETH Anchor Distributions, while RandomWalk NFTs enter Anchored-NFT Stellar Selection.',
     sections: [
       {
         heading: 'Anchor Distributions',
