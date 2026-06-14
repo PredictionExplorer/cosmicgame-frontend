@@ -214,23 +214,43 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     }
   }, [dashboardData, account, playAudio]);
 
-  const { gestureType, ethGestureInfo, cstGestureData, isGesturing, rwlkId, gestureCostPlus } =
-    gestureForm;
-  const { fetchActivationTime, allocationTime, timeoutFinalize, isClaiming, activationTime } =
-    allocationFinalize;
+  const {
+    gestureType,
+    ethGestureInfo,
+    cstGestureData,
+    isGesturing,
+    rwlkId,
+    gestureCostPlus,
+    onGesture,
+    onGestureWithCST,
+    setBidType,
+    setMessage,
+    setRwlkId,
+  } = gestureForm;
+  const {
+    fetchActivationTime,
+    allocationTime,
+    timeoutFinalize,
+    isClaiming,
+    activationTime,
+    onFinalize,
+  } = allocationFinalize;
 
-  const withPostTxRefresh = (retryMs = 1500, activationMs = 3000) => {
-    void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'refresh live data'));
-    gestureForm.setMessage('');
-    setTimeout(() => {
-      void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'retry live data'));
-    }, retryMs);
-    setTimeout(() => {
-      fetchActivationTime().catch((e) => reportError(e, 'fetchActivationTime'));
-    }, activationMs);
-  };
+  const withPostTxRefresh = useCallback(
+    (retryMs = 1500, activationMs = 3000) => {
+      void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'refresh live data'));
+      setMessage('');
+      setTimeout(() => {
+        void invalidateLiveGameQueries(queryClient).catch((e) => reportError(e, 'retry live data'));
+      }, retryMs);
+      setTimeout(() => {
+        fetchActivationTime().catch((e) => reportError(e, 'fetchActivationTime'));
+      }, activationMs);
+    },
+    [fetchActivationTime, queryClient, setMessage],
+  );
 
-  const optimisticallyRecordGesture = () => {
+  const optimisticallyRecordGesture = useCallback(() => {
     queryClient.setQueryData<DashboardInfo | null>(['dashboardInfo'], (current) => {
       if (!current) return current;
       return {
@@ -240,23 +260,23 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
       };
     });
     setGesturePulseKey((value) => value + 1);
-  };
+  }, [account, queryClient]);
 
-  const handleGesture = async () => {
-    if (await (gestureType === 'CST' ? gestureForm.onGestureWithCST() : gestureForm.onGesture())) {
+  const handleGesture = useCallback(async () => {
+    if (await (gestureType === 'CST' ? onGestureWithCST() : onGesture())) {
       optimisticallyRecordGesture();
       withPostTxRefresh();
     }
-  };
-  const handleFinalize = async () => {
-    if (await allocationFinalize.onFinalize()) withPostTxRefresh(1000, 3000);
-  };
+  }, [gestureType, onGesture, onGestureWithCST, optimisticallyRecordGesture, withPostTxRefresh]);
+  const handleFinalize = useCallback(async () => {
+    if (await onFinalize()) withPostTxRefresh(1000, 3000);
+  }, [onFinalize, withPostTxRefresh]);
 
   useEffect(() => {
     requestNotificationPermission();
     if (searchParams?.get('randomwalk')) {
-      gestureForm.setRwlkId(Number(searchParams.get('tokenId')));
-      gestureForm.setBidType('RandomWalk');
+      setRwlkId(Number(searchParams.get('tokenId')));
+      setBidType('RandomWalk');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, requestNotificationPermission]);
@@ -323,9 +343,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     }
 
     const buttonDisabled =
-      isGesturing ||
-      (gestureType === 'RandomWalk' && rwlkId === -1) ||
-      gestureType === '';
+      isGesturing || (gestureType === 'RandomWalk' && rwlkId === -1) || gestureType === '';
     if (buttonDisabled) {
       if (gestureType === 'RandomWalk' && rwlkId === -1) {
         notify('info', 'Select a RandomWalk token before making your gesture.');
@@ -346,6 +364,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     handleGesture,
     isGesturing,
     isRoundActive,
+    now,
     notify,
     rwlkId,
   ]);
