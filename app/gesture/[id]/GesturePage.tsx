@@ -185,10 +185,10 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
               description="Whether a Random Walk NFT or CST was used for this gesture."
             >
               <DefinitionList>
-                <DetailRow label="Was gesture with RandomWalkNFT:">
+                <DetailRow label="Attached RandomWalk NFT to ETH gesture:">
                   {(gestureInfo.RWalkNFTId ?? -1) < 0 ? 'No' : 'Yes'}
                 </DetailRow>
-                <DetailRow label="Was gesture with Cosmic Signature Token:">
+                <DetailRow label="Paid with CST (ERC-20):">
                   {gestureInfo.GestureType === 2 ? 'Yes' : 'No'}
                 </DetailRow>
                 {(gestureInfo.RWalkNFTId ?? -1) >= 0 ? (

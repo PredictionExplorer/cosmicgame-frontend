@@ -13,13 +13,13 @@ function MyWallet() {
   const { account } = useActiveWeb3React();
   const { data: tokensRaw, isLoading: loading, isError: hasError } = useCSTTokensByUser(account);
   const tokens = tokensRaw ?? [];
-  const error = hasError ? 'Failed to load CST tokens.' : null;
+  const error = hasError ? 'Failed to load Cosmic Signature NFTs.' : null;
 
   return (
     <PageShell variant="data" backdrop="signature">
       <PageHeader
-        title="My Cosmic Signature Tokens"
-        subtitle="ERC721 tokens in your connected wallet"
+        title="My Cosmic Signature NFTs"
+        subtitle="ERC-721 NFTs in your connected wallet"
       />
 
       {!account ? (
@@ -35,7 +35,7 @@ function MyWallet() {
         <ErrorState title="Failed to load tokens" message={error} />
       ) : (
         <div className="mt-12">
-          <h5 className="text-lg font-semibold mb-4">Cosmic Signature Tokens I Own</h5>
+          <h5 className="text-lg font-semibold mb-4">Cosmic Signature NFTs I Own</h5>
           <CSTTable list={tokens} />
         </div>
       )}

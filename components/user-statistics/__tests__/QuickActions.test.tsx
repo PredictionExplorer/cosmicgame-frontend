@@ -43,8 +43,13 @@ describe('QuickActions', () => {
   it('renders action descriptions', () => {
     render(<QuickActions address={address} />);
     expect(
-      screen.getByText('Receive Anchor Distributions by anchoring your tokens'),
+      screen.getByText(
+        'Anchor Cosmic Signature NFTs for ETH distributions or Random Walk NFTs for Stellar Selection',
+      ),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByText('Receive Anchor Distributions by anchoring your tokens'),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Take part in the active cycle')).toBeInTheDocument();
   });
 

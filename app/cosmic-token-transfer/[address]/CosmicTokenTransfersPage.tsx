@@ -157,7 +157,7 @@ const CosmicTokenTransfersPage = ({ address: rawAddress }: { address: string }) 
     <PageShell variant="data" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-5xl">
         <PageHeader
-          title="Cosmic Signature Token Transfers"
+          title="Cosmic Signature CST Token Transfers"
           subtitle={address !== 'Invalid Address' ? address : undefined}
           breadcrumbs={[
             { label: 'Home', href: '/' },

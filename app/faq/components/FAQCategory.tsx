@@ -25,7 +25,7 @@ const tooltipTerms: Record<string, string> = {
     'A price-discovery window where Gesture Cost starts high and descends over time from the Calibration Ceiling toward the Calibration Floor. The longer you wait, the lower the cost.',
   'Cosmic Council':
     'The on-chain coordination body where CST holders submit Coordination Proposals and express Support or Opposition \u2014 for example, selecting the Public Goods Beneficiary that receives each cycle\u2019s public-goods allocation.',
-  CST: 'Cosmic Signature Tokens \u2014 the ERC-20 token imprinted with every gesture. Used on the Cosmic Council and as alternative gesture currency.',
+  CST: 'CST tokens \u2014 the ERC-20 tokens imprinted with every gesture. Used on the Cosmic Council and as alternative gesture currency.',
   'ERC-20': 'A widely used Ethereum token standard for fungible (interchangeable) tokens.',
   'ERC-721':
     'The Ethereum token standard for non-fungible tokens (NFTs) \u2014 each token is unique.',
@@ -34,7 +34,7 @@ const tooltipTerms: Record<string, string> = {
   rollup:
     'A Layer 2 technique that bundles ("rolls up") many transactions into one, dramatically reducing costs while keeping Ethereum-level security.',
   RandomWalkNFT:
-    'A sister NFT collection. Attaching one to your gesture grants a one-time 50% Gesture-Cost reduction.',
+    'A sister NFT collection. Attaching one to an ETH gesture grants a one-time 50% ETH Gesture Cost reduction.',
   'renounceOwnership()':
     "A smart contract function that permanently gives up the team's ability to change protocol parameters \u2014 making the rules immutable.",
 };

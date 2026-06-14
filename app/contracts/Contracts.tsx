@@ -42,7 +42,7 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
       category: 'core',
     },
     {
-      name: 'Cosmic Signature Token',
+      name: 'Cosmic Signature CST Token',
       address: addrs.CosmicTokenAddr ?? '',
       description:
         'ERC-20 token (CST) imprinted with every gesture and used to express Coordination Weight on the Cosmic Council',
@@ -58,7 +58,7 @@ function buildContracts(addrs: Record<string, string | undefined> | undefined): 
       name: 'RandomWalk',
       address: addrs.RandomWalkAddr ?? '',
       description:
-        'RandomWalk NFT collection that can be anchored to the protocol for Stellar Selection entries',
+        'RandomWalk NFT collection that can be attached to ETH gestures for a one-time discount or anchored for Anchored-NFT Stellar Selection eligibility',
       category: 'core',
     },
     {

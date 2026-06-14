@@ -448,7 +448,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                 <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs">
                   Eligible for Anchoring
                   <InfoTooltip
-                    content="This token has never been anchored and can receive distributions through the Anchor Distribution program."
+                    content="This Cosmic Signature NFT has never been anchored and can earn ETH Anchor Distributions when anchored."
                     iconClassName="h-3 w-3 ml-1"
                   />
                 </Badge>

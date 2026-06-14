@@ -216,7 +216,7 @@ const AllocationFinalizedPage = () => {
                     {allocationInfo.AmountEth.toFixed(6)} ETH
                   </span>
                 </DetailRow>
-                <DetailRow label="Cosmic Signature Token number">
+                <DetailRow label="Cosmic Signature NFT ID">
                   <Link
                     href={`/detail/${allocationInfo.TokenId}`}
                     className={cn(detailLinkClass, 'font-mono tabular-nums')}

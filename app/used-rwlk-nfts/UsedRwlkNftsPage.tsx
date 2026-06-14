@@ -101,12 +101,12 @@ const UsedRwlkNftsPage = () => {
         title="Used Random Walk NFTs"
         titleLevel={2}
         gradientTitle="signature"
-        subtitle="Random Walk NFTs that have been anchored to gestures"
+        subtitle="Random Walk NFTs attached to ETH gestures for the one-time 50% Gesture Cost reduction"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        RandomWalk NFT holders can attach their tokens to receive a 50% Gesture Cost reduction in
-        Cosmic Signature. Once used, a RandomWalk NFT is recorded here. Each NFT can only be used
-        once for this discount, making the timing of its use a strategic decision.
+        RandomWalk NFT holders can attach an unused NFT to an ETH gesture for a 50% Gesture Cost
+        reduction in Cosmic Signature. Once used, a RandomWalk NFT is recorded here. Each NFT can
+        only be used once for this discount, making the timing of its use a strategic decision.
       </p>
 
       <div className="mt-12">

@@ -89,14 +89,16 @@ const Imprint = () => {
       <PageHeader
         title="Imprint Random Walk NFT"
         titleLevel={2}
-        subtitle="Own a Random Walk NFT and receive a 50% reduction in Gesture Cost"
+        subtitle="Own a Random Walk NFT and receive a 50% reduction in ETH Gesture Cost"
       />
 
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
         RandomWalk NFTs are unique digital collectibles that grant holders a strategic advantage in
-        the Cosmic Signature protocol. By attaching a RandomWalk NFT to your gesture, you receive a
-        50% reduction in Gesture Cost — a significant edge late in the cycle. Each RandomWalk NFT
-        can be used once for this discount, so choose your moment wisely for maximum impact.
+        the Cosmic Signature protocol. By attaching a RandomWalk NFT to an ETH gesture, you receive
+        a 50% reduction in ETH Gesture Cost - a significant edge late in the cycle. Each RandomWalk
+        NFT can be used once for this discount, so choose your moment wisely for maximum impact.
+        This gesture attachment is separate from anchoring RandomWalk NFTs for Anchored-NFT Stellar
+        Selection eligibility.
       </p>
 
       <div className="flex flex-col items-center">

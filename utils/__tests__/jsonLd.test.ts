@@ -217,7 +217,7 @@ describe('JSON-LD generators', () => {
   describe('nftProductJsonLd', () => {
     const result = nftProductJsonLd({
       tokenId: 42,
-      name: 'Cosmic Signature Token #42',
+      name: 'Cosmic Signature NFT #42',
       description: 'A unique NFT',
       imageUrl: 'https://example.com/42.png',
     });
@@ -228,7 +228,7 @@ describe('JSON-LD generators', () => {
     });
 
     it('includes token details', () => {
-      expect(result.name).toBe('Cosmic Signature Token #42');
+      expect(result.name).toBe('Cosmic Signature NFT #42');
       expect(result.description).toBe('A unique NFT');
       expect(result.image).toBe('https://example.com/42.png');
     });

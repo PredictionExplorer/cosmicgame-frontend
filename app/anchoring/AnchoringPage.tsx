@@ -79,7 +79,7 @@ const AnchoringPage = () => {
           dashboardData?.MainStats?.StakeStatisticsRWalk?.TotalTokensStaked ?? 0
         ).toLocaleString(),
         tooltip:
-          'Total number of RandomWalk NFTs currently anchored. Anchored RWLK tokens are eligible for allocation imprints via on-chain random selection.',
+          'Total number of RandomWalk NFTs currently anchored. Anchored RandomWalk NFTs are eligible for Anchored-NFT Stellar Selection via on-chain random selection.',
         icon: <Layers className="h-4 w-4" />,
       },
       {
@@ -93,7 +93,7 @@ const AnchoringPage = () => {
       {
         label: 'Unique Anchor-holders',
         value: (uniqueStakers?.length ?? 0).toLocaleString(),
-        tooltip: 'Number of distinct wallet addresses that have anchored CST tokens.',
+        tooltip: 'Number of distinct wallet addresses that have anchored Cosmic Signature NFTs.',
         icon: <Users className="h-4 w-4" />,
       },
     ],

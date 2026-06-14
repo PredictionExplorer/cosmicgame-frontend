@@ -192,7 +192,7 @@ const ConnectWalletButton = ({
               Anchored
             </p>
             <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">CST NFTs</span>
+              <span className="text-muted-foreground">Cosmic Signature NFTs</span>
               <span className="font-medium text-primary">{stakedTokenCount.cst}</span>
             </div>
             <div className="flex justify-between text-xs">

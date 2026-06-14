@@ -11,8 +11,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { address } = await params;
   return createMetadata(
-    'Cosmic Signature Token Transfer History | Cosmic Signature',
-    'Cosmic Signature Token Transfer History',
+    'Cosmic Signature NFT Transfer History | Cosmic Signature',
+    'Cosmic Signature NFT Transfer History',
     undefined,
     `/cosmic-signature-transfer/${address}`,
     { index: false },

@@ -204,7 +204,7 @@ const baseLearnArticles: LearnArticle[] = [
     slug: 'cst-token-and-cosmic-council',
     title: 'CST and the Cosmic Council | Cosmic Signature',
     description:
-      'Learn how Cosmic Signature Tokens (CST) relate to gestures, protocol coordination, and the Cosmic Council.',
+      'Learn how CST tokens relate to gestures, protocol coordination, and the Cosmic Council.',
     h1: 'CST and the Cosmic Council',
     updated: '2026-05-25',
     schemaType: 'Article',
@@ -228,18 +228,18 @@ const baseLearnArticles: LearnArticle[] = [
     slug: 'anchoring-nfts',
     title: 'Anchoring Cosmic Signature NFTs | Cosmic Signature',
     description:
-      'How anchoring works for Cosmic Signature NFTs, Anchor Distributions, and Random Walk NFT eligibility.',
+      'How anchoring works for Cosmic Signature NFTs, ETH Anchor Distributions, and Random Walk NFT eligibility.',
     h1: 'Anchoring Cosmic Signature NFTs',
     updated: '2026-05-25',
     schemaType: 'Article',
     summary:
-      'Anchoring connects Cosmic Signature NFTs back to the protocol and can make them eligible for Anchor Distributions or related selection mechanics.',
+      'Anchoring connects NFTs back to the protocol: Cosmic Signature NFTs earn ETH Anchor Distributions, while RandomWalk NFTs enter Anchored-NFT Stellar Selection.',
     sections: [
       {
         heading: 'Anchor Distributions',
         body: [
-          'Cosmic Signature NFTs can be anchored to the protocol. Anchored NFTs share the Anchor Distribution for a cycle according to the protocol rules.',
-          'Random Walk NFTs have a related anchoring role for Anchored-NFT Stellar Selection eligibility.',
+          'Cosmic Signature NFTs can be anchored to the protocol. Anchored Cosmic Signature NFTs share the ETH Anchor Distribution for a cycle according to the protocol rules.',
+          'Random Walk NFTs have a separate anchoring role for Anchored-NFT Stellar Selection eligibility.',
         ],
       },
     ],
@@ -430,7 +430,7 @@ const articleDepthSections: Record<string, LearnSection[]> = {
     {
       heading: 'Cosmic Signature And RandomWalk Roles',
       body: [
-        'Cosmic Signature NFTs and RandomWalk NFTs have different anchoring contexts. Cosmic Signature NFTs connect to Anchor Distributions, while RandomWalk NFTs can connect to selection eligibility and one-time gesture discounts depending on their state.',
+        'Cosmic Signature NFTs and RandomWalk NFTs have different anchoring contexts. Cosmic Signature NFTs connect to ETH Anchor Distributions, while RandomWalk NFTs can connect to selection eligibility and one-time ETH gesture discounts depending on their state.',
         'The distinction matters for both users and crawlers. Pages should label token types clearly, avoid generic lockup language where possible, and point back to statistics, gallery, and current-cycle pages for broader context.',
       ],
     },

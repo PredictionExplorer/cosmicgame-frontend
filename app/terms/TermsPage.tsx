@@ -63,7 +63,7 @@ const sections = [
       },
       {
         subtitle: 'Random Walk NFT Cost Reduction',
-        text: 'A Random Walk NFT can be attached once to a gesture to receive a 50% Gesture-Cost reduction. This action is permanent and cannot be undone. Once used, a Random Walk NFT cannot be used again for a cost reduction.',
+        text: 'A Random Walk NFT can be attached once to an ETH gesture to receive a 50% ETH Gesture Cost reduction. This action is permanent and cannot be undone. Once used, a Random Walk NFT cannot be used again for a cost reduction.',
       },
     ],
   },

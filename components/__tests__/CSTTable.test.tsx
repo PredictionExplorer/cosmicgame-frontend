@@ -99,7 +99,7 @@ describe('CSTTable', () => {
 
     render(<CSTTable list={mockData} />);
 
-    expect(screen.getByText('Stellar Selection NFT Token')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT Stellar Selection')).toBeInTheDocument();
   });
 
   test('renders table headers', () => {

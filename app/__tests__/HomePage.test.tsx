@@ -989,7 +989,7 @@ describe('HomePage', () => {
     expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
   });
 
-  it('prevents RandomWalk gestures until the participant selects a token', async () => {
+  it('prevents ETH + RandomWalk gestures until the participant selects a token', async () => {
     const user = userEvent.setup();
     mockGestureForm.gestureType = 'RandomWalk';
     mockGestureForm.rwlkId = -1;
@@ -999,7 +999,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    const gestureButton = screen.getByRole('button', { name: 'Gesture with RandomWalk' });
+    const gestureButton = screen.getByRole('button', { name: 'Gesture with ETH + RandomWalk' });
 
     expect(gestureButton).toBeDisabled();
     await user.click(gestureButton);

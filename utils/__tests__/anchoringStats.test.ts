@@ -10,6 +10,8 @@ describe('formatDistributionPerAnchoredNftEth', () => {
   it('returns pool only when count is zero but pool is positive', () => {
     const r = formatDistributionPerAnchoredNftEth(0.22579451528661923, 0);
     expect(r.value).toBe('0.225795 ETH');
+    expect(r.tooltipSuffix).toContain('anchored Cosmic Signature NFTs');
+    expect(r.tooltipSuffix).toContain('per-NFT rate');
     expect(r.tooltipSuffix).toContain('cg_stake_stats_cst');
   });
 

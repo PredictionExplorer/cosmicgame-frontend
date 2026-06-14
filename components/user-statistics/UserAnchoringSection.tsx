@@ -36,7 +36,7 @@ export interface UserAnchoringSectionProps {
   rwlkImprints: AnchorDistributionImprint[];
 }
 
-/** Staking statistics section with CST and RWLK tabs, stat cards, and detailed tables. */
+/** Anchoring statistics section with Cosmic Signature NFT and RWLK tabs, stat cards, and tables. */
 export function UserAnchoringSection({
   address,
   userInfo,

@@ -54,7 +54,7 @@ export function HeroStats({
         label: 'CST Balance',
         value: `${balanceCST.toFixed(2)} CST`,
         tooltip:
-          'Your Cosmic Signature Token (ERC-20) balance, imprinted through participation and Anchor Distributions.',
+          'Your CST token (ERC-20) balance from gestures, Recognition CST allocations, and transfers.',
         icon: <Coins className="h-4 w-4" />,
         featured: true,
       },

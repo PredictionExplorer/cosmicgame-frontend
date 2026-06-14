@@ -49,10 +49,9 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
     if (!contract) return;
 
     const fetchCycleTimeoutTimesToRetrieveAllocations = async () => {
-      const cycleTimeoutTimesToRetrieveAllocations = await (
-        contract.read.roundTimeoutTimesToWithdrawPrizes?.([BigInt(RoundNum)]) ??
-        Promise.resolve(0n)
-      );
+      const cycleTimeoutTimesToRetrieveAllocations =
+        await (contract.read.roundTimeoutTimesToWithdrawPrizes?.([BigInt(RoundNum)]) ??
+          Promise.resolve(0n));
       setRoundTimeoutTimesToWithdrawPrizes(Number(cycleTimeoutTimesToRetrieveAllocations ?? 0));
     };
 
@@ -95,10 +94,10 @@ const RecipientRow = ({ recipient }: { recipient: StellarSelectionRecipientEntry
         {Amount
           ? 'ETH Deposit'
           : IsStaker && IsRwalk
-            ? 'Random Walk Anchor Stellar Selection Token'
+            ? 'Anchored-NFT Stellar Selection Cosmic Signature NFT'
             : IsStaker && !IsRwalk
-              ? 'Cosmic Signature Anchor Stellar Selection Token'
-              : 'Cosmic Signature Token'}
+              ? 'Cosmic Signature NFT Stellar Selection'
+              : 'Cosmic Signature NFT'}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {convertTimestampToDateTime(cycleTimeoutTimesToRetrieveAllocations)}

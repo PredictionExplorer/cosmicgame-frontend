@@ -48,8 +48,8 @@ interface GestureFormProps {
 
 const gestureOptions = [
   { value: 'ETH', label: 'ETH', desc: 'Pay with Ether' },
-  { value: 'RandomWalk', label: 'RandomWalk', desc: '50% discount' },
-  { value: 'CST', label: 'CST', desc: 'Cosmic Token' },
+  { value: 'RandomWalk', label: 'ETH + RWLK', desc: '50% discount' },
+  { value: 'CST', label: 'CST', desc: 'ERC-20' },
 ];
 
 /** Form for making ETH or CST gestures with optional NFT/token attachment fields and RandomWalk discount. */
@@ -136,8 +136,8 @@ export function GestureForm({
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-[240px]">
-                  Attach a RandomWalk NFT to your gesture to receive a 50% cost reduction. Each NFT
-                  can only be used once.
+                  Attach a RandomWalk NFT to an ETH gesture to receive a 50% Gesture Cost reduction.
+                  Each NFT can only be used once.
                 </p>
               </TooltipContent>
             </Tooltip>

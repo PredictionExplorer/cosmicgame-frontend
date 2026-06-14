@@ -71,7 +71,7 @@ export function GameConfiguration({
       label: 'Participation CST per Gesture',
       value: `${cstRewardPerBid} CST`,
       icon: <Coins className="h-4 w-4" />,
-      tooltip: 'Cosmic Signature Tokens imprinted with each gesture',
+      tooltip: 'CST tokens imprinted with each gesture',
     },
     {
       label: 'Finalization Timeout',

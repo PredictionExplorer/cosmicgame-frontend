@@ -17,8 +17,7 @@ const tips = [
   {
     Icon: ImageIcon,
     title: 'Attach a Random Walk NFT',
-    description:
-      'Holding a Random Walk NFT grants a one-time 50% cost reduction on your ETH gesture.',
+    description: 'Holding a Random Walk NFT grants a one-time 50% ETH Gesture Cost reduction.',
     tooltip:
       'Each Random Walk NFT can be used once for the cost reduction. Save it for a higher-cost gesture to maximize the effect.',
   },

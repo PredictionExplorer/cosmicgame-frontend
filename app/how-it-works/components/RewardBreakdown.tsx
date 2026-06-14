@@ -9,9 +9,9 @@ const rewards = [
   {
     Icon: Coins,
     title: '100 Participation CST',
-    description: 'Every gesture imprints 100 Cosmic Signature Tokens directly to your wallet.',
+    description: 'Every gesture imprints 100 CST tokens directly to your wallet.',
     tooltip:
-      'CST is the native Cosmic Signature token. Use it as an alternative gesture currency or express Coordination Weight on the Cosmic Council.',
+      'CST is the protocol ERC-20 token. Use it as an alternative gesture currency or express Coordination Weight on the Cosmic Council.',
     accent: 'from-cyan-400/20 to-blue-500/20',
     iconColor: 'text-cyan-400',
   },

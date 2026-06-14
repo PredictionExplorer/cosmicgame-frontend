@@ -11,9 +11,9 @@ const cards = [
     number: '01',
     title: 'Gesture',
     description:
-      'Make a gesture with ETH or CST. Each gesture extends the Cycle Finalization Time and shapes the evolving Signature.',
+      'Make a gesture with ETH or CST (ERC-20). Each gesture extends the Cycle Finalization Time and shapes the evolving Signature.',
     tooltip:
-      'Gestures can be made with ETH or Cosmic Signature Tokens. Attaching a Random Walk NFT grants a one-time 50% cost reduction.',
+      'Gestures can be made with ETH or CST tokens (ERC-20). Attaching a Random Walk NFT to an ETH gesture grants a one-time 50% ETH Gesture Cost reduction.',
     Icon: Gavel,
   },
   {

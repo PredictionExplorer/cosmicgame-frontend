@@ -78,9 +78,9 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
 
       <TablePrimaryCell align="right">
         {nft.RecordType === 1 ? (
-          'Stellar Selection NFT Token'
+          'Cosmic Signature NFT Stellar Selection'
         ) : nft.RecordType === 2 ? (
-          'Anchor RandomWalk NFT'
+          'Anchored-NFT Stellar Selection (RandomWalk anchor-holder)'
         ) : nft.RecordType === 3 ? (
           <Link href={`/allocation/${nft.RoundNum}`} className="text-inherit">
             Signature Allocation Recipient (#{nft.RoundNum})

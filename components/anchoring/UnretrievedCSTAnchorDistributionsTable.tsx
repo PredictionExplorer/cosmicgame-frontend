@@ -145,7 +145,7 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
           text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
         });
       } else {
-        reportError(err, 'unstaking CST');
+        reportError(err, 'releasing Cosmic Signature NFT anchors');
         const msg = getEthErrorMessage(err);
         if (msg !== 'An error occurred') {
           setNotification({ visible: true, type: 'error', text: getErrorMessage(msg) });
@@ -243,15 +243,15 @@ export const UnretrievedCSTAnchorDistributionsTable = ({ user }: { user: string 
           <DialogHeader>
             <DialogTitle>Release Tokens &amp; Retrieve Distributions</DialogTitle>
             <DialogDescription>
-              This will <strong>release all your anchored CST tokens</strong> and forward{' '}
+              This will <strong>release all your anchored Cosmic Signature NFTs</strong> and forward{' '}
               <strong>{(status?.UnretrievedAnchorDistribution ?? 0).toFixed(6)} ETH</strong> in
               accumulated distributions to your wallet.
             </DialogDescription>
           </DialogHeader>
           <Alert variant="warning">
             <AlertDescription>
-              <strong>Permanent action:</strong> Once released, these tokens cannot be anchored
-              again. Only proceed if you want to exit anchoring entirely.
+              <strong>Permanent action:</strong> Once released, these Cosmic Signature NFTs cannot
+              be anchored again. Only proceed if you want to exit anchoring entirely.
             </AlertDescription>
           </Alert>
           <DialogFooter className="gap-2">

@@ -5,7 +5,7 @@ import { AnchoredTokensTable } from '@/components/anchoring/AnchoredTokensTable'
 import { CSTokensTable } from '@/components/tokens/CSTokensTable';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
-/** Props for the CST anchoring panel. */
+/** Props for the Cosmic Signature NFT anchoring panel. */
 export interface CSTAnchoringPanelProps {
   account: string;
   stakingActions: AnchorAction[];
@@ -44,7 +44,7 @@ export function CSTAnchoringPanel({
       <div>
         <SectionHeader
           title="Anchored Tokens"
-          tooltip="NFTs you currently have anchored. You receive distributions proportional to how many tokens you anchor."
+          tooltip="Cosmic Signature NFTs you currently have anchored. You receive ETH Anchor Distributions proportional to how many Cosmic Signature NFTs you anchor."
         />
         <AnchoredTokensTable
           list={anchoredTokens}
@@ -61,7 +61,7 @@ export function CSTAnchoringPanel({
       <div className="mt-12">
         <SectionHeader
           title="Available for Anchoring"
-          tooltip="NFTs in your wallet that can be anchored to start receiving Anchor Distributions."
+          tooltip="Cosmic Signature NFTs in your wallet that can be anchored to start receiving ETH Anchor Distributions."
         />
         <CSTokensTable
           list={userTokens}
@@ -77,7 +77,7 @@ export function CSTAnchoringPanel({
       <div className="mt-12">
         <SectionHeader
           title="Anchor Distributions"
-          tooltip="ETH Anchor Distributions allocated to each of your anchored tokens. Unretrieved distributions can be collected by releasing the anchor."
+          tooltip="ETH Anchor Distributions allocated to each anchored Cosmic Signature NFT. Unretrieved distributions can be collected by releasing the anchor."
         />
         <AnchorDistributionsTable list={anchorDistributions} address={account} />
       </div>

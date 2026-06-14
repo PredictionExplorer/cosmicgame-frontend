@@ -77,7 +77,7 @@ const GlobalAnchorDistributionsRow = ({ row }: { row: CSTAnchorDistribution }) =
           {open && (
             <div className="m-2 mb-8">
               <h3 className="text-base font-medium mb-2">
-                CST Staking Rewards for Round {row.RoundNum}
+                ETH Anchor Distributions for Cycle {row.RoundNum}
               </h3>
               <AnchoringRecipientTable list={list} />
             </div>

@@ -86,7 +86,7 @@ export const metadata: Metadata = {
     'Protocol Guild',
     'ERC-721',
     'RandomWalkNFT',
-    'Cosmic Signature Token',
+    'Cosmic Signature CST Token',
     'CST',
   ],
 };

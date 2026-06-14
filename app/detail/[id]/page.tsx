@@ -46,8 +46,8 @@ export async function generateMetadata({
     notFound();
   }
 
-  const title = `Token #${id} | Cosmic Signature Token`;
-  const description = `Attributes and ownership history of Cosmic Signature Token #${id} \u2014 a deterministic three-body NFT rendered spectrally on Arbitrum.`;
+  const title = `Cosmic Signature NFT #${id} | Cosmic Signature`;
+  const description = `Attributes and ownership history of Cosmic Signature NFT #${id} - a deterministic three-body NFT rendered spectrally on Arbitrum.`;
 
   const tokenInfo = await loadTokenInfo(tokenId);
   if (tokenInfo === null) {
@@ -65,7 +65,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
     notFound();
   }
 
-  const name = `Cosmic Signature Token #${id}`;
+  const name = `Cosmic Signature NFT #${id}`;
   const description = `Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body problem physics.`;
   const tokenInfo = await loadTokenInfo(tokenId);
 

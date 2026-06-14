@@ -91,7 +91,8 @@ export function FundDistribution({
       label: 'Anchor Distribution',
       value: stakingPercentage ?? 0,
       color: SEGMENT_COLORS.anchoring,
-      tooltip: 'Distributions to anchor-holders proportional to their anchored token count',
+      tooltip:
+        'ETH Anchor Distributions to Cosmic Signature NFT anchor-holders, proportional to anchored NFT count',
     },
     {
       label: 'Public Goods',

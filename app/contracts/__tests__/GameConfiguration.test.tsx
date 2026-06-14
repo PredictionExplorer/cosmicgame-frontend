@@ -113,7 +113,7 @@ describe('GameConfiguration tooltips', () => {
     },
     {
       label: 'Participation CST per Gesture',
-      tooltip: /Cosmic Signature Tokens imprinted with each gesture/,
+      tooltip: /CST tokens imprinted with each gesture/,
     },
     {
       label: 'Finalization Timeout',

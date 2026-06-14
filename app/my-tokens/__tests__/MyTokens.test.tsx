@@ -45,7 +45,7 @@ describe('MyTokens', () => {
   it('shows error state', () => {
     mockUseCSTTokensByUser.mockReturnValue({ data: undefined, isLoading: false, isError: true });
     render(<MyWallet />);
-    expect(screen.getByText('Failed to load CST tokens.')).toBeInTheDocument();
+    expect(screen.getByText('Failed to load Cosmic Signature NFTs.')).toBeInTheDocument();
   });
 
   it('renders token table with data', () => {
@@ -64,8 +64,8 @@ describe('MyTokens', () => {
   it('renders page title', () => {
     mockUseCSTTokensByUser.mockReturnValue({ data: [], isLoading: false, isError: false });
     render(<MyWallet />);
-    expect(screen.getByText('My Cosmic Signature Tokens')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature Tokens I Own')).toBeInTheDocument();
+    expect(screen.getByText('My Cosmic Signature NFTs')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFTs I Own')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

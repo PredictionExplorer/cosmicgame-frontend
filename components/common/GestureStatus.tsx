@@ -328,11 +328,11 @@ export const GestureStatus = ({
                   className="h-full"
                 >
                   <GestureMetricCard
-                    label="RandomWalk Gesture"
+                    label="ETH + RandomWalk Gesture"
                     value={`${((ethGestureInfo?.ETHPrice ?? 0) / 2).toFixed(5)} ETH`}
                     icon={<TrendingUp className="h-4 w-4" />}
                     tone="randomwalk"
-                    tooltip="50% cost reduction when attaching a RandomWalk NFT to your gesture"
+                    tooltip="50% ETH Gesture Cost reduction when attaching a RandomWalk NFT to an ETH gesture"
                   />
                 </motion.div>
                 <motion.div

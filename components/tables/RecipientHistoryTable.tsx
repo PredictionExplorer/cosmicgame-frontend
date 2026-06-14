@@ -25,14 +25,17 @@ const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; text: string }> = {
   1: { icon: <Coins className="h-5 w-5" />, text: 'Signature Allocation CST (ERC-20)' },
   2: { icon: <Heart className="h-5 w-5" />, text: 'Signature Allocation Cosmic Signature NFT' },
   3: { icon: <Trophy className="h-5 w-5" />, text: 'ETH Stellar Selection (for participants)' },
-  4: { icon: <Ticket className="h-5 w-5" />, text: 'CST Stellar Selection (for participants)' },
+  4: {
+    icon: <Ticket className="h-5 w-5" />,
+    text: 'Recognition CST from Stellar Selection (for participants)',
+  },
   5: {
     icon: <Layers className="h-5 w-5" />,
     text: 'Cosmic Signature NFT Stellar Selection (for participants)',
   },
   6: {
     icon: <Layers className="h-5 w-5" />,
-    text: 'CST Stellar Selection (for RandomWalk anchor-holders)',
+    text: 'Recognition CST from Anchored-NFT Stellar Selection (for RandomWalk anchor-holders)',
   },
   7: {
     icon: <Trophy className="h-5 w-5" />,

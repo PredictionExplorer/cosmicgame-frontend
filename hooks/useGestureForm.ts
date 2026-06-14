@@ -559,7 +559,7 @@ export function useGestureForm() {
         if (!(await hasCstBalance(cstWei))) {
           notify(
             'error',
-            "Insufficient CST balance! There isn't enough Cosmic Token in your wallet.",
+            "Insufficient CST balance! There isn't enough CST (ERC-20) in your wallet.",
           );
           return false;
         }

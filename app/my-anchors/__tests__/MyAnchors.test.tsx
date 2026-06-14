@@ -161,13 +161,15 @@ describe('MyAnchors', () => {
     });
     render(<MyAnchors />);
     await waitFor(() => {});
-    expect(screen.getByTestId('stat-Your Anchored CST')).toBeInTheDocument();
-    expect(screen.getByTestId('stat-Your Anchored RWLK')).toBeInTheDocument();
+    expect(screen.getByTestId('stat-Your Anchored Cosmic Signature NFTs')).toBeInTheDocument();
+    expect(screen.getByTestId('stat-Your Anchored Random Walk NFTs')).toBeInTheDocument();
     expect(screen.getByTestId('stat-Unretrieved Distributions')).toBeInTheDocument();
-    expect(screen.getByTestId('stat-Distribution per CST')).toBeInTheDocument();
+    expect(screen.getByTestId('stat-Distribution per Cosmic Signature NFT')).toBeInTheDocument();
+    expect(screen.queryByTestId('stat-Your Anchored CST')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('stat-Distribution per CST')).not.toBeInTheDocument();
   });
 
-  it('shows pool ETH in Distribution per CST when indexed TotalTokensStaked is zero', async () => {
+  it('shows pool ETH in Distribution per Cosmic Signature NFT when indexed TotalTokensStaked is zero', async () => {
     mockUseDashboardInfo.mockReturnValue({
       data: {
         MainStats: {
@@ -180,7 +182,9 @@ describe('MyAnchors', () => {
     });
     render(<MyAnchors />);
     await waitFor(() => {});
-    expect(screen.getByTestId('stat-Distribution per CST')).toHaveTextContent('0.225795 ETH');
+    expect(screen.getByTestId('stat-Distribution per Cosmic Signature NFT')).toHaveTextContent(
+      '0.225795 ETH',
+    );
   });
 
   it('renders page title', async () => {

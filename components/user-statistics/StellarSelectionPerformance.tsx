@@ -169,9 +169,9 @@ export function StellarSelectionPerformance({
           tooltip="Total Cosmic Signature NFTs received as allocations (all imprint types combined)."
         />
         <StellarSelectionStat
-          label="CS Tokens Received"
+          label="Cosmic Signature NFTs Received"
           value={(userInfo.TotalCSTokensWon ?? 0).toLocaleString()}
-          tooltip="Total Cosmic Signature tokens received across all cycles."
+          tooltip="Total Cosmic Signature NFTs received across all cycles."
         />
       </div>
     </motion.div>

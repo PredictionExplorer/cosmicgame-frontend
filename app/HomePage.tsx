@@ -67,7 +67,7 @@ function renderInlineCountdown({ total }: CountdownRenderProps) {
 
 function getGestureKindLabel(gestureType: unknown): string {
   if (gestureType === 2) return 'a CST gesture';
-  if (gestureType === 1) return 'a RandomWalk gesture';
+  if (gestureType === 1) return 'an ETH + RandomWalk gesture';
   return 'an ETH gesture';
 }
 
@@ -272,9 +272,10 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     const fmt = (v: number, t: number) => (v > t ? v.toFixed(2) : v.toFixed(5));
     if (gestureType === 'ETH') return `Gesture with ETH (${fmt(adj, 0.1)} ETH)`;
     if (gestureType === 'RandomWalk' && rwlkId !== -1)
-      return `Gesture with RandomWalk token ${rwlkId} (${fmt(adj * 0.5, 0.2)} ETH)`;
+      return `Gesture with ETH + RandomWalk token ${rwlkId} (${fmt(adj * 0.5, 0.2)} ETH)`;
     if (gestureType === 'CST')
       return `Gesture with CST ${cstGestureData.SecondsElapsed > cstGestureData.AuctionDuration ? '(FREE GESTURE)' : `(${cstGestureData.CSTPrice.toFixed(2)} CST)`}`;
+    if (gestureType === 'RandomWalk') return 'Gesture with ETH + RandomWalk';
     return `Gesture with ${gestureType}`;
   };
 

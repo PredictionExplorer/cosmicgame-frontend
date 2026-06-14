@@ -54,7 +54,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'what-type-of-gestures-are-available',
         question: 'What types of gestures are available?',
         answer:
-          'Gestures can be made with ETH or Cosmic Signature Tokens (ERC-20 CST). You may also attach a Random Walk NFT to your gesture to receive a 50% reduction in Gesture Cost. The CST Gesture Cost drifts downward continuously within its own Calibration Window, allowing more cost-efficient participation later in the cycle.',
+          'Gestures can be made with ETH or CST tokens (ERC-20). You may also attach a Random Walk NFT to an ETH gesture to receive a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. The CST Gesture Cost drifts downward continuously within its own Calibration Window, allowing more cost-efficient participation later in the cycle.',
       },
       {
         id: 'can-i-participate-without-nfts',
@@ -116,12 +116,12 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-does-anchoring-work',
         question: 'How does Anchoring work?',
         answer:
-          'Cosmic Signature NFTs can be anchored to the protocol to receive Anchor Distributions. Anchoring pays 6% of the Cycle Reserve each cycle, distributed proportionally across all anchored Cosmic Signature NFTs. Random Walk NFTs can also be anchored for Anchored-NFT Stellar Selection eligibility. Visit the My Anchors page (from your account menu) to manage anchors.',
+          'Cosmic Signature NFTs can be anchored to the protocol to receive ETH Anchor Distributions. Anchoring pays 6% of the Cycle Reserve each cycle, distributed proportionally across all anchored Cosmic Signature NFTs. Random Walk NFTs can also be anchored for Anchored-NFT Stellar Selection eligibility, where selected anchor-holders receive CST and Cosmic Signature NFTs. CST (ERC-20) cannot be anchored. Visit the My Anchors page (from your account menu) to manage anchors.',
       },
       {
         id: 'what-are-marketing-rewards',
         question: 'What is the Outreach Reserve?',
-        answer: `You can receive Cosmic Signature Tokens (ERC-20) for helping promote the protocol. The Outreach Reserve imprints ${protocolFacts.outreachReserveCst.toLocaleString()} CST per cycle and distributes it to ecosystem contributors. Contact the Outreach Custodian via Discord for guidance.`,
+        answer: `You can receive CST tokens (ERC-20) for helping promote the protocol. The Outreach Reserve imprints ${protocolFacts.outreachReserveCst.toLocaleString()} CST per cycle and distributes it to ecosystem contributors. Contact the Outreach Custodian via Discord for guidance.`,
       },
       {
         id: 'how-many-nfts-minted',
@@ -158,7 +158,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'what-is-dutch-auction',
         question: 'What is the Calibration Window?',
         answer:
-          'When you gesture with ETH, you imprint 100 Cosmic Signature Tokens (ERC-20 CST). These tokens can be used to make another gesture through the CST Calibration Window. A Calibration Window is a price-discovery window in which the Gesture Cost descends from a Calibration Ceiling to a Calibration Floor over a known duration. As time passes, Gesture Cost falls \u2014 giving cost-efficient participation to later entrants.',
+          'When you gesture with ETH, you imprint 100 CST tokens (ERC-20). These tokens can be used to make another gesture through the CST Calibration Window. A Calibration Window is a price-discovery window in which the Gesture Cost descends from a Calibration Ceiling to a Calibration Floor over a known duration. As time passes, Gesture Cost falls \u2014 giving cost-efficient participation to later entrants.',
       },
       {
         id: 'what-is-endurance-champion',
@@ -171,7 +171,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'what-is-final-cst-gesture',
         question: 'What is the Final CST Gesture?',
         answer:
-          'The Final CST Gesture is the last gesture made with Cosmic Signature Tokens (CST) during a cycle. When the cycle finalizes, the participant who made it receives a Recognition CST imprint of 1,000 CST and one Cosmic Signature NFT.',
+          'The Final CST Gesture is the last gesture made with CST tokens during a cycle. When the cycle finalizes, the participant who made it receives a Recognition CST imprint of 1,000 CST and one Cosmic Signature NFT.',
         hashAnchor: 'final-cst-gesture',
       },
       {
@@ -220,15 +220,15 @@ export const faqCategories: FAQCategory[] = [
     items: [
       {
         id: 'what-are-cst-and-dao',
-        question: 'What are Cosmic Signature Tokens and the Cosmic Council?',
+        question: 'What are CST tokens and the Cosmic Council?',
         answer:
-          'Every gesture imprints Cosmic Signature Tokens (CST), which express Coordination Weight on the Cosmic Council. The Council coordinates the protocol on-chain: CST holders submit Coordination Proposals and express Support or Opposition. The Council decides which Public Goods Beneficiary receives the 7% allocation each cycle and adjusts other on-chain parameters.',
+          'Every gesture imprints CST tokens, which express Coordination Weight on the Cosmic Council. The Council coordinates the protocol on-chain: CST holders submit Coordination Proposals and express Support or Opposition. The Council decides which Public Goods Beneficiary receives the 7% allocation each cycle and adjusts other on-chain parameters.',
       },
       {
         id: 'what-can-i-do-with-cst',
         question: 'What can I do with CST tokens?',
         answer:
-          'CST (Cosmic Signature Tokens) can be used as an alternative to ETH for gestures. You imprint 100 CST per gesture, so active participants naturally accumulate CST for future cycles. They also express Coordination Weight on the Cosmic Council.',
+          'CST tokens can be used as an alternative to ETH for gestures. You imprint 100 CST per gesture, so active participants naturally accumulate CST for future cycles. They also express Coordination Weight on the Cosmic Council.',
       },
       {
         id: 'what-makes-nfts-unique',
@@ -264,7 +264,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'connection-with-randomwalknft',
         question: 'What is the connection with Random Walk NFT?',
         answer:
-          'Random Walk NFT holders can attach an unused token to one ETH gesture for a 50% Gesture-Cost reduction. Random Walk NFT anchor-holders also receive entries into the Anchored-NFT Stellar Selection each cycle.',
+          'Random Walk NFT holders can attach an unused token to one ETH gesture for a 50% ETH Gesture Cost reduction. Random Walk NFT anchor-holders also receive entries into the Anchored-NFT Stellar Selection each cycle.',
       },
       {
         id: 'how-to-trade-nfts-tokens',
@@ -324,7 +324,7 @@ export const faqCategories: FAQCategory[] = [
       },
       {
         id: 'view-tokens-on-arbitrum',
-        question: 'How do I view my Cosmic Signature Tokens and NFTs on Arbitrum?',
+        question: 'How do I view my CST tokens and Cosmic Signature NFTs on Arbitrum?',
         answer:
           'View them directly on the Cosmic Signature website, or add the contract addresses to your wallet manually. Contract addresses are published on the Contracts page and in the community Discord.',
       },

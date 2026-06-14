@@ -307,7 +307,7 @@ export const landingContent = {
       {
         question: 'Is any of this an investment?',
         answer:
-          'No. Cosmic Signature tokens (CST) express participation and coordination weight within the protocol, not equity, profit share, dividend, or investment contract. No team wallet receives ETH from participant gestures. Cosmic Signature makes no representation about token price or future behavior and does not solicit participation as an investment.',
+          'No. CST tokens express participation and coordination weight within the protocol, not equity, profit share, dividend, or investment contract. No team wallet receives ETH from participant gestures. Cosmic Signature makes no representation about token price or future behavior and does not solicit participation as an investment.',
       },
       // lexicon-allow-end
       // lexicon-allow-start — mandatory public-goods / tax-sense denial FAQ,

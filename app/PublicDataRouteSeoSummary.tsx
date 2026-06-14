@@ -68,7 +68,7 @@ const configs: Record<SeoSummaryRoute, SummaryConfig> = {
     eyebrow: 'Anchor distributions · Arbitrum',
     heading: 'Anchor Distributions',
     description:
-      'Track public Cosmic Signature and RandomWalk NFT anchoring activity, release actions, active anchored tokens, and ETH Anchor Distribution records.',
+      'Track public Cosmic Signature NFT anchoring, ETH Anchor Distribution records, RandomWalk NFT anchoring, and Anchored-NFT Stellar Selection imprints.',
     source: 'Cosmic Signature public anchoring APIs',
     links: [
       { href: '/statistics', label: 'View anchoring statistics' },
@@ -155,7 +155,7 @@ const configs: Record<SeoSummaryRoute, SummaryConfig> = {
     eyebrow: 'RandomWalk NFT usage · Arbitrum',
     heading: 'Used RandomWalk NFTs',
     description:
-      'Review RandomWalk NFTs that have already been attached to Cosmic Signature gestures for their one-time Gesture Cost reduction.',
+      'Review RandomWalk NFTs that have already been attached to ETH gestures for their one-time Gesture Cost reduction.',
     source: 'Cosmic Signature public RandomWalk usage APIs',
     links: [
       { href: '/imprint', label: 'Imprint RandomWalk NFTs' },

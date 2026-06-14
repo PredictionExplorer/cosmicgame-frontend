@@ -1,8 +1,8 @@
 /**
- * Anchor “distribution per NFT” uses the live staking pool from the game contract
+ * Anchor "distribution per NFT" uses the live staking pool from the game contract
  * (`StakingAmountEth`) divided by the indexed total anchored count (`TotalTokensStaked`).
  * When the DB aggregate is stale or empty, the denominator can be 0 while the pool is still
- * positive — avoid implying a rate exists.
+ * positive - avoid implying a rate exists.
  */
 export function formatDistributionPerAnchoredNftEth(
   stakingPoolEth: number | undefined,
@@ -21,7 +21,7 @@ export function formatDistributionPerAnchoredNftEth(
     return {
       value: `${pool.toFixed(6)} ETH`,
       tooltipSuffix:
-        ' The on-chain anchor pool is non-zero, but the indexed total of anchored CST NFTs is zero (e.g. cg_stake_stats_cst not updated by ETL), so a per-token rate cannot be computed.',
+        ' The on-chain anchor pool is non-zero, but the indexed total of anchored Cosmic Signature NFTs is zero (e.g. cg_stake_stats_cst not updated by ETL), so a per-NFT rate cannot be computed.',
     };
   }
   return { value: '--', tooltipSuffix: '' };

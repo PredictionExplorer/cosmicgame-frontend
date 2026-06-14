@@ -37,7 +37,7 @@ const SampleDetailPage = () => {
       <div className="mx-auto w-full max-w-7xl px-4">
         <PageHeader
           title="Sample NFT detail"
-          subtitle="Reference layout for Cosmic Signature tokens"
+          subtitle="Reference layout for Cosmic Signature NFTs"
           breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Sample detail' }]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"

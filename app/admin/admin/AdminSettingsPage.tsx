@@ -55,7 +55,7 @@ const AdminSettingsPage = () => {
             description="Contract addresses and on-chain parameters from the dashboard API."
           >
             <div>
-              <AdminFieldRow label="Cosmic Signature Token (ERC721) contract address">
+              <AdminFieldRow label="Cosmic Signature NFT (ERC-721) contract address">
                 <Input
                   placeholder="Enter address here"
                   className="flex-1 font-mono text-sm"
@@ -66,7 +66,7 @@ const AdminSettingsPage = () => {
                   Set Address
                 </Button>
               </AdminFieldRow>
-              <AdminFieldRow label="Cosmic Token (ERC20) contract address">
+              <AdminFieldRow label="Cosmic Signature CST Token (ERC-20) contract address">
                 <Input
                   placeholder="Enter address here"
                   className="flex-1 font-mono text-sm"

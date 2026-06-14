@@ -41,8 +41,9 @@ describe('RWLKAnchoringPanel', () => {
     render(<RWLKAnchoringPanel {...defaultProps} />);
     expect(screen.getByText('Anchored Tokens')).toBeInTheDocument();
     expect(screen.getByText('Available for Anchoring')).toBeInTheDocument();
-    expect(screen.getByText('Anchor Allocation Tokens')).toBeInTheDocument();
+    expect(screen.getByText('Anchored-NFT Stellar Selection')).toBeInTheDocument();
     expect(screen.getByText('Anchor / Release History')).toBeInTheDocument();
+    expect(screen.queryByText('Anchor Allocation Tokens')).not.toBeInTheDocument();
   });
 
   it('renders Anchored Tokens section first', () => {
@@ -57,10 +58,10 @@ describe('RWLKAnchoringPanel', () => {
     expect(headings[1]).toHaveTextContent('Available for Anchoring');
   });
 
-  it('renders Anchor Allocation Tokens section third', () => {
+  it('renders Anchored-NFT Stellar Selection section third', () => {
     render(<RWLKAnchoringPanel {...defaultProps} />);
     const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[2]).toHaveTextContent('Anchor Allocation Tokens');
+    expect(headings[2]).toHaveTextContent('Anchored-NFT Stellar Selection');
   });
 
   it('renders Anchor / Release History section last', () => {

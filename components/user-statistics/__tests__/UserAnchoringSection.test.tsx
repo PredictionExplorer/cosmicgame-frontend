@@ -80,7 +80,7 @@ describe('UserAnchoringSection', () => {
     expect(screen.getByTestId('anchor-distributions-table')).toBeInTheDocument();
   });
 
-  it('shows empty state when no CST anchoring activity', () => {
+  it('shows empty state when no Cosmic Signature NFT anchoring activity', () => {
     render(
       <UserAnchoringSection {...defaultProps} cstAnchorActions={[]} cstAnchorDistributions={[]} />,
     );

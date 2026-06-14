@@ -7,7 +7,7 @@ import { get_dashboard_info } from '@/services/api/rounds';
 
 const CONTRACT_LABELS: Record<string, string> = {
   CosmicGameAddr: 'Cosmic Signature Protocol',
-  CosmicTokenAddr: 'Cosmic Signature Token (CST)',
+  CosmicTokenAddr: 'Cosmic Signature CST Token',
   CosmicSignatureAddr: 'Cosmic Signature NFT',
   RandomWalkAddr: 'RandomWalk NFT',
   CosmicDaoAddr: 'Cosmic Council',

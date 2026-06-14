@@ -44,7 +44,7 @@ export function RWLKAnchoringPanel({
       <div>
         <SectionHeader
           title="Anchored Tokens"
-          tooltip="RandomWalk NFTs you currently have anchored. Each anchored token is eligible for random anchor allocation imprints."
+          tooltip="RandomWalk NFTs you currently have anchored. Each anchored RandomWalk NFT is eligible for on-chain random selection in Anchored-NFT Stellar Selection."
         />
         <AnchoredTokensTable
           list={anchoredTokens}
@@ -61,7 +61,7 @@ export function RWLKAnchoringPanel({
       <div className="mt-12">
         <SectionHeader
           title="Available for Anchoring"
-          tooltip="RandomWalk NFTs in your wallet that can be anchored to take part in Anchor Distributions."
+          tooltip="RandomWalk NFTs in your wallet that can be anchored for Anchored-NFT Stellar Selection eligibility, not ETH Anchor Distributions."
         />
         <RWLKNFTTable
           list={userTokens}
@@ -77,8 +77,8 @@ export function RWLKAnchoringPanel({
 
       <div className="mt-12">
         <SectionHeader
-          title="Anchor Allocation Tokens"
-          tooltip="Tokens imprinted as allocations for your anchored RandomWalk NFTs through the on-chain random selection mechanism."
+          title="Anchored-NFT Stellar Selection"
+          tooltip="Cosmic Signature NFTs and paired CST imprinted when this wallet wins Anchored-NFT Stellar Selection through the on-chain random selection mechanism."
         />
         <RwalkAnchorDistributionImprintsTable list={rwlkImprints} />
       </div>

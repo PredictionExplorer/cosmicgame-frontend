@@ -183,7 +183,7 @@ const Statistics = () => {
       gradient: true,
     },
     {
-      label: 'Distribution per CST NFT',
+      label: 'Distribution per Cosmic Signature NFT',
       value: distributionPerCst.value,
       tooltip:
         'Current ETH Anchor Distribution per anchored Cosmic Signature NFT: on-chain pool divided by the indexed total of anchored NFTs.' +
@@ -259,8 +259,9 @@ const Statistics = () => {
               Anchoring at a Glance
             </h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Anchored tokens are a core part of Cosmic Signature: CST NFTs share ETH Anchor
-              Distributions, while RandomWalk NFTs participate in Anchored-NFT Stellar Selection.
+              Anchored NFTs are a core part of Cosmic Signature: Cosmic Signature NFTs share ETH
+              Anchor Distributions, while RandomWalk NFTs participate in Anchored-NFT Stellar
+              Selection.
             </p>
           </div>
           <Link
@@ -598,7 +599,7 @@ const Statistics = () => {
               <AttachedNFTDistributionTable list={data.MainStats.DonatedTokenDistribution ?? []} />
             </CollapsibleSection>
             <CollapsibleSection
-              title="Cosmic Signature Token (ERC-721)"
+              title="Cosmic Signature NFT (ERC-721)"
               tooltip={statisticsCopy.sections.cosmicSignatureTokenDistribution}
               icon={<Layers className="h-3.5 w-3.5" />}
             >

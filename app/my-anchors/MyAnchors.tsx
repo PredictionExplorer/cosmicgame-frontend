@@ -72,33 +72,33 @@ const MyAnchors = () => {
   const heroStats: AnchoringStatItem[] = useMemo(
     () => [
       {
-        label: 'Your Anchored CST',
+        label: 'Your Anchored Cosmic Signature NFTs',
         value: anchoredCSTokens.length.toLocaleString(),
         tooltip:
-          'Number of Cosmic Signature NFTs you currently have anchored. Anchoring more tokens increases your share of Anchor Distributions.',
+          'Number of Cosmic Signature NFTs you currently have anchored. Anchoring more Cosmic Signature NFTs increases your share of ETH Anchor Distributions.',
         icon: <Layers className="h-4 w-4" />,
       },
       {
-        label: 'Your Anchored RWLK',
+        label: 'Your Anchored Random Walk NFTs',
         value: anchoredRWLKTokens.length.toLocaleString(),
         tooltip:
-          'Number of RandomWalk NFTs you currently have anchored. Each anchored RWLK is eligible to receive an allocation imprint.',
+          'Number of Random Walk NFTs you currently have anchored. Each anchored Random Walk NFT is eligible for Anchored-NFT Stellar Selection.',
         icon: <Layers className="h-4 w-4" />,
       },
       {
         label: 'Unretrieved Distributions',
         value: unclaimedRewardEth > 0 ? `${unclaimedRewardEth.toFixed(4)} ETH` : '0 ETH',
         tooltip:
-          'ETH Anchor Distributions allocated to your anchored CST tokens but not yet retrieved. Releasing an anchor automatically retrieves its accumulated distributions.',
+          'ETH Anchor Distributions allocated to your anchored Cosmic Signature NFTs but not yet retrieved. Releasing a Cosmic Signature NFT anchor automatically retrieves its accumulated distributions.',
         icon: <Gift className="h-4 w-4" />,
         featured: true,
         gradient: true,
       },
       {
-        label: 'Distribution per CST',
+        label: 'Distribution per Cosmic Signature NFT',
         value: distributionPerCST.value,
         tooltip:
-          'Current ETH Anchor Distribution per anchored CST token, calculated as the total anchoring pool (on-chain) divided by the indexed number of anchored CST NFTs.' +
+          'Current ETH Anchor Distribution per anchored Cosmic Signature NFT, calculated as the total anchoring pool (on-chain) divided by the indexed number of anchored Cosmic Signature NFTs.' +
           distributionPerCST.tooltipSuffix,
         icon: <TrendingUp className="h-4 w-4" />,
       },
@@ -137,7 +137,7 @@ const MyAnchors = () => {
         }
         title="My Anchors"
         gradientTitle="signature"
-        subtitle="Manage your anchored tokens and view distributions"
+        subtitle="Manage your anchored NFTs and view Cosmic Signature NFT distributions"
       />
 
       {!account ? (

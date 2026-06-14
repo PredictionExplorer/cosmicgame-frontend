@@ -173,7 +173,7 @@ const HistoryRow = ({ history, isBanned, showRound, gestureDuration }: HistoryRo
           )}
           {(!!history.NFTDonationTokenAddr || !!history.DonatedERC20TokenAddr) && (
             <>
-              {gestureType === 2 && 'Gesture was made using Cosmic Signature Tokens'}
+              {gestureType === 2 && 'Gesture was made using CST tokens'}
               {gestureType === 0 && 'Gesture was made using ETH'}
               {!!history.NFTDonationTokenAddr &&
                 ` and a token (${shortenHex(

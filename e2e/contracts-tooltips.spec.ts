@@ -26,7 +26,7 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
   },
   {
     label: 'Participation CST per Gesture',
-    expected: /Cosmic Signature Tokens imprinted with each gesture/,
+    expected: /CST tokens imprinted with each gesture/,
   },
   {
     label: 'Finalization Timeout',

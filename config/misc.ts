@@ -80,12 +80,13 @@ export const ADMIN_EVENTS = [
   {
     name: 'CosmicTokenAddressChanged',
     type: 'address',
-    description: 'The address of the Cosmic Signature Token (ERC-20) contract has been changed.',
+    description:
+      'The address of the Cosmic Signature CST Token (ERC-20) contract has been changed.',
   },
   {
     name: 'CosmicSignatureAddressChanged',
     type: 'address',
-    description: 'The address of the Cosmic Signature Token (ERC-721) contract has been changed.',
+    description: 'The address of the Cosmic Signature NFT (ERC-721) contract has been changed.',
   },
   {
     name: 'Upgraded',

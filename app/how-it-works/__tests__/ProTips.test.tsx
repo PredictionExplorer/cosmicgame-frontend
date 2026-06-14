@@ -60,7 +60,7 @@ describe('ProTips', () => {
   it('renders tip descriptions', () => {
     renderWithTooltip(<ProTips />);
     expect(screen.getByText(/Gesture Cost starts low/)).toBeInTheDocument();
-    expect(screen.getByText(/one-time 50% cost reduction/)).toBeInTheDocument();
+    expect(screen.getByText(/one-time 50% ETH Gesture Cost reduction/)).toBeInTheDocument();
     expect(screen.getByText(/higher Selection frequency/)).toBeInTheDocument();
     expect(screen.getByText(/smart contract is formally verified/)).toBeInTheDocument();
     expect(screen.getByText(/Cycle Finalization Time gains/)).toBeInTheDocument();

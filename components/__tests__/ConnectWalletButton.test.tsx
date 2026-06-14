@@ -157,7 +157,8 @@ describe('ConnectWalletButton', () => {
 
     await user.click(screen.getByText(/0x1234\.{4}5678/));
 
-    expect(screen.getByText('CST NFTs')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFTs')).toBeInTheDocument();
+    expect(screen.queryByText('CST NFTs')).not.toBeInTheDocument();
     expect(screen.getByText('7')).toBeInTheDocument();
   });
 

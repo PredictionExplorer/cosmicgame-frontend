@@ -19,7 +19,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - [How It Works](https://app.cosmicsignature.com/how-it-works): Complete guide to protocol mechanics
 - [FAQ](https://app.cosmicsignature.com/faq): Frequently asked questions
 - [Statistics](https://app.cosmicsignature.com/statistics): Protocol statistics and analytics
-- [Anchoring](https://app.cosmicsignature.com/anchoring): Anchor Cosmic Signature NFTs to receive Anchor Distributions
+- [Anchoring](https://app.cosmicsignature.com/anchoring): Anchor Cosmic Signature NFTs to receive ETH Anchor Distributions, or anchor RandomWalkNFTs for Anchored-NFT Stellar Selection eligibility
 - [Allocation](https://app.cosmicsignature.com/allocation): Current Cycle Reserve and allocation tracks
 - [Contracts](https://app.cosmicsignature.com/contracts): Smart contract details and addresses
 - [Source Code](https://app.cosmicsignature.com/code): Source code and verification resources
@@ -44,14 +44,14 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - 7% of each Cycle Reserve is forwarded to Protocol Guild (public goods)
 - Outreach Reserve imprints 3,000 CST per cycle, bringing typical per-cycle CST imprints to 27,000 CST
 - Participants can make gestures with ETH or CST tokens (CST uses its own Calibration Window)
-- RandomWalkNFT holders can attach an unused token to an ETH gesture for a 50% Gesture-Cost reduction; each RandomWalkNFT can be used once for this discount
+- RandomWalkNFT holders can attach an unused token to an ETH gesture for a 50% ETH Gesture Cost reduction; each RandomWalkNFT can be used once for this discount
 - RandomWalkNFTs can also be anchored for Anchored-NFT Stellar Selection eligibility
 
 ## Tokens
 
-- **CST (Cosmic Signature Token)**: ERC-20 coordination and utility token
+- **CST tokens**: ERC-20 coordination and utility tokens
 - **Cosmic Signature NFT**: ERC-721 generative art based on three-body problem physics
-- **RandomWalkNFT**: Partner NFT offering Gesture-Cost reductions
+- **RandomWalkNFT**: Partner ERC-721 that can be attached to an ETH gesture for a one-time 50% ETH Gesture Cost reduction, or anchored for Anchored-NFT Stellar Selection eligibility
 
 ## Community
 

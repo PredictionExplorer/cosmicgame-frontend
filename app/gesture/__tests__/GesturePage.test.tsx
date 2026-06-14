@@ -154,10 +154,10 @@ describe('GesturePage', () => {
     expect(screen.getByText('Hello World')).toBeInTheDocument();
   });
 
-  it('shows "No" for RandomWalkNFT when RWalkNFTId < 0', () => {
+  it('shows "No" for ETH + RandomWalk attachment when RWalkNFTId < 0', () => {
     mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
     render(<GesturePage gestureId={1} />);
-    expect(screen.getByText('Was gesture with RandomWalkNFT:')).toBeInTheDocument();
+    expect(screen.getByText('Attached RandomWalk NFT to ETH gesture:')).toBeInTheDocument();
     const noTexts = screen.getAllByText('No');
     expect(noTexts.length).toBeGreaterThanOrEqual(1);
   });

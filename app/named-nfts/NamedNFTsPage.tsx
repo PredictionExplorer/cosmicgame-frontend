@@ -74,16 +74,16 @@ const NamedNFTsPage = () => {
     <PageShell variant="data" backdrop="signature">
       <PageHeader
         align="left"
-        eyebrow={<SectionEyebrow tone="aurora">Named Tokens · {list.length}</SectionEyebrow>}
-        title="Named Cosmic Signature Tokens"
+        eyebrow={<SectionEyebrow tone="aurora">Named NFTs · {list.length}</SectionEyebrow>}
+        title="Named Cosmic Signature NFTs"
         titleLevel={2}
         gradientTitle="signature"
-        subtitle="Browse tokens that have been given custom names"
+        subtitle="Browse Cosmic Signature NFTs that have been given custom names"
       />
       <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">
-        COSMIC NFT owners can give their tokens custom names, creating a unique identity within the
-        collection. Named tokens stand out in the gallery and carry the personal touch of their
-        owners.
+        Cosmic Signature NFT owners can give their NFTs custom names, creating a unique identity
+        within the collection. Named NFTs stand out in the gallery and carry the personal touch of
+        their owners.
       </p>
 
       <div className="mt-12">
@@ -103,8 +103,8 @@ const NamedNFTsPage = () => {
           </>
         ) : (
           <EmptyState
-            title="No named tokens"
-            description="No Cosmic Signature tokens have been named yet."
+            title="No named NFTs"
+            description="No Cosmic Signature NFTs have been named yet."
           />
         )}
       </div>

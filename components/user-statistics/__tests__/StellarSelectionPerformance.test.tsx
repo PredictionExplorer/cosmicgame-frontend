@@ -87,7 +87,7 @@ describe('StellarSelectionPerformance', () => {
     expect(screen.getByText('Unretrieved NFTs')).toBeInTheDocument();
     expect(screen.getByText('Stellar Selection NFTs')).toBeInTheDocument();
     expect(screen.getByText('Allocation NFTs')).toBeInTheDocument();
-    expect(screen.getByText('CS Tokens Received')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFTs Received')).toBeInTheDocument();
   });
 
   it('displays correct total Stellar Selection ETH', () => {

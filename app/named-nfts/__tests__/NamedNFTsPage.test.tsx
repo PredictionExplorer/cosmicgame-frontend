@@ -22,7 +22,7 @@ describe('NamedNFTsPage', () => {
   it('renders the heading', () => {
     mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
     render(<NamedNFTsPage />);
-    expect(screen.getByText('Named Cosmic Signature Tokens')).toBeInTheDocument();
+    expect(screen.getByText('Named Cosmic Signature NFTs')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -34,7 +34,8 @@ describe('NamedNFTsPage', () => {
   it('shows empty message when no NFTs', () => {
     mockUseNamedNFTs.mockReturnValue({ data: [], isLoading: false });
     render(<NamedNFTsPage />);
-    expect(screen.getByText('No named tokens')).toBeInTheDocument();
+    expect(screen.getByText('No named NFTs')).toBeInTheDocument();
+    expect(screen.getByText('No Cosmic Signature NFTs have been named yet.')).toBeInTheDocument();
   });
 
   it('renders table rows for NFT data', () => {

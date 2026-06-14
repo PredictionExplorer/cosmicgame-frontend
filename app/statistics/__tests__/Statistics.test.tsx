@@ -434,7 +434,7 @@ describe('Statistics', () => {
     expect(snapshot.getByText('7')).toBeInTheDocument();
     expect(snapshot.getByText('Anchor Distribution Pool')).toBeInTheDocument();
     expect(snapshot.getByText('4.2000 ETH')).toBeInTheDocument();
-    expect(snapshot.getByText('Distribution per CST NFT')).toBeInTheDocument();
+    expect(snapshot.getByText('Distribution per Cosmic Signature NFT')).toBeInTheDocument();
     expect(snapshot.getByText('0.100000 ETH')).toBeInTheDocument();
     expect(snapshot.getByText('Active Anchor-holders')).toBeInTheDocument();
     expect(snapshot.getByText('10')).toBeInTheDocument();
@@ -481,7 +481,7 @@ describe('Statistics', () => {
     expect(screen.getByText('RandomWalk NFT')).toBeInTheDocument();
   });
 
-  it('renders CST anchoring statistics', () => {
+  it('renders Cosmic Signature NFT anchoring statistics', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,

@@ -19,7 +19,7 @@ import type {
 
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
-/** Fetches unclaimed CST anchoring rewards (ETH deposits) for a wallet address. */
+/** Fetches unclaimed Cosmic Signature NFT anchoring rewards (ETH deposits) for a wallet address. */
 export function get_staking_cst_rewards_to_claim_by_user(
   address: string,
 ): Promise<CSTAnchorDistribution[]> {
@@ -29,7 +29,7 @@ export function get_staking_cst_rewards_to_claim_by_user(
   }, []);
 }
 
-/** Fetches already-collected CST anchoring rewards for a wallet address (optionally paged). */
+/** Fetches already-collected Cosmic Signature NFT anchoring rewards for a wallet address (optionally paged). */
 export function get_staking_cst_rewards_collected_by_user(
   address: string,
   page?: ApiPageWindow,
@@ -42,7 +42,7 @@ export function get_staking_cst_rewards_collected_by_user(
   }, []);
 }
 
-/** Fetches Cosmic Signature Tokens currently staked by a wallet address. */
+/** Fetches Cosmic Signature NFTs currently anchored by a wallet address. */
 export function get_staked_cst_tokens_by_user(address: string): Promise<AnchoredTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/cst/staked_tokens/by_user/${address}`));
@@ -63,7 +63,7 @@ export function get_cst_action_ids_by_deposit_id(
   }, null);
 }
 
-/** Fetches CST anchor/release actions performed by a wallet address (optionally paged). */
+/** Fetches Cosmic Signature NFT anchor/release actions performed by a wallet address (optionally paged). */
 export function get_staking_cst_actions_by_user(
   address: string,
   page?: ApiPageWindow,
@@ -76,7 +76,7 @@ export function get_staking_cst_actions_by_user(
   }, []);
 }
 
-/** Fetches CST anchor/release actions globally (optionally paged). */
+/** Fetches Cosmic Signature NFT anchor/release actions globally (optionally paged). */
 export function get_staking_cst_actions(page?: ApiPageWindow): Promise<AnchorAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/cst/actions/global/${pagedPath(page)}`));
@@ -84,7 +84,7 @@ export function get_staking_cst_actions(page?: ApiPageWindow): Promise<AnchorAct
   }, []);
 }
 
-/** Fetches combined anchor + release record details for a CST anchoring action. */
+/** Fetches combined anchor + release record details for a Cosmic Signature NFT anchoring action. */
 export function get_staking_cst_actions_info(
   actionId: number,
 ): Promise<CombinedAnchorRecordInfo | null> {
@@ -100,7 +100,7 @@ export function get_staking_cst_actions_info(
   }, null);
 }
 
-/** Fetches all CST anchoring rewards globally. */
+/** Fetches all Cosmic Signature NFT anchoring rewards globally. */
 export function get_staking_cst_rewards(): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/cst/rewards/global'));
@@ -108,7 +108,7 @@ export function get_staking_cst_rewards(): Promise<CSTAnchorDistribution[]> {
   }, []);
 }
 
-/** Fetches CST anchoring rewards distributed in a specific round. */
+/** Fetches Cosmic Signature NFT anchoring rewards distributed in a specific round. */
 export function get_staking_cst_rewards_by_round(round: number): Promise<CSTAnchorDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/cst/rewards/by_round/${round}`));
@@ -116,7 +116,7 @@ export function get_staking_cst_rewards_by_round(round: number): Promise<CSTAnch
   }, []);
 }
 
-/** Fetches CST anchoring reward-paid records for a wallet address. */
+/** Fetches Cosmic Signature NFT anchoring reward-paid records for a wallet address. */
 export function get_staking_cst_reward_paid_records_by_user(
   address: string,
 ): Promise<CSTAnchorDistribution[]> {
@@ -126,7 +126,7 @@ export function get_staking_cst_reward_paid_records_by_user(
   }, []);
 }
 
-/** Fetches all currently staked Cosmic Signature Tokens globally. */
+/** Fetches all currently anchored Cosmic Signature NFTs globally. */
 export function get_staked_cst_tokens(): Promise<AnchoredTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/cst/staked_tokens/all'));
@@ -192,7 +192,7 @@ export function get_staking_rewards_by_user_by_token_details(
   }, null);
 }
 
-/** Fetches CST anchoring rewards grouped by deposit for a wallet address. */
+/** Fetches Cosmic Signature NFT anchoring rewards grouped by deposit for a wallet address. */
 export function get_staking_cst_by_user_by_deposit_rewards(
   address: string,
 ): Promise<CSTAnchorDistribution[]> {

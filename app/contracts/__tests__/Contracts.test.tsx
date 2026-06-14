@@ -217,7 +217,7 @@ describe('Contracts', () => {
   it('renders contract address cards', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
-    expect(screen.getByText('Cosmic Signature Token')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature CST Token')).toBeInTheDocument();
     expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
   });
@@ -252,7 +252,7 @@ describe('Contracts', () => {
     const searchInput = screen.getByLabelText('Search contracts');
     fireEvent.change(searchInput, { target: { value: 'charity' } }); // lexicon-allow-line
     expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
-    expect(screen.queryByText('Cosmic Signature Token')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cosmic Signature CST Token')).not.toBeInTheDocument();
   });
 
   it('shows empty state when search has no results', () => {

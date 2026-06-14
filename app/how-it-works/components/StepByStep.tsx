@@ -35,13 +35,13 @@ const steps = [
     Icon: MousePointerClick,
     title: 'Make Your Gesture',
     highlights: [
-      'Choose your gesture method: ETH, CST, or attach a Random Walk NFT for a 50% ETH cost reduction.',
+      'Choose ETH, optionally attach a Random Walk NFT for a 50% ETH Gesture Cost reduction, or make a CST (ERC-20) gesture.',
       'Click "Gesture Now" and confirm the transaction in your wallet.',
       'Your gesture extends the Cycle Finalization Time by ~1 hour and raises the Gesture Cost by ~1%.',
       'Every gesture imprints 100 CST and records a Stellar Selection entry automatically.',
     ],
     tooltip:
-      'Each Random Walk NFT can be used once for the 50% cost reduction \u2014 choose your moment wisely.',
+      'Each Random Walk NFT can be used once for the 50% ETH Gesture Cost reduction - choose your moment wisely.',
   },
 ] as const;
 

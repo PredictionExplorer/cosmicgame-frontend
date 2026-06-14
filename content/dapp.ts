@@ -74,7 +74,7 @@ export const dappContent = {
     myAnchors: {
       title: 'My Anchors \u00b7 Cosmic Signature',
       description:
-        'Your anchored Cosmic Signature and Random Walk NFTs and their per-cycle distributions.',
+        'Your anchored Cosmic Signature NFTs, ETH Anchor Distributions, Random Walk NFT anchors, and Anchored-NFT Stellar Selection history.',
     },
     contracts: {
       title: 'Contracts \u00b7 Cosmic Signature',
@@ -89,9 +89,9 @@ export const dappContent = {
       description: 'Privacy practices for visitors to the Cosmic Signature protocol.',
     },
     tokenDetail: {
-      titleFor: (id: string | number) => `Token #${id} \u00b7 Cosmic Signature`,
+      titleFor: (id: string | number) => `Cosmic Signature NFT #${id} \u00b7 Cosmic Signature`,
       descriptionFor: (id: string | number) =>
-        `Attributes and ownership history of Cosmic Signature Token #${id} \u2014 a deterministic three-body NFT rendered spectrally on Arbitrum.`,
+        `Attributes and ownership history of Cosmic Signature NFT #${id} - a deterministic three-body NFT rendered spectrally on Arbitrum.`,
       fallbackDescription:
         'Unique generative NFT from the Cosmic Signature procedural on-chain art protocol, rendered from three-body physics.',
     },
@@ -108,7 +108,7 @@ export const dappContent = {
     mint: {
       title: 'Imprint RandomWalk NFT \u00b7 Cosmic Signature',
       description:
-        'Imprint a RandomWalk NFT on Cosmic Signature. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% Gesture Cost discount.',
+        'Imprint a RandomWalk NFT on Cosmic Signature. Each unused RandomWalk NFT can be attached to one ETH gesture for a 50% ETH Gesture Cost discount.',
     },
     systemEvent: {
       title: 'System Events \u00b7 Cosmic Signature',
@@ -198,7 +198,7 @@ export const dappContent = {
     usedRwlkNfts: {
       title: 'Used RandomWalk NFTs \u00b7 Cosmic Signature',
       description:
-        'RandomWalk NFTs already used for a 50% Gesture Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once for this discount.',
+        'RandomWalk NFTs already attached to ETH gestures for a 50% ETH Gesture Cost discount in Cosmic Signature. Each RandomWalk NFT can be used once for this discount.',
     },
     siteMap: {
       title: 'Site Map \u00b7 Cosmic Signature',
@@ -231,7 +231,7 @@ export const dappContent = {
       cst: 'CST',
       cosmicNfts: 'COSMIC NFTs',
       rwlkNfts: 'RWLK NFTs',
-      anchoredCst: 'Anchored CST NFTs',
+      anchoredCst: 'Anchored Cosmic Signature NFTs',
       anchoredRwlk: 'Anchored RWLK NFTs',
     },
     labels: {
@@ -352,11 +352,9 @@ export const dappContent = {
     tokenEconomy: {
       nftsImprintedTooltip: 'Total Cosmic Signature NFTs (ERC-721) imprinted',
       totalCstConsumed: 'Total CST Consumed',
-      totalCstConsumedTooltip:
-        'Cosmic Signature Tokens consumed by participants when gesturing with CST',
+      totalCstConsumedTooltip: 'CST tokens consumed by participants when gesturing with CST',
       gesturesWithCst: 'Gestures with CST',
-      gesturesWithCstTooltip:
-        'Number of gestures made using Cosmic Signature Tokens instead of ETH',
+      gesturesWithCstTooltip: 'Number of gestures made using CST tokens instead of ETH',
       outreachReserve: 'Outreach Reserve',
       outreachReserveTooltip:
         'CST forwarded to ecosystem contributors who help promote the protocol',
@@ -396,7 +394,8 @@ export const dappContent = {
       uniqueEthContributors: 'Unique ETH Contributors',
       uniqueEthContributorsTooltip: 'Unique addresses that have contributed ETH to the protocol',
       uniqueAnchorHolders: 'Unique Anchor-holders',
-      uniqueAnchorHoldersTooltip: 'Combined unique CST and RandomWalk token anchor-holders',
+      uniqueAnchorHoldersTooltip:
+        'Combined unique Cosmic Signature NFT and RandomWalk NFT anchor-holders',
     },
 
     tokenDistribution: {
@@ -407,7 +406,7 @@ export const dappContent = {
       cstHoldersTooltip: 'Unique wallet addresses holding CST tokens (ERC-20)',
       attachedNftsTooltip: 'Total ERC-721 tokens attached to gestures by community members',
       attachedTokenDistribution: 'Attached Token Distribution',
-      cosmicSignatureToken721: 'Cosmic Signature Token (ERC-721)',
+      cosmicSignatureToken721: 'Cosmic Signature NFT (ERC-721)',
       cstBalanceDistribution: 'CST (ERC-20) Balance Distribution',
     },
 
@@ -479,7 +478,7 @@ export const dappContent = {
       attachedNftLabel: 'Attached NFT',
       randomWalkLabel: 'Attach a RandomWalk NFT',
       randomWalkHelp:
-        'Attach a Random Walk NFT for a 50% Gesture-Cost discount (one-time use per NFT).',
+        'Attach a Random Walk NFT to an ETH gesture for a 50% Gesture-Cost discount (one-time use per NFT).',
       messageLabel: 'Gesture message (optional)',
       submitEth: 'Make Gesture \u2014 ETH',
       submitCst: 'Make Gesture \u2014 CST',

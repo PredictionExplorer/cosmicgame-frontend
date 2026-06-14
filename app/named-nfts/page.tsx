@@ -7,8 +7,8 @@ import { PublicDataRouteSeoSummary } from '../PublicDataRouteSeoSummary';
 import NamedNFTsPage from './NamedNFTsPage';
 
 export const metadata: Metadata = createMetadata(
-  'Named Cosmic Signature Tokens | Cosmic Signature',
-  'Browse COSMIC NFTs that have been given custom names by their owners. Each named token carries a unique identity within the collection.',
+  'Named Cosmic Signature NFTs | Cosmic Signature',
+  'Browse Cosmic Signature NFTs that have been given custom names by their owners. Each named NFT carries a unique identity within the collection.',
   undefined,
   '/named-nfts',
 );

@@ -6,7 +6,7 @@ import MyAnchors from './MyAnchors';
 
 export const metadata: Metadata = createMetadata(
   'My Anchors | Cosmic Signature',
-  'Manage your anchored NFTs on Cosmic Signature. View your anchor status, Anchor Distributions, and history across each Performance Cycle.',
+  'Manage your anchored Cosmic Signature and Random Walk NFTs. View ETH Anchor Distributions for Cosmic Signature NFTs and Anchored-NFT Stellar Selection history for Random Walk NFTs.',
   undefined,
   '/my-anchors',
   { index: false },

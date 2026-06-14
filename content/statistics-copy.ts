@@ -58,7 +58,7 @@ export const statisticsCopy = {
     totalSupplyErc20: {
       label: 'Total Supply (ERC-20)',
       tooltip:
-        'Current total supply of Cosmic Signature Tokens (CST), the ERC-20 token used for participation and coordination.',
+        'Current total supply of CST tokens, the ERC-20 token used for participation and coordination.',
     },
     totalCstConsumed: {
       label: 'Total CST Consumed',
@@ -187,13 +187,13 @@ export const statisticsCopy = {
     cstTotalAnchorDistributions:
       'Total ETH distributed as Anchor Distributions to Cosmic Signature NFT anchor-holders.',
     cstTotalTokensImprinted:
-      'Total Cosmic Signature NFTs imprinted for wallets that have participated in Cosmic Signature NFT anchoring.',
+      'Indexed Cosmic Signature NFT imprint count associated with Cosmic Signature NFT anchoring records.',
     cstTotalTokensAnchored: 'Number of Cosmic Signature NFTs currently anchored in the protocol.',
     cstUnretrievedAnchorDistributions:
       'Anchor Distributions allocated but not yet retrieved by Cosmic Signature NFT anchor-holders.',
     rwlkActiveAnchorHolders: 'Wallets currently anchoring at least one RandomWalk NFT.',
     rwlkTotalTokensImprinted:
-      'Total Cosmic Signature NFT allocation tokens imprinted for RandomWalk NFT anchor-holders through Anchored-NFT Stellar Selection.',
+      'Total Cosmic Signature NFTs and paired CST imprinted for RandomWalk NFT anchor-holders through Anchored-NFT Stellar Selection.',
     rwlkTotalTokensAnchored: 'Number of RandomWalk NFTs currently anchored in the protocol.',
     cstGroup:
       'Cosmic Signature NFT anchoring shares ETH Anchor Distributions among currently anchored Cosmic Signature NFTs.',

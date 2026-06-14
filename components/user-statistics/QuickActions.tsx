@@ -26,7 +26,8 @@ function buildActions(address: string): ActionItem[] {
   return [
     {
       label: 'Anchor NFTs',
-      description: 'Receive Anchor Distributions by anchoring your tokens',
+      description:
+        'Anchor Cosmic Signature NFTs for ETH distributions or Random Walk NFTs for Stellar Selection',
       href: '/my-anchors',
       icon: <Layers className="h-4 w-4" />,
     },
@@ -61,7 +62,10 @@ export function QuickActions({ address, className }: QuickActionsProps) {
 
   return (
     <motion.div
-      className={cn('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 print-motion-visible', className)}
+      className={cn(
+        'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 print-motion-visible',
+        className,
+      )}
       variants={fadeIn}
       initial={false}
       animate="visible"

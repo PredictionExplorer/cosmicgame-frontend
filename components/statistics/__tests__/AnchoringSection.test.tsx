@@ -110,7 +110,7 @@ const createAnchorAction = (
 beforeEach(() => jest.clearAllMocks());
 
 describe('AnchoringSection', () => {
-  it('renders CST anchoring stats', () => {
+  it('renders Cosmic Signature NFT anchoring stats', () => {
     render(<AnchoringSection {...defaultProps} />);
     expect(screen.getByText('10')).toBeInTheDocument();
     expect(screen.getByText('50')).toBeInTheDocument();

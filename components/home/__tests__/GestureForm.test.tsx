@@ -71,14 +71,14 @@ describe('GestureForm', () => {
       />,
     );
     expect(screen.getByText('ETH')).toBeInTheDocument();
-    expect(screen.queryByText('RandomWalk')).not.toBeInTheDocument();
-    expect(screen.queryByText('Cosmic Token')).not.toBeInTheDocument();
+    expect(screen.queryByText('ETH + RWLK')).not.toBeInTheDocument();
+    expect(screen.queryByText('ERC-20')).not.toBeInTheDocument();
   });
 
   it('shows RandomWalk/CST when LastBidderAddr is not zero', () => {
     render(<GestureForm {...defaultProps} />);
-    expect(screen.getByText('RandomWalk')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Token')).toBeInTheDocument();
+    expect(screen.getByText('ETH + RWLK')).toBeInTheDocument();
+    expect(screen.getByText('ERC-20')).toBeInTheDocument();
   });
 
   it('ETH selection renders correctly', () => {
@@ -144,7 +144,7 @@ describe('GestureForm', () => {
     const user = userEvent.setup();
     render(<GestureForm {...defaultProps} gestureType="ETH" />);
 
-    await user.click(screen.getByText('RandomWalk'));
+    await user.click(screen.getByText('ETH + RWLK'));
 
     expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
     expect(defaultProps.setBidType).toHaveBeenCalledWith('RandomWalk');
@@ -154,7 +154,7 @@ describe('GestureForm', () => {
     const user = userEvent.setup();
     render(<GestureForm {...defaultProps} gestureType="ETH" />);
 
-    await user.click(screen.getByText('Cosmic Token'));
+    await user.click(screen.getByText('CST'));
 
     expect(defaultProps.setRwlkId).toHaveBeenCalledWith(-1);
     expect(defaultProps.setBidType).toHaveBeenCalledWith('CST');
@@ -225,7 +225,7 @@ describe('GestureForm', () => {
     expect(screen.getByText(`≈ ${expectedPrice} ETH`)).toBeInTheDocument();
   });
 
-  it('computed gesture cost applies 50% discount for RandomWalk', () => {
+  it('computed gesture cost applies 50% discount for ETH + RandomWalk', () => {
     render(
       <GestureForm
         {...defaultProps}
@@ -263,7 +263,7 @@ describe('GestureForm', () => {
       'aria-pressed',
       'true',
     );
-    expect(screen.getByRole('button', { name: /RandomWalk 50% discount/ })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: /ETH \+ RWLK 50% discount/ })).toHaveAttribute(
       'aria-pressed',
       'false',
     );
@@ -289,7 +289,7 @@ describe('GestureForm', () => {
       const user = userEvent.setup();
       render(<GestureForm {...defaultProps} previewMode gestureType="ETH" />);
 
-      await user.click(screen.getByText('RandomWalk'));
+      await user.click(screen.getByText('ETH + RWLK'));
 
       expect(defaultProps.setBidType).toHaveBeenCalledWith('RandomWalk');
     });

@@ -30,7 +30,7 @@ describe('CosmicTokenTransfersPage', () => {
   it('renders the heading', () => {
     mockUseCTTransfers.mockReturnValue({ data: [], isLoading: false });
     render(<CosmicTokenTransfersPage address={VALID_ADDRESS} />);
-    expect(screen.getByText('Cosmic Signature Token Transfers')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature CST Token Transfers')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
