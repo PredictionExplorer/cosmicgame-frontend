@@ -9,6 +9,8 @@ jest.mock('wagmi', () => ({
   usePublicClient: jest.fn(),
 }));
 
+import { networkConfig } from '@/config/networks';
+
 import { useAttachedErc20Metadata } from '../useAttachedErc20Metadata';
 
 const mockUseQuery = useQuery as jest.Mock;
@@ -70,7 +72,7 @@ describe('useAttachedErc20Metadata', () => {
 
     const options = getOptions();
     expect(options.enabled).toBe(true);
-    expect(options.queryKey).toEqual(['attachedErc20Metadata', 421614, TOKEN]);
+    expect(options.queryKey).toEqual(['attachedErc20Metadata', networkConfig.chainId, TOKEN]);
     await expect(options.queryFn()).resolves.toEqual({
       name: 'Galaxy Credits',
       symbol: 'GLXY',
@@ -79,7 +81,7 @@ describe('useAttachedErc20Metadata', () => {
       logoSource: 'Token List',
     });
     expect(global.fetch).toHaveBeenCalledWith(
-      `/api/token-metadata?address=${TOKEN}&chainId=421614`,
+      `/api/token-metadata?address=${TOKEN}&chainId=${networkConfig.chainId}`,
       expect.any(Object),
     );
   });

@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom';
 
+import { networkConfig } from '@/config/networks';
 import AttachedNFT from '@/components/attachments/AttachedNFT';
+import { buildOpenSeaAssetUrl } from '@/components/attachments/attachedNftLinks';
 
 import { act, renderWithQuery, screen, waitFor, checkA11y } from '@/test-utils';
 
@@ -109,7 +111,7 @@ describe('AttachedNFT', () => {
     await waitFor(() => {
       expect(screen.getByRole('link', { name: /View attached NFT 1/i })).toHaveAttribute(
         'href',
-        expect.stringContaining('testnets.opensea.io/assets/arbitrum-sepolia'),
+        buildOpenSeaAssetUrl(mockData.TokenAddr, mockData.NFTTokenId, networkConfig.chainId),
       );
     });
     expect(screen.getByTestId('NFTTokenId')).toHaveTextContent('#1');

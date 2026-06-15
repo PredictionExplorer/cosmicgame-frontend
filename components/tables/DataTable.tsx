@@ -44,6 +44,10 @@ export interface DataTableColumn<T> {
   hideOnMobile?: boolean;
   /** Help-text tooltip rendered next to the header label. */
   tooltip?: string;
+  /** Extra classes on the `<th>`. */
+  headerClassName?: string;
+  /** Extra classes on the `<td>`. */
+  cellClassName?: string;
 }
 
 export type Density = 'comfortable' | 'compact';
@@ -130,114 +134,118 @@ export function DataTable<T>({
       ) : sortedData.length === 0 ? (
         <EmptyState title={emptyTitle} description={emptyDescription} action={emptyAction} />
       ) : (
-        <Table className="w-full border-collapse" aria-label={ariaLabel}>
-          <Thead className="bg-white/[0.04] sticky top-0 z-[1]">
-            <Tr>
-              {columns.map((col) => {
-                const isSorted = sort?.id === col.id;
-                const direction = isSorted ? sort.direction : null;
-                const Icon =
-                  direction === 'asc' ? ArrowUp : direction === 'desc' ? ArrowDown : ArrowUpDown;
-                return (
-                  <Th
-                    key={col.id}
-                    style={col.width ? { width: col.width } : undefined}
-                    aria-sort={
-                      !col.sortable
-                        ? undefined
-                        : direction === 'asc'
-                          ? 'ascending'
-                          : direction === 'desc'
-                            ? 'descending'
-                            : 'none'
-                    }
-                    className={cn(
-                      'border-b border-white/[0.06] px-4 py-3 type-eyebrow text-muted-foreground font-medium',
-                      col.hideOnMobile && 'max-sm:hidden',
-                      col.align === 'center' && 'text-center',
-                      col.align === 'right' && 'text-right',
-                    )}
-                  >
-                    {col.sortable ? (
-                      <span className="inline-flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => toggleSort(col.id)}
-                          className={cn(
-                            'inline-flex items-center gap-1.5 transition-colors',
-                            'hover:text-foreground',
-                            isSorted && 'text-foreground',
-                          )}
-                        >
-                          {col.header}
-                          <Icon className="h-3 w-3" aria-hidden />
-                        </button>
-                        {col.tooltip ? (
-                          <InfoTooltip content={col.tooltip} iconClassName="h-3 w-3" />
-                        ) : null}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1">
-                        {col.header}
-                        {col.tooltip ? (
-                          <InfoTooltip content={col.tooltip} iconClassName="h-3 w-3" />
-                        ) : null}
-                      </span>
-                    )}
-                  </Th>
-                );
-              })}
-            </Tr>
-          </Thead>
-          <tbody>
-            {sortedData.map((row, rowIdx) => {
-              const key = getRowKey ? getRowKey(row, rowIdx) : rowIdx;
-              const handleClick = onRowClick ? () => onRowClick(row, rowIdx) : undefined;
-              const handleKeyDown = handleClick
-                ? (e: React.KeyboardEvent<HTMLTableRowElement>) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleClick();
-                    }
-                  }
-                : undefined;
-              return (
-                <Tr
-                  key={key}
-                  tabIndex={handleClick ? 0 : undefined}
-                  role={handleClick ? 'button' : undefined}
-                  onClick={handleClick}
-                  onKeyDown={handleKeyDown}
-                  className={cn(
-                    'border-0 border-b border-white/[0.03] transition-colors',
-                    'duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
-                    handleClick && 'cursor-pointer hover:bg-white/[0.04]',
-                  )}
-                >
-                  {columns.map((col) => (
-                    <Td
+        <div className="overflow-x-auto">
+          <Table className="w-full min-w-[960px] border-collapse" aria-label={ariaLabel}>
+            <Thead className="bg-white/[0.04] sticky top-0 z-[1]">
+              <Tr>
+                {columns.map((col) => {
+                  const isSorted = sort?.id === col.id;
+                  const direction = isSorted ? sort.direction : null;
+                  const Icon =
+                    direction === 'asc' ? ArrowUp : direction === 'desc' ? ArrowDown : ArrowUpDown;
+                  return (
+                    <Th
                       key={col.id}
+                      style={col.width ? { width: col.width } : undefined}
+                      aria-sort={
+                        !col.sortable
+                          ? undefined
+                          : direction === 'asc'
+                            ? 'ascending'
+                            : direction === 'desc'
+                              ? 'descending'
+                              : 'none'
+                      }
                       className={cn(
-                        'px-4 text-muted-foreground leading-[1.43]',
-                        rowPadding,
-                        cellText,
+                        'border-b border-white/[0.06] px-4 py-3 type-eyebrow text-muted-foreground font-medium',
                         col.hideOnMobile && 'max-sm:hidden',
                         col.align === 'center' && 'text-center',
                         col.align === 'right' && 'text-right',
+                        col.headerClassName,
                       )}
                     >
-                      {col.render
-                        ? col.render(row, rowIdx)
-                        : col.accessor
-                          ? String(col.accessor(row) ?? '')
-                          : null}
-                    </Td>
-                  ))}
-                </Tr>
-              );
-            })}
-          </tbody>
-        </Table>
+                      {col.sortable ? (
+                        <span className="inline-flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => toggleSort(col.id)}
+                            className={cn(
+                              'inline-flex items-center gap-1.5 transition-colors',
+                              'hover:text-foreground',
+                              isSorted && 'text-foreground',
+                            )}
+                          >
+                            {col.header}
+                            <Icon className="h-3 w-3" aria-hidden />
+                          </button>
+                          {col.tooltip ? (
+                            <InfoTooltip content={col.tooltip} iconClassName="h-3 w-3" />
+                          ) : null}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1">
+                          {col.header}
+                          {col.tooltip ? (
+                            <InfoTooltip content={col.tooltip} iconClassName="h-3 w-3" />
+                          ) : null}
+                        </span>
+                      )}
+                    </Th>
+                  );
+                })}
+              </Tr>
+            </Thead>
+            <tbody>
+              {sortedData.map((row, rowIdx) => {
+                const key = getRowKey ? getRowKey(row, rowIdx) : rowIdx;
+                const handleClick = onRowClick ? () => onRowClick(row, rowIdx) : undefined;
+                const handleKeyDown = handleClick
+                  ? (e: React.KeyboardEvent<HTMLTableRowElement>) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleClick();
+                      }
+                    }
+                  : undefined;
+                return (
+                  <Tr
+                    key={key}
+                    tabIndex={handleClick ? 0 : undefined}
+                    role={handleClick ? 'button' : undefined}
+                    onClick={handleClick}
+                    onKeyDown={handleKeyDown}
+                    className={cn(
+                      'border-0 border-b border-white/[0.03] transition-colors',
+                      'duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
+                      handleClick && 'cursor-pointer hover:bg-white/[0.04]',
+                    )}
+                  >
+                    {columns.map((col) => (
+                      <Td
+                        key={col.id}
+                        className={cn(
+                          'px-4 text-muted-foreground leading-[1.43]',
+                          rowPadding,
+                          cellText,
+                          col.hideOnMobile && 'max-sm:hidden',
+                          col.align === 'center' && 'text-center',
+                          col.align === 'right' && 'text-right',
+                          col.cellClassName,
+                        )}
+                      >
+                        {col.render
+                          ? col.render(row, rowIdx)
+                          : col.accessor
+                            ? String(col.accessor(row) ?? '')
+                            : null}
+                      </Td>
+                    ))}
+                  </Tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </div>
       )}
     </Surface>
   );

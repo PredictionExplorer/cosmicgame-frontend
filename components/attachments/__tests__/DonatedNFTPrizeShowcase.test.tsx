@@ -1,9 +1,11 @@
 import '@testing-library/jest-dom';
 
+import { networkConfig } from '@/config/networks';
 import type { AttachedNFT, DonatedERC20Token } from '@/services/api/types';
 
 import { checkA11y, render, screen, within } from '@/test-utils';
 
+import { buildOpenSeaAssetUrl } from '../attachedNftLinks';
 import { AttachedNFTAllocationShowcase } from '../DonatedNFTPrizeShowcase';
 
 jest.mock('../../nft/NFTImage', () => ({
@@ -278,7 +280,7 @@ describe('AttachedNFTAllocationShowcase', () => {
     ).toBe(true);
     expect(screen.getByRole('link', { name: /OpenSea/i })).toHaveAttribute(
       'href',
-      expect.stringContaining('testnets.opensea.io/assets/arbitrum-sepolia'),
+      buildOpenSeaAssetUrl(CONTRACT, 123, networkConfig.chainId),
     );
     expect(screen.getByRole('link', { name: /Explorer/i })).toHaveAttribute(
       'href',
@@ -325,8 +327,10 @@ describe('AttachedNFTAllocationShowcase', () => {
     expect(
       screen
         .getAllByRole('link', { name: /View on OpenSea/i })
-        .some((link) =>
-          link.getAttribute('href')?.includes('testnets.opensea.io/assets/arbitrum-sepolia'),
+        .some(
+          (link) =>
+            link.getAttribute('href') ===
+            buildOpenSeaAssetUrl(CONTRACT, 123, networkConfig.chainId),
         ),
     ).toBe(true);
   });

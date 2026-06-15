@@ -56,6 +56,20 @@ jest.mock('../../../components/attachments/AttachedERC20Table', () => ({
   __esModule: true,
   default: () => <div data-testid="attached-erc20-table" />,
 }));
+jest.mock('../../../components/tables/RecipientHistoryTable', () => ({
+  __esModule: true,
+  default: ({
+    winningHistory,
+    showRoundColumn,
+  }: {
+    winningHistory: unknown[];
+    showRoundColumn?: boolean;
+  }) => (
+    <div data-testid="cycle-allocation-ledger-table">
+      records: {winningHistory.length}, showRoundColumn: {String(showRoundColumn)}
+    </div>
+  ),
+}));
 
 const baseAllocationInfo = {
   TimeStamp: 1700000000,
@@ -718,7 +732,45 @@ describe('AllocationInfoPage', () => {
       expect(screen.getByLabelText('Cycle Recipients')).toBeInTheDocument();
       expect(screen.getByLabelText('Allocation Distribution')).toBeInTheDocument();
       expect(screen.getByLabelText('Cycle Statistics')).toBeInTheDocument();
+      expect(screen.getByLabelText('All Allocations for This Cycle')).toBeInTheDocument();
       expect(screen.getByLabelText('Cycle Data')).toBeInTheDocument();
+    });
+
+    it('renders the per-cycle allocation ledger when AllPrizes is populated', () => {
+      mockUseRoundInfo.mockReturnValue({
+        data: {
+          ...baseAllocationInfo,
+          AllPrizes: [
+            {
+              RecordType: 0,
+              WinnerAddr: '0xWinnerAddr1234567890abcdef12345678',
+              AmountEth: 1.5,
+              RoundNum: 1,
+              TxHash: '0xprize1',
+            },
+            {
+              RecordType: 10,
+              WinnerAddr: '0xRaffle1234567890abcdef123456789',
+              AmountEth: 0.01,
+              RoundNum: 1,
+              WinnerIndex: 3,
+              TxHash: '0xprize2',
+            },
+          ],
+        },
+        isLoading: false,
+      });
+      render(<AllocationInfoPage roundNum={1} />);
+      expect(screen.getByText('All Allocations for This Cycle')).toBeInTheDocument();
+      expect(screen.getByTestId('cycle-allocation-ledger-table')).toHaveTextContent('records: 2');
+      expect(screen.getByTestId('cycle-allocation-ledger-table')).toHaveTextContent(
+        'showRoundColumn: false',
+      );
+    });
+
+    it('shows empty message when AllPrizes is empty', () => {
+      renderWithData(1);
+      expect(screen.getByText('No allocation records yet.')).toBeInTheDocument();
     });
 
     it('share button has accessible label', () => {

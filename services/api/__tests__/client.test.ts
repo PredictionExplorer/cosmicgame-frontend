@@ -674,6 +674,35 @@ describe('client helper functions', () => {
       expect(result.RaffleNFTWinners).toEqual([{ Addr: '0xr1' }]);
     });
 
+    it('flattens nested Tx fields in AllPrizes entries', () => {
+      const result = flattenRoundInfo({
+        RoundNum: 3,
+        AllPrizes: [
+          {
+            RecordType: 0,
+            WinnerAddr: '0xw1',
+            AmountEth: 1.25,
+            Tx: {
+              TxHash: '0xprizehash',
+              TimeStamp: 1700000000,
+              EvtLogId: 99,
+            },
+          },
+        ],
+      }) as Record<string, unknown>;
+
+      expect(result.AllPrizes).toEqual([
+        expect.objectContaining({
+          RecordType: 0,
+          WinnerAddr: '0xw1',
+          AmountEth: 1.25,
+          TxHash: '0xprizehash',
+          TimeStamp: 1700000000,
+          EvtLogId: 99,
+        }),
+      ]);
+    });
+
     it('returns null for null input', () => {
       expect(flattenRoundInfo(null)).toBeNull();
     });

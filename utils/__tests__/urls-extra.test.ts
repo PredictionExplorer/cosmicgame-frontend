@@ -1,3 +1,5 @@
+import { networkConfig } from '@/config/networks';
+
 import {
   getExplorerUrl,
   getProxiedUrl,
@@ -32,27 +34,25 @@ describe('getOriginUrl', () => {
 });
 
 describe('getAssetsUrl', () => {
+  const nftBase = networkConfig.nftApiUrl.replace(/\/+$/, '');
+
   it('constructs direct URL with the NFT image server base', () => {
     const result = getAssetsUrl('cosmicsignature/logo.png');
-    expect(result).toBe(
-      'https://nfts-sepolia.cosmicsignature.com/images/new/cosmicsignature/logo.png',
-    );
+    expect(result).toBe(`${nftBase}/images/new/cosmicsignature/logo.png`);
   });
 });
 
 describe('getRWLKImageUrl', () => {
+  const nftBase = networkConfig.nftApiUrl.replace(/\/+$/, '');
+
   it('constructs direct URL with default variant', () => {
     const result = getRWLKImageUrl('12345');
-    expect(result).toBe(
-      'https://nfts-sepolia.cosmicsignature.com/images/randomwalk/12345_black_thumb.jpg',
-    );
+    expect(result).toBe(`${nftBase}/images/randomwalk/12345_black_thumb.jpg`);
   });
 
   it('uses custom variant when provided', () => {
     const result = getRWLKImageUrl('12345', 'color.png');
-    expect(result).toBe(
-      'https://nfts-sepolia.cosmicsignature.com/images/randomwalk/12345_color.png',
-    );
+    expect(result).toBe(`${nftBase}/images/randomwalk/12345_color.png`);
   });
 });
 

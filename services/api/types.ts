@@ -198,9 +198,17 @@ export interface WinningHistoryEntry extends TxInfo {
 export interface AllocationEntry {
   EvtLogId?: number;
   RoundNum?: number;
+  RecordType?: number;
   WinnerAddr?: string;
+  WinnerIndex?: number;
   TokenId?: number;
-  Amount?: number;
+  TokenAddress?: string;
+  Amount?: number | string;
+  AmountEth?: number;
+  Claimed?: boolean;
+  TxHash?: string;
+  TimeStamp?: number;
+  DateTime?: string;
   [key: string]: unknown;
 }
 

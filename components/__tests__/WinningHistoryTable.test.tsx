@@ -45,14 +45,26 @@ describe('RecipientHistoryTable', () => {
     expect(screen.getByText(convertTimestampToDateTime(entry.TimeStamp))).toBeInTheDocument();
   });
 
-  it('renders record type text for Signature Allocation ETH', () => {
+  it('renders record type text for Main ETH Allocation', () => {
     render(<RecipientHistoryTable winningHistory={[createEntry({ RecordType: 0 })]} />);
-    expect(screen.getByText('Signature Allocation ETH')).toBeInTheDocument();
+    expect(screen.getByText('Main ETH Allocation')).toBeInTheDocument();
+  });
+
+  it('renders record type text for Final CST Gesture CS NFT', () => {
+    render(<RecipientHistoryTable winningHistory={[createEntry({ RecordType: 3, TokenId: 1 })]} />);
+    expect(screen.getByText('Final CST Gesture CS NFT')).toBeInTheDocument();
+    expect(screen.getByText('N/A')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '1' })).toHaveAttribute('href', '/detail/1');
   });
 
   it('renders record type text for Stellar Selection ETH', () => {
-    render(<RecipientHistoryTable winningHistory={[createEntry({ RecordType: 3 })]} />);
+    render(
+      <RecipientHistoryTable
+        winningHistory={[createEntry({ RecordType: 10, AmountEth: 0.329286 })]}
+      />,
+    );
     expect(screen.getByText('ETH Stellar Selection (for participants)')).toBeInTheDocument();
+    expect(screen.getByText('0.3293 ETH')).toBeInTheDocument();
   });
 
   it('renders round number as link', () => {

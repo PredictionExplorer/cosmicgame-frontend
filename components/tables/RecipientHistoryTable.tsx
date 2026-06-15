@@ -20,51 +20,74 @@ import { cn } from '@/lib/utils';
 import type { WinningHistoryEntry } from '@/services/api/types';
 export type { WinningHistoryEntry };
 
+/** Backend `cg_prize.ptype` / API `RecordType` — must match black-site prize history labels. */
 const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; text: string }> = {
-  0: { icon: <Ticket className="h-5 w-5" />, text: 'Signature Allocation ETH' },
-  1: { icon: <Coins className="h-5 w-5" />, text: 'Signature Allocation CST (ERC-20)' },
-  2: { icon: <Heart className="h-5 w-5" />, text: 'Signature Allocation Cosmic Signature NFT' },
-  3: { icon: <Trophy className="h-5 w-5" />, text: 'ETH Stellar Selection (for participants)' },
-  4: {
-    icon: <Ticket className="h-5 w-5" />,
+  0: { icon: <Ticket className="h-5 w-5" />, text: 'Main ETH Allocation' },
+  1: { icon: <Coins className="h-5 w-5" />, text: 'Main Signature Allocation CST' },
+  2: { icon: <Heart className="h-5 w-5" />, text: 'Main Signature Allocation CS NFT' },
+  3: { icon: <Ticket className="h-5 w-5" />, text: 'Final CST Gesture CS NFT' },
+  4: { icon: <Coins className="h-5 w-5" />, text: 'Final CST Gesture Recognition CST' },
+  5: { icon: <Trophy className="h-5 w-5" />, text: 'Endurance Champion CS NFT' },
+  6: { icon: <Coins className="h-5 w-5" />, text: 'Endurance Champion Recognition CST' },
+  7: { icon: <Trophy className="h-5 w-5" />, text: 'Chrono-Warrior ETH' },
+  8: { icon: <Coins className="h-5 w-5" />, text: 'Chrono-Warrior CST' },
+  9: { icon: <Ticket className="h-5 w-5" />, text: 'Chrono-Warrior CS NFT' },
+  10: { icon: <Trophy className="h-5 w-5" />, text: 'ETH Stellar Selection (for participants)' },
+  11: {
+    icon: <Coins className="h-5 w-5" />,
     text: 'Recognition CST from Stellar Selection (for participants)',
   },
-  5: {
+  12: {
     icon: <Layers className="h-5 w-5" />,
-    text: 'Cosmic Signature NFT Stellar Selection (for participants)',
+    text: 'CS NFT Stellar Selection (for participants)',
   },
-  6: {
-    icon: <Layers className="h-5 w-5" />,
+  13: {
+    icon: <Coins className="h-5 w-5" />,
     text: 'Recognition CST from Anchored-NFT Stellar Selection (for RandomWalk anchor-holders)',
   },
-  7: {
-    icon: <Trophy className="h-5 w-5" />,
-    text: 'Cosmic Signature NFT Stellar Selection (for RandomWalk anchor-holders)',
+  14: {
+    icon: <Layers className="h-5 w-5" />,
+    text: 'CS NFT Stellar Selection (for RandomWalk anchor-holders)',
   },
-  8: { icon: <Trophy className="h-5 w-5" />, text: 'Endurance Champion Cosmic Signature NFT' },
-  9: { icon: <Trophy className="h-5 w-5" />, text: 'Endurance Champion Recognition CST (ERC-20)' },
-  10: { icon: <Trophy className="h-5 w-5" />, text: 'Chrono-Warrior ETH' },
-  11: { icon: <Trophy className="h-5 w-5" />, text: 'Chrono-Warrior CST (ERC-20)' },
-  12: { icon: <Ticket className="h-5 w-5" />, text: 'Chrono-Warrior Cosmic Signature NFT' },
-  13: {
+  15: {
     icon: <Ticket className="h-5 w-5" />,
     text: 'Anchor Distribution ETH (for Cosmic Signature NFT anchor-holders)',
   },
-  14: {
-    icon: <Ticket className="h-5 w-5" />,
-    text: 'Final CST Gesture Cosmic Signature NFT (ERC-721)',
-  },
-  15: { icon: <Ticket className="h-5 w-5" />, text: 'Final CST Gesture Recognition CST (ERC-20)' },
+  16: { icon: <Heart className="h-5 w-5" />, text: 'Attached NFT (timeout retrieval)' },
+  17: { icon: <Coins className="h-5 w-5" />, text: 'Attached ERC-20 (timeout retrieval)' },
+  18: { icon: <Trophy className="h-5 w-5" />, text: 'ETH Stellar Selection (timeout retrieval)' },
 };
+
+const ETH_RECORD_TYPES = new Set([0, 7, 10, 15, 18]);
+const CST_RECORD_TYPES = new Set([1, 4, 6, 8, 11, 13]);
+const NFT_RECORD_TYPES = new Set([2, 3, 5, 9, 12, 14, 16]);
+
+function formatAllocationAmount(recordType: number, amountEth: number | undefined): string {
+  if (NFT_RECORD_TYPES.has(recordType)) {
+    return 'N/A';
+  }
+  if (ETH_RECORD_TYPES.has(recordType)) {
+    return `${(amountEth ?? 0).toFixed(4)} ETH`;
+  }
+  if (recordType === 17) {
+    return `${(amountEth ?? 0).toFixed(4)} (ERC-20)`;
+  }
+  if (CST_RECORD_TYPES.has(recordType)) {
+    return `${(amountEth ?? 0).toFixed(2)} CST`;
+  }
+  return ' ';
+}
 
 const WinningHistoryRow = ({
   history,
   showClaimedStatus,
   showWinnerAddr,
+  showRoundColumn,
 }: {
   history: WinningHistoryEntry;
   showClaimedStatus: boolean;
   showWinnerAddr: boolean;
+  showRoundColumn: boolean;
 }) => {
   const { cosmicToken } = useContractAddresses();
   if (!history) return <TablePrimaryRow />;
@@ -122,22 +145,20 @@ const WinningHistoryRow = ({
           )}
         </TablePrimaryCell>
       )}
-      <TablePrimaryCell align="center">
-        <a
-          href={`/allocation/${history.RoundNum}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-inherit"
-        >
-          {history.RoundNum}
-        </a>
-      </TablePrimaryCell>
+      {showRoundColumn && (
+        <TablePrimaryCell align="center">
+          <a
+            href={`/allocation/${history.RoundNum}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-inherit"
+          >
+            {history.RoundNum}
+          </a>
+        </TablePrimaryCell>
+      )}
       <TablePrimaryCell align="right">
-        {[0, 3, 10, 13].includes(history.RecordType)
-          ? `${(history.AmountEth ?? 0).toFixed(4)} ETH`
-          : [2, 5, 7, 8, 12, 15].includes(history.RecordType)
-            ? 'N/A'
-            : `${(history.AmountEth ?? 0).toFixed(2)} CST`}
+        {formatAllocationAmount(history.RecordType, history.AmountEth)}
       </TablePrimaryCell>
       <TablePrimaryCell align="center">
         {history.RecordType === 1 ? (
@@ -199,12 +220,14 @@ function WinningHistorySubTable({
   curPage,
   showClaimedStatus,
   showWinnerAddr,
+  showRoundColumn,
 }: {
   winningHistory: WinningHistoryEntry[];
   perPage: number;
   curPage: number;
   showClaimedStatus: boolean;
   showWinnerAddr: boolean;
+  showRoundColumn: boolean;
 }) {
   return (
     <TablePrimaryContainer>
@@ -213,7 +236,7 @@ function WinningHistorySubTable({
           <col width="20%" />
           <col width="14%" />
           {showWinnerAddr && <col width="17%" />}
-          <col width="7%" />
+          {showRoundColumn && <col width="7%" />}
           <col width="11%" />
           <col width="17%" />
           <col width="8%" />
@@ -224,7 +247,7 @@ function WinningHistorySubTable({
             <TablePrimaryHeadCell align="left">Record Type</TablePrimaryHeadCell>
             <TablePrimaryHeadCell align="left">Datetime</TablePrimaryHeadCell>
             {showWinnerAddr && <TablePrimaryHeadCell>Recipient</TablePrimaryHeadCell>}
-            <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
+            {showRoundColumn && <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>}
             <TablePrimaryHeadCell align="right">Amount</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Token Address</TablePrimaryHeadCell>
             <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
@@ -236,10 +259,11 @@ function WinningHistorySubTable({
             .slice((curPage - 1) * perPage, curPage * perPage)
             .map((history, index) => (
               <WinningHistoryRow
-                key={`${curPage}-${index}-${history.TxHash}`}
+                key={`${curPage}-${index}-${history.TxHash ?? history.RecordType}-${history.WinnerIndex ?? index}`}
                 history={history}
                 showClaimedStatus={showClaimedStatus}
                 showWinnerAddr={showWinnerAddr}
+                showRoundColumn={showRoundColumn}
               />
             ))}
         </tbody>
@@ -252,12 +276,15 @@ export default function RecipientHistoryTable({
   winningHistory,
   showClaimedStatus = false,
   showWinnerAddr = true,
+  showRoundColumn = true,
+  perPage = 5,
 }: {
   winningHistory: WinningHistoryEntry[];
   showClaimedStatus?: boolean;
   showWinnerAddr?: boolean;
+  showRoundColumn?: boolean;
+  perPage?: number;
 }) {
-  const PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
   if (!winningHistory || winningHistory.length === 0) {
@@ -270,14 +297,15 @@ export default function RecipientHistoryTable({
         winningHistory={winningHistory}
         showClaimedStatus={showClaimedStatus}
         showWinnerAddr={showWinnerAddr}
-        perPage={PER_PAGE}
+        showRoundColumn={showRoundColumn}
+        perPage={perPage}
         curPage={currentPage}
       />
       <CustomPagination
         page={currentPage}
         setPage={setCurrentPage}
         totalLength={winningHistory.length}
-        perPage={PER_PAGE}
+        perPage={perPage}
       />
     </div>
   );

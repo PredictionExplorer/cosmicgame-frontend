@@ -57,6 +57,8 @@ import AnchoringRecipientTable from '@/components/tables/AnchoringRecipientTable
 import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
+import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
+import type { WinningHistoryEntry } from '@/components/tables/RecipientHistoryTable';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 24 },
@@ -404,6 +406,11 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
     }
     return [];
   }, [gestureHistory, allocationInfo]);
+
+  const cycleAllocationLedger = useMemo(
+    () => (allocationInfo?.AllPrizes ?? []) as WinningHistoryEntry[],
+    [allocationInfo?.AllPrizes],
+  );
 
   const handleShareRound = async () => {
     if (!allocationInfo) return;
@@ -784,6 +791,36 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             </motion.div>
           ))}
         </motion.div>
+      </motion.section>
+
+      {/* All allocation records for this cycle (mirrors backend round info prize ledger) */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={sectionFade}
+        className="mb-12"
+        aria-label="All Allocations for This Cycle"
+      >
+        <div className="flex items-center gap-2 mb-5">
+          <h2 className="font-display text-lg font-semibold tracking-tight">
+            All Allocations for This Cycle
+          </h2>
+          <InfoTooltip content="Complete ledger of every allocation record for this cycle — Signature Allocation, Chrono-Warrior, Endurance Champion, Stellar Selection, Anchor Distributions, and related NFT/CST distributions." />
+          {cycleAllocationLedger.length > 0 ? (
+            <span className="ml-1 rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-0.5 text-xs tabular-nums text-muted-foreground">
+              {cycleAllocationLedger.length}
+            </span>
+          ) : null}
+        </div>
+        {cycleAllocationLedger.length > 0 ? (
+          <RecipientHistoryTable
+            winningHistory={cycleAllocationLedger}
+            showRoundColumn={false}
+            perPage={10}
+          />
+        ) : (
+          <p className="text-sm text-muted-foreground">No allocation records yet.</p>
+        )}
       </motion.section>
 
       {/* Section Divider */}

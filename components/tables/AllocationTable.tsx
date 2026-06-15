@@ -1,129 +1,145 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
 import { CustomPagination } from '@/components/common/CustomPagination';
-import { DataTable, type DataTableColumn } from '@/components/tables/DataTable';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Surface } from '@/components/ui/surface';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 import type { RoundInfo } from '@/services/api';
 
 const PER_PAGE = 10;
 
-const columns: DataTableColumn<RoundInfo>[] = [
-  {
-    id: 'cycle',
-    header: 'Cycle',
-    align: 'center',
-    width: '5%',
-    sortable: true,
-    accessor: (r) => r.RoundNum,
-    render: (r) => (
-      <Link
-        href={`/allocation/${r.RoundNum}`}
-        className="text-foreground transition-colors hover:text-primary"
-      >
-        {r.RoundNum}
-      </Link>
-    ),
-    tooltip: 'The sequential cycle number in the protocol.',
-  },
-  {
-    id: 'finalized',
-    header: 'Finalized',
-    align: 'center',
-    width: '20%',
-    sortable: true,
-    accessor: (r) => r.TimeStamp,
-    render: (r) => convertTimestampToDateTime(r.TimeStamp),
-    tooltip: 'The date and time when this cycle ended and allocations were distributed.',
-  },
-  {
-    id: 'recipient',
-    header: 'Recipient',
-    width: '7%',
-    accessor: (r) => r.WinnerAddr,
-    render: (r) => (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="font-mono">{r.WinnerAddr ? shortenHex(r.WinnerAddr, 6) : '-'}</span>
-        </TooltipTrigger>
-        {r.WinnerAddr ? (
-          <TooltipContent>
-            <p className="max-w-[280px] break-all font-mono text-xs leading-relaxed">
-              {r.WinnerAddr}
-            </p>
-          </TooltipContent>
-        ) : null}
-      </Tooltip>
-    ),
-    tooltip: 'The wallet address of the Signature Allocation recipient.',
-  },
-  {
-    id: 'amountEth',
-    header: 'Allocation Amount',
-    align: 'center',
-    width: '15%',
-    sortable: true,
-    accessor: (r) => r.AmountEth ?? 0,
-    render: (r) => (r.AmountEth || 0).toFixed(4),
-    tooltip: 'The total ETH distributed as the Signature Allocation for this cycle.',
-  },
-  {
-    id: 'gestures',
-    header: 'Gestures',
-    align: 'center',
-    width: '5%',
-    sortable: true,
-    accessor: (r) => r.RoundStats?.TotalBids ?? 0,
-    render: (r) => r.RoundStats?.TotalBids ?? 0,
-    tooltip: 'Total number of gestures made during this cycle.',
-  },
-  {
-    id: 'attachedNfts',
-    header: 'Attached NFTs',
-    align: 'center',
-    width: '12%',
-    sortable: true,
-    accessor: (r) => r.RoundStats?.TotalDonatedNFTs ?? 0,
-    render: (r) => r.RoundStats?.TotalDonatedNFTs ?? 0,
-    tooltip: 'Number of NFTs attached to gestures by participants during this cycle.',
-  },
-  {
-    id: 'stellarSelectionEth',
-    header: 'Stellar Selection Deposits',
-    align: 'center',
-    width: '12%',
-    sortable: true,
-    accessor: (r) => (r.RoundStats?.TotalRaffleEthDepositsEth as number) ?? 0,
-    render: (r) => ((r.RoundStats?.TotalRaffleEthDepositsEth as number) || 0).toFixed(4),
-    tooltip: 'Total ETH allocated to the Stellar Selection pool by participants.',
-  },
-  {
-    id: 'anchorDistribution',
-    header: 'Anchor Distribution Deposit',
-    align: 'center',
-    width: '11%',
-    sortable: true,
-    accessor: (r) => r.StakingDepositAmountEth ?? 0,
-    render: (r) => (r.StakingDepositAmountEth || 0).toFixed(4),
-    tooltip:
-      'Total ETH allocated to the Anchor Distribution pool, distributed among NFT anchor-holders.',
-  },
-  {
-    id: 'nftsDistributed',
-    header: 'NFTs Distributed',
-    align: 'center',
-    width: '13%',
-    sortable: true,
-    accessor: (r) => r.RoundStats?.TotalRaffleNFTs ?? 0,
-    render: (r) => r.RoundStats?.TotalRaffleNFTs ?? 0,
-    tooltip: 'Total Cosmic Signature NFTs distributed via Stellar Selection in this cycle.',
-  },
-];
+function StatChip({
+  label,
+  value,
+  tooltip,
+}: {
+  label: string;
+  value: ReactNode;
+  tooltip?: string;
+}) {
+  return (
+    <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+      <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70">
+        {label}
+      </span>
+      <span className="font-mono tabular-nums text-foreground/90">{value}</span>
+      {tooltip ? <InfoTooltip content={tooltip} iconClassName="h-3 w-3" /> : null}
+    </span>
+  );
+}
+
+function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
+  const roundNum = allocation.RoundNum;
+  const recipient = allocation.WinnerAddr ? shortenHex(allocation.WinnerAddr, 6) : '-';
+  const stellarEth = (allocation.RoundStats?.TotalRaffleEthDepositsEth as number) || 0;
+  const anchorEth = allocation.StakingDepositAmountEth || 0;
+
+  return (
+    <article
+      className={cn(
+        'border-b border-white/[0.06] px-4 py-3.5 last:border-b-0',
+        'transition-colors hover:bg-white/[0.03]',
+      )}
+      aria-label={`Cycle ${roundNum} allocation summary`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 space-y-1">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <Link
+              href={`/allocation/${roundNum}`}
+              className="font-display text-base font-semibold text-foreground transition-colors hover:text-primary"
+            >
+              Cycle {roundNum}
+            </Link>
+            <span className="text-xs text-muted-foreground">
+              {convertTimestampToDateTime(allocation.TimeStamp)}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+            <span className="font-mono tabular-nums text-foreground">
+              {(allocation.AmountEth || 0).toFixed(4)} ETH
+            </span>
+            <span className="text-muted-foreground/40" aria-hidden>
+              ·
+            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="font-mono text-muted-foreground">{recipient}</span>
+              </TooltipTrigger>
+              {allocation.WinnerAddr ? (
+                <TooltipContent>
+                  <p className="max-w-[280px] break-all font-mono text-xs leading-relaxed">
+                    {allocation.WinnerAddr}
+                  </p>
+                </TooltipContent>
+              ) : null}
+            </Tooltip>
+            <InfoTooltip content="Signature Allocation amount and recipient wallet for this cycle." />
+          </div>
+        </div>
+
+        <Button asChild variant="outline" size="sm" className="h-8 shrink-0 px-3 text-xs">
+          <Link href={`/allocation/${roundNum}`} aria-label={`Explore cycle ${roundNum}`}>
+            Explore
+          </Link>
+        </Button>
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <StatChip
+          label="Gestures"
+          value={allocation.RoundStats?.TotalBids ?? 0}
+          tooltip="Total gestures made during this cycle."
+        />
+        <StatChip
+          label="NFTs"
+          value={allocation.RoundStats?.TotalDonatedNFTs ?? 0}
+          tooltip="NFTs attached to gestures during this cycle."
+        />
+        <StatChip
+          label="Stellar"
+          value={stellarEth.toFixed(4)}
+          tooltip="ETH allocated to the Stellar Selection pool."
+        />
+        <StatChip
+          label="Anchor"
+          value={anchorEth.toFixed(4)}
+          tooltip="ETH allocated to Anchor Distributions."
+        />
+        <StatChip
+          label="Distributed"
+          value={allocation.RoundStats?.TotalRaffleNFTs ?? 0}
+          tooltip="Cosmic Signature NFTs distributed via Stellar Selection."
+        />
+      </div>
+    </article>
+  );
+}
+
+function AllocationRowSkeleton() {
+  return (
+    <div className="space-y-2 border-b border-white/[0.06] px-4 py-3.5 last:border-b-0">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-5 w-32" />
+          <Skeleton className="h-4 w-48" />
+        </div>
+        <Skeleton className="h-8 w-20" />
+      </div>
+      <Skeleton className="h-4 w-full max-w-md" />
+    </div>
+  );
+}
 
 export const AllocationTable = ({ list, loading }: { list: RoundInfo[]; loading: boolean }) => {
   const [page, setPage] = useState(1);
@@ -136,17 +152,28 @@ export const AllocationTable = ({ list, loading }: { list: RoundInfo[]; loading:
 
   return (
     <>
-      <DataTable
-        ariaLabel="Allocation recipients by cycle"
-        data={paginatedList}
-        columns={columns}
-        loading={loading}
-        skeletonRows={6}
-        emptyTitle="No recipients yet"
-        emptyDescription="No Performance Cycles have been finalized yet."
-        getRowKey={(r, i) => r.RoundNum ?? `cycle-${i}`}
-        densityStorageKey="cs.allocation.density"
-      />
+      <Surface variant="glass" radius="md" className="overflow-hidden">
+        {loading ? (
+          <div aria-busy="true" role="status" aria-label="Loading allocation cycles">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <AllocationRowSkeleton key={i} />
+            ))}
+          </div>
+        ) : list.length === 0 ? (
+          <EmptyState
+            title="No recipients yet"
+            description="No Performance Cycles have been finalized yet."
+          />
+        ) : (
+          <div role="list" aria-label="Allocation recipients by cycle">
+            {paginatedList.map((allocation, index) => (
+              <div key={allocation.RoundNum ?? `cycle-${index}`} role="listitem">
+                <AllocationCycleRow allocation={allocation} />
+              </div>
+            ))}
+          </div>
+        )}
+      </Surface>
       {!loading && list.length > 0 ? (
         <CustomPagination
           page={page}
