@@ -2,6 +2,29 @@ import { expect, test } from '@playwright/test';
 
 import { expectAllLabelTooltips } from './tooltip-helpers';
 
+const ALLOCATION_LIST_TOOLTIPS = [
+  {
+    label: 'Finalized round records only',
+    expected: /Pending cycles and unrelated allocation retrieval records are not included/,
+  },
+  {
+    label: 'Cycle Reserve Split',
+    expected: /ETH reserve is allocated across protocol tracks/,
+  },
+  {
+    label: 'Signature',
+    expected: /main ETH allocation/,
+  },
+  {
+    label: 'Stellar ETH',
+    expected: /selection frequency/,
+  },
+  {
+    label: 'Next cycle',
+    expected: /compounds into the next Performance Cycle/,
+  },
+];
+
 const ALLOCATION_DETAIL_TOOLTIPS = [
   {
     label: 'Cycle Reserve',
@@ -42,6 +65,12 @@ const ALLOCATION_DETAIL_TOOLTIPS = [
 ];
 
 test.describe('/allocation tooltips', () => {
+  test('opens representative allocation list tooltips', async ({ page }) => {
+    await page.goto('/allocation', { waitUntil: 'networkidle' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expectAllLabelTooltips(page, ALLOCATION_LIST_TOOLTIPS);
+  });
+
   test('opens allocation list recipient tooltip from the Radix replacement for title=', async ({
     page,
   }) => {

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import {
   get_staked_cst_tokens,
   get_staked_rwalk_tokens,
@@ -38,6 +39,7 @@ type SeoSummaryRoute =
 interface SummaryCard {
   label: string;
   value: string;
+  tooltip?: string;
 }
 
 interface SummaryConfig {
@@ -57,7 +59,7 @@ const configs: Record<SeoSummaryRoute, SummaryConfig> = {
     heading: 'Allocation Recipients',
     description:
       'Browse public Cosmic Signature allocation history across finalized Performance Cycles, including Signature Allocations, Stellar Selection, Anchor Distributions, and public-goods flows.',
-    source: 'Cosmic Signature public round and allocation APIs',
+    source: 'Cosmic Signature public round APIs',
     links: [
       { href: '/statistics', label: 'View protocol statistics' },
       { href: '/how-it-works', label: 'Learn how cycles finalize' },
@@ -242,13 +244,24 @@ function sumEth<T>(rows: T[], selector: (row: T) => unknown): number {
 async function getSummaryCards(route: SeoSummaryRoute): Promise<SummaryCard[]> {
   switch (route) {
     case 'allocation': {
-      const [rounds, claims] = await Promise.all([get_round_list(), get_claim_history()]);
+      const rounds = await get_round_list();
       return [
-        { label: 'Finalized Cycles', value: formatNumber(rounds.length) },
-        { label: 'Allocation Retrieval Records', value: formatNumber(claims.length) },
         {
-          label: 'Signature Allocation ETH Retrieved',
-          value: formatEth(sumEth(claims, (row) => row.AmountEth)),
+          label: 'Finalized Cycles',
+          value: formatNumber(rounds.length),
+          tooltip: 'The number of Performance Cycles with finalized allocation data.',
+        },
+        {
+          label: 'Signature Allocation Recipients',
+          value: formatNumber(new Set(rounds.map((row) => row.WinnerAddr).filter(Boolean)).size),
+          tooltip:
+            'Distinct wallets that received the Signature Allocation by making the Final Gesture.',
+        },
+        {
+          label: 'Total Signature Allocation ETH',
+          value: formatEth(sumEth(rounds, (row) => row.AmountEth)),
+          tooltip:
+            'The sum of Signature Allocation ETH across finalized cycles, based on round records.',
         },
       ];
     }
@@ -435,8 +448,11 @@ export async function PublicDataRouteSeoSummary({ route }: { route: SeoSummaryRo
       <dl className="mt-8 grid gap-3 sm:grid-cols-3">
         {cards.map((card) => (
           <div key={card.label} className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
-            <dt className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-              {card.label}
+            <dt className="flex items-center gap-1.5 text-xs uppercase tracking-[0.18em] text-muted-foreground">
+              <span>{card.label}</span>
+              {card.tooltip ? (
+                <InfoTooltip content={card.tooltip} label={card.label} iconClassName="h-3 w-3" />
+              ) : null}
             </dt>
             <dd className="mt-2 text-2xl font-semibold text-foreground">{card.value}</dd>
           </div>

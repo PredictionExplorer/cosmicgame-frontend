@@ -54,12 +54,21 @@ function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <Link
-              href={`/allocation/${roundNum}`}
-              className="font-display text-base font-semibold text-foreground transition-colors hover:text-primary"
-            >
-              Cycle {roundNum}
-            </Link>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href={`/allocation/${roundNum}`}
+                  className="font-display text-base font-semibold text-foreground transition-colors hover:text-primary"
+                >
+                  Cycle {roundNum}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-[240px] text-xs leading-relaxed">
+                  Open the detailed allocation breakdown for cycle #{roundNum}.
+                </p>
+              </TooltipContent>
+            </Tooltip>
             <span className="text-xs text-muted-foreground">
               {convertTimestampToDateTime(allocation.TimeStamp)}
             </span>
@@ -88,11 +97,20 @@ function AllocationCycleRow({ allocation }: { allocation: RoundInfo }) {
           </div>
         </div>
 
-        <Button asChild variant="outline" size="sm" className="h-8 shrink-0 px-3 text-xs">
-          <Link href={`/allocation/${roundNum}`} aria-label={`Explore cycle ${roundNum}`}>
-            Explore
-          </Link>
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button asChild variant="outline" size="sm" className="h-8 shrink-0 px-3 text-xs">
+              <Link href={`/allocation/${roundNum}`} aria-label={`Explore cycle ${roundNum}`}>
+                Explore
+              </Link>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="max-w-[240px] text-xs leading-relaxed">
+              View recipients, deposits, and allocation details for cycle #{roundNum}.
+            </p>
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">

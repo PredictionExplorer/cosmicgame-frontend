@@ -69,7 +69,7 @@ const STATISTICS_TOOLTIPS = [
   },
   {
     label: 'Total Tokens Imprinted',
-    expected: /Total Cosmic Signature NFTs imprinted for wallets/,
+    expected: /Indexed Cosmic Signature NFT imprint count associated/,
   },
 ];
 

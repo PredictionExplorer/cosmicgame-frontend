@@ -41,8 +41,8 @@ describe('DataTable', () => {
 
   it('renders a density toggle and switches density on click', () => {
     render(<DataTable ariaLabel="Test" data={rows} columns={columns} getRowKey={(r) => r.id} />);
-    const compact = screen.getByRole('button', { name: /compact/i });
-    const comfortable = screen.getByRole('button', { name: /comfortable/i });
+    const compact = screen.getByRole('button', { name: 'Compact row density' });
+    const comfortable = screen.getByRole('button', { name: 'Comfortable row density' });
     expect(comfortable).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(compact);
     expect(compact).toHaveAttribute('aria-pressed', 'true');

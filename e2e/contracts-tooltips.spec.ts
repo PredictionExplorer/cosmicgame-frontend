@@ -44,7 +44,10 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
   { label: 'Signature Allocation', expected: /participant who made the Final Gesture/ },
   { label: 'Chrono-Warrior', expected: /ETH allocation to the Chrono-Warrior/ },
   { label: 'Stellar Selection', expected: /Portion distributed to randomly selected participants/ },
-  { label: 'Anchor Distribution', expected: /Distributions to anchor-holders/ },
+  {
+    label: 'Anchor Distribution',
+    expected: /ETH Anchor Distributions to Cosmic Signature NFT anchor-holders/,
+  },
   { label: 'Public Goods', expected: /Forwarded to the Public Goods Beneficiary/ },
   // AuctionParameters stellar-selection cards
   {

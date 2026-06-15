@@ -10,7 +10,7 @@ import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
 import { render, screen } from '@/test-utils';
 
 // lexicon-allow-start: test imports mirror sealed API module filenames.
-import { get_dashboard_info } from '../../services/api/rounds';
+import { get_claim_history, get_dashboard_info, get_round_list } from '../../services/api/rounds';
 import { get_marketing_rewards } from '../../services/api/marketing';
 import { get_staking_cst_actions, get_staking_rwalk_actions } from '../../services/api/anchoring';
 import {
@@ -54,6 +54,8 @@ jest.mock('../../services/api/tokens', () => ({
 // lexicon-allow-end
 
 const mockGetDashboardInfo = get_dashboard_info as jest.MockedFunction<typeof get_dashboard_info>;
+const mockGetRoundList = get_round_list as jest.MockedFunction<typeof get_round_list>;
+const mockGetClaimHistory = get_claim_history as jest.MockedFunction<typeof get_claim_history>;
 const mockMarketingRewards = get_marketing_rewards as jest.MockedFunction<
   typeof get_marketing_rewards
 >;
@@ -90,6 +92,8 @@ const dashboard = {
 
 describe('server-visible SEO summaries', () => {
   beforeEach(() => {
+    mockGetRoundList.mockResolvedValue([]);
+    mockGetClaimHistory.mockResolvedValue([]);
     mockGetDashboardInfo.mockResolvedValue(
       dashboard as Awaited<ReturnType<typeof get_dashboard_info>>,
     );
@@ -206,6 +210,31 @@ describe('server-visible SEO summaries', () => {
     expect(screen.getByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
     expect(
       screen.getByText(/initial HTML for search engines and AI crawlers/i),
+    ).toBeInTheDocument();
+  });
+
+  it('renders allocation totals from finalized rounds instead of claim history', async () => {
+    mockGetRoundList.mockResolvedValue([
+      { AmountEth: 1.25, WinnerAddr: '0xaaa' },
+      { AmountEth: 2.5, WinnerAddr: '0xbbb' },
+      { AmountEth: 3, WinnerAddr: '0xaaa' },
+    ] as Awaited<ReturnType<typeof get_round_list>>);
+    mockGetClaimHistory.mockResolvedValue([
+      { AmountEth: 24_009.1377, WinnerAddr: '0xclaim' },
+    ] as unknown as Awaited<ReturnType<typeof get_claim_history>>);
+
+    render(await PublicDataRouteSeoSummary({ route: 'allocation' }));
+
+    expect(mockGetClaimHistory).not.toHaveBeenCalled();
+    expect(screen.getByText('Total Signature Allocation ETH')).toBeInTheDocument();
+    expect(screen.getByText('6.75 ETH')).toBeInTheDocument();
+    expect(screen.getByText('Signature Allocation Recipients')).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.queryByText('Signature Allocation ETH Retrieved')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'More information about Total Signature Allocation ETH',
+      }),
     ).toBeInTheDocument();
   });
 });

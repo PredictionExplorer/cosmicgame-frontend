@@ -10,8 +10,60 @@ import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { StatCard, StatCardSkeleton } from '@/components/ui/stat-card';
 import { Surface } from '@/components/ui/surface';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { AllocationTable } from '@/components/tables/AllocationTable';
 import { useRoundList } from '@/hooks/useApiQuery';
+
+const allocationTracks = [
+  {
+    label: 'Signature',
+    value: `${protocolFacts.mainEthPercentage}%`,
+    width: `${protocolFacts.mainEthPercentage}%`,
+    color: 'bg-[rgb(var(--aurora-cyan-rgb))]',
+    tooltip:
+      'The Signature Allocation is the main ETH allocation, retrieved by the participant who made the Final Gesture.',
+  },
+  {
+    label: 'Chrono',
+    value: `${protocolFacts.chronoWarriorEthPercentage}%`,
+    width: `${protocolFacts.chronoWarriorEthPercentage}%`,
+    color: 'bg-[rgb(var(--nebula-violet-rgb))]',
+    tooltip:
+      'The Chrono-Warrior allocation rewards the participant whose gesture carried the cycle through the most time.',
+  },
+  {
+    label: 'Stellar ETH',
+    value: `${protocolFacts.stellarSelectionEthPercentage}%`,
+    width: `${protocolFacts.stellarSelectionEthPercentage}%`,
+    color: 'bg-[rgb(var(--solar-gold-rgb))]',
+    tooltip:
+      'ETH set aside for Stellar Selection recipients. Each gesture creates selection frequency for these participant allocations.',
+  },
+  {
+    label: 'Anchor',
+    value: `${protocolFacts.anchorDistributionPercentage}%`,
+    width: `${protocolFacts.anchorDistributionPercentage}%`,
+    color: 'bg-[rgb(var(--impact-green-rgb))]',
+    tooltip:
+      'ETH distributed to wallets with eligible Cosmic Signature or RandomWalk NFTs anchored to the protocol.',
+  },
+  {
+    label: 'Public Goods',
+    value: `${protocolFacts.publicGoodsPercentage}%`,
+    width: `${protocolFacts.publicGoodsPercentage}%`,
+    color: 'bg-[rgb(var(--chrono-rose-rgb))]',
+    tooltip:
+      'ETH forwarded from the cycle to the selected Public Goods Beneficiary, currently Protocol Guild.',
+  },
+  {
+    label: 'Next cycle',
+    value: `~${protocolFacts.compoundingReservePercentage}%`,
+    width: `${protocolFacts.compoundingReservePercentage}%`,
+    color: 'bg-white/40',
+    tooltip:
+      'The remaining Cycle Reserve compounds into the next Performance Cycle after the finalized allocations are made.',
+  },
+] as const;
 
 const AllocationRecipientsPage = () => {
   const { data: rawPrizeClaims = [], isLoading: loading } = useRoundList();
@@ -48,6 +100,15 @@ const AllocationRecipientsPage = () => {
         titleLevel={2}
         gradientTitle="signature"
         subtitle="Browse the complete history of allocation recipients, cycle statistics, and allocation distributions across all finalized Performance Cycles."
+        meta={
+          <span className="inline-flex items-center gap-1.5 type-body-sm text-muted-foreground">
+            <span>Finalized round records only</span>
+            <InfoTooltip
+              content="This page summarizes finalized Performance Cycles from the round API. Pending cycles and unrelated allocation retrieval records are not included in these totals."
+              label="Finalized round records only"
+            />
+          </span>
+        }
       />
 
       <Surface
@@ -64,46 +125,26 @@ const AllocationRecipientsPage = () => {
           Cycle Reserve.
         </p>
         <div className="space-y-3">
-          {[
-            {
-              label: 'Signature',
-              value: `${protocolFacts.mainEthPercentage}%`,
-              width: `${protocolFacts.mainEthPercentage}%`,
-              color: 'bg-[rgb(var(--aurora-cyan-rgb))]',
-            },
-            {
-              label: 'Chrono',
-              value: `${protocolFacts.chronoWarriorEthPercentage}%`,
-              width: `${protocolFacts.chronoWarriorEthPercentage}%`,
-              color: 'bg-[rgb(var(--nebula-violet-rgb))]',
-            },
-            {
-              label: 'Stellar ETH',
-              value: `${protocolFacts.stellarSelectionEthPercentage}%`,
-              width: `${protocolFacts.stellarSelectionEthPercentage}%`,
-              color: 'bg-[rgb(var(--solar-gold-rgb))]',
-            },
-            {
-              label: 'Anchor',
-              value: `${protocolFacts.anchorDistributionPercentage}%`,
-              width: `${protocolFacts.anchorDistributionPercentage}%`,
-              color: 'bg-[rgb(var(--impact-green-rgb))]',
-            },
-            {
-              label: 'Public Goods',
-              value: `${protocolFacts.publicGoodsPercentage}%`,
-              width: `${protocolFacts.publicGoodsPercentage}%`,
-              color: 'bg-[rgb(var(--chrono-rose-rgb))]',
-            },
-            {
-              label: 'Next cycle',
-              value: `~${protocolFacts.compoundingReservePercentage}%`,
-              width: `${protocolFacts.compoundingReservePercentage}%`,
-              color: 'bg-white/40',
-            },
-          ].map(({ label, value, width, color }) => (
-            <div key={label} className="grid grid-cols-[96px_1fr_44px] items-center gap-3">
-              <span className="type-mono-sm text-white/55">{label}</span>
+          <div className="flex items-center gap-2">
+            <p className="type-eyebrow text-white/65">Cycle Reserve Split</p>
+            <InfoTooltip
+              content="Percentages show how a finalized cycle's ETH reserve is allocated across protocol tracks."
+              label="Cycle Reserve Split"
+              iconClassName="h-3 w-3"
+              className="text-white/45 hover:text-white/80"
+            />
+          </div>
+          {allocationTracks.map(({ label, value, width, color, tooltip }) => (
+            <div key={label} className="grid grid-cols-[112px_1fr_48px] items-center gap-3">
+              <span className="flex items-center gap-1.5 type-mono-sm text-white/55">
+                <span>{label}</span>
+                <InfoTooltip
+                  content={tooltip}
+                  label={label}
+                  iconClassName="h-3 w-3"
+                  className="text-white/45 hover:text-white/80"
+                />
+              </span>
               <span className="h-2 overflow-hidden rounded-full bg-white/[0.08]">
                 <span
                   className={`block h-full rounded-full ${color}`}

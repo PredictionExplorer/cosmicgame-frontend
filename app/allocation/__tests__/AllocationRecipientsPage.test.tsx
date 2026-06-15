@@ -48,6 +48,18 @@ describe('AllocationRecipientsPage', () => {
     ).toBeInTheDocument();
   });
 
+  it('renders page-scope and reserve-split tooltips', () => {
+    mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
+    render(<AllocationRecipientsPage />);
+
+    expect(
+      screen.getByRole('button', { name: 'More information about Finalized round records only' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'More information about Cycle Reserve Split' }),
+    ).toBeInTheDocument();
+  });
+
   it('passes loading state to AllocationTable', () => {
     mockUseRoundList.mockReturnValue({ data: [], isLoading: true });
     render(<AllocationRecipientsPage />);
@@ -86,6 +98,24 @@ describe('AllocationRecipientsPage', () => {
     expect(screen.getByText(`${protocolFacts.anchorDistributionPercentage}%`)).toBeInTheDocument();
     expect(screen.getByText(`${protocolFacts.publicGoodsPercentage}%`)).toBeInTheDocument();
     expect(screen.getByText(`~${protocolFacts.compoundingReservePercentage}%`)).toBeInTheDocument();
+  });
+
+  it('renders help tooltips for allocation track labels', () => {
+    mockUseRoundList.mockReturnValue({ data: [], isLoading: false });
+    render(<AllocationRecipientsPage />);
+
+    for (const label of [
+      'Signature',
+      'Chrono',
+      'Stellar ETH',
+      'Anchor',
+      'Public Goods',
+      'Next cycle',
+    ]) {
+      expect(
+        screen.getByRole('button', { name: `More information about ${label}` }),
+      ).toBeInTheDocument();
+    }
   });
 
   describe('summary statistics', () => {

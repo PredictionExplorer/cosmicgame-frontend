@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { ErrorState } from '@/components/ui/error-state';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { SkeletonTableRow } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 /**
  * DataTable — config-driven table primitive.
@@ -266,21 +267,32 @@ function DensityToolbar({
         className="inline-flex rounded-md border border-white/[0.08] p-0.5"
       >
         {(['comfortable', 'compact'] as const).map((option) => (
-          <button
-            key={option}
-            type="button"
-            onClick={() => onChange(option)}
-            aria-pressed={density === option}
-            className={cn(
-              'px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm transition-colors',
-              'duration-[var(--duration-fast)]',
-              density === option
-                ? 'bg-white/[0.08] text-foreground'
-                : 'text-muted-foreground hover:text-foreground',
-            )}
-          >
-            {option}
-          </button>
+          <Tooltip key={option}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => onChange(option)}
+                aria-pressed={density === option}
+                aria-label={`${option === 'comfortable' ? 'Comfortable' : 'Compact'} row density`}
+                className={cn(
+                  'px-2 py-0.5 text-[10px] uppercase tracking-wider rounded-sm transition-colors',
+                  'duration-[var(--duration-fast)]',
+                  density === option
+                    ? 'bg-white/[0.08] text-foreground'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {option}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="max-w-[220px] text-xs leading-relaxed">
+                {option === 'comfortable'
+                  ? 'Use taller rows with more spacing for easier scanning.'
+                  : 'Use shorter rows to fit more allocation records on screen.'}
+              </p>
+            </TooltipContent>
+          </Tooltip>
         ))}
       </div>
     </div>
