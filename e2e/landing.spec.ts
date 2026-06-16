@@ -16,7 +16,7 @@ const APP_ORIGIN_PATTERN =
 const MOCK_NOW_SECONDS = 1_700_000_000;
 const MOCK_CYCLE_FINALIZATION_SECONDS = MOCK_NOW_SECONDS + 7_265;
 const CURRENT_TIME_ROUTE = '**/api/cosmicgame/time/current';
-const PRIZE_TIME_ROUTE = '**/api/cosmicgame/rounds/current/time';
+const CYCLE_FINALIZATION_TIME_ROUTE = '**/api/cosmicgame/rounds/current/time';
 const DASHBOARD_ROUTE = '**/api/cosmicgame/statistics/dashboard';
 
 async function mockLandingCycleApi(
@@ -31,13 +31,13 @@ async function mockLandingCycleApi(
   const finalizationSeconds = overrides.finalizationSeconds ?? MOCK_CYCLE_FINALIZATION_SECONDS;
 
   await page.unroute(CURRENT_TIME_ROUTE).catch(() => undefined);
-  await page.unroute(PRIZE_TIME_ROUTE).catch(() => undefined);
+  await page.unroute(CYCLE_FINALIZATION_TIME_ROUTE).catch(() => undefined);
   await page.unroute(DASHBOARD_ROUTE).catch(() => undefined);
 
   await page.route(CURRENT_TIME_ROUTE, (route) =>
     route.fulfill({ json: { CurrentTimeStamp: currentTimeSeconds } }),
   );
-  await page.route(PRIZE_TIME_ROUTE, (route) =>
+  await page.route(CYCLE_FINALIZATION_TIME_ROUTE, (route) =>
     route.fulfill({ json: { CurRoundPrizeTime: finalizationSeconds } }),
   );
   await page.route(DASHBOARD_ROUTE, (route) =>
