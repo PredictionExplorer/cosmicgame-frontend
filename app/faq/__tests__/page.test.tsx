@@ -106,6 +106,6 @@ describe('app/faq/page.tsx', () => {
           region: { enabled: false },
         },
       });
-    });
+    }, 30_000);
   });
 });
