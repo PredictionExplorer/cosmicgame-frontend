@@ -1,5 +1,4 @@
-import { useEffect, useState, type FC } from 'react';
-import axios from 'axios';
+import { useState, type FC } from 'react';
 import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 
@@ -18,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import NFTImage from '@/components/nft/NFTImage';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import { reportError } from '@/utils/errors';
+import { useAttachedNftMetadata } from '@/components/attachments/useAttachedNftMetadata';
 
 export interface NFTRecord {
   RecordId: string | number;
@@ -47,22 +46,7 @@ interface DonatedNFTTableProps {
 }
 
 const NFTRow: FC<NFTRowProps> = ({ nft, handleClaim, claimingTokens }) => {
-  const [tokenURI, setTokenURI] = useState<{ image?: string; external_url?: string } | null>(null);
-
-  useEffect(() => {
-    const fetchTokenMetadata = async () => {
-      try {
-        const { data } = await axios.get(nft.NFTTokenURI!);
-        setTokenURI(data);
-      } catch (error) {
-        reportError(error, 'fetch attached NFT token URI');
-      }
-    };
-
-    if (nft.NFTTokenURI) {
-      fetchTokenMetadata();
-    }
-  }, [nft.NFTTokenURI]);
+  const { data: tokenURI } = useAttachedNftMetadata(nft.NFTTokenURI);
 
   if (!nft) return <TablePrimaryRow />;
 
@@ -209,7 +193,12 @@ const DonatedNFTTable: FC<DonatedNFTTableProps> = ({ list, handleClaim, claiming
           </TablePrimary>
         </TablePrimaryContainer>
 
-        <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
+        <CustomPagination
+          page={page}
+          setPage={setPage}
+          totalLength={list.length}
+          perPage={perPage}
+        />
       </div>
       <AttachedNFTPrintFallback list={list} />
     </>
@@ -253,9 +242,13 @@ function AttachedNFTPrintFallback({ list }: { list: NFTRecord[] }) {
               <td className="border border-foreground/15 p-2">
                 {convertTimestampToDateTime(nft.TimeStamp)}
               </td>
-              <td className="border border-foreground/15 p-2 font-mono break-all">{nft.DonorAddr}</td>
+              <td className="border border-foreground/15 p-2 font-mono break-all">
+                {nft.DonorAddr}
+              </td>
               <td className="border border-foreground/15 p-2 text-center">{nft.RoundNum}</td>
-              <td className="border border-foreground/15 p-2 font-mono break-all">{nft.TokenAddr}</td>
+              <td className="border border-foreground/15 p-2 font-mono break-all">
+                {nft.TokenAddr}
+              </td>
               <td className="border border-foreground/15 p-2 text-center">
                 {String(nft.NFTTokenId ?? nft.TokenId ?? '—')}
               </td>

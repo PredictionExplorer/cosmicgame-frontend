@@ -20,6 +20,9 @@ import { cn } from '@/lib/utils';
 import type { WinningHistoryEntry } from '@/services/api/types';
 export type { WinningHistoryEntry };
 
+/** Stellar Selection rows in `AllPrizes` / `cg_prize.ptype`. */
+export const STELLAR_SELECTION_RECORD_TYPES = new Set([10, 11, 12, 13, 14, 18]);
+
 /** Backend `cg_prize.ptype` / API `RecordType` — must match black-site prize history labels. */
 const RECORD_TYPE_MAP: Record<number, { icon: ReactNode; text: string }> = {
   0: { icon: <Ticket className="h-5 w-5" />, text: 'Main ETH Allocation' },
@@ -73,7 +76,7 @@ function formatAllocationAmount(recordType: number, amountEth: number | undefine
     return `${(amountEth ?? 0).toFixed(4)} (ERC-20)`;
   }
   if (CST_RECORD_TYPES.has(recordType)) {
-    return `${(amountEth ?? 0).toFixed(2)} CST`;
+    return `${Math.round(amountEth ?? 0)} CST`;
   }
   return ' ';
 }

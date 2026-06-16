@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom';
-import axios from 'axios';
 
 import { convertTimestampToDateTime, shortenHex } from '@/utils';
 
@@ -7,7 +6,15 @@ import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 
 import { render, screen, waitFor, fireEvent, within, checkA11y } from '@/test-utils';
 
-jest.mock('axios');
+const mockUseAttachedNftMetadata = jest.fn(() => ({
+  data: undefined as { image?: string; external_url?: string } | undefined,
+  isLoading: false,
+  isError: false,
+}));
+
+jest.mock('../attachments/useAttachedNftMetadata', () => ({
+  useAttachedNftMetadata: (_uri: string | null | undefined) => mockUseAttachedNftMetadata(),
+}));
 
 describe('AttachedNFTTable', () => {
   beforeEach(() => {
@@ -21,8 +28,10 @@ describe('AttachedNFTTable', () => {
 
   test('with mock data', async () => {
     const mockImageUrl = 'https://example.com/nft-image.png';
-    (axios.get as jest.Mock).mockResolvedValue({
+    mockUseAttachedNftMetadata.mockReturnValue({
       data: { image: mockImageUrl, external_url: 'https://example.com' },
+      isLoading: false,
+      isError: false,
     });
 
     const mockData = [
@@ -65,8 +74,10 @@ describe('AttachedNFTTable', () => {
   });
 
   test('external links have rel="noopener noreferrer"', async () => {
-    (axios.get as jest.Mock).mockResolvedValue({
+    mockUseAttachedNftMetadata.mockReturnValue({
       data: { image: 'https://example.com/nft.png', external_url: 'https://example.com' },
+      isLoading: false,
+      isError: false,
     });
 
     const mockData = [
@@ -104,8 +115,10 @@ describe('AttachedNFTTable', () => {
   test('Claim button click calls handleClaim with token index', async () => {
     const mockHandleClaim = jest.fn();
     const mockImageUrl = 'https://example.com/nft-image.png';
-    (axios.get as jest.Mock).mockResolvedValue({
+    mockUseAttachedNftMetadata.mockReturnValue({
       data: { image: mockImageUrl, external_url: 'https://example.com' },
+      isLoading: false,
+      isError: false,
     });
 
     const mockData = [

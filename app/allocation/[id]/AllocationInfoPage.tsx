@@ -51,14 +51,15 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { SectionDivider } from '@/components/ui/section-divider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import StellarSelectionRecipientTable from '@/components/tables/StellarSelectionRecipientTable';
 import GestureHistoryTable from '@/components/tables/GestureHistoryTable';
 import AnchoringRecipientTable from '@/components/tables/AnchoringRecipientTable';
 import AttachedNFTTable from '@/components/attachments/AttachedNFTTable';
 import EnduranceChampionsTable from '@/components/tables/EnduranceChampionsTable';
 import AttachedERC20Table from '@/components/attachments/AttachedERC20Table';
-import RecipientHistoryTable from '@/components/tables/RecipientHistoryTable';
-import type { WinningHistoryEntry } from '@/components/tables/RecipientHistoryTable';
+import RecipientHistoryTable, {
+  STELLAR_SELECTION_RECORD_TYPES,
+  type WinningHistoryEntry,
+} from '@/components/tables/RecipientHistoryTable';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 24 },
@@ -410,6 +411,12 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
   const cycleAllocationLedger = useMemo(
     () => (allocationInfo?.AllPrizes ?? []) as WinningHistoryEntry[],
     [allocationInfo?.AllPrizes],
+  );
+
+  const stellarSelectionLedger = useMemo(
+    () =>
+      cycleAllocationLedger.filter((entry) => STELLAR_SELECTION_RECORD_TYPES.has(entry.RecordType)),
+    [cycleAllocationLedger],
   );
 
   const handleShareRound = async () => {
@@ -845,12 +852,7 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
             </TabsTrigger>
             <TabsTrigger value="stellar-selection" className="flex-1 min-w-[100px]">
               Stellar Selection
-              <TabBadge
-                count={
-                  (allocationInfo.RaffleETHDeposits?.length ?? 0) +
-                  (allocationInfo.RaffleNFTWinners?.length ?? 0)
-                }
-              />
+              <TabBadge count={stellarSelectionLedger.length} />
             </TabsTrigger>
             <TabsTrigger value="anchoring" className="flex-1 min-w-[100px]">
               Anchor Distributions
@@ -879,12 +881,11 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
           </TabsContent>
 
           <TabsContent value="stellar-selection" className="mt-6">
-            {(allocationInfo.RaffleETHDeposits?.length ?? 0) +
-              (allocationInfo.RaffleNFTWinners?.length ?? 0) >
-            0 ? (
-              <StellarSelectionRecipientTable
-                RaffleETHDeposits={allocationInfo.RaffleETHDeposits}
-                RaffleNFTWinners={allocationInfo.RaffleNFTWinners}
+            {stellarSelectionLedger.length > 0 ? (
+              <RecipientHistoryTable
+                winningHistory={stellarSelectionLedger}
+                showRoundColumn={false}
+                perPage={10}
               />
             ) : (
               <EmptyState title="No Stellar Selection recipients for this cycle." />

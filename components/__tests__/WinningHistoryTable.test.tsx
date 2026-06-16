@@ -80,6 +80,14 @@ describe('RecipientHistoryTable', () => {
     expect(screen.getByText('1.5000 ETH')).toBeInTheDocument();
   });
 
+  it('renders CST amounts as whole numbers without decimals', () => {
+    render(
+      <RecipientHistoryTable winningHistory={[createEntry({ RecordType: 11, AmountEth: 1000 })]} />,
+    );
+    expect(screen.getByText('1000 CST')).toBeInTheDocument();
+    expect(screen.queryByText('1000.00 CST')).not.toBeInTheDocument();
+  });
+
   it('sets rel="noopener noreferrer" on all target="_blank" links', () => {
     const entry = createEntry({
       TokenAddress: '0xTokenAddress1234567890abcdef12345678901234',

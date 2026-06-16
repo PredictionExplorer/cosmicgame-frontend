@@ -716,6 +716,31 @@ describe('client helper functions', () => {
       expect(flattenRoundInfo(42)).toBeNull();
     });
 
+    it('flattens nested Tx fields in RaffleNFTWinners entries', () => {
+      const result = flattenRoundInfo({
+        RoundNum: 0,
+        RaffleNFTWinners: [
+          {
+            WinnerAddr: '0xw1',
+            Tx: {
+              TxHash: '0xnftwin',
+              TimeStamp: 1700000001,
+              EvtLogId: 55,
+            },
+          },
+        ],
+      }) as Record<string, unknown>;
+
+      expect(result.RaffleNFTWinners).toEqual([
+        {
+          WinnerAddr: '0xw1',
+          TxHash: '0xnftwin',
+          TimeStamp: 1700000001,
+          EvtLogId: 55,
+        },
+      ]);
+    });
+
     it('defaults missing nested objects to empty values', () => {
       const result = flattenRoundInfo({ RoundNum: 1 }) as Record<string, unknown>;
 

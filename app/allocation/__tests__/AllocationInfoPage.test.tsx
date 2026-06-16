@@ -30,10 +30,32 @@ jest.mock('sonner', () => ({
   toast: { success: jest.fn(), error: jest.fn() },
 }));
 
-jest.mock('../../../components/tables/StellarSelectionRecipientTable', () => ({
-  __esModule: true,
-  default: () => <div data-testid="stellar-selection-recipient-table" />,
-}));
+jest.mock('../../../components/tables/RecipientHistoryTable', () => {
+  const STELLAR = new Set([10, 11, 12, 13, 14, 18]);
+  return {
+    __esModule: true,
+    STELLAR_SELECTION_RECORD_TYPES: STELLAR,
+    default: ({
+      winningHistory,
+      showRoundColumn,
+    }: {
+      winningHistory: { RecordType?: number }[];
+      showRoundColumn?: boolean;
+    }) => {
+      const stellarOnly =
+        winningHistory.length > 0 &&
+        winningHistory.every((entry) => STELLAR.has(entry.RecordType ?? -1));
+      const testId = stellarOnly
+        ? 'stellar-selection-ledger-table'
+        : 'cycle-allocation-ledger-table';
+      return (
+        <div data-testid={testId}>
+          records: {winningHistory.length}, showRoundColumn: {String(showRoundColumn)}
+        </div>
+      );
+    },
+  };
+});
 jest.mock('../../../components/tables/GestureHistoryTable', () => ({
   __esModule: true,
   default: ({ gestureHistory }: { gestureHistory: unknown[] }) => (
@@ -55,20 +77,6 @@ jest.mock('../../../components/tables/EnduranceChampionsTable', () => ({
 jest.mock('../../../components/attachments/AttachedERC20Table', () => ({
   __esModule: true,
   default: () => <div data-testid="attached-erc20-table" />,
-}));
-jest.mock('../../../components/tables/RecipientHistoryTable', () => ({
-  __esModule: true,
-  default: ({
-    winningHistory,
-    showRoundColumn,
-  }: {
-    winningHistory: unknown[];
-    showRoundColumn?: boolean;
-  }) => (
-    <div data-testid="cycle-allocation-ledger-table">
-      records: {winningHistory.length}, showRoundColumn: {String(showRoundColumn)}
-    </div>
-  ),
 }));
 
 const baseAllocationInfo = {
@@ -505,10 +513,29 @@ describe('AllocationInfoPage', () => {
 
     it('switches to stellar selection distributions tab', async () => {
       const user = userEvent.setup();
-      renderWithData(1);
+      renderWithData(1, {
+        AllPrizes: [
+          {
+            RecordType: 0,
+            WinnerAddr: '0xWinnerAddr1234567890abcdef12345678',
+            AmountEth: 1.5,
+            RoundNum: 1,
+            TxHash: '0xprize1',
+          },
+          {
+            RecordType: 10,
+            WinnerAddr: '0xRaffle1234567890abcdef123456789',
+            AmountEth: 0.01,
+            RoundNum: 1,
+            TxHash: '0xprize2',
+          },
+        ],
+      });
       await user.click(screen.getByRole('tab', { name: /Stellar Selection/i }));
       await waitFor(() => {
-        expect(screen.getByTestId('stellar-selection-recipient-table')).toBeInTheDocument();
+        expect(screen.getByTestId('stellar-selection-ledger-table')).toHaveTextContent(
+          'records: 1',
+        );
       });
     });
 
@@ -561,13 +588,19 @@ describe('AllocationInfoPage', () => {
       expect(screen.getByText('No gestures were made in this cycle.')).toBeInTheDocument();
     });
 
-    it('shows empty state for stellar selection when no deposits or recipients', async () => {
+    it('shows empty state for stellar selection when no stellar allocation records', async () => {
       const user = userEvent.setup();
       mockUseRoundInfo.mockReturnValue({
         data: {
           ...baseAllocationInfo,
-          RaffleETHDeposits: [],
-          RaffleNFTWinners: [],
+          AllPrizes: [
+            {
+              RecordType: 0,
+              WinnerAddr: '0xWinnerAddr1234567890abcdef12345678',
+              AmountEth: 1.5,
+              RoundNum: 1,
+            },
+          ],
         },
         isLoading: false,
       });
@@ -661,8 +694,14 @@ describe('AllocationInfoPage', () => {
       expect(gesturesTab).toHaveTextContent('1');
     });
 
-    it('shows stellar-selection count badge', () => {
-      renderWithData(1);
+    it('shows stellar-selection count badge from AllPrizes stellar records', () => {
+      renderWithData(1, {
+        AllPrizes: [
+          { RecordType: 10, WinnerAddr: '0x1', RoundNum: 1 },
+          { RecordType: 11, WinnerAddr: '0x2', RoundNum: 1 },
+          { RecordType: 0, WinnerAddr: '0x3', RoundNum: 1 },
+        ],
+      });
       const stellarSelectionTab = screen.getByRole('tab', { name: /Stellar Selection/i });
       expect(stellarSelectionTab).toHaveTextContent('2');
     });
