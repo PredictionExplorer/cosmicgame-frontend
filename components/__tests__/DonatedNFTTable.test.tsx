@@ -152,7 +152,7 @@ describe('AttachedNFTTable', () => {
     expect(mockHandleClaim).toHaveBeenCalledWith(0);
   });
 
-  test('does not render Claim button for already claimed NFT donations', () => {
+  test('does not render Claim button for already claimed NFT assets', () => {
     const mockData = [
       {
         RecordId: '45',
@@ -178,7 +178,7 @@ describe('AttachedNFTTable', () => {
     expect(screen.queryByTestId('Claim Button')).not.toBeInTheDocument();
   });
 
-  test('disables Claim button while its donation index is pending', () => {
+  test('disables Claim button while its asset index is pending', () => {
     const mockData = [
       {
         RecordId: '45',

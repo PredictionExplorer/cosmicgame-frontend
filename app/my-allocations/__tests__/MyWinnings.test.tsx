@@ -211,7 +211,7 @@ describe('MyWinnings', () => {
     expect(screen.getByTestId('uncollected-rewards')).toBeInTheDocument();
   });
 
-  it('retrieves all donated NFTs by PrizesWallet donation index', () => {
+  it('retrieves all attached NFTs by PrizesWallet asset index', () => {
     mockApiData = { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 2 };
     mockUseUnclaimedDonatedNFTByUser.mockReturnValue({
       data: [
@@ -244,7 +244,7 @@ describe('MyWinnings', () => {
     expect(mockClaimAllDonatedNFTs).toHaveBeenCalledWith([7, 12]);
   });
 
-  it('retrieves all donated ERC20 tokens with raw base-unit amounts', () => {
+  it('retrieves all attached ERC20 tokens with raw base-unit amounts', () => {
     mockUseDonationsERC20ByUser.mockReturnValue({
       data: [
         {
