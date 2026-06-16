@@ -1,16 +1,14 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { formatEther } from 'viem';
 import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { UserCircle } from 'lucide-react';
 
 import { useActiveWeb3React } from '@/hooks/web3';
-import useStellarSelectionWalletContract from '@/hooks/useStellarSelectionWalletContract';
+import { useClaimAllocations } from '@/hooks/useClaimAllocations';
 import { useAnchoredToken } from '@/contexts/AnchoredTokenContext';
-import { useApiData } from '@/contexts/ApiDataContext';
-import { useNotification } from '@/contexts/NotificationContext';
 import type { GestureInfo } from '@/services/api';
 import {
   useDashboardInfo,
@@ -30,13 +28,7 @@ import {
   useDonationsERC20ByUser,
   useGestureListByCycle,
 } from '@/hooks/useApiQuery';
-import getErrorMessage from '@/utils/alert';
-import {
-  isUserRejection,
-  reportError,
-  getEthErrorMessage,
-  WALLET_TRANSACTION_CANCELLED_MESSAGE,
-} from '@/utils/errors';
+import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
 import { MainWrapper } from '@/components/styled';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionDivider } from '@/components/ui/section-divider';
@@ -95,16 +87,23 @@ function LoadingSkeleton() {
 /** Comprehensive user profile view with bidding stats, winning history, anchoring actions, token holdings, and stellarSelection claims. */
 const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) => {
   const { account } = useActiveWeb3React();
-  const allocationWalletContract = useStellarSelectionWalletContract();
   const { fetchData: fetchStakedTokens } = useAnchoredToken();
-  const { fetchData: fetchStatusData } = useApiData();
-  const { setNotification } = useNotification();
   const queryClient = useQueryClient();
 
   const canClaim =
     isOwnProfile || (!!account && !!address && account.toLowerCase() === address.toLowerCase());
-  const [isClaiming, setIsClaiming] = useState(false);
-  const [claimingDonatedNFTs, setClaimingDonatedNFTs] = useState<number[]>([]);
+  const refreshProfileClaims = useCallback(() => {
+    queryClient.invalidateQueries();
+    fetchStakedTokens();
+  }, [fetchStakedTokens, queryClient]);
+  const {
+    isClaiming,
+    claimingDonatedNFTs,
+    claimDonatedNFT,
+    claimAllDonatedNFTs,
+    claimDonatedERC20,
+    claimAllDonatedERC20,
+  } = useClaimAllocations(refreshProfileClaims);
 
   const { data: dashboardData, isLoading: loadingDashboard } = useDashboardInfo();
   const { data: claimHistoryRaw, isLoading: loadingClaims } = useClaimHistoryByUser(address);
@@ -211,113 +210,28 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
     loadingByDeposit ||
     loadingMints;
 
-  const handleDonatedNFTsClaim = async (tokenID: number) => {
-    if (!allocationWalletContract) return;
-    setClaimingDonatedNFTs((prev) => [...prev, tokenID]);
-    setIsClaiming(true);
-    try {
-      await allocationWalletContract.write.claimDonatedNft?.([tokenID]);
-      setTimeout(() => {
-        queryClient.invalidateQueries();
-        fetchStakedTokens();
-        fetchStatusData();
-        setIsClaiming(false);
-      }, 3000);
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
-          type: 'info',
-          visible: true,
-        });
-      } else {
-        reportError(err, 'retrieve attached NFT');
-        const msg = getEthErrorMessage(err, 'An error occurred');
-        setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
-      }
-      setIsClaiming(false);
-    } finally {
-      setClaimingDonatedNFTs((prev) => prev.filter((id) => id !== tokenID));
-    }
+  const handleDonatedNFTsClaim = (tokenID: number) => {
+    claimDonatedNFT(tokenID);
   };
 
-  const handleAllDonatedNFTsClaim = async () => {
-    if (!unclaimedDonatedNFTsList.length || !allocationWalletContract) return;
-    setIsClaiming(true);
-    try {
-      const indexList = unclaimedDonatedNFTsList.map((item: { Index: number }) => item.Index);
-      await allocationWalletContract.write.claimManyDonatedNfts?.([indexList]);
-      setTimeout(() => {
-        queryClient.invalidateQueries();
-        fetchStakedTokens();
-        fetchStatusData();
-        setIsClaiming(false);
-      }, 3000);
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
-          type: 'info',
-          visible: true,
-        });
-      } else {
-        reportError(err, 'retrieve all attached NFTs');
-        const msg = getEthErrorMessage(err, 'An error occurred while retrieving attached NFTs!');
-        setNotification({ text: getErrorMessage(msg), type: 'error', visible: true });
-      }
-      setIsClaiming(false);
-    }
+  const handleAllDonatedNFTsClaim = () => {
+    const indexList = unclaimedDonatedNFTsList.map((item: { Index: number }) => item.Index);
+    claimAllDonatedNFTs(indexList);
   };
 
-  const handleDonatedERC20Claim = async (roundNum: number, tokenAddr: string, amount: string) => {
-    if (!allocationWalletContract) return;
-    try {
-      await allocationWalletContract.write.claimDonatedToken?.([roundNum, tokenAddr, amount]);
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['donationsERC20ByUser'] });
-      }, 3000);
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
-          type: 'info',
-          visible: true,
-        });
-        return;
-      }
-      reportError(err, 'retrieve attached ERC20 token');
-      const rawMsg = getEthErrorMessage(err, 'An error occurred');
-      setNotification({ text: getErrorMessage(rawMsg) || rawMsg, type: 'error', visible: true });
-    }
+  const handleDonatedERC20Claim = (roundNum: number, tokenAddr: string, amount: string) => {
+    claimDonatedERC20(roundNum, tokenAddr, amount);
   };
 
-  const handleAllDonatedERC20Claim = async () => {
-    if (!allocationWalletContract) return;
-    try {
-      const donatedTokensToClaim = donatedERC20List
-        .filter((x) => !x.Claimed)
-        .map((x) => ({
-          roundNum: x.RoundNum,
-          tokenAddress: x.TokenAddr,
-          amount: x.AmountDonatedEth,
-        }));
-      await allocationWalletContract.write.claimManyDonatedTokens?.([donatedTokensToClaim]);
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['donationsERC20ByUser'] });
-      }, 3000);
-    } catch (err) {
-      if (isUserRejection(err)) {
-        setNotification({
-          text: WALLET_TRANSACTION_CANCELLED_MESSAGE,
-          type: 'info',
-          visible: true,
-        });
-        return;
-      }
-      reportError(err, 'retrieve all attached ERC20 tokens');
-      const rawMsg = getEthErrorMessage(err, 'An error occurred');
-      setNotification({ text: getErrorMessage(rawMsg) || rawMsg, type: 'error', visible: true });
-    }
+  const handleAllDonatedERC20Claim = () => {
+    const donatedTokensToClaim = donatedERC20List
+      .filter((x) => !x.Claimed)
+      .map((x) => ({
+        roundNum: x.RoundNum,
+        tokenAddress: x.TokenAddr,
+        amount: getDonatedErc20RawClaimAmount(x),
+      }));
+    claimAllDonatedERC20(donatedTokensToClaim);
   };
 
   if (address === 'Invalid Address') {
@@ -466,7 +380,7 @@ const UserStatisticsView = ({ address, isOwnProfile }: UserStatisticsViewProps) 
                 loadingNFTs={loadingUnclaimedNFTs || loadingClaimedNFTs}
                 loadingERC20={loadingERC20}
                 canClaim={canClaim}
-                isClaiming={isClaiming}
+                isClaiming={isClaiming.donatedNFT}
                 claimingDonatedNFTs={claimingDonatedNFTs}
                 onClaimNFT={handleDonatedNFTsClaim}
                 onClaimAllNFTs={handleAllDonatedNFTsClaim}

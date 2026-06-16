@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { parseUnits } from 'viem';
 import { usePublicClient } from 'wagmi';
 
 import {
@@ -11,6 +10,7 @@ import {
 import getErrorMessage from '@/utils/alert';
 import { useNotification } from '@/contexts/NotificationContext';
 import { useApiData } from '@/contexts/ApiDataContext';
+import { toDonatedErc20ClaimAmountBigInt } from '@/utils/donatedErc20';
 
 import useStellarSelectionWalletContract from './useStellarSelectionWalletContract';
 
@@ -19,15 +19,6 @@ interface ClaimingState {
   donatedNFT: boolean;
   donatedERC20: boolean;
 }
-
-/**
- * Default ERC-20 decimals when a token's metadata is not provided. This matches
- * the most common case (DAI, WETH, most governance tokens). For tokens with
- * different decimals (USDC/USDT: 6), callers must pass the correct decimals
- * explicitly to avoid scaling errors that would otherwise transfer the wrong
- * amount on-chain.
- */
-const DEFAULT_ERC20_DECIMALS = 18;
 
 /**
  * Encapsulates all retrieval/withdraw operations for the My Allocations page:
@@ -45,7 +36,8 @@ const DEFAULT_ERC20_DECIMALS = 18;
  *   3. Consistent contract-null guards across every public method.
  *   4. Per-operation loading state so consumers can render accurate
  *      disabled/spinner UI.
- *   5. ERC-20 decimals are a required caller concern, not a silent 18.
+ *   5. ERC-20 claims use raw token base-unit amounts from the API/contract,
+ *      never human-readable display amounts.
  */
 export function useClaimAllocations(onSuccess?: () => void) {
   const { setNotification } = useNotification();
@@ -209,12 +201,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
   );
 
   const claimDonatedERC20 = useCallback(
-    async (
-      roundNum: number,
-      tokenAddr: string,
-      amount: string,
-      decimals: number = DEFAULT_ERC20_DECIMALS,
-    ) => {
+    async (roundNum: number, tokenAddr: string, amount: string | number | bigint) => {
       if (!stellarSelectionWalletContract) {
         notifyWalletNotConnected();
         return;
@@ -224,7 +211,7 @@ export function useClaimAllocations(onSuccess?: () => void) {
         const hash = await stellarSelectionWalletContract.write.claimDonatedToken?.([
           roundNum,
           tokenAddr,
-          parseUnits(amount.toString(), decimals),
+          toDonatedErc20ClaimAmountBigInt(amount),
         ]);
         await awaitTx(hash);
         refreshAfterClaim();
@@ -246,14 +233,26 @@ export function useClaimAllocations(onSuccess?: () => void) {
   );
 
   const claimAllDonatedERC20 = useCallback(
-    async (tokens: { roundNum: number; tokenAddress: string; amount: number | undefined }[]) => {
+    async (
+      tokens: {
+        roundNum: number;
+        tokenAddress: string;
+        amount: string | number | bigint | null | undefined;
+      }[],
+    ) => {
       if (!stellarSelectionWalletContract) {
         notifyWalletNotConnected();
         return;
       }
       setIsClaiming((prev) => ({ ...prev, donatedERC20: true }));
       try {
-        const hash = await stellarSelectionWalletContract.write.claimManyDonatedTokens?.([tokens]);
+        const rawTokens = tokens.map((token) => ({
+          ...token,
+          amount: toDonatedErc20ClaimAmountBigInt(token.amount),
+        }));
+        const hash = await stellarSelectionWalletContract.write.claimManyDonatedTokens?.([
+          rawTokens,
+        ]);
         await awaitTx(hash);
         refreshAfterClaim();
       } catch (err) {

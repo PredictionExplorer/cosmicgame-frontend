@@ -713,12 +713,16 @@ export interface AdminEventRow {
 export interface DonatedERC20Token extends TxInfo {
   RoundNum: number;
   TokenAddr: string;
+  Amount?: string | number;
+  AmountDonated?: string;
   AmountDonatedEth: number;
+  AmountClaimed?: string;
   AmountClaimedEth: number;
   AmountEth?: number;
   WinnerAddr: string;
   DonorAddr?: string;
   Claimed?: boolean;
+  DonateClaimDiff?: string;
   DonateClaimDiffEth?: string;
   [key: string]: unknown;
 }

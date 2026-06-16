@@ -407,32 +407,36 @@ describe('useClaimAllocations', () => {
   });
 
   describe('claimDonatedERC20', () => {
-    it('defaults to 18 decimals when not specified (parseUnits scales by 1e18)', async () => {
+    it('forwards raw base-unit amounts as bigint without scaling', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1.5');
+        await result.current.claimDonatedERC20(5, '0xToken', '1999999999999999994000');
       });
       expect(mockWriteClaimDonatedToken).toHaveBeenCalledWith([
         5,
         '0xToken',
-        BigInt('1500000000000000000'),
+        BigInt('1999999999999999994000'),
       ]);
     });
 
-    it('respects caller-supplied decimals (e.g. USDC uses 6)', async () => {
+    it('accepts zero as a raw amount for contract-side balance fallback', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1.5', 6);
+        await result.current.claimDonatedERC20(5, '0xToken', '0');
       });
-      expect(mockWriteClaimDonatedToken).toHaveBeenCalledWith([5, '0xToken', BigInt('1500000')]);
+      expect(mockWriteClaimDonatedToken).toHaveBeenCalledWith([5, '0xToken', 0n]);
     });
 
-    it('supports 0-decimal tokens', async () => {
+    it('rejects display-denominated decimals before writing', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '3', 0);
+        await result.current.claimDonatedERC20(5, '0xToken', '1.5');
       });
-      expect(mockWriteClaimDonatedToken).toHaveBeenCalledWith([5, '0xToken', BigInt(3)]);
+      expect(mockWriteClaimDonatedToken).not.toHaveBeenCalled();
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(Error),
+        'retrieve attached ERC20 token',
+      );
     });
 
     it('notifies and aborts when wallet contract is null', async () => {
@@ -447,7 +451,7 @@ describe('useClaimAllocations', () => {
     it('awaits receipt and refreshes', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1.5');
+        await result.current.claimDonatedERC20(5, '0xToken', '1500000000000000000');
       });
       expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xtx4' });
       expect(mockFetchStatusData).toHaveBeenCalled();
@@ -456,7 +460,7 @@ describe('useClaimAllocations', () => {
     it('tracks isClaiming.donatedERC20 state', async () => {
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1.5');
+        await result.current.claimDonatedERC20(5, '0xToken', '1500000000000000000');
       });
       expect(result.current.isClaiming.donatedERC20).toBe(false);
     });
@@ -465,23 +469,42 @@ describe('useClaimAllocations', () => {
       mockWriteClaimDonatedToken.mockRejectedValueOnce(new Error('revert'));
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
-        await result.current.claimDonatedERC20(5, '0xToken', '1.5');
+        await result.current.claimDonatedERC20(5, '0xToken', '1500000000000000000');
       });
       expect(result.current.isClaiming.donatedERC20).toBe(false);
     });
   });
 
   describe('claimAllDonatedERC20', () => {
-    it('forwards the token list to claimManyDonatedTokens', async () => {
+    it('forwards raw token amounts to claimManyDonatedTokens as bigint', async () => {
       const tokens = [
-        { roundNum: 1, tokenAddress: '0xA', amount: 2 },
-        { roundNum: 2, tokenAddress: '0xB', amount: 3 },
+        { roundNum: 1, tokenAddress: '0xA', amount: '2000000000000000000' },
+        { roundNum: 2, tokenAddress: '0xB', amount: 3n },
       ];
       const { result } = renderHook(() => useClaimAllocations());
       await act(async () => {
         await result.current.claimAllDonatedERC20(tokens);
       });
-      expect(mockWriteClaimManyDonatedTokens).toHaveBeenCalledWith([tokens]);
+      expect(mockWriteClaimManyDonatedTokens).toHaveBeenCalledWith([
+        [
+          { roundNum: 1, tokenAddress: '0xA', amount: BigInt('2000000000000000000') },
+          { roundNum: 2, tokenAddress: '0xB', amount: 3n },
+        ],
+      ]);
+    });
+
+    it('does not write batch claims when any amount is display-denominated', async () => {
+      const { result } = renderHook(() => useClaimAllocations());
+      await act(async () => {
+        await result.current.claimAllDonatedERC20([
+          { roundNum: 1, tokenAddress: '0xA', amount: '1.25' },
+        ]);
+      });
+      expect(mockWriteClaimManyDonatedTokens).not.toHaveBeenCalled();
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(Error),
+        'retrieve all attached ERC20 tokens',
+      );
     });
 
     it('notifies and aborts when wallet contract is null', async () => {

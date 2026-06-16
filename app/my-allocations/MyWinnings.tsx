@@ -28,6 +28,7 @@ import {
   StellarSelectionAllocationsTable,
   type StellarSelectionAllocation,
 } from '@/components/winnings/StellarSelectionAllocationsTable';
+import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
 
 interface UnclaimedDonatedNFT {
   Index: number;
@@ -122,7 +123,11 @@ export default function MyWinnings() {
   const handleAllDonatedERC20Claim = () => {
     const tokens = donatedERC20Data
       .filter((x) => !x.Claimed)
-      .map((x) => ({ roundNum: x.RoundNum, tokenAddress: x.TokenAddr, amount: x.AmountEth }));
+      .map((x) => ({
+        roundNum: x.RoundNum,
+        tokenAddress: x.TokenAddr,
+        amount: getDonatedErc20RawClaimAmount(x),
+      }));
     claimAllDonatedERC20(tokens);
   };
 
@@ -269,8 +274,19 @@ export default function MyWinnings() {
           <div className="flex items-center justify-between mb-6">
             <SectionDivider title="Attached ERC-20 Tokens" className="flex-1" />
             {donatedERC20Data.filter((x) => !x.Claimed).length > 0 && (
-              <Button onClick={handleAllDonatedERC20Claim} size="sm" className="ml-4">
-                Retrieve All
+              <Button
+                onClick={handleAllDonatedERC20Claim}
+                disabled={isClaiming.donatedERC20}
+                size="sm"
+                className="ml-4"
+              >
+                {isClaiming.donatedERC20 ? (
+                  <>
+                    <Spinner size="sm" /> Retrieving...
+                  </>
+                ) : (
+                  'Retrieve All'
+                )}
               </Button>
             )}
           </div>

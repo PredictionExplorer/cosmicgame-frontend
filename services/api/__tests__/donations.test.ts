@@ -489,6 +489,35 @@ describe('donations API', () => {
         'Network response was not OK',
       );
     });
+
+    it('preserves donation index and NFT identity fields', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          UnclaimedDonatedNFTs: [
+            {
+              Tx: TX,
+              Index: 17,
+              RoundNum: 6,
+              TokenAddr: '0xNFT',
+              NFTTokenId: 123,
+              NFTTokenURI: 'ipfs://nft',
+            },
+          ],
+        },
+      });
+
+      const result = await get_unclaimed_donated_nft_by_user('0xaddr');
+      expect(result[0]).toEqual(
+        expect.objectContaining({
+          Index: 17,
+          RoundNum: 6,
+          TokenAddr: '0xNFT',
+          NFTTokenId: 123,
+          NFTTokenURI: 'ipfs://nft',
+          TxHash: '0xa',
+        }),
+      );
+    });
   });
 
   describe('get_donations_erc20_by_round', () => {
@@ -549,6 +578,42 @@ describe('donations API', () => {
       mockedAxios.get.mockRejectedValue(new Error('fail'));
       await expect(get_donations_erc20_by_user('0xwinner')).rejects.toThrow(
         'Network response was not OK',
+      );
+    });
+
+    it('preserves raw ERC20 claim fields alongside display fields', async () => {
+      mockedAxios.get.mockResolvedValue({
+        data: {
+          DonatedPrizesERC20ByWinner: [
+            {
+              Tx: TX,
+              RoundNum: 0,
+              TokenAddr: '0xToken',
+              AmountDonated: '1999999999999999994000',
+              AmountDonatedEth: 2000,
+              AmountClaimed: '6000',
+              AmountClaimedEth: 0.000000000000006,
+              DonateClaimDiff: '1999999999999999988000',
+              DonateClaimDiffEth: 2000,
+              WinnerAddr: '0xwinner',
+              Claimed: false,
+            },
+          ],
+        },
+      });
+
+      const result = await get_donations_erc20_by_user('0xwinner');
+      expect(result[0]).toEqual(
+        expect.objectContaining({
+          AmountDonated: '1999999999999999994000',
+          AmountDonatedEth: 2000,
+          AmountClaimed: '6000',
+          AmountClaimedEth: 0.000000000000006,
+          DonateClaimDiff: '1999999999999999988000',
+          DonateClaimDiffEth: '2000',
+          Claimed: false,
+          WinnerAddr: '0xwinner',
+        }),
       );
     });
   });

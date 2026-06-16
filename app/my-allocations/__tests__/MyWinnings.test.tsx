@@ -1,10 +1,16 @@
-import { checkA11y, render, screen } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen } from '@/test-utils';
 
 import MyWinnings from '../MyWinnings';
 
 const mockRefetchNFTs = jest.fn();
 const mockRefetchStellarSelection = jest.fn();
 const mockRefetchERC20 = jest.fn();
+const mockRetrieveAllStellarSelectionETH = jest.fn();
+const mockClaimDonatedNFT = jest.fn();
+const mockClaimAllDonatedNFTs = jest.fn();
+const mockClaimDonatedERC20 = jest.fn();
+const mockClaimAllDonatedERC20 = jest.fn();
+let mockApiData = { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 0 };
 
 const mockUseUnclaimedDonatedNFTByUser = jest.fn().mockReturnValue({
   data: undefined,
@@ -45,8 +51,19 @@ jest.mock('../../../contexts/NotificationContext', () => ({
 }));
 jest.mock('../../../contexts/ApiDataContext', () => ({
   useApiData: () => ({
-    apiData: { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 0 },
+    apiData: mockApiData,
     fetchData: jest.fn(),
+  }),
+}));
+jest.mock('../../../hooks/useClaimAllocations', () => ({
+  useClaimAllocations: () => ({
+    isClaiming: { raffleETH: false, donatedNFT: false, donatedERC20: false },
+    claimingDonatedNFTs: [],
+    retrieveAllStellarSelectionETH: mockRetrieveAllStellarSelectionETH,
+    claimDonatedNFT: mockClaimDonatedNFT,
+    claimAllDonatedNFTs: mockClaimAllDonatedNFTs,
+    claimDonatedERC20: mockClaimDonatedERC20,
+    claimAllDonatedERC20: mockClaimAllDonatedERC20,
   }),
 }));
 jest.mock('../../../hooks/useStellarSelectionWalletContract', () => ({
@@ -86,6 +103,24 @@ jest.mock('../../../components/attachments/AttachedERC20Table', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockAccount = '0xUser';
+  mockApiData = { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 0 };
+  mockUseUnclaimedDonatedNFTByUser.mockReturnValue({
+    data: undefined,
+    isLoading: false,
+    isError: false,
+    refetch: mockRefetchNFTs,
+  });
+  mockUseUnretrievedStellarSelectionDepositsByUser.mockReturnValue({
+    data: undefined,
+    isLoading: false,
+    isError: false,
+    refetch: mockRefetchStellarSelection,
+  });
+  mockUseDonationsERC20ByUser.mockReturnValue({
+    data: [],
+    isLoading: false,
+    refetch: mockRefetchERC20,
+  });
 });
 
 describe('MyWinnings', () => {
@@ -174,6 +209,83 @@ describe('MyWinnings', () => {
     expect(screen.getByText('Attached NFTs')).toBeInTheDocument();
     expect(screen.getByTestId('attached-nft-table')).toHaveTextContent('nfts: 1');
     expect(screen.getByTestId('uncollected-rewards')).toBeInTheDocument();
+  });
+
+  it('retrieves all donated NFTs by PrizesWallet donation index', () => {
+    mockApiData = { ETHRaffleToClaim: 0, NumDonatedNFTToClaim: 2 };
+    mockUseUnclaimedDonatedNFTByUser.mockReturnValue({
+      data: [
+        {
+          Index: 12,
+          TimeStamp: 1700000002,
+          RecordId: 1,
+          TxHash: '0x1',
+          DonorAddr: '0xDonor',
+          RoundNum: 1,
+          TokenAddr: '0xNFT',
+        },
+        {
+          Index: 7,
+          TimeStamp: 1700000001,
+          RecordId: 2,
+          TxHash: '0x2',
+          DonorAddr: '0xDonor',
+          RoundNum: 1,
+          TokenAddr: '0xNFT',
+        },
+      ],
+      isLoading: false,
+      isError: false,
+      refetch: mockRefetchNFTs,
+    });
+
+    render(<MyWinnings />);
+    fireEvent.click(screen.getByText('Retrieve All'));
+    expect(mockClaimAllDonatedNFTs).toHaveBeenCalledWith([7, 12]);
+  });
+
+  it('retrieves all donated ERC20 tokens with raw base-unit amounts', () => {
+    mockUseDonationsERC20ByUser.mockReturnValue({
+      data: [
+        {
+          EvtLogId: 1,
+          TxHash: '0x1',
+          TimeStamp: 1700000000,
+          RoundNum: 0,
+          TokenAddr: '0xARB',
+          AmountDonatedEth: 2000,
+          AmountClaimedEth: 0.000000000000006,
+          DonateClaimDiff: '1999999999999999988000',
+          DonateClaimDiffEth: '2000',
+          WinnerAddr: '0xUser',
+          Claimed: false,
+        },
+        {
+          EvtLogId: 2,
+          TxHash: '0x2',
+          TimeStamp: 1700000001,
+          RoundNum: 1,
+          TokenAddr: '0xClaimed',
+          AmountDonatedEth: 5,
+          AmountClaimedEth: 5,
+          DonateClaimDiff: '0',
+          WinnerAddr: '0xUser',
+          Claimed: true,
+        },
+      ],
+      isLoading: false,
+      refetch: mockRefetchERC20,
+    });
+
+    render(<MyWinnings />);
+    fireEvent.click(screen.getByText('Retrieve All'));
+    expect(mockClaimAllDonatedERC20).toHaveBeenCalledWith([
+      {
+        roundNum: 0,
+        tokenAddress: '0xARB',
+        amount: '1999999999999999988000',
+      },
+    ]);
   });
 
   it('has no accessibility violations', async () => {

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { render, screen, within, checkA11y } from '@/test-utils';
+import { fireEvent, render, screen, within, checkA11y } from '@/test-utils';
 
 import DonatedERC20Table from '../AttachedERC20Table';
 
@@ -17,6 +17,7 @@ const createToken = (overrides = {}) => ({
   AmountClaimedEth: 1.5,
   WinnerAddr: '0xWinnerAddr1234567890abcdef1234567890abcdef',
   Claimed: false,
+  DonateClaimDiff: '3750000000000000000',
   DonateClaimDiffEth: '3.75',
   ...overrides,
 });
@@ -67,10 +68,55 @@ describe('DonatedERC20Table', () => {
     expect(screen.getByTestId('Claim Button')).toBeInTheDocument();
   });
 
-  it('does not render Claim when token is already claimed', () => {
+  it('passes the raw claim amount, not the display amount, to handleClaim', () => {
+    const handleClaim = jest.fn();
     render(
-      <DonatedERC20Table list={[createToken({ Claimed: true })]} handleClaim={jest.fn()} />,
+      <DonatedERC20Table
+        list={[
+          createToken({
+            RoundNum: 7,
+            TokenAddr: '0xTokenAddr1234567890abcdef1234567890abcdef',
+            DonateClaimDiff: '1999999999999999994000',
+            DonateClaimDiffEth: '2000',
+          }),
+        ]}
+        handleClaim={handleClaim}
+      />,
     );
+
+    fireEvent.click(screen.getByTestId('Claim Button'));
+    expect(handleClaim).toHaveBeenCalledWith(
+      7,
+      '0xTokenAddr1234567890abcdef1234567890abcdef',
+      '1999999999999999994000',
+    );
+  });
+
+  it('falls back to raw Amount when DonateClaimDiff is missing', () => {
+    const handleClaim = jest.fn();
+    render(
+      <DonatedERC20Table
+        list={[
+          createToken({
+            Amount: '42000000000000000000',
+            DonateClaimDiff: undefined,
+            DonateClaimDiffEth: '42',
+          }),
+        ]}
+        handleClaim={handleClaim}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId('Claim Button'));
+    expect(handleClaim).toHaveBeenCalledWith(
+      1,
+      '0xTokenAddr1234567890abcdef1234567890abcdef',
+      '42000000000000000000',
+    );
+  });
+
+  it('does not render Claim when token is already claimed', () => {
+    render(<DonatedERC20Table list={[createToken({ Claimed: true })]} handleClaim={jest.fn()} />);
     expect(screen.queryByTestId('Claim Button')).not.toBeInTheDocument();
   });
 
@@ -79,7 +125,9 @@ describe('DonatedERC20Table', () => {
       createToken({ EvtLogId: i + 1, RoundNum: i + 1 }),
     );
     render(<DonatedERC20Table list={list} handleClaim={null} />);
-    expect(within(screen.getAllByRole('table')[0]!).getAllByText('5').length).toBeGreaterThanOrEqual(1);
+    expect(
+      within(screen.getAllByRole('table')[0]!).getAllByText('5').length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('includes a print-only PDF fallback in the DOM', () => {

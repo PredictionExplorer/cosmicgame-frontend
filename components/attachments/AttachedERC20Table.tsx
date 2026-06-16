@@ -17,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import type { DonatedERC20Token } from '@/services/api/types';
+import { getDonatedErc20RawClaimAmount } from '@/utils/donatedErc20';
 
 export type { DonatedERC20Token };
 
@@ -108,7 +109,7 @@ const TokenRow = ({ token, handleClaim }: TokenRowProps) => {
           {!token.Claimed && (
             <Button
               onClick={() =>
-                handleClaim(token.RoundNum, token.TokenAddr, token.DonateClaimDiffEth ?? '0')
+                handleClaim(token.RoundNum, token.TokenAddr, getDonatedErc20RawClaimAmount(token))
               }
               data-testid="Claim Button"
             >
@@ -165,7 +166,12 @@ const DonatedERC20Table = ({ list, handleClaim }: DonatedERC20TableProps) => {
           </TablePrimary>
         </TablePrimaryContainer>
 
-        <CustomPagination page={page} setPage={setPage} totalLength={list.length} perPage={perPage} />
+        <CustomPagination
+          page={page}
+          setPage={setPage}
+          totalLength={list.length}
+          perPage={perPage}
+        />
       </div>
       <AttachedERC20PrintFallback list={list} />
     </>

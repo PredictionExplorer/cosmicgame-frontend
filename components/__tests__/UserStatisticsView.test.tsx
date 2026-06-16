@@ -24,6 +24,10 @@ const mockUseClaimedDonatedNFTByUser = jest.fn().mockReturnValue({ data: [], isL
 const mockUseUnclaimedDonatedNFTByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
 const mockUseDonationsERC20ByUser = jest.fn().mockReturnValue({ data: [], isLoading: false });
 const mockUseGestureListByCycle = jest.fn().mockReturnValue({ data: [], isLoading: false });
+const mockClaimDonatedNFT = jest.fn();
+const mockClaimAllDonatedNFTs = jest.fn();
+const mockClaimDonatedERC20 = jest.fn();
+const mockClaimAllDonatedERC20 = jest.fn();
 
 jest.mock('../../hooks/useApiQuery', () => ({
   useDashboardInfo: (...args: unknown[]) => mockUseDashboardInfo(...args),
@@ -48,6 +52,17 @@ jest.mock('../../hooks/useApiQuery', () => ({
 
 jest.mock('../../hooks/web3', () => ({
   useActiveWeb3React: () => ({ account: '0xUser' }),
+}));
+jest.mock('../../hooks/useClaimAllocations', () => ({
+  useClaimAllocations: () => ({
+    isClaiming: { raffleETH: false, donatedNFT: false, donatedERC20: false },
+    claimingDonatedNFTs: [],
+    retrieveAllStellarSelectionETH: jest.fn(),
+    claimDonatedNFT: mockClaimDonatedNFT,
+    claimAllDonatedNFTs: mockClaimAllDonatedNFTs,
+    claimDonatedERC20: mockClaimDonatedERC20,
+    claimAllDonatedERC20: mockClaimAllDonatedERC20,
+  }),
 }));
 
 jest.mock('@tanstack/react-query', () => ({

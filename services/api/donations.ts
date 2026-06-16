@@ -41,13 +41,14 @@ function mapErc20DonationRowForTable(row: DonatedERC20Token): DonatedERC20Token 
   const claimed = toFiniteNumber(row.AmountClaimedEth);
   const winner =
     typeof row.WinnerAddr === 'string' && row.WinnerAddr.length > 0 ? row.WinnerAddr : '';
-  let diff = row.DonateClaimDiffEth;
-  if (diff == null || String(diff) === '') {
-    const amt = row.Amount;
-    diff = amt != null && String(amt) !== '' ? String(amt) : '0';
-  } else {
-    diff = String(diff);
-  }
+  const rawDiff =
+    row.DonateClaimDiff != null && String(row.DonateClaimDiff) !== ''
+      ? String(row.DonateClaimDiff)
+      : row.Amount != null && String(row.Amount) !== ''
+        ? String(row.Amount)
+        : row.AmountDonated != null && String(row.AmountDonated) !== ''
+          ? String(row.AmountDonated)
+          : '0';
 
   return {
     ...row,
@@ -55,7 +56,11 @@ function mapErc20DonationRowForTable(row: DonatedERC20Token): DonatedERC20Token 
     AmountClaimedEth: claimed,
     Claimed: Boolean(row.Claimed),
     WinnerAddr: winner,
-    DonateClaimDiffEth: diff,
+    DonateClaimDiff: rawDiff,
+    DonateClaimDiffEth:
+      row.DonateClaimDiffEth != null && String(row.DonateClaimDiffEth) !== ''
+        ? String(row.DonateClaimDiffEth)
+        : String(donated - claimed),
   };
 }
 
@@ -244,9 +249,10 @@ export function get_donations_erc20_by_round(round: number): Promise<DonatedERC2
 export function get_donations_erc20_by_user(address: string): Promise<DonatedERC20Token[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`donations/erc20/by_user/${address}`));
-    return normalizeFieldNamesArray(
+    const rows = normalizeFieldNamesArray(
       flattenTxArray<DonatedERC20Token>(data.DonatedPrizesERC20ByWinner),
     ) as DonatedERC20Token[];
+    return rows.map(mapErc20DonationRowForTable);
   }, []);
 }
 
