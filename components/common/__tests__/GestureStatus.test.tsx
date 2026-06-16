@@ -258,7 +258,7 @@ describe('GestureStatus', () => {
     ).not.toHaveLength(0);
   });
 
-  it('shows cycle closed when finalization time has passed', () => {
+  it('shows ready-to-finalize copy when finalization time has passed', () => {
     render(
       <GestureStatus
         {...baseProps}
@@ -267,8 +267,8 @@ describe('GestureStatus', () => {
         ethGestureInfo={{ ETHPrice: 0.01 }}
       />,
     );
-    expect(screen.getByText('Cycle Closed')).toBeInTheDocument();
-    expect(screen.getByText('Waiting for the cycle to finalize.')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Ready to Finalize')).toBeInTheDocument();
+    expect(screen.getByText('The finalization clock reached zero.')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

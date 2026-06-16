@@ -22,10 +22,16 @@ function makeData(overrides: Partial<DashboardInfo> = {}): DashboardInfo {
 }
 
 const sampleToken = { seed: 'sample', id: -1 };
+const liveProps = {
+  data: makeData(),
+  bannerToken: sampleToken,
+  canOpenGesturePanel: true,
+  phase: 'live' as const,
+};
 
 describe('HomeObservatoryHero', () => {
   it('renders the page H1 inside a labelled hero region', () => {
-    render(<HomeObservatoryHero data={makeData()} bannerToken={sampleToken} canOpenGesturePanel />);
+    render(<HomeObservatoryHero {...liveProps} />);
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Shape the next Cosmic Signature' }),
@@ -37,7 +43,7 @@ describe('HomeObservatoryHero', () => {
   });
 
   it('shows live cycle stats in the observatory console', () => {
-    render(<HomeObservatoryHero data={makeData()} bannerToken={sampleToken} canOpenGesturePanel />);
+    render(<HomeObservatoryHero {...liveProps} />);
 
     const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
     expect(within(observatory).getByRole('heading', { name: 'Cycle #7' })).toBeInTheDocument();
@@ -50,23 +56,13 @@ describe('HomeObservatoryHero', () => {
     jest.useFakeTimers();
     try {
       const { rerender } = render(
-        <HomeObservatoryHero
-          data={makeData({ CurNumBids: 100 })}
-          bannerToken={sampleToken}
-          canOpenGesturePanel
-        />,
+        <HomeObservatoryHero {...liveProps} data={makeData({ CurNumBids: 100 })} />,
       );
 
       const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
       expect(within(observatory).getByText('100')).toBeInTheDocument();
 
-      rerender(
-        <HomeObservatoryHero
-          data={makeData({ CurNumBids: 160 })}
-          bannerToken={sampleToken}
-          canOpenGesturePanel
-        />,
-      );
+      rerender(<HomeObservatoryHero {...liveProps} data={makeData({ CurNumBids: 160 })} />);
 
       act(() => {
         jest.advanceTimersByTime(1_000);
@@ -79,7 +75,7 @@ describe('HomeObservatoryHero', () => {
   });
 
   it('points the primary CTA at the gesture panel when the cycle is open', () => {
-    render(<HomeObservatoryHero data={makeData()} bannerToken={sampleToken} canOpenGesturePanel />);
+    render(<HomeObservatoryHero {...liveProps} />);
 
     expect(screen.getByRole('link', { name: /Make a Gesture/ })).toHaveAttribute(
       'href',
@@ -87,29 +83,38 @@ describe('HomeObservatoryHero', () => {
     );
   });
 
-  it('points the primary CTA at cycle details before the cycle opens', () => {
+  it('shows opening-soon copy and points the primary CTA at cycle details before the cycle opens', () => {
     render(
       <HomeObservatoryHero
+        {...liveProps}
         data={makeData()}
-        bannerToken={sampleToken}
         canOpenGesturePanel={false}
+        phase="opening-soon"
       />,
     );
 
-    expect(screen.getByRole('link', { name: /Explore Current Cycle/ })).toHaveAttribute(
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Next Cycle Opens Soon' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Opening soon')).toBeInTheDocument();
+    for (const link of screen.getAllByRole('link', { name: /View Cycle Details/ })) {
+      expect(link).toHaveAttribute('href', '/current-cycle');
+    }
+  });
+
+  it('shows first-Gesture copy when the cycle is open but no Gesture has started the clock', () => {
+    render(<HomeObservatoryHero {...liveProps} phase="waiting-first-gesture" />);
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Cycle #7 Is Open' })).toBeInTheDocument();
+    expect(screen.getByText('Open for first Gesture')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Make the first Gesture/ })).toHaveAttribute(
       'href',
-      '/current-cycle',
+      '#make-gesture',
     );
   });
 
   it('links to the previous cycle allocations when one exists', () => {
-    render(
-      <HomeObservatoryHero
-        data={makeData({ CurRoundNum: 5 })}
-        bannerToken={sampleToken}
-        canOpenGesturePanel
-      />,
-    );
+    render(<HomeObservatoryHero {...liveProps} data={makeData({ CurRoundNum: 5 })} />);
 
     expect(screen.getByRole('link', { name: /Cycle 4 allocations/ })).toHaveAttribute(
       'href',
@@ -118,9 +123,7 @@ describe('HomeObservatoryHero', () => {
   });
 
   it('has no accessibility violations', async () => {
-    const { container } = render(
-      <HomeObservatoryHero data={makeData()} bannerToken={sampleToken} canOpenGesturePanel />,
-    );
+    const { container } = render(<HomeObservatoryHero {...liveProps} />);
     await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });
   });
 });

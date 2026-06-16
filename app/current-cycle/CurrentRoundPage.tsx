@@ -122,6 +122,20 @@ const CurrentRoundPage = () => {
   const isPreActivation = activationTime > nowMs / 1000;
   const isCountdownActive = hasLastParticipant && allocationTime > nowMs;
   const isGesturesExhausted = hasLastParticipant && allocationTime > 0 && allocationTime <= nowMs;
+  const statusBadgeLabel = isPreActivation
+    ? 'Opening soon'
+    : !hasLastParticipant
+      ? 'Awaiting first Gesture'
+      : isGesturesExhausted
+        ? 'Ready to finalize'
+        : 'Live';
+  const primaryCtaLabel = isPreActivation
+    ? 'View Home Clock'
+    : isGesturesExhausted
+      ? 'Finalize Cycle'
+      : !hasLastParticipant
+        ? 'Make the first Gesture'
+        : 'Make a Gesture';
 
   const charityAmount =
     (Number(data.CosmicGameBalanceEth) || 0) * ((data.CharityPercentage ?? 0) / 100);
@@ -180,7 +194,7 @@ const CurrentRoundPage = () => {
                   : 'h-1.5 w-1.5 rounded-full bg-emerald-400 animate-live-dot'
               }
             />
-            {isPreActivation ? 'Opening soon' : 'Live'}
+            {statusBadgeLabel}
           </span>
         </div>
 
@@ -191,8 +205,7 @@ const CurrentRoundPage = () => {
               Cycle opens in
             </p>
             <p className="text-sm text-muted-foreground mb-4">
-              Cycle {data.CurRoundNum} opens at{' '}
-              {convertTimestampToDateTime(activationTime, true)}
+              Cycle {data.CurRoundNum} opens at {convertTimestampToDateTime(activationTime, true)}
             </p>
             <SmoothCountdown date={activationTime * 1000} renderer={Counter} />
           </div>
@@ -215,8 +228,8 @@ const CurrentRoundPage = () => {
         {!isPreActivation && hasStarted && isGesturesExhausted && (
           <div className="text-center rounded-xl bg-primary/[0.06] p-5 animate-pulse-glow">
             <Zap className="mx-auto h-7 w-7 text-primary mb-2" />
-            <p className="font-display text-lg font-bold text-primary">Cycle Closed</p>
-            <p className="mt-1 text-sm text-primary/80">Waiting for the cycle to finalize.</p>
+            <p className="font-display text-lg font-bold text-primary">Cycle Ready to Finalize</p>
+            <p className="mt-1 text-sm text-primary/80">The finalization clock reached zero.</p>
           </div>
         )}
 
@@ -233,7 +246,7 @@ const CurrentRoundPage = () => {
             className="bg-gradient-to-r from-[#15BFFD] to-[#9C37FD] hover:opacity-90 text-white border-0 font-semibold"
           >
             <Link href="/">
-              Make a Gesture <ArrowRight className="ml-2 h-4 w-4" />
+              {primaryCtaLabel} <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
         </div>

@@ -4,20 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowRight, Radio, Sparkles } from 'lucide-react';
 
 import api from '@/services/api';
+import { getCycleState, getDashboardActivationTime, type CyclePhase } from '@/lib/cycleState';
 import { getStableClientTargetTime } from '@/utils/time';
 import type { DashboardInfo } from '@/services/api';
 
 const POLL_INTERVAL_MS = 12_000;
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-type TimerPhase =
-  | 'loading'
-  | 'unavailable'
-  | 'waiting'
-  | 'active'
-  | 'final-hour'
-  | 'final-minutes'
-  | 'ready';
+type TimerPhase = CyclePhase;
 
 type LandingCycleTimerSample = {
   targetServerTimeSec: number | null;
@@ -34,6 +27,7 @@ type TimeShard = {
 type LandingCycleTimerSnapshot = {
   phase: TimerPhase;
   targetMs: number;
+  finalizationTargetMs: number;
   remainingMs: number;
   shards: TimeShard[];
   cycleNumber: number | null;
@@ -55,23 +49,6 @@ function getShards(remainingMs: number): TimeShard[] {
   ];
 }
 
-function getPhase({
-  dashboard,
-  targetMs,
-  remainingMs,
-}: {
-  dashboard: DashboardInfo | null;
-  targetMs: number;
-  remainingMs: number;
-}): TimerPhase {
-  if (!dashboard || targetMs <= 0) return 'unavailable';
-  if (dashboard.TsRoundStart === 0 || dashboard.LastBidderAddr === ZERO_ADDRESS) return 'waiting';
-  if (remainingMs <= 0) return 'ready';
-  if (remainingMs <= 5 * 60 * 1000) return 'final-minutes';
-  if (remainingMs <= 60 * 60 * 1000) return 'final-hour';
-  return 'active';
-}
-
 function copyForPhase(phase: TimerPhase, cycleNumber: number | null) {
   const cycleLabel = cycleNumber == null ? 'the current cycle' : `Cycle #${cycleNumber}`;
 
@@ -81,22 +58,33 @@ function copyForPhase(phase: TimerPhase, cycleNumber: number | null) {
         title: 'Synchronizing the cycle horizon',
         body: 'Reading the live protocol clock before the countdown appears.',
       };
-    case 'waiting':
+    case 'opening-soon':
+      return {
+        title: `${cycleLabel} opens soon`,
+        body: 'The next cycle is preparing to open. When this countdown reaches zero, Gestures become available.',
+      };
+    case 'waiting-first-gesture':
       return {
         title: `${cycleLabel} is waiting for its first Gesture`,
         body: 'The first Gesture ignites the Cycle Finalization Time and starts shaping the next Signature.',
+      };
+    case 'approach':
+      return {
+        title: `${cycleLabel} finalizes in`,
+        body: 'The cycle is live. Each Gesture shapes the Signature and can extend the finalization clock.',
       };
     case 'final-hour':
       return {
         title: `${cycleLabel} is entering the final hour`,
         body: 'Every new Gesture can extend the horizon and leave one more trace on the evolving Signature.',
       };
-    case 'final-minutes':
+    case 'final-ten':
+    case 'final-minute':
       return {
         title: `${cycleLabel} is near the horizon`,
         body: 'The Cycle Finalization Time is almost here. The next moments decide the final shape.',
       };
-    case 'ready':
+    case 'ready-to-finalize':
       return {
         title: `${cycleLabel} is ready to finalize`,
         body: 'The horizon has closed. The protocol is ready to transform the cycle into a final Signature.',
@@ -106,7 +94,7 @@ function copyForPhase(phase: TimerPhase, cycleNumber: number | null) {
         title: 'Live cycle clock unavailable',
         body: 'The landing page could not reach the protocol clock. Open the app for the latest cycle state.',
       };
-    case 'active':
+    case 'live':
     default:
       return {
         title: `${cycleLabel} finalizes in`,
@@ -127,6 +115,7 @@ export function getLandingCycleTimerSnapshot({
     return {
       phase: 'loading',
       targetMs: 0,
+      finalizationTargetMs: 0,
       remainingMs: 0,
       shards: getShards(0),
       cycleNumber: null,
@@ -136,26 +125,48 @@ export function getLandingCycleTimerSnapshot({
     };
   }
 
-  const targetMs = getStableClientTargetTime({
+  const finalizationTargetMs = getStableClientTargetTime({
     targetServerTimeSec: sample.targetServerTimeSec,
     currentServerTimeSec: sample.currentServerTimeSec,
     currentServerTimeUpdatedAtMs: sample.sampledAtMs,
     fallbackNowMs: nowMs,
   });
+  const activationTime = getDashboardActivationTime(sample.dashboard);
+  const state =
+    !sample.dashboard || (finalizationTargetMs <= 0 && activationTime == null)
+      ? getCycleState({
+          data: null,
+          loading: false,
+          allocationTime: finalizationTargetMs,
+          activationTime,
+          now: nowMs,
+        })
+      : getCycleState({
+          data: sample.dashboard,
+          loading: false,
+          allocationTime: finalizationTargetMs,
+          activationTime,
+          now: nowMs,
+        });
+  const targetMs =
+    state.isOpeningSoon && state.activationTime != null
+      ? state.activationTime * 1000
+      : finalizationTargetMs;
   const remainingMs = Math.max(0, targetMs - nowMs);
-  const phase = getPhase({ dashboard: sample.dashboard, targetMs, remainingMs });
+  const phase = state.phase;
   const cycleNumber = sample.dashboard?.CurRoundNum ?? null;
   const copy = copyForPhase(phase, cycleNumber);
 
   return {
     phase,
     targetMs,
+    finalizationTargetMs,
     remainingMs,
     shards: getShards(remainingMs),
     cycleNumber,
     gestureCount: sample.dashboard?.CurNumBids ?? 0,
     ariaLabel:
-      phase === 'active' || phase === 'final-hour' || phase === 'final-minutes'
+      state.isOpeningSoon || state.isFinalizationCountdownActive
         ? `${copy.title}: ${getShards(remainingMs)
             .map((shard) => `${shard.value} ${shard.label}`)
             .join(', ')}`
@@ -221,6 +232,7 @@ export function EventHorizonCountdown() {
       return {
         phase: 'unavailable' as const,
         targetMs: 0,
+        finalizationTargetMs: 0,
         remainingMs: 0,
         shards: getShards(0),
         cycleNumber: null,
@@ -232,9 +244,14 @@ export function EventHorizonCountdown() {
     return getLandingCycleTimerSnapshot({ sample, nowMs: nowMs ?? sample?.sampledAtMs ?? 0 });
   }, [loadFailed, nowMs, sample]);
 
-  const isUrgent = snapshot.phase === 'final-hour' || snapshot.phase === 'final-minutes';
-  const isFinalMinutes = snapshot.phase === 'final-minutes';
-  const isReady = snapshot.phase === 'ready';
+  const isOpeningSoon = snapshot.phase === 'opening-soon';
+  const isWaitingForFirstGesture = snapshot.phase === 'waiting-first-gesture';
+  const isUrgent =
+    snapshot.phase === 'final-hour' ||
+    snapshot.phase === 'final-ten' ||
+    snapshot.phase === 'final-minute';
+  const isFinalMinutes = snapshot.phase === 'final-ten' || snapshot.phase === 'final-minute';
+  const isReady = snapshot.phase === 'ready-to-finalize';
 
   return (
     <section
@@ -245,11 +262,15 @@ export function EventHorizonCountdown() {
       <div
         className={[
           'relative overflow-hidden rounded-[2rem] border p-4 shadow-[0_28px_120px_-50px_rgb(var(--aurora-cyan-rgb)/0.75)] backdrop-blur-xl sm:p-5',
-          isFinalMinutes
-            ? 'border-[rgb(var(--chrono-rose-rgb)/0.45)] bg-[linear-gradient(135deg,rgb(var(--chrono-rose-rgb)/0.18),rgb(var(--cosmic-indigo-rgb)/0.50)_42%,rgb(var(--nebula-violet-rgb)/0.20))]'
-            : isUrgent
-              ? 'border-[rgb(var(--solar-gold-rgb)/0.38)] bg-[linear-gradient(135deg,rgb(var(--solar-gold-rgb)/0.13),rgb(var(--cosmic-indigo-rgb)/0.50)_48%,rgb(var(--nebula-violet-rgb)/0.18))]'
-              : 'border-white/15 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.12),rgb(var(--cosmic-indigo-rgb)/0.54)_46%,rgb(var(--nebula-violet-rgb)/0.18))]',
+          isOpeningSoon
+            ? 'border-[rgb(var(--nebula-violet-rgb)/0.42)] bg-[linear-gradient(135deg,rgb(var(--nebula-violet-rgb)/0.20),rgb(var(--cosmic-indigo-rgb)/0.50)_42%,rgb(var(--aurora-cyan-rgb)/0.12))]'
+            : isWaitingForFirstGesture
+              ? 'border-[rgb(var(--impact-green-rgb)/0.38)] bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.15),rgb(var(--cosmic-indigo-rgb)/0.50)_42%,rgb(var(--aurora-cyan-rgb)/0.15))]'
+              : isFinalMinutes
+                ? 'border-[rgb(var(--chrono-rose-rgb)/0.45)] bg-[linear-gradient(135deg,rgb(var(--chrono-rose-rgb)/0.18),rgb(var(--cosmic-indigo-rgb)/0.50)_42%,rgb(var(--nebula-violet-rgb)/0.20))]'
+                : isUrgent
+                  ? 'border-[rgb(var(--solar-gold-rgb)/0.38)] bg-[linear-gradient(135deg,rgb(var(--solar-gold-rgb)/0.13),rgb(var(--cosmic-indigo-rgb)/0.50)_48%,rgb(var(--nebula-violet-rgb)/0.18))]'
+                  : 'border-white/15 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.12),rgb(var(--cosmic-indigo-rgb)/0.54)_46%,rgb(var(--nebula-violet-rgb)/0.18))]',
         ].join(' ')}
       >
         <div className="pointer-events-none absolute -left-24 top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-[rgb(var(--aurora-cyan-rgb)/0.22)] blur-3xl" />
@@ -266,7 +287,11 @@ export function EventHorizonCountdown() {
                   'h-2 w-2 rounded-full',
                   isReady
                     ? 'bg-emerald-300 animate-signature-pulse'
-                    : 'bg-primary animate-live-dot',
+                    : isOpeningSoon
+                      ? 'bg-[rgb(var(--nebula-violet-rgb))] animate-cosmic-drift'
+                      : isWaitingForFirstGesture
+                        ? 'bg-[rgb(var(--impact-green-rgb))] animate-live-dot'
+                        : 'bg-primary animate-live-dot',
                 ].join(' ')}
               />
               Live cycle clock
@@ -311,7 +336,11 @@ export function EventHorizonCountdown() {
                         ? 'text-[rgb(var(--chrono-rose-rgb))]'
                         : isUrgent
                           ? 'text-[rgb(var(--solar-gold-rgb))]'
-                          : 'text-white',
+                          : isOpeningSoon
+                            ? 'text-[rgb(var(--nebula-violet-rgb))]'
+                            : isWaitingForFirstGesture
+                              ? 'text-[rgb(var(--impact-green-rgb))]'
+                              : 'text-white',
                     ].join(' ')}
                   >
                     {pad(shard.value)}
@@ -326,7 +355,13 @@ export function EventHorizonCountdown() {
             <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.045] p-3 text-sm text-white/70 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
               <span className="inline-flex items-center gap-2">
                 <Radio className="h-4 w-4 text-primary" aria-hidden />
-                {isReady ? 'Ready to finalize' : 'Countdown synchronized to protocol time'}
+                {isReady
+                  ? 'Ready to finalize'
+                  : isOpeningSoon
+                    ? 'Countdown to cycle opening'
+                    : isWaitingForFirstGesture
+                      ? 'Open and waiting for the first Gesture'
+                      : 'Countdown synchronized to protocol time'}
               </span>
               <a
                 href="https://app.cosmicsignature.com"

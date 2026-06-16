@@ -279,7 +279,7 @@ beforeEach(() => {
   mockGestureForm.onGesture.mockResolvedValue(true);
   mockGestureForm.onGestureWithCST.mockResolvedValue(true);
   Object.assign(mockAllocationFinalize, {
-    allocationTime: Date.now() + 60_000,
+    allocationTime: Date.now() + 13 * 60 * 60_000,
     timeoutFinalize: 600,
     isClaiming: false,
     activationTime: 0,
@@ -331,7 +331,7 @@ describe('HomePage', () => {
 
     const chronoCore = screen.getByTestId('chrono-core-timer');
     const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
-    expect(chronoCore).toHaveAttribute('data-phase', 'final-minute');
+    expect(chronoCore).toHaveAttribute('data-phase', 'live');
     expect(observatory.compareDocumentPosition(chronoCore)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
@@ -418,7 +418,11 @@ describe('HomePage', () => {
     render(<HomePage />);
 
     expect(screen.queryByTestId('gesture-form')).not.toBeInTheDocument();
-    const links = screen.getAllByRole('link', { name: /Explore Current Cycle/ });
+    expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute('data-phase', 'opening-soon');
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Next Cycle Opens Soon' }),
+    ).toBeInTheDocument();
+    const links = screen.getAllByRole('link', { name: /View Cycle Details|View Cycle/ });
     expect(links.length).toBeGreaterThanOrEqual(1);
     for (const link of links) {
       expect(link).toHaveAttribute('href', '/current-cycle');
@@ -775,7 +779,9 @@ describe('HomePage', () => {
 
     const { rerender } = render(<HomePage />);
     // Hero + chrono timer use gesture-submit buttons; sticky mobile CTA remains a link.
-    expect(screen.getAllByRole('button', { name: 'Make a Gesture' }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole('button', { name: 'Make a Gesture' }).length).toBeGreaterThanOrEqual(
+      1,
+    );
     expect(screen.getByRole('link', { name: 'Make a Gesture' })).toHaveAttribute(
       'href',
       '#make-gesture',

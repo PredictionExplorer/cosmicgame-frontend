@@ -1,0 +1,95 @@
+import type { DashboardInfo } from '@/services/api';
+
+import { getCycleState, getDashboardActivationTime, ZERO_ADDRESS } from '../cycleState';
+
+const NOW = 1_700_000_000_000;
+
+function dashboard(overrides: Partial<DashboardInfo> = {}): DashboardInfo {
+  return {
+    CurRoundNum: 9,
+    CurNumBids: 12,
+    CurPrizeAmountEth: 1,
+    PrizeClaimTs: 0,
+    TsRoundStart: Math.floor(NOW / 1000) - 3600,
+    LastBidderAddr: '0x1111111111111111111111111111111111111111',
+    GestureCostEth: 0.01,
+    StakingAmountEth: 0,
+    MainStats: { NumCSTokenMints: 100 },
+    NumRaffleNFTWinnersBidding: 0,
+    NumRaffleNFTWinnersStakingRWalk: 0,
+    ...overrides,
+  } as DashboardInfo;
+}
+
+const baseInput = {
+  data: dashboard(),
+  loading: false,
+  allocationTime: NOW + 13 * 60 * 60_000,
+  activationTime: 0,
+  now: NOW,
+};
+
+describe('getDashboardActivationTime', () => {
+  it('reads a positive dashboard activation timestamp when present', () => {
+    expect(getDashboardActivationTime(dashboard({ ActivationTime: 1234 }))).toBe(1234);
+  });
+
+  it('ignores absent, zero, and invalid activation timestamps', () => {
+    expect(getDashboardActivationTime(dashboard())).toBeNull();
+    expect(getDashboardActivationTime(dashboard({ ActivationTime: 0 }))).toBeNull();
+    expect(getDashboardActivationTime(dashboard({ ActivationTime: Number.NaN }))).toBeNull();
+  });
+});
+
+describe('getCycleState', () => {
+  it.each([
+    ['loading', { loading: true }],
+    ['unavailable', { data: null }],
+    ['opening-soon', { activationTime: NOW / 1000 + 60 }],
+    [
+      'waiting-first-gesture',
+      { data: dashboard({ TsRoundStart: 0, LastBidderAddr: ZERO_ADDRESS }) },
+    ],
+    ['live', { allocationTime: NOW + 13 * 60 * 60_000 }],
+    ['approach', { allocationTime: NOW + 12 * 60 * 60_000 }],
+    ['final-hour', { allocationTime: NOW + 60 * 60_000 }],
+    ['final-ten', { allocationTime: NOW + 10 * 60_000 }],
+    ['final-minute', { allocationTime: NOW + 60_000 }],
+    ['ready-to-finalize', { allocationTime: NOW - 1 }],
+  ] as const)('returns %s phase', (phase, overrides) => {
+    expect(getCycleState({ ...baseInput, ...overrides }).phase).toBe(phase);
+  });
+
+  it('uses dashboard ActivationTime when no contract activation time is available', () => {
+    const state = getCycleState({
+      ...baseInput,
+      data: dashboard({ ActivationTime: NOW / 1000 + 120 }),
+      activationTime: 0,
+    });
+
+    expect(state.phase).toBe('opening-soon');
+    expect(state.activationTime).toBe(NOW / 1000 + 120);
+  });
+
+  it('does not treat activationTime 0 as an opening-soon or live signal by itself', () => {
+    const state = getCycleState({
+      ...baseInput,
+      data: dashboard({ TsRoundStart: 0, LastBidderAddr: ZERO_ADDRESS }),
+      activationTime: 0,
+    });
+
+    expect(state.phase).toBe('waiting-first-gesture');
+    expect(state.isGestureOpen).toBe(true);
+  });
+
+  it('marks only countdown phases as finalization countdown active', () => {
+    expect(getCycleState(baseInput).isFinalizationCountdownActive).toBe(true);
+    expect(
+      getCycleState({
+        ...baseInput,
+        data: dashboard({ TsRoundStart: 0, LastBidderAddr: ZERO_ADDRESS }),
+      }).isFinalizationCountdownActive,
+    ).toBe(false);
+    expect(getCycleState({ ...baseInput, allocationTime: NOW - 1 }).isReadyToFinalize).toBe(true);
+  });
+});

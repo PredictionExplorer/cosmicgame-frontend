@@ -280,8 +280,10 @@ export const GestureStatus = ({
                 className="gradient-border-card rounded-2xl bg-primary/[0.06] p-6 text-center animate-pulse-glow"
               >
                 <Zap className="mx-auto h-8 w-8 text-primary mb-2" />
-                <h5 className="font-display text-xl font-bold text-primary">Cycle Closed</h5>
-                <p className="mt-1 text-sm text-primary/80">Waiting for the cycle to finalize.</p>
+                <h5 className="font-display text-xl font-bold text-primary">
+                  Cycle Ready to Finalize
+                </h5>
+                <p className="mt-1 text-sm text-primary/80">The finalization clock reached zero.</p>
               </motion.div>
             ))}
 

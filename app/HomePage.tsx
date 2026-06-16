@@ -46,6 +46,7 @@ import {
   useDonationsERC20ByRound,
 } from '@/hooks/useApiQuery';
 import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/activationTime';
+import { getCycleState } from '@/lib/cycleState';
 import { isLandingHost } from '@/lib/hostRouting';
 import { LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO } from '@/lib/landingFlags';
 import { RootLandingPage } from '@/components/landing/RootLandingPage';
@@ -299,11 +300,12 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     return `Gesture with ${gestureType}`;
   };
 
+  const cycleState = getCycleState({ data, loading, allocationTime, activationTime, now });
   const canGesture = allocationTime > now || data?.LastBidderAddr !== account;
   const canClaim = !(allocationTime > now || data?.LastBidderAddr === zeroAddress || loading);
   const claimWait = allocationTime + timeoutFinalize * 1000;
-  const isRoundActive = activationTime < now / 1000;
-  const cycleTimerEnded = allocationTime <= now;
+  const isRoundActive = cycleState.isGestureOpen || cycleState.isReadyToFinalize;
+  const cycleTimerEnded = cycleState.isReadyToFinalize;
 
   const scrollToGestureForm = () => {
     const el = document.getElementById('make-gesture');
@@ -404,6 +406,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
           data={data}
           bannerToken={bannerToken}
           canOpenGesturePanel={!loading && isRoundActive}
+          phase={cycleState.phase}
           onPrimaryCtaClick={handlePrimaryCtaClick}
         />
 

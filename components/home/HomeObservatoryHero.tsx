@@ -12,6 +12,7 @@ import { GradientText } from '@/components/ui/gradient-text';
 import { Surface } from '@/components/ui/surface';
 import NFTImage from '@/components/nft/NFTImage';
 import { fadeRise, fadeRiseStagger, useMotionVariants } from '@/lib/motion';
+import type { CyclePhase } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 
@@ -24,6 +25,7 @@ interface HomeObservatoryHeroProps {
   data: DashboardInfo | null;
   bannerToken: BannerToken;
   canOpenGesturePanel: boolean;
+  phase: CyclePhase;
   /** When set, primary CTA submits a gesture (or finalize) instead of only scrolling. */
   onPrimaryCtaClick?: () => void;
 }
@@ -57,6 +59,73 @@ const toneClasses: Record<(typeof storyCards)[number]['tone'], string> = {
   impact:
     'border-[rgb(var(--impact-green-rgb)/0.24)] bg-[rgb(var(--impact-green-rgb)/0.10)] text-[rgb(var(--impact-green-rgb))]',
 };
+
+function getHeroPhaseView(phase: CyclePhase, cycleNumber: number | undefined) {
+  const cycleLabel = cycleNumber == null ? 'The cycle' : `Cycle #${cycleNumber}`;
+
+  switch (phase) {
+    case 'opening-soon':
+      return {
+        badge: 'Opening soon',
+        badgeDotClass: 'bg-[rgb(var(--nebula-violet-rgb))] animate-cosmic-drift',
+        headline: 'Next Cycle Opens Soon',
+        body: `${cycleLabel} is preparing to open. The countdown below shows exactly when Gestures become available.`,
+        primaryLabel: 'View Cycle Details',
+      };
+    case 'waiting-first-gesture':
+      return {
+        badge: 'Open for first Gesture',
+        badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-live-dot',
+        headline: `${cycleLabel} Is Open`,
+        body: "Make the first Gesture to start the finalization clock and begin shaping this cycle's Signature.",
+        primaryLabel: 'Make the first Gesture',
+      };
+    case 'ready-to-finalize':
+      return {
+        badge: 'Ready to finalize',
+        badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-signature-pulse',
+        headline: 'Cycle Ready to Finalize',
+        body: 'The finalization clock reached zero. The cycle can now close and distribute its reserve on-chain.',
+        primaryLabel: 'Finalize Cycle',
+      };
+    case 'final-hour':
+    case 'final-ten':
+    case 'final-minute':
+      return {
+        badge: 'Final window',
+        badgeDotClass: 'bg-[rgb(var(--chrono-rose-rgb))] animate-pulse-glow',
+        headline: 'The Final Window Is Open',
+        body: 'The finalization clock is the main event now. A new Gesture can still extend time and reshape the ending.',
+        primaryLabel: 'Make a Gesture',
+      };
+    case 'loading':
+      return {
+        badge: 'Syncing cycle state',
+        badgeDotClass: 'bg-primary animate-cosmic-drift',
+        headline: 'Syncing the Cycle',
+        body: 'Reading protocol time and current cycle data before showing the live state.',
+        primaryLabel: 'View Cycle Details',
+      };
+    case 'unavailable':
+      return {
+        badge: 'Clock unavailable',
+        badgeDotClass: 'bg-white/50',
+        headline: 'Cycle State Unavailable',
+        body: 'The app could not reach the live cycle clock. Cycle details may still show the latest indexed data.',
+        primaryLabel: 'View Cycle Details',
+      };
+    case 'approach':
+    case 'live':
+    default:
+      return {
+        badge: 'Live on Arbitrum',
+        badgeDotClass: 'bg-emerald-300 animate-live-dot',
+        headline: 'Shape the next Cosmic Signature',
+        body: 'Cosmic Signature is a live Performance Cycle where each Gesture leaves a visible trace, imprints Participation CST, and helps direct protocol reserves toward the Ethereum public goods that keep the network alive.',
+        primaryLabel: 'Make a Gesture',
+      };
+  }
+}
 
 function getHeroArtSrc(bannerToken: BannerToken): string {
   if (bannerToken.seed === '') return '/images/qmark-preview.png';
@@ -106,6 +175,7 @@ export function HomeObservatoryHero({
   data,
   bannerToken,
   canOpenGesturePanel,
+  phase,
   onPrimaryCtaClick,
 }: HomeObservatoryHeroProps) {
   const sectionVariants = useMotionVariants(fadeRise);
@@ -123,7 +193,8 @@ export function HomeObservatoryHero({
   const artHref = bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample';
   const artSrc = getHeroArtSrc(bannerToken);
   const primaryCtaHref = canOpenGesturePanel ? '#make-gesture' : '/current-cycle';
-  const primaryCtaLabel = canOpenGesturePanel ? 'Make a Gesture' : 'Explore Current Cycle';
+  const phaseView = getHeroPhaseView(phase, cycleNumber);
+  const primaryCtaLabel = canOpenGesturePanel ? phaseView.primaryLabel : 'View Cycle Details';
 
   return (
     <LazyMotion features={domAnimation}>
@@ -146,10 +217,14 @@ export function HomeObservatoryHero({
                 className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground"
               >
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-live-dot rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" />
+                  <span
+                    className={cn(
+                      'relative inline-flex h-2 w-2 rounded-full',
+                      phaseView.badgeDotClass,
+                    )}
+                  />
                 </span>
-                Live on Arbitrum
+                {phaseView.badge}
               </m.div>
 
               <m.div variants={itemVariants}>
@@ -158,12 +233,10 @@ export function HomeObservatoryHero({
                   id="home-observatory-title"
                   className="font-display text-4xl font-bold leading-[0.96] tracking-tight sm:text-5xl lg:text-6xl"
                 >
-                  Shape the next Cosmic Signature
+                  {phaseView.headline}
                 </GradientText>
                 <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                  Cosmic Signature is a live Performance Cycle where each Gesture leaves a visible
-                  trace, imprints Participation CST, and helps direct protocol reserves toward the
-                  Ethereum public goods that keep the network alive.
+                  {phaseView.body}
                 </p>
               </m.div>
 

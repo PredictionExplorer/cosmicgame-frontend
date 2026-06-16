@@ -8,22 +8,11 @@ import Counter from '@/components/common/Counter';
 import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Surface } from '@/components/ui/surface';
+import { getCycleState, type CyclePhase } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-
-export type ChronoCorePhase =
-  | 'loading'
-  | 'unavailable'
-  | 'pre-activation'
-  | 'waiting'
-  | 'stable'
-  | 'approach'
-  | 'final-hour'
-  | 'final-ten'
-  | 'final-minute'
-  | 'ready';
+export type ChronoCorePhase = CyclePhase;
 
 interface ChronoCoreTimerProps {
   data: DashboardInfo | null;
@@ -37,12 +26,16 @@ interface ChronoCoreTimerProps {
 }
 
 interface PhaseView {
+  eyebrow: string;
   label: string;
   status: string;
+  tooltip: string;
   toneClass: string;
   haloClass: string;
   glowClass: string;
   pulseClass: string;
+  clockTextClass: string;
+  iconClass: string;
   displayText?: string;
 }
 
@@ -53,127 +46,167 @@ export function getChronoCorePhase({
   activationTime,
   now,
 }: Pick<ChronoCoreTimerProps, 'data' | 'loading' | 'allocationTime' | 'activationTime' | 'now'>) {
-  if (loading) return 'loading' satisfies ChronoCorePhase;
-  if (!data) return 'unavailable' satisfies ChronoCorePhase;
-  if (activationTime > now / 1000) return 'pre-activation' satisfies ChronoCorePhase;
-  if (data.TsRoundStart === 0 || data.LastBidderAddr === ZERO_ADDRESS) {
-    return 'waiting' satisfies ChronoCorePhase;
-  }
-
-  const remainingMs = allocationTime - now;
-  if (remainingMs <= 0) return 'ready' satisfies ChronoCorePhase;
-  if (remainingMs <= 60_000) return 'final-minute' satisfies ChronoCorePhase;
-  if (remainingMs <= 10 * 60_000) return 'final-ten' satisfies ChronoCorePhase;
-  if (remainingMs <= 60 * 60_000) return 'final-hour' satisfies ChronoCorePhase;
-  if (remainingMs <= 12 * 60 * 60_000) return 'approach' satisfies ChronoCorePhase;
-  return 'stable' satisfies ChronoCorePhase;
+  return getCycleState({ data, loading, allocationTime, activationTime, now }).phase;
 }
 
 function viewForPhase(phase: ChronoCorePhase): PhaseView {
   switch (phase) {
     case 'loading':
       return {
+        eyebrow: 'Cycle clock syncing',
         label: 'Syncing',
         status: 'Reading the live cycle timer.',
+        tooltip:
+          'The app is synchronizing with protocol time before showing the current cycle state.',
         displayText: 'Syncing',
         toneClass: 'border-white/[0.10] bg-white/[0.03]',
         haloClass: 'border-white/10 bg-white/[0.02]',
         glowClass: 'shadow-[0_0_80px_rgb(var(--aurora-cyan-rgb)/0.16)]',
         pulseClass: '',
+        clockTextClass: 'text-gradient-signature',
+        iconClass: 'text-primary',
       };
     case 'unavailable':
       return {
+        eyebrow: 'Cycle clock unavailable',
         label: 'Clock unavailable',
         status: 'Live timer temporarily unavailable.',
+        tooltip:
+          'The live cycle clock could not be reached. Open cycle details for the latest indexed state.',
         displayText: 'Syncing',
         toneClass: 'border-white/[0.10] bg-white/[0.025]',
         haloClass: 'border-white/10 bg-white/[0.015]',
         glowClass: 'shadow-[0_0_60px_rgb(255_255_255/0.08)]',
         pulseClass: '',
+        clockTextClass: 'text-muted-foreground',
+        iconClass: 'text-muted-foreground',
       };
-    case 'pre-activation':
+    case 'opening-soon':
       return {
-        label: 'Cycle opens soon',
-        status: 'The next cycle is preparing to open.',
+        eyebrow: 'Next cycle opens in',
+        label: 'Opening soon',
+        status: 'Waiting for the next cycle. Gestures open when this countdown reaches zero.',
+        tooltip:
+          'This clock counts down to cycle opening. Once it reaches zero, the first Gesture can start the finalization clock.',
         toneClass:
-          'border-primary/25 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.10),rgb(var(--nebula-violet-rgb)/0.08))]',
-        haloClass: 'border-primary/20 bg-primary/[0.03]',
-        glowClass: 'shadow-[0_0_90px_rgb(var(--aurora-cyan-rgb)/0.24)]',
-        pulseClass: '',
-      };
-    case 'waiting':
-      return {
-        label: 'Waiting for first Gesture',
-        status: 'First Gesture starts the timer.',
-        displayText: 'Awaiting Gesture',
-        toneClass:
-          'border-primary/25 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.11),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--nebula-violet-rgb)/0.10))]',
-        haloClass: 'border-primary/20 bg-primary/[0.035]',
-        glowClass: 'shadow-[0_0_90px_rgb(var(--aurora-cyan-rgb)/0.22)]',
+          'border-[rgb(var(--nebula-violet-rgb)/0.38)] bg-[linear-gradient(135deg,rgb(var(--nebula-violet-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.38),rgb(var(--aurora-cyan-rgb)/0.08))]',
+        haloClass:
+          'border-[rgb(var(--nebula-violet-rgb)/0.34)] bg-[rgb(var(--nebula-violet-rgb)/0.055)]',
+        glowClass: 'shadow-[0_0_115px_rgb(var(--nebula-violet-rgb)/0.30)]',
         pulseClass: 'animate-cosmic-drift',
+        clockTextClass:
+          'bg-gradient-to-r from-[#AC56FF] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent',
+        iconClass: 'text-[rgb(var(--nebula-violet-rgb))]',
+      };
+    case 'waiting-first-gesture':
+      return {
+        eyebrow: 'Cycle is open',
+        label: 'Awaiting first Gesture',
+        status: 'Cycle is open. The first Gesture starts the finalization clock.',
+        tooltip:
+          'No finalization countdown is running yet. The first Gesture starts the cycle timer and begins shaping this Signature.',
+        displayText: 'Awaiting first Gesture',
+        toneClass:
+          'border-emerald-300/30 bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.13),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--aurora-cyan-rgb)/0.12))]',
+        haloClass: 'border-emerald-300/30 bg-emerald-400/[0.045]',
+        glowClass: 'shadow-[0_0_105px_rgb(var(--impact-green-rgb)/0.26)]',
+        pulseClass: 'animate-cosmic-drift',
+        clockTextClass:
+          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent',
+        iconClass: 'text-[rgb(var(--impact-green-rgb))]',
       };
     case 'approach':
       return {
+        eyebrow: 'Cycle finalizes in',
         label: 'Under 12 hours',
-        status: 'Each Gesture extends the Cycle Finalization Time.',
+        status: 'Cycle is live. Each Gesture can extend the finalization clock.',
+        tooltip:
+          'This is the Cycle Finalization Time. When it reaches zero, the Final Gesture participant may finalize the cycle.',
         toneClass:
           'border-primary/35 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--nebula-violet-rgb)/0.14))]',
         haloClass: 'border-primary/30 bg-primary/[0.045]',
         glowClass: 'shadow-[0_0_110px_rgb(var(--aurora-cyan-rgb)/0.32)]',
         pulseClass: 'animate-cosmic-drift',
+        clockTextClass: 'text-gradient-signature',
+        iconClass: 'text-primary',
       };
     case 'final-hour':
       return {
+        eyebrow: 'Final hour',
         label: 'Final hour',
-        status: 'Less than one hour remains.',
+        status: 'Less than one hour remains before this cycle can finalize.',
+        tooltip:
+          'The finalization clock is under one hour. New Gestures can still extend the Cycle Finalization Time.',
         toneClass:
           'border-[rgb(var(--solar-gold-rgb)/0.42)] bg-[linear-gradient(135deg,rgb(var(--solar-gold-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--nebula-violet-rgb)/0.13))]',
         haloClass: 'border-[rgb(var(--solar-gold-rgb)/0.36)] bg-[rgb(var(--solar-gold-rgb)/0.045)]',
         glowClass: 'shadow-[0_0_120px_rgb(var(--solar-gold-rgb)/0.30)]',
         pulseClass: 'animate-pulse-glow',
+        clockTextClass: 'text-[rgb(var(--solar-gold-rgb))]',
+        iconClass: 'text-[rgb(var(--solar-gold-rgb))]',
       };
     case 'final-ten':
       return {
+        eyebrow: 'Final 10 minutes',
         label: 'Final 10 minutes',
-        status: 'Final minutes. Every second matters.',
+        status: 'Final minutes. Every Gesture can still change the ending.',
+        tooltip:
+          'The cycle is inside the final ten minutes. The clock is urgent, but a new Gesture can still extend it.',
         toneClass:
           'border-[rgb(var(--chrono-rose-rgb)/0.46)] bg-[linear-gradient(135deg,rgb(var(--chrono-rose-rgb)/0.18),rgb(var(--cosmic-indigo-rgb)/0.36),rgb(var(--nebula-violet-rgb)/0.18))]',
         haloClass:
           'border-[rgb(var(--chrono-rose-rgb)/0.38)] bg-[rgb(var(--chrono-rose-rgb)/0.045)]',
         glowClass: 'shadow-[0_0_130px_rgb(var(--chrono-rose-rgb)/0.32)]',
         pulseClass: 'animate-pulse-glow',
+        clockTextClass: 'text-[rgb(var(--chrono-rose-rgb))]',
+        iconClass: 'text-[rgb(var(--chrono-rose-rgb))]',
       };
     case 'final-minute':
       return {
+        eyebrow: 'Final minute',
         label: 'Final minute',
         status: 'Final minute. Tenths are live.',
+        tooltip:
+          'The finalization clock is in its last minute. If it reaches zero, the cycle becomes ready to finalize.',
         toneClass:
           'border-red-400/55 bg-[linear-gradient(135deg,rgb(var(--chrono-rose-rgb)/0.24),rgb(127_29_29/0.32),rgb(var(--nebula-violet-rgb)/0.20))]',
         haloClass: 'border-red-400/45 bg-red-500/[0.055]',
         glowClass: 'shadow-[0_0_150px_rgb(248_113_113/0.40)]',
         pulseClass: 'motion-safe:animate-urgency-pulse',
+        clockTextClass: 'text-red-300',
+        iconClass: 'text-red-300',
       };
-    case 'ready':
+    case 'ready-to-finalize':
       return {
+        eyebrow: 'Cycle ready to finalize',
         label: 'Ready',
-        status: 'Cycle ready to finalize.',
+        status: 'Cycle closed. Finalization is ready.',
+        tooltip:
+          'The Cycle Finalization Time reached zero. The Final Gesture participant may finalize, followed by the open-finalization window.',
         displayText: '00:00',
         toneClass:
           'border-emerald-400/35 bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--aurora-cyan-rgb)/0.11))]',
         haloClass: 'border-emerald-300/35 bg-emerald-400/[0.045]',
         glowClass: 'shadow-[0_0_120px_rgb(var(--impact-green-rgb)/0.28)]',
         pulseClass: 'animate-signature-pulse',
+        clockTextClass: 'text-[rgb(var(--impact-green-rgb))]',
+        iconClass: 'text-[rgb(var(--impact-green-rgb))]',
       };
-    case 'stable':
+    case 'live':
     default:
       return {
-        label: 'Time left',
-        status: 'Each Gesture extends the Cycle Finalization Time.',
+        eyebrow: 'Cycle finalizes in',
+        label: 'Cycle is live',
+        status: 'Cycle is live. Each Gesture can extend the finalization clock.',
+        tooltip:
+          'This is the Cycle Finalization Time. When it reaches zero, the Final Gesture participant may finalize the cycle.',
         toneClass:
           'border-primary/25 bg-[linear-gradient(135deg,rgb(var(--aurora-cyan-rgb)/0.12),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--nebula-violet-rgb)/0.13))]',
         haloClass: 'border-primary/25 bg-primary/[0.035]',
         glowClass: 'shadow-[0_0_100px_rgb(var(--aurora-cyan-rgb)/0.26)]',
         pulseClass: '',
+        clockTextClass: 'text-gradient-signature',
+        iconClass: 'text-primary',
       };
   }
 }
@@ -191,23 +224,22 @@ export function ChronoCoreTimer({
   canOpenGesturePanel,
   onPrimaryCtaClick,
 }: ChronoCoreTimerProps) {
-  const phase = getChronoCorePhase({ data, loading, allocationTime, activationTime, now });
+  const cycleState = getCycleState({ data, loading, allocationTime, activationTime, now });
+  const phase = cycleState.phase;
   const view = viewForPhase(phase);
-  const targetMs = phase === 'pre-activation' ? activationTime * 1000 : allocationTime;
-  const showCountdown =
-    phase === 'pre-activation' ||
-    phase === 'stable' ||
-    phase === 'approach' ||
-    phase === 'final-hour' ||
-    phase === 'final-ten' ||
-    phase === 'final-minute';
-  const isReady = phase === 'ready';
+  const targetMs = cycleState.isOpeningSoon
+    ? (cycleState.activationTime ?? activationTime) * 1000
+    : allocationTime;
+  const showCountdown = cycleState.isOpeningSoon || cycleState.isFinalizationCountdownActive;
+  const isReady = cycleState.isReadyToFinalize;
   const primaryHref = canOpenGesturePanel ? '#make-gesture' : '/current-cycle';
   const primaryLabel = isReady
     ? 'Finalize Cycle'
-    : canOpenGesturePanel
-      ? 'Make a Gesture'
-      : 'View Cycle';
+    : phase === 'waiting-first-gesture' && canOpenGesturePanel
+      ? 'Make the first Gesture'
+      : canOpenGesturePanel
+        ? 'Make a Gesture'
+        : 'View Cycle';
 
   return (
     <section
@@ -234,12 +266,9 @@ export function ChronoCoreTimer({
 
         <div className="relative mx-auto max-w-5xl px-4 py-7 text-center sm:px-8 sm:py-10">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/[0.10] bg-white/[0.045] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            <Clock3 className="h-3.5 w-3.5 text-primary" aria-hidden />
-            Time left in this cycle
-            <InfoTooltip
-              content="When this timer hits zero, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation. Each new gesture extends the timer."
-              className="ml-0"
-            />
+            <Clock3 className={cn('h-3.5 w-3.5', view.iconClass)} aria-hidden />
+            {view.eyebrow}
+            <InfoTooltip content={view.tooltip} className="ml-0" />
           </div>
 
           <div className="relative mx-auto max-w-4xl">
@@ -256,7 +285,12 @@ export function ChronoCoreTimer({
                 <SmoothCountdown date={targetMs} renderer={renderMonumentCounter} />
               ) : (
                 <div className="flex min-h-[112px] items-center justify-center">
-                  <p className="font-display text-4xl font-bold tracking-tight text-gradient-signature sm:text-6xl">
+                  <p
+                    className={cn(
+                      'font-display text-4xl font-bold tracking-tight sm:text-6xl',
+                      view.clockTextClass,
+                    )}
+                  >
                     {view.displayText}
                   </p>
                 </div>

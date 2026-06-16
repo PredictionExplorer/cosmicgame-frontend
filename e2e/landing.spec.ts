@@ -15,22 +15,39 @@ const APP_ORIGIN_PATTERN =
   /^https:\/\/app\.cosmicsignature\.com$|^http:\/\/app\.cosmicsignature\.local:3000$/;
 const MOCK_NOW_SECONDS = 1_700_000_000;
 const MOCK_CYCLE_FINALIZATION_SECONDS = MOCK_NOW_SECONDS + 7_265;
+const CURRENT_TIME_ROUTE = '**/api/cosmicgame/time/current';
+const PRIZE_TIME_ROUTE = '**/api/cosmicgame/rounds/current/time';
+const DASHBOARD_ROUTE = '**/api/cosmicgame/statistics/dashboard';
 
-async function mockLandingCycleApi(page: Page) {
-  await page.route('**/api/cosmicgame/time/current', (route) =>
-    route.fulfill({ json: { CurrentTimeStamp: MOCK_NOW_SECONDS } }),
+async function mockLandingCycleApi(
+  page: Page,
+  overrides: {
+    currentTimeSeconds?: number;
+    finalizationSeconds?: number;
+    dashboard?: Record<string, unknown>;
+  } = {},
+) {
+  const currentTimeSeconds = overrides.currentTimeSeconds ?? MOCK_NOW_SECONDS;
+  const finalizationSeconds = overrides.finalizationSeconds ?? MOCK_CYCLE_FINALIZATION_SECONDS;
+
+  await page.unroute(CURRENT_TIME_ROUTE).catch(() => undefined);
+  await page.unroute(PRIZE_TIME_ROUTE).catch(() => undefined);
+  await page.unroute(DASHBOARD_ROUTE).catch(() => undefined);
+
+  await page.route(CURRENT_TIME_ROUTE, (route) =>
+    route.fulfill({ json: { CurrentTimeStamp: currentTimeSeconds } }),
   );
-  await page.route('**/api/cosmicgame/rounds/current/time', (route) =>
-    route.fulfill({ json: { CurRoundPrizeTime: MOCK_CYCLE_FINALIZATION_SECONDS } }),
+  await page.route(PRIZE_TIME_ROUTE, (route) =>
+    route.fulfill({ json: { CurRoundPrizeTime: finalizationSeconds } }),
   );
-  await page.route('**/api/cosmicgame/statistics/dashboard', (route) =>
+  await page.route(DASHBOARD_ROUTE, (route) =>
     route.fulfill({
       json: {
         CurRoundNum: 42,
         CurNumBids: 128,
         PrizeAmountEth: 2.5,
         PrizeClaimTs: 0,
-        TsRoundStart: MOCK_NOW_SECONDS - 3600,
+        TsRoundStart: currentTimeSeconds - 3600,
         LastBidderAddr: '0x1111111111111111111111111111111111111111',
         GestureCostEth: 0.01,
         StakingAmountEth: 0,
@@ -53,6 +70,7 @@ async function mockLandingCycleApi(page: Page) {
         },
         NumRaffleNFTWinnersBidding: 0,
         NumRaffleNFTWinnersStakingRWalk: 0,
+        ...overrides.dashboard,
       },
     }),
   );
@@ -90,6 +108,40 @@ test.describe('Landing page @ cosmicsignature.com', () => {
 
     const liveCycleLink = timer.getByRole('link', { name: /open live cycle/i });
     await expect(liveCycleLink).toHaveAttribute('href', APP_ORIGIN_PATTERN);
+  });
+
+  test('renders opening-soon state in the hero timer', async ({ page }) => {
+    await mockLandingCycleApi(page, {
+      dashboard: {
+        TsRoundStart: 0,
+        LastBidderAddr: '0x0000000000000000000000000000000000000000',
+        ActivationTime: Math.floor(Date.now() / 1000) + 3600,
+      },
+    });
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    const timer = page.getByLabel('Live Performance Cycle countdown');
+    await expect(timer.getByRole('heading', { name: /Cycle #42 opens soon/i })).toBeVisible();
+    await expect(timer.getByText(/countdown reaches zero/i)).toBeVisible();
+    await expect(timer.getByText('Countdown to cycle opening')).toBeVisible();
+  });
+
+  test('renders waiting-for-first-Gesture state in the hero timer', async ({ page }) => {
+    await mockLandingCycleApi(page, {
+      dashboard: {
+        TsRoundStart: 0,
+        LastBidderAddr: '0x0000000000000000000000000000000000000000',
+      },
+    });
+
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    const timer = page.getByLabel('Live Performance Cycle countdown');
+    await expect(
+      timer.getByRole('heading', { name: /Cycle #42 is waiting for its first Gesture/i }),
+    ).toBeVisible();
+    await expect(timer.getByText('Open and waiting for the first Gesture')).toBeVisible();
   });
 
   test('all ten landing sections are present in the DOM', async ({ page }) => {

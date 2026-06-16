@@ -41,14 +41,15 @@ describe('getLandingCycleTimerSnapshot', () => {
     sampledAtMs,
   };
 
-  it('builds an active snapshot from the same server target and server clock shape used by the app', () => {
+  it('builds a live countdown snapshot from the same server target and server clock shape used by the app', () => {
     const snapshot = getLandingCycleTimerSnapshot({
       sample: activeSample,
       nowMs: sampledAtMs,
     });
 
-    expect(snapshot.phase).toBe('active');
+    expect(snapshot.phase).toBe('approach');
     expect(snapshot.targetMs).toBe(sampledAtMs + 7_200_000);
+    expect(snapshot.finalizationTargetMs).toBe(sampledAtMs + 7_200_000);
     expect(snapshot.shards).toEqual([
       { label: 'Days', value: 0 },
       { label: 'Hours', value: 2 },
@@ -71,7 +72,29 @@ describe('getLandingCycleTimerSnapshot', () => {
         sample: activeSample,
         nowMs: activeSample.sampledAtMs + 116 * 60 * 1000,
       }).phase,
-    ).toBe('final-minutes');
+    ).toBe('final-ten');
+    expect(
+      getLandingCycleTimerSnapshot({
+        sample: activeSample,
+        nowMs: activeSample.sampledAtMs + 119 * 60 * 1000 + 10_000,
+      }).phase,
+    ).toBe('final-minute');
+  });
+
+  it('counts down to cycle opening when dashboard activation time is in the future', () => {
+    const activationTime = sampledAtMs / 1000 + 900;
+    const snapshot = getLandingCycleTimerSnapshot({
+      sample: {
+        ...activeSample,
+        dashboard: dashboard({ ActivationTime: activationTime, TsRoundStart: 0 }),
+      },
+      nowMs: sampledAtMs,
+    });
+
+    expect(snapshot.phase).toBe('opening-soon');
+    expect(snapshot.targetMs).toBe(activationTime * 1000);
+    expect(snapshot.finalizationTargetMs).toBe(sampledAtMs + 7_200_000);
+    expect(snapshot.title).toBe('Cycle #12 opens soon');
   });
 
   it('shows ready-to-finalize when the backend target has passed', () => {
@@ -80,7 +103,7 @@ describe('getLandingCycleTimerSnapshot', () => {
       nowMs: activeSample.sampledAtMs + 7_300_000,
     });
 
-    expect(snapshot.phase).toBe('ready');
+    expect(snapshot.phase).toBe('ready-to-finalize');
     expect(snapshot.title).toBe('Cycle #12 is ready to finalize');
   });
 
@@ -96,7 +119,7 @@ describe('getLandingCycleTimerSnapshot', () => {
       nowMs: sampledAtMs,
     });
 
-    expect(snapshot.phase).toBe('waiting');
+    expect(snapshot.phase).toBe('waiting-first-gesture');
     expect(snapshot.title).toBe('Cycle #12 is waiting for its first Gesture');
   });
 

@@ -28,10 +28,14 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
   test('shows the Chrono Core timer at the top of the game page', async ({ page }) => {
     const chronoCore = page.getByTestId('chrono-core-timer');
     await expect(chronoCore).toBeVisible({ timeout: 15000 });
-    await expect(chronoCore.getByText('Time left in this cycle')).toBeVisible();
     await expect(
       chronoCore.getByText(
-        /Each Gesture extends the Cycle Finalization Time|Cycle ready to finalize/,
+        /Next cycle opens in|Cycle is open|Cycle finalizes in|Final hour|Final 10 minutes|Final minute|Cycle ready to finalize/,
+      ),
+    ).toBeVisible();
+    await expect(
+      chronoCore.getByText(
+        /Gestures open when this countdown reaches zero|first Gesture starts the finalization clock|Cycle is live|less than one hour|Final minutes|Final minute|Finalization is ready/i,
       ),
     ).toBeVisible();
     await expect(chronoCore.getByRole('timer')).toBeVisible();

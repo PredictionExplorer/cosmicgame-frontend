@@ -122,6 +122,7 @@ describe('server-visible SEO summaries', () => {
         data={dashboard as Parameters<typeof HomeObservatoryHero>[0]['data']}
         bannerToken={{ seed: 'sample', id: -1 }}
         canOpenGesturePanel
+        phase="live"
       />,
     );
 

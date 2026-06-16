@@ -27,7 +27,7 @@ interface GuideProps {
 function renderGuide({
   data = makeData(),
   loading = false,
-  // Default: more than 12h remaining => 'stable' phase => Open Cycle.
+  // Default: more than 12h remaining => 'live' phase => Open Cycle.
   allocationTime = NOW_MS + 24 * 60 * 60_000,
   activationTime = 0,
   now = NOW_MS,
@@ -63,7 +63,8 @@ describe('CyclePhaseGuide', () => {
       screen.getByRole('heading', { name: 'Where this Performance Cycle is now' }),
     ).toBeInTheDocument();
     for (const label of [
-      'Calibration',
+      'Opening Soon',
+      'First Gesture',
       'Open Cycle',
       'Final Window',
       'Finalization',
@@ -81,9 +82,16 @@ describe('CyclePhaseGuide', () => {
     renderGuide();
 
     expect(getStep('Open Cycle')).toHaveAttribute('aria-current', 'step');
-    expect(getStep('Calibration')).not.toHaveAttribute('aria-current');
-    expect(getStep('Calibration')).toHaveTextContent('Passed');
+    expect(getStep('First Gesture')).not.toHaveAttribute('aria-current');
+    expect(getStep('First Gesture')).toHaveTextContent('Passed');
     expect(getStep('Final Window')).toHaveTextContent('Next');
+  });
+
+  it('marks Opening Soon before the next cycle opens', () => {
+    renderGuide({ activationTime: NOW_MS / 1000 + 3_600 });
+
+    expect(getStep('Opening Soon')).toHaveAttribute('aria-current', 'step');
+    expect(getStep('First Gesture')).toHaveTextContent('Next');
   });
 
   it('marks the Final Window step in the closing hour', () => {
@@ -99,12 +107,12 @@ describe('CyclePhaseGuide', () => {
     expect(getStep('Open Cycle')).toHaveTextContent('Passed');
   });
 
-  it('marks Calibration before the first gesture of a cycle', () => {
+  it('marks First Gesture before the first gesture of a cycle', () => {
     renderGuide({
       data: makeData({ LastBidderAddr: '0x0000000000000000000000000000000000000000' }),
     });
 
-    expect(getStep('Calibration')).toHaveAttribute('aria-current', 'step');
+    expect(getStep('First Gesture')).toHaveAttribute('aria-current', 'step');
   });
 
   it('shows the first-visit explainer with FAQ and walkthrough links', () => {

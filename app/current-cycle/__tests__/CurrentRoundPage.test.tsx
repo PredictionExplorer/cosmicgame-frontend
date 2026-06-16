@@ -227,7 +227,7 @@ describe('CurrentRoundPage', () => {
     );
   });
 
-  it('renders "Cycle Closed" state when countdown has passed', () => {
+  it('renders ready-to-finalize state when countdown has passed', () => {
     const pastTimeMs = (NOW_SEC - 60) * 1000;
     setupLoaded();
     mockUseAllocationFinalize.mockReturnValue({
@@ -237,8 +237,8 @@ describe('CurrentRoundPage', () => {
     mockUseCurrentTime.mockReturnValue({ data: NOW_SEC, dataUpdatedAt: NOW_SEC * 1000 });
     render(<CurrentRoundPage />);
 
-    expect(screen.getByText('Cycle Closed')).toBeInTheDocument();
-    expect(screen.getByText('Waiting for the cycle to finalize.')).toBeInTheDocument();
+    expect(screen.getByText('Cycle Ready to Finalize')).toBeInTheDocument();
+    expect(screen.getByText('The finalization clock reached zero.')).toBeInTheDocument();
   });
 
   it('does not show countdown or exhausted state when no last participant', () => {
@@ -251,7 +251,7 @@ describe('CurrentRoundPage', () => {
     render(<CurrentRoundPage />);
 
     expect(screen.queryByText('Cycle finalizes in')).not.toBeInTheDocument();
-    expect(screen.queryByText('Cycle Closed')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cycle Ready to Finalize')).not.toBeInTheDocument();
   });
 
   it('does not render duplicate standalone latest participant card', () => {

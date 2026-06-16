@@ -57,14 +57,14 @@ describe('getChronoCorePhase', () => {
   it.each([
     ['loading', { loading: true }],
     ['unavailable', { data: null }],
-    ['pre-activation', { activationTime: NOW / 1000 + 60 }],
-    ['waiting', { data: dashboard({ TsRoundStart: 0, LastBidderAddr: ZERO }) }],
-    ['stable', { allocationTime: NOW + 13 * 60 * 60 * 1000 }],
+    ['opening-soon', { activationTime: NOW / 1000 + 60 }],
+    ['waiting-first-gesture', { data: dashboard({ TsRoundStart: 0, LastBidderAddr: ZERO }) }],
+    ['live', { allocationTime: NOW + 13 * 60 * 60 * 1000 }],
     ['approach', { allocationTime: NOW + 12 * 60 * 60 * 1000 }],
     ['final-hour', { allocationTime: NOW + 60 * 60 * 1000 }],
     ['final-ten', { allocationTime: NOW + 10 * 60 * 1000 }],
     ['final-minute', { allocationTime: NOW + 60 * 1000 }],
-    ['ready', { allocationTime: NOW - 1 }],
+    ['ready-to-finalize', { allocationTime: NOW - 1 }],
   ] as const)('returns %s phase', (phase, overrides) => {
     expect(getChronoCorePhase({ ...baseProps, ...overrides })).toBe(phase);
   });
@@ -80,10 +80,10 @@ describe('<ChronoCoreTimer />', () => {
     render(<ChronoCoreTimer {...baseProps} />);
 
     const timer = screen.getByTestId('chrono-core-timer');
-    expect(timer).toHaveAttribute('data-phase', 'stable');
-    expect(screen.getByText('Time left in this cycle')).toBeInTheDocument();
+    expect(timer).toHaveAttribute('data-phase', 'live');
+    expect(screen.getByText('Cycle finalizes in')).toBeInTheDocument();
     expect(
-      screen.getByText('Each Gesture extends the Cycle Finalization Time.'),
+      screen.getByText('Cycle is live. Each Gesture can extend the finalization clock.'),
     ).toBeInTheDocument();
     expect(screen.queryByText('Protocol clock locked')).not.toBeInTheDocument();
     expect(screen.queryByText('Chrono Core')).not.toBeInTheDocument();
@@ -120,12 +120,43 @@ describe('<ChronoCoreTimer />', () => {
     );
   });
 
+  it('uses opening-soon copy and counts down to activation time', () => {
+    const activationTime = NOW / 1000 + 3_600;
+    render(
+      <ChronoCoreTimer
+        {...baseProps}
+        activationTime={activationTime}
+        canOpenGesturePanel={false}
+      />,
+    );
+
+    const timer = screen.getByTestId('chrono-core-timer');
+    expect(timer).toHaveAttribute('data-phase', 'opening-soon');
+    expect(screen.getByText('Next cycle opens in')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Waiting for the next cycle. Gestures open when this countdown reaches zero.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Time left in this cycle')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /View Cycle/ })).toHaveAttribute(
+      'href',
+      '/current-cycle',
+    );
+    expect(mockCountdownProps).toEqual(
+      expect.arrayContaining([expect.objectContaining({ date: activationTime * 1000 })]),
+    );
+  });
+
   it('shows ready-to-finalize state when the target has passed', () => {
     render(<ChronoCoreTimer {...baseProps} allocationTime={NOW - 1} />);
 
-    expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute('data-phase', 'ready');
+    expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute(
+      'data-phase',
+      'ready-to-finalize',
+    );
     expect(screen.getByText('00:00')).toBeInTheDocument();
-    expect(screen.getByText('Cycle ready to finalize.')).toBeInTheDocument();
+    expect(screen.getByText('Cycle closed. Finalization is ready.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Finalize Cycle/ })).toHaveAttribute(
       'href',
       '#make-gesture',
@@ -140,8 +171,15 @@ describe('<ChronoCoreTimer />', () => {
       />,
     );
 
-    expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute('data-phase', 'waiting');
-    expect(screen.getByText('Awaiting Gesture')).toBeInTheDocument();
+    expect(screen.getByTestId('chrono-core-timer')).toHaveAttribute(
+      'data-phase',
+      'waiting-first-gesture',
+    );
+    expect(screen.getByText('Awaiting first Gesture')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Make the first Gesture/ })).toHaveAttribute(
+      'href',
+      '#make-gesture',
+    );
     expect(mockCountdownProps).toHaveLength(0);
   });
 

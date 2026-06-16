@@ -7,7 +7,11 @@ const publicPages = [
   { path: '/', host: LANDING_HOST, h1: 'Cosmic Signature:' },
   { path: '/about', host: LANDING_HOST, h1: 'About Cosmic Signature' },
   { path: '/learn', host: LANDING_HOST, h1: 'Learn Cosmic Signature' },
-  { path: '/', host: APP_HOST, h1: 'Shape the next Cosmic Signature' },
+  {
+    path: '/',
+    host: APP_HOST,
+    h1: /Shape the next Cosmic Signature|Next Cycle Opens Soon|Cycle #\d+ Is Open|The Final Window Is Open|Cycle Ready to Finalize/,
+  },
   { path: '/statistics', host: APP_HOST, h1: 'Cosmic Signature Protocol Statistics' },
   { path: '/faq', host: APP_HOST, h1: 'Cosmic Signature FAQ' },
   { path: '/anchoring', host: APP_HOST, h1: 'Anchor Distributions' },
@@ -36,7 +40,11 @@ test.describe('raw HTML SEO', () => {
       expect(html).toMatch(/<title>[^<]{10,}<\/title>/);
       expect(html).toMatch(/<meta[^>]+name="description"[^>]+content="[^"]{30,}"/);
       expect(html).toMatch(/<link[^>]+rel="canonical"[^>]+href="https?:\/\//);
-      expect(html).toContain(page.h1);
+      if (typeof page.h1 === 'string') {
+        expect(html).toContain(page.h1);
+      } else {
+        expect(html).toMatch(page.h1);
+      }
       expect(countMatches(html, /<h1[\s>]/g)).toBe(1);
       expect(html).not.toMatch(/name="robots"[^>]+content="[^"]*noindex/i);
       expect(html).not.toMatch(/<body[^>]*>\s*<[^>]*>\s*Loading/i);

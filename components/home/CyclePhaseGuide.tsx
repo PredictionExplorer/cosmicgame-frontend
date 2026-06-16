@@ -6,7 +6,7 @@ import { ArrowRight, Check, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Surface } from '@/components/ui/surface';
-import { getChronoCorePhase, type ChronoCorePhase } from '@/components/home/ChronoCoreTimer';
+import { getCycleState, type CyclePhase } from '@/lib/cycleState';
 import { cn } from '@/lib/utils';
 import type { DashboardInfo } from '@/services/api';
 
@@ -34,9 +34,14 @@ const getExplainerDismissedServerSnapshot = (): boolean => true;
 
 const timelineSteps = [
   {
-    id: 'calibration',
-    label: 'Calibration',
-    detail: 'Gesture Cost descends toward the floor.',
+    id: 'opening-soon',
+    label: 'Opening Soon',
+    detail: 'The next cycle is scheduled and waiting to open.',
+  },
+  {
+    id: 'first-gesture',
+    label: 'First Gesture',
+    detail: 'The first Gesture starts the finalization clock.',
   },
   {
     id: 'open',
@@ -60,13 +65,17 @@ const timelineSteps = [
   },
 ] as const;
 
-function phaseToTimelineId(phase: ChronoCorePhase): (typeof timelineSteps)[number]['id'] {
-  if (phase === 'ready') return 'finalization';
+function phaseToTimelineId(phase: CyclePhase): (typeof timelineSteps)[number]['id'] {
+  if (phase === 'opening-soon' || phase === 'loading' || phase === 'unavailable') {
+    return 'opening-soon';
+  }
+  if (phase === 'waiting-first-gesture') return 'first-gesture';
+  if (phase === 'ready-to-finalize') return 'finalization';
   if (phase === 'final-hour' || phase === 'final-ten' || phase === 'final-minute') {
     return 'final-window';
   }
-  if (phase === 'stable' || phase === 'approach') return 'open';
-  return 'calibration';
+  if (phase === 'live' || phase === 'approach') return 'open';
+  return 'opening-soon';
 }
 
 export function CyclePhaseGuide({
@@ -76,7 +85,7 @@ export function CyclePhaseGuide({
   activationTime,
   now,
 }: CyclePhaseGuideProps) {
-  const phase = getChronoCorePhase({ data, loading, allocationTime, activationTime, now });
+  const phase = getCycleState({ data, loading, allocationTime, activationTime, now }).phase;
   const activeStepId = phaseToTimelineId(phase);
   const activeIndex = timelineSteps.findIndex((step) => step.id === activeStepId);
   const explainerDismissed = useSyncExternalStore(
@@ -109,7 +118,10 @@ export function CyclePhaseGuide({
           </Button>
         </div>
 
-        <ol className="mt-6 grid gap-3 md:grid-cols-5" aria-label="Performance Cycle phases">
+        <ol
+          className="mt-6 grid gap-3 md:grid-cols-3 xl:grid-cols-6"
+          aria-label="Performance Cycle phases"
+        >
           {timelineSteps.map((step, index) => {
             const isActive = step.id === activeStepId;
             const isComplete = index < activeIndex;
@@ -156,9 +168,10 @@ export function CyclePhaseGuide({
                   New here? Read the cycle in 30 seconds.
                 </h3>
                 <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-                  Make a gesture during the open cycle. Each gesture helps shape the final
-                  Signature, extends the timer, and updates who is in line for allocations. When
-                  time expires, the cycle finalizes and the reserve distributes on-chain.
+                  Wait for the cycle to open, make a Gesture once Gestures are available, and watch
+                  the finalization clock. Each Gesture helps shape the final Signature, can extend
+                  time, and updates who is in line for allocations. When time expires, the cycle
+                  finalizes and the reserve distributes on-chain.
                 </p>
                 <div className="mt-3 flex flex-wrap gap-3 text-sm">
                   <Link className="text-primary underline-offset-4 hover:underline" href="/faq">
