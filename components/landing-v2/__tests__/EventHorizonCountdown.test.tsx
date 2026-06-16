@@ -50,6 +50,7 @@ describe('getLandingCycleTimerSnapshot', () => {
     expect(snapshot.phase).toBe('approach');
     expect(snapshot.targetMs).toBe(sampledAtMs + 7_200_000);
     expect(snapshot.finalizationTargetMs).toBe(sampledAtMs + 7_200_000);
+    expect(snapshot.showCountdown).toBe(true);
     expect(snapshot.shards).toEqual([
       { label: 'Days', value: 0 },
       { label: 'Hours', value: 2 },
@@ -86,7 +87,10 @@ describe('getLandingCycleTimerSnapshot', () => {
     const snapshot = getLandingCycleTimerSnapshot({
       sample: {
         ...activeSample,
-        dashboard: dashboard({ ActivationTime: activationTime, TsRoundStart: 0 }),
+        dashboard: dashboard({
+          CurRoundStats: { TotalBids: 0, ActivationTime: activationTime },
+          TsRoundStart: 0,
+        }),
       },
       nowMs: sampledAtMs,
     });
@@ -94,6 +98,7 @@ describe('getLandingCycleTimerSnapshot', () => {
     expect(snapshot.phase).toBe('opening-soon');
     expect(snapshot.targetMs).toBe(activationTime * 1000);
     expect(snapshot.finalizationTargetMs).toBe(sampledAtMs + 7_200_000);
+    expect(snapshot.showCountdown).toBe(true);
     expect(snapshot.title).toBe('Cycle #12 opens soon');
   });
 
@@ -120,6 +125,8 @@ describe('getLandingCycleTimerSnapshot', () => {
     });
 
     expect(snapshot.phase).toBe('waiting-first-gesture');
+    expect(snapshot.remainingMs).toBe(0);
+    expect(snapshot.showCountdown).toBe(false);
     expect(snapshot.title).toBe('Cycle #12 is waiting for its first Gesture');
   });
 
@@ -173,5 +180,26 @@ describe('<EventHorizonCountdown />', () => {
       ).toBeInTheDocument();
     });
     expect(screen.getByText(/could not reach the protocol clock/i)).toBeInTheDocument();
+  });
+
+  it('renders waiting state without a ticking countdown', async () => {
+    mockApi.get_dashboard_info.mockResolvedValue(
+      dashboard({
+        CurRoundNum: 21,
+        CurNumBids: 0,
+        TsRoundStart: 0,
+        LastBidderAddr: '0x0000000000000000000000000000000000000000',
+      }),
+    );
+
+    render(<EventHorizonCountdown />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Cycle #21 is waiting for its first Gesture' }),
+      ).toBeInTheDocument();
+    });
+    expect(screen.getByText('Awaiting first Gesture')).toBeInTheDocument();
+    expect(screen.queryByText('Countdown synchronized to protocol time')).not.toBeInTheDocument();
   });
 });

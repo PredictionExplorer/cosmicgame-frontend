@@ -67,9 +67,10 @@ function getHeroPhaseView(phase: CyclePhase, cycleNumber: number | undefined) {
     case 'opening-soon':
       return {
         badge: 'Opening soon',
-        badgeDotClass: 'bg-[rgb(var(--nebula-violet-rgb))] animate-cosmic-drift',
+        badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-live-dot',
         headline: 'Next Cycle Opens Soon',
         body: `${cycleLabel} is preparing to open. The countdown below shows exactly when Gestures become available.`,
+        bodyClass: 'text-foreground/90 font-medium sm:text-xl',
         primaryLabel: 'View Cycle Details',
       };
     case 'waiting-first-gesture':
@@ -78,6 +79,7 @@ function getHeroPhaseView(phase: CyclePhase, cycleNumber: number | undefined) {
         badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-live-dot',
         headline: `${cycleLabel} Is Open`,
         body: "Make the first Gesture to start the finalization clock and begin shaping this cycle's Signature.",
+        bodyClass: 'text-foreground/90 font-medium sm:text-xl',
         primaryLabel: 'Make the first Gesture',
       };
     case 'ready-to-finalize':
@@ -86,6 +88,7 @@ function getHeroPhaseView(phase: CyclePhase, cycleNumber: number | undefined) {
         badgeDotClass: 'bg-[rgb(var(--impact-green-rgb))] animate-signature-pulse',
         headline: 'Cycle Ready to Finalize',
         body: 'The finalization clock reached zero. The cycle can now close and distribute its reserve on-chain.',
+        bodyClass: 'text-foreground/90 font-medium sm:text-xl',
         primaryLabel: 'Finalize Cycle',
       };
     case 'final-hour':
@@ -96,6 +99,7 @@ function getHeroPhaseView(phase: CyclePhase, cycleNumber: number | undefined) {
         badgeDotClass: 'bg-[rgb(var(--chrono-rose-rgb))] animate-pulse-glow',
         headline: 'The Final Window Is Open',
         body: 'The finalization clock is the main event now. A new Gesture can still extend time and reshape the ending.',
+        bodyClass: 'text-foreground/90',
         primaryLabel: 'Make a Gesture',
       };
     case 'loading':
@@ -104,6 +108,7 @@ function getHeroPhaseView(phase: CyclePhase, cycleNumber: number | undefined) {
         badgeDotClass: 'bg-primary animate-cosmic-drift',
         headline: 'Syncing the Cycle',
         body: 'Reading protocol time and current cycle data before showing the live state.',
+        bodyClass: 'text-muted-foreground',
         primaryLabel: 'View Cycle Details',
       };
     case 'unavailable':
@@ -112,6 +117,7 @@ function getHeroPhaseView(phase: CyclePhase, cycleNumber: number | undefined) {
         badgeDotClass: 'bg-white/50',
         headline: 'Cycle State Unavailable',
         body: 'The app could not reach the live cycle clock. Cycle details may still show the latest indexed data.',
+        bodyClass: 'text-muted-foreground',
         primaryLabel: 'View Cycle Details',
       };
     case 'approach':
@@ -122,6 +128,7 @@ function getHeroPhaseView(phase: CyclePhase, cycleNumber: number | undefined) {
         badgeDotClass: 'bg-emerald-300 animate-live-dot',
         headline: 'Shape the next Cosmic Signature',
         body: 'Cosmic Signature is a live Performance Cycle where each Gesture leaves a visible trace, imprints Participation CST, and helps direct protocol reserves toward the Ethereum public goods that keep the network alive.',
+        bodyClass: 'text-muted-foreground',
         primaryLabel: 'Make a Gesture',
       };
   }
@@ -235,7 +242,12 @@ export function HomeObservatoryHero({
                 >
                   {phaseView.headline}
                 </GradientText>
-                <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                <p
+                  className={cn(
+                    'mt-5 max-w-2xl text-base leading-relaxed sm:text-lg',
+                    phaseView.bodyClass,
+                  )}
+                >
                   {phaseView.body}
                 </p>
               </m.div>

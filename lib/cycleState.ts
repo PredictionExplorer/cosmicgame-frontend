@@ -34,13 +34,18 @@ export interface CycleState {
 }
 
 function getFinitePositiveSeconds(value: unknown): number | null {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) return null;
-  return value;
+  const n =
+    typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : Number.NaN;
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return n > 1e12 ? n / 1000 : n;
 }
 
 export function getDashboardActivationTime(data: DashboardInfo | null): number | null {
   if (!data) return null;
-  return getFinitePositiveSeconds(data.ActivationTime);
+  return (
+    getFinitePositiveSeconds(data.CurRoundStats?.ActivationTime) ??
+    getFinitePositiveSeconds(data.ActivationTime)
+  );
 }
 
 export function getCycleState({

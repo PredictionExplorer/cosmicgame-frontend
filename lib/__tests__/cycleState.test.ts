@@ -30,8 +30,27 @@ const baseInput = {
 };
 
 describe('getDashboardActivationTime', () => {
-  it('reads a positive dashboard activation timestamp when present', () => {
+  it('reads nested dashboard activation timestamp before top-level fallback', () => {
+    expect(
+      getDashboardActivationTime(
+        dashboard({
+          ActivationTime: 1234,
+          CurRoundStats: { TotalBids: 0, ActivationTime: 5678 },
+        }),
+      ),
+    ).toBe(5678);
+  });
+
+  it('reads a positive top-level dashboard activation timestamp as a fallback', () => {
     expect(getDashboardActivationTime(dashboard({ ActivationTime: 1234 }))).toBe(1234);
+  });
+
+  it('normalizes millisecond activation timestamps to seconds', () => {
+    expect(
+      getDashboardActivationTime(
+        dashboard({ CurRoundStats: { TotalBids: 0, ActivationTime: 1_700_000_123_000 } }),
+      ),
+    ).toBe(1_700_000_123);
   });
 
   it('ignores absent, zero, and invalid activation timestamps', () => {
@@ -63,7 +82,7 @@ describe('getCycleState', () => {
   it('uses dashboard ActivationTime when no contract activation time is available', () => {
     const state = getCycleState({
       ...baseInput,
-      data: dashboard({ ActivationTime: NOW / 1000 + 120 }),
+      data: dashboard({ CurRoundStats: { TotalBids: 0, ActivationTime: NOW / 1000 + 120 } }),
       activationTime: 0,
     });
 

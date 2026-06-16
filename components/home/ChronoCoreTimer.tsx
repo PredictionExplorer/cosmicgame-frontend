@@ -89,14 +89,13 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
         tooltip:
           'This clock counts down to cycle opening. Once it reaches zero, the first Gesture can start the finalization clock.',
         toneClass:
-          'border-[rgb(var(--nebula-violet-rgb)/0.38)] bg-[linear-gradient(135deg,rgb(var(--nebula-violet-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.38),rgb(var(--aurora-cyan-rgb)/0.08))]',
-        haloClass:
-          'border-[rgb(var(--nebula-violet-rgb)/0.34)] bg-[rgb(var(--nebula-violet-rgb)/0.055)]',
-        glowClass: 'shadow-[0_0_115px_rgb(var(--nebula-violet-rgb)/0.30)]',
+          'border-emerald-300/35 bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--aurora-cyan-rgb)/0.13))]',
+        haloClass: 'border-emerald-300/35 bg-emerald-400/[0.055]',
+        glowClass: 'shadow-[0_0_125px_rgb(var(--impact-green-rgb)/0.34)]',
         pulseClass: 'animate-cosmic-drift',
         clockTextClass:
-          'bg-gradient-to-r from-[#AC56FF] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent',
-        iconClass: 'text-[rgb(var(--nebula-violet-rgb))]',
+          'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent',
+        iconClass: 'text-[rgb(var(--impact-green-rgb))]',
       };
     case 'waiting-first-gesture':
       return {
@@ -211,10 +210,6 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
   }
 }
 
-function renderMonumentCounter(props: CountdownRenderProps) {
-  return <Counter {...props} size="xl" />;
-}
-
 export function ChronoCoreTimer({
   data,
   loading,
@@ -232,6 +227,10 @@ export function ChronoCoreTimer({
     : allocationTime;
   const showCountdown = cycleState.isOpeningSoon || cycleState.isFinalizationCountdownActive;
   const isReady = cycleState.isReadyToFinalize;
+  const emphasizeStatus = cycleState.isOpeningSoon || cycleState.isWaitingForFirstGesture;
+  const renderMonumentCounter = (props: CountdownRenderProps) => (
+    <Counter {...props} size="xl" tone={cycleState.isOpeningSoon ? 'impact' : 'default'} />
+  );
   const primaryHref = canOpenGesturePanel ? '#make-gesture' : '/current-cycle';
   const primaryLabel = isReady
     ? 'Finalize Cycle'
@@ -298,8 +297,22 @@ export function ChronoCoreTimer({
             </div>
           </div>
 
-          <div className="mt-5 flex flex-col items-center justify-center gap-3 text-sm text-muted-foreground sm:flex-row">
-            <span>{view.status}</span>
+          <div
+            className={cn(
+              'mt-5 flex flex-col items-center justify-center gap-3 text-center sm:flex-row',
+              emphasizeStatus ? 'text-base sm:text-lg' : 'text-sm text-muted-foreground',
+            )}
+          >
+            <span
+              data-testid="chrono-status"
+              className={cn(
+                emphasizeStatus
+                  ? 'max-w-3xl font-semibold leading-relaxed text-foreground'
+                  : undefined,
+              )}
+            >
+              {view.status}
+            </span>
             {onPrimaryCtaClick && primaryHref === '#make-gesture' ? (
               <button
                 type="button"

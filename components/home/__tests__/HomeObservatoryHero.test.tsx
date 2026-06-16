@@ -97,6 +97,10 @@ describe('HomeObservatoryHero', () => {
       screen.getByRole('heading', { level: 1, name: 'Next Cycle Opens Soon' }),
     ).toBeInTheDocument();
     expect(screen.getByText('Opening soon')).toBeInTheDocument();
+    expect(screen.getByText(/is preparing to open/)).toHaveClass(
+      'font-medium',
+      'text-foreground/90',
+    );
     for (const link of screen.getAllByRole('link', { name: /View Cycle Details/ })) {
       expect(link).toHaveAttribute('href', '/current-cycle');
     }

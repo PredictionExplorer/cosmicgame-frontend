@@ -161,6 +161,40 @@ describe('Counter', () => {
     expect(container.querySelector('[class*="lg:text-8xl"]')).toBeInTheDocument();
   });
 
+  it('applies impact tone to non-urgent countdown digits', () => {
+    const { container } = render(
+      <Counter
+        {...baseProps}
+        days={0}
+        hours={2}
+        minutes={30}
+        seconds={0}
+        size="xl"
+        tone="impact"
+      />,
+    );
+
+    expect(container.querySelector('[class*="impact-green-rgb"]')).toBeInTheDocument();
+    expect(container.querySelector('[class*="amber"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[class*="red"]')).not.toBeInTheDocument();
+  });
+
+  it('keeps urgency styling ahead of impact tone under one hour', () => {
+    const { container } = render(
+      <Counter
+        {...baseProps}
+        days={0}
+        hours={0}
+        minutes={45}
+        seconds={0}
+        size="xl"
+        tone="impact"
+      />,
+    );
+
+    expect(container.querySelector('[class*="amber"]')).toBeInTheDocument();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <Counter {...baseProps} days={1} hours={2} minutes={30} seconds={45} />,

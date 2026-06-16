@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import type { CountdownRenderProps } from 'react-countdown';
 import { ArrowRight, Radio, Sparkles } from 'lucide-react';
 
+import { SmoothCountdown } from '@/components/common/SmoothCountdown';
 import api from '@/services/api';
 import { getCycleState, getDashboardActivationTime, type CyclePhase } from '@/lib/cycleState';
 import { getStableClientTargetTime } from '@/utils/time';
@@ -29,6 +31,7 @@ type LandingCycleTimerSnapshot = {
   targetMs: number;
   finalizationTargetMs: number;
   remainingMs: number;
+  showCountdown: boolean;
   shards: TimeShard[];
   cycleNumber: number | null;
   gestureCount: number;
@@ -46,6 +49,20 @@ function getShards(remainingMs: number): TimeShard[] {
     { label: 'Hours', value: Math.floor((totalSeconds % 86_400) / 3_600) },
     { label: 'Min', value: Math.floor((totalSeconds % 3_600) / 60) },
     { label: 'Sec', value: totalSeconds % 60 },
+  ];
+}
+
+function getShardsFromCountdown({
+  days,
+  hours,
+  minutes,
+  seconds,
+}: Pick<CountdownRenderProps, 'days' | 'hours' | 'minutes' | 'seconds'>): TimeShard[] {
+  return [
+    { label: 'Days', value: days },
+    { label: 'Hours', value: hours },
+    { label: 'Min', value: minutes },
+    { label: 'Sec', value: seconds },
   ];
 }
 
@@ -103,6 +120,68 @@ function copyForPhase(phase: TimerPhase, cycleNumber: number | null) {
   }
 }
 
+function landingStaticTextForPhase(phase: TimerPhase): string {
+  if (phase === 'waiting-first-gesture') return 'Awaiting first Gesture';
+  if (phase === 'ready-to-finalize') return '00:00';
+  if (phase === 'unavailable') return 'Clock unavailable';
+  return 'Syncing';
+}
+
+function LandingStaticClock({ phase }: { phase: TimerPhase }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-black/20 px-4 py-8 text-center shadow-[inset_0_1px_0_rgb(255_255_255/0.12)] backdrop-blur-md">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
+      <p className="font-display text-3xl font-semibold tracking-tight text-[rgb(var(--impact-green-rgb))] sm:text-4xl">
+        {landingStaticTextForPhase(phase)}
+      </p>
+    </div>
+  );
+}
+
+function LandingShardGrid({
+  shards,
+  isFinalMinutes,
+  isUrgent,
+  isOpeningSoon,
+  isWaitingForFirstGesture,
+}: {
+  shards: TimeShard[];
+  isFinalMinutes: boolean;
+  isUrgent: boolean;
+  isOpeningSoon: boolean;
+  isWaitingForFirstGesture: boolean;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {shards.map((shard) => (
+        <div
+          key={shard.label}
+          className="relative overflow-hidden rounded-2xl border border-white/15 bg-black/20 px-3 py-4 text-center shadow-[inset_0_1px_0_rgb(255_255_255/0.12)] backdrop-blur-md"
+        >
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
+          <div
+            className={[
+              'font-mono text-4xl font-semibold leading-none tabular-nums sm:text-5xl',
+              isFinalMinutes
+                ? 'text-[rgb(var(--chrono-rose-rgb))]'
+                : isUrgent
+                  ? 'text-[rgb(var(--solar-gold-rgb))]'
+                  : isOpeningSoon || isWaitingForFirstGesture
+                    ? 'text-[rgb(var(--impact-green-rgb))]'
+                    : 'text-white',
+            ].join(' ')}
+          >
+            {pad(shard.value)}
+          </div>
+          <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/50">
+            {shard.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function getLandingCycleTimerSnapshot({
   sample,
   nowMs,
@@ -117,6 +196,7 @@ export function getLandingCycleTimerSnapshot({
       targetMs: 0,
       finalizationTargetMs: 0,
       remainingMs: 0,
+      showCountdown: false,
       shards: getShards(0),
       cycleNumber: null,
       gestureCount: 0,
@@ -152,7 +232,8 @@ export function getLandingCycleTimerSnapshot({
     state.isOpeningSoon && state.activationTime != null
       ? state.activationTime * 1000
       : finalizationTargetMs;
-  const remainingMs = Math.max(0, targetMs - nowMs);
+  const showCountdown = state.isOpeningSoon || state.isFinalizationCountdownActive;
+  const remainingMs = showCountdown ? Math.max(0, targetMs - nowMs) : 0;
   const phase = state.phase;
   const cycleNumber = sample.dashboard?.CurRoundNum ?? null;
   const copy = copyForPhase(phase, cycleNumber);
@@ -162,15 +243,15 @@ export function getLandingCycleTimerSnapshot({
     targetMs,
     finalizationTargetMs,
     remainingMs,
+    showCountdown,
     shards: getShards(remainingMs),
     cycleNumber,
     gestureCount: sample.dashboard?.CurNumBids ?? 0,
-    ariaLabel:
-      state.isOpeningSoon || state.isFinalizationCountdownActive
-        ? `${copy.title}: ${getShards(remainingMs)
-            .map((shard) => `${shard.value} ${shard.label}`)
-            .join(', ')}`
-        : copy.title,
+    ariaLabel: showCountdown
+      ? `${copy.title}: ${getShards(remainingMs)
+          .map((shard) => `${shard.value} ${shard.label}`)
+          .join(', ')}`
+      : copy.title,
     ...copy,
   };
 }
@@ -234,6 +315,7 @@ export function EventHorizonCountdown() {
         targetMs: 0,
         finalizationTargetMs: 0,
         remainingMs: 0,
+        showCountdown: false,
         shards: getShards(0),
         cycleNumber: null,
         gestureCount: 0,
@@ -252,6 +334,15 @@ export function EventHorizonCountdown() {
     snapshot.phase === 'final-minute';
   const isFinalMinutes = snapshot.phase === 'final-ten' || snapshot.phase === 'final-minute';
   const isReady = snapshot.phase === 'ready-to-finalize';
+  const renderShardGrid = (props: CountdownRenderProps) => (
+    <LandingShardGrid
+      shards={getShardsFromCountdown(props)}
+      isFinalMinutes={isFinalMinutes}
+      isUrgent={isUrgent}
+      isOpeningSoon={isOpeningSoon}
+      isWaitingForFirstGesture={isWaitingForFirstGesture}
+    />
+  );
 
   return (
     <section
@@ -322,35 +413,11 @@ export function EventHorizonCountdown() {
           </div>
 
           <div role="timer" aria-live="off" aria-label={snapshot.ariaLabel} className="relative">
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {snapshot.shards.map((shard) => (
-                <div
-                  key={shard.label}
-                  className="relative overflow-hidden rounded-2xl border border-white/15 bg-black/20 px-3 py-4 text-center shadow-[inset_0_1px_0_rgb(255_255_255/0.12)] backdrop-blur-md"
-                >
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
-                  <div
-                    className={[
-                      'font-mono text-4xl font-semibold leading-none tabular-nums sm:text-5xl',
-                      isFinalMinutes
-                        ? 'text-[rgb(var(--chrono-rose-rgb))]'
-                        : isUrgent
-                          ? 'text-[rgb(var(--solar-gold-rgb))]'
-                          : isOpeningSoon
-                            ? 'text-[rgb(var(--nebula-violet-rgb))]'
-                            : isWaitingForFirstGesture
-                              ? 'text-[rgb(var(--impact-green-rgb))]'
-                              : 'text-white',
-                    ].join(' ')}
-                  >
-                    {pad(shard.value)}
-                  </div>
-                  <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/50">
-                    {shard.label}
-                  </div>
-                </div>
-              ))}
-            </div>
+            {snapshot.showCountdown ? (
+              <SmoothCountdown date={snapshot.targetMs} renderer={renderShardGrid} />
+            ) : (
+              <LandingStaticClock phase={snapshot.phase} />
+            )}
 
             <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.045] p-3 text-sm text-white/70 backdrop-blur-md sm:flex-row sm:items-center sm:justify-between">
               <span className="inline-flex items-center gap-2">

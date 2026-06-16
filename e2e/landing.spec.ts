@@ -115,7 +115,10 @@ test.describe('Landing page @ cosmicsignature.com', () => {
       dashboard: {
         TsRoundStart: 0,
         LastBidderAddr: '0x0000000000000000000000000000000000000000',
-        ActivationTime: Math.floor(Date.now() / 1000) + 3600,
+        CurRoundStats: {
+          TotalBids: 0,
+          ActivationTime: Math.floor(Date.now() / 1000) + 3600,
+        },
       },
     });
 

@@ -1,3 +1,5 @@
+import type { ReactElement } from 'react';
+
 import type { DashboardInfo } from '@/services/api';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -20,7 +22,11 @@ jest.mock('../../common/SmoothCountdown', () => ({
 
 jest.mock('../../common/Counter', () => ({
   __esModule: true,
-  default: ({ size }: { size?: string }) => <div data-testid="counter">Counter {size}</div>,
+  default: ({ size, tone }: { size?: string; tone?: string }) => (
+    <div data-testid="counter" data-tone={tone}>
+      Counter {size}
+    </div>
+  ),
 }));
 
 const NOW = 1_700_000_000_000;
@@ -139,12 +145,20 @@ describe('<ChronoCoreTimer />', () => {
       ),
     ).toBeInTheDocument();
     expect(screen.queryByText('Time left in this cycle')).not.toBeInTheDocument();
+    expect(screen.getByTestId('chrono-status')).toHaveClass('font-semibold', 'text-foreground');
     expect(screen.getByRole('link', { name: /View Cycle/ })).toHaveAttribute(
       'href',
       '/current-cycle',
     );
     expect(mockCountdownProps).toEqual(
       expect.arrayContaining([expect.objectContaining({ date: activationTime * 1000 })]),
+    );
+
+    const renderer = mockCountdownProps.at(-1)?.renderer as
+      | ((props: Record<string, unknown>) => ReactElement)
+      | undefined;
+    expect(renderer?.({})).toEqual(
+      expect.objectContaining({ props: expect.objectContaining({ tone: 'impact' }) }),
     );
   });
 
@@ -176,6 +190,7 @@ describe('<ChronoCoreTimer />', () => {
       'waiting-first-gesture',
     );
     expect(screen.getByText('Awaiting first Gesture')).toBeInTheDocument();
+    expect(screen.getByTestId('chrono-status')).toHaveClass('font-semibold', 'text-foreground');
     expect(screen.getByRole('link', { name: /Make the first Gesture/ })).toHaveAttribute(
       'href',
       '#make-gesture',

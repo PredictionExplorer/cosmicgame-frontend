@@ -12,6 +12,7 @@ interface TimeUnit {
 
 interface CounterProps extends CountdownRenderProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  tone?: 'default' | 'impact';
 }
 
 const sizeClasses = {
@@ -53,6 +54,7 @@ const Counter = ({
   milliseconds = 0,
   total,
   size = 'md',
+  tone = 'default',
 }: CounterProps) => {
   const padZero = (value: number): string => value.toString().padStart(2, '0');
   const totalSeconds = days * 86400 + hours * 3600 + minutes * 60 + seconds;
@@ -62,6 +64,7 @@ const Counter = ({
   const tenths = Math.floor(milliseconds / 100);
   const isUrgent = totalSeconds < 3600 && totalSeconds > 0;
   const isCritical = totalSeconds < 300 && totalSeconds > 0;
+  const isImpact = tone === 'impact' && !isUrgent && !isCritical;
   const s = sizeClasses[size];
   const timeUnits = getTimeUnits(days, hours, minutes, seconds);
   const isMonument = size === 'xl';
@@ -79,7 +82,9 @@ const Counter = ({
                   ? 'border-red-500/40 bg-red-500/[0.08] animate-urgency-pulse'
                   : isUrgent
                     ? 'border-amber-500/30 bg-amber-500/[0.06]'
-                    : 'border-white/[0.08] bg-white/[0.04]',
+                    : isImpact
+                      ? 'border-[rgb(var(--impact-green-rgb)/0.30)] bg-[rgb(var(--impact-green-rgb)/0.08)]'
+                      : 'border-white/[0.08] bg-white/[0.04]',
               )}
             >
               <AnimatePresence mode="popLayout">
@@ -98,14 +103,18 @@ const Counter = ({
                       ? 'text-red-400'
                       : isUrgent
                         ? 'text-amber-300'
-                        : 'bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent',
+                        : isImpact
+                          ? 'bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] via-[#7DD3FC] to-[#35C9FF] bg-clip-text text-transparent'
+                          : 'bg-gradient-to-r from-[#35C9FF] via-[#1D9BEF] to-[#AC56FF] bg-clip-text text-transparent',
                   )}
                   style={
-                    !isCritical && !isUrgent
-                      ? { textShadow: '0 0 30px rgba(21, 191, 253, 0.3)' }
-                      : isCritical
-                        ? { textShadow: '0 0 20px rgba(239, 68, 68, 0.4)' }
-                        : { textShadow: '0 0 20px rgba(245, 158, 11, 0.3)' }
+                    isImpact
+                      ? { textShadow: '0 0 30px rgb(var(--impact-green-rgb) / 0.35)' }
+                      : !isCritical && !isUrgent
+                        ? { textShadow: '0 0 30px rgba(21, 191, 253, 0.3)' }
+                        : isCritical
+                          ? { textShadow: '0 0 20px rgba(239, 68, 68, 0.4)' }
+                          : { textShadow: '0 0 20px rgba(245, 158, 11, 0.3)' }
                   }
                 >
                   {padZero(value)}
@@ -125,7 +134,9 @@ const Counter = ({
                   ? 'text-red-400/70'
                   : isUrgent
                     ? 'text-amber-400/70'
-                    : 'text-muted-foreground',
+                    : isImpact
+                      ? 'text-[rgb(var(--impact-green-rgb)/0.78)]'
+                      : 'text-muted-foreground',
               )}
             >
               {label}
@@ -136,7 +147,13 @@ const Counter = ({
               className={cn(
                 'font-display font-bold self-start mt-1',
                 s.digit,
-                isCritical ? 'text-red-400/50' : isUrgent ? 'text-amber-400/50' : 'text-white/20',
+                isCritical
+                  ? 'text-red-400/50'
+                  : isUrgent
+                    ? 'text-amber-400/50'
+                    : isImpact
+                      ? 'text-[rgb(var(--impact-green-rgb)/0.36)]'
+                      : 'text-white/20',
               )}
             >
               :
