@@ -13,6 +13,8 @@ import { SectionDivider } from '@/components/ui/section-divider';
 import { StatCard, StatCardSkeleton } from '@/components/ui/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
 
+import { PublicGoodsVaultAction } from './PublicGoodsVaultAction';
+
 interface DutchAuctionDurations {
   AuctionDuration: number;
   ElapsedDuration: number;
@@ -22,7 +24,9 @@ interface AuctionParametersProps {
   cstDurations: DutchAuctionDurations;
   ethDurations: DutchAuctionDurations;
   cstBeginningBidPrice: number;
+  publicGoodsVaultAddress: string;
   charityAddress: string;
+  charityVaultBalanceEth?: number;
   charityPercentage?: number;
   explorerUrl: string;
   raffleEthWinners?: number;
@@ -136,7 +140,9 @@ export function AuctionParameters({
   cstDurations,
   ethDurations,
   cstBeginningBidPrice,
+  publicGoodsVaultAddress,
   charityAddress,
+  charityVaultBalanceEth,
   charityPercentage,
   explorerUrl,
   raffleEthWinners,
@@ -225,6 +231,12 @@ export function AuctionParameters({
         address={charityAddress}
         percentage={charityPercentage}
         explorerUrl={explorerUrl}
+      />
+
+      <PublicGoodsVaultAction
+        vaultAddress={publicGoodsVaultAddress}
+        beneficiaryAddress={charityAddress}
+        vaultBalanceEth={charityVaultBalanceEth}
       />
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">

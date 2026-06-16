@@ -20,6 +20,20 @@ jest.mock('framer-motion', () => ({
   },
 }));
 
+jest.mock('../components/PublicGoodsVaultAction', () => ({
+  PublicGoodsVaultAction: ({
+    vaultAddress,
+    vaultBalanceEth,
+  }: {
+    vaultAddress: string;
+    vaultBalanceEth?: number;
+  }) => (
+    <div>
+      Public Goods Vault Action {vaultAddress} {vaultBalanceEth}
+    </div>
+  ),
+}));
+
 jest.mock('../../../utils', () => ({
   formatSeconds: (s: number) => (s > 0 ? `${s}s` : '0s'),
 }));
@@ -37,7 +51,9 @@ const defaultProps = {
   cstDurations: { AuctionDuration: 3600, ElapsedDuration: 1800 },
   ethDurations: { AuctionDuration: 7200, ElapsedDuration: 3600 },
   cstBeginningBidPrice: 100,
+  publicGoodsVaultAddress: '0xVault123',
   charityAddress: '0xCharity123',
+  charityVaultBalanceEth: 0.5,
   charityPercentage: 7,
   explorerUrl: 'https://explorer.example.com',
   raffleEthWinners: 3,
@@ -89,6 +105,11 @@ describe('AuctionParameters', () => {
   it('renders public goods percentage', () => {
     render(<AuctionParameters {...defaultProps} />);
     expect(screen.getByText('7%')).toBeInTheDocument();
+  });
+
+  it('renders the public goods vault action', () => {
+    render(<AuctionParameters {...defaultProps} />);
+    expect(screen.getByText(/Public Goods Vault Action 0xVault123 0.5/)).toBeInTheDocument();
   });
 
   it('renders Stellar Selection stat cards', () => {

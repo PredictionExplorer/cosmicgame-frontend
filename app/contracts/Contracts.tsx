@@ -294,7 +294,9 @@ const Contracts = () => {
             cstDurations={cstDutchAuctionDurations}
             ethDurations={ethDutchAuctionDurations}
             cstBeginningBidPrice={cstDutchAuctionBeginningBidPriceMinLimit}
+            publicGoodsVaultAddress={charity}
             charityAddress={charityAddress}
+            charityVaultBalanceEth={Number(data?.CharityBalanceEth ?? 0)}
             charityPercentage={data?.CharityPercentage}
             explorerUrl={networkConfig.explorerUrl}
             raffleEthWinners={data?.NumRaffleEthWinnersBidding}

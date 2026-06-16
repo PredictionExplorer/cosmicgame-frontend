@@ -46,7 +46,10 @@ jest.mock('viem', () => ({
 /* ── utils mock ────────────────────────────────────────────────── */
 
 jest.mock('../../../utils', () => ({
+  formatEthValue: (value: number) => (value ? `${value.toFixed(4)} ETH` : '0 ETH'),
   formatSeconds: (s: number) => (s > 0 ? `${s}s` : '0s'),
+  shortenHex: (hex: string, length = 4) =>
+    hex ? `${hex.substring(0, length + 2)}....${hex.substring(hex.length - length)}` : '',
 }));
 
 /* ── next/link mock ────────────────────────────────────────────── */
@@ -56,6 +59,25 @@ jest.mock('next/link', () => ({
   default: ({ children, ...props }: { children: React.ReactNode; href: string }) => (
     <a {...props}>{children}</a>
   ),
+}));
+
+jest.mock('@wagmi/core', () => ({
+  writeContract: jest.fn(),
+}));
+
+jest.mock('wagmi', () => ({
+  useAccount: () => ({ address: undefined, isConnected: false }),
+  useChainId: () => 421614,
+  useConfig: () => ({}),
+  usePublicClient: () => undefined,
+}));
+
+jest.mock('sonner', () => ({
+  toast: {
+    error: jest.fn(),
+    info: jest.fn(),
+    success: jest.fn(),
+  },
 }));
 
 /* ── useApiQuery mock ──────────────────────────────────────────── */
@@ -144,6 +166,7 @@ const makeDashboardData = (overrides = {}) => ({
   RafflePercentage: 25,
   StakingPercentage: 30,
   CharityPercentage: 10,
+  CharityBalanceEth: 0.5,
   NumRaffleEthRecipientsBidding: 5,
   NumRaffleNFTRecipientsBidding: 3,
   NumRaffleNFTRecipientsStakingRWalk: 2,

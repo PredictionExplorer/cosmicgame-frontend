@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
 module.exports = {
   useAccount: () => ({ address: undefined, isConnected: false }),
   useChainId: () => 421614,
+  useConfig: () => ({}),
   useConnectorClient: () => ({ data: undefined }),
   usePublicClient: () => undefined,
   useWalletClient: () => ({ data: undefined }),
