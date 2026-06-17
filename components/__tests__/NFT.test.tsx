@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 
-import { formatId, getAssetsUrl } from '@/utils';
+import { formatId, getThumbUrl } from '@/utils';
 
 import NFT from '@/components/nft/NFT';
 
@@ -29,10 +29,11 @@ describe('NFT', () => {
     };
     render(<NFT nft={mockData} />);
 
-    const image = getAssetsUrl(`cosmicsignature/0x${mockData.Seed}.png`);
+    // Grid cards render the lightweight card thumbnail (full image is the fallback).
+    const thumb = getThumbUrl(mockData.Seed, 'card');
     const src = screen.getByAltText('NFT').getAttribute('src') ?? '';
     const decoded = new URL(src, 'http://localhost').searchParams.get('url') ?? src;
-    expect(decoded).toContain(image);
+    expect(decoded).toContain(thumb);
     expect(screen.getByText(formatId(mockData.TokenId))).toBeInTheDocument();
     expect(screen.getByText(mockData.TokenName)).toBeInTheDocument();
   });

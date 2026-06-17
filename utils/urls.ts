@@ -22,6 +22,19 @@ export const getAssetsUrl = (url: string): string => {
   return `${nftCdnOrigin()}/images/new/${url}`;
 };
 
+/** Pre-rendered thumbnail size served from the per-seed package directory. */
+export type ThumbVariant = 'card' | 'micro';
+
+/**
+ * Returns the WebP thumbnail URL for a Cosmic Signature token. Thumbnails live
+ * inside the per-seed package dir (`0x<seed>/thumb_<variant>.webp`) and are
+ * generated server-side; callers should fall back to the full image when a
+ * thumbnail is not present yet.
+ */
+export const getThumbUrl = (seed: string | number, variant: ThumbVariant): string => {
+  return getAssetsUrl(`cosmicsignature/0x${seed}/thumb_${variant}.webp`);
+};
+
 /** Returns direct RandomWalk NFT image URL. */
 export const getRWLKImageUrl = (fileName: string, variant: string = 'black_thumb.jpg'): string => {
   return `${nftCdnOrigin()}/images/randomwalk/${fileName}_${variant}`;

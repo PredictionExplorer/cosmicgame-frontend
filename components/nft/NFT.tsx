@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { formatId, getAssetsUrl } from '@/utils';
+import { formatId, getAssetsUrl, getThumbUrl } from '@/utils';
 
 import { NFTSkeleton } from '@/components/styled';
 
@@ -14,7 +14,9 @@ interface NFTProps {
 }
 
 const NFT = ({ nft }: { nft: NFTProps }) => {
-  const image = getAssetsUrl(`cosmicsignature/0x${nft.Seed ?? ''}.png`);
+  const seed = nft.Seed ?? '';
+  const thumb = getThumbUrl(seed, 'card');
+  const fullImage = getAssetsUrl(`cosmicsignature/0x${seed}.png`);
 
   return (
     <div className="group relative rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_0_20px_rgba(21,191,253,0.08)]">
@@ -24,7 +26,7 @@ const NFT = ({ nft }: { nft: NFTProps }) => {
         <Link href={`/detail/${nft.TokenId}`} className="block">
           <div className="overflow-hidden">
             <div className="transition-transform duration-300 group-hover:scale-[1.03]">
-              <NFTImage src={image} />
+              <NFTImage src={thumb} fallbackSrc={fullImage} />
             </div>
           </div>
           <div className="p-3 flex items-center justify-between">

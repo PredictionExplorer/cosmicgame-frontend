@@ -45,6 +45,25 @@ describe('NFTImage', () => {
     expect(extractOptimizedUrl(img.getAttribute('src'))).toContain('/images/qmark-preview.png');
   });
 
+  test('falls back from thumbnail to full image, then to the placeholder', () => {
+    const thumb =
+      'https://nfts.cosmicsignature.com/images/new/cosmicsignature/0xabc/thumb_card.webp';
+    const full = 'https://nfts.cosmicsignature.com/images/new/cosmicsignature/0xabc.png';
+    render(<NFTImage src={thumb} fallbackSrc={full} />);
+    const img = screen.getByAltText('NFT');
+
+    // 1) thumbnail first
+    expect(img.getAttribute('src')).toBe(thumb);
+
+    // 2) thumbnail missing → full image
+    fireEvent.error(img);
+    expect(img.getAttribute('src')).toBe(full);
+
+    // 3) full image also fails → lightweight placeholder
+    fireEvent.error(img);
+    expect(extractOptimizedUrl(img.getAttribute('src'))).toContain('/images/qmark-preview.png');
+  });
+
   test('never references the full-resolution qmark asset as fallback', () => {
     render(<NFTImage src="" />);
     const src = screen.getByAltText('NFT').getAttribute('src');

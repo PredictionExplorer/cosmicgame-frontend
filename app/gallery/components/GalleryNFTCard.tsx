@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Lock, Tag } from 'lucide-react';
 
-import { formatId, getAssetsUrl, convertTimestampToDateTime } from '@/utils';
+import { formatId, getAssetsUrl, getThumbUrl, convertTimestampToDateTime } from '@/utils';
 
 import { cn } from '@/lib/utils';
 import NFTImage from '@/components/nft/NFTImage';
@@ -43,24 +43,26 @@ function formatImprintAge(timestamp: number): string {
 }
 
 export function GalleryNFTCard({ nft, index, variant }: GalleryNFTCardProps) {
-  const image = getAssetsUrl(`cosmicsignature/0x${nft.Seed ?? ''}.png`);
+  const seed = nft.Seed ?? '';
+  const fullImage = getAssetsUrl(`cosmicsignature/0x${seed}.png`);
   const hasName = Boolean(nft.TokenName && nft.TokenName !== '');
 
   if (variant === 'list') {
-    return <ListRow nft={nft} image={image} hasName={hasName} index={index} />;
+    return <ListRow nft={nft} seed={seed} fullImage={fullImage} hasName={hasName} index={index} />;
   }
 
-  return <GridCard nft={nft} image={image} hasName={hasName} index={index} />;
+  return <GridCard nft={nft} seed={seed} fullImage={fullImage} hasName={hasName} index={index} />;
 }
 
 interface CardInnerProps {
   nft: GalleryNFTData;
-  image: string;
+  seed: string | number;
+  fullImage: string;
   hasName: boolean;
   index: number;
 }
 
-function GridCard({ nft, image, hasName, index }: CardInnerProps) {
+function GridCard({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -71,7 +73,11 @@ function GridCard({ nft, image, hasName, index }: CardInnerProps) {
       <Link href={`/detail/${nft.TokenId}`} className="block">
         <div className="relative overflow-hidden">
           <div className="transition-transform duration-300 group-hover:scale-[1.03]">
-            <NFTImage src={image} alt={`Cosmic Signature ${formatId(nft.TokenId)}`} />
+            <NFTImage
+              src={getThumbUrl(seed, 'card')}
+              fallbackSrc={fullImage}
+              alt={`Cosmic Signature ${formatId(nft.TokenId)}`}
+            />
           </div>
           {nft.RoundNum !== undefined && nft.RoundNum !== null && (
             <Tooltip>
@@ -144,7 +150,7 @@ function GridCard({ nft, image, hasName, index }: CardInnerProps) {
   );
 }
 
-function ListRow({ nft, image, hasName, index }: CardInnerProps) {
+function ListRow({ nft, seed, fullImage, hasName, index }: CardInnerProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -160,7 +166,8 @@ function ListRow({ nft, image, hasName, index }: CardInnerProps) {
       >
         <div className="h-14 w-24 shrink-0 rounded-lg overflow-hidden">
           <NFTImage
-            src={image}
+            src={getThumbUrl(seed, 'micro')}
+            fallbackSrc={fullImage}
             alt={`Cosmic Signature ${formatId(nft.TokenId)}`}
             className="h-full w-full object-cover"
           />

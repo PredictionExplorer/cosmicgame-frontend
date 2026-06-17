@@ -5,6 +5,7 @@ import {
   getProxiedUrl,
   getOriginUrl,
   getAssetsUrl,
+  getThumbUrl,
   getRWLKImageUrl,
   logoImgUrl,
 } from '../urls';
@@ -39,6 +40,25 @@ describe('getAssetsUrl', () => {
   it('constructs direct URL with the NFT image server base', () => {
     const result = getAssetsUrl('cosmicsignature/logo.png');
     expect(result).toBe(`${nftBase}/images/new/cosmicsignature/logo.png`);
+  });
+});
+
+describe('getThumbUrl', () => {
+  const nftBase = networkConfig.nftApiUrl.replace(/\/+$/, '');
+
+  it('builds the card thumbnail path inside the per-seed package dir', () => {
+    const result = getThumbUrl('abc123', 'card');
+    expect(result).toBe(`${nftBase}/images/new/cosmicsignature/0xabc123/thumb_card.webp`);
+  });
+
+  it('builds the micro thumbnail path', () => {
+    const result = getThumbUrl('abc123', 'micro');
+    expect(result).toBe(`${nftBase}/images/new/cosmicsignature/0xabc123/thumb_micro.webp`);
+  });
+
+  it('accepts numeric seeds', () => {
+    const result = getThumbUrl(0, 'card');
+    expect(result).toBe(`${nftBase}/images/new/cosmicsignature/0x0/thumb_card.webp`);
   });
 });
 

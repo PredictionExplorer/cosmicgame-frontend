@@ -4,7 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 
-import { getExplorerUrl, convertTimestampToDateTime, getAssetsUrl, shortenHex } from '@/utils';
+import {
+  getExplorerUrl,
+  convertTimestampToDateTime,
+  getAssetsUrl,
+  getThumbUrl,
+  shortenHex,
+} from '@/utils';
 
 import NFTImage from '@/components/nft/NFTImage';
 import { CustomPagination } from '@/components/common/CustomPagination';
@@ -22,7 +28,9 @@ import type { CSTTokenInfo } from '@/services/api';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 function CSTRow({ nft }: { nft: CSTTokenInfo }) {
-  const getTokenImageURL = () => getAssetsUrl(`cosmicsignature/0x${nft.Seed ?? ''}.png`);
+  const seed = nft?.Seed ?? '';
+  const thumbURL = getThumbUrl(seed, 'micro');
+  const fullURL = getAssetsUrl(`cosmicsignature/0x${seed}.png`);
 
   if (!nft) {
     return <TablePrimaryRow />;
@@ -32,7 +40,7 @@ function CSTRow({ nft }: { nft: CSTTokenInfo }) {
     <TablePrimaryRow>
       <TablePrimaryCell className="w-[120px]">
         <Link href={`/detail/${nft.TokenId}`} className="text-inherit">
-          <NFTImage src={getTokenImageURL()} />
+          <NFTImage src={thumbURL} fallbackSrc={fullURL} />
         </Link>
       </TablePrimaryCell>
 

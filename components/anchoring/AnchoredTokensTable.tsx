@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { Tbody, Tr } from 'react-super-responsive-table';
 
-import { convertTimestampToDateTime, getAssetsUrl, getRWLKImageUrl } from '@/utils';
+import { convertTimestampToDateTime, getAssetsUrl, getThumbUrl, getRWLKImageUrl } from '@/utils';
 
 import {
   TablePrimary,
@@ -117,11 +117,15 @@ const AnchoredTokenRow = ({
     !isRandomWalk ? (row as CosmicSignatureRow).TokenInfo : undefined,
   );
 
-  const tokenImageURL = useMemo(() => {
+  const { tokenImageURL, tokenImageFallback } = useMemo(() => {
     const fileName = seedOrRandomId.toString().padStart(6, '0');
-    return isRandomWalk
-      ? getRWLKImageUrl(fileName)
-      : getAssetsUrl(`cosmicsignature/0x${fileName}.png`);
+    if (isRandomWalk) {
+      return { tokenImageURL: getRWLKImageUrl(fileName), tokenImageFallback: undefined };
+    }
+    return {
+      tokenImageURL: getThumbUrl(fileName, 'micro'),
+      tokenImageFallback: getAssetsUrl(`cosmicsignature/0x${fileName}.png`),
+    };
   }, [isRandomWalk, seedOrRandomId]);
 
   if (!row) return null;
@@ -139,7 +143,7 @@ const AnchoredTokenRow = ({
       </TablePrimaryCell>
 
       <TablePrimaryCell className="w-[120px]">
-        <NFTImage src={tokenImageURL} />
+        <NFTImage src={tokenImageURL} fallbackSrc={tokenImageFallback} />
         <span className="text-xs mt-2 block">{tokenName}</span>
       </TablePrimaryCell>
 
