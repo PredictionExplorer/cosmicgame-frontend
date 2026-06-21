@@ -12,12 +12,15 @@ import cosmicGameJson from '@/contracts/CosmicGame.json';
 
 import { networkConfig } from '@/config/networks';
 
-
-
 const cosmicGameAbiFull = cosmicGameJson as Abi;
 
 /** Default min CST reward accepted on V2 gesture entrypoints (0 = accept contract value). */
 export const GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2 = 0n;
+
+export interface GestureArgsCompatOptions {
+  bidCstRewardAmountMinLimit?: bigint;
+  preferV2First?: boolean;
+}
 
 export type CosmicGameGestureFunctionName =
   | 'bidWithEth'
@@ -86,9 +89,9 @@ export async function readCosmicGameWithFallback<T>(
   return undefined;
 }
 
-/** Local Hardhat stack runs V2 after populate-old-v2; try V2 args first to avoid Rabby simulating a doomed V1 call. */
+/** Deployed Arbitrum and local upgraded stacks are V2; try V2 args first to avoid simulating a doomed V1 call. */
 export function preferV2GestureArgsFirst(): boolean {
-  return networkConfig.chainId === 31337;
+  return [42161, 421614, 31337].includes(networkConfig.chainId);
 }
 
 /** Narrow ABI slice for a single bid overload (avoids duplicate-name encoding ambiguity). */
@@ -130,8 +133,9 @@ export function normalizeV1GestureArgs(
 export function gestureArgsForV2(
   functionName: CosmicGameGestureFunctionName,
   v1Args: readonly unknown[],
+  bidCstRewardAmountMinLimit: bigint = GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2,
 ): readonly unknown[] {
-  const minLimit = GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2;
+  const minLimit = bidCstRewardAmountMinLimit;
   switch (functionName) {
     case 'bidWithEth':
       return [v1Args[0], v1Args[1], minLimit];
@@ -157,10 +161,12 @@ export async function withGestureArgsV1ThenV2<T>(
   functionName: CosmicGameGestureFunctionName,
   v1Args: readonly unknown[],
   run: (args: readonly unknown[]) => Promise<T>,
+  options: GestureArgsCompatOptions = {},
 ): Promise<T> {
   const normalized = normalizeV1GestureArgs(functionName, v1Args);
-  const v2Args = gestureArgsForV2(functionName, normalized);
-  const attempts = preferV2GestureArgsFirst() ? [v2Args, normalized] : [normalized, v2Args];
+  const v2Args = gestureArgsForV2(functionName, normalized, options.bidCstRewardAmountMinLimit);
+  const shouldPreferV2 = options.preferV2First ?? preferV2GestureArgsFirst();
+  const attempts = shouldPreferV2 ? [v2Args, normalized] : [normalized, v2Args];
 
   let lastSelectorError: unknown;
   for (const args of attempts) {

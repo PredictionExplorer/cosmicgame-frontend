@@ -33,6 +33,13 @@ jest.mock('../Counter', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockCountdownProps.length = 0;
+  mockUseCTPrice.mockReturnValue({
+    data: {
+      AuctionDuration: '43200',
+      CSTPrice: '1500000000000000000',
+      SecondsElapsed: '1200',
+    },
+  });
 });
 
 const baseProps = {
@@ -93,7 +100,29 @@ describe('GestureStatus', () => {
     expect(screen.getByText('10.5000 ETH')).toBeInTheDocument();
     expect(screen.getByText('0.01000 ETH')).toBeInTheDocument();
     expect(screen.getByText('0.00500 ETH')).toBeInTheDocument();
+    expect(screen.getByText('1.5 CST')).toBeInTheDocument();
     expect(screen.queryByText('Last Participant')).not.toBeInTheDocument();
+  });
+
+  it('shows CST gesture as free when API price is zero', () => {
+    mockUseCTPrice.mockReturnValueOnce({
+      data: {
+        AuctionDuration: '43200',
+        CSTPrice: '0',
+        SecondsElapsed: '1200',
+      },
+    });
+
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={activeData as never}
+        allocationTime={Date.now() + 60000}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+      />,
+    );
+
+    expect(screen.getByText('FREE')).toBeInTheDocument();
   });
 
   it('uses smooth countdown props for cycle finalization countdown', () => {

@@ -76,11 +76,17 @@ const mockGestureWithEthAndContributeToken = jest.fn().mockResolvedValue('0xhash
 const mockGestureWithCstAndContributeToken = jest.fn().mockResolvedValue('0xhash');
 const mockGetNextEthGestureCost = jest.fn().mockResolvedValue(BigInt(1e16));
 const mockGetNextCstGestureCost = jest.fn().mockResolvedValue(BigInt(100));
+const mockGetBidCstRewardAmount = jest.fn().mockResolvedValue(BigInt('100000000000000000000'));
+const mockGetBidCstRewardAmountAdvanced = jest
+  .fn()
+  .mockResolvedValue(BigInt('100000000000000000000'));
 
 const mockContractObj = {
   read: {
     getNextEthBidPrice: mockGetNextEthGestureCost,
     getNextCstBidPrice: mockGetNextCstGestureCost,
+    getBidCstRewardAmount: mockGetBidCstRewardAmount,
+    getBidCstRewardAmountAdvanced: mockGetBidCstRewardAmountAdvanced,
   },
   write: {
     bidWithEth: mockGestureWithEth,
@@ -244,9 +250,14 @@ beforeEach(() => {
   mockGestureWithCstAndContributeToken.mockResolvedValue('0xhash');
   mockGetNextEthGestureCost.mockResolvedValue(BigInt(1e16));
   mockGetNextCstGestureCost.mockResolvedValue(BigInt(100));
+  mockGetBidCstRewardAmount.mockResolvedValue(BigInt('100000000000000000000'));
+  mockGetBidCstRewardAmountAdvanced.mockResolvedValue(BigInt('100000000000000000000'));
   mockGetBalance.mockResolvedValue(BigInt(10e18));
   mockGetCode.mockResolvedValue('0x1234');
-  mockReadContract.mockResolvedValue(true);
+  mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+    if (functionName === 'allowance') return MAX_UINT256;
+    return true;
+  });
   mockWriteContract.mockResolvedValue('0xhash');
   mockWaitForTransactionReceipt.mockResolvedValue({});
   mockIsUserRejection.mockReturnValue(false);
@@ -305,10 +316,13 @@ describe('useGestureForm', () => {
     expect(result.current.isGesturing).toBe(false);
     expect(result.current.advancedExpanded).toBe(false);
     expect(result.current.rwlknftIds).toEqual([]);
-    expect(result.current.cstGestureData).toEqual({
+    expect(result.current.cstGestureData).toMatchObject({
       AuctionDuration: 3600,
       CSTPrice: 1,
       SecondsElapsed: 1800,
+      CSTPriceWei: BigInt('1000000000000000000'),
+      isFree: false,
+      source: 'api',
     });
     expect(result.current.ethGestureInfo).toEqual({
       AuctionDuration: 3600,
@@ -320,10 +334,11 @@ describe('useGestureForm', () => {
   it('derives cstGestureData from useCTPrice query', () => {
     const { result } = renderHook(() => useGestureForm());
 
-    expect(result.current.cstGestureData).toEqual({
+    expect(result.current.cstGestureData).toMatchObject({
       AuctionDuration: 3600,
       CSTPrice: 1,
       SecondsElapsed: 1800,
+      isFree: false,
     });
   });
 
@@ -341,10 +356,50 @@ describe('useGestureForm', () => {
     mockUseCTPrice.mockReturnValue({ data: undefined });
     const { result } = renderHook(() => useGestureForm());
 
-    expect(result.current.cstGestureData).toEqual({
+    expect(result.current.cstGestureData).toMatchObject({
       AuctionDuration: 0,
       CSTPrice: 0,
       SecondsElapsed: 0,
+      CSTPriceWei: 0n,
+      isFree: false,
+      source: 'empty',
+    });
+  });
+
+  it('derives dynamic CST duration from contract read when available', async () => {
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'getCstDutchAuctionDurations') return [43200n, 1200n];
+      return true;
+    });
+
+    const { result } = renderHook(() => useGestureForm());
+    await act(async () => {});
+
+    expect(result.current.cstGestureData).toMatchObject({
+      AuctionDuration: 43200,
+      SecondsElapsed: 1200,
+      CSTPrice: 1,
+      source: 'contract',
+      apiAuctionDuration: 3600,
+      apiSecondsElapsed: 1800,
+    });
+  });
+
+  it('treats zero CST price as free even before elapsed duration crosses threshold', () => {
+    mockUseCTPrice.mockReturnValue({
+      data: {
+        AuctionDuration: '43200',
+        CSTPrice: '0',
+        SecondsElapsed: '1200',
+      },
+    });
+    const { result } = renderHook(() => useGestureForm());
+
+    expect(result.current.cstGestureData).toMatchObject({
+      AuctionDuration: 43200,
+      CSTPrice: 0,
+      SecondsElapsed: 1200,
+      isFree: true,
     });
   });
 
@@ -462,8 +517,30 @@ describe('useGestureForm', () => {
     expect(result.current.isGesturing).toBe(false);
   });
 
+  it('passes selected minimum CST reward to V2 CST gesture writes', async () => {
+    const { result } = renderHook(() => useGestureForm());
+    await act(async () => {});
+
+    act(() => {
+      result.current.setCstRewardTolerancePercent(5);
+    });
+
+    await act(async () => {
+      await result.current.onGestureWithCST();
+    });
+
+    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        functionName: 'bidWithCst',
+        args: [100n, '', BigInt('95000000000000000000')],
+      }),
+    );
+  });
+
   it('onGestureWithCST handles free gesture when window closed', async () => {
     mockUseCTPrice.mockReturnValue({ data: undefined });
+    mockGetNextCstGestureCost.mockResolvedValue(0n);
     const { result } = renderHook(() => useGestureForm());
     await act(async () => {});
 
@@ -587,7 +664,7 @@ describe('useGestureForm', () => {
 
   it('onGesture without connected account notifies error', async () => {
     const useWeb3 = jest.requireMock('../../hooks/web3');
-    useWeb3.useActiveWeb3React.mockReturnValueOnce({ account: null, chainId: 1, active: false });
+    useWeb3.useActiveWeb3React.mockReturnValue({ account: null, chainId: 1, active: false });
 
     const { result } = renderHook(() => useGestureForm());
     await act(async () => {});

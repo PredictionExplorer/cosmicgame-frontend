@@ -12,6 +12,7 @@ import { formatEther, isAddress, maxUint256, parseEther, parseUnits, type Client
 import { getChainId } from 'viem/actions';
 
 import { randomWalkNftAbi as NFT_ABI, cosmicTokenAbi as ERC20_ABI } from '@/contracts/abis';
+import { cosmicGameAbi } from '@/contracts/abis';
 
 import api from '@/services/api';
 import useCosmicGameContract from '@/hooks/useCosmicGameContract';
@@ -25,16 +26,15 @@ import { getContractErrorMessage } from '@/utils/contractErrors';
 import {
   type CosmicGameGestureFunctionName,
   pickGestureWriteAbi,
+  readCosmicGameWithFallback,
   withGestureArgsV1ThenV2,
 } from '@/utils/cosmicGameContractCompat';
 import { useNotify } from '@/hooks/useNotify';
 import { useCTPrice, useGestureEthCost, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
+import { mapCTPriceInfo, type CstAuctionDurations, type CstGestureData } from '@/utils/cstGesture';
 
-export interface CSTGestureData {
-  AuctionDuration: number;
-  CSTPrice: number;
-  SecondsElapsed: number;
-}
+export type { CstGestureData } from '@/utils/cstGesture';
+export type CSTGestureData = CstGestureData;
 
 export interface EthGestureInfo {
   AuctionDuration: number;
@@ -72,15 +72,16 @@ export function useGestureForm() {
   const [isGesturing, setIsBidding] = useState(false);
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const [rwlknftIds, setRwlknftIds] = useState<number[]>([]);
+  const [contractCstDurations, setContractCstDurations] = useState<CstAuctionDurations | null>(
+    null,
+  );
+  const [bidCstRewardAmountWei, setBidCstRewardAmountWei] = useState<bigint | null>(null);
+  const [isCstRewardLoading, setIsCstRewardLoading] = useState(false);
+  const [cstRewardTolerancePercent, setCstRewardTolerancePercent] = useState(1);
 
   const cstGestureData = useMemo<CSTGestureData>(() => {
-    if (!ctPriceData) return { AuctionDuration: 0, CSTPrice: 0, SecondsElapsed: 0 };
-    return {
-      AuctionDuration: parseInt(ctPriceData.AuctionDuration),
-      CSTPrice: parseFloat(formatEther(BigInt(ctPriceData.CSTPrice))),
-      SecondsElapsed: parseInt(ctPriceData.SecondsElapsed),
-    };
-  }, [ctPriceData]);
+    return mapCTPriceInfo(ctPriceData, contractCstDurations);
+  }, [contractCstDurations, ctPriceData]);
 
   const ethGestureInfo = useMemo<EthGestureInfo | null>(() => {
     if (!bidEthPriceData) return null;
@@ -90,6 +91,95 @@ export function useGestureForm() {
       SecondsElapsed: parseInt(bidEthPriceData.SecondsElapsed),
     };
   }, [bidEthPriceData]);
+
+  const bidCstRewardAmount = useMemo(() => {
+    if (bidCstRewardAmountWei == null) return null;
+    const value = Number(formatEther(bidCstRewardAmountWei));
+    return Number.isFinite(value) ? value : null;
+  }, [bidCstRewardAmountWei]);
+
+  const cstRewardToleranceBps = useMemo(() => {
+    const clamped = Math.min(100, Math.max(0, cstRewardTolerancePercent));
+    return Math.round(clamped * 100);
+  }, [cstRewardTolerancePercent]);
+
+  const bidCstRewardAmountMinLimitWei = useMemo(() => {
+    if (!bidCstRewardAmountWei || bidCstRewardAmountWei <= 0n) return 0n;
+    return (bidCstRewardAmountWei * BigInt(10_000 - cstRewardToleranceBps)) / 10_000n;
+  }, [bidCstRewardAmountWei, cstRewardToleranceBps]);
+
+  const bidCstRewardAmountMin = useMemo(() => {
+    const value = Number(formatEther(bidCstRewardAmountMinLimitWei));
+    return Number.isFinite(value) ? value : 0;
+  }, [bidCstRewardAmountMinLimitWei]);
+
+  useEffect(() => {
+    if (!publicClient || !contractAddrs.cosmicGame) return;
+    let cancelled = false;
+
+    publicClient
+      .readContract({
+        address: contractAddrs.cosmicGame as `0x${string}`,
+        abi: cosmicGameAbi,
+        functionName: 'getCstDutchAuctionDurations',
+      })
+      .then((value) => {
+        if (cancelled || !Array.isArray(value)) return;
+        const [auctionDuration, secondsElapsed] = value;
+        if (typeof auctionDuration !== 'bigint' || typeof secondsElapsed !== 'bigint') return;
+        const next = {
+          AuctionDuration: Number(auctionDuration),
+          SecondsElapsed: Number(secondsElapsed),
+        };
+        setContractCstDurations((current) => {
+          if (
+            current?.AuctionDuration === next.AuctionDuration &&
+            current?.SecondsElapsed === next.SecondsElapsed
+          ) {
+            return current;
+          }
+          return next;
+        });
+      })
+      .catch((e) => reportError(e, 'getCstDutchAuctionDurations'));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [contractAddrs.cosmicGame, publicClient]);
+
+  useEffect(() => {
+    if (!cosmicGameContract) {
+      setBidCstRewardAmountWei(null);
+      return;
+    }
+    let cancelled = false;
+    setIsCstRewardLoading(true);
+
+    readCosmicGameWithFallback<bigint>([
+      () => cosmicGameContract.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
+      () =>
+        cosmicGameContract.read.getBidCstRewardAmountAdvanced?.([0n]) as Promise<
+          bigint | undefined
+        >,
+    ])
+      .then((value) => {
+        if (!cancelled) setBidCstRewardAmountWei(value ?? null);
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          setBidCstRewardAmountWei(null);
+          reportError(e, 'getBidCstRewardAmount');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsCstRewardLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cosmicGameContract]);
 
   const handleTx = async (hashPromise: Promise<`0x${string}`>) => {
     const hash = await hashPromise;
@@ -158,38 +248,38 @@ export function useGestureForm() {
     }
   };
 
-  const ensureErc20Allowance = async (tokenAddress: string, required: bigint) => {
-    let approved = false;
+  const ensureErc20Allowance = async (
+    tokenAddress: string,
+    spender: string,
+    required: bigint,
+    options: { approveMax?: boolean } = {},
+  ) => {
+    if (required <= 0n) return;
     const allowance = (await publicClient!.readContract({
       address: tokenAddress as `0x${string}`,
       abi: ERC20_ABI,
       functionName: 'allowance',
-      args: [account as `0x${string}`, contractAddrs.prizesWallet as `0x${string}`],
+      args: [account as `0x${string}`, spender as `0x${string}`],
     })) as bigint;
 
-    if (allowance < maxUint256) {
-      const hash = await writeContract(config, {
-        address: tokenAddress as `0x${string}`,
-        abi: ERC20_ABI,
-        functionName: 'approve',
-        args: [contractAddrs.prizesWallet as `0x${string}`, maxUint256],
-        account: account!,
-        chainId: activeChain.id,
-      });
-      const receipt = await publicClient!.waitForTransactionReceipt({ hash });
-      approved = receipt.status === 'success';
-    }
-    if (!approved && allowance < required) {
-      const hash = await writeContract(config, {
-        address: tokenAddress as `0x${string}`,
-        abi: ERC20_ABI,
-        functionName: 'approve',
-        args: [contractAddrs.prizesWallet as `0x${string}`, required],
-        account: account!,
-        chainId: activeChain.id,
-      });
-      await publicClient!.waitForTransactionReceipt({ hash });
-    }
+    if (allowance >= required) return;
+    const approvalAmount = options.approveMax === false ? required : maxUint256;
+    const hash = await writeContract(config, {
+      address: tokenAddress as `0x${string}`,
+      abi: ERC20_ABI,
+      functionName: 'approve',
+      args: [spender as `0x${string}`, approvalAmount],
+      account: account!,
+      chainId: activeChain.id,
+    });
+    await publicClient!.waitForTransactionReceipt({ hash });
+  };
+
+  const ensureCstAllowance = async (required: bigint) => {
+    if (required <= 0n) return;
+    await ensureErc20Allowance(contractAddrs.cosmicToken, contractAddrs.cosmicGame, required, {
+      approveMax: false,
+    });
   };
 
   const getErc20Decimals = async (tokenAddress: string) => {
@@ -289,7 +379,7 @@ export function useGestureForm() {
       notify('error', 'Insufficient token balance to attach to this gesture.');
       return { ok: false as const };
     }
-    await ensureErc20Allowance(tokenAddress, amountWei);
+    await ensureErc20Allowance(tokenAddress, contractAddrs.prizesWallet, amountWei);
     return { ok: true as const, amountWei, decimals };
   };
 
@@ -309,7 +399,11 @@ export function useGestureForm() {
       });
 
     try {
-      return (await withGestureArgsV1ThenV2(fnName, args, estimate)) * 2n;
+      return (
+        (await withGestureArgsV1ThenV2(fnName, args, estimate, {
+          bidCstRewardAmountMinLimit: bidCstRewardAmountMinLimitWei,
+        })) * 2n
+      );
     } catch {
       return GESTURE_GAS_LIMIT;
     }
@@ -351,18 +445,22 @@ export function useGestureForm() {
     feeParams: Awaited<ReturnType<typeof getFeeParams>>,
     options?: { value?: bigint; gas?: bigint },
   ) =>
-    withGestureArgsV1ThenV2(functionName, args, async (callArgs) =>
-      writeContract(config, {
-        address: contractAddrs.cosmicGame as `0x${string}`,
-        abi: pickGestureWriteAbi(functionName, callArgs),
-        functionName,
-        args: callArgs as unknown[],
-        account: signerAddress,
-        chainId: activeChain.id,
-        ...feeParams,
-        ...(options?.value !== undefined ? { value: options.value } : {}),
-        ...(options?.gas !== undefined ? { gas: options.gas } : {}),
-      }),
+    withGestureArgsV1ThenV2(
+      functionName,
+      args,
+      async (callArgs) =>
+        writeContract(config, {
+          address: contractAddrs.cosmicGame as `0x${string}`,
+          abi: pickGestureWriteAbi(functionName, callArgs),
+          functionName,
+          args: callArgs as unknown[],
+          account: signerAddress,
+          chainId: activeChain.id,
+          ...feeParams,
+          ...(options?.value !== undefined ? { value: options.value } : {}),
+          ...(options?.gas !== undefined ? { gas: options.gas } : {}),
+        }),
+      { bidCstRewardAmountMinLimit: bidCstRewardAmountMinLimitWei },
     );
 
   /**
@@ -548,18 +646,20 @@ export function useGestureForm() {
         (signerClient as { account?: { address: `0x${string}` } } | undefined)?.account?.address ??
         (account as `0x${string}`);
 
-      if (cstGestureData?.CSTPrice > 0) {
-        const cstWei = parseEther(cstGestureData.CSTPrice.toString());
-        if (!(await hasCstBalance(cstWei))) {
+      const priceMaxLimit =
+        ((await cosmicGameContract.read.getNextCstBidPrice?.()) as bigint | undefined) ??
+        cstGestureData.CSTPriceWei;
+
+      if (priceMaxLimit > 0n) {
+        if (!(await hasCstBalance(priceMaxLimit))) {
           notify(
             'error',
             "Insufficient CST balance! There isn't enough CST (ERC-20) in your wallet.",
           );
           return false;
         }
+        await ensureCstAllowance(priceMaxLimit);
       }
-
-      const priceMaxLimit = await cosmicGameContract.read.getNextCstBidPrice?.();
 
       const noDonation =
         (contributionType === 'NFT' && (!nftDonateAddress || !nftId)) ||
@@ -638,6 +738,11 @@ export function useGestureForm() {
       .catch((e) => reportError(e, 'getRwlkNFTIds'));
   }, [nftRWLKContract, account, usedRWLKData]);
 
+  const updateCstRewardTolerancePercent = useCallback((value: number) => {
+    if (!Number.isFinite(value)) return;
+    setCstRewardTolerancePercent(Math.min(100, Math.max(0, value)));
+  }, []);
+
   return {
     gestureType,
     setBidType,
@@ -645,6 +750,12 @@ export function useGestureForm() {
     setContributionType,
     cstGestureData,
     ethGestureInfo,
+    bidCstRewardAmount,
+    bidCstRewardAmountMin,
+    bidCstRewardAmountMinLimitWei,
+    isCstRewardLoading,
+    cstRewardTolerancePercent,
+    setCstRewardTolerancePercent: updateCstRewardTolerancePercent,
     message,
     setMessage,
     nftDonateAddress,

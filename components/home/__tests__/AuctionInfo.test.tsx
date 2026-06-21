@@ -25,6 +25,14 @@ describe('AuctionInfo', () => {
     expect(screen.queryByText('Elapsed Time:')).not.toBeInTheDocument();
   });
 
+  it('keeps the dynamic window active when elapsed equals duration', () => {
+    render(<AuctionInfo secondsElapsed={43200} auctionDuration={43200} />);
+
+    expect(screen.getByText('Elapsed Time:')).toBeInTheDocument();
+    expect(screen.getAllByText('43200s')).toHaveLength(2);
+    expect(screen.queryByText('Calibration Window closed.')).not.toBeInTheDocument();
+  });
+
   it('handles zero values gracefully', () => {
     render(<AuctionInfo secondsElapsed={0} auctionDuration={0} />);
 

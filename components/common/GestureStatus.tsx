@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, type ReactNode } from 'react';
-import { formatEther, zeroAddress } from 'viem';
+import { zeroAddress } from 'viem';
 import { Trophy, Coins, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -13,6 +13,7 @@ import type { DashboardInfo, GestureInfo } from '@/services/api';
 import { useUserInfo, useCTPrice } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
+import { formatCstAmount, mapCTPriceInfo } from '@/utils/cstGesture';
 
 import Counter from './Counter';
 import { SmoothCountdown } from './SmoothCountdown';
@@ -222,14 +223,7 @@ export const GestureStatus = ({
     attachedERC20Count,
   );
 
-  const cstGestureData = useMemo(() => {
-    if (!ctPriceRaw) return { AuctionDuration: 0, CSTPrice: 0, SecondsElapsed: 0 };
-    return {
-      AuctionDuration: parseInt(String(ctPriceRaw.AuctionDuration)),
-      CSTPrice: parseFloat(formatEther(BigInt(ctPriceRaw.CSTPrice))),
-      SecondsElapsed: parseInt(String(ctPriceRaw.SecondsElapsed)),
-    };
-  }, [ctPriceRaw]);
+  const cstGestureData = useMemo(() => mapCTPriceInfo(ctPriceRaw), [ctPriceRaw]);
 
   if (loading) return null;
 
@@ -347,9 +341,9 @@ export const GestureStatus = ({
                   <GestureMetricCard
                     label="CST Gesture"
                     value={
-                      cstGestureData?.CSTPrice > 0
-                        ? `${cstGestureData.CSTPrice.toFixed(4)} CST`
-                        : 'FREE'
+                      cstGestureData.isFree
+                        ? 'FREE'
+                        : `${formatCstAmount(cstGestureData.CSTPrice)} CST`
                     }
                     icon={<Zap className="h-4 w-4" />}
                     tone="cst"

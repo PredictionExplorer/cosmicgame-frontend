@@ -38,8 +38,20 @@ const mockGestureForm = {
   setBidType: jest.fn(),
   contributionType: 'NFT',
   setContributionType: jest.fn(),
-  cstGestureData: { AuctionDuration: 3600, CSTPrice: 1, SecondsElapsed: 1800 },
+  cstGestureData: {
+    AuctionDuration: 3600,
+    CSTPrice: 1,
+    CSTPriceWei: 1000000000000000000n,
+    SecondsElapsed: 1800,
+    isFree: false,
+    source: 'api' as const,
+  },
   ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
+  bidCstRewardAmount: 100,
+  bidCstRewardAmountMin: 99,
+  isCstRewardLoading: false,
+  cstRewardTolerancePercent: 1,
+  setCstRewardTolerancePercent: jest.fn(),
   message: '',
   setMessage: jest.fn(),
   nftDonateAddress: '',
@@ -263,8 +275,19 @@ beforeEach(() => {
   Object.assign(mockGestureForm, {
     gestureType: 'ETH',
     contributionType: 'NFT',
-    cstGestureData: { AuctionDuration: 3600, CSTPrice: 1, SecondsElapsed: 1800 },
+    cstGestureData: {
+      AuctionDuration: 3600,
+      CSTPrice: 1,
+      CSTPriceWei: 1000000000000000000n,
+      SecondsElapsed: 1800,
+      isFree: false,
+      source: 'api' as const,
+    },
     ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
+    bidCstRewardAmount: 100,
+    bidCstRewardAmountMin: 99,
+    isCstRewardLoading: false,
+    cstRewardTolerancePercent: 1,
     message: '',
     nftDonateAddress: '',
     nftId: '',
@@ -989,7 +1012,9 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    await user.click(screen.getByRole('button', { name: /Gesture with CST \(1\.00 CST\)/ }));
+    await user.click(
+      screen.getByRole('button', { name: /Gesture with CST \(1\.00 CST, receive ~100 CST\)/ }),
+    );
 
     expect(mockGestureForm.onGestureWithCST).toHaveBeenCalledTimes(1);
     expect(mockGestureForm.onGesture).not.toHaveBeenCalled();

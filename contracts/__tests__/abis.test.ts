@@ -26,6 +26,12 @@ function functionNames(abi: Abi): string[] {
     .map((item) => item.name);
 }
 
+function functionSignatures(abi: Abi): string[] {
+  return abi
+    .filter((item): item is AbiFunction => item.type === 'function')
+    .map((item) => `${item.name}(${(item.inputs ?? []).map((input) => input.type).join(',')})`);
+}
+
 describe('generated ABI barrel', () => {
   it.each(allAbis)('%s is a non-empty array of parsed ABI entries', (_name, abi) => {
     expect(Array.isArray(abi)).toBe(true);
@@ -39,6 +45,17 @@ describe('generated ABI barrel', () => {
 
   it('exposes the BidPlaced event the live refresh watcher depends on', () => {
     expect(eventNames(abis.cosmicGameAbi)).toContain('BidPlaced');
+  });
+
+  it('exposes upgraded CST bid reward and dynamic duration selectors', () => {
+    const signatures = functionSignatures(abis.cosmicGameAbi);
+    expect(signatures).toContain('getBidCstRewardAmount()');
+    expect(signatures).toContain('getBidCstRewardAmountAdvanced(int256)');
+    expect(signatures).toContain('getCstDutchAuctionDurations()');
+    expect(signatures).toContain('cstDutchAuctionDuration()');
+    expect(signatures).toContain('cstDutchAuctionDurationChangeDivisor()');
+    expect(signatures).toContain('bidWithCst(uint256,string,uint256)');
+    expect(signatures).toContain('bidWithEth(int256,string,uint256)');
   });
 
   it('parses the human-readable CosmicDAO ABI into structured entries', () => {

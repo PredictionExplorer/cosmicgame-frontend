@@ -99,9 +99,12 @@ const Contracts = () => {
 
     safeCall(async () => {
       const v = await readCosmicGameWithFallback<bigint>([
-        () => cosmicGameContract.read.cstRewardAmountForBidding?.() as Promise<bigint | undefined>,
-        () => cosmicGameContract.read.bidCstRewardAmount?.() as Promise<bigint | undefined>,
         () => cosmicGameContract.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
+        () =>
+          cosmicGameContract.read.getBidCstRewardAmountAdvanced?.([0n]) as Promise<
+            bigint | undefined
+          >,
+        () => cosmicGameContract.read.cstRewardAmountForBidding?.() as Promise<bigint | undefined>,
       ]);
       setCstRewardAmountForBidding(Number(formatEther(v ?? 0n)));
     }, 'cstRewardAmountForBidding');

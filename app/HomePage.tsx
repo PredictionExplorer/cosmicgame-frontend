@@ -12,6 +12,7 @@ import { LazyMotion, domAnimation, m } from 'framer-motion';
 
 import { formatSeconds, shortenHex } from '@/utils';
 
+import { formatCstAmount } from '@/utils/cstGesture';
 import { reportError } from '@/utils/errors';
 import { useNotify } from '@/hooks/useNotify';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
@@ -219,6 +220,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     gestureType,
     ethGestureInfo,
     cstGestureData,
+    bidCstRewardAmount,
     isGesturing,
     rwlkId,
     gestureCostPlus,
@@ -294,8 +296,14 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     if (gestureType === 'ETH') return `Gesture with ETH (${fmt(adj, 0.1)} ETH)`;
     if (gestureType === 'RandomWalk' && rwlkId !== -1)
       return `Gesture with ETH + RandomWalk token ${rwlkId} (${fmt(adj * 0.5, 0.2)} ETH)`;
-    if (gestureType === 'CST')
-      return `Gesture with CST ${cstGestureData.SecondsElapsed > cstGestureData.AuctionDuration ? '(FREE GESTURE)' : `(${cstGestureData.CSTPrice.toFixed(2)} CST)`}`;
+    if (gestureType === 'CST') {
+      const costLabel = cstGestureData.isFree
+        ? 'FREE GESTURE'
+        : `${cstGestureData.CSTPrice.toFixed(2)} CST`;
+      const rewardLabel =
+        bidCstRewardAmount != null ? `, receive ~${formatCstAmount(bidCstRewardAmount)} CST` : '';
+      return `Gesture with CST (${costLabel}${rewardLabel})`;
+    }
     if (gestureType === 'RandomWalk') return 'Gesture with ETH + RandomWalk';
     return `Gesture with ${gestureType}`;
   };

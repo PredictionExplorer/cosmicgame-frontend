@@ -66,19 +66,40 @@ describe('cosmicGameContractCompat', () => {
     ]);
   });
 
+  test('gestureArgsForV2 accepts a dynamic min limit', () => {
+    expect(gestureArgsForV2('bidWithCst', [100n, 'msg'], 42n)).toEqual([100n, 'msg', 42n]);
+  });
+
   test('withGestureArgsV1ThenV2 retries with V2 args on selector error', async () => {
     const calls: unknown[][] = [];
-    const result = await withGestureArgsV1ThenV2('bidWithCst', [100n, 'msg'], async (args) => {
-      calls.push([...args]);
-      if (args.length === 2) throw selectorError;
-      return '0xok';
-    });
+    const result = await withGestureArgsV1ThenV2(
+      'bidWithCst',
+      [100n, 'msg'],
+      async (args) => {
+        calls.push([...args]);
+        if (args.length === 2) throw selectorError;
+        return '0xok';
+      },
+      { preferV2First: false },
+    );
     expect(result).toBe('0xok');
     const expectedV2 = [100n, 'msg', GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2];
-    if (preferV2GestureArgsFirst()) {
-      expect(calls).toEqual([expectedV2, [100n, 'msg']]);
-    } else {
-      expect(calls).toEqual([[100n, 'msg'], expectedV2]);
-    }
+    expect(calls).toEqual([[100n, 'msg'], expectedV2]);
+  });
+
+  test('withGestureArgsV1ThenV2 can prefer V2 args with a dynamic min limit', async () => {
+    const calls: unknown[][] = [];
+    const result = await withGestureArgsV1ThenV2(
+      'bidWithCst',
+      [100n, 'msg'],
+      async (args) => {
+        calls.push([...args]);
+        return '0xok';
+      },
+      { bidCstRewardAmountMinLimit: 99n, preferV2First: true },
+    );
+    expect(result).toBe('0xok');
+    expect(calls).toEqual([[100n, 'msg', 99n]]);
+    expect(preferV2GestureArgsFirst()).toBe(true);
   });
 });

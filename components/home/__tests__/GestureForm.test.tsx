@@ -44,8 +44,20 @@ const defaultProps = {
   advancedExpanded: false,
   setAdvancedExpanded: jest.fn(),
   rwlknftIds: [1, 3, 5],
-  cstGestureData: { AuctionDuration: 3600, CSTPrice: 1.5, SecondsElapsed: 1800 },
+  cstGestureData: {
+    AuctionDuration: 3600,
+    CSTPrice: 1.5,
+    CSTPriceWei: 1500000000000000000n,
+    SecondsElapsed: 1800,
+    isFree: false,
+    source: 'api' as const,
+  },
   ethGestureInfo: { AuctionDuration: 3600, ETHPrice: 0.01, SecondsElapsed: 1800 },
+  bidCstRewardAmount: 100,
+  bidCstRewardAmountMin: 99,
+  isCstRewardLoading: false,
+  cstRewardTolerancePercent: 1,
+  setCstRewardTolerancePercent: jest.fn(),
 };
 
 beforeEach(() => {
@@ -96,6 +108,13 @@ describe('GestureForm', () => {
   it('CST selection shows Calibration Window info', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" />);
     expect(screen.getByText('Calibration Window Duration:')).toBeInTheDocument();
+  });
+
+  it('CST selection shows reward preview and minimum accepted amount', () => {
+    render(<GestureForm {...defaultProps} gestureType="CST" />);
+    expect(screen.getByText('CST Reward Preview')).toBeInTheDocument();
+    expect(screen.getByText('100 CST')).toBeInTheDocument();
+    expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
   });
 
   it('Message textarea accepts input', () => {
@@ -243,17 +262,37 @@ describe('GestureForm', () => {
     expect(screen.queryByText('Collision Prevention')).not.toBeInTheDocument();
   });
 
+  it('shows CST reward protection control for CST gesture type', () => {
+    render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="CST" />);
+    expect(screen.getByText('CST Reward Protection')).toBeInTheDocument();
+    expect(screen.getByText(/bidCstRewardAmountMinLimit_/)).toBeInTheDocument();
+  });
+
+  it('updates CST reward tolerance from advanced options', () => {
+    render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="CST" />);
+    const input = screen.getByPlaceholderText('1');
+    fireEvent.change(input, { target: { value: '5' } });
+    expect(defaultProps.setCstRewardTolerancePercent).toHaveBeenCalledWith(5);
+  });
+
   it('shows CalibrationInfo with endedMessage for CST when window closed', () => {
     render(
       <GestureForm
         {...defaultProps}
         gestureType="CST"
-        cstGestureData={{ AuctionDuration: 3600, CSTPrice: 1.5, SecondsElapsed: 4000 }}
+        cstGestureData={{
+          ...defaultProps.cstGestureData,
+          AuctionDuration: 43200,
+          SecondsElapsed: 50000,
+          source: 'contract',
+          apiAuctionDuration: 3600,
+        }}
       />,
     );
     expect(
       screen.getByText('Calibration Window ended \u2014 you can gesture for free.'),
     ).toBeInTheDocument();
+    expect(screen.getByText(/Using on-chain duration/)).toBeInTheDocument();
   });
 
   it('marks the selected gesture method with aria-pressed', () => {

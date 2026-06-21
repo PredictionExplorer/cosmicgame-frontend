@@ -192,6 +192,7 @@ const makeDashboardData = (overrides = {}) => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockWriteText.mockClear();
+  mockUseContractNoSigner.mockReturnValue(null);
 });
 
 /* ── Tests ─────────────────────────────────────────────────────── */
@@ -267,6 +268,31 @@ describe('Contracts', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('CST Calibration Window')).toBeInTheDocument();
     expect(screen.getByText('ETH Calibration Window')).toBeInTheDocument();
+  });
+
+  it('renders dynamic CST calibration duration from contract reads', async () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    mockUseContractNoSigner.mockReturnValue({
+      read: {
+        bidMessageLengthMaxLimit: jest.fn().mockResolvedValue(280n),
+        ethBidPriceIncreaseDivisor: jest.fn().mockResolvedValue(100n),
+        mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
+        mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
+        getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
+        getBidCstRewardAmount: jest.fn().mockResolvedValue(100000000000000000000n),
+        getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
+        getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
+        cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
+        charityAddress: jest.fn().mockResolvedValue('0xCharityBeneficiary'),
+      },
+    });
+
+    render(<Contracts />);
+
+    await waitFor(() => {
+      expect(screen.getByText('43200s')).toBeInTheDocument();
+      expect(screen.getByText('1200s')).toBeInTheDocument();
+    });
   });
 
   it('renders stellar selection configuration cards', () => {

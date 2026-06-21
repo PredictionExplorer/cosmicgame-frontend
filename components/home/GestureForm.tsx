@@ -1,6 +1,9 @@
 import { zeroAddress } from 'viem';
 import { Settings2, Info } from 'lucide-react';
 
+import { formatSeconds } from '@/utils';
+
+import { formatCstAmount } from '@/utils/cstGesture';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -43,6 +46,11 @@ interface GestureFormProps {
   rwlknftIds: number[];
   cstGestureData: CSTGestureData;
   ethGestureInfo: EthGestureInfo | null;
+  bidCstRewardAmount?: number | null;
+  bidCstRewardAmountMin?: number | null;
+  isCstRewardLoading?: boolean;
+  cstRewardTolerancePercent?: number;
+  setCstRewardTolerancePercent?: (value: number) => void;
   previewMode?: boolean;
 }
 
@@ -78,6 +86,11 @@ export function GestureForm({
   rwlknftIds,
   cstGestureData,
   ethGestureInfo,
+  bidCstRewardAmount = null,
+  bidCstRewardAmountMin = null,
+  isCstRewardLoading = false,
+  cstRewardTolerancePercent = 1,
+  setCstRewardTolerancePercent,
   previewMode = false,
 }: GestureFormProps) {
   const showAll = data?.LastBidderAddr !== zeroAddress;
@@ -152,11 +165,41 @@ export function GestureForm({
       )}
 
       {gestureType === 'CST' && (
-        <AuctionInfo
-          secondsElapsed={cstGestureData.SecondsElapsed}
-          auctionDuration={cstGestureData.AuctionDuration}
-          endedMessage="Calibration Window ended — you can gesture for free."
-        />
+        <div className="space-y-3">
+          <AuctionInfo
+            secondsElapsed={cstGestureData.SecondsElapsed}
+            auctionDuration={cstGestureData.AuctionDuration}
+            endedMessage="Calibration Window ended — you can gesture for free."
+          />
+          <div className="rounded-xl border border-emerald-400/15 bg-emerald-400/[0.045] p-4 text-sm">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  CST Reward Preview
+                </p>
+                <p className="mt-1 text-muted-foreground">
+                  Estimated CST you receive if this gesture lands.
+                </p>
+              </div>
+              <div className="text-right font-mono tabular-nums">
+                <p className="text-base font-semibold text-emerald-300">
+                  {isCstRewardLoading ? 'Loading...' : `${formatCstAmount(bidCstRewardAmount)} CST`}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Min accepted: {formatCstAmount(bidCstRewardAmountMin)} CST
+                </p>
+              </div>
+            </div>
+            {cstGestureData.source === 'contract' &&
+              cstGestureData.apiAuctionDuration != null &&
+              cstGestureData.apiAuctionDuration !== cstGestureData.AuctionDuration && (
+                <p className="mt-3 text-xs text-amber-200/90">
+                  Using on-chain duration ({formatSeconds(cstGestureData.AuctionDuration)}) because
+                  the API reported {formatSeconds(cstGestureData.apiAuctionDuration)}.
+                </p>
+              )}
+          </div>
+        </div>
       )}
 
       {previewMode && (
@@ -222,6 +265,44 @@ export function GestureForm({
               <p className="text-xs text-muted-foreground">
                 Attach tokens or NFTs to your gesture, or adjust gesture-cost collision prevention.
               </p>
+              {gestureType === 'CST' && (
+                <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    CST Reward Protection
+                  </p>
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-sm text-muted-foreground whitespace-nowrap">
+                        Allow reward to move down by
+                      </span>
+                      <div className="relative w-[4.75rem] shrink-0">
+                        <CustomTextField
+                          type="number"
+                          placeholder="1"
+                          value={cstRewardTolerancePercent}
+                          min={0}
+                          max={100}
+                          step={0.1}
+                          className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
+                          disabled={previewMode || !setCstRewardTolerancePercent}
+                          onChange={(e) => setCstRewardTolerancePercent?.(Number(e.target.value))}
+                        />
+                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-xs">
+                          %
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-sm font-mono text-muted-foreground tabular-nums min-w-0">
+                      min {formatCstAmount(bidCstRewardAmountMin)} CST
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    This becomes the V2 `bidCstRewardAmountMinLimit_` value. If the contract would
+                    mint less CST than this minimum by the time your transaction lands, the gesture
+                    should revert instead of accepting a worse reward.
+                  </p>
+                </div>
+              )}
               <RadioGroup
                 value={contributionType}
                 onValueChange={(value) => {
