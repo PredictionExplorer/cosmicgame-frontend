@@ -4,7 +4,7 @@
  *
  * Source of truth:
  * - Proxy: 0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2
- * - Implementation: 0x7739148013777c485AD9f3d971e1005Eca686661
+ * - Implementation: 0x50eB3d05d2C463949DE9238D419385594f7AdB97
  * - Sourcify match: "perfect" for chain 42161
  *
  * Typical per-cycle imprint totals:
@@ -15,7 +15,7 @@
 export const protocolFacts = {
   contractAddresses: {
     proxy: '0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2',
-    implementation: '0x7739148013777c485AD9f3d971e1005Eca686661',
+    implementation: '0x50eB3d05d2C463949DE9238D419385594f7AdB97',
   },
   mainEthPercentage: 25,
   chronoWarriorEthPercentage: 8,

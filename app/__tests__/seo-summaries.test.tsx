@@ -3,6 +3,7 @@ import { ContractsSeoSummary } from '@/app/contracts/ContractsSeoSummary';
 import { CurrentCycleSeoSummary } from '@/app/current-cycle/CurrentCycleSeoSummary';
 import { GallerySeoSummary } from '@/app/gallery/GallerySeoSummary';
 import { StatisticsSeoSummary } from '@/app/statistics/StatisticsSeoSummary';
+import { protocolFacts } from '@/content/protocol-facts';
 import { statisticsCopy } from '@/content/statistics-copy';
 
 import { HomeObservatoryHero } from '@/components/home/HomeObservatoryHero';
@@ -87,6 +88,15 @@ const dashboard = {
     CosmicGameAddr: '0x1111111111111111111111111111111111111111',
     CosmicTokenAddr: '0x2222222222222222222222222222222222222222',
     CosmicSignatureAddr: '0x3333333333333333333333333333333333333333',
+    RandomWalkAddr: '0x4444444444444444444444444444444444444444',
+    CosmicDaoAddr: '0x5555555555555555555555555555555555555555',
+    CharityWalletAddr: '0x6666666666666666666666666666666666666666',
+    MarketingWalletAddr: '0x7777777777777777777777777777777777777777',
+    PrizesWalletAddr: '0x8888888888888888888888888888888888888888',
+    StakingWalletCSTAddr: '0x9999999999999999999999999999999999999999',
+    StakingWalletRWalkAddr: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    MarketplaceAddr: '0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
+    ImplementationAddr: '0x7739148013777c485AD9f3d971e1005Eca686661',
   },
 };
 
@@ -95,7 +105,7 @@ describe('server-visible SEO summaries', () => {
     mockGetRoundList.mockResolvedValue([]);
     mockGetClaimHistory.mockResolvedValue([]);
     mockGetDashboardInfo.mockResolvedValue(
-      dashboard as Awaited<ReturnType<typeof get_dashboard_info>>,
+      dashboard as unknown as Awaited<ReturnType<typeof get_dashboard_info>>,
     );
     mockMarketingRewards.mockResolvedValue([{ MarketerAddr: '0xabc' }] as Awaited<
       ReturnType<typeof get_marketing_rewards>
@@ -119,7 +129,7 @@ describe('server-visible SEO summaries', () => {
   it('renders the app home H1 and crawlable app links in the live hero', () => {
     render(
       <HomeObservatoryHero
-        data={dashboard as Parameters<typeof HomeObservatoryHero>[0]['data']}
+        data={dashboard as unknown as Parameters<typeof HomeObservatoryHero>[0]['data']}
         bannerToken={{ seed: 'sample', id: -1 }}
         canOpenGesturePanel
         phase="live"
@@ -181,6 +191,12 @@ describe('server-visible SEO summaries', () => {
       screen.getByRole('heading', { level: 1, name: 'Cosmic Signature Contracts' }),
     ).toBeInTheDocument();
     expect(screen.getByText('0x1111111111111111111111111111111111111111')).toBeInTheDocument();
+    expect(screen.getByText(protocolFacts.contractAddresses.implementation)).toBeInTheDocument();
+    expect(
+      screen.queryByText('0x7739148013777c485AD9f3d971e1005Eca686661'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('MarketplaceAddr')).toBeInTheDocument();
+    expect(screen.getByText('0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb')).toBeInTheDocument();
   });
 
   it('renders gallery and current-cycle H1 summaries', async () => {

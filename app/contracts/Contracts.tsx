@@ -23,82 +23,14 @@ import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { NetworkBadge } from './components/NetworkBadge';
 import { FundDistribution } from './components/FundDistribution';
 import { GameConfiguration } from './components/GameConfiguration';
-import { ContractAddressGrid, type ContractEntry } from './components/ContractAddressGrid';
+import { ContractAddressGrid } from './components/ContractAddressGrid';
 import { AuctionParameters } from './components/AuctionParameters';
+import { buildContracts } from './contractAddressData';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
-
-function buildContracts(addrs: Record<string, string | undefined> | undefined): ContractEntry[] {
-  if (!addrs) return [];
-  return [
-    {
-      name: 'Cosmic Signature Protocol',
-      address: addrs.CosmicGameAddr ?? '',
-      description:
-        'The main protocol contract that manages cycles, gestures, and allocation distribution',
-      category: 'core',
-    },
-    {
-      name: 'Cosmic Signature CST Token',
-      address: addrs.CosmicTokenAddr ?? '',
-      description:
-        'ERC-20 token (CST) imprinted with every gesture and used to express Coordination Weight on the Cosmic Council',
-      category: 'core',
-    },
-    {
-      name: 'Cosmic Signature NFT',
-      address: addrs.CosmicSignatureAddr ?? '',
-      description: 'ERC-721 NFT collection imprinted as allocations to cycle recipients',
-      category: 'core',
-    },
-    {
-      name: 'RandomWalk',
-      address: addrs.RandomWalkAddr ?? '',
-      description:
-        'RandomWalk NFT collection that can be attached to ETH gestures for a one-time discount or anchored for Anchored-NFT Stellar Selection eligibility',
-      category: 'core',
-    },
-    {
-      name: 'Cosmic Council',
-      address: addrs.CosmicDaoAddr ?? '',
-      description: 'On-chain Protocol Coordination contract for Coordination Proposals',
-      category: 'core',
-    },
-    {
-      name: 'Public Goods Vault',
-      address: addrs.CharityWalletAddr ?? '',
-      description: "Receives the Public Goods Allocation from each cycle's Cycle Reserve",
-      category: 'wallet',
-    },
-    {
-      name: 'Outreach Reserve',
-      address: addrs.MarketingWalletAddr ?? '',
-      description: 'Funds allocated for outreach distributions and ecosystem contributors',
-      category: 'wallet',
-    },
-    {
-      name: 'Allocations Wallet',
-      address: addrs.PrizesWalletAddr ?? '',
-      description: 'Escrow contract holding allocations awaiting retrieval',
-      category: 'wallet',
-    },
-    {
-      name: 'Cosmic Signature NFT Anchoring Wallet',
-      address: addrs.StakingWalletCSTAddr ?? '',
-      description: 'Anchoring contract for Cosmic Signature NFTs',
-      category: 'anchoring',
-    },
-    {
-      name: 'RWLK Anchoring Wallet',
-      address: addrs.StakingWalletRWalkAddr ?? '',
-      description: 'Anchoring contract for RandomWalk NFTs',
-      category: 'anchoring',
-    },
-  ].filter((c) => c.address) as ContractEntry[];
-}
 
 const Contracts = () => {
   const { data, isLoading: loading } = useDashboardInfo();

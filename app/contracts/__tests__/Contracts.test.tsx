@@ -1,3 +1,5 @@
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { render, screen, fireEvent, waitFor, checkA11y } from '@/test-utils';
 
 import Contracts from '../Contracts';
@@ -182,6 +184,7 @@ const makeDashboardData = (overrides = {}) => ({
     PrizesWalletAddr: '0xPrizesAddr',
     StakingWalletCSTAddr: '0xStakeCSTAddr',
     StakingWalletRWalkAddr: '0xStakeRWLKAddr',
+    ImplementationAddr: '0x7739148013777c485AD9f3d971e1005Eca686661',
   },
   ...overrides,
 });
@@ -240,9 +243,20 @@ describe('Contracts', () => {
   it('renders contract address cards', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
+    expect(screen.getByText('Implementation Contract')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature CST Token')).toBeInTheDocument();
     expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
+  });
+
+  it('renders the verified implementation address over a stale dashboard value', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<Contracts />);
+
+    expect(screen.getByText(protocolFacts.contractAddresses.implementation)).toBeInTheDocument();
+    expect(
+      screen.queryByText('0x7739148013777c485AD9f3d971e1005Eca686661'),
+    ).not.toBeInTheDocument();
   });
 
   it('renders calibration parameters section', () => {

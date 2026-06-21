@@ -1,42 +1,20 @@
 import Link from 'next/link';
 
-import { protocolFacts } from '@/content/protocol-facts';
-
 import { networkConfig } from '@/config/networks';
 import { get_dashboard_info } from '@/services/api/rounds';
 
-const CONTRACT_LABELS: Record<string, string> = {
-  CosmicGameAddr: 'Cosmic Signature Protocol',
-  CosmicTokenAddr: 'Cosmic Signature CST Token',
-  CosmicSignatureAddr: 'Cosmic Signature NFT',
-  RandomWalkAddr: 'RandomWalk NFT',
-  CosmicDaoAddr: 'Cosmic Council',
-  CharityWalletAddr: 'Public Goods Vault',
-  PrizesWalletAddr: 'Allocations Wallet',
-  StakingWalletCSTAddr: 'Cosmic Signature NFT Anchoring Wallet',
-  StakingWalletRWalkAddr: 'RWLK Anchoring Wallet',
-  MarketingWalletAddr: 'Outreach Reserve',
-  ImplementationAddr: 'Implementation Contract',
-};
-
-function isAddress(value: unknown): value is string {
-  return typeof value === 'string' && /^0x[a-fA-F0-9]{40}$/.test(value);
-}
+import { getSeoContractAddressEntries } from './contractAddressData';
 
 export async function ContractsSeoSummary() {
   const data = await get_dashboard_info();
-  const fallbackAddrs = {
-    CosmicGameAddr: protocolFacts.contractAddresses.proxy,
-    ImplementationAddr: protocolFacts.contractAddresses.implementation,
-  };
-  const entries = Object.entries({ ...fallbackAddrs, ...(data?.ContractAddrs ?? {}) })
-    .filter((entry): entry is [string, string] => isAddress(entry[1]))
-    .map(([key, address]) => ({
+  const entries = getSeoContractAddressEntries(data?.ContractAddrs).map(
+    ({ key, label, address }) => ({
       key,
-      label: CONTRACT_LABELS[key] ?? key,
+      label,
       address,
       explorerUrl: `${networkConfig.explorerUrl.replace(/\/$/, '')}/address/${address}`,
-    }));
+    }),
+  );
 
   return (
     <section
@@ -61,7 +39,7 @@ export async function ContractsSeoSummary() {
       ) : null}
       {entries.length > 0 ? (
         <dl className="mt-6 grid gap-3 md:grid-cols-2">
-          {entries.slice(0, 10).map(({ key, label, address, explorerUrl }) => (
+          {entries.map(({ key, label, address, explorerUrl }) => (
             <div key={key} className="rounded-xl border border-white/[0.06] bg-black/20 p-4">
               <dt className="text-sm font-semibold text-foreground">{label}</dt>
               <dd className="mt-2 break-all font-mono text-xs text-muted-foreground">

@@ -4,15 +4,12 @@ import { motion } from 'framer-motion';
 
 import { SectionDivider } from '@/components/ui/section-divider';
 
+import type { ContractEntry } from '../contractAddressData';
+
 import { ContractAddressCard } from './ContractAddressCard';
 import { ContractSearch } from './ContractSearch';
 
-export interface ContractEntry {
-  name: string;
-  address: string;
-  description: string;
-  category: 'core' | 'wallet' | 'anchoring';
-}
+export type { ContractEntry };
 
 interface ContractAddressGridProps {
   contracts: ContractEntry[];
