@@ -76,8 +76,8 @@ const mockGestureWithEthAndContributeToken = jest.fn().mockResolvedValue('0xhash
 const mockGestureWithCstAndContributeToken = jest.fn().mockResolvedValue('0xhash');
 const mockGetNextEthGestureCost = jest.fn().mockResolvedValue(BigInt(1e16));
 const mockGetNextCstGestureCost = jest.fn().mockResolvedValue(BigInt(100));
-const mockGetBidCstRewardAmount = jest.fn().mockResolvedValue(BigInt('100000000000000000000'));
-const mockGetBidCstRewardAmountAdvanced = jest
+const mockGetGestureCstRewardAmount = jest.fn().mockResolvedValue(BigInt('100000000000000000000'));
+const mockGetGestureCstRewardAmountAdvanced = jest
   .fn()
   .mockResolvedValue(BigInt('100000000000000000000'));
 
@@ -85,8 +85,8 @@ const mockContractObj = {
   read: {
     getNextEthBidPrice: mockGetNextEthGestureCost,
     getNextCstBidPrice: mockGetNextCstGestureCost,
-    getBidCstRewardAmount: mockGetBidCstRewardAmount,
-    getBidCstRewardAmountAdvanced: mockGetBidCstRewardAmountAdvanced,
+    getBidCstRewardAmount: mockGetGestureCstRewardAmount,
+    getBidCstRewardAmountAdvanced: mockGetGestureCstRewardAmountAdvanced,
   },
   write: {
     bidWithEth: mockGestureWithEth,
@@ -250,8 +250,8 @@ beforeEach(() => {
   mockGestureWithCstAndContributeToken.mockResolvedValue('0xhash');
   mockGetNextEthGestureCost.mockResolvedValue(BigInt(1e16));
   mockGetNextCstGestureCost.mockResolvedValue(BigInt(100));
-  mockGetBidCstRewardAmount.mockResolvedValue(BigInt('100000000000000000000'));
-  mockGetBidCstRewardAmountAdvanced.mockResolvedValue(BigInt('100000000000000000000'));
+  mockGetGestureCstRewardAmount.mockResolvedValue(BigInt('100000000000000000000'));
+  mockGetGestureCstRewardAmountAdvanced.mockResolvedValue(BigInt('100000000000000000000'));
   mockGetBalance.mockResolvedValue(BigInt(10e18));
   mockGetCode.mockResolvedValue('0x1234');
   mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {

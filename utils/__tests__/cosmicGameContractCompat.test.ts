@@ -96,7 +96,7 @@ describe('cosmicGameContractCompat', () => {
         calls.push([...args]);
         return '0xok';
       },
-      { bidCstRewardAmountMinLimit: 99n, preferV2First: true },
+      { cstRewardAmountMinLimit: 99n, preferV2First: true },
     );
     expect(result).toBe('0xok');
     expect(calls).toEqual([[100n, 'msg', 99n]]);

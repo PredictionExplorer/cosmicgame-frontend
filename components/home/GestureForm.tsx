@@ -46,8 +46,8 @@ interface GestureFormProps {
   rwlknftIds: number[];
   cstGestureData: CSTGestureData;
   ethGestureInfo: EthGestureInfo | null;
-  bidCstRewardAmount?: number | null;
-  bidCstRewardAmountMin?: number | null;
+  gestureCstRewardAmount?: number | null;
+  gestureCstRewardAmountMin?: number | null;
   isCstRewardLoading?: boolean;
   cstRewardTolerancePercent?: number;
   setCstRewardTolerancePercent?: (value: number) => void;
@@ -86,8 +86,8 @@ export function GestureForm({
   rwlknftIds,
   cstGestureData,
   ethGestureInfo,
-  bidCstRewardAmount = null,
-  bidCstRewardAmountMin = null,
+  gestureCstRewardAmount = null,
+  gestureCstRewardAmountMin = null,
   isCstRewardLoading = false,
   cstRewardTolerancePercent = 1,
   setCstRewardTolerancePercent,
@@ -183,10 +183,12 @@ export function GestureForm({
               </div>
               <div className="text-right font-mono tabular-nums">
                 <p className="text-base font-semibold text-emerald-300">
-                  {isCstRewardLoading ? 'Loading...' : `${formatCstAmount(bidCstRewardAmount)} CST`}
+                  {isCstRewardLoading
+                    ? 'Loading...'
+                    : `${formatCstAmount(gestureCstRewardAmount)} CST`}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Min accepted: {formatCstAmount(bidCstRewardAmountMin)} CST
+                  Min accepted: {formatCstAmount(gestureCstRewardAmountMin)} CST
                 </p>
               </div>
             </div>
@@ -293,7 +295,7 @@ export function GestureForm({
                       </div>
                     </div>
                     <span className="text-sm font-mono text-muted-foreground tabular-nums min-w-0">
-                      min {formatCstAmount(bidCstRewardAmountMin)} CST
+                      min {formatCstAmount(gestureCstRewardAmountMin)} CST
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">

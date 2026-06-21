@@ -220,7 +220,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     gestureType,
     ethGestureInfo,
     cstGestureData,
-    bidCstRewardAmount,
+    gestureCstRewardAmount,
     isGesturing,
     rwlkId,
     gestureCostPlus,
@@ -301,7 +301,9 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
         ? 'FREE GESTURE'
         : `${cstGestureData.CSTPrice.toFixed(2)} CST`;
       const rewardLabel =
-        bidCstRewardAmount != null ? `, receive ~${formatCstAmount(bidCstRewardAmount)} CST` : '';
+        gestureCstRewardAmount != null
+          ? `, receive ~${formatCstAmount(gestureCstRewardAmount)} CST`
+          : '';
       return `Gesture with CST (${costLabel}${rewardLabel})`;
     }
     if (gestureType === 'RandomWalk') return 'Gesture with ETH + RandomWalk';

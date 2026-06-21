@@ -75,7 +75,7 @@ export function useGestureForm() {
   const [contractCstDurations, setContractCstDurations] = useState<CstAuctionDurations | null>(
     null,
   );
-  const [bidCstRewardAmountWei, setBidCstRewardAmountWei] = useState<bigint | null>(null);
+  const [gestureCstRewardAmountWei, setGestureCstRewardAmountWei] = useState<bigint | null>(null);
   const [isCstRewardLoading, setIsCstRewardLoading] = useState(false);
   const [cstRewardTolerancePercent, setCstRewardTolerancePercent] = useState(1);
 
@@ -92,26 +92,26 @@ export function useGestureForm() {
     };
   }, [bidEthPriceData]);
 
-  const bidCstRewardAmount = useMemo(() => {
-    if (bidCstRewardAmountWei == null) return null;
-    const value = Number(formatEther(bidCstRewardAmountWei));
+  const gestureCstRewardAmount = useMemo(() => {
+    if (gestureCstRewardAmountWei == null) return null;
+    const value = Number(formatEther(gestureCstRewardAmountWei));
     return Number.isFinite(value) ? value : null;
-  }, [bidCstRewardAmountWei]);
+  }, [gestureCstRewardAmountWei]);
 
   const cstRewardToleranceBps = useMemo(() => {
     const clamped = Math.min(100, Math.max(0, cstRewardTolerancePercent));
     return Math.round(clamped * 100);
   }, [cstRewardTolerancePercent]);
 
-  const bidCstRewardAmountMinLimitWei = useMemo(() => {
-    if (!bidCstRewardAmountWei || bidCstRewardAmountWei <= 0n) return 0n;
-    return (bidCstRewardAmountWei * BigInt(10_000 - cstRewardToleranceBps)) / 10_000n;
-  }, [bidCstRewardAmountWei, cstRewardToleranceBps]);
+  const gestureCstRewardAmountMinLimitWei = useMemo(() => {
+    if (!gestureCstRewardAmountWei || gestureCstRewardAmountWei <= 0n) return 0n;
+    return (gestureCstRewardAmountWei * BigInt(10_000 - cstRewardToleranceBps)) / 10_000n;
+  }, [gestureCstRewardAmountWei, cstRewardToleranceBps]);
 
-  const bidCstRewardAmountMin = useMemo(() => {
-    const value = Number(formatEther(bidCstRewardAmountMinLimitWei));
+  const gestureCstRewardAmountMin = useMemo(() => {
+    const value = Number(formatEther(gestureCstRewardAmountMinLimitWei));
     return Number.isFinite(value) ? value : 0;
-  }, [bidCstRewardAmountMinLimitWei]);
+  }, [gestureCstRewardAmountMinLimitWei]);
 
   useEffect(() => {
     if (!publicClient || !contractAddrs.cosmicGame) return;
@@ -150,7 +150,7 @@ export function useGestureForm() {
 
   useEffect(() => {
     if (!cosmicGameContract) {
-      setBidCstRewardAmountWei(null);
+      setGestureCstRewardAmountWei(null);
       return;
     }
     let cancelled = false;
@@ -164,11 +164,11 @@ export function useGestureForm() {
         >,
     ])
       .then((value) => {
-        if (!cancelled) setBidCstRewardAmountWei(value ?? null);
+        if (!cancelled) setGestureCstRewardAmountWei(value ?? null);
       })
       .catch((e) => {
         if (!cancelled) {
-          setBidCstRewardAmountWei(null);
+          setGestureCstRewardAmountWei(null);
           reportError(e, 'getBidCstRewardAmount');
         }
       })
@@ -401,7 +401,7 @@ export function useGestureForm() {
     try {
       return (
         (await withGestureArgsV1ThenV2(fnName, args, estimate, {
-          bidCstRewardAmountMinLimit: bidCstRewardAmountMinLimitWei,
+          cstRewardAmountMinLimit: gestureCstRewardAmountMinLimitWei,
         })) * 2n
       );
     } catch {
@@ -460,7 +460,7 @@ export function useGestureForm() {
           ...(options?.value !== undefined ? { value: options.value } : {}),
           ...(options?.gas !== undefined ? { gas: options.gas } : {}),
         }),
-      { bidCstRewardAmountMinLimit: bidCstRewardAmountMinLimitWei },
+      { cstRewardAmountMinLimit: gestureCstRewardAmountMinLimitWei },
     );
 
   /**
@@ -750,9 +750,9 @@ export function useGestureForm() {
     setContributionType,
     cstGestureData,
     ethGestureInfo,
-    bidCstRewardAmount,
-    bidCstRewardAmountMin,
-    bidCstRewardAmountMinLimitWei,
+    gestureCstRewardAmount,
+    gestureCstRewardAmountMin,
+    gestureCstRewardAmountMinLimitWei,
     isCstRewardLoading,
     cstRewardTolerancePercent,
     setCstRewardTolerancePercent: updateCstRewardTolerancePercent,

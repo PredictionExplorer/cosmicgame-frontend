@@ -18,7 +18,7 @@ const cosmicGameAbiFull = cosmicGameJson as Abi;
 export const GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2 = 0n;
 
 export interface GestureArgsCompatOptions {
-  bidCstRewardAmountMinLimit?: bigint;
+  cstRewardAmountMinLimit?: bigint;
   preferV2First?: boolean;
 }
 
@@ -133,9 +133,9 @@ export function normalizeV1GestureArgs(
 export function gestureArgsForV2(
   functionName: CosmicGameGestureFunctionName,
   v1Args: readonly unknown[],
-  bidCstRewardAmountMinLimit: bigint = GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2,
+  cstRewardAmountMinLimit: bigint = GESTURE_CST_REWARD_AMOUNT_MIN_LIMIT_V2,
 ): readonly unknown[] {
-  const minLimit = bidCstRewardAmountMinLimit;
+  const minLimit = cstRewardAmountMinLimit;
   switch (functionName) {
     case 'bidWithEth':
       return [v1Args[0], v1Args[1], minLimit];
@@ -164,7 +164,7 @@ export async function withGestureArgsV1ThenV2<T>(
   options: GestureArgsCompatOptions = {},
 ): Promise<T> {
   const normalized = normalizeV1GestureArgs(functionName, v1Args);
-  const v2Args = gestureArgsForV2(functionName, normalized, options.bidCstRewardAmountMinLimit);
+  const v2Args = gestureArgsForV2(functionName, normalized, options.cstRewardAmountMinLimit);
   const shouldPreferV2 = options.preferV2First ?? preferV2GestureArgsFirst();
   const attempts = shouldPreferV2 ? [v2Args, normalized] : [normalized, v2Args];
 
