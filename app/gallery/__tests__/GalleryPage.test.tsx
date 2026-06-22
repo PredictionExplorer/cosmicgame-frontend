@@ -129,7 +129,7 @@ describe('GalleryPage', () => {
   it('renders NFT cards when data is loaded', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
-    expect(screen.getByText('#000003')).toBeInTheDocument();
+    expect(screen.getAllByText('#000003').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('#000002')).toBeInTheDocument();
     expect(screen.getByText('#000001')).toBeInTheDocument();
   });
@@ -158,7 +158,7 @@ describe('GalleryPage', () => {
     mockUseCSTList.mockReturnValue({ data: mockNFTs, isLoading: false, error: null });
     render(<GalleryPage />);
     fireEvent.click(screen.getByRole('radio', { name: /Anchored/i }));
-    expect(screen.getByText('#000003')).toBeInTheDocument();
+    expect(screen.getAllByText('#000003').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('#000002')).toBeInTheDocument();
     expect(screen.queryByText('#000001')).not.toBeInTheDocument();
   });

@@ -70,6 +70,16 @@ describe('NFTImage', () => {
     expect(extractOptimizedUrl(src)).not.toBe('/images/qmark.png');
   });
 
+  test('can render a neutral unavailable state instead of a terminal image fallback', () => {
+    const brokenSrc = 'https://example.com/real-token-that-failed.png';
+    render(<NFTImage src={brokenSrc} terminalFallbackSrc={null} alt="Real NFT" />);
+    const img = screen.getByAltText('Real NFT');
+
+    fireEvent.error(img);
+
+    expect(screen.getByRole('img', { name: 'Real NFT' })).toHaveTextContent('Artwork unavailable');
+  });
+
   test('defaults to lazy loading for below-the-fold use', () => {
     const mockData = getAssetsUrl('cosmicsignature/000000.png');
     render(<NFTImage src={mockData} />);

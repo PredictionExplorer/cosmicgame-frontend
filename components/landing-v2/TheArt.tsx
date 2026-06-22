@@ -1,15 +1,104 @@
 'use client';
 
-import Image from 'next/image';
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 
+import { formatId, getAssetsUrl } from '@/utils';
 import { landingContent } from '@/content/landing';
+
+import { networkConfig } from '@/config/networks';
+import { APP_ORIGIN } from '@/lib/hostRouting';
+import { useRotatingIndex } from '@/hooks/useRotatingIndex';
+import NFTImage from '@/components/nft/NFTImage';
 
 import { SectionHeading } from './SectionHeading';
 
 const { art } = landingContent;
+const SHOWCASE_LIMIT = 36;
+const ROTATION_MS = 18_000;
+
+interface LandingShowcaseToken {
+  TokenId: number;
+  Seed?: string | number;
+  TokenName?: string;
+}
+
+function landingApiUrl(path: string): string {
+  const base = (networkConfig.apiUrl || '').replace(/\/+$/, '');
+  const cleanPath = path.replace(/^\/+/, '');
+  return base ? `${base}/${cleanPath}` : `/${cleanPath}`;
+}
+
+function isShowcaseToken(token: LandingShowcaseToken): boolean {
+  return Number.isFinite(token.TokenId) && token.Seed !== undefined && String(token.Seed) !== '';
+}
+
+function useLandingShowcaseTokens() {
+  const [tokens, setTokens] = useState<LandingShowcaseToken[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchTokens() {
+      try {
+        const response = await fetch(landingApiUrl(`cst/list/all/0/${SHOWCASE_LIMIT}`));
+        if (!response.ok) return;
+        const body = (await response.json()) as {
+          CosmicSignatureTokenList?: LandingShowcaseToken[];
+        };
+        if (cancelled) return;
+        setTokens((body.CosmicSignatureTokenList ?? []).filter(isShowcaseToken));
+      } catch {
+        if (!cancelled) setTokens([]);
+      }
+    }
+
+    void fetchTokens();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return tokens;
+}
+
+function GenerativeProcessVisual() {
+  return (
+    <div className="relative flex h-full min-h-[24rem] items-center justify-center overflow-hidden">
+      <div className="absolute h-64 w-64 rounded-full border border-white/10" />
+      <div className="absolute h-44 w-44 rounded-full border border-primary/20" />
+      <div className="absolute h-24 w-24 rounded-full border border-[rgb(var(--nebula-violet-rgb)/0.35)]" />
+      <div className="absolute h-3 w-3 rounded-full bg-primary shadow-[0_0_28px_rgb(var(--aurora-cyan-rgb)/0.8)]" />
+      <div className="absolute h-px w-72 rotate-12 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+      <div className="absolute h-px w-56 -rotate-[32deg] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+      <div className="relative z-[1] max-w-xs px-6 text-center">
+        <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-white/50">
+          Live archive syncing
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-white/70">
+          Real generated NFTs appear here as soon as indexed token metadata is available.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export function TheArt() {
+  const tokens = useLandingShowcaseTokens();
+  const rotationIndex = useRotatingIndex({
+    count: tokens.length,
+    intervalMs: ROTATION_MS,
+    enabled: tokens.length > 1,
+    randomStart: true,
+  });
+  const showcaseToken = tokens[rotationIndex ?? 0] ?? null;
+  const showcaseImage = useMemo(() => {
+    if (!showcaseToken?.Seed) return null;
+    return getAssetsUrl(`cosmicsignature/0x${showcaseToken.Seed}.png`);
+  }, [showcaseToken]);
+  const tokenLabel = showcaseToken ? formatId(showcaseToken.TokenId) : null;
+
   return (
     <section className="relative overflow-hidden border-t border-white/10 bg-[#0D0521] py-28 sm:py-40">
       <div
@@ -26,14 +115,24 @@ export function TheArt() {
 
         <div className="mt-20 grid gap-16 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
           <div className="relative aspect-square max-w-xl overflow-hidden rounded-3xl border border-white/10 bg-black/40">
-            <Image
-              src="/images/CosmicSignatureNFT.png"
-              alt="A Cosmic Signature artwork: a deterministic three-body orbit rendered spectrally."
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              priority={false}
-            />
+            {showcaseToken && showcaseImage && tokenLabel ? (
+              <Link
+                key={showcaseToken.TokenId}
+                href={`${APP_ORIGIN}/detail/${showcaseToken.TokenId}`}
+                className="group block h-full animate-in fade-in duration-700"
+                aria-label={`View Cosmic Signature ${tokenLabel}`}
+              >
+                <NFTImage
+                  src={showcaseImage}
+                  alt={`Cosmic Signature artwork ${tokenLabel}`}
+                  terminalFallbackSrc={null}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="h-full aspect-square object-cover transition-transform duration-700 group-hover:scale-[1.025]"
+                />
+              </Link>
+            ) : (
+              <GenerativeProcessVisual />
+            )}
             <div
               className="pointer-events-none absolute inset-0"
               style={{
@@ -43,8 +142,10 @@ export function TheArt() {
               aria-hidden
             />
             <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between rounded-xl border border-white/10 bg-black/50 px-4 py-3 text-xs backdrop-blur">
-              <span className="font-mono uppercase tracking-[0.2em] text-white/60">Seed</span>
-              <span className="font-mono text-white/90">0xa7e3&hellip;6f2b</span>
+              <span className="font-mono uppercase tracking-[0.2em] text-white/60">
+                {tokenLabel ? 'Live Signature' : 'Signal'}
+              </span>
+              <span className="font-mono text-white/90">{tokenLabel ?? 'Awaiting metadata'}</span>
             </div>
           </div>
 

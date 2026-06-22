@@ -85,7 +85,6 @@ describe('sitemap (host-aware)', () => {
       );
       expect(urls).toContain('https://app.cosmicsignature.com/public-goods-retrievals');
       expect(urls).not.toContain('https://app.cosmicsignature.com/recipient-history');
-      expect(urls).not.toContain('https://app.cosmicsignature.com/detail/sample');
 
       // Legacy (pre-migration) paths are absent.
       // lexicon-allow-start: legacy URL paths must literally appear here to verify they're absent from the sitemap

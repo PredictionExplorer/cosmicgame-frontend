@@ -122,7 +122,6 @@ export const noindexAppRoutes: SeoRoute[] = [
   '/my-statistics',
   '/recipient-history',
   '/transfer-cst',
-  '/detail/sample',
 ].map((path) => ({
   path,
   host: 'app',

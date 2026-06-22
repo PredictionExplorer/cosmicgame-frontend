@@ -29,9 +29,7 @@ export function WinningHistorySection({
   setTwitterHandle,
 }: WinningHistorySectionProps) {
   const imageSrc =
-    bannerTokenSeed === ''
-      ? '/images/qmark-preview.png'
-      : getAssetsUrl(`cosmicsignature/${bannerTokenSeed}.png`);
+    bannerTokenSeed === '' ? null : getAssetsUrl(`cosmicsignature/${bannerTokenSeed}.png`);
 
   return (
     <>
@@ -53,7 +51,9 @@ export function WinningHistorySection({
           <TwitterShareButton />
         </div>
       </div>
-      <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: imageSrc }]} />
+      {imageSrc ? (
+        <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: imageSrc }]} />
+      ) : null}
       <TwitterPopup
         open={twitterPopupOpen}
         setOpen={setTwitterPopupOpen}

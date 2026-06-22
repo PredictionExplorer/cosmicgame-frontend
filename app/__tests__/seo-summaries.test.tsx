@@ -130,7 +130,7 @@ describe('server-visible SEO summaries', () => {
     render(
       <HomeObservatoryHero
         data={dashboard as unknown as Parameters<typeof HomeObservatoryHero>[0]['data']}
-        bannerToken={{ seed: 'sample', id: -1 }}
+        bannerToken={{ seed: '0xabc123', id: 17 }}
         canOpenGesturePanel
         phase="live"
       />,

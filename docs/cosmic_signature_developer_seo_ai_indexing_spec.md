@@ -17,7 +17,7 @@ This document started life as an implementation spec. **Most of it is now built 
 The remaining repository-implementable SEO backlog has been substantially implemented:
 
 - Added a shared route policy in [`lib/seoRoutes.ts`](../lib/seoRoutes.ts) and refactored [`app/sitemap.ts`](../app/sitemap.ts) around it.
-- Removed wallet/demo URLs from the XML sitemap and marked [`/recipient-history`](../app/recipient-history/page.tsx) and [`/detail/sample`](../app/detail/sample/page.tsx) `noindex,follow`.
+- Removed wallet-personal URLs from the XML sitemap and marked [`/recipient-history`](../app/recipient-history/page.tsx) `noindex,follow`.
 - Added server-rendered crawler summaries to the public app data routes via [`app/PublicDataRouteSeoSummary.tsx`](../app/PublicDataRouteSeoSummary.tsx).
 - Fixed structured-data accuracy in [`utils/jsonLd.tsx`](../utils/jsonLd.tsx): no false zero-price Offers, GitHub in `Organization.sameAs`, and no WebApplication schema on the landing host.
 - Enriched custom Open Graph image metadata in [`utils/seo.ts`](../utils/seo.ts) with width, height, and alt text.
@@ -66,18 +66,18 @@ All checks below were run with `curl` against the **raw HTML** (no JavaScript ex
 
 ### robots, sitemaps, redirects, status codes
 
-| Check                                               | Result                                                                                                                                                 |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `robots.txt` (both hosts)                           | ✅ Valid; correct per-host `Sitemap:` + `Host:`; AI/search bots enumerated and allowed; sensible `Disallow` per host                                   |
-| `sitemap.xml` — landing                             | ✅ 13 URLs: `/`, `/about`, `/learn` + all 10 `/learn/*` articles                                                                                       |
-| `sitemap.xml` — app                                 | ✅ 27 URLs; wallet-personal `/recipient-history` and demo `/detail/sample` are removed; app routes come from [`lib/seoRoutes.ts`](../lib/seoRoutes.ts) |
-| `llms.txt` (both hosts)                             | ✅ 200; includes the biology disambiguation line; `llms-full.txt` also present                                                                         |
-| `http://…` → `https://…`                            | ✅ 308                                                                                                                                                 |
-| `https://www.cosmicsignature.com/` → apex           | 🟡 **307 (temporary)** — should be 301/308 permanent                                                                                                   |
-| cross-host paths (e.g. landing `/faq` → app `/faq`) | ✅ 308                                                                                                                                                 |
-| unknown route (e.g. `/this-does-not-exist`)         | ✅ Real **404** + "Page Not Found" H1 (no soft-404)                                                                                                    |
-| `X-Robots-Tag` on public pages                      | ✅ None present (good)                                                                                                                                 |
-| `Cache-Control` on app `/` and `/statistics`        | 🟡 `private, no-cache, no-store` — pages render per-request, not CDN-cached (see [§4 Performance](#performance-and-core-web-vitals))                   |
+| Check                                               | Result                                                                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `robots.txt` (both hosts)                           | ✅ Valid; correct per-host `Sitemap:` + `Host:`; AI/search bots enumerated and allowed; sensible `Disallow` per host                 |
+| `sitemap.xml` — landing                             | ✅ 13 URLs: `/`, `/about`, `/learn` + all 10 `/learn/*` articles                                                                     |
+| `sitemap.xml` — app                                 | ✅ App routes come from [`lib/seoRoutes.ts`](../lib/seoRoutes.ts); wallet-personal routes such as `/recipient-history` are excluded  |
+| `llms.txt` (both hosts)                             | ✅ 200; includes the biology disambiguation line; `llms-full.txt` also present                                                       |
+| `http://…` → `https://…`                            | ✅ 308                                                                                                                               |
+| `https://www.cosmicsignature.com/` → apex           | 🟡 **307 (temporary)** — should be 301/308 permanent                                                                                 |
+| cross-host paths (e.g. landing `/faq` → app `/faq`) | ✅ 308                                                                                                                               |
+| unknown route (e.g. `/this-does-not-exist`)         | ✅ Real **404** + "Page Not Found" H1 (no soft-404)                                                                                  |
+| `X-Robots-Tag` on public pages                      | ✅ None present (good)                                                                                                               |
+| `Cache-Control` on app `/` and `/statistics`        | 🟡 `private, no-cache, no-store` — pages render per-request, not CDN-cached (see [§4 Performance](#performance-and-core-web-vitals)) |
 
 > **Still to confirm off-box:** WAF/CDN behavior toward real crawler user-agents can only be verified from Vercel/CDN logs. See [§6](#6-off-box-verification-not-doable-from-the-repo).
 
@@ -140,10 +140,10 @@ Ordered by SEO/trust impact. Each item: **what → where → why → fix.**
 - **Where:** [`app/recipient-history/`](../app/recipient-history).
 - **Fix implemented:** `createMetadata(..., { index: false })` and route policy exclusion.
 
-**3. ✅ Done — `/detail/sample` is a hardcoded demo placeholder** ("Static sample values for this demo page") and is now `noindex,follow` and absent from the sitemap.
+**3. ✅ Done — demo NFT route removed**: the former hardcoded demo page was deleted so users and crawlers only encounter real generated NFTs.
 
-- **Where:** [`app/detail/sample/`](../app/detail/sample), [`app/sitemap.ts`](../app/sitemap.ts).
-- **Fix implemented:** removed from sitemap and marked noindex.
+- **Where:** [`app/detail/[id]/`](../app/detail/[id]) now represents token detail pages; deleted sample-route code is no longer part of the app route policy.
+- **Fix implemented:** removed the route, links, and route-policy entry instead of preserving a noindex placeholder.
 
 **4. ✅ Done — soft-404 on `/detail/[id]`** — invalid non-numeric IDs now call `notFound()`, and API 404s for missing tokens also return the real 404 page.
 
@@ -173,7 +173,7 @@ Ordered by SEO/trust impact. Each item: **what → where → why → fix.**
 
 ### Low / hygiene
 
-**9. ✅ Done / partial by design — sitemap hygiene** ([`app/sitemap.ts`](../app/sitemap.ts)): route entries now come from [`lib/seoRoutes.ts`](../lib/seoRoutes.ts), noindex/demo URLs are excluded, and learn article `lastmod` values use article update dates. `priority`/`changefreq` remain for compatibility with existing consumers, though Google ignores them.
+**9. ✅ Done / partial by design — sitemap hygiene** ([`app/sitemap.ts`](../app/sitemap.ts)): route entries now come from [`lib/seoRoutes.ts`](../lib/seoRoutes.ts), noindex URLs are excluded, and learn article `lastmod` values use article update dates. `priority`/`changefreq` remain for compatibility with existing consumers, though Google ignores them.
 
 **10. ✅ Done — disambiguation line** (not the COSMIC cancer/biology database) now appears on `/about`, landing home, FAQ, one learn article, and `llms.txt`.
 

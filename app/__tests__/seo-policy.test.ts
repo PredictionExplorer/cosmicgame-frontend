@@ -1,15 +1,9 @@
-import { metadata as sampleDetailMetadata } from '@/app/detail/sample/page';
 import { metadata as cstOutreachTransferMetadata } from '@/app/internal/cst-outreach-transfer/page';
 import { metadata as recipientHistoryMetadata } from '@/app/recipient-history/page';
 import { metadata as transferCstMetadata } from '@/app/transfer-cst/page';
 
 import { appSitemapRoutes, dynamicNoindexRoutePrefixes, noindexAppRoutes } from '@/lib/seoRoutes';
 import { createMetadata } from '@/utils/seo';
-
-jest.mock('../detail/sample/SampleDetailPage', () => ({
-  __esModule: true,
-  default: () => null,
-}));
 
 jest.mock('../internal/cst-outreach-transfer/CstOutreachTransferPage', () => ({
   __esModule: true,
@@ -92,10 +86,9 @@ describe('SEO route policy', () => {
     }
   });
 
-  it('marks wallet-personal and demo detail routes as noindex', () => {
+  it('marks wallet-personal routes as noindex', () => {
     expectNoIndex(recipientHistoryMetadata);
     expectNoIndex(transferCstMetadata);
-    expectNoIndex(sampleDetailMetadata);
   });
 
   it('marks the URL-only CST outreach transfer route as noindex and out of sitemap', () => {

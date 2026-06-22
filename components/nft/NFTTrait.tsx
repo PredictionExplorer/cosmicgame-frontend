@@ -127,7 +127,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
   const transferHistory = transferHistoryRaw as (CSTTransferRecord & { TransferType?: number })[];
 
   const image = useMemo(() => {
-    if (!nft?.Seed) return '/images/qmark.png';
+    if (!nft?.Seed) return '';
     return getAssetsUrl(`cosmicsignature/0x${nft.Seed}.png`);
   }, [nft]);
 
@@ -336,7 +336,7 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
               onClick={() => setImageOpen(true)}
               data-testid="nft-image-container"
             >
-              <NFTImage src={image} />
+              <NFTImage src={image} terminalFallbackSrc={null} />
               <div className="absolute top-3 left-3">
                 <Badge className="bg-black/50 backdrop-blur-sm text-white border-white/20 text-xs font-mono">
                   {formatId(tokenId)}
@@ -494,15 +494,17 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       </motion.section>
 
       {/* Video Preview */}
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        transition={{ duration: 0.5, delay: 0.35 }}
-        className="print-motion-visible mt-12"
-      >
-        <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
-      </motion.section>
+      {video ? (
+        <motion.section
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          transition={{ duration: 0.5, delay: 0.35 }}
+          className="print-motion-visible mt-12"
+        >
+          <NFTVideo image_thumb={image} onClick={() => handlePlay(video)} />
+        </motion.section>
+      ) : null}
 
       {/* Owner Actions */}
       {isOwner && (
@@ -559,7 +561,9 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
       )}
 
       {/* Lightbox & Video Dialog */}
-      <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: image }]} />
+      {image ? (
+        <Lightbox open={imageOpen} close={() => setImageOpen(false)} slides={[{ src: image }]} />
+      ) : null}
       <VideoPlayerDialog
         open={openVideo}
         videoPath={videoPath}

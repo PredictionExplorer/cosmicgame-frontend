@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import Image from 'next/image';
 import { Layers, TrendingUp, Gift } from 'lucide-react';
 
 import { PageShell } from '@/components/ui/page-shell';
@@ -165,13 +164,9 @@ const MyAnchors = () => {
             <TabsList className="w-full h-auto">
               <TabsTrigger value="cst" className="flex-1 py-3">
                 <div className="flex items-center">
-                  <Image
-                    src="/images/CosmicSignatureNFT.png"
-                    width={94}
-                    height={60}
-                    alt="cosmic signature nft"
-                    className="h-auto w-[94px] shrink-0"
-                  />
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+                    <Layers className="h-5 w-5" />
+                  </span>
                   <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
                     Cosmic Signature Anchoring
                   </span>
@@ -179,13 +174,9 @@ const MyAnchors = () => {
               </TabsTrigger>
               <TabsTrigger value="rwlk" className="flex-1 py-3">
                 <div className="flex items-center">
-                  <Image
-                    src="/images/rwalk.jpg"
-                    width={94}
-                    height={60}
-                    alt="RandomWalk nft"
-                    className="h-auto w-[94px] shrink-0"
-                  />
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[rgb(var(--nebula-violet-rgb)/0.28)] bg-[rgb(var(--nebula-violet-rgb)/0.12)] text-[rgb(var(--nebula-violet-rgb))]">
+                    <Layers className="h-5 w-5" />
+                  </span>
                   <span className="text-lg font-semibold whitespace-nowrap normal-case ml-4">
                     Random Walk Anchoring
                   </span>

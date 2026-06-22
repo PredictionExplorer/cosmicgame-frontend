@@ -261,6 +261,7 @@ jest.mock('../../utils', () => ({
     if (!value) return '0 ETH';
     return value < 10 ? `${value.toFixed(4)} ETH` : `${value.toFixed(2)} ETH`;
   },
+  formatId: (id: number | string) => `#${id.toString().padStart(6, '0')}`,
   getAssetsUrl: (path: string) => `https://assets.example.com/${path}`,
   getEnduranceChampions: () => [],
   shortenHex: (hex: string, length = 4) =>
@@ -400,21 +401,22 @@ describe('HomePage', () => {
     expect(within(observatory).getByText('7%')).toBeInTheDocument();
   });
 
-  it('keeps the hero artwork visible and linked on the main game page', () => {
+  it('keeps real hero artwork visible and linked on the main game page', () => {
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
+    mockUseCSTInfo.mockReturnValue({ data: { Seed: 'abc123' } });
 
     render(<HomePage />);
 
-    expect(screen.getByRole('link', { name: 'View Cosmic Signature art' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /View Cosmic Signature #/ })).toHaveAttribute(
       'href',
-      '/detail/sample',
+      expect.stringMatching(/^\/detail\/\d+$/),
     );
     expect(screen.getByTestId('nft-image')).toHaveAttribute(
       'alt',
-      'Cosmic Signature artwork preview',
+      expect.stringMatching(/^Cosmic Signature artwork #\d{6}$/),
     );
   });
 

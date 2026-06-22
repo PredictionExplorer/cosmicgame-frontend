@@ -37,6 +37,7 @@ import { useAllocationNotification } from '@/hooks/useAllocationNotification';
 import { invalidateLiveGameQueries } from '@/hooks/useLiveGameDataRefresh';
 import { useLivePulse } from '@/hooks/useLivePulse';
 import { useNow } from '@/hooks/useNow';
+import { useRotatingIndex } from '@/hooks/useRotatingIndex';
 import {
   useDashboardInfo,
   useGestureListByCycle,
@@ -174,30 +175,21 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     return currentTimeData * 1000 - sampledAtMs;
   }, [currentTimeData, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
-  const [bannerTokenId, setBannerTokenId] = useState<number | null>(null);
   const [gesturePulseKey, setGesturePulseKey] = useState(0);
-
-  useEffect(() => {
-    if (dashboardData && bannerTokenId === null) {
-      const count = dashboardData.MainStats.NumCSTokenMints;
-      if (count > 0) {
-        // Random NFT pick happens once per session when dashboardData first
-        // loads. The lint rule flags setState-in-effect as an anti-pattern,
-        // but this is a genuine "compute once from async data" — useMemo
-        // would re-roll on every dashboardData fetch.
-        setBannerTokenId(Math.floor(Math.random() * count));
-      } else {
-        setBannerTokenId(-1);
-      }
-    }
-  }, [dashboardData, bannerTokenId]);
+  const mintedTokenCount = dashboardData?.MainStats.NumCSTokenMints ?? 0;
+  const bannerTokenId = useRotatingIndex({
+    count: mintedTokenCount,
+    intervalMs: 15_000,
+    enabled: mintedTokenCount > 1,
+    randomStart: true,
+  });
 
   const { data: bannerCSTInfo } = useCSTInfo(bannerTokenId);
 
   const bannerToken = useMemo(() => {
-    if (bannerTokenId === -1) return { seed: 'sample', id: -1 };
-    if (bannerCSTInfo) return { seed: `0x${bannerCSTInfo.Seed}`, id: bannerTokenId! };
-    return { seed: '', id: -1 };
+    if (bannerTokenId != null && bannerCSTInfo)
+      return { seed: `0x${bannerCSTInfo.Seed}`, id: bannerTokenId };
+    return null;
   }, [bannerTokenId, bannerCSTInfo]);
 
   const gestureForm = useGestureForm();

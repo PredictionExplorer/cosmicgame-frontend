@@ -65,7 +65,6 @@ test.describe('raw HTML SEO', () => {
 
     expect(xml).toContain('https://app.cosmicsignature.com/statistics');
     expect(xml).not.toContain('https://app.cosmicsignature.com/recipient-history');
-    expect(xml).not.toContain('https://app.cosmicsignature.com/detail/sample');
   });
 
   test('invalid token detail routes return a real 404', async ({ request }) => {

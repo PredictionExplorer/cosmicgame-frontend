@@ -33,7 +33,6 @@ const dynamicRoutes = [
   '/gesture/1',
   '/allocation/1',
   '/detail/1',
-  '/detail/sample',
   '/user/0x1b2E85De21C7CF4bD1787c6Ac4bd505e83b62Ba5',
 ];
 

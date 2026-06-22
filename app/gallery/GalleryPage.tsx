@@ -1,14 +1,17 @@
 'use client';
 
-import Image from 'next/image';
 import { useMemo, useState, useCallback, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
+
+import { formatId, getAssetsUrl } from '@/utils';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { Surface } from '@/components/ui/surface';
+import NFTImage from '@/components/nft/NFTImage';
 import { useCSTList } from '@/hooks/useApiQuery';
 import api from '@/services/api';
 
@@ -106,6 +109,13 @@ const GalleryPage = () => {
 
   const startIndex = (currentPage - 1) * perPage;
   const visibleItems: GalleryNFTData[] = searched.slice(startIndex, startIndex + perPage);
+  const featuredNft = useMemo(
+    () => sorted.find((n) => n.Seed != null && String(n.Seed) !== ''),
+    [sorted],
+  );
+  const featuredImage = featuredNft
+    ? getAssetsUrl(`cosmicsignature/0x${featuredNft.Seed}.png`)
+    : null;
 
   const handleSearchChange = useCallback(
     (query: string) => {
@@ -213,20 +223,38 @@ const GalleryPage = () => {
           </p>
         </div>
         <div className="relative min-h-[220px] overflow-hidden rounded-[var(--radius-surface)] border border-white/[0.10] bg-black/30">
-          <Image
-            src="/images/CosmicSignatureNFT.png"
-            alt=""
-            fill
-            className="object-cover opacity-90 saturate-125"
-            sizes="(max-width: 1024px) 100vw, 360px"
-          />
+          {featuredNft && featuredImage ? (
+            <Link
+              href={`/detail/${featuredNft.TokenId}`}
+              className="group block h-full min-h-[220px]"
+              aria-label={`View Cosmic Signature ${formatId(featuredNft.TokenId)}`}
+            >
+              <NFTImage
+                src={featuredImage}
+                alt={`Cosmic Signature artwork ${formatId(featuredNft.TokenId)}`}
+                terminalFallbackSrc={null}
+                sizes="(max-width: 1024px) 100vw, 360px"
+                className="h-full min-h-[220px] object-cover opacity-90 saturate-125 transition-transform duration-700 group-hover:scale-[1.025]"
+              />
+            </Link>
+          ) : (
+            <div className="relative flex min-h-[220px] items-center justify-center">
+              <div className="absolute h-40 w-40 rounded-full border border-primary/20" />
+              <div className="absolute h-px w-56 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+              <div className="relative z-[1] max-w-[14rem] px-4 text-center text-xs leading-relaxed text-muted-foreground">
+                Real collection artwork appears here when indexed NFTs are available.
+              </div>
+            </div>
+          )}
           <div
             aria-hidden
             className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_0%,rgb(13_5_33/0.18)_58%,rgb(13_5_33/0.64)_100%)]"
           />
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-lg border border-white/10 bg-black/45 px-3 py-2 text-xs text-white/70 backdrop-blur">
-            <span className="font-mono uppercase tracking-[0.2em]">Preview</span>
-            <span>Three-body imprint</span>
+            <span className="font-mono uppercase tracking-[0.2em]">
+              {featuredNft ? 'Featured imprint' : 'Archive'}
+            </span>
+            <span>{featuredNft ? formatId(featuredNft.TokenId) : 'Awaiting metadata'}</span>
           </div>
         </div>
       </Surface>

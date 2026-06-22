@@ -99,7 +99,7 @@ describe('GalleryGrid', () => {
   it('shows empty state when no items', () => {
     render(<GalleryGrid {...defaultProps} items={[]} totalItems={0} />);
     expect(screen.getByText('No NFTs found')).toBeInTheDocument();
-    expect(screen.getByText('View Sample NFT')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('shows pagination info', () => {

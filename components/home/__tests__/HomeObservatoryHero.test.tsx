@@ -21,10 +21,10 @@ function makeData(overrides: Partial<DashboardInfo> = {}): DashboardInfo {
   } as Partial<DashboardInfo> as DashboardInfo;
 }
 
-const sampleToken = { seed: 'sample', id: -1 };
+const liveToken = { seed: '0xabc123', id: 12 };
 const liveProps = {
   data: makeData(),
-  bannerToken: sampleToken,
+  bannerToken: liveToken,
   canOpenGesturePanel: true,
   phase: 'live' as const,
 };
@@ -50,6 +50,29 @@ describe('HomeObservatoryHero', () => {
     expect(within(observatory).getByText('42')).toBeInTheDocument();
     expect(within(observatory).getByText('2.7500 ETH')).toBeInTheDocument();
     expect(within(observatory).getByText('7%')).toBeInTheDocument();
+  });
+
+  it('links real artwork to its token detail page and shows the token number', () => {
+    render(<HomeObservatoryHero {...liveProps} />);
+
+    const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
+    expect(
+      within(observatory).getByRole('link', { name: 'View Cosmic Signature #000012' }),
+    ).toHaveAttribute('href', '/detail/12');
+    expect(within(observatory).getByText('Signature #000012')).toBeInTheDocument();
+    expect(
+      within(observatory).getByAltText('Cosmic Signature artwork #000012'),
+    ).toBeInTheDocument();
+  });
+
+  it('shows a neutral state instead of sample art when no real token is available', () => {
+    render(<HomeObservatoryHero {...liveProps} bannerToken={null} />);
+
+    const observatory = screen.getByRole('region', { name: 'Current cycle observatory' });
+    expect(within(observatory).getByText('Awaiting generated Signature')).toBeInTheDocument();
+    expect(
+      within(observatory).queryByRole('link', { name: /View Cosmic Signature #/ }),
+    ).not.toBeInTheDocument();
   });
 
   it('animates the gesture count toward an updated value', () => {

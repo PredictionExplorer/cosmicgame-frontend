@@ -177,11 +177,14 @@ describe('PaginationGrid', () => {
     expect(cards).toHaveLength(2);
   });
 
-  it('renders link to /detail/sample when collection is empty', () => {
+  it('does not link to non-real NFT content when collection is empty', () => {
     render(<PaginationGrid data={[]} loading={false} />);
-    const links = screen.getAllByRole('link');
-    const sampleLink = links.find((l) => l.getAttribute('href') === '/detail/sample');
-    expect(sampleLink).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Try a different search or clear the filter to return to real indexed NFTs.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

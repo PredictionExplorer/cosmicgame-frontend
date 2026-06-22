@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { cn } from '@/lib/utils';
@@ -43,11 +42,6 @@ export function GalleryGrid({
       <EmptyState
         title="No NFTs found"
         description="Try adjusting your search or filters to find what you're looking for."
-        action={
-          <Link href="/detail/sample" className="text-sm text-primary hover:underline">
-            View Sample NFT
-          </Link>
-        }
       />
     );
   }

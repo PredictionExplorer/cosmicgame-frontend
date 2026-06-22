@@ -1,6 +1,5 @@
 import { useState, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { Search } from 'lucide-react';
 
 import {
@@ -135,12 +134,7 @@ const PaginationGrid = ({ data, loading }: PaginationGridProps) => {
               <div className="col-span-full">
                 <EmptyState
                   title="No NFTs found"
-                  description="Try a different search or check out the sample NFT."
-                  action={
-                    <Link href="/detail/sample" className="text-sm text-primary hover:underline">
-                      View Sample NFT
-                    </Link>
-                  }
+                  description="Try a different search or clear the filter to return to real indexed NFTs."
                 />
               </div>
             ) : (

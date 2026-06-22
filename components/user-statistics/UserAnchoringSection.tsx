@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Lock, Unlock, Coins, Gift, Layers } from 'lucide-react';
 
 import { formatEthValue } from '@/utils';
@@ -72,13 +71,9 @@ export function UserAnchoringSection({
             className="flex-1 h-auto py-3 rounded-none data-[state=active]:bg-white/5 data-[state=active]:shadow-none"
           >
             <div className="flex items-center">
-              <Image
-                src="/images/CosmicSignatureNFT.png"
-                width={94}
-                height={60}
-                alt="cosmic signature nft"
-                className="h-auto w-[94px] shrink-0"
-              />
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+                <Layers className="h-5 w-5" />
+              </span>
               <span className="text-lg whitespace-nowrap normal-case ml-4">
                 Cosmic Signature Anchoring
               </span>
@@ -89,13 +84,9 @@ export function UserAnchoringSection({
             className="flex-1 h-auto py-3 rounded-none data-[state=active]:bg-white/5 data-[state=active]:shadow-none"
           >
             <div className="flex items-center">
-              <Image
-                src="/images/rwalk.jpg"
-                width={94}
-                height={60}
-                alt="RandomWalk nft"
-                className="h-auto w-[94px] shrink-0"
-              />
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[rgb(var(--nebula-violet-rgb)/0.28)] bg-[rgb(var(--nebula-violet-rgb)/0.12)] text-[rgb(var(--nebula-violet-rgb))]">
+                <Layers className="h-5 w-5" />
+              </span>
               <span className="text-lg whitespace-nowrap normal-case ml-4">
                 Random Walk Anchoring
               </span>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, Fingerprint, HeartHandshake, Orbit, Radio, Sparkles } from 'lucide-react';
 import { LazyMotion, domAnimation, m } from 'framer-motion';
 
-import { getAssetsUrl } from '@/utils';
+import { formatId, getAssetsUrl } from '@/utils';
 
 import { Button } from '@/components/ui/button';
 import { GradientText } from '@/components/ui/gradient-text';
@@ -23,7 +23,7 @@ interface BannerToken {
 
 interface HomeObservatoryHeroProps {
   data: DashboardInfo | null;
-  bannerToken: BannerToken;
+  bannerToken: BannerToken | null;
   canOpenGesturePanel: boolean;
   phase: CyclePhase;
   /** When set, primary CTA submits a gesture (or finalize) instead of only scrolling. */
@@ -135,9 +135,25 @@ function getHeroPhaseView(phase: CyclePhase, cycleNumber: number | undefined) {
 }
 
 function getHeroArtSrc(bannerToken: BannerToken): string {
-  if (bannerToken.seed === '') return '/images/qmark-preview.png';
-  if (bannerToken.seed === 'sample') return '/images/CosmicSignatureNFT.png';
   return getAssetsUrl(`cosmicsignature/${bannerToken.seed}.png`);
+}
+
+function ObservatoryArtworkUnavailable() {
+  return (
+    <div className="relative flex aspect-video min-h-[220px] overflow-hidden rounded-2xl border border-white/[0.08] bg-black/20">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgb(var(--aurora-cyan-rgb)/0.18),transparent_34%),radial-gradient(circle_at_78%_15%,rgb(var(--nebula-violet-rgb)/0.20),transparent_38%)]" />
+      <div className="pointer-events-none absolute inset-x-10 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary/20 bg-primary/10 blur-sm" />
+      <div className="relative z-[1] m-auto max-w-xs px-6 text-center">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+          Awaiting generated Signature
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Real Cosmic Signature artwork will appear here once indexed token metadata is available.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function formatEth(value: number | undefined): string {
@@ -197,8 +213,9 @@ export function HomeObservatoryHero({
   const publicGoodsPercentage = data?.CharityPercentage ?? 0;
   const animatedGestureCount = useAnimatedNumber(gestureCount);
   const animatedSignatureAllocation = useAnimatedNumber(signatureAllocation ?? 0);
-  const artHref = bannerToken.id >= 0 ? `/detail/${bannerToken.id}` : '/detail/sample';
-  const artSrc = getHeroArtSrc(bannerToken);
+  const hasRealBannerToken = bannerToken != null && bannerToken.seed !== '' && bannerToken.id >= 0;
+  const artHref = hasRealBannerToken ? `/detail/${bannerToken.id}` : null;
+  const artSrc = hasRealBannerToken ? getHeroArtSrc(bannerToken) : null;
   const primaryCtaHref = canOpenGesturePanel ? '#make-gesture' : '/current-cycle';
   const phaseView = getHeroPhaseView(phase, cycleNumber);
   const primaryCtaLabel = canOpenGesturePanel ? phaseView.primaryLabel : 'View Cycle Details';
@@ -331,25 +348,35 @@ export function HomeObservatoryHero({
                   </Link>
                 </div>
 
-                <Link href={artHref} className="group block" aria-label="View Cosmic Signature art">
-                  <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-black/20">
-                    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgb(var(--aurora-cyan-rgb)/0.16),transparent_34%),radial-gradient(circle_at_78%_15%,rgb(var(--nebula-violet-rgb)/0.18),transparent_38%)]" />
-                    <NFTImage
-                      src={artSrc}
-                      alt="Cosmic Signature artwork preview"
-                      priority
-                      sizes="(max-width: 1024px) 100vw, 520px"
-                      className="relative transition-transform duration-500 group-hover:scale-[1.025]"
-                    />
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 via-black/25 to-transparent px-4 pb-4 pt-12">
-                      <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.08] px-3 py-1 text-[11px] font-medium text-white/90 backdrop-blur-sm">
-                        <Sparkles className="h-3.5 w-3.5 text-primary" />
-                        Signature Artifact
-                      </span>
-                      <ArrowRight className="h-4 w-4 text-white/80 transition-transform duration-300 group-hover:translate-x-1" />
+                {artHref && artSrc && bannerToken ? (
+                  <Link
+                    key={bannerToken.id}
+                    href={artHref}
+                    className="group block animate-in fade-in duration-700"
+                    aria-label={`View Cosmic Signature ${formatId(bannerToken.id)}`}
+                  >
+                    <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-black/20">
+                      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_28%_20%,rgb(var(--aurora-cyan-rgb)/0.16),transparent_34%),radial-gradient(circle_at_78%_15%,rgb(var(--nebula-violet-rgb)/0.18),transparent_38%)]" />
+                      <NFTImage
+                        src={artSrc}
+                        alt={`Cosmic Signature artwork ${formatId(bannerToken.id)}`}
+                        priority
+                        terminalFallbackSrc={null}
+                        sizes="(max-width: 1024px) 100vw, 520px"
+                        className="relative transition-transform duration-700 group-hover:scale-[1.025]"
+                      />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 via-black/25 to-transparent px-4 pb-4 pt-12">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.08] px-3 py-1 text-[11px] font-medium text-white/90 backdrop-blur-sm">
+                          <Sparkles className="h-3.5 w-3.5 text-primary" />
+                          Signature {formatId(bannerToken.id)}
+                        </span>
+                        <ArrowRight className="h-4 w-4 text-white/80 transition-transform duration-300 group-hover:translate-x-1" />
+                      </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                ) : (
+                  <ObservatoryArtworkUnavailable />
+                )}
 
                 <div className="mt-4 grid grid-cols-3 gap-2">
                   <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
