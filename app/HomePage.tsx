@@ -12,7 +12,6 @@ import { LazyMotion, domAnimation, m } from 'framer-motion';
 
 import { formatSeconds, shortenHex } from '@/utils';
 
-import { formatCstAmount } from '@/utils/cstGesture';
 import { reportError } from '@/utils/errors';
 import { useNotify } from '@/hooks/useNotify';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
@@ -50,6 +49,11 @@ import { localClockUtcEpochMs, parseActivationMsFromDashboard } from '@/lib/acti
 import { getCycleState } from '@/lib/cycleState';
 import { isLandingHost } from '@/lib/hostRouting';
 import { LANDING_COUNTDOWN_REQUIRE_ROUND_ZERO } from '@/lib/landingFlags';
+import {
+  UX_SCENARIO_DEMO_ACCOUNT,
+  simulateUxScenarioGesture,
+  useUxScenarioSnapshot,
+} from '@/lib/uxCycleScenarios';
 import { RootLandingPage } from '@/components/landing/RootLandingPage';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
 
@@ -136,6 +140,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   const { account } = useActiveWeb3React();
   const queryClient = useQueryClient();
   const { notify } = useNotify();
+  const uxScenario = useUxScenarioSnapshot();
 
   const [hostname, setHostname] = useState<string | null>(initialHostname);
 
@@ -220,7 +225,6 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     gestureType,
     ethGestureInfo,
     cstGestureData,
-    gestureCstRewardAmount,
     isGesturing,
     rwlkId,
     gestureCostPlus,
@@ -266,11 +270,38 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   }, [account, queryClient]);
 
   const handleGesture = useCallback(async () => {
+    if (uxScenario) {
+      const nextScenario = simulateUxScenarioGesture({
+        bidder: account ?? UX_SCENARIO_DEMO_ACCOUNT,
+        gestureType: gestureType as 'ETH' | 'RandomWalk' | 'CST',
+        message: gestureForm.message,
+      });
+      if (nextScenario) {
+        setMessage('');
+        setGesturePulseKey((value) => value + 1);
+        notify(
+          'success',
+          `Simulated gesture placed. Timer extended by ${nextScenario.extensionSeconds}s.`,
+        );
+      }
+      return;
+    }
     if (await (gestureType === 'CST' ? onGestureWithCST() : onGesture())) {
       optimisticallyRecordGesture();
       withPostTxRefresh();
     }
-  }, [gestureType, onGesture, onGestureWithCST, optimisticallyRecordGesture, withPostTxRefresh]);
+  }, [
+    account,
+    gestureForm.message,
+    gestureType,
+    notify,
+    onGesture,
+    onGestureWithCST,
+    optimisticallyRecordGesture,
+    setMessage,
+    uxScenario,
+    withPostTxRefresh,
+  ]);
   const handleFinalize = useCallback(async () => {
     if (await onFinalize()) withPostTxRefresh(1000, 3000);
   }, [onFinalize, withPostTxRefresh]);
@@ -300,11 +331,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
       const costLabel = cstGestureData.isFree
         ? 'FREE GESTURE'
         : `${cstGestureData.CSTPrice.toFixed(2)} CST`;
-      const rewardLabel =
-        gestureCstRewardAmount != null
-          ? `, receive ~${formatCstAmount(gestureCstRewardAmount)} CST`
-          : '';
-      return `Gesture with CST (${costLabel}${rewardLabel})`;
+      return `Gesture with CST (${costLabel})`;
     }
     if (gestureType === 'RandomWalk') return 'Gesture with ETH + RandomWalk';
     return `Gesture with ${gestureType}`;
@@ -412,6 +439,14 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
         backdrop="signature"
         className="xl:max-w-[92rem] 2xl:max-w-[108rem] 2xl:px-10"
       >
+        {uxScenario && (
+          <div className="mb-5 rounded-xl border border-amber-300/25 bg-amber-300/[0.08] px-4 py-3 text-sm text-amber-100">
+            <span className="font-semibold text-amber-50">UX scenario: {uxScenario.name}</span>
+            <span className="ml-2 text-amber-100/80">
+              Cycle data and gesture placement are simulated for local UI testing.
+            </span>
+          </div>
+        )}
         <HomeObservatoryHero
           data={data}
           bannerToken={bannerToken}

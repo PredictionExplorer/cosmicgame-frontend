@@ -2,9 +2,10 @@
  * React Query hooks that wrap the API layer. Each hook maps to a backend endpoint
  * with appropriate stale times and refetch intervals for the Cosmic Signature app.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 
 import api from '@/services/api';
+import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 import type {
   ActionIdWithClaimInfo,
   AdminEventRow,
@@ -60,10 +61,43 @@ import type {
 // Rounds & Bidding
 // ---------------------------------------------------------------------------
 
+function withUxScenarioData<T>(
+  query: UseQueryResult<T, Error>,
+  data: T | undefined,
+  dataUpdatedAt?: number,
+): UseQueryResult<T, Error> {
+  if (data === undefined) return query;
+  return {
+    ...query,
+    data,
+    dataUpdatedAt: dataUpdatedAt ?? Date.now(),
+    error: null,
+    failureCount: 0,
+    failureReason: null,
+    fetchStatus: 'idle',
+    isError: false,
+    isFetched: true,
+    isFetchedAfterMount: true,
+    isFetching: false,
+    isInitialLoading: false,
+    isLoading: false,
+    isLoadingError: false,
+    isPending: false,
+    isPlaceholderData: false,
+    isRefetchError: false,
+    isRefetching: false,
+    isStale: false,
+    isSuccess: true,
+    status: 'success',
+  } as UseQueryResult<T, Error>;
+}
+
 export function useDashboardInfo(initialData?: DashboardInfo | null) {
-  return useQuery<DashboardInfo | null>({
+  const scenario = useUxScenarioSnapshot();
+  const query = useQuery<DashboardInfo | null>({
     queryKey: ['dashboardInfo'],
     queryFn: () => api.get_dashboard_info(),
+    enabled: !scenario,
     refetchInterval: 12_000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
@@ -72,6 +106,7 @@ export function useDashboardInfo(initialData?: DashboardInfo | null) {
     // so the query still starts in a loading state and fetches immediately.
     initialData: initialData ?? undefined,
   });
+  return withUxScenarioData(query, scenario?.dashboard ?? undefined, scenario?.createdAtMs);
 }
 
 export function useRoundList() {
@@ -95,14 +130,17 @@ export function useRoundInfo(roundNum: number) {
 }
 
 export function useAllocationTime() {
-  return useQuery<number>({
+  const scenario = useUxScenarioSnapshot();
+  const query = useQuery<number>({
     queryKey: ['allocationTime'],
     queryFn: () => api.get_prize_time(),
+    enabled: !scenario,
     staleTime: 5_000,
     refetchInterval: 10_000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
+  return withUxScenarioData(query, scenario?.finalizationTimeSec, scenario?.createdAtMs);
 }
 
 export function useClaimHistory() {
@@ -143,24 +181,29 @@ export function useGestureInfo(evtLogId: number) {
 }
 
 export function useGestureListByCycle(round: number, sortDir: string = 'desc') {
-  return useQuery<GestureInfo[]>({
+  const scenario = useUxScenarioSnapshot();
+  const query = useQuery<GestureInfo[]>({
     queryKey: ['bidListByRound', round, sortDir],
     queryFn: () => api.get_bid_list_by_round(round, sortDir),
-    enabled: round >= 0,
+    enabled: !scenario && round >= 0,
     staleTime: 15_000,
     refetchOnWindowFocus: true,
   });
+  return withUxScenarioData(query, scenario?.gestures, scenario?.createdAtMs);
 }
 
 export function useCurrentSpecialRecipients() {
-  return useQuery<SpecialRecipients | null>({
+  const scenario = useUxScenarioSnapshot();
+  const query = useQuery<SpecialRecipients | null>({
     queryKey: ['currentSpecialWinners'],
     queryFn: () => api.get_current_special_winners(),
+    enabled: !scenario,
     staleTime: 15_000,
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
+  return withUxScenarioData(query, scenario?.specialRecipients ?? undefined, scenario?.createdAtMs);
 }
 
 export function useAllocationDepositsList() {
@@ -189,14 +232,17 @@ export function useBannedGestures() {
 }
 
 export function useGestureEthCost() {
-  return useQuery<GestureEthCostInfo | null>({
+  const scenario = useUxScenarioSnapshot();
+  const query = useQuery<GestureEthCostInfo | null>({
     queryKey: ['bidEthPrice'],
     queryFn: () => api.get_bid_eth_price(),
+    enabled: !scenario,
     staleTime: 10_000,
     refetchInterval: 15_000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
+  return withUxScenarioData(query, scenario?.ethCost ?? undefined, scenario?.createdAtMs);
 }
 
 export function useTimeUntilAllocation() {
@@ -391,13 +437,16 @@ export function useCTOwnershipTransfers(tokenId: number | null | undefined) {
 }
 
 export function useCTPrice() {
-  return useQuery<CTPriceInfo | null>({
+  const scenario = useUxScenarioSnapshot();
+  const query = useQuery<CTPriceInfo | null>({
     queryKey: ['ctPrice'],
     queryFn: () => api.get_ct_price(),
+    enabled: !scenario,
     staleTime: 30_000,
     refetchInterval: 30_000,
     refetchIntervalInBackground: false,
   });
+  return withUxScenarioData(query, scenario?.cstPrice ?? undefined, scenario?.createdAtMs);
 }
 
 export function useTokenInfo(tokenId: number | string | null | undefined) {
@@ -776,12 +825,14 @@ export function useNFTDonationStats() {
 }
 
 export function useDonationsNFTByRound(round: number) {
-  return useQuery<AttachedNFT[]>({
+  const scenario = useUxScenarioSnapshot();
+  const query = useQuery<AttachedNFT[]>({
     queryKey: ['donationsNFTByRound', round],
     queryFn: () => api.get_donations_nft_by_round(round),
-    enabled: round >= 0,
+    enabled: !scenario && round >= 0,
     staleTime: 30_000,
   });
+  return withUxScenarioData(query, scenario?.donationsNft, scenario?.createdAtMs);
 }
 
 export function useDonationsNFTUnclaimedByRound(round: number) {
@@ -807,12 +858,14 @@ export function useUnclaimedDonatedNFTByUser(address: string | null | undefined)
 // ---------------------------------------------------------------------------
 
 export function useDonationsERC20ByRound(round: number) {
-  return useQuery<DonatedERC20Token[]>({
+  const scenario = useUxScenarioSnapshot();
+  const query = useQuery<DonatedERC20Token[]>({
     queryKey: ['donationsERC20ByRound', round],
     queryFn: () => api.get_donations_erc20_by_round(round),
-    enabled: round >= 0,
+    enabled: !scenario && round >= 0,
     staleTime: 30_000,
   });
+  return withUxScenarioData(query, scenario?.donationsErc20, scenario?.createdAtMs);
 }
 
 export function useDonationsERC20ByUser(address: string | null | undefined) {
@@ -994,14 +1047,17 @@ export function useMarketingRewardsByUser(address: string | null | undefined) {
 // ---------------------------------------------------------------------------
 
 export function useCurrentTime() {
-  return useQuery<number>({
+  const scenario = useUxScenarioSnapshot();
+  const query = useQuery<number>({
     queryKey: ['currentTime'],
     queryFn: () => api.get_current_time(),
+    enabled: !scenario,
     staleTime: 5_000,
     refetchInterval: 12_000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
+  return withUxScenarioData(query, scenario?.currentTimeSec, scenario?.createdAtMs);
 }
 
 export function useSystemModelist() {

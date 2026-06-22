@@ -22,7 +22,7 @@ import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { ERC721_INTERFACE_ID, GESTURE_GAS_LIMIT } from '@/config/constants';
 import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
-import { getContractErrorMessage } from '@/utils/contractErrors';
+import { getContractErrorMessage, isContractRevertError } from '@/utils/contractErrors';
 import {
   type CosmicGameGestureFunctionName,
   pickGestureWriteAbi,
@@ -32,6 +32,7 @@ import {
 import { useNotify } from '@/hooks/useNotify';
 import { useCTPrice, useGestureEthCost, useUsedRWLKNFTs } from '@/hooks/useApiQuery';
 import { mapCTPriceInfo, type CstAuctionDurations, type CstGestureData } from '@/utils/cstGesture';
+import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 
 export type { CstGestureData } from '@/utils/cstGesture';
 export type CSTGestureData = CstGestureData;
@@ -55,6 +56,7 @@ export function useGestureForm() {
   const cosmicGameContract = useCosmicGameContract();
   const nftRWLKContract = useRWLKNFTContract();
   const { notify, notifyErrorFromEthers } = useNotify();
+  const uxScenario = useUxScenarioSnapshot();
 
   const { data: ctPriceData } = useCTPrice();
   const { data: bidEthPriceData } = useGestureEthCost();
@@ -78,6 +80,7 @@ export function useGestureForm() {
   const [gestureCstRewardAmountWei, setGestureCstRewardAmountWei] = useState<bigint | null>(null);
   const [isCstRewardLoading, setIsCstRewardLoading] = useState(false);
   const [cstRewardTolerancePercent, setCstRewardTolerancePercent] = useState(1);
+  const [acceptAnyCstReward, setAcceptAnyCstReward] = useState(false);
 
   const cstGestureData = useMemo<CSTGestureData>(() => {
     return mapCTPriceInfo(ctPriceData, contractCstDurations);
@@ -104,9 +107,10 @@ export function useGestureForm() {
   }, [cstRewardTolerancePercent]);
 
   const gestureCstRewardAmountMinLimitWei = useMemo(() => {
+    if (acceptAnyCstReward) return 0n;
     if (!gestureCstRewardAmountWei || gestureCstRewardAmountWei <= 0n) return 0n;
     return (gestureCstRewardAmountWei * BigInt(10_000 - cstRewardToleranceBps)) / 10_000n;
-  }, [gestureCstRewardAmountWei, cstRewardToleranceBps]);
+  }, [acceptAnyCstReward, gestureCstRewardAmountWei, cstRewardToleranceBps]);
 
   const gestureCstRewardAmountMin = useMemo(() => {
     const value = Number(formatEther(gestureCstRewardAmountMinLimitWei));
@@ -114,6 +118,7 @@ export function useGestureForm() {
   }, [gestureCstRewardAmountMinLimitWei]);
 
   useEffect(() => {
+    if (uxScenario) return;
     if (!publicClient || !contractAddrs.cosmicGame) return;
     let cancelled = false;
 
@@ -146,9 +151,14 @@ export function useGestureForm() {
     return () => {
       cancelled = true;
     };
-  }, [contractAddrs.cosmicGame, publicClient]);
+  }, [contractAddrs.cosmicGame, publicClient, uxScenario]);
 
   useEffect(() => {
+    if (uxScenario) {
+      setGestureCstRewardAmountWei(100n * 10n ** 18n);
+      setIsCstRewardLoading(false);
+      return;
+    }
     if (!cosmicGameContract) {
       setGestureCstRewardAmountWei(null);
       return;
@@ -179,7 +189,7 @@ export function useGestureForm() {
     return () => {
       cancelled = true;
     };
-  }, [cosmicGameContract]);
+  }, [cosmicGameContract, uxScenario]);
 
   const handleTx = async (hashPromise: Promise<`0x${string}`>) => {
     const hash = await hashPromise;
@@ -622,6 +632,7 @@ export function useGestureForm() {
    */
   const onGestureWithCST = async (): Promise<boolean> => {
     setIsBidding(true);
+    let submittedCstPriceMaxLimit: bigint | null = null;
     try {
       if (!account) {
         notify('error', 'Please connect your wallet.');
@@ -649,6 +660,7 @@ export function useGestureForm() {
       const priceMaxLimit =
         ((await cosmicGameContract.read.getNextCstBidPrice?.()) as bigint | undefined) ??
         cstGestureData.CSTPriceWei;
+      submittedCstPriceMaxLimit = priceMaxLimit;
 
       if (priceMaxLimit > 0n) {
         if (!(await hasCstBalance(priceMaxLimit))) {
@@ -712,9 +724,17 @@ export function useGestureForm() {
         return false;
       }
       reportError(err, 'gesture-cst');
-      const msg = getContractErrorMessage(err);
+      const msg = getContractErrorMessage(err, {
+        gestureCurrency: 'CST',
+        displayedPriceWei: submittedCstPriceMaxLimit,
+      });
       if (msg) {
         notify('error', msg);
+      } else if (isContractRevertError(err)) {
+        notify(
+          'error',
+          'The CST gesture reverted. Another gesture may have landed first, causing your max CST cost or minimum CST reward protection to fail. Refresh the preview and try again, or choose "Accept any CST reward" if you are comfortable receiving 0 CST.',
+        );
       } else {
         notifyErrorFromEthers(err);
       }
@@ -756,6 +776,8 @@ export function useGestureForm() {
     isCstRewardLoading,
     cstRewardTolerancePercent,
     setCstRewardTolerancePercent: updateCstRewardTolerancePercent,
+    acceptAnyCstReward,
+    setAcceptAnyCstReward,
     message,
     setMessage,
     nftDonateAddress,

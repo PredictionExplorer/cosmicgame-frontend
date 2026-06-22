@@ -1,6 +1,7 @@
 import { useAccount, useChainId } from 'wagmi';
 
 import { networkConfig } from '@/config/networks';
+import { UX_SCENARIO_DEMO_ACCOUNT, useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 
 /**
  * Provides wallet connection state using native wagmi hooks.
@@ -9,10 +10,12 @@ import { networkConfig } from '@/config/networks';
 export function useActiveWeb3React() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
+  const uxScenario = useUxScenarioSnapshot();
+  const demoAccount = uxScenario ? (UX_SCENARIO_DEMO_ACCOUNT as `0x${string}`) : null;
 
   return {
-    account: address ?? null,
+    account: address ?? demoAccount,
     chainId: chainId ?? networkConfig.chainId,
-    active: isConnected,
+    active: isConnected || !!demoAccount,
   };
 }

@@ -13,6 +13,7 @@ import { asWriteFn } from '@/utils/contractWrite';
 import { useNotify } from '@/hooks/useNotify';
 import { useAllocationTime, useCurrentTime, useClaimHistory } from '@/hooks/useApiQuery';
 import { getStableClientTargetTime } from '@/utils/time';
+import { useUxScenarioSnapshot } from '@/lib/uxCycleScenarios';
 
 const GAS_EXTRA = BigInt(1_000_000);
 const GAS_FLOOR = BigInt(2_000_000);
@@ -27,6 +28,7 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
   const publicClient = usePublicClient();
   const cosmicGameContract = useCosmicGameContract();
   const { notify, notifyErrorFromEthers } = useNotify();
+  const uxScenario = useUxScenarioSnapshot();
 
   const { data: prizeTimeRaw } = useAllocationTime();
   const { data: currentTimeRaw, dataUpdatedAt: currentTimeUpdatedAt } = useCurrentTime();
@@ -166,6 +168,10 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
   };
 
   const fetchActivationTime = useCallback(async () => {
+    if (uxScenario) {
+      if (mountedRef.current) setActivationTime(0);
+      return;
+    }
     if (!cosmicGameContract) return;
     try {
       const time = await cosmicGameContract.read.roundActivationTime?.();
@@ -177,9 +183,14 @@ export function useAllocationFinalize({ data, offset }: UseAllocationFinalizeOpt
       }
       if (mountedRef.current) setActivationTime(0);
     }
-  }, [cosmicGameContract, offset]);
+  }, [cosmicGameContract, offset, uxScenario]);
 
   useEffect(() => {
+    if (uxScenario) {
+      setTimeoutClaimPrize(300);
+      setActivationTime(0);
+      return;
+    }
     const fetchTimeoutFinalize = async () => {
       if (!cosmicGameContract) return;
       try {

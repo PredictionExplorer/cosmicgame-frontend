@@ -52,6 +52,8 @@ const mockGestureForm = {
   isCstRewardLoading: false,
   cstRewardTolerancePercent: 1,
   setCstRewardTolerancePercent: jest.fn(),
+  acceptAnyCstReward: false,
+  setAcceptAnyCstReward: jest.fn(),
   message: '',
   setMessage: jest.fn(),
   nftDonateAddress: '',
@@ -288,6 +290,7 @@ beforeEach(() => {
     gestureCstRewardAmountMin: 99,
     isCstRewardLoading: false,
     cstRewardTolerancePercent: 1,
+    acceptAnyCstReward: false,
     message: '',
     nftDonateAddress: '',
     nftId: '',
@@ -1012,9 +1015,7 @@ describe('HomePage', () => {
     });
 
     render(<HomePage />);
-    await user.click(
-      screen.getByRole('button', { name: /Gesture with CST \(1\.00 CST, receive ~100 CST\)/ }),
-    );
+    await user.click(screen.getByRole('button', { name: /Gesture with CST \(1\.00 CST\)/ }));
 
     expect(mockGestureForm.onGestureWithCST).toHaveBeenCalledTimes(1);
     expect(mockGestureForm.onGesture).not.toHaveBeenCalled();

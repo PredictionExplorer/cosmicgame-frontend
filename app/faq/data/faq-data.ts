@@ -282,7 +282,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'donate-nfts-to-game',
         question: 'How can other NFT projects contribute their tokens to a cycle?',
         answer:
-          'Projects can attach their tokens (ERC-721 or ERC-20) to a gesture using the "Advanced Options" pane. Provide the contract address and token ID or amount and submit the gesture. Attached tokens forward into the Cycle Reserve and flow to the Signature Allocation recipient after finalization.',
+          'Projects can attach their tokens (ERC-721 or ERC-20) to a gesture using the "Advanced" pane. Provide the contract address and token ID or amount and submit the gesture. Attached tokens forward into the Cycle Reserve and flow to the Signature Allocation recipient after finalization.',
       },
     ],
   },

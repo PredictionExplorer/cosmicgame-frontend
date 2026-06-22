@@ -4,6 +4,7 @@ import { writeContract as wagmiWriteContract } from '@wagmi/core';
 import { useGestureForm } from '../useGestureForm';
 import useCosmicGameContract from '../../hooks/useCosmicGameContract';
 import api from '../../services/api';
+import { resetUxScenarioForTest } from '../../lib/uxCycleScenarios';
 
 jest.mock('@wagmi/core', () => ({
   getConnectorClient: jest.fn().mockResolvedValue(undefined),
@@ -215,6 +216,7 @@ jest.mock('../../contracts/abis', () => ({
 const mockIsUserRejection = jest.fn().mockReturnValue(false);
 const mockReportError = jest.fn();
 const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
+const mockIsContractRevertError = jest.fn().mockReturnValue(false);
 
 jest.mock('../../utils/errors', () => ({
   isUserRejection: (...args: unknown[]) => mockIsUserRejection(...args),
@@ -223,6 +225,7 @@ jest.mock('../../utils/errors', () => ({
 
 jest.mock('../../utils/contractErrors', () => ({
   getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
+  isContractRevertError: (...args: unknown[]) => mockIsContractRevertError(...args),
 }));
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -240,6 +243,9 @@ const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffff
 
 beforeEach(() => {
   jest.clearAllMocks();
+  process.env.NEXT_PUBLIC_UX_SCENARIO = '';
+  window.history.pushState({}, '', '/');
+  resetUxScenarioForTest();
   mockWagmiWriteContract.mockResolvedValue('0xhash' as `0x${string}`);
 
   mockGestureWithEth.mockResolvedValue('0xhash');
@@ -261,6 +267,7 @@ beforeEach(() => {
   mockWriteContract.mockResolvedValue('0xhash');
   mockWaitForTransactionReceipt.mockResolvedValue({});
   mockIsUserRejection.mockReturnValue(false);
+  mockIsContractRevertError.mockReturnValue(false);
   mockGetContractErrorMessage.mockReturnValue(null);
   mockEstimateContractGas.mockResolvedValue(BigInt(500_000));
   mockUseCosmicGameContract.mockReturnValue(mockContractObj);
@@ -293,6 +300,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  resetUxScenarioForTest();
   jest.restoreAllMocks();
 });
 
@@ -401,6 +409,17 @@ describe('useGestureForm', () => {
       SecondsElapsed: 1200,
       isFree: true,
     });
+  });
+
+  it('keeps local UX scenarios aligned with normal gesture form defaults', async () => {
+    process.env.NEXT_PUBLIC_UX_SCENARIO = 'live-low-time';
+    resetUxScenarioForTest();
+
+    const { result } = renderHook(() => useGestureForm());
+    await act(async () => {});
+
+    expect(result.current.gestureType).toBe('ETH');
+    expect(result.current.advancedExpanded).toBe(false);
   });
 
   it('returns null ethGestureInfo when useGestureEthCost returns no data', () => {
@@ -534,6 +553,28 @@ describe('useGestureForm', () => {
       expect.objectContaining({
         functionName: 'bidWithCst',
         args: [100n, '', BigInt('95000000000000000000')],
+      }),
+    );
+  });
+
+  it('submits zero minimum CST reward when accepting any reward', async () => {
+    const { result } = renderHook(() => useGestureForm());
+    await act(async () => {});
+
+    act(() => {
+      result.current.setAcceptAnyCstReward(true);
+    });
+
+    await act(async () => {
+      await result.current.onGestureWithCST();
+    });
+
+    expect(result.current.gestureCstRewardAmountMinLimitWei).toBe(0n);
+    expect(mockWagmiWriteContract).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        functionName: 'bidWithCst',
+        args: [100n, '', 0n],
       }),
     );
   });
@@ -738,6 +779,30 @@ describe('useGestureForm', () => {
     });
 
     expect(mockReportError).toHaveBeenCalledWith(cstErr, 'gesture-cst');
+  });
+
+  it('explains CST protection reverts when no specific contract message is decoded', async () => {
+    const cstErr = new Error('execution reverted');
+    mockWagmiWriteContract.mockRejectedValueOnce(cstErr);
+    mockGetContractErrorMessage.mockReturnValue(null);
+    mockIsContractRevertError.mockReturnValue(true);
+
+    const { result } = renderHook(() => useGestureForm());
+    await act(async () => {});
+
+    await act(async () => {
+      await result.current.onGestureWithCST();
+    });
+
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      expect.stringContaining('minimum CST reward protection'),
+    );
+    expect(mockNotify).toHaveBeenCalledWith(
+      'error',
+      expect.stringContaining('Accept any CST reward'),
+    );
+    expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
   });
 
   it('onGesture awaits transaction receipt after writeContract returns a hash', async () => {

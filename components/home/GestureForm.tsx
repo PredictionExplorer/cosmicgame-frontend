@@ -7,6 +7,7 @@ import { formatCstAmount } from '@/utils/cstGesture';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Accordion,
   AccordionContent,
@@ -51,6 +52,8 @@ interface GestureFormProps {
   isCstRewardLoading?: boolean;
   cstRewardTolerancePercent?: number;
   setCstRewardTolerancePercent?: (value: number) => void;
+  acceptAnyCstReward?: boolean;
+  setAcceptAnyCstReward?: (value: boolean) => void;
   previewMode?: boolean;
 }
 
@@ -91,6 +94,8 @@ export function GestureForm({
   isCstRewardLoading = false,
   cstRewardTolerancePercent = 1,
   setCstRewardTolerancePercent,
+  acceptAnyCstReward = false,
+  setAcceptAnyCstReward,
   previewMode = false,
 }: GestureFormProps) {
   const showAll = data?.LastBidderAddr !== zeroAddress;
@@ -171,36 +176,44 @@ export function GestureForm({
             auctionDuration={cstGestureData.AuctionDuration}
             endedMessage="Calibration Window ended — you can gesture for free."
           />
-          <div className="rounded-xl border border-emerald-400/15 bg-emerald-400/[0.045] p-4 text-sm">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  CST Reward Preview
-                </p>
-                <p className="mt-1 text-muted-foreground">
-                  Estimated CST you receive if this gesture lands.
-                </p>
-              </div>
-              <div className="text-right font-mono tabular-nums">
-                <p className="text-base font-semibold text-emerald-300">
-                  {isCstRewardLoading
-                    ? 'Loading...'
-                    : `${formatCstAmount(gestureCstRewardAmount)} CST`}
-                </p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Min accepted: {formatCstAmount(gestureCstRewardAmountMin)} CST
-                </p>
-              </div>
+        </div>
+      )}
+
+      {showAll && (
+        <div className="rounded-xl border border-emerald-400/15 bg-emerald-400/[0.045] p-4 text-sm">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                CST Reward Preview
+              </p>
+              <p className="mt-1 text-muted-foreground">
+                Estimated CST you receive if this gesture lands. Every gesture method has two
+                protections: maximum cost and minimum CST reward.
+              </p>
             </div>
-            {cstGestureData.source === 'contract' &&
-              cstGestureData.apiAuctionDuration != null &&
-              cstGestureData.apiAuctionDuration !== cstGestureData.AuctionDuration && (
-                <p className="mt-3 text-xs text-amber-200/90">
-                  Using on-chain duration ({formatSeconds(cstGestureData.AuctionDuration)}) because
-                  the API reported {formatSeconds(cstGestureData.apiAuctionDuration)}.
-                </p>
-              )}
+            <div className="text-right font-mono tabular-nums">
+              <p className="text-base font-semibold text-emerald-300">
+                {isCstRewardLoading
+                  ? 'Loading...'
+                  : `${formatCstAmount(gestureCstRewardAmount)} CST`}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Min accepted:{' '}
+                {acceptAnyCstReward
+                  ? 'any reward, including 0 CST'
+                  : `${formatCstAmount(gestureCstRewardAmountMin)} CST`}
+              </p>
+            </div>
           </div>
+          {gestureType === 'CST' &&
+            cstGestureData.source === 'contract' &&
+            cstGestureData.apiAuctionDuration != null &&
+            cstGestureData.apiAuctionDuration !== cstGestureData.AuctionDuration && (
+              <p className="mt-3 text-xs text-amber-200/90">
+                Using on-chain duration ({formatSeconds(cstGestureData.AuctionDuration)}) because
+                the API reported {formatSeconds(cstGestureData.apiAuctionDuration)}.
+              </p>
+            )}
         </div>
       )}
 
@@ -210,41 +223,6 @@ export function GestureForm({
           assets, and submit the gesture on Arbitrum.
         </div>
       )}
-
-      <div>
-        <div className="mb-2 flex items-center gap-2">
-          <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Message{' '}
-            <span className="normal-case tracking-normal opacity-50">(optional, 280 chars)</span>
-          </Label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                aria-label="How gesture messages work"
-                className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >
-                <Info className="h-3.5 w-3.5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-[260px]">
-                Leave a message to appear in Gesture Chat. Your message is recorded on-chain with
-                your gesture and remains on the blockchain permanently.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <textarea
-          placeholder="Leave a message with your gesture..."
-          value={message}
-          maxLength={280}
-          rows={3}
-          disabled={previewMode}
-          className="w-full flex min-h-[72px] rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
-          onChange={(e) => setMessage(e.target.value)}
-        />
-      </div>
 
       <Accordion
         type="single"
@@ -259,19 +237,72 @@ export function GestureForm({
           >
             <span className="flex items-center gap-2">
               <Settings2 className="h-4 w-4" />
-              Advanced Options
+              Advanced
             </span>
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-4 pt-2 max-w-xl">
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Message{' '}
+                    <span className="normal-case tracking-normal opacity-50">
+                      (optional, 280 chars)
+                    </span>
+                  </Label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        aria-label="How gesture messages work"
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.04] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      >
+                        <Info className="h-3.5 w-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-[260px]">
+                        Leave a message to appear in Gesture Chat. Your message is recorded on-chain
+                        with your gesture and remains on the blockchain permanently.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <textarea
+                  placeholder="Leave a message with your gesture..."
+                  value={message}
+                  maxLength={280}
+                  rows={3}
+                  disabled={previewMode}
+                  className="w-full flex min-h-[72px] rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-colors"
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+              </div>
               <p className="text-xs text-muted-foreground">
                 Attach tokens or NFTs to your gesture, or adjust gesture-cost collision prevention.
               </p>
-              {gestureType === 'CST' && (
+              {showAll && (
                 <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 space-y-3">
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    CST Reward Protection
+                    Minimum CST Reward Protection
                   </p>
+                  <label className="flex items-start gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] p-3 text-sm">
+                    <Checkbox
+                      checked={acceptAnyCstReward}
+                      disabled={previewMode || !setAcceptAnyCstReward}
+                      onChange={(e) => setAcceptAnyCstReward?.(e.currentTarget.checked)}
+                      aria-label="Accept any CST reward"
+                    />
+                    <span>
+                      <span className="block font-medium text-foreground">
+                        Accept any CST reward, including 0
+                      </span>
+                      <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
+                        Sends a minimum accepted CST reward of 0. Use this when you prefer the
+                        gesture to land even if the reward changes before confirmation.
+                      </span>
+                    </span>
+                  </label>
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-2">
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-sm text-muted-foreground whitespace-nowrap">
@@ -286,7 +317,9 @@ export function GestureForm({
                           max={100}
                           step={0.1}
                           className="h-9 px-2.5 py-2 pr-7 text-sm tabular-nums"
-                          disabled={previewMode || !setCstRewardTolerancePercent}
+                          disabled={
+                            acceptAnyCstReward || previewMode || !setCstRewardTolerancePercent
+                          }
                           onChange={(e) => setCstRewardTolerancePercent?.(Number(e.target.value))}
                         />
                         <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none text-xs">
