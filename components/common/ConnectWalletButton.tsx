@@ -5,6 +5,7 @@ import {
   Coins,
   Layers,
   History,
+  SendHorizontal,
   Wallet,
   Copy,
   Check,
@@ -131,6 +132,15 @@ const ConnectWalletButton = ({
               >
                 <Coins className="h-3.5 w-3.5 text-muted-foreground" />
                 My Tokens
+              </NavLink>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer p-0">
+              <NavLink
+                href="/transfer-cst"
+                className="flex w-full items-center gap-2.5 px-2 py-1.5 text-sm"
+              >
+                <SendHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
+                Transfer CST
               </NavLink>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer p-0">

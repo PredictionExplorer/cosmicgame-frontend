@@ -67,6 +67,13 @@ describe('SiteMapPage', () => {
     expect(links).toHaveLength(19);
   });
 
+  it('does not expose CST transfer or hidden outreach transfer tools', () => {
+    render(<SiteMapPage />);
+
+    expect(document.querySelector('a[href="/transfer-cst"]')).toBeNull();
+    expect(document.querySelector('a[href="/internal/cst-outreach-transfer"]')).toBeNull();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(<SiteMapPage />);
     await checkA11y(container, { rules: { 'heading-order': { enabled: false } } });

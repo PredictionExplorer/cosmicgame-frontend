@@ -154,6 +154,8 @@ describe('hostRouting', () => {
           '/risk-disclosures',
           '/faq',
           '/admin',
+          '/internal',
+          '/transfer-cst',
         ]),
       );
     });
@@ -246,6 +248,7 @@ describe('hostRouting', () => {
         '/how-it-works',
         '/marketing',
         '/imprint',
+        '/internal',
         '/my-allocations',
         '/my-anchors',
         '/my-statistics',
@@ -264,6 +267,7 @@ describe('hostRouting', () => {
         '/statistics',
         '/system-event',
         '/terms',
+        '/transfer-cst',
         '/used-rwlk-nfts',
         '/user',
       ];
@@ -292,6 +296,8 @@ describe('hostRouting', () => {
       '/allocation/42',
       '/my-anchors',
       '/admin',
+      '/internal/cst-outreach-transfer',
+      '/transfer-cst',
       '/gesture/1',
       '/allocation/42',
       '/anchoring',

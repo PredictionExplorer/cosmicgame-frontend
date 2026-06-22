@@ -99,6 +99,11 @@ describe('Footer', () => {
     expect(siteMapLink).toHaveAttribute('href', '/site-map');
   });
 
+  it('does not expose CST transfer or hidden outreach transfer tools', () => {
+    expect(document.querySelector('a[href="/transfer-cst"]')).toBeNull();
+    expect(document.querySelector('a[href="/internal/cst-outreach-transfer"]')).toBeNull();
+  });
+
   it('wraps content in a footer element', () => {
     const footer = document.querySelector('footer');
     expect(footer).toBeInTheDocument();

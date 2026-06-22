@@ -39,7 +39,9 @@ describe('robots (host-aware)', () => {
       const disallow = Array.isArray(wildcardRule.disallow)
         ? wildcardRule.disallow
         : [wildcardRule.disallow];
-      expect(disallow).toEqual(expect.arrayContaining(['/admin/', '/api/', '/gallery/']));
+      expect(disallow).toEqual(
+        expect.arrayContaining(['/admin/', '/api/', '/gallery/', '/internal/', '/transfer-cst']),
+      );
     });
 
     it('includes AI crawler bot rules', async () => {

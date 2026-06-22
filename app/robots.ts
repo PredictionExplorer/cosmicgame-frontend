@@ -49,6 +49,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     '/eth-contribution',
     '/gallery/',
     '/gesture/',
+    '/internal/',
     '/landing-site',
     '/my-',
     '/public-goods-',
@@ -59,6 +60,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     '/security',
     '/statistics',
     '/terms',
+    '/transfer-cst',
   ];
 
   const appDisallow = ['/api/', '/internal/', '/debug/', '/wallet/', '/account/', '/landing-site'];

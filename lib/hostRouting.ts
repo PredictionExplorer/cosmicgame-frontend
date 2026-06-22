@@ -82,6 +82,7 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/how-it-works',
   '/marketing',
   '/imprint',
+  '/internal',
   '/attached-nfts',
   '/my-allocations',
   '/my-anchors',
@@ -101,6 +102,7 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/statistics',
   '/system-event',
   '/terms',
+  '/transfer-cst',
   '/used-rwlk-nfts',
   '/user',
 ];
