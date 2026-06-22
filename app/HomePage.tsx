@@ -176,11 +176,11 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   }, [currentTimeData, currentTimeUpdatedAt, currentTimeFallbackMs]);
 
   const [gesturePulseKey, setGesturePulseKey] = useState(0);
-  const mintedTokenCount = dashboardData?.MainStats.NumCSTokenMints ?? 0;
+  const imprintedTokenCount = dashboardData?.MainStats.NumCSTokenMints ?? 0;
   const bannerTokenId = useRotatingIndex({
-    count: mintedTokenCount,
+    count: imprintedTokenCount,
     intervalMs: 15_000,
-    enabled: mintedTokenCount > 1,
+    enabled: imprintedTokenCount > 1,
     randomStart: true,
   });
 
