@@ -81,7 +81,7 @@ describe('WinningHistorySection', () => {
   });
 
   it('renders lightbox when imageOpen is true', () => {
-    render(<WinningHistorySection {...defaultProps} imageOpen={true} />);
+    render(<WinningHistorySection {...defaultProps} bannerTokenSeed="abc123" imageOpen={true} />);
     expect(screen.getByTestId('lightbox')).toBeInTheDocument();
   });
 
@@ -105,7 +105,7 @@ describe('WinningHistorySection', () => {
     expect(screen.getByTestId('winning-table')).toHaveTextContent('0 entries');
   });
 
-  it('shows lightbox with fallback image when bannerTokenSeed is empty', () => {
+  it('does not show lightbox when bannerTokenSeed is empty', () => {
     render(
       <WinningHistorySection
         {...defaultProps}
@@ -114,7 +114,7 @@ describe('WinningHistorySection', () => {
         claimHistory={[]}
       />,
     );
-    expect(screen.getByTestId('lightbox')).toBeInTheDocument();
+    expect(screen.queryByTestId('lightbox')).not.toBeInTheDocument();
   });
 
   it('shows lightbox when bannerTokenSeed is set', () => {
