@@ -1,0 +1,68 @@
+[
+  {
+    "type": "error",
+    "name": "OwnableInvalidOwner",
+    "inputs": [{ "name": "owner", "type": "address" }]
+  },
+  {
+    "type": "error",
+    "name": "OwnableUnauthorizedAccount",
+    "inputs": [{ "name": "account", "type": "address" }]
+  },
+  {
+    "type": "error",
+    "name": "UnauthorizedCaller",
+    "inputs": [
+      { "name": "errStr", "type": "string" },
+      { "name": "callerAddress", "type": "address" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "OwnershipTransferred",
+    "inputs": [
+      { "name": "previousOwner", "type": "address", "indexed": true },
+      { "name": "newOwner", "type": "address", "indexed": true }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RewardPaid",
+    "inputs": [
+      { "name": "marketerAddress", "type": "address", "indexed": true },
+      { "name": "amount", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "TreasurerAddressChanged",
+    "inputs": [{ "name": "newValue", "type": "address", "indexed": true }],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "payReward",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "marketerAddress_", "type": "address" },
+      { "name": "amount_", "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "treasurerAddress",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address" }]
+  }
+]

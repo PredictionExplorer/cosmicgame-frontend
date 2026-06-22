@@ -17,6 +17,7 @@ export const cosmicGameAbi: Abi = generated.cosmicGameAbi;
 export const cosmicSignatureAbi: Abi = generated.cosmicSignatureAbi;
 export const cosmicTokenAbi: Abi = generated.cosmicTokenAbi;
 export const ethDonationsAbi: Abi = generated.ethDonationsAbi;
+export const marketingWalletAbi: Abi = generated.marketingWalletAbi;
 export const prizesWalletAbi: Abi = generated.prizesWalletAbi;
 export const randomWalkNftAbi: Abi = generated.randomWalkNftAbi;
 export const stakingWalletCstAbi: Abi = generated.stakingWalletCosmicSignatureNftAbi;

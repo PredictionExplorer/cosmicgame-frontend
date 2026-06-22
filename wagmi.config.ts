@@ -7,6 +7,7 @@ import cosmicGameAbi from './contracts/CosmicGame.json';
 import cosmicSignatureAbi from './contracts/CosmicSignature.json';
 import cosmicTokenAbi from './contracts/CosmicToken.json';
 import ethDonationsAbi from './contracts/EthDonations.json';
+import marketingWalletAbi from './contracts/MarketingWallet.json';
 import prizesWalletAbi from './contracts/PrizesWallet.json';
 import randomWalkNftAbi from './contracts/RandomWalkNFT.json';
 import stakingWalletCosmicSignatureNftAbi from './contracts/StakingWalletCosmicSignatureNft.json';
@@ -24,6 +25,7 @@ export default defineConfig({
     { name: 'CosmicSignature', abi: cosmicSignatureAbi as Abi },
     { name: 'CosmicToken', abi: cosmicTokenAbi as Abi },
     { name: 'EthDonations', abi: ethDonationsAbi as Abi },
+    { name: 'MarketingWallet', abi: marketingWalletAbi as Abi },
     { name: 'PrizesWallet', abi: prizesWalletAbi as Abi },
     { name: 'RandomWalkNft', abi: randomWalkNftAbi as Abi },
     { name: 'StakingWalletCosmicSignatureNft', abi: stakingWalletCosmicSignatureNftAbi as Abi },

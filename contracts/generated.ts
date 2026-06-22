@@ -5405,6 +5405,79 @@ export const ethDonationsAbi = [
 ] as const;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// MarketingWallet
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const marketingWalletAbi = [
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'errStr', type: 'string' },
+      { name: 'callerAddress', type: 'address' },
+    ],
+    name: 'UnauthorizedCaller',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'previousOwner', type: 'address', indexed: true },
+      { name: 'newOwner', type: 'address', indexed: true },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'marketerAddress', type: 'address', indexed: true },
+      { name: 'amount', type: 'uint256', indexed: false },
+    ],
+    name: 'RewardPaid',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [{ name: 'newValue', type: 'address', indexed: true }],
+    name: 'TreasurerAddressChanged',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'marketerAddress_', type: 'address' },
+      { name: 'amount_', type: 'uint256' },
+    ],
+    name: 'payReward',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'treasurerAddress',
+    outputs: [{ name: '', type: 'address' }],
+    stateMutability: 'view',
+  },
+] as const;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // PrizesWallet
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
