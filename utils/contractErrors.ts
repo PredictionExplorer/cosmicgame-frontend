@@ -1,4 +1,6 @@
-import { formatEther } from 'viem';
+import { decodeErrorResult, formatEther, type Abi, type Hex } from 'viem';
+
+import { cosmicGameAbi } from '@/contracts/abis';
 
 /**
  * Contract-revert error helpers.
@@ -142,4 +144,99 @@ export function getContractErrorMessage(
   }
 
   return CUSTOM_ERROR_MESSAGES[errorName] ?? null;
+}
+
+/**
+ * Custom errors that the V2 bid paths can revert with but that are missing from
+ * the generated `cosmicGameAbi` (the ABI has the V2 bid *functions* but not these
+ * V2 error definitions). Regenerating the ABI from the V2 contracts would make
+ * this list unnecessary — keep it in sync until then.
+ */
+const SUPPLEMENTAL_ERROR_ABI = [
+  {
+    type: 'error',
+    name: 'BidCstRewardAmountMinLimitNotReached',
+    inputs: [
+      { name: 'bidCstRewardAmount', type: 'uint256', internalType: 'uint256' },
+      { name: 'bidCstRewardAmountMinLimit', type: 'uint256', internalType: 'uint256' },
+    ],
+  },
+] as const;
+
+/** Full ABI used only for decoding revert data (game ABI + supplemental V2 errors). */
+const ERROR_DECODE_ABI = [...cosmicGameAbi, ...SUPPLEMENTAL_ERROR_ABI] as Abi;
+
+/** Pulls the raw revert data (`0x<selector><args>`) out of a viem/wagmi error chain. */
+function extractRevertData(err: unknown): Hex | undefined {
+  const seen = new Set<unknown>();
+  let e: unknown = err;
+  while (e && typeof e === 'object' && !seen.has(e)) {
+    seen.add(e);
+    const node = e as { raw?: unknown; data?: unknown; cause?: unknown };
+    if (typeof node.raw === 'string' && node.raw.startsWith('0x') && node.raw.length >= 10) {
+      return node.raw as Hex;
+    }
+    if (typeof node.data === 'string' && node.data.startsWith('0x') && node.data.length >= 10) {
+      return node.data as Hex;
+    }
+    e = node.cause;
+  }
+  const walkable = err as { walk?: (fn: (e: unknown) => boolean) => unknown };
+  if (typeof walkable.walk === 'function') {
+    const found = walkable.walk((x: unknown) => {
+      const n = x as { raw?: unknown; data?: unknown };
+      return (
+        (typeof n?.raw === 'string' && n.raw.startsWith('0x')) ||
+        (typeof n?.data === 'string' && n.data.startsWith('0x'))
+      );
+    }) as { raw?: unknown; data?: unknown } | null;
+    const hex = (found?.raw ?? found?.data) as string | undefined;
+    if (typeof hex === 'string' && hex.startsWith('0x') && hex.length >= 10) return hex as Hex;
+  }
+  return undefined;
+}
+
+/** Renders a single decoded argument value as a readable string. */
+function formatArgValue(v: unknown): string {
+  if (typeof v === 'bigint') return v.toString();
+  if (typeof v === 'string') return v;
+  if (Array.isArray(v)) return `[${v.map(formatArgValue).join(', ')}]`;
+  if (v && typeof v === 'object') {
+    return `{ ${Object.entries(v as Record<string, unknown>)
+      .map(([k, val]) => `${k}: ${formatArgValue(val)}`)
+      .join(', ')} }`;
+  }
+  return String(v);
+}
+
+/**
+ * Decodes a contract revert into a human-readable custom error string with named
+ * args, e.g. `CosmicSignatureErrors.BidCstRewardAmountMinLimitNotReached(
+ * bidCstRewardAmount = 777777, bidCstRewardAmountMinLimit = 666666)`. Decodes
+ * against the full game ABI plus supplemental V2 errors (the bid calls use a
+ * narrow per-function ABI slice with no error defs). Returns `null` when the
+ * error is not a decodable contract revert.
+ */
+export function formatCustomContractError(err: unknown): string | null {
+  const data = extractRevertData(err);
+  if (!data || data === '0x') return null;
+  try {
+    const decoded = decodeErrorResult({ abi: ERROR_DECODE_ABI, data });
+    const name = decoded.errorName;
+    const args = (decoded.args ?? []) as readonly unknown[];
+    const inputs = ((decoded.abiItem as { inputs?: { name?: string }[] } | undefined)?.inputs ??
+      []) as {
+      name?: string;
+    }[];
+
+    // Built-in reverts: present them plainly rather than as a CosmicSignatureErrors.* call.
+    if (name === 'Error') return `Revert: "${formatArgValue(args[0])}"`;
+    if (name === 'Panic') return `Panic(${formatArgValue(args[0])})`;
+
+    if (args.length === 0) return `CosmicSignatureErrors.${name}()`;
+    const lines = args.map((a, i) => `  ${inputs[i]?.name ?? `arg${i}`} = ${formatArgValue(a)}`);
+    return `CosmicSignatureErrors.${name}(\n${lines.join(',\n')}\n)`;
+  } catch {
+    return null;
+  }
 }
