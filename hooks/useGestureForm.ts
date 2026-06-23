@@ -22,7 +22,11 @@ import { activeChain } from '@/config/chains';
 import { useContractAddresses } from '@/contexts/ContractAddressesContext';
 import { ERC721_INTERFACE_ID, GESTURE_GAS_LIMIT } from '@/config/constants';
 import { isUserRejection, reportError, WALLET_TRANSACTION_CANCELLED_MESSAGE } from '@/utils/errors';
-import { getContractErrorMessage, isContractRevertError } from '@/utils/contractErrors';
+import {
+  formatCustomContractError,
+  getContractErrorMessage,
+  isContractRevertError,
+} from '@/utils/contractErrors';
 import {
   type CosmicGameGestureFunctionName,
   pickGestureWriteAbi,
@@ -246,6 +250,7 @@ export function useGestureForm() {
       args: [account as `0x${string}`, contractAddrs.prizesWallet as `0x${string}`],
     });
     if (!approved) {
+      const feeParams = await getFeeParams();
       const hash = await writeContract(config, {
         address: nftAddress as `0x${string}`,
         abi: NFT_ABI,
@@ -253,6 +258,7 @@ export function useGestureForm() {
         args: [contractAddrs.prizesWallet as `0x${string}`, true],
         account: account!,
         chainId: activeChain.id,
+        ...feeParams,
       });
       await publicClient!.waitForTransactionReceipt({ hash });
     }
@@ -274,6 +280,7 @@ export function useGestureForm() {
 
     if (allowance >= required) return;
     const approvalAmount = options.approveMax === false ? required : maxUint256;
+    const feeParams = await getFeeParams();
     const hash = await writeContract(config, {
       address: tokenAddress as `0x${string}`,
       abi: ERC20_ABI,
@@ -281,15 +288,9 @@ export function useGestureForm() {
       args: [spender as `0x${string}`, approvalAmount],
       account: account!,
       chainId: activeChain.id,
+      ...feeParams,
     });
     await publicClient!.waitForTransactionReceipt({ hash });
-  };
-
-  const ensureCstAllowance = async (required: bigint) => {
-    if (required <= 0n) return;
-    await ensureErc20Allowance(contractAddrs.cosmicToken, contractAddrs.cosmicGame, required, {
-      approveMax: false,
-    });
   };
 
   const getErc20Decimals = async (tokenAddress: string) => {
@@ -482,7 +483,11 @@ export function useGestureForm() {
     let signer = connectorClient ?? walletClient;
     if (!signer) {
       try {
-        signer = (await getConnectorClient(config, { chainId: activeChain.id })) ?? undefined;
+        // Do NOT pin `chainId` here: wagmi would require the connector to ALREADY be on
+        // `activeChain.id` and throws `ConnectorChainMismatchError` otherwise (MetaMask
+        // frequently disagrees with wagmi's chain state). We need the client on the
+        // wallet's *current* chain precisely so we can detect the mismatch and switch below.
+        signer = ((await getConnectorClient(config)) as unknown as typeof signer) ?? undefined;
       } catch {
         signer = undefined;
       }
@@ -614,9 +619,11 @@ export function useGestureForm() {
         return false;
       }
       reportError(err, 'gesture-eth');
+      const detailed = formatCustomContractError(err);
       const msg = getContractErrorMessage(err, ethGestureInfo?.ETHPrice);
-      if (msg) {
-        notify('error', msg);
+      const combined = [msg, detailed].filter(Boolean).join('\n\n');
+      if (combined) {
+        notify('error', combined);
       } else {
         notifyErrorFromEthers(err);
       }
@@ -643,7 +650,11 @@ export function useGestureForm() {
       }
       let signerClient = client;
       if (!signerClient) {
-        signerClient = (await getConnectorClient(config, { chainId: activeChain.id })) ?? undefined;
+        // Unpinned: the chain was already aligned by switchToActiveChainIfNeeded(), and
+        // MetaMask's connector chain can lag right after a switch. Pinning `chainId` here
+        // would throw `ConnectorChainMismatchError`. We only need the account address.
+        signerClient =
+          ((await getConnectorClient(config)) as unknown as typeof signerClient) ?? undefined;
       }
       if (!signerClient) {
         notify('error', 'Wallet is still connecting. Please try again in a moment.');
@@ -670,7 +681,9 @@ export function useGestureForm() {
           );
           return false;
         }
-        await ensureCstAllowance(priceMaxLimit);
+        // No ERC-20 approval needed: the game burns the bidder's CST directly via the
+        // privileged `CosmicSignatureToken.burn(account, value)` (_onlyGame), which calls
+        // `_burn` without touching allowance. An `approve` here would be a pointless extra tx.
       }
 
       const noDonation =
@@ -724,12 +737,13 @@ export function useGestureForm() {
         return false;
       }
       reportError(err, 'gesture-cst');
+      const detailed = formatCustomContractError(err);
       const msg = getContractErrorMessage(err, {
         gestureCurrency: 'CST',
         displayedPriceWei: submittedCstPriceMaxLimit,
       });
-      if (msg) {
-        notify('error', msg);
+      if (msg || detailed) {
+        notify('error', [msg, detailed].filter(Boolean).join('\n\n'));
       } else if (isContractRevertError(err)) {
         notify(
           'error',

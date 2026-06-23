@@ -217,6 +217,7 @@ const mockIsUserRejection = jest.fn().mockReturnValue(false);
 const mockReportError = jest.fn();
 const mockGetContractErrorMessage = jest.fn().mockReturnValue(null);
 const mockIsContractRevertError = jest.fn().mockReturnValue(false);
+const mockFormatCustomContractError = jest.fn().mockReturnValue(null);
 
 jest.mock('../../utils/errors', () => ({
   isUserRejection: (...args: unknown[]) => mockIsUserRejection(...args),
@@ -226,6 +227,7 @@ jest.mock('../../utils/errors', () => ({
 jest.mock('../../utils/contractErrors', () => ({
   getContractErrorMessage: (...args: unknown[]) => mockGetContractErrorMessage(...args),
   isContractRevertError: (...args: unknown[]) => mockIsContractRevertError(...args),
+  formatCustomContractError: (...args: unknown[]) => mockFormatCustomContractError(...args),
 }));
 
 /* ────────────────────────────────────────────────────────────────── */
@@ -269,6 +271,7 @@ beforeEach(() => {
   mockIsUserRejection.mockReturnValue(false);
   mockIsContractRevertError.mockReturnValue(false);
   mockGetContractErrorMessage.mockReturnValue(null);
+  mockFormatCustomContractError.mockReturnValue(null);
   mockEstimateContractGas.mockResolvedValue(BigInt(500_000));
   mockUseCosmicGameContract.mockReturnValue(mockContractObj);
   mockApiGetUserBalance.mockResolvedValue({
