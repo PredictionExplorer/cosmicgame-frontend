@@ -69,6 +69,7 @@ function makeLatestGesture(overrides: Partial<GestureInfo> = {}): GestureInfo {
     BidderAddr: enduranceAddress,
     GestureType: 0,
     GestureCostEth: 0.123456789,
+    ParticipationCST: 100,
     ...overrides,
   };
 }
@@ -129,8 +130,10 @@ describe('SpecialAllocationRecipients', () => {
     expect(details).toHaveTextContent('ETH');
     expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent('No');
     expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#101');
-    expect(details).toHaveTextContent('Attached assets');
-    expect(details).toHaveTextContent('None');
+    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('100.00 CST');
+    expect(screen.queryByTestId('latest-participant-attached-assets')).not.toBeInTheDocument();
+    expect(details).not.toHaveTextContent('Attached assets');
+    expect(details).not.toHaveTextContent('None');
   });
 
   it('shows CST payment details for the latest participant gesture', () => {
@@ -148,6 +151,49 @@ describe('SpecialAllocationRecipients', () => {
     expect(screen.getByTestId('latest-participant-paid-amount')).toHaveTextContent('25.5000 CST');
     expect(details).toHaveTextContent('CST');
     expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent('No');
+    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('100.00 CST');
+  });
+
+  it('shows Participation CST received from the canonical latest gesture field', () => {
+    render(
+      <SpecialAllocationRecipients
+        latestGesture={makeLatestGesture({
+          ParticipationCST: 123.45,
+          CSTRewardEth: 100,
+          ERC20RewardAmountEth: 100,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('123.45 CST');
+  });
+
+  it('falls back to legacy CST received fields for older latest gesture payloads', () => {
+    render(
+      <SpecialAllocationRecipients
+        latestGesture={makeLatestGesture({
+          ParticipationCST: undefined,
+          CSTRewardEth: undefined,
+          ERC20RewardAmountEth: 88,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('88.00 CST');
+  });
+
+  it('shows unavailable CST received copy when the latest gesture omits reward fields', () => {
+    render(
+      <SpecialAllocationRecipients
+        latestGesture={makeLatestGesture({
+          ParticipationCST: undefined,
+          CSTRewardEth: undefined,
+          ERC20RewardAmountEth: undefined,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('Unavailable');
   });
 
   it('shows Random Walk token involvement and attached assets for the latest participant gesture', () => {
@@ -171,7 +217,27 @@ describe('SpecialAllocationRecipients', () => {
     expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent(
       'Yes, token #123',
     );
+    expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('100.00 CST');
+    expect(screen.getByTestId('latest-participant-attached-assets')).toHaveTextContent(
+      'Attached assets',
+    );
     expect(details).toHaveTextContent('NFT + ERC20');
+  });
+
+  it('hides attached assets for sentinel NFT donation IDs without a token attachment', () => {
+    render(
+      <SpecialAllocationRecipients
+        latestGesture={makeLatestGesture({
+          NFTDonationTokenAddr: '0xNFT',
+          NFTDonationTokenId: -1,
+          DonatedERC20TokenAddr: undefined,
+        })}
+      />,
+    );
+
+    const details = screen.getByTestId('latest-participant-gesture-details');
+    expect(screen.queryByTestId('latest-participant-attached-assets')).not.toBeInTheDocument();
+    expect(details).not.toHaveTextContent('Attached assets');
   });
 
   it('does not show latest gesture details when the gesture belongs to another participant', () => {

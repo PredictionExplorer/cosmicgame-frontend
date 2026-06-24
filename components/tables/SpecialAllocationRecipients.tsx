@@ -251,6 +251,11 @@ function formatGestureAmount(amount: number | undefined, unit: 'ETH' | 'CST'): s
   return `${amount.toFixed(amount > 0 && amount < 1 ? 7 : 4)} ${unit}`;
 }
 
+function formatReceivedCstAmount(amount: number | undefined): string {
+  if (amount === undefined) return 'Unavailable';
+  return `${amount.toFixed(amount > 0 && amount < 1 ? 7 : 2)} CST`;
+}
+
 function getCstGestureCost(gesture: GestureInfo): number | undefined {
   return firstNonNegativeNumber(
     gesture.CstCost,
@@ -262,6 +267,14 @@ function getCstGestureCost(gesture: GestureInfo): number | undefined {
 
 function getEthGestureCost(gesture: GestureInfo): number | undefined {
   return firstNonNegativeNumber(gesture.GestureCostEth, gesture.EthPriceEth);
+}
+
+function getParticipationCST(gesture: GestureInfo): number | undefined {
+  return firstNonNegativeNumber(
+    gesture.ParticipationCST,
+    gesture.CSTRewardEth,
+    gesture.ERC20RewardAmountEth,
+  );
 }
 
 function formatLatestGesturePayment(gesture: GestureInfo): string {
@@ -298,12 +311,15 @@ function formatGestureTime(gesture: GestureInfo): string {
     : 'Unavailable';
 }
 
-function formatAttachedAssets(gesture: GestureInfo): string {
-  const assets = [
+function getAttachedAssetLabels(gesture: GestureInfo): string[] {
+  return [
     gesture.NFTDonationTokenAddr && gesture.NFTDonationTokenId !== -1 ? 'NFT' : '',
     gesture.DonatedERC20TokenAddr ? 'ERC20' : '',
   ].filter(Boolean);
+}
 
+function formatAttachedAssets(gesture: GestureInfo): string {
+  const assets = getAttachedAssetLabels(gesture);
   if (assets.length === 0) return 'None';
   return assets.join(' + ');
 }
@@ -391,7 +407,19 @@ function LatestGestureDetails({
               : 'Unavailable'
           }
         />
-        <DetailMetric label="Attached assets" value={formatAttachedAssets(latestGesture)} />
+        <DetailMetric
+          testId="latest-participant-cst-received"
+          label="CST received"
+          value={formatReceivedCstAmount(getParticipationCST(latestGesture))}
+          tone="emerald"
+        />
+        {getAttachedAssetLabels(latestGesture).length > 0 && (
+          <DetailMetric
+            testId="latest-participant-attached-assets"
+            label="Attached assets"
+            value={formatAttachedAssets(latestGesture)}
+          />
+        )}
       </div>
     </div>
   );
