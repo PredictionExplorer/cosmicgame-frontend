@@ -525,7 +525,7 @@ describe('HomePage', () => {
         SecondsElapsed: 100,
         isFree: false,
         source: 'contract' as const,
-        updatedAtMs: Date.now() - 10_500,
+        updatedAtMs: Date.now() - 30_500,
       },
     });
     mockUseDashboardInfo.mockReturnValue({
@@ -537,11 +537,11 @@ describe('HomePage', () => {
 
     expect(screen.getByTestId('gesture-status')).toHaveAttribute('data-cst-duration', '7200');
     expect(Number(screen.getByTestId('gesture-status').dataset.cstElapsed)).toBeGreaterThanOrEqual(
-      110,
+      120,
     );
     expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-cst-duration', '7200');
     expect(Number(screen.getByTestId('gesture-form').dataset.cstElapsed)).toBeGreaterThanOrEqual(
-      110,
+      120,
     );
   });
 
@@ -555,7 +555,7 @@ describe('HomePage', () => {
         SecondsElapsed: 9,
         isFree: false,
         source: 'contract' as const,
-        updatedAtMs: Date.now() - 2_500,
+        updatedAtMs: Date.now() - 30_500,
       },
     });
     mockUseDashboardInfo.mockReturnValue({
