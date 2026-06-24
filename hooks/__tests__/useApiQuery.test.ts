@@ -1422,7 +1422,7 @@ describe('useApiQuery hooks', () => {
       expect(getOptions().enabled).toBe(true);
     });
 
-    it('refreshes attached NFT prize context on window focus', () => {
+    it('refreshes attached NFT asset context on window focus', () => {
       renderHook(() => useDonationsNFTByRound(0));
       expect(getOptions().refetchOnWindowFocus).toBe(true);
     });
@@ -1476,7 +1476,7 @@ describe('useApiQuery hooks', () => {
       expect(getOptions().enabled).toBe(true);
     });
 
-    it('refreshes attached ERC20 prize context on window focus', () => {
+    it('refreshes attached ERC20 asset context on window focus', () => {
       renderHook(() => useDonationsERC20ByRound(0));
       expect(getOptions().refetchOnWindowFocus).toBe(true);
     });
