@@ -34,6 +34,15 @@ describe('AuctionInfo', () => {
     expect(progress.firstElementChild).toHaveStyle({ width: '25%' });
   });
 
+  it('shows one decimal place when progress would otherwise look static', () => {
+    render(
+      <AuctionInfo secondsElapsed={43} auctionDuration={43200} title="CST Calibration Window" />,
+    );
+
+    expect(screen.getByText('0.1% complete')).toBeInTheDocument();
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0.1');
+  });
+
   it('shows ended message when elapsed is greater than duration', () => {
     render(<AuctionInfo secondsElapsed={6000} auctionDuration={5400} />);
 

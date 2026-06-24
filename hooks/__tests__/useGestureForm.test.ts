@@ -81,7 +81,7 @@ const mockGestureWithCstAndContributeNft = jest.fn().mockResolvedValue('0xhash')
 const mockGestureWithEthAndContributeToken = jest.fn().mockResolvedValue('0xhash');
 const mockGestureWithCstAndContributeToken = jest.fn().mockResolvedValue('0xhash');
 const mockGetNextEthGestureCost = jest.fn().mockResolvedValue(BigInt(1e16));
-const mockGetNextCstGestureCost = jest.fn().mockResolvedValue(BigInt(100));
+const mockGetNextCstGestureCost = jest.fn().mockResolvedValue(BigInt('1000000000000000000'));
 const mockGetGestureCstRewardAmount = jest.fn().mockResolvedValue(BigInt('100000000000000000000'));
 const mockGetGestureCstRewardAmountAdvanced = jest
   .fn()
@@ -265,7 +265,7 @@ beforeEach(() => {
   mockGestureWithCstAndContributeNft.mockResolvedValue('0xhash');
   mockGestureWithCstAndContributeToken.mockResolvedValue('0xhash');
   mockGetNextEthGestureCost.mockResolvedValue(BigInt(1e16));
-  mockGetNextCstGestureCost.mockResolvedValue(BigInt(100));
+  mockGetNextCstGestureCost.mockResolvedValue(BigInt('1000000000000000000'));
   mockGetGestureCstRewardAmount.mockResolvedValue(BigInt('100000000000000000000'));
   mockGetGestureCstRewardAmountAdvanced.mockResolvedValue(BigInt('100000000000000000000'));
   mockGetBalance.mockResolvedValue(BigInt(10e18));
@@ -407,6 +407,27 @@ describe('useGestureForm', () => {
       AuctionDuration: 43200,
       SecondsElapsed: 1200,
       CSTPrice: 1,
+      CSTPriceWei: BigInt('1000000000000000000'),
+      source: 'contract',
+      apiAuctionDuration: 3600,
+      apiSecondsElapsed: 1800,
+    });
+  });
+
+  it('uses live contract CST price when it differs from the API fallback', async () => {
+    mockGetNextCstGestureCost.mockResolvedValue(BigInt('2500000000000000000'));
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'getCstDutchAuctionDurations') return [5400n, 2700n];
+      return true;
+    });
+
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.cstGestureData.CSTPrice).toBe(2.5));
+
+    expect(result.current.cstGestureData).toMatchObject({
+      AuctionDuration: 5400,
+      SecondsElapsed: 2700,
+      CSTPriceWei: BigInt('2500000000000000000'),
       source: 'contract',
       apiAuctionDuration: 3600,
       apiSecondsElapsed: 1800,
@@ -418,13 +439,18 @@ describe('useGestureForm', () => {
     liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
     liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = 50;
     const rewardValues = [BigInt('100000000000000000000'), BigInt('125000000000000000000')];
+    const priceValues = [BigInt('1000000000000000000'), BigInt('2000000000000000000')];
     const durationValues = [
       [43200n, 1200n],
       [43200n, 1201n],
     ];
 
     let rewardReadCount = 0;
+    let priceReadCount = 0;
     let durationReadCount = 0;
+    mockGetNextCstGestureCost.mockImplementation(
+      async () => priceValues[Math.min(priceReadCount++, priceValues.length - 1)]!,
+    );
     mockGetGestureCstRewardAmount.mockImplementation(
       async () => rewardValues[Math.min(rewardReadCount++, rewardValues.length - 1)]!,
     );
@@ -440,9 +466,11 @@ describe('useGestureForm', () => {
     await waitFor(() => expect(result.current.gestureCstRewardAmount).toBe(125));
 
     expect(mockGetGestureCstRewardAmount.mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(mockGetNextCstGestureCost.mock.calls.length).toBeGreaterThanOrEqual(2);
     expect(result.current.gestureCstRewardAmount).toBe(125);
     expect(result.current.gestureCstRewardAmountMin).toBe(123.75);
     expect(result.current.cstGestureData.SecondsElapsed).toBe(1201);
+    expect(result.current.cstGestureData.CSTPrice).toBe(2);
   });
 
   it('refreshes the CST preview immediately when a gesture event lands', async () => {
@@ -683,7 +711,7 @@ describe('useGestureForm', () => {
       expect.anything(),
       expect.objectContaining({
         functionName: 'bidWithCst',
-        args: [100n, '', BigInt('95000000000000000000')],
+        args: [BigInt('1000000000000000000'), '', BigInt('95000000000000000000')],
       }),
     );
   });
@@ -704,7 +732,7 @@ describe('useGestureForm', () => {
       expect.anything(),
       expect.objectContaining({
         functionName: 'bidWithCst',
-        args: [100n, '', 0n],
+        args: [BigInt('1000000000000000000'), '', 0n],
       }),
     );
   });

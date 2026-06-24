@@ -1,4 +1,9 @@
-import { getCstAuctionProgress, mapCTPriceInfo } from '../cstGesture';
+import {
+  deriveLiveCstGestureData,
+  formatCstProgressPercent,
+  getCstAuctionProgress,
+  mapCTPriceInfo,
+} from '../cstGesture';
 
 describe('cstGesture utilities', () => {
   it('maps API price info into finite CST gesture data', () => {
@@ -54,6 +59,45 @@ describe('cstGesture utilities', () => {
       apiSecondsElapsed: 1200,
       CSTPrice: 2.5,
       source: 'contract',
+    });
+  });
+
+  it('uses live contract CST price when supplied', () => {
+    const result = mapCTPriceInfo(
+      {
+        AuctionDuration: '43200',
+        CSTPrice: '2500000000000000000',
+        SecondsElapsed: '1200',
+      },
+      { AuctionDuration: 5400, SecondsElapsed: 2700, updatedAtMs: 10_000 },
+      1500000000000000000n,
+    );
+
+    expect(result).toMatchObject({
+      AuctionDuration: 5400,
+      SecondsElapsed: 2700,
+      CSTPrice: 1.5,
+      CSTPriceWei: 1500000000000000000n,
+      source: 'contract',
+      updatedAtMs: 10_000,
+    });
+  });
+
+  it('can render contract-backed CST values before API data arrives', () => {
+    const result = mapCTPriceInfo(
+      null,
+      { AuctionDuration: 5400, SecondsElapsed: 2700, updatedAtMs: 10_000 },
+      1500000000000000000n,
+    );
+
+    expect(result).toMatchObject({
+      AuctionDuration: 5400,
+      SecondsElapsed: 2700,
+      CSTPrice: 1.5,
+      CSTPriceWei: 1500000000000000000n,
+      source: 'contract',
+      updatedAtMs: 10_000,
+      isFree: false,
     });
   });
 
@@ -138,5 +182,62 @@ describe('cstGesture utilities', () => {
       percentCompleteRounded: 0,
       isEnded: false,
     });
+  });
+
+  it('derives live elapsed time from the last CST timing sample', () => {
+    const result = deriveLiveCstGestureData(
+      {
+        AuctionDuration: 5400,
+        CSTPrice: 1.5,
+        CSTPriceWei: 1500000000000000000n,
+        SecondsElapsed: 2700,
+        isFree: false,
+        source: 'contract',
+        updatedAtMs: 10_000,
+      },
+      { nowMs: 13_400 },
+    );
+
+    expect(result.SecondsElapsed).toBe(2703);
+    expect(result.isFree).toBe(false);
+  });
+
+  it('marks live CST display free after elapsed time passes the dynamic duration', () => {
+    const result = deriveLiveCstGestureData(
+      {
+        AuctionDuration: 10,
+        CSTPrice: 1.5,
+        CSTPriceWei: 1500000000000000000n,
+        SecondsElapsed: 9,
+        isFree: false,
+        source: 'contract',
+        updatedAtMs: 10_000,
+      },
+      { nowMs: 12_000 },
+    );
+
+    expect(result.SecondsElapsed).toBe(11);
+    expect(result.isFree).toBe(true);
+  });
+
+  it('leaves CST display unchanged when no timing sample exists', () => {
+    const data = {
+      AuctionDuration: 5400,
+      CSTPrice: 1.5,
+      CSTPriceWei: 1500000000000000000n,
+      SecondsElapsed: 2700,
+      isFree: false,
+      source: 'api' as const,
+    };
+
+    expect(deriveLiveCstGestureData(data, { nowMs: 20_000 })).toBe(data);
+  });
+
+  it('formats compact progress with decimals only when useful', () => {
+    expect(formatCstProgressPercent(0)).toBe('0%');
+    expect(formatCstProgressPercent(50)).toBe('50%');
+    expect(formatCstProgressPercent(50.25)).toBe('50.3%');
+    expect(formatCstProgressPercent(100)).toBe('100%');
+    expect(formatCstProgressPercent(Number.NaN)).toBe('0%');
   });
 });

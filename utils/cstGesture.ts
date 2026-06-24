@@ -5,6 +5,7 @@ import type { CTPriceInfo } from '@/services/api/types';
 export interface CstAuctionDurations {
   AuctionDuration: number;
   SecondsElapsed: number;
+  updatedAtMs?: number;
 }
 
 export interface CstGestureData extends CstAuctionDurations {
@@ -23,6 +24,10 @@ export interface CstAuctionProgress {
   percentComplete: number;
   percentCompleteRounded: number;
   isEnded: boolean;
+}
+
+export interface CstLiveDisplayOptions {
+  nowMs: number;
 }
 
 const EMPTY_CST_GESTURE_DATA: CstGestureData = {
@@ -62,12 +67,13 @@ export function isCstGestureFree({
 export function mapCTPriceInfo(
   raw: CTPriceInfo | null | undefined,
   contractDurations?: CstAuctionDurations | null,
+  contractCstPriceWei?: bigint | null,
 ): CstGestureData {
-  if (!raw) return EMPTY_CST_GESTURE_DATA;
+  if (!raw && !contractDurations && contractCstPriceWei == null) return EMPTY_CST_GESTURE_DATA;
 
-  const apiAuctionDuration = parseDuration(raw.AuctionDuration);
-  const apiSecondsElapsed = parseDuration(raw.SecondsElapsed);
-  const cstPriceWei = parseWei(raw.CSTPrice);
+  const apiAuctionDuration = parseDuration(raw?.AuctionDuration);
+  const apiSecondsElapsed = parseDuration(raw?.SecondsElapsed);
+  const cstPriceWei = contractCstPriceWei ?? parseWei(raw?.CSTPrice);
   const auctionDuration = contractDurations?.AuctionDuration ?? apiAuctionDuration;
   const secondsElapsed = contractDurations?.SecondsElapsed ?? apiSecondsElapsed;
   const cstPrice = Number(formatEther(cstPriceWei));
@@ -77,9 +83,10 @@ export function mapCTPriceInfo(
     CSTPriceWei: cstPriceWei,
     SecondsElapsed: secondsElapsed,
     isFree: false,
-    source: contractDurations ? 'contract' : 'api',
+    source: contractDurations || contractCstPriceWei != null ? 'contract' : 'api',
     apiAuctionDuration,
     apiSecondsElapsed,
+    updatedAtMs: contractDurations?.updatedAtMs,
   };
   return { ...data, isFree: isCstGestureFree(data) };
 }
@@ -108,4 +115,28 @@ export function getCstAuctionProgress({
     percentCompleteRounded: Math.round(percentComplete),
     isEnded: auctionDuration > 0 && secondsElapsed > auctionDuration,
   };
+}
+
+export function deriveLiveCstGestureData(
+  data: CstGestureData,
+  { nowMs }: CstLiveDisplayOptions,
+): CstGestureData {
+  if (!data.updatedAtMs || !Number.isFinite(nowMs) || nowMs <= data.updatedAtMs) return data;
+
+  const elapsedDelta = Math.floor((nowMs - data.updatedAtMs) / 1000);
+  if (elapsedDelta <= 0) return data;
+
+  const next: CstGestureData = {
+    ...data,
+    SecondsElapsed: Math.max(0, data.SecondsElapsed + elapsedDelta),
+  };
+  return { ...next, isFree: isCstGestureFree(next) };
+}
+
+export function formatCstProgressPercent(value: number): string {
+  if (!Number.isFinite(value)) return '0%';
+  const clamped = Math.min(100, Math.max(0, value));
+  if (clamped === 0 || clamped === 100 || Number.isInteger(clamped))
+    return `${clamped.toFixed(0)}%`;
+  return `${clamped.toFixed(1)}%`;
 }

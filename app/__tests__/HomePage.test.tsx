@@ -171,8 +171,19 @@ jest.mock('../../components/common/GestureStatus', () => ({
 }));
 
 jest.mock('../../components/home/GestureForm', () => ({
-  GestureForm: ({ previewMode = false }: { previewMode?: boolean }) => (
-    <div data-testid="gesture-form" data-preview={String(previewMode)}>
+  GestureForm: ({
+    previewMode = false,
+    cstGestureData,
+  }: {
+    previewMode?: boolean;
+    cstGestureData?: typeof mockGestureForm.cstGestureData;
+  }) => (
+    <div
+      data-testid="gesture-form"
+      data-preview={String(previewMode)}
+      data-cst-duration={String(cstGestureData?.AuctionDuration ?? 0)}
+      data-cst-elapsed={String(cstGestureData?.SecondsElapsed ?? 0)}
+    >
       GestureForm
     </div>
   ),
@@ -503,6 +514,60 @@ describe('HomePage', () => {
     expect(mockGestureStatus).toHaveBeenCalledWith(expect.objectContaining({ cstGestureData }));
     expect(screen.getByTestId('gesture-status')).toHaveAttribute('data-cst-duration', '5400');
     expect(screen.getByTestId('gesture-status')).toHaveAttribute('data-cst-elapsed', '2700');
+  });
+
+  it('passes live-derived CST elapsed values into status and form surfaces', () => {
+    Object.assign(mockGestureForm, {
+      cstGestureData: {
+        AuctionDuration: 7200,
+        CSTPrice: 2,
+        CSTPriceWei: 2000000000000000000n,
+        SecondsElapsed: 100,
+        isFree: false,
+        source: 'contract' as const,
+        updatedAtMs: Date.now() - 10_500,
+      },
+    });
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    expect(screen.getByTestId('gesture-status')).toHaveAttribute('data-cst-duration', '7200');
+    expect(Number(screen.getByTestId('gesture-status').dataset.cstElapsed)).toBeGreaterThanOrEqual(
+      110,
+    );
+    expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-cst-duration', '7200');
+    expect(Number(screen.getByTestId('gesture-form').dataset.cstElapsed)).toBeGreaterThanOrEqual(
+      110,
+    );
+  });
+
+  it('uses live-derived CST state for the submit button label', () => {
+    Object.assign(mockGestureForm, {
+      gestureType: 'CST',
+      cstGestureData: {
+        AuctionDuration: 10,
+        CSTPrice: 2,
+        CSTPriceWei: 2000000000000000000n,
+        SecondsElapsed: 9,
+        isFree: false,
+        source: 'contract' as const,
+        updatedAtMs: Date.now() - 2_500,
+      },
+    });
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    expect(
+      screen.getByRole('button', { name: /Gesture with CST \(FREE GESTURE\)/ }),
+    ).toBeInTheDocument();
   });
 
   it('keeps merged CST data wired while rendering the disconnected preview path', () => {

@@ -1,6 +1,6 @@
 import { formatSeconds } from '@/utils';
 
-import { getCstAuctionProgress } from '@/utils/cstGesture';
+import { formatCstProgressPercent, getCstAuctionProgress } from '@/utils/cstGesture';
 
 interface AuctionInfoProps {
   secondsElapsed: number;
@@ -23,6 +23,7 @@ export function AuctionInfo({
     SecondsElapsed: secondsElapsed,
   });
   const progressLabel = `${title} progress`;
+  const progressValue = Number(progress.percentComplete.toFixed(1));
 
   return (
     <section
@@ -53,7 +54,7 @@ export function AuctionInfo({
           <div className="flex items-center justify-between gap-3 text-sm">
             <span className="text-muted-foreground">Progress</span>
             <span className="font-mono font-medium tabular-nums text-primary">
-              {progress.percentCompleteRounded}% complete
+              {formatCstProgressPercent(progress.percentComplete)} complete
             </span>
           </div>
           <div
@@ -61,7 +62,7 @@ export function AuctionInfo({
             aria-label={progressLabel}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={progress.percentCompleteRounded}
+            aria-valuenow={progressValue}
             className="h-2.5 overflow-hidden rounded-full bg-white/[0.08]"
           >
             <div

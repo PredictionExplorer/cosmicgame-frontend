@@ -13,7 +13,12 @@ import type { DashboardInfo, GestureInfo } from '@/services/api';
 import { useUserInfo } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
-import { formatCstAmount, getCstAuctionProgress, type CstGestureData } from '@/utils/cstGesture';
+import {
+  formatCstAmount,
+  formatCstProgressPercent,
+  getCstAuctionProgress,
+  type CstGestureData,
+} from '@/utils/cstGesture';
 
 import Counter from './Counter';
 import { SmoothCountdown } from './SmoothCountdown';
@@ -228,6 +233,7 @@ export const GestureStatus = ({
   );
 
   const cstAuctionProgress = getCstAuctionProgress(cstGestureData);
+  const cstProgressValue = Number(cstAuctionProgress.percentComplete.toFixed(1));
 
   if (loading) return null;
 
@@ -354,7 +360,7 @@ export const GestureStatus = ({
                         <div className="flex items-center justify-between gap-3 text-[11px]">
                           <span className="text-muted-foreground">CST Window</span>
                           <span className="font-mono tabular-nums text-[rgb(var(--impact-green-rgb))]">
-                            {cstAuctionProgress.percentCompleteRounded}%
+                            {formatCstProgressPercent(cstAuctionProgress.percentComplete)}
                           </span>
                         </div>
                         <div
@@ -362,7 +368,7 @@ export const GestureStatus = ({
                           aria-label="CST Calibration Window progress"
                           aria-valuemin={0}
                           aria-valuemax={100}
-                          aria-valuenow={cstAuctionProgress.percentCompleteRounded}
+                          aria-valuenow={cstProgressValue}
                           className="h-1.5 overflow-hidden rounded-full bg-white/[0.08]"
                         >
                           <div

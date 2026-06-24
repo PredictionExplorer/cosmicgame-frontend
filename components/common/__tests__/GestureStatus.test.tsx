@@ -150,6 +150,27 @@ describe('GestureStatus', () => {
     ).toHaveAttribute('aria-valuenow', '50');
   });
 
+  it('shows precise compact CST progress for long dynamic durations', () => {
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={activeData as never}
+        allocationTime={Date.now() + 60000}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+        cstGestureData={{
+          ...baseProps.cstGestureData,
+          AuctionDuration: 43200,
+          SecondsElapsed: 43,
+        }}
+      />,
+    );
+
+    expect(screen.getByText('0.1%')).toBeInTheDocument();
+    expect(
+      screen.getByRole('progressbar', { name: 'CST Calibration Window progress' }),
+    ).toHaveAttribute('aria-valuenow', '0.1');
+  });
+
   it('uses smooth countdown props for cycle finalization countdown', () => {
     render(
       <GestureStatus

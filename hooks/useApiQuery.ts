@@ -444,9 +444,10 @@ export function useCTPrice() {
     queryKey: ['ctPrice'],
     queryFn: () => api.get_ct_price(),
     enabled: !scenario,
-    staleTime: 30_000,
-    refetchInterval: 30_000,
+    staleTime: 10_000,
+    refetchInterval: 15_000,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
   });
   return withUxScenarioData(query, scenario?.cstPrice ?? undefined, scenario?.createdAtMs);
 }

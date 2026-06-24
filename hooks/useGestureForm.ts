@@ -104,14 +104,15 @@ export function useGestureForm() {
   const [contractCstDurations, setContractCstDurations] = useState<CstAuctionDurations | null>(
     null,
   );
+  const [contractCstPriceWei, setContractCstPriceWei] = useState<bigint | null>(null);
   const [gestureCstRewardAmountWei, setGestureCstRewardAmountWei] = useState<bigint | null>(null);
   const [isCstRewardLoading, setIsCstRewardLoading] = useState(false);
   const [cstRewardTolerancePercent, setCstRewardTolerancePercent] = useState(1);
   const [acceptAnyCstReward, setAcceptAnyCstReward] = useState(false);
 
   const cstGestureData = useMemo<CSTGestureData>(() => {
-    return mapCTPriceInfo(ctPriceData, contractCstDurations);
-  }, [contractCstDurations, ctPriceData]);
+    return mapCTPriceInfo(ctPriceData, contractCstDurations, contractCstPriceWei);
+  }, [contractCstDurations, contractCstPriceWei, ctPriceData]);
 
   const ethGestureInfo = useMemo<EthGestureInfo | null>(() => {
     if (!bidEthPriceData) return null;
@@ -147,6 +148,7 @@ export function useGestureForm() {
   useEffect(() => {
     if (uxScenario) {
       setContractCstDurations(null);
+      setContractCstPriceWei(null);
       setGestureCstRewardAmountWei(100n * 10n ** 18n);
       setIsCstRewardLoading(false);
       return;
@@ -154,15 +156,19 @@ export function useGestureForm() {
 
     const canReadDurations = !!publicClient && !!contractAddrs.cosmicGame;
     const canReadReward = !!cosmicGameContract;
+    const canReadPrice = !!cosmicGameContract;
 
     if (!canReadDurations) {
       setContractCstDurations(null);
+    }
+    if (!canReadPrice) {
+      setContractCstPriceWei(null);
     }
     if (!canReadReward) {
       setGestureCstRewardAmountWei(null);
       setIsCstRewardLoading(false);
     }
-    if (!canReadDurations && !canReadReward) {
+    if (!canReadDurations && !canReadReward && !canReadPrice) {
       return;
     }
 
@@ -193,19 +199,35 @@ export function useGestureForm() {
                   const next = {
                     AuctionDuration: Number(auctionDuration),
                     SecondsElapsed: Number(secondsElapsed),
+                    updatedAtMs: Date.now(),
                   };
                   setContractCstDurations((current) => {
                     if (
                       current?.AuctionDuration === next.AuctionDuration &&
                       current?.SecondsElapsed === next.SecondsElapsed
                     ) {
-                      return current;
+                      return { ...current, updatedAtMs: next.updatedAtMs };
                     }
                     return next;
                   });
                 })
                 .catch((e) => {
                   if (!cancelled) reportError(e, 'getCstDutchAuctionDurations');
+                })
+            : Promise.resolve(),
+          canReadPrice
+            ? (
+                (cosmicGameContract!.read.getNextCstBidPrice?.() as Promise<bigint | undefined>) ??
+                Promise.resolve(undefined)
+              )
+                .then((value) => {
+                  if (!cancelled) setContractCstPriceWei(value ?? null);
+                })
+                .catch((e) => {
+                  if (!cancelled) {
+                    setContractCstPriceWei(null);
+                    reportError(e, 'getNextCstBidPrice');
+                  }
                 })
             : Promise.resolve(),
           canReadReward

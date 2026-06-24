@@ -697,13 +697,14 @@ describe('useApiQuery hooks', () => {
       expect(mockUseQuery).toHaveBeenCalledWith(expect.objectContaining({ queryKey: ['ctPrice'] }));
     });
 
-    it('configures polling', () => {
+    it('configures live fallback polling and focus refresh', () => {
       renderHook(() => useCTPrice());
 
       const options = getOptions();
-      expect(options.staleTime).toBe(30_000);
-      expect(options.refetchInterval).toBe(30_000);
+      expect(options.staleTime).toBe(10_000);
+      expect(options.refetchInterval).toBe(15_000);
       expect(options.refetchIntervalInBackground).toBe(false);
+      expect(options.refetchOnWindowFocus).toBe(true);
     });
   });
 

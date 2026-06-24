@@ -57,6 +57,7 @@ import {
 } from '@/lib/uxCycleScenarios';
 import { RootLandingPage } from '@/components/landing/RootLandingPage';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
+import { deriveLiveCstGestureData } from '@/utils/cstGesture';
 
 const LatestNFTs = dynamic(() => import('@/components/nft/LatestNFTs'), {
   ssr: false,
@@ -226,6 +227,12 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     setMessage,
     setRwlkId,
   } = gestureForm;
+  const cstDisplayNow =
+    now > 0 && (!cstGestureData.updatedAtMs || now > cstGestureData.updatedAtMs) ? now : Date.now();
+  const liveCstGestureData = useMemo(
+    () => deriveLiveCstGestureData(cstGestureData, { nowMs: cstDisplayNow }),
+    [cstDisplayNow, cstGestureData],
+  );
   const {
     fetchActivationTime,
     allocationTime,
@@ -320,9 +327,9 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
     if (gestureType === 'RandomWalk' && rwlkId !== -1)
       return `Gesture with ETH + RandomWalk token ${rwlkId} (${fmt(adj * 0.5, 0.2)} ETH)`;
     if (gestureType === 'CST') {
-      const costLabel = cstGestureData.isFree
+      const costLabel = liveCstGestureData.isFree
         ? 'FREE GESTURE'
-        : `${cstGestureData.CSTPrice.toFixed(2)} CST`;
+        : `${liveCstGestureData.CSTPrice.toFixed(2)} CST`;
       return `Gesture with CST (${costLabel})`;
     }
     if (gestureType === 'RandomWalk') return 'Gesture with ETH + RandomWalk';
@@ -477,7 +484,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
               activationTime={activationTime}
               curGestureList={curGestureList}
               ethGestureInfo={ethGestureInfo}
-              cstGestureData={cstGestureData}
+              cstGestureData={liveCstGestureData}
               allocationTime={allocationTime}
               suppressPrimaryTimer
               attachedNFTCount={donatedNFTs.length}
@@ -538,7 +545,11 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                     </div>
                   ) : account ? (
                     <>
-                      <GestureForm {...gestureForm} data={data} />
+                      <GestureForm
+                        {...gestureForm}
+                        cstGestureData={liveCstGestureData}
+                        data={data}
+                      />
 
                       <div className="mt-6 space-y-4">
                         {canGesture && (
@@ -616,7 +627,12 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
                     </>
                   ) : (
                     <div data-testid="connect-to-gesture" className="space-y-5">
-                      <GestureForm {...gestureForm} data={data} previewMode />
+                      <GestureForm
+                        {...gestureForm}
+                        cstGestureData={liveCstGestureData}
+                        data={data}
+                        previewMode
+                      />
                       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
                         <h3 className="font-display text-lg font-semibold tracking-tight">
                           Connect to submit your gesture
