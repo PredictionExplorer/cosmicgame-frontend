@@ -22,11 +22,15 @@ export interface SpecialAllocationSnapshot extends SpecialRecipients {
   hasChronoSegmentData: boolean;
   hasFinalCstTime: boolean;
   StoredChronoWarriorDuration?: number;
+  StoredEnduranceChampionAddress?: string;
+  StoredEnduranceChampionDuration?: number;
 }
 
 interface ChainSpecialAllocationSnapshot {
   data: Partial<SpecialRecipients> & {
     StoredChronoWarriorDuration?: number;
+    StoredEnduranceChampionAddress?: string;
+    StoredEnduranceChampionDuration?: number;
   };
   receivedAtMs?: number;
 }
@@ -139,6 +143,8 @@ export async function fetchChainSpecialAllocationSnapshot({
   const [
     block,
     champions,
+    storedEnduranceChampionAddress,
+    storedEnduranceChampionDuration,
     enduranceChampionStartTimeStamp,
     prevEnduranceChampionDuration,
     storedChronoWarriorDuration,
@@ -148,6 +154,8 @@ export async function fetchChainSpecialAllocationSnapshot({
   ] = await Promise.all([
     publicClient.getBlock({ blockTag: 'latest' }),
     read('tryGetCurrentChampions'),
+    read('enduranceChampionAddress'),
+    read('enduranceChampionDuration'),
     read('enduranceChampionStartTimeStamp'),
     read('prevEnduranceChampionDuration'),
     read('chronoWarriorDuration'),
@@ -181,18 +189,21 @@ export async function fetchChainSpecialAllocationSnapshot({
           (bigintToSafeNumber(prevEnduranceChampionDuration) ?? 0))
       : undefined;
   const storedChronoDuration = bigintToSafeNumber(storedChronoWarriorDuration);
+  const returnedChronoDuration = bigintToSafeNumber(chronoDuration);
 
   return {
     data: {
       EnduranceChampionAddress: enduranceChampionAddress,
       EnduranceChampionDuration: bigintToSafeNumber(enduranceChampionDuration),
+      StoredEnduranceChampionAddress: cleanAddress(storedEnduranceChampionAddress),
+      StoredEnduranceChampionDuration: bigintToSafeNumber(storedEnduranceChampionDuration),
       EnduranceChampionStartTimeStamp: bigintToSafeNumber(enduranceChampionStartTimeStamp),
       PrevEnduranceChampionDuration: bigintToSafeNumber(prevEnduranceChampionDuration),
       ChronoWarriorAddress: chronoWarriorAddress,
       ChronoWarriorDuration: bigintToSafeNumber(chronoDuration),
       ChronoWarriorIsLive:
-        currentChronoSegmentDuration !== undefined && storedChronoDuration !== undefined
-          ? currentChronoSegmentDuration > storedChronoDuration
+        currentChronoSegmentDuration !== undefined && returnedChronoDuration !== undefined
+          ? currentChronoSegmentDuration === returnedChronoDuration
           : undefined,
       StoredChronoWarriorDuration: storedChronoDuration,
       LastBidderAddress: latestParticipant,

@@ -220,15 +220,21 @@ describe('deriveChampionsState', () => {
 
   it('marks chrono live only when source-backed segment duration beats the record', () => {
     const liveState = deriveChampionsState({
-      data: snapshot(baseSnapshot, {
-        source: 'api-v1+chain',
-        receivedAtMs: 1_095_000,
-        hasChronoSegmentData: true,
-        EnduranceChampionStartTimeStamp: 800,
-        PrevEnduranceChampionDuration: 100,
-        SourceBlockTimeStamp: 1_000,
-        StoredChronoWarriorDuration: 50,
-      }),
+      data: snapshot(
+        {
+          ...baseSnapshot,
+          ChronoWarriorDuration: 100,
+        },
+        {
+          source: 'api-v1+chain',
+          receivedAtMs: 1_095_000,
+          hasChronoSegmentData: true,
+          EnduranceChampionStartTimeStamp: 800,
+          PrevEnduranceChampionDuration: 100,
+          SourceBlockTimeStamp: 1_000,
+          StoredChronoWarriorDuration: 50,
+        },
+      ),
       nowMs: 1_100_000,
     });
 
@@ -238,15 +244,51 @@ describe('deriveChampionsState', () => {
     expect(liveState.chrono.sourceText).toBe('Chain verified');
   });
 
-  it('switches chrono ownership to the effective live endurance owner when the segment wins', () => {
+  it('keeps the returned chrono owner when storage segment fields describe an outgoing champion', () => {
+    const liveEndurance = '0xe7eD7F31cd76CeD85861ec5bD37879cBA053e887';
+    const returnedChrono = '0x7406B34d25A9B7841CAC133E3173919e0af6Bc6c';
+
+    const state = deriveChampionsState({
+      data: snapshot(
+        {
+          EnduranceChampionAddress: liveEndurance,
+          EnduranceChampionDuration: 3979,
+          ChronoWarriorAddress: returnedChrono,
+          ChronoWarriorDuration: 6942,
+          LastBidderAddress: liveEndurance,
+          LastBidderLastBidTime: 1_782_277_324,
+          LastCstBidderAddress: baseSnapshot.LastCstBidderAddress,
+        },
+        {
+          source: 'api-v2',
+          receivedAtMs: 1_782_281_303_000,
+          hasChronoSegmentData: true,
+          EnduranceChampionStartTimeStamp: 1_782_271_323,
+          PrevEnduranceChampionDuration: 1990,
+          SourceBlockTimeStamp: 1_782_281_303,
+          ChronoWarriorIsLive: true,
+        },
+      ),
+      nowMs: 1_782_281_303_000,
+    });
+
+    expect(state.endurance.address).toBe(liveEndurance);
+    expect(state.chrono.address).toBe(returnedChrono);
+    expect(state.chrono.duration).toBe(6942);
+    expect(state.chrono.isLive).toBe(false);
+    expect(state.chrono.currentSegmentDuration).toBeUndefined();
+    expect(state.chrono.hasLiveDetails).toBe(false);
+  });
+
+  it('keeps chrono ownership on the authoritative returned winner when the segment wins', () => {
     const challenger = '0x3333333333333333333333333333333333333333';
     const state = deriveChampionsState({
       data: snapshot(
         {
           ...baseSnapshot,
           EnduranceChampionDuration: 100,
-          ChronoWarriorDuration: 50,
-          ChronoWarriorAddress: '0x4444444444444444444444444444444444444444',
+          ChronoWarriorDuration: 200,
+          ChronoWarriorAddress: challenger,
           LastBidderAddress: challenger,
           LastBidderLastBidTime: 900,
         },
@@ -266,6 +308,7 @@ describe('deriveChampionsState', () => {
     expect(state.endurance.address).toBe(challenger);
     expect(state.chrono.address).toBe(challenger);
     expect(state.chrono.isLive).toBe(true);
+    expect(state.chrono.currentSegmentDuration).toBe(300);
   });
 
   it('shows when chrono starts growing if the source-backed segment is below record', () => {
@@ -365,15 +408,21 @@ describe('deriveChampionsState', () => {
 
   it('does not extend chrono when source receive time is in the future', () => {
     const state = deriveChampionsState({
-      data: snapshot(baseSnapshot, {
-        source: 'api-v1+chain',
-        receivedAtMs: 1_200_000,
-        hasChronoSegmentData: true,
-        EnduranceChampionStartTimeStamp: 800,
-        PrevEnduranceChampionDuration: 100,
-        SourceBlockTimeStamp: 1_000,
-        StoredChronoWarriorDuration: 50,
-      }),
+      data: snapshot(
+        {
+          ...baseSnapshot,
+          ChronoWarriorDuration: 100,
+        },
+        {
+          source: 'api-v1+chain',
+          receivedAtMs: 1_200_000,
+          hasChronoSegmentData: true,
+          EnduranceChampionStartTimeStamp: 800,
+          PrevEnduranceChampionDuration: 100,
+          SourceBlockTimeStamp: 1_000,
+          StoredChronoWarriorDuration: 50,
+        },
+      ),
       nowMs: 1_100_000,
     });
 

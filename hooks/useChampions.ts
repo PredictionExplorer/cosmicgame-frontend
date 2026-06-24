@@ -67,6 +67,12 @@ function nonNegativeSeconds(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 }
 
+function optionalNonNegativeSeconds(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? Math.max(0, Math.floor(value))
+    : undefined;
+}
+
 function clampProgress(value: number): number {
   if (!Number.isFinite(value)) return 0;
   return Math.min(99.9, Math.max(0, value));
@@ -150,38 +156,50 @@ export function deriveChampionsState({
   const sourceChronoSegmentStart =
     nonNegativeSeconds(data?.EnduranceChampionStartTimeStamp) +
     nonNegativeSeconds(data?.PrevEnduranceChampionDuration);
-  const localChronoSegmentStart =
-    latestBeatsEnduranceRecord && !latestMatchesEndurance && latestGestureTime > 0
-      ? latestGestureTime + enduranceLockedDuration + 1
-      : 0;
-  const chronoSegmentStart = localChronoSegmentStart || sourceChronoSegmentStart;
+  const chronoSegmentStart = sourceChronoSegmentStart;
+  const sourceBlockTimeStamp = optionalNonNegativeSeconds(data?.SourceBlockTimeStamp);
+  const sourceChronoSegmentDuration =
+    hasChronoSegmentData && sourceBlockTimeStamp !== undefined && chronoSegmentStart > 0
+      ? Math.max(0, sourceBlockTimeStamp - chronoSegmentStart)
+      : undefined;
   const currentChronoSegmentDuration =
     hasChronoSegmentData && sourceNowSec !== null && chronoSegmentStart > 0
       ? Math.max(0, sourceNowSec - chronoSegmentStart)
       : undefined;
-  const storedChronoDuration =
-    data && isSnapshot(data) && typeof data.StoredChronoWarriorDuration === 'number'
-      ? nonNegativeSeconds(data.StoredChronoWarriorDuration)
-      : chronoLockedDuration;
-  const chronoSegmentBeatsRecord =
+  const storedChronoDuration = optionalNonNegativeSeconds(
+    data && isSnapshot(data) ? data.StoredChronoWarriorDuration : undefined,
+  );
+  const chronoSegmentMatchesReturnedRecord =
     hasChronoSegmentData &&
-    currentChronoSegmentDuration !== undefined &&
-    currentChronoSegmentDuration > storedChronoDuration;
+    sourceChronoSegmentDuration !== undefined &&
+    sourceChronoSegmentDuration === chronoLockedDuration;
+  const chronoSegmentIsBelowRecord =
+    hasChronoSegmentData &&
+    sourceChronoSegmentDuration !== undefined &&
+    sourceChronoSegmentDuration <= chronoLockedDuration;
+  const apiSaysChronoIsLive =
+    typeof data?.ChronoWarriorIsLive === 'boolean' ? data.ChronoWarriorIsLive : undefined;
+  const chronoSegmentBeatsStoredRecord =
+    storedChronoDuration !== undefined &&
+    sourceChronoSegmentDuration !== undefined &&
+    sourceChronoSegmentDuration > storedChronoDuration;
   const chronoIsLive =
     hasChronoSegmentData &&
-    (chronoSegmentBeatsRecord ||
-      (typeof data?.ChronoWarriorIsLive === 'boolean' && data.ChronoWarriorIsLive));
-  const effectiveChronoAddress =
-    chronoSegmentBeatsRecord && effectiveEnduranceAddress
-      ? effectiveEnduranceAddress
-      : chronoAddress;
+    chronoSegmentMatchesReturnedRecord &&
+    (apiSaysChronoIsLive === true || chronoSegmentBeatsStoredRecord);
+  const canShowChronoSegmentDetails =
+    chronoIsLive ||
+    (hasChronoSegmentData && apiSaysChronoIsLive !== true && chronoSegmentIsBelowRecord);
+  const visibleChronoSegmentDuration = canShowChronoSegmentDetails
+    ? currentChronoSegmentDuration
+    : undefined;
   const chronoDuration =
-    chronoIsLive && currentChronoSegmentDuration !== undefined
-      ? Math.max(chronoLockedDuration, currentChronoSegmentDuration)
+    chronoIsLive && visibleChronoSegmentDuration !== undefined
+      ? Math.max(chronoLockedDuration, visibleChronoSegmentDuration)
       : chronoLockedDuration;
   const startsGrowingIn =
-    hasChronoSegmentData && !chronoIsLive && currentChronoSegmentDuration !== undefined
-      ? Math.max(0, chronoLockedDuration + 1 - currentChronoSegmentDuration)
+    canShowChronoSegmentDetails && !chronoIsLive && visibleChronoSegmentDuration !== undefined
+      ? Math.max(0, chronoLockedDuration + 1 - visibleChronoSegmentDuration)
       : undefined;
   const willStopGrowingIn =
     chronoIsLive && durationToBeat > 0 ? Math.max(0, durationToBeat - holdDuration) : undefined;
@@ -197,16 +215,16 @@ export function deriveChampionsState({
       isLive: enduranceIsLive,
     },
     chrono: {
-      address: effectiveChronoAddress,
+      address: chronoAddress,
       duration: chronoDuration,
       lockedDuration: chronoLockedDuration,
       isLive: chronoIsLive,
       statusText: chronoStatusText,
       sourceText: sourceText(source),
-      currentSegmentDuration: currentChronoSegmentDuration,
+      currentSegmentDuration: visibleChronoSegmentDuration,
       startsGrowingIn,
       willStopGrowingIn,
-      hasLiveDetails: hasChronoSegmentData,
+      hasLiveDetails: canShowChronoSegmentDetails,
     },
     lastCst: {
       address: lastCstAddress,
