@@ -3,15 +3,17 @@
 import { motion } from 'framer-motion';
 import { Coins, Ticket, ImageIcon, Trophy } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 const rewards = [
   {
     Icon: Coins,
-    title: '100 Participation CST',
-    description: 'Every gesture imprints 100 CST tokens directly to your wallet.',
-    tooltip:
-      'CST is the protocol ERC-20 token. Use it as an alternative gesture currency or express Coordination Weight on the Cosmic Council.',
+    title: 'Dynamic Participation CST',
+    description:
+      'Each gesture may imprint CST based on how long it has been since the previous gesture.',
+    tooltip: `Participation CST uses a square-root formula: ${protocolFacts.dynamicCstRewardFormula}. Rapid gestures can receive 0 CST; longer quiet periods create larger imprints.`,
     accent: 'from-cyan-400/20 to-blue-500/20',
     iconColor: 'text-cyan-400',
   },

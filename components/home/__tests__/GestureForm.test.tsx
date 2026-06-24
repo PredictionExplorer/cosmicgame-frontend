@@ -370,7 +370,7 @@ describe('GestureForm', () => {
   it('shows minimum CST reward protection control for every unlocked gesture type', () => {
     render(<GestureForm {...defaultProps} advancedExpanded={true} gestureType="ETH" />);
     expect(screen.getByText('Minimum CST Reward Protection')).toBeInTheDocument();
-    expect(screen.getByText(/bidCstRewardAmountMinLimit_/)).toBeInTheDocument();
+    expect(screen.getByText(/square-root formula based on elapsed time/)).toBeInTheDocument();
   });
 
   it('updates CST reward tolerance from advanced options', () => {

@@ -1,6 +1,7 @@
 import { zeroAddress } from 'viem';
 import { Settings2, Info } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
 
 import { formatCstAmount } from '@/utils/cstGesture';
@@ -177,7 +178,7 @@ export function GestureForm({
             secondsElapsed={cstGestureData.SecondsElapsed}
             auctionDuration={cstGestureData.AuctionDuration}
             title="CST Calibration Window"
-            subtitle="The CST gesture cost descends through this dynamic contract window."
+            subtitle={`CST cost descends through this dynamic window. ETH gestures shorten it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`}
             endedMessage="Calibration Window ended — you can gesture for free."
           />
         </div>
@@ -191,8 +192,9 @@ export function GestureForm({
                 CST Reward Preview
               </p>
               <p className="mt-1 text-muted-foreground">
-                Estimated CST you receive if this gesture lands. Every gesture method has two
-                protections: maximum cost and minimum CST reward.
+                Estimated dynamic CST you receive if this gesture lands. The amount depends on time
+                since the previous gesture, and every gesture method has two protections: maximum
+                cost and minimum CST reward.
               </p>
             </div>
             <div className="text-right font-mono tabular-nums">
@@ -290,6 +292,11 @@ export function GestureForm({
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Minimum CST Reward Protection
                   </p>
+                  <p className="text-xs leading-relaxed text-muted-foreground">
+                    Participation CST uses a square-root formula based on elapsed time. This setting
+                    protects you if another gesture lands first and lowers the amount before your
+                    transaction confirms.
+                  </p>
                   <label className="flex items-start gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] p-3 text-sm">
                     <Checkbox
                       checked={acceptAnyCstReward}
@@ -303,7 +310,7 @@ export function GestureForm({
                       </span>
                       <span className="mt-1 block text-xs leading-relaxed text-muted-foreground">
                         Sends a minimum accepted CST reward of 0. Use this when you prefer the
-                        gesture to land even if the reward changes before confirmation.
+                        gesture to land even if the dynamic CST amount changes before confirmation.
                       </span>
                     </span>
                   </label>
@@ -336,9 +343,9 @@ export function GestureForm({
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    This becomes the V2 `bidCstRewardAmountMinLimit_` value. If the contract would
-                    mint less CST than this minimum by the time your transaction lands, the gesture
-                    should revert instead of accepting a worse reward.
+                    If the contract would imprint less CST than this minimum by the time your
+                    transaction lands, the gesture should revert instead of accepting a lower
+                    dynamic CST amount.
                   </p>
                 </div>
               )}

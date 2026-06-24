@@ -11,7 +11,7 @@ const cards = [
     number: '01',
     title: 'Gesture',
     description:
-      'Make a gesture with ETH or CST (ERC-20). Each gesture extends the Cycle Finalization Time and shapes the evolving Signature.',
+      'Make a gesture with ETH or CST (ERC-20). Each gesture extends the Cycle Finalization Time, records a Stellar Selection entry, and shapes the evolving Signature.',
     tooltip:
       'Gestures can be made with ETH or CST tokens (ERC-20). Attaching a Random Walk NFT to an ETH gesture grants a one-time 50% ETH Gesture Cost reduction.',
     Icon: Gavel,
@@ -20,9 +20,9 @@ const cards = [
     number: '02',
     title: 'Endure',
     description:
-      'The cycle runs until the Cycle Finalization Time expires. Each new gesture adds roughly one hour to the clock.',
+      'The cycle runs until the Cycle Finalization Time expires. Each new gesture adds the current time increment to the stored finalization time.',
     tooltip:
-      'The cycle timer starts at ~24 hours and gains ~1 hour per gesture. Gesture Cost drifts upward ~1% per gesture (Gesture-Cost Drift).',
+      'The time increment starts around one hour and grows gradually across cycles. CST Gesture Cost uses a dynamic Calibration Window that ETH and CST gestures move in opposite directions.',
     Icon: Timer,
   },
   {

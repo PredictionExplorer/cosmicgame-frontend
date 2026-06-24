@@ -71,12 +71,12 @@ export const landingContent = {
       {
         number: '01',
         title: 'Cycle Opening',
-        body: 'A new Performance Cycle begins. The Calibration Window opens: Gesture Cost descends from the Calibration Ceiling toward the Calibration Floor over roughly two days.',
+        body: `A new Performance Cycle begins. The first ETH Calibration Window opens, and the CST Calibration Window uses a stored on-chain duration that currently starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference.`,
       },
       {
         number: '02',
         title: 'Gestures',
-        body: 'Participants make gestures with ETH or CST. Every gesture imprints Participation CST, extends the Cycle Finalization Time, and shapes the cycle\u2019s evolving Signature.',
+        body: `Participants make gestures with ETH or CST. Every gesture extends the Cycle Finalization Time, records a Stellar Selection entry, and may imprint dynamic Participation CST based on the square root of the time since the previous gesture. ETH gestures shorten the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
       },
       {
         number: '03',
@@ -294,7 +294,15 @@ export const landingContent = {
       {
         question: 'What do I actually do as a participant?',
         answer:
-          'You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, imprints Participation CST, and shapes the cycle\u2019s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least 100 CST.',
+          'You make gestures. Each gesture is an ETH or CST transaction that extends the Cycle Finalization Time, records a Stellar Selection entry, may imprint dynamic Participation CST, and shapes the cycle\u2019s Signature. You may anchor Cosmic Signature NFTs to receive a share of Anchor Distributions. You may submit Coordination Proposals through the Cosmic Council if you hold at least 100 CST.',
+      },
+      {
+        question: 'Why does the Participation CST amount change?',
+        answer: `The Participation CST imprint uses a square-root formula based on how long it has been since the previous gesture. Longer quiet periods create larger CST imprints, but the square root makes the increase sublinear. Very rapid gestures can imprint 0 CST. The app previews the current amount before you submit.`,
+      },
+      {
+        question: 'How do ETH and CST gestures affect the CST Calibration Window?',
+        answer: `The CST Calibration Window is stored on-chain and changes after every gesture. A CST gesture lengthens it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, making CST Gesture Cost descend more slowly. An ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%, making CST Gesture Cost descend faster.`,
       },
       {
         question: 'Where do the ETH allocations come from?',

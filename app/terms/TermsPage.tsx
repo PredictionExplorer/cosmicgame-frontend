@@ -51,7 +51,15 @@ const sections = [
     content: [
       {
         subtitle: 'How the Protocol Works',
-        text: 'Cosmic Signature is a decentralized, procedural on-chain art protocol where participants make gestures with ETH or CST tokens during a Performance Cycle. When the Cycle Finalization Time expires, the participant who made the Final Gesture may retrieve the Signature Allocation. Additional allocations are distributed according to the published allocation-track structure.',
+        text: 'Cosmic Signature is a decentralized, procedural on-chain art protocol where participants make gestures with ETH or CST tokens during a Performance Cycle. Gestures extend the Cycle Finalization Time, record protocol entries, and may imprint dynamic Participation CST according to the smart contract formula. When the Cycle Finalization Time expires, the participant who made the Final Gesture may retrieve the Signature Allocation. Additional allocations are distributed according to the published allocation-track structure.',
+      },
+      {
+        subtitle: 'Dynamic CST Imprints',
+        text: 'Participation CST imprinted by a gesture is not fixed. The amount depends on how much time has elapsed since the previous gesture and is calculated with a square-root formula. Very rapid gestures may imprint 0 CST.',
+      },
+      {
+        subtitle: 'CST Calibration Window',
+        text: `The CST Gesture Cost descends through a Calibration Window stored on-chain. Each CST gesture increases that window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, and each ETH gesture decreases it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
       },
       {
         subtitle: 'Smart Contract Interaction',
@@ -121,7 +129,7 @@ const sections = [
       },
       {
         subtitle: 'Retrieving Allocations',
-        text: 'Some allocations require manual retrieval through the platform. The participant eligible for the Signature Allocation has 24 hours to finalize the cycle and retrieve the allocation. After that window, anyone may finalize the cycle according to the smart contract rules.',
+        text: `Some allocations require manual retrieval through the platform. The participant eligible for the Signature Allocation has ${protocolFacts.finalGestureExclusivityHours} hours after the Cycle Finalization Time to finalize the cycle. After that window, anyone may finalize the cycle according to the smart contract rules. Secondary ETH and attached-token or attached-NFT allocations use a separate retrieval timeout that defaults to ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks.`,
       },
       {
         subtitle: 'No Guaranteed Outcomes',

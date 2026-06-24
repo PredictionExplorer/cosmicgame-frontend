@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Copy, Check, ExternalLink, Gavel, Timer } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
 
 import { useClipboard } from '@/hooks/useClipboard';
@@ -188,8 +189,7 @@ export function AuctionParameters({
               {
                 label: 'Duration',
                 value: formatSeconds(cstDurations.AuctionDuration),
-                tooltip:
-                  'Total duration of the CST Calibration Window where Gesture Cost descends over time',
+                tooltip: `Live stored duration of the CST Calibration Window. CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%; ETH gestures shorten it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
               },
               {
                 label: 'Elapsed Duration',
@@ -200,7 +200,7 @@ export function AuctionParameters({
                 label: 'Calibration Ceiling',
                 value: `${cstBeginningBidPrice} CST`,
                 tooltip:
-                  'Starting Gesture Cost of the CST Calibration Window that descends linearly over time',
+                  'Starting Gesture Cost of the CST Calibration Window currently displayed. The cost descends linearly across the live stored duration.',
               },
             ]}
           />

@@ -23,8 +23,9 @@ const steps = [
     Icon: Search,
     title: 'Check the Gesture Cost',
     highlights: [
-      'Review the Cycle Finalization Time \u2014 every gesture adds ~1 hour to the clock.',
+      'Review the Cycle Finalization Time — every gesture adds the current time increment to the stored finalization time.',
       'Check the current Gesture Cost in ETH or CST before committing.',
+      'Review the live Participation CST preview; the amount changes with time since the previous gesture.',
       'Note the Signature Allocation amount to see the potential ETH distribution.',
       'Ensure your wallet holds the Gesture Cost plus a small amount for gas fees.',
     ],
@@ -37,8 +38,8 @@ const steps = [
     highlights: [
       'Choose ETH, optionally attach a Random Walk NFT for a 50% ETH Gesture Cost reduction, or make a CST (ERC-20) gesture.',
       'Click "Gesture Now" and confirm the transaction in your wallet.',
-      'Your gesture extends the Cycle Finalization Time by ~1 hour and raises the Gesture Cost by ~1%.',
-      'Every gesture imprints 100 CST and records a Stellar Selection entry automatically.',
+      'Your gesture extends the Cycle Finalization Time and updates the ETH/CST cost state.',
+      'Every gesture records a Stellar Selection entry and may imprint dynamic Participation CST automatically.',
     ],
     tooltip:
       'Each Random Walk NFT can be used once for the 50% ETH Gesture Cost reduction - choose your moment wisely.',

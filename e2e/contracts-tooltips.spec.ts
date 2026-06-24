@@ -16,8 +16,8 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
   // GameConfiguration cards
   {
-    label: 'Gesture-Cost Drift',
-    expected: /Each gesture increases the next Gesture Cost by this percentage/,
+    label: 'ETH Gesture-Cost Step-Up',
+    expected: /ETH gesture cost uses this step-up parameter/,
   },
   {
     label: 'Time Increment',
@@ -25,8 +25,8 @@ const TOOLTIP_LABELS_AND_COPY: Array<{ label: string; expected: RegExp }> = [
       /Each gesture adds this much time to the Cycle Finalization Time\. The increment grows by \d+(?:\.\d+)?% with each cycle\./,
   },
   {
-    label: 'Participation CST per Gesture',
-    expected: /CST tokens imprinted with each gesture/,
+    label: 'Current Participation CST Preview',
+    expected: /Estimated Participation CST if a gesture lands now/,
   },
   {
     label: 'Finalization Timeout',

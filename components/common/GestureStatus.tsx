@@ -383,7 +383,7 @@ export const GestureStatus = ({
                     }
                     icon={<Zap className="h-4 w-4" />}
                     tone="cst"
-                    tooltip="Gesture with CST. Cost descends over time via the Calibration Window — can become free."
+                    tooltip="Gesture with CST. Cost descends through the live Calibration Window, which CST gestures lengthen and ETH gestures shorten."
                   />
                 </motion.div>
               </>

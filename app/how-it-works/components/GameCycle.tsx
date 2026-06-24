@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { Play, Users, TimerOff, Trophy, Ticket, RotateCcw } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { GradientText } from '@/components/styled';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
@@ -10,18 +12,16 @@ const phases = [
   {
     Icon: Play,
     label: 'Cycle Opens',
-    description:
-      'A new Performance Cycle begins. The Calibration Window opens: Gesture Cost descends from the Calibration Ceiling to the Calibration Floor over ~2 days.',
+    description: `A new Performance Cycle begins. The first ETH Calibration Window opens, and the CST Calibration Window starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference that then changes with participation.`,
     tooltip:
-      'The Calibration Window lets any participant gesture at a falling cost. The Cycle Reserve starts at zero plus the Compounding Reserve from the previous cycle.',
+      'Calibration Windows let participants gesture at falling cost. The Cycle Reserve starts at zero plus the Compounding Reserve from the previous cycle.',
   },
   {
     Icon: Users,
     label: 'Participants Gesture',
-    description:
-      'Each gesture adds ~1 hour to the Cycle Finalization Time and raises the Gesture Cost by ~1%.',
+    description: `Each gesture adds the current time increment to Cycle Finalization Time. Participation CST is dynamic, and ETH/CST gestures move the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}% down or ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% up.`,
     tooltip:
-      'Gestures extend the cycle and introduce a Gesture-Cost Drift \u2014 a strategic tension between cost-efficient early gestures and decisive late ones.',
+      'Participation CST follows a square-root formula based on elapsed time since the previous gesture. The current app preview is the source of truth for the exact CST amount.',
   },
   {
     Icon: TimerOff,
@@ -50,9 +50,9 @@ const phases = [
     Icon: RotateCcw,
     label: 'Next Cycle',
     description:
-      'About half of the Cycle Reserve rolls forward as the Compounding Reserve, and the Gesture Cost resets ~100x lower than the Final Gesture cost.',
+      'About half of the Cycle Reserve rolls forward as the Compounding Reserve, and the next cycle begins with fresh Calibration Windows.',
     tooltip:
-      'Each new cycle begins with a reset Calibration Window. The Compounding Cycle Reserve means the protocol accumulates value rather than extracts it.',
+      'The Compounding Cycle Reserve means the protocol accumulates value rather than extracts it. The live contracts report the current window durations and costs.',
   },
 ] as const;
 

@@ -4,6 +4,7 @@ import { type SyntheticEvent, type ComponentProps, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Wallet, Clock, Users } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
 import { formatEthValue, formatSeconds, type EnduranceChampion } from '@/utils';
 
 import Allocation from '@/components/common/Allocation';
@@ -185,9 +186,16 @@ export function RoundInfoSection({
               <AccordionContent className="px-5 pb-5">
                 <div className="text-sm text-muted-foreground space-y-3">
                   <p>
-                    When you gesture, you imprint{' '}
-                    <span className="text-white font-medium">100 Participation CST</span>, which
-                    expresses Coordination Weight on the Cosmic Council.
+                    When you gesture, you may imprint{' '}
+                    <span className="text-white font-medium">dynamic Participation CST</span>. The
+                    amount uses a square-root formula based on how long it has been since the
+                    previous gesture.
+                  </p>
+                  <p>
+                    ETH gestures shorten the CST Calibration Window by about{' '}
+                    {protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures
+                    lengthen it by about{' '}
+                    {protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.
                   </p>
                   <p>
                     Each gesture records one Stellar Selection entry.{' '}

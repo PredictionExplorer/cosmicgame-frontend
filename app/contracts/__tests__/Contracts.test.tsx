@@ -228,9 +228,9 @@ describe('Contracts', () => {
     mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
     render(<Contracts />);
     expect(screen.getByText('Protocol Configuration')).toBeInTheDocument();
-    expect(screen.getByText('Gesture-Cost Drift')).toBeInTheDocument();
+    expect(screen.getByText('ETH Gesture-Cost Step-Up')).toBeInTheDocument();
     expect(screen.getByText('Time Increment')).toBeInTheDocument();
-    expect(screen.getByText('Participation CST per Gesture')).toBeInTheDocument();
+    expect(screen.getByText('Current Participation CST Preview')).toBeInTheDocument();
   });
 
   it('renders all contract address groups', () => {

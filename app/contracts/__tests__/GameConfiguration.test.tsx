@@ -37,11 +37,11 @@ const defaultProps = {
 describe('GameConfiguration', () => {
   it('renders all stat cards with correct values', () => {
     render(<GameConfiguration {...defaultProps} />);
-    expect(screen.getByText('Gesture-Cost Drift')).toBeInTheDocument();
+    expect(screen.getByText('ETH Gesture-Cost Step-Up')).toBeInTheDocument();
     expect(screen.getByText('1%')).toBeInTheDocument();
     expect(screen.getByText('Time Increment')).toBeInTheDocument();
     expect(screen.getByText('3600s')).toBeInTheDocument();
-    expect(screen.getByText('Participation CST per Gesture')).toBeInTheDocument();
+    expect(screen.getByText('Current Participation CST Preview')).toBeInTheDocument();
     expect(screen.getByText('200 CST')).toBeInTheDocument();
     expect(screen.getByText('Max Message Length')).toBeInTheDocument();
     expect(screen.getByText('280')).toBeInTheDocument();
@@ -103,8 +103,8 @@ describe('GameConfiguration', () => {
 describe('GameConfiguration tooltips', () => {
   const STAT_TOOLTIPS: Array<{ label: string; tooltip: string | RegExp }> = [
     {
-      label: 'Gesture-Cost Drift',
-      tooltip: /Each gesture increases the next Gesture Cost by this percentage/,
+      label: 'ETH Gesture-Cost Step-Up',
+      tooltip: /ETH gesture cost uses this step-up parameter/,
     },
     {
       label: 'Time Increment',
@@ -112,8 +112,8 @@ describe('GameConfiguration tooltips', () => {
         /Each gesture adds this much time to the Cycle Finalization Time\. The increment grows by 1% with each cycle\./,
     },
     {
-      label: 'Participation CST per Gesture',
-      tooltip: /CST tokens imprinted with each gesture/,
+      label: 'Current Participation CST Preview',
+      tooltip: /Estimated Participation CST if a gesture lands now/,
     },
     {
       label: 'Finalization Timeout',

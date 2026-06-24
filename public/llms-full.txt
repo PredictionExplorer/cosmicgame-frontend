@@ -56,12 +56,13 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 ### Gesture Process
 
-1. Each cycle opens with a Calibration Window where the Gesture Cost descends from the Calibration Ceiling toward the Calibration Floor over roughly two days
-2. Every new gesture increases the Gesture Cost by approximately 1% and extends the Cycle Finalization Time by about an hour
+1. Each cycle opens with an ETH Calibration Window for the first gesture, while the CST Calibration Window starts from a 12-hour reference and then changes on-chain
+2. Every new gesture adds the current time increment to the stored Cycle Finalization Time
 3. The participant who makes the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation
 4. Gestures can be made with ETH or CST tokens (ERC-20)
-5. CST gestures use a Calibration Window — the CST Gesture Cost drifts downward continuously within its own window
-6. Random Walk NFT holders can attach an unused token to an ETH gesture for a 50% ETH Gesture Cost reduction (each Random Walk NFT can be used once for this discount)
+5. CST gestures use a Calibration Window — the CST Gesture Cost descends through the current window
+6. CST gestures increase the CST Calibration Window by about 0.4%; ETH gestures decrease it by about 0.398%
+7. Random Walk NFT holders can attach an unused token to an ETH gesture for a 50% ETH Gesture Cost reduction (each Random Walk NFT can be used once for this discount)
 
 ### Allocation Distribution Per Cycle
 
@@ -75,7 +76,9 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 ### Per-Gesture Imprints
 
-- 100 CST tokens imprinted per gesture
+- Dynamic Participation CST may be imprinted per gesture
+- Participation CST uses a square-root formula based on elapsed time since the previous gesture: floor(sqrt(elapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds))
+- Rapid gestures can imprint 0 CST; longer quiet periods imprint more, with sublinear growth
 - One Stellar Selection entry for end-of-cycle selections
 - Eligibility for end-of-cycle allocation tracks
 
@@ -90,7 +93,7 @@ In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted. Each NFT
 - 10 for NFT Stellar Selection recipients
 - 10 for RandomWalk NFT anchor-holders selected through Anchored-NFT Stellar Selection
 
-Together with the 3,000 CST Outreach Reserve, typical per-cycle CST imprints total 27,000 CST.
+Together with the 3,000 CST Outreach Reserve, typical fixed end-of-cycle/outreach CST imprints total 27,000 CST. Dynamic per-gesture Participation CST is additional.
 
 ### Special Titles
 
@@ -108,7 +111,7 @@ Together with the 3,000 CST Outreach Reserve, typical per-cycle CST imprints tot
 ### CST tokens
 
 - Type: ERC-20
-- Imprinted: 100 CST per gesture made
+- Imprinted: dynamic Participation CST can be imprinted by gestures based on time since the previous gesture
 - Uses: Alternative gesture currency (Calibration Window), Cosmic Council coordination signalling
 - Tradeable on Uniswap and other Arbitrum DEXes
 
@@ -159,10 +162,10 @@ Q: What is Cosmic Signature?
 A: Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; every gesture shapes the cycle's final Signature. When the cycle finalizes, the protocol distributes its reserves across multiple allocation tracks — including Protocol Guild.
 
 Q: How does a Performance Cycle work?
-A: Each cycle opens with a Calibration Window where Gesture Cost descends from the Calibration Ceiling toward the Calibration Floor over roughly two days. The first gesture starts the Cycle Finalization Time (initially ~24 hours). Each subsequent gesture increases the Gesture Cost by approximately 1% and extends the Cycle Finalization Time by about an hour. When the Cycle Finalization Time expires, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation.
+A: Each cycle opens with an ETH Calibration Window for the first gesture. That first gesture starts the Cycle Finalization Time, currently about 24 hours by default. Subsequent gestures add the current time increment to the stored finalization time. When the Cycle Finalization Time expires, the participant who made the Final Gesture has an exclusive window to finalize the cycle and retrieve the Signature Allocation.
 
 Q: What types of gestures are available?
-A: Gestures can be made with ETH or CST tokens (ERC-20). You may also attach a Random Walk NFT to an ETH gesture for a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. The CST Gesture Cost drifts downward continuously within its own Calibration Window.
+A: Gestures can be made with ETH or CST tokens (ERC-20). You may also attach a Random Walk NFT to an ETH gesture for a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. CST gestures use their own Calibration Window, and that window changes after every ETH or CST gesture.
 
 Q: Can I participate if I don't own any NFTs?
 A: Yes, anyone can participate by making a gesture. You do not need to own an NFT. An unused Random Walk NFT can be attached to an ETH gesture for a 50% ETH Gesture Cost reduction.
@@ -173,7 +176,7 @@ Q: What is the Signature Allocation?
 A: The Signature Allocation includes 25% of the Cycle Reserve in ETH, 1,000 CST, a unique Cosmic Signature NFT, and any attached tokens (ERC-20/ERC-721) from other projects.
 
 Q: What do I receive for each gesture?
-A: Each gesture imprints 100 CST tokens, records one Stellar Selection entry for end-of-cycle selections, and contributes to Endurance Champion and Chrono-Warrior timing.
+A: Each gesture records one Stellar Selection entry, contributes to Endurance Champion and Chrono-Warrior timing, and may imprint dynamic Participation CST. Participation CST uses a square-root formula based on elapsed time since the previous gesture, so rapid gestures can imprint 0 CST while longer quiet periods imprint more.
 
 Q: How does Stellar Selection work?
 A: Each gesture records one Stellar Selection entry. At finalization, three ETH Stellar Selection recipients share 4% of the Cycle Reserve, ten NFT Stellar Selection recipients each receive 1,000 CST and a Cosmic Signature NFT, and ten RandomWalk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT through Anchored-NFT Stellar Selection.
@@ -183,11 +186,11 @@ A: Cosmic Signature NFT anchor-holders share the 6% Anchor Distribution each cyc
 
 ### Cycle Mechanics
 
-Q: How does the Gesture Cost increase with each gesture?
-A: Each gesture increases the current Gesture Cost by 1%. This exponential growth adds a strategic element. At the start of a new cycle, the Gesture Cost resets to approximately 100× lower than the Final Gesture Cost of the previous cycle.
+Q: How does Gesture Cost change?
+A: ETH and CST Gesture Costs follow separate on-chain paths. CST Gesture Cost descends through the current CST Calibration Window. Each CST gesture lengthens that window by about 0.4%; each ETH gesture shortens it by about 0.398%.
 
 Q: What is CST-based gesturing?
-A: When you gesture with ETH, you are imprinted with 100 CST. These tokens can be used to make another gesture through the Calibration Window, where the CST Gesture Cost decreases over time if no gestures are made.
+A: CST can be used as an alternative gesture currency through the CST Calibration Window. The CST Gesture Cost decreases as the current window progresses, and the window itself is adjusted by every ETH or CST gesture.
 
 Q: What is an Endurance Champion?
 A: The participant who remained the most recent gesture maker for the longest single continuous interval. Receives 1,000 CST and one Cosmic Signature NFT when the cycle finalizes.

@@ -51,7 +51,7 @@ describe('RewardBreakdown', () => {
 
   it('renders all four reward titles', () => {
     renderWithTooltip(<RewardBreakdown />);
-    expect(screen.getByText('100 Participation CST')).toBeInTheDocument();
+    expect(screen.getByText('Dynamic Participation CST')).toBeInTheDocument();
     expect(screen.getByText('Stellar Selection Entry')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature NFT Selection')).toBeInTheDocument();
     expect(screen.getByText('Signature Allocation')).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('RewardBreakdown', () => {
 
   it('renders reward descriptions', () => {
     renderWithTooltip(<RewardBreakdown />);
-    expect(screen.getByText(/Every gesture imprints 100 CST tokens/)).toBeInTheDocument();
+    expect(screen.getByText(/may imprint CST based on how long/)).toBeInTheDocument();
     expect(screen.getByText(/records an entry in Stellar Selection/)).toBeInTheDocument();
     expect(
       screen.getByText(/receive 1,000 CST and a unique Cosmic Signature NFT/),

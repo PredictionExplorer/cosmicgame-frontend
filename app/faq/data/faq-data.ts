@@ -48,13 +48,13 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-does-the-bidding-game-work',
         question: 'How does a Performance Cycle work?',
         answer:
-          'Each cycle opens with a Calibration Window where Gesture Cost descends from the Calibration Ceiling toward the Calibration Floor over roughly two days. The first gesture starts the Cycle Finalization Time (initially ~24 hours). Each subsequent gesture increases the Gesture Cost by approximately 1% and extends the Cycle Finalization Time by about an hour. When the Cycle Finalization Time expires, the participant who made the Final Gesture may finalize the cycle and receive the Signature Allocation.',
+          'Each cycle opens with an ETH Calibration Window for the first gesture. That first gesture starts the Cycle Finalization Time, currently about 24 hours by default. Subsequent gestures with ETH or CST add the current time increment to the stored finalization time, with the increment starting around one hour and growing gradually across cycles. When the Cycle Finalization Time expires, the participant who made the Final Gesture has an exclusive window to finalize the cycle and retrieve the Signature Allocation.',
       },
       {
         id: 'what-type-of-gestures-are-available',
         question: 'What types of gestures are available?',
         answer:
-          'Gestures can be made with ETH or CST tokens (ERC-20). You may also attach a Random Walk NFT to an ETH gesture to receive a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. The CST Gesture Cost drifts downward continuously within its own Calibration Window, allowing more cost-efficient participation later in the cycle.',
+          'Gestures can be made with ETH or CST tokens (ERC-20). You may also attach a Random Walk NFT to an ETH gesture to receive a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. CST gestures use their own Calibration Window: the CST Gesture Cost descends while the window runs, and the window length itself changes after every ETH or CST gesture.',
       },
       {
         id: 'can-i-participate-without-nfts',
@@ -72,13 +72,13 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-long-does-each-round-last',
         question: 'How long does each Performance Cycle last?',
         answer:
-          'Each cycle begins with an initial Cycle Finalization Time of approximately 24 hours once the first gesture is made. Every gesture extends the time by about an hour, so cycles frequently last longer than a day. The cycle ends when the Cycle Finalization Time expires without another gesture arriving.',
+          'Each cycle begins when the first ETH gesture is made, which starts the Cycle Finalization Time. The current default starts around 24 hours, and every later gesture adds the current time increment, which starts around one hour and gradually increases across cycles. A cycle can therefore last much longer than a day if gestures keep arriving before finalization.',
       },
       {
         id: 'can-i-place-multiple-gestures',
         question: 'Can I make multiple gestures in one cycle?',
         answer:
-          'Yes. Each gesture imprints 100 Participation CST into your wallet, increases your entry count for Stellar Selections, and shapes the cycle\u2019s evolving Signature.',
+          'Yes. Each gesture can imprint Participation CST into your wallet, increases your entry count for Stellar Selections, and shapes the cycle\u2019s evolving Signature. The Participation CST amount is dynamic: it depends on how much time has passed since the previous gesture, so a longer quiet period creates a larger CST imprint than a rapid follow-up gesture.',
       },
     ],
   },
@@ -98,8 +98,7 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'what-rewards-per-bid',
         question: 'What do I receive for each gesture?',
-        answer:
-          'Every gesture imprints three things: 100 Participation CST (ERC-20), one entry in end-of-cycle Stellar Selections, and a record of your Endurance Window contribution toward the Endurance Champion and Chrono-Warrior tracks.',
+        answer: `Every gesture records one entry in end-of-cycle Stellar Selections, updates your Endurance Window contribution toward the Endurance Champion and Chrono-Warrior tracks, and may imprint Participation CST. Participation CST is calculated with a square-root formula: ${protocolFacts.dynamicCstRewardFormula}. In plain English, the amount grows with the time since the previous gesture, but at a slowing rate. Very rapid gestures can receive 0 CST; a longer gap can produce a much larger CST imprint.`,
       },
       {
         id: 'how-does-the-stellarSelection-work',
@@ -107,10 +106,15 @@ export const faqCategories: FAQCategory[] = [
         answer: `Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects participants from the entry pool: ${protocolFacts.ethStellarSelectionRecipients} participants share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.nftStellarSelectionRecipients} participants each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} anchor-holders of Random Walk NFTs also receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and Cosmic Signature NFTs. Selection frequency increases with the number of gestures you make.`,
       },
       {
+        id: 'how-random-selection-works',
+        question: 'How are random selections made?',
+        answer:
+          'Stellar Selection uses on-chain randomness sources at cycle finalization time, including Arbitrum-provided block context and fallback entropy sources. Participant Stellar Selection is entry-weighted: each gesture adds an entry, so more gestures increase selection frequency. Anchored-NFT Stellar Selection is separate and is based on anchored Random Walk NFT eligibility rather than the participant gesture-entry pool.',
+      },
+      {
         id: 'how-do-i-claim-my-allocation',
         question: 'How do I retrieve my allocation if I\u2019m a recipient?',
-        answer:
-          'Recipients of the Signature Allocation retrieve their share of the Cycle Reserve through the protocol contract. Visit the My Allocations page or the cycle allocation page to initiate the retrieval after the cycle finalizes.',
+        answer: `Recipients retrieve allocations through the app and protocol contracts. The Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours after the Cycle Finalization Time to finalize the cycle and retrieve the Signature Allocation. After that, the Open-Finalization Window begins and anyone may finalize the cycle, but the Signature Allocation still belongs to the Final Gesture participant. Secondary ETH and attached-token or attached-NFT allocations use a separate retrieval timeout that defaults to ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks before others may retrieve on behalf of the eligible address.`,
       },
       {
         id: 'how-does-anchoring-work',
@@ -135,6 +139,11 @@ export const faqCategories: FAQCategory[] = [
           'About half of the Cycle Reserve rolls forward into the next Performance Cycle as the Compounding Cycle Reserve, increasing the starting balance for the following cycle. The protocol compounds rather than extracts.',
       },
       {
+        id: 'what-happens-to-attached-assets',
+        question: 'What happens to tokens or NFTs attached to gestures?',
+        answer: `ERC-20 tokens or ERC-721 NFTs attached to gestures become part of the cycle's attached allocations. The Signature Allocation recipient has priority to retrieve those attached assets after finalization. If attached assets remain unclaimed past the secondary retrieval timeout, currently ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks by default, the contracts allow retrieval according to the public timeout rules.`,
+      },
+      {
         id: 'who-receives-10-percent',
         question: 'Who receives the public-goods allocation from the Cycle Reserve?',
         answer:
@@ -152,13 +161,33 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-does-price-increase',
         question: 'How does Gesture Cost change across a cycle?',
         answer:
-          'Each gesture increases Gesture Cost by approximately 1% \u2014 a Gesture-Cost Drift that adds a strategic element. Gesture early for lower cost and more Stellar Selection entries, or gesture later when the cycle matures. At the start of each new cycle, Gesture Cost resets to approximately 100x lower than the previous cycle\u2019s Final Gesture cost, then opens a Calibration Window.',
+          'ETH and CST Gesture Costs follow separate on-chain paths. ETH Gesture Cost uses an ETH Calibration Window and then steps upward after ETH gestures. CST Gesture Cost descends through the current CST Calibration Window. That CST window is not static: ETH gestures shorten it slightly, while CST gestures lengthen it slightly, so the cost path reacts to the balance of ETH and CST participation.',
       },
       {
         id: 'what-is-dutch-auction',
         question: 'What is the Calibration Window?',
+        answer: `A Calibration Window is a price-discovery window in which Gesture Cost descends from a Calibration Ceiling toward a Calibration Floor over a known duration. ETH gestures and CST gestures use separate Calibration Windows. The CST Calibration Window currently starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference, but it is stored on-chain and changes after every gesture: each CST gesture increases the window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, and each ETH gesture decreases it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
+      },
+      {
+        id: 'how-is-participation-cst-calculated',
+        question: 'How is Participation CST calculated?',
+        answer: `Participation CST uses a square-root formula based on elapsed time since the previous gesture: ${protocolFacts.dynamicCstRewardFormula}. The square root matters because it rewards longer quiet periods without making the reward grow linearly forever. With the current default parameters, examples from the contract docs are approximately ${protocolFacts.dynamicCstRewardExamples.map((example) => `${example.cst} CST after ${example.elapsed}`).join(', ')}. The live app preview and the contract are the source of truth for the exact amount at the moment your gesture lands.`,
+      },
+      {
+        id: 'why-minimum-cst-reward-protection',
+        question: 'What is Minimum CST Reward Protection?',
         answer:
-          'When you gesture with ETH, you imprint 100 CST tokens (ERC-20). These tokens can be used to make another gesture through the CST Calibration Window. A Calibration Window is a price-discovery window in which the Gesture Cost descends from a Calibration Ceiling to a Calibration Floor over a known duration. As time passes, Gesture Cost falls \u2014 giving cost-efficient participation to later entrants.',
+          'Before you submit a gesture, the app previews the expected Participation CST amount and sends a minimum CST amount you are willing to accept. If another gesture lands first, your expected amount may change. Minimum CST Reward Protection can stop the transaction if the resulting CST imprint would be below your chosen minimum. You can also choose to accept any CST amount, including 0 CST, if you prefer the gesture to proceed whenever the cost checks pass.',
+      },
+      {
+        id: 'how-cst-calibration-window-changes',
+        question: 'How does each gesture change the CST Calibration Window?',
+        answer: `Every ETH or CST gesture updates the stored CST Calibration Window. A CST gesture lengthens the window by duration / ${protocolFacts.cstCalibrationWindowChangeDivisor}, which is about +${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}% before integer truncation. An ETH gesture shortens it by approximately duration / ${protocolFacts.cstCalibrationWindowChangeDivisor + 1}, about -${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%. A shorter window makes CST Gesture Cost fall faster; a longer window makes it fall more slowly.`,
+      },
+      {
+        id: 'what-is-open-finalization-window',
+        question: 'What is the Open-Finalization Window?',
+        answer: `When the Cycle Finalization Time expires, the Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours to finalize the cycle. If they do not finalize during that exclusivity window, anyone may call the finalization transaction. Open finalization keeps the protocol moving; it does not transfer the Signature Allocation away from the Final Gesture participant.`,
       },
       {
         id: 'what-is-endurance-champion',
@@ -228,7 +257,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'what-can-i-do-with-cst',
         question: 'What can I do with CST tokens?',
         answer:
-          'CST tokens can be used as an alternative to ETH for gestures. You imprint 100 CST per gesture, so active participants naturally accumulate CST for future cycles. They also express Coordination Weight on the Cosmic Council.',
+          'CST tokens can be used as an alternative to ETH for gestures through the CST Calibration Window. Gestures can also imprint Participation CST, but the amount is dynamic and depends on how long it has been since the previous gesture. CST also expresses Coordination Weight on the Cosmic Council.',
       },
       {
         id: 'what-makes-nfts-unique',

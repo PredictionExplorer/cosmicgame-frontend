@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, Clock, Coins, MessageSquare, Timer, Zap } from 'lucide-react';
 
+import { protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
 
 import { StatCard, StatCardSkeleton } from '@/components/ui/stat-card';
@@ -54,10 +55,11 @@ export function GameConfiguration({
 
   const cards = [
     {
-      label: 'Gesture-Cost Drift',
+      label: 'ETH Gesture-Cost Step-Up',
       value: `${priceIncrease}%`,
       icon: <TrendingUp className="h-4 w-4" />,
-      tooltip: 'Each gesture increases the next Gesture Cost by this percentage',
+      tooltip:
+        'ETH gesture cost uses this step-up parameter. CST gesture cost follows the live CST Calibration Window.',
       featured: true,
     },
     {
@@ -68,10 +70,10 @@ export function GameConfiguration({
       featured: true,
     },
     {
-      label: 'Participation CST per Gesture',
+      label: 'Current Participation CST Preview',
       value: `${cstRewardPerBid} CST`,
       icon: <Coins className="h-4 w-4" />,
-      tooltip: 'CST tokens imprinted with each gesture',
+      tooltip: `Estimated Participation CST if a gesture lands now. The amount is dynamic and uses ${protocolFacts.dynamicCstRewardFormula}.`,
     },
     {
       label: 'Finalization Timeout',

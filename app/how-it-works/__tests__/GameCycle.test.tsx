@@ -71,8 +71,8 @@ describe('GameCycle', () => {
 
   it('renders phase descriptions', () => {
     renderWithTooltip(<GameCycle />);
-    expect(screen.getByText(/Calibration Window opens/)).toBeInTheDocument();
-    expect(screen.getByText(/adds ~1 hour to the Cycle Finalization Time/)).toBeInTheDocument();
+    expect(screen.getByText(/first ETH Calibration Window opens/)).toBeInTheDocument();
+    expect(screen.getByText(/Participation CST is dynamic/)).toBeInTheDocument();
     expect(screen.getByText(/countdown reaches zero, the cycle closes/)).toBeInTheDocument();
     expect(screen.getByText(/25% of the Cycle Reserve/)).toBeInTheDocument();
     expect(screen.getByText(/Three ETH Stellar Selection recipients/)).toBeInTheDocument();

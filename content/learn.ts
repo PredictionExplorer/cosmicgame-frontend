@@ -1,3 +1,5 @@
+import { protocolFacts } from '@/content/protocol-facts';
+
 import { APP_ORIGIN, LANDING_ORIGIN } from '@/lib/hostRouting';
 
 export interface LearnSection {
@@ -26,7 +28,7 @@ const baseLearnArticles: LearnArticle[] = [
     description:
       'Cosmic Signature is a procedural on-chain art protocol on Arbitrum where Performance Cycle gestures shape deterministic three-body NFT artwork.',
     h1: 'What Is Cosmic Signature?',
-    updated: '2026-05-25',
+    updated: '2026-06-24',
     schemaType: 'Article',
     summary:
       'Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during Performance Cycles, and those gestures shape deterministic Cosmic Signature NFT artwork generated from on-chain data.',
@@ -58,7 +60,7 @@ const baseLearnArticles: LearnArticle[] = [
     description:
       'Learn how Cosmic Signature Performance Cycles use Calibration Windows, gestures, finalization, and allocation tracks on Arbitrum.',
     h1: 'How the Cosmic Signature Performance Cycle Works',
-    updated: '2026-05-25',
+    updated: '2026-06-24',
     schemaType: 'TechArticle',
     summary:
       'A Cosmic Signature Performance Cycle is the protocol window where gestures accumulate, timing evolves, and the final Signature allocation is determined by on-chain rules.',
@@ -66,8 +68,8 @@ const baseLearnArticles: LearnArticle[] = [
       {
         heading: 'Cycle Opening',
         body: [
-          'A cycle begins with a Calibration Window. Gesture Cost descends from a Calibration Ceiling toward a Calibration Floor, giving participants a visible on-chain window for timing their gestures.',
-          'The first gesture starts the Cycle Finalization Time. Subsequent gestures extend that time and update the current cycle state.',
+          `A cycle begins with an ETH Calibration Window for the first gesture. The CST Calibration Window starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference and then changes on-chain as gestures arrive.`,
+          `The first gesture starts the Cycle Finalization Time. Subsequent gestures add the current time increment and update the current cycle state. ETH gestures shorten the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`,
         ],
       },
       {
@@ -90,7 +92,7 @@ const baseLearnArticles: LearnArticle[] = [
     description:
       'Understand ETH gestures, CST gestures, Gesture Cost, Participation CST, and how gestures shape each Cosmic Signature Performance Cycle.',
     h1: 'How Gestures Work in Cosmic Signature',
-    updated: '2026-05-25',
+    updated: '2026-06-24',
     schemaType: 'Article',
     summary:
       'A gesture is an on-chain participation action in Cosmic Signature. Gestures can be made with ETH or CST, and every gesture affects the active Performance Cycle.',
@@ -98,8 +100,8 @@ const baseLearnArticles: LearnArticle[] = [
       {
         heading: 'What A Gesture Does',
         body: [
-          'Every gesture records participation in the active cycle, imprints Participation CST, extends Cycle Finalization Time, and contributes to the historical context around the final Signature.',
-          'Gesture Cost changes across the cycle. ETH gestures and CST gestures use related but distinct mechanics, including Calibration Windows that make the cost path visible to participants.',
+          `Every gesture records participation in the active cycle, may imprint dynamic Participation CST, extends Cycle Finalization Time, and contributes to the historical context around the final Signature. Participation CST uses a square-root formula: ${protocolFacts.dynamicCstRewardFormula}.`,
+          `Gesture Cost changes across the cycle. ETH gestures and CST gestures use related but distinct mechanics, including Calibration Windows that make the cost path visible to participants. Each CST gesture lengthens the CST Calibration Window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%; each ETH gesture shortens it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
         ],
       },
       {
@@ -125,7 +127,7 @@ const baseLearnArticles: LearnArticle[] = [
     description:
       'A technical explanation of deterministic Cosmic Signature NFT artwork generated from on-chain seeds and three-body physics.',
     h1: 'How Cosmic Signature Generates Three-Body NFT Art',
-    updated: '2026-05-25',
+    updated: '2026-06-24',
     schemaType: 'TechArticle',
     summary:
       'Cosmic Signature NFTs are deterministic artwork generated from on-chain seeds and a reproducible three-body physics rendering pipeline.',
@@ -157,7 +159,7 @@ const baseLearnArticles: LearnArticle[] = [
     description:
       'Why Cosmic Signature runs on Arbitrum and how the protocol uses Ethereum Layer 2 infrastructure for on-chain art.',
     h1: 'Cosmic Signature on Arbitrum',
-    updated: '2026-05-25',
+    updated: '2026-06-24',
     schemaType: 'Article',
     summary:
       'Cosmic Signature runs on Arbitrum so gestures, cycles, NFT records, and allocations can be handled on an Ethereum Layer 2 network.',
@@ -181,7 +183,7 @@ const baseLearnArticles: LearnArticle[] = [
     description:
       'Find the Cosmic Signature smart contract, source code, verification, and security context for the Arbitrum protocol.',
     h1: 'Cosmic Signature Contracts, Security, and Verification',
-    updated: '2026-05-25',
+    updated: '2026-06-24',
     schemaType: 'TechArticle',
     summary:
       'Cosmic Signature publishes contract and source-code information so participants can inspect the protocol mechanics and verify on-chain behavior.',
@@ -206,7 +208,7 @@ const baseLearnArticles: LearnArticle[] = [
     description:
       'Learn how CST tokens relate to gestures, protocol coordination, and the Cosmic Council.',
     h1: 'CST and the Cosmic Council',
-    updated: '2026-05-25',
+    updated: '2026-06-24',
     schemaType: 'Article',
     summary:
       'CST is the Cosmic Signature ERC-20 token imprinted through participation and used for protocol coordination through the Cosmic Council.',
@@ -214,7 +216,8 @@ const baseLearnArticles: LearnArticle[] = [
       {
         heading: 'CST In The Protocol',
         body: [
-          'Gestures imprint CST, and CST can also be used as an alternative gesture currency through its own Calibration Window.',
+          'Gestures can imprint Participation CST, and CST can also be used as an alternative gesture currency through its own Calibration Window.',
+          'The Participation CST amount is dynamic: it depends on time since the previous gesture and uses a square-root formula, so long quiet periods produce larger imprints while rapid gestures can produce 0 CST.',
           'CST expresses coordination weight in the Cosmic Council, where holders can participate in protocol coordination according to on-chain rules.',
         ],
       },

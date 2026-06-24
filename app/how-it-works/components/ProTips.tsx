@@ -8,11 +8,11 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 const tips = [
   {
     Icon: TrendingDown,
-    title: 'Gesture Early, Gesture Cheap',
+    title: 'Watch Both Calibration Windows',
     description:
-      'Gesture Cost starts low after each cycle reset \u2014 roughly 100x lower than the previous Final Gesture cost.',
+      'ETH and CST Gesture Costs follow separate live windows, and each gesture changes the CST window.',
     tooltip:
-      'Early-cycle gestures cost a fraction of late-cycle gestures. Ideal for accumulating Stellar Selection entries at low cost.',
+      'ETH gestures slightly shorten the CST Calibration Window; CST gestures slightly lengthen it. The live app panels show the current cost path.',
   },
   {
     Icon: ImageIcon,
@@ -41,17 +41,16 @@ const tips = [
     Icon: Clock,
     title: 'Watch the Finalization Time',
     description:
-      'The Cycle Finalization Time gains ~1 hour per gesture. Strategic timing near the end of a cycle can be decisive.',
+      'Each gesture adds the current time increment to the stored Cycle Finalization Time.',
     tooltip:
       'Gesturing when the timer is low is riskier (higher cost) but positions you closest to the Final Gesture.',
   },
   {
     Icon: Zap,
     title: 'Gesture with CST',
-    description:
-      'Already imprinted CST from previous gestures? Use it as an alternative currency to conserve ETH.',
+    description: 'Use CST as an alternative gesture currency through the CST Calibration Window.',
     tooltip:
-      'CST gestures follow the same rules as ETH gestures. Your gesture still records a Stellar Selection entry and extends the timer.',
+      'A CST gesture records a Stellar Selection entry, extends the timer, may imprint dynamic Participation CST, and lengthens the CST Calibration Window by about 0.4%.',
   },
 ] as const;
 

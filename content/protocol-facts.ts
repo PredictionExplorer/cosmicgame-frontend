@@ -10,7 +10,8 @@
  * Typical per-cycle imprint totals:
  * - 24 Cosmic Signature NFTs = 4 role NFTs + 10 participant Stellar NFTs
  *   + 10 anchored-RWLK Stellar NFTs.
- * - 27,000 CST = 24 NFT-paired 1,000 CST imprints + 3,000 CST outreach.
+ * - 27,000 fixed CST = 24 NFT-paired 1,000 CST imprints + 3,000 CST outreach.
+ *   Dynamic per-gesture CST imprints are additional and depend on gesture timing.
  */
 export const protocolFacts = {
   contractAddresses: {
@@ -25,14 +26,26 @@ export const protocolFacts = {
   ethStellarSelectionRecipients: 3,
   nftStellarSelectionRecipients: 10,
   anchoredRwlkNftSelectionRecipients: 10,
-  perGestureCst: 100,
+  dynamicCstRewardFormula:
+    'floor(sqrt(elapsedSinceLastGesture * bidCstRewardAmountMultiplier / mainPrizeTimeIncrementInMicroSeconds))',
+  dynamicCstRewardExamples: [
+    { elapsed: '0 seconds', cst: '0' },
+    { elapsed: '1 second', cst: '1.73' },
+    { elapsed: '60 seconds', cst: '13.4' },
+    { elapsed: '1 hour', cst: '104' },
+    { elapsed: '1 day', cst: '509' },
+  ],
+  initialCstCalibrationWindowHours: 12,
+  cstCalibrationWindowChangeDivisor: 250,
+  cstCalibrationWindowIncreasePercentPerCstGesture: 0.4,
+  cstCalibrationWindowDecreasePercentPerEthGesture: 0.398,
   specialAllocationCst: 1_000,
   outreachReserveCst: 3_000,
   roleNftsPerCycle: 4,
   stellarNftsPerCycle: 20,
   typicalNftsPerCycle: 24,
   typicalCstImprintsPerCycle: 27_000,
-  claimTimeoutHours: 24,
+  finalGestureExclusivityHours: 48,
   secondaryRetrievalTimeoutWeeks: 5,
   randomWalkDiscountPercentage: 50,
   initialGestureCostEth: 0.0001,

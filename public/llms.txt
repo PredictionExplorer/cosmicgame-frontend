@@ -31,10 +31,12 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 ## Protocol Mechanics
 
-- Each cycle opens with a Calibration Window where Gesture Cost descends over roughly two days
-- Every gesture increases the Gesture Cost by ~1% and extends the Cycle Finalization Time by about an hour
+- Each cycle opens with ETH and CST Calibration Window mechanics; the CST window starts from a 12-hour reference and then changes on-chain
+- Every gesture adds the current time increment to Cycle Finalization Time
 - The participant who made the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation (25% of the Cycle Reserve, 1,000 CST, and 1 Cosmic Signature NFT)
-- Every gesture imprints 100 CST tokens and a Stellar Selection entry
+- Every gesture records a Stellar Selection entry and may imprint dynamic Participation CST
+- Participation CST uses a square-root formula based on elapsed time since the previous gesture; rapid gestures can imprint 0 CST, while longer quiet periods imprint more
+- CST gestures increase the CST Calibration Window by about 0.4%; ETH gestures decrease it by about 0.398%
 - In the vast majority of cycles, 24 Cosmic Signature NFTs are imprinted and paired with 24,000 CST
 - Three ETH Stellar Selection recipients share 4% of the Cycle Reserve
 - Ten NFT Stellar Selection recipients and ten RandomWalk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT
@@ -42,7 +44,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 - The Endurance Champion and Final CST Gesture recipient each receive 1,000 CST and 1 Cosmic Signature NFT
 - Anchor Distributions route 6% of the Cycle Reserve to Cosmic Signature NFT anchor-holders
 - 7% of each Cycle Reserve is forwarded to Protocol Guild (public goods)
-- Outreach Reserve imprints 3,000 CST per cycle, bringing typical per-cycle CST imprints to 27,000 CST
+- Outreach Reserve imprints 3,000 CST per cycle, bringing typical fixed end-of-cycle/outreach CST imprints to 27,000 CST before dynamic per-gesture CST
 - Participants can make gestures with ETH or CST tokens (CST uses its own Calibration Window)
 - RandomWalkNFT holders can attach an unused token to an ETH gesture for a 50% ETH Gesture Cost reduction; each RandomWalkNFT can be used once for this discount
 - RandomWalkNFTs can also be anchored for Anchored-NFT Stellar Selection eligibility
