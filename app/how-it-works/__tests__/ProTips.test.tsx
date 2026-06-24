@@ -49,7 +49,7 @@ describe('ProTips', () => {
 
   it('renders all six tip titles', () => {
     renderWithTooltip(<ProTips />);
-    expect(screen.getByText('Gesture Early, Gesture Cheap')).toBeInTheDocument();
+    expect(screen.getByText('Watch Both Calibration Windows')).toBeInTheDocument();
     expect(screen.getByText('Attach a Random Walk NFT')).toBeInTheDocument();
     expect(screen.getByText('Stack Stellar Selection Entries')).toBeInTheDocument();
     expect(screen.getByText('Use a Burner Wallet')).toBeInTheDocument();
@@ -59,12 +59,14 @@ describe('ProTips', () => {
 
   it('renders tip descriptions', () => {
     renderWithTooltip(<ProTips />);
-    expect(screen.getByText(/Gesture Cost starts low/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/ETH and CST Gesture Costs follow separate live windows/),
+    ).toBeInTheDocument();
     expect(screen.getByText(/one-time 50% ETH Gesture Cost reduction/)).toBeInTheDocument();
     expect(screen.getByText(/higher Selection frequency/)).toBeInTheDocument();
     expect(screen.getByText(/smart contract is formally verified/)).toBeInTheDocument();
-    expect(screen.getByText(/Cycle Finalization Time gains/)).toBeInTheDocument();
-    expect(screen.getByText(/Already imprinted CST/)).toBeInTheDocument();
+    expect(screen.getByText(/adds the current time increment/)).toBeInTheDocument();
+    expect(screen.getByText(/Use CST as an alternative gesture currency/)).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
