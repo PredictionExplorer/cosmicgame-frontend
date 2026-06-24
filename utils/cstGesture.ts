@@ -16,6 +16,15 @@ export interface CstGestureData extends CstAuctionDurations {
   apiSecondsElapsed?: number;
 }
 
+export interface CstAuctionProgress {
+  auctionDuration: number;
+  secondsElapsed: number;
+  secondsRemaining: number;
+  percentComplete: number;
+  percentCompleteRounded: number;
+  isEnded: boolean;
+}
+
 const EMPTY_CST_GESTURE_DATA: CstGestureData = {
   AuctionDuration: 0,
   CSTPrice: 0,
@@ -79,4 +88,24 @@ export function formatCstAmount(value: number | null | undefined, digits = 4): s
   if (value == null || !Number.isFinite(value)) return '--';
   if (value === 0) return '0';
   return value >= 1 ? value.toFixed(digits).replace(/\.?0+$/, '') : value.toFixed(6);
+}
+
+export function getCstAuctionProgress({
+  AuctionDuration,
+  SecondsElapsed,
+}: Pick<CstAuctionDurations, 'AuctionDuration' | 'SecondsElapsed'>): CstAuctionProgress {
+  const auctionDuration =
+    Number.isFinite(AuctionDuration) && AuctionDuration > 0 ? AuctionDuration : 0;
+  const secondsElapsed = Number.isFinite(SecondsElapsed) && SecondsElapsed > 0 ? SecondsElapsed : 0;
+  const rawPercent = auctionDuration > 0 ? (secondsElapsed / auctionDuration) * 100 : 0;
+  const percentComplete = Math.min(100, Math.max(0, rawPercent));
+
+  return {
+    auctionDuration,
+    secondsElapsed,
+    secondsRemaining: Math.max(auctionDuration - secondsElapsed, 0),
+    percentComplete,
+    percentCompleteRounded: Math.round(percentComplete),
+    isEnded: auctionDuration > 0 && secondsElapsed > auctionDuration,
+  };
 }

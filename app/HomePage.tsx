@@ -477,6 +477,7 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
               activationTime={activationTime}
               curGestureList={curGestureList}
               ethGestureInfo={ethGestureInfo}
+              cstGestureData={cstGestureData}
               allocationTime={allocationTime}
               suppressPrimaryTimer
               attachedNFTCount={donatedNFTs.length}

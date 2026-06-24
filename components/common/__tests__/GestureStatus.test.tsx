@@ -7,12 +7,10 @@ import { GestureStatus } from '../GestureStatus';
 const mockCountdownProps: Array<Record<string, unknown>> = [];
 const mockUseCurrentTime = jest.fn().mockReturnValue({ data: undefined });
 const mockUseUserInfo = jest.fn().mockReturnValue({ data: undefined });
-const mockUseCTPrice = jest.fn().mockReturnValue({ data: undefined });
 
 jest.mock('../../../hooks/useApiQuery', () => ({
   useCurrentTime: (...args: unknown[]) => mockUseCurrentTime(...args),
   useUserInfo: (...args: unknown[]) => mockUseUserInfo(...args),
-  useCTPrice: (...args: unknown[]) => mockUseCTPrice(...args),
 }));
 
 jest.mock('../../../hooks/web3', () => ({
@@ -33,13 +31,6 @@ jest.mock('../Counter', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
   mockCountdownProps.length = 0;
-  mockUseCTPrice.mockReturnValue({
-    data: {
-      AuctionDuration: '43200',
-      CSTPrice: '1500000000000000000',
-      SecondsElapsed: '1200',
-    },
-  });
 });
 
 const baseProps = {
@@ -48,6 +39,16 @@ const baseProps = {
   activationTime: 0,
   curGestureList: [] as import('@/services/api').GestureInfo[],
   ethGestureInfo: null,
+  cstGestureData: {
+    AuctionDuration: 5400,
+    CSTPrice: 1.5,
+    CSTPriceWei: 1500000000000000000n,
+    SecondsElapsed: 1350,
+    isFree: false,
+    source: 'contract' as const,
+    apiAuctionDuration: 43200,
+    apiSecondsElapsed: 1200,
+  },
   allocationTime: 0,
 };
 
@@ -104,25 +105,49 @@ describe('GestureStatus', () => {
     expect(screen.queryByText('Last Participant')).not.toBeInTheDocument();
   });
 
-  it('shows CST gesture as free when API price is zero', () => {
-    mockUseCTPrice.mockReturnValueOnce({
-      data: {
-        AuctionDuration: '43200',
-        CSTPrice: '0',
-        SecondsElapsed: '1200',
-      },
-    });
-
+  it('shows CST gesture as free when merged CST data is free', () => {
     render(
       <GestureStatus
         {...baseProps}
         data={activeData as never}
         allocationTime={Date.now() + 60000}
         ethGestureInfo={{ ETHPrice: 0.01 }}
+        cstGestureData={{
+          ...baseProps.cstGestureData,
+          CSTPrice: 0,
+          CSTPriceWei: 0n,
+          isFree: true,
+        }}
       />,
     );
 
     expect(screen.getByText('FREE')).toBeInTheDocument();
+  });
+
+  it('shows compact CST Calibration Window progress from merged contract data', () => {
+    render(
+      <GestureStatus
+        {...baseProps}
+        data={activeData as never}
+        allocationTime={Date.now() + 60000}
+        ethGestureInfo={{ ETHPrice: 0.01 }}
+        cstGestureData={{
+          ...baseProps.cstGestureData,
+          AuctionDuration: 5400,
+          SecondsElapsed: 2700,
+          source: 'contract',
+          apiAuctionDuration: 43200,
+          apiSecondsElapsed: 1200,
+        }}
+      />,
+    );
+
+    expect(screen.getByText('CST Window')).toBeInTheDocument();
+    expect(screen.getByText('50%')).toBeInTheDocument();
+    expect(screen.getByText('Duration 1h 30m')).toBeInTheDocument();
+    expect(
+      screen.getByRole('progressbar', { name: 'CST Calibration Window progress' }),
+    ).toHaveAttribute('aria-valuenow', '50');
   });
 
   it('uses smooth countdown props for cycle finalization countdown', () => {

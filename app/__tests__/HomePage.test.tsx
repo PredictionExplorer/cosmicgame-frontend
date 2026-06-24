@@ -153,6 +153,14 @@ const mockGestureStatus = jest.fn((props: Record<string, unknown>) => (
     data-testid="gesture-status"
     data-attached-nft-count={String(props.attachedNFTCount ?? 0)}
     data-attached-erc20-count={String(props.attachedERC20Count ?? 0)}
+    data-cst-duration={String(
+      (props.cstGestureData as typeof mockGestureForm.cstGestureData | undefined)
+        ?.AuctionDuration ?? 0,
+    )}
+    data-cst-elapsed={String(
+      (props.cstGestureData as typeof mockGestureForm.cstGestureData | undefined)?.SecondsElapsed ??
+        0,
+    )}
   >
     GestureStatus
   </div>
@@ -471,6 +479,54 @@ describe('HomePage', () => {
     });
     render(<HomePage />);
     expect(screen.getByTestId('gesture-status')).toBeInTheDocument();
+  });
+
+  it('passes merged CST gesture data into GestureStatus', () => {
+    const cstGestureData = {
+      AuctionDuration: 5400,
+      CSTPrice: 2.5,
+      CSTPriceWei: 2500000000000000000n,
+      SecondsElapsed: 2700,
+      isFree: false,
+      source: 'contract' as const,
+      apiAuctionDuration: 43200,
+      apiSecondsElapsed: 1200,
+    };
+    Object.assign(mockGestureForm, { cstGestureData });
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    expect(mockGestureStatus).toHaveBeenCalledWith(expect.objectContaining({ cstGestureData }));
+    expect(screen.getByTestId('gesture-status')).toHaveAttribute('data-cst-duration', '5400');
+    expect(screen.getByTestId('gesture-status')).toHaveAttribute('data-cst-elapsed', '2700');
+  });
+
+  it('keeps merged CST data wired while rendering the disconnected preview path', () => {
+    mockAccount = null;
+    Object.assign(mockGestureForm, {
+      cstGestureData: {
+        AuctionDuration: 7200,
+        CSTPrice: 0,
+        CSTPriceWei: 0n,
+        SecondsElapsed: 7201,
+        isFree: true,
+        source: 'contract' as const,
+      },
+    });
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData(),
+      isLoading: false,
+    });
+
+    render(<HomePage />);
+
+    expect(screen.getByTestId('gesture-form')).toHaveAttribute('data-preview', 'true');
+    expect(screen.getByTestId('gesture-status')).toHaveAttribute('data-cst-duration', '7200');
+    expect(screen.getByTestId('gesture-status')).toHaveAttribute('data-cst-elapsed', '7201');
   });
 
   it('renders current-cycle gesture messages in the chat panel', () => {

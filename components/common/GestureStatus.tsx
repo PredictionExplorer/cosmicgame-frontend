@@ -5,15 +5,15 @@ import { zeroAddress } from 'viem';
 import { Trophy, Coins, Zap, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import { convertTimestampToDateTime } from '@/utils';
+import { convertTimestampToDateTime, formatSeconds } from '@/utils';
 
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { useActiveWeb3React } from '@/hooks/web3';
 import type { DashboardInfo, GestureInfo } from '@/services/api';
-import { useUserInfo, useCTPrice } from '@/hooks/useApiQuery';
+import { useUserInfo } from '@/hooks/useApiQuery';
 import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/utils';
-import { formatCstAmount, mapCTPriceInfo } from '@/utils/cstGesture';
+import { formatCstAmount, getCstAuctionProgress, type CstGestureData } from '@/utils/cstGesture';
 
 import Counter from './Counter';
 import { SmoothCountdown } from './SmoothCountdown';
@@ -35,6 +35,7 @@ interface GestureStatusProps {
   activationTime: number;
   curGestureList: GestureInfo[];
   ethGestureInfo: EthGestureInfo | null;
+  cstGestureData: CstGestureData;
   allocationTime: number;
   suppressPrimaryTimer?: boolean;
   attachedNFTCount?: number;
@@ -86,12 +87,14 @@ const gestureMetricTone: Record<
 function GestureMetricCard({
   label,
   value,
+  detail,
   icon,
   tooltip,
   tone,
 }: {
   label: string;
   value: ReactNode;
+  detail?: ReactNode;
   icon?: ReactNode;
   tooltip?: string;
   tone: GestureMetricTone;
@@ -133,6 +136,7 @@ function GestureMetricCard({
       >
         {value}
       </div>
+      {detail ? <div className="relative z-[1] mt-3">{detail}</div> : null}
     </div>
   );
 }
@@ -180,6 +184,7 @@ export const GestureStatus = ({
   activationTime,
   curGestureList,
   ethGestureInfo,
+  cstGestureData,
   allocationTime,
   suppressPrimaryTimer = false,
   attachedNFTCount = 0,
@@ -187,7 +192,6 @@ export const GestureStatus = ({
 }: GestureStatusProps) => {
   const { account } = useActiveWeb3React();
   const { data: userInfoRaw } = useUserInfo(account);
-  const { data: ctPriceRaw } = useCTPrice();
 
   const now = useNow(1000);
 
@@ -223,7 +227,7 @@ export const GestureStatus = ({
     attachedERC20Count,
   );
 
-  const cstGestureData = useMemo(() => mapCTPriceInfo(ctPriceRaw), [ctPriceRaw]);
+  const cstAuctionProgress = getCstAuctionProgress(cstGestureData);
 
   if (loading) return null;
 
@@ -344,6 +348,32 @@ export const GestureStatus = ({
                       cstGestureData.isFree
                         ? 'FREE'
                         : `${formatCstAmount(cstGestureData.CSTPrice)} CST`
+                    }
+                    detail={
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between gap-3 text-[11px]">
+                          <span className="text-muted-foreground">CST Window</span>
+                          <span className="font-mono tabular-nums text-[rgb(var(--impact-green-rgb))]">
+                            {cstAuctionProgress.percentCompleteRounded}%
+                          </span>
+                        </div>
+                        <div
+                          role="progressbar"
+                          aria-label="CST Calibration Window progress"
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-valuenow={cstAuctionProgress.percentCompleteRounded}
+                          className="h-1.5 overflow-hidden rounded-full bg-white/[0.08]"
+                        >
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-[rgb(var(--impact-green-rgb))] to-primary transition-all duration-500"
+                            style={{ width: `${cstAuctionProgress.percentComplete}%` }}
+                          />
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          Duration {formatSeconds(cstAuctionProgress.auctionDuration)}
+                        </p>
+                      </div>
                     }
                     icon={<Zap className="h-4 w-4" />}
                     tone="cst"

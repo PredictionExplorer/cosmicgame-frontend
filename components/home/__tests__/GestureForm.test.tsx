@@ -115,7 +115,33 @@ describe('GestureForm', () => {
 
   it('CST selection shows Calibration Window info', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" />);
-    expect(screen.getByText('Calibration Window Duration:')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'CST Calibration Window' })).toBeInTheDocument();
+    expect(screen.getByText('Dynamic Duration')).toBeInTheDocument();
+    expect(screen.getByText('50% complete')).toBeInTheDocument();
+    expect(
+      screen.getByRole('progressbar', { name: 'CST Calibration Window progress' }),
+    ).toHaveAttribute('aria-valuenow', '50');
+  });
+
+  it('shows first-gesture ETH Calibration Window copy before all methods unlock', () => {
+    render(
+      <GestureForm
+        {...defaultProps}
+        data={
+          {
+            LastBidderAddr: '0x0000000000000000000000000000000000000000',
+          } as Partial<DashboardInfo> as DashboardInfo
+        }
+        gestureType="ETH"
+      />,
+    );
+
+    expect(
+      screen.getByRole('region', { name: 'First Gesture Calibration Window' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('The first ETH gesture cost descends while this opening window progresses.'),
+    ).toBeInTheDocument();
   });
 
   it('CST selection shows reward preview and minimum accepted amount', () => {
@@ -395,6 +421,9 @@ describe('GestureForm', () => {
       screen.getByText('Calibration Window ended \u2014 you can gesture for free.'),
     ).toBeInTheDocument();
     expect(screen.getByText(/Using on-chain duration/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole('progressbar', { name: 'CST Calibration Window progress' }),
+    ).not.toBeInTheDocument();
   });
 
   it('marks the selected gesture method with aria-pressed', () => {

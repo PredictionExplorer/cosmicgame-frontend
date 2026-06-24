@@ -135,6 +135,8 @@ export function GestureForm({
         <AuctionInfo
           secondsElapsed={ethGestureInfo?.SecondsElapsed ?? 0}
           auctionDuration={ethGestureInfo?.AuctionDuration ?? 0}
+          title="First Gesture Calibration Window"
+          subtitle="The first ETH gesture cost descends while this opening window progresses."
         />
       )}
 
@@ -174,6 +176,8 @@ export function GestureForm({
           <AuctionInfo
             secondsElapsed={cstGestureData.SecondsElapsed}
             auctionDuration={cstGestureData.AuctionDuration}
+            title="CST Calibration Window"
+            subtitle="The CST gesture cost descends through this dynamic contract window."
             endedMessage="Calibration Window ended — you can gesture for free."
           />
         </div>
