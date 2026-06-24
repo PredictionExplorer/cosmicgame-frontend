@@ -24,6 +24,17 @@ export interface ChampionRoleState {
   hasLiveDetails?: boolean;
 }
 
+export interface ChronoChallengeState {
+  address: string | null;
+  duration?: number;
+  recordToBeat: number;
+  isLive: boolean;
+  isRecordHolder: boolean;
+  hasDetails: boolean;
+  startsGrowingIn?: number;
+  willStopGrowingIn?: number;
+}
+
 export interface LatestGestureState {
   address: string | null;
   holdDuration: number;
@@ -40,6 +51,7 @@ export interface ChampionsState {
   hasData: boolean;
   endurance: ChampionRoleState;
   chrono: ChampionRoleState;
+  chronoChallenge: ChronoChallengeState;
   lastCst: {
     address: string | null;
   };
@@ -183,23 +195,26 @@ export function deriveChampionsState({
     storedChronoDuration !== undefined &&
     sourceChronoSegmentDuration !== undefined &&
     sourceChronoSegmentDuration > storedChronoDuration;
+  const chronoChallengeAddress = effectiveEnduranceAddress;
+  const chronoChallengeIsRecordHolder = sameAddress(chronoChallengeAddress, chronoAddress);
   const chronoIsLive =
     hasChronoSegmentData &&
+    chronoChallengeIsRecordHolder &&
     chronoSegmentMatchesReturnedRecord &&
     (apiSaysChronoIsLive === true || chronoSegmentBeatsStoredRecord);
-  const canShowChronoSegmentDetails =
-    chronoIsLive ||
-    (hasChronoSegmentData && apiSaysChronoIsLive !== true && chronoSegmentIsBelowRecord);
-  const visibleChronoSegmentDuration = canShowChronoSegmentDetails
-    ? currentChronoSegmentDuration
-    : undefined;
+  const chronoChallengeHasDetails =
+    hasChronoSegmentData &&
+    chronoChallengeAddress !== null &&
+    sourceChronoSegmentDuration !== undefined &&
+    currentChronoSegmentDuration !== undefined;
+  const visibleChronoSegmentDuration = chronoIsLive ? currentChronoSegmentDuration : undefined;
   const chronoDuration =
     chronoIsLive && visibleChronoSegmentDuration !== undefined
       ? Math.max(chronoLockedDuration, visibleChronoSegmentDuration)
       : chronoLockedDuration;
-  const startsGrowingIn =
-    canShowChronoSegmentDetails && !chronoIsLive && visibleChronoSegmentDuration !== undefined
-      ? Math.max(0, chronoLockedDuration + 1 - visibleChronoSegmentDuration)
+  const chronoChallengeStartsGrowingIn =
+    chronoChallengeHasDetails && !chronoIsLive && chronoSegmentIsBelowRecord
+      ? Math.max(0, chronoLockedDuration + 1 - currentChronoSegmentDuration)
       : undefined;
   const willStopGrowingIn =
     chronoIsLive && durationToBeat > 0 ? Math.max(0, durationToBeat - holdDuration) : undefined;
@@ -222,9 +237,19 @@ export function deriveChampionsState({
       statusText: chronoStatusText,
       sourceText: sourceText(source),
       currentSegmentDuration: visibleChronoSegmentDuration,
-      startsGrowingIn,
+      startsGrowingIn: undefined,
       willStopGrowingIn,
-      hasLiveDetails: canShowChronoSegmentDetails,
+      hasLiveDetails: chronoIsLive,
+    },
+    chronoChallenge: {
+      address: chronoChallengeAddress,
+      duration: chronoChallengeHasDetails ? currentChronoSegmentDuration : undefined,
+      recordToBeat: chronoLockedDuration,
+      isLive: chronoIsLive,
+      isRecordHolder: chronoChallengeIsRecordHolder,
+      hasDetails: chronoChallengeHasDetails,
+      startsGrowingIn: chronoChallengeStartsGrowingIn,
+      willStopGrowingIn,
     },
     lastCst: {
       address: lastCstAddress,

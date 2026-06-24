@@ -40,9 +40,9 @@ This is enough to display:
 This is not enough to safely display:
 
 - Whether Chrono-Warrior is truly growing right now.
-- When Chrono-Warrior will start growing.
-- When a currently growing Chrono-Warrior segment will stop.
-- The current Chrono-Warrior reign segment duration.
+- When the active Endurance Champion's chrono challenge can overtake the standing record.
+- When a currently growing Chrono-Warrior segment can be closed by a new Endurance Champion.
+- The active Endurance Champion's current chrono challenge duration.
 - The age or gesture link for the Final CST Gesture.
 
 ## Contract Semantics
@@ -70,7 +70,18 @@ if chronoDuration > chronoWarriorDuration:
   current chrono duration = chronoDuration
 ```
 
-The key point: `ChronoWarriorAddress === EnduranceChampionAddress` does not prove that Chrono-Warrior is growing. The frontend also needs the current Chrono segment start and a source timestamp.
+The key point: `ChronoWarriorAddress === EnduranceChampionAddress` does not prove that
+Chrono-Warrior is growing. The frontend also needs the current Chrono segment start and a source
+timestamp.
+
+There are two separate concepts:
+
+- **Standing Chrono-Warrior record**: `ChronoWarriorAddress` and `ChronoWarriorDuration`.
+- **Active Endurance challenge**: the current Endurance Champion's chrono segment, derived from
+  `EnduranceChampionStartTimeStamp + PrevEnduranceChampionDuration`.
+
+If those addresses differ, the active challenge countdown must not be rendered as if it belongs to
+the standing Chrono-Warrior.
 
 ## Required API Additions
 
@@ -86,6 +97,12 @@ interface CurrentSpecialWinnersV2 {
   ChronoWarriorAddress: string;
   ChronoWarriorDuration: number;
   ChronoWarriorIsLive: boolean;
+
+  // Optional but preferred: explicit active challenge fields.
+  ChronoChallengeAddress?: string;
+  ChronoChallengeDuration?: number;
+  ChronoChallengeStartsGrowingIn?: number;
+  ChronoChallengeIsRecordHolder?: boolean;
 
   LastBidderAddress: string;
   LastBidderLastBidTime: number;
@@ -112,6 +129,13 @@ interface CurrentSpecialWinnersV2 {
 - `SourceBlockNumber`: useful for debugging and parity checks.
 - `LastCstBidderLastBidTime`: enables `Last CST gesture age`.
 - `LastCstBidEventLogId`: enables a link to the actual gesture record.
+- `ChronoChallengeAddress`: the Endurance Champion whose active segment is challenging the standing
+  Chrono record.
+- `ChronoChallengeDuration`: the active challenge duration at `SourceBlockTimeStamp`.
+- `ChronoChallengeStartsGrowingIn`: countdown until the active challenge can overtake or extend the
+  standing Chrono record.
+- `ChronoChallengeIsRecordHolder`: whether the active challenge address is also the standing
+  Chrono-Warrior address.
 
 ## Backend Computation
 
@@ -186,7 +210,7 @@ V2 additionally enables:
 - `Record segment started`
 - clearer explanation of same-wallet segment resets.
 
-### Chrono-Warrior
+### Chrono-Warrior Record
 
 Requires V2 fields:
 
@@ -201,9 +225,28 @@ currentChronoSegmentDuration =
 Display:
 
 - `Growing now` if `ChronoWarriorIsLive` is true.
-- `Starts growing in X` if the current segment has not beaten `ChronoWarriorDuration`.
 - `Will stop growing in X` if Chrono is live and the latest bidder is approaching an Endurance record transition that would close the current Chrono segment.
-- `Current reign segment`.
+- `Record-growing segment` only when the standing Chrono-Warrior is also the active Endurance
+  challenge.
+
+### Active Endurance Challenge
+
+Requires V2 fields:
+
+```text
+chronoChallengeAddress = EnduranceChampionAddress
+chronoChallengeDuration = now - chronoSegmentStart
+chronoChallengeStartsGrowingIn =
+  ChronoWarriorDuration + 1 - chronoChallengeDuration
+```
+
+Display this separately from the Chrono-Warrior record when `chronoChallengeAddress !=
+ChronoWarriorAddress`:
+
+- `Active Endurance challenge`.
+- `Challenge segment`.
+- `Can overtake in X` if another address is challenging the standing Chrono-Warrior.
+- `Can extend in X` if the standing Chrono-Warrior is building a new segment below its own record.
 
 ### Final CST Gesture
 

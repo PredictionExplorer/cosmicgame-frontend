@@ -57,6 +57,9 @@ describe('deriveChampionsState', () => {
     expect(state.endurance.address).toBeNull();
     expect(state.endurance.duration).toBe(0);
     expect(state.chrono.address).toBeNull();
+    expect(state.chronoChallenge.address).toBeNull();
+    expect(state.chronoChallenge.recordToBeat).toBe(0);
+    expect(state.chronoChallenge.hasDetails).toBe(false);
     expect(state.lastCst.address).toBeNull();
     expect(state.latestGesture.durationToBeat).toBe(0);
     expect(state.latestGesture.secondsUntilEnduranceChampion).toBe(0);
@@ -216,6 +219,9 @@ describe('deriveChampionsState', () => {
     expect(state.chrono.duration).toBe(50);
     expect(state.chrono.statusText).toBe('Record standing');
     expect(state.chrono.startsGrowingIn).toBeUndefined();
+    expect(state.chronoChallenge.address).toBe(baseSnapshot.EnduranceChampionAddress);
+    expect(state.chronoChallenge.hasDetails).toBe(false);
+    expect(state.chronoChallenge.startsGrowingIn).toBeUndefined();
   });
 
   it('marks chrono live only when source-backed segment duration beats the record', () => {
@@ -242,6 +248,11 @@ describe('deriveChampionsState', () => {
     expect(liveState.chrono.duration).toBe(105);
     expect(liveState.chrono.currentSegmentDuration).toBe(105);
     expect(liveState.chrono.sourceText).toBe('Chain verified');
+    expect(liveState.chronoChallenge.address).toBe(baseSnapshot.EnduranceChampionAddress);
+    expect(liveState.chronoChallenge.isLive).toBe(true);
+    expect(liveState.chronoChallenge.isRecordHolder).toBe(true);
+    expect(liveState.chronoChallenge.duration).toBe(105);
+    expect(liveState.chronoChallenge.startsGrowingIn).toBeUndefined();
   });
 
   it('keeps the returned chrono owner when storage segment fields describe an outgoing champion', () => {
@@ -278,6 +289,12 @@ describe('deriveChampionsState', () => {
     expect(state.chrono.isLive).toBe(false);
     expect(state.chrono.currentSegmentDuration).toBeUndefined();
     expect(state.chrono.hasLiveDetails).toBe(false);
+    expect(state.chrono.startsGrowingIn).toBeUndefined();
+    expect(state.chronoChallenge.address).toBe(liveEndurance);
+    expect(state.chronoChallenge.isRecordHolder).toBe(false);
+    expect(state.chronoChallenge.isLive).toBe(false);
+    expect(state.chronoChallenge.duration).toBe(7990);
+    expect(state.chronoChallenge.startsGrowingIn).toBeUndefined();
   });
 
   it('keeps chrono ownership on the authoritative returned recipient when the segment wins', () => {
@@ -309,6 +326,10 @@ describe('deriveChampionsState', () => {
     expect(state.chrono.address).toBe(challenger);
     expect(state.chrono.isLive).toBe(true);
     expect(state.chrono.currentSegmentDuration).toBe(300);
+    expect(state.chronoChallenge.address).toBe(challenger);
+    expect(state.chronoChallenge.isRecordHolder).toBe(true);
+    expect(state.chronoChallenge.isLive).toBe(true);
+    expect(state.chronoChallenge.duration).toBe(300);
   });
 
   it('shows when chrono starts growing if the source-backed segment is below record', () => {
@@ -327,8 +348,11 @@ describe('deriveChampionsState', () => {
 
     expect(state.chrono.isLive).toBe(false);
     expect(state.chrono.duration).toBe(50);
-    expect(state.chrono.currentSegmentDuration).toBe(40);
-    expect(state.chrono.startsGrowingIn).toBe(11);
+    expect(state.chrono.currentSegmentDuration).toBeUndefined();
+    expect(state.chrono.startsGrowingIn).toBeUndefined();
+    expect(state.chronoChallenge.duration).toBe(40);
+    expect(state.chronoChallenge.startsGrowingIn).toBe(11);
+    expect(state.chronoChallenge.isLive).toBe(false);
   });
 
   it('compares addresses case-insensitively', () => {
@@ -364,6 +388,8 @@ describe('deriveChampionsState', () => {
     expect(state.endurance.isLive).toBe(false);
     expect(state.chrono.address).toBeNull();
     expect(state.chrono.isLive).toBe(false);
+    expect(state.chronoChallenge.address).toBeNull();
+    expect(state.chronoChallenge.hasDetails).toBe(false);
     expect(state.latestGesture.address).toBeNull();
     expect(state.latestGesture.durationToBeat).toBe(0);
     expect(state.latestGesture.secondsUntilEnduranceChampion).toBe(0);

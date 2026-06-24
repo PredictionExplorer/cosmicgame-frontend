@@ -28,6 +28,13 @@ const baseChampions: ChampionsState = {
     sourceText: 'Snapshot only',
     hasLiveDetails: false,
   },
+  chronoChallenge: {
+    address: enduranceAddress,
+    recordToBeat: 1800,
+    isLive: false,
+    isRecordHolder: false,
+    hasDetails: false,
+  },
   lastCst: {
     address: lastCstAddress,
   },
@@ -281,9 +288,10 @@ describe('SpecialAllocationRecipients', () => {
     const chronoCard = screen.getByTestId('special-allocation-card-chrono-warrior');
     expect(chronoCard).not.toHaveTextContent('Snapshot only');
     expect(chronoCard).not.toHaveTextContent('Source');
-    expect(chronoCard).toHaveTextContent('Confirmed duration; no local growth inferred');
+    expect(chronoCard).toHaveTextContent('Standing Chrono-Warrior record');
     expect(chronoCard).toHaveTextContent('Chrono Reign');
     expect(chronoCard).not.toHaveTextContent('Live - growing');
+    expect(screen.queryByTestId('chrono-active-challenge')).not.toBeInTheDocument();
   });
 
   it('shows source-backed chrono growth details', () => {
@@ -298,6 +306,15 @@ describe('SpecialAllocationRecipients', () => {
         currentSegmentDuration: 1900,
         willStopGrowingIn: 300,
       },
+      chronoChallenge: {
+        address: chronoAddress,
+        duration: 1900,
+        recordToBeat: 1800,
+        isLive: true,
+        isRecordHolder: true,
+        hasDetails: true,
+        willStopGrowingIn: 300,
+      },
       source: 'api-v1+chain',
     });
 
@@ -307,19 +324,30 @@ describe('SpecialAllocationRecipients', () => {
     expect(chronoCard).toHaveTextContent('Growing now');
     expect(chronoCard).not.toHaveTextContent('Chain verified');
     expect(screen.getByTestId('chrono-current-segment')).toHaveTextContent('31m 40s');
+    expect(screen.getByTestId('chrono-current-segment')).toHaveTextContent(
+      'Record-growing segment',
+    );
     expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('May close in');
     expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('5m');
+    expect(screen.queryByTestId('chrono-active-challenge')).not.toBeInTheDocument();
   });
 
-  it('shows chrono start countdown when source-backed segment is below record', () => {
+  it('shows active Endurance challenge countdown outside the standing Chrono record', () => {
     mockUseChampions.mockReturnValue({
       ...baseChampions,
       chrono: {
         ...baseChampions.chrono,
         statusText: 'Record standing',
         sourceText: 'API confirmed',
-        hasLiveDetails: true,
-        currentSegmentDuration: 1200,
+        hasLiveDetails: false,
+      },
+      chronoChallenge: {
+        address: enduranceAddress,
+        duration: 1200,
+        recordToBeat: 1800,
+        isLive: false,
+        isRecordHolder: false,
+        hasDetails: true,
         startsGrowingIn: 601,
       },
       source: 'api-v2',
@@ -328,8 +356,45 @@ describe('SpecialAllocationRecipients', () => {
     render(<SpecialAllocationRecipients />);
 
     expect(screen.queryByTestId('chrono-source-status')).not.toBeInTheDocument();
-    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('Starts growing in');
-    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('10m 1s');
+    expect(screen.getByTestId('chrono-next-change')).toHaveTextContent('Record status');
+    expect(screen.getByTestId('chrono-next-change')).not.toHaveTextContent('Starts growing in');
+    expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(
+      'Active Endurance Challenge',
+    );
+    expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(enduranceAddress);
+    expect(screen.getByTestId('chrono-challenge-segment')).toHaveTextContent('20m');
+    expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent('Can overtake in');
+    expect(screen.getByTestId('chrono-challenge-next-change')).toHaveTextContent('10m 1s');
+    expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(
+      'not necessarily the standing Chrono-Warrior',
+    );
+  });
+
+  it('keeps the active Endurance challenge panel accessible', async () => {
+    mockUseChampions.mockReturnValue({
+      ...baseChampions,
+      chrono: {
+        ...baseChampions.chrono,
+        hasLiveDetails: false,
+      },
+      chronoChallenge: {
+        address: enduranceAddress,
+        duration: 1200,
+        recordToBeat: 1800,
+        isLive: false,
+        isRecordHolder: false,
+        hasDetails: true,
+        startsGrowingIn: 601,
+      },
+      source: 'api-v2',
+    });
+
+    const { container } = render(<SpecialAllocationRecipients />);
+
+    expect(screen.getByTestId('chrono-active-challenge')).toHaveTextContent(
+      'Active Endurance Challenge',
+    );
+    await checkA11y(container);
   });
 
   it('does not render a live or locked timer badge on the Final CST card', () => {
@@ -357,6 +422,12 @@ describe('SpecialAllocationRecipients', () => {
       },
       endurance: { ...baseChampions.endurance, address: null, duration: 0, isLive: false },
       chrono: { ...baseChampions.chrono, address: null, duration: 0, isLive: false },
+      chronoChallenge: {
+        ...baseChampions.chronoChallenge,
+        address: null,
+        duration: undefined,
+        hasDetails: false,
+      },
       lastCst: { address: null },
     });
 

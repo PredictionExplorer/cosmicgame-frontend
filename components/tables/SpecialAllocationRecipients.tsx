@@ -397,16 +397,16 @@ function LatestGestureDetails({
   );
 }
 
-function ChronoWarriorDetails({ chrono }: { chrono: ChampionsState['chrono'] }) {
+function ChronoWarriorDetails({
+  chrono,
+  challenge,
+}: {
+  chrono: ChampionsState['chrono'];
+  challenge: ChampionsState['chronoChallenge'];
+}) {
   if (!chrono.address) return null;
 
   const nextMetric = (() => {
-    if (!chrono.hasLiveDetails) {
-      return {
-        label: 'Record status',
-        value: 'Confirmed duration; no local growth inferred',
-      };
-    }
     if (chrono.isLive) {
       return chrono.willStopGrowingIn !== undefined && chrono.willStopGrowingIn > 0
         ? {
@@ -416,13 +416,13 @@ function ChronoWarriorDetails({ chrono }: { chrono: ChampionsState['chrono'] }) 
         : { label: 'Status', value: 'Growing now' };
     }
     return {
-      label: 'Starts growing in',
-      value:
-        chrono.startsGrowingIn !== undefined
-          ? formatSeconds(chrono.startsGrowingIn)
-          : 'Waiting for current reign to beat the record',
+      label: 'Record status',
+      value: 'Standing Chrono-Warrior record',
     };
   })();
+
+  const showChallenge = challenge.hasDetails && !challenge.isLive;
+  const challengeVerb = challenge.isRecordHolder ? 'extend' : 'overtake';
 
   return (
     <div
@@ -435,10 +435,10 @@ function ChronoWarriorDetails({ chrono }: { chrono: ChampionsState['chrono'] }) 
           Chrono Reign
         </p>
       </div>
-      {chrono.currentSegmentDuration !== undefined && (
+      {chrono.isLive && chrono.currentSegmentDuration !== undefined && (
         <DetailMetric
           testId="chrono-current-segment"
-          label="Current reign segment"
+          label="Record-growing segment"
           value={formatSeconds(chrono.currentSegmentDuration)}
           tone="primary"
         />
@@ -450,9 +450,48 @@ function ChronoWarriorDetails({ chrono }: { chrono: ChampionsState['chrono'] }) 
         tone={chrono.isLive ? 'emerald' : 'primary'}
       />
       <p className="text-[11px] leading-relaxed text-muted-foreground">
-        Chrono-Warrior measures continuous time as Endurance Champion. The same wallet can start a
-        new segment after beating its own Endurance record.
+        Chrono-Warrior is the standing record for continuous time as Endurance Champion.
       </p>
+      {showChallenge && (
+        <div
+          data-testid="chrono-active-challenge"
+          className="mt-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.045] p-3"
+        >
+          <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-300">
+            Active Endurance Challenge
+          </p>
+          {challenge.address && (
+            <a
+              href={`/user/${challenge.address}`}
+              className="mt-2 block break-all font-mono text-xs text-foreground transition-colors hover:text-primary"
+            >
+              {challenge.address}
+            </a>
+          )}
+          {challenge.duration !== undefined && (
+            <DetailMetric
+              testId="chrono-challenge-segment"
+              label="Challenge segment"
+              value={formatSeconds(challenge.duration)}
+              tone="emerald"
+            />
+          )}
+          <DetailMetric
+            testId="chrono-challenge-next-change"
+            label={challenge.isRecordHolder ? 'Can extend in' : 'Can overtake in'}
+            value={
+              challenge.startsGrowingIn !== undefined
+                ? formatSeconds(challenge.startsGrowingIn)
+                : `Waiting to ${challengeVerb} the Chrono record`
+            }
+            tone="emerald"
+          />
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            This countdown belongs to the current Endurance Champion, not necessarily the standing
+            Chrono-Warrior.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -596,7 +635,9 @@ export const SpecialAllocationRecipients = ({
       statusText: champions.chrono.statusText,
       emptyText: 'No Chrono-Warrior record yet',
       accent: 'primary',
-      extra: <ChronoWarriorDetails chrono={champions.chrono} />,
+      extra: (
+        <ChronoWarriorDetails chrono={champions.chrono} challenge={champions.chronoChallenge} />
+      ),
     },
     {
       key: 'lastcst',
