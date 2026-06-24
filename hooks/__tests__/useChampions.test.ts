@@ -280,7 +280,7 @@ describe('deriveChampionsState', () => {
     expect(state.chrono.hasLiveDetails).toBe(false);
   });
 
-  it('keeps chrono ownership on the authoritative returned winner when the segment wins', () => {
+  it('keeps chrono ownership on the authoritative returned recipient when the segment wins', () => {
     const challenger = '0x3333333333333333333333333333333333333333';
     const state = deriveChampionsState({
       data: snapshot(
