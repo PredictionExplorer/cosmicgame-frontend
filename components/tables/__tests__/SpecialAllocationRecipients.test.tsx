@@ -224,7 +224,7 @@ describe('SpecialAllocationRecipients', () => {
     expect(details).toHaveTextContent('NFT + ERC20');
   });
 
-  it('hides attached assets for sentinel NFT donation IDs without a token attachment', () => {
+  it('hides attached assets for sentinel NFT attachment IDs without a token attachment', () => {
     render(
       <SpecialAllocationRecipients
         latestGesture={makeLatestGesture({
