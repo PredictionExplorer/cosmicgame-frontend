@@ -80,7 +80,7 @@ describe('cstGesture utilities', () => {
     expect(result.CSTPriceWei).toBe(0n);
   });
 
-  it('calculates auction progress for dynamic durations', () => {
+  it('calculates calibration progress for dynamic durations', () => {
     expect(
       getCstAuctionProgress({
         AuctionDuration: 5400,
