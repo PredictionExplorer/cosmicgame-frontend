@@ -187,6 +187,8 @@ export function useGestureListByCycle(round: number, sortDir: string = 'desc') {
     queryFn: () => api.get_bid_list_by_round(round, sortDir),
     enabled: !scenario && round >= 0,
     staleTime: 15_000,
+    refetchInterval: 10_000,
+    refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
   });
   return withUxScenarioData(query, scenario?.gestures, scenario?.createdAtMs);
@@ -831,6 +833,7 @@ export function useDonationsNFTByRound(round: number) {
     queryFn: () => api.get_donations_nft_by_round(round),
     enabled: !scenario && round >= 0,
     staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
   return withUxScenarioData(query, scenario?.donationsNft, scenario?.createdAtMs);
 }
@@ -864,6 +867,7 @@ export function useDonationsERC20ByRound(round: number) {
     queryFn: () => api.get_donations_erc20_by_round(round),
     enabled: !scenario && round >= 0,
     staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
   return withUxScenarioData(query, scenario?.donationsErc20, scenario?.createdAtMs);
 }

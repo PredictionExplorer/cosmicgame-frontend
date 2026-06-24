@@ -362,6 +362,16 @@ describe('useApiQuery hooks', () => {
       renderHook(() => useGestureListByCycle(0));
       expect(mockUseQuery.mock.calls[0][0].enabled).toBe(true);
     });
+
+    it('polls active-cycle gestures so passive viewers see new chat and ticker entries', () => {
+      renderHook(() => useGestureListByCycle(0));
+
+      const options = getOptions();
+      expect(options.staleTime).toBe(15_000);
+      expect(options.refetchInterval).toBe(10_000);
+      expect(options.refetchIntervalInBackground).toBe(false);
+      expect(options.refetchOnWindowFocus).toBe(true);
+    });
   });
 
   describe('useCurrentSpecialRecipients', () => {
@@ -1411,6 +1421,11 @@ describe('useApiQuery hooks', () => {
       renderHook(() => useDonationsNFTByRound(0));
       expect(getOptions().enabled).toBe(true);
     });
+
+    it('refreshes attached NFT prize context on window focus', () => {
+      renderHook(() => useDonationsNFTByRound(0));
+      expect(getOptions().refetchOnWindowFocus).toBe(true);
+    });
   });
 
   describe('useDonationsNFTUnclaimedByRound', () => {
@@ -1459,6 +1474,11 @@ describe('useApiQuery hooks', () => {
     it('is enabled for round >= 0', () => {
       renderHook(() => useDonationsERC20ByRound(0));
       expect(getOptions().enabled).toBe(true);
+    });
+
+    it('refreshes attached ERC20 prize context on window focus', () => {
+      renderHook(() => useDonationsERC20ByRound(0));
+      expect(getOptions().refetchOnWindowFocus).toBe(true);
     });
   });
 

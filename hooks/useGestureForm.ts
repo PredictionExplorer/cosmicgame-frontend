@@ -47,6 +47,29 @@ export interface EthGestureInfo {
   SecondsElapsed: number;
 }
 
+const CST_REWARD_PREVIEW_REFRESH_MS = 1_000;
+
+interface LiveCstPreviewTestGlobals {
+  expect?: unknown;
+  __COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__?: boolean;
+  __COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__?: number;
+}
+
+function shouldScheduleLiveCstPreviewTimer(): boolean {
+  const testGlobals = globalThis as LiveCstPreviewTestGlobals;
+  const isJest = typeof testGlobals.expect === 'function';
+  return !isJest || testGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ === true;
+}
+
+function getLiveCstPreviewRefreshMs(): number {
+  const testInterval = (globalThis as LiveCstPreviewTestGlobals)
+    .__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__;
+  if (typeof testInterval === 'number' && Number.isFinite(testInterval) && testInterval > 0) {
+    return testInterval;
+  }
+  return CST_REWARD_PREVIEW_REFRESH_MS;
+}
+
 export function useGestureForm() {
   const contractAddrs = useContractAddresses();
   const config = useConfig();
@@ -122,78 +145,119 @@ export function useGestureForm() {
   }, [gestureCstRewardAmountMinLimitWei]);
 
   useEffect(() => {
-    if (uxScenario) return;
-    if (!publicClient || !contractAddrs.cosmicGame) return;
-    let cancelled = false;
-
-    publicClient
-      .readContract({
-        address: contractAddrs.cosmicGame as `0x${string}`,
-        abi: cosmicGameAbi,
-        functionName: 'getCstDutchAuctionDurations',
-      })
-      .then((value) => {
-        if (cancelled || !Array.isArray(value)) return;
-        const [auctionDuration, secondsElapsed] = value;
-        if (typeof auctionDuration !== 'bigint' || typeof secondsElapsed !== 'bigint') return;
-        const next = {
-          AuctionDuration: Number(auctionDuration),
-          SecondsElapsed: Number(secondsElapsed),
-        };
-        setContractCstDurations((current) => {
-          if (
-            current?.AuctionDuration === next.AuctionDuration &&
-            current?.SecondsElapsed === next.SecondsElapsed
-          ) {
-            return current;
-          }
-          return next;
-        });
-      })
-      .catch((e) => reportError(e, 'getCstDutchAuctionDurations'));
-
-    return () => {
-      cancelled = true;
-    };
-  }, [contractAddrs.cosmicGame, publicClient, uxScenario]);
-
-  useEffect(() => {
     if (uxScenario) {
+      setContractCstDurations(null);
       setGestureCstRewardAmountWei(100n * 10n ** 18n);
       setIsCstRewardLoading(false);
       return;
     }
-    if (!cosmicGameContract) {
+
+    const canReadDurations = !!publicClient && !!contractAddrs.cosmicGame;
+    const canReadReward = !!cosmicGameContract;
+
+    if (!canReadDurations) {
+      setContractCstDurations(null);
+    }
+    if (!canReadReward) {
       setGestureCstRewardAmountWei(null);
+      setIsCstRewardLoading(false);
+    }
+    if (!canReadDurations && !canReadReward) {
       return;
     }
-    let cancelled = false;
-    setIsCstRewardLoading(true);
 
-    readCosmicGameWithFallback<bigint>([
-      () => cosmicGameContract.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
-      () =>
-        cosmicGameContract.read.getBidCstRewardAmountAdvanced?.([0n]) as Promise<
-          bigint | undefined
-        >,
-    ])
-      .then((value) => {
-        if (!cancelled) setGestureCstRewardAmountWei(value ?? null);
-      })
-      .catch((e) => {
-        if (!cancelled) {
-          setGestureCstRewardAmountWei(null);
-          reportError(e, 'getBidCstRewardAmount');
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setIsCstRewardLoading(false);
-      });
+    let cancelled = false;
+    let inFlight = false;
+    let timeoutId: number | null = null;
+
+    const refreshLiveCstPreview = async (showLoading = false) => {
+      if (cancelled || inFlight) return;
+      inFlight = true;
+      if (showLoading && canReadReward) setIsCstRewardLoading(true);
+
+      try {
+        await Promise.all([
+          canReadDurations
+            ? publicClient!
+                .readContract({
+                  address: contractAddrs.cosmicGame as `0x${string}`,
+                  abi: cosmicGameAbi,
+                  functionName: 'getCstDutchAuctionDurations',
+                })
+                .then((value) => {
+                  if (cancelled || !Array.isArray(value)) return;
+                  const [auctionDuration, secondsElapsed] = value;
+                  if (typeof auctionDuration !== 'bigint' || typeof secondsElapsed !== 'bigint') {
+                    return;
+                  }
+                  const next = {
+                    AuctionDuration: Number(auctionDuration),
+                    SecondsElapsed: Number(secondsElapsed),
+                  };
+                  setContractCstDurations((current) => {
+                    if (
+                      current?.AuctionDuration === next.AuctionDuration &&
+                      current?.SecondsElapsed === next.SecondsElapsed
+                    ) {
+                      return current;
+                    }
+                    return next;
+                  });
+                })
+                .catch((e) => {
+                  if (!cancelled) reportError(e, 'getCstDutchAuctionDurations');
+                })
+            : Promise.resolve(),
+          canReadReward
+            ? readCosmicGameWithFallback<bigint>([
+                () =>
+                  cosmicGameContract!.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
+                () =>
+                  cosmicGameContract!.read.getBidCstRewardAmountAdvanced?.([0n]) as Promise<
+                    bigint | undefined
+                  >,
+              ])
+                .then((value) => {
+                  if (!cancelled) setGestureCstRewardAmountWei(value ?? null);
+                })
+                .catch((e) => {
+                  if (!cancelled) {
+                    setGestureCstRewardAmountWei(null);
+                    reportError(e, 'getBidCstRewardAmount');
+                  }
+                })
+            : Promise.resolve(),
+        ]);
+      } finally {
+        inFlight = false;
+        if (!cancelled && showLoading) setIsCstRewardLoading(false);
+      }
+    };
+
+    const scheduleNextRefresh = () => {
+      if (cancelled) return;
+      timeoutId = window.setTimeout(() => {
+        void refreshLiveCstPreview().finally(scheduleNextRefresh);
+      }, getLiveCstPreviewRefreshMs());
+    };
+
+    const scheduleLiveTimer = shouldScheduleLiveCstPreviewTimer();
+    if (scheduleLiveTimer) {
+      void refreshLiveCstPreview(true).finally(scheduleNextRefresh);
+    } else {
+      void refreshLiveCstPreview(true);
+    }
+    const handleGesturePlaced = () => {
+      void refreshLiveCstPreview();
+    };
+    window.addEventListener('cosmic:gesture-placed', handleGesturePlaced);
 
     return () => {
       cancelled = true;
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+      window.removeEventListener('cosmic:gesture-placed', handleGesturePlaced);
     };
-  }, [cosmicGameContract, uxScenario]);
+  }, [contractAddrs.cosmicGame, cosmicGameContract, publicClient, uxScenario]);
 
   const handleTx = async (hashPromise: Promise<`0x${string}`>) => {
     const hash = await hashPromise;

@@ -38,6 +38,12 @@ describe('invalidateLiveGameQueries', () => {
     expect(queryClient.invalidateQueries).toHaveBeenCalledTimes(LIVE_GAME_QUERY_KEYS.length);
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['dashboardInfo'] });
     expect(queryClient.invalidateQueries).toHaveBeenCalledWith({ queryKey: ['bidListByRound'] });
+    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['donationsNFTByRound'],
+    });
+    expect(queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: ['donationsERC20ByRound'],
+    });
   });
 });
 

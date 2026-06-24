@@ -127,6 +127,46 @@ describe('GestureForm', () => {
     expect(screen.queryByText(/Protection 2:/)).not.toBeInTheDocument();
   });
 
+  it('shows a loading state while the live CST reward preview is refreshing', () => {
+    render(<GestureForm {...defaultProps} gestureType="CST" isCstRewardLoading />);
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
+  });
+
+  it('shows a placeholder when the live CST reward preview is unavailable', () => {
+    render(
+      <GestureForm
+        {...defaultProps}
+        gestureType="CST"
+        gestureCstRewardAmount={null}
+        gestureCstRewardAmountMin={null}
+      />,
+    );
+
+    expect(screen.getByText('-- CST')).toBeInTheDocument();
+    expect(screen.getByText('Min accepted: -- CST')).toBeInTheDocument();
+  });
+
+  it('updates displayed CST reward preview values when live props change', () => {
+    const { rerender } = render(<GestureForm {...defaultProps} gestureType="CST" />);
+
+    expect(screen.getByText('100 CST')).toBeInTheDocument();
+    expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
+
+    rerender(
+      <GestureForm
+        {...defaultProps}
+        gestureType="CST"
+        gestureCstRewardAmount={125}
+        gestureCstRewardAmountMin={123.75}
+      />,
+    );
+
+    expect(screen.getByText('125 CST')).toBeInTheDocument();
+    expect(screen.getByText('Min accepted: 123.75 CST')).toBeInTheDocument();
+    expect(screen.queryByText('100 CST')).not.toBeInTheDocument();
+  });
+
   it('hides gesture protections before the first gesture unlocks all methods', () => {
     render(
       <GestureForm

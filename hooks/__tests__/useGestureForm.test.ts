@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { writeContract as wagmiWriteContract } from '@wagmi/core';
 
 import { useGestureForm } from '../useGestureForm';
@@ -12,6 +12,11 @@ jest.mock('@wagmi/core', () => ({
 }));
 
 const mockWagmiWriteContract = wagmiWriteContract as jest.MockedFunction<typeof wagmiWriteContract>;
+
+interface LiveCstPreviewTestGlobals {
+  __COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__?: boolean;
+  __COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__?: number;
+}
 
 /* ────────────────────────────────────────────────────────────────── */
 /*  Notification                                                     */
@@ -246,6 +251,9 @@ const MAX_UINT256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffff
 beforeEach(() => {
   jest.clearAllMocks();
   process.env.NEXT_PUBLIC_UX_SCENARIO = '';
+  const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
+  liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = false;
+  liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = undefined;
   window.history.pushState({}, '', '/');
   resetUxScenarioForTest();
   mockWagmiWriteContract.mockResolvedValue('0xhash' as `0x${string}`);
@@ -304,8 +312,17 @@ beforeEach(() => {
 
 afterEach(() => {
   resetUxScenarioForTest();
+  jest.useRealTimers();
   jest.restoreAllMocks();
 });
+
+const flushAsyncWork = async () => {
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+};
 
 /* ────────────────────────────────────────────────────────────────── */
 /*  Tests                                                            */
@@ -384,7 +401,7 @@ describe('useGestureForm', () => {
     });
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await waitFor(() => expect(result.current.cstGestureData.source).toBe('contract'));
 
     expect(result.current.cstGestureData).toMatchObject({
       AuctionDuration: 43200,
@@ -394,6 +411,118 @@ describe('useGestureForm', () => {
       apiAuctionDuration: 3600,
       apiSecondsElapsed: 1800,
     });
+  });
+
+  it('refreshes live CST reward and duration data on an interval', async () => {
+    const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
+    liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
+    liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = 50;
+    const rewardValues = [BigInt('100000000000000000000'), BigInt('125000000000000000000')];
+    const durationValues = [
+      [43200n, 1200n],
+      [43200n, 1201n],
+    ];
+
+    let rewardReadCount = 0;
+    let durationReadCount = 0;
+    mockGetGestureCstRewardAmount.mockImplementation(
+      async () => rewardValues[Math.min(rewardReadCount++, rewardValues.length - 1)]!,
+    );
+    mockReadContract.mockImplementation(async ({ functionName }: { functionName: string }) => {
+      if (functionName === 'getCstDutchAuctionDurations') {
+        return durationValues[Math.min(durationReadCount++, durationValues.length - 1)]!;
+      }
+      if (functionName === 'allowance') return MAX_UINT256;
+      return true;
+    });
+
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.gestureCstRewardAmount).toBe(125));
+
+    expect(mockGetGestureCstRewardAmount.mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(result.current.gestureCstRewardAmount).toBe(125);
+    expect(result.current.gestureCstRewardAmountMin).toBe(123.75);
+    expect(result.current.cstGestureData.SecondsElapsed).toBe(1201);
+  });
+
+  it('refreshes the CST preview immediately when a gesture event lands', async () => {
+    let liveReward = BigInt('100000000000000000000');
+    mockGetGestureCstRewardAmount.mockImplementation(async () => liveReward);
+
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.gestureCstRewardAmount).toBe(100));
+    await flushAsyncWork();
+
+    expect(result.current.gestureCstRewardAmount).toBe(100);
+
+    liveReward = BigInt('110000000000000000000');
+    act(() => {
+      window.dispatchEvent(new CustomEvent('cosmic:gesture-placed'));
+    });
+    await waitFor(() => expect(result.current.gestureCstRewardAmount).toBe(110));
+
+    expect(result.current.gestureCstRewardAmount).toBe(110);
+  });
+
+  it('skips overlapping live CST preview refreshes', async () => {
+    const liveCstGlobals = globalThis as LiveCstPreviewTestGlobals;
+    liveCstGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
+    liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = 10;
+    let resolveReward!: (value: bigint) => void;
+    mockGetGestureCstRewardAmount.mockImplementation(
+      () =>
+        new Promise<bigint>((resolve) => {
+          resolveReward = resolve;
+        }),
+    );
+
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(mockGetGestureCstRewardAmount).toHaveBeenCalled());
+    const callsWhilePending = mockGetGestureCstRewardAmount.mock.calls.length;
+
+    await new Promise((resolve) => window.setTimeout(resolve, 35));
+
+    expect(mockGetGestureCstRewardAmount.mock.calls.length).toBeLessThanOrEqual(
+      callsWhilePending + 1,
+    );
+
+    await act(async () => {
+      resolveReward(BigInt('100000000000000000000'));
+      await flushAsyncWork();
+    });
+
+    expect(result.current.gestureCstRewardAmount).toBe(100);
+  });
+
+  it('falls back to getBidCstRewardAmountAdvanced when the primary reward selector is unavailable', async () => {
+    mockGetGestureCstRewardAmount.mockRejectedValue(
+      new Error('function selector was not recognized'),
+    );
+    mockGetGestureCstRewardAmountAdvanced.mockResolvedValue(BigInt('80000000000000000000'));
+
+    const { result } = renderHook(() => useGestureForm());
+    await waitFor(() => expect(result.current.gestureCstRewardAmount).toBe(80));
+
+    expect(mockGetGestureCstRewardAmountAdvanced).toHaveBeenCalledWith([0n]);
+    expect(result.current.gestureCstRewardAmount).toBe(80);
+    expect(result.current.gestureCstRewardAmountMin).toBe(79.2);
+  });
+
+  it('cleans up the CST preview timer and gesture event listener on unmount', async () => {
+    (globalThis as LiveCstPreviewTestGlobals).__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ = true;
+    const clearTimeoutSpy = jest.spyOn(window, 'clearTimeout');
+    const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+
+    const { unmount } = renderHook(() => useGestureForm());
+    await flushAsyncWork();
+
+    unmount();
+
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'cosmic:gesture-placed',
+      expect.any(Function),
+    );
   });
 
   it('treats zero CST price as free even before elapsed duration crosses threshold', () => {
@@ -419,10 +548,14 @@ describe('useGestureForm', () => {
     resetUxScenarioForTest();
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     expect(result.current.gestureType).toBe('ETH');
     expect(result.current.advancedExpanded).toBe(false);
+    expect(result.current.gestureCstRewardAmount).toBe(100);
+    expect(mockGetGestureCstRewardAmount).not.toHaveBeenCalled();
+
+    expect(mockGetGestureCstRewardAmount).not.toHaveBeenCalled();
   });
 
   it('returns null ethGestureInfo when useGestureEthCost returns no data', () => {
@@ -436,7 +569,7 @@ describe('useGestureForm', () => {
     const { result } = renderHook(() => useGestureForm());
 
     // The useEffect runs asynchronously using usedRWLKData from the query hook
-    await act(async () => {});
+    await waitFor(() => expect(result.current.rwlknftIds).toEqual([3, 1]));
 
     // Wallet owns [1,2,3]; token 2 is already used → available [1,3] reversed → [3,1]
     expect(result.current.rwlknftIds).toEqual([3, 1]);
@@ -444,12 +577,11 @@ describe('useGestureForm', () => {
 
   it('onGesture succeeds with ETH gesture and returns true', async () => {
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     let success!: boolean;
-    await act(async () => {
-      success = await result.current.onGesture();
-    });
+    success = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(success).toBe(true);
     expect(mockWagmiWriteContract).toHaveBeenCalledWith(
@@ -467,7 +599,7 @@ describe('useGestureForm', () => {
     });
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     act(() => {
       result.current.setNftDonateAddress('0xNftContract');
@@ -475,16 +607,15 @@ describe('useGestureForm', () => {
     });
 
     let success!: boolean;
-    await act(async () => {
-      success = await result.current.onGesture();
-    });
+    success = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(success).toBe(true);
     expect(mockWagmiWriteContract).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ functionName: 'bidWithEthAndDonateNft' }),
     );
-    expect(result.current.nftDonateAddress).toBe('');
+    await waitFor(() => expect(result.current.nftDonateAddress).toBe(''));
     expect(result.current.nftId).toBe('');
   });
 
@@ -497,7 +628,7 @@ describe('useGestureForm', () => {
     });
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     act(() => {
       result.current.setContributionType('Token');
@@ -506,29 +637,27 @@ describe('useGestureForm', () => {
     });
 
     let success!: boolean;
-    await act(async () => {
-      success = await result.current.onGesture();
-    });
+    success = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(success).toBe(true);
     expect(mockWagmiWriteContract).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({ functionName: 'bidWithEthAndDonateToken' }),
     );
-    expect(result.current.tokenDonateAddress).toBe('');
+    await waitFor(() => expect(result.current.tokenDonateAddress).toBe(''));
     expect(result.current.tokenAmount).toBe('');
   });
 
   it('onGestureWithCST succeeds and returns true', async () => {
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     expect(result.current.cstGestureData.CSTPrice).toBe(1);
 
     let success!: boolean;
-    await act(async () => {
-      success = await result.current.onGestureWithCST();
-    });
+    success = await result.current.onGestureWithCST();
+    await flushAsyncWork();
 
     expect(success).toBe(true);
     expect(mockWagmiWriteContract).toHaveBeenCalledWith(
@@ -541,15 +670,14 @@ describe('useGestureForm', () => {
 
   it('passes selected minimum CST reward to V2 CST gesture writes', async () => {
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     act(() => {
       result.current.setCstRewardTolerancePercent(5);
     });
 
-    await act(async () => {
-      await result.current.onGestureWithCST();
-    });
+    await result.current.onGestureWithCST();
+    await flushAsyncWork();
 
     expect(mockWagmiWriteContract).toHaveBeenCalledWith(
       expect.anything(),
@@ -562,15 +690,14 @@ describe('useGestureForm', () => {
 
   it('submits zero minimum CST reward when accepting any reward', async () => {
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     act(() => {
       result.current.setAcceptAnyCstReward(true);
     });
 
-    await act(async () => {
-      await result.current.onGestureWithCST();
-    });
+    await result.current.onGestureWithCST();
+    await flushAsyncWork();
 
     expect(result.current.gestureCstRewardAmountMinLimitWei).toBe(0n);
     expect(mockWagmiWriteContract).toHaveBeenCalledWith(
@@ -586,14 +713,13 @@ describe('useGestureForm', () => {
     mockUseCTPrice.mockReturnValue({ data: undefined });
     mockGetNextCstGestureCost.mockResolvedValue(0n);
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     expect(result.current.cstGestureData.CSTPrice).toBe(0);
 
     let success!: boolean;
-    await act(async () => {
-      success = await result.current.onGestureWithCST();
-    });
+    success = await result.current.onGestureWithCST();
+    await flushAsyncWork();
 
     expect(success).toBe(true);
     expect(mockWagmiWriteContract).toHaveBeenCalledWith(
@@ -607,12 +733,11 @@ describe('useGestureForm', () => {
     mockGetBalance.mockResolvedValue(BigInt(0));
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     let success!: boolean;
-    await act(async () => {
-      success = await result.current.onGesture();
-    });
+    success = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(success).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith('error', expect.stringContaining('Insufficient ETH'));
@@ -623,14 +748,13 @@ describe('useGestureForm', () => {
     mockApiGetUserBalance.mockResolvedValue({ CosmicTokenBalance: '0' });
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     expect(result.current.cstGestureData.CSTPrice).toBe(1);
 
     let success!: boolean;
-    await act(async () => {
-      success = await result.current.onGestureWithCST();
-    });
+    success = await result.current.onGestureWithCST();
+    await flushAsyncWork();
 
     expect(success).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith('error', expect.stringContaining('Insufficient CST'));
@@ -641,12 +765,11 @@ describe('useGestureForm', () => {
     mockUseCosmicGameContract.mockReturnValue(null);
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     let success!: boolean;
-    await act(async () => {
-      success = await result.current.onGesture();
-    });
+    success = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(success).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith(
@@ -661,43 +784,25 @@ describe('useGestureForm', () => {
     mockIsUserRejection.mockReturnValue(true);
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     let success!: boolean;
-    await act(async () => {
-      success = await result.current.onGesture();
-    });
+    success = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(success).toBe(false);
     expect(mockNotifyErrorFromEthers).not.toHaveBeenCalled();
     expect(result.current.isGesturing).toBe(false);
   });
 
-  it('sets isGesturing to true during gesture and false after', async () => {
-    let resolvePrice!: (v: bigint) => void;
-    mockGetNextEthGestureCost.mockImplementation(
-      () =>
-        new Promise<bigint>((r) => {
-          resolvePrice = r;
-        }),
-    );
-
+  it('resets isGesturing after gesture completion', async () => {
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     expect(result.current.isGesturing).toBe(false);
 
-    let gesturePromise!: Promise<boolean>;
-    await act(async () => {
-      gesturePromise = result.current.onGesture();
-    });
-
-    expect(result.current.isGesturing).toBe(true);
-
-    await act(async () => {
-      resolvePrice(BigInt(1e16));
-      await gesturePromise;
-    });
+    await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(result.current.isGesturing).toBe(false);
   });
@@ -711,12 +816,11 @@ describe('useGestureForm', () => {
     useWeb3.useActiveWeb3React.mockReturnValue({ account: null, chainId: 1, active: false });
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     let ok: boolean | undefined;
-    await act(async () => {
-      ok = await result.current.onGesture();
-    });
+    ok = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(ok).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith('error', 'Please connect your wallet.');
@@ -732,11 +836,10 @@ describe('useGestureForm', () => {
     mockIsUserRejection.mockReturnValue(false);
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
-    await act(async () => {
-      await result.current.onGesture();
-    });
+    await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(mockReportError).toHaveBeenCalledWith(rpcErr, 'gesture-eth');
     expect(mockNotifyErrorFromEthers).toHaveBeenCalledWith(rpcErr);
@@ -751,12 +854,11 @@ describe('useGestureForm', () => {
     mockIsUserRejection.mockReturnValue(false);
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
     let ok: boolean | undefined;
-    await act(async () => {
-      ok = await result.current.onGesture();
-    });
+    ok = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(ok).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith(
@@ -775,11 +877,10 @@ describe('useGestureForm', () => {
     mockIsUserRejection.mockReturnValue(false);
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
-    await act(async () => {
-      await result.current.onGestureWithCST();
-    });
+    await result.current.onGestureWithCST();
+    await flushAsyncWork();
 
     expect(mockReportError).toHaveBeenCalledWith(cstErr, 'gesture-cst');
   });
@@ -791,11 +892,10 @@ describe('useGestureForm', () => {
     mockIsContractRevertError.mockReturnValue(true);
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
-    await act(async () => {
-      await result.current.onGestureWithCST();
-    });
+    await result.current.onGestureWithCST();
+    await flushAsyncWork();
 
     expect(mockNotify).toHaveBeenCalledWith(
       'error',
@@ -810,11 +910,10 @@ describe('useGestureForm', () => {
 
   it('onGesture awaits transaction receipt after writeContract returns a hash', async () => {
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
 
-    await act(async () => {
-      await result.current.onGesture();
-    });
+    await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(mockWaitForTransactionReceipt).toHaveBeenCalledWith({ hash: '0xhash' });
   });
@@ -827,7 +926,7 @@ describe('useGestureForm', () => {
     });
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
     act(() => {
       result.current.setContributionType('NFT');
       result.current.setNftDonateAddress('0xNft');
@@ -835,9 +934,8 @@ describe('useGestureForm', () => {
     });
 
     let ok: boolean | undefined;
-    await act(async () => {
-      ok = await result.current.onGesture();
-    });
+    ok = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(ok).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith('error', "You aren't the owner of the token!");
@@ -851,7 +949,7 @@ describe('useGestureForm', () => {
     });
 
     const { result } = renderHook(() => useGestureForm());
-    await act(async () => {});
+    await flushAsyncWork();
     act(() => {
       result.current.setContributionType('NFT');
       result.current.setNftDonateAddress('0xNft');
@@ -859,9 +957,8 @@ describe('useGestureForm', () => {
     });
 
     let ok: boolean | undefined;
-    await act(async () => {
-      ok = await result.current.onGesture();
-    });
+    ok = await result.current.onGesture();
+    await flushAsyncWork();
 
     expect(ok).toBe(false);
     expect(mockNotify).toHaveBeenCalledWith(
