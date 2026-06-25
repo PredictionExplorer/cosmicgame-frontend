@@ -155,7 +155,6 @@ describe('hostRouting', () => {
           '/faq',
           '/admin',
           '/internal',
-          '/transfer-cosmic-signature-nfts',
           '/transfer-cst',
         ]),
       );
@@ -268,7 +267,6 @@ describe('hostRouting', () => {
         '/statistics',
         '/system-event',
         '/terms',
-        '/transfer-cosmic-signature-nfts',
         '/transfer-cst',
         '/used-rwlk-nfts',
         '/user',
@@ -299,7 +297,6 @@ describe('hostRouting', () => {
       '/my-anchors',
       '/admin',
       '/internal/cst-outreach-transfer',
-      '/transfer-cosmic-signature-nfts',
       '/transfer-cst',
       '/gesture/1',
       '/allocation/42',

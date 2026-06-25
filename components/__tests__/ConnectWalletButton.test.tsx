@@ -182,10 +182,13 @@ describe('ConnectWalletButton', () => {
     await user.click(screen.getByText(/0x1234\.{4}5678/));
 
     expect(screen.getByText('My Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('My Tokens')).toBeInTheDocument();
+    expect(screen.getByText('My NFTs')).toBeInTheDocument();
+    expect(screen.queryByText('Transfer NFTs')).not.toBeInTheDocument();
 
     const statLink = screen.getByText('My Dashboard').closest('a');
     expect(statLink).toHaveAttribute('href', '/my-statistics');
+    expect(screen.getByText('My NFTs').closest('a')).toHaveAttribute('href', '/my-tokens');
+    expect(document.querySelector('a[href="/transfer-cosmic-signature-nfts"]')).toBeNull();
   });
 
   it('has no accessibility violations', async () => {

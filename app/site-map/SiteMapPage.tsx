@@ -8,7 +8,7 @@ import { PageShell } from '@/components/ui/page-shell';
 import { cn } from '@/lib/utils';
 
 const appToolLinks = [
-  { href: '/my-tokens', label: 'My Tokens', description: 'Wallet-specific token view; noindexed.' },
+  { href: '/my-tokens', label: 'My NFTs', description: 'Wallet-specific NFT view; noindexed.' },
   {
     href: '/my-allocations',
     label: 'My Unretrieved Allocations',

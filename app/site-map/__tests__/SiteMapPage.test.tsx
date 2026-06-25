@@ -16,7 +16,7 @@ describe('SiteMapPage', () => {
   it('renders all per-user links', () => {
     render(<SiteMapPage />);
     const expectedLinks = [
-      { label: 'My Tokens', href: '/my-tokens' },
+      { label: 'My NFTs', href: '/my-tokens' },
       { label: 'My Unretrieved Allocations', href: '/my-allocations' },
       { label: 'My Anchors', href: '/my-anchors' },
     ];

@@ -1,6 +1,5 @@
 import { metadata as cstOutreachTransferMetadata } from '@/app/internal/cst-outreach-transfer/page';
 import { metadata as recipientHistoryMetadata } from '@/app/recipient-history/page';
-import { metadata as transferCosmicSignatureNftsMetadata } from '@/app/transfer-cosmic-signature-nfts/page';
 import { metadata as transferCstMetadata } from '@/app/transfer-cst/page';
 
 import { appSitemapRoutes, dynamicNoindexRoutePrefixes, noindexAppRoutes } from '@/lib/seoRoutes';
@@ -12,11 +11,6 @@ jest.mock('../internal/cst-outreach-transfer/CstOutreachTransferPage', () => ({
 }));
 
 jest.mock('../transfer-cst/TransferCstPage', () => ({
-  __esModule: true,
-  default: () => null,
-}));
-
-jest.mock('../transfer-cosmic-signature-nfts/TransferCosmicSignatureNftsPage', () => ({
   __esModule: true,
   default: () => null,
 }));
@@ -61,7 +55,7 @@ describe('SEO route policy', () => {
       createMetadata('Admin', 'Admin description', undefined, '/admin', { index: false }),
     );
     expectNoIndex(
-      createMetadata('My Tokens', 'Wallet description', undefined, '/my-tokens', {
+      createMetadata('My NFTs', 'Wallet description', undefined, '/my-tokens', {
         index: false,
       }),
     );
@@ -95,7 +89,6 @@ describe('SEO route policy', () => {
   it('marks wallet-personal routes as noindex', () => {
     expectNoIndex(recipientHistoryMetadata);
     expectNoIndex(transferCstMetadata);
-    expectNoIndex(transferCosmicSignatureNftsMetadata);
   });
 
   it('marks the URL-only CST outreach transfer route as noindex and out of sitemap', () => {

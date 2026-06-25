@@ -37,7 +37,7 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 ### User Pages
 
-- **My Tokens** (https://app.cosmicsignature.com/my-tokens): View your owned Cosmic Signature NFTs
+- **My NFTs** (https://app.cosmicsignature.com/my-tokens): View and optionally transfer your owned Cosmic Signature NFTs
 - **My Anchors** (https://app.cosmicsignature.com/my-anchors): Manage anchored Cosmic Signature NFTs, ETH Anchor Distributions, RandomWalkNFT anchors, and Anchored-NFT Stellar Selection history
 - **My Allocations** (https://app.cosmicsignature.com/my-allocations): Track your allocations across cycles
 - **My Statistics** (https://app.cosmicsignature.com/my-statistics): Personal participation statistics

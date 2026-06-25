@@ -5,8 +5,8 @@ import { createMetadata } from '@/utils/seo';
 import MyTokens from './MyTokens';
 
 export const metadata: Metadata = createMetadata(
-  'My Tokens | Cosmic Signature',
-  'Manage your digital assets on the My Tokens page at Cosmic Signature. View your token balance, transaction history, and ownership details. Keep track of your NFTs and tokens effortlessly.',
+  'My NFTs | Cosmic Signature',
+  'View and manage the Cosmic Signature NFTs in your connected wallet, including optional transfers to another address.',
   undefined,
   '/my-tokens',
   { index: false },

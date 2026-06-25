@@ -278,7 +278,7 @@ const Header: FC = () => {
                       route: '/my-allocations',
                     }}
                   />
-                  <ListItemButton nav={{ title: 'My Tokens', route: '/my-tokens' }} />
+                  <ListItemButton nav={{ title: 'My NFTs', route: '/my-tokens' }} />
                   <ListItemButton nav={{ title: 'My Anchors', route: '/my-anchors' }} />
                   <ListItemButton
                     nav={{ title: 'Recipient History', route: '/recipient-history' }}
