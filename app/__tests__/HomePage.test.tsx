@@ -364,6 +364,33 @@ const makeDashboardData = (overrides = {}) => ({
   ...overrides,
 });
 
+function mockScrollIntoView() {
+  const scrollIntoView = jest.fn();
+  const prototype = window.HTMLElement.prototype as Partial<Pick<HTMLElement, 'scrollIntoView'>>;
+  const original = prototype.scrollIntoView;
+
+  Object.defineProperty(prototype, 'scrollIntoView', {
+    configurable: true,
+    writable: true,
+    value: scrollIntoView,
+  });
+
+  return {
+    scrollIntoView,
+    restore: () => {
+      if (original) {
+        Object.defineProperty(prototype, 'scrollIntoView', {
+          configurable: true,
+          writable: true,
+          value: original,
+        });
+      } else {
+        delete prototype.scrollIntoView;
+      }
+    },
+  };
+}
+
 /* ── Tests ──────────────────────────────────────────────────────── */
 
 describe('HomePage', () => {
@@ -439,20 +466,51 @@ describe('HomePage', () => {
     );
   });
 
-  it('hero primary action submits a gesture when the cycle is active', async () => {
+  it('hero primary action only scrolls to gesture options when the cycle is active', async () => {
     const user = userEvent.setup();
+    const { scrollIntoView, restore } = mockScrollIntoView();
     mockUseDashboardInfo.mockReturnValue({
       data: makeDashboardData(),
       isLoading: false,
     });
 
-    render(<HomePage />);
+    try {
+      render(<HomePage />);
 
-    const buttons = screen.getAllByRole('button', { name: /Make a Gesture/ });
-    expect(buttons.length).toBeGreaterThanOrEqual(1);
-    await user.click(buttons[0]!);
+      const buttons = screen.getAllByRole('button', { name: /Make a Gesture/ });
+      expect(buttons.length).toBeGreaterThanOrEqual(1);
+      await user.click(buttons[0]!);
 
-    expect(mockGestureForm.onGesture).toHaveBeenCalledTimes(1);
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+      expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
+      expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
+    } finally {
+      restore();
+    }
+  });
+
+  it('Chrono Core primary action only scrolls and does not finalize a ready cycle', async () => {
+    const user = userEvent.setup();
+    const { scrollIntoView, restore } = mockScrollIntoView();
+    mockUseDashboardInfo.mockReturnValue({
+      data: makeDashboardData({ LastBidderAddr: mockAccount }),
+      isLoading: false,
+    });
+    mockAllocationFinalize.allocationTime = Date.now() - 1_000;
+
+    try {
+      render(<HomePage />);
+
+      const chronoCore = screen.getByTestId('chrono-core-timer');
+      await user.click(within(chronoCore).getByRole('button', { name: /Finalize Cycle/ }));
+
+      expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+      expect(mockAllocationFinalize.onFinalize).not.toHaveBeenCalled();
+      expect(mockGestureForm.onGesture).not.toHaveBeenCalled();
+      expect(mockGestureForm.onGestureWithCST).not.toHaveBeenCalled();
+    } finally {
+      restore();
+    }
   });
 
   it('links the hero primary action to cycle details before gestures are open', () => {
@@ -927,7 +985,7 @@ describe('HomePage', () => {
     });
 
     const { rerender } = render(<HomePage />);
-    // Hero + chrono timer use gesture-submit buttons; sticky mobile CTA remains a link.
+    // Hero + chrono timer use scroll-only buttons; sticky mobile CTA remains a link.
     expect(screen.getAllByRole('button', { name: 'Make a Gesture' }).length).toBeGreaterThanOrEqual(
       1,
     );

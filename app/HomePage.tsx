@@ -343,69 +343,16 @@ const HomePage = ({ initialDashboardData = null, initialHostname = null }: HomeP
   const isRoundActive = cycleState.isGestureOpen || cycleState.isReadyToFinalize;
   const cycleTimerEnded = cycleState.isReadyToFinalize;
 
-  const scrollToGestureForm = () => {
+  const scrollToGestureForm = useCallback(() => {
     const el = document.getElementById('make-gesture');
     if (el && typeof el.scrollIntoView === 'function') {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
+  }, []);
 
-  const handlePrimaryCtaClick = useCallback(async () => {
+  const handlePrimaryCtaClick = useCallback(() => {
     scrollToGestureForm();
-
-    if (!isRoundActive) {
-      notify('info', 'This cycle is not active yet.');
-      return;
-    }
-    if (!account) {
-      notify('info', 'Connect your wallet below, then confirm your gesture in Rabby.');
-      return;
-    }
-
-    if (cycleTimerEnded && canClaim) {
-      const canFinalizeNow = data?.LastBidderAddr === account || claimWait <= now;
-      if (canFinalizeNow) {
-        await handleFinalize();
-      } else {
-        notify(
-          'info',
-          'Please wait for the participant who made the final gesture to finalize the cycle.',
-        );
-      }
-      return;
-    }
-
-    if (!canGesture) {
-      notify('info', 'You made the final gesture for this cycle. Finalize when the timer ends.');
-      return;
-    }
-
-    const buttonDisabled =
-      isGesturing || (gestureType === 'RandomWalk' && rwlkId === -1) || gestureType === '';
-    if (buttonDisabled) {
-      if (gestureType === 'RandomWalk' && rwlkId === -1) {
-        notify('info', 'Select a RandomWalk token before making your gesture.');
-      }
-      return;
-    }
-
-    await handleGesture();
-  }, [
-    account,
-    canClaim,
-    canGesture,
-    claimWait,
-    cycleTimerEnded,
-    data?.LastBidderAddr,
-    gestureType,
-    handleFinalize,
-    handleGesture,
-    isGesturing,
-    isRoundActive,
-    now,
-    notify,
-    rwlkId,
-  ]);
+  }, [scrollToGestureForm]);
 
   const hasAttachedAssets = donatedNFTs.length > 0 || donatedERC20Tokens.length > 0;
   const hasPublicGoodsImpact = Number(data?.CharityPercentage ?? 0) > 0;
