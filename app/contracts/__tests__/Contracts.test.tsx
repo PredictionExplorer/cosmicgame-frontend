@@ -309,7 +309,7 @@ describe('Contracts', () => {
     liveCstGlobals.__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__ = 20;
     const rewardValues = [BigInt('100000000000000000000'), BigInt('125123456789123000000')];
     let rewardReadCount = 0;
-    const getBidCstRewardAmount = jest.fn(async () => {
+    const readParticipationCstPreview = jest.fn(async () => {
       return rewardValues[Math.min(rewardReadCount++, rewardValues.length - 1)]!;
     });
 
@@ -321,7 +321,7 @@ describe('Contracts', () => {
         mainPrizeTimeIncrementIncreaseDivisor: jest.fn().mockResolvedValue(100n),
         mainPrizeTimeIncrementInMicroSeconds: jest.fn().mockResolvedValue(1_000_000n),
         getInitialDurationUntilMainPrize: jest.fn().mockResolvedValue(3600n),
-        getBidCstRewardAmount,
+        getBidCstRewardAmount: readParticipationCstPreview,
         getCstDutchAuctionDurations: jest.fn().mockResolvedValue([43200n, 1200n]),
         getEthDutchAuctionDurations: jest.fn().mockResolvedValue([7200n, 300n]),
         cstDutchAuctionBeginningBidPriceMinLimit: jest.fn().mockResolvedValue(1000000000000000000n),
@@ -334,7 +334,7 @@ describe('Contracts', () => {
     await waitFor(() => {
       expect(screen.getByText('125.1235 CST')).toBeInTheDocument();
     });
-    expect(getBidCstRewardAmount.mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(readParticipationCstPreview.mock.calls.length).toBeGreaterThanOrEqual(2);
   });
 
   it('renders stellar selection configuration cards', () => {
