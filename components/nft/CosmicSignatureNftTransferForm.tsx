@@ -1,11 +1,10 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { writeContract } from '@wagmi/core';
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowUpRight, ChevronDown, ChevronUp, Loader2, SendHorizontal } from 'lucide-react';
-import { Tr } from 'react-super-responsive-table';
+import { ArrowUpRight, Loader2, SendHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 import { getAddress, isAddress, zeroAddress } from 'viem';
 import { useConfig, usePublicClient } from 'wagmi';
@@ -26,16 +25,8 @@ import {
 } from '@/utils/errors';
 import { AddressLink } from '@/components/common/AddressLink';
 import { CustomPagination } from '@/components/common/CustomPagination';
-import {
-  TablePrimary,
-  TablePrimaryCell,
-  TablePrimaryContainer,
-  TablePrimaryHead,
-  TablePrimaryHeadCell,
-  TablePrimaryRow,
-} from '@/components/styled';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
@@ -45,12 +36,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -109,14 +94,12 @@ export function CosmicSignatureNftTransferForm({
 }: CosmicSignatureNftTransferFormProps) {
   const [recipient, setRecipient] = useState('');
   const [page, setPage] = useState(1);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [progress, setProgress] = useState<TransferProgress | null>(null);
   const [txHashes, setTxHashes] = useState<`0x${string}`[]>([]);
   const [warningOpen, setWarningOpen] = useState(false);
   const [pendingTransfer, setPendingTransfer] = useState<ValidTransfer | null>(null);
-  const headerCheckboxRef = useRef<HTMLInputElement>(null);
 
   const config = useConfig();
   const publicClient = usePublicClient({ chainId: activeChain.id });
@@ -148,22 +131,9 @@ export function CosmicSignatureNftTransferForm({
     [selectedTokenIds, transferableTokenIds],
   );
 
-  const isIndeterminate =
-    selectedTransferableIds.length > 0 &&
-    selectedTransferableIds.length < transferableTokenIds.length;
-  const isAllTransferableSelected =
-    transferableTokenIds.length > 0 &&
-    selectedTransferableIds.length === transferableTokenIds.length;
-
   useEffect(() => {
     setSelectedTokenIds((current) => current.filter((id) => transferableTokenIds.includes(id)));
   }, [transferableTokenIds]);
-
-  useEffect(() => {
-    if (headerCheckboxRef.current) {
-      headerCheckboxRef.current.indeterminate = isIndeterminate;
-    }
-  }, [isIndeterminate]);
 
   const isSelected = (id: number) => selectedTokenIds.includes(id);
 
@@ -377,7 +347,6 @@ export function CosmicSignatureNftTransferForm({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Transfer Cosmic Signature NFTs</CardTitle>
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -418,144 +387,165 @@ export function CosmicSignatureNftTransferForm({
                 You do not have any Cosmic Signature NFTs in this wallet.
               </div>
             ) : (
-              <>
-                <TablePrimaryContainer>
-                  <TablePrimary>
-                    <colgroup>
-                      <col width="5%" />
-                      <col width="14%" />
-                      <col width="26%" />
-                      <col width="15%" />
-                      <col width="20%" />
-                      <col width="20%" />
-                    </colgroup>
-                    <TablePrimaryHead>
-                      <Tr>
-                        <TablePrimaryHeadCell align="left" className="!px-3 !py-2">
-                          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-                            <DropdownMenuTrigger asChild>
-                              <div className="hidden cursor-pointer items-center sm:flex">
-                                <Checkbox
-                                  ref={headerCheckboxRef}
-                                  checked={isAllTransferableSelected}
-                                  readOnly
-                                  aria-label="Select Cosmic Signature NFTs"
-                                  className="h-4 w-4"
-                                />
-                                {menuOpen ? (
-                                  <ChevronUp className="h-5 w-5" aria-hidden />
-                                ) : (
-                                  <ChevronDown className="h-5 w-5" aria-hidden />
-                                )}
-                              </div>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="min-w-[166px]">
-                              <DropdownMenuItem onSelect={handleSelectAll}>
-                                Select All Transferable
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onSelect={handleSelectCurrentPage}>
-                                Select Current Page
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onSelect={handleSelectNone}>
-                                Select None
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell>Token ID</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell>Token Name</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell>Cycle</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell>Current Owner</TablePrimaryHeadCell>
-                        <TablePrimaryHeadCell>Status</TablePrimaryHeadCell>
-                      </Tr>
-                    </TablePrimaryHead>
-                    <tbody>
-                      {pageItems.map((token) => {
-                        const disabledReason = getDisabledReason(token, normalizedSource);
-                        const transferable = disabledReason == null;
-                        return (
-                          <TablePrimaryRow
-                            key={`${token.EvtLogId}-${token.TokenId}`}
-                            role="checkbox"
-                            aria-checked={isSelected(token.TokenId)}
-                            tabIndex={transferable && !submitting ? 0 : -1}
-                            onClick={() => handleSelectToggle(token)}
-                            onKeyDown={(event) => {
-                              if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault();
-                                handleSelectToggle(token);
-                              }
-                            }}
+              <div className="space-y-4" data-testid="nft-transfer-picker">
+                <div className="flex flex-col gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="text-sm text-muted-foreground">
+                    <p className="font-medium text-foreground">Choose NFTs to transfer</p>
+                    <p>
+                      {selectedTransferableIds.length} selected of {transferableTokenIds.length}{' '}
+                      transferable NFTs.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={submitting || transferableTokenIds.length === 0}
+                      onClick={handleSelectAll}
+                    >
+                      Select all transferable
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={submitting || pageItems.length === 0}
+                      onClick={handleSelectCurrentPage}
+                    >
+                      Select current page
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      disabled={submitting || selectedTransferableIds.length === 0}
+                      onClick={handleSelectNone}
+                    >
+                      Clear selection
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-3" aria-label="Cosmic Signature NFTs">
+                  {pageItems.map((token) => {
+                    const disabledReason = getDisabledReason(token, normalizedSource);
+                    const transferable = disabledReason == null;
+                    const selected = isSelected(token.TokenId);
+
+                    return (
+                      <div
+                        key={`${token.EvtLogId}-${token.TokenId}`}
+                        data-testid={`nft-row-${token.TokenId}`}
+                        onClick={() => handleSelectToggle(token)}
+                        className={cn(
+                          'grid gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-sm transition-colors sm:grid-cols-[auto_minmax(5rem,0.7fr)_minmax(10rem,1.4fr)_minmax(5rem,0.7fr)_minmax(12rem,1.2fr)_minmax(9rem,1fr)] sm:items-center',
+                          transferable && !submitting
+                            ? 'cursor-pointer hover:bg-white/[0.055]'
+                            : 'cursor-not-allowed opacity-60',
+                          selected && 'border-primary/40 bg-primary/[0.08]',
+                        )}
+                      >
+                        <div
+                          className="flex items-center gap-3"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <Checkbox
+                            checked={selected}
+                            disabled={!transferable || submitting}
+                            aria-label={`Select NFT #${token.TokenId}`}
+                            className="h-4 w-4"
+                            onChange={() => handleSelectToggle(token)}
+                          />
+                          <span className="font-medium text-foreground sm:hidden">
+                            NFT #{token.TokenId}
+                          </span>
+                        </div>
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
+                            Token ID
+                          </p>
+                          <Link
+                            href={`/detail/${token.TokenId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-foreground underline-offset-4 hover:underline"
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            #{token.TokenId}
+                          </Link>
+                        </div>
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
+                            Token Name
+                          </p>
+                          <p className="text-foreground">{token.TokenName || 'Unnamed'}</p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
+                            Cycle
+                          </p>
+                          {token.RoundNum ? (
+                            <Link
+                              href={`/allocation/${token.RoundNum}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-foreground underline-offset-4 hover:underline"
+                              onClick={(event) => event.stopPropagation()}
+                            >
+                              {token.RoundNum}
+                            </Link>
+                          ) : (
+                            <span className="text-muted-foreground">Unknown</span>
+                          )}
+                        </div>
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
+                            Current Owner
+                          </p>
+                          {token.CurOwnerAddr ? (
+                            <AddressLink
+                              address={String(token.CurOwnerAddr)}
+                              url={`/user/${token.CurOwnerAddr}`}
+                            />
+                          ) : (
+                            <span className="text-muted-foreground">Unknown</span>
+                          )}
+                        </div>
+
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
+                            Status
+                          </p>
+                          <span
                             className={cn(
-                              transferable && !submitting
-                                ? 'cursor-pointer'
-                                : 'cursor-not-allowed opacity-60',
-                              isSelected(token.TokenId) && 'bg-white/5',
+                              'inline-flex rounded-full border px-2 py-1 text-xs font-medium',
+                              disabledReason
+                                ? 'border-amber-400/30 bg-amber-400/10 text-amber-200'
+                                : selected
+                                  ? 'border-primary/40 bg-primary/10 text-primary'
+                                  : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200',
                             )}
                           >
-                            <TablePrimaryCell className="!px-3 !py-2">
-                              <Checkbox
-                                checked={isSelected(token.TokenId)}
-                                readOnly
-                                disabled={!transferable || submitting}
-                                aria-label={`Select NFT #${token.TokenId}`}
-                                className="h-4 w-4"
-                              />
-                            </TablePrimaryCell>
-                            <TablePrimaryCell align="center">
-                              <Link
-                                href={`/detail/${token.TokenId}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-inherit underline-offset-4 hover:underline"
-                                onClick={(event) => event.stopPropagation()}
-                              >
-                                {token.TokenId}
-                              </Link>
-                            </TablePrimaryCell>
-                            <TablePrimaryCell>{token.TokenName || 'Unnamed'}</TablePrimaryCell>
-                            <TablePrimaryCell align="center">
-                              {token.RoundNum ? (
-                                <Link
-                                  href={`/allocation/${token.RoundNum}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-inherit underline-offset-4 hover:underline"
-                                  onClick={(event) => event.stopPropagation()}
-                                >
-                                  {token.RoundNum}
-                                </Link>
-                              ) : (
-                                ' '
-                              )}
-                            </TablePrimaryCell>
-                            <TablePrimaryCell>
-                              {token.CurOwnerAddr ? (
-                                <AddressLink
-                                  address={String(token.CurOwnerAddr)}
-                                  url={`/user/${token.CurOwnerAddr}`}
-                                />
-                              ) : (
-                                'Unknown'
-                              )}
-                            </TablePrimaryCell>
-                            <TablePrimaryCell>
-                              {disabledReason ??
-                                (isSelected(token.TokenId) ? 'Selected' : 'Transferable')}
-                            </TablePrimaryCell>
-                          </TablePrimaryRow>
-                        );
-                      })}
-                    </tbody>
-                  </TablePrimary>
-                </TablePrimaryContainer>
+                            {disabledReason ?? (selected ? 'Selected' : 'Transferable')}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
                 <CustomPagination
                   page={page}
                   setPage={setPage}
                   totalLength={tokens.length}
                   perPage={perPage}
                 />
-              </>
+              </div>
             )}
 
             {progress ? (

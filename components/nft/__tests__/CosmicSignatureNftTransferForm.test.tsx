@@ -1,10 +1,11 @@
 import { toast } from 'sonner';
+import userEvent from '@testing-library/user-event';
 
 import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
 import type { CSTTokenInfo } from '@/services/api/types';
 
-import { fireEvent, render, screen, waitFor } from '@/test-utils';
+import { checkA11y, fireEvent, render, screen, waitFor } from '@/test-utils';
 
 import { CosmicSignatureNftTransferForm } from '../CosmicSignatureNftTransferForm';
 
@@ -106,10 +107,14 @@ function fillRecipient(value = RECIPIENT) {
   });
 }
 
+function getTokenRow(nameOrId: string | RegExp) {
+  const row = screen.getByText(nameOrId).closest('[data-testid^="nft-row-"]');
+  expect(row).not.toBeNull();
+  return row as HTMLElement;
+}
+
 function selectToken(nameOrId: string | RegExp) {
-  const cell = screen.getByText(nameOrId).closest('td');
-  expect(cell).not.toBeNull();
-  fireEvent.click(cell!.closest('tr')!);
+  fireEvent.click(getTokenRow(nameOrId));
 }
 
 function submitForm() {
@@ -144,10 +149,84 @@ describe('CosmicSignatureNftTransferForm', () => {
     expect(screen.getAllByText('0x111111....111111').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
+    expect(screen.getAllByLabelText(/select nft #/i)).toHaveLength(2);
+    expect(screen.queryByLabelText('Select Cosmic Signature NFTs')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /select all transferable/i })).toHaveLength(1);
     expect(screen.getByRole('link', { name: /view nft transfer history/i })).toHaveAttribute(
       'href',
       `/cosmic-signature-transfer/${SOURCE}`,
     );
+  });
+
+  it('allows the recipient address to be typed normally', async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const input = screen.getByLabelText('Recipient address');
+    await user.type(input, RECIPIENT);
+
+    expect(input).toHaveValue(RECIPIENT);
+  });
+
+  it('selects and unselects NFTs from row clicks', async () => {
+    const user = userEvent.setup();
+    renderForm([
+      createToken({ TokenId: 1, TokenName: 'Alpha' }),
+      createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
+    ]);
+
+    await user.click(getTokenRow('Alpha'));
+
+    expect(screen.getByLabelText('Select NFT #1')).toBeChecked();
+    expect(screen.getByText('1 selected of 2 transferable NFTs.')).toBeInTheDocument();
+    expect(getTokenRow('Alpha')).toHaveTextContent('Selected');
+
+    await user.click(getTokenRow('Alpha'));
+
+    expect(screen.getByLabelText('Select NFT #1')).not.toBeChecked();
+    expect(screen.getByText('0 selected of 2 transferable NFTs.')).toBeInTheDocument();
+  });
+
+  it('selects and unselects NFTs from the checkbox without double toggling', async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const checkbox = screen.getByLabelText('Select NFT #1');
+    await user.click(checkbox);
+
+    expect(checkbox).toBeChecked();
+    expect(screen.getByText('1 selected of 1 transferable NFTs.')).toBeInTheDocument();
+
+    await user.click(checkbox);
+
+    expect(checkbox).not.toBeChecked();
+    expect(screen.getByText('0 selected of 1 transferable NFTs.')).toBeInTheDocument();
+  });
+
+  it('bulk-selects only transferable NFTs and clears selection', async () => {
+    const user = userEvent.setup();
+    renderForm([
+      createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
+      createToken({ TokenId: 2, TokenName: 'Anchored', EvtLogId: 2, Staked: true }),
+      createToken({
+        TokenId: 3,
+        TokenName: 'Stale owner',
+        EvtLogId: 3,
+        CurOwnerAddr: OTHER_SOURCE,
+      }),
+    ]);
+
+    await user.click(screen.getByRole('button', { name: /select all transferable/i }));
+
+    expect(screen.getByLabelText('Select NFT #1')).toBeChecked();
+    expect(screen.getByLabelText('Select NFT #2')).not.toBeChecked();
+    expect(screen.getByLabelText('Select NFT #3')).not.toBeChecked();
+    expect(screen.getByText('1 selected of 1 transferable NFTs.')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /clear selection/i }));
+
+    expect(screen.getByLabelText('Select NFT #1')).not.toBeChecked();
+    expect(screen.getByText('0 selected of 1 transferable NFTs.')).toBeInTheDocument();
   });
 
   it('shows anchored NFTs but keeps them unselectable', () => {
@@ -158,6 +237,23 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     selectToken('Anchored');
     expect(screen.getByText('Anchored - release before transfer')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /send selected nfts/i })).toBeDisabled();
+  });
+
+  it('keeps stale-owner NFTs unselectable', async () => {
+    const user = userEvent.setup();
+    renderForm([
+      createToken({
+        TokenId: 1,
+        TokenName: 'Stale owner',
+        CurOwnerAddr: OTHER_SOURCE,
+      }),
+    ]);
+
+    await user.click(getTokenRow('Stale owner'));
+
+    expect(screen.getByText('Owner changed - refresh before transfer')).toBeInTheDocument();
+    expect(screen.getByLabelText('Select NFT #1')).not.toBeChecked();
     expect(screen.getByRole('button', { name: /send selected nfts/i })).toBeDisabled();
   });
 
@@ -298,5 +394,20 @@ describe('CosmicSignatureNftTransferForm', () => {
     fireEvent.click(screen.getByRole('button', { name: /continue transfer/i }));
 
     await waitFor(() => expect(mockWriteContract).toHaveBeenCalledTimes(1));
+  });
+
+  it('has no accessibility violations', async () => {
+    const { container } = render(
+      <CosmicSignatureNftTransferForm
+        sourceAddress={SOURCE}
+        tokens={[
+          createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
+          createToken({ TokenId: 2, TokenName: 'Anchored', EvtLogId: 2, Staked: true }),
+        ]}
+        historyHref={`/cosmic-signature-transfer/${SOURCE}`}
+      />,
+    );
+
+    await checkA11y(container);
   });
 });
