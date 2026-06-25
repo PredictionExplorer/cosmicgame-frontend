@@ -477,28 +477,32 @@ export function CosmicSignatureNftTransferForm({
                         </div>
 
                         <div>
-                          <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
-                            Token Name
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                            Custom name
                           </p>
-                          <p className="text-foreground">{token.TokenName || 'Unnamed'}</p>
+                          <p className="mt-1 text-foreground">
+                            {token.TokenName ? token.TokenName : 'No custom name'}
+                          </p>
                         </div>
 
                         <div>
-                          <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
-                            Cycle
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                            Generation cycle
                           </p>
-                          {token.RoundNum ? (
+                          {token.RoundNum != null ? (
                             <Link
                               href={`/allocation/${token.RoundNum}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-foreground underline-offset-4 hover:underline"
+                              className="mt-1 inline-flex text-foreground underline-offset-4 hover:underline"
                               onClick={(event) => event.stopPropagation()}
                             >
-                              {token.RoundNum}
+                              Cycle {token.RoundNum}
                             </Link>
                           ) : (
-                            <span className="text-muted-foreground">Unknown</span>
+                            <span className="mt-1 inline-flex text-muted-foreground">
+                              Cycle data not available
+                            </span>
                           )}
                         </div>
 

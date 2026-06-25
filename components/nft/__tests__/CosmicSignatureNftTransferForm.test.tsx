@@ -158,6 +158,29 @@ describe('CosmicSignatureNftTransferForm', () => {
     );
   });
 
+  it('renders clear NFT metadata labels and values', () => {
+    renderForm([
+      createToken({ TokenId: 1, TokenName: 'Alpha', RoundNum: 42 }),
+      createToken({ TokenId: 2, TokenName: '', RoundNum: undefined, EvtLogId: 2 }),
+    ]);
+
+    expect(screen.getAllByText('Custom name')).toHaveLength(2);
+    expect(screen.getAllByText('Generation cycle')).toHaveLength(2);
+    expect(getTokenRow('Alpha')).toHaveTextContent('Cycle 42');
+    expect(getTokenRow('No custom name')).toHaveTextContent('Cycle data not available');
+    expect(screen.queryByText('Unnamed')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unknown')).not.toBeInTheDocument();
+  });
+
+  it('treats cycle 0 as a real generation cycle', () => {
+    renderForm([createToken({ TokenId: 1, TokenName: 'Deployment NFT', RoundNum: 0 })]);
+
+    const row = getTokenRow('Deployment NFT');
+    expect(row).toHaveTextContent('Cycle 0');
+    expect(screen.getByRole('link', { name: 'Cycle 0' })).toHaveAttribute('href', '/allocation/0');
+    expect(screen.queryByText('Cycle data not available')).not.toBeInTheDocument();
+  });
+
   it('does not repeat owner addresses inside NFT rows', () => {
     renderForm([
       createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
