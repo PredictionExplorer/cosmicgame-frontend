@@ -23,7 +23,6 @@ import {
   reportError,
   WALLET_TRANSACTION_CANCELLED_MESSAGE,
 } from '@/utils/errors';
-import { AddressLink } from '@/components/common/AddressLink';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
@@ -439,7 +438,7 @@ export function CosmicSignatureNftTransferForm({
                         data-testid={`nft-row-${token.TokenId}`}
                         onClick={() => handleSelectToggle(token)}
                         className={cn(
-                          'grid gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-sm transition-colors sm:grid-cols-[auto_minmax(5rem,0.7fr)_minmax(10rem,1.4fr)_minmax(5rem,0.7fr)_minmax(12rem,1.2fr)_minmax(9rem,1fr)] sm:items-center',
+                          'grid gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-sm transition-colors sm:grid-cols-[auto_minmax(5rem,0.7fr)_minmax(12rem,1.8fr)_minmax(5rem,0.7fr)_minmax(10rem,1fr)] sm:items-center',
                           transferable && !submitting
                             ? 'cursor-pointer hover:bg-white/[0.055]'
                             : 'cursor-not-allowed opacity-60',
@@ -498,20 +497,6 @@ export function CosmicSignatureNftTransferForm({
                             >
                               {token.RoundNum}
                             </Link>
-                          ) : (
-                            <span className="text-muted-foreground">Unknown</span>
-                          )}
-                        </div>
-
-                        <div>
-                          <p className="text-xs uppercase tracking-wider text-muted-foreground sm:hidden">
-                            Current Owner
-                          </p>
-                          {token.CurOwnerAddr ? (
-                            <AddressLink
-                              address={String(token.CurOwnerAddr)}
-                              url={`/user/${token.CurOwnerAddr}`}
-                            />
                           ) : (
                             <span className="text-muted-foreground">Unknown</span>
                           )}

@@ -146,7 +146,7 @@ describe('CosmicSignatureNftTransferForm', () => {
       createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
     ]);
 
-    expect(screen.getAllByText('0x111111....111111').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('0x111111....111111')).toHaveLength(1);
     expect(screen.getByText('Alpha')).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
     expect(screen.getAllByLabelText(/select nft #/i)).toHaveLength(2);
@@ -156,6 +156,25 @@ describe('CosmicSignatureNftTransferForm', () => {
       'href',
       `/cosmic-signature-transfer/${SOURCE}`,
     );
+  });
+
+  it('does not repeat owner addresses inside NFT rows', () => {
+    renderForm([
+      createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
+      createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
+      createToken({
+        TokenId: 3,
+        TokenName: 'Stale owner',
+        EvtLogId: 3,
+        CurOwnerAddr: OTHER_SOURCE,
+      }),
+    ]);
+
+    expect(screen.queryByText('Current Owner')).not.toBeInTheDocument();
+    expect(screen.getByTestId('nft-transfer-picker')).not.toHaveTextContent('0x111111....111111');
+    expect(screen.getByTestId('nft-transfer-picker')).not.toHaveTextContent('0x222222....222222');
+    expect(document.querySelector(`a[href="/user/${SOURCE}"]`)).toBeNull();
+    expect(document.querySelector(`a[href="/user/${OTHER_SOURCE}"]`)).toBeNull();
   });
 
   it('allows the recipient address to be typed normally', async () => {
@@ -227,6 +246,22 @@ describe('CosmicSignatureNftTransferForm', () => {
 
     expect(screen.getByLabelText('Select NFT #1')).not.toBeChecked();
     expect(screen.getByText('0 selected of 1 transferable NFTs.')).toBeInTheDocument();
+  });
+
+  it('keeps picker controls usable when NFTs include owner metadata', async () => {
+    const user = userEvent.setup();
+    renderForm([
+      createToken({ TokenId: 1, TokenName: 'Alpha', EvtLogId: 1 }),
+      createToken({ TokenId: 2, TokenName: 'Beta', EvtLogId: 2 }),
+    ]);
+
+    await user.type(screen.getByLabelText('Recipient address'), RECIPIENT);
+    await user.click(screen.getByRole('button', { name: /select current page/i }));
+
+    expect(screen.getByLabelText('Recipient address')).toHaveValue(RECIPIENT);
+    expect(screen.getByLabelText('Select NFT #1')).toBeChecked();
+    expect(screen.getByLabelText('Select NFT #2')).toBeChecked();
+    expect(screen.getByRole('button', { name: /send selected nfts/i })).toBeEnabled();
   });
 
   it('shows anchored NFTs but keeps them unselectable', () => {
