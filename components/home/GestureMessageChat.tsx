@@ -138,6 +138,8 @@ export function GestureMessageChat({
                   const timestamp = formatGestureMessageTimestamp(gesture.TimeStamp);
                   const isNewest = index === 0;
                   const gestureId = Number.isFinite(gesture.EvtLogId) ? gesture.EvtLogId : null;
+                  const gesturePosition =
+                    typeof gesture.BidPosition === 'number' ? gesture.BidPosition : null;
                   const messageKey =
                     gestureId ?? `${gesture.BidderAddr}-${gesture.TimeStamp}-${index}`;
 
@@ -169,9 +171,9 @@ export function GestureMessageChat({
                             <Link
                               href={`/gesture/${gestureId}`}
                               className="inline-flex shrink-0 items-center gap-1 rounded-full border border-white/[0.08] bg-white/[0.035] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:border-primary/25 hover:text-primary"
-                              aria-label={`Open gesture ${gestureId}`}
+                              aria-label={`Open gesture position ${gesturePosition ?? gestureId}`}
                             >
-                              <Radio className="h-3 w-3" />#{gestureId}
+                              <Radio className="h-3 w-3" />#{gesturePosition ?? gestureId}
                             </Link>
                           ) : null}
                         </div>

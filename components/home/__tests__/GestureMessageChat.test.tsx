@@ -93,6 +93,7 @@ describe('GestureMessageChat', () => {
         gestures={[
           makeGesture({
             EvtLogId: 9,
+            BidPosition: 3,
             BidderAddr: participant,
             TimeStamp: timestamp,
             Message: 'A carefully timed gesture.',
@@ -105,10 +106,9 @@ describe('GestureMessageChat', () => {
       'href',
       `/user/${participant}`,
     );
-    expect(screen.getByRole('link', { name: 'Open gesture 9' })).toHaveAttribute(
-      'href',
-      '/gesture/9',
-    );
+    const positionBadge = screen.getByRole('link', { name: 'Open gesture position 3' });
+    expect(positionBadge).toHaveAttribute('href', '/gesture/9');
+    expect(positionBadge).toHaveTextContent('#3');
     expect(screen.getByText(date!)).toBeInTheDocument();
     expect(screen.getByText(time!)).toBeInTheDocument();
     expect(screen.getByText('A carefully timed gesture.')).toBeInTheDocument();

@@ -15,12 +15,19 @@ import '@testing-library/jest-dom';
 
 // Required by config/networks.ts (which refuses defaults); set so tests
 // can render app components without tripping the env-validation guard.
-process.env.NEXT_PUBLIC_NETWORK = process.env.NEXT_PUBLIC_NETWORK || 'sepolia';
-process.env.NEXT_PUBLIC_API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://test-api.example/api/cosmicgame/';
-process.env.NEXT_PUBLIC_RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545';
-process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'test-walletconnect-project-id';
+//
+// These are assigned UNCONDITIONALLY (no `|| existing` fallback) so the suite
+// is hermetic. `next/jest` can leak `.env.local` values (e.g.
+// `NEXT_PUBLIC_NETWORK=mainnet`) into a Jest worker depending on worker
+// scheduling, which previously caused flaky chain-id mismatches under parallel
+// runs (mainnet 42161 vs the expected sepolia 421614) while `--runInBand`
+// passed. Forcing the values here guarantees every worker resolves the same
+// network regardless of `.env.local` or shell env. Per-test overrides still
+// work because they run in `beforeEach`, after this setup file.
+process.env.NEXT_PUBLIC_NETWORK = 'sepolia';
+process.env.NEXT_PUBLIC_API_URL = 'http://test-api.example/api/cosmicgame/';
+process.env.NEXT_PUBLIC_RPC_URL = 'http://127.0.0.1:8545';
+process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID = 'test-walletconnect-project-id';
 
 // Build stamp (mirrors next.config `env`); Preview/local show footer line in tests.
 process.env.NEXT_PUBLIC_BUILD_COMMIT =

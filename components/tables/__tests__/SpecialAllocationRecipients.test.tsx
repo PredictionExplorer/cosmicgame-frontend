@@ -60,6 +60,7 @@ jest.mock('../../../hooks/useChampions', () => ({
 function makeLatestGesture(overrides: Partial<GestureInfo> = {}): GestureInfo {
   return {
     EvtLogId: 101,
+    BidPosition: 7,
     BlockNum: 1,
     TxId: 1,
     TxHash: '0xgesture',
@@ -129,7 +130,7 @@ describe('SpecialAllocationRecipients', () => {
     expect(details).toHaveTextContent('Method');
     expect(details).toHaveTextContent('ETH');
     expect(screen.getByTestId('latest-participant-random-walk')).toHaveTextContent('No');
-    expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#101');
+    expect(screen.getByTestId('latest-participant-gesture-id')).toHaveTextContent('#7');
     expect(screen.getByTestId('latest-participant-cst-received')).toHaveTextContent('100.00 CST');
     expect(screen.queryByTestId('latest-participant-attached-assets')).not.toBeInTheDocument();
     expect(details).not.toHaveTextContent('Attached assets');

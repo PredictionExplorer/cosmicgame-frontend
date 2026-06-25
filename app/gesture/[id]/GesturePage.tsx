@@ -101,13 +101,19 @@ const GesturePage = ({ gestureId }: { gestureId: number }) => {
     );
   }
 
+  const gesturePosition = gestureInfo?.BidPosition;
+  const gesturePositionLabel =
+    gesturePosition !== undefined && gesturePosition !== null
+      ? `Gesture Position #${gesturePosition}`
+      : 'Gesture Position';
+
   return (
     <PageShell variant="detail" backdrop="signature" className="max-sm:pb-16">
       <div className="mx-auto max-w-3xl">
         <PageHeader
           title="Gesture details"
-          subtitle={loading ? 'Loading gesture data\u2026' : `Gesture #${gestureId}`}
-          breadcrumbs={[{ label: 'Home', href: '/' }, { label: `Gesture #${gestureId}` }]}
+          subtitle={loading ? 'Loading gesture data\u2026' : gesturePositionLabel}
+          breadcrumbs={[{ label: 'Home', href: '/' }, { label: gesturePositionLabel }]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
         />

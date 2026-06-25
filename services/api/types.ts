@@ -254,6 +254,8 @@ export interface RoundInfo {
 export interface GestureInfo extends TxInfo {
   GestureCost?: number;
   RoundNum: number;
+  /** Position of this gesture within its cycle (per-round ordinal), surfaced as "Gesture Position". */
+  BidPosition?: number;
   BidderAddr: string;
   Message?: string;
   GestureType: number;

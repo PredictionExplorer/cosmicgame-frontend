@@ -331,22 +331,104 @@ describe('allocation/[id] dynamic OG card', () => {
 });
 
 describe('gesture/[id] dynamic OG card', () => {
-  const cases: ReadonlyArray<readonly [string, string]> = [
-    ['0', 'Gesture #0'],
-    ['1', 'Gesture #1'],
-    ['9999', 'Gesture #9999'],
-    ['  3  ', 'Gesture #3'],
-    ['-5', 'Gesture'],
-    ['hello', 'Gesture'],
-    ['', 'Gesture'],
-    ['NaN', 'Gesture'],
-  ];
+  // The route param is an event-log id; the card resolves the human-facing
+  // gesture position via the API, falling back to a plain "Gesture" eyebrow.
+  const ORIGINAL_API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const originalFetch = global.fetch;
 
-  it.each(cases)('id=%j -> eyebrow=%j', async (id, expected) => {
+  afterEach(() => {
+    if (ORIGINAL_API_URL === undefined) {
+      delete process.env.NEXT_PUBLIC_API_URL;
+    } else {
+      process.env.NEXT_PUBLIC_API_URL = ORIGINAL_API_URL;
+    }
+    global.fetch = originalFetch;
+  });
+
+  /** Configures an API base URL and a `fetch` stub returning the given response. */
+  function stubApi(response: { ok: boolean; body: unknown }): jest.Mock {
+    process.env.NEXT_PUBLIC_API_URL = 'http://api.test/api/cosmicgame';
+    const fetchMock = jest.fn(async () => ({
+      ok: response.ok,
+      json: async () => response.body,
+    }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+    return fetchMock;
+  }
+
+  it('labels the resolved gesture position from the API', async () => {
+    const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 410 } } });
+
     const mod = (await import('@/app/gesture/[id]/opengraph-image')) as OgModule;
-    await mod.default({ params: Promise.resolve({ id }) });
-    expect(lastCardProps().eyebrow).toBe(expected);
+    await mod.default({ params: Promise.resolve({ id: '23514' }) });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining('/info/23514'),
+      expect.anything(),
+    );
+    expect(lastCardProps().eyebrow).toBe('Gesture Position #410');
     expect(lastCardProps().title).toMatch(/imprint on the signature/i);
+  });
+
+  it('treats position 0 as a valid position', async () => {
+    stubApi({ ok: true, body: { BidInfo: { BidPosition: 0 } } });
+    const mod = (await import('@/app/gesture/[id]/opengraph-image')) as OgModule;
+    await mod.default({ params: Promise.resolve({ id: '7' }) });
+    expect(lastCardProps().eyebrow).toBe('Gesture Position #0');
+  });
+
+  it('trims and parses the route id before requesting', async () => {
+    const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 9 } } });
+    const mod = (await import('@/app/gesture/[id]/opengraph-image')) as OgModule;
+    await mod.default({ params: Promise.resolve({ id: '  3  ' }) });
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/info/3'), expect.anything());
+    expect(lastCardProps().eyebrow).toBe('Gesture Position #9');
+  });
+
+  const invalidIds: ReadonlyArray<string> = ['-5', 'hello', '', 'NaN'];
+  it.each(invalidIds)(
+    'falls back to "Gesture" for invalid id %j without calling the API',
+    async (id) => {
+      const fetchMock = stubApi({ ok: true, body: { BidInfo: { BidPosition: 1 } } });
+      const mod = (await import('@/app/gesture/[id]/opengraph-image')) as OgModule;
+      await mod.default({ params: Promise.resolve({ id }) });
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(lastCardProps().eyebrow).toBe('Gesture');
+    },
+  );
+
+  it('falls back to "Gesture" on a non-OK API response', async () => {
+    stubApi({ ok: false, body: {} });
+    const mod = (await import('@/app/gesture/[id]/opengraph-image')) as OgModule;
+    await mod.default({ params: Promise.resolve({ id: '12' }) });
+    expect(lastCardProps().eyebrow).toBe('Gesture');
+  });
+
+  it('falls back to "Gesture" when the position is absent from the response', async () => {
+    stubApi({ ok: true, body: { BidInfo: {} } });
+    const mod = (await import('@/app/gesture/[id]/opengraph-image')) as OgModule;
+    await mod.default({ params: Promise.resolve({ id: '12' }) });
+    expect(lastCardProps().eyebrow).toBe('Gesture');
+  });
+
+  it('falls back to "Gesture" when the lookup throws', async () => {
+    process.env.NEXT_PUBLIC_API_URL = 'http://api.test/api/cosmicgame';
+    global.fetch = jest.fn(async () => {
+      throw new Error('network down');
+    }) as unknown as typeof fetch;
+    const mod = (await import('@/app/gesture/[id]/opengraph-image')) as OgModule;
+    await mod.default({ params: Promise.resolve({ id: '12' }) });
+    expect(lastCardProps().eyebrow).toBe('Gesture');
+  });
+
+  it('falls back to "Gesture" when no API base URL is configured', async () => {
+    delete process.env.NEXT_PUBLIC_API_URL;
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock as unknown as typeof fetch;
+    const mod = (await import('@/app/gesture/[id]/opengraph-image')) as OgModule;
+    await mod.default({ params: Promise.resolve({ id: '12' }) });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(lastCardProps().eyebrow).toBe('Gesture');
   });
 });
 

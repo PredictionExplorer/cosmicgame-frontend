@@ -400,10 +400,10 @@ function LatestGestureDetails({
         <DetailMetric label="Gesture time" value={formatGestureTime(latestGesture)} />
         <DetailMetric
           testId="latest-participant-gesture-id"
-          label="Gesture ID"
+          label="Gesture Position"
           value={
-            typeof latestGesture.EvtLogId === 'number'
-              ? `#${latestGesture.EvtLogId}`
+            typeof latestGesture.BidPosition === 'number'
+              ? `#${latestGesture.BidPosition}`
               : 'Unavailable'
           }
         />

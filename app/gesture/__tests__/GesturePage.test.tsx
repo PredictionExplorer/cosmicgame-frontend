@@ -36,6 +36,7 @@ const baseGestureInfo = {
   TimeStamp: 1000,
   BidderAddr: '0xBidder',
   RoundNum: 5,
+  BidPosition: 7,
   GestureType: 0,
   GestureCostEth: 1.5,
   NumCSTTokensEth: 0,
@@ -72,6 +73,16 @@ describe('GesturePage', () => {
     mockUseGestureInfo.mockReturnValue({ data: baseGestureInfo, isLoading: false });
     render(<GesturePage gestureId={1} />);
     expect(screen.getByRole('heading', { name: 'Gesture details', level: 1 })).toBeInTheDocument();
+  });
+
+  it('shows the gesture position (bid_position) instead of the event-log id', () => {
+    mockUseGestureInfo.mockReturnValue({
+      data: { ...baseGestureInfo, BidPosition: 7 },
+      isLoading: false,
+    });
+    render(<GesturePage gestureId={23514} />);
+    expect(screen.getAllByText('Gesture Position #7').length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText('Gesture #23514')).not.toBeInTheDocument();
   });
 
   it('renders participant address', () => {

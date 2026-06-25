@@ -496,7 +496,13 @@ describe('HomePage', () => {
       data: makeDashboardData({ LastBidderAddr: mockAccount }),
       isLoading: false,
     });
-    mockAllocationFinalize.allocationTime = Date.now() - 1_000;
+    // Put the finalization deadline comfortably in the past. `useNow()` shares
+    // a module-global ticker whose clock can read a few seconds stale across
+    // remounts within a test file, so a razor-thin margin (e.g. now - 1s) made
+    // this assertion flaky under parallel load: a stale `now` landed just shy
+    // of the deadline, rendering the `final-minute` phase instead of
+    // `ready-to-finalize`. A wide margin makes "ready" robust to clock skew.
+    mockAllocationFinalize.allocationTime = Date.now() - 60 * 60_000;
 
     try {
       render(<HomePage />);
