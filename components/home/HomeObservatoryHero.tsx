@@ -8,6 +8,7 @@ import { LazyMotion, domAnimation, m } from 'framer-motion';
 import { formatId, getAssetsUrl } from '@/utils';
 
 import { Button } from '@/components/ui/button';
+import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { GradientText } from '@/components/ui/gradient-text';
 import { Surface } from '@/components/ui/surface';
 import NFTImage from '@/components/nft/NFTImage';
@@ -313,6 +314,7 @@ export function HomeObservatoryHero({
                 <Button asChild variant="secondary" size="lg" className="h-11 px-5">
                   <Link href="/current-cycle">View Cycle Details</Link>
                 </Button>
+                <UniswapTradeButton variant="secondary" className="h-11 px-5" />
               </m.div>
             </m.div>
 

@@ -1,3 +1,5 @@
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+
 import { render, screen } from '@/test-utils';
 
 import TransferCstPage from '../TransferCstPage';
@@ -50,5 +52,14 @@ describe('TransferCstPage', () => {
     const form = screen.getByTestId('cst-transfer-form');
     expect(form).toHaveAttribute('data-source', ACCOUNT);
     expect(form).toHaveAttribute('data-history', `/cosmic-token-transfer/${ACCOUNT}`);
+  });
+
+  it('renders the Uniswap CST trade action in the page header', () => {
+    render(<TransferCstPage />);
+
+    expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+      'href',
+      CST_UNISWAP_SWAP_URL,
+    );
   });
 });

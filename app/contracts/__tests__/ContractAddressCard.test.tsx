@@ -1,3 +1,5 @@
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+
 import { render, screen, fireEvent, waitFor, checkA11y } from '@/test-utils';
 
 import { ContractAddressCard } from '../components/ContractAddressCard';
@@ -78,6 +80,23 @@ describe('ContractAddressCard', () => {
     render(<ContractAddressCard {...defaultProps} />);
     const link = screen.getByLabelText('View Cosmic Game on block explorer');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('renders the Uniswap trade action when requested', () => {
+    render(
+      <ContractAddressCard {...defaultProps} name="Cosmic Signature CST Token" showTradeAction />,
+    );
+
+    expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+      'href',
+      CST_UNISWAP_SWAP_URL,
+    );
+  });
+
+  it('does not render the Uniswap trade action by default', () => {
+    render(<ContractAddressCard {...defaultProps} />);
+
+    expect(screen.queryByRole('link', { name: 'Trade CST on Uniswap' })).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

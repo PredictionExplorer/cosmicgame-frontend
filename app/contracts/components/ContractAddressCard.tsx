@@ -5,6 +5,7 @@ import { Copy, Check, ExternalLink } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { useClipboard } from '@/hooks/useClipboard';
+import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
 interface ContractAddressCardProps {
@@ -12,6 +13,7 @@ interface ContractAddressCardProps {
   address: string;
   description: string;
   explorerUrl: string;
+  showTradeAction?: boolean;
   className?: string;
 }
 
@@ -20,6 +22,7 @@ export function ContractAddressCard({
   address,
   description,
   explorerUrl,
+  showTradeAction = false,
   className,
 }: ContractAddressCardProps) {
   const [copied, setCopied] = useState(false);
@@ -71,6 +74,11 @@ export function ContractAddressCard({
       <p className="mt-2 break-all font-mono text-xs text-muted-foreground leading-relaxed">
         {address}
       </p>
+      {showTradeAction ? (
+        <div className="mt-3">
+          <UniswapTradeButton variant="card" />
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { DashboardInfo } from '@/services/api';
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
 import { render, screen, within, act, checkA11y } from '@/test-utils';
 
@@ -103,6 +104,15 @@ describe('HomeObservatoryHero', () => {
     expect(screen.getByRole('link', { name: /Make a Gesture/ })).toHaveAttribute(
       'href',
       '#make-gesture',
+    );
+  });
+
+  it('links visitors to trade CST on Uniswap', () => {
+    render(<HomeObservatoryHero {...liveProps} />);
+
+    expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+      'href',
+      CST_UNISWAP_SWAP_URL,
     );
   });
 

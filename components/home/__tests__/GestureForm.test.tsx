@@ -16,6 +16,7 @@ jest.mock('../../nft/PaginationRWLKGrid', () => ({
 }));
 
 import type { DashboardInfo } from '@/services/api/types';
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
 import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
@@ -121,6 +122,21 @@ describe('GestureForm', () => {
     expect(
       screen.getByRole('progressbar', { name: 'CST Calibration Window progress' }),
     ).toHaveAttribute('aria-valuenow', '50');
+  });
+
+  it('CST selection links to trade CST on Uniswap', () => {
+    render(<GestureForm {...defaultProps} gestureType="CST" />);
+
+    expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+      'href',
+      CST_UNISWAP_SWAP_URL,
+    );
+  });
+
+  it('does not show the Uniswap trade link for ETH selection', () => {
+    render(<GestureForm {...defaultProps} gestureType="ETH" />);
+
+    expect(screen.queryByRole('link', { name: 'Trade CST on Uniswap' })).not.toBeInTheDocument();
   });
 
   it('shows first-gesture ETH Calibration Window copy before all methods unlock', () => {

@@ -3,6 +3,7 @@
 import { SendHorizontal } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
+import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { CstTransferForm } from '@/components/tokens/CstTransferForm';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PageShell } from '@/components/ui/page-shell';
@@ -20,6 +21,7 @@ export default function TransferCstPage() {
           breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'Transfer CST' }]}
           className="mb-10 text-left sm:max-w-none [&_p]:mx-0 [&_p]:max-w-none"
           align="left"
+          actions={<UniswapTradeButton variant="secondary" />}
         />
 
         {!active || !account ? (

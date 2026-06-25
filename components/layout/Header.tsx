@@ -9,6 +9,7 @@ import { formatEther } from 'viem';
 import { cn } from '@/lib/utils';
 import getNAVs from '@/config/nav';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
+import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { AppBarWrapper, DrawerList } from '@/components/styled';
 import ListNavItem from '@/components/common/ListNavItem';
 import ListItemButton from '@/components/common/ListItemButton';
@@ -133,6 +134,8 @@ const Header: FC = () => {
         <ArrowUpRight className="h-3 w-3 opacity-70" aria-hidden />
       </a>
 
+      <UniswapTradeButton variant="compact" className="hidden lg:inline-flex" />
+
       <ConnectWalletButton
         isMobileView={false}
         loading={loading}
@@ -255,6 +258,13 @@ const Header: FC = () => {
                 </span>
                 <ArrowUpRight className="h-4 w-4 opacity-70" aria-hidden />
               </a>
+
+              <div className="px-4 pt-3">
+                <UniswapTradeButton
+                  variant="secondary"
+                  className="h-10 w-full justify-between rounded-lg px-3 text-sm"
+                />
+              </div>
 
               {account && (
                 <>

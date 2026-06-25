@@ -1,4 +1,10 @@
 import '@testing-library/jest-dom';
+
+import userEvent from '@testing-library/user-event';
+
+import Header from '@/components/layout/Header';
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('@rainbow-me/rainbowkit');
@@ -52,9 +58,6 @@ jest.mock('../../services/api', () => ({
   },
 }));
 
-// eslint-disable-next-line import/order
-import Header from '@/components/layout/Header';
-
 beforeEach(() => {
   jest.clearAllMocks();
   Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1200 });
@@ -80,6 +83,29 @@ describe('Header', () => {
     const link = screen.getByRole('link', { name: /discover cosmic signature/i });
     expect(link).toHaveAttribute('href', 'https://cosmicsignature.com');
     expect(link).toHaveTextContent(/discover/i);
+  });
+
+  it('renders the desktop Uniswap CST trade link', () => {
+    render(<Header />);
+
+    expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+      'href',
+      CST_UNISWAP_SWAP_URL,
+    );
+  });
+
+  it('renders the mobile drawer Uniswap CST trade link', async () => {
+    const user = userEvent.setup();
+    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 });
+
+    render(<Header />);
+
+    await user.click(screen.getByRole('button', { name: 'menu' }));
+
+    expect(await screen.findByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+      'href',
+      CST_UNISWAP_SWAP_URL,
+    );
   });
 
   it('shows a mobile wallet connect button without opening the drawer', async () => {

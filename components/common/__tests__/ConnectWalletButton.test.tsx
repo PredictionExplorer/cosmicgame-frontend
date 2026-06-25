@@ -1,3 +1,5 @@
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+
 import { render, screen } from '@/test-utils';
 
 import ConnectWalletButton from '../ConnectWalletButton';
@@ -60,6 +62,15 @@ describe('ConnectWalletButton', () => {
 
     const transferLink = await screen.findByText('Transfer CST');
     expect(transferLink.closest('a')).toHaveAttribute('href', '/transfer-cst');
+  });
+
+  it('links connected users to trade CST on Uniswap', async () => {
+    renderWalletButton();
+
+    const tradeLink = await screen.findByRole('link', { name: 'Trade CST on Uniswap' });
+    expect(tradeLink).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
+    expect(tradeLink).toHaveAttribute('target', '_blank');
+    expect(tradeLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('links connected users to the My NFTs page', async () => {

@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+const CST_UNISWAP_SWAP_URL =
+  'https://app.uniswap.org/swap?chain=arbitrum&inputCurrency=NATIVE&outputCurrency=0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0';
+
 /**
  * End-to-end tests for the dApp home at app.cosmicsignature.com.
  *
@@ -23,6 +26,13 @@ test.describe('dApp home page @ app.cosmicsignature.com', () => {
     await ensureVisible(cycleInfo);
     await expect(cycleInfo).toBeVisible();
     await expect(cycleInfo.getByRole('heading', { name: /Cycle #/ })).toBeVisible();
+  });
+
+  test('links to trade CST on Uniswap', async ({ page }) => {
+    const tradeLink = page.getByRole('link', { name: 'Trade CST on Uniswap' }).first();
+    await ensureVisible(tradeLink);
+    await expect(tradeLink).toBeVisible();
+    await expect(tradeLink).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
   });
 
   test('shows the Chrono Core timer at the top of the game page', async ({ page }) => {

@@ -34,8 +34,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command:
-      'PLAYWRIGHT=1 YARN_IGNORE_ENGINES=1 yarn build && PLAYWRIGHT=1 YARN_IGNORE_ENGINES=1 yarn start -p 3000',
+    command: 'PLAYWRIGHT=1 npm run build && PLAYWRIGHT=1 npm run start -- -p 3000',
     port: 3000,
     reuseExistingServer: false,
     timeout: 120_000,

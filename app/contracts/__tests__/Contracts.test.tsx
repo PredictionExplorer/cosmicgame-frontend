@@ -1,5 +1,7 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+
 import { render, screen, fireEvent, waitFor, checkA11y } from '@/test-utils';
 
 import Contracts from '../Contracts';
@@ -256,6 +258,16 @@ describe('Contracts', () => {
     expect(screen.getByText('Cosmic Signature CST Token')).toBeInTheDocument();
     expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
+  });
+
+  it('links the CST token card to the Uniswap swap page', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<Contracts />);
+
+    expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
+      'href',
+      CST_UNISWAP_SWAP_URL,
+    );
   });
 
   it('renders the verified implementation address over a stale dashboard value', () => {

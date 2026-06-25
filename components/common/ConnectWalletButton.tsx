@@ -24,6 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { MobileWallet, NavLink } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
 
@@ -142,6 +143,9 @@ const ConnectWalletButton = ({
                 <SendHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
                 Transfer CST
               </NavLink>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer p-0">
+              <UniswapTradeButton variant="menu" />
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer p-0">
               <NavLink

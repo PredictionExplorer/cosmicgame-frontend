@@ -83,6 +83,7 @@ export function ContractAddressGrid({
                   address={contract.address}
                   description={contract.description}
                   explorerUrl={explorerUrl}
+                  showTradeAction={contract.name === 'Cosmic Signature CST Token'}
                 />
               </motion.div>
             ))}

@@ -19,6 +19,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CustomTextField } from '@/components/styled';
 import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
+import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import type { DashboardInfo } from '@/services/api/types';
 import type { CSTGestureData, EthGestureInfo } from '@/hooks/useGestureForm';
 import { AuctionInfo } from '@/components/home/AuctionInfo';
@@ -181,6 +182,12 @@ export function GestureForm({
             subtitle={`CST cost descends through this dynamic window. ETH gestures shorten it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%; CST gestures lengthen it by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%.`}
             endedMessage="Calibration Window ended — you can gesture for free."
           />
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/15 bg-primary/[0.045] p-4">
+            <p className="max-w-md text-sm text-muted-foreground">
+              Need CST for this gesture method? Trade ETH for CST on Arbitrum through Uniswap.
+            </p>
+            <UniswapTradeButton variant="compact" />
+          </div>
         </div>
       )}
 

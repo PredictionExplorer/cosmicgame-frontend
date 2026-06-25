@@ -1,3 +1,5 @@
+import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 import { ContractAddressGrid, type ContractEntry } from '../components/ContractAddressGrid';
@@ -39,6 +41,12 @@ const contracts: ContractEntry[] = [
     category: 'core',
   },
   {
+    name: 'Cosmic Signature CST Token',
+    address: '0xCST',
+    description: 'CST token',
+    category: 'core',
+  },
+  {
     name: 'Public Goods Vault',
     address: '0xCCC',
     description: 'Public Goods',
@@ -64,6 +72,7 @@ describe('ContractAddressGrid', () => {
     render(<ContractAddressGrid {...defaultProps} />);
     expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature CST Token')).toBeInTheDocument();
     expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
   });
@@ -90,6 +99,14 @@ describe('ContractAddressGrid', () => {
   it('shows empty state when search has no results', () => {
     render(<ContractAddressGrid {...defaultProps} searchTerm="nonexistent" />);
     expect(screen.getByText(/No contracts match/)).toBeInTheDocument();
+  });
+
+  it('shows the Uniswap trade action only for the CST token contract', () => {
+    render(<ContractAddressGrid {...defaultProps} />);
+
+    const links = screen.getAllByRole('link', { name: 'Trade CST on Uniswap' });
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
   });
 
   it('has no accessibility violations', async () => {
