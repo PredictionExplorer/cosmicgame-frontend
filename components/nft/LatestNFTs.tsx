@@ -4,6 +4,7 @@ import { useSnapCarousel } from 'react-snap-carousel';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { useCSTList } from '@/hooks/useApiQuery';
 
 import NFT from './NFT';
@@ -17,8 +18,9 @@ const LatestNFTs = () => {
   return (
     <div className="bg-[#101441]">
       <div className="container mx-auto px-2.5 py-20 md:pb-[150px]">
-        <div className="flex items-center justify-center flex-wrap">
+        <div className="flex items-center justify-center flex-wrap gap-3">
           <h2 className="text-2xl font-semibold text-foreground">Latest NFTs</h2>
+          <NftMarketplaceButton variant="compact" />
         </div>
         <div className="text-center mb-14">
           <Image src="/images/divider.svg" width={93} height={3} alt="divider" />

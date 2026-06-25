@@ -9,6 +9,7 @@ import { formatEther } from 'viem';
 import { cn } from '@/lib/utils';
 import getNAVs from '@/config/nav';
 import ConnectWalletButton from '@/components/common/ConnectWalletButton';
+import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { AppBarWrapper, DrawerList } from '@/components/styled';
 import ListNavItem from '@/components/common/ListNavItem';
@@ -135,6 +136,7 @@ const Header: FC = () => {
       </a>
 
       <UniswapTradeButton variant="compact" className="hidden lg:inline-flex" />
+      <NftMarketplaceButton variant="compact" className="hidden lg:inline-flex" />
 
       <ConnectWalletButton
         isMobileView={false}
@@ -261,6 +263,12 @@ const Header: FC = () => {
 
               <div className="px-4 pt-3">
                 <UniswapTradeButton
+                  variant="secondary"
+                  className="h-10 w-full justify-between rounded-lg px-3 text-sm"
+                />
+              </div>
+              <div className="px-4 pt-2">
+                <NftMarketplaceButton
                   variant="secondary"
                   className="h-10 w-full justify-between rounded-lg px-3 text-sm"
                 />

@@ -1,5 +1,7 @@
 import userEvent from '@testing-library/user-event';
 
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+
 import { checkA11y, render, screen } from '@/test-utils';
 
 import MyWallet from '../MyTokens';
@@ -99,6 +101,16 @@ describe('MyTokens', () => {
     render(<MyWallet />);
     expect(screen.getByText('My NFTs')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature NFTs I Own')).toBeInTheDocument();
+  });
+
+  it('links to the Cosmic Signature marketplace from the page header', () => {
+    mockUseCSTTokensByUser.mockReturnValue({ data: [], isLoading: false, isError: false });
+    render(<MyWallet />);
+
+    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+      'href',
+      COSMIC_SIGNATURE_MARKETPLACE_URL,
+    );
   });
 
   it('offers NFT transfers as a secondary collapsed option', async () => {

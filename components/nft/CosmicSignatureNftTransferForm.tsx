@@ -24,6 +24,7 @@ import {
   WALLET_TRANSACTION_CANCELLED_MESSAGE,
 } from '@/utils/errors';
 import { CustomPagination } from '@/components/common/CustomPagination';
+import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -349,6 +350,13 @@ export function CosmicSignatureNftTransferForm({
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/15 bg-primary/[0.045] p-4 text-sm">
+            <p className="max-w-md text-muted-foreground">
+              Looking to sell instead of sending directly? Use the marketplace to list or acquire
+              Cosmic Signature NFTs.
+            </p>
+            <NftMarketplaceButton variant="compact" label="Buy or sell NFTs" />
+          </div>
           <div className="mb-6 grid gap-3 rounded-lg border border-white/[0.06] bg-white/[0.025] p-4 text-sm sm:grid-cols-3">
             <div>
               <p className="text-xs uppercase tracking-wider text-muted-foreground">

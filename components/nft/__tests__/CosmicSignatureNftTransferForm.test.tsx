@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 
 import { TEST_APP_CONTRACT_ADDRESSES } from '@/test-utils/contractAddressesFixture';
 
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import type { CSTTokenInfo } from '@/services/api/types';
 
 import { checkA11y, fireEvent, render, screen, waitFor } from '@/test-utils';
@@ -155,6 +156,15 @@ describe('CosmicSignatureNftTransferForm', () => {
     expect(screen.getByRole('link', { name: /view nft transfer history/i })).toHaveAttribute(
       'href',
       `/cosmic-signature-transfer/${SOURCE}`,
+    );
+  });
+
+  it('links sellers to the Cosmic Signature marketplace', () => {
+    renderForm();
+
+    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+      'href',
+      COSMIC_SIGNATURE_MARKETPLACE_URL,
     );
   });
 

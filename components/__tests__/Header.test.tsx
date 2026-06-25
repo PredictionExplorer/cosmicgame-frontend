@@ -3,6 +3,7 @@ import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 
 import Header from '@/components/layout/Header';
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -94,6 +95,15 @@ describe('Header', () => {
     );
   });
 
+  it('renders the desktop NFT marketplace link', () => {
+    render(<Header />);
+
+    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+      'href',
+      COSMIC_SIGNATURE_MARKETPLACE_URL,
+    );
+  });
+
   it('renders the mobile drawer Uniswap CST trade link', async () => {
     const user = userEvent.setup();
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 });
@@ -106,6 +116,19 @@ describe('Header', () => {
       'href',
       CST_UNISWAP_SWAP_URL,
     );
+  });
+
+  it('renders the mobile drawer NFT marketplace link', async () => {
+    const user = userEvent.setup();
+    Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 });
+
+    render(<Header />);
+
+    await user.click(screen.getByRole('button', { name: 'menu' }));
+
+    expect(
+      await screen.findByRole('link', { name: 'Open Cosmic Signature marketplace' }),
+    ).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
   });
 
   it('shows a mobile wallet connect button without opening the drawer', async () => {

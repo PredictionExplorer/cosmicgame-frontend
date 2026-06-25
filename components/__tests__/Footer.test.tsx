@@ -1,4 +1,8 @@
 import '@testing-library/jest-dom';
+
+import Footer from '@/components/layout/Footer';
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+
 import { render, screen, checkA11y } from '@/test-utils';
 
 jest.mock('next/image', () => ({
@@ -24,9 +28,6 @@ jest.mock('next/link', () => ({
     </a>
   ),
 }));
-
-// eslint-disable-next-line import/order
-import Footer from '@/components/layout/Footer';
 
 describe('Footer', () => {
   beforeEach(() => {
@@ -91,6 +92,13 @@ describe('Footer', () => {
     expect(pg).toBeInTheDocument();
     expect(pg).toHaveAttribute('href', 'https://protocol-guild.readthedocs.io');
     expect(pg).toHaveAttribute('target', '_blank');
+  });
+
+  it('renders the Cosmic Signature marketplace link', () => {
+    const marketplace = screen.getByRole('link', { name: 'NFT Marketplace' });
+    expect(marketplace).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
+    expect(marketplace).toHaveAttribute('target', '_blank');
+    expect(marketplace).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('renders the site map link', () => {

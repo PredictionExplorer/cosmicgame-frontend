@@ -1,5 +1,6 @@
 import { protocolFacts } from '@/content/protocol-facts';
 
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
 import { render, screen, fireEvent, waitFor, checkA11y } from '@/test-utils';
@@ -267,6 +268,16 @@ describe('Contracts', () => {
     expect(screen.getByRole('link', { name: 'Trade CST on Uniswap' })).toHaveAttribute(
       'href',
       CST_UNISWAP_SWAP_URL,
+    );
+  });
+
+  it('links the Cosmic Signature NFT card to the marketplace', () => {
+    mockUseDashboardInfo.mockReturnValue({ data: makeDashboardData(), isLoading: false });
+    render(<Contracts />);
+
+    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+      'href',
+      COSMIC_SIGNATURE_MARKETPLACE_URL,
     );
   });
 

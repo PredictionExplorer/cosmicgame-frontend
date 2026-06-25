@@ -5,6 +5,7 @@ import { Copy, Check, ExternalLink } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { useClipboard } from '@/hooks/useClipboard';
+import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
 
@@ -14,6 +15,7 @@ interface ContractAddressCardProps {
   description: string;
   explorerUrl: string;
   showTradeAction?: boolean;
+  showMarketplaceAction?: boolean;
   className?: string;
 }
 
@@ -23,6 +25,7 @@ export function ContractAddressCard({
   description,
   explorerUrl,
   showTradeAction = false,
+  showMarketplaceAction = false,
   className,
 }: ContractAddressCardProps) {
   const [copied, setCopied] = useState(false);
@@ -74,9 +77,10 @@ export function ContractAddressCard({
       <p className="mt-2 break-all font-mono text-xs text-muted-foreground leading-relaxed">
         {address}
       </p>
-      {showTradeAction ? (
-        <div className="mt-3">
-          <UniswapTradeButton variant="card" />
+      {showTradeAction || showMarketplaceAction ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {showTradeAction ? <UniswapTradeButton variant="card" /> : null}
+          {showMarketplaceAction ? <NftMarketplaceButton variant="card" /> : null}
         </div>
       ) : null}
     </div>

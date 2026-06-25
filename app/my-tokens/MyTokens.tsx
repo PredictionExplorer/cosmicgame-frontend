@@ -3,6 +3,7 @@
 import { SendHorizontal } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/PageHeader';
+import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { CosmicSignatureNftTransferForm } from '@/components/nft/CosmicSignatureNftTransferForm';
 import { CSTTable } from '@/components/tokens/CSTTable';
 import {
@@ -30,7 +31,11 @@ function MyWallet() {
 
   return (
     <PageShell variant="data" backdrop="signature">
-      <PageHeader title="My NFTs" subtitle="Cosmic Signature NFTs in your connected wallet" />
+      <PageHeader
+        title="My NFTs"
+        subtitle="Cosmic Signature NFTs in your connected wallet"
+        actions={<NftMarketplaceButton variant="secondary" label="Buy or sell NFTs" />}
+      />
 
       {!active || !account ? (
         <EmptyState

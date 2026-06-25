@@ -1,4 +1,5 @@
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 
 import { render, screen } from '@/test-utils';
 
@@ -71,6 +72,17 @@ describe('ConnectWalletButton', () => {
     expect(tradeLink).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
     expect(tradeLink).toHaveAttribute('target', '_blank');
     expect(tradeLink).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('links connected users to the Cosmic Signature marketplace', async () => {
+    renderWalletButton();
+
+    const marketplaceLink = await screen.findByRole('link', {
+      name: 'Open Cosmic Signature marketplace',
+    });
+    expect(marketplaceLink).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
+    expect(marketplaceLink).toHaveAttribute('target', '_blank');
+    expect(marketplaceLink).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
   it('links connected users to the My NFTs page', async () => {

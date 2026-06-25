@@ -1,3 +1,4 @@
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
 import { render, screen, fireEvent, waitFor, checkA11y } from '@/test-utils';
@@ -97,6 +98,25 @@ describe('ContractAddressCard', () => {
     render(<ContractAddressCard {...defaultProps} />);
 
     expect(screen.queryByRole('link', { name: 'Trade CST on Uniswap' })).not.toBeInTheDocument();
+  });
+
+  it('renders the marketplace action when requested', () => {
+    render(
+      <ContractAddressCard {...defaultProps} name="Cosmic Signature NFT" showMarketplaceAction />,
+    );
+
+    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+      'href',
+      COSMIC_SIGNATURE_MARKETPLACE_URL,
+    );
+  });
+
+  it('does not render the marketplace action by default', () => {
+    render(<ContractAddressCard {...defaultProps} />);
+
+    expect(
+      screen.queryByRole('link', { name: 'Open Cosmic Signature marketplace' }),
+    ).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

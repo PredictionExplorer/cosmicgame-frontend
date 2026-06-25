@@ -1,4 +1,5 @@
 import LatestNFTs from '@/components/nft/LatestNFTs';
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 
 import { render, screen, checkA11y } from '@/test-utils';
 import '@testing-library/jest-dom';
@@ -16,6 +17,10 @@ describe('LatestNFTs', () => {
     expect(screen.getByRole('link', { name: 'Open the gallery' })).toHaveAttribute(
       'href',
       '/gallery',
+    );
+    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+      'href',
+      COSMIC_SIGNATURE_MARKETPLACE_URL,
     );
   });
 

@@ -8,6 +8,7 @@ import { Sparkles } from 'lucide-react';
 import { formatId, getAssetsUrl } from '@/utils';
 
 import { PageHeader } from '@/components/layout/PageHeader';
+import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { PageShell } from '@/components/ui/page-shell';
 import { SectionEyebrow } from '@/components/ui/section-eyebrow';
 import { Surface } from '@/components/ui/surface';
@@ -202,6 +203,7 @@ const GalleryPage = () => {
         titleLevel={2}
         gradientTitle="signature"
         subtitle="Explore the complete Cosmic Signature NFT collection imprinted across every cycle"
+        actions={<NftMarketplaceButton variant="secondary" />}
       />
 
       <Surface
@@ -248,7 +250,7 @@ const GalleryPage = () => {
           )}
           <div
             aria-hidden
-            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_0%,rgb(13_5_33/0.18)_58%,rgb(13_5_33/0.64)_100%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,transparent_0%,rgb(13_5_33/0.18)_58%,rgb(13_5_33/0.64)_100%)]"
           />
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-lg border border-white/10 bg-black/45 px-3 py-2 text-xs text-white/70 backdrop-blur">
             <span className="font-mono uppercase tracking-[0.2em]">

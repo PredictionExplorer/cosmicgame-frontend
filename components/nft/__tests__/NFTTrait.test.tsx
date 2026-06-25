@@ -1,3 +1,5 @@
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+
 import { render, screen, fireEvent, checkA11y } from '@/test-utils';
 
 import NFTTrait from '../NFTTrait';
@@ -175,6 +177,18 @@ describe('NFTTrait', () => {
     withNameHistory();
     render(<NFTTrait tokenId={5} />);
     expect(screen.getByTestId('hero-section')).toBeInTheDocument();
+  });
+
+  it('links to the Cosmic Signature marketplace from the token actions', () => {
+    withDashboard();
+    withNft();
+    withNameHistory();
+    render(<NFTTrait tokenId={5} />);
+
+    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+      'href',
+      COSMIC_SIGNATURE_MARKETPLACE_URL,
+    );
   });
 
   it('renders breadcrumb', () => {

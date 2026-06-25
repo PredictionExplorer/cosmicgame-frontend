@@ -1,3 +1,5 @@
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
+
 import { render, screen, checkA11y, fireEvent, waitFor } from '@/test-utils';
 
 import GalleryPage from '../GalleryPage';
@@ -108,6 +110,16 @@ describe('GalleryPage', () => {
     expect(
       screen.getByText(/Explore the complete Cosmic Signature NFT collection imprinted/),
     ).toBeInTheDocument();
+  });
+
+  it('links to the Cosmic Signature marketplace', () => {
+    mockUseCSTList.mockReturnValue({ data: [], isLoading: false, error: null });
+    render(<GalleryPage />);
+
+    expect(screen.getByRole('link', { name: 'Open Cosmic Signature marketplace' })).toHaveAttribute(
+      'href',
+      COSMIC_SIGNATURE_MARKETPLACE_URL,
+    );
   });
 
   it('shows skeleton loading state', () => {

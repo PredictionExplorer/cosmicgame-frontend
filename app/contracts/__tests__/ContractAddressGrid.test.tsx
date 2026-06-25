@@ -1,3 +1,4 @@
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { CST_UNISWAP_SWAP_URL } from '@/config/uniswap';
 
 import { render, screen, checkA11y } from '@/test-utils';
@@ -35,7 +36,7 @@ const contracts: ContractEntry[] = [
     category: 'core',
   },
   {
-    name: 'Cosmic Signature',
+    name: 'Cosmic Signature NFT',
     address: '0xBBB',
     description: 'NFT collection',
     category: 'core',
@@ -71,7 +72,7 @@ describe('ContractAddressGrid', () => {
   it('renders all contract address cards', () => {
     render(<ContractAddressGrid {...defaultProps} />);
     expect(screen.getByText('Cosmic Game')).toBeInTheDocument();
-    expect(screen.getByText('Cosmic Signature')).toBeInTheDocument();
+    expect(screen.getByText('Cosmic Signature NFT')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature CST Token')).toBeInTheDocument();
     expect(screen.getByText('Public Goods Vault')).toBeInTheDocument();
     expect(screen.getByText('Cosmic Signature NFT Anchoring Wallet')).toBeInTheDocument();
@@ -107,6 +108,14 @@ describe('ContractAddressGrid', () => {
     const links = screen.getAllByRole('link', { name: 'Trade CST on Uniswap' });
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveAttribute('href', CST_UNISWAP_SWAP_URL);
+  });
+
+  it('shows the marketplace action only for the Cosmic Signature NFT contract', () => {
+    render(<ContractAddressGrid {...defaultProps} />);
+
+    const links = screen.getAllByRole('link', { name: 'Open Cosmic Signature marketplace' });
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
   });
 
   it('has no accessibility violations', async () => {

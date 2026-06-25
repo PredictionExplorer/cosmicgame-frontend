@@ -50,6 +50,7 @@ import {
 import { useClipboard } from '@/hooks/useClipboard';
 import { GradientText } from '@/components/styled';
 import VideoPlayerDialog from '@/components/common/VideoPlayerDialog';
+import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 
 import NFTImage from './NFTImage';
 import NFTVideo from './NFTVideo';
@@ -387,6 +388,8 @@ const NFTTrait = ({ tokenId }: NFTTraitProps) => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              <NftMarketplaceButton variant="card" label="Buy or sell NFTs" />
 
               <div className="flex gap-2 ml-auto">
                 <Button

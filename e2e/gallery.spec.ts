@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 
+const COSMIC_SIGNATURE_MARKETPLACE_URL = 'https://www.axiomzero.market/cosmic-signature';
+
 /** Scrolls locator into view before interaction/assertion (needed on mobile). */
 async function ensureVisible(locator: { scrollIntoViewIfNeeded(): Promise<void> }) {
   await locator.scrollIntoViewIfNeeded();
@@ -13,6 +15,15 @@ test.describe('Gallery page', () => {
   test('renders NFT cards', async ({ page }) => {
     await expect(page.getByRole('heading', { name: /NFT Gallery/i })).toBeVisible();
     await expect(page.getByText(/Showing 1 -|There is no NFT yet/i).first()).toBeVisible();
+  });
+
+  test('links to the Cosmic Signature marketplace', async ({ page }) => {
+    const marketplaceLink = page
+      .getByRole('link', { name: 'Open Cosmic Signature marketplace' })
+      .first();
+    await ensureVisible(marketplaceLink);
+    await expect(marketplaceLink).toBeVisible();
+    await expect(marketplaceLink).toHaveAttribute('href', COSMIC_SIGNATURE_MARKETPLACE_URL);
   });
 
   test('search box is visible and accepts input', async ({ page }) => {

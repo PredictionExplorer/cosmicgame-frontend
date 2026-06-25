@@ -24,6 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { NftMarketplaceButton } from '@/components/common/NftMarketplaceButton';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
 import { MobileWallet, NavLink } from '@/components/styled';
 import { useActiveWeb3React } from '@/hooks/web3';
@@ -134,6 +135,9 @@ const ConnectWalletButton = ({
                 <Coins className="h-3.5 w-3.5 text-muted-foreground" />
                 My NFTs
               </NavLink>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer p-0">
+              <NftMarketplaceButton variant="menu" />
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer p-0">
               <NavLink

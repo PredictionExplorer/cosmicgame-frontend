@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { FooterWrapper } from '@/components/styled';
+import { COSMIC_SIGNATURE_MARKETPLACE_URL } from '@/config/marketplace';
 import { getClientBuildInfo, isVercelProductionDeploy } from '@/lib/buildInfo';
 
 const XIcon = (props: { className?: string }) => (
@@ -33,6 +34,7 @@ const DiscordIcon = (props: { className?: string }) => (
 const footerLinks: Record<string, { label: string; href: string; external?: boolean }[]> = {
   Protocol: [
     { label: 'Gallery', href: '/gallery' },
+    { label: 'NFT Marketplace', href: COSMIC_SIGNATURE_MARKETPLACE_URL, external: true },
     { label: 'Statistics', href: '/statistics' },
     { label: 'Contracts', href: '/contracts' },
     { label: 'Source Code', href: '/code' },
