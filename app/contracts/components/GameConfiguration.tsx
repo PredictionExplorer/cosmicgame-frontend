@@ -6,6 +6,7 @@ import { TrendingUp, Clock, Coins, MessageSquare, Timer, Zap } from 'lucide-reac
 import { protocolFacts } from '@/content/protocol-facts';
 import { formatSeconds } from '@/utils';
 
+import { formatCstAmount } from '@/utils/cstGesture';
 import { StatCard, StatCardSkeleton } from '@/components/ui/stat-card';
 import { SectionDivider } from '@/components/ui/section-divider';
 
@@ -13,7 +14,7 @@ interface GameConfigurationProps {
   priceIncrease: number;
   timeIncrease: number;
   timeIncrement: number;
-  cstRewardPerBid: number;
+  cstRewardPerBid: number | null;
   maxMessageLength: number;
   claimTimeout: number;
   initialIncrement: number;
@@ -71,7 +72,7 @@ export function GameConfiguration({
     },
     {
       label: 'Current Participation CST Preview',
-      value: `${cstRewardPerBid} CST`,
+      value: `${formatCstAmount(cstRewardPerBid)} CST`,
       icon: <Coins className="h-4 w-4" />,
       tooltip: `Estimated Participation CST if a gesture lands now. The amount is dynamic and uses ${protocolFacts.dynamicCstRewardFormula}.`,
     },

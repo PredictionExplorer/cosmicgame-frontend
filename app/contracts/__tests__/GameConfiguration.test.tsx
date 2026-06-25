@@ -47,6 +47,11 @@ describe('GameConfiguration', () => {
     expect(screen.getByText('280')).toBeInTheDocument();
   });
 
+  it('formats CST preview values with bounded decimal precision', () => {
+    render(<GameConfiguration {...defaultProps} cstRewardPerBid={123.456789123} />);
+    expect(screen.getByText('123.4568 CST')).toBeInTheDocument();
+  });
+
   it('renders the Protocol Configuration section title', () => {
     render(<GameConfiguration {...defaultProps} />);
     expect(screen.getByText('Protocol Configuration')).toBeInTheDocument();

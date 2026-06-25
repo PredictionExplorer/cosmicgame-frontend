@@ -32,6 +32,29 @@ const sectionFade = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 };
 
+const CST_REWARD_PREVIEW_REFRESH_MS = 1_000;
+
+interface LiveCstPreviewTestGlobals {
+  expect?: unknown;
+  __COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__?: boolean;
+  __COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__?: number;
+}
+
+function shouldScheduleLiveCstPreviewTimer(): boolean {
+  const testGlobals = globalThis as LiveCstPreviewTestGlobals;
+  const isJest = typeof testGlobals.expect === 'function';
+  return !isJest || testGlobals.__COSMIC_ENABLE_LIVE_CST_PREVIEW_TEST_TIMERS__ === true;
+}
+
+function getLiveCstPreviewRefreshMs(): number {
+  const testInterval = (globalThis as LiveCstPreviewTestGlobals)
+    .__COSMIC_LIVE_CST_PREVIEW_TEST_INTERVAL_MS__;
+  if (typeof testInterval === 'number' && Number.isFinite(testInterval) && testInterval > 0) {
+    return testInterval;
+  }
+  return CST_REWARD_PREVIEW_REFRESH_MS;
+}
+
 const Contracts = () => {
   const { data, isLoading: loading } = useDashboardInfo();
   const { charity, cosmicGame } = useContractAddresses();
@@ -43,7 +66,7 @@ const Contracts = () => {
   const [timeIncrement, setTimeIncrement] = useState(0);
   const [initialIncrement, setInitialIncrement] = useState(0);
   const [msgMaxLen, setMsgMaxLen] = useState(0);
-  const [cstRewardAmountForBidding, setCstRewardAmountForBidding] = useState(0);
+  const [cstRewardAmountForBidding, setCstRewardAmountForBidding] = useState<number | null>(null);
   const [cstDutchAuctionDurations, setCstDutchAuctionDurations] = useState({
     AuctionDuration: 0,
     ElapsedDuration: 0,
@@ -98,18 +121,6 @@ const Contracts = () => {
     }, 'getInitialDurationUntilMainPrize');
 
     safeCall(async () => {
-      const v = await readCosmicGameWithFallback<bigint>([
-        () => cosmicGameContract.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
-        () =>
-          cosmicGameContract.read.getBidCstRewardAmountAdvanced?.([0n]) as Promise<
-            bigint | undefined
-          >,
-        () => cosmicGameContract.read.cstRewardAmountForBidding?.() as Promise<bigint | undefined>,
-      ]);
-      setCstRewardAmountForBidding(Number(formatEther(v ?? 0n)));
-    }, 'cstRewardAmountForBidding');
-
-    safeCall(async () => {
       const v = (await cosmicGameContract.read.getCstDutchAuctionDurations?.()) as
         | bigint[]
         | undefined;
@@ -133,6 +144,69 @@ const Contracts = () => {
       const v = await cosmicGameContract.read.cstDutchAuctionBeginningBidPriceMinLimit?.();
       setCstDutchAuctionBeginningBidPriceMinLimit(Number(formatEther((v ?? 0n) as bigint)));
     }, 'cstDutchAuctionBeginningBidPriceMinLimit');
+  }, [cosmicGameContract]);
+
+  useEffect(() => {
+    if (!cosmicGameContract) {
+      setCstRewardAmountForBidding(null);
+      return;
+    }
+
+    let cancelled = false;
+    let inFlight = false;
+    let timeoutId: number | null = null;
+
+    const refreshCstRewardPreview = async () => {
+      if (cancelled || inFlight) return;
+      inFlight = true;
+
+      try {
+        const v = await readCosmicGameWithFallback<bigint>([
+          () => cosmicGameContract.read.getBidCstRewardAmount?.() as Promise<bigint | undefined>,
+          () =>
+            cosmicGameContract.read.getBidCstRewardAmountAdvanced?.([0n]) as Promise<
+              bigint | undefined
+            >,
+          () =>
+            cosmicGameContract.read.cstRewardAmountForBidding?.() as Promise<bigint | undefined>,
+        ]);
+        const amount = Number(formatEther(v ?? 0n));
+        if (!cancelled) {
+          setCstRewardAmountForBidding(Number.isFinite(amount) ? amount : null);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setCstRewardAmountForBidding(null);
+          reportError(e, 'contracts live cstRewardAmountForBidding');
+        }
+      } finally {
+        inFlight = false;
+      }
+    };
+
+    const scheduleNextRefresh = () => {
+      if (cancelled) return;
+      timeoutId = window.setTimeout(() => {
+        void refreshCstRewardPreview().finally(scheduleNextRefresh);
+      }, getLiveCstPreviewRefreshMs());
+    };
+
+    if (shouldScheduleLiveCstPreviewTimer()) {
+      void refreshCstRewardPreview().finally(scheduleNextRefresh);
+    } else {
+      void refreshCstRewardPreview();
+    }
+
+    const handleGesturePlaced = () => {
+      void refreshCstRewardPreview();
+    };
+    window.addEventListener('cosmic:gesture-placed', handleGesturePlaced);
+
+    return () => {
+      cancelled = true;
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+      window.removeEventListener('cosmic:gesture-placed', handleGesturePlaced);
+    };
   }, [cosmicGameContract]);
 
   useEffect(() => {
