@@ -12,6 +12,7 @@ describe('getNAVs', () => {
     const routes = flattenRoutes(getNAVs(null, '0x1111111111111111111111111111111111111111'));
 
     expect(routes).not.toContain('/transfer-cst');
+    expect(routes).not.toContain('/transfer-cosmic-signature-nfts');
     expect(routes).not.toContain('/internal/cst-outreach-transfer');
   });
 });

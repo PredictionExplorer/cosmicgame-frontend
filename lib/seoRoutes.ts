@@ -121,6 +121,7 @@ export const noindexAppRoutes: SeoRoute[] = [
   '/my-allocations',
   '/my-statistics',
   '/recipient-history',
+  '/transfer-cosmic-signature-nfts',
   '/transfer-cst',
 ].map((path) => ({
   path,

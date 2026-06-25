@@ -40,7 +40,14 @@ describe('robots (host-aware)', () => {
         ? wildcardRule.disallow
         : [wildcardRule.disallow];
       expect(disallow).toEqual(
-        expect.arrayContaining(['/admin/', '/api/', '/gallery/', '/internal/', '/transfer-cst']),
+        expect.arrayContaining([
+          '/admin/',
+          '/api/',
+          '/gallery/',
+          '/internal/',
+          '/transfer-cosmic-signature-nfts',
+          '/transfer-cst',
+        ]),
       );
     });
 

@@ -62,6 +62,13 @@ describe('ConnectWalletButton', () => {
     expect(transferLink.closest('a')).toHaveAttribute('href', '/transfer-cst');
   });
 
+  it('links connected users to the Cosmic Signature NFT transfer page', async () => {
+    renderWalletButton();
+
+    const transferLink = await screen.findByText('Transfer NFTs');
+    expect(transferLink.closest('a')).toHaveAttribute('href', '/transfer-cosmic-signature-nfts');
+  });
+
   it('does not expose the hidden marketing transfer URL in the wallet menu', async () => {
     renderWalletButton();
 

@@ -102,6 +102,7 @@ export const APP_ONLY_PATH_PREFIXES: readonly string[] = [
   '/statistics',
   '/system-event',
   '/terms',
+  '/transfer-cosmic-signature-nfts',
   '/transfer-cst',
   '/used-rwlk-nfts',
   '/user',

@@ -60,6 +60,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     '/security',
     '/statistics',
     '/terms',
+    '/transfer-cosmic-signature-nfts',
     '/transfer-cst',
   ];
 
