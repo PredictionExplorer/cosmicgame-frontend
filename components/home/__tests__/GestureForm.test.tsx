@@ -166,7 +166,9 @@ describe('GestureForm', () => {
     expect(screen.getByText('100 CST')).toBeInTheDocument();
     expect(screen.getByText('1.5 CST')).toBeInTheDocument();
     expect(screen.getByText('+98.5 CST')).toBeInTheDocument();
-    expect(screen.getByText('You profit in CST if this lands.')).toBeInTheDocument();
+    expect(
+      screen.getByText('The CST reward exceeds the CST cost if this lands.'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
     expect(screen.queryByText(/Protection 1:/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Protection 2:/)).not.toBeInTheDocument();
@@ -211,7 +213,9 @@ describe('GestureForm', () => {
     );
 
     expect(screen.getByText('+3.75 CST')).toBeInTheDocument();
-    expect(screen.getByText('You profit in CST if this lands.')).toBeInTheDocument();
+    expect(
+      screen.getByText('The CST reward exceeds the CST cost if this lands.'),
+    ).toBeInTheDocument();
   });
 
   it('treats free CST gestures as zero cost when calculating net CST', () => {
@@ -238,7 +242,7 @@ describe('GestureForm', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" isCstRewardLoading />);
     expect(screen.getAllByText('Loading...')).toHaveLength(2);
     expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
-    expect(screen.queryByText(/profit in CST/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/reward exceeds/)).not.toBeInTheDocument();
   });
 
   it('shows a placeholder when the live CST reward preview is unavailable', () => {
@@ -253,7 +257,7 @@ describe('GestureForm', () => {
 
     expect(screen.getAllByText('-- CST')).toHaveLength(2);
     expect(screen.getByText('Min accepted: -- CST')).toBeInTheDocument();
-    expect(screen.queryByText(/profit in CST/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/reward exceeds/)).not.toBeInTheDocument();
     expect(screen.queryByText(/spend more CST/)).not.toBeInTheDocument();
   });
 

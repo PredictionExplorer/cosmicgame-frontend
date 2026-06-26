@@ -282,7 +282,7 @@ export function GestureForm({
                   )}
                 >
                   {netCstAmount > 0
-                    ? 'You profit in CST if this lands.'
+                    ? 'The CST reward exceeds the CST cost if this lands.'
                     : 'Most CST gestures spend more CST than they receive.'}
                 </p>
               )}
