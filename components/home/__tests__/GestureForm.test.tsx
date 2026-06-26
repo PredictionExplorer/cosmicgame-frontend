@@ -174,6 +174,20 @@ describe('GestureForm', () => {
     expect(screen.queryByText(/Protection 2:/)).not.toBeInTheDocument();
   });
 
+  it('explains the minimum accepted CST reward guard', async () => {
+    const user = userEvent.setup();
+    render(<GestureForm {...defaultProps} gestureType="CST" />);
+
+    await user.hover(screen.getByRole('button', { name: 'What Min accepted CST means' }));
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      'The minimum Participation CST reward your transaction will accept.',
+    );
+    expect(screen.getByRole('tooltip')).toHaveTextContent(
+      'If the contract would imprint less by confirmation, the gesture reverts instead of accepting a lower reward.',
+    );
+  });
+
   it('shows negative net CST when the CST gesture cost is greater than the reward', () => {
     render(
       <GestureForm

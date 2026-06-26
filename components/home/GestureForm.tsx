@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/accordion';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { CustomTextField } from '@/components/styled';
 import PaginationRWLKGrid from '@/components/nft/PaginationRWLKGrid';
 import { UniswapTradeButton } from '@/components/common/UniswapTradeButton';
@@ -124,6 +125,12 @@ export function GestureForm({
     gestureType === 'CST'
       ? 'Net CST is the Participation CST reward minus the current CST gesture cost.'
       : 'Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.';
+  const minAcceptedCstLabel = acceptAnyCstReward
+    ? 'any reward, including 0 CST'
+    : `${formatCstAmount(gestureCstRewardAmountMin)} CST`;
+  const minAcceptedCstTooltip = acceptAnyCstReward
+    ? 'Accept any CST reward sends a minimum accepted reward of 0, so the gesture can land with any dynamic CST reward, including none.'
+    : 'The minimum Participation CST reward your transaction will accept. It is the current preview minus your Minimum CST Reward Protection tolerance. If the contract would imprint less by confirmation, the gesture reverts instead of accepting a lower reward.';
 
   return (
     <div className="mt-8 space-y-5">
@@ -268,11 +275,15 @@ export function GestureForm({
                     : `${formatCstAmount(gestureCstRewardAmount)} CST`}
                 </p>
               )}
-              <p className="mt-1 text-xs text-muted-foreground">
-                Min accepted:{' '}
-                {acceptAnyCstReward
-                  ? 'any reward, including 0 CST'
-                  : `${formatCstAmount(gestureCstRewardAmountMin)} CST`}
+              <p className="mt-1 flex items-center justify-end gap-1 text-xs text-muted-foreground">
+                <span>Min accepted: {minAcceptedCstLabel}</span>
+                <InfoTooltip
+                  content={minAcceptedCstTooltip}
+                  ariaLabel="What Min accepted CST means"
+                  maxWidth={320}
+                  side="top"
+                  className="text-muted-foreground/60"
+                />
               </p>
               {gestureType === 'CST' && !isCstRewardLoading && netCstAmount != null && (
                 <p
