@@ -65,6 +65,12 @@ const gestureOptions = [
   { value: 'CST', label: 'CST', desc: 'ERC-20' },
 ];
 
+function formatCompactCstDelta(value: number): string {
+  return formatCstAmount(value)
+    .replace(/(\.\d*?)0+$/, '$1')
+    .replace(/\.$/, '');
+}
+
 /** Form for making ETH or CST gestures with optional NFT/token attachment fields and RandomWalk discount. */
 export function GestureForm({
   data,
@@ -102,6 +108,22 @@ export function GestureForm({
 }: GestureFormProps) {
   const showAll = data?.LastBidderAddr !== zeroAddress;
   const visibleOptions = showAll ? gestureOptions : gestureOptions.filter((o) => o.value === 'ETH');
+  const currentCstGestureCost = cstGestureData.isFree ? 0 : cstGestureData.CSTPrice;
+  const hasCstReward = gestureCstRewardAmount != null && Number.isFinite(gestureCstRewardAmount);
+  const hasCstCost = Number.isFinite(currentCstGestureCost) && currentCstGestureCost >= 0;
+  const netCstAmount =
+    hasCstReward && hasCstCost ? gestureCstRewardAmount - currentCstGestureCost : null;
+  const netCstLabel =
+    netCstAmount == null
+      ? '-- CST'
+      : `${netCstAmount > 0 ? '+' : netCstAmount < 0 ? '-' : ''}${formatCompactCstDelta(
+          Math.abs(netCstAmount),
+        )} CST`;
+  const rewardPreviewTitle = gestureType === 'CST' ? 'CST Gesture Economics' : 'CST Reward Preview';
+  const rewardPreviewDescription =
+    gestureType === 'CST'
+      ? 'Net CST is the Participation CST reward minus the current CST gesture cost.'
+      : 'Estimated dynamic CST you receive if this gesture lands. The amount depends on time since the previous gesture, and every gesture method has two protections: maximum cost and minimum CST reward.';
 
   return (
     <div className="mt-8 space-y-5">
@@ -196,26 +218,74 @@ export function GestureForm({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                CST Reward Preview
+                {rewardPreviewTitle}
               </p>
-              <p className="mt-1 text-muted-foreground">
-                Estimated dynamic CST you receive if this gesture lands. The amount depends on time
-                since the previous gesture, and every gesture method has two protections: maximum
-                cost and minimum CST reward.
-              </p>
+              <p className="mt-1 text-muted-foreground">{rewardPreviewDescription}</p>
             </div>
             <div className="text-right font-mono tabular-nums">
-              <p className="text-base font-semibold text-emerald-300">
-                {isCstRewardLoading
-                  ? 'Loading...'
-                  : `${formatCstAmount(gestureCstRewardAmount)} CST`}
-              </p>
+              {gestureType === 'CST' ? (
+                <div className="grid min-w-[13rem] grid-cols-2 gap-2 text-left sm:min-w-[19rem] sm:grid-cols-3">
+                  <div className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2">
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                      Reward
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-emerald-300">
+                      {isCstRewardLoading
+                        ? 'Loading...'
+                        : `${formatCstAmount(gestureCstRewardAmount)} CST`}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2">
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                      Cost
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-foreground">
+                      {formatCstAmount(currentCstGestureCost)} CST
+                    </p>
+                  </div>
+                  <div className="col-span-2 rounded-lg border border-white/[0.06] bg-white/[0.025] px-3 py-2 sm:col-span-1">
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                      Net CST
+                    </p>
+                    <p
+                      className={cn(
+                        'mt-1 text-sm font-semibold',
+                        netCstAmount != null && netCstAmount > 0
+                          ? 'text-emerald-300'
+                          : netCstAmount != null && netCstAmount < 0
+                            ? 'text-amber-200'
+                            : 'text-muted-foreground',
+                      )}
+                    >
+                      {isCstRewardLoading ? 'Loading...' : netCstLabel}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-base font-semibold text-emerald-300">
+                  {isCstRewardLoading
+                    ? 'Loading...'
+                    : `${formatCstAmount(gestureCstRewardAmount)} CST`}
+                </p>
+              )}
               <p className="mt-1 text-xs text-muted-foreground">
                 Min accepted:{' '}
                 {acceptAnyCstReward
                   ? 'any reward, including 0 CST'
                   : `${formatCstAmount(gestureCstRewardAmountMin)} CST`}
               </p>
+              {gestureType === 'CST' && !isCstRewardLoading && netCstAmount != null && (
+                <p
+                  className={cn(
+                    'mt-1 text-xs',
+                    netCstAmount > 0 ? 'text-emerald-300' : 'text-muted-foreground',
+                  )}
+                >
+                  {netCstAmount > 0
+                    ? 'You profit in CST if this lands.'
+                    : 'Most CST gestures spend more CST than they receive.'}
+                </p>
+              )}
             </div>
           </div>
           {gestureType === 'CST' &&

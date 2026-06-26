@@ -162,17 +162,83 @@ describe('GestureForm', () => {
 
   it('CST selection shows reward preview and minimum accepted amount', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" />);
-    expect(screen.getByText('CST Reward Preview')).toBeInTheDocument();
+    expect(screen.getByText('CST Gesture Economics')).toBeInTheDocument();
     expect(screen.getByText('100 CST')).toBeInTheDocument();
+    expect(screen.getByText('1.5 CST')).toBeInTheDocument();
+    expect(screen.getByText('+98.5 CST')).toBeInTheDocument();
+    expect(screen.getByText('You profit in CST if this lands.')).toBeInTheDocument();
     expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
     expect(screen.queryByText(/Protection 1:/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Protection 2:/)).not.toBeInTheDocument();
   });
 
+  it('shows negative net CST when the CST gesture cost is greater than the reward', () => {
+    render(
+      <GestureForm
+        {...defaultProps}
+        gestureType="CST"
+        gestureCstRewardAmount={1}
+        gestureCstRewardAmountMin={0.99}
+        cstGestureData={{
+          ...defaultProps.cstGestureData,
+          CSTPrice: 1.5,
+          CSTPriceWei: 1500000000000000000n,
+          isFree: false,
+        }}
+      />,
+    );
+
+    expect(screen.getByText('-0.5 CST')).toBeInTheDocument();
+    expect(
+      screen.getByText('Most CST gestures spend more CST than they receive.'),
+    ).toBeInTheDocument();
+  });
+
+  it('shows positive net CST when the CST reward is greater than the cost', () => {
+    render(
+      <GestureForm
+        {...defaultProps}
+        gestureType="CST"
+        gestureCstRewardAmount={5}
+        gestureCstRewardAmountMin={4.95}
+        cstGestureData={{
+          ...defaultProps.cstGestureData,
+          CSTPrice: 1.25,
+          CSTPriceWei: 1250000000000000000n,
+          isFree: false,
+        }}
+      />,
+    );
+
+    expect(screen.getByText('+3.75 CST')).toBeInTheDocument();
+    expect(screen.getByText('You profit in CST if this lands.')).toBeInTheDocument();
+  });
+
+  it('treats free CST gestures as zero cost when calculating net CST', () => {
+    render(
+      <GestureForm
+        {...defaultProps}
+        gestureType="CST"
+        gestureCstRewardAmount={2}
+        gestureCstRewardAmountMin={1.98}
+        cstGestureData={{
+          ...defaultProps.cstGestureData,
+          CSTPrice: 1.5,
+          CSTPriceWei: 1500000000000000000n,
+          isFree: true,
+        }}
+      />,
+    );
+
+    expect(screen.getByText('0 CST')).toBeInTheDocument();
+    expect(screen.getByText('+2 CST')).toBeInTheDocument();
+  });
+
   it('shows a loading state while the live CST reward preview is refreshing', () => {
     render(<GestureForm {...defaultProps} gestureType="CST" isCstRewardLoading />);
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getAllByText('Loading...')).toHaveLength(2);
     expect(screen.getByText('Min accepted: 99 CST')).toBeInTheDocument();
+    expect(screen.queryByText(/profit in CST/)).not.toBeInTheDocument();
   });
 
   it('shows a placeholder when the live CST reward preview is unavailable', () => {
@@ -185,8 +251,10 @@ describe('GestureForm', () => {
       />,
     );
 
-    expect(screen.getByText('-- CST')).toBeInTheDocument();
+    expect(screen.getAllByText('-- CST')).toHaveLength(2);
     expect(screen.getByText('Min accepted: -- CST')).toBeInTheDocument();
+    expect(screen.queryByText(/profit in CST/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/spend more CST/)).not.toBeInTheDocument();
   });
 
   it('updates displayed CST reward preview values when live props change', () => {
@@ -205,6 +273,7 @@ describe('GestureForm', () => {
     );
 
     expect(screen.getByText('125 CST')).toBeInTheDocument();
+    expect(screen.getByText('+123.5 CST')).toBeInTheDocument();
     expect(screen.getByText('Min accepted: 123.75 CST')).toBeInTheDocument();
     expect(screen.queryByText('100 CST')).not.toBeInTheDocument();
   });
