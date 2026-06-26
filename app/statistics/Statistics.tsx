@@ -36,6 +36,7 @@ import { CSTokenDistributionTable } from '@/components/tokens/CSTokenDistributio
 import { CTBalanceDistributionTable } from '@/components/tokens/CTBalanceDistributionTable';
 import { CTBalanceDistributionChart } from '@/components/tokens/CTBalanceDistributionChart';
 import { CSTTotalSupplyHistorySection } from '@/components/tokens/CSTTotalSupplyHistorySection';
+import { BidTypeRatioChart } from '@/components/statistics/BidTypeRatioChart';
 import { SystemModesTable, EventRow } from '@/components/tables/SystemModesTable';
 import { UniqueEthDonorsTable, UniqueEthDonor } from '@/components/tables/UniqueEthDonorsTable';
 import {
@@ -622,6 +623,18 @@ const Statistics = () => {
               defaultOpen
             >
               <CSTTotalSupplyHistorySection />
+            </CollapsibleSection>
+            <CollapsibleSection
+              title="Gesture Type Distribution"
+              tooltip="Share of gestures placed with ETH, RandomWalk (ETH-paid), and CST over time, sampled at a chosen interval. Current round only."
+              icon={<Activity className="h-3.5 w-3.5" />}
+            >
+              <div className="mb-4">
+                <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  Current round only
+                </span>
+              </div>
+              <BidTypeRatioChart roundStartTs={data.TsRoundStart} />
             </CollapsibleSection>
           </div>
         </div>

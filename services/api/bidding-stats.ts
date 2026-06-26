@@ -13,6 +13,7 @@ import { axios, getAPIUrl, isAxiosError } from './client';
 import { get_bid_list } from './rounds';
 import type {
   BidFrequencyBucket,
+  BidTypeRatioBucket,
   BiddingActivityResponse,
   BidTimeBounds,
   TopBidderActivePeriodsResponse,
@@ -104,6 +105,22 @@ export async function get_bid_time_bounds(): Promise<BidTimeBounds> {
     const gestures = await loadGestures();
     return computeTimeBounds(gestures);
   }
+}
+
+/**
+ * Fetches the per-interval bid-type composition (ETH / RandomWalk / CST) over a
+ * time range. Each bucket carries raw counts plus windowed percentages summing
+ * to ~100%. Windows with no bids report zeros (a dip to baseline, not a gap).
+ */
+export async function get_bid_type_ratio(
+  fromTs: number,
+  toTs: number,
+  intervalSecs: number,
+): Promise<BidTypeRatioBucket[]> {
+  const { data } = await axios.get(getAPIUrl('bid/bid_type_ratio'), {
+    params: { from_ts: fromTs, to_ts: toTs, interval_secs: intervalSecs },
+  });
+  return data.RatioHistory ?? [];
 }
 
 /** Fetches active bidding periods for the top N bidders. */

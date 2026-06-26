@@ -143,6 +143,7 @@ const USE_API_QUERY_EXPORTS = [
   'useBidTimeBounds',
   'useBiddingActivity',
   'useBidFrequency',
+  'useBidTypeRatio',
   'useTopBidderActivePeriods',
   'useSystemModelist',
   'useSystemEvents',

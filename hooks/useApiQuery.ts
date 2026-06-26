@@ -24,6 +24,7 @@ import type {
   CTPriceInfo,
   DashboardInfo,
   BidFrequencyBucket,
+  BidTypeRatioBucket,
   BiddingActivityResponse,
   BidTimeBounds,
   TopBidderActivePeriodsResponse,
@@ -401,6 +402,20 @@ export function useBidFrequency(
     queryKey: ['bidFrequency', initTs, finTs, intervalSecs],
     queryFn: () => api.get_bid_frequency(initTs, finTs, intervalSecs),
     enabled: enabled && initTs > 0 && finTs > initTs && intervalSecs > 0,
+    staleTime: 60_000,
+  });
+}
+
+export function useBidTypeRatio(
+  fromTs: number,
+  toTs: number,
+  intervalSecs: number,
+  enabled = true,
+) {
+  return useQuery<BidTypeRatioBucket[]>({
+    queryKey: ['bidTypeRatio', fromTs, toTs, intervalSecs],
+    queryFn: () => api.get_bid_type_ratio(fromTs, toTs, intervalSecs),
+    enabled: enabled && fromTs > 0 && toTs > fromTs && intervalSecs > 0,
     staleTime: 60_000,
   });
 }

@@ -758,6 +758,24 @@ export interface BidFrequencyBucket {
   UniqueBidders: number;
 }
 
+/**
+ * Per-interval bid-type composition for the 100% stacked area chart. Counts are
+ * the raw bids of each type within the window [BucketTs, BucketTs+interval); the
+ * *Pct fields are those counts normalized to a windowed 100% of TotalBids. When
+ * a window has no bids, TotalBids is 0 and all *Pct fields are 0.
+ * Type mapping: ETH, RandomWalk (ETH-paid), CST.
+ */
+export interface BidTypeRatioBucket {
+  BucketTs: number;
+  EthBids: number;
+  RwalkBids: number;
+  CstBids: number;
+  TotalBids: number;
+  EthPct: number;
+  RwalkPct: number;
+  CstPct: number;
+}
+
 export interface BidSpike {
   Index: number;
   StartTs: number;
