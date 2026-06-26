@@ -2,6 +2,7 @@
 
 import { memo, useState, useEffect, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
 import type { ISourceOptions } from '@tsparticles/engine';
 import { offchainLookupSignature } from 'viem/utils';
 import { WagmiProvider } from 'wagmi';
@@ -184,6 +185,12 @@ export function Providers({
   const [queryClient] = useState(() => makeQueryClient());
   const [engineReady, setEngineReady] = useState(false);
 
+  // Routes under /embed render a single artifact (e.g. a chart) with no app chrome
+  // or background, so they can be opened standalone in their own browser window.
+  const pathname = usePathname();
+  const bareEmbed = !!pathname && pathname.startsWith('/embed');
+  const chrome = showAppChrome && !bareEmbed;
+
   useEffect(() => {
     installGlobalErrorHandlers();
   }, []);
@@ -262,7 +269,7 @@ export function Providers({
         <ContractAddressesProvider>
           <LiveGameDataRefresh />
           <RainbowKitProvider theme={cosmicRainbowTheme}>
-            {engineReady && <ParticleBackdrop />}
+            {engineReady && !bareEmbed && <ParticleBackdrop />}
             <ErrorBoundary>
               <CookiesProvider>
                 <AnchoredTokenProvider>
@@ -271,9 +278,9 @@ export function Providers({
                       <NotificationProvider>
                         <TooltipProvider delayDuration={200} skipDelayDuration={300}>
                           <SkipLink />
-                          {showAppChrome && <Header />}
+                          {chrome && <Header />}
                           <ErrorBoundary>{children}</ErrorBoundary>
-                          {showAppChrome && <Footer />}
+                          {chrome && <Footer />}
                         </TooltipProvider>
                       </NotificationProvider>
                     </ApiDataProvider>

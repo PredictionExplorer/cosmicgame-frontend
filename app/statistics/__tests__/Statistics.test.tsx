@@ -128,6 +128,9 @@ jest.mock('../../../components/tokens/CSTTotalSupplyHistorySection', () => ({
 jest.mock('../../../components/statistics/BidTypeRatioChart', () => ({
   BidTypeRatioChart: () => <div data-testid="bid-type-ratio-chart" />,
 }));
+jest.mock('../../../components/statistics/EnduranceTimelineChart', () => ({
+  EnduranceTimelineSection: () => <div data-testid="endurance-timeline-section" />,
+}));
 jest.mock('../../../components/statistics/StatisticsItem', () => ({
   StatisticsItem: ({
     title,

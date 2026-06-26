@@ -37,6 +37,7 @@ import { CTBalanceDistributionTable } from '@/components/tokens/CTBalanceDistrib
 import { CTBalanceDistributionChart } from '@/components/tokens/CTBalanceDistributionChart';
 import { CSTTotalSupplyHistorySection } from '@/components/tokens/CSTTotalSupplyHistorySection';
 import { BidTypeRatioChart } from '@/components/statistics/BidTypeRatioChart';
+import { EnduranceTimelineSection } from '@/components/statistics/EnduranceTimelineChart';
 import { SystemModesTable, EventRow } from '@/components/tables/SystemModesTable';
 import { UniqueEthDonorsTable, UniqueEthDonor } from '@/components/tables/UniqueEthDonorsTable';
 import {
@@ -635,6 +636,13 @@ const Statistics = () => {
                 </span>
               </div>
               <BidTypeRatioChart roundStartTs={data.TsRoundStart} />
+            </CollapsibleSection>
+            <CollapsibleSection
+              title="Endurance & Chrono Timeline"
+              tooltip="A Gantt of who held the lead during a round. Each bar is a lead stint (its width = how long that address held the lead). The widest bar is the Endurance Champion; the lane that held the title longest overall is the Chrono-Warrior. Pick any round to compare."
+              icon={<Activity className="h-3.5 w-3.5" />}
+            >
+              <EnduranceTimelineSection currentRoundNum={curRoundNum} />
             </CollapsibleSection>
           </div>
         </div>

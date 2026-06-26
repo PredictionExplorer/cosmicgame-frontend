@@ -1,7 +1,7 @@
 'use client';
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
-import { useMemo, useState, type FC } from 'react';
+import { memo, useMemo, useState, type FC } from 'react';
 import {
   AreaChart,
   Area,
@@ -118,6 +118,80 @@ function RatioTooltip({ active, payload }: RatioTooltipProps) {
   );
 }
 
+/**
+ * Pure Recharts view, memoized on its props. Isolating it keeps the chart from
+ * repainting on every 12s parent re-render (the dashboard poll) — it only redraws
+ * when the data, interpolation, or axis granularity actually change.
+ */
+const RatioAreaChart = memo(function RatioAreaChart({
+  data,
+  interpolation,
+  withTime,
+}: {
+  data: ChartPoint[];
+  interpolation: InterpolationOption['type'];
+  withTime: boolean;
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+      <AreaChart data={data} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+        <XAxis
+          dataKey="bucketTs"
+          tickFormatter={(ts) => formatUnixTsLabel(Number(ts), withTime)}
+          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          interval="preserveStartEnd"
+          minTickGap={withTime ? 48 : 24}
+        />
+        <YAxis
+          domain={[0, 100]}
+          ticks={[0, 25, 50, 75, 100]}
+          tickFormatter={(v) => `${v}%`}
+          tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
+          width={44}
+        />
+        <Tooltip
+          content={<RatioTooltip />}
+          isAnimationActive={false}
+          allowEscapeViewBox={{ x: false, y: false }}
+          wrapperStyle={{ pointerEvents: 'none', zIndex: 10 }}
+        />
+        <Legend wrapperStyle={{ fontSize: 12 }} />
+        <Area
+          type={interpolation}
+          dataKey="ethPct"
+          name="ETH"
+          stackId="ratio"
+          stroke={ETH_COLOR}
+          fill={ETH_COLOR}
+          fillOpacity={0.7}
+          isAnimationActive={false}
+        />
+        <Area
+          type={interpolation}
+          dataKey="rwalkPct"
+          name="RandomWalk"
+          stackId="ratio"
+          stroke={RWALK_COLOR}
+          fill={RWALK_COLOR}
+          fillOpacity={0.7}
+          isAnimationActive={false}
+        />
+        <Area
+          type={interpolation}
+          dataKey="cstPct"
+          name="CST"
+          stackId="ratio"
+          stroke={CST_COLOR}
+          fill={CST_COLOR}
+          fillOpacity={0.7}
+          isAnimationActive={false}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+});
+
 type BidTypeRatioChartProps = {
   /** Unix seconds for the start of the current round (from dashboard TsRoundStart). */
   roundStartTs: number;
@@ -141,7 +215,12 @@ export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, en
 
   const hasRound = roundStartTs > 0;
   const fromTs = roundStartTs;
-  const toTs = Math.max(nowSec, roundStartTs + intervalSecs);
+  // Align the window's end to the bucket grid so the query key only changes when
+  // "now" crosses into a new bucket — not on every 12s clock tick. Previously the
+  // key churned each tick, dropping `data` to undefined and blanking the chart
+  // (a visible flash) before it refetched.
+  const spanBuckets = Math.max(1, Math.ceil((nowSec - fromTs) / intervalSecs));
+  const toTs = fromTs + spanBuckets * intervalSecs;
 
   const { data, isLoading, isError, refetch } = useBidTypeRatio(
     fromTs,
@@ -209,57 +288,7 @@ export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, en
           No gesture activity in the current round yet.
         </p>
       ) : (
-        <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-          <AreaChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-            <XAxis
-              dataKey="bucketTs"
-              tickFormatter={(ts) => formatUnixTsLabel(Number(ts), withTime)}
-              tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
-              interval="preserveStartEnd"
-              minTickGap={withTime ? 48 : 24}
-            />
-            <YAxis
-              domain={[0, 100]}
-              ticks={[0, 25, 50, 75, 100]}
-              tickFormatter={(v) => `${v}%`}
-              tick={{ fill: 'rgba(255,255,255,0.65)', fontSize: 11 }}
-              width={44}
-            />
-            <Tooltip content={<RatioTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Area
-              type={interpolation}
-              dataKey="ethPct"
-              name="ETH"
-              stackId="ratio"
-              stroke={ETH_COLOR}
-              fill={ETH_COLOR}
-              fillOpacity={0.7}
-              isAnimationActive={false}
-            />
-            <Area
-              type={interpolation}
-              dataKey="rwalkPct"
-              name="RandomWalk"
-              stackId="ratio"
-              stroke={RWALK_COLOR}
-              fill={RWALK_COLOR}
-              fillOpacity={0.7}
-              isAnimationActive={false}
-            />
-            <Area
-              type={interpolation}
-              dataKey="cstPct"
-              name="CST"
-              stackId="ratio"
-              stroke={CST_COLOR}
-              fill={CST_COLOR}
-              fillOpacity={0.7}
-              isAnimationActive={false}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        <RatioAreaChart data={chartData} interpolation={interpolation} withTime={withTime} />
       )}
 
       <p className="text-xs text-muted-foreground">
