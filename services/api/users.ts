@@ -7,6 +7,8 @@ import type {
   NotifyRedBoxResult,
   Participant,
   Recipient,
+  RoiLeaderboardEntry,
+  RoiLeaderboardSort,
   UniqueEthDonor,
   UniqueAnchorHolderCST,
   UniqueAnchorHolderRWLK,
@@ -69,6 +71,25 @@ export function get_unique_winners(): Promise<Recipient[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/winners'));
     return data.UniqueWinners as Recipient[];
+  }, []);
+}
+
+/**
+ * Fetches the per-player ROI leaderboard (Tier-1, ETH-only). The backend sorts
+ * server-side per `sort` and filters by `minBids`; we over-fetch and paginate
+ * client-side. Returns `[]` when the endpoint isn't deployed yet.
+ */
+export function get_roi_leaderboard(
+  sort: RoiLeaderboardSort = 'net_pl',
+  minBids = 5,
+  limit = 200,
+  offset = 0,
+): Promise<RoiLeaderboardEntry[]> {
+  return apiCall(async () => {
+    const { data } = await axios.get(getAPIUrl('statistics/leaderboard/roi'), {
+      params: { sort, min_bids: minBids, limit, offset },
+    });
+    return (data.RoiLeaderboard ?? []) as RoiLeaderboardEntry[];
   }, []);
 }
 

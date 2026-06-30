@@ -629,6 +629,35 @@ export interface Recipient {
   [key: string]: unknown;
 }
 
+/** Sort modes accepted by the ROI leaderboard endpoint. */
+export type RoiLeaderboardSort = 'net_pl' | 'roi' | 'winrate' | 'spent' | 'nfts' | 'bids';
+
+/**
+ * Per-player bidding profitability row (Tier-1, ETH-only ROI) from
+ * `statistics/leaderboard/roi`. ETH/CST `*Eth` fields are human-readable; the
+ * non-`Eth` strings are raw wei. `Roi` is a fraction (multiply by 100 for %).
+ */
+export interface RoiLeaderboardEntry {
+  BidderAid: number;
+  BidderAddr: string;
+  NumBids: number;
+  RoundsParticipated: number;
+  RoundsWon: number;
+  WinRate: number; // 0..1
+  TotalEthSpent: string;
+  TotalEthSpentEth: number;
+  TotalCstSpent: string;
+  TotalCstSpentEth: number;
+  EthWon: string;
+  EthWonEth: number;
+  PrizesCount: number;
+  CstPrizesCount: number;
+  NftPrizesCount: number;
+  NetPlEth: number;
+  Roi: number; // fraction; 0 when no ETH was spent
+  [key: string]: unknown;
+}
+
 export interface UniqueAnchorHolderCST {
   StakerAid: string | number;
   StakerAddr: string;

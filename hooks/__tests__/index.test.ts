@@ -128,6 +128,7 @@ const USE_API_QUERY_EXPORTS = [
   'useUniqueParticipants',
   'useUniqueRecipients',
   'useUniqueDonors',
+  'useRoiLeaderboard',
   'useUniqueCSTAnchorHolders',
   'useUniqueRWLKAnchorHolders',
   'useUniqueBothAnchorHolders',

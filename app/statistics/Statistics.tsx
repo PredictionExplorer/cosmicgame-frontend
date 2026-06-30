@@ -67,6 +67,7 @@ import { AnchoringSection } from '@/components/statistics/AnchoringSection';
 import { DonatedNFTsGrid } from '@/components/statistics/DonatedNFTsGrid';
 import { DonatedTokensSection } from '@/components/home/DonatedTokensSection';
 import { BiddingActivitySection } from '@/components/statistics/BiddingActivitySection';
+import { RoiLeaderboardSection } from '@/components/statistics/RoiLeaderboardSection';
 import {
   AnchoringHeroStats,
   type AnchoringStatItem,
@@ -708,6 +709,12 @@ const Statistics = () => {
         </CollapsibleSection>
 
         <BiddingActivitySection />
+
+        {/* 8 ── Participant Performance ───────────────────────────── */}
+        <div>
+          <SectionDivider title="Participant Performance" className="mb-6" />
+          <RoiLeaderboardSection />
+        </div>
       </section>
     </>
   );

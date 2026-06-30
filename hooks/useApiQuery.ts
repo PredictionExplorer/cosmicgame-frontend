@@ -55,6 +55,8 @@ import type {
   UserBalance,
   UserInfoWithLists,
   Recipient,
+  RoiLeaderboardEntry,
+  RoiLeaderboardSort,
   WinningHistoryEntry,
 } from '@/services/api';
 
@@ -954,6 +956,14 @@ export function useUniqueDonors() {
   return useQuery<UniqueEthDonor[]>({
     queryKey: ['uniqueDonors'],
     queryFn: () => api.get_unique_donors(),
+    staleTime: 60_000,
+  });
+}
+
+export function useRoiLeaderboard(sort: RoiLeaderboardSort = 'net_pl', minBids = 5) {
+  return useQuery<RoiLeaderboardEntry[]>({
+    queryKey: ['roiLeaderboard', sort, minBids],
+    queryFn: () => api.get_roi_leaderboard(sort, minBids),
     staleTime: 60_000,
   });
 }
