@@ -1,4 +1,4 @@
-import { learnArticles } from '@/content/learn';
+import { getLearnArticle, learnArticles } from '@/content/learn';
 
 describe('learnArticles', () => {
   it('has unique slugs, titles, descriptions, and h1s', () => {
@@ -50,5 +50,26 @@ describe('learnArticles', () => {
         `not-a-${['lot', 'tery'].join('')}-not-an-${['invest', 'ment'].join('')}`,
       ]),
     );
+  });
+});
+
+describe('learn article contract accuracy', () => {
+  function articleText(slug: string): string {
+    const article = getLearnArticle(slug);
+    expect(article).toBeDefined();
+    return [article!.summary, ...article!.sections.flatMap((section) => section.body)].join(' ');
+  }
+
+  it('anchoring article states the once-only rule and RandomWalk no-ETH rule', () => {
+    const text = articleText('anchoring-nfts');
+    expect(text).toMatch(/anchored only once/i);
+    expect(text).toMatch(/do not receive ETH Anchor Distributions/i);
+    expect(text).toMatch(/retrieved when the anchor is released/i);
+  });
+
+  it('CST article states the burn-on-gesture and delegation mechanics', () => {
+    const text = articleText('cst-token-and-cosmic-council');
+    expect(text).toMatch(/burned/i);
+    expect(text).toMatch(/delegat/i);
   });
 });

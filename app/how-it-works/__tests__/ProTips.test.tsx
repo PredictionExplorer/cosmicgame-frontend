@@ -64,7 +64,9 @@ describe('ProTips', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/one-time 50% ETH Gesture Cost reduction/)).toBeInTheDocument();
     expect(screen.getByText(/higher Selection frequency/)).toBeInTheDocument();
-    expect(screen.getByText(/smart contract is formally verified/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/smart contracts are publicly source-verified on-chain/),
+    ).toBeInTheDocument();
     expect(screen.getByText(/adds the current time increment/)).toBeInTheDocument();
     expect(screen.getByText(/Use CST as an alternative gesture currency/)).toBeInTheDocument();
   });

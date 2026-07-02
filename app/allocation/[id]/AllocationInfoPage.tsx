@@ -504,10 +504,10 @@ const AllocationInfoPage = ({ roundNum }: AllocationInfoPageProps) => {
   const stats = [
     {
       icon: <Trophy className="h-3.5 w-3.5" />,
-      label: 'Cycle Reserve',
+      label: 'Signature Allocation ETH',
       value: `${allocationInfo.AmountEth.toFixed(4)} ETH`,
       tooltip:
-        'The total ETH retrieved by the participant who made the Final Gesture of this cycle.',
+        'The ETH portion of the Signature Allocation retrieved by the participant who made the Final Gesture of this cycle.',
     },
     {
       icon: <Heart className="h-3.5 w-3.5" />,

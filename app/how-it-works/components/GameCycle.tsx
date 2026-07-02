@@ -26,9 +26,10 @@ const phases = [
   {
     Icon: TimerOff,
     label: 'Cycle Finalization Time Expires',
-    description: 'When the countdown reaches zero, the cycle closes.',
+    description:
+      'When the countdown reaches zero, the participant who made the Final Gesture becomes eligible to finalize the cycle.',
     tooltip:
-      'No more gestures can be made once the timer hits zero. The participant who made the Final Gesture becomes eligible to finalize the cycle.',
+      'Gestures remain possible until finalization actually executes \u2014 a late gesture extends the stored time and takes over the Final Gesture position. The Final Gesture participant has a 48-hour exclusive finalization window; afterwards anyone may finalize and receives the Signature Allocation.',
   },
   {
     Icon: Trophy,

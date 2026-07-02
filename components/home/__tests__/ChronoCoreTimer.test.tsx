@@ -170,7 +170,9 @@ describe('<ChronoCoreTimer />', () => {
       'ready-to-finalize',
     );
     expect(screen.getByText('00:00')).toBeInTheDocument();
-    expect(screen.getByText('Cycle closed. Finalization is ready.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Finalization is ready. A new Gesture can still extend the cycle.'),
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Finalize Cycle/ })).toHaveAttribute(
       'href',
       '#make-gesture',

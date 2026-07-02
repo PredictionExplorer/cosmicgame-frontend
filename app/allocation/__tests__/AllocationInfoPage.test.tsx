@@ -436,7 +436,9 @@ describe('AllocationInfoPage', () => {
     it('renders all 9 stat cards', () => {
       renderWithData(1);
       const statsSection = screen.getByLabelText('Cycle Statistics');
-      expect(within(statsSection).getByText('Cycle Reserve')).toBeInTheDocument();
+      // Labeled "Signature Allocation ETH" because the stat shows the Final
+      // Gesture recipient's ETH, not the whole Cycle Reserve.
+      expect(within(statsSection).getByText('Signature Allocation ETH')).toBeInTheDocument();
       expect(within(statsSection).getByText('Public Goods')).toBeInTheDocument();
       expect(within(statsSection).getByText('Anchor Distribution')).toBeInTheDocument();
       expect(within(statsSection).getByText('Stellar Selection Pool')).toBeInTheDocument();

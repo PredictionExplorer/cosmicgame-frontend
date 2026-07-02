@@ -132,8 +132,8 @@ export function useAllocationNotification({ allocationTime }: UseAllocationNotif
     const interval = setInterval(() => {
       const now = Date.now();
       if (allocationTime && now >= allocationTime - 5 * 60 * 1000 && now <= allocationTime) {
-        sendNotification('Gesture now or the cycle closes', {
-          body: 'The Performance Cycle closes in 5 minutes. Make a gesture now to take part in the final allocations.',
+        sendNotification('Gesture now \u2014 the cycle can finalize soon', {
+          body: 'The Cycle Finalization Time expires in 5 minutes. Make a gesture now to extend the cycle and take part in the final allocations.',
         });
         clearInterval(interval);
       }

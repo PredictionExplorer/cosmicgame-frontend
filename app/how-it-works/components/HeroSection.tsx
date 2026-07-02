@@ -64,9 +64,9 @@ export function HeroSection() {
         className="relative mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground"
       >
         Gesture. Endure. Shape the Signature. Participants make gestures during a Performance Cycle.
-        When the Cycle Finalization Time expires, the cycle closes and allocations distribute across
-        more than ten tracks &mdash; including the Signature Allocation, Anchor Distributions, and
-        Protocol Guild.
+        When the Cycle Finalization Time expires, the cycle can be finalized and allocations
+        distribute across more than ten tracks &mdash; including the Signature Allocation, Anchor
+        Distributions, and Protocol Guild.
       </motion.p>
 
       <motion.div

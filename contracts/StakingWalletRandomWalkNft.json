@@ -1,15 +1,28 @@
 [
   {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "randomWalkNft_",
+        "type": "address",
+        "internalType": "contract RandomWalkNFT"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
     "name": "NftHasAlreadyBeenStaked",
     "type": "error",
     "inputs": [
       {
+        "name": "errStr",
         "type": "string",
-        "name": "param0"
+        "internalType": "string"
       },
       {
+        "name": "nftId",
         "type": "uint256",
-        "name": "param1"
+        "internalType": "uint256"
       }
     ]
   },
@@ -18,16 +31,19 @@
     "type": "error",
     "inputs": [
       {
+        "name": "errStr",
         "type": "string",
-        "name": "param0"
+        "internalType": "string"
       },
       {
+        "name": "stakeActionId",
         "type": "uint256",
-        "name": "param1"
+        "internalType": "uint256"
       },
       {
+        "name": "callerAddress",
         "type": "address",
-        "name": "param2"
+        "internalType": "address"
       }
     ]
   },
@@ -36,12 +52,14 @@
     "type": "error",
     "inputs": [
       {
+        "name": "errStr",
         "type": "string",
-        "name": "param0"
+        "internalType": "string"
       },
       {
+        "name": "stakeActionId",
         "type": "uint256",
-        "name": "param1"
+        "internalType": "uint256"
       }
     ]
   },
@@ -50,8 +68,9 @@
     "type": "error",
     "inputs": [
       {
+        "name": "errStr",
         "type": "string",
-        "name": "param0"
+        "internalType": "string"
       }
     ]
   },
@@ -60,217 +79,249 @@
     "type": "event",
     "inputs": [
       {
+        "name": "stakeActionId",
         "type": "uint256",
         "indexed": true,
-        "name": "param0"
+        "internalType": "uint256"
       },
       {
-        "type": "uint8",
-        "name": "param1"
-      },
-      {
+        "name": "nftId",
         "type": "uint256",
         "indexed": true,
-        "name": "param2"
+        "internalType": "uint256"
       },
       {
+        "name": "stakerAddress",
         "type": "address",
         "indexed": true,
-        "name": "param3"
+        "internalType": "address"
       },
       {
+        "name": "numStakedNfts",
         "type": "uint256",
-        "name": "param4"
+        "indexed": false,
+        "internalType": "uint256"
       }
-    ]
+    ],
+    "anonymous": false
   },
   {
     "name": "NftUnstaked",
     "type": "event",
     "inputs": [
       {
+        "name": "actionCounter",
         "type": "uint256",
-        "indexed": true,
-        "name": "param0"
+        "indexed": false,
+        "internalType": "uint256"
       },
       {
+        "name": "stakeActionId",
         "type": "uint256",
         "indexed": true,
-        "name": "param1"
+        "internalType": "uint256"
       },
       {
+        "name": "nftId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "stakerAddress",
         "type": "address",
         "indexed": true,
-        "name": "param2"
+        "internalType": "address"
       },
       {
+        "name": "numStakedNfts",
         "type": "uint256",
-        "name": "param3"
+        "indexed": false,
+        "internalType": "uint256"
       }
-    ]
+    ],
+    "anonymous": false
   },
   {
     "name": "actionCounter",
     "type": "function",
-    "stateMutability": "view",
     "inputs": [],
     "outputs": [
       {
+        "name": "",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       }
-    ]
+    ],
+    "stateMutability": "view"
   },
   {
     "name": "numStakedNfts",
     "type": "function",
-    "stateMutability": "view",
     "inputs": [],
     "outputs": [
       {
+        "name": "",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       }
-    ]
+    ],
+    "stateMutability": "view"
   },
   {
     "name": "pickRandomStakerAddressesIfPossible",
     "type": "function",
-    "stateMutability": "view",
     "inputs": [
       {
+        "name": "numStakerAddresses_",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       },
       {
+        "name": "randomNumberSeed_",
         "type": "uint256",
-        "name": "param1"
+        "internalType": "uint256"
       }
     ],
     "outputs": [
       {
+        "name": "",
         "type": "address[]",
-        "name": "param0"
+        "internalType": "address[]"
       }
-    ]
+    ],
+    "stateMutability": "view"
   },
   {
     "name": "randomWalkNft",
     "type": "function",
-    "stateMutability": "view",
     "inputs": [],
     "outputs": [
       {
+        "name": "",
         "type": "address",
-        "name": "param0"
+        "internalType": "contract RandomWalkNFT"
       }
-    ]
+    ],
+    "stateMutability": "view"
   },
   {
     "name": "stake",
     "type": "function",
-    "stateMutability": "nonpayable",
     "inputs": [
       {
+        "name": "nftId_",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       }
     ],
-    "outputs": []
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "name": "stakeActionIds",
     "type": "function",
-    "stateMutability": "view",
     "inputs": [
       {
+        "name": "",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       }
     ],
     "outputs": [
       {
+        "name": "",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       }
-    ]
+    ],
+    "stateMutability": "view"
   },
   {
     "name": "stakeActions",
     "type": "function",
-    "stateMutability": "view",
     "inputs": [
       {
+        "name": "",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       }
     ],
     "outputs": [
       {
+        "name": "nftId",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       },
       {
-        "type": "uint256",
-        "name": "param1"
-      },
-      {
+        "name": "nftOwnerAddress",
         "type": "address",
-        "name": "param2"
+        "internalType": "address"
+      },
+      {
+        "name": "index",
+        "type": "uint256",
+        "internalType": "uint256"
       }
-    ]
+    ],
+    "stateMutability": "view"
   },
   {
     "name": "stakeMany",
     "type": "function",
-    "stateMutability": "nonpayable",
     "inputs": [
       {
+        "name": "nftIds_",
         "type": "uint256[]",
-        "name": "param0"
+        "internalType": "uint256[]"
       }
     ],
-    "outputs": []
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "name": "unstake",
     "type": "function",
-    "stateMutability": "nonpayable",
     "inputs": [
       {
+        "name": "stakeActionId_",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       }
     ],
-    "outputs": []
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "name": "unstakeMany",
     "type": "function",
-    "stateMutability": "nonpayable",
     "inputs": [
       {
+        "name": "stakeActionIds_",
         "type": "uint256[]",
-        "name": "param0"
+        "internalType": "uint256[]"
       }
     ],
-    "outputs": []
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
-    "name": "wasNftUsed",
+    "name": "usedNfts",
     "type": "function",
-    "stateMutability": "view",
     "inputs": [
       {
+        "name": "",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       }
     ],
     "outputs": [
       {
+        "name": "",
         "type": "uint256",
-        "name": "param0"
+        "internalType": "uint256"
       }
-    ]
+    ],
+    "stateMutability": "view"
   }
 ]

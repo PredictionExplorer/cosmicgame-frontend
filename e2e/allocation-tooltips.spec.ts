@@ -27,8 +27,8 @@ const ALLOCATION_LIST_TOOLTIPS = [
 
 const ALLOCATION_DETAIL_TOOLTIPS = [
   {
-    label: 'Cycle Reserve',
-    expected: /total ETH retrieved by the participant/,
+    label: 'Signature Allocation ETH',
+    expected: /ETH portion of the Signature Allocation retrieved by the participant/,
   },
   {
     label: 'Public Goods',

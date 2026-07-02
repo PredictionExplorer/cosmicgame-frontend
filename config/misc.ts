@@ -1,5 +1,13 @@
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
+/**
+ * Coordination-parameter event catalog, indexed positionally by the backend's
+ * `RecordType` enum (see AdminEventsTable). DO NOT reorder or insert entries
+ * mid-array; append only, matching backend enum additions. Names reflect the
+ * indexer's event vocabulary (V1-era); the V2 contract emits renamed events
+ * (e.g. MainPrizeTimeIncrementInMicroSecondsChanged) that the backend maps
+ * onto these same RecordType slots.
+ */
 export const ADMIN_EVENTS = [
   { name: 'Undefined', description: 'Undefined' },
   {
@@ -60,7 +68,7 @@ export const ADMIN_EVENTS = [
   {
     name: 'PrizeWalletAddressChanged',
     type: 'address',
-    description: 'The address of the stellar selection wallet has been changed.',
+    description: 'The address of the Allocations Wallet (allocation escrow) has been changed.',
   },
   {
     name: 'StakingWalletAddressChanged',

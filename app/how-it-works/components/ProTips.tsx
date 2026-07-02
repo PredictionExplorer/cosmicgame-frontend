@@ -33,9 +33,9 @@ const tips = [
     Icon: Shield,
     title: 'Use a Burner Wallet',
     description:
-      'The smart contract is formally verified, but using a dedicated wallet for participation adds an extra layer of safety.',
+      'The smart contracts are publicly source-verified on-chain, but using a dedicated wallet for participation adds an extra layer of safety.',
     tooltip:
-      'A burner wallet isolates your protocol activity from your main holdings for additional security.',
+      'A burner wallet isolates your protocol activity from your main holdings for additional security. Audit and verification status is published on the Audits page.',
   },
   {
     Icon: Clock,
@@ -43,7 +43,7 @@ const tips = [
     description:
       'Each gesture adds the current time increment to the stored Cycle Finalization Time.',
     tooltip:
-      'Gesturing when the timer is low is riskier (higher cost) but positions you closest to the Final Gesture.',
+      'Gesturing near the deadline positions you closest to the Final Gesture, but another participant can still gesture after you until the cycle is finalized.',
   },
   {
     Icon: Zap,

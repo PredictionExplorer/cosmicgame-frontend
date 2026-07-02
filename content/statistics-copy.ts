@@ -173,7 +173,7 @@ export const statisticsCopy = {
     gestureTypeDistribution:
       'Share of gestures made with ETH, RandomWalk (ETH-paid), and CST over time, sampled at a chosen interval. Current cycle only.',
     enduranceTimeline:
-      'A Gantt of who held the lead during a cycle. Each bar is a lead stint (its width = how long that address held the lead). The widest bar is the Endurance Champion; the lane that held the title longest overall is the Chrono-Warrior. Pick any cycle to compare.',
+      'A Gantt of who held the lead during a cycle. Each bar is a lead stint (its width = how long that address held the lead). The widest bar is the Endurance Champion; the Chrono-Warrior is the participant whose single continuous reign as Endurance Champion lasted the longest. Pick any cycle to compare.',
     attachedTokenDistribution:
       'Contracts and token counts for ERC-721 assets attached to gestures.',
     cosmicSignatureTokenDistribution:

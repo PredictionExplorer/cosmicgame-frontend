@@ -216,9 +216,9 @@ const baseLearnArticles: LearnArticle[] = [
       {
         heading: 'CST In The Protocol',
         body: [
-          'Gestures can imprint Participation CST, and CST can also be used as an alternative gesture currency through its own Calibration Window.',
+          'Gestures can imprint Participation CST, and CST can also be used as an alternative gesture currency through its own Calibration Window. CST spent on a gesture is burned \u2014 permanently removed from supply \u2014 rather than pooled.',
           'The Participation CST amount is dynamic: it depends on time since the previous gesture and uses a square-root formula, so long quiet periods produce larger imprints while rapid gestures can produce 0 CST.',
-          'CST expresses coordination weight in the Cosmic Council, where holders can participate in protocol coordination according to on-chain rules.',
+          'CST expresses coordination weight in the Cosmic Council once delegated (holders can delegate to themselves), where participants coordinate protocol changes according to on-chain rules.',
         ],
       },
     ],
@@ -241,8 +241,9 @@ const baseLearnArticles: LearnArticle[] = [
       {
         heading: 'Anchor Distributions',
         body: [
-          'Cosmic Signature NFTs can be anchored to the protocol. Anchored Cosmic Signature NFTs share the ETH Anchor Distribution for a cycle according to the protocol rules.',
-          'Random Walk NFTs have a separate anchoring role for Anchored-NFT Stellar Selection eligibility.',
+          'Cosmic Signature NFTs can be anchored to the protocol. Anchored Cosmic Signature NFTs share the ETH Anchor Distribution for a cycle according to the protocol rules, and the accumulated ETH is retrieved when the anchor is released.',
+          'Random Walk NFTs have a separate anchoring role for Anchored-NFT Stellar Selection eligibility; they do not receive ETH Anchor Distributions.',
+          'Each NFT \u2014 Cosmic Signature or Random Walk \u2014 can be anchored only once. Releasing an anchor returns the NFT and any accumulated distributions, but that NFT can never be anchored again.',
         ],
       },
     ],

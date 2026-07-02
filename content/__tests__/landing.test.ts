@@ -56,6 +56,46 @@ describe('landing content shape', () => {
   });
 });
 
+describe('landing content contract accuracy', () => {
+  it('anchoring copy states the once-only rule and payout-at-release behavior', () => {
+    // StakingWalletNftBase.usedNfts: every NFT can be anchored only once,
+    // and CS-NFT ETH accrual is paid out at unstake (anchor release).
+    expect(landingContent.anchoring.body).toMatch(/anchored only once/i);
+    expect(landingContent.anchoring.body).toMatch(/paid out when the anchor is released/i);
+    expect(landingContent.anchoring.body).not.toMatch(/no lockup, no penalties, no fixed term/i);
+  });
+
+  it('anchoring copy does not promise ETH to RandomWalk anchors', () => {
+    expect(landingContent.anchoring.body).toMatch(/no ETH/i);
+  });
+
+  it('council quorum copy matches GovernorCountingSimple (Support + Abstain only)', () => {
+    const quorumColumn = landingContent.council.columns.find(
+      (column) => column.title === 'Coordination Quorum',
+    );
+    expect(quorumColumn).toBeDefined();
+    expect(quorumColumn!.body).toMatch(/Support plus Abstain/i);
+    expect(quorumColumn!.body).toMatch(/Opposition weight does not count/i);
+    expect(quorumColumn!.body).not.toMatch(/expressed a position/i);
+  });
+
+  it('council copy mentions the delegation requirement for Coordination Weight', () => {
+    expect(landingContent.council.body).toMatch(/delegate/i);
+  });
+
+  it('art facts match the open-source render pipeline (64 spectral bins)', () => {
+    const bins = landingContent.art.facts.find((fact) => fact.label === 'Wavelength bins');
+    expect(bins?.value).toBe('64');
+    expect(JSON.stringify(landingContent.art)).not.toMatch(/\b16 wavelength|Sixteen wavelength/i);
+  });
+
+  it('marquee chips avoid unsupported audit claims', () => {
+    expect(landingContent.hero.marqueeChips).not.toContain('Audited Contracts');
+    expect(landingContent.hero.marqueeChips).not.toContain('Formally Verified');
+    expect(landingContent.hero.marqueeChips).toContain('Verified Contracts');
+  });
+});
+
 describe('landing content lexicon (outside allow-list)', () => {
   // Terms that must never appear anywhere in the landing copy, including
   // inside the FAQ denial block. These are strict-always bans.

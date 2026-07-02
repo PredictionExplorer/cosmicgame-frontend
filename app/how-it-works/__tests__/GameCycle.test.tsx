@@ -73,10 +73,20 @@ describe('GameCycle', () => {
     renderWithTooltip(<GameCycle />);
     expect(screen.getByText(/first ETH Calibration Window opens/)).toBeInTheDocument();
     expect(screen.getByText(/Participation CST is dynamic/)).toBeInTheDocument();
-    expect(screen.getByText(/countdown reaches zero, the cycle closes/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/countdown reaches zero, the participant who made the Final Gesture/),
+    ).toBeInTheDocument();
     expect(screen.getByText(/25% of the Cycle Reserve/)).toBeInTheDocument();
     expect(screen.getByText(/Three ETH Stellar Selection recipients/)).toBeInTheDocument();
     expect(screen.getByText(/Cycle Reserve rolls forward/)).toBeInTheDocument();
+  });
+
+  it('does not claim that gestures stop when the countdown expires', () => {
+    // Contract behavior: gestures stay open until finalization executes, and a
+    // late gesture takes over the Final Gesture position.
+    renderWithTooltip(<GameCycle />);
+    expect(screen.queryByText(/the cycle closes/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/No more gestures/)).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

@@ -47,14 +47,13 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'how-does-the-bidding-game-work',
         question: 'How does a Performance Cycle work?',
-        answer:
-          'Each cycle opens with an ETH Calibration Window for the first gesture. That first gesture starts the Cycle Finalization Time, currently about 24 hours by default. Subsequent gestures with ETH or CST add the current time increment to the stored finalization time, with the increment starting around one hour and growing gradually across cycles. When the Cycle Finalization Time expires, the participant who made the Final Gesture has an exclusive window to finalize the cycle and retrieve the Signature Allocation.',
+        answer: `Each cycle opens with an ETH Calibration Window for the first gesture. That first gesture starts the Cycle Finalization Time, currently about 24 hours by default. Subsequent gestures with ETH or CST add the current time increment to the stored finalization time, with the increment starting at one hour and growing ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% per finalized cycle. When the Cycle Finalization Time expires, the participant who made the Final Gesture has an exclusive ${protocolFacts.finalGestureExclusivityHours}-hour window to finalize the cycle and retrieve the Signature Allocation; gestures remain possible until the cycle is actually finalized.`,
       },
       {
         id: 'what-type-of-gestures-are-available',
         question: 'What types of gestures are available?',
         answer:
-          'Gestures can be made with ETH or CST tokens (ERC-20). You may also attach a Random Walk NFT to an ETH gesture to receive a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. CST gestures use their own Calibration Window: the CST Gesture Cost descends while the window runs, and the window length itself changes after every ETH or CST gesture.',
+          'Gestures can be made with ETH or CST tokens (ERC-20). The first gesture of every cycle must be an ETH gesture; after that, ETH and CST gestures can be mixed freely. You may also attach a Random Walk NFT to an ETH gesture to receive a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. CST gestures use their own Calibration Window: the CST Gesture Cost descends while the window runs, and the window length itself changes after every ETH or CST gesture.',
       },
       {
         id: 'can-i-participate-without-nfts',
@@ -71,8 +70,7 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'how-long-does-each-round-last',
         question: 'How long does each Performance Cycle last?',
-        answer:
-          'Each cycle begins when the first ETH gesture is made, which starts the Cycle Finalization Time. The current default starts around 24 hours, and every later gesture adds the current time increment, which starts around one hour and gradually increases across cycles. A cycle can therefore last much longer than a day if gestures keep arriving before finalization.',
+        answer: `Each cycle begins when the first ETH gesture is made, which starts the Cycle Finalization Time at roughly 24 times the current time increment (about one day at launch). Every later gesture adds the current time increment, which started at exactly one hour and grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with each finalized cycle. A cycle can therefore last much longer than a day if gestures keep arriving before finalization.`,
       },
       {
         id: 'can-i-place-multiple-gestures',
@@ -103,7 +101,7 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'how-does-the-stellarSelection-work',
         question: 'How does Stellar Selection work?',
-        answer: `Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects participants from the entry pool: ${protocolFacts.ethStellarSelectionRecipients} participants share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.nftStellarSelectionRecipients} participants each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} anchor-holders of Random Walk NFTs also receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and Cosmic Signature NFTs. Selection frequency increases with the number of gestures you make.`,
+        answer: `Each gesture records one entry in Stellar Selection. At the end of each cycle, the smart contract randomly selects entries from the pool: ${protocolFacts.ethStellarSelectionRecipients} selections share ${protocolFacts.stellarSelectionEthPercentage}% of the Cycle Reserve in ETH, ${protocolFacts.nftStellarSelectionRecipients} selections each receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} selections among anchored Random Walk NFTs also receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and Cosmic Signature NFTs. Selections are drawn with replacement, so the same address can be selected more than once in a cycle. Selection frequency increases with the number of gestures you make.`,
       },
       {
         id: 'how-random-selection-works',
@@ -114,13 +112,12 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'how-do-i-claim-my-allocation',
         question: 'How do I retrieve my allocation if I\u2019m a recipient?',
-        answer: `Recipients retrieve allocations through the app and protocol contracts. The Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours after the Cycle Finalization Time to finalize the cycle and retrieve the Signature Allocation. After that, the Open-Finalization Window begins and anyone may finalize the cycle, but the Signature Allocation still belongs to the Final Gesture participant. Secondary ETH and attached-token or attached-NFT allocations use a separate retrieval timeout that defaults to ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks before others may retrieve on behalf of the eligible address.`,
+        answer: `Recipients retrieve allocations through the app and protocol contracts. The Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours of exclusive time after the Cycle Finalization Time to finalize the cycle and retrieve the Signature Allocation. After that, the Open-Finalization Window begins: anyone may finalize the cycle, and the smart contract treats whoever finalizes as the cycle beneficiary \u2014 the finalizer receives the entire Signature Allocation (the ETH share, the ${protocolFacts.specialAllocationCst.toLocaleString()} CST imprint, the Cosmic Signature NFT, and priority over attached assets). Secondary ETH and attached-token or attached-NFT allocations sit in the Allocations Wallet escrow with a separate retrieval timeout that defaults to ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks; once it expires, the contracts permit anyone to retrieve an unretrieved allocation for themselves. Retrieve promptly.`,
       },
       {
         id: 'how-does-anchoring-work',
         question: 'How does Anchoring work?',
-        answer:
-          'Cosmic Signature NFTs can be anchored to the protocol to receive ETH Anchor Distributions. Anchoring pays 6% of the Cycle Reserve each cycle, distributed proportionally across all anchored Cosmic Signature NFTs. Random Walk NFTs can also be anchored for Anchored-NFT Stellar Selection eligibility, where selected anchor-holders receive CST and Cosmic Signature NFTs. CST (ERC-20) cannot be anchored. Visit the My Anchors page (from your account menu) to manage anchors.',
+        answer: `Cosmic Signature NFTs can be anchored to the protocol to receive ETH Anchor Distributions: each finalized cycle allocates ${protocolFacts.anchorDistributionPercentage}% of the Cycle Reserve, split equally per anchored Cosmic Signature NFT, and the accumulated ETH is paid out when you release the anchor. Random Walk NFTs can also be anchored, but only for Anchored-NFT Stellar Selection eligibility \u2014 selected anchor-holders receive CST and Cosmic Signature NFTs, not ETH. Two rules to know: every NFT can be anchored only once, ever (after you release an anchor, that NFT can never be anchored again), and if no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle's ${protocolFacts.anchorDistributionPercentage}% simply stays in the Cycle Reserve. CST (ERC-20) cannot be anchored. Visit the My Anchors page (from your account menu) to manage anchors.`,
       },
       {
         id: 'what-are-marketing-rewards',
@@ -130,7 +127,7 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'how-many-nfts-minted',
         question: 'How many Cosmic Signature NFTs are imprinted each cycle?',
-        answer: `In the vast majority of cycles, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs are imprinted: one for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ${protocolFacts.nftStellarSelectionRecipients} for NFT Stellar Selection recipients, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection. Each of those ${protocolFacts.typicalNftsPerCycle} NFT allocations also includes ${protocolFacts.specialAllocationCst.toLocaleString()} CST.`,
+        answer: `In the vast majority of cycles, ${protocolFacts.typicalNftsPerCycle} Cosmic Signature NFTs are imprinted: one for the Signature Allocation recipient, one for the Final CST Gesture recipient, one for the Endurance Champion, one for the Chrono-Warrior, ${protocolFacts.nftStellarSelectionRecipients} for NFT Stellar Selection recipients, and ${protocolFacts.anchoredRwlkNftSelectionRecipients} for Random Walk NFT anchor-holders selected through Anchored-NFT Stellar Selection. Each of those ${protocolFacts.typicalNftsPerCycle} NFT allocations also includes ${protocolFacts.specialAllocationCst.toLocaleString()} CST. If a cycle has no CST gestures or no anchored Random Walk NFTs, those specific imprints are skipped for that cycle.`,
       },
       {
         id: 'what-happens-to-remaining-eth',
@@ -141,13 +138,13 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'what-happens-to-attached-assets',
         question: 'What happens to tokens or NFTs attached to gestures?',
-        answer: `ERC-20 tokens or ERC-721 NFTs attached to gestures become part of the cycle's attached allocations. The Signature Allocation recipient has priority to retrieve those attached assets after finalization. If attached assets remain unclaimed past the secondary retrieval timeout, currently ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks by default, the contracts allow retrieval according to the public timeout rules.`,
+        answer: `ERC-20 tokens or ERC-721 NFTs attached to gestures are held in escrow by the Allocations Wallet contract; they do not join the ETH Cycle Reserve. After finalization, the cycle beneficiary (normally the Final Gesture participant) has exclusive priority to retrieve them. If attached assets remain unretrieved past the secondary retrieval timeout, currently ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks by default, the contracts permit anyone to retrieve them for themselves.`,
       },
       {
         id: 'who-receives-10-percent',
         question: 'Who receives the public-goods allocation from the Cycle Reserve?',
         answer:
-          'Seven percent of the Cycle Reserve is forwarded to a Public Goods Beneficiary selected through Protocol Coordination on the Cosmic Council. The current beneficiary is Protocol Guild \u2014 the collective funding mechanism for 170+ Ethereum core contributors.',
+          'Seven percent of the Cycle Reserve is forwarded to the Public Goods Vault at finalization, and anyone can then forward the vault balance to the configured Public Goods Beneficiary. The current beneficiary is Protocol Guild \u2014 the collective funding mechanism for 170+ Ethereum core contributors. Today the beneficiary address is set by the protocol owner; the intent is for the Cosmic Council to direct it once ownership moves under Council control.',
       },
     ],
   },
@@ -166,12 +163,12 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'what-is-dutch-auction',
         question: 'What is the Calibration Window?',
-        answer: `A Calibration Window is a price-discovery window in which Gesture Cost descends from a Calibration Ceiling toward a Calibration Floor over a known duration. ETH gestures and CST gestures use separate Calibration Windows. The CST Calibration Window currently starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference, but it is stored on-chain and changes after every gesture: each CST gesture increases the window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, and each ETH gesture decreases it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
+        answer: `A Calibration Window is a cost-discovery window in which Gesture Cost descends linearly from a Calibration Ceiling over a known duration. ETH gestures and CST gestures use separate windows with different floors: the ETH Gesture Cost descends to a floor of about 1/${protocolFacts.ethCalibrationFloorDivisor} of its ceiling, while the CST Gesture Cost descends all the way to ${protocolFacts.cstCalibrationFloorCst} \u2014 a free CST gesture is possible if the window fully elapses. The CST Calibration Window currently starts from a ${protocolFacts.initialCstCalibrationWindowHours}-hour reference, but it is stored on-chain and changes after every gesture: each CST gesture increases the window by about ${protocolFacts.cstCalibrationWindowIncreasePercentPerCstGesture}%, and each ETH gesture decreases it by about ${protocolFacts.cstCalibrationWindowDecreasePercentPerEthGesture}%.`,
       },
       {
         id: 'how-is-participation-cst-calculated',
         question: 'How is Participation CST calculated?',
-        answer: `Participation CST uses a square-root formula based on elapsed time since the previous gesture: ${protocolFacts.dynamicCstRewardFormula}. The square root matters because it rewards longer quiet periods without making the reward grow linearly forever. With the current default parameters, examples from the contract docs are approximately ${protocolFacts.dynamicCstRewardExamples.map((example) => `${example.cst} CST after ${example.elapsed}`).join(', ')}. The live app preview and the contract are the source of truth for the exact amount at the moment your gesture lands.`,
+        answer: `Participation CST uses a square-root formula based on elapsed time since the previous gesture: ${protocolFacts.dynamicCstRewardFormula}. The square root matters because it rewards longer quiet periods without making the reward grow linearly forever. At the launch parameters (a time increment of exactly one hour), examples are approximately ${protocolFacts.dynamicCstRewardExamples.map((example) => `${example.cst} CST after ${example.elapsed}`).join(', ')}. The increment grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% per finalized cycle, so live amounts drift slightly below these over time. The live app preview and the contract are the source of truth for the exact amount at the moment your gesture lands.`,
       },
       {
         id: 'why-minimum-cst-reward-protection',
@@ -187,7 +184,7 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'what-is-open-finalization-window',
         question: 'What is the Open-Finalization Window?',
-        answer: `When the Cycle Finalization Time expires, the Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours to finalize the cycle. If they do not finalize during that exclusivity window, anyone may call the finalization transaction. Open finalization keeps the protocol moving; it does not transfer the Signature Allocation away from the Final Gesture participant.`,
+        answer: `When the Cycle Finalization Time expires, the Final Gesture participant has ${protocolFacts.finalGestureExclusivityHours} hours of exclusive time to finalize the cycle. If they do not finalize during that exclusivity window, anyone may call the finalization transaction \u2014 and the smart contract makes whoever finalizes the cycle beneficiary. The finalizer receives the full Signature Allocation (ETH share, ${protocolFacts.specialAllocationCst.toLocaleString()} CST, the Cosmic Signature NFT, and priority over attached assets), so the Final Gesture participant should finalize before the window ends. Open finalization keeps the protocol moving even if the Final Gesture participant disappears.`,
       },
       {
         id: 'what-is-endurance-champion',
@@ -212,8 +209,7 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'does-time-per-bid-stay-same',
         question: 'Does the time added per gesture always stay the same?',
-        answer:
-          'No. The time added after each gesture starts at approximately one hour, but gradually increases over time. The increment is designed to be slow \u2014 approximately 10% to 20% per year, exponentially.',
+        answer: `No. The time added after each gesture started at exactly one hour at launch and grows by ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% every time a cycle finalizes. Because a larger increment also makes each cycle last longer, the growth naturally slows down in calendar time.`,
       },
       {
         id: 'why-time-per-bid-increases',
@@ -251,13 +247,13 @@ export const faqCategories: FAQCategory[] = [
         id: 'what-are-cst-and-dao',
         question: 'What are CST tokens and the Cosmic Council?',
         answer:
-          'Every gesture imprints CST tokens, which express Coordination Weight on the Cosmic Council. The Council coordinates the protocol on-chain: CST holders submit Coordination Proposals and express Support or Opposition. The Council decides which Public Goods Beneficiary receives the 7% allocation each cycle and adjusts other on-chain parameters.',
+          'Every gesture can imprint CST tokens, which express Coordination Weight on the Cosmic Council. The Council coordinates the protocol on-chain: CST holders submit Coordination Proposals and express Support or Opposition (delegate your CST \u2014 to yourself or another address \u2014 to activate that weight). The Council is designed to direct protocol parameters, including which Public Goods Beneficiary receives the 7% allocation, once contract ownership moves under Council control; today those settings are still managed by the protocol owner.',
       },
       {
         id: 'what-can-i-do-with-cst',
         question: 'What can I do with CST tokens?',
         answer:
-          'CST tokens can be used as an alternative to ETH for gestures through the CST Calibration Window. Gestures can also imprint Participation CST, but the amount is dynamic and depends on how long it has been since the previous gesture. CST also expresses Coordination Weight on the Cosmic Council.',
+          'CST tokens can be used as an alternative to ETH for gestures through the CST Calibration Window; CST spent on a gesture is burned (permanently removed from supply) rather than pooled. Gestures can also imprint Participation CST, but the amount is dynamic and depends on how long it has been since the previous gesture. CST also expresses Coordination Weight on the Cosmic Council once delegated (you can delegate to yourself).',
       },
       {
         id: 'what-makes-nfts-unique',
@@ -269,7 +265,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'how-are-nft-images-created',
         question: 'How are the NFT images created?',
         answer:
-          'Each Cosmic Signature NFT visualizes the three-body problem in Newtonian gravity. The protocol simulates three celestial bodies under gravity and spectrally renders their trajectories across 16 wavelength bins, creating a unique chaotic pattern for every NFT.',
+          'Each Cosmic Signature NFT visualizes the three-body problem in Newtonian gravity. The pipeline simulates three celestial bodies under gravity and spectrally renders their trajectories across 64 wavelength bins spanning 380\u2013700 nanometers, creating a unique chaotic pattern for every NFT.',
       },
       {
         id: 'significance-of-random-seed',
@@ -280,8 +276,7 @@ export const faqCategories: FAQCategory[] = [
       {
         id: 'is-nft-supply-limited',
         question: 'Is the number of Cosmic Signature NFTs limited?',
-        answer:
-          'Yes. Because the time added per gesture grows exponentially over time, the pace of NFT imprinting slows. Total Cosmic Signature NFTs become a limited resource in the long run.',
+        answer: `Yes, in practice. The time added per gesture grows ${protocolFacts.cycleTimeIncrementIncreasePercentPerCycle}% with every finalized cycle, so cycles gradually lengthen and the pace of NFT imprinting slows. There is no hard supply cap in the contract, but the slowing cycle rhythm makes Cosmic Signature NFTs an increasingly scarce resource over time.`,
       },
       {
         id: 'impact-of-limiting-nfts',
@@ -305,13 +300,13 @@ export const faqCategories: FAQCategory[] = [
         id: 'participate-dao-without-bidding',
         question: 'Can I participate in the Cosmic Council without making a gesture?',
         answer:
-          'Yes. You can acquire CST on a supported exchange and use it to express Coordination Weight on the Cosmic Council. Making gestures remains the primary way to imprint new CST.',
+          'Yes. You can acquire CST on a supported exchange and use it to express Coordination Weight on the Cosmic Council after delegating it (to yourself or another address). Making gestures remains the primary way to imprint new CST.',
       },
       {
         id: 'donate-nfts-to-game',
         question: 'How can other NFT projects contribute their tokens to a cycle?',
         answer:
-          'Projects can attach their tokens (ERC-721 or ERC-20) to a gesture using the "Advanced" pane. Provide the contract address and token ID or amount and submit the gesture. Attached tokens forward into the Cycle Reserve and flow to the Signature Allocation recipient after finalization.',
+          'Projects can attach their tokens (ERC-721 or ERC-20) to a gesture using the "Advanced" pane. Provide the contract address and token ID or amount and submit the gesture. Attached tokens are held in the Allocations Wallet escrow and flow to the Signature Allocation recipient after finalization.',
       },
     ],
   },
@@ -393,7 +388,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'team-controls',
         question: 'What controls does the team have over the protocol?',
         answer:
-          'Initially, the team has the ability to adjust certain parameters of the protocol, such as gesture-time increments or allocation-track percentages. This control is scoped to the inter-cycle window and implemented through the smart contract\'s "Ownable" pattern. Once a cycle begins (at the first gesture), nobody \u2014 including the owner \u2014 can change protocol conditions until the cycle finalizes.',
+          'Initially, the team has the ability to adjust certain parameters of the protocol, such as gesture-time increments or allocation-track percentages. This control is implemented through the smart contract\'s "Ownable" pattern and is scoped to the inter-cycle window: once the next cycle activates \u2014 which happens before its first gesture \u2014 the core protocol parameters are locked until that cycle finalizes. A few narrower controls remain available outside that lock: the owner can postpone a cycle\u2019s activation until its first gesture arrives, adjust the delay before the next cycle at any time, and manage peripheral contracts (the Public Goods Vault beneficiary, NFT metadata URIs, and the Allocations Wallet retrieval timeout) at any time. The protocol contract is also upgradeable (UUPS) by the owner, but only between cycles; the currently deployed implementation is the publicly verified V2.',
       },
       {
         id: 'will-team-always-have-control',
@@ -441,7 +436,7 @@ export const faqCategories: FAQCategory[] = [
         id: 'donate-to-pot',
         question: 'Can I contribute ETH to the Cycle Reserve without making a gesture?',
         answer:
-          'Yes. The smart contract accepts ETH contributions independent of a gesture. You may also attach a note to the contribution, which may surface on the cycle\u2019s contribution list. Reach out via Discord for details.',
+          'Yes. The protocol contract exposes dedicated contribution functions that accept ETH independent of a gesture, and you may attach a note that can surface on the cycle\u2019s contribution list. Use the app\u2019s contribution flow rather than a plain wallet transfer: ETH sent directly to the protocol address is processed as an ETH gesture, not as a contribution. Reach out via Discord for details.',
       },
       {
         id: 'get-help',

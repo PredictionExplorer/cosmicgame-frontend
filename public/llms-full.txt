@@ -58,11 +58,12 @@ Cosmic Signature is not related to the COSMIC cancer mutation database or COSMIC
 
 1. Each cycle opens with an ETH Calibration Window for the first gesture, while the CST Calibration Window starts from a 12-hour reference and then changes on-chain
 2. Every new gesture adds the current time increment to the stored Cycle Finalization Time
-3. The participant who makes the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation
-4. Gestures can be made with ETH or CST tokens (ERC-20)
-5. CST gestures use a Calibration Window — the CST Gesture Cost descends through the current window
-6. CST gestures increase the CST Calibration Window by about 0.4%; ETH gestures decrease it by about 0.398%
-7. Random Walk NFT holders can attach an unused token to an ETH gesture for a 50% ETH Gesture Cost reduction (each Random Walk NFT can be used once for this discount)
+3. The participant who makes the Final Gesture when the Cycle Finalization Time expires may finalize the cycle and receive the Signature Allocation; gestures remain possible until finalization actually executes
+4. The Final Gesture participant has a 48-hour exclusive finalization window; after it expires, anyone may finalize the cycle and the finalizer receives the Signature Allocation
+5. Gestures can be made with ETH or CST tokens (ERC-20); the first gesture of each cycle must be an ETH gesture
+6. CST gestures use a Calibration Window — the CST Gesture Cost descends through the current window (all the way to 0 if the window fully elapses); CST spent on a gesture is burned
+7. CST gestures increase the CST Calibration Window by about 0.4%; ETH gestures decrease it by about 0.398%
+8. Random Walk NFT holders can attach an unused token to an ETH gesture for a 50% ETH Gesture Cost reduction (each Random Walk NFT can be used once for this discount)
 
 ### Allocation Distribution Per Cycle
 
@@ -103,8 +104,17 @@ Together with the 3,000 CST Outreach Reserve, typical fixed end-of-cycle/outreac
 
 ### Time Mechanics
 
-- Time added per gesture starts at 1 hour and gradually increases over time (~10-20% per year)
-- This slows cycle-duration growth and limits total NFT supply, maintaining scarcity
+- Time added per gesture started at exactly 1 hour and grows 1% each time a cycle finalizes
+- Because larger increments also lengthen cycles, the growth naturally slows in calendar time
+- This slows the pace of NFT imprinting over time, maintaining scarcity
+
+### Anchoring Rules
+
+- Anchored Cosmic Signature NFTs accrue the 6% ETH Anchor Distribution each cycle, split equally per anchored NFT; the accumulated ETH is paid out when the anchor is released
+- Anchored RandomWalk NFTs receive Anchored-NFT Stellar Selection eligibility only (no ETH)
+- Every NFT (Cosmic Signature or RandomWalk) can be anchored only once, ever; releasing an anchor permanently ends that NFT's anchoring eligibility
+- If no Cosmic Signature NFTs are anchored when a cycle finalizes, that cycle's 6% stays in the Cycle Reserve
+- Secondary ETH allocations and attached tokens/NFTs sit in the Allocations Wallet escrow; after a 5-week retrieval timeout, anyone may retrieve unretrieved allocations for themselves
 
 ## Tokens
 
@@ -132,7 +142,7 @@ Together with the 3,000 CST Outreach Reserve, typical fixed end-of-cycle/outreac
 ## Technical Architecture
 
 - **Blockchain**: Arbitrum (Ethereum Layer 2 rollup)
-- **Smart Contracts**: Solidity contracts with owner-controlled parameters until ownership is renounced
+- **Smart Contracts**: Open-source Solidity contracts, exact-match verified on-chain, with owner-controlled parameters until ownership moves under Cosmic Council control
 - **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS
 - **Wallet Integration**: RainbowKit, wagmi, supporting MetaMask, Coinbase Wallet, WalletConnect
 - **Data**: TanStack React Query for real-time data fetching
@@ -140,11 +150,12 @@ Together with the 3,000 CST Outreach Reserve, typical fixed end-of-cycle/outreac
 
 ## Coordination & Trust
 
-- Most protocol parameter changes are restricted to inactive intervals before a cycle activates; the delay before the next cycle can be adjusted separately
-- Once stable, ownership will be permanently renounced via renounceOwnership()
-- After renunciation, protocol rules become immutable
-- All smart contracts are open-source and verifiable
-- The team does not receive funds directly — all reserves flow through the immutable smart contract
+- Most protocol parameter changes are restricted to inactive intervals before a cycle activates; the delay before the next cycle and some peripheral settings (Public Goods Vault beneficiary, NFT metadata URIs, Allocations Wallet retrieval timeout) can be adjusted separately
+- The protocol contract is upgradeable (UUPS) by the owner, but only between cycles; the deployed implementation is publicly verified
+- Once the protocol is stable, ownership is intended to transfer to the Cosmic Council; the team may ultimately renounce ownership entirely via renounceOwnership()
+- After renunciation, no owner remains and parameters can no longer be changed or upgraded
+- All smart contracts are open-source and exact-match verified on-chain; audit and formal-verification status is published at https://app.cosmicsignature.com/audits
+- No team wallet receives ETH from participant gestures — all reserves flow through the public smart contracts under the published allocation rules
 - If the team disappears, the protocol is self-sustaining (seeds on-chain, code open-source)
 
 ## Community & Support
@@ -162,7 +173,7 @@ Q: What is Cosmic Signature?
 A: Cosmic Signature is a procedural on-chain art protocol on Arbitrum. Participants make gestures during a Performance Cycle; every gesture shapes the cycle's final Signature. When the cycle finalizes, the protocol distributes its reserves across multiple allocation tracks — including Protocol Guild.
 
 Q: How does a Performance Cycle work?
-A: Each cycle opens with an ETH Calibration Window for the first gesture. That first gesture starts the Cycle Finalization Time, currently about 24 hours by default. Subsequent gestures add the current time increment to the stored finalization time. When the Cycle Finalization Time expires, the participant who made the Final Gesture has an exclusive window to finalize the cycle and retrieve the Signature Allocation.
+A: Each cycle opens with an ETH Calibration Window for the first gesture. That first gesture starts the Cycle Finalization Time, currently about 24 hours by default. Subsequent gestures add the current time increment to the stored finalization time. When the Cycle Finalization Time expires, the participant who made the Final Gesture has an exclusive 48-hour window to finalize the cycle and retrieve the Signature Allocation; after that window, anyone may finalize and the finalizer receives the Signature Allocation. Gestures remain possible until the cycle is actually finalized.
 
 Q: What types of gestures are available?
 A: Gestures can be made with ETH or CST tokens (ERC-20). You may also attach a Random Walk NFT to an ETH gesture for a 50% reduction in ETH Gesture Cost. Cosmic Signature NFTs (ERC-721) are allocation and anchoring assets; they are not accepted as gesture payment. CST gestures use their own Calibration Window, and that window changes after every ETH or CST gesture.
@@ -182,7 +193,7 @@ Q: How does Stellar Selection work?
 A: Each gesture records one Stellar Selection entry. At finalization, three ETH Stellar Selection recipients share 4% of the Cycle Reserve, ten NFT Stellar Selection recipients each receive 1,000 CST and a Cosmic Signature NFT, and ten RandomWalk NFT anchor-holders each receive 1,000 CST and a Cosmic Signature NFT through Anchored-NFT Stellar Selection.
 
 Q: How does anchoring work?
-A: Cosmic Signature NFT anchor-holders share the 6% Anchor Distribution each cycle, proportional to the number of NFTs anchored. RandomWalk NFT anchor-holders are eligible for Anchored-NFT Stellar Selection.
+A: Cosmic Signature NFT anchor-holders share the 6% Anchor Distribution each cycle, proportional to the number of NFTs anchored; the accumulated ETH is paid out when an anchor is released. RandomWalk NFT anchor-holders are eligible for Anchored-NFT Stellar Selection (no ETH). Every NFT can be anchored only once — releasing an anchor permanently ends that NFT's anchoring eligibility.
 
 ### Cycle Mechanics
 
@@ -207,7 +218,7 @@ Q: How are the NFT images created?
 A: The images are generated from the three-body problem in physics, simulating the motion of three planets in space and tracing their trajectories.
 
 Q: Is the NFT supply limited?
-A: Yes, due to the gradual increase in time added per gesture, the pace of new NFT creation slows over time, effectively limiting the total supply.
+A: In practice, yes. The time added per gesture grows 1% with every finalized cycle, so cycles gradually lengthen and the pace of new NFT imprinting slows over time. There is no hard supply cap in the contract.
 
 ### Arbitrum & Technical
 
@@ -220,10 +231,10 @@ A: Yes, the same private keys are valid on both networks. You just need to adjus
 ### Trust & Coordination
 
 Q: What controls does the team have?
-A: The team can adjust certain protocol parameters only during cycle activation windows. Once the project is stable, ownership will be permanently renounced.
+A: Core protocol parameters can be adjusted only while the next cycle has not yet activated. A few narrower controls remain available at other times: cycle activation timing (until the first gesture), the delay before the next cycle, and peripheral settings such as the Public Goods Vault beneficiary and NFT metadata URIs. The protocol contract is upgradeable (UUPS) between cycles. Once the project is stable, ownership is intended to transfer to the Cosmic Council, with eventual renunciation as the end state.
 
 Q: Does the team receive funds directly?
-A: The team does not receive funds directly. All reserves flow through the immutable smart contract and are allocated according to the protocol's rules.
+A: No team wallet receives ETH from participant gestures. All reserves flow through the public smart contracts and are allocated according to the protocol's rules.
 
 Q: What happens if the team disappears?
 A: The protocol is self-sustaining. Since NFT seeds are stored on-chain, anyone can regenerate the images using the open-source Rust program.

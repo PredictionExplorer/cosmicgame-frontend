@@ -101,15 +101,23 @@ describe('CosmicOgCard component', () => {
   it('uses the three default chip labels', () => {
     const strings = collectStrings(CosmicOgCard({ title: 'X' }));
     expect(strings).toEqual(
-      expect.arrayContaining(['CC0', 'Formally Verified', '7% Protocol Guild']),
+      expect.arrayContaining(['CC0', 'Verified On-Chain', '7% Protocol Guild']),
     );
+  });
+
+  it('avoids unsupported audit claims in the default chips', () => {
+    // Audit/formal-verification status lives on /audits; social cards must
+    // not assert it as a blanket fact.
+    const strings = collectStrings(CosmicOgCard({ title: 'X' }));
+    expect(strings).not.toContain('Formally Verified');
+    expect(strings).not.toContain('Audited Contracts');
   });
 
   it('uses custom chips and drops the defaults', () => {
     const strings = collectStrings(CosmicOgCard({ title: 'X', chips: ['Alpha', 'Beta', 'Gamma'] }));
     expect(strings).toEqual(expect.arrayContaining(['Alpha', 'Beta', 'Gamma']));
     expect(strings).not.toContain('CC0');
-    expect(strings).not.toContain('Formally Verified');
+    expect(strings).not.toContain('Verified On-Chain');
   });
 
   it('handles an empty chips array without throwing', () => {

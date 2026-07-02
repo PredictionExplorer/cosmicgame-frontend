@@ -47,4 +47,35 @@ describe('LLM-facing protocol docs', () => {
     expect(content).toContain('https://app.cosmicsignature.com/audits');
     expect(content).toContain('https://app.cosmicsignature.com/risk-disclosures');
   });
+
+  it.each(docs)(
+    '%s states the open-finalization transfer behavior (claimMainPrize after 48h)',
+    (_fileName, content) => {
+      expect(content).toMatch(/48-hour exclusive/i);
+      expect(content).toMatch(/anyone may finalize/i);
+      expect(content).toMatch(/finalizer receives the Signature Allocation/i);
+      expect(content).not.toMatch(/still belongs/i);
+    },
+  );
+
+  it.each(docs)('%s states the once-only anchoring rule', (_fileName, content) => {
+    expect(content).toMatch(/anchored only once/i);
+  });
+
+  it.each(docs)('%s uses the exact 1%-per-cycle increment growth', (_fileName, content) => {
+    expect(content).toMatch(
+      /grows 1% (per finalized cycle|each time a cycle finalizes|with every finalized cycle)/i,
+    );
+    expect(content).not.toMatch(/10-20% per year|10% to 20%/i);
+  });
+
+  it.each(docs)('%s avoids unsupported blanket audit claims', (_fileName, content) => {
+    expect(content).not.toMatch(/formally verified Solidity contracts/i);
+  });
+
+  it('llms.txt documents the 5-week open-retrieval escrow timeout', () => {
+    const content = readPublicFile('llms.txt');
+    expect(content).toMatch(/5-week retrieval timeout/i);
+    expect(content).toMatch(/anyone may retrieve unretrieved allocations for themselves/i);
+  });
 });

@@ -45,7 +45,7 @@ const allocationTracks = [
     width: `${protocolFacts.anchorDistributionPercentage}%`,
     color: 'bg-[rgb(var(--impact-green-rgb))]',
     tooltip:
-      'ETH distributed to wallets with eligible Cosmic Signature or RandomWalk NFTs anchored to the protocol.',
+      'ETH distributed to wallets with Cosmic Signature NFTs anchored to the protocol. RandomWalk NFT anchors receive Anchored-NFT Stellar Selection eligibility instead, not ETH.',
   },
   {
     label: 'Public Goods',

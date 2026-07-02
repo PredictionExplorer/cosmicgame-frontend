@@ -49,7 +49,7 @@ export const dappContent = {
     anchoring: {
       title: 'Anchor Distributions \u00b7 Cosmic Signature',
       description:
-        'Anchor Cosmic Signature and Random Walk NFTs to the protocol to receive per-cycle ETH distributions.',
+        'Anchor Cosmic Signature NFTs to the protocol to receive per-cycle ETH Anchor Distributions, or anchor Random Walk NFTs for Anchored-NFT Stellar Selection eligibility.',
     },
     statistics: {
       title: 'Statistics \u00b7 Cosmic Signature',
@@ -148,17 +148,17 @@ export const dappContent = {
     publicGoodsCgContributions: {
       title: 'Protocol Public-Goods Contributions \u00b7 Cosmic Signature',
       description:
-        'Automatic forwards from the Cosmic Signature protocol to the Public Goods Beneficiary. Each cycle, a fixed share of the Cycle Reserve is forwarded to support public goods via the Cosmic Council.',
+        'Automatic forwards from the Cosmic Signature protocol to the Public Goods Vault. Each cycle, a fixed share of the Cycle Reserve is forwarded to support public goods.',
     },
     publicGoodsRetrievals: {
       title: 'Public Goods Retrievals \u00b7 Cosmic Signature',
       description:
-        'Retrievals from the Public Goods Vault. Each cycle, a share of the Cycle Reserve is forwarded to a beneficiary address selected by the Cosmic Council.',
+        'Retrievals from the Public Goods Vault. Each cycle, a share of the Cycle Reserve is forwarded to the configured Public Goods Beneficiary \u2014 currently Protocol Guild.',
     },
     publicGoodsVoluntary: {
       title: 'Voluntary Public-Goods Contributions \u00b7 Cosmic Signature',
       description:
-        'Voluntary contributions to the Public Goods Vault from the Cosmic Signature community. Contributions support beneficiaries selected through Cosmic Council coordination.',
+        'Voluntary contributions to the Public Goods Vault from the Cosmic Signature community. Contributions support the configured Public Goods Beneficiary \u2014 currently Protocol Guild.',
     },
     allocationRetrieved: {
       title: 'Retrieved Allocations \u00b7 Cosmic Signature',

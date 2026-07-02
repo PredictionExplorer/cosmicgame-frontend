@@ -170,9 +170,12 @@ describe('useAllocationNotification', () => {
         jest.advanceTimersByTime(1000);
       });
 
-      expect(mockNotification).toHaveBeenCalledWith('Gesture now or the cycle closes', {
-        body: 'The Performance Cycle closes in 5 minutes. Make a gesture now to take part in the final allocations.',
-      });
+      expect(mockNotification).toHaveBeenCalledWith(
+        'Gesture now \u2014 the cycle can finalize soon',
+        {
+          body: 'The Cycle Finalization Time expires in 5 minutes. Make a gesture now to extend the cycle and take part in the final allocations.',
+        },
+      );
     });
 
     it('does not fire notification when outside the 5-minute window', () => {

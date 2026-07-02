@@ -38,7 +38,7 @@ export type CosmicOgCardProps = {
   footerEnd?: string;
 };
 
-const DEFAULT_CHIPS = ['CC0', 'Formally Verified', '7% Protocol Guild'] as const;
+const DEFAULT_CHIPS = ['CC0', 'Verified On-Chain', '7% Protocol Guild'] as const;
 
 /**
  * Background uses literal RGBA values rather than CSS `rgb(var(...))`

@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from 'react';
 
+import { protocolFacts } from '@/content/protocol-facts';
+
 import type {
   CTPriceInfo,
   DashboardInfo,
@@ -23,16 +25,17 @@ export type UxCycleScenarioName =
 
 export const UX_SCENARIO_DEMO_ACCOUNT = '0x1111111111111111111111111111111111111111';
 const OTHER_PARTICIPANT = '0x2222222222222222222222222222222222222222';
-const PROTOCOL_PROXY = '0x6a714Ae7B5b6eA520F6BCA23d2E609C4Fd5863F2';
-const IMPLEMENTATION = '0x50eB3d05d2C463949DE9238D419385594f7AdB97';
-const CST_TOKEN = '0xAD91843e6A58Ba560F577E676986AFb1dba6FBA0';
-const COSMIC_SIGNATURE_NFT = '0xbb84Be3500A63581d3F2d5AC3bdF8685AAedad25';
-const RANDOM_WALK_NFT = '0x47eF85Dfb775aCE0934fBa9EEd09D22e6eC0Cc08';
-const PUBLIC_GOODS_VAULT = '0x96bB0ADB414d5350f435E52f94946B6C7A0760a9';
-const OUTREACH_RESERVE = '0xa3802c799f5e3D3D3562A9B513a41C6aAF92e25e';
-const ALLOCATIONS_WALLET = '0xE1b619e9B39ea4109D2F429Ea5eAA307759b0011';
-const CST_ANCHORING_WALLET = '0x6308A405B4FF1eA890870Efe2a6D036750B81F7C';
-const RWLK_ANCHORING_WALLET = '0x5EB3396092841E6c5b0b51141699F6711E830529';
+const PROTOCOL_PROXY = protocolFacts.contractAddresses.proxy;
+const IMPLEMENTATION = protocolFacts.contractAddresses.implementation;
+const CST_TOKEN = protocolFacts.contractAddresses.cstToken;
+const COSMIC_SIGNATURE_NFT = protocolFacts.contractAddresses.cosmicSignatureNft;
+const RANDOM_WALK_NFT = protocolFacts.contractAddresses.randomWalkNft;
+const COSMIC_COUNCIL = protocolFacts.contractAddresses.cosmicCouncil;
+const PUBLIC_GOODS_VAULT = protocolFacts.contractAddresses.publicGoodsVault;
+const OUTREACH_RESERVE = protocolFacts.contractAddresses.outreachReserve;
+const ALLOCATIONS_WALLET = protocolFacts.contractAddresses.allocationsWallet;
+const CST_ANCHORING_WALLET = protocolFacts.contractAddresses.cosmicSignatureNftAnchoringWallet;
+const RWLK_ANCHORING_WALLET = protocolFacts.contractAddresses.rwlkAnchoringWallet;
 
 interface ScenarioConfig {
   remainingSeconds: number;
@@ -231,7 +234,7 @@ function buildScenario(name: UxCycleScenarioName): UxCycleScenarioState {
       CosmicTokenAddr: CST_TOKEN,
       CosmicSignatureAddr: COSMIC_SIGNATURE_NFT,
       RandomWalkAddr: RANDOM_WALK_NFT,
-      CosmicDaoAddr: PROTOCOL_PROXY,
+      CosmicDaoAddr: COSMIC_COUNCIL,
       CharityWalletAddr: PUBLIC_GOODS_VAULT,
       MarketingWalletAddr: OUTREACH_RESERVE,
       PrizesWalletAddr: ALLOCATIONS_WALLET,

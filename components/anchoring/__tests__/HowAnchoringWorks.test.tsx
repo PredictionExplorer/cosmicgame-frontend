@@ -21,6 +21,32 @@ describe('HowAnchoringWorks', () => {
     expect(screen.getByText('Cosmic Signature NFT Anchoring')).toBeInTheDocument();
     expect(screen.getByText('RandomWalk (RWLK) Anchoring')).toBeInTheDocument();
     expect(screen.getByText('How are distributions calculated?')).toBeInTheDocument();
+    expect(screen.getByText('Can I re-anchor an NFT after releasing it?')).toBeInTheDocument();
+  });
+
+  it('explains the once-only anchoring rule (usedNfts) when expanded', () => {
+    render(<HowAnchoringWorks />);
+    fireEvent.click(screen.getByText('What is Anchoring?'));
+    expect(screen.getByText(/anchored only once, ever/)).toBeVisible();
+  });
+
+  it('explains that releasing is permanent per NFT', () => {
+    render(<HowAnchoringWorks />);
+    fireEvent.click(screen.getByText('Can I re-anchor an NFT after releasing it?'));
+    expect(screen.getByText(/permanently ends that NFT/)).toBeVisible();
+  });
+
+  it('explains payout-at-release and the zero-anchor rollover for CS NFT anchoring', () => {
+    render(<HowAnchoringWorks />);
+    fireEvent.click(screen.getByText('Cosmic Signature NFT Anchoring'));
+    expect(screen.getByText(/paid out when you release an anchor/)).toBeVisible();
+    expect(screen.getByText(/stays in the Cycle Reserve/)).toBeVisible();
+  });
+
+  it('states that RandomWalk anchors receive no ETH', () => {
+    render(<HowAnchoringWorks />);
+    fireEvent.click(screen.getByText('RandomWalk (RWLK) Anchoring'));
+    expect(screen.getByText(/RandomWalk anchors receive no ETH/)).toBeVisible();
   });
 
   it('does not show content before expanding', () => {

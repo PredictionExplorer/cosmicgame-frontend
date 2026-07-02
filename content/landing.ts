@@ -48,13 +48,13 @@ export const landingContent = {
     eyebrow: 'Procedural on-chain art protocol \u00b7 Arbitrum',
     headline: 'Cosmic Signature: Procedural On-Chain Art on Arbitrum',
     subhead:
-      'Every Gesture Shapes the Signature. Make a gesture during a Performance Cycle, and every gesture shapes the cycle\u2019s final Signature. When the cycle closes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including the infrastructure Ethereum itself depends on.',
+      'Every Gesture Shapes the Signature. Make a gesture during a Performance Cycle, and every gesture shapes the cycle\u2019s final Signature. When the cycle finalizes, the protocol distributes its reserves across more than ten allocation tracks \u2014 including the infrastructure Ethereum itself depends on.',
     primaryCta: { label: 'Open the App', href: APP_ORIGIN },
     secondaryCta: { label: 'Explore the Cycle', href: '#cycle' },
     marqueeChips: [
-      'Audited Contracts',
+      'Verified Contracts',
       'CC0',
-      'Formally Verified',
+      'Open Source',
       'Deterministic Art',
       '7% to Protocol Guild',
       'Cosmic Council',
@@ -125,7 +125,7 @@ export const landingContent = {
       {
         number: '06',
         title: 'Spectral Render',
-        body: 'Sixteen wavelength bins from 380 to 700 nanometers render the orbit trails with velocity-dependent thickness and depth of field.',
+        body: 'Sixty-four wavelength bins from 380 to 700 nanometers render the orbit trails with velocity-dependent thickness and depth of field.',
       },
       {
         number: '07',
@@ -134,7 +134,7 @@ export const landingContent = {
       },
     ],
     facts: [
-      { label: 'Wavelength bins', value: '16' },
+      { label: 'Wavelength bins', value: '64' },
       { label: 'Physics steps per candidate', value: '1,000,000' },
       { label: 'Candidate orbits', value: '100,000' },
       { label: 'License', value: 'CC0 1.0' },
@@ -213,12 +213,12 @@ export const landingContent = {
   anchoring: {
     eyebrow: 'Anchoring',
     heading: 'Anchor Cosmic Signature NFTs to the protocol.',
-    body: `Anchored Cosmic Signature NFTs receive a proportional share of the ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution each cycle. Release the anchor whenever you like. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection, where selected anchor-holders receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT.`,
+    body: `Anchored Cosmic Signature NFTs receive a proportional share of the ${protocolFacts.anchorDistributionPercentage}% Anchor Distribution each cycle, paid out when the anchor is released. Release the anchor whenever you like \u2014 but each NFT can be anchored only once, so releasing permanently ends that NFT\u2019s anchoring eligibility. Anchored Random Walk NFTs receive entries into the Anchored-NFT Stellar Selection, where selected anchor-holders receive ${protocolFacts.specialAllocationCst.toLocaleString()} CST and a Cosmic Signature NFT (no ETH).`,
     bullets: [
-      'Per-cycle ETH distribution for anchor-holders',
-      'Release anchors at any time',
+      'Per-cycle ETH accrual, retrieved at anchor release',
+      'Release anchors at any time \u2014 each NFT anchors only once',
       'Random Walk anchors enter the Stellar Selection',
-      'No lockup, no penalties, no fixed term',
+      'No fixed term and no penalties; releasing is permanent per NFT',
     ],
     cta: { label: 'Anchor in the App', href: `${APP_ORIGIN}/anchoring` },
   },
@@ -239,19 +239,19 @@ export const landingContent = {
   council: {
     eyebrow: 'Cosmic Council',
     heading: 'Protocol Coordination, on-chain.',
-    body: 'The Cosmic Council coordinates the protocol on-chain. CST holders submit Coordination Proposals and express Support or Opposition. The Coordination Quorum is met at 3% of CST supply. Proposal threshold: 100 CST.',
+    body: 'The Cosmic Council coordinates the protocol on-chain. CST holders delegate their weight (to themselves or another address), submit Coordination Proposals, and express Support or Opposition. The Coordination Quorum is met when Support plus Abstain weight reaches 3% of CST supply. Proposal threshold: 100 CST.',
     columns: [
       {
         title: 'Coordination Proposal',
-        body: 'Any CST holder with at least 100 CST may submit a proposal. Two-day coordination delay, two-week coordination period.',
+        body: 'Any address with at least 100 CST of delegated weight may submit a proposal. Two-day coordination delay, two-week coordination period.',
       },
       {
         title: 'Coordination Weight',
-        body: 'Each CST expresses one unit of weight. Expression is a cryptographic signature, not a share or equity instrument.',
+        body: 'Each CST expresses one unit of weight once delegated. Expression is a cryptographic signature, not a share or equity instrument.',
       },
       {
         title: 'Coordination Quorum',
-        body: 'A proposal passes if support exceeds opposition and 3% of total CST supply has expressed a position.',
+        body: 'A proposal passes if Support exceeds Opposition and Support plus Abstain weight reaches 3% of total CST supply. Opposition weight does not count toward the quorum.',
       },
     ],
   },
@@ -330,7 +330,7 @@ export const landingContent = {
       {
         question: 'What is the art, technically?',
         answer:
-          'Each Cosmic Signature NFT is a deterministic render of a three-body Newtonian simulation. The on-chain seed selects a candidate orbit (from 100,000 simulated via a 4th-order Yoshida symplectic integrator), which is then spectrally rendered across 16 wavelength bins with OKLab color mixing. The pipeline is fully open-source under CC0; anyone can reproduce a Signature from its seed.',
+          'Each Cosmic Signature NFT is a deterministic render of a three-body Newtonian simulation. The on-chain seed selects a candidate orbit (from 100,000 simulated via a 4th-order Yoshida symplectic integrator), which is then spectrally rendered across 64 wavelength bins with OKLab color mixing. The pipeline is fully open-source under CC0; anyone can reproduce a Signature from its seed.',
       },
       {
         question: 'Can I fork this?',

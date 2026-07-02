@@ -243,7 +243,7 @@ test.describe('Landing page @ cosmicsignature.com', () => {
 
   test('marquee chips render credibility signals', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
-    for (const chip of ['CC0', 'Formally Verified', '7% to Protocol Guild']) {
+    for (const chip of ['CC0', 'Verified Contracts', '7% to Protocol Guild']) {
       await expect(page.getByText(chip).first()).toBeVisible();
     }
   });

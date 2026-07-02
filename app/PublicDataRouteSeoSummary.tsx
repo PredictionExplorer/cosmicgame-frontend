@@ -184,7 +184,7 @@ const configs: Record<SeoSummaryRoute, SummaryConfig> = {
     eyebrow: 'Protocol public-goods contributions · Arbitrum',
     heading: 'Protocol Public-Goods Contributions',
     description:
-      'Track automatic Cosmic Signature public-goods forwards from protocol cycles to the Public Goods Beneficiary selected through Cosmic Council coordination.',
+      'Track automatic Cosmic Signature public-goods forwards from protocol cycles to the Public Goods Vault and its configured beneficiary \u2014 currently Protocol Guild.',
     source: 'Cosmic Signature public public-goods APIs',
     links: [
       {
@@ -211,7 +211,7 @@ const configs: Record<SeoSummaryRoute, SummaryConfig> = {
     eyebrow: 'Public-goods retrievals · Arbitrum',
     heading: 'Public Goods Retrievals',
     description:
-      'Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the selected public-goods beneficiary.',
+      'Review retrievals from the Cosmic Signature Public Goods Vault, where cycle reserves forward support to the configured public-goods beneficiary \u2014 currently Protocol Guild.',
     source: 'Cosmic Signature public public-goods APIs',
     links: [
       { href: '/public-goods-contributions-cg', label: 'Protocol public-goods contributions' },

@@ -179,9 +179,9 @@ function viewForPhase(phase: ChronoCorePhase): PhaseView {
       return {
         eyebrow: 'Cycle ready to finalize',
         label: 'Ready',
-        status: 'Cycle closed. Finalization is ready.',
+        status: 'Finalization is ready. A new Gesture can still extend the cycle.',
         tooltip:
-          'The Cycle Finalization Time reached zero. The Final Gesture participant may finalize, followed by the open-finalization window.',
+          'The Cycle Finalization Time reached zero. The Final Gesture participant may finalize; after the exclusivity window, anyone may finalize and receives the Signature Allocation. Gestures remain possible until finalization executes.',
         displayText: '00:00',
         toneClass:
           'border-emerald-400/35 bg-[linear-gradient(135deg,rgb(var(--impact-green-rgb)/0.16),rgb(var(--cosmic-indigo-rgb)/0.34),rgb(var(--aurora-cyan-rgb)/0.11))]',

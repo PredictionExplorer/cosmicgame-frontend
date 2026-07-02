@@ -54,8 +54,16 @@ describe('<Hero />', () => {
   it('renders the marquee credibility chips', () => {
     render(<Hero />);
     expect(screen.getByText('CC0')).toBeInTheDocument();
-    expect(screen.getByText('Formally Verified')).toBeInTheDocument();
+    expect(screen.getByText('Verified Contracts')).toBeInTheDocument();
     expect(screen.getByText('7% to Protocol Guild')).toBeInTheDocument();
+  });
+
+  it('avoids unsupported audit claims in the marquee chips', () => {
+    // Audit/formal-verification status is published on /audits; the hero
+    // must not assert it as a blanket fact.
+    render(<Hero />);
+    expect(screen.queryByText('Formally Verified')).not.toBeInTheDocument();
+    expect(screen.queryByText('Audited Contracts')).not.toBeInTheDocument();
   });
 
   it('contains no banned lexicon terms in the rendered DOM', () => {

@@ -21,6 +21,7 @@
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
     "audit:high": "tsx scripts/audit-high.ts",
+    "audit:protocol-facts": "tsx scripts/audit-protocol-facts.ts",
     "indexnow:submit": "tsx scripts/indexnow-submit.ts",
     "lexicon:scan": "tsx scripts/lexicon-scan.ts",
     "prepare": "husky"

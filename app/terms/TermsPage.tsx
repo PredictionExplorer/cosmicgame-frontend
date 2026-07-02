@@ -129,7 +129,7 @@ const sections = [
       },
       {
         subtitle: 'Retrieving Allocations',
-        text: `Some allocations require manual retrieval through the platform. The participant eligible for the Signature Allocation has ${protocolFacts.finalGestureExclusivityHours} hours after the Cycle Finalization Time to finalize the cycle. After that window, anyone may finalize the cycle according to the smart contract rules. Secondary ETH and attached-token or attached-NFT allocations use a separate retrieval timeout that defaults to ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks.`,
+        text: `Some allocations require manual retrieval through the platform. The participant eligible for the Signature Allocation has ${protocolFacts.finalGestureExclusivityHours} hours after the Cycle Finalization Time to finalize the cycle exclusively. After that window, anyone may finalize the cycle, and under the smart contract rules the finalizer becomes the cycle beneficiary and receives the Signature Allocation. Secondary ETH and attached-token or attached-NFT allocations use a separate retrieval timeout that defaults to ${protocolFacts.secondaryRetrievalTimeoutWeeks} weeks; after it expires, the smart contracts permit anyone to retrieve unretrieved allocations for themselves. You are responsible for retrieving your allocations before these timeouts expire.`,
       },
       {
         subtitle: 'No Guaranteed Outcomes',
