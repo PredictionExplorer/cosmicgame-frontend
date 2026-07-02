@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 import { expectAllLabelTooltips, expectLabelTooltip } from './tooltip-helpers';
 
-const STATISTICS_TOOLTIPS = [
+const HUB_TOOLTIPS = [
   {
     label: 'Active Performance Cycle',
     expected: /current Performance Cycle number indexed/,
@@ -36,6 +36,21 @@ const STATISTICS_TOOLTIPS = [
     expected: /ETH currently held by the Cosmic Signature protocol contract/,
   },
   {
+    label: 'Outreach Reserve',
+    expected: /CST imprinted for outreach and ecosystem contributors/,
+  },
+  {
+    label: 'Allocation Economy',
+    expected: /Cumulative allocation records and ETH flows/,
+  },
+  {
+    label: 'RandomWalk NFTs Used',
+    expected: /attached to ETH gestures for a one-time Gesture Cost reduction/,
+  },
+];
+
+const PARTICIPATION_TOOLTIPS = [
+  {
     label: 'Unique Participants',
     expected: /Unique wallet addresses that have made at least one indexed gesture/,
   },
@@ -51,39 +66,47 @@ const STATISTICS_TOOLTIPS = [
     label: 'Unique Anchor-holders',
     expected: /Combined unique wallets that have anchored Cosmic Signature NFTs or RandomWalk NFTs/,
   },
-  {
-    label: 'Outreach Reserve',
-    expected: /CST imprinted for outreach and ecosystem contributors/,
-  },
-  {
-    label: 'Allocation Economy',
-    expected: /Cumulative allocation records and ETH flows/,
-  },
-  {
-    label: 'Cycle Activations',
-    expected: /System event windows that show when protocol cycles/,
-  },
-  {
-    label: 'RandomWalk NFTs Used',
-    expected: /attached to ETH gestures for a one-time Gesture Cost reduction/,
-  },
-  {
-    label: 'Total Tokens Imprinted',
-    expected: /Indexed Cosmic Signature NFT imprint count associated/,
-  },
 ];
 
 test.describe('/statistics tooltips', () => {
-  test.beforeEach(async ({ page }) => {
+  test('opens representative tooltips on the hub', async ({ page }) => {
     await page.goto('/statistics', { waitUntil: 'networkidle' });
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expectAllLabelTooltips(page, HUB_TOOLTIPS);
   });
 
-  test('opens representative statistics tooltips across overview groups', async ({ page }) => {
-    await expectAllLabelTooltips(page, STATISTICS_TOOLTIPS);
+  test('opens participation tooltips', async ({ page }) => {
+    await page.goto('/statistics/participation', { waitUntil: 'networkidle' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expectAllLabelTooltips(page, PARTICIPATION_TOOLTIPS);
+  });
+
+  test('opens anchoring tooltips', async ({ page }) => {
+    await page.goto('/statistics/anchoring', { waitUntil: 'networkidle' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expectAllLabelTooltips(page, [
+      {
+        label: 'Total Tokens Imprinted',
+        expected: /Indexed Cosmic Signature NFT imprint count associated/,
+      },
+    ]);
+  });
+
+  test('opens activity tooltips', async ({ page }) => {
+    await page.goto('/statistics/activity', { waitUntil: 'networkidle' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expectAllLabelTooltips(page, [
+      {
+        label: 'Cycle Activations',
+        expected: /System event windows that show when protocol cycles/,
+      },
+    ]);
   });
 
   test('opens a representative table header tooltip', async ({ page }, testInfo) => {
+    await page.goto('/statistics/participation', { waitUntil: 'networkidle' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+
     if (testInfo.project.name !== 'Desktop Chrome') {
       const firstParticipantRow = page
         .getByRole('table')

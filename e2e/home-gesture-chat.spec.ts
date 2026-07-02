@@ -186,11 +186,11 @@ test.describe('home gesture chat', () => {
     await expect(chat.getByText('Cycle #7 messages from gestures.')).toBeVisible();
     await expect(chat.getByText('Newest message from a gesture')).toBeVisible();
     await expect(chat.getByText('Older message from a gesture')).toBeVisible();
-    await expect(chat.getByRole('link', { name: 'Open gesture 103' })).toHaveAttribute(
+    await expect(chat.getByRole('link', { name: 'Open gesture position 103' })).toHaveAttribute(
       'href',
       '/gesture/103',
     );
-    await expect(chat.getByRole('link', { name: 'Open gesture 102' })).toHaveCount(0);
+    await expect(chat.getByRole('link', { name: 'Open gesture position 102' })).toHaveCount(0);
 
     const firstMessage = chat.getByRole('listitem').first();
     await expect(firstMessage).toContainText('Newest message from a gesture');

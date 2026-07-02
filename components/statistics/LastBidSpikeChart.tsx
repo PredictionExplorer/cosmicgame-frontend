@@ -24,7 +24,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 
 const CHART_HEIGHT = 320;
-const BAR_COLOR = '#15bffd';
+const BAR_COLOR = 'rgb(var(--aurora-cyan-rgb))';
 const SPIKE_COLOR = 'rgba(239, 68, 68, 0.18)';
 const SPIKE_INTERVAL_SECS = 3600;
 const VIEW_PADDING_SECS = 12 * 3600;
@@ -65,7 +65,7 @@ function SpikeTooltip({ active, payload }: SpikeTooltipProps) {
   if (!point) return null;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
+    <div className="rounded-lg border border-white/10 bg-background/95 px-3 py-2 text-sm shadow-lg">
       <p className="mb-1 font-medium text-white">{point.label}</p>
       <p className="text-muted-foreground">
         Gestures: <span className="text-white">{point.numBids}</span>
@@ -147,22 +147,32 @@ export const LastBidSpikeChart: FC<LastBidSpikeChartProps> = ({ enabled = true }
     <div className="space-y-4" data-testid="last-bid-spike-chart">
       {spikes.length > 0 ? (
         <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs uppercase tracking-wider text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
               Spikes ({spikes.length})
             </span>
-            {spikes.map((spike) => (
-              <Button
-                key={spike.Index}
-                type="button"
-                size="sm"
-                variant={selectedIndex === spike.Index ? 'default' : 'outline'}
-                onClick={() => setSelectedIndexOverride(spike.Index)}
-                className="font-mono text-xs"
-              >
-                #{spike.Index + 1}
-              </Button>
-            ))}
+            {/* Selection is by array position — the backend `Index` field is not
+                guaranteed to match the array order, and mixing the two broke
+                prev/next navigation. Scrolls horizontally when many spikes exist. */}
+            <div
+              role="group"
+              aria-label="Detected gesture spikes"
+              className="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none"
+            >
+              {spikes.map((spike, arrayIndex) => (
+                <Button
+                  key={`${spike.StartTs}-${spike.EndTs}`}
+                  type="button"
+                  size="sm"
+                  variant={selectedIndex === arrayIndex ? 'default' : 'outline'}
+                  aria-pressed={selectedIndex === arrayIndex}
+                  onClick={() => setSelectedIndexOverride(arrayIndex)}
+                  className="shrink-0 font-mono text-xs"
+                >
+                  #{arrayIndex + 1}
+                </Button>
+              ))}
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

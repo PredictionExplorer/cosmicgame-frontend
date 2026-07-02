@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
-import { shortenHex } from '@/utils';
+import { formatTableAmount, shortenHex } from '@/utils';
 import { statisticsCopy } from '@/content/statistics-copy';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -93,8 +93,8 @@ const UniqueAnchorHoldersCSTRow = ({ row }: { row: UniqueAnchorHolderCST }) => {
       <TablePrimaryCell align="center">{NumUnstakeActions}</TablePrimaryCell>
       <TablePrimaryCell align="center">{TotalTokensMinted}</TablePrimaryCell>
       <TablePrimaryCell align="center">{TotalTokensStaked}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{TotalRewardEth.toFixed(6)}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{UnclaimedRewardEth.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{formatTableAmount(TotalRewardEth)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{formatTableAmount(UnclaimedRewardEth)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };

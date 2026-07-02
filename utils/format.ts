@@ -88,6 +88,24 @@ export const formatEthValue = (value: number): string => {
   return value < 10 ? `${value.toFixed(4)} ETH` : `${value.toFixed(2)} ETH`;
 };
 
+const compactAmountFormatter = new Intl.NumberFormat('en-US', {
+  maximumFractionDigits: 6,
+});
+
+/**
+ * Formats a numeric table amount without the misleading `0.000000` wall that
+ * fixed-precision output produces: zero renders as "0", dust renders as
+ * "<0.0001", and everything else gets up to 6 decimals with trailing zeros
+ * trimmed. Unit-free — append " ETH"/" CST" at the call site if needed.
+ */
+export const formatTableAmount = (value: number | null | undefined): string => {
+  if (value == null || !Number.isFinite(value)) return '—';
+  if (value === 0) return '0';
+  const magnitude = Math.abs(value);
+  if (magnitude < 0.0001) return value > 0 ? '<0.0001' : '>-0.0001';
+  return compactAmountFormatter.format(value);
+};
+
 /** Formats CST for display: 4 decimals when < 10, else 2. */
 export const formatCSTValue = (value: number): string => {
   if (!value) return '0 CST';

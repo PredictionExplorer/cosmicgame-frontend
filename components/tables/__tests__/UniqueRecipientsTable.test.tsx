@@ -30,16 +30,16 @@ describe('UniqueRecipientsTable', () => {
   it('renders recipient data', () => {
     render(<UniqueRecipientsTable list={[createRecipient()]} />);
     expect(screen.getByText('10')).toBeInTheDocument();
-    expect(screen.getByText('2.500000')).toBeInTheDocument();
-    expect(screen.getByText('15.750000')).toBeInTheDocument();
+    expect(screen.getByText('2.5')).toBeInTheDocument();
+    expect(screen.getByText('15.75')).toBeInTheDocument();
   });
 
-  it('formats ETH values to 6 decimal places', () => {
+  it('formats ETH values without a trailing-zero wall', () => {
     render(
       <UniqueRecipientsTable list={[createRecipient({ MaxWinAmountEth: 0.1, PrizesSum: 0.2 })]} />,
     );
-    expect(screen.getByText('0.100000')).toBeInTheDocument();
-    expect(screen.getByText('0.200000')).toBeInTheDocument();
+    expect(screen.getByText('0.1')).toBeInTheDocument();
+    expect(screen.getByText('0.2')).toBeInTheDocument();
   });
 
   it('renders only first page of results (perPage=5)', () => {

@@ -14,7 +14,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { ErrorState } from '@/components/ui/error-state';
 
 const CHART_HEIGHT = 320;
-const BAR_COLOR = '#15bffd';
+const BAR_COLOR = 'rgb(var(--aurora-cyan-rgb))';
 const DAY_SECS = 86400;
 const HOUR_SECS = 3600;
 const DEFAULT_LOOKBACK_SECS = 365 * DAY_SECS;
@@ -48,7 +48,7 @@ function FrequencyTooltip({ active, payload }: FrequencyTooltipProps) {
   if (!point) return null;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-[#0d1117]/95 px-3 py-2 text-sm shadow-lg">
+    <div className="rounded-lg border border-white/10 bg-background/95 px-3 py-2 text-sm shadow-lg">
       <p className="mb-2 font-medium text-white">{point.label}</p>
       <dl className="space-y-1 text-muted-foreground">
         <div className="flex justify-between gap-4">
@@ -102,6 +102,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
           type="button"
           size="sm"
           variant={interval === 'day' ? 'default' : 'outline'}
+          aria-pressed={interval === 'day'}
           onClick={() => setInterval('day')}
         >
           Daily
@@ -110,6 +111,7 @@ export const BidFrequencyChart: FC<BidFrequencyChartProps> = ({ enabled = true }
           type="button"
           size="sm"
           variant={interval === 'hour' ? 'default' : 'outline'}
+          aria-pressed={interval === 'hour'}
           onClick={() => setInterval('hour')}
         >
           Hourly

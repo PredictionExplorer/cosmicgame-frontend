@@ -3,6 +3,7 @@ import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { statisticsCopy } from '@/content/statistics-copy';
+import { formatTableAmount } from '@/utils';
 
 import {
   TablePrimary,
@@ -34,8 +35,10 @@ const UniqueRecipientsRow = ({ recipient }: UniqueRecipientsRowProps) => {
         <AddressLink address={recipient.WinnerAddr} url={`/user/${recipient.WinnerAddr}`} />
       </TablePrimaryCell>
       <TablePrimaryCell align="right">{recipient.AllocationsCount}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{recipient.MaxWinAmountEth.toFixed(6)}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{recipient.PrizesSum.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {formatTableAmount(recipient.MaxWinAmountEth)}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="right">{formatTableAmount(recipient.PrizesSum)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };

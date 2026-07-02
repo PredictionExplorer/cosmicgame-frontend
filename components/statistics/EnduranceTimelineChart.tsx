@@ -70,13 +70,24 @@ function LegendDot({ color, label }: { color: string; label: string }) {
   );
 }
 
-function RoleBadge({ color, children }: { color: string; children: string }) {
+function RoleBadge({
+  color,
+  label,
+  children,
+}: {
+  color: string;
+  /** Full role name announced to assistive tech in place of the abbreviation. */
+  label: string;
+  children: string;
+}) {
   return (
     <span
       className="rounded px-1 py-px text-[9px] font-semibold leading-none"
       style={{ backgroundColor: `${color}26`, color }}
+      title={label}
+      aria-label={label}
     >
-      {children}
+      <span aria-hidden>{children}</span>
     </span>
   );
 }
@@ -285,9 +296,15 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                   {shortenHex(lane.address, 4)}
                 </span>
                 {lane.isEnduranceChampion ? (
-                  <RoleBadge color={ENDURANCE_COLOR}>EC</RoleBadge>
+                  <RoleBadge color={ENDURANCE_COLOR} label="Endurance Champion">
+                    EC
+                  </RoleBadge>
                 ) : null}
-                {lane.isChronoWarrior ? <RoleBadge color={CHRONO_COLOR}>CW</RoleBadge> : null}
+                {lane.isChronoWarrior ? (
+                  <RoleBadge color={CHRONO_COLOR} label="Chrono-Warrior">
+                    CW
+                  </RoleBadge>
+                ) : null}
               </div>
               <div
                 className="relative h-5 flex-1 overflow-hidden rounded bg-white/[0.03]"
@@ -306,7 +323,12 @@ const EnduranceGanttView = memo(function EnduranceGanttView({ gantt }: { gantt: 
                     <div
                       key={i}
                       title={stintTitle(stint, lane.address)}
-                      className="absolute top-0.5 bottom-0.5 rounded-sm"
+                      // Focusable so keyboard and screen-reader users can step
+                      // through stints; `title` alone is hover-only.
+                      tabIndex={0}
+                      role="img"
+                      aria-label={stintTitle(stint, lane.address)}
+                      className="absolute top-0.5 bottom-0.5 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-white"
                       style={{
                         left: pct(stint.startHours / durHours),
                         width: pct(stint.durationHours / durHours),
@@ -450,9 +472,15 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
   currentRoundNum,
 }) => {
   const maxRound = Math.max(0, currentRoundNum);
-  // This section only mounts after the dashboard has resolved, so currentRoundNum is
-  // already valid here; the initial selection is the live round.
-  const [selectedRound, setSelectedRound] = useState<number>(maxRound);
+  // `null` means "follow the live round": the selection is derived from
+  // currentRoundNum until the user explicitly navigates, so a new live round
+  // (or a late-arriving dashboard response) is picked up automatically.
+  const [pinnedRound, setPinnedRound] = useState<number | null>(null);
+  const selectedRound = pinnedRound === null ? maxRound : Math.min(pinnedRound, maxRound);
+  const setSelectedRound = (round: number) => {
+    const clamped = Math.min(Math.max(0, round), maxRound);
+    setPinnedRound(clamped >= maxRound ? null : clamped);
+  };
 
   const isLive = selectedRound >= currentRoundNum;
 
@@ -467,7 +495,7 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
             variant="outline"
             aria-label="Previous round"
             disabled={selectedRound <= 0}
-            onClick={() => setSelectedRound((r) => Math.max(0, r - 1))}
+            onClick={() => setSelectedRound(selectedRound - 1)}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -476,10 +504,11 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
             min={0}
             max={maxRound}
             value={selectedRound}
+            aria-label="Round number"
             onChange={(e) => {
               const next = Number(e.target.value);
               if (Number.isFinite(next)) {
-                setSelectedRound(Math.min(Math.max(0, Math.floor(next)), maxRound));
+                setSelectedRound(Math.floor(next));
               }
             }}
             className="w-20 rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-center text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -490,7 +519,7 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
             variant="outline"
             aria-label="Next round"
             disabled={selectedRound >= maxRound}
-            onClick={() => setSelectedRound((r) => Math.min(maxRound, r + 1))}
+            onClick={() => setSelectedRound(selectedRound + 1)}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -500,12 +529,7 @@ export const EnduranceTimelineSection: FC<EnduranceTimelineSectionProps> = ({
             Live round
           </span>
         ) : (
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={() => setSelectedRound(maxRound)}
-          >
+          <Button type="button" size="sm" variant="ghost" onClick={() => setPinnedRound(null)}>
             Jump to live
           </Button>
         )}

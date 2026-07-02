@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import type { ISourceOptions } from '@tsparticles/engine';
 import { offchainLookupSignature } from 'viem/utils';
 import { WagmiProvider } from 'wagmi';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { CookiesProvider } from 'react-cookie';
 import { Toaster } from 'sonner';
@@ -56,11 +56,22 @@ const ParticleBackdrop = memo(function ParticleBackdrop() {
 
 function makeQueryClient() {
   return new QueryClient({
+    // Surface failed reads in Sentry. `apiCall` already reports transport
+    // errors; this additionally catches queryFn-level failures (schema
+    // asserts, envelope errors) with the owning query key for context.
+    queryCache: new QueryCache({
+      onError: (error, query) => {
+        reportError(error, `query:${String(query.queryKey[0] ?? 'unknown')}`);
+      },
+    }),
     defaultOptions: {
       queries: {
         staleTime: 30_000,
         gcTime: 300_000,
         refetchOnWindowFocus: false,
+        // Two retries (~3 attempts) balances resilience against slow error
+        // surfacing now that per-section error states are user-visible.
+        retry: 2,
       },
     },
   });

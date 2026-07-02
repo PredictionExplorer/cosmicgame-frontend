@@ -19,6 +19,7 @@ jest.mock('axios', () => {
       get: jest.fn(),
       post: jest.fn(),
       interceptors: { response: { use: jest.fn() } },
+      defaults: {},
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -135,9 +136,7 @@ describe('stellarSelection API', () => {
       const result = await get_raffle_nft_winners_list();
       expect(result).toHaveLength(1);
       expect(result[0]).toHaveProperty('TxHash', '0xb');
-      expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringMatching(/raffle\/nft\/all\/list/),
-      );
+      expect(mockedAxios.get).toHaveBeenCalledWith(expect.stringMatching(/raffle\/nft\/all\/list/));
     });
 
     it('returns empty array on 400', async () => {

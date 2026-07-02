@@ -23,6 +23,8 @@ import {
 import { AddressLink } from '@/components/common/AddressLink';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Spinner } from '@/components/ui/spinner';
+import { ErrorState } from '@/components/ui/error-state';
+import { useNow } from '@/hooks/useNow';
 import {
   Dialog,
   DialogContent,
@@ -46,7 +48,8 @@ const ASSET_LABEL: Record<ClaimUnclaimedItem['AssetType'], string> = {
   ERC20: 'Attached ERC-20',
 };
 
-const shortAddr = (a: string) => (a && a.length > 12 ? `${a.slice(0, 6)}…${a.slice(-4)}` : a);
+/** Delegates to the shared address shortener so truncation is consistent app-wide. */
+const shortAddr = (a: string) => shortenHex(a);
 
 /** Small labelled count badge; renders nothing when the count is zero. */
 const CountBadge = ({ n, label }: { n: number; label: string }) => {
@@ -112,7 +115,9 @@ const UnclaimedDialog = ({
                 </TablePrimaryHead>
                 <tbody>
                   {cycle.UnclaimedItems.map((item, idx) => (
-                    <TablePrimaryRow key={idx}>
+                    <TablePrimaryRow
+                      key={`${item.AssetType}-${item.TokenAddr ?? ''}-${item.TokenId ?? ''}-${item.RecipientAddr ?? idx}`}
+                    >
                       <TablePrimaryCell>{ASSET_LABEL[item.AssetType]}</TablePrimaryCell>
                       <TablePrimaryCell>
                         {item.RecipientAddr ? (
@@ -226,7 +231,7 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
                     </TablePrimaryHead>
                     <tbody>
                       {claims.map((txn, idx) => (
-                        <TablePrimaryRow key={idx}>
+                        <TablePrimaryRow key={txn.TxHash ? `${txn.TxHash}-${idx}` : idx}>
                           <TablePrimaryCell>
                             <TxnAssetDetail txn={txn} />
                           </TablePrimaryCell>
@@ -278,7 +283,7 @@ const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: 
                     </TablePrimaryHead>
                     <tbody>
                       {attached.map((tok, idx) => (
-                        <TablePrimaryRow key={idx}>
+                        <TablePrimaryRow key={tok.TxHash ? `${tok.TxHash}-${idx}` : idx}>
                           <TablePrimaryCell>
                             {tok.AssetType === 'ERC721' ? 'Attached NFT' : 'Attached ERC-20'}
                           </TablePrimaryCell>
@@ -425,10 +430,11 @@ export const ClaimsByRoundSection = () => {
   const [selected, setSelected] = useState<RoundClaimSummary | null>(null);
   const [exploreRound, setExploreRound] = useState<number | null>(null);
 
-  const { data, isLoading } = useClaimsByRound();
+  const { data, isLoading, isError, refetch } = useClaimsByRound();
   const list = data ?? [];
-  // Snapshot "now" once on mount — keeps render pure (no Date.now() during render).
-  const [nowSec] = useState(() => Math.floor(Date.now() / 1000));
+  // Ticks every 30s so the "claim window closes in …" countdown never goes
+  // stale during long sessions (a mount-time snapshot previously froze it).
+  const nowSec = Math.floor(useNow(30_000) / 1000);
 
   return (
     <div className="space-y-4">
@@ -443,6 +449,13 @@ export const ClaimsByRoundSection = () => {
         <div className="flex justify-center py-12">
           <Spinner />
         </div>
+      ) : isError ? (
+        <ErrorState
+          title="Failed to load allocation claims"
+          message="The statistics service did not respond. Try again in a moment."
+          onRetry={() => refetch()}
+          className="py-10"
+        />
       ) : list.length === 0 ? (
         <p className="py-8 text-center text-muted-foreground">No claimable assets awarded yet.</p>
       ) : (

@@ -2,7 +2,11 @@ import { statisticsCopy } from '@/content/statistics-copy';
 
 import { fireEvent, render, screen, checkA11y } from '@/test-utils';
 
-import { AnchoringSection, type AnchoringSectionProps } from '../AnchoringSection';
+import {
+  AnchoringSection,
+  type AnchoringDataState,
+  type AnchoringSectionProps,
+} from '../AnchoringSection';
 
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
@@ -71,6 +75,10 @@ jest.mock('../CollapsibleSection', () => ({
   ),
 }));
 
+function dataState<T>(data: T[] = [], overrides: Partial<AnchoringDataState<T>> = {}) {
+  return { data, isLoading: false, isError: false, onRetry: jest.fn(), ...overrides };
+}
+
 const defaultProps: AnchoringSectionProps = {
   cstStats: {
     NumActiveStakers: 10,
@@ -85,17 +93,17 @@ const defaultProps: AnchoringSectionProps = {
     TotalTokensMinted: 20,
     TotalTokensStaked: 8,
   },
-  cstAnchorActions: [],
-  rwlkAnchorActions: [],
-  anchoredCSTokens: [],
-  anchoredRWLKTokens: [],
-  uniqueCSTAnchorHolders: [],
-  uniqueRWLKAnchorHolders: [],
+  cstAnchorActions: dataState(),
+  rwlkAnchorActions: dataState(),
+  anchoredCSTokens: dataState(),
+  anchoredRWLKTokens: dataState(),
+  uniqueCSTAnchorHolders: dataState(),
+  uniqueRWLKAnchorHolders: dataState(),
 };
 
-const createAnchorAction = (
-  overrides = {},
-): NonNullable<AnchoringSectionProps['cstAnchorActions']>[number] =>
+type AnchorActionRecord = NonNullable<AnchoringSectionProps['cstAnchorActions']['data']>[number];
+
+const createAnchorAction = (overrides = {}): AnchorActionRecord =>
   ({
     EvtLogId: 1,
     ActionId: 10,
@@ -105,7 +113,7 @@ const createAnchorAction = (
     StakerAddr: '0x1234567890abcdef1234567890abcdef12345678',
     NumStakedNFTs: 5,
     ...overrides,
-  }) as NonNullable<AnchoringSectionProps['cstAnchorActions']>[number];
+  }) as AnchorActionRecord;
 
 beforeEach(() => jest.clearAllMocks());
 
@@ -128,22 +136,46 @@ describe('AnchoringSection', () => {
   });
 
   it('renders anchor-action table for CST', () => {
-    render(<AnchoringSection {...defaultProps} cstAnchorActions={[createAnchorAction()]} />);
+    render(
+      <AnchoringSection {...defaultProps} cstAnchorActions={dataState([createAnchorAction()])} />,
+    );
     expect(screen.getAllByText('Anchor Datetime').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Datetime').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Anchor').length).toBeGreaterThanOrEqual(1);
   });
 
   it('navigates from a CST anchor-action row', () => {
-    render(<AnchoringSection {...defaultProps} cstAnchorActions={[createAnchorAction()]} />);
+    render(
+      <AnchoringSection {...defaultProps} cstAnchorActions={dataState([createAnchorAction()])} />,
+    );
     const row = screen.getAllByText('Anchor')[0]!.closest('tr');
     fireEvent.click(row!);
     expect(mockPush).toHaveBeenCalledWith('/anchor-action/0/10');
   });
 
-  it('shows loading when cstAnchorActions is null', () => {
-    render(<AnchoringSection {...defaultProps} cstAnchorActions={null} />);
-    expect(screen.getAllByText('Loading...').length).toBeGreaterThan(0);
+  it('shows a loading skeleton while anchor actions load', () => {
+    render(
+      <AnchoringSection {...defaultProps} cstAnchorActions={dataState([], { isLoading: true })} />,
+    );
+    expect(screen.getAllByTestId('stats-section-skeleton').length).toBeGreaterThan(0);
+  });
+
+  it('shows an error state with retry when anchor actions fail', () => {
+    const onRetry = jest.fn();
+    render(
+      <AnchoringSection
+        {...defaultProps}
+        cstAnchorActions={dataState([], { isError: true, onRetry })}
+      />,
+    );
+    expect(screen.getByText(/failed to load anchor \/ release actions/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    expect(onRetry).toHaveBeenCalled();
+  });
+
+  it('shows an empty state when there are no anchor actions', () => {
+    render(<AnchoringSection {...defaultProps} />);
+    expect(screen.getAllByText('No anchor actions yet').length).toBeGreaterThan(0);
   });
 
   it('renders tab triggers', () => {

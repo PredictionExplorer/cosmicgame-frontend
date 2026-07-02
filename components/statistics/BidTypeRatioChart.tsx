@@ -245,6 +245,7 @@ export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, en
               type="button"
               size="sm"
               variant={intervalSecs === opt.secs ? 'default' : 'outline'}
+              aria-pressed={intervalSecs === opt.secs}
               onClick={() => setIntervalSecs(opt.secs)}
             >
               {opt.label}
@@ -261,6 +262,7 @@ export const BidTypeRatioChart: FC<BidTypeRatioChartProps> = ({ roundStartTs, en
               type="button"
               size="sm"
               variant={interpolation === opt.type ? 'default' : 'outline'}
+              aria-pressed={interpolation === opt.type}
               onClick={() => setInterpolation(opt.type)}
             >
               {opt.label}

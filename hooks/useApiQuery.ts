@@ -97,16 +97,28 @@ function withUxScenarioData<T>(
   } as UseQueryResult<T, Error>;
 }
 
-export function useDashboardInfo(initialData?: DashboardInfo | null) {
+export interface DashboardInfoOptions {
+  /**
+   * Live pages (home, current cycle, statistics hub) poll every 12s. Pages
+   * showing mostly historical data should pass `poll: false` to fetch once
+   * and rely on the shared cache instead.
+   */
+  poll?: boolean;
+}
+
+export function useDashboardInfo(
+  initialData?: DashboardInfo | null,
+  { poll = true }: DashboardInfoOptions = {},
+) {
   const scenario = useUxScenarioSnapshot();
   const query = useQuery<DashboardInfo | null>({
     queryKey: ['dashboardInfo'],
     queryFn: () => api.get_dashboard_info(),
     enabled: !scenario,
-    refetchInterval: 12_000,
+    refetchInterval: poll ? 12_000 : false,
     refetchIntervalInBackground: false,
-    refetchOnWindowFocus: true,
-    staleTime: 5_000,
+    refetchOnWindowFocus: poll,
+    staleTime: poll ? 5_000 : 60_000,
     // A failed server-side fetch arrives as `null`; normalize it to undefined
     // so the query still starts in a loading state and fetches immediately.
     initialData: initialData ?? undefined,

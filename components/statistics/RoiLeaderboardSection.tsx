@@ -15,6 +15,7 @@ import {
 import { AddressLink } from '@/components/common/AddressLink';
 import { CustomPagination } from '@/components/common/CustomPagination';
 import { Spinner } from '@/components/ui/spinner';
+import { ErrorState } from '@/components/ui/error-state';
 import { useRoiLeaderboard } from '@/hooks/useApiQuery';
 import type { RoiLeaderboardEntry, RoiLeaderboardSort } from '@/services/api/types';
 
@@ -48,6 +49,7 @@ const Pill = ({
 }) => (
   <button
     type="button"
+    aria-pressed={active}
     onClick={onClick}
     className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
       active
@@ -74,6 +76,18 @@ const NetPctCell = ({ entry }: { entry: RoiLeaderboardEntry }) => {
     );
   }
   const pct = entry.Roi * 100;
+  // "-100%" simply means no ETH allocations received yet — expected for most
+  // participants while cycles run. Mute it instead of painting the table red.
+  if (pct <= -100 && entry.EthWonEth <= 0) {
+    return (
+      <span
+        className="tabular-nums text-muted-foreground"
+        title="No ETH received back yet — this participant has not received an ETH allocation so far"
+      >
+        −100%
+      </span>
+    );
+  }
   const tone = pct > 0 ? 'text-emerald-400' : pct < 0 ? 'text-red-400' : 'text-muted-foreground';
   return (
     <span className={`font-semibold ${tone}`}>{`${pct >= 0 ? '+' : ''}${pct.toFixed(0)}%`}</span>
@@ -147,7 +161,7 @@ export const RoiLeaderboardSection = () => {
   const [minBids, setMinBids] = useState(5);
   const [page, setPage] = useState(1);
 
-  const { data, isLoading } = useRoiLeaderboard(sort, minBids);
+  const { data, isLoading, isError, refetch } = useRoiLeaderboard(sort, minBids);
   const list = data ?? [];
 
   const onSort = (next: RoiLeaderboardSort) => {
@@ -190,6 +204,13 @@ export const RoiLeaderboardSection = () => {
         <div className="flex justify-center py-12">
           <Spinner />
         </div>
+      ) : isError ? (
+        <ErrorState
+          title="Failed to load the performance leaderboard"
+          message="The statistics service did not respond. Try again in a moment."
+          onRetry={() => refetch()}
+          className="py-10"
+        />
       ) : list.length === 0 ? (
         <p className="py-8 text-center text-muted-foreground">
           No participants match this filter yet.

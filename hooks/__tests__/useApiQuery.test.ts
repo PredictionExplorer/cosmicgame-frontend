@@ -175,6 +175,23 @@ describe('useApiQuery hooks', () => {
 
       expect(getOptions().initialData).toBeUndefined();
     });
+
+    it('disables polling and focus refetch when poll is false', () => {
+      renderHook(() => useDashboardInfo(undefined, { poll: false }));
+
+      const options = getOptions();
+      expect(options.refetchInterval).toBe(false);
+      expect(options.refetchOnWindowFocus).toBe(false);
+      expect(options.staleTime).toBe(60_000);
+    });
+
+    it('keeps live polling by default', () => {
+      renderHook(() => useDashboardInfo(undefined, {}));
+
+      const options = getOptions();
+      expect(options.refetchInterval).toBe(12_000);
+      expect(options.refetchOnWindowFocus).toBe(true);
+    });
   });
 
   describe('live freshness (refetchOnWindowFocus)', () => {

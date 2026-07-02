@@ -4,6 +4,7 @@ import { memo, useMemo, useState, type FC } from 'react';
 import { Tr } from 'react-super-responsive-table';
 
 import { statisticsCopy } from '@/content/statistics-copy';
+import { formatTableAmount } from '@/utils';
 
 import {
   TablePrimary,
@@ -32,7 +33,7 @@ const CTBalanceDistributionRow: FC<{ row?: BalanceRow }> = memo(({ row }) => {
         <AddressLink address={row.OwnerAddr} url={`/user/${row.OwnerAddr}`} />
       </TablePrimaryCell>
 
-      <TablePrimaryCell align="right">{row.BalanceFloat.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{formatTableAmount(row.BalanceFloat)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 });

@@ -1,5 +1,6 @@
 import { axios, getAPIUrl, apiCall, flattenTxArray, pagedPath } from './client';
 import type { ApiPageWindow } from './client';
+import { SystemModeChangeEventSchema, safeValidateListSample } from './schemas';
 import type { SystemModeChangeEvent, AdminEventRow } from './types';
 
 /** Fetches the current server timestamp (Unix seconds). */
@@ -14,7 +15,11 @@ export function get_current_time(): Promise<number> {
 export function get_system_modelist(page?: ApiPageWindow): Promise<SystemModeChangeEvent[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`system/modelist/${pagedPath(page)}`));
-    return flattenTxArray<SystemModeChangeEvent>(data.SystemModeChanges);
+    return safeValidateListSample(
+      SystemModeChangeEventSchema,
+      flattenTxArray<SystemModeChangeEvent>(data.SystemModeChanges),
+      'systemModelist',
+    ) as SystemModeChangeEvent[];
   }, []);
 }
 

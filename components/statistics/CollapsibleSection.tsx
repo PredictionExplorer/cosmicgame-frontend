@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -14,6 +14,12 @@ export interface CollapsibleSectionProps {
   icon?: ReactNode;
   description?: string;
   tooltip?: string;
+  /**
+   * Defer mounting children until the section is first opened. Once opened,
+   * children stay mounted so collapsing again doesn't drop state or refetch.
+   * Use for heavy content (charts, tables with their own queries).
+   */
+  lazy?: boolean;
 }
 
 export function CollapsibleSection({
@@ -24,8 +30,21 @@ export function CollapsibleSection({
   icon,
   description,
   tooltip,
+  lazy = false,
 }: CollapsibleSectionProps) {
   const [open, setOpen] = useState(defaultOpen);
+  const [hasOpened, setHasOpened] = useState(defaultOpen);
+  const panelId = useId();
+
+  const handleToggle = () => {
+    setOpen((prev) => {
+      const next = !prev;
+      if (next) setHasOpened(true);
+      return next;
+    });
+  };
+
+  const shouldRenderChildren = !lazy || hasOpened;
 
   return (
     <div
@@ -37,13 +56,17 @@ export function CollapsibleSection({
       <div className="flex items-start gap-2 px-4 py-4 transition-colors hover:bg-white/[0.04] sm:px-5">
         <button
           type="button"
-          onClick={() => setOpen((prev) => !prev)}
+          onClick={handleToggle}
           aria-expanded={open}
+          aria-controls={panelId}
           className="flex min-w-0 flex-1 items-center justify-between gap-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           <div className="flex min-w-0 items-start gap-2.5">
             {icon && (
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <div
+                aria-hidden
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary"
+              >
                 {icon}
               </div>
             )}
@@ -59,6 +82,7 @@ export function CollapsibleSection({
             </div>
           </div>
           <ChevronDown
+            aria-hidden
             className={cn(
               'h-4 w-4 shrink-0 text-primary/60 transition-transform duration-200',
               open && 'rotate-180',
@@ -76,7 +100,15 @@ export function CollapsibleSection({
         )}
       >
         <div className="overflow-hidden">
-          <div className="border-t border-white/[0.06] px-3 py-3 sm:px-5 sm:py-4">{children}</div>
+          <div
+            id={panelId}
+            // Keep collapsed content out of the a11y tree and tab order.
+            inert={!open || undefined}
+            aria-hidden={!open || undefined}
+            className="border-t border-white/[0.06] px-3 py-3 sm:px-5 sm:py-4"
+          >
+            {shouldRenderChildren ? children : null}
+          </div>
         </div>
       </div>
     </div>

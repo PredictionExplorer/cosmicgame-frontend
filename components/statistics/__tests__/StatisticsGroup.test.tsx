@@ -64,7 +64,7 @@ describe('StatisticsGroup', () => {
     );
     expect(screen.getByTestId('icon')).toBeInTheDocument();
     const wrapper = screen.getByTestId('icon').parentElement;
-    expect(wrapper).toHaveClass('bg-[#AC56FF]/10');
+    expect(wrapper).toHaveClass('bg-[rgb(var(--nebula-violet-rgb)/0.10)]');
   });
 
   it('applies custom className', () => {

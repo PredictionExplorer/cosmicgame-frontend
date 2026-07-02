@@ -264,6 +264,139 @@ export const SpecialRecipientsSchema = z
 export type SpecialRecipientsParsed = z.infer<typeof SpecialRecipientsSchema>;
 
 /* ------------------------------------------------------------------------- *
+ *  Statistics list endpoints
+ * ------------------------------------------------------------------------- */
+
+export const ParticipantSchema = z
+  .object({
+    BidderAid: z.union([z.string(), z.number()]),
+    BidderAddr: AddressSchema,
+    NumBids: z.number(),
+    MaxBidAmountEth: z.number(),
+  })
+  .loose();
+
+export const RecipientSchema = z
+  .object({
+    WinnerAid: z.union([z.string(), z.number()]),
+    WinnerAddr: AddressSchema,
+    AllocationsCount: z.number().optional(),
+    MaxWinAmountEth: z.number(),
+    PrizesSum: z.number(),
+  })
+  .loose();
+
+export const UniqueEthDonorSchema = z
+  .object({
+    DonorAid: z.union([z.string(), z.number()]),
+    DonorAddr: AddressSchema,
+    CountDonations: z.number(),
+    TotalDonatedEth: z.number(),
+  })
+  .loose();
+
+export const TokenDistributionSchema = z
+  .object({
+    OwnerAddr: AddressSchema,
+    OwnerAid: z.union([z.string(), z.number()]),
+    NumTokens: z.number(),
+  })
+  .loose();
+
+export const CTBalanceDistributionSchema = z
+  .object({
+    OwnerAddr: AddressSchema,
+    OwnerAid: z.union([z.string(), z.number()]),
+    BalanceFloat: z.number(),
+  })
+  .loose();
+
+export const CTStatisticsSchema = z
+  .object({
+    TotalSupply: z.string(),
+    TotalSupplyEth: z.number(),
+    TotalHolders: z.number(),
+  })
+  .loose();
+
+export const AnchorActionSchema = z
+  .object({
+    ActionId: z.number(),
+    ActionType: z.number(),
+    TokenId: z.number(),
+    StakerAddr: AddressSchema,
+    NumStakedNFTs: z.number(),
+    TimeStamp: z.number().optional(),
+  })
+  .loose();
+
+export const AnchoredTokenInfoSchema = z
+  .object({
+    StakeActionId: z.number(),
+    StakedTokenId: z.number(),
+    StakeTimeStamp: z.number(),
+  })
+  .loose();
+
+export const SystemModeChangeEventSchema = z
+  .object({
+    RoundNum: z.number(),
+    EvtLogId: z.union([z.string(), z.number()]),
+    TimeStamp: z.number(),
+  })
+  .loose();
+
+export const UniqueAnchorHolderCSTSchema = z
+  .object({
+    StakerAid: z.union([z.string(), z.number()]),
+    StakerAddr: AddressSchema,
+    NumStakeActions: z.number(),
+    NumUnstakeActions: z.number(),
+    TotalTokensMinted: z.number(),
+    TotalTokensStaked: z.number(),
+    TotalRewardEth: z.number(),
+    UnclaimedRewardEth: z.number(),
+  })
+  .loose();
+
+export const UniqueAnchorHolderRWLKSchema = z
+  .object({
+    StakerAid: z.union([z.string(), z.number()]),
+    StakerAddr: AddressSchema,
+    NumStakeActions: z.number(),
+    NumUnstakeActions: z.number(),
+    TotalTokensStaked: z.number(),
+    TotalTokensMinted: z.number(),
+  })
+  .loose();
+
+export const AttachedNFTRecordSchema = z
+  .object({
+    RoundNum: z.number(),
+    DonorAddr: AddressSchema,
+    TokenAddr: AddressSchema.optional(),
+    TokenAddress: AddressSchema.optional(),
+  })
+  .loose();
+
+/**
+ * Warn-mode validation for statistics list payloads: checks a sample of rows
+ * (full scans of 10k+ row lists would be wasted work) and reports the first
+ * mismatch to Sentry with the endpoint name.
+ */
+export function safeValidateListSample<T>(
+  schema: z.ZodType<T>,
+  rows: unknown,
+  name: string,
+  sampleSize = 5,
+): unknown {
+  if (!Array.isArray(rows) || rows.length === 0) return rows;
+  const sample = rows.slice(0, sampleSize);
+  safeValidate(z.array(schema), sample, name);
+  return rows;
+}
+
+/* ------------------------------------------------------------------------- *
  *  Validation helpers
  * ------------------------------------------------------------------------- */
 

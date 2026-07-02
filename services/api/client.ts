@@ -55,6 +55,10 @@ axios.interceptors.response.use(
   },
 );
 
+// Fail hung requests instead of leaving React Query pending indefinitely.
+// Individual calls can still override via a per-request `timeout` config.
+axios.defaults.timeout = 15_000;
+
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
   const b = (process.env.NEXT_PUBLIC_API_URL || '').trim();
   if (b && !b.includes('cosmicgame')) {

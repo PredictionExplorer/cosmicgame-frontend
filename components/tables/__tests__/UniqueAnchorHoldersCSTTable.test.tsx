@@ -58,8 +58,8 @@ describe('UniqueAnchorHoldersCSTTable', () => {
         list={[createAnchorHolder({ TotalRewardEth: 1.5, UnclaimedRewardEth: 0.3 })]}
       />,
     );
-    expect(screen.getByText('1.500000')).toBeInTheDocument();
-    expect(screen.getByText('0.300000')).toBeInTheDocument();
+    expect(screen.getByText('1.5')).toBeInTheDocument();
+    expect(screen.getByText('0.3')).toBeInTheDocument();
   });
 
   it('renders shortened address with link', () => {

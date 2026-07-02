@@ -41,9 +41,30 @@ describe('UniqueParticipantsTable', () => {
     expect(screen.getByText('1.234567')).toBeInTheDocument();
   });
 
-  it('formats MaxBidAmountEth to 6 decimal places', () => {
+  it('formats MaxBidAmountEth without a trailing-zero wall', () => {
     render(<UniqueParticipantsTable list={[createParticipant({ MaxBidAmountEth: 0.1 })]} />);
-    expect(screen.getByText('0.100000')).toBeInTheDocument();
+    expect(screen.getByText('0.1')).toBeInTheDocument();
+  });
+
+  it('renders zero and dust amounts distinctly', () => {
+    render(
+      <UniqueParticipantsTable
+        list={[
+          createParticipant({
+            BidderAid: 'zero',
+            BidderAddr: `0x${'1'.repeat(40)}`,
+            MaxBidAmountEth: 0,
+          }),
+          createParticipant({
+            BidderAid: 'dust',
+            BidderAddr: `0x${'2'.repeat(40)}`,
+            MaxBidAmountEth: 0.00000001,
+          }),
+        ]}
+      />,
+    );
+    expect(screen.getByText('0')).toBeInTheDocument();
+    expect(screen.getByText('<0.0001')).toBeInTheDocument();
   });
 
   it('renders only first page of results (perPage=5)', () => {

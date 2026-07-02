@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
 
-import { PageShell } from '@/components/ui/page-shell';
 import { APP_ORIGIN } from '@/lib/hostRouting';
 import { JsonLd, datasetJsonLd, webPageJsonLd } from '@/utils/jsonLd';
 import { createMetadata } from '@/utils/seo';
 
 import { StatisticsSeoSummary } from './StatisticsSeoSummary';
-import StatisticsLoader from './StatisticsLoader';
+import StatisticsHubPanel from './StatisticsHubPanel';
 
 export const metadata: Metadata = createMetadata(
   'Cosmic Signature Statistics | Performance Cycle, Gestures, NFTs, and CST',
@@ -37,10 +36,8 @@ export default function Page() {
           }),
         ]}
       />
-      <PageShell variant="data" backdrop="signature">
-        <StatisticsSeoSummary />
-        <StatisticsLoader />
-      </PageShell>
+      <StatisticsSeoSummary />
+      <StatisticsHubPanel />
     </>
   );
 }

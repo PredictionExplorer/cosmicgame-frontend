@@ -9,7 +9,7 @@ async function expectNoHorizontalPageOverflow(page: import('@playwright/test').P
 }
 
 async function openStatisticsAnchorActions(page: import('@playwright/test').Page) {
-  const anchoringHeading = page.getByText('Anchoring', { exact: true }).first();
+  const anchoringHeading = page.getByRole('heading', { name: 'Anchoring Statistics' });
   await anchoringHeading.scrollIntoViewIfNeeded();
   await expect(anchoringHeading).toBeVisible();
 
@@ -80,12 +80,10 @@ test.describe('Responsive - Mobile viewport', () => {
   });
 
   test('statistics anchoring remains readable without page overflow at 375px', async ({ page }) => {
-    const response = await page.goto('/statistics', { waitUntil: 'networkidle' });
+    const response = await page.goto('/statistics/anchoring', { waitUntil: 'networkidle' });
     expect(response?.status()).toBe(200);
     await openStatisticsAnchorActions(page);
-    await expect(
-      page.getByText(/No actions yet\.|Anchor|Release|Loading\.\.\./i).first(),
-    ).toBeVisible();
+    await expect(page.getByText(/No anchor actions yet|Anchor|Release/i).first()).toBeVisible();
     await expectNoHorizontalPageOverflow(page);
   });
 
@@ -107,7 +105,7 @@ test.describe('Responsive - Tablet viewport', () => {
   test('statistics anchoring remains readable without page overflow at medium width', async ({
     page,
   }) => {
-    const response = await page.goto('/statistics', { waitUntil: 'networkidle' });
+    const response = await page.goto('/statistics/anchoring', { waitUntil: 'networkidle' });
     expect(response?.status()).toBe(200);
     await openStatisticsAnchorActions(page);
     await expectNoHorizontalPageOverflow(page);

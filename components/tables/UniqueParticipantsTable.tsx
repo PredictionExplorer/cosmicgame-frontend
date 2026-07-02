@@ -3,6 +3,7 @@ import { Tr } from 'react-super-responsive-table';
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 
 import { statisticsCopy } from '@/content/statistics-copy';
+import { formatTableAmount } from '@/utils';
 
 import {
   TablePrimary,
@@ -36,7 +37,7 @@ const UniqueParticipantsRow = ({ bidder }: UniqueParticipantsRowProps) => {
         <AddressLink address={BidderAddr} url={`/user/${BidderAddr}`} />
       </TablePrimaryCell>
       <TablePrimaryCell align="center">{NumBids}</TablePrimaryCell>
-      <TablePrimaryCell align="right">{MaxBidAmountEth.toFixed(6)}</TablePrimaryCell>
+      <TablePrimaryCell align="right">{formatTableAmount(MaxBidAmountEth)}</TablePrimaryCell>
     </TablePrimaryRow>
   );
 };

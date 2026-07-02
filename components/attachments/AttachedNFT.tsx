@@ -33,7 +33,7 @@ const DonatedNFT = ({ nft }: DonatedNFTProps) => {
   );
 
   return (
-    <StyledCard>
+    <StyledCard className="overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.02]">
       {link.href ? (
         <a
           href={link.href}
@@ -50,17 +50,20 @@ const DonatedNFT = ({ nft }: DonatedNFTProps) => {
         </div>
       )}
 
-      <div className="flex absolute inset-4 justify-between pointer-events-none">
+      {/* Caption row below the image — overlaying both labels on the artwork
+          made them collide on narrow grid cards. */}
+      <div className="flex items-center justify-between gap-2 px-2 py-1.5">
         <span
-          className="text-xs [text-shadow:0px_0px_8px_var(--background)]"
+          className="truncate text-xs text-muted-foreground"
           data-testid="NFTTokenId"
+          title={tokenId ? `#${tokenId}` : undefined}
         >
           {tokenId ? `#${tokenId}` : 'Unknown token'}
         </span>
         <span
           className={cn(
-            'text-primary [text-shadow:0px_0px_8px_var(--background)]',
-            !link.href && 'text-muted-foreground',
+            'shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary',
+            !link.href && 'bg-white/[0.05] text-muted-foreground',
           )}
         >
           Attached

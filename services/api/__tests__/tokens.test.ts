@@ -34,6 +34,7 @@ jest.mock('axios', () => {
         request: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
         response: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
       },
+      defaults: {},
     },
     isAxiosError: actual.isAxiosError,
   };
@@ -235,7 +236,11 @@ describe('tokens API', () => {
 
   describe('get_ct_statistics', () => {
     it('returns statistics on success', async () => {
-      const stats = { TotalSupplyEth: 40590.44, TotalSupply: '40590440000000000000000', TotalHolders: 100 };
+      const stats = {
+        TotalSupplyEth: 40590.44,
+        TotalSupply: '40590440000000000000000',
+        TotalHolders: 100,
+      };
       mockedAxios.get.mockResolvedValue({ data: { Statistics: stats } });
       const result = await get_ct_statistics();
       expect(result).toEqual(stats);

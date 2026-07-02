@@ -12,18 +12,20 @@ export interface StatisticsGroupProps {
   tooltip?: string;
 }
 
-const accentBorderMap: Record<string, string> = {
-  blue: 'border-l-[#15BFFD]',
-  purple: 'border-l-[#AC56FF]',
-  emerald: 'border-l-emerald-500',
-  amber: 'border-l-amber-500',
+type AccentColor = NonNullable<StatisticsGroupProps['accentColor']>;
+
+const accentBorderMap: Record<AccentColor, string> = {
+  blue: 'border-l-[rgb(var(--aurora-cyan-rgb))]',
+  purple: 'border-l-[rgb(var(--nebula-violet-rgb))]',
+  emerald: 'border-l-[rgb(var(--impact-green-rgb))]',
+  amber: 'border-l-[rgb(var(--solar-gold-rgb))]',
 };
 
-const accentBgMap: Record<string, string> = {
-  blue: 'bg-[#15BFFD]/10 text-[#15BFFD]',
-  purple: 'bg-[#AC56FF]/10 text-[#AC56FF]',
-  emerald: 'bg-emerald-500/10 text-emerald-400',
-  amber: 'bg-amber-500/10 text-amber-400',
+const accentBgMap: Record<AccentColor, string> = {
+  blue: 'bg-[rgb(var(--aurora-cyan-rgb)/0.10)] text-[rgb(var(--aurora-cyan-rgb))]',
+  purple: 'bg-[rgb(var(--nebula-violet-rgb)/0.10)] text-[rgb(var(--nebula-violet-rgb))]',
+  emerald: 'bg-[rgb(var(--impact-green-rgb)/0.10)] text-[rgb(var(--impact-green-rgb))]',
+  amber: 'bg-[rgb(var(--solar-gold-rgb)/0.10)] text-[rgb(var(--solar-gold-rgb))]',
 };
 
 export function StatisticsGroup({

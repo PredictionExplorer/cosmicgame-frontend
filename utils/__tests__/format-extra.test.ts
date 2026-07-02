@@ -3,12 +3,44 @@ import {
   calculateTimeDiff,
   formatEthValue,
   formatCSTValue,
+  formatTableAmount,
   toYyyymmdd,
   fromYyyymmdd,
   supplyHistoryBootstrapRange,
   supplyHistoryDateBounds,
   formatYyyymmddLabel,
 } from '../format';
+
+describe('formatTableAmount', () => {
+  it('renders zero as a bare 0', () => {
+    expect(formatTableAmount(0)).toBe('0');
+  });
+
+  it('renders dust below display precision as a bounded value', () => {
+    expect(formatTableAmount(0.00000001)).toBe('<0.0001');
+    expect(formatTableAmount(-0.00000001)).toBe('>-0.0001');
+  });
+
+  it('trims trailing zeros instead of padding to 6 decimals', () => {
+    expect(formatTableAmount(0.1)).toBe('0.1');
+    expect(formatTableAmount(1.5)).toBe('1.5');
+  });
+
+  it('keeps up to 6 decimals of precision', () => {
+    expect(formatTableAmount(0.135830123)).toBe('0.13583');
+    expect(formatTableAmount(3.100415642)).toBe('3.100416');
+  });
+
+  it('adds thousands separators for large values', () => {
+    expect(formatTableAmount(12096.254179)).toBe('12,096.254179');
+  });
+
+  it('renders non-finite input as an em dash', () => {
+    expect(formatTableAmount(undefined)).toBe('—');
+    expect(formatTableAmount(null)).toBe('—');
+    expect(formatTableAmount(Number.NaN)).toBe('—');
+  });
+});
 
 describe('formatSeconds edge cases', () => {
   it('returns "1m " for exactly 60 seconds', () => {

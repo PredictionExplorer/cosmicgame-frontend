@@ -7,6 +7,7 @@ import {
   pagedPath,
   type ApiPageWindow,
 } from './client';
+import { AnchorActionSchema, AnchoredTokenInfoSchema, safeValidateListSample } from './schemas';
 import type {
   ActionIdWithClaimInfo,
   CSTAnchorDistribution,
@@ -80,7 +81,11 @@ export function get_staking_cst_actions_by_user(
 export function get_staking_cst_actions(page?: ApiPageWindow): Promise<AnchorAction[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`staking/cst/actions/global/${pagedPath(page)}`));
-    return flattenTxArray<AnchorAction>(data.StakingCSTActions);
+    return safeValidateListSample(
+      AnchorActionSchema,
+      flattenTxArray<AnchorAction>(data.StakingCSTActions),
+      'stakingCSTActions',
+    ) as AnchorAction[];
   }, []);
 }
 
@@ -130,7 +135,11 @@ export function get_staking_cst_reward_paid_records_by_user(
 export function get_staked_cst_tokens(): Promise<AnchoredTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/cst/staked_tokens/all'));
-    return data.StakedTokensCST as AnchoredTokenInfo[];
+    return safeValidateListSample(
+      AnchoredTokenInfoSchema,
+      data.StakedTokensCST,
+      'stakedTokensCST',
+    ) as AnchoredTokenInfo[];
   }, []);
 }
 
@@ -226,7 +235,11 @@ export function get_staking_rwalk_actions(page?: ApiPageWindow): Promise<AnchorA
     const { data } = await axios.get(
       getAPIUrl(`staking/randomwalk/actions/global/${pagedPath(page)}`),
     );
-    return flattenTxArray<AnchorAction>(data.GlobalStakingActionsRWalk);
+    return safeValidateListSample(
+      AnchorActionSchema,
+      flattenTxArray<AnchorAction>(data.GlobalStakingActionsRWalk),
+      'stakingRWalkActions',
+    ) as AnchorAction[];
   }, []);
 }
 
@@ -269,7 +282,11 @@ export function get_staking_rwalk_mints_by_user(
 export function get_staked_rwalk_tokens(): Promise<AnchoredTokenInfo[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('staking/randomwalk/staked_tokens/all'));
-    return data.StakedTokensRWalk as AnchoredTokenInfo[];
+    return safeValidateListSample(
+      AnchoredTokenInfoSchema,
+      data.StakedTokensRWalk,
+      'stakedTokensRWalk',
+    ) as AnchoredTokenInfo[];
   }, []);
 }
 

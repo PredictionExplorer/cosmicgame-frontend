@@ -9,7 +9,8 @@ test.describe('Gesture detail page', () => {
 
   test('shows gesture information fields', async ({ page }) => {
     await page.goto('/gesture/1', { waitUntil: 'networkidle' });
-    await expect(page.getByText(/Gesture #1/i).first()).toBeVisible();
+    // The page header always shows "Gesture Position" (with "#N" once indexed).
+    await expect(page.getByText(/Gesture Position/i).first()).toBeVisible();
     await expect(
       page.getByText(/Gesture details|No gesture information found/i).first(),
     ).toBeVisible();

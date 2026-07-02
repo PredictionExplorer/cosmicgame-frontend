@@ -11,6 +11,7 @@ import {
   pagedPath,
   type ApiPageWindow,
 } from './client';
+import { AttachedNFTRecordSchema, safeValidateListSample } from './schemas';
 import type {
   CharityWithdrawal,
   ETHDonation,
@@ -164,8 +165,10 @@ export function get_charity_withdrawals(): Promise<CharityWithdrawal[]> {
 export function get_donations_nft_list(page?: ApiPageWindow): Promise<AttachedNFT[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl(`donations/nft/list/${pagedPath(page)}`));
-    return normalizeFieldNamesArray(
-      flattenTxArray<AttachedNFT>(data.NFTDonations),
+    return safeValidateListSample(
+      AttachedNFTRecordSchema,
+      normalizeFieldNamesArray(flattenTxArray<AttachedNFT>(data.NFTDonations)),
+      'donationsNFTList',
     ) as AttachedNFT[];
   }, []);
 }

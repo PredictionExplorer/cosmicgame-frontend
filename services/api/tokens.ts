@@ -9,6 +9,13 @@ import {
   pagedPath,
   type ApiPageWindow,
 } from './client';
+import {
+  CTBalanceDistributionSchema,
+  CTStatisticsSchema,
+  TokenDistributionSchema,
+  safeValidate,
+  safeValidateListSample,
+} from './schemas';
 import type {
   CSTTokenInfo,
   CSTTransferRecord,
@@ -92,7 +99,11 @@ export function get_cst_transfers(
 export function get_cst_distribution(): Promise<TokenDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('cst/distribution'));
-    return data.CosmicSignatureTokenDistribution;
+    return safeValidateListSample(
+      TokenDistributionSchema,
+      data.CosmicSignatureTokenDistribution,
+      'cstDistribution',
+    ) as TokenDistribution[];
   }, []);
 }
 
@@ -100,7 +111,11 @@ export function get_cst_distribution(): Promise<TokenDistribution[]> {
 export function get_ct_balances_distribution(): Promise<CTBalanceDistribution[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('ct/balances'));
-    return data.CosmicTokenBalances;
+    return safeValidateListSample(
+      CTBalanceDistributionSchema,
+      data.CosmicTokenBalances,
+      'ctBalancesDistribution',
+    ) as CTBalanceDistribution[];
   }, []);
 }
 
@@ -108,7 +123,8 @@ export function get_ct_balances_distribution(): Promise<CTBalanceDistribution[]>
 export function get_ct_statistics(): Promise<CTStatistics | null> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('ct/statistics'));
-    return (data.Statistics ?? null) as CTStatistics | null;
+    if (data.Statistics == null) return null;
+    return safeValidate(CTStatisticsSchema, data.Statistics, 'ctStatistics') as CTStatistics;
   }, null);
 }
 

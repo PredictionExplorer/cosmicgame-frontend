@@ -172,6 +172,72 @@ describe('CollapsibleSection', () => {
     expect(container.querySelector('.bg-primary\\/10')).not.toBeInTheDocument();
   });
 
+  it('links the toggle to the content panel via aria-controls', () => {
+    render(
+      <CollapsibleSection title="Wired Section" defaultOpen>
+        <p>Content</p>
+      </CollapsibleSection>,
+    );
+    const button = screen.getByRole('button');
+    const panelId = button.getAttribute('aria-controls');
+    expect(panelId).toBeTruthy();
+    expect(document.getElementById(panelId!)).toContainElement(screen.getByText('Content'));
+  });
+
+  it('hides collapsed content from assistive tech', async () => {
+    const user = userEvent.setup();
+    render(
+      <CollapsibleSection title="Inert Section" defaultOpen>
+        <p>Content</p>
+      </CollapsibleSection>,
+    );
+    const button = screen.getByRole('button');
+    const panel = document.getElementById(button.getAttribute('aria-controls')!)!;
+    expect(panel).not.toHaveAttribute('aria-hidden');
+
+    await user.click(button);
+    expect(panel).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  describe('lazy mounting', () => {
+    it('does not mount children until first opened', async () => {
+      const user = userEvent.setup();
+      render(
+        <CollapsibleSection title="Lazy Section" defaultOpen={false} lazy>
+          <p>Expensive content</p>
+        </CollapsibleSection>,
+      );
+      expect(screen.queryByText('Expensive content')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button'));
+      expect(screen.getByText('Expensive content')).toBeInTheDocument();
+    });
+
+    it('keeps children mounted after collapsing again', async () => {
+      const user = userEvent.setup();
+      render(
+        <CollapsibleSection title="Lazy Section" defaultOpen={false} lazy>
+          <p>Expensive content</p>
+        </CollapsibleSection>,
+      );
+      const button = screen.getByRole('button');
+      await user.click(button);
+      await user.click(button);
+      // Still mounted (state preserved), just hidden.
+      expect(screen.getByText('Expensive content')).toBeInTheDocument();
+      expect(button).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('mounts immediately when lazy and defaultOpen', () => {
+      render(
+        <CollapsibleSection title="Lazy Open" defaultOpen lazy>
+          <p>Content</p>
+        </CollapsibleSection>,
+      );
+      expect(screen.getByText('Content')).toBeInTheDocument();
+    });
+  });
+
   it('has no accessibility violations when open', async () => {
     const { container } = render(
       <CollapsibleSection title="A11y Open" defaultOpen>

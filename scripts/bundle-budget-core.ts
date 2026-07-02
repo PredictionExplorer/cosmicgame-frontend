@@ -28,7 +28,10 @@ export function pickHomeAssets(manifest: BuildManifest | null): string[] | null 
     manifest?.pages?.['/_app'] ??
     null;
   if (manifestRoute == null) return null;
-  return [...new Set(manifestRoute.filter((asset) => asset.endsWith('.js')))];
+  const jsAssets = [...new Set(manifestRoute.filter((asset) => asset.endsWith('.js')))];
+  // Turbopack writes a root build-manifest with an EMPTY `/_app` entry;
+  // treat that as "not found" so the Turbopack per-route fallback runs.
+  return jsAssets.length > 0 ? jsAssets : null;
 }
 
 /** Reads the first available Next.js build manifest under `nextDir`, or null. */
@@ -57,9 +60,22 @@ async function listJsFiles(dir: string): Promise<string[]> {
   return files.flat();
 }
 
+/**
+ * Reads the home route's client entry chunks from a Turbopack production
+ * build, which writes per-route manifests under `server/app/page/` instead
+ * of a root `app-build-manifest.json`.
+ */
+export function pickTurbopackHomeAssets(nextDir: string): string[] | null {
+  const manifestPath = path.join(nextDir, 'server', 'app', 'page', 'build-manifest.json');
+  if (!existsSync(manifestPath)) return null;
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as BuildManifest;
+  const rootMain = (manifest.rootMainFiles ?? []).filter((asset) => asset.endsWith('.js'));
+  return rootMain.length > 0 ? [...new Set(rootMain)] : null;
+}
+
 /** Resolves the home-route JS chunk files for a build, preferring the manifest. */
 export async function getHomeJsFiles(nextDir: string): Promise<string[]> {
-  const assets = pickHomeAssets(readManifest(nextDir));
+  const assets = pickHomeAssets(readManifest(nextDir)) ?? pickTurbopackHomeAssets(nextDir);
   if (assets != null) {
     return assets.map((asset) => resolveNextAsset(nextDir, asset));
   }

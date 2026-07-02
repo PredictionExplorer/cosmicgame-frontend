@@ -1,7 +1,7 @@
 'use client';
 
 // lexicon-allow-start: internal analytics identifiers mirror backend wire names
-import { useMemo, useState, type FC, type MouseEvent } from 'react';
+import { useMemo, useState, type FC, type FocusEvent, type MouseEvent } from 'react';
 import Link from 'next/link';
 
 import { formatUnixTsLabel, shortenHex } from '@/utils';
@@ -93,6 +93,24 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
     });
   };
 
+  /** Keyboard equivalent of hover: anchor the tooltip to the focused bar. */
+  const handleBarFocus = (period: BidderActivePeriod, e: FocusEvent<SVGRectElement>) => {
+    const svgRect = e.currentTarget.ownerSVGElement?.getBoundingClientRect();
+    const barRect = e.currentTarget.getBoundingClientRect();
+    if (!svgRect) return;
+    setHover({
+      period,
+      x: barRect.left - svgRect.left + barRect.width / 2,
+      y: barRect.top - svgRect.top,
+    });
+  };
+
+  const periodLabel = (period: BidderActivePeriod) =>
+    `${shortenHex(period.BidderAddr, 6)}: ${period.NumBids} gestures from ${formatUnixTsLabel(
+      period.PeriodStart,
+      true,
+    )} to ${formatUnixTsLabel(period.PeriodEnd, true)}`;
+
   return (
     <div className="space-y-3" data-testid="bidder-active-periods-timeline">
       <p className="text-xs text-muted-foreground">
@@ -177,9 +195,14 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
                           rx={2}
                           fill={row.color}
                           fillOpacity={0.85}
-                          className="cursor-pointer"
+                          className="cursor-pointer focus-visible:outline-none focus-visible:stroke-white"
+                          tabIndex={0}
+                          role="img"
+                          aria-label={periodLabel(period)}
                           onMouseEnter={(e) => handleBarEnter(period, e)}
                           onMouseLeave={() => setHover(null)}
+                          onFocus={(e) => handleBarFocus(period, e)}
+                          onBlur={() => setHover(null)}
                         />
                       );
                     })}
@@ -192,7 +215,7 @@ export const BidderActivePeriodsTimeline: FC<BidderActivePeriodsTimelineProps> =
               <div
                 className={cn(
                   'pointer-events-none absolute z-10 rounded-md border border-white/10',
-                  'bg-[#0d1117]/95 px-2 py-1.5 text-xs shadow-lg',
+                  'bg-background/95 px-2 py-1.5 text-xs shadow-lg',
                 )}
                 style={{
                   left: Math.min(hover.x + 12, LABEL_WIDTH + CHART_MIN_WIDTH - 220),

@@ -37,6 +37,7 @@ jest.mock('axios', () => {
         request: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
         response: { use: jest.fn(), eject: jest.fn(), clear: jest.fn() },
       },
+      defaults: {},
     },
     isAxiosError: actual.isAxiosError,
   };

@@ -22,8 +22,8 @@ describe('CTBalanceDistributionTable', () => {
     const addressEl =
       screen.queryByText(mockData[0]!.OwnerAddr) || screen.queryByText(/0x555ece.*310e60/);
     expect(addressEl).toBeInTheDocument();
-    // Component displays balance with toFixed(6)
-    expect(screen.getByText(mockData[0]!.BalanceFloat.toFixed(6))).toBeInTheDocument();
+    // Balance renders with up to 6 decimals, trailing zeros trimmed
+    expect(screen.getByText('3.100416')).toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {

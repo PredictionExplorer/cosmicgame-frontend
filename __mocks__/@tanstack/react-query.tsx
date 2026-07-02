@@ -8,5 +8,6 @@ module.exports = {
   useQuery: () => ({ data: undefined, isLoading: false, error: null }),
   useQueryClient: () => ({ invalidateQueries: jest.fn() }),
   QueryClient: class QueryClient {},
+  QueryCache: class QueryCache {},
   QueryClientProvider: ({ children }: { children: ReactNode }) => children,
 };

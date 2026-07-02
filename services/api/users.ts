@@ -1,6 +1,14 @@
 // lexicon-allow-start: backend HTTP URL paths mirror the Go server routes and are a sealed contract
 
 import { axios, getAPIUrl, apiCall, flattenGestureArray, flattenTxArray } from './client';
+import {
+  ParticipantSchema,
+  RecipientSchema,
+  UniqueAnchorHolderCSTSchema,
+  UniqueAnchorHolderRWLKSchema,
+  UniqueEthDonorSchema,
+  safeValidateListSample,
+} from './schemas';
 import type {
   UserInfoWithLists,
   UserBalance,
@@ -64,7 +72,11 @@ export function notify_red_box(address: string): Promise<NotifyRedBoxResult | nu
 export function get_unique_bidders(): Promise<Participant[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/bidders'));
-    return data.UniqueBidders as Participant[];
+    return safeValidateListSample(
+      ParticipantSchema,
+      data.UniqueBidders,
+      'uniqueBidders',
+    ) as Participant[];
   }, []);
 }
 
@@ -72,7 +84,11 @@ export function get_unique_bidders(): Promise<Participant[]> {
 export function get_unique_winners(): Promise<Recipient[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/winners'));
-    return data.UniqueWinners as Recipient[];
+    return safeValidateListSample(
+      RecipientSchema,
+      data.UniqueWinners,
+      'uniqueWinners',
+    ) as Recipient[];
   }, []);
 }
 
@@ -128,7 +144,11 @@ export function get_claim_detail_by_round(round: number): Promise<RoundClaimDeta
 export function get_unique_donors(): Promise<UniqueEthDonor[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/donors'));
-    return data.UniqueDonors as UniqueEthDonor[];
+    return safeValidateListSample(
+      UniqueEthDonorSchema,
+      data.UniqueDonors,
+      'uniqueDonors',
+    ) as UniqueEthDonor[];
   }, []);
 }
 
@@ -136,7 +156,11 @@ export function get_unique_donors(): Promise<UniqueEthDonor[]> {
 export function get_unique_cst_stakers(): Promise<UniqueAnchorHolderCST[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/cst'));
-    return data.UniqueStakersCST as UniqueAnchorHolderCST[];
+    return safeValidateListSample(
+      UniqueAnchorHolderCSTSchema,
+      data.UniqueStakersCST,
+      'uniqueStakersCST',
+    ) as UniqueAnchorHolderCST[];
   }, []);
 }
 
@@ -144,7 +168,11 @@ export function get_unique_cst_stakers(): Promise<UniqueAnchorHolderCST[]> {
 export function get_unique_rwalk_stakers(): Promise<UniqueAnchorHolderRWLK[]> {
   return apiCall(async () => {
     const { data } = await axios.get(getAPIUrl('statistics/unique/stakers/randomwalk'));
-    return data.UniqueStakersRWalk as UniqueAnchorHolderRWLK[];
+    return safeValidateListSample(
+      UniqueAnchorHolderRWLKSchema,
+      data.UniqueStakersRWalk,
+      'uniqueStakersRWalk',
+    ) as UniqueAnchorHolderRWLK[];
   }, []);
 }
 

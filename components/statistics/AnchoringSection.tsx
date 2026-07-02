@@ -1,4 +1,7 @@
+'use client';
+
 import { statisticsCopy } from '@/content/statistics-copy';
+import { formatEthValue } from '@/utils';
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GlobalAnchorActionsTable } from '@/components/anchoring/GlobalAnchorActionsTable';
@@ -11,7 +14,15 @@ import type { AnchorAction, AnchoredTokenInfo } from '@/services/api';
 
 import { StatisticsItem } from './StatisticsItem';
 import { StatisticsGroup } from './StatisticsGroup';
-import { CollapsibleSection } from './CollapsibleSection';
+import { StatsSection } from './StatsSection';
+
+/** Query-state bundle for one anchoring dataset. */
+export interface AnchoringDataState<T> {
+  data: T[] | null | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
+}
 
 /** Props for the anchoring statistics section. */
 export interface AnchoringSectionProps {
@@ -28,12 +39,42 @@ export interface AnchoringSectionProps {
     TotalTokensMinted?: number;
     TotalTokensStaked: number;
   };
-  cstAnchorActions: AnchorAction[] | null;
-  rwlkAnchorActions: AnchorAction[] | null;
-  anchoredCSTokens: AnchoredTokenInfo[] | null;
-  anchoredRWLKTokens: AnchoredTokenInfo[] | null;
-  uniqueCSTAnchorHolders: UniqueAnchorHolderCST[];
-  uniqueRWLKAnchorHolders: UniqueAnchorHolderRWLK[];
+  cstAnchorActions: AnchoringDataState<AnchorAction>;
+  rwlkAnchorActions: AnchoringDataState<AnchorAction>;
+  anchoredCSTokens: AnchoringDataState<AnchoredTokenInfo>;
+  anchoredRWLKTokens: AnchoringDataState<AnchoredTokenInfo>;
+  uniqueCSTAnchorHolders: AnchoringDataState<UniqueAnchorHolderCST>;
+  uniqueRWLKAnchorHolders: AnchoringDataState<UniqueAnchorHolderRWLK>;
+}
+
+interface AnchoringTableSectionProps<T> {
+  title: string;
+  tooltip: string;
+  state: AnchoringDataState<T>;
+  emptyTitle: string;
+  children: React.ReactNode;
+}
+
+function AnchoringTableSection<T>({
+  title,
+  tooltip,
+  state,
+  emptyTitle,
+  children,
+}: AnchoringTableSectionProps<T>) {
+  return (
+    <StatsSection
+      title={title}
+      tooltip={tooltip}
+      isLoading={state.isLoading}
+      isError={state.isError}
+      onRetry={state.onRetry}
+      isEmpty={(state.data ?? []).length === 0}
+      emptyTitle={emptyTitle}
+    >
+      {children}
+    </StatsSection>
+  );
 }
 
 /** CST and RWLK anchoring tabs with stats, actions, anchored tokens, and unique anchor-holders. */
@@ -82,7 +123,7 @@ export function AnchoringSection({
           />
           <StatisticsItem
             title="Total Anchor Distributions"
-            value={`${(cstStats.TotalRewardEth ?? 0).toFixed(4)} ETH`}
+            value={formatEthValue(cstStats.TotalRewardEth ?? 0)}
             tooltip={statisticsCopy.anchoring.cstTotalAnchorDistributions}
           />
           <StatisticsItem
@@ -97,39 +138,37 @@ export function AnchoringSection({
           />
           <StatisticsItem
             title="Unretrieved Anchor Distributions"
-            value={`${(cstStats.UnclaimedRewardEth ?? 0).toFixed(4)} ETH`}
+            value={formatEthValue(cstStats.UnclaimedRewardEth ?? 0)}
             tooltip={statisticsCopy.anchoring.cstUnretrievedAnchorDistributions}
           />
         </StatisticsGroup>
 
-        <CollapsibleSection
+        <AnchoringTableSection
           title="Anchor / Release Actions"
           tooltip={statisticsCopy.sections.anchorReleaseActions}
+          state={cstAnchorActions}
+          emptyTitle="No anchor actions yet"
         >
-          {cstAnchorActions === null ? (
-            <p className="text-lg font-semibold">Loading...</p>
-          ) : (
-            <GlobalAnchorActionsTable list={cstAnchorActions} IsRWLK={false} />
-          )}
-        </CollapsibleSection>
+          <GlobalAnchorActionsTable list={cstAnchorActions.data ?? []} IsRWLK={false} />
+        </AnchoringTableSection>
 
-        <CollapsibleSection
+        <AnchoringTableSection
           title="Anchored Tokens"
           tooltip={statisticsCopy.sections.anchoredTokens}
+          state={anchoredCSTokens}
+          emptyTitle="No tokens currently anchored"
         >
-          {anchoredCSTokens === null ? (
-            <p className="text-lg font-semibold">Loading...</p>
-          ) : (
-            <GlobalAnchoredTokensTable list={anchoredCSTokens ?? []} IsRWLK={false} />
-          )}
-        </CollapsibleSection>
+          <GlobalAnchoredTokensTable list={anchoredCSTokens.data ?? []} IsRWLK={false} />
+        </AnchoringTableSection>
 
-        <CollapsibleSection
+        <AnchoringTableSection
           title="Unique Anchor-holders"
           tooltip={statisticsCopy.sections.uniqueAnchorHolders}
+          state={uniqueCSTAnchorHolders}
+          emptyTitle="No anchor-holders yet"
         >
-          <UniqueAnchorHoldersCSTTable list={uniqueCSTAnchorHolders} />
-        </CollapsibleSection>
+          <UniqueAnchorHoldersCSTTable list={uniqueCSTAnchorHolders.data ?? []} />
+        </AnchoringTableSection>
       </TabsContent>
 
       <TabsContent value="rwlk" className="space-y-6 pt-4">
@@ -155,34 +194,32 @@ export function AnchoringSection({
           />
         </StatisticsGroup>
 
-        <CollapsibleSection
+        <AnchoringTableSection
           title="Anchor / Release Actions"
           tooltip={statisticsCopy.sections.anchorReleaseActions}
+          state={rwlkAnchorActions}
+          emptyTitle="No anchor actions yet"
         >
-          {rwlkAnchorActions === null ? (
-            <p className="text-lg font-semibold">Loading...</p>
-          ) : (
-            <GlobalAnchorActionsTable list={rwlkAnchorActions} IsRWLK={true} />
-          )}
-        </CollapsibleSection>
+          <GlobalAnchorActionsTable list={rwlkAnchorActions.data ?? []} IsRWLK={true} />
+        </AnchoringTableSection>
 
-        <CollapsibleSection
+        <AnchoringTableSection
           title="Anchored Tokens"
           tooltip={statisticsCopy.sections.anchoredTokens}
+          state={anchoredRWLKTokens}
+          emptyTitle="No tokens currently anchored"
         >
-          {anchoredRWLKTokens === null ? (
-            <p className="text-lg font-semibold">Loading...</p>
-          ) : (
-            <GlobalAnchoredTokensTable list={anchoredRWLKTokens ?? []} IsRWLK={true} />
-          )}
-        </CollapsibleSection>
+          <GlobalAnchoredTokensTable list={anchoredRWLKTokens.data ?? []} IsRWLK={true} />
+        </AnchoringTableSection>
 
-        <CollapsibleSection
+        <AnchoringTableSection
           title="Unique Anchor-holders"
           tooltip={statisticsCopy.sections.uniqueAnchorHolders}
+          state={uniqueRWLKAnchorHolders}
+          emptyTitle="No anchor-holders yet"
         >
-          <UniqueAnchorHoldersRWLKTable list={uniqueRWLKAnchorHolders} />
-        </CollapsibleSection>
+          <UniqueAnchorHoldersRWLKTable list={uniqueRWLKAnchorHolders.data ?? []} />
+        </AnchoringTableSection>
       </TabsContent>
     </Tabs>
   );

@@ -8,6 +8,7 @@ import {
   evaluateBudget,
   getHomeJsFiles,
   pickHomeAssets,
+  pickTurbopackHomeAssets,
   readManifest,
   resolveNextAsset,
 } from '../bundle-budget-core';
@@ -59,6 +60,29 @@ describe('bundle budget core', () => {
         'static/legacy.js',
       ]);
     });
+
+    it('treats an empty route entry as not found (Turbopack root manifest)', () => {
+      expect(pickHomeAssets({ pages: { '/_app': [] } })).toBeNull();
+    });
+  });
+
+  describe('pickTurbopackHomeAssets', () => {
+    it('returns null when the per-route manifest does not exist', () => {
+      expect(pickTurbopackHomeAssets(tempDir)).toBeNull();
+    });
+
+    it('reads rootMainFiles from the per-route build manifest', () => {
+      const routeDir = path.join(tempDir, 'server', 'app', 'page');
+      mkdirSync(routeDir, { recursive: true });
+      writeFileSync(
+        path.join(routeDir, 'build-manifest.json'),
+        JSON.stringify({
+          rootMainFiles: ['static/chunks/main-1.js', 'static/chunks/main-1.js', 'static/x.css'],
+        }),
+      );
+
+      expect(pickTurbopackHomeAssets(tempDir)).toEqual(['static/chunks/main-1.js']);
+    });
   });
 
   describe('readManifest', () => {
@@ -89,6 +113,23 @@ describe('bundle budget core', () => {
 
       await expect(getHomeJsFiles(tempDir)).resolves.toEqual([
         path.join(tempDir, 'static/chunks/home.js'),
+      ]);
+    });
+
+    it('falls back to the Turbopack per-route manifest when the root manifest is empty', async () => {
+      writeFileSync(
+        path.join(tempDir, 'build-manifest.json'),
+        JSON.stringify({ pages: { '/_app': [] } }),
+      );
+      const routeDir = path.join(tempDir, 'server', 'app', 'page');
+      mkdirSync(routeDir, { recursive: true });
+      writeFileSync(
+        path.join(routeDir, 'build-manifest.json'),
+        JSON.stringify({ rootMainFiles: ['static/chunks/main-1.js'] }),
+      );
+
+      await expect(getHomeJsFiles(tempDir)).resolves.toEqual([
+        path.join(tempDir, 'static/chunks/main-1.js'),
       ]);
     });
   });

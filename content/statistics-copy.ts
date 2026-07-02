@@ -168,6 +168,12 @@ export const statisticsCopy = {
       'Protocol balances and contribution flows related to public goods and attached assets.',
   },
   sections: {
+    attachedAssets:
+      'ERC-721 and ERC-20 assets attached to gestures, viewable for all cycles or only the current Performance Cycle.',
+    gestureTypeDistribution:
+      'Share of gestures made with ETH, RandomWalk (ETH-paid), and CST over time, sampled at a chosen interval. Current cycle only.',
+    enduranceTimeline:
+      'A Gantt of who held the lead during a cycle. Each bar is a lead stint (its width = how long that address held the lead). The widest bar is the Endurance Champion; the lane that held the title longest overall is the Chrono-Warrior. Pick any cycle to compare.',
     attachedTokenDistribution:
       'Contracts and token counts for ERC-721 assets attached to gestures.',
     cosmicSignatureTokenDistribution:
