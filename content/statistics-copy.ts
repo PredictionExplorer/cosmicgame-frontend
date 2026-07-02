@@ -64,6 +64,16 @@ export const statisticsCopy = {
       label: 'Total CST Consumed',
       tooltip: 'Cumulative CST spent by participants when making CST gestures.',
     },
+    cstConsumedCurrentCycle: {
+      label: 'CST Consumed This Cycle',
+      tooltip:
+        'CST spent by participants making CST gestures during the active Performance Cycle so far.',
+    },
+    ethInGesturesCurrentCycle: {
+      label: 'ETH in Gestures This Cycle',
+      tooltip:
+        'Total ETH paid by participants in ETH gestures during the active Performance Cycle so far.',
+    },
     cstGestures: {
       label: 'Gestures with CST',
       tooltip: 'Number of gestures made with CST instead of ETH across indexed cycles.',

@@ -57,6 +57,8 @@ import type {
   Recipient,
   RoiLeaderboardEntry,
   RoiLeaderboardSort,
+  RoundClaimSummary,
+  RoundClaimDetail,
   WinningHistoryEntry,
 } from '@/services/api';
 
@@ -964,6 +966,23 @@ export function useRoiLeaderboard(sort: RoiLeaderboardSort = 'net_pl', minBids =
   return useQuery<RoiLeaderboardEntry[]>({
     queryKey: ['roiLeaderboard', sort, minBids],
     queryFn: () => api.get_roi_leaderboard(sort, minBids),
+    staleTime: 60_000,
+  });
+}
+
+export function useClaimsByRound() {
+  return useQuery<RoundClaimSummary[]>({
+    queryKey: ['claimsByRound'],
+    queryFn: () => api.get_claims_by_round(),
+    staleTime: 60_000,
+  });
+}
+
+export function useClaimDetailByRound(round: number | null) {
+  return useQuery<RoundClaimDetail | null>({
+    queryKey: ['claimDetailByRound', round],
+    queryFn: () => api.get_claim_detail_by_round(round!),
+    enabled: round != null && round >= 0,
     staleTime: 60_000,
   });
 }

@@ -63,7 +63,7 @@ const EXPECTED_COUNTS: Record<string, number> = {
   'tokens.ts': 18,
   'anchoring.ts': 21,
   'donations.ts': 22,
-  'users.ts': 10,
+  'users.ts': 12,
   'stellarSelection.ts': 6,
   'marketing.ts': 2,
   'system.ts': 3,
@@ -90,9 +90,9 @@ describe('API service JSDoc coverage', () => {
   });
 
   describe('no function is missing from the inventory', () => {
-    it('total exported functions across all service files is 117', () => {
+    it('total exported functions across all service files is 119', () => {
       const total = files.reduce((sum, f) => sum + f.exports.length, 0);
-      expect(total).toBe(117);
+      expect(total).toBe(119);
     });
   });
 

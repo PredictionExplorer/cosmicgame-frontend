@@ -129,6 +129,8 @@ const USE_API_QUERY_EXPORTS = [
   'useUniqueRecipients',
   'useUniqueDonors',
   'useRoiLeaderboard',
+  'useClaimsByRound',
+  'useClaimDetailByRound',
   'useUniqueCSTAnchorHolders',
   'useUniqueRWLKAnchorHolders',
   'useUniqueBothAnchorHolders',

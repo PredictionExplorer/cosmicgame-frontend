@@ -152,6 +152,10 @@ export interface RoundStats {
   TotalDonatedNFTs?: number;
   TotalRaffleEthDepositsEth?: number;
   TotalRaffleNFTs?: number;
+  /** CST consumed in gestures during this cycle (cg_round_stats.total_cst_in_bids). */
+  TotalCstInBidsEth?: number;
+  /** ETH wagered in gestures during this cycle (cg_round_stats.total_eth_in_bids). */
+  TotalEthInBidsEth?: number;
   /** Unix seconds; contract `roundActivationTime` (dashboard). */
   ActivationTime?: number;
   DelayDurationBeforeRoundActivation?: number;
@@ -656,6 +660,70 @@ export interface RoiLeaderboardEntry {
   NetPlEth: number;
   Roi: number; // fraction; 0 when no ETH was spent
   [key: string]: unknown;
+}
+
+/** A single not-yet-claimed claimable asset held in PrizesWallet (per-cycle drill-down). */
+export interface ClaimUnclaimedItem {
+  AssetType: 'ETH' | 'ERC721' | 'ERC20';
+  RecipientAddr: string;
+  AmountEth: number; // ETH allocation, or ERC-20 amount /1e18; 0 for ERC721
+  TokenAddr: string; // contract address for ERC721 / ERC20; '' for ETH
+  TokenId: number; // token id for ERC721; -1 otherwise
+}
+
+/**
+ * Per-cycle summary of claimable assets awarded via PrizesWallet (secondary ETH
+ * allocations, attached NFTs, attached ERC-20s) and their claim status. Directly-
+ * paid assets (main ETH, minted CST/NFT) are excluded — they aren't claimed.
+ */
+export interface RoundClaimSummary {
+  RoundNum: number;
+  ClaimWindowTimeout: number; // unix ts after which unclaimed assets can be swept by anyone
+  AwardedTs: number; // unix ts when the cycle finalized
+  Expired: boolean;
+  EthAwarded: number;
+  EthUnclaimed: number;
+  EthUnclaimedEth: number;
+  NftAwarded: number;
+  NftUnclaimed: number;
+  Erc20Awarded: number;
+  Erc20Unclaimed: number;
+  TotalAwarded: number;
+  TotalUnclaimed: number;
+  AvgClaimPeriodSecs: number;
+  UnclaimedItems: ClaimUnclaimedItem[];
+  [key: string]: unknown;
+}
+
+/** A single claim transaction — a recipient withdrawing a claimable asset from PrizesWallet. */
+export interface ClaimTxn {
+  AssetType: 'ETH' | 'ERC721' | 'ERC20';
+  RecipientAddr: string;
+  BeneficiaryAddr: string; // who actually claimed (ETH: can differ from recipient after expiry)
+  AmountEth: number;
+  TokenAddr: string;
+  TokenId: number;
+  ClaimedAfterSecs: number; // time from cycle finalize to this claim
+  ClaimTs: number; // unix ts of the claim
+  TxHash: string;
+}
+
+/** A token attached (contributed) during a cycle, held for the recipient to claim. */
+export interface AttachedToken {
+  AssetType: 'ERC721' | 'ERC20';
+  ContributorAddr: string;
+  TokenAddr: string;
+  TokenId: number;
+  AmountEth: number;
+  Ts: number;
+  TxHash: string;
+}
+
+/** Per-cycle claim drill-down: claim transactions (with latency) + tokens attached that cycle. */
+export interface RoundClaimDetail {
+  RoundNum: number;
+  ClaimTransactions: ClaimTxn[];
+  AttachedTokens: AttachedToken[];
 }
 
 export interface UniqueAnchorHolderCST {

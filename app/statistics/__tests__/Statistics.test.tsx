@@ -134,6 +134,9 @@ jest.mock('../../../components/statistics/EnduranceTimelineChart', () => ({
 jest.mock('../../../components/statistics/RoiLeaderboardSection', () => ({
   RoiLeaderboardSection: () => <div data-testid="roi-leaderboard-section" />,
 }));
+jest.mock('../../../components/statistics/ClaimsByRoundSection', () => ({
+  ClaimsByRoundSection: () => <div data-testid="claims-by-round-section" />,
+}));
 jest.mock('../../../components/statistics/StatisticsItem', () => ({
   StatisticsItem: ({
     title,

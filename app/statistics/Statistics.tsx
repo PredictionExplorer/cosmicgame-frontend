@@ -68,6 +68,7 @@ import { DonatedNFTsGrid } from '@/components/statistics/DonatedNFTsGrid';
 import { DonatedTokensSection } from '@/components/home/DonatedTokensSection';
 import { BiddingActivitySection } from '@/components/statistics/BiddingActivitySection';
 import { RoiLeaderboardSection } from '@/components/statistics/RoiLeaderboardSection';
+import { ClaimsByRoundSection } from '@/components/statistics/ClaimsByRoundSection';
 import {
   AnchoringHeroStats,
   type AnchoringStatItem,
@@ -346,6 +347,11 @@ const Statistics = () => {
                 value={formatEthValue(data.MainStats.TotalRaffleEthWithdrawn)}
                 tooltip={statisticsCopy.metrics.stellarSelectionEthRetrieved.tooltip}
               />
+              <StatisticsItem
+                title={statisticsCopy.metrics.ethInGesturesCurrentCycle.label}
+                value={formatEthValue(data.CurRoundStats?.TotalEthInBidsEth ?? 0)}
+                tooltip={statisticsCopy.metrics.ethInGesturesCurrentCycle.tooltip}
+              />
               {(data.MainStats.NumWinnersWithPendingRaffleWithdrawal ?? 0) > 0 && (
                 <p className="text-sm text-primary mt-2">{`${data.MainStats.NumWinnersWithPendingRaffleWithdrawal} recipients have yet to retrieve funds totaling ${formatEthValue(data.MainStats.TotalRaffleEthDeposits - data.MainStats.TotalRaffleEthWithdrawn)} ETH`}</p>
               )}
@@ -376,6 +382,11 @@ const Statistics = () => {
                 title={statisticsCopy.metrics.totalCstConsumed.label}
                 value={formatCSTValue(data.MainStats.TotalCSTConsumedEth)}
                 tooltip={statisticsCopy.metrics.totalCstConsumed.tooltip}
+              />
+              <StatisticsItem
+                title={statisticsCopy.metrics.cstConsumedCurrentCycle.label}
+                value={formatCSTValue(data.CurRoundStats?.TotalCstInBidsEth ?? 0)}
+                tooltip={statisticsCopy.metrics.cstConsumedCurrentCycle.tooltip}
               />
               <StatisticsItem
                 title={statisticsCopy.metrics.cstGestures.label}
@@ -714,6 +725,12 @@ const Statistics = () => {
         <div>
           <SectionDivider title="Participant Performance" className="mb-6" />
           <RoiLeaderboardSection />
+        </div>
+
+        {/* 9 ── Allocation Claims by Cycle ────────────────────────── */}
+        <div>
+          <SectionDivider title="Allocation Claims by Cycle" className="mb-6" />
+          <ClaimsByRoundSection />
         </div>
       </section>
     </>

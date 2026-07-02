@@ -1,0 +1,489 @@
+'use client';
+
+import { useState } from 'react';
+import { Tr } from 'react-super-responsive-table';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
+
+import {
+  formatSeconds,
+  formatEthValue,
+  getExplorerUrl,
+  shortenHex,
+  convertTimestampToDateTime,
+} from '@/utils';
+
+import {
+  TablePrimary,
+  TablePrimaryCell,
+  TablePrimaryContainer,
+  TablePrimaryHead,
+  TablePrimaryHeadCell,
+  TablePrimaryRow,
+} from '@/components/styled';
+import { AddressLink } from '@/components/common/AddressLink';
+import { CustomPagination } from '@/components/common/CustomPagination';
+import { Spinner } from '@/components/ui/spinner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { useClaimsByRound, useClaimDetailByRound } from '@/hooks/useApiQuery';
+import type {
+  ClaimUnclaimedItem,
+  RoundClaimSummary,
+  ClaimTxn,
+  AttachedToken,
+} from '@/services/api/types';
+
+const PER_PAGE = 10;
+
+const ASSET_LABEL: Record<ClaimUnclaimedItem['AssetType'], string> = {
+  ETH: 'ETH',
+  ERC721: 'Attached NFT',
+  ERC20: 'Attached ERC-20',
+};
+
+const shortAddr = (a: string) => (a && a.length > 12 ? `${a.slice(0, 6)}…${a.slice(-4)}` : a);
+
+/** Small labelled count badge; renders nothing when the count is zero. */
+const CountBadge = ({ n, label }: { n: number; label: string }) => {
+  if (n <= 0) return null;
+  return (
+    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+      {n} {label}
+    </span>
+  );
+};
+
+const ItemDetail = ({ item }: { item: ClaimUnclaimedItem }) => {
+  if (item.AssetType === 'ETH') {
+    return <span>{formatEthValue(item.AmountEth)}</span>;
+  }
+  if (item.AssetType === 'ERC721') {
+    return (
+      <span className="text-muted-foreground">
+        <span className="font-mono">{shortAddr(item.TokenAddr)}</span> #{item.TokenId}
+      </span>
+    );
+  }
+  return (
+    <span className="text-muted-foreground">
+      {item.AmountEth.toLocaleString()} ·{' '}
+      <span className="font-mono">{shortAddr(item.TokenAddr)}</span>
+    </span>
+  );
+};
+
+const UnclaimedDialog = ({
+  cycle,
+  nowSec,
+  onClose,
+}: {
+  cycle: RoundClaimSummary | null;
+  nowSec: number;
+  onClose: () => void;
+}) => (
+  <Dialog open={!!cycle} onOpenChange={(open) => !open && onClose()}>
+    <DialogContent className="max-w-xl">
+      {cycle && (
+        <>
+          <DialogHeader>
+            <DialogTitle>Unclaimed assets — Cycle {cycle.RoundNum}</DialogTitle>
+            <DialogDescription>
+              {cycle.Expired
+                ? 'The claim window has closed — these assets can now be swept by anyone.'
+                : `Claim window closes in ${formatSeconds(
+                    Math.max(0, cycle.ClaimWindowTimeout - nowSec),
+                  )}.`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-auto">
+            <TablePrimaryContainer>
+              <TablePrimary>
+                <TablePrimaryHead>
+                  <Tr>
+                    <TablePrimaryHeadCell align="left">Asset</TablePrimaryHeadCell>
+                    <TablePrimaryHeadCell align="left">Recipient</TablePrimaryHeadCell>
+                    <TablePrimaryHeadCell align="right">Detail</TablePrimaryHeadCell>
+                  </Tr>
+                </TablePrimaryHead>
+                <tbody>
+                  {cycle.UnclaimedItems.map((item, idx) => (
+                    <TablePrimaryRow key={idx}>
+                      <TablePrimaryCell>{ASSET_LABEL[item.AssetType]}</TablePrimaryCell>
+                      <TablePrimaryCell>
+                        {item.RecipientAddr ? (
+                          <AddressLink
+                            address={item.RecipientAddr}
+                            url={`/user/${item.RecipientAddr}`}
+                          />
+                        ) : (
+                          '—'
+                        )}
+                      </TablePrimaryCell>
+                      <TablePrimaryCell align="right">
+                        <ItemDetail item={item} />
+                      </TablePrimaryCell>
+                    </TablePrimaryRow>
+                  ))}
+                </tbody>
+              </TablePrimary>
+            </TablePrimaryContainer>
+          </div>
+        </>
+      )}
+    </DialogContent>
+  </Dialog>
+);
+
+const TxLink = ({ hash }: { hash: string }) =>
+  hash ? (
+    <a
+      href={getExplorerUrl('tx', hash)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-mono text-primary hover:underline"
+    >
+      {shortenHex(hash)}
+    </a>
+  ) : (
+    <span className="text-muted-foreground">—</span>
+  );
+
+const TxnAssetDetail = ({ txn }: { txn: ClaimTxn }) => {
+  if (txn.AssetType === 'ETH') return <span>{formatEthValue(txn.AmountEth)}</span>;
+  if (txn.AssetType === 'ERC721')
+    return (
+      <span>
+        Attached NFT{' '}
+        <a
+          href={getExplorerUrl('address', txn.TokenAddr)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-primary hover:underline"
+        >
+          {shortAddr(txn.TokenAddr)}
+        </a>{' '}
+        #{txn.TokenId}
+      </span>
+    );
+  return (
+    <span>
+      {txn.AmountEth.toLocaleString()}{' '}
+      <a
+        href={getExplorerUrl('address', txn.TokenAddr)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-mono text-primary hover:underline"
+      >
+        {shortAddr(txn.TokenAddr)}
+      </a>
+    </span>
+  );
+};
+
+/** Explore dialog: the claim transactions (with latency) + tokens attached this cycle. */
+const ClaimDetailDialog = ({ round, onClose }: { round: number | null; onClose: () => void }) => {
+  const { data, isLoading } = useClaimDetailByRound(round);
+  const claims: ClaimTxn[] = data?.ClaimTransactions ?? [];
+  const attached: AttachedToken[] = data?.AttachedTokens ?? [];
+
+  return (
+    <Dialog open={round != null} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-[883px]">
+        <DialogHeader>
+          <DialogTitle>Explore Cycle {round}</DialogTitle>
+          <DialogDescription>
+            Claim transactions with how long each recipient took, and the tokens attached this
+            cycle.
+          </DialogDescription>
+        </DialogHeader>
+
+        {isLoading ? (
+          <div className="flex justify-center py-10">
+            <Spinner />
+          </div>
+        ) : (
+          <div className="max-h-[65vh] space-y-6 overflow-auto">
+            <div>
+              <h4 className="mb-2 text-sm font-semibold text-white">Claim transactions</h4>
+              {claims.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No claims recorded for this cycle.</p>
+              ) : (
+                <TablePrimaryContainer>
+                  <TablePrimary>
+                    <TablePrimaryHead>
+                      <Tr>
+                        <TablePrimaryHeadCell align="left">Asset</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">Recipient</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="right">Claimed After</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">When</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="right">Transaction</TablePrimaryHeadCell>
+                      </Tr>
+                    </TablePrimaryHead>
+                    <tbody>
+                      {claims.map((txn, idx) => (
+                        <TablePrimaryRow key={idx}>
+                          <TablePrimaryCell>
+                            <TxnAssetDetail txn={txn} />
+                          </TablePrimaryCell>
+                          <TablePrimaryCell>
+                            <AddressLink
+                              address={txn.RecipientAddr}
+                              url={`/user/${txn.RecipientAddr}`}
+                            />
+                            {txn.BeneficiaryAddr &&
+                              txn.BeneficiaryAddr.toLowerCase() !==
+                                txn.RecipientAddr.toLowerCase() && (
+                                <span className="block text-xs text-red-400">
+                                  swept by {shortAddr(txn.BeneficiaryAddr)}
+                                </span>
+                              )}
+                          </TablePrimaryCell>
+                          <TablePrimaryCell align="right">
+                            {formatSeconds(Math.max(0, txn.ClaimedAfterSecs))}
+                          </TablePrimaryCell>
+                          <TablePrimaryCell>
+                            {convertTimestampToDateTime(txn.ClaimTs)}
+                          </TablePrimaryCell>
+                          <TablePrimaryCell align="right">
+                            <TxLink hash={txn.TxHash} />
+                          </TablePrimaryCell>
+                        </TablePrimaryRow>
+                      ))}
+                    </tbody>
+                  </TablePrimary>
+                </TablePrimaryContainer>
+              )}
+            </div>
+
+            <div>
+              <h4 className="mb-2 text-sm font-semibold text-white">Attached tokens</h4>
+              {attached.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No tokens attached this cycle.</p>
+              ) : (
+                <TablePrimaryContainer>
+                  <TablePrimary>
+                    <TablePrimaryHead>
+                      <Tr>
+                        <TablePrimaryHeadCell align="left">Asset</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">Token</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="right">Detail</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="left">Attached By</TablePrimaryHeadCell>
+                        <TablePrimaryHeadCell align="right">Transaction</TablePrimaryHeadCell>
+                      </Tr>
+                    </TablePrimaryHead>
+                    <tbody>
+                      {attached.map((tok, idx) => (
+                        <TablePrimaryRow key={idx}>
+                          <TablePrimaryCell>
+                            {tok.AssetType === 'ERC721' ? 'Attached NFT' : 'Attached ERC-20'}
+                          </TablePrimaryCell>
+                          <TablePrimaryCell>
+                            <a
+                              href={getExplorerUrl('address', tok.TokenAddr)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-mono text-primary hover:underline"
+                            >
+                              {shortAddr(tok.TokenAddr)}
+                            </a>
+                          </TablePrimaryCell>
+                          <TablePrimaryCell align="right">
+                            {tok.AssetType === 'ERC721'
+                              ? `#${tok.TokenId}`
+                              : tok.AmountEth.toLocaleString()}
+                          </TablePrimaryCell>
+                          <TablePrimaryCell>
+                            <AddressLink
+                              address={tok.ContributorAddr}
+                              url={`/user/${tok.ContributorAddr}`}
+                            />
+                          </TablePrimaryCell>
+                          <TablePrimaryCell align="right">
+                            <TxLink hash={tok.TxHash} />
+                          </TablePrimaryCell>
+                        </TablePrimaryRow>
+                      ))}
+                    </tbody>
+                  </TablePrimary>
+                </TablePrimaryContainer>
+              )}
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+/** One asset type's claimed percentage; "—" when nothing of that type was awarded. */
+const PctRow = ({
+  label,
+  awarded,
+  unclaimed,
+}: {
+  label: string;
+  awarded: number;
+  unclaimed: number;
+}) => {
+  if (awarded <= 0) {
+    return (
+      <span className="text-muted-foreground">
+        {label} <span className="tabular-nums">—</span>
+      </span>
+    );
+  }
+  const pct = Math.round(((awarded - unclaimed) / awarded) * 100);
+  const tone = pct >= 100 ? 'text-emerald-400' : pct <= 0 ? 'text-red-400' : 'text-white';
+  return (
+    <span>
+      <span className="text-muted-foreground">{label}</span>{' '}
+      <span className={`tabular-nums font-medium ${tone}`}>{pct}%</span>
+    </span>
+  );
+};
+
+const ClaimedPctCell = ({ cycle }: { cycle: RoundClaimSummary }) => (
+  <span className="inline-flex flex-col items-end gap-0.5 text-xs leading-tight">
+    <PctRow label="ETH" awarded={cycle.EthAwarded} unclaimed={cycle.EthUnclaimed} />
+    <PctRow label="NFT" awarded={cycle.NftAwarded} unclaimed={cycle.NftUnclaimed} />
+    <PctRow label="ERC-20" awarded={cycle.Erc20Awarded} unclaimed={cycle.Erc20Unclaimed} />
+  </span>
+);
+
+const Row = ({
+  cycle,
+  onOpen,
+  onExplore,
+}: {
+  cycle?: RoundClaimSummary;
+  onOpen: (c: RoundClaimSummary) => void;
+  onExplore: (round: number) => void;
+}) => {
+  if (!cycle) return <TablePrimaryRow />;
+
+  const hasUnclaimed = cycle.TotalUnclaimed > 0;
+
+  return (
+    <TablePrimaryRow>
+      <TablePrimaryCell align="center">{cycle.RoundNum}</TablePrimaryCell>
+      <TablePrimaryCell>
+        <span className="inline-flex flex-wrap items-center gap-1.5">
+          <CountBadge n={cycle.EthAwarded} label="ETH" />
+          <CountBadge n={cycle.NftAwarded} label="NFT" />
+          <CountBadge n={cycle.Erc20Awarded} label="ERC-20" />
+        </span>
+      </TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {hasUnclaimed ? (
+          <button
+            type="button"
+            onClick={() => onOpen(cycle)}
+            className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors hover:border-primary/60 hover:bg-primary/15"
+            title="View unclaimed assets"
+          >
+            {cycle.TotalUnclaimed} unclaimed
+            {cycle.EthUnclaimedEth > 0 && (
+              <span className="text-muted-foreground">
+                · {formatEthValue(cycle.EthUnclaimedEth)}
+              </span>
+            )}
+          </button>
+        ) : (
+          <span className="text-muted-foreground">All claimed</span>
+        )}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        <ClaimedPctCell cycle={cycle} />
+      </TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        {cycle.AvgClaimPeriodSecs > 0 ? (
+          formatSeconds(cycle.AvgClaimPeriodSecs)
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        )}
+      </TablePrimaryCell>
+      <TablePrimaryCell align="right">
+        <button
+          type="button"
+          onClick={() => onExplore(cycle.RoundNum)}
+          className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white transition-colors hover:border-white/30 hover:bg-white/[0.08]"
+        >
+          Explore
+        </button>
+      </TablePrimaryCell>
+    </TablePrimaryRow>
+  );
+};
+
+export const ClaimsByRoundSection = () => {
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<RoundClaimSummary | null>(null);
+  const [exploreRound, setExploreRound] = useState<number | null>(null);
+
+  const { data, isLoading } = useClaimsByRound();
+  const list = data ?? [];
+  // Snapshot "now" once on mount — keeps render pure (no Date.now() during render).
+  const [nowSec] = useState(() => Math.floor(Date.now() / 1000));
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm leading-6 text-muted-foreground">
+        Claimable assets awarded each cycle — secondary ETH allocations, attached NFTs, and attached
+        ERC-20s that recipients withdraw themselves. Directly-paid assets (main ETH, imprinted CST
+        and NFTs) are excluded, since they aren&apos;t claimed. Recipients normally claim right
+        away; anything left past the claim window can be swept by anyone.
+      </p>
+
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <Spinner />
+        </div>
+      ) : list.length === 0 ? (
+        <p className="py-8 text-center text-muted-foreground">No claimable assets awarded yet.</p>
+      ) : (
+        <>
+          <TablePrimaryContainer>
+            <TablePrimary>
+              <TablePrimaryHead>
+                <Tr>
+                  <TablePrimaryHeadCell align="center">Cycle</TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="left">Awarded (claimable)</TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">Unclaimed</TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">Claimed %</TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">Avg Claim Time</TablePrimaryHeadCell>
+                  <TablePrimaryHeadCell align="right">Details</TablePrimaryHeadCell>
+                </Tr>
+              </TablePrimaryHead>
+              <tbody>
+                {list.slice((page - 1) * PER_PAGE, page * PER_PAGE).map((cycle) => (
+                  <Row
+                    key={cycle.RoundNum}
+                    cycle={cycle}
+                    onOpen={setSelected}
+                    onExplore={setExploreRound}
+                  />
+                ))}
+              </tbody>
+            </TablePrimary>
+          </TablePrimaryContainer>
+          <CustomPagination
+            page={page}
+            setPage={setPage}
+            totalLength={list.length}
+            perPage={PER_PAGE}
+          />
+        </>
+      )}
+
+      <UnclaimedDialog cycle={selected} nowSec={nowSec} onClose={() => setSelected(null)} />
+      <ClaimDetailDialog round={exploreRound} onClose={() => setExploreRound(null)} />
+    </div>
+  );
+};
+
+export default ClaimsByRoundSection;

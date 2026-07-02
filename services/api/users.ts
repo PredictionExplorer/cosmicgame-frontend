@@ -9,6 +9,8 @@ import type {
   Recipient,
   RoiLeaderboardEntry,
   RoiLeaderboardSort,
+  RoundClaimSummary,
+  RoundClaimDetail,
   UniqueEthDonor,
   UniqueAnchorHolderCST,
   UniqueAnchorHolderRWLK,
@@ -91,6 +93,35 @@ export function get_roi_leaderboard(
     });
     return (data.RoiLeaderboard ?? []) as RoiLeaderboardEntry[];
   }, []);
+}
+
+/**
+ * Fetches the per-cycle claimable-asset summary (awarded vs unclaimed secondary
+ * ETH allocations, attached NFTs, and attached ERC-20s held in PrizesWallet), with
+ * claim-window expiry, average claim time, and the unclaimed items for drill-down.
+ * Returns `[]` when the endpoint isn't deployed yet.
+ */
+export function get_claims_by_round(): Promise<RoundClaimSummary[]> {
+  return apiCall(async () => {
+    const { data } = await axios.get(getAPIUrl('statistics/claims/by_round'));
+    return (data.ClaimsByRound ?? []) as RoundClaimSummary[];
+  }, []);
+}
+
+/**
+ * Fetches the per-cycle claim drill-down: the claim transactions (each recipient's
+ * withdrawal, with the time it took after the cycle finalized and the tx hash) and
+ * the tokens attached during that cycle. Returns `null` when unavailable.
+ */
+export function get_claim_detail_by_round(round: number): Promise<RoundClaimDetail | null> {
+  return apiCall(async () => {
+    const { data } = await axios.get(getAPIUrl(`statistics/claims/detail/${round}`));
+    return {
+      RoundNum: data.RoundNum ?? round,
+      ClaimTransactions: data.ClaimTransactions ?? [],
+      AttachedTokens: data.AttachedTokens ?? [],
+    } as RoundClaimDetail;
+  }, null);
 }
 
 /** Fetches the list of unique ETH donor addresses with donation totals. */
